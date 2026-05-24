@@ -15,6 +15,23 @@ type ScanUploadTicketResponse =
   | { result: { status: 'ready'; ticket: ScanUploadTicket } }
   | { result: { status: 'failed_no_storage'; reason: string } };
 
+type ReceiptPurchaseHistoryItem = {
+  productId: string;
+  name: string;
+  quantity?: number;
+  totalAmount?: number;
+};
+
+type ScanProcessResponse = {
+  result?: {
+    status: string;
+    kind: 'receipt' | 'barcode';
+    totalAmount?: number;
+    confidence?: number;
+  };
+  purchaseHistory?: ReceiptPurchaseHistoryItem[];
+};
+
 function readSession(): BrowserSession {
   const accessToken = sessionStorage.getItem('groceryview:accessToken') || '';
   const userId = sessionStorage.getItem('groceryview:userId') || '';
@@ -32,6 +49,7 @@ export function ScannerUploadActions() {
   const [status, setStatus] = useState<ScannerStatus>('idle');
   const [message, setMessage] = useState('No anonymous scan uploads. Sign in first to request private upload tickets or process barcode scans.');
   const [cameraReady, setCameraReady] = useState(false);
+  const [receiptHistory, setReceiptHistory] = useState<ReceiptPurchaseHistoryItem[]>([]);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
@@ -138,7 +156,15 @@ export function ScannerUploadActions() {
       headers: { 'content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
       body: JSON.stringify({ scanId, kind: 'receipt', payload: ticket.payloadUri, uploadedAt: new Date().toISOString() })
     });
-    await handleResponse(processResponse, `Receipt image submitted for ${scanId}; review work items are returned when OCR needs human review.`);
+    if (!processResponse.ok) {
+      setStatus('error');
+      setMessage('Scanner request was rejected by the production API.');
+      return;
+    }
+    const processBody = (await processResponse.json()) as ScanProcessResponse;
+    setReceiptHistory(processBody.purchaseHistory ?? []);
+    setStatus('ready');
+    setMessage(`Receipt image submitted for ${scanId}; OCR parsed the receipt and matched canonical products for purchase history.`);
   }
 
   async function startReceiptCamera() {
@@ -252,6 +278,20 @@ export function ScannerUploadActions() {
         </form>
       </div>
       <p aria-live="polite" className="mt-4 rounded-2xl bg-indigo-50 p-3 text-sm font-bold text-indigo-950" data-status={status}>{message}</p>
+      {receiptHistory.length > 0 ? (
+        <section className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4" aria-label="Receipt purchase history">
+          <h3 className="text-sm font-black uppercase tracking-[0.18em] text-emerald-800">Receipt purchase history</h3>
+          <p className="mt-2 text-sm font-semibold text-emerald-950">OCR rows matched to canonical products and are ready for purchase history review.</p>
+          <ul className="mt-3 space-y-2">
+            {receiptHistory.map((item) => (
+              <li className="rounded-xl bg-white/80 p-3 text-sm font-bold text-slate-950" key={item.productId}>
+                {item.name} <span className="text-slate-600">({item.productId})</span>
+                {item.totalAmount === undefined ? null : <span className="ml-2 text-emerald-800">{item.totalAmount} kr</span>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
     </section>
   );
 }
