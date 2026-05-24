@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { OcrScanHistoryTimeline } from '@/components/ocr-scan-history-timeline';
 import { ScannerUploadActions } from '@/components/scanner-upload-actions';
 import { routeMetadata } from '@/lib/seo';
 import { receiptFedAliasGrowthPlan } from '@/lib/verified-data';
@@ -96,6 +97,7 @@ export default function ScannerPage() {
           {premiumOcrScanHistory.guardrails.map((guardrail) => <li key={guardrail}>• {guardrail}</li>)}
         </ul>
       </Card>
+      <OcrScanHistoryTimeline />
       <ScannerUploadActions />
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
         <TopSpreads limit={5} />

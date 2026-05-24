@@ -199,6 +199,8 @@ describe('verified-data UI', () => {
   it('surfaces premium OCR scan history on scanner and pricing routes', async () => {
     const scanner = await read('src/app/scanner/page.tsx');
     const pricing = await read('src/app/pricing/page.tsx');
+    const historyTimeline = await read('src/components/ocr-scan-history-timeline.tsx');
+    const historyClient = await read('src/lib/scanner-history.ts');
     const seo = await read('src/lib/seo.ts');
     const sitemap = await read('src/app/sitemap.ts');
 
@@ -206,6 +208,17 @@ describe('verified-data UI', () => {
     assert.match(scanner, /OCR scan history and advanced corrections/);
     assert.match(scanner, /active premium entitlement/);
     assert.match(scanner, /href="\/pricing"/);
+    assert.match(scanner, /OcrScanHistoryTimeline/);
+    assert.match(historyTimeline, /corrections_pending/);
+    assert.match(historyTimeline, /corrected/);
+    assert.match(historyTimeline, /export_ready/);
+    assert.match(historyTimeline, /getScanHistoryEndpoint/);
+    assert.match(historyClient, /premiumOcrHistoryTimeline/);
+    assert.match(historyClient, /Premium OCR scan history timeline/);
+    assert.match(historyClient, /no receipt images, raw OCR text, item prices, or correction history/i);
+    assert.match(historyClient, /apiPathTemplate/);
+    assert.match(historyClient, /encodeURIComponent/);
+    assert.match(historyClient, /Retailer hidden until sign-in/);
     assert.match(pricing, /Premium OCR history/);
     assert.match(pricing, /Private OCR scan history timeline/);
     assert.match(pricing, /Advanced line-item correction tools/);
