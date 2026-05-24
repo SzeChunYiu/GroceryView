@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import maplibregl from 'maplibre-gl';
+import dynamic from 'next/dynamic';
+import type { GeoJSONSource, Map as MapLibreMap } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { osmStores, type OsmStore } from '@/lib/osm-stores';
 import { cheapestMapChain, mapChainIndexScores } from '@/lib/map-chain-index';
@@ -138,9 +139,9 @@ function districtHeatCollection(): GeoJSON.FeatureCollection<GeoJSON.Point> {
   };
 }
 
-export function StoreMap() {
+function StoreMapClient() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<maplibregl.Map | null>(null);
+  const mapRef = useRef<MapLibreMap | null>(null);
   const [storeCount, setStoreCount] = useState(0);
   const [selectedStoreSlug, setSelectedStoreSlug] = useState(syncedMapListStores[0]?.slug ?? '');
 
@@ -156,127 +157,134 @@ export function StoreMap() {
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const data = toFeatureCollection();
-    setStoreCount(data.features.length);
+    let disposed = false;
+    let mapInstance: MapLibreMap | null = null;
 
-    const map = new maplibregl.Map({
-      container: containerRef.current,
-      style: MAP_STYLE,
-      center: STOCKHOLM,
-      zoom: 9.5,
-      attributionControl: false,
-    });
-    mapRef.current = map;
+    void import('maplibre-gl').then(({ default: maplibregl }) => {
+      if (disposed || !containerRef.current) return;
 
-    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
-    map.addControl(
-      new maplibregl.GeolocateControl({ trackUserLocation: true, showUserLocation: true }),
-      'top-right',
-    );
-    map.addControl(
-      new maplibregl.AttributionControl({
-        compact: true,
-        customAttribution:
-          '© OpenStreetMap contributors · Tiles © OpenFreeMap',
-      }),
-      'bottom-right',
-    );
+      const data = toFeatureCollection();
+      setStoreCount(data.features.length);
 
-    const popup = new maplibregl.Popup({ closeButton: true, closeOnClick: true, maxWidth: '280px' });
-
-    map.on('load', () => {
-      map.addSource('district-heat', {
-        type: 'geojson',
-        data: districtHeatCollection(),
+      const map = new maplibregl.Map({
+        container: containerRef.current,
+        style: MAP_STYLE,
+        center: STOCKHOLM,
+        zoom: 9.5,
+        attributionControl: false,
       });
-      map.addLayer({
-        id: 'district-heat',
-        type: 'circle',
-        source: 'district-heat',
-        paint: {
-          'circle-color': ['get', 'heatColor'],
-          'circle-opacity': 0.16,
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 24, 12, 72, 15, 130],
-          'circle-blur': 0.7,
-        },
-      });
+      mapInstance = map;
+      mapRef.current = map;
 
-      map.addSource('stores', {
-        type: 'geojson',
-        data,
-        cluster: true,
-        clusterRadius: 48,
-        clusterMaxZoom: 13,
-      });
+      map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
+      map.addControl(
+        new maplibregl.GeolocateControl({ trackUserLocation: true, showUserLocation: true }),
+        'top-right',
+      );
+      map.addControl(
+        new maplibregl.AttributionControl({
+          compact: true,
+          customAttribution:
+            '© OpenStreetMap contributors · Tiles © OpenFreeMap',
+        }),
+        'bottom-right',
+      );
 
-      // Cluster bubbles.
-      map.addLayer({
-        id: 'clusters',
-        type: 'circle',
-        source: 'stores',
-        filter: ['has', 'point_count'],
-        paint: {
-          'circle-color': '#101617',
-          'circle-opacity': 0.9,
-          'circle-radius': ['step', ['get', 'point_count'], 16, 25, 22, 100, 30],
-          'circle-stroke-width': 2,
-          'circle-stroke-color': '#ffffff',
-        },
-      });
-      map.addLayer({
-        id: 'cluster-count',
-        type: 'symbol',
-        source: 'stores',
-        filter: ['has', 'point_count'],
-        layout: {
-          'text-field': ['get', 'point_count_abbreviated'],
-          'text-font': ['Noto Sans Bold', 'Open Sans Bold'],
-          'text-size': 13,
-        },
-        paint: { 'text-color': '#ffffff' },
-      });
+      const popup = new maplibregl.Popup({ closeButton: true, closeOnClick: true, maxWidth: '280px' });
 
-      // Individual stores, coloured by chain.
-      map.addLayer({
-        id: 'store-points',
-        type: 'circle',
-        source: 'stores',
-        filter: ['!', ['has', 'point_count']],
-        paint: {
-          'circle-color': ['get', 'color'],
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 9, 4, 13, 7, 16, 10],
-          'circle-stroke-width': 1.5,
-          'circle-stroke-color': '#ffffff',
-        },
-      });
-
-      // Zoom into a cluster on click.
-      map.on('click', 'clusters', (e) => {
-        const feature = map.queryRenderedFeatures(e.point, { layers: ['clusters'] })[0];
-        if (!feature) return;
-        const clusterId = feature.properties?.cluster_id;
-        const source = map.getSource('stores') as maplibregl.GeoJSONSource;
-        source.getClusterExpansionZoom(clusterId).then((zoom) => {
-          const [lng, lat] = (feature.geometry as GeoJSON.Point).coordinates;
-          map.easeTo({ center: [lng, lat], zoom });
+      map.on('load', () => {
+        map.addSource('district-heat', {
+          type: 'geojson',
+          data: districtHeatCollection(),
         });
-      });
+        map.addLayer({
+          id: 'district-heat',
+          type: 'circle',
+          source: 'district-heat',
+          paint: {
+            'circle-color': ['get', 'heatColor'],
+            'circle-opacity': 0.16,
+            'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 24, 12, 72, 15, 130],
+            'circle-blur': 0.7,
+          },
+        });
 
-      // Store detail popup.
-      map.on('click', 'store-points', (e) => {
-        const f = e.features?.[0];
-        if (!f) return;
-        const p = f.properties as Record<string, string>;
-        setSelectedStoreSlug(String(p.slug ?? ''));
-        const [lng, lat] = (f.geometry as GeoJSON.Point).coordinates;
-        const directions = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
-        const where = [escapeHtml(p.address || ''), escapeHtml(p.district || '')]
-          .filter(Boolean)
-          .join(' · ');
-        popup
-          .setLngLat([lng, lat])
-          .setHTML(
-            `<div style="font-family:inherit;min-width:180px">
+        map.addSource('stores', {
+          type: 'geojson',
+          data,
+          cluster: true,
+          clusterRadius: 48,
+          clusterMaxZoom: 13,
+        });
+
+        // Cluster bubbles.
+        map.addLayer({
+          id: 'clusters',
+          type: 'circle',
+          source: 'stores',
+          filter: ['has', 'point_count'],
+          paint: {
+            'circle-color': '#101617',
+            'circle-opacity': 0.9,
+            'circle-radius': ['step', ['get', 'point_count'], 16, 25, 22, 100, 30],
+            'circle-stroke-width': 2,
+            'circle-stroke-color': '#ffffff',
+          },
+        });
+        map.addLayer({
+          id: 'cluster-count',
+          type: 'symbol',
+          source: 'stores',
+          filter: ['has', 'point_count'],
+          layout: {
+            'text-field': ['get', 'point_count_abbreviated'],
+            'text-font': ['Noto Sans Bold', 'Open Sans Bold'],
+            'text-size': 13,
+          },
+          paint: { 'text-color': '#ffffff' },
+        });
+
+        // Individual stores, coloured by chain.
+        map.addLayer({
+          id: 'store-points',
+          type: 'circle',
+          source: 'stores',
+          filter: ['!', ['has', 'point_count']],
+          paint: {
+            'circle-color': ['get', 'color'],
+            'circle-radius': ['interpolate', ['linear'], ['zoom'], 9, 4, 13, 7, 16, 10],
+            'circle-stroke-width': 1.5,
+            'circle-stroke-color': '#ffffff',
+          },
+        });
+
+        // Zoom into a cluster on click.
+        map.on('click', 'clusters', (e) => {
+          const feature = map.queryRenderedFeatures(e.point, { layers: ['clusters'] })[0];
+          if (!feature) return;
+          const clusterId = feature.properties?.cluster_id;
+          const source = map.getSource('stores') as GeoJSONSource;
+          source.getClusterExpansionZoom(clusterId).then((zoom) => {
+            const [lng, lat] = (feature.geometry as GeoJSON.Point).coordinates;
+            map.easeTo({ center: [lng, lat], zoom });
+          });
+        });
+
+        // Store detail popup.
+        map.on('click', 'store-points', (e) => {
+          const f = e.features?.[0];
+          if (!f) return;
+          const p = f.properties as Record<string, string>;
+          setSelectedStoreSlug(String(p.slug ?? ''));
+          const [lng, lat] = (f.geometry as GeoJSON.Point).coordinates;
+          const directions = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+          const where = [escapeHtml(p.address || ''), escapeHtml(p.district || '')]
+            .filter(Boolean)
+            .join(' · ');
+          popup
+            .setLngLat([lng, lat])
+            .setHTML(
+              `<div style="font-family:inherit;min-width:180px">
                <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
                  <span style="width:10px;height:10px;border-radius:50%;background:${escapeHtml(p.color)};display:inline-block"></span>
                  <strong style="font-size:14px">${escapeHtml(p.name)}</strong>
@@ -288,19 +296,21 @@ export function StoreMap() {
                   style="display:inline-block;margin-top:8px;font-size:12px;font-weight:600;color:#1D8649">
                   Directions →</a>
              </div>`,
-          )
-          .addTo(map);
-      });
+            )
+            .addTo(map);
+        });
 
-      for (const layer of ['clusters', 'store-points']) {
-        map.on('mouseenter', layer, () => (map.getCanvas().style.cursor = 'pointer'));
-        map.on('mouseleave', layer, () => (map.getCanvas().style.cursor = ''));
-      }
+        for (const layer of ['clusters', 'store-points']) {
+          map.on('mouseenter', layer, () => (map.getCanvas().style.cursor = 'pointer'));
+          map.on('mouseleave', layer, () => (map.getCanvas().style.cursor = ''));
+        }
+      });
     });
 
     return () => {
+      disposed = true;
       mapRef.current = null;
-      map.remove();
+      mapInstance?.remove();
     };
   }, []);
 
@@ -380,5 +390,7 @@ export function StoreMap() {
     </div>
   );
 }
+
+export const StoreMap = dynamic(() => Promise.resolve(StoreMapClient), { ssr: false });
 
 export type { OsmStore };
