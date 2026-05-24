@@ -9,6 +9,7 @@ import {
   summarizePriceHistoryConfidence,
   type BrandTier
 } from '@groceryview/core';
+import { Breadcrumbs } from '@/components/breadcrumbs';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
 import { axfoodProducts } from '@/lib/axfood-products';
@@ -976,6 +977,14 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
     <PageShell>
       <script dangerouslySetInnerHTML={{ __html: jsonLd(productJsonLd) }} type="application/ld+json" />
       <script dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbJsonLd) }} type="application/ld+json" />
+      <Breadcrumbs
+        className="mb-4"
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Products', href: '/products' },
+          { label: product.name }
+        ]}
+      />
       <Eyebrow>{isChain ? 'Axfood chain product' : 'OpenPrices product'}</Eyebrow>
       <h1 className="mt-2 max-w-4xl text-4xl font-black tracking-tight">{product.name}</h1>
       <p className="mt-3 text-lg text-slate-700">{isChain ? product.brand : product.brands || 'Brand not reported'} · {isChain ? product.subline : product.quantity || 'Quantity not reported'}</p>
