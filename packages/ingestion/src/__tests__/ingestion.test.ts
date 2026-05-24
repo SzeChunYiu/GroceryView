@@ -12,6 +12,7 @@ import {
   buildCoopStoresUrl,
   buildCityGrossProductsUrl,
   buildCityGrossStoresUrl,
+  circleKSePricingRows,
   buildDailyConnectorConfigsFromEnv,
   buildDailyIngestionPostgresPoolConfig,
   CITY_GROSS_BULK_MINIMUM_ROWS,
@@ -60,6 +61,7 @@ import {
   fetchOverpassGroceryStores,
   fetchRetailerConnectorSnapshot,
   fetchCityGrossBulkProducts,
+  fetchCircleKSePricingRows,
   fetchCityGrossProducts,
   fetchCityGrossProductsForAllStores,
   fetchCityGrossStores,
@@ -185,6 +187,7 @@ import {
   scbCoicopFoodCategoryCodes,
   scbPxWebQueryFixtures,
   validateScbPxWebQueryFixtures,
+  validateCircleKSePricingRows,
   validateStoreLocatorFixtures
 } from '../index.js';
 import type { QueryExecutor } from '@groceryview/db';
@@ -362,6 +365,36 @@ describe('store enumerator', () => {
     assert.deepEqual(rows.map((row) => row.storeId), ['willys:2149', 'hemkop:4660']);
     assert.equal(requestedUrls[0], buildAxfoodStoreSearchUrl('willys'));
     assert.equal(requestedUrls[1], buildAxfoodStoreSearchUrl('hemkop'));
+  });
+});
+
+describe('Circle K SE pricing study rows', () => {
+  it('codifies justified member, channel, format, and clearance fields', () => {
+    assert.equal(validateCircleKSePricingRows(), true);
+    assert.equal(fetchCircleKSePricingRows(), circleKSePricingRows);
+
+    const memberFuel = circleKSePricingRows.find((row) => row.id === 'circle-k-se-extra-new-member-fuel');
+    assert.equal(memberFuel?.is_member_price, true);
+    assert.equal(memberFuel?.priceDelta, -0.5);
+    assert.equal(memberFuel?.channel, 'store');
+    assert.equal(memberFuel?.format, 'fullservice_or_automat');
+
+    const appCharge = circleKSePricingRows.find((row) => row.id === 'circle-k-se-charge-app-300-400kw');
+    const oneOffCharge = circleKSePricingRows.find((row) => row.id === 'circle-k-se-charge-single-payment-300-400kw');
+    assert.equal(appCharge?.channel, 'app');
+    assert.equal(oneOffCharge?.channel, 'single_payment');
+
+    const truckRow = circleKSePricingRows.find((row) => row.id === 'circle-k-se-truck-miles-diesel-truck-weekly');
+    assert.equal(truckRow?.channel, 'truck_card');
+    assert.equal(truckRow?.format, 'truck_network');
+
+    const clearance = circleKSePricingRows.find((row) => row.id === 'circle-k-se-too-good-to-go-clearance');
+    assert.equal(clearance?.is_clearance, true);
+    assert.equal(clearance?.channel, 'partner_app');
+    assert.equal(clearance?.priceMultiplier, 1 / 3);
+
+    assert.equal(circleKSePricingRows.every((row) => row.is_coupon_price === false), true);
+    assert.equal(circleKSePricingRows.every((row) => row.multi_buy === null), true);
   });
 });
 
