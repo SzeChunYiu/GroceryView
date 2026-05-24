@@ -17,6 +17,33 @@ services:
       timeout: 5s
       retries: 5
 
+  pgbouncer:
+    image: edoburu/pgbouncer:latest
+    container_name: groceryview-pgbouncer
+    restart: unless-stopped
+    # Local API DATABASE_POOL_URL: postgres://groceryview:groceryview@localhost:6432/groceryview
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: groceryview
+      DB_USER: groceryview
+      DB_PASSWORD: groceryview
+      AUTH_TYPE: trust
+      POOL_MODE: transaction
+      MAX_CLIENT_CONN: ${PGBOUNCER_MAX_CLIENT_CONN:-500}
+      DEFAULT_POOL_SIZE: ${PGBOUNCER_DEFAULT_POOL_SIZE:-20}
+      RESERVE_POOL_SIZE: ${PGBOUNCER_RESERVE_POOL_SIZE:-5}
+    ports:
+      - "6432:5432"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -p 5432 -U groceryview -d groceryview"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   redis:
     image: redis:7-alpine
     container_name: groceryview-redis

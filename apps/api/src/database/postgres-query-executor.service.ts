@@ -1,4 +1,5 @@
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
+import { loadDatabaseConfig, toPgPoolOptions } from '../lib/db.js';
 
 export type QueryExecutor = {
   query<T>(sql: string, params?: unknown[]): Promise<T[]>;
@@ -13,7 +14,7 @@ type PgPoolLike = PgLikeClient & {
 };
 
 type PgModuleLike = {
-  Pool: new (config: { connectionString: string }) => PgPoolLike;
+  Pool: new (config: NonNullable<ReturnType<typeof toPgPoolOptions>>) => PgPoolLike;
 };
 
 async function importPgModule(): Promise<PgModuleLike> {
@@ -29,7 +30,7 @@ export class PostgresQueryExecutorService implements QueryExecutor, OnModuleDest
   private pool: PgPoolLike | null = null;
 
   isConfigured(): boolean {
-    return Boolean(process.env.DATABASE_URL);
+    return Boolean(loadDatabaseConfig().connectionString);
   }
 
   async query<T>(sql: string, params: unknown[] = []): Promise<T[]> {
@@ -44,13 +45,13 @@ export class PostgresQueryExecutorService implements QueryExecutor, OnModuleDest
 
   private async getExecutor(): Promise<QueryExecutor | null> {
     if (this.executor !== undefined) return this.executor;
-    const databaseUrl = process.env.DATABASE_URL;
-    if (!databaseUrl) {
+    const poolOptions = toPgPoolOptions(loadDatabaseConfig());
+    if (!poolOptions) {
       this.executor = null;
       return null;
     }
     const pgModule = await importPgModule();
-    this.pool = new pgModule.Pool({ connectionString: databaseUrl });
+    this.pool = new pgModule.Pool(poolOptions);
     this.executor = {
       query: async <T>(sql: string, params: unknown[] = []) => {
         const result = await this.pool!.query(sql, params);

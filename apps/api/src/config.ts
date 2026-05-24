@@ -1,4 +1,5 @@
 import { type RequestLoggingConfig } from './middleware/logger.js';
+import { loadDatabaseConfig, type ApiDatabaseConfig } from './lib/db.js';
 
 export type ApiCorsConfig = {
   allowedOrigins: string[];
@@ -18,6 +19,7 @@ export type ScrapeSchedulerConfig = {
 
 export type ApiConfig = {
   cors: ApiCorsConfig;
+  database: ApiDatabaseConfig;
   requestLogging: RequestLoggingConfig;
   scrapeScheduler: ScrapeSchedulerConfig;
 };
@@ -84,6 +86,7 @@ function loadScrapeSchedulerConfig(env: NodeJS.ProcessEnv): ScrapeSchedulerConfi
 export function loadApiConfig(env: NodeJS.ProcessEnv = process.env): ApiConfig {
   return {
     cors: loadCorsConfig(env),
+    database: loadDatabaseConfig(env),
     requestLogging: {
       enabled: parseBooleanFlag(env.REQUEST_LOGGING_ENABLED, true),
       serviceName: env.API_SERVICE_NAME?.trim() || 'groceryview-api'
