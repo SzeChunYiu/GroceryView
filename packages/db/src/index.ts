@@ -662,6 +662,7 @@ export type TrendingPriceChangeInput = {
 export type TrendingPriceChangeFilter = {
   since: string;
   until: string;
+  city?: string;
   limit?: number;
 };
 
@@ -4729,9 +4730,20 @@ export function createPostgresTrendingPriceChangeReader(executor: QueryExecutor)
   return {
     async listTrendingPriceChanges(filter) {
       const limit = Math.min(Math.max(filter.limit ?? 10, 1), 10);
+      const city = filter.city?.trim() || null;
       const rows = await executor.query<TrendingPriceChangeRow>(
         `/* trending_price_changes */
-         with observed as (
+         with latest_scope as (
+           select distinct latest_prices.product_id,
+                           latest_prices.chain_id,
+                           latest_prices.store_id,
+                           latest_prices.price_type
+           from latest_prices
+           left join stores latest_stores on latest_stores.id = latest_prices.store_id
+           where latest_prices.domain = 'grocery'
+             and ($3::text is null or latest_stores.city = $3)
+         ),
+         observed as (
            select observations.product_id,
                   products.slug as product_slug,
                   products.canonical_name as product_name,
@@ -4751,6 +4763,10 @@ export function createPostgresTrendingPriceChangeReader(executor: QueryExecutor)
                     order by observations.observed_at, observations.id
                   ) as previous_price
            from observations
+           join latest_scope on latest_scope.product_id = observations.product_id
+             and latest_scope.chain_id = observations.chain_id
+             and latest_scope.store_id is not distinct from observations.store_id
+             and latest_scope.price_type = observations.price_type
            join products on products.id = observations.product_id
            join chains on chains.id = observations.chain_id
            left join stores on stores.id = observations.store_id
@@ -4758,6 +4774,7 @@ export function createPostgresTrendingPriceChangeReader(executor: QueryExecutor)
              and observations.observed_at >= ($1::timestamptz - interval '31 days')
              and observations.observed_at < $2::timestamptz
              and observations.price >= 0
+             and ($3::text is null or stores.city = $3)
          ),
          changed as (
            select *
@@ -4833,8 +4850,8 @@ export function createPostgresTrendingPriceChangeReader(executor: QueryExecutor)
                   latest_price, previous_price, change_amount, change_percent, currency, latest_observed_at,
                   chain_slug, chain_name, store_slug, store_name
          order by rank, product_name
-         limit $3`,
-        [filter.since, filter.until, limit]
+         limit $4`,
+        [filter.since, filter.until, city, limit]
       );
       return rows.map(mapTrendingPriceChangeRow);
     }
