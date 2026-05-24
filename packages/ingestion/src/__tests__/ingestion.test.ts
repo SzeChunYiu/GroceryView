@@ -31,6 +31,8 @@ import {
   buildMatpriskollenStoreOffersUrl,
   buildMatpriskollenStoresUrl,
   buildMathemSearchUrl,
+  fetchBabylandSeProducts,
+  BABYLAND_SE_DIAPERS_URL,
   buildMatsparSearchUrl,
   buildOpenFoodFactsProductUrl,
   buildOpenFoodFactsSwedenSearchUrl,
@@ -2850,6 +2852,49 @@ describe('fetchIcaReklambladOffers', () => {
     assert.equal(requestedUrls[0], 'https://www.ica.se/erbjudanden/ica-focus-1004247/');
     assert.equal(rows.length, 1);
     assert.deepEqual(rows.map((row) => row.storeId), ['1735']);
+  });
+});
+
+
+describe('fetchBabylandSeProducts', () => {
+  it('parses Babyland specialty category JSON-LD product rows', async () => {
+    const html = `<script type="application/ld+json">${JSON.stringify({
+      '@type': 'ItemList',
+      itemListElement: [{
+        item: {
+          '@type': 'Product',
+          sku: 'babyland-1',
+          name: 'Pampers Blöjor 32 st',
+          brand: { name: 'Pampers' },
+          url: '/pampers-blojor-32-st',
+          image: 'https://www.babyland.se/pampers.jpg',
+          offers: { price: '129.00', priceCurrency: 'SEK', availability: 'https://schema.org/InStock' }
+        }
+      }]
+    })}</script>`;
+    const rows = await fetchBabylandSeProducts({
+      categoryUrls: [BABYLAND_SE_DIAPERS_URL],
+      fetchImpl: async () => new Response(html, { status: 200, headers: { 'content-type': 'text/html' } }),
+      retrievedAt: '2026-05-24T10:00:00.000Z'
+    });
+
+    assert.deepEqual(rows, [{
+      available: true,
+      brand: 'Pampers',
+      category: 'diapers',
+      code: 'babyland-1',
+      currency: 'SEK',
+      imageUrl: 'https://www.babyland.se/pampers.jpg',
+      name: 'Pampers Blöjor 32 st',
+      packageText: '32 st',
+      price: 129,
+      priceText: '129.00 SEK',
+      productUrl: 'https://www.babyland.se/pampers-blojor-32-st',
+      retrievedAt: '2026-05-24T10:00:00.000Z',
+      sourceUrl: BABYLAND_SE_DIAPERS_URL,
+      unitPrice: null,
+      unitPriceText: ''
+    }]);
   });
 });
 
