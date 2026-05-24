@@ -5,6 +5,10 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 import {
+  parseWillysPlusOffersSe,
+  willysPlusPromotionRouter
+} from '../connectors/willys-plus-offers-se.js';
+import {
   buildCoopCategoryProductsUrl,
   buildCoopCategoryTreeUrl,
   buildCoopSearchUrl,
@@ -7307,5 +7311,36 @@ describe('daily ingestion runner', () => {
     assert.equal(result.status, 'blocked');
     assert.deepEqual(result.blockers, ['ica:robots_txt_allow_required', 'ica:legal_review_approval_required']);
     assert.equal(executor.calls.length, 0);
+  });
+});
+
+describe('fetchWillysPlusOffersSe', () => {
+  it('routes direct Willys Plus fixture promotions through promotionRouter', () => {
+    const rows = parseWillysPlusOffersSe({
+      offers: [{
+        code: 'plus-2026-05-ost',
+        mainProductCode: '101284933_ST',
+        name: 'Willys hushållsost 1 kg',
+        brand: 'Willys',
+        price: 69,
+        cartLabel: 'Willys Plus 69 kr/st',
+        comparePrice: '69:00 kr/kg',
+        weightVolume: '1 kg',
+        startDate: '2026-05-20',
+        endDate: '2026-05-26'
+      }]
+    }, 'fixture://willys-plus', '2026-05-24T10:00:00.000Z');
+
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0]?.promotion.router, 'promotionRouter');
+    assert.deepEqual(rows[0]?.promotion, willysPlusPromotionRouter({
+      price: 69,
+      cartLabel: 'Willys Plus 69 kr/st',
+      comparePrice: '69:00 kr/kg',
+      startDate: '2026-05-20',
+      endDate: '2026-05-26'
+    }));
+    assert.equal(rows[0]?.promotion.memberOnly, true);
+    assert.equal(rows[0]?.price, 69);
   });
 });
