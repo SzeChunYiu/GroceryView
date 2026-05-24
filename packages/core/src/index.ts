@@ -5077,3 +5077,6 @@ export function calculateChainPriceIndex(observations: ChainPriceObservation[]):
 
   return { chains, categories, marketReferenceByCategory, generatedFrom: usable.length };
 }
+
+export { rankHouseholdSizePromotion } from './lib/rankers/householdSize.js';
+export type { HouseholdSizeRankerInput, HouseholdSizeRankerResult } from './lib/rankers/householdSize.js';
