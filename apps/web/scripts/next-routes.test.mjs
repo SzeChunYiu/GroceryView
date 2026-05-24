@@ -2390,6 +2390,19 @@ ${seo}`;
     assert.doesNotMatch(source, /@\/lib\/demo-data/);
     assert.doesNotMatch(source, /@\/components\/sample-data/);
   });
+  it('adds accessible volatility methodology popovers to product cards', async () => {
+    const cards = await read('src/components/product-price-cards.tsx');
+    const intelligence = await read('src/lib/price-intelligence.ts');
+
+    assert.match(cards, /volatilityBadgeMethodology/);
+    assert.match(cards, /<details/);
+    assert.match(cards, /aria-label=\{`\$\{card\.name\} volatility score methodology`\}/);
+    assert.match(cards, /historical observations/);
+    assert.match(intelligence, /0-100 volatility score/);
+    assert.match(intelligence, /observationCount/);
+    assert.match(intelligence, /No future price forecast/);
+  });
+
 
   it('surfaces a factual price-change event log from consecutive observed prices', async () => {
     const source = await read('src/app/products/[slug]/page.tsx');
