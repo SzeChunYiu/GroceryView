@@ -4,6 +4,7 @@ type VolatilityBand = 'stable' | 'watch' | 'volatile';
 
 export type ProductStoreVolatilityPrediction = {
   category: string;
+  earliestObservedAt: string;
   latestObservedAt: string;
   latestPrice: number;
   observationCount: number;
@@ -22,6 +23,14 @@ export type VolatilityPredictionOptions = {
   category?: string;
   limit?: number;
   minObservations?: number;
+};
+
+export type VolatilityInputWindow = {
+  earliestObservedAt: string | null;
+  latestObservedAt: string | null;
+  minObservations: number;
+  pairCount: number;
+  sourceObservationCount: number;
 };
 
 type DailyPricePoint = {
@@ -89,6 +98,7 @@ function volatilityPredictionFor(product: PricedProduct, minObservations: number
 
   return {
     category: product.category,
+    earliestObservedAt: first.date,
     latestObservedAt: latest.date,
     latestPrice: round(latest.price),
     observationCount: points.length,
@@ -104,12 +114,19 @@ function volatilityPredictionFor(product: PricedProduct, minObservations: number
   };
 }
 
+export function normalizedVolatilityOptions(options: VolatilityPredictionOptions = {}) {
+  return {
+    category: options.category,
+    limit: clamp(Math.floor(options.limit ?? DEFAULT_LIMIT), 1, 50),
+    minObservations: clamp(Math.floor(options.minObservations ?? DEFAULT_MIN_OBSERVATIONS), 2, 25)
+  };
+}
+
 export function runVolatilityPredictionJob(options: VolatilityPredictionOptions = {}): ProductStoreVolatilityPrediction[] {
-  const limit = clamp(Math.floor(options.limit ?? DEFAULT_LIMIT), 1, 50);
-  const minObservations = clamp(Math.floor(options.minObservations ?? DEFAULT_MIN_OBSERVATIONS), 2, 25);
+  const { category, limit, minObservations } = normalizedVolatilityOptions(options);
 
   return pricedProducts
-    .filter((product) => !options.category || product.category === options.category)
+    .filter((product) => !category || product.category === category)
     .map((product) => volatilityPredictionFor(product, minObservations))
     .filter((prediction): prediction is ProductStoreVolatilityPrediction => prediction !== null)
     .sort((left, right) => (
@@ -118,6 +135,19 @@ export function runVolatilityPredictionJob(options: VolatilityPredictionOptions 
       || right.latestObservedAt.localeCompare(left.latestObservedAt)
     ))
     .slice(0, limit);
+}
+
+export function describeVolatilityInputWindow(
+  predictions: ProductStoreVolatilityPrediction[],
+  minObservations = DEFAULT_MIN_OBSERVATIONS
+): VolatilityInputWindow {
+  return {
+    earliestObservedAt: predictions.length > 0 ? predictions.reduce((earliest, prediction) => (prediction.earliestObservedAt < earliest ? prediction.earliestObservedAt : earliest), predictions[0].earliestObservedAt) : null,
+    latestObservedAt: predictions.length > 0 ? predictions.reduce((latest, prediction) => (prediction.latestObservedAt > latest ? prediction.latestObservedAt : latest), predictions[0].latestObservedAt) : null,
+    minObservations,
+    pairCount: predictions.length,
+    sourceObservationCount: predictions.reduce((sum, prediction) => sum + prediction.observationCount, 0)
+  };
 }
 
 export const volatilityPredictionMethodology = {

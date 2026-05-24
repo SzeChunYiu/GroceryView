@@ -16,6 +16,10 @@ describe('price volatility prediction endpoint', () => {
 
     assert.match(route, /api\/pricing\/volatility|runVolatilityPredictionJob/);
     assert.match(route, /NextResponse\.json/);
+    assert.match(route, /Cache-Control/);
+    assert.match(route, /ETag/);
+    assert.match(route, /if-none-match/);
+    assert.match(route, /status: 304/);
     assert.match(route, /minObservations/);
     assert.match(route, /category/);
     assert.match(intelligence, /ProductStoreVolatilityPrediction/);
@@ -24,6 +28,9 @@ describe('price volatility prediction endpoint', () => {
     assert.match(intelligence, /OpenPrices generated historical timestamps/);
     assert.match(intelligence, /does not forecast a future price/);
     assert.match(intelligence, /priceSwingPercent/);
+    assert.match(intelligence, /describeVolatilityInputWindow/);
+    assert.match(intelligence, /earliestObservedAt/);
+    assert.match(intelligence, /sourceObservationCount/);
     assert.match(verified, /priceVolatilityPredictionPreview/);
     assert.match(verified, /\/api\/pricing\/volatility/);
   });
