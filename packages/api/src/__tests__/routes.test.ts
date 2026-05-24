@@ -932,6 +932,12 @@ describe('createGroceryViewApi', () => {
     assert.equal(report.maxMealCost, 120);
     assert.equal(report.servings, 4);
     assert.equal(report.dealCount, 4);
+    assert.deepEqual(report.budgetGuardrail, {
+      weeklyBudget: 0,
+      currentPlannedSpend: 0,
+      remainingWeeklyBudget: null,
+      hiddenSuggestionCount: 0
+    });
     assert.deepEqual(report.ingredientProductIds, ['chicken', 'pasta', 'tomatoes']);
     assert.deepEqual(report.suggestions, [{
       title: 'Chicken thighs pasta bowl',
@@ -942,6 +948,16 @@ describe('createGroceryViewApi', () => {
     }]);
     assert.match(report.guardrails[0], /never update a basket/i);
     assert.deepEqual(api.getMealPlanSuggestionsReport('user-1', { maxMealCost: 20 }).suggestions, []);
+    api.updateBudget('user-1', { weeklyBudget: 120, monthlyBudget: 480 });
+    api.addBasketItem('user-1', { productId: 'milk', quantity: 2 });
+    const budgetedReport = api.getMealPlanSuggestionsReport('user-1', { maxMealCost: 120, servings: 4 });
+    assert.deepEqual(budgetedReport.budgetGuardrail, {
+      weeklyBudget: 120,
+      currentPlannedSpend: 27.8,
+      remainingWeeklyBudget: 92.2,
+      hiddenSuggestionCount: 1
+    });
+    assert.deepEqual(budgetedReport.suggestions, []);
     assert.throws(() => api.getMealPlanSuggestionsReport('user-1', { servings: 0 }), /servings must be positive/);
   });
 

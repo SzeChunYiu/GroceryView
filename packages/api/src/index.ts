@@ -1200,6 +1200,12 @@ export type MealPlanSuggestionsReport = {
   currency: 'SEK';
   servings: number;
   maxMealCost: number;
+  budgetGuardrail: {
+    weeklyBudget: number;
+    currentPlannedSpend: number;
+    remainingWeeklyBudget: number | null;
+    hiddenSuggestionCount: number;
+  };
   suggestions: MealSuggestion[];
   dealCount: number;
   ingredientProductIds: string[];
@@ -4392,19 +4398,38 @@ export function createGroceryViewApi() {
       const servings = options.servings ?? 4;
       requirePositiveFinite(maxMealCost, 'maxMealCost');
       requirePositiveFinite(servings, 'servings');
-      const suggestions = suggestDealBasedMeals({ deals: mealDeals, maxMealCost, servings });
+      const favoriteStoreIds = this.getFavoriteStores(userId).map((store) => store.id);
+      const comparisonStoreIds = favoriteStoreIds.length > 0 ? favoriteStoreIds : stores.map((store) => store.id);
+      const currentPlannedSpend = compareBasketStrategies({
+        favoriteStoreIds: comparisonStoreIds,
+        items: basketInputItems(baskets.get(userId) ?? [])
+      }).cheapestByProduct.total;
+      const weeklyBudget = budgets.get(userId)?.weeklyBudget ?? 0;
+      const remainingWeeklyBudget = weeklyBudget > 0 ? Math.max(0, Math.round((weeklyBudget - currentPlannedSpend) * 100) / 100) : null;
+      const budgetedMaxMealCost = remainingWeeklyBudget === null ? maxMealCost : Math.min(maxMealCost, remainingWeeklyBudget);
+      const unbudgetedSuggestions = suggestDealBasedMeals({ deals: mealDeals, maxMealCost, servings });
+      const suggestions = budgetedMaxMealCost > 0
+        ? suggestDealBasedMeals({ deals: mealDeals, maxMealCost: budgetedMaxMealCost, servings })
+        : [];
       return {
         userId,
         currency: 'SEK',
         servings,
         maxMealCost,
+        budgetGuardrail: {
+          weeklyBudget,
+          currentPlannedSpend,
+          remainingWeeklyBudget,
+          hiddenSuggestionCount: unbudgetedSuggestions.length - suggestions.length
+        },
         suggestions,
         dealCount: mealDeals.length,
         ingredientProductIds: [...new Set(suggestions.flatMap((suggestion) => suggestion.ingredientProductIds))].sort(),
         guardrails: [
           'Meal suggestions use current high-scoring deals but never update a basket without user confirmation.',
           'Diet, allergen, and household rules must be checked before a suggested meal is saved.',
-          'Per-serving cost is advisory and cannot hide stale or missing ingredient price evidence.'
+          'Per-serving cost is advisory and cannot hide stale or missing ingredient price evidence.',
+          'Saved weekly budgets and current planned basket spend hide meal suggestions that would exceed the remaining budget.'
         ]
       };
     },
