@@ -37,7 +37,9 @@ export default function MealPlannerPage() {
         <Card>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Budget</p>
           <p className="mt-2 text-5xl font-black text-slate-950">{formatSek(dealBasedMeals.maxMealCost)}</p>
-          <p className="mt-3 font-semibold text-slate-700">for {dealBasedMeals.servings} servings; anything above budget is excluded by core.</p>
+          <p className="mt-3 font-semibold text-slate-700">
+            {formatSek(dealBasedMeals.budgetEnvelope.adaptiveMaxMealCost)} currently available after committed weekly spend and reserve.
+          </p>
         </Card>
         <Card>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Confidence</p>
@@ -50,6 +52,11 @@ export default function MealPlannerPage() {
 
       <Card className="mt-6">
         <h2 className="text-2xl font-black">Suggested meals</h2>
+        {dealBasedMeals.suggestions.length === 0 ? (
+          <p className="mt-4 rounded-2xl bg-amber-50 p-4 text-sm font-semibold text-amber-900">
+            No generated recipe fits the current weekly budget envelope. Review demoted recipes below before adding anything to the plan.
+          </p>
+        ) : null}
         <div className="mt-4 space-y-4">
           {dealBasedMeals.suggestions.map((meal) => (
             <div className="rounded-3xl border border-slate-200 p-5" key={meal.title}>
@@ -61,6 +68,9 @@ export default function MealPlannerPage() {
                 <div className="text-right">
                   <p className="text-3xl font-black text-emerald-800">{formatSek(meal.estimatedCost)}</p>
                   <p className="text-sm font-semibold text-slate-600">{formatSek(meal.estimatedCostPerServing)} / serving</p>
+                  <p className="mt-1 text-sm font-semibold text-emerald-700">
+                    {formatSek(meal.budgetGuardrail.remainingAfterMeal)} left in weekly meal envelope
+                  </p>
                 </div>
               </div>
               <div className="mt-4 grid gap-3 md:grid-cols-3">
@@ -76,6 +86,32 @@ export default function MealPlannerPage() {
           ))}
         </div>
       </Card>
+
+      {dealBasedMeals.demotedSuggestions.length > 0 ? (
+        <Card className="mt-6 border-amber-200 bg-amber-50">
+          <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-800">Budget guardrails</p>
+          <h2 className="mt-2 text-2xl font-black">Demoted recipes</h2>
+          <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+            These recipes still come from visible deal prices, but they are kept out of the main meal generation list because they would exceed this week&apos;s adaptive meal envelope.
+          </p>
+          <div className="mt-4 space-y-4">
+            {dealBasedMeals.demotedSuggestions.map((meal) => (
+              <div className="rounded-3xl border border-amber-200 bg-white p-5" key={meal.title}>
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div>
+                    <p className="text-2xl font-black text-slate-950">{meal.title}</p>
+                    <p className="mt-1 text-sm font-semibold text-slate-700">{meal.budgetGuardrail.reason}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-3xl font-black text-amber-800">{formatSek(meal.estimatedCost)}</p>
+                    <p className="text-sm font-semibold text-slate-600">{formatSek(meal.budgetGuardrail.overEnvelopeBy)} over envelope</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      ) : null}
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">{studentDealRecipes.persona}</p>
@@ -94,6 +130,9 @@ export default function MealPlannerPage() {
                 <div className="text-right">
                   <p className="text-3xl font-black text-emerald-800">{formatSek(recipe.estimatedCost)}</p>
                   <p className="text-sm font-semibold text-slate-600">{formatSek(recipe.estimatedCostPerServing)} / serving</p>
+                  <p className="mt-1 text-sm font-semibold text-emerald-700">
+                    {formatSek(recipe.budgetGuardrail.remainingAfterMeal)} student envelope left
+                  </p>
                 </div>
               </div>
               <div className="mt-4 grid gap-3 md:grid-cols-3">
@@ -132,6 +171,9 @@ export default function MealPlannerPage() {
                 <div className="text-right">
                   <p className="text-3xl font-black text-blue-800">{formatSek(meal.estimatedCost)}</p>
                   <p className="text-sm font-semibold text-slate-600">{meal.lunchboxLeftovers ? 'lunchboxLeftovers ready' : 'dinner only'}</p>
+                  <p className="mt-1 text-sm font-semibold text-blue-700">
+                    {formatSek(meal.budgetGuardrail.remainingAfterMeal)} family envelope left
+                  </p>
                 </div>
               </div>
               <div className="mt-4 grid gap-3 md:grid-cols-3">
@@ -166,6 +208,9 @@ export default function MealPlannerPage() {
                 <div className="text-right">
                   <p className="text-3xl font-black text-cyan-800">{formatSek(meal.estimatedCost)}</p>
                   <p className="text-sm font-semibold text-slate-600">freezerPortions: {meal.freezerPortions}</p>
+                  <p className="mt-1 text-sm font-semibold text-cyan-700">
+                    {formatSek(meal.budgetGuardrail.remainingAfterMeal)} batch envelope left
+                  </p>
                 </div>
               </div>
               <div className="mt-4 grid gap-3 md:grid-cols-3">

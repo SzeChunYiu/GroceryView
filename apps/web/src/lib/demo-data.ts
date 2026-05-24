@@ -3,6 +3,7 @@
 // Real prices replace these as packages/ingestion connectors come online.
 
 import { buildExpiryDealRadar, buildPriceChartSeries, buildWatchlistAlerts, calculateMealCostBreakdown, calculatePersonalGroceryInflation, compareBasketStrategies, planGroceryAlertChannelDefault, planMultiWeekStockUpList, planNotifications, planPantryReplenishment, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeBudget, summarizeCategoryDealLeaders, summarizePriceHistory, summarizeStoreBasketCoverage, type BasketComparisonInput, type HouseholdSnapshot, type PantryDeal, type PantryInventoryItem, type PriceChartObservation, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
+import { applyAdaptiveMealBudgetGuardrails } from './meal-cost-estimator';
 import { pricedProducts } from './openprices-products';
 
 export const products = [
@@ -2590,21 +2591,33 @@ export const dealBasedMealInputs = [
   { productId: 'garant-gurka-300g', name: 'Garant Gurka 300g', category: 'vegetables' as const, price: 16.9, dealScore: 69, source: 'visible Coop Medborgarplatsen shelf row' }
 ];
 
+const dealBasedMealSuggestions = suggestDealBasedMeals({
+  deals: dealBasedMealInputs.map(({ source: _source, ...deal }) => deal),
+  maxMealCost: 120,
+  servings: 4
+}).map((suggestion) => ({
+  ...suggestion,
+  ingredients: suggestion.ingredientProductIds.map((productId) => dealBasedMealInputs.find((deal) => deal.productId === productId)).filter(Boolean)
+}));
+
+const dealBasedMealBudgetGuardrails = applyAdaptiveMealBudgetGuardrails(dealBasedMealSuggestions, {
+  weeklyBudget: 450,
+  committedSpend: 355,
+  plannedMealSpend: 45,
+  reservePercent: 0.05,
+  maxMealCost: 120
+});
+
 export const dealBasedMeals = {
   servings: 4,
   maxMealCost: 120,
-  suggestions: suggestDealBasedMeals({
-    deals: dealBasedMealInputs.map(({ source: _source, ...deal }) => deal),
-    maxMealCost: 120,
-    servings: 4
-  }).map((suggestion) => ({
-    ...suggestion,
-    ingredients: suggestion.ingredientProductIds.map((productId) => dealBasedMealInputs.find((deal) => deal.productId === productId)).filter(Boolean)
-  })),
+  budgetEnvelope: dealBasedMealBudgetGuardrails.envelope,
+  suggestions: dealBasedMealBudgetGuardrails.visibleMeals,
+  demotedSuggestions: dealBasedMealBudgetGuardrails.demotedMeals,
   coverage: {
     confidence: 'medium',
     dealCount: dealBasedMealInputs.length,
-    caveat: 'Meal suggestions use visible price rows with deal scores; diet, allergen, and household preference data are not inferred.'
+    caveat: 'Meal suggestions use visible price rows with deal scores and are demoted when they break the current weekly budget envelope; diet, allergen, and household preference data are not inferred.'
   }
 };
 
@@ -2614,41 +2627,61 @@ const studentRecipeSteps: Record<string, string[]> = {
   'Protein lunchbox': ['Drain or slice the protein row.', 'Add the pantry deal for bulk without raising spend.', 'Finish with the vegetable deal and keep chilled until lunch.']
 };
 
+const studentDealRecipeGuardrails = applyAdaptiveMealBudgetGuardrails(suggestDealBasedMeals({
+  deals: dealBasedMealInputs.map(({ source: _source, ...deal }) => deal),
+  maxMealCost: 65,
+  servings: 2
+}).map((suggestion) => ({
+  ...suggestion,
+  ingredients: suggestion.ingredientProductIds.map((productId) => dealBasedMealInputs.find((deal) => deal.productId === productId)).filter(Boolean),
+  cookSteps: studentRecipeSteps[suggestion.title] ?? ['Combine the selected deal ingredients.', 'Cook once and portion into two student meals.', 'Label leftovers with the visible deal source date.']
+})), {
+  weeklyBudget: 300,
+  committedSpend: 185,
+  plannedMealSpend: 40,
+  reservePercent: 0.05,
+  maxMealCost: 65
+});
+
 export const studentDealRecipes = {
   persona: 'Students / young singles',
   title: 'Student deal recipes',
   servings: 2,
   maxMealCost: 65,
-  recipes: suggestDealBasedMeals({
-    deals: dealBasedMealInputs.map(({ source: _source, ...deal }) => deal),
-    maxMealCost: 65,
-    servings: 2
-  }).map((suggestion) => ({
-    ...suggestion,
-    ingredients: suggestion.ingredientProductIds.map((productId) => dealBasedMealInputs.find((deal) => deal.productId === productId)).filter(Boolean),
-    cookSteps: studentRecipeSteps[suggestion.title] ?? ['Combine the selected deal ingredients.', 'Cook once and portion into two student meals.', 'Label leftovers with the visible deal source date.']
-  })),
+  budgetEnvelope: studentDealRecipeGuardrails.envelope,
+  recipes: studentDealRecipeGuardrails.visibleMeals,
+  demotedRecipes: studentDealRecipeGuardrails.demotedMeals,
   coverage: {
     confidence: 'medium',
     caveat: 'Recipes are generated from suggestDealBasedMeals using visible deal prices only; prep time, allergens, and pantry spices are not inferred.'
   }
 };
 
+const familyMealPlannerGuardrails = applyAdaptiveMealBudgetGuardrails(suggestDealBasedMeals({
+  deals: dealBasedMealInputs.map(({ source: _source, ...deal }) => deal),
+  maxMealCost: 135,
+  servings: 4
+}).map((suggestion, index) => ({
+    ...suggestion,
+    weeknightSlot: ['Monday dinner', 'Wednesday dinner', 'Friday freezer night'][index] ?? 'Weekend fallback',
+    lunchboxLeftovers: suggestion.estimatedCostPerServing <= 35,
+    ingredients: suggestion.ingredientProductIds.map((productId) => dealBasedMealInputs.find((deal) => deal.productId === productId)).filter(Boolean)
+})), {
+  weeklyBudget: 900,
+  committedSpend: 620,
+  plannedMealSpend: 160,
+  reservePercent: 0.05,
+  maxMealCost: 135
+});
+
 export const familyMealPlannerFromDeals = {
   persona: 'Families with kids',
   title: 'Family weekly meal planner',
   servings: 4,
   maxMealCost: 135,
-  meals: suggestDealBasedMeals({
-    deals: dealBasedMealInputs.map(({ source: _source, ...deal }) => deal),
-    maxMealCost: 135,
-    servings: 4
-  }).map((suggestion, index) => ({
-    ...suggestion,
-    weeknightSlot: ['Monday dinner', 'Wednesday dinner', 'Friday freezer night'][index] ?? 'Weekend fallback',
-    lunchboxLeftovers: suggestion.estimatedCostPerServing <= 35,
-    ingredients: suggestion.ingredientProductIds.map((productId) => dealBasedMealInputs.find((deal) => deal.productId === productId)).filter(Boolean)
-  })),
+  budgetEnvelope: familyMealPlannerGuardrails.envelope,
+  meals: familyMealPlannerGuardrails.visibleMeals,
+  demotedMeals: familyMealPlannerGuardrails.demotedMeals,
   coverage: {
     confidence: 'medium',
     caveat: 'Family meals use visible deal rows from the same core meal engine; snacks, allergens, and child preferences need account data before launch.'
@@ -2673,16 +2706,11 @@ const freezerBatchCookSteps: Record<string, string[]> = {
   ]
 };
 
-export const freezerBatchCookPlanner = {
-  persona: 'Meal-preppers / large households',
-  title: 'Freezer batch-cook planner',
-  servings: 8,
-  maxBatchCost: 240,
-  meals: suggestDealBasedMeals({
-    deals: dealBasedMealInputs.map(({ source: _source, ...deal }) => deal),
-    maxMealCost: 240,
-    servings: 8
-  }).map((suggestion) => ({
+const freezerBatchCookGuardrails = applyAdaptiveMealBudgetGuardrails(suggestDealBasedMeals({
+  deals: dealBasedMealInputs.map(({ source: _source, ...deal }) => deal),
+  maxMealCost: 240,
+  servings: 8
+}).map((suggestion) => ({
     ...suggestion,
     freezerPortions: Math.max(0, 8 - 4),
     batchCookSteps: freezerBatchCookSteps[suggestion.title] ?? [
@@ -2691,7 +2719,22 @@ export const freezerBatchCookPlanner = {
       'Freeze labelled portions with the visible deal source.'
     ],
     ingredients: suggestion.ingredientProductIds.map((productId) => dealBasedMealInputs.find((deal) => deal.productId === productId)).filter(Boolean)
-  })),
+})), {
+  weeklyBudget: 1200,
+  committedSpend: 850,
+  plannedMealSpend: 220,
+  reservePercent: 0.05,
+  maxMealCost: 240
+});
+
+export const freezerBatchCookPlanner = {
+  persona: 'Meal-preppers / large households',
+  title: 'Freezer batch-cook planner',
+  servings: 8,
+  maxBatchCost: 240,
+  budgetEnvelope: freezerBatchCookGuardrails.envelope,
+  meals: freezerBatchCookGuardrails.visibleMeals,
+  demotedMeals: freezerBatchCookGuardrails.demotedMeals,
   coverage: {
     confidence: 'medium',
     caveat: 'Batch-cook planning reuses suggestDealBasedMeals with visible deal prices only; freezer capacity, allergens, and household preferences need account data before auto-planning.'
@@ -4128,6 +4171,3 @@ export const expiryDealReports = [
     reportedAt: '2026-05-20T08:00:00.000Z',
     distanceKm: 2.7,
     verificationCount: 2,
-    photoCount: 1
-  }
-];
