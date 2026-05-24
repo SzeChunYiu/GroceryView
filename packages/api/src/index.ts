@@ -2566,14 +2566,39 @@ function comparableUnitBasis(product: ProductDetail): { quantity: number; unit: 
   return { quantity: referencePrice / referenceUnitPrice, unit: match[2]! };
 }
 
+function normalizeComparableUnit(unitPrice: number, unit: string): { unitPrice: number; unit: string } | null {
+  const normalized = unit.trim().toLowerCase().replace(/^kr\s*\/\s*/, '').replace(',', '.');
+  const match = normalized.match(/^(?:(\d+(?:\.\d+)?)\s*)?(kg|kilogram|g|gram|l|liter|litre|ml|milliliter|millilitre|st|pcs|pc|piece|pieces|each)$/);
+  if (!match || !Number.isFinite(unitPrice) || unitPrice <= 0) return null;
+
+  const amount = match[1] ? Number(match[1]) : 1;
+  if (!Number.isFinite(amount) || amount <= 0) return null;
+
+  const parsedUnit = match[2]!;
+  if (parsedUnit === 'kg' || parsedUnit === 'kilogram') return { unitPrice: unitPrice / amount, unit: 'kg' };
+  if (parsedUnit === 'g' || parsedUnit === 'gram') return { unitPrice: unitPrice * (1000 / amount), unit: 'kg' };
+  if (parsedUnit === 'l' || parsedUnit === 'liter' || parsedUnit === 'litre') return { unitPrice: unitPrice / amount, unit: 'l' };
+  if (parsedUnit === 'ml' || parsedUnit === 'milliliter' || parsedUnit === 'millilitre') return { unitPrice: unitPrice * (1000 / amount), unit: 'l' };
+  return { unitPrice: unitPrice / amount, unit: 'st' };
+}
+
 function comparableUnitPrice(product: ProductDetail, packagePrice: number): number {
-  const { quantity } = comparableUnitBasis(product);
-  return roundPrice(packagePrice / quantity);
+  const { quantity, unit } = comparableUnitBasis(product);
+  const unitPrice = packagePrice / quantity;
+  return roundPrice(normalizeComparableUnit(unitPrice, unit)?.unitPrice ?? unitPrice);
+}
+
+function compareCheapestUnit(left: ProductCheapestNowChainPrice, right: ProductCheapestNowChainPrice): number {
+  return left.comparableUnitPrice - right.comparableUnitPrice ||
+    left.packagePrice - right.packagePrice ||
+    left.chain.localeCompare(right.chain) ||
+    left.storeName.localeCompare(right.storeName);
 }
 
 function cheapestByChain(product: ProductDetail): ProductCheapestNowChainPrice[] {
   const byChain = new Map<string, ProductCheapestNowChainPrice>();
   const { unit } = comparableUnitBasis(product);
+  const normalizedUnit = normalizeComparableUnit(1, unit)?.unit ?? unit;
   for (const price of product.currentPrices) {
     const store = storeForId(price.storeId);
     if (!store) continue;
@@ -2583,14 +2608,14 @@ function cheapestByChain(product: ProductDetail): ProductCheapestNowChainPrice[]
       storeName: price.storeName,
       packagePrice: roundPrice(price.price),
       comparableUnitPrice: comparableUnitPrice(product, price.price),
-      comparableUnit: unit
+      comparableUnit: normalizedUnit
     };
     const current = byChain.get(store.chain);
-    if (!current || row.packagePrice < current.packagePrice || (row.packagePrice === current.packagePrice && row.storeName.localeCompare(current.storeName) < 0)) {
+    if (!current || compareCheapestUnit(row, current) < 0) {
       byChain.set(store.chain, row);
     }
   }
-  return [...byChain.values()].sort((left, right) => left.packagePrice - right.packagePrice || left.chain.localeCompare(right.chain));
+  return [...byChain.values()].sort(compareCheapestUnit);
 }
 
 function confidenceLabel(confidence: number): ProductLatestPriceConfidence {
@@ -2661,6 +2686,9 @@ export function buildProductCheapestNowReport(rows: ProductCheapestNowPriceRow[]
       continue;
     }
 
+    const normalizedUnit = normalizeComparableUnit(row.unitPrice, row.comparableUnit);
+    if (!normalizedUnit) continue;
+
     observedPriceCount += 1;
     if (row.observedAt) observedAtValues.push(row.observedAt);
     const candidate: ProductCheapestNowChainPrice = {
@@ -2668,20 +2696,16 @@ export function buildProductCheapestNowReport(rows: ProductCheapestNowPriceRow[]
       storeId: row.storeSlug,
       storeName: row.storeName,
       packagePrice: roundPrice(row.price),
-      comparableUnitPrice: roundPrice(row.unitPrice),
-      comparableUnit: row.comparableUnit
+      comparableUnitPrice: roundPrice(normalizedUnit.unitPrice),
+      comparableUnit: normalizedUnit.unit
     };
     const current = byChain.get(row.chainSlug);
-    if (
-      !current ||
-      candidate.packagePrice < current.packagePrice ||
-      (candidate.packagePrice === current.packagePrice && candidate.storeName.localeCompare(current.storeName) < 0)
-    ) {
+    if (!current || compareCheapestUnit(candidate, current) < 0) {
       byChain.set(row.chainSlug, candidate);
     }
   }
 
-  const chainPrices = [...byChain.values()].sort((left, right) => left.packagePrice - right.packagePrice || left.chain.localeCompare(right.chain));
+  const chainPrices = [...byChain.values()].sort(compareCheapestUnit);
 
   return {
     productId: product.productId,
@@ -2695,8 +2719,8 @@ export function buildProductCheapestNowReport(rows: ProductCheapestNowPriceRow[]
     lastObservedAt: observedAtValues.sort().at(-1) ?? null,
     guardrails: [
       'Cheapest-now rows are calculated only from persisted latest_prices observations for the requested product.',
-      'Rows with missing or non-positive package/unit prices are excluded instead of treated as current offers.',
-      'Each chain contributes at most one current lowest package price, preserving the store that supplied it.',
+      'Rows with missing, unsupported, or non-positive package/unit prices are excluded instead of treated as current offers.',
+      'Each chain contributes at most one current lowest normalized unit price, preserving the store that supplied it.',
       'No missing chain or product prices are filled with synthetic estimates.'
     ]
   };
