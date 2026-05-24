@@ -22,6 +22,16 @@ export default function AdminSourcesPage() {
         paused before bad matches spread.
       </p>
 
+      <section className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-5" aria-label="Executable incident runbooks">
+        <p className="text-xs font-bold uppercase tracking-wide text-slate-500">SRE runbooks</p>
+        <h2 className="mt-1 text-xl font-semibold text-slate-950">Executable incident checks</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-700">
+          Ingestion failure, DB outage, stale data, Vercel deploy failure, bad source parser, and API latency spike runbooks
+          are documented in <code className="rounded bg-white px-1 py-0.5">docs/ops/incident-runbooks.md</code> and backed by
+          <code className="ml-1 rounded bg-white px-1 py-0.5">npm run ops:incident-runbooks</code>.
+        </p>
+      </section>
+
       <section className="mt-8 grid gap-4" aria-label="Duplicate conflict alerts">
         {alerts.map((alert) => (
           <article
