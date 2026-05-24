@@ -1,12 +1,14 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { calculateChainPriceIndex, calculateFixedBasketIndex, type ChainPriceIndex, type FixedBasketIndex } from '@groceryview/core';
+import { calculateChainPriceIndex, calculateFixedBasketIndex, type ChainCategoryIndex, type ChainPriceIndex, type FixedBasketIndex } from '@groceryview/core';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
 import { axfoodProducts, type AxfoodProduct } from '@/lib/axfood-products';
 import { buildChainIndexTrendSeries, buildChainPriceObservations, buildMatchedBasketChainPriceObservations } from '@/lib/chain-index-data';
-import { formatPct, formatSek } from '@/lib/verified-data';
+import { indexSymbol, matchedCategoryCells, type HeatmapCell, weightedCellIndex } from '@/lib/heatmap-index';
+import { categorySummaries, formatPct, formatSek } from '@/lib/verified-data';
 
 type CategorySymbol = 'grocery' | 'dairy' | 'produce' | 'meat' | 'bakery';
 
@@ -27,6 +29,14 @@ type CategoryConstituent = {
   currentUnitPrice: number;
   weight: number;
   movementPercent: number;
+};
+
+type HeatmapIndexSymbol = {
+  symbol: string;
+  chain: ChainPriceIndex;
+  category: (typeof categorySummaries)[number];
+  rows: ChainCategoryIndex[];
+  cell: HeatmapCell | null;
 };
 
 const categoryDefinitions: CategoryDefinition[] = [
@@ -83,11 +93,22 @@ function chainSlug(chainId: string) {
 
 const chainsBySlug = new Map(chainIndexReport.chains.map((chain) => [chainSlug(chain.chainId), chain]));
 const categoryBySymbol = new Map(categoryDefinitions.map((definition) => [definition.symbol, definition]));
+const heatmapIndexSymbols: HeatmapIndexSymbol[] = chainIndexReport.chains.flatMap((chain) =>
+  categorySummaries.map((category) => ({
+    symbol: indexSymbol(chain.chainId, category.slug),
+    chain,
+    category,
+    rows: matchedCategoryCells(chain, category.slug),
+    cell: weightedCellIndex(chain, category.slug)
+  }))
+);
+const heatmapIndexBySymbol = new Map(heatmapIndexSymbols.map((entry) => [entry.symbol, entry]));
 
 export function generateStaticParams() {
   return [
     ...categoryDefinitions.map((definition) => ({ symbol: definition.symbol })),
-    ...chainIndexReport.chains.map((chain) => ({ symbol: chainSlug(chain.chainId) }))
+    ...chainIndexReport.chains.map((chain) => ({ symbol: chainSlug(chain.chainId) })),
+    ...heatmapIndexSymbols.map((entry) => ({ symbol: entry.symbol }))
   ];
 }
 
@@ -95,9 +116,10 @@ export async function generateMetadata({ params }: Readonly<{ params: Promise<{ 
   const { symbol } = await params;
   const category = categoryBySymbol.get(symbol as CategorySymbol);
   const chain = chainsBySlug.get(symbol);
-  if (!category && !chain) notFound();
+  const heatmapCell = heatmapIndexBySymbol.get(symbol);
+  if (!category && !chain && !heatmapCell) notFound();
 
-  const label = category?.label ?? `${chain?.chainId ?? symbol} chain index`;
+  const label = category?.label ?? (heatmapCell ? `${heatmapCell.category.label} ${heatmapCell.chain.chainId} index` : `${chain?.chainId ?? symbol} chain index`);
   return {
     title: `${label} | GroceryView`,
     description: 'Observed GroceryView price index page with fixed-basket and chain-price index calculations.'
@@ -447,6 +469,91 @@ function ChainIndexPage({ chain }: Readonly<{ chain: ChainPriceIndex }>) {
   );
 }
 
+function HeatmapIndexPage({ entry }: Readonly<{ entry: HeatmapIndexSymbol }>) {
+  const { cell, category, chain, rows } = entry;
+
+  return (
+    <PageShell>
+      <Eyebrow>Heatmap index symbol</Eyebrow>
+      <div className="mt-2 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
+        <div>
+          <h1 className="text-4xl font-black tracking-tight">{category.label} · {chain.chainId}</h1>
+          <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
+            This symbol resolves a /heatmap cell. It aggregates the matching calculateChainPriceIndex category rows for one categorySummary row and one chain column, so every TradingView-style heatmap tile links to a real /index/[symbol] route.
+          </p>
+        </div>
+        <div className="rounded-[1.75rem] border border-emerald-200 bg-white p-5 shadow-sm">
+          <p className="text-sm font-black uppercase tracking-[0.18em] text-emerald-800">Cell index</p>
+          <p className={`mt-2 text-6xl font-black tracking-tight ${cell ? indexTone(cell.index) : 'text-slate-400'}`}>{cell ? cell.index.toFixed(1) : 'n/a'}</p>
+          <div className="mt-3">
+            <ConfidenceBadge level={cell?.confidence ?? 'low'} label={cell ? confidenceLabel(cell.confidence) : 'no indexed coverage'} sampleSize={cell?.observations ?? 0} />
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-4 md:grid-cols-4">
+        <Card>
+          <p className="text-sm font-black text-slate-600">Heatmap row</p>
+          <p className="mt-2 text-2xl font-black text-slate-950">{category.label}</p>
+          <p className="mt-2 text-sm font-semibold text-slate-600">{category.openPriceRows + category.chainRows} verified rows</p>
+        </Card>
+        <Card>
+          <p className="text-sm font-black text-slate-600">Heatmap column</p>
+          <p className="mt-2 text-2xl font-black text-slate-950">{chain.chainId}</p>
+          <p className="mt-2 text-sm font-semibold text-slate-600">{chain.observations.toLocaleString('sv-SE')} chain observations</p>
+        </Card>
+        <Card>
+          <p className="text-sm font-black text-slate-600">Calculation</p>
+          <p className="mt-2 text-base font-black text-slate-950">calculateChainPriceIndex</p>
+          <p className="mt-2 text-sm font-semibold text-slate-600">Cell value is observation-weighted across matching category rows.</p>
+        </Card>
+        <Card>
+          <p className="text-sm font-black text-slate-600">Heatmap band</p>
+          <p className={`mt-2 text-2xl font-black ${cell ? indexTone(cell.index) : 'text-slate-400'}`}>
+            {cell ? (cell.index < 96 ? 'Green <96' : cell.index <= 103 ? 'Amber 96-103' : 'Red >103') : 'No coverage'}
+          </p>
+          <Link className="mt-3 inline-flex text-sm font-black text-emerald-800 hover:text-emerald-700" href="/heatmap">Back to heatmap</Link>
+        </Card>
+      </div>
+
+      <Card className="mt-6">
+        <Eyebrow>Constituents</Eyebrow>
+        <h2 className="mt-2 text-2xl font-black tracking-tight">Matched chain-category rows</h2>
+        <div className="mt-5 overflow-x-auto">
+          <table className="w-full min-w-[760px] text-left text-sm">
+            <thead className="border-b border-slate-200 text-xs uppercase tracking-[0.18em] text-slate-500">
+              <tr>
+                <th className="py-3 pr-4">Source category</th>
+                <th className="py-3 pr-4">Index</th>
+                <th className="py-3 pr-4">Market reference</th>
+                <th className="py-3 pr-4">Rows</th>
+                <th className="py-3 pr-4">Confidence</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {rows.length > 0 ? rows.map((row) => (
+                <tr key={row.category}>
+                  <td className="py-3 pr-4 font-black text-slate-950">{row.category}</td>
+                  <td className={`py-3 pr-4 font-black ${indexTone(row.index)}`}>{row.index.toFixed(1)}</td>
+                  <td className="py-3 pr-4 font-bold text-slate-700">{formatSek(row.marketReference)}</td>
+                  <td className="py-3 pr-4 font-bold text-slate-700">{row.observations}</td>
+                  <td className="py-3 pr-4">
+                    <ConfidenceBadge level={row.confidence} label={row.estimated ? 'estimated cell' : confidenceLabel(row.confidence)} sampleSize={row.observations} />
+                  </td>
+                </tr>
+              )) : (
+                <tr>
+                  <td className="py-5 pr-4 text-sm font-bold text-slate-600" colSpan={5}>No matching calculateChainPriceIndex category rows are available for this heatmap cell.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+    </PageShell>
+  );
+}
+
 export default async function IndexSymbolPage({ params }: Readonly<{ params: Promise<{ symbol: string }> }>) {
   const { symbol } = await params;
   const category = categoryBySymbol.get(symbol as CategorySymbol);
@@ -455,6 +562,9 @@ export default async function IndexSymbolPage({ params }: Readonly<{ params: Pro
     if (!fixedBasket) notFound();
     return <CategoryIndexPage definition={category} index={fixedBasket.index} rows={fixedBasket.rows} />;
   }
+
+  const heatmapCell = heatmapIndexBySymbol.get(symbol);
+  if (heatmapCell) return <HeatmapIndexPage entry={heatmapCell} />;
 
   const chain = chainsBySlug.get(symbol);
   if (!chain) notFound();
