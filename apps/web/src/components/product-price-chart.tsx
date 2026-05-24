@@ -38,6 +38,15 @@ type RangeData = {
 };
 
 const RANGE_STEPS: readonly Range[] = ["7D", "30D", "90D", "1Y"];
+type ThemeMode = "light" | "dark";
+
+function getThemeMode(): ThemeMode {
+  if (typeof window === "undefined") return "light";
+  const root = document.documentElement;
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  return root.classList.contains("dark") || prefersDark ? "dark" : "light";
+}
+
 
 const RANGE_DATA: Record<Range, RangeData> = {
   "7D": {
@@ -245,9 +254,29 @@ function confidenceDescription(confidence: PriceConfidence) {
 
 export function ProductPriceChart() {
   const [activeRange, setActiveRange] = useState<Range>("30D");
+  const [themeMode, setThemeMode] = useState<ThemeMode>(() => getThemeMode());
   const chartContainerRef = useRef<HTMLDivElement | null>(null);
 
   const currentRange = RANGE_DATA[activeRange];
+
+  useEffect(() => {
+    const updateTheme = () => {
+      setThemeMode(getThemeMode());
+    };
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+    mediaQuery.addEventListener("change", updateTheme);
+
+    const observer = new MutationObserver(updateTheme);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+
+    updateTheme();
+
+    return () => {
+      mediaQuery.removeEventListener("change", updateTheme);
+      observer.disconnect();
+    };
+  }, []);
 
   const legendRows = useMemo(() => {
     return currentRange.stores.map((store) => {
@@ -263,6 +292,23 @@ export function ProductPriceChart() {
   }, [currentRange]);
 
   useEffect(() => {
+    const colors =
+      themeMode === "dark"
+        ? {
+            background: "#09090b",
+            axis: "rgba(244, 244, 245, 0.26)",
+            grid: "rgba(244, 244, 245, 0.08)",
+            text: "#d4d4d8",
+            crosshair: "rgba(129, 140, 248, 0.8)",
+          }
+        : {
+            background: "transparent",
+            axis: "rgba(82, 82, 91, 0.45)",
+            grid: "rgba(113, 113, 122, 0.12)",
+            text: "#71717a",
+            crosshair: "rgba(37, 99, 235, 0.35)",
+          };
+
     const container = chartContainerRef.current;
     if (!container) {
       return;
@@ -272,22 +318,24 @@ export function ProductPriceChart() {
       width: container.clientWidth,
       height: container.clientHeight,
       layout: {
-        background: { type: ColorType.Solid, color: "transparent" },
-        textColor: "#71717a",
+        background: { type: ColorType.Solid, color: colors.background },
+        textColor: colors.text,
       },
       grid: {
-        horzLines: { color: "rgba(113, 113, 122, 0.12)" },
-        vertLines: { color: "rgba(113, 113, 122, 0.08)" },
+        horzLines: { color: colors.grid },
+        vertLines: { color: `${colors.grid}` },
       },
       rightPriceScale: {
-        borderVisible: false,
+        borderVisible: true,
+        borderColor: colors.axis,
       },
       timeScale: {
-        borderVisible: false,
+        borderColor: colors.axis,
+        borderVisible: true,
       },
       crosshair: {
-        vertLine: { color: "rgba(37, 99, 235, 0.35)" },
-        horzLine: { color: "rgba(37, 99, 235, 0.35)" },
+        vertLine: { color: colors.crosshair },
+        horzLine: { color: colors.crosshair },
       },
     });
 
@@ -365,7 +413,7 @@ export function ProductPriceChart() {
       resizeObserver.disconnect();
       chart.remove();
     };
-  }, [activeRange, currentRange]);
+  }, [activeRange, currentRange, themeMode]);
 
   return (
     <section className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
