@@ -5077,3 +5077,5 @@ export function calculateChainPriceIndex(observations: ChainPriceObservation[]):
 
   return { chains, categories, marketReferenceByCategory, generatedFrom: usable.length };
 }
+
+export * from './lib/promotionParsers/memberPrice.js';
