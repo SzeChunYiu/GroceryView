@@ -21,18 +21,33 @@ model Category {
   @@map("categories")
 }
 
+model Brand {
+  id        String    @id @default(uuid()) @db.Uuid
+  name      String
+  slug      String    @unique
+  logoUrl   String?   @map("logo_url")
+  products  Product[] @relation("BrandProducts")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@map("brands")
+}
+
 model Product {
   id             String   @id @default(uuid()) @db.Uuid
   slug           String   @unique
   canonicalName  String   @map("canonical_name")
   nameSv         String?  @map("name_sv")
   nameEn         String?  @map("name_en")
-  brand          String?
+  brand          String?  @map("brand")
+  brandId        String?  @map("brand_id") @db.Uuid
+  brandRecord    Brand?   @relation("BrandProducts", fields: [brandId], references: [id], onDelete: SetNull)
   categoryPath   String[] @default([]) @map("category_path")
   comparableUnit String   @map("comparable_unit")
   imageUrl       String?  @map("image_url")
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
 
+  @@index([brandId])
   @@map("products")
 }
