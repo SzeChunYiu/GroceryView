@@ -1,5 +1,7 @@
 import { runAllStoreTasks, type AllStoreTaskRunnerControls } from './all-store-runner.js';
 
+export type IcaFormat = 'maxi' | 'kvantum' | 'supermarket' | 'nara';
+
 export type IcaProduct = {
   code: string;
   productId: string;
@@ -28,6 +30,8 @@ export type IcaProduct = {
   regionId: string;
   sourceUrl: string;
   retrievedAt: string;
+  chain: 'ica';
+  ica_format: IcaFormat;
 };
 
 export const ICA_STORE_BASE_URL = 'https://handlaprivatkund.ica.se';
@@ -41,6 +45,18 @@ export type IcaStoreConfig = {
   storeName: string;
   regionId: string;
 };
+
+export function deriveIcaFormat(storeName: string): IcaFormat {
+  const normalized = storeName
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase('sv-SE');
+  if (/(^|\s)maxi(\s|$)/.test(normalized)) return 'maxi';
+  if (/(^|\s)kvantum(\s|$)/.test(normalized)) return 'kvantum';
+  if (/(^|\s)nara(\s|$)/.test(normalized)) return 'nara';
+  return 'supermarket';
+}
+
 
 export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
   {
@@ -1696,6 +1712,7 @@ export async function fetchIcaProducts(options: FetchIcaProductsOptions = {}): P
   const fetchImpl = options.fetchImpl ?? fetch;
   const storeAccountId = options.storeAccountId ?? DEFAULT_ICA_STORE_ACCOUNT_ID;
   const storeName = options.storeName ?? DEFAULT_ICA_STORE_NAME;
+  const icaFormat = deriveIcaFormat(storeName);
   const regionId = options.regionId ?? DEFAULT_ICA_REGION_ID;
   const maxRows = options.maxRows ?? DEFAULT_ICA_MAX_PRODUCTS;
   const maxPageSize = options.maxPageSize ?? maxRows;
@@ -1721,6 +1738,7 @@ export async function fetchIcaProducts(options: FetchIcaProductsOptions = {}): P
     retrievedAt,
     storeAccountId,
     storeName,
+    icaFormat,
     regionId,
     maxRows
   });
@@ -1779,6 +1797,7 @@ export type ParseIcaStorePromotionsOptions = {
   retrievedAt: string;
   storeAccountId: string;
   storeName: string;
+  icaFormat?: IcaFormat;
   regionId: string;
   maxRows?: number;
 };
@@ -1841,6 +1860,8 @@ export function parseIcaStorePromotions(payload: unknown, options: ParseIcaStore
         ...(soldByWeight ? { soldByWeight: true } : {}),
         storeAccountId: options.storeAccountId,
         storeName: options.storeName,
+        chain: 'ica',
+        ica_format: options.icaFormat ?? deriveIcaFormat(options.storeName),
         regionId: options.regionId,
         sourceUrl: options.sourceUrl,
         retrievedAt: options.retrievedAt

@@ -79,6 +79,7 @@ import {
   fetchHemkopWeeklyDiscountsForAllStores,
   fetchIcaDefaultStoreProducts,
   fetchIcaProducts,
+  deriveIcaFormat,
   ICA_MAXI_CATALOG_SEARCH_INVESTIGATION,
   ICA_PRODUCT_PAGE_SEARCH_PATH,
   fetchIcaReklambladOffers,
@@ -2600,6 +2601,14 @@ describe('fetchIcaProducts', () => {
     });
   });
 
+  it('derives ICA sub-brand format from store metadata', () => {
+    assert.equal(deriveIcaFormat('Maxi ICA Stormarknad Solna'), 'maxi');
+    assert.equal(deriveIcaFormat('ICA Kvantum Kungsholmen'), 'kvantum');
+    assert.equal(deriveIcaFormat('ICA Supermarket Fältöversten'), 'supermarket');
+    assert.equal(deriveIcaFormat('ICA Nära Annedal'), 'nara');
+  });
+
+
   it('fetches ICA store-scoped promotion products with source provenance', async () => {
     const requestedUrls: string[] = [];
     const payload = {
@@ -2657,6 +2666,8 @@ describe('fetchIcaProducts', () => {
       promotionDescription: '28 kr/st',
       storeAccountId: '1004599',
       storeName: 'ICA Kvantum Kungsholmen',
+      chain: 'ica',
+      ica_format: 'kvantum',
       regionId: '6ae1c52a-99a8-4b19-9464-dd01274df39d',
       sourceUrl: buildIcaStorePromotionsUrl('1004599', '6ae1c52a-99a8-4b19-9464-dd01274df39d', 1),
       retrievedAt: '2026-05-22T08:28:14.000Z'
