@@ -17,6 +17,7 @@ import {
 } from '@groceryview/analytics';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
+import { PriceReportReviewActions } from '@/components/price-report-review-actions';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
 import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
@@ -1149,6 +1150,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           <p className="rounded-2xl bg-white p-4 text-sm font-bold text-slate-700">Confidence: {freshnessBadge.confidenceBadge}</p>
         </div>
       </Card>
+      <PriceReportReviewActions productName={product.name} productSlug={product.slug} />
       {commodityComparison ? (
         <Card className="mt-6 border-lime-200 bg-lime-50/70">
           <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-start">
