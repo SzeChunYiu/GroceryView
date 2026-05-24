@@ -10,6 +10,7 @@ import { PostgresQueryExecutorService } from '../src/database/postgres-query-exe
 
 class RecordingPriceHistoryExecutor {
   calls: Array<{ sql: string; params: unknown[] }> = [];
+  configured = true;
   watchlistRows: Array<{
     id: string;
     product_id: string;
@@ -23,7 +24,7 @@ class RecordingPriceHistoryExecutor {
   favoriteStoreRows = new Map<string, string[]>();
 
   isConfigured(): boolean {
-    return true;
+    return this.configured;
   }
 
   async query<T>(sql: string, params: unknown[] = []): Promise<T[]> {
@@ -637,6 +638,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/users/demo/settings/account']);
     assert.ok(docs.body.paths['/users/demo/settings/data-export']);
     assert.ok(docs.body.paths['/api/settings']);
+    assert.deepEqual(docs.body.paths['/api/settings'].get.security, [{ bearer: [] }]);
     assert.deepEqual(docs.body.paths['/api/settings'].patch.security, [{ bearer: [] }]);
     assert.ok(docs.body.paths['/products']);
     assert.ok(docs.body.paths['/products/{productId}/cheapest-now']);
@@ -713,6 +715,50 @@ describe('GroceryView API app', () => {
       .set('authorization', `Bearer ${token}`)
       .send({ notificationChannels: ['sms'] })
       .expect(400);
+  });
+
+  it('reads authenticated user settings preferences through GET /api/settings', async () => {
+    process.env.AUTH_SECRET = 'test-auth-secret';
+    const token = await createSessionToken({ userId: 'user-settings-read-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'test-auth-secret');
+
+    await request(app.getHttpServer()).get('/api/settings').expect(401);
+
+    const defaultResponse = await request(app.getHttpServer())
+      .get('/api/settings')
+      .set('authorization', `Bearer ${token}`)
+      .expect(200);
+
+    assert.deepEqual(defaultResponse.body, {
+      userId: 'user-settings-read-1',
+      currency: 'SEK',
+      preferredStores: [],
+      notificationChannels: []
+    });
+
+    priceHistoryExecutor.preferenceRows.set('user-settings-read-1', {
+      preferred_currency: 'NOK',
+      notification_channels: ['email', 'telegram']
+    });
+    priceHistoryExecutor.favoriteStoreRows.set('user-settings-read-1', ['willys-odenplan', 'lidl-sveavagen']);
+
+    const response = await request(app.getHttpServer())
+      .get('/api/settings')
+      .set('authorization', `Bearer ${token}`)
+      .expect(200);
+
+    assert.deepEqual(response.body, {
+      userId: 'user-settings-read-1',
+      currency: 'NOK',
+      preferredStores: ['lidl-sveavagen', 'willys-odenplan'],
+      notificationChannels: ['email', 'telegram']
+    });
+    assert.equal(priceHistoryExecutor.calls.some((call) => call.sql.includes('insert into user_preferences')), false);
+
+    priceHistoryExecutor.configured = false;
+    await request(app.getHttpServer())
+      .get('/api/settings')
+      .set('authorization', `Bearer ${token}`)
+      .expect(503);
   });
 
   it('serves products, stores, prices, watchlists, baskets, and alerts', async () => {

@@ -23,6 +23,10 @@ export class SettingsService {
     return this.executor.isConfigured();
   }
 
+  async readPreferences(userId: string) {
+    return this.fetchPreferences(userId);
+  }
+
   async savePreferences(userId: string, patch: UserPreferencePatch) {
     await this.executor.query(
       `insert into app_users(id) values ($1)
@@ -52,6 +56,10 @@ export class SettingsService {
       }
     }
 
+    return this.fetchPreferences(userId);
+  }
+
+  private async fetchPreferences(userId: string) {
     const preferenceRows = await this.executor.query<PreferenceRow>(
       `select preferred_currency, notification_channels
        from user_preferences
