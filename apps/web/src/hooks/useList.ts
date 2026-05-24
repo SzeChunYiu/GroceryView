@@ -1,12 +1,15 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { purchaseHistoryReorderSuggestions, type ReorderSuggestion } from '@/lib/reorder-suggestions';
+
+type PersistentListItemSource = 'bulk-clipboard' | 'reorder-suggestion';
 
 export type ShoppingListItem = {
   checked: boolean;
   detail: string;
   id: string;
-  importSource?: 'starter' | 'bulk-clipboard';
+  importSource?: 'starter' | PersistentListItemSource;
   matchedProductName?: string;
   matchedProductSlug?: string;
   name: string;
@@ -17,9 +20,13 @@ export type BulkImportedListItemInput = Omit<ShoppingListItem, 'checked'> & {
   importSource: 'bulk-clipboard';
 };
 
+type PersistedImportedListItemInput = Omit<ShoppingListItem, 'checked'> & {
+  importSource: PersistentListItemSource;
+};
+
 type PersistedListState = {
   checkedById?: Record<string, boolean>;
-  importedItems?: BulkImportedListItemInput[];
+  importedItems?: PersistedImportedListItemInput[];
 };
 
 export const LIST_STORAGE_KEY = 'groceryview:shopping-list:checked:v1';
@@ -79,10 +86,10 @@ function listStateFromStorage(value: string | null): Required<PersistedListState
       : {};
 
     const importedItems = Array.isArray(maybeImportedItems)
-      ? maybeImportedItems.filter((item): item is BulkImportedListItemInput => (
+      ? maybeImportedItems.filter((item): item is PersistedImportedListItemInput => (
         item !== null
         && typeof item === 'object'
-        && item.importSource === 'bulk-clipboard'
+        && (item.importSource === 'bulk-clipboard' || item.importSource === 'reorder-suggestion')
         && typeof item.id === 'string'
         && typeof item.name === 'string'
         && typeof item.quantity === 'string'
@@ -96,7 +103,7 @@ function listStateFromStorage(value: string | null): Required<PersistedListState
   }
 }
 
-function withCheckedState(checkedById: Record<string, boolean>, importedItems: BulkImportedListItemInput[] = []): ShoppingListItem[] {
+function withCheckedState(checkedById: Record<string, boolean>, importedItems: PersistedImportedListItemInput[] = []): ShoppingListItem[] {
   const uniqueItems = new Map<string, Omit<ShoppingListItem, 'checked'>>();
   for (const item of baseListItems) uniqueItems.set(item.id, item);
   for (const item of importedItems) uniqueItems.set(item.id, item);
@@ -111,11 +118,13 @@ function persistCheckedState(items: ShoppingListItem[]) {
   try {
     const checkedById = Object.fromEntries(items.map((item) => [item.id, item.checked]));
     const importedItems = items
-      .filter((item) => item.importSource === 'bulk-clipboard')
+      .filter((item): item is ShoppingListItem & { importSource: PersistentListItemSource } => (
+        item.importSource === 'bulk-clipboard' || item.importSource === 'reorder-suggestion'
+      ))
       .map((item) => ({
         detail: item.detail,
         id: item.id,
-        importSource: 'bulk-clipboard' as const,
+        importSource: item.importSource,
         matchedProductName: item.matchedProductName,
         matchedProductSlug: item.matchedProductSlug,
         name: item.name,
@@ -155,6 +164,31 @@ export function useList() {
     setItems((currentItems) => currentItems.map((item) => ({ ...item, checked: false })));
   }, []);
 
+  const addReorderSuggestion = useCallback((suggestion: ReorderSuggestion) => {
+    setItems((currentItems) => {
+      const suggestionAlreadyListed = currentItems.some((item) => (
+        item.id === suggestion.id
+        || item.matchedProductSlug === suggestion.productSlug
+        || item.name.toLowerCase() === suggestion.name.toLowerCase()
+      ));
+      if (suggestionAlreadyListed) return currentItems;
+
+      return [
+        ...currentItems,
+        {
+          checked: false,
+          detail: suggestion.reasonLabel,
+          id: suggestion.id,
+          importSource: 'reorder-suggestion' as const,
+          matchedProductName: suggestion.name,
+          matchedProductSlug: suggestion.productSlug,
+          name: suggestion.name,
+          quantity: suggestion.quantity
+        }
+      ];
+    });
+  }, []);
+
   const addImportedItems = useCallback((importedItems: BulkImportedListItemInput[]) => {
     setItems((currentItems) => {
       const existingIds = new Set(currentItems.map((item) => item.id));
@@ -166,15 +200,23 @@ export function useList() {
     });
   }, []);
 
+  const reorderSuggestions = useMemo(() => purchaseHistoryReorderSuggestions.filter((suggestion) => !items.some((item) => (
+    item.id === suggestion.id
+    || item.matchedProductSlug === suggestion.productSlug
+    || item.name.toLowerCase() === suggestion.name.toLowerCase()
+  ))), [items]);
+
   const checkedCount = useMemo(() => items.filter((item) => item.checked).length, [items]);
   const totalCount = items.length;
   const remainingCount = totalCount - checkedCount;
 
   return {
     addImportedItems,
+    addReorderSuggestion,
     checkedCount,
     items,
     remainingCount,
+    reorderSuggestions,
     resetCheckedState,
     toggleItemChecked,
     totalCount

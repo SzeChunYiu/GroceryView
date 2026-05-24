@@ -198,6 +198,11 @@ export function ProductPriceCards({
             <p className="mt-4 text-3xl font-black text-emerald-800">{primaryLabel(card, compareMode)}</p>
             <p className="mt-1 text-sm font-semibold text-slate-700">{secondaryLabel(card, compareMode)}</p>
             <p className="mt-3 text-sm leading-6 text-slate-600">{card.sourceLabel}</p>
+            {card.reorderSuggestion ? (
+              <p className="mt-3 rounded-xl bg-amber-50 p-3 text-xs font-bold text-amber-950">
+                {card.reorderSuggestion.status === 'due' ? 'Reorder candidate' : 'Reorder soon'} · {card.reorderSuggestion.frequencyLabel}; {card.reorderSuggestion.recencyLabel}.
+              </p>
+            ) : null}
             <PriceHistorySparkline card={card} />
             <p className="mt-2 rounded-xl bg-blue-50 p-3 text-xs font-bold text-blue-950">{card.confidenceLabel}</p>
             {card.cheapestUnitBadge ? (

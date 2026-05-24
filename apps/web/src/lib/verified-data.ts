@@ -33,6 +33,7 @@ import {
   supportedCurrencies,
   unknownUnitPriceLabel
 } from './i18n';
+import { reorderSuggestionForProductSlug, type ReorderSuggestion } from './reorder-suggestions';
 
 const icaReklambladOffers = dbSiteIcaReklambladOffers.length > 0 ? dbSiteIcaReklambladOffers : staticIcaReklambladOffers;
 const icaReklambladSource = dbSiteIcaReklambladOffers.length > 0 ? dbSiteIcaReklambladSource : staticIcaReklambladSource;
@@ -1918,6 +1919,7 @@ export type AdaptiveProductCard = {
   }>;
   sparklineLabel: string;
   isAvailable: boolean;
+  reorderSuggestion: ReorderSuggestion | null;
 };
 
 function isOpenPricesProduct(product: ItemComparisonProduct): product is (typeof pricedProducts)[number] {
@@ -1964,6 +1966,7 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
     : [];
   const sparklinePoints = sevenDaySparklinePoints(product);
   const priceDrop = priceDropFromThirtyDayHistory(product);
+  const reorderSuggestion = reorderSuggestionForProductSlug(product.slug);
 
   return {
     slug: product.slug,
@@ -1994,7 +1997,8 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
     sparklineLabel: sparklinePoints.length >= 2
       ? `${sparklinePoints.length} observed daily points from price_daily/OpenPrices history`
       : '7-day sparkline waits for at least two observed price-history points',
-    isAvailable
+    isAvailable,
+    reorderSuggestion
   };
 });
 export const homepageAdaptiveProductCards = adaptiveProductCards.slice(0, 6);
