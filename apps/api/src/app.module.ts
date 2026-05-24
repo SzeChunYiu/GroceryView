@@ -9,6 +9,7 @@ import { HealthModule } from './health/health.module.js';
 import { PricesModule } from './prices/prices.module.js';
 import { ProductsModule } from './products/products.module.js';
 import { StoresModule } from './stores/stores.module.js';
+import { ReportsModule } from './reports/reports.module.js';
 import { UsersModule } from './users/users.module.js';
 import { WatchlistsModule } from './watchlists/watchlists.module.js';
 
@@ -23,7 +24,8 @@ import { WatchlistsModule } from './watchlists/watchlists.module.js';
     UsersModule,
     WatchlistsModule,
     BasketsModule,
-    AlertsModule
+    AlertsModule,
+    ReportsModule
   ],
   controllers: [AppController]
 })

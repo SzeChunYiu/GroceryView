@@ -5,6 +5,7 @@ import { Test, type TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { AppModule } from '../src/app.module.js';
 import { configureApp } from '../src/configure-app.js';
+import { resetQueuedPriceReports } from '../src/routes/reports.js';
 
 describe('GroceryView API app', () => {
   let app: INestApplication;
@@ -17,6 +18,7 @@ describe('GroceryView API app', () => {
     app = moduleFixture.createNestApplication();
     configureApp(app);
     await app.init();
+    resetQueuedPriceReports();
   });
 
   afterEach(async () => {
@@ -35,7 +37,49 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/products']);
     assert.ok(docs.body.paths['/products/{id}/terminal']);
     assert.ok(docs.body.paths['/products/{id}/spread']);
+    assert.ok(docs.body.paths['/reports']);
+    assert.ok(docs.body.paths['/reports/price']);
     assert.ok(docs.body.paths['/stores']);
+  });
+
+  it('supports price-report queueing for admin review', async () => {
+    const initialQueue = await request(app.getHttpServer()).get('/reports').expect(200);
+    assert.ok(Array.isArray(initialQueue.body));
+
+    const submitted = await request(app.getHttpServer())
+      .post('/reports/price')
+      .send({
+        itemId: 'coffee',
+        reportedPrice: 52.75,
+        storeName: 'Willys Odenplan',
+        observedAt: '2026-05-24',
+        notes: 'Shelf label showed 52.75 SEK'
+      })
+      .expect(201);
+
+    assert.equal(submitted.body.payload.itemId, 'coffee');
+    assert.equal(submitted.body.payload.reportedPrice, 52.75);
+    assert.equal(submitted.body.payload.storeName, 'Willys Odenplan');
+    assert.equal(submitted.body.status, 'queued');
+
+    const reports = await request(app.getHttpServer()).get('/reports').expect(200);
+    assert.equal(reports.body.length, initialQueue.body.length + 1);
+    assert.ok(
+      reports.body.some(
+        (report: {
+          payload: {
+            itemId: string;
+            reportedPrice: number;
+            storeName?: string;
+            observedAt?: string;
+            notes?: string;
+          };
+        }) =>
+          report.payload.itemId === 'coffee' &&
+          report.payload.reportedPrice === 52.75 &&
+          report.payload.storeName === 'Willys Odenplan'
+      )
+    );
   });
 
   it('serves products, stores, prices, watchlists, baskets, and alerts', async () => {
