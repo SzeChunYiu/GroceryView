@@ -548,6 +548,23 @@ describe('verified-data UI', () => {
   });
 
 
+  it('prioritizes review moderation by confidence and risk scoring', async () => {
+    const route = await read('src/app/admin/moderation/page.tsx');
+    const reviews = await read('src/lib/community-reviews.ts');
+
+    assert.match(route, /prioritizedModerationQueue/);
+    assert.match(route, /Review moderation confidence scoring/);
+    assert.match(route, /riskScore/);
+    assert.match(route, /confidenceScore/);
+    assert.match(route, /Highest moderation risk first/);
+    assert.match(reviews, /scoreReviewModerationConfidence/);
+    assert.match(reviews, /prioritizeModerationQueue/);
+    assert.match(reviews, /riskyTerms/);
+    assert.match(reviews, /reviewerTrustScore/);
+    assert.match(reviews, /priorityRank/);
+  });
+
+
   it('surfaces crowd price submissions with photo evidence and trust guardrails', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const priceReports = await read('src/app/price-reports/page.tsx');
