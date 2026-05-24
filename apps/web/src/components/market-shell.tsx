@@ -128,6 +128,12 @@ const launchFixtureStores = [
   { slug: 'city-gross-stockholm', name: 'City Gross Stockholm', district: 'Stockholm County', fixture: 'City Gross Stockholm county locator result' }
 ];
 
+const locationAwareDefaultStores = [
+  { slug: 'willys-odenplan', name: 'Willys Odenplan', district: 'Vasastan', distance: '0.8 km from central Stockholm' },
+  { slug: 'ica-nara-sergels-torg', name: 'ICA Nära Sergels Torg', district: 'Norrmalm', distance: '0.2 km from central Stockholm' },
+  { slug: 'coop-swedenborgsgatan', name: 'Coop Swedenborgsgatan', district: 'Södermalm', distance: '1.8 km from central Stockholm' }
+];
+
 function heatmapTileClass(heatScore: number) {
   if (heatScore >= 80) return 'border-rose-300 bg-rose-50 text-rose-950';
   if (heatScore >= 55) return 'border-amber-300 bg-amber-50 text-amber-950';
@@ -170,6 +176,57 @@ export function MarketShell() {
       </section>
 
       <div className="mt-6"><MetricGrid /></div>
+
+
+      <Card className="mt-6 border-cyan-200 bg-cyan-50">
+        <div className="grid gap-5 lg:grid-cols-[1fr_0.9fr] lg:items-start">
+          <div>
+            <Eyebrow>Location-aware search</Eyebrow>
+            <h2 className="mt-2 text-3xl font-black tracking-tight">Nearby store defaults for autocomplete</h2>
+            <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-cyan-950">
+              Search can ask for browser geolocation, send <code className="rounded bg-white/80 px-1 py-0.5 text-cyan-900">lat</code> and <code className="rounded bg-white/80 px-1 py-0.5 text-cyan-900">lng</code> to <code className="rounded bg-white/80 px-1 py-0.5 text-cyan-900">/api/search</code>, and bias default store suggestions toward the shopper's catchment area before general catalogue matches.
+            </p>
+            <button className="mt-4 rounded-full bg-cyan-900 px-5 py-3 text-sm font-black text-white" data-location-search-button type="button">Use my location for search</button>
+            <p className="mt-2 text-xs font-bold text-cyan-900" data-location-search-status>Location is optional; search still works without it.</p>
+          </div>
+          <div className="grid gap-3">
+            {locationAwareDefaultStores.map((store) => (
+              <Link className="rounded-2xl border border-cyan-100 bg-white p-4 shadow-sm hover:border-cyan-700" data-location-search-link href={`/api/search?q=${encodeURIComponent(store.name)}`} key={store.slug}>
+                <p className="font-black text-slate-950">{store.name}</p>
+                <p className="mt-1 text-sm font-semibold text-slate-700">{store.district} · {store.distance}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(() => {
+              const button = document.querySelector('[data-location-search-button]');
+              const status = document.querySelector('[data-location-search-status]');
+              const links = Array.from(document.querySelectorAll('[data-location-search-link]'));
+              button?.addEventListener('click', () => {
+                if (!navigator.geolocation) {
+                  if (status) status.textContent = 'Geolocation is not available in this browser.';
+                  return;
+                }
+                navigator.geolocation.getCurrentPosition((position) => {
+                  const lat = position.coords.latitude.toFixed(5);
+                  const lng = position.coords.longitude.toFixed(5);
+                  links.forEach((link) => {
+                    const url = new URL(link.getAttribute('href') || '/api/search', window.location.origin);
+                    url.searchParams.set('lat', lat);
+                    url.searchParams.set('lng', lng);
+                    link.setAttribute('href', url.pathname + url.search);
+                  });
+                  if (status) status.textContent = 'Nearby stores now rank first in search suggestions.';
+                }, () => {
+                  if (status) status.textContent = 'Location permission was not granted; default suggestions remain available.';
+                }, { maximumAge: 300000, timeout: 8000 });
+              });
+            })();`,
+          }}
+        />
+      </Card>
 
       <TrendingCarousel items={homepageTrendingPriceChanges} />
 
