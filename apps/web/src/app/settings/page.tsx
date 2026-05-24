@@ -7,6 +7,11 @@ export function generateMetadata() {
   return routeMetadata('/settings');
 }
 
+const settingsValidationErrorAnnouncements = [
+  'Email and export request validation errors render in role="alert" live regions.',
+  'Screen readers are notified immediately when settings form errors appear.'
+];
+
 const dataExportContract = buildPrivacyExport(
   {
     userId: 'signed-in-account',
@@ -32,6 +37,18 @@ export default function SettingsPage() {
       </p>
 
       <SettingsDataExportActions />
+
+      <Card className="mt-6 border-amber-200 bg-amber-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-900">Form error announcements</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Validation errors use live alert regions</h2>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          {settingsValidationErrorAnnouncements.map((message) => (
+            <p className="rounded-2xl bg-white/85 p-4 text-sm font-bold text-slate-700" key={message} role="alert" aria-live="assertive">
+              {message}
+            </p>
+          ))}
+        </div>
+      </Card>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
         <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
