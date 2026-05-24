@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "files": [
+    "src/lib/distance.ts",
+    "src/hooks/useGeolocation.ts",
+    "src/components/store-distance-card.tsx"
+  ],
+  "exclude": []
+}

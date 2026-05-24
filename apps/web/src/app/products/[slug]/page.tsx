@@ -11,6 +11,7 @@ import {
 } from '@groceryview/core';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
+import { StoreDistanceCard } from '@/components/store-distance-card';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
 import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
@@ -124,6 +125,12 @@ function productOfferBounds(product: NonNullable<ReturnType<typeof findProduct>>
   }
 
   return { lowPrice: product.priceMin, highPrice: product.priceMax, offerCount: product.observationCount };
+}
+
+function nearestStoreChainLabel(chain: string) {
+  if (chain === 'willys') return 'Willys';
+  if (chain === 'hemkop') return 'Hemköp';
+  return chain.charAt(0).toUpperCase() + chain.slice(1);
 }
 
 function productJsonLdFor(product: NonNullable<ReturnType<typeof findProduct>>) {
@@ -1023,6 +1030,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const freshnessBadge = dataFreshnessBadges.find((badge) => badge.sourceKind === (isChain ? 'axfood' : 'openprices')) ?? dataFreshnessBadges[0]!;
   const productJsonLd = productJsonLdFor(product);
   const breadcrumbJsonLd = breadcrumbJsonLdFor(product);
+  const nearestChainLabel = isChain ? nearestStoreChainLabel(product.lowestChain) : null;
   return (
     <PageShell>
       <script dangerouslySetInnerHTML={{ __html: jsonLd(productJsonLd) }} type="application/ld+json" />
@@ -1062,6 +1070,15 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           )}
         </Card>
         <Card>
+          {isChain && nearestChainLabel ? (
+            <StoreDistanceCard
+              chain={product.lowestChain}
+              chainLabel={nearestChainLabel}
+              chainPrice={product.lowestPrice}
+              chainPriceLabel={formatSek(product.lowestPrice)}
+              productBrand={productBrand(product)}
+            />
+          ) : null}
           <h2 className="text-2xl font-black">Source fields</h2>
           <dl className="mt-4 grid gap-3 text-sm">
             <div className="rounded-2xl bg-slate-50 p-4"><dt className="font-black">Code</dt><dd>{product.code}</dd></div>
@@ -1105,7 +1122,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           </div>
           {commodityComparison.status === 'priced' ? (
             <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {commodityComparison.rows.map((row) => (
+              {commodityComparison.rows.map((row: (typeof commodityComparison.rows)[number]) => (
                 <Link className="rounded-2xl border border-lime-100 bg-white p-4 shadow-sm transition hover:border-lime-700" href={`/products/${row.productId}`} key={`${row.chainId}-${row.productId}`}>
                   <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-800">#{row.rank} · {row.chainName}</p>
                   <h3 className="mt-2 text-lg font-black text-slate-950">{row.productName}</h3>
