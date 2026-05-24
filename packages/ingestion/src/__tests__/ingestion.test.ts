@@ -96,6 +96,7 @@ import {
   fetchWillysWeeklyDiscounts,
   fetchWillysWeeklyDiscountsForAllStores,
   findPharmacyEanMatches,
+  parseLyfjaProducts,
   parseApohemProducts,
   parseApotekHjartatProducts,
   parseIcaReklambladOffers,
@@ -7030,6 +7031,34 @@ describe('daily ingestion runner', () => {
       apohemSourceUrl,
       apotekHjartatSourceUrl
     ]);
+  });
+
+  it('parses Lyfja Iceland product fixtures into ISK pharmacy rows', () => {
+    const retrievedAt = '2026-05-24T15:35:00.000Z';
+    const sourceUrl = 'https://www.lyfja.is/verslun/tilbod/';
+    const rows = parseLyfjaProducts(`
+      <astro-island component-export="AddToCartButton" props="{&quot;sku&quot;:[0,&quot;10103656&quot;],&quot;product&quot;:[0,{&quot;title&quot;:[0,&quot;After Sun Intense Moisture&quot;],&quot;brand&quot;:[0,&quot;Biotherm&quot;],&quot;maxSellable&quot;:[0,4],&quot;retailQuantity&quot;:[0,&quot;400 ml&quot;],&quot;productCategories&quot;:[1,[[0,{&quot;title&quot;:[0,&quot;Eftir sól&quot;]}],[0,{&quot;title&quot;:[0,&quot;Sólarvarnir&quot;]}]]],&quot;breadcrumbs&quot;:[1,[[0,{&quot;name&quot;:[0,&quot;Forsíða&quot;],&quot;url&quot;:[0,&quot;/&quot;]}],[0,{&quot;name&quot;:[0,&quot;After Sun Intense Moisture&quot;],&quot;url&quot;:[0,&quot;/verslun/hudin/solarvarnir/eftir-sol/biotherm-after-sun-facebody-400-ml-10103656/&quot;]}]]],&quot;images&quot;:[1,[[0,{&quot;url&quot;:[0,&quot;/media/axnjory1/10103656.png&quot;]}]]],&quot;price&quot;:[0,{&quot;currentAmount&quot;:[0,{&quot;value&quot;:[0,1239.8],&quot;currencyString&quot;:[0,&quot;1.240 kr&quot;]}],&quot;regularAmount&quot;:[0,{&quot;value&quot;:[0,1549],&quot;currencyString&quot;:[0,&quot;1.549 kr&quot;]}],&quot;vat&quot;:[0,0.24]}]}]}"></astro-island>
+    `, sourceUrl, retrievedAt);
+
+    assert.deepEqual(rows, [{
+      country: 'IS',
+      currency: 'ISK',
+      chain: 'lyfja',
+      sku: '10103656',
+      name: 'After Sun Intense Moisture',
+      brand: 'Biotherm',
+      category: 'Eftir sól',
+      price: 1239.8,
+      priceText: '1.240 kr',
+      originalPrice: 1549,
+      originalPriceText: '1.549 kr',
+      vatPercent: 0.24,
+      stockStatus: 'in_stock',
+      productUrl: 'https://www.lyfja.is/verslun/hudin/solarvarnir/eftir-sol/biotherm-after-sun-facebody-400-ml-10103656/',
+      imageUrl: 'https://www.lyfja.is/media/axnjory1/10103656.png',
+      sourceUrl,
+      retrievedAt
+    }]);
   });
 
   it('materializes native Lidl all-store public offer prices into daily database observations', async () => {
