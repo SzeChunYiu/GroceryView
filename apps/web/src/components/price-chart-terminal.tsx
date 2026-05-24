@@ -76,12 +76,23 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
     () => chart.windows.find((window) => window.label === activeWindowLabel) ?? chart.windows[0],
     [activeWindowLabel, chart.windows]
   );
+  const visibleChartSeries = useMemo(
+    () =>
+      activeWindow?.series.map((series) => ({
+        lineStyle: series.lineStyle,
+        points: series.points.map((point) => ({
+          time: point.time.slice(0, 10),
+          value: point.value
+        }))
+      })) ?? [],
+    [activeWindow]
+  );
   const firstSeries = activeWindow?.series[0];
   const latestPoint = firstSeries?.points.at(-1);
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container || !chart.available || !activeWindow || activeWindow.series.length === 0) return;
+    if (!container || !chart.available || visibleChartSeries.length === 0) return;
 
     let isDisposed = false;
     let removeChart: (() => void) | undefined;
@@ -113,7 +124,7 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
           }
         });
 
-        activeWindow.series.forEach((series, index) => {
+        visibleChartSeries.forEach((series, index) => {
           const line = chartApi.addSeries(LineSeries, {
             color: chartColorFor(index),
             lineWidth: 3,
@@ -121,10 +132,7 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
             lastValueVisible: true,
             priceLineVisible: true
           });
-          line.setData(series.points.map((point) => ({
-            time: point.time.slice(0, 10),
-            value: point.value
-          })));
+          line.setData(series.points);
         });
 
         chartApi.timeScale().fitContent();
@@ -141,7 +149,7 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
       isDisposed = true;
       removeChart?.();
     };
-  }, [activeWindow, chart.available]);
+  }, [chart.available, visibleChartSeries]);
 
   return (
     <section className="mt-6 rounded-[2rem] border border-slate-800 bg-slate-950 p-5 text-white shadow-xl md:p-6">
