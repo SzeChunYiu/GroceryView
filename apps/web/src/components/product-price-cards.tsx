@@ -1,8 +1,8 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
+import { LazyItemCard } from './LazyItemCard';
 import type { AdaptiveProductCard } from '@/lib/verified-data';
 
 type CompareMode = 'adaptive' | 'total' | 'unit';
@@ -142,11 +142,16 @@ export function ProductPriceCards({
         </div>
       </div>
       <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-        {sortedCards.map((card) => (
-          <Link
+        {sortedCards.map((card, index) => (
+          <LazyItemCard
             className="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:-translate-y-0.5 hover:border-emerald-700"
+            compareMode={compareMode}
             href={`/products/${card.slug}`}
+            itemId={card.slug}
+            itemName={card.name}
             key={card.slug}
+            listId="adaptive-product-cards"
+            listIndex={index}
           >
             {card.imageUrl && card.imageAlt ? (
               <div className="mb-4 flex aspect-[4/3] items-center justify-center rounded-2xl border border-white bg-white p-3 shadow-sm">
@@ -185,7 +190,7 @@ export function ProductPriceCards({
             ) : (
               <p className="mt-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">cheapest-per-unit badge waits for cross-chain unit evidence</p>
             )}
-          </Link>
+          </LazyItemCard>
         ))}
       </div>
     </section>
