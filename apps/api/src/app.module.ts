@@ -9,6 +9,7 @@ import { HealthModule } from './health/health.module.js';
 import { PricesModule } from './prices/prices.module.js';
 import { ProductsModule } from './products/products.module.js';
 import { StoresModule } from './stores/stores.module.js';
+import { SearchController } from './routes/search.js';
 import { UsersModule } from './users/users.module.js';
 import { WatchlistsModule } from './watchlists/watchlists.module.js';
 
@@ -25,6 +26,6 @@ import { WatchlistsModule } from './watchlists/watchlists.module.js';
     BasketsModule,
     AlertsModule
   ],
-  controllers: [AppController]
+  controllers: [AppController, SearchController]
 })
 export class AppModule {}
