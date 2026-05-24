@@ -1,4 +1,5 @@
 import { MarketShell } from '@/components/market-shell';
+import { PromoBanner, defaultPromoBanners } from '@/components/PromoBanner';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -7,5 +8,10 @@ export function generateMetadata() {
 
 
 export default function HomePage() {
-  return <MarketShell />;
+  return (
+    <section className="grid gap-5">
+      <PromoBanner banners={defaultPromoBanners} />
+      <MarketShell />
+    </section>
+  );
 }
