@@ -1,3 +1,6 @@
+export { parseXForYPromotion } from './lib/promotionParsers/xForY.js';
+export type { XForYPromotion } from './lib/promotionParsers/xForY.js';
+
 export type DealScoreInput = {
   currentCityPercentile: number;
   knownPromoHistoryPercentile: number;
