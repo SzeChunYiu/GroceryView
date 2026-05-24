@@ -32,6 +32,7 @@ import {
   buildMatpriskollenStoresUrl,
   buildMathemSearchUrl,
   buildMatsparSearchUrl,
+  buildNilleNoSearchUrl,
   buildOpenFoodFactsProductUrl,
   buildOpenFoodFactsSwedenSearchUrl,
   buildOpenPricesConnectorUrl,
@@ -90,6 +91,7 @@ import {
   fetchMathemProducts,
   fetchMatpriskollenOffers,
   fetchMatsparProducts,
+  fetchNilleNoProducts,
   fetchWillysProducts,
   fetchWillysProductsForAllStores,
   fetchWillysStores,
@@ -128,6 +130,7 @@ import {
   parseLidlStoreDirectoryLinks,
   parseLidlStorePayload,
   parseOsmChainStores,
+  parseNilleNoProducts,
   parseOpenPricesSnapshot,
   parseOkq8FuelPricePage,
   parseBrandedSwedishFuelStations,
@@ -4073,6 +4076,60 @@ describe('fetchMatsparProducts', () => {
       }),
       /Matspar fetch returned only 1 rows; minimum required is 2/
     );
+  });
+});
+
+describe('fetchNilleNoProducts', () => {
+  it('fetches Nille Norway variety discount rows with NOK prices', async () => {
+    const requestedUrls: string[] = [];
+    const payload = {
+      products: [{
+        sku: 'nille-lys-1',
+        name: 'LED kubbelys',
+        brand: 'Nille',
+        category: 'interiør',
+        salesPrice: '39,90 kr',
+        originalPrice: '59,90 kr',
+        packageText: '1 stk',
+        inStock: true,
+        productUrl: '/produkter/led-kubbelys',
+        imageUrl: '/images/led-kubbelys.jpg',
+        campaignText: 'Kampanje'
+      }]
+    };
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(JSON.stringify(payload), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchNilleNoProducts({
+      queries: ['lys'],
+      fetchImpl,
+      retrievedAt: '2026-05-24T11:00:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [buildNilleNoSearchUrl('lys')]);
+    assert.deepEqual(rows.map((row) => [row.chainId, row.countryCode, row.domain, row.productId, row.price, row.originalPrice, row.currency]), [
+      ['nille-no', 'NO', 'variety', 'nille-lys-1', 39.9, 59.9, 'NOK']
+    ]);
+    assert.equal(rows[0]?.promotionText, 'Kampanje');
+    assert.equal(rows[0]?.productUrl, 'https://www.nille.no/produkter/led-kubbelys');
+  });
+
+  it('parses embedded Nille fixture data and drops rows without prices', () => {
+    const rows = parseNilleNoProducts(`
+      <script id="__NILLE_PRODUCTS__" type="application/json">
+        {"items":[{"id":"serviett-1","title":"Servietter","price":25,"url":"/servietter"},{"id":"missing-price","title":"Mangler pris"}]}
+      </script>
+    `, {
+      sourceUrl: buildNilleNoSearchUrl('servietter'),
+      retrievedAt: '2026-05-24T11:00:00.000Z'
+    });
+
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0]?.productId, 'serviett-1');
+    assert.equal(rows[0]?.price, 25);
+    assert.equal(rows[0]?.brand, 'Nille');
   });
 });
 
