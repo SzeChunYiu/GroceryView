@@ -7,7 +7,7 @@ import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { useList } from '@/hooks/useList';
 
 export default function ShoppingListPage() {
-  const { addImportedItems, checkedCount, items, remainingCount, resetCheckedState, toggleItemChecked, totalCount } = useList();
+  const { addImportedItems, checkedCount, items, offlineSync, remainingCount, resetCheckedState, toggleItemChecked, totalCount } = useList();
   const progress = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
 
   return (
@@ -30,6 +30,15 @@ export default function ShoppingListPage() {
         </div>
 
         <BulkImportDialog onImportItems={addImportedItems} />
+
+        <div className="mt-6 rounded-[1.5rem] border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-950">
+          {offlineSync.isOnline ? (
+            <span>Online sync ready{offlineSync.lastReplayedAt ? ` · replayed queued edits ${new Date(offlineSync.lastReplayedAt).toLocaleTimeString()}` : ""}.</span>
+          ) : (
+            <span>Offline mode: list edits are queued on this device and will replay when connectivity returns.</span>
+          )}
+          {offlineSync.pendingCount > 0 ? <span className="ml-2 font-black">{offlineSync.pendingCount} pending list {offlineSync.pendingCount === 1 ? "edit" : "edits"}.</span> : null}
+        </div>
 
         <section className="mt-6 rounded-[1.75rem] border border-emerald-200 bg-white/95 p-5 shadow-sm">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

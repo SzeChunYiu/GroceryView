@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { queueListMutation, saveListOfflineSnapshot, subscribeToListOfflineSync, type ListOfflineSyncState } from '@/lib/offline-sync';
 
 export type ShoppingListItem = {
   checked: boolean;
@@ -194,6 +195,7 @@ export function useList() {
   const [items, setItems] = useState<ShoppingListItem[]>(() => withCheckedState({}));
   const [hasLoadedBrowserState, setHasLoadedBrowserState] = useState(false);
   const [shareLink, setShareLink] = useState<ShareLinkState | null>(null);
+  const [offlineSync, setOfflineSync] = useState<ListOfflineSyncState>({ isOnline: true, pendingCount: 0, lastReplayedAt: null });
 
   useEffect(() => {
     let cancelled = false;
@@ -223,19 +225,25 @@ export function useList() {
   useEffect(() => {
     if (!hasLoadedBrowserState || shareLink?.isValid) return;
     persistCheckedState(items);
+    saveListOfflineSnapshot(items);
   }, [hasLoadedBrowserState, items, shareLink?.isValid]);
 
+  useEffect(() => subscribeToListOfflineSync(setOfflineSync), []);
+
   const toggleItemChecked = useCallback((itemId: string) => {
+    if (!navigator.onLine) queueListMutation({ type: 'toggle-item', itemId });
     setItems((currentItems) => currentItems.map((item) => (
       item.id === itemId ? { ...item, checked: !item.checked } : item
     )));
   }, []);
 
   const resetCheckedState = useCallback(() => {
+    if (!navigator.onLine) queueListMutation({ type: 'reset-checked' });
     setItems((currentItems) => currentItems.map((item) => ({ ...item, checked: false })));
   }, []);
 
   const addImportedItems = useCallback((importedItems: BulkImportedListItemInput[]) => {
+    if (!navigator.onLine) queueListMutation({ type: 'bulk-import', items: importedItems });
     setItems((currentItems) => {
       const existingIds = new Set(currentItems.map((item) => item.id));
       const nextImportedItems = importedItems
@@ -255,6 +263,7 @@ export function useList() {
     checkedCount,
     items,
     remainingCount,
+    offlineSync,
     resetCheckedState,
     shareLink,
     toggleItemChecked,
