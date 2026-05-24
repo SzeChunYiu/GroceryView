@@ -100,6 +100,7 @@ export * from './connectors/ica-reklamblad.js';
 export * from './connectors/lidl.js';
 export * from './connectors/mathem.js';
 export * from './connectors/matpriskollen.js';
+export * from './connectors/mix-no.js';
 export * from './connectors/matspar.js';
 export * from './connectors/lidl-bulk.js';
 export * from './connectors/willys-bulk.js';

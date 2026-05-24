@@ -32,6 +32,7 @@ import {
   buildMatpriskollenStoresUrl,
   buildMathemSearchUrl,
   buildMatsparSearchUrl,
+  buildMixNoSearchUrl,
   buildOpenFoodFactsProductUrl,
   buildOpenFoodFactsSwedenSearchUrl,
   buildOpenPricesConnectorUrl,
@@ -90,6 +91,7 @@ import {
   fetchMathemProducts,
   fetchMatpriskollenOffers,
   fetchMatsparProducts,
+  fetchMixNoProducts,
   fetchWillysProducts,
   fetchWillysProductsForAllStores,
   fetchWillysStores,
@@ -127,6 +129,7 @@ import {
   parseIcaStoreList,
   parseLidlStoreDirectoryLinks,
   parseLidlStorePayload,
+  parseMixNoProducts,
   parseOsmChainStores,
   parseOpenPricesSnapshot,
   parseOkq8FuelPricePage,
@@ -4073,6 +4076,68 @@ describe('fetchMatsparProducts', () => {
       }),
       /Matspar fetch returned only 1 rows; minimum required is 2/
     );
+  });
+});
+
+describe('fetchMixNoProducts', () => {
+  it('parses Mix NO convenience products from public JSON-LD', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(`
+        <script type="application/ld+json">
+          {
+            "@context":"https://schema.org",
+            "@type":"ItemList",
+            "itemListElement":[{
+              "@type":"Product",
+              "sku":"mix-cola-500",
+              "name":"Mix Cola 0,5l",
+              "brand":{"name":"Mix"},
+              "description":"Flaske 0,5l",
+              "image":"/images/cola.png",
+              "url":"/produkt/mix-cola",
+              "offers":{"@type":"Offer","price":"29,90","priceCurrency":"NOK"}
+            }]
+          }
+        </script>
+      `, { status: 200, headers: { 'content-type': 'text/html' } });
+    };
+
+    const rows = await fetchMixNoProducts({
+      queries: ['cola'],
+      fetchImpl,
+      retrievedAt: '2026-05-24T14:00:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [buildMixNoSearchUrl('cola')]);
+    assert.deepEqual(rows, [{
+      code: 'mix-cola-500',
+      name: 'Mix Cola 0,5l',
+      brand: 'Mix',
+      packageText: '0,5l',
+      category: '',
+      price: 29.9,
+      priceText: '29.90 NOK',
+      currency: 'NOK',
+      country: 'NO',
+      productUrl: 'https://mixmix.no/produkt/mix-cola',
+      imageUrl: 'https://mixmix.no/images/cola.png',
+      sourceUrl: buildMixNoSearchUrl('cola'),
+      retrievedAt: '2026-05-24T14:00:00.000Z'
+    }]);
+  });
+
+  it('deduplicates Mix NO products parsed from repeated JSON sources', () => {
+    const rows = parseMixNoProducts(`
+      <script type="application/ld+json">[
+        {"@type":"Product","sku":"same","name":"Same","offers":{"price":10}},
+        {"@type":"Product","sku":"same","name":"Same","offers":{"price":10}}
+      ]</script>
+    `, buildMixNoSearchUrl('same'), '2026-05-24T14:00:00.000Z');
+
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0]?.country, 'NO');
   });
 });
 
