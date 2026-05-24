@@ -10,10 +10,10 @@ export const willysSourceSummary = {
 
 export const hemkopSourceSummary = {
   source: 'hemkop.se public search JSON',
-  retrievedAt: '2026-05-24T22:11:12.471Z',
-  rowCount: 8600,
+  retrievedAt: '2026-05-24T22:59:19.059Z',
+  rowCount: 11799,
   sourceUrlPattern: 'https://www.hemkop.se/search?q={query}&page={page}&size=100',
-  sourceUrlCount: 104
+  sourceUrlCount: 140
 };
 
 export const willysWeeklyDiscountSourceSummary = {
@@ -28,8 +28,8 @@ export const willysWeeklyDiscountSourceSummary = {
 
 export const hemkopWeeklyDiscountSourceSummary = {
   source: 'hemkop.se public Axfood campaign JSON',
-  retrievedAt: '2026-05-24T22:11:12.471Z',
-  rowCount: 55335,
+  retrievedAt: '2026-05-24T22:59:19.059Z',
+  rowCount: 55355,
   storeSourceUrl: 'https://www.hemkop.se/axfood/rest/store',
   sourceUrlPattern: 'https://www.hemkop.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100',
   storeCount: 205,

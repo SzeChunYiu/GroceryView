@@ -199,11 +199,11 @@ Sample rows:
 - Source: hemkop.se public Axfood campaign JSON
 - Store catalog source: https://www.hemkop.se/axfood/rest/store
 - Source URL pattern: https://www.hemkop.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100
-- Retrieved: 2026-05-24T22:11:12.471Z
+- Retrieved: 2026-05-24T22:59:19.059Z
 - Store count: 205
 - Source URLs fetched: 615
-- Real weekly discount rows fetched and wired: 55335
-- Current flyer rows for 25/05-2026-31/05-2026: 13470 rows across 204 stores
+- Real weekly discount rows fetched and wired: 55355
+- Current flyer rows for 25/05-2026-31/05-2026: 13535 rows across 205 stores
 - Web wire: apps/web/src/lib/ingested/hemkop.ts
 - Connector: packages/ingestion/src/connectors/hemkop.ts
 
