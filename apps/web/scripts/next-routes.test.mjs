@@ -3360,11 +3360,18 @@ ${seo}`;
 
   it('surfaces brand-tier indices on the chain index route using the real core brand-tier output', async () => {
     const source = await read('src/app/chain-index/page.tsx');
+    const chainData = await read('src/lib/chain-index-data.ts');
+    assert.match(source, /ConfidenceBadge/);
     assert.match(source, /calculateBrandTierIndices/);
     assert.match(source, /buildBrandTierPriceObservations/);
+    assert.match(source, /brandTierObservations/);
     assert.match(source, /brandTierSummary/);
+    assert.match(source, /brandTierConfidenceLevel/);
     assert.match(source, /privateLabelSavingsPercent/);
     assert.match(source, /premiumGapPercent/);
+    assert.match(chainData, /axfoodProducts\.filter/);
+    assert.match(chainData, /product\.inChains\.length > 1/);
+    assert.doesNotMatch(chainData, /const BRAND_TIER_OBSERVATIONS/);
   });
 
   it('refines the chain index with matched-basket observations on the 100-centred scale', async () => {
