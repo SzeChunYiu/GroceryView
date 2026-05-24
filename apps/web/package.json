@@ -9,7 +9,7 @@
     "perf:lighthouse:ci": "lhci autorun --config=./lighthouserc.cjs",
     "perf:lighthouse:preview": "lhci autorun --config=./lighthouserc.preview.cjs",
     "start": "next start",
-    "test": "node --test scripts/*.test.mjs"
+    "test": "node --test scripts/*.test.mjs src/components/__tests__/*.test.mjs"
   },
   "dependencies": {
     "@groceryview/analytics": "0.1.0",

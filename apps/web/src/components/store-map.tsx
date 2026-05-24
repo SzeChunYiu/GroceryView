@@ -143,6 +143,8 @@ export function StoreMap() {
   const mapRef = useRef<maplibregl.Map | null>(null);
   const [storeCount, setStoreCount] = useState(0);
   const [selectedStoreSlug, setSelectedStoreSlug] = useState(syncedMapListStores[0]?.slug ?? '');
+  const [geolocationAvailable, setGeolocationAvailable] = useState(true);
+  const [manualLocationQuery, setManualLocationQuery] = useState('');
 
   function focusStore(store: OsmStore) {
     setSelectedStoreSlug(store.slug);
@@ -157,7 +159,9 @@ export function StoreMap() {
     if (!containerRef.current) return;
 
     const data = toFeatureCollection();
+    const canGeolocate = typeof navigator !== 'undefined' && 'geolocation' in navigator;
     setStoreCount(data.features.length);
+    setGeolocationAvailable(canGeolocate);
 
     const map = new maplibregl.Map({
       container: containerRef.current,
@@ -169,10 +173,12 @@ export function StoreMap() {
     mapRef.current = map;
 
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
-    map.addControl(
-      new maplibregl.GeolocateControl({ trackUserLocation: true, showUserLocation: true }),
-      'top-right',
-    );
+    if (canGeolocate) {
+      map.addControl(
+        new maplibregl.GeolocateControl({ trackUserLocation: true, showUserLocation: true }),
+        'top-right',
+      );
+    }
     map.addControl(
       new maplibregl.AttributionControl({
         compact: true,
@@ -340,6 +346,45 @@ export function StoreMap() {
             Click a list row to fly the map; click a marker to update the selected row.
           </p>
         </div>
+        {!geolocationAvailable ? (
+          <form
+            className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950"
+            onSubmit={(event) => {
+              event.preventDefault();
+              const query = manualLocationQuery.trim();
+              if (!query) return;
+              window.open(
+                'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query),
+                '_blank',
+                'noopener,noreferrer',
+              );
+            }}
+          >
+            <label className="text-xs font-black uppercase tracking-[0.14em]" htmlFor="manual-location">
+              Location lookup unavailable
+            </label>
+            <p className="mt-1 text-xs font-semibold leading-5">
+              Enter an address, suburb, or postcode manually to search nearby stores.
+            </p>
+            <div className="mt-2 flex gap-2">
+              <input
+                className="min-w-0 flex-1 rounded-lg border border-amber-200 bg-white px-3 py-2 text-sm text-slate-950 outline-none focus:border-amber-400"
+                id="manual-location"
+                onChange={(event) => setManualLocationQuery(event.target.value)}
+                placeholder="e.g. Södermalm"
+                type="text"
+                value={manualLocationQuery}
+              />
+              <button
+                className="rounded-lg bg-slate-950 px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-white disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={!manualLocationQuery.trim()}
+                type="submit"
+              >
+                Search
+              </button>
+            </div>
+          </form>
+        ) : null}
         <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
           {syncedMapListStores.map((store) => {
             const selected = selectedStoreSlug === store.slug;
