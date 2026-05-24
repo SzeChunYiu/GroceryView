@@ -4,6 +4,7 @@ import { mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
+import { parseKartaMartSeFixture } from '../connectors/kartamart-se.js';
 import {
   buildCoopCategoryProductsUrl,
   buildCoopCategoryTreeUrl,
@@ -7307,5 +7308,22 @@ describe('daily ingestion runner', () => {
     assert.equal(result.status, 'blocked');
     assert.deepEqual(result.blockers, ['ica:robots_txt_allow_required', 'ica:legal_review_approval_required']);
     assert.equal(executor.calls.length, 0);
+  });
+});
+
+describe('Karta Mart SE connector', () => {
+  it('keeps Asian grocery overlap rows when national online eligibility is present', () => {
+    const rows = parseKartaMartSeFixture({
+      nationalOnline: true,
+      stores: [{ id: 'stockholm-online', name: 'Karta Mart Stockholm', city: 'Stockholm', address: 'Online lager', online: true }],
+      products: [
+        { sku: 'gochujang-500', name: 'Gochujang 500 g', brand: 'Sempio', category: 'sauces', price: '59,90', storeIds: ['stockholm-online'] },
+        { sku: 'rice-cooker', name: 'Rice cooker', category: 'homewares', price: 499, storeIds: ['stockholm-online'] }
+      ]
+    }, 'fixture://kartamart', '2026-05-24T12:30:00.000Z');
+
+    assert.deepEqual(rows.map((row) => [row.country, row.currency, row.chain, row.retailer_type, row.category, row.price]), [
+      ['SE', 'SEK', 'kartamart', 'ethnic_asian', 'sauces', 59.9]
+    ]);
   });
 });
