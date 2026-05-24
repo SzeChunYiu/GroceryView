@@ -18,6 +18,7 @@
       "@groceryview/catalog": ["packages/catalog/src/index.ts"],
       "@groceryview/core": ["packages/core/src/index.ts"],
       "@groceryview/db": ["packages/db/src/index.ts"],
+      "@groceryview/image-cache": ["packages/image-cache/src/index.ts"],
       "@groceryview/ingestion": ["packages/ingestion/src/index.ts"],
       "@groceryview/monetization": ["packages/monetization/src/index.ts"],
       "@groceryview/notifications": ["packages/notifications/src/index.ts"],

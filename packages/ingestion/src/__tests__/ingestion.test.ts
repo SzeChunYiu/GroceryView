@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
@@ -5366,6 +5366,7 @@ class DailyIngestionExecutor implements QueryExecutor {
       { id: 'product-db-ean-7310130003547', slug: 'ean-7310130003547', barcode: '7310130003547', canonical_name: 'Ideal Makaroner', brand: 'Kungsörnen' },
       { id: 'product-db-ean-7310130000000', slug: 'ean-7310130000000', barcode: '7310130000000', canonical_name: 'Missing Nutrition', brand: 'Testbrand' }
     ] as T[];
+    if (sql.includes('update products') && sql.includes('set image_url = $1')) return [{ id: params[1] }] as T[];
     if (sql.includes('update products') && params[0] === '7310130003547') return [{ id: 'product-db-ean-7310130003547' }] as T[];
     if (sql.includes('update products')) return [] as T[];
     if (sql.includes('insert into chains')) return [{ id: `chain-db-${++this.sequence}` }] as T[];
@@ -5905,6 +5906,66 @@ describe('daily ingestion runner', () => {
     assert.equal(observationRows[0]?.store_id, 'store-db-2');
     assert.equal(observationRows[0]?.domain, 'grocery');
     assert.equal(observationRows[0]?.is_available, false);
+  });
+
+  it('caches and rewrites product image URLs while persisting daily connector runs when enabled', async () => {
+    const executor = new DailyIngestionExecutor();
+    const publicDir = mkdtempSync(join(tmpdir(), 'grocery-daily-image-cache-'));
+    const imageBytes = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
+
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-21T03:17:00.000Z',
+      connectors: [
+        {
+          connectorId: 'willys-normalized-json',
+          chainId: 'willys',
+          sourceType: 'official_api',
+          endpointUrl: 'https://sources.example.test/willys/products.json',
+          parserVersion: 'normalized-json-v1',
+          robotsTxtStatus: 'not_applicable',
+          legalReviewStatus: 'approved',
+          hasDataAgreement: true,
+          stores: [{ storeId: 'willys-odenplan', name: 'Willys Odenplan', address: 'Odenplan', city: 'Stockholm' }]
+        }
+      ],
+      fetchImpl: async (url) => {
+        if (String(url).includes('cdn.example.test')) {
+          return new Response(imageBytes, {
+            status: 200,
+            headers: {
+              'content-type': 'image/png',
+              'content-length': String(imageBytes.byteLength)
+            }
+          });
+        }
+
+        return new Response(JSON.stringify({
+          items: [{
+            storeId: 'willys-odenplan',
+            retailerProductId: 'wil-zoegas-450',
+            rawName: 'Zoégas Skånerost 450g',
+            canonicalName: 'Zoégas Coffee 450g',
+            productId: 'zoegas-coffee-450g',
+            categoryId: 'coffee',
+            brand: 'Zoégas',
+            packageSize: 450,
+            packageUnit: 'g',
+            price: 49.9,
+            imageUrl: 'https://cdn.example.test/zoegas.png'
+          }]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      },
+      imageCache: { enabled: true, publicDir }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    const imageRewrite = executor.calls.find((call) => call.sql.includes('update products') && call.sql.includes('set image_url = $1'));
+    assert.ok(imageRewrite, 'daily ingestion should rewrite product image_url to the cached public URL');
+    assert.match(String(imageRewrite.params[0]), /^\/images\/products\/product-db-zoegas-coffee-450g-[a-f0-9]{16}\.png$/);
+    assert.equal(imageRewrite.params[1], 'product-db-zoegas-coffee-450g');
+    assert.equal(imageRewrite.params[2], 'https://cdn.example.test/zoegas.png');
+    assert.equal(readdirSync(join(publicDir, 'images', 'products')).length, 1);
   });
 
   it('reuses daily chain, store, and product ids while persisting a connector batch', async () => {
