@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ChainSelector } from '@/components/chain-selector';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { SavedMarketViewActions } from '@/components/saved-market-view-actions';
 import { StorePriceMatrix } from '@/components/store-price-matrix';
 import { COMPARE_CHAIN_ORDER, buildChainComparisonTable } from '@/lib/chain-compare';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
@@ -59,6 +60,13 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
       <Eyebrow>Willys vs Hemköp</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Comparable chain prices</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">Rows appear only when the same Axfood product code is present in both chain catalogues. Savings are not shown across unmatched products.</p>
+      <SavedMarketViewActions
+        alertEligible
+        alertMetric="Saved comparison changes best chain, spread, or matched product availability"
+        description="Save the current comparison query string and return to the same product set quickly, with alert drafts tied only to matched comparison evidence."
+        surface="compare"
+        title="Save this comparison"
+      />
       <Card className="mt-6 overflow-hidden border-emerald-200 bg-gradient-to-br from-white via-emerald-50 to-sky-50">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
           <div>

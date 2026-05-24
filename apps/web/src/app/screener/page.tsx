@@ -229,6 +229,14 @@ export default async function ScreenerPage({ searchParams }: Readonly<{ searchPa
         </Card>
       </div>
 
+      <SavedMarketViewActions
+        alertEligible
+        alertMetric="Saved screener filter has a new verified row or ranking movement"
+        description="Save the current screener URL, including sort, category, and discount parameters, then draft alerts from semantically valid deal-ranking views."
+        surface="screener"
+        title="Save this screener setup"
+      />
+
       <Card className="mt-6">
         <div className="grid gap-4 lg:grid-cols-[1fr_0.8fr_0.7fr]">
           <div>

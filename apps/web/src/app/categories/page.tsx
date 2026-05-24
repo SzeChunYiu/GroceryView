@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { SavedMarketViewActions } from '@/components/saved-market-view-actions';
 import { buildDemoHouseholdCategorySignals, defaultHouseholdId, getHouseholdCategoryScore, rankCategoriesByPurchaseHistory } from '@/lib/personalization';
 import { categorySummaries, dietaryScenarioFilters, formatPct, formatSek, immigrantAisleFinder, sustainableBrandFilter } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
@@ -19,6 +20,14 @@ export default function CategoriesIndexPage() {
       <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
         Search categories are ranked for {defaultHouseholdId} using historical conversions and clicks so high-intent aisles appear first.
       </p>
+
+      <SavedMarketViewActions
+        alertEligible
+        alertMetric="Saved category view has new verified rows, stronger spreads, or matching dietary evidence"
+        description="Save category browsing state for a signed-in account session or local guest fallback, with alert drafts limited to category evidence changes."
+        surface="categories"
+        title="Save this category workspace"
+      />
       <Card className="mt-6 border-orange-200 bg-orange-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-orange-800">Immigrants / new arrivals</p>
         <h2 className="mt-2 text-2xl font-black">Halal, kosher & ethnic aisle finder</h2>

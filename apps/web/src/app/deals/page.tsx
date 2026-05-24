@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { calculateBrandTierIndices } from '@groceryview/core';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { SavedMarketViewActions } from '@/components/saved-market-view-actions';
 import { buildBrandTierPriceObservations } from '@/lib/chain-index-data';
 import { expiryDealRadar, expiryDealRadarReports, kidsSnackLunchboxDeals, singlePortionDealFinder } from '@/lib/demo-data';
 import { digitalCatalogueOfferBoard, flyerValidityCalendar, offerExpiryReminderBoard } from '@/lib/verified-data';
@@ -46,6 +47,14 @@ export default function DealsPage() {
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
         This page calls buildExpiryDealRadar with visible product rows plus timestamped expiry-sticker reports. Expired and stale evidence stays visible as coverage context, but it is not promoted as an active deal.
       </p>
+
+      <SavedMarketViewActions
+        alertEligible
+        alertMetric="New active deal, markdown, or catalogue offer appears in this saved deals view"
+        description="Save the current deals workspace and create alert drafts only for deal signals backed by visible timestamped evidence."
+        surface="deals"
+        title="Save this deals view"
+      />
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
