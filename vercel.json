@@ -6,6 +6,21 @@
     {
       "source": "/api/:path*",
       "destination": "/api/[...path]"
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "groceryview.se" }],
+      "destination": "/se/:path*"
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "groceryview.no" }],
+      "destination": "/no/:path*"
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "groceryview.is" }],
+      "destination": "/is/:path*"
     }
   ],
   "outputDirectory": "."
