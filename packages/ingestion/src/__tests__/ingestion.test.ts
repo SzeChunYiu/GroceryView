@@ -132,6 +132,7 @@ import {
   parseOkq8FuelPricePage,
   parseBrandedSwedishFuelStations,
   parseCoopDrPdfTextOffers,
+  parseNarvesenNoStores,
   parseRetailerProductJsonSnapshot,
   persistOpenFoodFactsProductMetadata,
   parseSt1FuelPriceHtml,
@@ -198,6 +199,37 @@ describe('confidenceForSource', () => {
     assert.equal(confidenceForSource('flyer_campaign'), 0.7);
     assert.equal(confidenceForSource('manual_user_report'), 0.5);
     assert.equal(confidenceForSource('estimated'), 0.25);
+  });
+});
+
+describe('Narvesen NO connector', () => {
+  it('parses Reitan convenience store rows from the Narvesen locator markup', () => {
+    const rows = parseNarvesenNoStores(`
+      <ol id="Maps-475-list">
+        <li data-lat="58.458960" data-lng="8.763755" data-title="ALTI Arendal" data-externalid="498">
+          <header><h3 class="name">ALTI Arendal</h3></header>
+          <div class="adr">
+            <div class="street-address">Vesterveien 3</div>
+            <div class="postal"><span class="locality">ARENDAL</span></div>
+          </div>
+        </li>
+      </ol>
+    `, 'https://narvesen.no/finn-butikk', '2026-05-24T12:00:00.000Z');
+
+    assert.deepEqual(rows, [{
+      chain: 'narvesen-no',
+      ownerGroup: 'Reitan Convenience Norway',
+      countryCode: 'NO',
+      storeId: '498',
+      name: 'ALTI Arendal',
+      streetAddress: 'Vesterveien 3',
+      locality: 'ARENDAL',
+      latitude: 58.45896,
+      longitude: 8.763755,
+      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=58.45896,8.763755',
+      sourceUrl: 'https://narvesen.no/finn-butikk',
+      retrievedAt: '2026-05-24T12:00:00.000Z'
+    }]);
   });
 });
 
