@@ -32,6 +32,8 @@ import {
   buildMatpriskollenStoresUrl,
   buildMathemSearchUrl,
   buildMatsparSearchUrl,
+  buildMatsmartSeUrl,
+  normalizeMatsmartSeProduct,
   buildOpenFoodFactsProductUrl,
   buildOpenFoodFactsSwedenSearchUrl,
   buildOpenPricesConnectorUrl,
@@ -188,6 +190,18 @@ import {
   validateStoreLocatorFixtures
 } from '../index.js';
 import type { QueryExecutor } from '@groceryview/db';
+
+describe('Matsmart SE connector', () => {
+  it('normalizes surplus products as clearance rows', () => {
+    assert.equal(buildMatsmartSeUrl('/fynd'), 'https://www.matsmart.se/fynd');
+    const row = normalizeMatsmartSeProduct({ id: 'mm-1', name: 'Krossade tomater kort datum', brand: 'Matsmart', category: 'Kolonial', price: '9,90 kr', regularPrice: '19,90 kr', size: '400 g', url: '/produkt/tomater' }, 'https://www.matsmart.se/fynd', '2026-05-24T12:00:00.000Z');
+
+    assert.equal(row?.is_clearance, true);
+    assert.equal(row?.price, 9.9);
+    assert.equal(row?.regularPrice, 19.9);
+    assert.equal(row?.discountPercent, 50);
+  });
+});
 
 describe('confidenceForSource', () => {
   it('uses proposal confidence values by source type', () => {
