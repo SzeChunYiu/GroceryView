@@ -21,6 +21,7 @@ import {
   formatPct,
   formatSek,
   freshestOpenPrices,
+  friendSharedDealSuggestions,
   homepageAdaptiveProductCards,
   homepageTrendingPriceChanges,
   icaStorePromotionEvidence,
@@ -893,6 +894,34 @@ export function MarketShell() {
               <p className="mt-2 font-black text-slate-950">{leader.productName}</p>
               <p className="mt-3 text-2xl font-black text-emerald-800">{leader.signal}</p>
               <p className="mt-2 text-sm font-semibold text-slate-600">{leader.evidenceLabel}</p>
+            </Link>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-sky-200 bg-sky-50">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <Eyebrow>Friend-shared deal suggestions</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Discovery deals promoted by opted-in household and friend shares</h2>
+          </div>
+          <p className="max-w-xl text-sm leading-6 text-slate-700">
+            Calls suggestFriendSharedDeals over the same verified cross-chain deal candidates, then promotes only recent shares with consent and sourceConfidence above the discovery threshold.
+          </p>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {friendSharedDealSuggestions.slice(0, 4).map((suggestion) => (
+            <Link
+              className="rounded-2xl border border-sky-100 bg-white p-4 shadow-sm hover:border-sky-700"
+              data-friend-shared-deal={suggestion.productSlug}
+              href={`/products/${suggestion.productSlug}`}
+              key={suggestion.productSlug}
+            >
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-sky-800">{suggestion.socialSignalLabel}</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{suggestion.productName}</h3>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{suggestion.storeName} · {formatSek(suggestion.currentPrice)} now</p>
+              <p className="mt-3 rounded-2xl bg-sky-50 p-3 text-sm font-black text-sky-950">Deal Score {suggestion.dealScore} · social proof {suggestion.socialProofScore}</p>
+              <p className="mt-3 text-xs font-bold leading-5 text-slate-500">{suggestion.socialEvidenceLabel}</p>
             </Link>
           ))}
         </div>

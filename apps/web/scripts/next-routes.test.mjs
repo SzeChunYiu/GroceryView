@@ -2710,6 +2710,24 @@ ${seo}`;
     assert.doesNotMatch(categoryRoute, /@\/lib\/demo-data/);
   });
 
+  it('promotes friend-shared deal suggestions in discovery from opted-in social signals', async () => {
+    const core = await read('../../packages/core/src/index.ts');
+    const verified = await read('src/lib/verified-data.ts');
+    const shell = await read('src/components/market-shell.tsx');
+
+    assert.match(core, /suggestFriendSharedDeals/);
+    assert.match(core, /optedIn/);
+    assert.match(core, /socialProofScore/);
+    assert.match(verified, /friendSharedDealShareSignals/);
+    assert.match(verified, /friendSharedDealSuggestions/);
+    assert.match(verified, /suggestFriendSharedDeals/);
+    assert.match(verified, /no anonymous or non-consented shares/);
+    assert.match(shell, /Friend-shared deal suggestions/);
+    assert.match(shell, /data-friend-shared-deal/);
+    assert.match(shell, /suggestion\.socialProofScore/);
+    assert.doesNotMatch(shell, /@\/lib\/demo-data/);
+  });
+
   it('surfaces reusable data-freshness confidence badges across public routes', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const shell = await read('src/components/market-shell.tsx');

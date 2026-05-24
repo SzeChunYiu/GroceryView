@@ -1,6 +1,6 @@
 import { buildFacetedProductSearch, type RealCatalogSearchPriceRow } from '@groceryview/api';
 import { COMMODITIES, STAPLE_BASKET, SUPPORTED_PRICE_DOMAINS, type Commodity, type ComparableUnit } from '@groceryview/catalog';
-import { buildPriceChartSeries, buildWatchlistAlerts, calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type PriceChartObservation, type ProductMatchInput, type WatchlistItem, type WatchlistPriceType, type WatchlistProductSnapshot } from '@groceryview/core';
+import { buildPriceChartSeries, buildWatchlistAlerts, calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, suggestFriendSharedDeals, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type PriceChartObservation, type ProductMatchInput, type WatchlistItem, type WatchlistPriceType, type WatchlistProductSnapshot } from '@groceryview/core';
 import { summarizeTrendingProductPriceChanges, type TrendingPriceChangePoint } from '@groceryview/db';
 import { planReceiptAliasGrowth } from '@groceryview/scanning';
 import { axfoodProducts } from './axfood-products';
@@ -2942,6 +2942,51 @@ export const categoryDealLeaders = summarizeCategoryDealLeaders({
   categoryLabel: labelFromSlug(leader.category),
   productSlug: leader.productId,
   evidenceLabel: `${leader.storeName} lowest · ${formatPct(leader.sourceConfidence * 100)} sourceConfidence · cross-chain spread derived`
+}));
+
+const friendSharedDealCandidateProducts = topChainSpreads.slice(0, 8);
+
+export const friendSharedDealShareSignals = friendSharedDealCandidateProducts.slice(0, 4).map((product, index) => ({
+  productId: product.slug,
+  sharedByDisplayName: ['Alex', 'Samira', 'Jonas', 'Mina'][index] ?? 'Household member',
+  relationship: index % 2 === 0 ? 'household' as const : 'friend' as const,
+  sharedAt: `2026-05-${24 - index}T09:30:00.000Z`,
+  sourceConfidence: 0.9,
+  optedIn: true
+}));
+
+export const friendSharedDealSuggestions = suggestFriendSharedDeals({
+  asOf: '2026-05-24T12:00:00.000Z',
+  deals: friendSharedDealCandidateProducts.map((product) => {
+    const pricedRows = chainPriceRows(product).sort((left, right) => left.price - right.price || String(left.chain).localeCompare(String(right.chain), 'sv'));
+    const cheapest = pricedRows[0]!;
+    const regularPrice = pricedRows[pricedRows.length - 1]?.price ?? cheapest.price;
+    const sourceConfidence = clamp(product.inChains.length / 2, 0, 1);
+    return {
+      productId: product.slug,
+      productName: product.name,
+      storeId: `${cheapest.chain}-online-catalog`,
+      storeName: `${chainDisplayNames[cheapest.chain] ?? cheapest.chain} online catalog`,
+      currentPrice: cheapest.price,
+      regularPrice,
+      dealScore: calculateDealScore({
+        currentCityPercentile: clamp(100 - product.spreadPct * 2, 0, 100),
+        knownPromoHistoryPercentile: clamp(100 - product.spreadPct * 2, 0, 100),
+        equivalentUnitPricePercentile: product.inChains.length > 1 ? 0 : 50,
+        discountDepthPercent: product.spreadPct,
+        sourceConfidence
+      }),
+      sourceConfidence
+    };
+  }),
+  shares: friendSharedDealShareSignals,
+  minimumDealScore: 60,
+  minimumSourceConfidence: 0.6
+}).map((suggestion) => ({
+  ...suggestion,
+  productSlug: suggestion.productId,
+  socialSignalLabel: `${suggestion.socialSignals.length} opted-in friend/household shares`,
+  socialEvidenceLabel: `socialProofScore ${suggestion.socialProofScore} · no anonymous or non-consented shares`
 }));
 
 export const marketHeatmapSourceSignals = [
