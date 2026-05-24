@@ -1517,6 +1517,7 @@ describe('verified-data UI', () => {
     const pkg = await read('package.json');
     const lhci = await read('lighthouserc.cjs');
     const previewLhci = await read('lighthouserc.preview.cjs');
+    const sizeLimit = await read('size-limit.config.cjs');
     const workflow = await read('../../.github/workflows/ci.yml');
     const previewWorkflow = await read('../../.github/workflows/lighthouse.yml');
     const verified = await read('src/lib/verified-data.ts');
@@ -1524,7 +1525,12 @@ describe('verified-data UI', () => {
 
     assert.match(pkg, /"perf:lighthouse:ci"/);
     assert.match(pkg, /"perf:lighthouse:preview"/);
+    assert.match(pkg, /"perf:bundle:profile"/);
+    assert.match(pkg, /next build --profile/);
+    assert.match(pkg, /size-limit --config \.\/size-limit\.config\.cjs/);
     assert.match(pkg, /@lhci\/cli/);
+    assert.match(pkg, /"size-limit"/);
+    assert.match(pkg, /"@size-limit\/file"/);
     assert.match(lhci, /http:\/\/127\.0\.0\.1:3000\//);
     assert.match(lhci, /numberOfRuns:\s*3/);
     assert.match(lhci, /categories:performance/);
@@ -1533,8 +1539,14 @@ describe('verified-data UI', () => {
     assert.match(lhci, /'cumulative-layout-shift': \['error', \{ maxNumericValue: 0\.15 \}\]/);
     assert.match(lhci, /total-byte-weight/);
     assert.match(lhci, /filesystem/);
+    assert.match(sizeLimit, /name:\s*'Next main JS chunk'/);
+    assert.match(sizeLimit, /path:\s*'\.next\/static\/chunks\/main\*\.js'/);
+    assert.match(sizeLimit, /limit:\s*'250 KB'/);
+    assert.match(sizeLimit, /gzip:\s*true/);
     assert.match(workflow, /Lighthouse performance budget/);
     assert.match(workflow, /npm run perf:lighthouse:ci -w @groceryview\/web/);
+    assert.match(workflow, /Next profile bundle budget/);
+    assert.match(workflow, /npm run perf:bundle:profile -w @groceryview\/web/);
     assert.match(previewLhci, /LHCI_PREVIEW_URL/);
     assert.match(previewLhci, /categories:performance': \['error', \{ minScore: 0\.85 \}\]/);
     assert.match(previewLhci, /largest-contentful-paint': \['error', \{ maxNumericValue: 2500 \}\]/);

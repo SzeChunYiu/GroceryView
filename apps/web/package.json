@@ -5,6 +5,7 @@
   "scripts": {
     "build": "NODE_OPTIONS=--max-old-space-size=6144 next build --webpack",
     "dev": "next dev",
+    "perf:bundle:profile": "NODE_OPTIONS=--max-old-space-size=6144 next build --profile --webpack && size-limit --config ./size-limit.config.cjs",
     "perf:lighthouse:ci": "lhci autorun --config=./lighthouserc.cjs",
     "perf:lighthouse:preview": "lhci autorun --config=./lighthouserc.preview.cjs",
     "start": "next start",
@@ -32,11 +33,13 @@
   },
   "devDependencies": {
     "@lhci/cli": "^0.15.1",
+    "@size-limit/file": "^12.1.0",
     "@types/geojson": "^7946.0.16",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "autoprefixer": "^10.4.23",
     "postcss": "^8.5.6",
+    "size-limit": "^12.1.0",
     "tailwindcss": "^3.4.19"
   }
 }
