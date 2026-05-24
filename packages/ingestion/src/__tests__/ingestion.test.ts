@@ -185,7 +185,10 @@ import {
   scbCoicopFoodCategoryCodes,
   scbPxWebQueryFixtures,
   validateScbPxWebQueryFixtures,
-  validateStoreLocatorFixtures
+  validateStoreLocatorFixtures,
+  fetchVitaNoProducts,
+  parseVitaNoProducts,
+  VITA_NO_BASE_URL
 } from '../index.js';
 import type { QueryExecutor } from '@groceryview/db';
 
@@ -7307,5 +7310,53 @@ describe('daily ingestion runner', () => {
     assert.equal(result.status, 'blocked');
     assert.deepEqual(result.blockers, ['ica:robots_txt_allow_required', 'ica:legal_review_approval_required']);
     assert.equal(executor.calls.length, 0);
+  });
+});
+
+describe('Vita NO connector', () => {
+  it('parses Vita product JSON-LD into online personal care rows', () => {
+    const rows = parseVitaNoProducts(`
+      <script type="application/ld+json">{
+        "@type":"ProductGroup",
+        "brand":{"@type":"Brand","name":"Ole Henriksen"},
+        "hasVariant":[{
+          "@type":"Product",
+          "name":"Glow2OH Dark Spot Toner 190ml",
+          "brand":{"@type":"Brand","name":"Ole Henriksen"},
+          "image":"/globalassets/produktbilder/816657026382_0.jpg",
+          "offers":{"@type":"Offer","availability":"http://schema.org/InStock","price":"262.50","priceCurrency":"NOK","sku":"351550","url":"/ole-henriksen/ole-henriksen-glow2oh-dark-spot-toner-190ml-351550"}
+        }]
+      }</script>
+    `, 'https://www.vita.no/hudpleie/toner/glow2oh-dark-spot-toner-190ml', '2026-05-24T16:20:00.000Z');
+
+    assert.deepEqual(rows, [{
+      chain: 'vita-no',
+      code: '351550',
+      name: 'Glow2OH Dark Spot Toner 190ml',
+      brand: 'Ole Henriksen',
+      category: 'personal_care',
+      price: 262.5,
+      priceText: '262.50 NOK',
+      currency: 'NOK',
+      channel: 'online',
+      productUrl: `${VITA_NO_BASE_URL}/ole-henriksen/ole-henriksen-glow2oh-dark-spot-toner-190ml-351550`,
+      imageUrl: `${VITA_NO_BASE_URL}/globalassets/produktbilder/816657026382_0.jpg`,
+      stockStatus: 'in_stock',
+      sourceUrl: 'https://www.vita.no/hudpleie/toner/glow2oh-dark-spot-toner-190ml',
+      retrievedAt: '2026-05-24T16:20:00.000Z'
+    }]);
+  });
+
+  it('fetches and deduplicates Vita product pages', async () => {
+    const html = `<script type="application/ld+json">{"@type":"Product","name":"Vitamin C","brand":{"name":"Vita"},"image":"/vitamin.jpg","offers":{"availability":"http://schema.org/InStock","price":"99","priceCurrency":"NOK","sku":"VIT-C","url":"/vitamin-c"}}</script>`;
+    const rows = await fetchVitaNoProducts({
+      sourceUrls: ['https://www.vita.no/helsekost-og-kosttilskudd/vitamin-c', 'https://www.vita.no/helsekost-og-kosttilskudd/vitamin-c'],
+      retrievedAt: '2026-05-24T16:25:00.000Z',
+      fetchImpl: async () => new Response(html, { status: 200, headers: { 'content-type': 'text/html' } })
+    });
+
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0]?.category, 'supplement');
+    assert.equal(rows[0]?.code, 'VIT-C');
   });
 });
