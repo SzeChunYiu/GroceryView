@@ -13,6 +13,7 @@ import {
 } from '@/lib/demo-data';
 import { categoryLabels, pricedProducts } from '@/lib/openprices-products';
 import { osmStores } from '@/lib/osm-stores';
+import { NearbyStoresWidget } from '@/components/NearbyStoresWidget';
 
 const totalObservedPrices = pricedProducts.reduce((sum, product) => sum + product.observationCount, 0);
 const latestPriceDate = pricedProducts.reduce(
@@ -84,6 +85,8 @@ export function MarketShell() {
           Weekly basket work can build on the same App Router shell and TanStack Query provider.
         </FeatureCard>
       </section>
+
+      <NearbyStoresWidget />
 
       <section className="rounded-lg border border-market-ink/10 bg-white">
         <div className="grid gap-3 border-b border-market-ink/10 px-4 py-3 md:grid-cols-[1fr_auto_auto] md:items-center">

@@ -296,6 +296,12 @@ export const stores = [
   }
 ];
 
+export const nearestStoreFallbacks = stores.slice(0, 3).map((store) => ({
+  slug: store.slug,
+  name: store.name,
+  distanceLabel: store.distanceLabel
+}));
+
 export const categories = [
   {
     slug: 'coffee',
