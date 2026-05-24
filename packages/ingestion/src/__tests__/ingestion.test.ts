@@ -188,6 +188,7 @@ import {
   validateStoreLocatorFixtures
 } from '../index.js';
 import type { QueryExecutor } from '@groceryview/db';
+import { parseAtlantsoliaFuelPricingQuirks } from '../connectors/atlantsolia-is.js';
 
 describe('confidenceForSource', () => {
   it('uses proposal confidence values by source type', () => {
@@ -615,6 +616,32 @@ describe('OKQ8 fuel price connector', () => {
     ]);
     assert.equal(parsed.items.every((row) => row.sourceType === 'retailer_online_page'), true);
     assert.equal(parsed.items.every((row) => row.storeId === undefined), true);
+  });
+});
+
+describe('Atlantsolía fuel pricing quirk connector', () => {
+  it('emits the verified Dælulykill/applykill member discount and excluded format', () => {
+    const rows = parseAtlantsoliaFuelPricingQuirks({
+      capturedAt: '2026-05-24T15:45:00.000Z',
+      body: `
+        <p>Dælulykilinn og applykilinn gefa 11 kr afslátt á bensínstöðvum AO.</p>
+        <p>*nema á Bensínsprengjustöðvunum - þar er okkar lægsta verð og enginn afsláttur!</p>
+      `
+    });
+
+    assert.deepEqual(rows, [{
+      country: 'IS',
+      chainId: 'atlantsolia',
+      productScope: 'fuel',
+      channel: 'store',
+      loyaltyProgram: 'Dælulykill/applykill',
+      isMemberPrice: true,
+      discountPerLitre: 11,
+      currency: 'ISK',
+      excludedFormats: ['Bensínsprengjustöðvar'],
+      sourceUrl: 'https://www.atlantsolia.is/daelulykill/afslattur-og-allskonar/',
+      capturedAt: '2026-05-24T15:45:00.000Z'
+    }]);
   });
 });
 
