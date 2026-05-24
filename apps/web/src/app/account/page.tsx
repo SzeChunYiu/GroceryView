@@ -105,6 +105,43 @@ export default function AccountPage() {
         </div>
       </Card>
 
+      <Card className="mt-6 border-amber-200 bg-amber-50">
+        <div className="grid gap-5 lg:grid-cols-[1fr_0.85fr] lg:items-start">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-800">Best-time-to-buy alerts</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Target stores, categories, and confidence</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-700">
+              Define a rule for the stores and grocery categories you care about, then choose the minimum confidence required before GroceryView sends a best-time-to-buy notification.
+            </p>
+          </div>
+          <form action="/api/alerts/best-time" className="rounded-[1.5rem] border border-amber-100 bg-white p-4 shadow-sm" method="post">
+            <label className="block text-sm font-black text-slate-950" htmlFor="stores">Target stores</label>
+            <input
+              className="mt-2 w-full rounded-xl border border-amber-100 px-3 py-2 text-sm font-semibold text-slate-800"
+              defaultValue="ICA, Coop"
+              id="stores"
+              name="stores"
+            />
+            <label className="mt-4 block text-sm font-black text-slate-950" htmlFor="categories">Categories</label>
+            <input
+              className="mt-2 w-full rounded-xl border border-amber-100 px-3 py-2 text-sm font-semibold text-slate-800"
+              defaultValue="Pantry, Dairy"
+              id="categories"
+              name="categories"
+            />
+            <label className="mt-4 block text-sm font-black text-slate-950" htmlFor="minConfidence">Minimum confidence</label>
+            <select className="mt-2 w-full rounded-xl border border-amber-100 px-3 py-2 text-sm font-semibold text-slate-800" defaultValue="85" id="minConfidence" name="minConfidence">
+              <option value="75">75% confidence</option>
+              <option value="85">85% confidence</option>
+              <option value="95">95% confidence</option>
+            </select>
+            <button className="mt-4 w-full rounded-full bg-amber-600 px-4 py-2 text-sm font-black text-white transition hover:bg-amber-700" type="submit">
+              Save alert rule
+            </button>
+          </form>
+        </div>
+      </Card>
+
       <Card className="mt-6 border-rose-200 bg-rose-50">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
