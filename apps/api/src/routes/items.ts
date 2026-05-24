@@ -3,6 +3,7 @@ export const itemsRoutes = {
   detailAlias: 'items/:id',
   seasonalSalePattern: 'items/:id/seasonal-sale-pattern',
   substitutionSuggestions: 'items/:id/substitution-suggestions',
+  priceHistoryCache: { keyPrefix: 'price-history', ttlSeconds: 300 },
   holidayWindow: 'midsommar',
   description: 'Item detail, seasonalSalePattern metadata, substitutionSuggestions, and localized product names backed by explicit current price evidence.',
   queryParams: ['holiday', 'locale'],

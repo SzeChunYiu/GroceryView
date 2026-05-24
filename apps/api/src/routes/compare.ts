@@ -8,5 +8,6 @@ export const compareRoutes = {
   responseFields: ['items', 'nutrition', 'storePrices', 'trendPoints', 'missingItemIds', 'truncatedItemIds'],
   nutrition: 'nutrition',
   storePrices: 'storePrices',
-  trendPoints: 'trendPoints'
+  trendPoints: 'trendPoints',
+  storeComparisonCache: { keyPrefix: 'store-comparison', ttlSeconds: 300 },
 } as const;
