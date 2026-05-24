@@ -5,6 +5,7 @@ import {
   type ProductCheapestNowPriceRow
 } from '@groceryview/api';
 import { PostgresQueryExecutorService } from '../database/postgres-query-executor.service.js';
+import { localizedProductNameSql, type ProductNameLocale } from '../product-name-locale.js';
 
 type CheapestNowSqlRow = {
   product_id: string;
@@ -53,15 +54,16 @@ function mapRow(row: CheapestNowSqlRow): ProductCheapestNowPriceRow {
 export class CheapestNowService {
   constructor(private readonly postgres: PostgresQueryExecutorService) {}
 
-  async getProductCheapestNow(productIdentifier: string): Promise<ProductCheapestNow | null> {
+  async getProductCheapestNow(productIdentifier: string, productNameLocale?: ProductNameLocale): Promise<ProductCheapestNow | null> {
     if (!this.postgres.isConfigured()) {
       throw new ServiceUnavailableException('DATABASE_URL is required for real cheapest-now data.');
     }
 
+    const productName = localizedProductNameSql('$2');
     const rows = await this.postgres.query<CheapestNowSqlRow>(
       `select products.id::text as product_id,
               products.slug as product_slug,
-              products.canonical_name as product_name,
+              ${productName} as product_name,
               products.category_path,
               products.comparable_unit,
               latest_prices.price,
@@ -81,7 +83,7 @@ export class CheapestNowService {
        left join stores on stores.id = latest_prices.store_id
        where products.slug = $1 or products.id::text = $1
        order by latest_prices.price nulls last, chains.slug nulls last, stores.name nulls last`,
-      [productIdentifier]
+      [productIdentifier, productNameLocale ?? null]
     );
 
     return buildProductCheapestNowReport(rows.map(mapRow));

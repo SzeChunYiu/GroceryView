@@ -43,6 +43,8 @@ const requiredColumns = [
   'confidence_score',
   'barcode',
   'canonical_name',
+  'name_sv',
+  'name_en',
   'private_label_owner',
   'match_confidence',
   'weekly_budget',

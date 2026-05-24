@@ -68,9 +68,9 @@ Indexes: `stores_position_gix` for location queries, plus `stores_name_trgm_idx`
 
 Canonical product records used by search, charts, baskets, and matching.
 
-Key columns: `slug`, `canonical_name`, `domain`, `brand`, `brand_owner`, `private_label_owner`, `barcode`, `category_path`, package fields, `comparable_unit`, `nutrition`, `image_url`. Commodity columns (migration 010): `product_kind` (`branded`|`commodity`), `commodity_id`, `variant`, `is_organic`, `origin_country`. Fuel column (migration 014): `fuel_grade_id`.
+Key columns: `slug`, `canonical_name`, localized display names (`name_sv`, `name_en`), `domain`, `brand`, `brand_owner`, `private_label_owner`, `barcode`, `category_path`, package fields, `comparable_unit`, `nutrition`, `image_url`. Commodity columns (migration 010): `product_kind` (`branded`|`commodity`), `commodity_id`, `variant`, `is_organic`, `origin_country`. Fuel column (migration 014): `fuel_grade_id`.
 
-Indexes: `products_name_trgm_idx` and `products_slug_trgm_idx` for fuzzy product search; `products_commodity_idx` and `products_kind_idx` for commodity matching.
+Indexes: `products_name_trgm_idx`, `products_name_sv_trgm_idx`, `products_name_en_trgm_idx`, and `products_slug_trgm_idx` for fuzzy product search; `products_commodity_idx` and `products_kind_idx` for commodity matching.
 
 ### `commodities`
 
