@@ -1,8 +1,10 @@
 const CORE_SHELL_CACHE_NAME = 'groceryview-core-shell-v1';
 const PAGE_CACHE_NAME = 'groceryview-offline-pages-v1';
+const ITEM_PAGE_CACHE_NAME = 'groceryview-offline-item-pages-v1';
 const PRODUCT_DATA_CACHE_NAME = 'groceryview-product-data-v1';
 const RUNTIME_ASSET_CACHE_NAME = 'groceryview-runtime-assets-v1';
 const MAX_PAGE_CACHE_ENTRIES = 80;
+const MAX_ITEM_PAGE_CACHE_ENTRIES = 50;
 const MAX_PRODUCT_DATA_CACHE_ENTRIES = 80;
 const MAX_RUNTIME_ASSET_CACHE_ENTRIES = 120;
 
@@ -119,6 +121,10 @@ async function trimCache(cache, maxEntries) {
   await Promise.all(keys.slice(0, overflow).map((key) => cache.delete(key)));
 }
 
+async function trimItemPageCache(cache) {
+  await trimCache(cache, MAX_ITEM_PAGE_CACHE_ENTRIES);
+}
+
 async function putResponse(cacheName, request, response, maxEntries) {
   if (!response || !response.ok || response.type === 'opaque') return response;
 
@@ -155,6 +161,36 @@ async function networkFirst(request, cacheName, maxEntries, fallbackUrls = [], i
   }
 }
 
+async function itemPageNetworkFirst(request, fallbackUrls = []) {
+  const cache = await caches.open(ITEM_PAGE_CACHE_NAME);
+  const key = cacheKey(request);
+
+  try {
+    const response = await fetch(request);
+    if (!response || !response.ok || response.type === 'opaque') return response;
+
+    await cache.delete(key);
+    await cache.put(key, response.clone());
+    await trimItemPageCache(cache);
+    return response;
+  } catch (error) {
+    const cached = await cache.match(key, { ignoreSearch: true });
+    if (cached) return cached;
+
+    for (const fallbackUrl of fallbackUrls) {
+      const fallback = await cache.match(fallbackUrl, { ignoreSearch: true }) ||
+        await caches.match(fallbackUrl, { ignoreSearch: true });
+      if (fallback) return fallback;
+    }
+
+    return new Response('Offline: this GroceryView item page has not been cached yet.', {
+      headers: { 'content-type': 'text/plain; charset=utf-8' },
+      status: 503,
+      statusText: 'Offline'
+    });
+  }
+}
+
 async function cacheFirst(request, cacheName, maxEntries) {
   const cache = await caches.open(cacheName);
   const key = cacheKey(request);
@@ -178,6 +214,7 @@ self.addEventListener('activate', (event) => {
   const currentCaches = new Set([
     CORE_SHELL_CACHE_NAME,
     PAGE_CACHE_NAME,
+    ITEM_PAGE_CACHE_NAME,
     PRODUCT_DATA_CACHE_NAME,
     RUNTIME_ASSET_CACHE_NAME
   ]);
@@ -205,7 +242,7 @@ self.addEventListener('fetch', (event) => {
   }
 
   if (isItemPageRequest(request)) {
-    event.respondWith(networkFirst(request, PAGE_CACHE_NAME, MAX_PAGE_CACHE_ENTRIES, ['/products', '/items', '/']));
+    event.respondWith(itemPageNetworkFirst(request, ['/products', '/items', '/']));
     return;
   }
 
