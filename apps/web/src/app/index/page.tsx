@@ -3,6 +3,8 @@ import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { buildDemoHouseholdCategorySignals, defaultHouseholdId, getHouseholdCategoryScore, rankLandingShortcuts } from '@/lib/personalization';
 import { categorySummaries, formatPct, formatSek } from '@/lib/verified-data';
 
+export const dynamic = 'force-dynamic';
+
 type LandingShortcut = {
   categorySlug: string;
   href: string;
