@@ -1,3 +1,8 @@
+import {
+  majorSwedishGroceryChainSeeds,
+  type MajorSwedishGroceryChainSlug
+} from '../seed/retailers.js';
+
 export type RetailerQuery = {
   sql: string;
   values: [supportedRetailerIds: string[]];
@@ -17,7 +22,20 @@ export type RetailerMetadata = {
   websiteUrl: string;
 };
 
-export const supportedRetailerIds = ['city-gross', 'coop', 'hemkop', 'ica', 'lidl', 'willys'] as const;
+export const supportedRetailerIds = ['city-gross', 'coop', 'hemkop', 'ica', 'lidl', 'netto', 'willys'] as const;
+
+const majorSwedishGroceryMetadataBySlug = new Map(majorSwedishGroceryChainSeeds.map((chain) => [chain.slug, chain]));
+
+function seededRetailerMetadata(slug: MajorSwedishGroceryChainSlug): RetailerMetadata {
+  const seed = majorSwedishGroceryMetadataBySlug.get(slug);
+  if (!seed) throw new Error(`Missing major Swedish grocery chain seed metadata: ${slug}`);
+  return {
+    id: seed.slug,
+    name: seed.name,
+    logo: seed.logo,
+    websiteUrl: seed.websiteUrl
+  };
+}
 
 export const supportedRetailerMetadata: Record<typeof supportedRetailerIds[number], RetailerMetadata> = {
   'city-gross': {
@@ -26,36 +44,12 @@ export const supportedRetailerMetadata: Record<typeof supportedRetailerIds[numbe
     logo: '/retailers/city-gross.svg',
     websiteUrl: 'https://www.citygross.se/'
   },
-  coop: {
-    id: 'coop',
-    name: 'Coop',
-    logo: '/retailers/coop.svg',
-    websiteUrl: 'https://www.coop.se/'
-  },
-  hemkop: {
-    id: 'hemkop',
-    name: 'Hemköp',
-    logo: '/retailers/hemkop.svg',
-    websiteUrl: 'https://www.hemkop.se/'
-  },
-  ica: {
-    id: 'ica',
-    name: 'ICA',
-    logo: '/retailers/ica.svg',
-    websiteUrl: 'https://www.ica.se/'
-  },
-  lidl: {
-    id: 'lidl',
-    name: 'Lidl',
-    logo: '/retailers/lidl.svg',
-    websiteUrl: 'https://www.lidl.se/'
-  },
-  willys: {
-    id: 'willys',
-    name: 'Willys',
-    logo: '/retailers/willys.svg',
-    websiteUrl: 'https://www.willys.se/'
-  }
+  coop: seededRetailerMetadata('coop'),
+  hemkop: seededRetailerMetadata('hemkop'),
+  ica: seededRetailerMetadata('ica'),
+  lidl: seededRetailerMetadata('lidl'),
+  netto: seededRetailerMetadata('netto'),
+  willys: seededRetailerMetadata('willys')
 };
 
 export const supportedRetailers: RetailerMetadata[] = supportedRetailerIds.map((id) => supportedRetailerMetadata[id]);

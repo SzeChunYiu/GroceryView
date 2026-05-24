@@ -8,6 +8,7 @@ const readPackage = (path) => JSON.parse(readFileSync(new URL(`../../${path}/pac
 
 const packages = {
   api: readPackage('packages/api'),
+  db: readPackage('packages/db'),
   server: readPackage('packages/server'),
   mobile: readPackage('apps/mobile'),
   web: readPackage('apps/web')
@@ -74,6 +75,16 @@ describe('workspace package scripts', () => {
     assert.match(rootPackage.scripts['ingest:generate-live'], /generate-live-retailer-ingested\.mjs/);
     assert.equal(existsSync(new URL('../../scripts/ingestion/verify-ingested-provenance.mjs', import.meta.url)), true);
     assert.equal(existsSync(new URL('../../scripts/ingestion/generate-live-retailer-ingested.mjs', import.meta.url)), true);
+  });
+
+  it('exposes a focused retailer seed metadata verification script', () => {
+    assert.equal(
+      rootPackage.scripts['db:check-retailer-seeds'],
+      'npm run test:retailer-seeds -w @groceryview/db && node --test tests/schema/stockholm-seed.test.mjs'
+    );
+    assert.match(packages.db.scripts['test:retailer-seeds'], /retailerSeed\.test\.js/);
+    assert.match(packages.db.scripts['test:retailer-seeds'], /infraSeed\.test\.js/);
+    assert.match(packages.db.scripts['test:retailer-seeds'], /retailerQueries\.test\.js/);
   });
 
   it('typechecks workspace imports against source entrypoints before build artifacts exist', () => {
