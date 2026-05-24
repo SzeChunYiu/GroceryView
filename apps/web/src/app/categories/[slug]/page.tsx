@@ -48,6 +48,9 @@ export default async function CategoryPage({ params }: Readonly<{ params: Promis
             This route calls summarizeCategoryDealLeaders over visible chain-price candidates only; sourceConfidence must clear 60% before a product appears.
           </p>
         </div>
+        <Link className="mt-4 inline-flex rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white transition hover:bg-emerald-900" href="/price-statistics">
+          View local category price statistics
+        </Link>
         <div className="mt-5 grid gap-3 md:grid-cols-2">
           {dealLeaders.map((leader) => (
             <Link

@@ -29,6 +29,16 @@ export default function StoresIndexPage() {
             </Link>
           </Card>
         ) : null}
+        <Card>
+          <p className="text-sm font-black uppercase tracking-[0.18em] text-slate-500">Local price statistics</p>
+          <h2 className="mt-2 text-2xl font-black">Browse city and district price levels</h2>
+          <p className="mt-3 text-sm leading-6 text-slate-700">
+            Regional pages aggregate observed branch rows and keep sparse product, category, and basket cohorts withheld until coverage is high enough.
+          </p>
+          <Link className="mt-4 inline-flex rounded-full bg-slate-950 px-4 py-2 text-sm font-black text-white transition hover:bg-emerald-800" href="/price-statistics">
+            Open /price-statistics
+          </Link>
+        </Card>
         <Card><h2 className="text-2xl font-black">Stores with coordinates</h2><div className="mt-4 grid gap-3 md:grid-cols-2">{storeUniverse.slice(0, 60).map((store) => <Link className="rounded-2xl border border-slate-200 p-4 hover:border-emerald-700" href={`/stores/${store.slug}`} key={store.slug}><p className="font-black">{store.name}</p><p className="text-sm text-slate-600">{store.brand} · {store.city || store.district || 'City not reported'}</p></Link>)}</div></Card>
       </div>
     </PageShell>

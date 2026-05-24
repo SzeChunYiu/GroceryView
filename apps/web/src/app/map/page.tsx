@@ -1,4 +1,5 @@
 import { calculateChainPriceIndex } from '@groceryview/core';
+import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { StoreMap } from '@/components/store-map';
 import { buildChainPriceObservations } from '@/lib/chain-index-data';
@@ -286,6 +287,9 @@ export default function MapPage() {
             <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-700">{regionalPriceStatisticsGate.title}</p>
             <h2 className="mt-2 text-3xl font-black text-sky-950">Regional price statistics gate</h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-sky-900">{regionalPriceStatisticsGate.detail}</p>
+            <Link className="mt-4 inline-flex rounded-full bg-sky-800 px-4 py-2 text-sm font-black text-white transition hover:bg-sky-900" href="/price-statistics">
+              Open local price statistics
+            </Link>
           </div>
           <div className="rounded-2xl bg-white/80 p-4 text-right">
             <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-700">Status</p>

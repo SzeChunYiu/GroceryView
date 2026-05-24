@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { geoPriceStatistics } from '@/lib/geo-price-statistics';
 import { osmStores } from '@/lib/osm-stores';
 import {
   findStore,
@@ -128,6 +130,9 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
   const pricePercentileRank = storePricePercentileRankFor(store);
   const openingHoursLabel = storeOpeningHoursLabel(store);
   const assortmentOverview = storeAssortmentOverviewForStore(store);
+  const localPriceStatistic = geoPriceStatistics.find((area) => area.scope === 'district' && area.label === store.district)
+    ?? geoPriceStatistics.find((area) => area.scope === 'city' && area.label === store.city)
+    ?? geoPriceStatistics.find((area) => area.scope === 'region');
 
   return (
     <PageShell>
@@ -219,6 +224,11 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
           <p className="mt-4 text-sm font-black text-amber-900">
             Source: {store.source}; retrieved {store.retrievedDate}.
           </p>
+          {localPriceStatistic ? (
+            <Link className="mt-4 inline-flex rounded-full bg-amber-900 px-4 py-2 text-sm font-black text-white transition hover:bg-amber-950" href={localPriceStatistic.href}>
+              Open local price statistics
+            </Link>
+          ) : null}
         </Card>
         <Card className="border-cyan-200 bg-cyan-50">
           <p className="text-xs font-black uppercase tracking-[0.22em] text-cyan-800">{pricePercentileRank.title}</p>

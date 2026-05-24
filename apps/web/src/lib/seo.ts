@@ -156,6 +156,10 @@ export const routeMetadataCatalog = {
     title: 'Price report evidence gate | GroceryView',
     description: 'Crowd price reports are blocked from public claims until verified submissions, trust records, and moderation are wired.'
   },
+  '/price-statistics': {
+    title: 'Local grocery price statistics | GroceryView',
+    description: 'Browse regional, city, and district product, category, and basket price levels with source-backed coverage and confidence labels.'
+  },
   '/privacy': {
     title: 'Privacy and data controls | GroceryView',
     description: 'Read GroceryView privacy guardrails, private data gates, and source boundaries for account and receipt information.'

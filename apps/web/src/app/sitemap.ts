@@ -6,6 +6,7 @@ import {
   type StoreCatalogRecord
 } from '@groceryview/db';
 import { axfoodProducts } from '@/lib/axfood-products';
+import { geoPriceStatistics } from '@/lib/geo-price-statistics';
 import { osmStores } from '@/lib/osm-stores';
 import { pricedProducts } from '@/lib/openprices-products';
 import { seoLandingCities, seoLandingProducts } from '@/lib/seo-landing-pages';
@@ -93,6 +94,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     entry('/chain-index', 0.85, 'daily'),
     entry('/widgets/grocery-index-ticker', 0.7, 'daily'),
     entry('/categories', 0.8, 'daily'),
+    entry('/price-statistics', 0.82, 'daily'),
     entry('/stores', 0.75, 'weekly'),
     entry('/map', 0.75, 'daily'),
     entry('/cookies', 0.68, 'weekly'),
@@ -113,6 +115,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     ...staticRoutes,
     ...buildCatalogSitemapEntries(),
+    ...geoPriceStatistics.map((area) => entry(area.href, 0.72, 'daily')),
     ...seoLandingRoutes
   ];
 }

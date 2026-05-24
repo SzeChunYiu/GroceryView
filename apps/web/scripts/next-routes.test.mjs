@@ -12,6 +12,8 @@ const appFiles = [
   'src/app/stores/[slug]/page.tsx',
   'src/app/categories/page.tsx',
   'src/app/categories/[slug]/page.tsx',
+  'src/app/price-statistics/page.tsx',
+  'src/app/price-statistics/[scope]/[slug]/page.tsx',
   'src/app/compare/page.tsx',
   'src/app/catalogue-savings/page.tsx',
   'src/app/chain-index/page.tsx',
@@ -24,6 +26,7 @@ const appFiles = [
   'src/components/market-shell.tsx',
   'src/components/settings-data-export-actions.tsx',
   'src/components/data-ui.tsx',
+  'src/lib/geo-price-statistics.ts',
   'src/lib/verified-data.ts'
 ];
 
@@ -77,6 +80,35 @@ describe('verified-data UI', () => {
     assert.match(productsPage, /Out of stock/);
     assert.match(verified, /isAvailable/);
     assert.match(verified, /outOfStockLatestPriceCount/);
+  });
+
+  it('publishes SEO-friendly local price statistics with coverage gates', async () => {
+    const indexPage = await read('src/app/price-statistics/page.tsx');
+    const areaPage = await read('src/app/price-statistics/[scope]/[slug]/page.tsx');
+    const statistics = await read('src/lib/geo-price-statistics.ts');
+    const sitemap = await read('src/app/sitemap.ts');
+    const nav = await read('src/components/app-nav.tsx');
+    const map = await read('src/app/map/page.tsx');
+    const stores = await read('src/app/stores/page.tsx');
+    const category = await read('src/app/categories/[slug]/page.tsx');
+
+    assert.match(statistics, /GeoPriceScope = 'region' \| 'city' \| 'district'/);
+    assert.match(statistics, /basketCategoryCount: 4/);
+    assert.match(statistics, /areaProductObservationCount: 20/);
+    assert.match(statistics, /productObservationCount: 3/);
+    assert.match(statistics, /categoryObservationCount: 6/);
+    assert.match(statistics, /lidlStoreOffers/);
+    assert.doesNotMatch(statistics, /demo-data/);
+    assert.match(indexPage, /Regional, city, and district grocery price levels/);
+    assert.match(areaPage, /generateStaticParams/);
+    assert.match(areaPage, /Product price levels/);
+    assert.match(areaPage, /coverage and confidence labels/);
+    assert.match(statistics, /Withheld/);
+    assert.match(sitemap, /geoPriceStatistics/);
+    assert.match(nav, /\/price-statistics/);
+    assert.match(map, /Open local price statistics/);
+    assert.match(stores, /Browse city and district price levels/);
+    assert.match(category, /View local category price statistics/);
   });
 
   it('makes unavailable private features fail closed instead of showing fabricated rows', async () => {
