@@ -46,6 +46,10 @@ export type ChainComparisonTable = {
   generatedAt: string | null;
 };
 
+type CompareResetSearchParams = {
+  products?: string | string[] | null | undefined;
+};
+
 function normalizeCompareId(value: string): string {
   return value.trim().toLowerCase();
 }
@@ -62,6 +66,12 @@ export function parseCompareProductsParam(input: string | string[] | null | unde
       return true;
     })
     .slice(0, 6);
+}
+
+export function buildCompareNoChainResetUrl(searchParams: CompareResetSearchParams = {}): string {
+  const products = parseCompareProductsParam(searchParams.products);
+  const productsQuery = products.map(encodeURIComponent).join(',');
+  return productsQuery ? `/compare?products=${productsQuery}` : '/compare';
 }
 
 function productLookup(products: readonly AxfoodProduct[]): Map<string, AxfoodProduct> {
