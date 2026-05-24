@@ -4,6 +4,7 @@ import { mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
+import { parsePolskiSklepSeFixture } from '../connectors/polski-sklep-se.js';
 import {
   buildCoopCategoryProductsUrl,
   buildCoopCategoryTreeUrl,
@@ -7307,5 +7308,26 @@ describe('daily ingestion runner', () => {
     assert.equal(result.status, 'blocked');
     assert.deepEqual(result.blockers, ['ica:robots_txt_allow_required', 'ica:legal_review_approval_required']);
     assert.equal(executor.calls.length, 0);
+  });
+});
+
+describe('Polski Sklep SE connector', () => {
+  it('keeps whitelisted grocery overlap categories for a verified multi-location Polish chain', () => {
+    const rows = parsePolskiSklepSeFixture({
+      stores: [
+        { id: 'stockholm', name: 'Polski Sklep Stockholm', city: 'Stockholm', address: 'Testgatan 1' },
+        { id: 'malmo', name: 'Polski Sklep Malmö', city: 'Malmö', address: 'Testgatan 2' },
+        { id: 'goteborg', name: 'Polski Sklep Göteborg', city: 'Göteborg', address: 'Testgatan 3' }
+      ],
+      products: [
+        { sku: 'ptasie-mleczko', name: 'Ptasie Mleczko', brand: 'Wedel', category: 'sweets', price: '39,90', storeIds: ['stockholm', 'malmo'] },
+        { sku: 'kitchen-mug', name: 'Kubek', category: 'homewares', price: 49, storeIds: ['stockholm'] }
+      ]
+    }, 'fixture://polski-sklep', '2026-05-24T12:00:00.000Z');
+
+    assert.deepEqual(rows.map((row) => [row.country, row.currency, row.chain, row.retailer_type, row.category, row.price, row.city]), [
+      ['SE', 'SEK', 'polski-sklep', 'ethnic_polish_eastern_european', 'sweets', 39.9, 'Stockholm'],
+      ['SE', 'SEK', 'polski-sklep', 'ethnic_polish_eastern_european', 'sweets', 39.9, 'Malmö']
+    ]);
   });
 });
