@@ -4392,7 +4392,15 @@ export function createGroceryViewApi() {
       const servings = options.servings ?? 4;
       requirePositiveFinite(maxMealCost, 'maxMealCost');
       requirePositiveFinite(servings, 'servings');
-      const suggestions = suggestDealBasedMeals({ deals: mealDeals, maxMealCost, servings });
+      const savedBudget = budgets.get(userId);
+      const favoriteStoreIds = this.getFavoriteStores(userId).map((store) => store.id);
+      const comparisonStoreIds = favoriteStoreIds.length > 0 ? favoriteStoreIds : stores.map((store) => store.id);
+      const plannedSpend = compareBasketStrategies({
+        favoriteStoreIds: comparisonStoreIds,
+        items: basketInputItems(baskets.get(userId) ?? [])
+      }).cheapestByProduct.total;
+      const suggestions = suggestDealBasedMeals({ deals: mealDeals, maxMealCost, servings })
+        .filter((suggestion) => !savedBudget || roundPrice(plannedSpend + suggestion.estimatedCost) <= savedBudget.weeklyBudget);
       return {
         userId,
         currency: 'SEK',
@@ -4404,7 +4412,8 @@ export function createGroceryViewApi() {
         guardrails: [
           'Meal suggestions use current high-scoring deals but never update a basket without user confirmation.',
           'Diet, allergen, and household rules must be checked before a suggested meal is saved.',
-          'Per-serving cost is advisory and cannot hide stale or missing ingredient price evidence.'
+          'Per-serving cost is advisory and cannot hide stale or missing ingredient price evidence.',
+          'Saved weekly budgets include current planned basket spend before budget-breaking meals are shown.'
         ]
       };
     },

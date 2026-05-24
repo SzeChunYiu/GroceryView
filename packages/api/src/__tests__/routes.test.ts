@@ -941,6 +941,13 @@ describe('createGroceryViewApi', () => {
       reason: 'Uses high-scoring current deals across protein, pantry, and vegetables.'
     }]);
     assert.match(report.guardrails[0], /never update a basket/i);
+    assert.match(report.guardrails[3], /weekly budgets/i);
+    api.updateBudget('user-1', { weeklyBudget: 110, monthlyBudget: 440 });
+    assert.equal(api.getMealPlanSuggestionsReport('user-1', { maxMealCost: 120, servings: 4 }).suggestions.length, 1);
+    api.addBasketItem('user-1', { productId: 'milk', quantity: 1 });
+    const budgetGuardedReport = api.getMealPlanSuggestionsReport('user-1', { maxMealCost: 120, servings: 4 });
+    assert.deepEqual(budgetGuardedReport.suggestions, []);
+    assert.deepEqual(budgetGuardedReport.ingredientProductIds, []);
     assert.deepEqual(api.getMealPlanSuggestionsReport('user-1', { maxMealCost: 20 }).suggestions, []);
     assert.throws(() => api.getMealPlanSuggestionsReport('user-1', { servings: 0 }), /servings must be positive/);
   });
