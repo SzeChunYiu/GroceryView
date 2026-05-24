@@ -28,7 +28,15 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: 'GroceryView',
   description: 'Sweden grocery price intelligence for products, stores, and weekly baskets.',
-  manifest: '/manifest.webmanifest'
+  manifest: '/manifest.webmanifest',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'GroceryView'
+  },
+  other: {
+    'mobile-web-app-capable': 'yes'
+  }
 };
 
 function jsonLd(value: unknown) {

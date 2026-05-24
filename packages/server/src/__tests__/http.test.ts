@@ -1276,6 +1276,9 @@ describe('createHttpHandler', () => {
     api.addWatchlistItem('user-1', { productId: 'coffee', targetPrice: 50, favoriteStoresOnly: true });
     api.addBasketItem('user-1', { productId: 'milk', quantity: 2 });
     api.updateBudget('user-1', { weeklyBudget: 100, monthlyBudget: 400 });
+    (api as typeof api & { getFriendSharedDealSignals(userId: string): unknown[] }).getFriendSharedDealSignals = (userId) => userId === 'user-1'
+      ? [{ signalId: 'friend-share-1', productId: 'coffee', sharedByUserId: 'friend-1', dealScore: 82 }]
+      : [];
     const handle = createHttpHandler(api, { now: new Date('2026-05-20T12:00:00.000Z') });
 
     const exported = await json(await handle(new Request('http://localhost/api/privacy/export?userId=user-1'))) as {
@@ -1291,6 +1294,9 @@ describe('createHttpHandler', () => {
     assert.equal(exported.sections.find((section) => section.name === 'alerts')?.records.length, 1);
     assert.deepEqual(exported.sections.find((section) => section.name === 'preferences')?.records, [{ weeklyBudget: 100, monthlyBudget: 400 }]);
     assert.deepEqual(exported.sections.find((section) => section.name === 'analytics_events')?.records, []);
+    assert.deepEqual(exported.sections.find((section) => section.name === 'friend_shared_deal_signals')?.records, [
+      { signalId: 'friend-share-1', productId: 'coffee', sharedByUserId: 'friend-1', dealScore: 82 }
+    ]);
 
     const settingsExport = await json(await handle(new Request('http://localhost/api/settings/data-export?userId=user-1'))) as {
       generatedAt: string;
@@ -1305,6 +1311,7 @@ describe('createHttpHandler', () => {
     assert.equal(plan.userId, 'user-1');
     assert.equal(plan.destructiveAction, false);
     assert.ok(plan.deleteFromTables.includes('receipt_uploads'));
+    assert.ok(plan.deleteFromTables.includes('friend_shared_deal_signals'));
     assert.deepEqual(plan.anonymizeTables, ['community_price_reports']);
 
     const fulfillment = await handle(new Request('http://localhost/api/privacy/request-fulfillment?userId=user-1', {
@@ -2314,5 +2321,21 @@ describe('createHttpHandler', () => {
 
     const missing = await handle(new Request('http://localhost/api/nope'));
     assert.equal(missing.status, 404);
+  });
+
+  it('returns structured error JSON for malformed POST bodies', async () => {
+    const handle = createHttpHandler();
+
+    const response = await handle(new Request('http://localhost/api/watchlist?userId=user-1', {
+      method: 'POST',
+      body: '[]'
+    }));
+
+    assert.equal(response.status, 400);
+    assert.deepEqual(await json(response), {
+      error: 'Invalid JSON body.',
+      code: 'malformed_post_body',
+      details: { reason: 'JSON body must be an object.' }
+    });
   });
 });

@@ -3,9 +3,137 @@ import { AccountMutationActions } from '@/components/account-mutation-actions';
 import { AdDisclosureActions } from '@/components/ad-disclosure-actions';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { listShareRoles, accountListSharePermissions } from '@/lib/list-permissions';
 import { routeMetadata } from '@/lib/seo';
 import { accountSavedShoppingContract, formatSek, savedBasketAutoReorderPlanner } from '@/lib/verified-data';
 import { planAccountDeletion } from '@groceryview/core';
+
+const notificationSubscriptionEndpoint = '/api/notifications/subscription';
+const notificationVapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? '';
+const notificationChannelPreferences = ['price-drop-alerts', 'basket-reminders'];
+const notificationSubscriptionScript = `(() => {
+  const root = document.querySelector('[data-push-preferences]');
+  if (!root) return;
+
+  const endpoint = root.getAttribute('data-subscription-endpoint');
+  const vapidPublicKey = root.getAttribute('data-vapid-public-key') || '';
+  const accountId = root.getAttribute('data-account-id') || 'signed-in-user';
+  const channels = (root.getAttribute('data-channels') || '').split(',').filter(Boolean);
+  const status = root.querySelector('[data-push-status]');
+  const token = root.querySelector('[data-push-token]');
+  const enable = root.querySelector('[data-push-enable]');
+  const disable = root.querySelector('[data-push-disable]');
+
+  const setStatus = (message, tokenId) => {
+    if (status) status.textContent = message;
+    if (token) token.textContent = tokenId ? 'Active token: ' + tokenId : 'No active push token saved for this account.';
+  };
+
+  const urlBase64ToUint8Array = (base64String) => {
+    const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    return Uint8Array.from(Array.from(rawData).map((character) => character.charCodeAt(0)));
+  };
+
+  const saveConsent = async (payload) => {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ accountId, channels, ...payload })
+    });
+    const body = await response.json();
+    if (!response.ok) throw new Error(body.error || 'Unable to save push notification consent.');
+    return body;
+  };
+
+  const getSubscription = async () => {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return null;
+    const registration = await navigator.serviceWorker.getRegistration('/');
+    return registration ? registration.pushManager.getSubscription() : null;
+  };
+
+  const refreshState = async () => {
+    if (!('Notification' in window)) {
+      setStatus('This browser does not expose notification permissions.');
+      return;
+    }
+    const subscription = await getSubscription();
+    if (Notification.permission === 'granted' && subscription) {
+      setStatus('Push notifications are enabled for this browser.', 'browser-managed');
+      return;
+    }
+    if (Notification.permission === 'denied') {
+      setStatus('Notifications are blocked in this browser. Update browser settings to enable GroceryView alerts.');
+      return;
+    }
+    setStatus('Notifications are not enabled yet. You can grant account-level consent below.');
+  };
+
+  enable?.addEventListener('click', async () => {
+    enable.setAttribute('disabled', 'true');
+    try {
+      if (!('Notification' in window)) {
+        const body = await saveConsent({ permission: 'unsupported', subscription: null, deliveryEnabled: false });
+        setStatus('This browser cannot receive web push notifications.', body.tokenId);
+        return;
+      }
+
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        const body = await saveConsent({ permission, subscription: null, deliveryEnabled: false });
+        setStatus('Notification consent was not granted, so no delivery token was stored.', body.tokenId);
+        return;
+      }
+
+      if (!('serviceWorker' in navigator) || !('PushManager' in window) || !vapidPublicKey) {
+        const body = await saveConsent({ permission, subscription: null, deliveryEnabled: false });
+        setStatus('Consent saved. Delivery waits for service worker and VAPID configuration.', body.tokenId);
+        return;
+      }
+
+      const registration = await navigator.serviceWorker.getRegistration('/');
+      if (!registration) {
+        const body = await saveConsent({ permission, subscription: null, deliveryEnabled: false });
+        setStatus('Consent saved. Delivery waits for the GroceryView service worker.', body.tokenId);
+        return;
+      }
+
+      const subscription = await registration.pushManager.getSubscription() || await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
+      });
+      const body = await saveConsent({ permission, subscription: subscription.toJSON(), deliveryEnabled: true });
+      setStatus('Push notifications are enabled for price drops and basket reminders.', body.tokenId);
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : 'Unable to enable push notifications.');
+    } finally {
+      enable.removeAttribute('disabled');
+    }
+  });
+
+  disable?.addEventListener('click', async () => {
+    disable.setAttribute('disabled', 'true');
+    try {
+      const subscription = await getSubscription();
+      if (subscription) await subscription.unsubscribe();
+      const response = await fetch(endpoint, {
+        method: 'DELETE',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ accountId, endpoint: subscription?.endpoint })
+      });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error || 'Unable to remove push notification token.');
+      setStatus('Push notifications are disabled for this account.');
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : 'Unable to disable push notifications.');
+    } finally {
+      disable.removeAttribute('disabled');
+    }
+  });
+
+  refreshState();
+})();`;
 
 const accountDeletionPlan = planAccountDeletion('signed-in-user');
 const accountDeletionConfirmations = [
@@ -32,6 +160,44 @@ export default function AccountPage() {
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
         GroceryView now surfaces the real account API contract for saved shopping state while keeping private rows available to signed-in shoppers only. The public static build describes the production contract and stays closed when authenticated account records are absent.
       </p>
+
+
+      <Card className="mt-6 border-indigo-200 bg-indigo-50">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <Eyebrow>List sharing permissions</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">View-only, edit, and instant revoke controls</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+              Household lists can now be shared with explicit <code className="rounded bg-white/80 px-1 py-0.5 text-indigo-900">view</code> or <code className="rounded bg-white/80 px-1 py-0.5 text-indigo-900">edit</code> roles through <code className="rounded bg-white/80 px-1 py-0.5 text-indigo-900">/api/list/permissions</code>, and account settings expose a one-click revoke action for every active collaborator.
+            </p>
+          </div>
+          <ConfidenceBadge level="high" label="Revocation available" sampleSize={accountListSharePermissions.length} />
+        </div>
+        <div className="mt-5 grid gap-4 lg:grid-cols-2">
+          {Object.entries(listShareRoles).map(([role, config]) => (
+            <div className="rounded-2xl bg-white p-4 shadow-sm" key={role}>
+              <p className="text-sm font-black text-indigo-950">{config.label}</p>
+              <p className="mt-2 text-sm leading-6 text-slate-700">{config.description}</p>
+              <ul className="mt-3 list-disc space-y-1 pl-5 text-sm font-semibold text-slate-700">
+                {config.capabilities.map((capability) => <li key={capability}>{capability}</li>)}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <div className="mt-5 grid gap-3">
+          {accountListSharePermissions.map((permission) => (
+            <form action="/api/list/permissions" className="flex flex-col gap-3 rounded-2xl border border-indigo-100 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between" key={permission.id} method="post">
+              <input name="action" type="hidden" value="revoke" />
+              <input name="shareId" type="hidden" value={permission.id} />
+              <div>
+                <p className="font-black text-slate-950">{permission.listName} · {permission.collaboratorName}</p>
+                <p className="mt-1 text-sm text-slate-600">{permission.collaboratorEmail} has {listShareRoles[permission.role].label.toLowerCase()} access.</p>
+              </div>
+              <button className="rounded-full bg-indigo-950 px-4 py-2 text-sm font-black text-white" type="submit">Revoke now</button>
+            </form>
+          ))}
+        </div>
+      </Card>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Account-bound contract</p>
@@ -200,6 +366,52 @@ export default function AccountPage() {
             </ol>
           </div>
         </div>
+      </Card>
+
+      <Card
+        className="mt-6 border-indigo-200 bg-indigo-50"
+        data-account-id="signed-in-user"
+        data-channels={notificationChannelPreferences.join(',')}
+        data-push-preferences
+        data-subscription-endpoint={notificationSubscriptionEndpoint}
+        data-vapid-public-key={notificationVapidPublicKey}
+      >
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <Eyebrow>Push notification consent</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Price and reminder alerts need account-level consent</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+              GroceryView only stores a browser push token after the signed-in shopper grants notification permission. Tokens are scoped to this account, can be removed from this page, and are limited to price-drop alerts and saved-basket reminders.
+            </p>
+          </div>
+          <ConfidenceBadge level="high" label="Consent required" sampleSize={notificationChannelPreferences.length} />
+        </div>
+        <div className="mt-5 grid gap-4 lg:grid-cols-[1fr_0.85fr]">
+          <div className="rounded-lg border border-indigo-100 bg-white p-4">
+            <p className="text-sm font-black text-slate-950">Subscription flow</p>
+            <p className="mt-2 text-sm leading-6 text-slate-700" data-push-status>
+              Notifications are not enabled yet. You can grant account-level consent below.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <button className="rounded-full bg-indigo-900 px-4 py-2 text-sm font-black text-white shadow-sm" data-push-enable type="button">
+                Enable push alerts
+              </button>
+              <button className="rounded-full border border-indigo-200 bg-white px-4 py-2 text-sm font-black text-indigo-900 shadow-sm" data-push-disable type="button">
+                Disable alerts
+              </button>
+            </div>
+            <p className="mt-3 text-xs font-bold text-indigo-950" data-push-token>No active push token saved for this account.</p>
+          </div>
+          <div className="rounded-lg border border-indigo-100 bg-white p-4">
+            <p className="text-sm font-black text-slate-950">Token safeguards</p>
+            <ul className="mt-3 space-y-2 text-sm font-semibold text-slate-700">
+              <li className="rounded-lg bg-indigo-50 p-3">Permission is requested in the browser before any token is sent to GroceryView.</li>
+              <li className="rounded-lg bg-indigo-50 p-3">The subscription endpoint stores one account-scoped token per signed-in shopper.</li>
+              <li className="rounded-lg bg-indigo-50 p-3">Disabling alerts unsubscribes the browser and removes the saved account token.</li>
+            </ul>
+          </div>
+        </div>
+        <script dangerouslySetInnerHTML={{ __html: notificationSubscriptionScript }} />
       </Card>
 
       <AccountMutationActions />

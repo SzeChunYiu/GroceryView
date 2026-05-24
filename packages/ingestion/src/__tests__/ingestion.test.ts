@@ -6341,6 +6341,64 @@ describe('daily ingestion runner', () => {
     assert.equal(observations.product_id, 'product-db-ean-7310130003547');
   });
 
+  it('deduplicates daily scraped products by normalized barcode keys', async () => {
+    const executor = new DailyIngestionExecutor();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-21T03:17:00.000Z',
+      connectors: [
+        {
+          connectorId: 'willys-normalized-json',
+          chainId: 'willys',
+          sourceType: 'official_api',
+          endpointUrl: 'https://sources.example.test/willys/products.json',
+          parserVersion: 'normalized-json-v1',
+          robotsTxtStatus: 'not_applicable',
+          legalReviewStatus: 'approved',
+          hasDataAgreement: true,
+          stores: [{ storeId: '2110', name: 'Willys Kungsbacka Hede', address: 'Tölöleden 3', city: 'Kungsbacka' }]
+        }
+      ],
+      fetchImpl: async () => new Response(JSON.stringify({
+        items: [
+          {
+            storeId: '2110',
+            retailerProductId: 'wil-case-1',
+            rawName: 'Barcode Case 1',
+            canonicalName: 'Barcode Case',
+            productId: 'willys-barcode-case-1',
+            categoryId: 'test',
+            barcode: ' EAN-CASE-001 ',
+            packageSize: 1,
+            packageUnit: 'piece',
+            price: 10
+          },
+          {
+            storeId: '2110',
+            retailerProductId: 'wil-case-2',
+            rawName: 'Barcode Case 2',
+            canonicalName: 'Barcode Case',
+            productId: 'willys-barcode-case-2',
+            categoryId: 'test',
+            barcode: 'ean-case-001',
+            packageSize: 1,
+            packageUnit: 'piece',
+            price: 11
+          }
+        ]
+      }), { status: 200, headers: { 'content-type': 'application/json' } })
+    });
+
+    assert.equal(result.acceptedCount, 2);
+    const aliasInsert = executor.calls.find((call) => call.sql.includes('jsonb_to_recordset') && call.sql.includes('insert into aliases'));
+    assert.ok(aliasInsert, 'daily ingestion should batch upsert aliases');
+    const aliases = JSON.parse(String(aliasInsert.params[0])) as Array<{ product_id: string }>;
+    assert.deepEqual(aliases.map((alias) => alias.product_id), [
+      'product-db-ean-ean-case-001',
+      'product-db-ean-ean-case-001'
+    ]);
+  });
+
   it('upserts every configured daily store before writing partial store-scoped observations', async () => {
     const executor = new DailyIngestionExecutor();
     const result = await runDailyIngestion({

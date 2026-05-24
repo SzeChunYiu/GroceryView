@@ -23,6 +23,24 @@ export default function NutritionValuePage() {
     ? nutritionPerKrona.coverage.confidence as 'high' | 'medium' | 'low'
     : 'low';
 
+  if (nutritionRows.length === 0) {
+    return (
+      <PageShell>
+        <Eyebrow>Nutrition per krona</Eyebrow>
+        <h1 className="mt-2 text-4xl font-black tracking-tight">Best protein value per 10 SEK</h1>
+        <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
+          This route uses the real rankNutritionPerKrona core ranking on visible product rows that also have package nutrition-label fixtures. Products without label coverage are excluded instead of estimated.
+        </p>
+
+        <Card className="mt-6 border-dashed border-slate-300 bg-slate-50 text-center">
+          <p className="text-4xl" aria-hidden="true">🥗</p>
+          <h2 className="mt-3 text-2xl font-black text-slate-950">No nutrition value rows yet</h2>
+          <p className="mt-2 font-semibold text-slate-700">Add visible products, deal rows, and store coverage to unlock protein-per-krona rankings.</p>
+        </Card>
+      </PageShell>
+    );
+  }
+
   return (
     <PageShell>
       <Eyebrow>Nutrition per krona</Eyebrow>
