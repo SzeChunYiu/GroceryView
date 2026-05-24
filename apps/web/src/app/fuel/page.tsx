@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { FuelDetourCalc } from '@/components/fuel-detour-calc';
 import { formatFuelPrice, fuelPriceSourceSchema, fuelPriceTargetAlerts, verifiedFuelPriceObservations, verifiedFuelPriceSource } from '@/lib/fuel-prices';
 import { fuelStations, fuelStationSource, type FuelStationChain } from '@/lib/ingested/fuel-stations';
 import { fuelStationSourceCoverage, multiVerticalDomainFoundation } from '@/lib/verified-data';
@@ -81,6 +82,8 @@ export default function FuelPage() {
           <p className="mt-3 text-sm font-semibold text-slate-700">Captured {freshnessLabel(verifiedFuelPriceSource.capturedAt)}.</p>
         </Card>
       </div>
+
+      <FuelDetourCalc />
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
         <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
