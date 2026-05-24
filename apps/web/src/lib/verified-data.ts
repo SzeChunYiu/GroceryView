@@ -23,6 +23,7 @@ import {
 } from './generated/db-site-ingested-overrides';
 import { categoryLabels, pricedProducts } from './openprices-products';
 import { osmStores } from './osm-stores';
+import { friendShareSignalForProduct, type FriendShareSignalBadge } from './friend-share-signals';
 import {
   currencyFromObservation,
   defaultLocale,
@@ -1918,6 +1919,7 @@ export type AdaptiveProductCard = {
   }>;
   sparklineLabel: string;
   isAvailable: boolean;
+  friendShareSignal: FriendShareSignalBadge | null;
 };
 
 function isOpenPricesProduct(product: ItemComparisonProduct): product is (typeof pricedProducts)[number] {
@@ -1964,6 +1966,7 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
     : [];
   const sparklinePoints = sevenDaySparklinePoints(product);
   const priceDrop = priceDropFromThirtyDayHistory(product);
+  const friendShareSignal = friendShareSignalForProduct(product.slug);
 
   return {
     slug: product.slug,
@@ -1994,7 +1997,8 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
     sparklineLabel: sparklinePoints.length >= 2
       ? `${sparklinePoints.length} observed daily points from price_daily/OpenPrices history`
       : '7-day sparkline waits for at least two observed price-history points',
-    isAvailable
+    isAvailable,
+    friendShareSignal
   };
 });
 export const homepageAdaptiveProductCards = adaptiveProductCards.slice(0, 6);

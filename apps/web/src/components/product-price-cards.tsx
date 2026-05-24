@@ -192,6 +192,15 @@ export function ProductPriceCards({
                     {card.priceDropBadge}
                   </span>
                 ) : null}
+                {card.friendShareSignal ? (
+                  <span
+                    aria-label={card.friendShareSignal.ariaLabel}
+                    className="rounded-full bg-violet-100 px-3 py-1 text-[0.7rem] font-black text-violet-950"
+                    title={card.friendShareSignal.sourceLabel}
+                  >
+                    {card.friendShareSignal.sharedByCount} shared
+                  </span>
+                ) : null}
                 <span className="rounded-full bg-white px-3 py-1 text-[0.7rem] font-black text-slate-700">{resolvedMode(card, compareMode)}</span>
               </div>
             </div>
@@ -200,6 +209,9 @@ export function ProductPriceCards({
             <p className="mt-3 text-sm leading-6 text-slate-600">{card.sourceLabel}</p>
             <PriceHistorySparkline card={card} />
             <p className="mt-2 rounded-xl bg-blue-50 p-3 text-xs font-bold text-blue-950">{card.confidenceLabel}</p>
+            {card.friendShareSignal ? (
+              <p className="mt-2 rounded-xl bg-violet-50 p-3 text-xs font-bold text-violet-950">{card.friendShareSignal.label}</p>
+            ) : null}
             {card.cheapestUnitBadge ? (
               <p className="mt-2 rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-950">{card.cheapestUnitBadge}</p>
             ) : (

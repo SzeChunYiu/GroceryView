@@ -3336,6 +3336,8 @@ ${seo}`;
     assert.match(verified, /currentPrice - price30dAgo/);
     assert.match(verified, /priceDropBadge/);
     assert.match(verified, /isAvailable/);
+    assert.match(verified, /friendShareSignalForProduct/);
+    assert.match(verified, /friendShareSignal/);
     assert.match(products, /ProductPriceCards/);
     assert.match(products, /adaptiveProductCards/);
     assert.match(products, /searchParams/);
@@ -3366,6 +3368,27 @@ ${seo}`;
     assert.match(cards, /Out of stock/);
     assert.match(cards, /No synthetic product images/);
     assert.match(cards, /No synthetic unit prices/);
+    assert.match(cards, /card\.friendShareSignal/);
+    assert.match(cards, /shared/);
+  });
+
+  it('surfaces opted-in friend share signals on product and deal cards', async () => {
+    const helper = await read('src/lib/friend-share-signals.ts');
+    const route = await read('src/app/api/deals/friend-share-signals/route.ts');
+    const deals = await read('src/app/deals/page.tsx');
+    const cards = await read('src/components/product-price-cards.tsx');
+
+    assert.match(helper, /suggestionProductIds/);
+    assert.match(helper, /\/api\/deals\/friend-share-signals/);
+    assert.match(helper, /Opted-in friend and household shares only/);
+    assert.match(helper, /anonymous or public social signals are excluded/);
+    assert.match(helper, /fetchFriendShareSignalFeed/);
+    assert.match(route, /friendShareSignalFeed/);
+    assert.match(route, /NextResponse\.json/);
+    assert.match(deals, /friendShareSignalForProduct\(item\.productId\)/);
+    assert.match(deals, /suggestionProductIds/);
+    assert.match(cards, /card\.friendShareSignal\.sharedByCount/);
+    assert.match(cards, /card\.friendShareSignal\.sourceLabel/);
   });
 
   it('surfaces verified source coverage on the data sources route', async () => {

@@ -4,6 +4,7 @@ import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/componen
 import { buildBrandTierPriceObservations } from '@/lib/chain-index-data';
 import { expiryDealRadar, expiryDealRadarReports, kidsSnackLunchboxDeals, singlePortionDealFinder } from '@/lib/demo-data';
 import { digitalCatalogueOfferBoard, flyerValidityCalendar, offerExpiryReminderBoard } from '@/lib/verified-data';
+import { friendShareSignalFeed, friendShareSignalForProduct } from '@/lib/friend-share-signals';
 import { unknownUnitPriceLabel } from '@/lib/i18n';
 import { routeMetadata } from '@/lib/seo';
 import { screenerDefaultHref } from '@/lib/screener-query';
@@ -38,7 +39,11 @@ function sourceFor(reportId: string) {
 }
 
 export default function DealsPage() {
-  const activeItems = expiryDealRadar.radar.stores.flatMap((store) => store.items.map((item) => ({ ...item, storeName: store.storeName })));
+  const activeItems = expiryDealRadar.radar.stores.flatMap((store) => store.items.map((item) => ({
+    ...item,
+    storeName: store.storeName,
+    friendShareSignal: friendShareSignalForProduct(item.productId)
+  })));
   return (
     <PageShell>
       <Eyebrow>Expiry deal radar</Eyebrow>
@@ -166,6 +171,11 @@ export default function DealsPage() {
                 <div>
                   <p className="text-xl font-black text-slate-950">{item.productName}</p>
                   <p className="mt-1 text-sm text-slate-600">{item.storeName} · {item.category} · {sourceFor(item.id)}</p>
+                  {item.friendShareSignal ? (
+                    <p className="mt-2 rounded-full bg-violet-100 px-3 py-1 text-xs font-black text-violet-950" title={item.friendShareSignal.sourceLabel}>
+                      {item.friendShareSignal.label}
+                    </p>
+                  ) : null}
                 </div>
                 <div className="text-right">
                   <p className="text-3xl font-black text-emerald-800">{item.markdownPercent}% off</p>
@@ -182,6 +192,10 @@ export default function DealsPage() {
           ))}
         </div>
       </Card>
+
+      <p className="mt-3 text-xs font-bold text-slate-500">
+        Friend-shared badges use {friendShareSignalFeed.path} suggestionProductIds only; anonymous/public social data is excluded.
+      </p>
 
 
       <Card className="mt-6 border-amber-200 bg-amber-50">
