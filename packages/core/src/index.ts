@@ -4483,6 +4483,10 @@ export function buildExpiryDealRadar(input: ExpiryDealRadarInput): ExpiryDealRad
 
 export type PrivacyExportInput = {
   userId: string;
+  lists?: unknown[];
+  alerts?: unknown[];
+  preferences?: unknown[];
+  analyticsEvents?: unknown[];
   favoriteStoreIds: string[];
   watchlistProductIds: string[];
   receiptIds: string[];
@@ -4501,6 +4505,10 @@ export function buildPrivacyExport(input: PrivacyExportInput, generatedAt = '202
     generatedAt,
     sections: [
       { name: 'profile', records: [{ userId: input.userId }] },
+      { name: 'lists', records: input.lists ?? [] },
+      { name: 'alerts', records: input.alerts ?? [] },
+      { name: 'preferences', records: input.preferences ?? [] },
+      { name: 'analytics_events', records: input.analyticsEvents ?? [] },
       { name: 'favorite_stores', records: input.favoriteStoreIds.map((storeId) => ({ storeId })) },
       { name: 'watchlist', records: input.watchlistProductIds.map((productId) => ({ productId })) },
       { name: 'receipts', records: input.receiptIds.map((receiptId) => ({ receiptId })) },

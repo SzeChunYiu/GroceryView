@@ -484,6 +484,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/prices/freshness']);
     assert.ok(docs.body.paths['/users/demo/privacy/export']);
     assert.ok(docs.body.paths['/users/demo/privacy/deletion-plan']);
+    assert.ok(docs.body.paths['/users/demo/settings/data-export']);
     assert.ok(docs.body.paths['/products']);
     assert.ok(docs.body.paths['/products/{productId}/cheapest-now']);
     assert.ok(docs.body.paths['/products/{id}/terminal']);
@@ -554,6 +555,21 @@ describe('GroceryView API app', () => {
 
     const subscriptionEntitlement = await request(app.getHttpServer()).get('/users/demo/account/subscription-entitlement').expect(200);
     assert.deepEqual(subscriptionEntitlement.body, { userId: 'demo', entitlement: null, demo: true });
+
+    const settingsExport = await request(app.getHttpServer()).get('/users/demo/settings/data-export').expect(200);
+    assert.equal(settingsExport.body.userId, 'demo');
+    assert.equal(settingsExport.body.demo, true);
+    assert.deepEqual(settingsExport.body.sections.map((section: { name: string }) => section.name), [
+      'profile',
+      'lists',
+      'alerts',
+      'preferences',
+      'analytics_events',
+      'favorite_stores',
+      'watchlist',
+      'receipts',
+      'households'
+    ]);
 
     const mealPlan = await request(app.getHttpServer())
       .get('/users/demo/meal-plans/suggestions?maxMealCost=120&servings=4')

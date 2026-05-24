@@ -1823,6 +1823,39 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
     return null;
   };
 
+  const buildAccountDataExport = (user: string) => {
+    const householdPlan = api.getHouseholdPlan(user);
+    const watchlist = api.getWatchlist(user);
+    const budgetSummary = api.getBudgetSummary(user);
+    const alerts = watchlist.items
+      .filter((item) => item.targetPrice !== undefined || item.alertDealScoreAt !== undefined)
+      .map((item) => ({
+        productId: item.productId,
+        ...(item.targetPrice === undefined ? {} : { targetPrice: item.targetPrice }),
+        ...(item.alertDealScoreAt === undefined ? {} : { alertDealScoreAt: item.alertDealScoreAt }),
+        favoriteStoresOnly: item.favoriteStoresOnly ?? false,
+        allowedPriceTypes: item.allowedPriceTypes ?? []
+      }));
+    const preferences = budgetSummary.weeklyBudget > 0 || budgetSummary.monthlyBudget > 0
+      ? [{ weeklyBudget: budgetSummary.weeklyBudget, monthlyBudget: budgetSummary.monthlyBudget }]
+      : [];
+
+    return buildPrivacyExport(
+      {
+        userId: user,
+        lists: [{ id: 'current_basket', items: api.getBasket(user).items }],
+        alerts,
+        preferences,
+        analyticsEvents: [],
+        favoriteStoreIds: api.getFavoriteStores(user).map((store) => store.id),
+        watchlistProductIds: watchlist.items.map((item) => item.productId),
+        receiptIds: [],
+        householdIds: householdPlan ? [householdPlan.household.id] : []
+      },
+      (authOptions.now ?? new Date()).toISOString()
+    );
+  };
+
   return async (request: Request): Promise<Response> => {
     const url = new URL(request.url);
     const path = url.pathname.replace(/\/+$/, '') || '/';
@@ -2847,26 +2880,12 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         }
       }
 
-      if (path === '/api/privacy/export') {
+      if (path === '/api/privacy/export' || path === '/api/settings/data-export') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
         const authError = await authorizeUser(request, user);
         if (authError) return authError;
-        if (method === 'GET') {
-          const householdPlan = api.getHouseholdPlan(user);
-          return jsonResponse(
-            buildPrivacyExport(
-              {
-                userId: user,
-                favoriteStoreIds: api.getFavoriteStores(user).map((store) => store.id),
-                watchlistProductIds: api.getWatchlist(user).items.map((item) => item.productId),
-                receiptIds: [],
-                householdIds: householdPlan ? [householdPlan.household.id] : []
-              },
-              (authOptions.now ?? new Date()).toISOString()
-            )
-          );
-        }
+        if (method === 'GET') return jsonResponse(buildAccountDataExport(user));
       }
 
       if (path === '/api/privacy/deletion-plan') {
@@ -3087,6 +3106,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/households/join': { post: protectedOperation('Join an existing household from a signed-in invite token.') },
       '/api/households/current/basket/check': { post: protectedOperation('Check or uncheck a shared household shopping-list item with member attribution.') },
       '/api/privacy/export': { get: protectedOperation('Export signed-in user profile, favorite-store, watchlist, receipt, and household data.') },
+      '/api/settings/data-export': { get: protectedOperation('Download my data JSON export with lists, alerts, preferences, and analytics event records.') },
       '/api/privacy/deletion-plan': { post: protectedOperation('Plan account deletion without performing a destructive delete.') },
       '/api/privacy/request-fulfillment': { post: protectedOperation('Classify privacy export, deletion, and ad opt-out requests by fulfillment deadline.') },
       '/api/scans/process': { post: protectedOperation('Process barcode or receipt scan payloads through configured providers and return review routing work.') },

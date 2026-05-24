@@ -18,7 +18,9 @@ const appFiles = [
   'src/app/data-sources/page.tsx',
   'src/app/store-coverage/page.tsx',
   'src/app/openprices-depth/page.tsx',
+  'src/app/settings/page.tsx',
   'src/components/market-shell.tsx',
+  'src/components/settings-data-export-actions.tsx',
   'src/components/data-ui.tsx',
   'src/lib/verified-data.ts'
 ];
@@ -230,6 +232,28 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(actions, /localStorage\.setItem\('groceryview:userId'/);
     assert.doesNotMatch(actions, /demo-data|sample-data|mock session/i);
     assert.match(server, /requiresReauthentication: true/);
+  });
+
+  it('ships a signed-in settings data export download without anonymous private rows', async () => {
+    const settings = await read('src/app/settings/page.tsx');
+    const actions = await read('src/components/settings-data-export-actions.tsx');
+    const server = await read('../../packages/server/src/index.ts');
+
+    assert.match(settings, /SettingsDataExportActions/);
+    assert.match(settings, /Download my data/);
+    assert.match(settings, /lists, alerts, preferences, and analytics events/);
+    assert.match(actions, /'use client'/);
+    assert.match(actions, /sessionStorage\.getItem\('groceryview:accessToken'/);
+    assert.match(actions, /sessionStorage\.getItem\('groceryview:userId'/);
+    assert.match(actions, /Authorization: `Bearer \$\{accessToken\}`/);
+    assert.match(actions, /\/api\/settings\/data-export\?userId=\$\{encodeURIComponent\(userId\)\}/);
+    assert.match(actions, /method: 'GET'/);
+    assert.match(actions, /new Blob\(\[JSON\.stringify\(payload, null, 2\)\]/);
+    assert.match(actions, /link\.download = `groceryview-data-export-\$\{userId\}\.json`/);
+    assert.match(actions, /Sign in first/);
+    assert.match(actions, /No anonymous data exports/);
+    assert.doesNotMatch(actions, /localStorage\.setItem\('groceryview:userId'/);
+    assert.match(server, /\/api\/settings\/data-export/);
   });
 
 

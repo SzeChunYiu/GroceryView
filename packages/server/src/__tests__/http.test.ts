@@ -1269,6 +1269,8 @@ describe('createHttpHandler', () => {
     const api = createGroceryViewApi();
     api.addFavoriteStore('user-1', 'willys-odenplan');
     api.addWatchlistItem('user-1', { productId: 'coffee', targetPrice: 50, favoriteStoresOnly: true });
+    api.addBasketItem('user-1', { productId: 'milk', quantity: 2 });
+    api.updateBudget('user-1', { weeklyBudget: 100, monthlyBudget: 400 });
     const handle = createHttpHandler(api, { now: new Date('2026-05-20T12:00:00.000Z') });
 
     const exported = await json(await handle(new Request('http://localhost/api/privacy/export?userId=user-1'))) as {
@@ -1278,6 +1280,19 @@ describe('createHttpHandler', () => {
     assert.equal(exported.generatedAt, '2026-05-20T12:00:00.000Z');
     assert.deepEqual(exported.sections.find((section) => section.name === 'favorite_stores')?.records, [{ storeId: 'willys-odenplan' }]);
     assert.deepEqual(exported.sections.find((section) => section.name === 'watchlist')?.records, [{ productId: 'coffee' }]);
+    assert.deepEqual(exported.sections.find((section) => section.name === 'lists')?.records, [
+      { id: 'current_basket', items: [{ productId: 'milk', quantity: 2 }] }
+    ]);
+    assert.equal(exported.sections.find((section) => section.name === 'alerts')?.records.length, 1);
+    assert.deepEqual(exported.sections.find((section) => section.name === 'preferences')?.records, [{ weeklyBudget: 100, monthlyBudget: 400 }]);
+    assert.deepEqual(exported.sections.find((section) => section.name === 'analytics_events')?.records, []);
+
+    const settingsExport = await json(await handle(new Request('http://localhost/api/settings/data-export?userId=user-1'))) as {
+      generatedAt: string;
+      sections: Array<{ name: string; records: Array<Record<string, unknown>> }>;
+    };
+    assert.equal(settingsExport.generatedAt, '2026-05-20T12:00:00.000Z');
+    assert.deepEqual(settingsExport.sections.map((section) => section.name), exported.sections.map((section) => section.name));
 
     const deletion = await handle(new Request('http://localhost/api/privacy/deletion-plan?userId=user-1', { method: 'POST' }));
     assert.equal(deletion.status, 200);
