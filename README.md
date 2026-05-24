@@ -2,7 +2,7 @@
 
 > **Live status board — auto-generated, do not hand-edit.**
 > Regenerated from real signals (merged PRs, open PRs, GOAL.md, live prod HTML) by
-> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-23 23:50 UTC.
+> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-24 01:05 UTC.
 
 GroceryView turns grocery prices into a market: every product is a **ticker** with a
 price chart, chains/categories/brands have **indices**, deals get a **Buy/Wait**
@@ -42,6 +42,10 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 
 ## ✅ Recently shipped (last 15 merged `feat:`/`wire:` PRs)
 
+- #1485 feat(ingestion): wire Mathem daily connector
+- #1482 feat(account): add confirmed account deletion
+- #1481 feat(api): add notification inbox timing contract
+- #1479 feat(account): add GDPR data export settings
 - #1470 feat(api): add category tree endpoint
 - #1469 feat(web): add dietary product filters
 - #1468 feat: add household shared list collaboration
@@ -53,13 +57,20 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 - #1455 feat(ingest): persist Matspar daily prices
 - #1451 feat: wire unit price alerts to API
 - #1450 feat(web): add price history CSV export
-- #1446 feat(ingest): add ICA Toria store prices
-- #1434 feat(web): add trending products carousel
-- #1439 feat(ingest): deepen Matpriskollen offer rows
-- #1449 feat(api): export product price history csv
 
 ## 🔄 In progress (open PRs)
 
+- #1490 lunarc/feat account deletion
+- #1489 feat(ingest): expand ICA Toria store prices
+- #1488 feat(ingestion): wire Mathem daily connector
+- #1487 feat(web): add product detail alias route
+- #1486 feat(ingestion): add City Gross bulk connector
+- #1484 fix: add breadcrumb coverage for category and product pages
+- #1483 feat(web): add cookies disclosure page
+- #1480 feat(web): group desktop navigation
+- #1478 chore: add Renovate configuration and validation
+- #1477 lunarc/feat screener
+- #1474 ci: add Renovate config and validation
 - #1472 Add canonical URL tags for filtered category and search pages
 - #1471 Add breadcrumbs to category and item pages
 - #1467 [codex] Add auth route crawl rules
@@ -99,10 +110,6 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 - #1348 lunarc/feat product cross chain table
 - #1347 feat(ingest): expand Axfood weekly flyer discounts
 - #1344 feat(web): wire meal planner deal suggestions
-- #1337 feat(domain): multi-vertical tag + vertical routes
-- #1329 feat(web): rank nutrition value with confidence
-- #1304 feat(ingest): add ICA Tierp promotions
-- #1260 feat(web): dark mode (WIP from LUNARC fleet)
 
 ## 📋 To-do (from GOAL.md backlog)
 
