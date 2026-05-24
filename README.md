@@ -15,6 +15,20 @@ Strategy + competitor teardown: [`GOAL.md`](GOAL.md) · [`COMPETITIVE-ANALYSIS.m
 - **Visible on homepage:** ~**24** store pages, ~**35** product pages
 - **Shipped `feat:`/`wire:` PRs to date:** **190**
 
+## 🧰 One-command local development
+
+New contributors can start the core local stack with Docker Compose:
+
+```bash
+docker compose up --build api
+```
+
+The compose stack starts PostgreSQL, Redis, applies Prisma migrations, builds the
+API workspace, and serves the API at [http://localhost:3001](http://localhost:3001).
+Swagger docs are available at `/api`; health checks are available at `/health` and
+`/api/health`. Data is stored in named Docker volumes; reset with
+`docker compose down -v`.
+
 ## 🛒 What shoppers get (consumer value)
 
 The metrics a real shopper cares about — ✅ = core engine wired into the web app,
