@@ -1,70 +1,59 @@
 'use client';
 
-import Link from 'next/link';
 import { Search } from 'lucide-react';
-import { useEffect, useId, useMemo, useState } from 'react';
-
-type ProductSearchResult = {
-  id: string;
-  slug: string;
-  name: string;
-  brand: string | null;
-  imageUrl: string | null;
-  searchRank: number;
-};
-
-type ProductSearchResponse = {
-  query: string;
-  results: ProductSearchResult[];
-  error?: string;
-};
-
-type SearchStatus = 'idle' | 'loading' | 'ready' | 'empty' | 'error';
-
-const MIN_QUERY_LENGTH = 2;
+import { useRouter } from 'next/navigation';
+import { useEffect, useId, useState, type KeyboardEvent } from 'react';
+import { SearchResultItem } from './SearchResultItem';
+import { MIN_QUERY_LENGTH, useSearch } from '@/hooks/useSearch';
 
 export function SearchBar() {
+  const router = useRouter();
   const inputId = useId();
   const listboxId = useId();
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<ProductSearchResult[]>([]);
-  const [status, setStatus] = useState<SearchStatus>('idle');
-  const trimmedQuery = useMemo(() => query.trim(), [query]);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const { results, status, trimmedQuery } = useSearch(query);
   const shouldShowDropdown = status !== 'idle' && trimmedQuery.length >= MIN_QUERY_LENGTH;
+  const activeResult = activeIndex === null ? null : results[activeIndex] ?? null;
+  const activeOptionId = activeResult ? `${listboxId}-option-${activeResult.id}` : undefined;
 
   useEffect(() => {
-    if (trimmedQuery.length < MIN_QUERY_LENGTH) {
-      setResults([]);
-      setStatus('idle');
+    setActiveIndex(null);
+  }, [trimmedQuery]);
+
+  useEffect(() => {
+    if (results.length === 0) {
+      setActiveIndex(null);
       return;
     }
 
-    const controller = new AbortController();
-    const timeout = window.setTimeout(async () => {
-      setStatus('loading');
-      try {
-        const response = await fetch(`/api/products?q=${encodeURIComponent(trimmedQuery)}`, {
-          signal: controller.signal,
-          headers: { Accept: 'application/json' }
-        });
-        const payload = await response.json() as ProductSearchResponse;
-        if (!response.ok || payload.error) throw new Error(payload.error ?? 'product_search_failed');
-        if (controller.signal.aborted) return;
-        setResults(payload.results ?? []);
-        setStatus((payload.results ?? []).length > 0 ? 'ready' : 'empty');
-      } catch (error) {
-        if (controller.signal.aborted) return;
-        console.error('Product search request failed', error instanceof Error ? { name: error.name } : { name: 'unknown' });
-        setResults([]);
-        setStatus('error');
-      }
-    }, 300);
+    setActiveIndex((current) => (current !== null && current >= results.length ? results.length - 1 : current));
+  }, [results]);
 
-    return () => {
-      window.clearTimeout(timeout);
-      controller.abort();
-    };
-  }, [trimmedQuery]);
+  function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (!shouldShowDropdown) return;
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      if (results.length === 0) return;
+      setActiveIndex((current) => (current === null ? 0 : (current + 1) % results.length));
+    }
+
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      if (results.length === 0) return;
+      setActiveIndex((current) => (current === null ? results.length - 1 : (current - 1 + results.length) % results.length));
+    }
+
+    if (event.key === 'Enter' && activeResult) {
+      event.preventDefault();
+      router.push(`/products/${activeResult.slug}`);
+    }
+
+    if (event.key === 'Escape') {
+      setActiveIndex(null);
+    }
+  }
 
   return (
     <div className="relative w-full max-w-xl lg:w-[min(36vw,28rem)]">
@@ -73,6 +62,7 @@ export function SearchBar() {
         <Search className="h-4 w-4 text-slate-500" aria-hidden="true" />
         <input
           aria-autocomplete="list"
+          aria-activedescendant={activeOptionId}
           aria-controls={listboxId}
           aria-expanded={shouldShowDropdown}
           aria-label="Search products"
@@ -80,6 +70,7 @@ export function SearchBar() {
           className="min-w-0 flex-1 bg-transparent text-sm font-semibold text-slate-950 outline-none placeholder:text-slate-500"
           id={inputId}
           onChange={(event) => setQuery(event.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder="Search product or brand"
           role="combobox"
           type="search"
@@ -104,16 +95,13 @@ export function SearchBar() {
           ) : null}
           {status === 'ready' ? (
             <div className="max-h-96 divide-y divide-slate-100 overflow-y-auto">
-              {results.map((result) => (
-                <Link
-                  className="block px-4 py-3 transition hover:bg-emerald-50 focus:bg-emerald-50 focus:outline-none"
-                  href={`/products/${result.slug}`}
+              {results.map((result, index) => (
+                <SearchResultItem
+                  id={`${listboxId}-option-${result.id}`}
+                  isActive={activeIndex === index}
                   key={result.id}
-                  role="option"
-                >
-                  <span className="block text-sm font-black text-slate-950">{result.name}</span>
-                  <span className="mt-1 block text-xs font-semibold text-slate-600">{result.brand ?? 'Brand not reported'} · PostgreSQL product search</span>
-                </Link>
+                  result={result}
+                />
               ))}
             </div>
           ) : null}

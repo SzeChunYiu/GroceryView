@@ -16,15 +16,26 @@ async function exists(relative) {
 
 test('search bar debounces product search API calls and renders a dropdown', async () => {
   assert.equal(await exists('src/components/SearchBar.tsx'), true);
+  assert.equal(await exists('src/hooks/useSearch.ts'), true);
+  assert.equal(await exists('src/components/SearchResultItem.tsx'), true);
   const searchBar = await read('src/components/SearchBar.tsx');
+  const searchHook = await read('src/hooks/useSearch.ts');
+  const searchResultItem = await read('src/components/SearchResultItem.tsx');
 
   assert.match(searchBar, /'use client'/);
-  assert.match(searchBar, /setTimeout\([\s\S]*300/);
-  assert.match(searchBar, /AbortController/);
-  assert.match(searchBar, /\/api\/products\?q=/);
+  assert.match(searchHook, /setTimeout\([\s\S]*300/);
+  assert.match(searchHook, /AbortController/);
+  assert.match(searchHook, /\/api\/products\?q=/);
   assert.match(searchBar, /role="combobox"/);
   assert.match(searchBar, /role="listbox"/);
-  assert.match(searchBar, /href=\{`\/products\/\$\{result\.slug\}`\}/);
+  assert.match(searchBar, /aria-activedescendant=\{activeOptionId\}/);
+  assert.match(searchBar, /onKeyDown=\{handleKeyDown\}/);
+  assert.match(searchBar, /ArrowDown/);
+  assert.match(searchBar, /ArrowUp/);
+  assert.match(searchBar, /router\.push\(`\/products\/\$\{activeResult\.slug\}`\)/);
+  assert.match(searchResultItem, /aria-selected=\{isActive\}/);
+  assert.match(searchResultItem, /role="option"/);
+  assert.match(searchResultItem, /href=\{`\/products\/\$\{result\.slug\}`\}/);
 });
 
 test('global navigation mounts the debounced product search bar', async () => {
