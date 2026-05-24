@@ -1,9 +1,12 @@
 import Link from 'next/link';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { dealBasedMeals, familyMealPlannerFromDeals, freezerBatchCookPlanner, studentDealRecipes } from '@/lib/demo-data';
+import { dealBasedMealInputs, dealBasedMeals, familyMealPlannerFromDeals, freezerBatchCookPlanner, studentDealRecipes } from '@/lib/demo-data';
 import { dietarySubstitutionAssistantContract } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
+
+type MealPlanIngredient = (typeof dealBasedMealInputs)[number];
+type FamilyMealPlanDay = (typeof familyMealPlannerFromDeals.meals)[number];
 
 export function generateMetadata() {
   return routeMetadata('/meal-planner');
@@ -15,6 +18,34 @@ function formatSek(value: number) {
 
 function confidenceLevel(value: string): 'high' | 'medium' | 'low' {
   return value === 'high' || value === 'medium' || value === 'low' ? value : 'low';
+}
+
+function quantityEstimateForIngredient(ingredient: MealPlanIngredient, servings: number) {
+  const packLabel = ingredient.category === 'protein'
+    ? 'main pack'
+    : ingredient.category === 'pantry'
+      ? 'pantry pack'
+      : 'vegetable pack';
+
+  return `1 ${packLabel} for ${servings} servings`;
+}
+
+function shoppingListHrefForMealPlanDay(meal: FamilyMealPlanDay) {
+  const payload = {
+    day: meal.weeknightSlot,
+    mealTitle: meal.title,
+    source: 'familyMealPlannerFromDeals',
+    items: meal.ingredients.map((ingredient) => ({
+      detail: `From ${meal.weeknightSlot}: ${meal.title} · ${ingredient.source}`,
+      id: `meal-plan-${meal.weeknightSlot.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${ingredient.productId}`,
+      matchedProductName: ingredient.name,
+      matchedProductSlug: ingredient.productId,
+      name: ingredient.name,
+      quantity: quantityEstimateForIngredient(ingredient, familyMealPlannerFromDeals.servings)
+    }))
+  };
+
+  return `/list?mealPlan=${encodeURIComponent(JSON.stringify(payload))}`;
 }
 
 export default function MealPlannerPage() {
@@ -128,6 +159,12 @@ export default function MealPlannerPage() {
                   <p className="text-sm font-black uppercase tracking-[0.16em] text-blue-800">{meal.weeknightSlot}</p>
                   <p className="mt-1 text-2xl font-black text-slate-950">{meal.title}</p>
                   <p className="mt-1 text-sm font-semibold text-slate-700">{meal.reason}</p>
+                  <Link
+                    className="mt-3 inline-flex rounded-full bg-blue-800 px-4 py-2 text-sm font-black text-white transition hover:bg-blue-900"
+                    href={shoppingListHrefForMealPlanDay(meal)}
+                  >
+                    Add day to shopping list
+                  </Link>
                 </div>
                 <div className="text-right">
                   <p className="text-3xl font-black text-blue-800">{formatSek(meal.estimatedCost)}</p>

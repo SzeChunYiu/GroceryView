@@ -20,6 +20,8 @@ describe('shopping list route', () => {
     assert.match(page, /CheckableListItem/);
     assert.match(page, /BulkImportDialog/);
     assert.match(page, /addImportedItems/);
+    assert.match(page, /mealPlan/);
+    assert.match(page, /meal-plan/);
     assert.match(page, /Shopping list/);
 
     assert.match(row, /'use client'/);
@@ -36,6 +38,8 @@ describe('shopping list route', () => {
     assert.match(hook, /checked: !item\.checked/);
     assert.match(hook, /addImportedItems/);
     assert.match(hook, /importSource: 'bulk-clipboard'/);
+    assert.match(hook, /MealPlanListItemInput/);
+    assert.match(hook, /meal-plan/);
     assert.match(hook, /matchedProductSlug/);
 
     assert.match(bulkImport, /'use client'/);

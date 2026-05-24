@@ -1186,6 +1186,8 @@ describe('verified-data UI', () => {
     assert.match(source, /suggestDealBasedMeals/);
     assert.match(source, /Family weekly meal planner/);
     assert.match(source, /lunchboxLeftovers/);
+    assert.match(source, /shoppingListHrefForMealPlanDay/);
+    assert.match(source, /Add day to shopping list/);
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 

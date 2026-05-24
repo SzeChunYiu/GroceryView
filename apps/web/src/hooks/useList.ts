@@ -6,20 +6,28 @@ export type ShoppingListItem = {
   checked: boolean;
   detail: string;
   id: string;
-  importSource?: 'starter' | 'bulk-clipboard';
+  importSource?: 'starter' | 'bulk-clipboard' | 'meal-plan';
   matchedProductName?: string;
   matchedProductSlug?: string;
   name: string;
   quantity: string;
 };
 
-export type BulkImportedListItemInput = Omit<ShoppingListItem, 'checked'> & {
+export type ImportedListItemInput = Omit<ShoppingListItem, 'checked'> & {
+  importSource: 'bulk-clipboard' | 'meal-plan';
+};
+
+export type BulkImportedListItemInput = ImportedListItemInput & {
   importSource: 'bulk-clipboard';
+};
+
+export type MealPlanListItemInput = ImportedListItemInput & {
+  importSource: 'meal-plan';
 };
 
 type PersistedListState = {
   checkedById?: Record<string, boolean>;
-  importedItems?: BulkImportedListItemInput[];
+  importedItems?: ImportedListItemInput[];
 };
 
 export const LIST_STORAGE_KEY = 'groceryview:shopping-list:checked:v1';
@@ -79,10 +87,10 @@ function listStateFromStorage(value: string | null): Required<PersistedListState
       : {};
 
     const importedItems = Array.isArray(maybeImportedItems)
-      ? maybeImportedItems.filter((item): item is BulkImportedListItemInput => (
+      ? maybeImportedItems.filter((item): item is ImportedListItemInput => (
         item !== null
         && typeof item === 'object'
-        && item.importSource === 'bulk-clipboard'
+        && (item.importSource === 'bulk-clipboard' || item.importSource === 'meal-plan')
         && typeof item.id === 'string'
         && typeof item.name === 'string'
         && typeof item.quantity === 'string'
@@ -96,7 +104,7 @@ function listStateFromStorage(value: string | null): Required<PersistedListState
   }
 }
 
-function withCheckedState(checkedById: Record<string, boolean>, importedItems: BulkImportedListItemInput[] = []): ShoppingListItem[] {
+function withCheckedState(checkedById: Record<string, boolean>, importedItems: ImportedListItemInput[] = []): ShoppingListItem[] {
   const uniqueItems = new Map<string, Omit<ShoppingListItem, 'checked'>>();
   for (const item of baseListItems) uniqueItems.set(item.id, item);
   for (const item of importedItems) uniqueItems.set(item.id, item);
@@ -111,11 +119,11 @@ function persistCheckedState(items: ShoppingListItem[]) {
   try {
     const checkedById = Object.fromEntries(items.map((item) => [item.id, item.checked]));
     const importedItems = items
-      .filter((item) => item.importSource === 'bulk-clipboard')
+      .filter((item) => item.importSource === 'bulk-clipboard' || item.importSource === 'meal-plan')
       .map((item) => ({
         detail: item.detail,
         id: item.id,
-        importSource: 'bulk-clipboard' as const,
+        importSource: item.importSource,
         matchedProductName: item.matchedProductName,
         matchedProductSlug: item.matchedProductSlug,
         name: item.name,
@@ -155,12 +163,12 @@ export function useList() {
     setItems((currentItems) => currentItems.map((item) => ({ ...item, checked: false })));
   }, []);
 
-  const addImportedItems = useCallback((importedItems: BulkImportedListItemInput[]) => {
+  const addImportedItems = useCallback((importedItems: ImportedListItemInput[]) => {
     setItems((currentItems) => {
       const existingIds = new Set(currentItems.map((item) => item.id));
       const nextImportedItems = importedItems
         .filter((item) => !existingIds.has(item.id))
-        .map((item) => ({ ...item, importSource: 'bulk-clipboard' as const, checked: false }));
+        .map((item) => ({ ...item, checked: false }));
 
       return [...currentItems, ...nextImportedItems];
     });

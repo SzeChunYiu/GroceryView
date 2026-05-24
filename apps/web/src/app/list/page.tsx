@@ -1,14 +1,57 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { CheckableListItem } from '@/components/CheckableListItem';
 import { AppNav } from '@/components/app-nav';
 import { BottomNav } from '@/components/bottom-nav';
 import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { useList } from '@/hooks/useList';
+import type { MealPlanListItemInput } from '@/hooks/useList';
+
+type MealPlanListPayload = {
+  day?: unknown;
+  items?: unknown;
+  mealTitle?: unknown;
+};
+
+function parseMealPlanListItems(search: string): MealPlanListItemInput[] {
+  const rawPayload = new URLSearchParams(search).get('mealPlan');
+  if (!rawPayload) return [];
+
+  try {
+    const payload = JSON.parse(rawPayload) as MealPlanListPayload;
+    if (!Array.isArray(payload.items)) return [];
+
+    return payload.items
+      .filter((item): item is Record<string, unknown> => item !== null && typeof item === 'object' && !Array.isArray(item))
+      .map((item) => ({
+        detail: typeof item.detail === 'string' ? item.detail : 'Imported from meal planner',
+        id: typeof item.id === 'string' ? item.id : '',
+        importSource: 'meal-plan' as const,
+        matchedProductName: typeof item.matchedProductName === 'string' ? item.matchedProductName : undefined,
+        matchedProductSlug: typeof item.matchedProductSlug === 'string' ? item.matchedProductSlug : undefined,
+        name: typeof item.name === 'string' ? item.name : '',
+        quantity: typeof item.quantity === 'string' ? item.quantity : '1 pack'
+      }))
+      .filter((item) => item.id && item.name);
+  } catch {
+    return [];
+  }
+}
 
 export default function ShoppingListPage() {
   const { addImportedItems, checkedCount, items, remainingCount, resetCheckedState, toggleItemChecked, totalCount } = useList();
+  const [mealPlanImportStatus, setMealPlanImportStatus] = useState('');
   const progress = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
+
+  useEffect(() => {
+    const mealPlanItems = parseMealPlanListItems(window.location.search);
+    if (mealPlanItems.length === 0) return;
+
+    addImportedItems(mealPlanItems);
+    setMealPlanImportStatus(`Added ${mealPlanItems.length} meal plan ingredient(s) to today's basket.`);
+    window.history.replaceState(null, '', window.location.pathname);
+  }, [addImportedItems]);
 
   return (
     <div className="min-h-screen bg-[#f5f1e8] text-slate-950">
@@ -30,6 +73,12 @@ export default function ShoppingListPage() {
         </div>
 
         <BulkImportDialog onImportItems={addImportedItems} />
+
+        {mealPlanImportStatus ? (
+          <p className="mt-4 rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm font-black text-blue-950">
+            {mealPlanImportStatus}
+          </p>
+        ) : null}
 
         <section className="mt-6 rounded-[1.75rem] border border-emerald-200 bg-white/95 p-5 shadow-sm">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
