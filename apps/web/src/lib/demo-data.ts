@@ -714,6 +714,22 @@ export const stores = [
   }
 ];
 
+function parseDistanceLabel(distanceLabel?: string): number {
+  if (!distanceLabel) return Number.POSITIVE_INFINITY;
+  const match = distanceLabel.match(/(\d+(?:\.\d+)?)/);
+  const value = match ? Number(match[1]) : Number.NaN;
+  return Number.isFinite(value) ? value : Number.POSITIVE_INFINITY;
+}
+
+export const nearestDemoStoresFromDistanceLabel = stores
+  .filter((store) => store.distanceLabel)
+  .map((store) => ({
+    ...store,
+    distanceLabelDistanceKm: parseDistanceLabel(store.distanceLabel)
+  }))
+  .sort((left, right) => left.distanceLabelDistanceKm - right.distanceLabelDistanceKm)
+  .slice(0, 3);
+
 export const categories = [
   {
     slug: 'coffee',

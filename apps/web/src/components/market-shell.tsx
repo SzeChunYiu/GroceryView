@@ -2,10 +2,12 @@ import Link from 'next/link';
 import { Card, Eyebrow, MetricGrid, PageShell, SourceCoverage, TopSpreads } from './data-ui';
 import { ProductPriceCards } from './product-price-cards';
 import { TrendingCarousel } from './TrendingCarousel';
+import NearbyStoresWidget from '@/components/NearbyStoresWidget';
 import { buildChainIndexTrendSeries } from '@/lib/chain-index-data';
 import { defaultLocale, localeReadiness, localeTranslationGuardrails, localizedShellCopy } from '@/lib/i18n';
 import { basketCostHeatmap } from '@/lib/map-basket-cost-heatmap';
 import { mapChainIndexScores } from '@/lib/map-chain-index';
+import { stores } from '../lib/demo-data';
 import {
   allStoreDailyRunnerReadiness,
   apiPerformanceReadiness,
@@ -168,6 +170,7 @@ export function MarketShell() {
           </div>
         </Card>
       </section>
+      <NearbyStoresWidget stores={stores} />
 
       <div className="mt-6"><MetricGrid /></div>
 
