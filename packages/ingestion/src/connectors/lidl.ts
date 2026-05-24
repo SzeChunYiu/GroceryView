@@ -24,6 +24,10 @@ export type LidlOffer = {
   unitPriceText: string;
   promotionText: string;
   memberOnly: boolean;
+  is_member_price: boolean;
+  is_coupon_price: boolean;
+  channel: 'store';
+  format: 'standard';
   regions: string[];
   validFrom: string;
   validTo: string;
@@ -304,6 +308,10 @@ export function normalizeLidlOffer(
     unitPriceText: basePriceText,
     promotionText,
     memberOnly: Boolean(regionEntry?.currentLidlPlusPrice || payload.currentLidlPlusPrice),
+    is_member_price: Boolean(regionEntry?.currentLidlPlusPrice || payload.currentLidlPlusPrice),
+    is_coupon_price: Boolean(regionEntry?.currentLidlPlusPrice || payload.currentLidlPlusPrice),
+    channel: 'store',
+    format: 'standard',
     regions: Array.isArray(payload.regions) ? payload.regions.map((region) => text(region) || String(region)).filter(Boolean) : Object.keys(payload.regionsPrices ?? {}),
     validFrom: text(currentPrice?.startDate),
     validTo: text(currentPrice?.endDate),

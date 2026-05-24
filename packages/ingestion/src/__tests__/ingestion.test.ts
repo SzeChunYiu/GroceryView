@@ -3448,6 +3448,10 @@ describe('fetchLidlOffers', () => {
       unitPriceText: '/kg',
       promotionText: 'Superpris',
       memberOnly: false,
+      is_member_price: false,
+      is_coupon_price: false,
+      channel: 'store',
+      format: 'standard',
       regions: ['1', '2', '3'],
       validFrom: '2026-05-05T11:22:50.499Z',
       validTo: '2026-05-24T21:59:59Z',
@@ -3504,6 +3508,10 @@ describe('fetchLidlOffers', () => {
     assert.equal(rows[0].price, 29.9);
     assert.equal(rows[0].regularPrice, 44.9);
     assert.equal(rows[0].memberOnly, true);
+    assert.equal(rows[0].is_member_price, true);
+    assert.equal(rows[0].is_coupon_price, true);
+    assert.equal(rows[0].channel, 'store');
+    assert.equal(rows[0].format, 'standard');
     assert.deepEqual(requestedUrls, [
       buildLidlStoresUrl(),
       buildLidlStoreDetailPayloadUrl('/s/sv-SE/butiker/alingsas/vaenersborgsvaegen-21/'),
