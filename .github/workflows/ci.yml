@@ -7,7 +7,7 @@ on:
 
 jobs:
   verify:
-    name: Test, build, and typecheck
+    name: Test, lint, build, and typecheck
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -19,6 +19,8 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
+      - name: Lint workspace apps/web
+        run: npm run lint
       - name: Run tests
         run: npm test
       - name: Build workspaces

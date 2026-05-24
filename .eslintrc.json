@@ -1,0 +1,18 @@
+{
+  "root": true,
+  "extends": [
+    "next/core-web-vitals",
+    "plugin:jsx-a11y/recommended"
+  ],
+  "ignorePatterns": [
+    ".next/**",
+    "dist/**",
+    "node_modules/**"
+  ],
+  "overrides": [
+    {
+      "files": ["apps/web/**/*.{js,jsx,ts,tsx}"],
+      "extends": ["next/core-web-vitals", "next/typescript", "plugin:jsx-a11y/recommended"]
+    }
+  ]
+}

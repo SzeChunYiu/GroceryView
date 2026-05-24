@@ -5,6 +5,7 @@
   "scripts": {
     "build": "next build --webpack",
     "dev": "next dev",
+    "lint": "next lint",
     "test": "node --test scripts/*.test.mjs"
   },
   "dependencies": {
@@ -20,6 +21,10 @@
     "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
+    "eslint": "^9.23.0",
+    "eslint-config-next": "^16.2.6",
+    "eslint-plugin-jsx-a11y": "^6.10.1",
+    "eslint-plugin-next": "^16.2.6",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "autoprefixer": "^10.4.23",
