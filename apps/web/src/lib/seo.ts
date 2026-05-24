@@ -93,6 +93,10 @@ export const routeMetadataCatalog = {
     title: 'Compare grocery items side by side | GroceryView',
     description: 'Compare up to four verified grocery items by nutrition labels, store price evidence, and observed trend charts.'
   },
+  '/contact': {
+    title: 'Contact GroceryView',
+    description: 'Send GroceryView product coverage, source correction, and account support messages through the local contact intake stub.'
+  },
   '/coupon-stacks': {
     title: 'Coupon stack evidence gate | GroceryView',
     description: 'Coupon stacking is blocked from public rendering until verified production coupon and retailer records are available.'
