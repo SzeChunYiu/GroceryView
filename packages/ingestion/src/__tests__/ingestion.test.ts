@@ -14,6 +14,7 @@ import {
   buildCityGrossStoresUrl,
   buildDailyConnectorConfigsFromEnv,
   buildDailyIngestionPostgresPoolConfig,
+  buildBiltemaSearchUrl,
   CITY_GROSS_BULK_MINIMUM_ROWS,
   createDailyIngestionQueryExecutor,
   DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_IDS,
@@ -98,6 +99,7 @@ import {
   findPharmacyEanMatches,
   parseApohemProducts,
   parseApotekHjartatProducts,
+  parseBiltemaProducts,
   parseIcaReklambladOffers,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
@@ -198,6 +200,38 @@ describe('confidenceForSource', () => {
     assert.equal(confidenceForSource('flyer_campaign'), 0.7);
     assert.equal(confidenceForSource('manual_user_report'), 0.5);
     assert.equal(confidenceForSource('estimated'), 0.25);
+  });
+});
+
+describe('Biltema household connector', () => {
+  it('builds search URLs and parses household JSON-LD product fixtures', () => {
+    assert.equal(buildBiltemaSearchUrl('hushållspapper'), 'https://www.biltema.se/sok/?query=hush%C3%A5llspapper');
+
+    const rows = parseBiltemaProducts(`
+      <script type="application/ld+json">{
+        "@type": "Product",
+        "sku": "paper-123",
+        "name": "Hushållspapper 4-pack",
+        "url": "/hem/stadning/hushallspapper/",
+        "image": "/paper.jpg",
+        "offers": {
+          "price": "29.90",
+          "priceCurrency": "SEK",
+          "availability": "https://schema.org/InStock"
+        }
+      }</script>
+    `, {
+      sourceUrl: buildBiltemaSearchUrl('hushållspapper'),
+      retrievedAt: '2026-05-24T12:00:00.000Z',
+      query: 'hushållspapper'
+    });
+
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0]!.brand, 'Biltema');
+    assert.equal(rows[0]!.category, 'paper');
+    assert.equal(rows[0]!.price, 29.9);
+    assert.equal(rows[0]!.currency, 'SEK');
+    assert.equal(rows[0]!.available, true);
   });
 });
 

@@ -89,6 +89,7 @@ import { fetchWillysBulkProducts } from './connectors/willys-bulk.js';
 export * from './connectors/openfoodfacts.js';
 export * from './connectors/all-store-runner.js';
 export * from './connectors/overpass.js';
+export * from './connectors/biltema-se.js';
 export * from './connectors/fuel-stations.js';
 export * from './connectors/citygross.js';
 export * from './connectors/citygross-bulk.js';
