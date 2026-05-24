@@ -27,7 +27,7 @@
       "@groceryview/server": ["packages/server/src/index.ts"]
     }
   },
-  "include": ["apps/**/*.ts", "packages/**/*.ts"],
+  "include": ["apps/**/*.ts", "packages/**/*.ts", "scripts/**/*.ts"],
   "comment": "apps/web is a bundled Next.js app: it uses moduleResolution:Bundler and is typechecked by `next build`. The root config uses NodeNext (correct for the backend packages + api/mobile), whose Node ESM semantics conflict with bundler resolution, so apps/web is excluded here.",
   "exclude": ["apps/web/**"]
 }
