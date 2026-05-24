@@ -5,6 +5,11 @@ import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { osmStores, type OsmStore } from '@/lib/osm-stores';
 import { cheapestMapChain, mapChainIndexScores } from '@/lib/map-chain-index';
+import {
+  buildStoreQueueSnapshot,
+  STORE_QUEUE_REFRESH_INTERVAL_MS,
+  type StoreQueueEstimate,
+} from '@/lib/store-queue';
 
 // Free, no-API-key vector tiles (© OpenMapTiles / OpenFreeMap, data © OSM).
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/bright';
@@ -77,27 +82,35 @@ function escapeHtml(value: string): string {
     .replace(/"/g, '&quot;');
 }
 
-function toFeatureCollection(): GeoJSON.FeatureCollection<GeoJSON.Point> {
+function toFeatureCollection(queueSnapshot: Record<string, StoreQueueEstimate>): GeoJSON.FeatureCollection<GeoJSON.Point> {
   return {
     type: 'FeatureCollection',
     features: osmStores
       .filter((s) => Number.isFinite(s.lat) && Number.isFinite(s.lng))
-      .map((s) => ({
-        type: 'Feature',
-        geometry: { type: 'Point', coordinates: [s.lng, s.lat] },
-        properties: {
-          slug: s.slug,
-          name: s.name,
-          brand: s.brand || 'Other',
-          chainIndex: chainIndexScore(s.brand || ''),
-          format: s.format || 'store',
-          district: s.district || s.city || '',
-          address: s.address || '',
-          color: chainIndexColor(chainIndexScore(s.brand || ''), chainColor(s.brand || '')),
-          lat: s.lat,
-          lng: s.lng,
-        },
-      })),
+      .map((s) => {
+        const queue = queueSnapshot[s.slug];
+        return {
+          type: 'Feature',
+          geometry: { type: 'Point', coordinates: [s.lng, s.lat] },
+          properties: {
+            slug: s.slug,
+            name: s.name,
+            brand: s.brand || 'Other',
+            chainIndex: chainIndexScore(s.brand || ''),
+            format: s.format || 'store',
+            district: s.district || s.city || '',
+            address: s.address || '',
+            color: chainIndexColor(chainIndexScore(s.brand || ''), chainColor(s.brand || '')),
+            lat: s.lat,
+            lng: s.lng,
+            queueColor: queue?.color || '#1D8649',
+            queueLabel: queue?.label || 'Queue pending',
+            queueLevel: queue?.level || 'quiet',
+            queueMinutes: queue?.minutes ?? 0,
+            queueRefreshedAt: queue?.refreshedAt || '',
+          },
+        };
+      }),
   };
 }
 
@@ -141,7 +154,9 @@ function districtHeatCollection(): GeoJSON.FeatureCollection<GeoJSON.Point> {
 export function StoreMap() {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
+  const initialQueueSnapshotRef = useRef(buildStoreQueueSnapshot(osmStores));
   const [storeCount, setStoreCount] = useState(0);
+  const [queueSnapshot, setQueueSnapshot] = useState(initialQueueSnapshotRef.current);
   const [selectedStoreSlug, setSelectedStoreSlug] = useState(syncedMapListStores[0]?.slug ?? '');
 
   function focusStore(store: OsmStore) {
@@ -156,7 +171,7 @@ export function StoreMap() {
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const data = toFeatureCollection();
+    const data = toFeatureCollection(initialQueueSnapshotRef.current);
     setStoreCount(data.features.length);
 
     const map = new maplibregl.Map({
@@ -245,8 +260,8 @@ export function StoreMap() {
         paint: {
           'circle-color': ['get', 'color'],
           'circle-radius': ['interpolate', ['linear'], ['zoom'], 9, 4, 13, 7, 16, 10],
-          'circle-stroke-width': 1.5,
-          'circle-stroke-color': '#ffffff',
+          'circle-stroke-width': ['case', ['==', ['get', 'queueLevel'], 'busy'], 3, 1.5],
+          'circle-stroke-color': ['get', 'queueColor'],
         },
       });
 
@@ -283,6 +298,7 @@ export function StoreMap() {
                </div>
               <div style="font-size:12px;color:#475569">${escapeHtml(p.brand)} · ${escapeHtml(p.format)}</div>
                ${p.chainIndex ? `<div style="font-size:12px;color:#475569;margin-top:2px">Chain index ${Number(p.chainIndex).toFixed(1)} (100 = market)</div>` : ''}
+               <div style="font-size:12px;color:${escapeHtml(p.queueColor || '#1D8649')};font-weight:700;margin-top:4px">${escapeHtml(p.queueLabel || 'Queue pending')} ${p.queueRefreshedAt ? `· refreshed ${escapeHtml(p.queueRefreshedAt)}` : ''}</div>
                ${where ? `<div style="font-size:12px;color:#64748b;margin-top:2px">${where}</div>` : ''}
                <a href="${directions}" target="_blank" rel="noopener noreferrer"
                   style="display:inline-block;margin-top:8px;font-size:12px;font-weight:600;color:#1D8649">
@@ -303,6 +319,19 @@ export function StoreMap() {
       map.remove();
     };
   }, []);
+
+  useEffect(() => {
+    const refreshQueueSnapshot = () => setQueueSnapshot(buildStoreQueueSnapshot(osmStores));
+    const intervalId = window.setInterval(refreshQueueSnapshot, STORE_QUEUE_REFRESH_INTERVAL_MS);
+    return () => window.clearInterval(intervalId);
+  }, []);
+
+  useEffect(() => {
+    const source = mapRef.current?.getSource('stores') as maplibregl.GeoJSONSource | undefined;
+    const data = toFeatureCollection(queueSnapshot);
+    setStoreCount(data.features.length);
+    source?.setData(data);
+  }, [queueSnapshot]);
 
   return (
     <div className="relative h-full w-full">
@@ -329,6 +358,7 @@ export function StoreMap() {
           <div className="font-bold uppercase tracking-wide text-market-ink/55">Cheapest chain near me</div>
           <div>{cheapestMapChain ? `${cheapestMapChain.chainId} · index ${cheapestMapChain.overallIndex.toFixed(1)}` : 'Awaiting index coverage'}</div>
           <div className="mt-1">Green &lt; 96 · amber 96-103 · red &gt; 103</div>
+          <div className="mt-1">Queue ring refreshes every {Math.round(STORE_QUEUE_REFRESH_INTERVAL_MS / 1000)}s</div>
         </div>
       </div>
 
@@ -344,6 +374,7 @@ export function StoreMap() {
           {syncedMapListStores.map((store) => {
             const selected = selectedStoreSlug === store.slug;
             const score = chainIndexScore(store.brand || '');
+            const queue = queueSnapshot[store.slug];
             return (
               <button
                 aria-pressed={selected}
@@ -371,6 +402,7 @@ export function StoreMap() {
                 <div className="mt-3 flex flex-wrap gap-2 text-[11px] font-black uppercase tracking-[0.12em]">
                   <span className="rounded-full bg-slate-100 px-2 py-1 text-slate-600">{store.brand || 'Other'}</span>
                   <span className="rounded-full bg-emerald-100 px-2 py-1 text-emerald-800">{chainIndexLabel(store)}</span>
+                  {queue ? <span className="rounded-full border px-2 py-1" style={{ borderColor: queue.color, color: queue.color }}>{queue.label}</span> : null}
                 </div>
               </button>
             );
