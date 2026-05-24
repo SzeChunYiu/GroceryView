@@ -99,6 +99,8 @@ import {
   parseApohemProducts,
   parseApotekHjartatProducts,
   parseIcaReklambladOffers,
+  parseIcaStammisOffers,
+  promotionRouter,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
   GROCERYVIEW_DAILY_CITY_GROSS_BULK_PRODUCTS_URL,
@@ -198,6 +200,48 @@ describe('confidenceForSource', () => {
     assert.equal(confidenceForSource('flyer_campaign'), 0.7);
     assert.equal(confidenceForSource('manual_user_report'), 0.5);
     assert.equal(confidenceForSource('estimated'), 0.25);
+  });
+});
+
+describe('ICA Stammis offers connector', () => {
+  it('routes app-exclusive Stammis rows as structured member promotions with day restrictions', () => {
+    const row = promotionRouter({
+      id: 'stammis-coffee-weekday',
+      name: 'Kaffe',
+      brand: 'ICA',
+      mechanicInfo: 'Stammispris fredag',
+      regularPriceText: 'Ord. pris 59:90',
+      storeId: '1004247',
+      storeName: 'ICA Focus',
+      imageUrl: 'https://www.ica.se/kaffe.png',
+      validFrom: '2026-05-18',
+      validTo: '2026-05-24',
+      daysOfWeek: ['fredag']
+    }, { sourceUrl: 'https://www.ica.se/stammis/erbjudanden/', retrievedAt: '2026-05-24T12:00:00.000Z' });
+
+    assert.equal(row?.kind, 'member');
+    assert.equal(row?.isMemberPrice, true);
+    assert.equal(row?.requiresIcaStammis, true);
+    assert.equal(row?.channel, 'app');
+    assert.deepEqual(row?.dowRestriction, ['friday']);
+    assert.equal(row?.storeId, '1004247');
+  });
+
+  it('parses a fixture payload through promotionRouter without losing member-only fields', () => {
+    const rows = parseIcaStammisOffers(JSON.stringify({
+      stammisOffers: [{
+        code: 'stammis-fruit-weekend',
+        title: 'Bananer',
+        priceText: 'Stammispris lördag söndag',
+        regularPriceText: 'Ord. pris 24:90/kg',
+        dowRestriction: ['lördag', 'söndag']
+      }]
+    }), { sourceUrl: 'fixture://ica-stammis', retrievedAt: '2026-05-24T12:00:00.000Z' });
+
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0]!.kind, 'member');
+    assert.equal(rows[0]!.channel, 'app');
+    assert.deepEqual(rows[0]!.dowRestriction, ['saturday', 'sunday']);
   });
 });
 
