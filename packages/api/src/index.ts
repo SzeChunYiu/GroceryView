@@ -169,6 +169,24 @@ export type BasketImportReviewDecisionRequest = {
   quantity?: number;
 };
 
+export type OcrScanHistoryItem = {
+  scanId: string;
+  kind: 'receipt';
+  capturedAt: string;
+  status: string;
+  itemCount?: number;
+  totalAmount?: number;
+  confidence?: number;
+  lowConfidenceRows: string[];
+};
+
+export type OcrScanHistoryReport = {
+  userId: string;
+  itemCount: number;
+  items: OcrScanHistoryItem[];
+  guardrails: string[];
+};
+
 export type ProductCheapestNowChainPrice = {
   chain: string;
   storeId: string;
@@ -2381,6 +2399,81 @@ function normalizeSubscriptionEntitlement(input: SubscriptionEntitlementSnapshot
   };
 }
 
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function requiredHistoryString(record: Record<string, unknown>, key: string): string {
+  const value = record[key];
+  if (typeof value !== 'string' || value.trim() === '') throw new Error(`${key} is required`);
+  return value;
+}
+
+function optionalHistoryString(record: Record<string, unknown>, key: string): string | undefined {
+  const value = record[key];
+  if (value === undefined) return undefined;
+  if (typeof value !== 'string') throw new Error(`${key} must be a string`);
+  const trimmed = value.trim();
+  return trimmed ? trimmed : undefined;
+}
+
+function optionalHistoryNonNegativeNumber(record: Record<string, unknown>, key: string): number | undefined {
+  const value = record[key];
+  if (value === undefined) return undefined;
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) throw new Error(`${key} must be a non-negative number`);
+  return value;
+}
+
+function optionalHistoryStringArray(record: Record<string, unknown>, key: string): string[] | undefined {
+  const value = record[key];
+  if (value === undefined) return undefined;
+  if (!Array.isArray(value)) throw new Error(`${key} must be an array`);
+  return value.map((item, index) => {
+    if (typeof item !== 'string' || item.trim() === '') throw new Error(`${key}[${index}] is required`);
+    return item;
+  });
+}
+
+function normalizeOcrScanHistoryItem(input: unknown, now: string): OcrScanHistoryItem {
+  requireIsoTimestamp(now, 'now');
+  if (!isPlainRecord(input)) throw new Error('scan history item must be an object');
+  if (input.kind !== undefined && input.kind !== 'receipt') throw new Error('OCR scan history only supports receipt scans');
+  const result = isPlainRecord(input.result) ? input.result : undefined;
+  const rows = result && Array.isArray(result.rows) ? result.rows : undefined;
+  const itemCount = optionalHistoryNonNegativeNumber(input, 'itemCount') ?? (result ? optionalHistoryNonNegativeNumber(result, 'itemCount') : undefined) ?? rows?.length;
+  const totalAmount = optionalHistoryNonNegativeNumber(input, 'totalAmount') ?? (result ? optionalHistoryNonNegativeNumber(result, 'totalAmount') : undefined);
+  const confidence = optionalHistoryNonNegativeNumber(input, 'confidence') ?? (result ? optionalHistoryNonNegativeNumber(result, 'confidence') : undefined);
+  return {
+    scanId: requiredHistoryString(input, 'scanId'),
+    kind: 'receipt',
+    capturedAt: requireIsoTimestamp(
+      optionalHistoryString(input, 'capturedAt') ??
+        optionalHistoryString(input, 'uploadedAt') ??
+        optionalHistoryString(input, 'processedAt') ??
+        now,
+      'capturedAt'
+    ),
+    status: optionalHistoryString(input, 'status') ?? (result ? optionalHistoryString(result, 'status') : undefined) ?? 'saved',
+    ...(itemCount !== undefined ? { itemCount } : {}),
+    ...(totalAmount !== undefined ? { totalAmount } : {}),
+    ...(confidence !== undefined ? { confidence } : {}),
+    lowConfidenceRows: optionalHistoryStringArray(input, 'lowConfidenceRows') ?? (result ? optionalHistoryStringArray(result, 'lowConfidenceRows') : undefined) ?? []
+  };
+}
+
+function buildOcrScanHistoryReport(userId: string, items: OcrScanHistoryItem[]): OcrScanHistoryReport {
+  return {
+    userId,
+    itemCount: items.length,
+    items: [...items],
+    guardrails: [
+      'OCR scan history is account-scoped and only available after the server verifies an active premium entitlement.',
+      'Only receipt OCR summaries are stored; raw receipt images or OCR payload text must remain in private scan storage.',
+      'Canceled, past-due, expired, or missing entitlements must fail closed before reads or writes.'
+    ]
+  };
+}
+
 function sortPricesByValue(prices: StorePrice[]) {
   return [...prices].sort((left, right) => left.price - right.price || left.storeName.localeCompare(right.storeName));
 }
@@ -4306,6 +4399,7 @@ export function createGroceryViewApi() {
   const householdPlans = new Map<string, HouseholdPlan>();
   const householdIdByUserId = new Map<string, string>();
   const basketImportReviews = new Map<string, BasketImportReviewItem[]>();
+  const ocrScanHistory = new Map<string, OcrScanHistoryItem[]>();
 
   const productSnapshots = () =>
     products.map((product) => {
@@ -5298,6 +5392,22 @@ export function createGroceryViewApi() {
         entitlement: subscriptionEntitlements.get(userId) ?? null,
         now: requireIsoTimestamp(now, 'now')
       });
+    },
+
+    upsertOcrScanHistoryItem(userId: string, input: unknown, now = new Date().toISOString()): OcrScanHistoryItem {
+      requireNonEmptyId(userId, 'userId');
+      const item = normalizeOcrScanHistoryItem(input, now);
+      const existing = ocrScanHistory.get(userId) ?? [];
+      ocrScanHistory.set(userId, [
+        item,
+        ...existing.filter((candidate) => candidate.scanId !== item.scanId)
+      ].sort((left, right) => Date.parse(right.capturedAt) - Date.parse(left.capturedAt) || left.scanId.localeCompare(right.scanId)));
+      return item;
+    },
+
+    getOcrScanHistory(userId: string): OcrScanHistoryReport {
+      requireNonEmptyId(userId, 'userId');
+      return buildOcrScanHistoryReport(userId, ocrScanHistory.get(userId) ?? []);
     },
 
     getChainPriceIndices(): ChainPriceIndexSummary {

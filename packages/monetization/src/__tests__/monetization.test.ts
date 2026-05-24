@@ -7,6 +7,7 @@ import {
   buildMonetizationProviderReadinessReport,
   buildSubscriptionAccessPolicy,
   buildSubscriptionCheckoutPlan,
+  hasActivePremiumEntitlement,
   parseStripeCompatibleSubscriptionEvent,
   processBillingSubscriptionEvent
 } from '../index.js';
@@ -362,6 +363,33 @@ describe('monetization foundation', () => {
       now: '2026-05-22T00:00:00.000Z',
       entitlement: canceled
     }).accountActions, ['show_renew']);
+  });
+
+  it('exposes an active premium entitlement helper for premium feature gates', () => {
+    assert.equal(hasActivePremiumEntitlement({
+      now: '2026-05-22T00:00:00.000Z',
+      entitlement: {
+        tier: 'premium',
+        plan: 'premium_monthly',
+        status: 'active',
+        currentPeriodEndsAt: '2026-06-22T00:00:00.000Z',
+        updatedAt: '2026-05-22T00:00:00.000Z'
+      }
+    }), true);
+    assert.equal(hasActivePremiumEntitlement({
+      now: '2026-05-22T00:00:00.000Z',
+      entitlement: null
+    }), false);
+    assert.equal(hasActivePremiumEntitlement({
+      now: '2026-05-22T00:00:00.000Z',
+      entitlement: {
+        tier: 'premium',
+        plan: 'premium_monthly',
+        status: 'past_due',
+        currentPeriodEndsAt: '2026-06-22T00:00:00.000Z',
+        updatedAt: '2026-05-22T00:00:00.000Z'
+      }
+    }), false);
   });
 
   it('builds a billing-provider checkout request when configured', () => {

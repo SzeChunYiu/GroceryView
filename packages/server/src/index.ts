@@ -43,6 +43,7 @@ import {
 import {
   buildSubscriptionCheckoutPlan,
   buildSubscriptionAccessPolicy,
+  hasActivePremiumEntitlement,
   parseStripeCompatibleSubscriptionEvent,
   processBillingSubscriptionEvent,
   type BillingSubscriptionEntitlementMutation,
@@ -1829,6 +1830,19 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
     return null;
   };
 
+  const requireOcrScanHistoryPremium = async (userId: string): Promise<Response | null> => {
+    const now = (authOptions.now ?? new Date()).toISOString();
+    const entitlement = authOptions.subscriptionEntitlementRepository
+      ? await authOptions.subscriptionEntitlementRepository.getSubscriptionEntitlement(userId)
+      : api.getSubscriptionEntitlement(userId);
+    const access = buildSubscriptionAccessPolicy({ entitlement, now });
+    if (hasActivePremiumEntitlement({ entitlement, now })) return null;
+    return jsonResponse({
+      error: 'Active premium subscription is required for OCR scan history.',
+      access
+    }, { status: 402 });
+  };
+
   const buildAccountDataExport = (user: string) => {
     const householdPlan = api.getHouseholdPlan(user);
     const watchlist = api.getWatchlist(user);
@@ -2943,6 +2957,25 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         }
       }
 
+      if (path === '/api/scans/history') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        const premiumError = await requireOcrScanHistoryPremium(user);
+        if (premiumError) return premiumError;
+        if (method === 'GET') {
+          return jsonResponse(api.getOcrScanHistory(user));
+        }
+        if (method === 'POST') {
+          const body = await readJson(request);
+          return jsonResponse({
+            userId: user,
+            item: api.upsertOcrScanHistoryItem(user, body, (authOptions.now ?? new Date()).toISOString())
+          }, { status: 201 });
+        }
+      }
+
       if (path === '/api/scans/upload-url') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
@@ -3165,6 +3198,10 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/settings/data-export': { get: protectedOperation('Download my data JSON export with lists, alerts, preferences, and analytics event records.') },
       '/api/privacy/deletion-plan': { post: protectedOperation('Plan account deletion without performing a destructive delete.') },
       '/api/privacy/request-fulfillment': { post: protectedOperation('Classify privacy export, deletion, and ad opt-out requests by fulfillment deadline.') },
+      '/api/scans/history': {
+        get: protectedOperation('List premium OCR receipt scan history after entitlement enforcement.'),
+        post: protectedOperation('Persist a premium OCR receipt scan history summary after entitlement enforcement.')
+      },
       '/api/scans/process': { post: protectedOperation('Process barcode or receipt scan payloads through configured providers and return review routing work.') },
       '/api/scans/upload-url': { post: protectedOperation('Create a private upload ticket for barcode or receipt scan payload storage.') },
       '/api/users/{userId}/favorite-stores': {
