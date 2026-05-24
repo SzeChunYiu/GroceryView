@@ -9,6 +9,87 @@ price chart, chains/categories/brands have **indices**, deals get a **Buy/Wait**
 rating, and shoppers **track, compare, and get alerted** across chains over time.
 Strategy + competitor teardown: [`GOAL.md`](GOAL.md) · [`COMPETITIVE-ANALYSIS.md`](COMPETITIVE-ANALYSIS.md).
 
+## Project overview
+
+GroceryView is a TypeScript monorepo for grocery-price intelligence: it ingests retailer evidence, normalizes products and observations, exposes API/domain packages, and renders a web experience where shoppers can compare products, baskets, stores, freshness, and price-history signals with visible provenance. The project is intentionally evidence-first: UI claims should trace back to source-backed fixtures, generated snapshots, or documented ingestion outputs.
+
+## Screenshots and live preview
+
+- Live preview: <https://grocery-web-mu.vercel.app>
+- Checked-in screenshots: none at the repository root today. Add future verified UI captures under the relevant app/test snapshot directory (for example `apps/web/e2e/snapshots/`) and link them here rather than embedding untracked images.
+- Current visible product/store coverage is summarized in the auto-generated status board below; do not inflate these numbers manually.
+
+## Supported countries and data posture
+
+| Country | Status | Notes |
+| --- | --- | --- |
+| Sweden (`SE`) | Active primary market | Current checked-in data and visible web coverage focus on Swedish chains such as Willys, Hemköp, ICA, Coop, and Mathem. |
+| Norway (`NO`) | Expansion workstream | Connector/readiness work is tracked in `GOAL.md`, `docs/data-sources.md`, and `docs/ingestion-targets.md`. |
+| Iceland (`IS`) | Expansion proof-of-concept | Iceland source studies and connector docs are exploratory unless a connector has source-backed fixtures and freshness evidence. |
+| Denmark (`DK`) | Later expansion candidate | Tracked as a future Nordic target, not current production coverage. |
+| Finland (`FI`) | Deprioritized | Listed for completeness; current strategy explicitly does not lead with Finland. |
+
+## Quick start
+
+```bash
+npm install
+npm run build
+npm run test
+npm run dev -w @groceryview/web
+```
+
+Useful focused commands:
+
+```bash
+npm run test -w @groceryview/core
+npm run test -w @groceryview/ingestion
+npm run ingest:verify
+npm run ops:daily-connectors
+```
+
+Local development expects Node/npm workspace support and environment variables modeled by `.env.example`. The full root test/build can be expensive because it walks all apps and packages; CI remains the authoritative gate for pull requests.
+
+## Monorepo layout
+
+| Path | Purpose |
+| --- | --- |
+| `apps/web` | Next.js shopper-facing web app, static/generated pages, route smoke tests, Lighthouse budgets. |
+| `apps/api` | NestJS API app wrapper around the shared API/domain packages. |
+| `apps/mobile` | Mobile app scaffolding and device-specific scan/permission flows. |
+| `apps/jobs` | Background jobs for scheduled notification/worker paths. |
+| `packages/core` | Core pricing, market, ranking, basket, product, and trust-domain logic. |
+| `packages/ingestion` | Retailer/source connectors, normalization, fixtures, and ingestion tests. |
+| `packages/db` | Database schema/query helpers, seed data, and DB-focused tests. |
+| `packages/server` | Server-side composition across API, auth, notifications, scanning, catalog, and database packages. |
+| `packages/notifications` | Notification scheduling, delivery, suppression, metrics, and operations reporting primitives. |
+| `packages/scanning` | Receipt/barcode scanning and matching primitives. |
+| `packages/catalog`, `packages/analytics`, `packages/geo`, `packages/ops`, `packages/image-cache`, `packages/monetization`, `packages/auth`, `packages/api-contracts`, `packages/api` | Supporting domain, contract, operations, and integration packages used by the apps. |
+| `scripts/ingestion` and `scripts/ops` | Repository-level ingestion/export/verification and operations helpers. |
+| `docs/` | Audits, status docs, research, ingestion notes, source inventories, and runbooks. |
+| `infra/` | Local infrastructure notes and Docker Compose assets. |
+
+## Documentation links
+
+- Strategy and product scope: [`GOAL.md`](GOAL.md), [`PROPOSAL.md`](PROPOSAL.md), [`COMPETITIVE-ANALYSIS.md`](COMPETITIVE-ANALYSIS.md)
+- Data/source inventory: [`docs/data-sources.md`](docs/data-sources.md), [`docs/ingestion-targets.md`](docs/ingestion-targets.md), [`docs/ingestion-playbook.md`](docs/ingestion-playbook.md)
+- Status and completion evidence: [`docs/status/completion-audit.md`](docs/status/completion-audit.md), [`docs/audits/`](docs/audits/)
+- Infrastructure: [`infra/README.md`](infra/README.md), [`.github/workflows/`](.github/workflows/)
+- Package entry points: [`apps/web/package.json`](apps/web/package.json), [`apps/api/package.json`](apps/api/package.json), [`apps/mobile/package.json`](apps/mobile/package.json), [`packages/core/package.json`](packages/core/package.json), [`packages/ingestion/package.json`](packages/ingestion/package.json), [`packages/db/package.json`](packages/db/package.json), [`packages/server/package.json`](packages/server/package.json)
+
+## Project policies
+
+### License
+
+No standalone `LICENSE` file is currently checked in. Treat the repository as private/internal unless the owner adds an explicit license file.
+
+### Code of conduct
+
+No standalone `CODE_OF_CONDUCT.md` is currently checked in. Contributors should keep reviews focused on evidence, respectful collaboration, and small auditable changes; add a dedicated policy file before opening the project to broad external contribution.
+
+### Security policy
+
+No standalone `SECURITY.md` is currently checked in. Until one exists, do not disclose vulnerabilities in public issues; use private maintainer channels or GitHub private vulnerability reporting/advisories if enabled. Never commit secrets; start from [`.env.example`](.env.example) and use the repository's CI/ops validation workflows for environment checks.
+
 ## 🟢 Live
 
 - **Site:** [https://grocery-web-mu.vercel.app](https://grocery-web-mu.vercel.app) — `/` returns HTTP **200**
