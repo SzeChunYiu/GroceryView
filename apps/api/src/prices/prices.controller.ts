@@ -2,6 +2,7 @@ import { Readable } from 'node:stream';
 import { BadRequestException, Controller, Get, Headers, NotFoundException, Param, Query, Res, StreamableFile } from '@nestjs/common';
 import { ApiOkResponse, ApiProduces, ApiTags } from '@nestjs/swagger';
 import { groceryApi } from '../demo-data.js';
+import { apiRouteTraceSpans, traceApiRoute } from '../instrumentation.js';
 import { resolveProductNameLocale } from '../product-name-locale.js';
 import { CheapestNowService } from './cheapest-now.service.js';
 import { LatestPricesService } from './latest-prices.service.js';
@@ -31,10 +32,10 @@ export class PricesController {
     @Headers('accept-language') acceptLanguage?: string,
     @Headers('cookie') cookie?: string
   ) {
-    const cheapest = await this.cheapestNowService.getProductCheapestNow(
+    const cheapest = await traceApiRoute(apiRouteTraceSpans.prices, { route: 'prices.cheapestNow', productId }, () => this.cheapestNowService.getProductCheapestNow(
       productId,
       resolveProductNameLocale({ locale, groceryViewLocale, acceptLanguage, cookie })
-    );
+    ));
     if (!cheapest) throw new NotFoundException('Product not found');
     return cheapest;
   }
@@ -48,10 +49,10 @@ export class PricesController {
     @Headers('accept-language') acceptLanguage?: string,
     @Headers('cookie') cookie?: string
   ) {
-    const prices = await this.latestPricesService.getProductLatestPrices(
+    const prices = await traceApiRoute(apiRouteTraceSpans.prices, { route: 'prices.latest', productId }, () => this.latestPricesService.getProductLatestPrices(
       productId,
       resolveProductNameLocale({ locale, groceryViewLocale, acceptLanguage, cookie })
-    );
+    ));
     if (!prices) throw new NotFoundException('Product not found');
     return prices;
   }
@@ -74,11 +75,11 @@ export class PricesController {
     @Headers('cookie') cookie?: string
   ) {
     const filter = parsePriceHistoryFilter({ priceType, chain, store, sourceRun, minConfidence, observedFrom, observedTo, limit });
-    const report = await this.priceHistory.getProductPriceHistory(
+    const report = await traceApiRoute(apiRouteTraceSpans.prices, { route: 'prices.history', productId, priceType: filter.priceType, chain: filter.chain, store: filter.store }, () => this.priceHistory.getProductPriceHistory(
       productId,
       filter,
       resolveProductNameLocale({ locale, groceryViewLocale, acceptLanguage, cookie })
-    );
+    ));
     if (!report) throw new NotFoundException('Product not found');
     return report;
   }
