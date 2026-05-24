@@ -9,6 +9,9 @@ export type FuelPriceObservation = {
   gradeLabel: string;
   chainId: 'okq8';
   operatorName: 'OKQ8';
+  customerSegment: 'business';
+  channel: 'store';
+  storeRegion: 'SE-national';
   sourceKind: FuelPriceSourceKind;
   sourceUrl: string;
   observedAt: string;
@@ -116,6 +119,9 @@ export function parseOkq8FuelPricePage(input: {
       gradeLabel: grade.gradeLabel,
       chainId: 'okq8',
       operatorName: 'OKQ8',
+      customerSegment: 'business',
+      channel: 'store',
+      storeRegion: 'SE-national',
       sourceKind: 'operator_public_price_page',
       sourceUrl,
       observedAt: isoDateAtStartOfDay(effectiveFrom),

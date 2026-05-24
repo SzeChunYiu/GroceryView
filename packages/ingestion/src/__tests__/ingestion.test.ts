@@ -572,6 +572,13 @@ describe('OKQ8 fuel price connector', () => {
       ['fuel', 'fuel-e85', 15.84, 'l']
     ]);
     assert.equal(rows[0]?.sourceKind, 'operator_public_price_page');
+    assert.deepEqual(rows.map((row) => [row.customerSegment, row.channel, row.storeRegion]), [
+      ['business', 'store', 'SE-national'],
+      ['business', 'store', 'SE-national'],
+      ['business', 'store', 'SE-national'],
+      ['business', 'store', 'SE-national'],
+      ['business', 'store', 'SE-national']
+    ]);
     assert.equal(rows[0]?.provenance.originalPriceText, '18,89 kr');
   });
 
