@@ -6,8 +6,28 @@ import { budgetStretchKronaOptimizer, familyBulkUnitPriceComparison, loyaltyAdju
 import { recurringBasketDigestContract, weeklyBasketChangeDigest } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
+const weeklyBasketMetadata = {
+  path: '/weekly-basket',
+  title: 'Weekly grocery basket optimizer | GroceryView',
+  description: 'Compare weekly basket strategies, split-shop savings, family-pack unit prices, and recurring digest signals.',
+  imagePath: '/pwa-icon.svg',
+  imageAlt: 'GroceryView weekly basket optimizer'
+} as const;
+
 export function generateMetadata() {
-  return routeMetadata('/weekly-basket');
+  const metadata = routeMetadata(weeklyBasketMetadata);
+  const openGraph = metadata.openGraph;
+  const openGraphImages = (Array.isArray(openGraph?.images) ? openGraph.images : []) as Array<{ url: string | URL; alt?: string }>;
+
+  return {
+    ...metadata,
+    twitter: {
+      card: 'summary_large_image' as const,
+      title: openGraph?.title ?? weeklyBasketMetadata.title,
+      description: openGraph?.description ?? weeklyBasketMetadata.description,
+      images: openGraphImages.map(({ url, alt }) => ({ url, alt }))
+    }
+  };
 }
 
 function formatSek(value: number) {
