@@ -158,14 +158,9 @@ function priceDropFromThirtyDayHistory(product: (typeof productUniverse)[number]
   if (!latest) return null;
 
   const anchorDate = new Date(Date.parse(latest.observedAt) - thirtyDaysMs);
-  let anchor: (typeof priceHistory)[number] | null = null;
-  for (let index = priceHistory.length - 1; index >= 0; index -= 1) {
-    const point = priceHistory[index];
-    if (Date.parse(point.observedAt) <= anchorDate.getTime()) {
-      anchor = point;
-      break;
-    }
-  }
+  const anchor = [...priceHistory]
+    .reverse()
+    .find((point) => Date.parse(point.observedAt) <= anchorDate.getTime());
   if (!anchor || anchor.price <= 0) return null;
 
   const currentPrice = latest.price;
