@@ -76,14 +76,14 @@ if (shouldRun('citygross')) {
 if (shouldRun('coop')) {
   const coopProducts = await fetchCoopProductsForAllStores({
     queries: COOP_QUERIES,
-    maxStores: 11,
-    maxRowsPerStore: 260,
+    maxStores: 12,
+    maxRowsPerStore: 280,
     retrievedAt
   });
   const coopWeeklyDiscounts = await fetchCoopWeeklyDiscountsForAllStores({
     productQueries: COOP_WEEKLY_QUERIES,
-    maxStores: 204,
-    maxRows: 4200,
+    maxStores: 230,
+    maxRows: 4800,
     retrievedAt
   });
   await writeCoop(coopProducts, coopWeeklyDiscounts);
