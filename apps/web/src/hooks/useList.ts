@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 export type ShoppingListItem = {
   checked: boolean;
   detail: string;
+  estimatedPriceSek?: number;
   id: string;
   importSource?: 'starter' | 'bulk-clipboard';
   matchedProductName?: string;
@@ -18,6 +19,7 @@ export type BulkImportedListItemInput = Omit<ShoppingListItem, 'checked'> & {
 };
 
 type PersistedListState = {
+  budgetTargetSek?: number;
   checkedById?: Record<string, boolean>;
   importedItems?: BulkImportedListItemInput[];
 };
@@ -29,36 +31,41 @@ const baseListItems: Omit<ShoppingListItem, 'checked'>[] = [
     id: 'coffee-weekly-top-up',
     name: 'Coffee',
     quantity: '1 package',
-    detail: 'Weekly basket top-up item'
+    detail: 'Weekly basket top-up item',
+    estimatedPriceSek: 65
   },
   {
     id: 'oats-breakfast-staple',
     name: 'Oats',
     quantity: '1 bag',
-    detail: 'Breakfast staple'
+    detail: 'Breakfast staple',
+    estimatedPriceSek: 28
   },
   {
     id: 'milk-dairy-run',
     name: 'Milk or fil',
     quantity: '2 cartons',
-    detail: 'Dairy aisle check'
+    detail: 'Dairy aisle check',
+    estimatedPriceSek: 36
   },
   {
     id: 'frozen-vegetables',
     name: 'Frozen vegetables',
     quantity: '1 bag',
-    detail: 'Dinner backup item'
+    detail: 'Dinner backup item',
+    estimatedPriceSek: 32
   },
   {
     id: 'fresh-fruit',
     name: 'Fresh fruit',
     quantity: '1 basket',
-    detail: 'Snack and lunchbox item'
+    detail: 'Snack and lunchbox item',
+    estimatedPriceSek: 45
   }
 ];
 
 function listStateFromStorage(value: string | null): Required<PersistedListState> {
-  const empty = { checkedById: {}, importedItems: [] };
+  const empty = { budgetTargetSek: 350, checkedById: {}, importedItems: [] };
   if (!value) return empty;
 
   try {
@@ -70,6 +77,9 @@ function listStateFromStorage(value: string | null): Required<PersistedListState
 
     const maybeCheckedById = 'checkedById' in parsed ? parsed.checkedById : parsed;
     const maybeImportedItems = 'importedItems' in parsed ? parsed.importedItems : [];
+    const budgetTargetSek = 'budgetTargetSek' in parsed && typeof parsed.budgetTargetSek === 'number' && Number.isFinite(parsed.budgetTargetSek)
+      ? Math.max(0, parsed.budgetTargetSek)
+      : empty.budgetTargetSek;
 
     const checkedById = maybeCheckedById && typeof maybeCheckedById === 'object' && !Array.isArray(maybeCheckedById)
       ? Object.fromEntries(
@@ -87,10 +97,11 @@ function listStateFromStorage(value: string | null): Required<PersistedListState
         && typeof item.name === 'string'
         && typeof item.quantity === 'string'
         && typeof item.detail === 'string'
+        && (item.estimatedPriceSek === undefined || typeof item.estimatedPriceSek === 'number')
       ))
       : [];
 
-    return { checkedById, importedItems };
+    return { budgetTargetSek, checkedById, importedItems };
   } catch {
     return empty;
   }
@@ -107,13 +118,14 @@ function withCheckedState(checkedById: Record<string, boolean>, importedItems: B
   }));
 }
 
-function persistCheckedState(items: ShoppingListItem[]) {
+function persistCheckedState(items: ShoppingListItem[], budgetTargetSek: number) {
   try {
     const checkedById = Object.fromEntries(items.map((item) => [item.id, item.checked]));
     const importedItems = items
       .filter((item) => item.importSource === 'bulk-clipboard')
       .map((item) => ({
         detail: item.detail,
+        estimatedPriceSek: item.estimatedPriceSek,
         id: item.id,
         importSource: 'bulk-clipboard' as const,
         matchedProductName: item.matchedProductName,
@@ -121,19 +133,21 @@ function persistCheckedState(items: ShoppingListItem[]) {
         name: item.name,
         quantity: item.quantity
       }));
-    localStorage.setItem(LIST_STORAGE_KEY, JSON.stringify({ checkedById, importedItems }));
+    localStorage.setItem(LIST_STORAGE_KEY, JSON.stringify({ budgetTargetSek, checkedById, importedItems }));
   } catch {
     // Keep the check-off UI usable even when a browser blocks localStorage.
   }
 }
 
 export function useList() {
+  const [budgetTargetSek, setBudgetTargetSek] = useState(350);
   const [items, setItems] = useState<ShoppingListItem[]>(() => withCheckedState({}));
   const [hasLoadedBrowserState, setHasLoadedBrowserState] = useState(false);
 
   useEffect(() => {
     try {
-      const { checkedById, importedItems } = listStateFromStorage(localStorage.getItem(LIST_STORAGE_KEY));
+      const { budgetTargetSek: storedBudgetTargetSek, checkedById, importedItems } = listStateFromStorage(localStorage.getItem(LIST_STORAGE_KEY));
+      setBudgetTargetSek(storedBudgetTargetSek);
       setItems(withCheckedState(checkedById, importedItems));
     } finally {
       setHasLoadedBrowserState(true);
@@ -142,8 +156,8 @@ export function useList() {
 
   useEffect(() => {
     if (!hasLoadedBrowserState) return;
-    persistCheckedState(items);
-  }, [hasLoadedBrowserState, items]);
+    persistCheckedState(items, budgetTargetSek);
+  }, [budgetTargetSek, hasLoadedBrowserState, items]);
 
   const toggleItemChecked = useCallback((itemId: string) => {
     setItems((currentItems) => currentItems.map((item) => (
@@ -167,15 +181,25 @@ export function useList() {
   }, []);
 
   const checkedCount = useMemo(() => items.filter((item) => item.checked).length, [items]);
+  const estimatedTripTotalSek = useMemo(() => items.reduce((total, item) => (
+    total + (item.checked ? item.estimatedPriceSek ?? 0 : 0)
+  ), 0), [items]);
   const totalCount = items.length;
   const remainingCount = totalCount - checkedCount;
+  const budgetRemainingSek = budgetTargetSek - estimatedTripTotalSek;
+  const budgetUsageRatio = budgetTargetSek > 0 ? estimatedTripTotalSek / budgetTargetSek : 0;
 
   return {
     addImportedItems,
+    budgetRemainingSek,
+    budgetTargetSek,
+    budgetUsageRatio,
     checkedCount,
+    estimatedTripTotalSek,
     items,
     remainingCount,
     resetCheckedState,
+    setBudgetTargetSek,
     toggleItemChecked,
     totalCount
   };
