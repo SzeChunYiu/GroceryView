@@ -128,6 +128,8 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
+const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+
 function dailyObservedPricePoints(product: (typeof pricedProducts)[number]) {
   const pricesByDate = product.observations.reduce<Record<string, number[]>>((ledger, observation) => {
     if (!observation.date || !Number.isFinite(observation.price)) return ledger;
@@ -140,6 +142,41 @@ function dailyObservedPricePoints(product: (typeof pricedProducts)[number]) {
     price: median(prices),
     storeId: 'openprices-community'
   }));
+}
+
+function priceDropBadgeLabel(changePercent: number): string {
+  return `${Math.round(changePercent)}%`;
+}
+
+function priceDropFromThirtyDayHistory(product: (typeof productUniverse)[number]) {
+  if (!isOpenPricesProduct(product)) return null;
+  const priceHistory = dailyObservedPricePoints(product)
+    .sort((left, right) => Date.parse(left.observedAt) - Date.parse(right.observedAt));
+  const latest = priceHistory[priceHistory.length - 1];
+  if (!latest) return null;
+
+  const anchorDate = new Date(Date.parse(latest.observedAt) - thirtyDaysMs);
+  let anchor: (typeof priceHistory)[number] | null = null;
+  for (let index = priceHistory.length - 1; index >= 0; index -= 1) {
+    const point = priceHistory[index];
+    if (Date.parse(point.observedAt) <= anchorDate.getTime()) {
+      anchor = point;
+      break;
+    }
+  }
+  if (!anchor || anchor.price <= 0) return null;
+
+  const currentPrice = latest.price;
+  const price30dAgo = anchor.price;
+  const changePercent = ((currentPrice - price30dAgo) / price30dAgo) * 100;
+  if (changePercent >= -5) return null;
+
+  return {
+    percent: changePercent,
+    badge: priceDropBadgeLabel(changePercent),
+    anchorDate: anchor.observedAt.slice(0, 10),
+    label: `${priceDropBadgeLabel(changePercent)} 30-day price drop from price_history`
+  };
 }
 
 const compareOverlayProducts = [...pricedProducts]
@@ -1751,6 +1788,10 @@ export type AdaptiveProductCard = {
   unitSortPrice: number | null;
   defaultCompareMode: 'total' | 'unit';
   cheapestUnitBadge: string | null;
+  priceDropPercent: number | null;
+  priceDropBadge: string | null;
+  priceDropLabel: string | null;
+  priceDropAnchorDate: string | null;
   sparklineWindowDays: 7;
   sparklinePoints: Array<{
     date: string;
@@ -1804,6 +1845,7 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
       .filter((value): value is number => typeof value === 'number' && Number.isFinite(value))
     : [];
   const sparklinePoints = sevenDaySparklinePoints(product);
+  const priceDrop = priceDropFromThirtyDayHistory(product);
 
   return {
     slug: product.slug,
@@ -1825,6 +1867,10 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
     unitSortPrice: normalizedUnit?.unitSortPrice ?? null,
     defaultCompareMode: productKind === 'commodity' ? 'unit' : 'total',
     cheapestUnitBadge: normalizedUnit ? cheapestUnitBadge(normalizedUnit.unitPrice, peerUnitPrices, normalizedUnit.unitLabel) : null,
+    priceDropPercent: priceDrop?.percent ?? null,
+    priceDropBadge: priceDrop?.badge ?? null,
+    priceDropLabel: priceDrop?.label ?? null,
+    priceDropAnchorDate: priceDrop?.anchorDate ?? null,
     sparklineWindowDays: 7,
     sparklinePoints,
     sparklineLabel: sparklinePoints.length >= 2
