@@ -678,6 +678,8 @@ export type SiteLatestPriceSnapshotRow = LatestPriceRecord & {
   packageSize?: number;
   packageUnit?: string;
   comparableUnit: string;
+  unitType: string;
+  unitLabel: string;
   chainSlug: string;
   chainName: string;
   storeSlug?: string;
@@ -1904,6 +1906,7 @@ function optionalNumberFromDb(value: string | number | null): number | undefined
 }
 
 function mapSiteLatestPriceSnapshotRow(row: SiteLatestPriceSnapshotRowSql): SiteLatestPriceSnapshotRow {
+  const unitType = row.comparable_unit || row.package_unit || 'st';
   return {
     ...mapLatestPrice(row),
     productSlug: row.product_slug,
@@ -1914,6 +1917,8 @@ function mapSiteLatestPriceSnapshotRow(row: SiteLatestPriceSnapshotRowSql): Site
     ...(optionalNumberFromDb(row.package_size) === undefined ? {} : { packageSize: optionalNumberFromDb(row.package_size) }),
     ...(row.package_unit ? { packageUnit: row.package_unit } : {}),
     comparableUnit: row.comparable_unit,
+    unitType,
+    unitLabel: `kr/${unitType}`,
     chainSlug: row.chain_slug,
     chainName: row.chain_name,
     ...(row.store_slug ? { storeSlug: row.store_slug } : {}),

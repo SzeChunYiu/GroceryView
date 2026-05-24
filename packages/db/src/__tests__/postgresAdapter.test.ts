@@ -2049,6 +2049,8 @@ describe('createPostgresSiteSnapshotReader', () => {
         packageSize: 450,
         packageUnit: 'g',
         comparableUnit: 'kg',
+        unitType: 'kg',
+        unitLabel: 'kr/kg',
         chainId: 'chain-1',
         chainSlug: 'willys',
         chainName: 'Willys',

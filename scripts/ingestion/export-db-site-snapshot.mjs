@@ -60,6 +60,14 @@ function normalizeCoverageSlug(value) {
     .replace(/^-+|-+$/g, '');
 }
 
+function rowUnitType(row) {
+  return String(row.unitType || row.comparableUnit || row.packageUnit || 'st').replace(/^kr\//, '');
+}
+
+function rowUnitLabel(row) {
+  return row.unitLabel || `kr/${rowUnitType(row)}`;
+}
+
 export function buildDbSiteSnapshotArtifact({ generatedAt = new Date().toISOString(), rows, requiredChains = DEFAULT_REQUIRED_SNAPSHOT_CHAINS, requiredStoreExternalRefs = [], requiredProductSlugs = [], requiredPriceTypes = [], requiredCategorySlugs = [], maxObservedAgeHours }) {
   if (!Array.isArray(rows) || rows.length === 0) throw new Error('No latest price rows available for DB-to-site snapshot export.');
 
@@ -72,6 +80,8 @@ export function buildDbSiteSnapshotArtifact({ generatedAt = new Date().toISOStri
     ...optional(row.packageSize, 'packageSize'),
     ...optional(row.packageUnit, 'packageUnit'),
     comparableUnit: row.comparableUnit,
+    unitType: rowUnitType(row),
+    unitLabel: rowUnitLabel(row),
     chainSlug: row.chainSlug,
     chainName: row.chainName,
     ...optional(row.storeSlug, 'storeSlug'),
@@ -229,8 +239,7 @@ function formatSek(value) {
 }
 
 function observedPriceUnit(row) {
-  if (row.packageSize !== undefined && row.packageSize !== null) return 'kr/st';
-  return `kr/${row.packageUnit || row.comparableUnit || 'st'}`;
+  return rowUnitLabel(row);
 }
 
 function buildChainPrice(row) {

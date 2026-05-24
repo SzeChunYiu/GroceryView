@@ -178,6 +178,8 @@ describe('DB-backed site snapshot export script', () => {
       packageSize: 450,
       packageUnit: 'g',
       comparableUnit: 'kg',
+      unitType: 'kg',
+      unitLabel: 'kr/kg',
       chainSlug: 'willys',
       chainName: 'Willys',
       storeSlug: 'willys-hemma-stockholm-torsplan',
@@ -723,7 +725,7 @@ describe('DB-backed site snapshot export script', () => {
         hemkop: {
           price: 58.9,
           priceText: '58,90 kr',
-          priceUnit: 'kr/st',
+          priceUnit: 'kr/kg',
           isAvailable: true,
           savings: null,
           url: ''
@@ -731,7 +733,7 @@ describe('DB-backed site snapshot export script', () => {
         willys: {
           price: 44.9,
           priceText: '44,90 kr',
-          priceUnit: 'kr/st',
+          priceUnit: 'kr/kg',
           isAvailable: true,
           savings: 15,
           url: ''
