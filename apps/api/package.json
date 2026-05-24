@@ -20,6 +20,7 @@
     "class-validator": "^0.14.3",
     "pg": "^8.21.0",
     "reflect-metadata": "^0.2.2",
+    "ws": "^8.21.0",
     "rxjs": "^7.8.2"
   },
   "devDependencies": {
