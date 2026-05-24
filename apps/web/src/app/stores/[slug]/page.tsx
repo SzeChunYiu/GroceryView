@@ -110,6 +110,20 @@ function storePricePercentileRankFor(store: (typeof storeUniverse)[number]) {
   };
 }
 
+function StoreDetailEmptyState() {
+  return (
+    <div className="mt-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-5 text-center">
+      <span aria-hidden="true" className="text-3xl">
+        🛒
+      </span>
+      <h3 className="mt-2 text-lg font-black text-slate-950">No branch products or deals yet</h3>
+      <p className="mt-1 text-sm font-semibold text-slate-700">
+        Check product and comparison pages for chain-level prices while store coverage fills in.
+      </p>
+    </div>
+  );
+}
+
 export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
   const { slug } = await params;
   const store = findStore(slug);
@@ -200,7 +214,9 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
                 </div>
               ))}
             </div>
-          ) : null}
+          ) : (
+            <StoreDetailEmptyState />
+          )}
           <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-6 text-slate-700">
             {assortmentOverview.guardrails.map((guardrail) => (
               <li key={guardrail}>{guardrail}</li>
