@@ -241,6 +241,8 @@ describe('mobile app foundation', () => {
         markerCount: 1
       }
     ]);
+    assert.equal(viewModel?.priceDropContext.label, 'Temporary store clearance');
+    assert.equal(viewModel?.priceDropContext.purchaseTiming, 'Buy only if the local shelf still shows the price; do not assume it will hold.');
     assert.deepEqual(viewModel?.actions, ['add_to_watchlist', 'add_to_weekly_basket', 'compare_stores', 'scan_receipt_to_verify']);
     assert.equal(createMobileProductPriceTerminalViewModel('missing-product'), null);
   });
@@ -860,7 +862,7 @@ describe('mobile app foundation', () => {
     assert.equal(screen.type, 'screen');
     assert.equal(screen.title, 'Zoégas Coffee 450g');
     assert.equal(screen.state, 'ready');
-    assert.deepEqual(screen.children.map((section) => section.key), ['quote', 'evidence', 'distribution', 'chart', 'actions']);
+    assert.deepEqual(screen.children.map((section) => section.key), ['quote', 'evidence', 'distribution', 'chart', 'price-drop-context', 'actions']);
 
     const quote = screen.children.find((section) => section.key === 'quote');
     assert.equal(quote?.type, 'section');
@@ -883,6 +885,14 @@ describe('mobile app foundation', () => {
     if (!chart || chart.type !== 'section') throw new Error('chart section missing');
     assert.deepEqual(chart?.children.map((row) => 'value' in row ? row.value : null), [
       '3 points, latest 49.90 SEK, 1 markers'
+    ]);
+
+    const context = screen.children.find((section) => section.key === 'price-drop-context');
+    if (!context || context.type !== 'section') throw new Error('price drop context section missing');
+    assert.deepEqual(context?.children.map((row) => 'value' in row ? row.value : null), [
+      'Temporary store clearance',
+      'The latest drop is a one-observation 17% move without repeated campaign evidence.',
+      'Buy only if the local shelf still shows the price; do not assume it will hold.'
     ]);
 
     const actions = screen.children.find((section) => section.key === 'actions');
