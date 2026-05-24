@@ -228,6 +228,37 @@ function productMatchInputFor(product: NonNullable<ReturnType<typeof findProduct
   };
 }
 
+function retailerTypeFor(chain: string) {
+  const normalized = chain.toLowerCase();
+  if (/(?:apotek|pharmacy|apohem|hjartat|kronans|meds)/.test(normalized)) return 'pharmacy';
+  if (/(?:lyko|kicks|cocopanda|beauty|cosmetic)/.test(normalized)) return 'cosmetics';
+  if (/(?:rusta|normal|dollarstore|clas ohlson|variety)/.test(normalized)) return 'variety';
+  if (/(?:okq8|circle k|preem|st1|7-eleven|pressbyr)/.test(normalized)) return 'fuel-convenience';
+  return 'grocery';
+}
+
+function retailerTypeBadgeClass(retailerType: string) {
+  if (retailerType === 'pharmacy') return 'bg-sky-100 text-sky-900';
+  if (retailerType === 'cosmetics') return 'bg-fuchsia-100 text-fuchsia-900';
+  if (retailerType === 'variety') return 'bg-violet-100 text-violet-900';
+  if (retailerType === 'fuel-convenience') return 'bg-amber-100 text-amber-900';
+  return 'bg-emerald-100 text-emerald-900';
+}
+
+function effectiveUnitPriceFor(row: ReturnType<typeof chainPriceRows>[number]) {
+  return row.price;
+}
+
+function retailerComparisonRows(product: (typeof axfoodProducts)[number]) {
+  return chainPriceRows(product)
+    .map((row) => ({
+      ...row,
+      effectiveUnitPrice: effectiveUnitPriceFor(row),
+      retailer_type: retailerTypeFor(row.chain)
+    }))
+    .sort((a, b) => a.effectiveUnitPrice - b.effectiveUnitPrice || a.chain.localeCompare(b.chain, 'sv'));
+}
+
 function dealScoreVerdictFor(product: NonNullable<ReturnType<typeof findProduct>>) {
   if ('lowestPrice' in product) {
     const rows = chainPriceRows(product);
@@ -1591,13 +1622,18 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
       </Card>
       {isChain ? (
         <Card className="mt-6">
-          <h2 className="text-2xl font-black">Chain price rows</h2>
+          <h2 className="text-2xl font-black">Retailer price comparison</h2>
           <div className="mt-4 grid gap-3 md:grid-cols-2">
-            {chainPriceRows(product).map((row) => (
+            {retailerComparisonRows(product).map((row) => (
               <div className="rounded-2xl border border-slate-200 p-4" key={row.chain}>
-                <p className="text-lg font-black capitalize">{row.chain}</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-lg font-black capitalize">{row.chain}</p>
+                  <span className={`rounded-full px-2 py-1 text-xs font-black uppercase tracking-[0.16em] ${retailerTypeBadgeClass(row.retailer_type)}`}>
+                    {row.retailer_type}
+                  </span>
+                </div>
                 <p className="mt-1 text-3xl font-black text-emerald-800">{formatSek(row.price)}</p>
-                <p className="text-sm text-slate-600">{row.priceUnit || 'Unit not reported'}{row.savings ? ` · listed saving ${formatSek(row.savings)}` : ''}</p>
+                <p className="text-sm text-slate-600">effective {formatSek(row.effectiveUnitPrice)} · {row.priceUnit || 'Unit not reported'}{row.savings ? ` · listed saving ${formatSek(row.savings)}` : ''}</p>
               </div>
             ))}
           </div>
