@@ -1,0 +1,231 @@
+@page {
+  size: A4 portrait;
+  margin: 10mm;
+}
+
+.my-flyer-print-summary,
+.my-flyer-print-grid,
+.my-flyer-product-card,
+.my-flyer-product-image,
+.my-flyer-print-note {
+  break-inside: avoid;
+}
+
+.my-flyer-print-only {
+  display: none;
+}
+
+@media print {
+  html,
+  body {
+    background: #fff !important;
+    color: #111827 !important;
+    font-size: 10pt;
+  }
+
+  body {
+    margin: 0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  nav,
+  header:not(.my-flyer-print-header),
+  footer,
+  aside,
+  [role="navigation"],
+  [aria-label*="navigation" i],
+  [aria-label*="advert" i],
+  [data-print-hide],
+  [data-ad],
+  .app-nav,
+  .bottom-nav,
+  .my-flyer-screen-only,
+  .my-flyer-ad {
+    display: none !important;
+  }
+
+  .my-flyer-page {
+    background: #fff !important;
+    min-height: auto !important;
+    padding: 0 !important;
+  }
+
+  .my-flyer-shell {
+    box-shadow: none !important;
+    border: 0 !important;
+    max-width: none !important;
+    padding: 0 !important;
+  }
+
+  .my-flyer-print-only {
+    display: block !important;
+  }
+
+  .my-flyer-print-header {
+    align-items: start !important;
+    border-bottom: 2px solid #111827 !important;
+    display: grid !important;
+    gap: 4mm !important;
+    grid-template-columns: 1fr auto !important;
+    margin-bottom: 5mm !important;
+    padding-bottom: 3mm !important;
+  }
+
+  .my-flyer-print-kicker,
+  .my-flyer-print-date,
+  .my-flyer-print-meta {
+    color: #374151 !important;
+    font-size: 8pt !important;
+    letter-spacing: 0.12em !important;
+    text-transform: uppercase !important;
+  }
+
+  .my-flyer-title {
+    color: #111827 !important;
+    font-size: 22pt !important;
+    line-height: 1 !important;
+    margin: 1mm 0 !important;
+  }
+
+  .my-flyer-intro {
+    color: #374151 !important;
+    font-size: 9pt !important;
+    margin: 0 !important;
+    max-width: 120mm !important;
+  }
+
+  .my-flyer-print-summary {
+    border: 1px solid #111827 !important;
+    display: grid !important;
+    gap: 0 !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    margin: 0 0 5mm !important;
+  }
+
+  .my-flyer-print-summary > * {
+    border-right: 1px solid #111827 !important;
+    padding: 2.5mm !important;
+  }
+
+  .my-flyer-print-summary > *:last-child {
+    border-right: 0 !important;
+  }
+
+  .my-flyer-print-summary strong {
+    display: block !important;
+    font-size: 14pt !important;
+    line-height: 1.05 !important;
+  }
+
+  .my-flyer-print-summary span {
+    color: #4b5563 !important;
+    display: block !important;
+    font-size: 7.5pt !important;
+    letter-spacing: 0.08em !important;
+    margin-top: 1mm !important;
+    text-transform: uppercase !important;
+  }
+
+  .my-flyer-print-grid {
+    display: grid !important;
+    gap: 3mm !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .my-flyer-product-card {
+    align-items: stretch !important;
+    background: #fff !important;
+    border: 1px solid #111827 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    display: grid !important;
+    grid-template-columns: 34mm 1fr !important;
+    min-height: 42mm !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    page-break-inside: avoid !important;
+  }
+
+  .my-flyer-product-media {
+    align-items: center !important;
+    background: #f8fafc !important;
+    border-right: 1px solid #111827 !important;
+    display: flex !important;
+    min-height: 42mm !important;
+    padding: 1.5mm !important;
+  }
+
+  .my-flyer-product-image {
+    display: block !important;
+    filter: none !important;
+    height: 36mm !important;
+    max-height: none !important;
+    max-width: none !important;
+    object-fit: contain !important;
+    width: 100% !important;
+  }
+
+  .my-flyer-product-content {
+    display: grid !important;
+    grid-template-rows: auto 1fr auto !important;
+    min-width: 0 !important;
+    padding: 2.5mm !important;
+  }
+
+  .my-flyer-product-brand,
+  .my-flyer-product-store,
+  .my-flyer-product-unit,
+  .my-flyer-product-source {
+    color: #4b5563 !important;
+    font-size: 7.5pt !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+  }
+
+  .my-flyer-product-name {
+    color: #111827 !important;
+    font-size: 12pt !important;
+    line-height: 1.05 !important;
+    margin: 1mm 0 !important;
+  }
+
+  .my-flyer-product-subline {
+    color: #374151 !important;
+    font-size: 8pt !important;
+    line-height: 1.2 !important;
+    margin: 0 !important;
+  }
+
+  .my-flyer-product-price-row {
+    align-items: end !important;
+    display: flex !important;
+    gap: 2mm !important;
+    justify-content: space-between !important;
+    margin-top: 2mm !important;
+  }
+
+  .my-flyer-product-price {
+    color: #111827 !important;
+    font-size: 18pt !important;
+    font-weight: 900 !important;
+    line-height: 0.95 !important;
+  }
+
+  .my-flyer-product-saving {
+    border: 1px solid #111827 !important;
+    color: #111827 !important;
+    font-size: 8pt !important;
+    font-weight: 800 !important;
+    padding: 0.8mm 1.2mm !important;
+    white-space: nowrap !important;
+  }
+
+  .my-flyer-print-note {
+    border-top: 1px solid #111827 !important;
+    color: #4b5563 !important;
+    font-size: 7.5pt !important;
+    margin-top: 5mm !important;
+    padding-top: 2mm !important;
+  }
+}
