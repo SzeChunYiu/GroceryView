@@ -67,6 +67,10 @@ function chartColorFor(index: number) {
   return ['#047857', '#0f766e', '#2563eb', '#7c3aed'][index % 4]!;
 }
 
+export function getRenderableChartSeries(series: PriceChartTerminalSeries[]) {
+  return series.filter((item) => item.points.length > 0);
+}
+
 export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTerminalModel }>) {
   const [activeWindowLabel, setActiveWindowLabel] = useState(chart.defaultWindow);
   const [chartLoadError, setChartLoadError] = useState<string | null>(null);
@@ -82,6 +86,8 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
   useEffect(() => {
     const container = containerRef.current;
     if (!container || !chart.available || !activeWindow || activeWindow.series.length === 0) return;
+    const renderableSeries = getRenderableChartSeries(activeWindow.series);
+    if (renderableSeries.length === 0) return;
 
     let isDisposed = false;
     let removeChart: (() => void) | undefined;
@@ -113,7 +119,7 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
           }
         });
 
-        activeWindow.series.forEach((series, index) => {
+        renderableSeries.forEach((series, index) => {
           const line = chartApi.addSeries(LineSeries, {
             color: chartColorFor(index),
             lineWidth: 3,
