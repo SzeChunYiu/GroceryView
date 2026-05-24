@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import { CheckableListItem } from '@/components/CheckableListItem';
 import { AppNav } from '@/components/app-nav';
 import { BottomNav } from '@/components/bottom-nav';
@@ -8,7 +10,39 @@ import { useList } from '@/hooks/useList';
 
 export default function ShoppingListPage() {
   const { addImportedItems, checkedCount, items, remainingCount, resetCheckedState, toggleItemChecked, totalCount } = useList();
+  const [shareError, setShareError] = useState('');
+  const [shareExpiresAt, setShareExpiresAt] = useState('');
+  const [shareLoading, setShareLoading] = useState(false);
+  const [shareUrl, setShareUrl] = useState('');
   const progress = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
+  const shareExpiryLabel = shareExpiresAt
+    ? new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(shareExpiresAt))
+    : '';
+
+  async function createShareLink() {
+    setShareError('');
+    setShareLoading(true);
+
+    try {
+      const response = await fetch('/api/list/share', {
+        body: JSON.stringify({ expiresInHours: 24, items }),
+        headers: { 'content-type': 'application/json' },
+        method: 'POST',
+      });
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? 'Could not create share link.');
+      }
+
+      setShareExpiresAt(payload.expiresAt);
+      setShareUrl(payload.shareUrl);
+    } catch (error) {
+      setShareError(error instanceof Error ? error.message : 'Could not create share link.');
+    } finally {
+      setShareLoading(false);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-[#f5f1e8] text-slate-950">
@@ -39,14 +73,42 @@ export default function ShoppingListPage() {
                 Tap the checkbox once an item is in your basket. Completed rows are struck through immediately and restored from localStorage on reload.
               </p>
             </div>
-            <button
-              className="inline-flex items-center justify-center rounded-full border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 transition hover:border-emerald-700 hover:text-emerald-900"
-              onClick={resetCheckedState}
-              type="button"
-            >
-              Clear check marks
-            </button>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <button
+                className="inline-flex items-center justify-center rounded-full border border-emerald-700 bg-emerald-700 px-4 py-2 text-sm font-black text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
+                disabled={shareLoading || totalCount === 0}
+                onClick={createShareLink}
+                type="button"
+              >
+                {shareLoading ? 'Creating link…' : 'Share for 24 hours'}
+              </button>
+              <button
+                className="inline-flex items-center justify-center rounded-full border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 transition hover:border-emerald-700 hover:text-emerald-900"
+                onClick={resetCheckedState}
+                type="button"
+              >
+                Clear check marks
+              </button>
+            </div>
           </div>
+
+          {(shareUrl || shareError) && (
+            <div className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50 p-4 text-sm font-semibold text-slate-700">
+              {shareUrl ? (
+                <>
+                  <p className="font-black text-emerald-900">Share link expires {shareExpiryLabel}.</p>
+                  <input
+                    aria-label="Expiring share link"
+                    className="mt-2 w-full rounded-xl border border-emerald-200 bg-white px-3 py-2 font-mono text-xs text-slate-800"
+                    readOnly
+                    value={shareUrl}
+                  />
+                </>
+              ) : (
+                <p className="text-red-700">{shareError}</p>
+              )}
+            </div>
+          )}
 
           <div
             aria-label={`${progress}% complete`}
