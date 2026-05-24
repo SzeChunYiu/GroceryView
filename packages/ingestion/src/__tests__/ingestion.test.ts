@@ -83,6 +83,7 @@ import {
   ICA_PRODUCT_PAGE_SEARCH_PATH,
   fetchIcaReklambladOffers,
   fetchLidlBulkProducts,
+  fetchLekiaProducts,
   fetchWillysBulkProducts,
   fetchLidlOffers,
   fetchLidlOffersForAllStores,
@@ -99,6 +100,7 @@ import {
   parseApohemProducts,
   parseApotekHjartatProducts,
   parseIcaReklambladOffers,
+  parseLekiaProducts,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
   GROCERYVIEW_DAILY_CITY_GROSS_BULK_PRODUCTS_URL,
@@ -7030,6 +7032,63 @@ describe('daily ingestion runner', () => {
       apohemSourceUrl,
       apotekHjartatSourceUrl
     ]);
+  });
+
+  it('parses Lekia public SSR product fixtures with discount and baby-care provenance', () => {
+    const retrievedAt = '2026-05-24T18:30:00.000Z';
+    const sourceUrl = 'https://www.lekia.se/leksaker/babyleksaker';
+    const rows = parseLekiaProducts(`
+      <script>self.__next_f.push([1,"[
+        {\\"id\\":\\"lekia-product-1\\",\\"articleNumber\\":\\"100-38102772\\",\\"name\\":\\"PAP Kassaapparat med ljud\\",\\"isVariant\\":true,\\"stockStatus\\":{\\"inStockQuantity\\":40,\\"__typename\\":\\"StockStatus\\"},\\"mediumImages\\":[{\\"url\\":\\"/storage/register.jpeg\\",\\"__typename\\":\\"Image\\"}],\\"price\\":{\\"unitPriceIncludingVat\\":299,\\"discountPriceIncludingVat\\":199,\\"__typename\\":\\"ProductPrice\\"},\\"recommendedPriceIncludingVat\\":349,\\"parents\\":{\\"nodes\\":[{\\"__typename\\":\\"LandingPage\\"},{\\"name\\":\\"Leksaker\\",\\"__typename\\":\\"CategoryProductCategory\\"},{\\"name\\":\\"Babyleksaker\\",\\"__typename\\":\\"CategoryProductCategory\\"}],\\"__typename\\":\\"ContentConnection\\"},\\"fields\\":{\\"brand\\":[{\\"name\\":\\"PAP\\",\\"__typename\\":\\"TextOptionDefinition\\"}],\\"badge1Text\\":[{\\"name\\":\\"REA\\",\\"value\\":\\"SALE\\",\\"__typename\\":\\"TextOptionDefinition\\"}],\\"articleStatus\\":[{\\"value\\":\\"Sellable\\",\\"__typename\\":\\"TextOptionDefinition\\"}],\\"__typename\\":\\"LekiaProductProductFieldContainer\\"},\\"storeStockStatus\\":{\\"availableInStoresCount\\":118,\\"__typename\\":\\"StoreStockStatus\\"},\\"url\\":\\"/leksaker/babyleksaker/pap-kassaapparat-med-ljud\\",\\"__typename\\":\\"LekiaProductProduct\\"}
+      ]"])</script>
+    `, sourceUrl, retrievedAt);
+
+    assert.equal(rows.length, 1);
+    assert.deepEqual(rows[0], {
+      chain: 'lekia-se',
+      code: '100-38102772',
+      name: 'PAP Kassaapparat med ljud',
+      brand: 'PAP',
+      category: 'baby',
+      categories: ['Leksaker', 'Babyleksaker'],
+      price: 299,
+      priceCurrency: 'SEK',
+      originalPrice: 299,
+      originalPriceCurrency: 'SEK',
+      recommendedPrice: 349,
+      recommendedPriceCurrency: 'SEK',
+      discountPrice: 199,
+      discountPriceCurrency: 'SEK',
+      stockStatus: 'Sellable',
+      inStockQuantity: 40,
+      availableInStoresCount: 118,
+      badgeText: 'REA',
+      productUrl: 'https://www.lekia.se/leksaker/babyleksaker/pap-kassaapparat-med-ljud',
+      imageUrl: 'https://www.lekia.se/storage/register.jpeg',
+      sourceUrl,
+      retrievedAt
+    });
+  });
+
+  it('fetches and deduplicates Lekia public product pages by article number', async () => {
+    const requestedUrls: string[] = [];
+    const sourceUrl = 'https://www.lekia.se/leksaker/babyleksaker';
+    const rows = await fetchLekiaProducts({
+      sourcePaths: ['/leksaker/babyleksaker', '/leksaker/babyleksaker'],
+      retrievedAt: '2026-05-24T18:31:00.000Z',
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return new Response(`
+          <script>self.__next_f.push([1,"[
+            {\\"id\\":\\"lekia-product-1\\",\\"articleNumber\\":\\"100-38102772\\",\\"name\\":\\"PAP Kassaapparat med ljud\\",\\"stockStatus\\":{\\"inStockQuantity\\":40},\\"mediumImages\\":[{\\"url\\":\\"/storage/register.jpeg\\"}],\\"price\\":{\\"unitPriceIncludingVat\\":299,\\"discountPriceIncludingVat\\":199},\\"recommendedPriceIncludingVat\\":349,\\"parents\\":{\\"nodes\\":[{\\"name\\":\\"Leksaker\\"},{\\"name\\":\\"Babyleksaker\\"}]},\\"fields\\":{\\"brand\\":[{\\"name\\":\\"PAP\\"}],\\"articleStatus\\":[{\\"value\\":\\"Sellable\\"}]},\\"storeStockStatus\\":{\\"availableInStoresCount\\":118},\\"url\\":\\"/leksaker/babyleksaker/pap-kassaapparat-med-ljud\\",\\"__typename\\":\\"LekiaProductProduct\\"}
+          ]"])</script>
+        `, { status: 200, headers: { 'content-type': 'text/html' } });
+      }
+    });
+
+    assert.deepEqual(requestedUrls, [sourceUrl, sourceUrl]);
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].code, '100-38102772');
   });
 
   it('materializes native Lidl all-store public offer prices into daily database observations', async () => {

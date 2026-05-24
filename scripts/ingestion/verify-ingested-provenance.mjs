@@ -53,6 +53,12 @@ const DATASETS = [
     key: ['sourceUrl', 'code', 'storeId', 'price']
   },
   {
+    file: 'lekia-se.ts',
+    rows: 'lekiaSeProducts',
+    source: 'lekiaSeSource',
+    key: ['sourceUrl', 'code', 'price']
+  },
+  {
     file: 'mathem.ts',
     rows: 'mathemProducts',
     source: 'mathemSource',
