@@ -120,6 +120,7 @@ import {
   locatorFixturesCanAffectDealScore,
   normaliseUnitPrice,
   normalizeUnitPrice,
+  parseDiaperPackageClass,
   offerSelectorFixtures,
   offerSelectorFixturesCanEmitOfferFacts,
   parseAxfoodStoreList,
@@ -4595,10 +4596,43 @@ describe('normalizeUnitPrice', () => {
     assert.deepEqual(normalizeUnitPrice({ price: 34.9, packageSize: 12, packageUnit: 'piece' }), { unitPrice: 2.9083, comparableUnit: 'piece' });
   });
 
+
   it('normalises retailer package strings into comparable unit prices', () => {
     assert.deepEqual(normaliseUnitPrice(49.9, '500g'), { unitPrice: 99.8, comparableUnit: 'kg' });
     assert.deepEqual(normaliseUnitPrice(22.5, '1.5L'), { unitPrice: 15, comparableUnit: 'l' });
     assert.deepEqual(normaliseUnitPrice(29.94, '6-pack'), { unitPrice: 4.99, comparableUnit: 'piece' });
+  });
+
+  it('extracts diaper package counts and supported size classes from retailer text', () => {
+    assert.deepEqual(parseDiaperPackageClass('Strl 4 + 39p'), {
+      diaperCount: 39,
+      declaredSize: 4,
+      diaperSizeClass: 'diaper-size-4'
+    });
+    assert.deepEqual(parseDiaperPackageClass('37 per frp'), {
+      diaperCount: 37,
+      declaredSize: null,
+      diaperSizeClass: null
+    });
+    assert.deepEqual(parseDiaperPackageClass('Comfort2 3-6kg + 47p'), {
+      diaperCount: 47,
+      declaredSize: 2,
+      diaperSizeClass: 'diaper-size-2'
+    });
+    assert.deepEqual(parseDiaperPackageClass('2x37p'), {
+      diaperCount: 74,
+      declaredSize: null,
+      diaperSizeClass: null
+    });
+  });
+
+  it('normalises diaper package strings by diaper count without mapping sizes 7 or 8', () => {
+    assert.deepEqual(normaliseUnitPrice(78, 'Strl 4 + 39p'), { unitPrice: 2, comparableUnit: 'piece' });
+    assert.deepEqual(normaliseUnitPrice(74, '37 per frp'), { unitPrice: 2, comparableUnit: 'piece' });
+    assert.deepEqual(normaliseUnitPrice(94, 'Comfort2 3-6kg + 47p'), { unitPrice: 2, comparableUnit: 'piece' });
+    assert.deepEqual(normaliseUnitPrice(148, '2x37p'), { unitPrice: 2, comparableUnit: 'piece' });
+    assert.deepEqual(parseDiaperPackageClass('Strl 7 + 34p'), { diaperCount: 34, declaredSize: 7, diaperSizeClass: null });
+    assert.deepEqual(parseDiaperPackageClass('Size 8 + 30p'), { diaperCount: 30, declaredSize: 8, diaperSizeClass: null });
   });
 });
 
