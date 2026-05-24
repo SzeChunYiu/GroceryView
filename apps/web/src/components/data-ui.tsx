@@ -31,6 +31,19 @@ export function Card({ children, className = '' }: Readonly<{ children: ReactNod
   return <section className={`rounded-[1.75rem] border border-slate-200 bg-white/88 p-5 shadow-sm ${className}`}>{children}</section>;
 }
 
+export function UnitHarmonizedUnitPrice({
+  label,
+  source
+}: Readonly<{ label: string | null | undefined; source?: string | null }>) {
+  if (!label) return null;
+
+  return (
+    <p className="mt-1 rounded-xl bg-emerald-50 px-2 py-1 text-xs font-black text-emerald-900">
+      Comparable {label}{source ? ` · ${source}` : ''}
+    </p>
+  );
+}
+
 export function MetricGrid() {
   return (
     <div className="grid gap-3 md:grid-cols-4">

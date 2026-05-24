@@ -1,7 +1,8 @@
 import Link from 'next/link';
-import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { Card, Eyebrow, PageShell, UnitHarmonizedUnitPrice } from '@/components/data-ui';
 import { COMPARE_CHAIN_ORDER, buildChainComparisonTable } from '@/lib/chain-compare';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
+import { compareUnitHarmonizedPrices, normalizeComparisonCell } from '@/lib/normalization';
 import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, commodityComparisons, compareOverlayChart, formatPct, formatSek, matchedChainProducts, privateLabelDupeFinder } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -25,8 +26,32 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
   const productsParam = resolvedSearchParams.products;
   const comparison = buildChainComparisonTable(productsParam);
-  const packagedRows = comparison.products.filter((product) => product.matchType === 'packaged_barcode');
-  const commodityRows = comparison.products.filter((product) => product.matchType === 'commodity_alias');
+  const chainNamesById = Object.fromEntries(COMPARE_CHAIN_ORDER.map((chain) => [chain.id, chain.label]));
+  const unitHarmonizedRows = comparison.products
+    .map((product) => {
+      const unitHarmonizedCells = product.cells.map((cell) => ({
+        cell,
+        unitPrice: normalizeComparisonCell({
+          priceText: cell.priceText,
+          unitLabel: cell.unitLabel,
+          packageLabel: product.packageLabel
+        })
+      }));
+      const unitHarmonizedBest = unitHarmonizedCells
+        .filter((entry) => entry.cell.status === 'priced' && entry.unitPrice !== null)
+        .sort((a, b) => compareUnitHarmonizedPrices(a.unitPrice, b.unitPrice))[0] ?? null;
+
+      return {
+        ...product,
+        unitHarmonizedCells,
+        unitHarmonizedBestChainName: unitHarmonizedBest ? (chainNamesById[unitHarmonizedBest.cell.chainId] ?? unitHarmonizedBest.cell.chainId) : product.bestChainName,
+        unitHarmonizedBestPriceText: unitHarmonizedBest?.unitPrice?.label ?? product.bestPriceText,
+        unitHarmonizedSortPrice: unitHarmonizedBest?.unitPrice ?? null
+      };
+    })
+    .sort((a, b) => compareUnitHarmonizedPrices(a.unitHarmonizedSortPrice, b.unitHarmonizedSortPrice) || a.productName.localeCompare(b.productName));
+  const packagedRows = unitHarmonizedRows.filter((product) => product.matchType === 'packaged_barcode');
+  const commodityRows = unitHarmonizedRows.filter((product) => product.matchType === 'commodity_alias');
   const rowSections = [
     {
       id: 'commodity-alias',
@@ -54,7 +79,7 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
             <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Chain comparison table</h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
               Enter product slugs or retailer product ids in the query string to compare side-by-side prices across ICA, Willys, and Coop.
-              The table uses packages/db snapshot rows when production exports are present and marks missing chain rows explicitly.
+              The table uses packages/db snapshot rows when production exports are present, aligns comparable prices to kr/kg, kr/l, or kr/st before ranking, and marks missing chain rows explicitly.
             </p>
           </div>
           <Link className="rounded-full bg-emerald-900 px-4 py-2 text-sm font-black text-white shadow-sm" href="/compare?products=makaroner-pasta-101302991-st,havregryn-extra-fylliga-101758934-st">
@@ -95,10 +120,11 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
                             <span className="mt-2 inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700">{product.matchLabel}</span>
                             <span className="mt-2 block text-xs font-semibold leading-5 text-slate-500">{product.confidenceLabel}</span>
                           </th>
-                          {product.cells.map((cell) => (
+                          {product.unitHarmonizedCells.map(({ cell, unitPrice }) => (
                             <td className="px-4 py-4" key={`${product.productSlug}-${cell.chainId}`}>
                               <p className={cell.status === 'priced' ? 'font-black text-emerald-900' : 'font-black text-slate-400'}>{cell.priceText}</p>
                               <p className="mt-1 text-xs font-semibold text-slate-500">{cell.unitLabel}</p>
+                              <UnitHarmonizedUnitPrice label={unitPrice?.label} source={unitPrice?.source === 'package-size' ? 'from pack size' : 'reported unit'} />
                               {cell.productSlug ? (
                                 <Link className="mt-2 block text-xs font-black text-emerald-800 underline decoration-emerald-300 underline-offset-4" href={`/products/${cell.productSlug}`}>
                                   {cell.productName ?? cell.productSlug}
@@ -110,8 +136,8 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
                             </td>
                           ))}
                           <td className="px-4 py-4">
-                            <p className="rounded-2xl bg-emerald-50 px-3 py-2 font-black text-emerald-950">{product.bestChainName}</p>
-                            <p className="mt-1 text-xs font-semibold text-slate-500">{product.bestPriceText}</p>
+                            <p className="rounded-2xl bg-emerald-50 px-3 py-2 font-black text-emerald-950">{product.unitHarmonizedBestChainName}</p>
+                            <p className="mt-1 text-xs font-semibold text-slate-500">{product.unitHarmonizedBestPriceText} comparable</p>
                           </td>
                         </tr>
                       ))}
