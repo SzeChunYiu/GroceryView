@@ -170,6 +170,7 @@ import {
   parseOverpassGroceryStores,
   retailerRobotsPolicyMatrix,
   runAllStoreTasks,
+  runDailyRetailerIngestion,
   runRetailerConnector,
   runDailyIngestion,
   STORE_ENUMERATOR_CHAIN_IDS,
@@ -5150,6 +5151,150 @@ describe('runRetailerConnector', () => {
     assert.equal(result.parserAttempted, false);
     assert.deepEqual(result.requiredActions, ['investigate_connector_run_failure']);
     assert.match(result.error ?? '', /HTTP 503/);
+  });
+});
+
+describe('runDailyRetailerIngestion', () => {
+  const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+  const productFor = (id: string, chainId = 'willys') => ({
+    storeId: `${chainId}-stockholm`,
+    retailerProductId: `${id}-retailer`,
+    rawName: `Product ${id}`,
+    canonicalName: `Product ${id}`,
+    productId: `product-${id}`,
+    categoryId: 'pantry',
+    brand: 'Test',
+    packageSize: 1,
+    packageUnit: 'kg',
+    price: 25
+  });
+
+  it('limits fetch, parse, and persist concurrency per source and market', async () => {
+    const active = { fetch: 0, parse: 0, persist: 0 };
+    const maxActive = { fetch: 0, parse: 0, persist: 0 };
+    const track = async <T>(stage: keyof typeof active, work: () => T | Promise<T>): Promise<T> => {
+      active[stage] += 1;
+      maxActive[stage] = Math.max(maxActive[stage], active[stage]);
+      try {
+        await sleep(5);
+        return await work();
+      } finally {
+        active[stage] -= 1;
+      }
+    };
+
+    const connectors = [1, 2, 3].map((index) => ({
+      connectorId: `willys-api-${index}`,
+      requestedAt: '2026-05-21T08:00:00.000Z',
+      chainId: 'willys',
+      sourceType: 'official_api' as const,
+      sourceKey: 'willys-api',
+      market: 'SE',
+      robotsTxtStatus: 'not_applicable' as const,
+      legalReviewStatus: 'approved' as const,
+      hasDataAgreement: true,
+      endpointUrl: `https://api.example.test/willys/${index}`,
+      parserVersion: 'willys-api-v1',
+      fetcher: (plan) => track('fetch', () => ({
+        statusCode: 200,
+        body: '{}',
+        contentType: 'application/json',
+        retrievedAt: plan.provenance.capturedAt,
+        sourceUrl: plan.provenance.sourceUrl,
+        rawSnapshotRef: `raw://willys/${plan.runKey}.json`
+      })),
+      parser: () => track('parse', () => [productFor(String(index))]),
+      persister: (run) => track('persist', () => ({ persistedCount: run.acceptedCount }))
+    }));
+
+    const result = await runDailyRetailerIngestion({
+      connectors,
+      limits: { perSourceMarket: { fetch: 1, parse: 1, persist: 1 } }
+    });
+
+    assert.equal(result.status, 'completed');
+    assert.equal(result.persistedCount, 3);
+    assert.equal(maxActive.fetch, 1);
+    assert.equal(maxActive.parse, 1);
+    assert.equal(maxActive.persist, 1);
+    assert.deepEqual(result.records.map((record) => record.status), ['persisted', 'persisted', 'persisted']);
+  });
+
+  it('records API, DB, and cache backpressure without starving healthy sources', async () => {
+    const goodPersisted: string[] = [];
+    const makeGoodConnector = (connectorId: string, chainId: string, persister?: (run: Awaited<ReturnType<typeof runRetailerConnector>>) => Promise<{ persistedCount: number }> | { persistedCount: number }) => ({
+      connectorId,
+      requestedAt: '2026-05-21T09:00:00.000Z',
+      chainId,
+      sourceType: 'official_api' as const,
+      sourceKey: `${chainId}-api`,
+      market: 'SE',
+      robotsTxtStatus: 'not_applicable' as const,
+      legalReviewStatus: 'approved' as const,
+      hasDataAgreement: true,
+      endpointUrl: `https://api.example.test/${chainId}`,
+      parserVersion: `${chainId}-api-v1`,
+      fetcher: (plan) => ({
+        statusCode: 200,
+        body: '{}',
+        contentType: 'application/json',
+        retrievedAt: plan.provenance.capturedAt,
+        sourceUrl: plan.provenance.sourceUrl,
+        rawSnapshotRef: `raw://${chainId}/${plan.runKey}.json`
+      }),
+      parser: () => [productFor(connectorId, chainId)],
+      persister: persister ?? ((run) => {
+        goodPersisted.push(connectorId);
+        return { persistedCount: run.acceptedCount };
+      })
+    });
+
+    const apiLimited = {
+      connectorId: 'api-limited-source',
+      requestedAt: '2026-05-21T09:00:00.000Z',
+      chainId: 'ica',
+      sourceType: 'official_api' as const,
+      sourceKey: 'ica-api',
+      market: 'SE',
+      robotsTxtStatus: 'not_applicable' as const,
+      legalReviewStatus: 'approved' as const,
+      hasDataAgreement: true,
+      endpointUrl: 'https://api.example.test/ica',
+      parserVersion: 'ica-api-v1',
+      fetcher: () => {
+        throw Object.assign(new Error('HTTP 429 too many requests'), { statusCode: 429, retryAfterMs: 30_000 });
+      },
+      parser: () => []
+    };
+    const dbLimited = makeGoodConnector('db-limited-source', 'coop', () => {
+      throw Object.assign(new Error('postgres connection pool limit hit'), { code: 'DB_LIMIT' });
+    });
+    const cacheLimited = makeGoodConnector('cache-limited-source', 'hemkop', () => {
+      throw new Error('redis cache limit hit');
+    });
+    const healthy = makeGoodConnector('healthy-source', 'willys');
+
+    const result = await runDailyRetailerIngestion({
+      connectors: [apiLimited, dbLimited, cacheLimited, healthy],
+      limits: { defaultPerSourceMarket: 1 },
+      now: '2026-05-21T09:00:00.000Z'
+    });
+
+    assert.equal(result.status, 'degraded');
+    assert.equal(result.persistedCount, 1);
+    assert.deepEqual(goodPersisted, ['healthy-source']);
+
+    const byId = new Map(result.records.map((record) => [record.connectorId, record]));
+    assert.equal(byId.get('api-limited-source')?.status, 'failed');
+    assert.equal(byId.get('api-limited-source')?.backpressureEvents[0].reason, 'api_limit_hit');
+    assert.equal(byId.get('api-limited-source')?.backpressureEvents[0].operation, 'fetch');
+    assert.equal(byId.get('db-limited-source')?.status, 'deferred');
+    assert.equal(byId.get('db-limited-source')?.backpressureEvents[0].reason, 'db_limit_hit');
+    assert.equal(byId.get('cache-limited-source')?.status, 'deferred');
+    assert.equal(byId.get('cache-limited-source')?.backpressureEvents[0].reason, 'cache_limit_hit');
+    assert.equal(byId.get('healthy-source')?.status, 'persisted');
+    assert.deepEqual(result.deferReasons.sort(), ['api_limit_hit', 'cache_limit_hit', 'db_limit_hit']);
+    assert.deepEqual(result.requiredActions.sort(), ['defer_due_to_api_limit', 'defer_due_to_cache_limit', 'defer_due_to_db_limit']);
   });
 });
 

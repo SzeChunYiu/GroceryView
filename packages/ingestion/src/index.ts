@@ -1522,8 +1522,25 @@ export type RetailerConnectorFetcher = (plan: RetailerConnectorRunPlan) => Retai
 export type RetailerConnectorParser = (snapshot: RetailerConnectorSnapshot, plan: RetailerConnectorRunPlan) => RetailerConnectorParsedProduct[] | Promise<RetailerConnectorParsedProduct[]>;
 
 export type RetailerConnectorRunInput = RetailerConnectorPlanInput & {
+  market?: string;
+  sourceKey?: string;
   fetcher: RetailerConnectorFetcher;
   parser: RetailerConnectorParser;
+};
+
+export type RetailerConnectorOperationStage = 'fetch' | 'parse' | 'persist';
+export type RetailerConnectorBackpressureReason = 'api_limit_hit' | 'db_limit_hit' | 'cache_limit_hit' | 'unknown_limit_hit';
+
+export type RetailerConnectorBackpressureEvent = {
+  connectorId: string;
+  chainId: string;
+  market: string;
+  sourceKey: string;
+  operation: RetailerConnectorOperationStage;
+  reason: RetailerConnectorBackpressureReason;
+  detail: string;
+  retryAfterMs?: number;
+  deferredUntil?: string;
 };
 
 export type RetailerConnectorRunResult = {
@@ -1536,7 +1553,61 @@ export type RetailerConnectorRunResult = {
   acceptedCount: number;
   rejectedCount: number;
   requiredActions: string[];
+  backpressureEvents: RetailerConnectorBackpressureEvent[];
   error?: string;
+};
+
+export type RetailerConnectorPersistResult = {
+  persistedCount: number;
+  requiredActions?: string[];
+  backpressureEvents?: RetailerConnectorBackpressureEvent[];
+  deferReasons?: string[];
+};
+
+export type RetailerConnectorPersister = (
+  result: RetailerConnectorRunResult
+) => RetailerConnectorPersistResult | Promise<RetailerConnectorPersistResult>;
+
+export type DailyRetailerConnectorInput = RetailerConnectorRunInput & {
+  market: string;
+  persister?: RetailerConnectorPersister;
+};
+
+export type RetailerConnectorConcurrencyLimits = {
+  defaultPerSourceMarket?: number;
+  perSourceMarket?: Partial<Record<RetailerConnectorOperationStage, number>>;
+};
+
+export type DailyRetailerIngestionInput = {
+  connectors: DailyRetailerConnectorInput[];
+  limits?: RetailerConnectorConcurrencyLimits;
+  now?: string;
+};
+
+export type DailyRetailerConnectorRunRecord = {
+  connectorId: string;
+  sourceKey: string;
+  market: string;
+  status: 'completed' | 'blocked' | 'duplicate' | 'failed' | 'persisted' | 'deferred';
+  run: RetailerConnectorRunResult;
+  persistAttempted: boolean;
+  persistedCount: number;
+  requiredActions: string[];
+  backpressureEvents: RetailerConnectorBackpressureEvent[];
+  deferReasons: string[];
+  error?: string;
+};
+
+export type DailyRetailerIngestionRunResult = {
+  status: 'completed' | 'degraded' | 'failed';
+  records: DailyRetailerConnectorRunRecord[];
+  completedCount: number;
+  failedCount: number;
+  deferredCount: number;
+  persistedCount: number;
+  requiredActions: string[];
+  backpressureEvents: RetailerConnectorBackpressureEvent[];
+  deferReasons: string[];
 };
 
 export type ConnectorFetchResponse = {
@@ -1559,6 +1630,77 @@ const isIsoDate = (value: string): boolean => !Number.isNaN(Date.parse(value));
 
 function contentHashFor(body: string): string {
   return `sha256:${createHash('sha256').update(body).digest('hex')}`;
+}
+
+function sourceMarketIdentity(input: Pick<RetailerConnectorRunInput, 'chainId' | 'sourceType' | 'sourceKey' | 'market'>): { sourceKey: string; market: string } {
+  return {
+    sourceKey: stableKeyPart(input.sourceKey ?? `${input.sourceType}:${input.chainId}`),
+    market: stableKeyPart(input.market ?? 'SE').toUpperCase()
+  };
+}
+
+function numberProperty(value: unknown, key: string): number | undefined {
+  if (typeof value !== 'object' || value === null) return undefined;
+  const candidate = (value as Record<string, unknown>)[key];
+  return typeof candidate === 'number' && Number.isFinite(candidate) ? candidate : undefined;
+}
+
+function stringProperty(value: unknown, key: string): string | undefined {
+  if (typeof value !== 'object' || value === null) return undefined;
+  const candidate = (value as Record<string, unknown>)[key];
+  return typeof candidate === 'string' && candidate.trim() ? candidate.trim() : undefined;
+}
+
+function backpressureActionFor(reason: RetailerConnectorBackpressureReason): string {
+  if (reason === 'api_limit_hit') return 'defer_due_to_api_limit';
+  if (reason === 'db_limit_hit') return 'defer_due_to_db_limit';
+  if (reason === 'cache_limit_hit') return 'defer_due_to_cache_limit';
+  return 'defer_due_to_unknown_limit';
+}
+
+function classifyBackpressureEvent(
+  error: unknown,
+  operation: RetailerConnectorOperationStage,
+  input: Pick<RetailerConnectorRunInput, 'connectorId' | 'chainId' | 'sourceType' | 'sourceKey' | 'market'>,
+  now = new Date().toISOString()
+): RetailerConnectorBackpressureEvent | null {
+  const statusCode = numberProperty(error, 'statusCode') ?? numberProperty(error, 'status');
+  const retryAfterSeconds = numberProperty(error, 'retryAfterSeconds');
+  const retryAfterMs = numberProperty(error, 'retryAfterMs') ?? (retryAfterSeconds === undefined ? undefined : retryAfterSeconds * 1000);
+  const code = stringProperty(error, 'code') ?? stringProperty(error, 'name') ?? '';
+  const message = error instanceof Error ? error.message : String(error);
+  const detail = [code, message].filter(Boolean).join(': ');
+  const haystack = `${code} ${message}`.toLowerCase();
+
+  let reason: RetailerConnectorBackpressureReason | null = null;
+  if (statusCode === 429 || /(^|[^0-9])429([^0-9]|$)|rate.?limit|too many requests|api limit|quota/.test(haystack)) {
+    reason = 'api_limit_hit';
+  } else if (/database|postgres|sql|connection pool|db limit|deadlock|too many clients/.test(haystack)) {
+    reason = 'db_limit_hit';
+  } else if (/cache|redis|memcached/.test(haystack)) {
+    reason = 'cache_limit_hit';
+  } else if (/limit|backpressure|throttl/.test(haystack)) {
+    reason = 'unknown_limit_hit';
+  }
+  if (!reason) return null;
+
+  const identity = sourceMarketIdentity(input);
+  const parsedNow = Date.parse(now);
+  const deferredUntil = retryAfterMs !== undefined && !Number.isNaN(parsedNow)
+    ? new Date(parsedNow + retryAfterMs).toISOString()
+    : undefined;
+
+  return {
+    connectorId: input.connectorId,
+    chainId: input.chainId,
+    market: identity.market,
+    sourceKey: identity.sourceKey,
+    operation,
+    reason,
+    detail,
+    retryAfterMs,
+    deferredUntil
+  };
 }
 
 function normalizeSnapshot(fetchResult: RetailerConnectorFetchResult, plan: RetailerConnectorRunPlan): RetailerConnectorSnapshot {
@@ -2292,7 +2434,8 @@ export async function runRetailerConnector(input: RetailerConnectorRunInput): Pr
     fetchAttempted: false,
     parserAttempted: false,
     acceptedCount: 0,
-    rejectedCount: 0
+    rejectedCount: 0,
+    backpressureEvents: []
   };
 
   if (plan.status === 'blocked') return { ...baseResult, status: 'blocked', requiredActions: plan.requiredActions };
@@ -2324,9 +2467,13 @@ export async function runRetailerConnector(input: RetailerConnectorRunInput): Pr
       acceptedCount: ingestion.accepted.length,
       rejectedCount: ingestion.rejected.length,
       requiredActions,
+      backpressureEvents: [],
       error: ingestion.accepted.length === 0 && ingestion.rejected.length > 0 ? 'Every parsed connector record was rejected.' : undefined
     };
   } catch (error) {
+    const operation: RetailerConnectorOperationStage = parserAttempted ? 'parse' : 'fetch';
+    const backpressure = classifyBackpressureEvent(error, operation, input, input.requestedAt);
+    const backpressureEvents = backpressure ? [backpressure] : [];
     return {
       status: 'failed',
       plan,
@@ -2336,10 +2483,154 @@ export async function runRetailerConnector(input: RetailerConnectorRunInput): Pr
       parserAttempted,
       acceptedCount: 0,
       rejectedCount: 0,
-      requiredActions: ['investigate_connector_run_failure'],
+      requiredActions: backpressure ? [backpressureActionFor(backpressure.reason)] : ['investigate_connector_run_failure'],
+      backpressureEvents,
       error: error instanceof Error ? error.message : 'Unknown connector run error.'
     };
   }
+}
+
+class SourceMarketSemaphore {
+  private active = 0;
+  private readonly waiters: Array<() => void> = [];
+
+  constructor(private readonly limit: number) {}
+
+  async run<T>(task: () => T | Promise<T>): Promise<T> {
+    if (this.active >= this.limit) {
+      await new Promise<void>((resolve) => this.waiters.push(resolve));
+    }
+    this.active += 1;
+    try {
+      return await task();
+    } finally {
+      this.active -= 1;
+      this.waiters.shift()?.();
+    }
+  }
+}
+
+function limitForStage(limits: RetailerConnectorConcurrencyLimits | undefined, stage: RetailerConnectorOperationStage): number {
+  const configured = limits?.perSourceMarket?.[stage] ?? limits?.defaultPerSourceMarket ?? 2;
+  return Math.max(1, Math.floor(configured));
+}
+
+function uniqueStrings(values: string[]): string[] {
+  return [...new Set(values)];
+}
+
+export async function runDailyRetailerIngestion(input: DailyRetailerIngestionInput): Promise<DailyRetailerIngestionRunResult> {
+  const semaphores = new Map<string, SourceMarketSemaphore>();
+  const semaphoreFor = (
+    connector: DailyRetailerConnectorInput,
+    operation: RetailerConnectorOperationStage
+  ): SourceMarketSemaphore => {
+    const identity = sourceMarketIdentity(connector);
+    const key = `${identity.sourceKey}:${identity.market}:${operation}`;
+    const existing = semaphores.get(key);
+    if (existing) return existing;
+    const created = new SourceMarketSemaphore(limitForStage(input.limits, operation));
+    semaphores.set(key, created);
+    return created;
+  };
+
+  const runOne = async (connector: DailyRetailerConnectorInput): Promise<DailyRetailerConnectorRunRecord> => {
+    const identity = sourceMarketIdentity(connector);
+    const wrapped: RetailerConnectorRunInput = {
+      ...connector,
+      fetcher: (plan) => semaphoreFor(connector, 'fetch').run(() => connector.fetcher(plan)),
+      parser: (snapshot, plan) => semaphoreFor(connector, 'parse').run(() => connector.parser(snapshot, plan))
+    };
+    const run = await runRetailerConnector(wrapped);
+    const baseRequiredActions = [...run.requiredActions];
+    const baseBackpressure = [...run.backpressureEvents];
+    const baseDeferReasons = baseBackpressure.map((event) => event.reason);
+
+    if (run.status !== 'completed' || !connector.persister) {
+      return {
+        connectorId: connector.connectorId,
+        sourceKey: identity.sourceKey,
+        market: identity.market,
+        status: run.status,
+        run,
+        persistAttempted: false,
+        persistedCount: 0,
+        requiredActions: baseRequiredActions,
+        backpressureEvents: baseBackpressure,
+        deferReasons: baseDeferReasons,
+        error: run.error
+      };
+    }
+
+    try {
+      const persist = await semaphoreFor(connector, 'persist').run(() => connector.persister?.(run));
+      const persistBackpressure = persist?.backpressureEvents ?? [];
+      const requiredActions = uniqueStrings([...baseRequiredActions, ...(persist?.requiredActions ?? [])]);
+      const deferReasons = uniqueStrings([...baseDeferReasons, ...(persist?.deferReasons ?? []), ...persistBackpressure.map((event) => event.reason)]);
+      return {
+        connectorId: connector.connectorId,
+        sourceKey: identity.sourceKey,
+        market: identity.market,
+        status: persistBackpressure.length > 0 || deferReasons.length > 0 ? 'deferred' : 'persisted',
+        run,
+        persistAttempted: true,
+        persistedCount: persist?.persistedCount ?? run.acceptedCount,
+        requiredActions,
+        backpressureEvents: [...baseBackpressure, ...persistBackpressure],
+        deferReasons
+      };
+    } catch (error) {
+      const backpressure = classifyBackpressureEvent(error, 'persist', connector, input.now ?? connector.requestedAt);
+      const backpressureEvents = backpressure ? [...baseBackpressure, backpressure] : baseBackpressure;
+      const requiredActions = uniqueStrings([
+        ...baseRequiredActions,
+        backpressure ? backpressureActionFor(backpressure.reason) : 'investigate_connector_persist_failure'
+      ]);
+      const deferReasons = uniqueStrings([
+        ...baseDeferReasons,
+        ...(backpressure ? [backpressure.reason] : [])
+      ]);
+      return {
+        connectorId: connector.connectorId,
+        sourceKey: identity.sourceKey,
+        market: identity.market,
+        status: backpressure ? 'deferred' : 'failed',
+        run,
+        persistAttempted: true,
+        persistedCount: 0,
+        requiredActions,
+        backpressureEvents,
+        deferReasons,
+        error: error instanceof Error ? error.message : 'Unknown connector persist error.'
+      };
+    }
+  };
+
+  const records = await Promise.all(input.connectors.map(runOne));
+  const backpressureEvents = records.flatMap((record) => record.backpressureEvents);
+  const deferReasons = uniqueStrings(records.flatMap((record) => record.deferReasons));
+  const requiredActions = uniqueStrings(records.flatMap((record) => record.requiredActions));
+  const completedCount = records.filter((record) => record.status === 'completed' || record.status === 'persisted').length;
+  const failedCount = records.filter((record) => record.status === 'failed').length;
+  const deferredCount = records.filter((record) => record.status === 'deferred').length;
+  const persistedCount = records.reduce((sum, record) => sum + record.persistedCount, 0);
+  const status = failedCount === records.length && deferredCount === 0 && completedCount === 0
+    ? 'failed'
+    : failedCount > 0 || deferredCount > 0 || backpressureEvents.length > 0
+      ? 'degraded'
+      : 'completed';
+
+  return {
+    status,
+    records,
+    completedCount,
+    failedCount,
+    deferredCount,
+    persistedCount,
+    requiredActions,
+    backpressureEvents,
+    deferReasons
+  };
 }
 
 
