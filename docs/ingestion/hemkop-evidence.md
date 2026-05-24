@@ -411,7 +411,7 @@ Sample newly added rows:
 - Source: www.hemkop.se public Axfood campaign JSON
 - Store catalog source: https://www.hemkop.se/axfood/rest/store
 - Source URL pattern: https://www.hemkop.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100
-- Retrieved: 2026-05-24T11:23:37.652Z
+- Retrieved: 2026-05-24T14:13:14.711Z
 - Public store IDs with wired rows: 205
 - Source URLs fetched and cited in metadata: 615
 - Real weekly discount rows fetched and wired: 51058
