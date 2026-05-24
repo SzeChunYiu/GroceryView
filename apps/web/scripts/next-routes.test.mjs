@@ -21,6 +21,7 @@ const appFiles = [
   'src/app/store-coverage/page.tsx',
   'src/app/openprices-depth/page.tsx',
   'src/app/settings/page.tsx',
+  'src/components/category-filter.tsx',
   'src/components/market-shell.tsx',
   'src/components/settings-data-export-actions.tsx',
   'src/components/data-ui.tsx',
@@ -77,6 +78,19 @@ describe('verified-data UI', () => {
     assert.match(productsPage, /Out of stock/);
     assert.match(verified, /isAvailable/);
     assert.match(verified, /outOfStockLatestPriceCount/);
+  });
+
+  it('wires the accessible category filter into product search facets', async () => {
+    const productsPage = await read('src/app/products/page.tsx');
+    const categoryFilter = await read('src/components/category-filter.tsx');
+
+    assert.match(productsPage, /CategoryFilter/);
+    assert.match(productsPage, /facets=\{categoryFacets\}/);
+    assert.match(productsPage, /getCategoryHref/);
+    assert.match(productsPage, /searchFacetUrl\(\{ category \}\)/);
+    assert.match(productsPage, /selectedCategories=\{search\.filters\.categories\}/);
+    assert.match(categoryFilter, /aria-label="Filter products by category"/);
+    assert.match(categoryFilter, /aria-current=\{isSelected \? 'page' : undefined\}/);
   });
 
   it('makes unavailable private features fail closed instead of showing fabricated rows', async () => {
