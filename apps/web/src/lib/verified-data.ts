@@ -22,6 +22,7 @@ import {
   dbSiteMatpriskollenSource
 } from './generated/db-site-ingested-overrides';
 import { categoryLabels, pricedProducts } from './openprices-products';
+import { allergenRiskBadgesForText } from './search-filters';
 import { osmStores } from './osm-stores';
 import {
   currencyFromObservation,
@@ -571,7 +572,13 @@ function productSearchResultCards(searchResult: typeof rawFacetedProductSearch) 
       }) : unknownUnitPriceLabel,
       isAvailable: product.isAvailable,
       chainLabel: cheapest ? `${cheapest.chainName} · ${cheapest.priceType}` : 'Awaiting latest_prices row',
-      sourceTables: searchResult.evidence.sourceTables
+      sourceTables: searchResult.evidence.sourceTables,
+      allergenRiskBadges: allergenRiskBadgesForText([
+        product.canonicalName,
+        product.brand,
+        product.categoryPath.join(' '),
+        product.labels.join(' ')
+      ])
     };
   });
 }

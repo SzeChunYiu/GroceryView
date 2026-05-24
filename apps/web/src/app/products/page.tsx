@@ -304,6 +304,9 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">{product.brand}</p>
+                    {product.allergenRiskBadges.map((badge) => (
+                      <span className="rounded-full bg-amber-100 px-2 py-1 text-[0.65rem] font-black uppercase tracking-[0.14em] text-amber-900" key={badge.label} title={"Matched: " + badge.matchedTerms.join(", ")}>{badge.label}</span>
+                    ))}
                     {product.isAvailable === false ? (
                       <span className="rounded-full bg-rose-100 px-2 py-1 text-[0.65rem] font-black uppercase tracking-[0.14em] text-rose-900">Out of stock</span>
                     ) : null}
