@@ -104,6 +104,7 @@ export * from './connectors/matspar.js';
 export * from './connectors/lidl-bulk.js';
 export * from './connectors/willys-bulk.js';
 export * from './connectors/apohem.js';
+export * from './connectors/pressbyran-se.js';
 export * from './connectors/okq8-fuel.js';
 export * from './connectors/st1-fuel.js';
 export * from './connectors/willys.js';

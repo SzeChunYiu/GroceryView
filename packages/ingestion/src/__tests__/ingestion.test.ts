@@ -97,6 +97,8 @@ import {
   fetchWillysWeeklyDiscountsForAllStores,
   findPharmacyEanMatches,
   parseApohemProducts,
+  normalizePressbyranOffer,
+  parsePressbyranOfferJson,
   parseApotekHjartatProducts,
   parseIcaReklambladOffers,
   groceryCategoryCoicopMappings,
@@ -7307,5 +7309,37 @@ describe('daily ingestion runner', () => {
     assert.equal(result.status, 'blocked');
     assert.deepEqual(result.blockers, ['ica:robots_txt_allow_required', 'ica:legal_review_approval_required']);
     assert.equal(executor.calls.length, 0);
+  });
+});
+
+describe('Pressbyrån pricing quirks connector', () => {
+  it('marks Kompis app rewards as member coupon prices', () => {
+    const row = normalizePressbyranOffer({
+      title: 'Kompisfika app-kupong',
+      description: 'Medlemmar skannar QR-kod i appen för rabatt på liten varm dryck och fikabröd.',
+      priceText: '15 kr',
+      sourceUrl: 'https://www.pressbyran.se/handla-hos-oss/pressbyransapp/',
+      retrievedAt: '2026-05-24T12:00:00.000Z'
+    });
+
+    assert.equal(row.country, 'SE');
+    assert.equal(row.currency, 'SEK');
+    assert.equal(row.chain, 'pressbyran');
+    assert.equal(row.channel, 'store');
+    assert.equal(row.promotionType, 'member_coupon');
+    assert.equal(row.is_member_price, true);
+    assert.equal(row.is_coupon_price, true);
+    assert.equal(row.is_subscription_price, false);
+  });
+
+  it('marks ice-cream campaign delivery rows as case preorder multi-buy', () => {
+    const rows = parsePressbyranOfferJson(`
+      <script type="application/json">{"offers":[{"title":"Halva priset på all glass","description":"Förbeställ hela lådor via beställningsblankett med hemleverans via Wolt, Foodora och Uber Eats.","priceText":"10 kr"}]}</script>
+    `, 'https://www.pressbyran.se/handla-hos-oss/ata/glass-godis/halva-priset-pa-all-glass/', '2026-05-24T12:00:00.000Z');
+
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0]!.channel, 'delivery');
+    assert.deepEqual(rows[0]!.multi_buy, { type: 'case_preorder', detail: 'Primary source describes whole-box preorder/order-form flow.' });
+    assert.equal(rows[0]!.is_clearance, false);
   });
 });
