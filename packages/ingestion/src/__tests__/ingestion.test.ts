@@ -133,6 +133,8 @@ import {
   parseBrandedSwedishFuelStations,
   parseCoopDrPdfTextOffers,
   parseRetailerProductJsonSnapshot,
+  parseRema1000FlyerNoOffers,
+  REMA_1000_NO_FLYER_SOURCES,
   persistOpenFoodFactsProductMetadata,
   parseSt1FuelPriceHtml,
   planIngestionBatch,
@@ -7307,5 +7309,32 @@ describe('daily ingestion runner', () => {
     assert.equal(result.status, 'blocked');
     assert.deepEqual(result.blockers, ['ica:robots_txt_allow_required', 'ica:legal_review_approval_required']);
     assert.equal(executor.calls.length, 0);
+  });
+});
+
+describe('parseRema1000FlyerNoOffers', () => {
+  it('emits NO/NOK promotion rows and æ-app member prices', () => {
+    const rows = parseRema1000FlyerNoOffers([
+      {
+        id: 'ae-bananer-week-21',
+        title: 'Bananer',
+        subtitle: 'æ-pris',
+        price: 14.9,
+        observedAt: '2026-05-24T12:00:00.000Z',
+        validFrom: '2026-05-20',
+        validTo: '2026-05-26',
+        sourceUrl: REMA_1000_NO_FLYER_SOURCES.offers,
+        memberOnly: true,
+        multiBuyQuantity: 2,
+        multiBuyPrice: 25
+      }
+    ]);
+
+    assert.equal(rows[0]?.country, 'NO');
+    assert.equal(rows[0]?.currency, 'NOK');
+    assert.equal(rows[0]?.row_type, 'promotion');
+    assert.equal(rows[0]?.price_program, 'ae-app');
+    assert.equal(rows[0]?.is_member_price, true);
+    assert.deepEqual(rows[0]?.multi_buy, { quantity: 2, price: 25 });
   });
 });
