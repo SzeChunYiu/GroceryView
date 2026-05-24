@@ -56,6 +56,11 @@ describe('shopping list route', () => {
     assert.match(hook, /budgetHistory/);
     assert.match(hook, /capturedAt/);
     assert.match(hook, /saveBudgetSnapshot/);
+    assert.match(hook, /AUTO_BUDGET_SNAPSHOT_DELAY_MS/);
+    assert.match(hook, /pendingBulkImportBaselineSignature/);
+    assert.match(hook, /budgetSnapshotSignature/);
+    assert.match(hook, /latestSignature === currentBudgetSnapshotSignature/);
+    assert.match(hook, /setTimeout/);
 
     assert.match(bulkImport, /'use client'/);
     assert.match(bulkImport, /parseBulkImportLines/);
@@ -67,6 +72,7 @@ describe('shopping list route', () => {
     assert.match(bulkImport, /unmatchedLines/);
     assert.match(bulkImport, /estimatedPrice/);
     assert.match(bulkImport, /category: match\?\.category/);
+    assert.match(bulkImport, /auto-save if category totals changed/);
 
     assert.match(searchRoute, /searchRoutes/);
     assert.match(searchRoute, /products\/search\/list-import/);

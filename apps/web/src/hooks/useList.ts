@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 export type ShoppingListItem = {
   category: string;
@@ -43,6 +43,7 @@ type PersistedListState = {
 
 export const LIST_STORAGE_KEY = 'groceryview:shopping-list:checked:v1';
 export const MAX_BUDGET_HISTORY_SNAPSHOTS = 6;
+export const AUTO_BUDGET_SNAPSHOT_DELAY_MS = 650;
 
 export const listCategoryBudgets: Record<string, number> = {
   breakfast: 50,
@@ -154,6 +155,13 @@ function createBudgetHistorySnapshot(
     estimatedTotal,
     overspendCategories: buckets.filter((bucket) => bucket.status === 'over').map((bucket) => bucket.category)
   };
+}
+
+function budgetSnapshotSignature(buckets: ListBudgetBucket[], estimatedTotal: number) {
+  const bucketSignature = buckets
+    .map((bucket) => `${bucket.category}:${bucket.itemCount}:${bucket.spent}:${bucket.budget}:${bucket.remaining}:${bucket.status}`)
+    .join('|');
+  return `${estimatedTotal}|${bucketSignature}`;
 }
 
 function listStateFromStorage(value: string | null): Required<PersistedListState> {
@@ -271,6 +279,8 @@ export function useList() {
   const [items, setItems] = useState<ShoppingListItem[]>(() => withCheckedState({}));
   const [budgetHistory, setBudgetHistory] = useState<ListBudgetHistorySnapshot[]>([]);
   const [hasLoadedBrowserState, setHasLoadedBrowserState] = useState(false);
+  const [pendingBulkImportBaselineSignature, setPendingBulkImportBaselineSignature] = useState<string | null>(null);
+  const autoSnapshotTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     try {
@@ -297,7 +307,14 @@ export function useList() {
     setItems((currentItems) => currentItems.map((item) => ({ ...item, checked: false })));
   }, []);
 
+  const checkedCount = useMemo(() => items.filter((item) => item.checked).length, [items]);
+  const budgetBuckets = useMemo(() => summarizeListBudgetBuckets(items), [items]);
+  const budgetAlerts = useMemo(() => budgetBuckets.filter((bucket) => bucket.status === 'over'), [budgetBuckets]);
+  const estimatedTotal = useMemo(() => Math.round(items.reduce((sum, item) => sum + item.estimatedPrice, 0) * 100) / 100, [items]);
+  const currentBudgetSnapshotSignature = useMemo(() => budgetSnapshotSignature(budgetBuckets, estimatedTotal), [budgetBuckets, estimatedTotal]);
   const addImportedItems = useCallback((importedItems: BulkImportedListItemInput[]) => {
+    if (importedItems.length === 0) return;
+    setPendingBulkImportBaselineSignature(currentBudgetSnapshotSignature);
     setItems((currentItems) => {
       const existingIds = new Set(currentItems.map((item) => item.id));
       const nextImportedItems = importedItems
@@ -306,12 +323,7 @@ export function useList() {
 
       return [...currentItems, ...nextImportedItems];
     });
-  }, []);
-
-  const checkedCount = useMemo(() => items.filter((item) => item.checked).length, [items]);
-  const budgetBuckets = useMemo(() => summarizeListBudgetBuckets(items), [items]);
-  const budgetAlerts = useMemo(() => budgetBuckets.filter((bucket) => bucket.status === 'over'), [budgetBuckets]);
-  const estimatedTotal = useMemo(() => Math.round(items.reduce((sum, item) => sum + item.estimatedPrice, 0) * 100) / 100, [items]);
+  }, [currentBudgetSnapshotSignature]);
   const totalCount = items.length;
   const remainingCount = totalCount - checkedCount;
   const saveBudgetSnapshot = useCallback(() => {
@@ -320,6 +332,37 @@ export function useList() {
       ...currentHistory
     ].slice(0, MAX_BUDGET_HISTORY_SNAPSHOTS));
   }, [budgetBuckets, estimatedTotal]);
+
+  useEffect(() => () => {
+    if (autoSnapshotTimeoutRef.current) clearTimeout(autoSnapshotTimeoutRef.current);
+  }, []);
+
+  useEffect(() => {
+    if (!hasLoadedBrowserState || pendingBulkImportBaselineSignature === null) return;
+
+    if (currentBudgetSnapshotSignature === pendingBulkImportBaselineSignature) {
+      setPendingBulkImportBaselineSignature(null);
+      return;
+    }
+
+    if (autoSnapshotTimeoutRef.current) clearTimeout(autoSnapshotTimeoutRef.current);
+    autoSnapshotTimeoutRef.current = setTimeout(() => {
+      setBudgetHistory((currentHistory) => {
+        const nextSnapshot = createBudgetHistorySnapshot(budgetBuckets, estimatedTotal);
+        const latestSnapshot = currentHistory[0];
+        const latestSignature = latestSnapshot ? budgetSnapshotSignature(latestSnapshot.buckets, latestSnapshot.estimatedTotal) : '';
+
+        if (latestSignature === currentBudgetSnapshotSignature) return currentHistory;
+        return [nextSnapshot, ...currentHistory].slice(0, MAX_BUDGET_HISTORY_SNAPSHOTS);
+      });
+      setPendingBulkImportBaselineSignature(null);
+      autoSnapshotTimeoutRef.current = null;
+    }, AUTO_BUDGET_SNAPSHOT_DELAY_MS);
+
+    return () => {
+      if (autoSnapshotTimeoutRef.current) clearTimeout(autoSnapshotTimeoutRef.current);
+    };
+  }, [budgetBuckets, currentBudgetSnapshotSignature, estimatedTotal, hasLoadedBrowserState, pendingBulkImportBaselineSignature]);
 
   return {
     addImportedItems,

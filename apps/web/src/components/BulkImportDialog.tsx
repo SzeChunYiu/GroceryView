@@ -133,7 +133,7 @@ export function BulkImportDialog({ onImportItems }: Readonly<BulkImportDialogPro
   function importList() {
     if (importItems.length === 0) return;
     onImportItems(importItems);
-    setLastImportSummary(`Imported ${importItems.length} line(s), ${matchedCount} matched to the product catalog.`);
+    setLastImportSummary(`Imported ${importItems.length} line(s), ${matchedCount} matched to the product catalog. A budget snapshot will auto-save if category totals changed.`);
     setPlainText('');
   }
 
