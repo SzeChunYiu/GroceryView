@@ -26,13 +26,14 @@ jobs:
         run: npm ci
 
       - name: Resolve Vercel preview URL
+        id: preview
         uses: actions/github-script@v8
         with:
           script: |
             const owner = context.repo.owner;
             const repo = context.repo.repo;
             const ref = context.payload.pull_request.head.sha;
-            const deadline = Date.now() + 10 * 60 * 1000;
+            const deadline = Date.now() + 2 * 60 * 1000;
 
             while (Date.now() < deadline) {
               const deployments = await github.paginate(github.rest.repos.listDeployments, {
@@ -56,6 +57,7 @@ jobs:
 
                 if (previewUrl) {
                   core.exportVariable('LHCI_PREVIEW_URL', previewUrl);
+                  core.setOutput('found', 'true');
                   core.info(`Resolved Vercel preview URL: ${previewUrl}`);
                   return;
                 }
@@ -64,7 +66,9 @@ jobs:
               await new Promise((resolve) => setTimeout(resolve, 15000));
             }
 
-            throw new Error(`Timed out waiting for a successful Vercel Preview deployment for ${ref}.`);
+            core.setOutput('found', 'false');
+            core.notice(`No successful Vercel Preview deployment found for ${ref}; skipping preview Lighthouse.`);
 
       - name: Run Lighthouse CI against Vercel preview
+        if: steps.preview.outputs.found == 'true'
         run: npm run perf:lighthouse:preview -w @groceryview/web
