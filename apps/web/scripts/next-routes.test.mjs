@@ -874,6 +874,7 @@ describe('verified-data UI', () => {
 
   it('surfaces cross-chain commodity comparison by comparable unit on compare and product routes', async () => {
     const verified = await read('src/lib/verified-data.ts');
+    const chainCompare = await read('src/lib/chain-compare.ts');
     const compare = await read('src/app/compare/page.tsx');
     const product = await read('src/app/products/[slug]/page.tsx');
 
@@ -881,8 +882,14 @@ describe('verified-data UI', () => {
     assert.match(verified, /commodityComparisons/);
     assert.match(verified, /commodityComparisonForProduct/);
     assert.match(verified, /commodity\/alias match/);
+    assert.match(chainCompare, /commodityComparisonForProduct/);
+    assert.match(chainCompare, /matchType: 'commodity_alias'/);
+    assert.match(chainCompare, /unitLabel: `commodity\/alias kr\/\$\{comparableUnit\}`/);
     assert.match(compare, /commodityComparisons/);
     assert.match(compare, /Cross-chain commodity comparison/);
+    assert.match(compare, /Commodity\/alias unit-price matches/);
+    assert.match(compare, /Packaged\/barcode matches/);
+    assert.match(compare, /sourceConfidence \{formatPct\(cell\.sourceConfidence \* 100\)\}/);
     assert.match(compare, /kr\/\{comparison\.comparableUnit\}/);
     assert.match(product, /commodityComparisonForProduct/);
     assert.match(product, /Cheapest chain for this commodity/);
@@ -2380,7 +2387,9 @@ ${seo}`;
     assert.match(route, /productsParam/);
     assert.match(route, /Chain comparison table/);
     assert.match(route, /<table/);
-    assert.match(route, /comparison\.products\.map/);
+    assert.match(route, /comparison\.products\.filter/);
+    assert.match(route, /rowSections\.map/);
+    assert.match(route, /section\.rows\.map/);
     assert.match(route, /ICA/);
     assert.match(route, /Willys/);
     assert.match(route, /Coop/);
