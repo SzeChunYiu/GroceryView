@@ -5,9 +5,10 @@ import { AppNav } from '@/components/app-nav';
 import { BottomNav } from '@/components/bottom-nav';
 import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { useList } from '@/hooks/useList';
+import { listTemplates } from '@/lib/list-templates';
 
 export default function ShoppingListPage() {
-  const { addImportedItems, checkedCount, items, remainingCount, resetCheckedState, toggleItemChecked, totalCount } = useList();
+  const { addImportedItems, checkedCount, createListFromTemplate, items, remainingCount, resetCheckedState, toggleItemChecked, totalCount } = useList();
   const progress = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
 
   return (
@@ -30,6 +31,33 @@ export default function ShoppingListPage() {
         </div>
 
         <BulkImportDialog onImportItems={addImportedItems} />
+
+        <section className="mt-6 rounded-[1.75rem] border border-emerald-200 bg-white/95 p-5 shadow-sm">
+          <div>
+            <h2 className="text-2xl font-black tracking-tight text-slate-950">List templates</h2>
+            <p className="mt-1 text-sm font-semibold leading-6 text-slate-700">
+              Start a recurring basket in one click for common shopping occasions.
+            </p>
+          </div>
+          <div className="mt-4 grid gap-3 md:grid-cols-3">
+            {listTemplates.map((template) => (
+              <article className="rounded-[1.25rem] border border-emerald-100 bg-emerald-50/60 p-4" key={template.id}>
+                <h3 className="text-lg font-black text-slate-950">{template.title}</h3>
+                <p className="mt-1 min-h-12 text-sm font-semibold leading-6 text-slate-700">{template.description}</p>
+                <p className="mt-3 text-xs font-black uppercase tracking-[0.18em] text-emerald-800">
+                  {template.items.length} items
+                </p>
+                <button
+                  className="mt-3 inline-flex w-full items-center justify-center rounded-full bg-emerald-700 px-4 py-2 text-sm font-black text-white transition hover:bg-emerald-800"
+                  onClick={() => createListFromTemplate(template.items)}
+                  type="button"
+                >
+                  Create list
+                </button>
+              </article>
+            ))}
+          </div>
+        </section>
 
         <section className="mt-6 rounded-[1.75rem] border border-emerald-200 bg-white/95 p-5 shadow-sm">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

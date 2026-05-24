@@ -1,17 +1,20 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { ListTemplateItem } from '@/lib/list-templates';
 
 export type ShoppingListItem = {
   checked: boolean;
   detail: string;
   id: string;
-  importSource?: 'starter' | 'bulk-clipboard';
+  importSource?: 'starter' | 'bulk-clipboard' | 'template';
   matchedProductName?: string;
   matchedProductSlug?: string;
   name: string;
   quantity: string;
 };
+
+type ListItemInput = Omit<ShoppingListItem, 'checked'>;
 
 export type BulkImportedListItemInput = Omit<ShoppingListItem, 'checked'> & {
   importSource: 'bulk-clipboard';
@@ -20,6 +23,7 @@ export type BulkImportedListItemInput = Omit<ShoppingListItem, 'checked'> & {
 type PersistedListState = {
   checkedById?: Record<string, boolean>;
   importedItems?: BulkImportedListItemInput[];
+  savedItems?: ListItemInput[];
 };
 
 export const LIST_STORAGE_KEY = 'groceryview:shopping-list:checked:v1';
@@ -57,8 +61,19 @@ const baseListItems: Omit<ShoppingListItem, 'checked'>[] = [
   }
 ];
 
-function listStateFromStorage(value: string | null): Required<PersistedListState> {
-  const empty = { checkedById: {}, importedItems: [] };
+function isListItemInput(item: unknown): item is ListItemInput {
+  return (
+    item !== null
+    && typeof item === 'object'
+    && typeof (item as ListItemInput).id === 'string'
+    && typeof (item as ListItemInput).name === 'string'
+    && typeof (item as ListItemInput).quantity === 'string'
+    && typeof (item as ListItemInput).detail === 'string'
+  );
+}
+
+function listStateFromStorage(value: string | null): { checkedById: Record<string, boolean>; savedItems: ListItemInput[] } {
+  const empty = { checkedById: {}, savedItems: baseListItems };
   if (!value) return empty;
 
   try {
@@ -70,6 +85,7 @@ function listStateFromStorage(value: string | null): Required<PersistedListState
 
     const maybeCheckedById = 'checkedById' in parsed ? parsed.checkedById : parsed;
     const maybeImportedItems = 'importedItems' in parsed ? parsed.importedItems : [];
+    const maybeSavedItems = 'savedItems' in parsed ? parsed.savedItems : undefined;
 
     const checkedById = maybeCheckedById && typeof maybeCheckedById === 'object' && !Array.isArray(maybeCheckedById)
       ? Object.fromEntries(
@@ -90,16 +106,19 @@ function listStateFromStorage(value: string | null): Required<PersistedListState
       ))
       : [];
 
-    return { checkedById, importedItems };
+    const savedItems = Array.isArray(maybeSavedItems)
+      ? maybeSavedItems.filter(isListItemInput)
+      : [...baseListItems, ...importedItems];
+
+    return { checkedById, savedItems };
   } catch {
     return empty;
   }
 }
 
-function withCheckedState(checkedById: Record<string, boolean>, importedItems: BulkImportedListItemInput[] = []): ShoppingListItem[] {
-  const uniqueItems = new Map<string, Omit<ShoppingListItem, 'checked'>>();
-  for (const item of baseListItems) uniqueItems.set(item.id, item);
-  for (const item of importedItems) uniqueItems.set(item.id, item);
+function withCheckedState(checkedById: Record<string, boolean>, listItems: ListItemInput[] = baseListItems): ShoppingListItem[] {
+  const uniqueItems = new Map<string, ListItemInput>();
+  for (const item of listItems) uniqueItems.set(item.id, item);
 
   return [...uniqueItems.values()].map((item) => ({
     ...item,
@@ -110,18 +129,17 @@ function withCheckedState(checkedById: Record<string, boolean>, importedItems: B
 function persistCheckedState(items: ShoppingListItem[]) {
   try {
     const checkedById = Object.fromEntries(items.map((item) => [item.id, item.checked]));
-    const importedItems = items
-      .filter((item) => item.importSource === 'bulk-clipboard')
+    const savedItems = items
       .map((item) => ({
         detail: item.detail,
         id: item.id,
-        importSource: 'bulk-clipboard' as const,
+        importSource: item.importSource,
         matchedProductName: item.matchedProductName,
         matchedProductSlug: item.matchedProductSlug,
         name: item.name,
         quantity: item.quantity
       }));
-    localStorage.setItem(LIST_STORAGE_KEY, JSON.stringify({ checkedById, importedItems }));
+    localStorage.setItem(LIST_STORAGE_KEY, JSON.stringify({ checkedById, savedItems }));
   } catch {
     // Keep the check-off UI usable even when a browser blocks localStorage.
   }
@@ -133,8 +151,8 @@ export function useList() {
 
   useEffect(() => {
     try {
-      const { checkedById, importedItems } = listStateFromStorage(localStorage.getItem(LIST_STORAGE_KEY));
-      setItems(withCheckedState(checkedById, importedItems));
+      const { checkedById, savedItems } = listStateFromStorage(localStorage.getItem(LIST_STORAGE_KEY));
+      setItems(withCheckedState(checkedById, savedItems));
     } finally {
       setHasLoadedBrowserState(true);
     }
@@ -166,6 +184,10 @@ export function useList() {
     });
   }, []);
 
+  const createListFromTemplate = useCallback((templateItems: ListTemplateItem[]) => {
+    setItems(templateItems.map((item) => ({ ...item, importSource: 'template' as const, checked: false })));
+  }, []);
+
   const checkedCount = useMemo(() => items.filter((item) => item.checked).length, [items]);
   const totalCount = items.length;
   const remainingCount = totalCount - checkedCount;
@@ -173,6 +195,7 @@ export function useList() {
   return {
     addImportedItems,
     checkedCount,
+    createListFromTemplate,
     items,
     remainingCount,
     resetCheckedState,
