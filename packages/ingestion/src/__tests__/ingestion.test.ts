@@ -32,6 +32,7 @@ import {
   buildMatpriskollenStoresUrl,
   buildMathemSearchUrl,
   buildMatsparSearchUrl,
+  ASIA_SUPERMARKET_GBG_SOURCE_URL,
   buildOpenFoodFactsProductUrl,
   buildOpenFoodFactsSwedenSearchUrl,
   buildOpenPricesConnectorUrl,
@@ -47,6 +48,7 @@ import {
   buildWillysSearchUrl,
   buildWillysStoresUrl,
   buildWillysWeeklyDiscountsUrl,
+  fetchAsiaSupermarketGbgRows,
   extractOpenFoodFactsBarcodeFromAxfoodImageUrl,
   extractOpenFoodFactsBarcodeFromImageUrl,
   fetchOpenFoodFactsExportProducts,
@@ -123,6 +125,7 @@ import {
   offerSelectorFixtures,
   offerSelectorFixturesCanEmitOfferFacts,
   parseAxfoodStoreList,
+  parseAsiaSupermarketGbgSource,
   parseCityGrossSites,
   parseIcaStoreList,
   parseLidlStoreDirectoryLinks,
@@ -615,6 +618,88 @@ describe('OKQ8 fuel price connector', () => {
     ]);
     assert.equal(parsed.items.every((row) => row.sourceType === 'retailer_online_page'), true);
     assert.equal(parsed.items.every((row) => row.storeId === undefined), true);
+  });
+});
+
+describe('Asia Supermarket Gothenburg connector', () => {
+  const kvilleAsianFoodStoreHtml = `
+    <main>
+      <h1>Asian Food Store</h1>
+      <p>Välkommen till Asian Food Store – en liten del av Asien i Kville Saluhall.</p>
+      <p>Här hittar ni gyoza, dumplings, nudlar, kimchi, sticky rice, jasminris, frysta jätteräkor, asiatiska såser och snacks.</p>
+      <address>Gustaf Dalénsgatan 2, 417 22 Göteborg</address>
+    </main>
+  `;
+
+  it('skips the Gothenburg Asian store source when fewer than three stores are verified', () => {
+    const result = parseAsiaSupermarketGbgSource(kvilleAsianFoodStoreHtml, {
+      sourceUrl: ASIA_SUPERMARKET_GBG_SOURCE_URL,
+      fixtureRows: [
+        { id: 'jasmine-rice', name: 'Jasminris', category: 'rice', price: 49, unit: 'SEK/kg' }
+      ]
+    });
+
+    assert.equal(result.status, 'skipped');
+    assert.equal(result.store_count, 1);
+    assert.equal(result.minimum_store_count, 3);
+    assert.equal(result.chain, 'asia-supermarket-gbg');
+    assert.equal(result.retailer_type, 'ethnic_asian');
+    assert.equal(result.country, 'SE');
+    assert.equal(result.currency, 'SEK');
+    assert.deepEqual(result.rows, []);
+    assert.match(result.note, /below the 3-store chain threshold/);
+    assert.match(result.evidence[0], /Gustaf Dalénsgatan 2/);
+  });
+
+  it('applies the overlap category whitelist when a source clears the store threshold', () => {
+    const includedHtml = `
+      <main>
+        <h1>Asian Food Store</h1><address>Gustaf Dalénsgatan 2, 417 22 Göteborg</address>
+        <h1>Asian Food Store</h1><address>Gustaf Dalénsgatan 2, 417 22 Göteborg</address>
+        <h1>Asian Food Store</h1><address>Gustaf Dalénsgatan 2, 417 22 Göteborg</address>
+      </main>
+    `;
+
+    const result = parseAsiaSupermarketGbgSource(includedHtml, {
+      sourceUrl: ASIA_SUPERMARKET_GBG_SOURCE_URL,
+      fixtureRows: [
+        { id: 'jasmine-rice', name: 'Jasminris', category: 'rice', price: 49, unit: 'SEK/kg' },
+        { id: 'wok-pan', name: 'Wokpanna', category: 'cookware', price: 199, unit: 'SEK/st' }
+      ]
+    });
+
+    assert.equal(result.status, 'included');
+    assert.equal(result.rows.length, 1);
+    assert.deepEqual(result.rows[0], {
+      id: 'jasmine-rice',
+      name: 'Jasminris',
+      category: 'rice',
+      price: 49,
+      unit: 'SEK/kg',
+      country: 'SE',
+      currency: 'SEK',
+      chain: 'asia-supermarket-gbg',
+      retailer_type: 'ethnic_asian',
+      source_url: ASIA_SUPERMARKET_GBG_SOURCE_URL
+    });
+  });
+
+  it('fetches the source page and fails closed on blocked responses', async () => {
+    const requestedUrls: string[] = [];
+    const result = await fetchAsiaSupermarketGbgRows({
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return new Response(kvilleAsianFoodStoreHtml, { status: 200, headers: { 'content-type': 'text/html' } });
+      }
+    });
+
+    assert.deepEqual(requestedUrls, [ASIA_SUPERMARKET_GBG_SOURCE_URL]);
+    assert.equal(result.status, 'skipped');
+
+    await assert.rejects(
+      () => fetchAsiaSupermarketGbgRows({ fetchImpl: async () => new Response('Forbidden', { status: 403 }) }),
+      /blocked/
+    );
   });
 });
 
