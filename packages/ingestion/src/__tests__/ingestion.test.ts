@@ -4578,12 +4578,52 @@ describe('ingestRetailerProduct', () => {
 
     assert.equal(output.product.productKind, 'commodity');
     assert.equal(output.product.commodityId, 'tomato');
+    assert.equal(output.product.produceClassId, 'tomatoes');
     assert.equal(output.product.variant, 'vine');
     assert.equal(output.product.isOrganic, false);
     assert.equal(output.product.originCountry, 'SE');
     assert.equal(output.alias.matchConfidence, 0.68);
     assert.equal(output.priceObservation.confidenceScore, 0.68);
     assert.equal(output.priceObservation.unitPrice, 39.9);
+  });
+
+  it('maps sold-by-weight produce labels to produce class ids without raising mapping confidence', () => {
+    const base = {
+      sourceType: 'retailer_online_page' as const,
+      observedAt: '2026-05-22T09:00:00.000Z',
+      parserVersion: 'produce-classifier-v1',
+      rawSnapshotRef: 's3://groceryview-raw/willys/produce-classes-2026-05-22.json',
+      chainId: 'willys',
+      categoryId: 'frukt-gront',
+      packageSize: 1,
+      packageUnit: 'kg',
+      price: 29.9,
+      soldByWeight: true
+    };
+
+    const examples = [
+      ['Fast potatis lösvikt', 'potatoes'],
+      ['Royal Gala äpplen lösvikt', 'apples'],
+      ['Apelsiner lösvikt', 'citrus'],
+      ['Färska örter basilika i kruka', 'herbs'],
+      ['Champinjoner lösvikt', 'mushrooms'],
+      ['Spenat lösvikt', 'leafy-vegetables']
+    ] as const;
+
+    for (const [rawName, produceClassId] of examples) {
+      const output = ingestRetailerProduct({
+        ...base,
+        rawName,
+        canonicalName: rawName,
+        productId: `produce-${produceClassId}`,
+        retailerProductId: `retailer-${produceClassId}`
+      });
+
+      assert.equal(output.product.productKind, 'commodity', rawName);
+      assert.equal(output.product.produceClassId, produceClassId, rawName);
+      assert.equal(output.alias.matchConfidence, 0.68, rawName);
+      assert.equal(output.priceObservation.confidenceScore, 0.68, rawName);
+    }
   });
 
   it('rejects records that cannot preserve parser and raw snapshot provenance', () => {

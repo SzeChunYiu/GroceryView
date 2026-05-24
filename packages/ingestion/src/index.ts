@@ -2651,6 +2651,7 @@ export type RetailerProductInput = {
   barcode?: string;
   productKind?: 'branded' | 'commodity';
   commodityId?: string;
+  produceClassId?: string;
   fuelGradeId?: FuelGradeId;
   fuelSource?: {
     sourceKind: FuelPriceSourceKind;
@@ -2703,6 +2704,7 @@ export type IngestedProduct = {
   categoryId: string;
   productKind: 'branded' | 'commodity';
   commodityId?: string;
+  produceClassId?: string;
   fuelGradeId?: FuelGradeId;
   variant?: string;
   isOrganic: boolean;
@@ -2822,6 +2824,42 @@ function categoryHintsMatch(input: RetailerProductInput, commodity: Commodity): 
     .some((hint) => hint.length > 0 && (category.includes(hint) || hint.includes(category)));
 }
 
+const PRODUCE_CLASS_BY_COMMODITY_ID: Record<string, string> = {
+  tomato: 'tomatoes',
+  potato: 'potatoes',
+  apple: 'apples',
+  orange: 'citrus',
+  lemon: 'citrus',
+  lime: 'citrus',
+  mushroom: 'mushrooms',
+  'iceberg-lettuce': 'leafy-vegetables',
+  spinach: 'leafy-vegetables',
+  'white-cabbage': 'leafy-vegetables'
+};
+
+const PRODUCE_CLASS_PATTERNS: readonly { produceClassId: string; patterns: readonly RegExp[] }[] = [
+  { produceClassId: 'tomatoes', patterns: [/\btomat(?:er)?\b/, /\btomato(?:es)?\b/] },
+  { produceClassId: 'potatoes', patterns: [/\bpotatis\b/, /\bpotato(?:es)?\b/] },
+  { produceClassId: 'apples', patterns: [/\bappl(?:e|en)?\b/, /\bapple(?:s)?\b/] },
+  { produceClassId: 'citrus', patterns: [/\bcitrus\b/, /\bapelsin(?:er)?\b/, /\borange(?:s)?\b/, /\bcitron(?:er)?\b/, /\blemon(?:s)?\b/, /\blime\b/] },
+  { produceClassId: 'herbs', patterns: [/\bort(?:er)?\b/, /\bherb(?:s)?\b/, /\bbasilika\b/, /\bkoriander\b/, /\bpersilja\b/, /\bdill\b/, /\bgraslok\b/, /\btimjan\b/, /\brosemary\b/] },
+  { produceClassId: 'mushrooms', patterns: [/\bchampinjon(?:er)?\b/, /\bsvamp\b/, /\bmushroom(?:s)?\b/] },
+  { produceClassId: 'leafy-vegetables', patterns: [/\bsallad\b/, /\blettuce\b/, /\bspenat\b/, /\bspinach\b/, /\bkal\b/, /\bkale\b/, /\bvitkal\b/, /\bcabbage\b/, /\bruccola\b/, /\barugula\b/] }
+];
+
+function resolveProduceClassId(input: RetailerProductInput, commodity: Commodity): string | undefined {
+  const byCommodity = PRODUCE_CLASS_BY_COMMODITY_ID[commodity.slug];
+  if (byCommodity) return byCommodity;
+
+  const haystack = normalizeSearchText(`${input.rawName} ${input.canonicalName} ${input.categoryId} ${input.variant ?? ''}`);
+  return PRODUCE_CLASS_PATTERNS.find(({ patterns }) => patterns.some((pattern) => pattern.test(haystack)))?.produceClassId;
+}
+
+function resolveProduceClassIdFromInput(input: RetailerProductInput): string | undefined {
+  const haystack = normalizeSearchText(`${input.rawName} ${input.canonicalName} ${input.categoryId} ${input.variant ?? ''}`);
+  return PRODUCE_CLASS_PATTERNS.find(({ patterns }) => patterns.some((pattern) => pattern.test(haystack)))?.produceClassId;
+}
+
 function resolveCommodity(input: RetailerProductInput): Commodity | null {
   if (input.commodityId) {
     const explicit = findCommodity(input.commodityId);
@@ -2839,6 +2877,7 @@ function resolveCommodity(input: RetailerProductInput): Commodity | null {
 function classifyRetailerProduct(input: RetailerProductInput): {
   productKind: 'branded' | 'commodity';
   commodityId?: string;
+  produceClassId?: string;
   matchConfidence: number;
 } {
   const sourceConfidence = confidenceForSource(input.sourceType);
@@ -2846,10 +2885,21 @@ function classifyRetailerProduct(input: RetailerProductInput): {
   if (!requiresCommodityResolution) return { productKind: 'branded', matchConfidence: sourceConfidence };
 
   const commodity = resolveCommodity(input);
-  if (!commodity) throw new Error(`Could not resolve commodity mapping for ${input.rawName}.`);
+  if (!commodity) {
+    const produceClassId = input.produceClassId ?? resolveProduceClassIdFromInput(input);
+    if (produceClassId) {
+      return {
+        productKind: 'commodity',
+        produceClassId,
+        matchConfidence: Math.min(sourceConfidence, 0.68)
+      };
+    }
+    throw new Error(`Could not resolve commodity mapping for ${input.rawName}.`);
+  }
   return {
     productKind: 'commodity',
     commodityId: commodity.slug,
+    produceClassId: input.produceClassId ?? resolveProduceClassId(input, commodity),
     matchConfidence: Math.min(sourceConfidence, 0.68)
   };
 }
@@ -2879,6 +2929,7 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
       categoryId: input.categoryId,
       productKind: classification.productKind,
       commodityId: classification.commodityId,
+      produceClassId: classification.produceClassId,
       fuelGradeId: input.fuelGradeId,
       variant: input.variant,
       isOrganic: input.isOrganic ?? (/\b(eko|ekologisk|organic)\b/i.test(input.rawName) || /\b(eko|ekologisk|organic)\b/i.test(input.canonicalName)),
