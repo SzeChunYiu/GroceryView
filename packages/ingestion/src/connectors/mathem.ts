@@ -13,6 +13,15 @@ export type MathemProduct = {
   available: boolean;
   sourceUrl: string;
   retrievedAt: string;
+  channel: 'online';
+  format: 'online_grocery';
+  is_member_price: boolean;
+  is_subscription_price: boolean;
+  is_coupon_price: boolean;
+  is_clearance: boolean;
+  multi_buy?: string;
+  region_tag?: string;
+  store_id?: string;
 };
 
 type MathemSearchProduct = {
@@ -32,6 +41,9 @@ type MathemSearchProduct = {
     currency?: unknown;
     availability?: { isAvailable?: unknown };
     images?: Array<{ thumbnail?: { url?: unknown }; large?: { url?: unknown } }>;
+    campaign?: { name?: unknown; label?: unknown };
+    promotionText?: unknown;
+    badges?: Array<{ text?: unknown; label?: unknown }>;
   };
 };
 
@@ -216,6 +228,8 @@ export type FetchMathemProductsOptions = {
   pages?: readonly number[];
   maxRows?: number;
   retrievedAt?: string;
+  regionTag?: string;
+  storeId?: string;
 };
 
 export function buildMathemSearchUrl(query: string, page = 1): string {
@@ -249,7 +263,10 @@ export async function fetchMathemProducts(options: FetchMathemProductsOptions = 
       }
 
       for (const product of parseMathemSearchProducts(await response.text())) {
-        const row = normalizeMathemProduct(product, sourceUrl, retrievedAt);
+        const context: { regionTag?: string; storeId?: string } = {};
+        if (options.regionTag) context.regionTag = options.regionTag;
+        if (options.storeId) context.storeId = options.storeId;
+        const row = normalizeMathemProduct(product, sourceUrl, retrievedAt, context);
         if (!row || seenCodes.has(row.code)) {
           continue;
         }
@@ -280,7 +297,8 @@ export function parseMathemSearchProducts(html: string): MathemSearchProduct[] {
 export function normalizeMathemProduct(
   product: MathemSearchProduct,
   sourceUrl: string,
-  retrievedAt: string
+  retrievedAt: string,
+  context: { regionTag?: string; storeId?: string } = {}
 ): MathemProduct | null {
   const attributes = product.attributes;
   const code = text(attributes?.id ?? product.id);
@@ -292,7 +310,7 @@ export function normalizeMathemProduct(
 
   const unitPrice = numberFromText(attributes.grossUnitPrice);
   const unit = text(attributes.unitPriceQuantityAbbreviation);
-  return {
+  const row: MathemProduct = {
     code,
     name,
     brand: text(attributes.brand),
@@ -306,8 +324,31 @@ export function normalizeMathemProduct(
     productUrl: absoluteMathemUrl(attributes.frontUrl ?? attributes.absoluteUrl),
     available: attributes.availability?.isAvailable === true,
     sourceUrl,
-    retrievedAt
+    retrievedAt,
+    channel: 'online',
+    format: 'online_grocery',
+    is_member_price: false,
+    is_subscription_price: false,
+    is_coupon_price: false,
+    is_clearance: false
   };
+
+  const multiBuy = multiBuyFromAttributes(attributes);
+  if (multiBuy) row.multi_buy = multiBuy;
+  if (context.regionTag) row.region_tag = context.regionTag;
+  if (context.storeId) row.store_id = context.storeId;
+  return row;
+}
+
+function multiBuyFromAttributes(attributes: NonNullable<MathemSearchProduct['attributes']>): string | undefined {
+  const candidates = [
+    attributes.promotionText,
+    attributes.campaign?.name,
+    attributes.campaign?.label,
+    ...(attributes.badges ?? []).flatMap((badge) => [badge.text, badge.label])
+  ].map(text).filter(Boolean);
+
+  return candidates.find((candidate) => /\b\d+\s*(?:för|for)\s*\d+/i.test(candidate));
 }
 
 function visit(value: unknown, products: MathemSearchProduct[]): void {

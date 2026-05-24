@@ -2916,8 +2916,71 @@ describe('fetchMathemProducts', () => {
       productUrl: 'https://www.mathem.se/se/products/6448-kungsornen-gammaldags-idealmakaroner/',
       available: true,
       sourceUrl: buildMathemSearchUrl('makaroner'),
-      retrievedAt: '2026-05-21T01:00:00.000Z'
+      retrievedAt: '2026-05-21T01:00:00.000Z',
+      channel: 'online',
+      format: 'online_grocery',
+      is_member_price: false,
+      is_subscription_price: false,
+      is_coupon_price: false,
+      is_clearance: false
     }]);
+  });
+
+  it('surfaces documented online channel, region/store context, and explicit Mathem multi-buy rows', async () => {
+    const nextData = {
+      props: {
+        pageProps: {
+          dehydratedState: {
+            queries: [{
+              state: {
+                data: {
+                  items: [{
+                    id: 2,
+                    type: 'product',
+                    attributes: {
+                      id: 2,
+                      fullName: 'LOWCALY Fruktdryck Mango Sockerfri',
+                      brand: 'LOWCALY',
+                      nameExtra: '1 l',
+                      frontUrl: '/se/products/2-lowcaly-fruktdryck-mango/',
+                      grossPrice: '16.99',
+                      grossUnitPrice: '16.99',
+                      unitPriceQuantityAbbreviation: 'l',
+                      currency: 'SEK',
+                      availability: { isAvailable: true },
+                      badges: [{ text: '2 för 30 kr' }]
+                    }
+                  }]
+                }
+              }
+            }]
+          }
+        }
+      }
+    };
+    const fetchImpl: typeof fetch = async () => new Response(`<script id="__NEXT_DATA__" type="application/json">${JSON.stringify(nextData)}</script>`, {
+      status: 200,
+      headers: { 'content-type': 'text/html' }
+    });
+
+    const rows = await fetchMathemProducts({
+      queries: ['lowcaly'],
+      pages: [1],
+      fetchImpl,
+      regionTag: 'stockholm',
+      storeId: 'mathem-stockholm',
+      retrievedAt: '2026-05-21T01:00:00.000Z'
+    });
+
+    assert.equal(rows[0].channel, 'online');
+    assert.equal(rows[0].format, 'online_grocery');
+    assert.equal(rows[0].region_tag, 'stockholm');
+    assert.equal(rows[0].store_id, 'mathem-stockholm');
+    assert.equal(rows[0].multi_buy, '2 för 30 kr');
+    assert.equal(rows[0].is_member_price, false);
+    assert.equal(rows[0].is_subscription_price, false);
+    assert.equal(rows[0].is_coupon_price, false);
+    assert.equal(rows[0].is_clearance, false);
   });
 
   it('deduplicates products across Mathem search queries', async () => {
