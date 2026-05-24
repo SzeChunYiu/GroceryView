@@ -7,11 +7,24 @@ import { categorySummaries } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
-  return routeMetadata({
+  const metadata = routeMetadata({
     path: '/heatmap',
     title: 'Grocery chain price heatmap | GroceryView',
-    description: 'Scan category-by-chain grocery index cells built from verified chain price observations and confidence-labelled index coverage.'
+    description: 'Scan category-by-chain grocery index cells built from verified chain price observations and confidence-labelled index coverage.',
+    imagePath: '/pwa-icon.svg',
+    imageAlt: 'GroceryView category x chain heatmap preview'
   });
+  const openGraph = metadata.openGraph;
+
+  return {
+    ...metadata,
+    twitter: {
+      card: 'summary_large_image',
+      title: openGraph?.title ?? metadata.title,
+      description: openGraph?.description ?? metadata.description,
+      images: openGraph?.images
+    }
+  };
 }
 
 const groceryIndex = calculateChainPriceIndex([
