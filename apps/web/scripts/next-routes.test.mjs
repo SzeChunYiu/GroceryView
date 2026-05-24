@@ -836,6 +836,8 @@ describe('verified-data UI', () => {
   it('ships a no-persistence cross-chain basket calculator from DB-backed current prices', async () => {
     const route = await read('src/app/basket/page.tsx');
     const calculator = await read('src/components/basket-calculator.tsx');
+    const actions = await read('src/components/basket-actions.tsx');
+    const totals = await read('src/components/basket-totals.tsx');
     const seo = await read('src/lib/seo.ts');
     const nav = await read('src/components/app-nav.tsx');
 
@@ -851,10 +853,14 @@ describe('verified-data UI', () => {
     assert.match(calculator, /useState/);
     assert.match(calculator, /compareBasketStrategies/);
     assert.match(calculator, /summarizeStoreBasketCoverage/);
-    assert.match(calculator, /Best full-chain total/);
-    assert.match(calculator, /Cheapest split basket/);
-    assert.match(calculator, /No state persistence/);
+    assert.match(calculator, /BasketActions/);
+    assert.match(calculator, /BasketTotals/);
     assert.doesNotMatch(calculator, /localStorage|sessionStorage/);
+
+    assert.match(actions, /No state persistence/);
+    assert.match(totals, /Best full-chain total/);
+    assert.match(totals, /Cheapest split basket/);
+    assert.match(totals, /No state persistence/);
 
     assert.match(seo, /'\/basket'/);
     assert.match(nav, /href: '\/basket'/);
