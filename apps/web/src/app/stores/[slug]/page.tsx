@@ -10,6 +10,7 @@ import {
   storePricePercentileRanks,
   storeUniverse
 } from '@/lib/verified-data';
+import { storePageViewScript } from '@/lib/analytics';
 import { metadataForStore } from '@/lib/seo';
 
 type ConfidenceLevel = 'high' | 'medium' | 'low';
@@ -128,9 +129,15 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
   const pricePercentileRank = storePricePercentileRankFor(store);
   const openingHoursLabel = storeOpeningHoursLabel(store);
   const assortmentOverview = storeAssortmentOverviewForStore(store);
+  const storeViewAnalyticsScript = storePageViewScript({
+    brand: store.brand,
+    storeName: store.name,
+    storeSlug: store.slug
+  });
 
   return (
     <PageShell>
+      <script dangerouslySetInnerHTML={{ __html: storeViewAnalyticsScript }} />
       <Eyebrow>OSM store record</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">{store.name}</h1>
       <p className="mt-3 text-lg text-slate-700">
