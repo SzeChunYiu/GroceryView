@@ -40,7 +40,9 @@ import {
   fetchOpenFoodFactsSwedenCatalog,
   buildOpenFoodFactsSwedenSearchUrl,
   fetchIcaReklambladOffers,
+  fetchOkq8FuelPrices,
   fetchPharmacyProducts,
+  fetchSt1FuelPrices,
   fetchWillysProducts,
   fetchWillysWeeklyDiscountsForAllStores
 } from '../../packages/ingestion/dist/index.js';
@@ -201,11 +203,29 @@ if (shouldRun('ica-reklamblad')) {
   summary.icaReklambladOffers = icaReklambladOffers.length;
 }
 
+if (shouldRun('okq8-fuel-prices')) {
+  const okq8FuelPrices = (await fetchOkq8FuelPrices({ capturedAt: retrievedAt }))
+    .map((row) => ({ ...row, retrievedAt: row.capturedAt }));
+  await writeOkq8FuelPrices(okq8FuelPrices);
+  summary.okq8FuelPrices = okq8FuelPrices.length;
+}
+
+if (shouldRun('st1-fuel-prices')) {
+  const st1FuelPrices = (await fetchSt1FuelPrices({ retrievedAt }))
+    .map((row) => ({
+      ...row,
+      sourceUrl: row.provenance.sourceUrl,
+      retrievedAt: row.provenance.capturedAt
+    }));
+  await writeSt1FuelPrices(st1FuelPrices);
+  summary.st1FuelPrices = st1FuelPrices.length;
+}
+
 if (shouldRun('apohem')) {
   const pharmacyProducts = await fetchPharmacyProducts({
     sourcePaths: APOHEM_SOURCE_PATHS,
     apotekHjartatUrls: APOTEK_HJARTAT_SEARCH_URLS,
-    maxRows: 900,
+    maxRows: 1200,
     retrievedAt
   });
   await writeApohem(pharmacyProducts);
@@ -898,6 +918,107 @@ async function writeApohem(rows) {
     `export const apohemProducts: ApohemIngestedProduct[] = ${literal(rows)};`,
     '',
     'export const pharmacyProducts = apohemProducts;',
+    ''
+  ]);
+}
+
+async function writeOkq8FuelPrices(rows) {
+  await writeGeneratedFile('okq8-fuel-prices.ts', [
+    '// AUTO-GENERATED from OKQ8 public business fuel price page.',
+    '// Source URL: https://www.okq8.se/foretag/priser/',
+    `// Retrieved: ${retrievedAt}`,
+    `// Row count: ${rows.length} real operator fuel price rows fetched from okq8.se.`,
+    '',
+    'export type Okq8FuelPriceIngestedObservation = {',
+    "  domain: 'fuel';",
+    "  productId: 'fuel-95-e10' | 'fuel-98' | 'fuel-diesel' | 'fuel-hvo100' | 'fuel-e85';",
+    "  fuelGrade: '95' | '98' | 'diesel' | 'hvo100' | 'e85';",
+    '  gradeLabel: string;',
+    "  chainId: 'okq8';",
+    "  operatorName: 'OKQ8';",
+    "  sourceKind: 'operator_public_price_page';",
+    '  sourceUrl: string;',
+    '  observedAt: string;',
+    '  capturedAt: string;',
+    '  effectiveFrom: string;',
+    '  pricePerLitre: number;',
+    "  currency: 'SEK';",
+    "  unit: 'l';",
+    '  confidence: number;',
+    '  provenance: {',
+    "    source: 'okq8_fuel_prices';",
+    '    sourceUrl: string;',
+    '    parserVersion: string;',
+    '    rawSnapshotRef: string;',
+    '    originalTitle: string;',
+    '    originalPriceText: string;',
+    '    originalEffectiveDate: string;',
+    '  };',
+    '  retrievedAt: string;',
+    '};',
+    '',
+    `export const okq8FuelPriceSource = ${literal({
+      source: 'OKQ8 public business fuel price page',
+      retrievedAt,
+      rowCount: rows.length,
+      sourceUrl: 'https://www.okq8.se/foretag/priser/',
+      parserVersion: 'okq8-fuel-prices-v1'
+    })} as const;`,
+    '',
+    `export const okq8FuelPriceObservations: Okq8FuelPriceIngestedObservation[] = ${literal(rows)};`,
+    ''
+  ]);
+}
+
+async function writeSt1FuelPrices(rows) {
+  await writeGeneratedFile('st1-fuel-prices.ts', [
+    '// AUTO-GENERATED from St1 public business fuel list price page.',
+    '// Source URL: https://st1.se/foretag/listpris',
+    `// Retrieved: ${retrievedAt}`,
+    `// Row count: ${rows.length} real operator fuel price rows fetched from st1.se.`,
+    '',
+    'export type St1FuelPriceIngestedObservation = {',
+    '  id: string;',
+    "  domain: 'fuel';",
+    "  grade: '95' | '98' | 'diesel' | 'HVO100' | 'E85';",
+    '  label: string;',
+    '  pricePerLitre: number;',
+    "  currency: 'SEK';",
+    '  litreBasis: 1;',
+    '  observedAt: string;',
+    '  validFrom: string;',
+    '  confidence: number;',
+    '  source: {',
+    '    id: string;',
+    "    kind: 'operator';",
+    '    name: string;',
+    '    operatorName: string;',
+    '    sourceUrl: string;',
+    "    legalReviewStatus: 'approved';",
+    '  };',
+    '  provenance: {',
+    '    sourceRunId: string;',
+    '    sourceUrl: string;',
+    '    capturedAt: string;',
+    '    parserVersion: string;',
+    '    contentDigest: {',
+    "      algorithm: 'sha-256';",
+    '      value: string;',
+    '    };',
+    '  };',
+    '  sourceUrl: string;',
+    '  retrievedAt: string;',
+    '};',
+    '',
+    `export const st1FuelPriceSource = ${literal({
+      source: 'St1 public business fuel list price page',
+      retrievedAt,
+      rowCount: rows.length,
+      sourceUrl: 'https://st1.se/foretag/listpris',
+      parserVersion: 'st1-fuel-listpris-v1'
+    })} as const;`,
+    '',
+    `export const st1FuelPriceObservations: St1FuelPriceIngestedObservation[] = ${literal(rows)};`,
     ''
   ]);
 }
