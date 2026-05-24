@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 import {
+  AFROSHOP_SE_LOCATIONS,
   buildCoopCategoryProductsUrl,
   buildCoopCategoryTreeUrl,
   buildCoopSearchUrl,
@@ -123,6 +124,7 @@ import {
   offerSelectorFixtures,
   offerSelectorFixturesCanEmitOfferFacts,
   parseAxfoodStoreList,
+  parseAfroshopSeProducts,
   parseCityGrossSites,
   parseIcaStoreList,
   parseLidlStoreDirectoryLinks,
@@ -198,6 +200,37 @@ describe('confidenceForSource', () => {
     assert.equal(confidenceForSource('flyer_campaign'), 0.7);
     assert.equal(confidenceForSource('manual_user_report'), 0.5);
     assert.equal(confidenceForSource('estimated'), 0.25);
+  });
+});
+
+describe('Afroshop SE connector', () => {
+  it('keeps ethnic African grocery rows in overlapping categories and carries multi-location evidence', () => {
+    const rows = parseAfroshopSeProducts(`
+      <article data-afroshop-product data-product-id="plantain-chips" data-category="snacks" data-package="85 g">
+        <a href="/products/plantain-chips"><img src="/images/plantain.jpg" /></a>
+        <h2 class="name">Plantain chips</h2>
+        <span class="price">39 kr</span>
+      </article>
+      <article data-afroshop-product data-product-id="shea-butter" data-category="beauty">
+        <h2 class="name">Shea butter</h2>
+        <span class="price">69 kr</span>
+      </article>
+      <article data-afroshop-product data-product-id="palm-oil" data-category="oils" data-package="500 ml">
+        <a href="/products/palm-oil"></a>
+        <h2 class="name">Red palm oil</h2>
+        <span class="price">79,50 SEK</span>
+      </article>
+    `, 'https://afroshop.example/catalogue', '2026-05-24T12:00:00.000Z');
+
+    assert.equal(AFROSHOP_SE_LOCATIONS.length >= 2, true);
+    assert.deepEqual(rows.map((row) => row.productId), ['plantain-chips', 'palm-oil']);
+    assert.equal(rows[0]?.country, 'SE');
+    assert.equal(rows[0]?.currency, 'SEK');
+    assert.equal(rows[0]?.chain, 'afroshop');
+    assert.equal(rows[0]?.retailer_type, 'ethnic_african');
+    assert.equal(rows[0]?.category, 'snacks');
+    assert.equal(rows[0]?.locations.length, AFROSHOP_SE_LOCATIONS.length);
+    assert.equal(rows[1]?.price, 79.5);
   });
 });
 
