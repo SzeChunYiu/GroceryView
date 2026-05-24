@@ -1,3 +1,20 @@
+/**
+ * ConfidenceBadge renders the compact trust indicator used beside product, store,
+ * and chain evidence summaries when the UI needs to explain how dependable a
+ * comparison is. Consumers provide a semantic confidence level, a short label,
+ * and optionally the sample size behind the score.
+ *
+ * Accessibility: the badge is plain text inside a non-interactive inline element.
+ * The colored status dot is marked aria-hidden so screen readers announce the
+ * label and optional sample size without redundant color-only information.
+ *
+ * Dependencies: styling is limited to Tailwind utility classes from the web app
+ * design system; no runtime providers, icons, or data-fetching hooks are needed.
+ *
+ * Edge cases: omit sampleSize when the backing evidence count is unknown. The
+ * component still renders the supplied confidence label, and the explicit level
+ * mapping keeps unsupported visual states from appearing silently.
+ */
 type ConfidenceBadgeProps = {
   level: "high" | "medium" | "low";
   label: string;
