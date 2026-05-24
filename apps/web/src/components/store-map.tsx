@@ -69,6 +69,29 @@ function districtHeatColor(score: number): string {
   return '#D94F3D';
 }
 
+function storeOpenHours(store: OsmStore): string {
+  const record = store as OsmStore & Record<string, unknown>;
+  const value = record.opening_hours ?? record.openingHours ?? record.hours;
+  return typeof value === 'string' && value.trim() ? value : 'Open hours not listed';
+}
+
+function distanceFromStockholmKm(store: OsmStore): number {
+  const toRadians = (value: number) => (value * Math.PI) / 180;
+  const earthRadiusKm = 6371;
+  const dLat = toRadians(store.lat - STOCKHOLM[1]);
+  const dLng = toRadians(store.lng - STOCKHOLM[0]);
+  const lat1 = toRadians(STOCKHOLM[1]);
+  const lat2 = toRadians(store.lat);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+  return 2 * earthRadiusKm * Math.asin(Math.sqrt(a));
+}
+
+function formatDistance(km: number): string {
+  return `${km < 10 ? km.toFixed(1) : km.toFixed(0)} km from central Stockholm`;
+}
+
 function escapeHtml(value: string): string {
   return value
     .replace(/&/g, '&amp;')
@@ -93,6 +116,8 @@ function toFeatureCollection(): GeoJSON.FeatureCollection<GeoJSON.Point> {
           format: s.format || 'store',
           district: s.district || s.city || '',
           address: s.address || '',
+          openHours: storeOpenHours(s),
+          distanceKm: distanceFromStockholmKm(s),
           color: chainIndexColor(chainIndexScore(s.brand || ''), chainColor(s.brand || '')),
           lat: s.lat,
           lng: s.lng,
@@ -183,6 +208,7 @@ export function StoreMap() {
     );
 
     const popup = new maplibregl.Popup({ closeButton: true, closeOnClick: true, maxWidth: '280px' });
+    const clusterPopup = new maplibregl.Popup({ closeButton: true, closeOnClick: true, maxWidth: '320px' });
 
     map.on('load', () => {
       map.addSource('district-heat', {
@@ -256,8 +282,29 @@ export function StoreMap() {
         if (!feature) return;
         const clusterId = feature.properties?.cluster_id;
         const source = map.getSource('stores') as maplibregl.GeoJSONSource;
+        const [lng, lat] = (feature.geometry as GeoJSON.Point).coordinates;
+
+        source.getClusterLeaves(clusterId, 5, 0).then((leaves) => {
+          const rows = leaves
+            .map((leaf) => {
+              const p = leaf.properties as Record<string, string | number | undefined>;
+              const distance = typeof p.distanceKm === 'number' ? formatDistance(p.distanceKm) : '';
+              return `<li style="margin-top:6px"><strong>${escapeHtml(String(p.name ?? 'Store'))}</strong><br/><span style="color:#64748b">${escapeHtml(distance)} · ${escapeHtml(String(p.openHours ?? 'Open hours not listed'))}</span></li>`;
+            })
+            .join('');
+          clusterPopup
+            .setLngLat([lng, lat])
+            .setHTML(
+              `<div style="font-family:inherit;min-width:220px">
+                 <strong>${Number(feature.properties?.point_count ?? 0).toLocaleString()} stores in this dense area</strong>
+                 <div style="font-size:12px;color:#475569;margin-top:4px">Zoom in to separate clustered markers.</div>
+                 <ul style="list-style:none;margin:6px 0 0;padding:0;font-size:12px">${rows}</ul>
+               </div>`,
+            )
+            .addTo(map);
+        });
+
         source.getClusterExpansionZoom(clusterId).then((zoom) => {
-          const [lng, lat] = (feature.geometry as GeoJSON.Point).coordinates;
           map.easeTo({ center: [lng, lat], zoom });
         });
       });
@@ -281,8 +328,10 @@ export function StoreMap() {
                  <span style="width:10px;height:10px;border-radius:50%;background:${escapeHtml(p.color)};display:inline-block"></span>
                  <strong style="font-size:14px">${escapeHtml(p.name)}</strong>
                </div>
-              <div style="font-size:12px;color:#475569">${escapeHtml(p.brand)} · ${escapeHtml(p.format)}</div>
+               <div style="font-size:12px;color:#475569">${escapeHtml(p.brand)} · ${escapeHtml(p.format)}</div>
                ${p.chainIndex ? `<div style="font-size:12px;color:#475569;margin-top:2px">Chain index ${Number(p.chainIndex).toFixed(1)} (100 = market)</div>` : ''}
+               <div style="font-size:12px;color:#475569;margin-top:2px">${escapeHtml(formatDistance(Number(p.distanceKm) || 0))}</div>
+               <div style="font-size:12px;color:#475569;margin-top:2px">Hours: ${escapeHtml(p.openHours || 'Open hours not listed')}</div>
                ${where ? `<div style="font-size:12px;color:#64748b;margin-top:2px">${where}</div>` : ''}
                <a href="${directions}" target="_blank" rel="noopener noreferrer"
                   style="display:inline-block;margin-top:8px;font-size:12px;font-weight:600;color:#1D8649">
