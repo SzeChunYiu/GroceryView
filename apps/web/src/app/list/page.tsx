@@ -5,10 +5,12 @@ import { AppNav } from '@/components/app-nav';
 import { BottomNav } from '@/components/bottom-nav';
 import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { useList } from '@/hooks/useList';
+import { calculateBasketForecast } from '@/lib/basket-forecast';
 
 export default function ShoppingListPage() {
   const { addImportedItems, checkedCount, items, remainingCount, resetCheckedState, toggleItemChecked, totalCount } = useList();
   const progress = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
+  const forecast = calculateBasketForecast(items);
 
   return (
     <div className="min-h-screen bg-[#f5f1e8] text-slate-950">
@@ -30,6 +32,33 @@ export default function ShoppingListPage() {
         </div>
 
         <BulkImportDialog onImportItems={addImportedItems} />
+
+        <section className="mt-6 rounded-[1.75rem] border border-amber-200 bg-amber-50/90 p-5 shadow-sm">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-800">Basket forecast</p>
+              <h2 className="mt-1 text-2xl font-black tracking-tight text-slate-950">Expected checkout total</h2>
+              <p className="mt-1 text-sm font-semibold leading-6 text-slate-700">
+                Rolling price bands estimate the remaining {forecast.itemCount} items before checkout and flag possible spend drift.
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded-2xl border border-amber-200 bg-white px-4 py-3">
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-800">Expected</p>
+                <p className="mt-1 text-2xl font-black text-slate-950">${forecast.expectedTotal.toFixed(2)}</p>
+              </div>
+              <div className="rounded-2xl border border-amber-200 bg-white px-4 py-3">
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-800">Price band</p>
+                <p className="mt-1 text-lg font-black text-slate-950">${forecast.lowTotal.toFixed(2)}–${forecast.highTotal.toFixed(2)}</p>
+              </div>
+              <div className="rounded-2xl border border-amber-200 bg-white px-4 py-3">
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-800">Variance</p>
+                <p className="mt-1 text-2xl font-black text-slate-950">±${(forecast.variance / 2).toFixed(2)}</p>
+                <p className="text-xs font-bold text-slate-600">{forecast.confidence}% confidence</p>
+              </div>
+            </div>
+          </div>
+        </section>
 
         <section className="mt-6 rounded-[1.75rem] border border-emerald-200 bg-white/95 p-5 shadow-sm">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
