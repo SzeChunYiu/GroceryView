@@ -18,6 +18,7 @@ import {
   createDailyIngestionQueryExecutor,
   DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_IDS,
   DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_IDS,
+  buildGranngardenSearchUrl,
   buildHemkopCategoryUrl,
   buildHemkopSearchUrl,
   buildHemkopStoresUrl,
@@ -72,6 +73,7 @@ import {
   fetchCoopWeeklyDiscounts,
   fetchCoopWeeklyDiscountsForAllStores,
   fetchDailyConnectorSnapshot,
+  fetchGranngardenProducts,
   fetchHemkopProducts,
   fetchHemkopProductsForAllStores,
   fetchHemkopStores,
@@ -123,6 +125,7 @@ import {
   offerSelectorFixtures,
   offerSelectorFixturesCanEmitOfferFacts,
   parseAxfoodStoreList,
+  parseGranngardenProducts,
   parseCityGrossSites,
   parseIcaStoreList,
   parseLidlStoreDirectoryLinks,
@@ -2957,6 +2960,67 @@ describe('fetchMathemProducts', () => {
     });
 
     assert.equal(rows.length, 1);
+  });
+});
+
+describe('fetchGranngardenProducts', () => {
+  it('parses Granngården household and pet products from JSON-LD', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(`
+        <script type="application/ld+json">{
+          "@context":"https://schema.org",
+          "@type":"ItemList",
+          "itemListElement":[{
+            "@type":"Product",
+            "sku":"gg-hundmat-12kg",
+            "name":"Hundmat Aktiv 12 kg",
+            "brand":{"name":"Granngården"},
+            "category":"Djur/Hundmat",
+            "description":"Komplettfoder 12 kg",
+            "image":"/media/hundmat.png",
+            "url":"/hundmat-aktiv-12kg",
+            "offers":{"@type":"Offer","price":"549,00","priceCurrency":"SEK"}
+          }]
+        }</script>
+      `, { status: 200, headers: { 'content-type': 'text/html' } });
+    };
+
+    const rows = await fetchGranngardenProducts({
+      queries: ['hundmat'],
+      fetchImpl,
+      retrievedAt: '2026-05-24T16:00:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [buildGranngardenSearchUrl('hundmat')]);
+    assert.deepEqual(rows, [{
+      code: 'gg-hundmat-12kg',
+      name: 'Hundmat Aktiv 12 kg',
+      brand: 'Granngården',
+      packageText: '12 kg',
+      category: 'Djur/Hundmat',
+      price: 549,
+      priceText: '549.00 SEK',
+      currency: 'SEK',
+      country: 'SE',
+      productUrl: 'https://www.granngarden.se/hundmat-aktiv-12kg',
+      imageUrl: 'https://www.granngarden.se/media/hundmat.png',
+      sourceUrl: buildGranngardenSearchUrl('hundmat'),
+      retrievedAt: '2026-05-24T16:00:00.000Z'
+    }]);
+  });
+
+  it('deduplicates Granngården products across embedded product sources', () => {
+    const rows = parseGranngardenProducts(`
+      <script type="application/ld+json">[
+        {"@type":"Product","sku":"same","name":"Same","offers":{"price":10}},
+        {"@type":"Product","sku":"same","name":"Same","offers":{"price":10}}
+      ]</script>
+    `, buildGranngardenSearchUrl('same'), '2026-05-24T16:00:00.000Z');
+
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0]?.country, 'SE');
   });
 });
 
