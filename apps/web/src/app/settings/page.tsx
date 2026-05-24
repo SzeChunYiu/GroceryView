@@ -1,4 +1,5 @@
 import { buildPrivacyExport } from '@groceryview/core';
+import { NotificationPreferenceToggle } from '@/app/account/preferences/notifications';
 import { SettingsDataExportActions } from '@/components/settings-data-export-actions';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { routeMetadata } from '@/lib/seo';
@@ -37,6 +38,7 @@ export default function SettingsPage() {
       </p>
 
       <SettingsDataExportActions />
+      <NotificationPreferenceToggle />
 
       <Card className="mt-6 border-amber-200 bg-amber-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-900">Form error announcements</p>
