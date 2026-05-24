@@ -153,6 +153,34 @@ class RecordingPriceHistoryExecutor {
     if (sql.includes('from favorite_stores')) {
       return [] as T[];
     }
+    if (sql.includes('with store_locations') && sql.includes('distance_km')) {
+      return [
+        {
+          store_id: 'store-coop-odenplan',
+          store_slug: 'coop-odenplan',
+          store_name: 'Coop Odenplan',
+          chain_slug: 'coop',
+          chain_name: 'Coop',
+          address_line1: 'Odengatan 65',
+          city: 'Stockholm',
+          latitude: '59.342900',
+          longitude: '18.049400',
+          distance_km: '1.86'
+        },
+        {
+          store_id: 'store-ica-baronen',
+          store_slug: 'ica-baronen',
+          store_name: 'ICA Nära Baronen',
+          chain_slug: 'ica',
+          chain_name: 'ICA',
+          address_line1: 'Odengatan 40',
+          city: 'Stockholm',
+          latitude: '59.342900',
+          longitude: '18.047000',
+          distance_km: '1.94'
+        }
+      ] as T[];
+    }
     if (sql.includes('from stores') && sql.includes('where stores.slug = $1')) {
       if (params[0] === 'missing-store') return [] as T[];
       return [{
@@ -542,6 +570,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/users/demo/receipts/review']);
     assert.ok(docs.body.paths['/retailers']);
     assert.ok(docs.body.paths['/stores']);
+    assert.ok(docs.body.paths['/stores/nearest']);
     assert.ok(docs.body.paths['/users/demo/basket/items/{productId}']);
     assert.ok(docs.body.paths['/stores/{id}/category-coverage']);
     assert.ok(docs.body.paths['/stores/{id}/coverage']);
@@ -730,6 +759,7 @@ describe('GroceryView API app', () => {
       ['hemkop', 'Hemköp', '/retailers/hemkop.svg', 'https://www.hemkop.se/'],
       ['ica', 'ICA', '/retailers/ica.svg', 'https://www.ica.se/'],
       ['lidl', 'Lidl', '/retailers/lidl.svg', 'https://www.lidl.se/'],
+      ['netto', 'Netto', '/retailers/netto.svg', 'https://www.coop.se/'],
       ['willys', 'Willys', '/retailers/willys.svg', 'https://www.willys.se/']
     ]);
 
@@ -744,6 +774,15 @@ describe('GroceryView API app', () => {
 
     await request(app.getHttpServer()).get('/products/coffee').expect(200);
     await request(app.getHttpServer()).get('/stores/willys-odenplan').expect(200);
+
+    const nearestStores = await request(app.getHttpServer())
+      .get('/stores/nearest?lat=59.3293&lng=18.0686&radius=5&chain=coop')
+      .expect(200);
+    assert.deepEqual(nearestStores.body.stores.map((store: { slug: string; distanceKm: number }) => [store.slug, store.distanceKm]), [
+      ['coop-odenplan', 1.86],
+      ['ica-baronen', 1.94]
+    ]);
+    assert.equal(priceHistoryExecutor.calls.some((call) => call.params.join('|') === '59.3293|18.0686|5|coop'), true);
 
     const storeDeals = await request(app.getHttpServer()).get('/stores/willys-odenplan/deals').expect(200);
     assert.deepEqual(
@@ -1557,6 +1596,7 @@ describe('GroceryView API real-only deal and alert endpoints', () => {
     await request(app.getHttpServer()).get('/deals/flyer-offers').expect(503);
     await request(app.getHttpServer()).get('/stores/willys-odenplan/discounts').expect(503);
     await request(app.getHttpServer()).get('/stores/willys-odenplan/flyer-offers').expect(503);
+    await request(app.getHttpServer()).get('/stores/nearest?lat=59.3293&lng=18.0686&radius=5').expect(503);
     await request(app.getHttpServer()).get('/users/demo/watchlist/price-alerts').expect(503);
     await request(app.getHttpServer())
       .post('/users/demo/watchlist/price-alerts')
