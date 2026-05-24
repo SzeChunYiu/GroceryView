@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
@@ -112,11 +113,39 @@ function storePricePercentileRankFor(store: (typeof storeUniverse)[number]) {
   };
 }
 
+function twitterImagesFromOpenGraph(openGraph: Metadata['openGraph']) {
+  const images = openGraph && 'images' in openGraph ? openGraph.images : undefined;
+  return images ?? [{ url: '/pwa-icon.svg', alt: 'GroceryView store record image' }];
+}
+
 export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
   const { slug } = await params;
   const store = findStore(slug);
   if (!store) notFound();
-  return metadataForStore(store);
+
+  const metadata = metadataForStore(store);
+  const openGraph = metadata.openGraph ?? {};
+  const title = openGraph && 'title' in openGraph && typeof openGraph.title === 'string'
+    ? openGraph.title
+    : store.name + ' store record | GroceryView';
+  const description = openGraph && 'description' in openGraph && typeof openGraph.description === 'string'
+    ? openGraph.description
+    : 'Verified OpenStreetMap grocery store record for ' + store.name + ', ' + store.brand + '. Prices are not inferred from store location.';
+  const images = twitterImagesFromOpenGraph(openGraph);
+
+  return {
+    ...metadata,
+    openGraph: {
+      ...openGraph,
+      images
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images
+    }
+  } satisfies Metadata;
 }
 
 export function generateStaticParams() {
