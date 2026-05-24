@@ -16,16 +16,46 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
+      - name: Classify changed files
+        id: changes
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              per_page: 100
+            });
+            const previewRelevant = files.some((file) => {
+              const name = file.filename;
+              return name.startsWith('apps/web/')
+                || name.startsWith('packages/')
+                || name.startsWith('scripts/')
+                || name === 'package.json'
+                || name === 'package-lock.json'
+                || name === 'tsconfig.json'
+                || name === 'next.config.js'
+                || name === 'next.config.mjs';
+            });
+            core.setOutput('preview_relevant', String(previewRelevant));
+            core.info(previewRelevant
+              ? 'Preview-relevant files changed; Lighthouse will run.'
+              : 'No preview-relevant files changed; skipping Lighthouse.');
+
       - name: Setup Node
+        if: steps.changes.outputs.preview_relevant == 'true'
         uses: actions/setup-node@v5
         with:
           node-version: '22'
           cache: npm
 
       - name: Install dependencies
+        if: steps.changes.outputs.preview_relevant == 'true'
         run: npm ci
 
       - name: Resolve Vercel preview URL
+        if: steps.changes.outputs.preview_relevant == 'true'
         uses: actions/github-script@v8
         with:
           script: |
@@ -67,4 +97,5 @@ jobs:
             throw new Error(`Timed out waiting for a successful Vercel Preview deployment for ${ref}.`);
 
       - name: Run Lighthouse CI against Vercel preview
+        if: steps.changes.outputs.preview_relevant == 'true'
         run: npm run perf:lighthouse:preview -w @groceryview/web
