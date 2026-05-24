@@ -35,6 +35,7 @@ import {
   buildOpenFoodFactsProductUrl,
   buildOpenFoodFactsSwedenSearchUrl,
   buildOpenPricesConnectorUrl,
+  ATLANTSOLIA_IS_FUEL_PRICES_URL,
   fetchSt1FuelPrices,
   cacheKeyForScbPxWebQueryFixture,
   cellCountForScbPxWebQueryFixture,
@@ -53,6 +54,7 @@ import {
   fetchOpenFoodFactsExportRetailerEnrichments,
   fetchOpenFoodFactsProducts,
   fetchOpenFoodFactsSwedenCatalog,
+  fetchAtlantsoliaIsFuelPrices,
   fetchOkq8FuelPrices,
   fetchOpenFoodFactsRetailerEnrichments,
   fetchBrandedSwedishFuelStations,
@@ -129,6 +131,7 @@ import {
   parseLidlStorePayload,
   parseOsmChainStores,
   parseOpenPricesSnapshot,
+  parseAtlantsoliaIsFuelPricePage,
   parseOkq8FuelPricePage,
   parseBrandedSwedishFuelStations,
   parseCoopDrPdfTextOffers,
@@ -615,6 +618,64 @@ describe('OKQ8 fuel price connector', () => {
     ]);
     assert.equal(parsed.items.every((row) => row.sourceType === 'retailer_online_page'), true);
     assert.equal(parsed.items.every((row) => row.storeId === undefined), true);
+  });
+});
+
+describe('Atlantsolía IS fuel price connector', () => {
+  const atlantsoliaFuelHtml = `
+    <section>
+      <h2>Lægsta verðið!</h2>
+      <div class="subtitle2 color-white">95 Okt.</div>
+      <div class="counter bignumber">
+        <div>2</div><div>0</div><div>5</div><div>,</div><div>4</div><div>0</div>
+      </div>
+      <div class="subtitle2 color-white mt-20">D&#xED;sel</div>
+      <div class="counter bignumber">
+        <div>2</div><div>4</div><div>6</div><div>,</div><div>7</div><div>0</div>
+      </div>
+    </section>
+  `;
+
+  it('parses homepage counter prices as Iceland fuel observations', () => {
+    const rows = parseAtlantsoliaIsFuelPricePage({
+      body: atlantsoliaFuelHtml,
+      sourceUrl: ATLANTSOLIA_IS_FUEL_PRICES_URL,
+      capturedAt: '2026-05-24T10:15:00.000Z',
+      rawSnapshotRef: 'raw://atlantsolia-is-fuel/test'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.productId, row.fuelGrade, row.pricePerLitre, row.currency, row.unit]), [
+      ['fuel-is-95', '95', 205.4, 'ISK', 'l'],
+      ['fuel-is-diesel', 'diesel', 246.7, 'ISK', 'l']
+    ]);
+    assert.equal(rows[0].domain, 'fuel');
+    assert.equal(rows[0].chainId, 'atlantsolia');
+    assert.equal(rows[0].operatorName, 'Atlantsolía');
+    assert.equal(rows[0].countryCode, 'IS');
+    assert.equal(rows[0].effectiveFrom, '2026-05-24T00:00:00.000Z');
+    assert.equal(rows[0].provenance.parserVersion, 'atlantsolia-is-fuel-prices-v1');
+  });
+
+  it('fetches the public Atlantsolía page and fails closed on blocked source responses', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(atlantsoliaFuelHtml, { status: 200, headers: { 'content-type': 'text/html' } });
+    };
+
+    const rows = await fetchAtlantsoliaIsFuelPrices({
+      fetchImpl,
+      capturedAt: '2026-05-24T10:15:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [ATLANTSOLIA_IS_FUEL_PRICES_URL]);
+    assert.equal(rows.length, 2);
+    assert.equal(rows.find((row) => row.fuelGrade === 'diesel')?.pricePerLitre, 246.7);
+
+    await assert.rejects(
+      () => fetchAtlantsoliaIsFuelPrices({ fetchImpl: async () => new Response('Forbidden', { status: 403 }) }),
+      /blocked/
+    );
   });
 });
 
