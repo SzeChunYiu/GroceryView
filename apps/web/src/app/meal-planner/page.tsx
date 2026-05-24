@@ -1,7 +1,8 @@
 import Link from 'next/link';
+import { suggestDealBasedMeals } from '@groceryview/core';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { dealBasedMeals, familyMealPlannerFromDeals, freezerBatchCookPlanner, studentDealRecipes } from '@/lib/demo-data';
+import { dealBasedMealInputs, familyMealPlannerFromDeals, freezerBatchCookPlanner, studentDealRecipes } from '@/lib/demo-data';
 import { dietarySubstitutionAssistantContract } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -13,13 +14,30 @@ function formatSek(value: number) {
   return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);
 }
 
-function confidenceLevel(value: string): 'high' | 'medium' | 'low' {
-  return value === 'high' || value === 'medium' || value === 'low' ? value : 'low';
-}
+const mealPlannerDeals = dealBasedMealInputs.map(({ source: _source, ...deal }) => deal);
+
+const dealBasedMeals = {
+  servings: 4,
+  maxMealCost: 120,
+  suggestions: suggestDealBasedMeals({
+    deals: mealPlannerDeals,
+    maxMealCost: 120,
+    servings: 4
+  }).map((suggestion) => ({
+    ...suggestion,
+    ingredients: suggestion.ingredientProductIds.flatMap((productId) => {
+      const ingredient = dealBasedMealInputs.find((deal) => deal.productId === productId);
+      return ingredient ? [ingredient] : [];
+    })
+  })),
+  coverage: {
+    confidence: 'medium' as const,
+    dealCount: dealBasedMealInputs.length,
+    caveat: 'Meal suggestions use visible price rows with deal scores; diet, allergen, and household preference data are not inferred.'
+  }
+};
 
 export default function MealPlannerPage() {
-  const dealMealConfidenceLevel = confidenceLevel(dealBasedMeals.coverage.confidence);
-
   return (
     <PageShell>
       <Eyebrow>Deal-based meals</Eyebrow>
@@ -42,7 +60,11 @@ export default function MealPlannerPage() {
         <Card>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Confidence</p>
           <div className="mt-4">
-            <ConfidenceBadge level={dealMealConfidenceLevel} label={`${dealBasedMeals.coverage.confidence} confidence`} sampleSize={dealBasedMeals.coverage.dealCount} />
+            <ConfidenceBadge
+              level={dealBasedMeals.coverage.confidence}
+              label={`${dealBasedMeals.coverage.confidence} confidence`}
+              sampleSize={dealBasedMeals.coverage.dealCount}
+            />
           </div>
           <p className="mt-3 font-semibold text-slate-700">{dealBasedMeals.coverage.caveat}</p>
         </Card>
