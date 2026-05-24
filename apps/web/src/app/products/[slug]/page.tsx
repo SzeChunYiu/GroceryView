@@ -145,11 +145,14 @@ function storeOfferFor(input: { price: number; storeName: string; url: string })
 
 function productStoreOffersFor(product: NonNullable<ReturnType<typeof findProduct>>) {
   if ('lowestPrice' in product) {
-    return chainPriceRows(product).map((row) => storeOfferFor({
-      price: row.price,
-      storeName: storeNameFor(row.chain),
-      url: row.url || `${siteUrl}/products/${product.slug}`
-    }));
+    return chainPriceRows(product).flatMap((row) => {
+      if (typeof row.price !== 'number' || !Number.isFinite(row.price)) return [];
+      return [storeOfferFor({
+        price: row.price,
+        storeName: storeNameFor(row.chain),
+        url: row.url || `${siteUrl}/products/${product.slug}`
+      })];
+    });
   }
 
   const latest = latestObservationFor(product);
