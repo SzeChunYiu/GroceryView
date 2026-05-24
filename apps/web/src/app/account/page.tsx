@@ -3,6 +3,7 @@ import { AccountMutationActions } from '@/components/account-mutation-actions';
 import { AdDisclosureActions } from '@/components/ad-disclosure-actions';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { listShareRoles, accountListSharePermissions } from '@/lib/list-permissions';
 import { routeMetadata } from '@/lib/seo';
 import { accountSavedShoppingContract, formatSek, savedBasketAutoReorderPlanner } from '@/lib/verified-data';
 import { planAccountDeletion } from '@groceryview/core';
@@ -27,6 +28,44 @@ export default function AccountPage() {
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
         GroceryView now surfaces the real account API contract for saved shopping state while keeping private rows available to signed-in shoppers only. The public static build describes the production contract and stays closed when authenticated account records are absent.
       </p>
+
+
+      <Card className="mt-6 border-indigo-200 bg-indigo-50">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <Eyebrow>List sharing permissions</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">View-only, edit, and instant revoke controls</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+              Household lists can now be shared with explicit <code className="rounded bg-white/80 px-1 py-0.5 text-indigo-900">view</code> or <code className="rounded bg-white/80 px-1 py-0.5 text-indigo-900">edit</code> roles through <code className="rounded bg-white/80 px-1 py-0.5 text-indigo-900">/api/list/permissions</code>, and account settings expose a one-click revoke action for every active collaborator.
+            </p>
+          </div>
+          <ConfidenceBadge level="high" label="Revocation available" sampleSize={accountListSharePermissions.length} />
+        </div>
+        <div className="mt-5 grid gap-4 lg:grid-cols-2">
+          {Object.entries(listShareRoles).map(([role, config]) => (
+            <div className="rounded-2xl bg-white p-4 shadow-sm" key={role}>
+              <p className="text-sm font-black text-indigo-950">{config.label}</p>
+              <p className="mt-2 text-sm leading-6 text-slate-700">{config.description}</p>
+              <ul className="mt-3 list-disc space-y-1 pl-5 text-sm font-semibold text-slate-700">
+                {config.capabilities.map((capability) => <li key={capability}>{capability}</li>)}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <div className="mt-5 grid gap-3">
+          {accountListSharePermissions.map((permission) => (
+            <form action="/api/list/permissions" className="flex flex-col gap-3 rounded-2xl border border-indigo-100 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between" key={permission.id} method="post">
+              <input name="action" type="hidden" value="revoke" />
+              <input name="shareId" type="hidden" value={permission.id} />
+              <div>
+                <p className="font-black text-slate-950">{permission.listName} · {permission.collaboratorName}</p>
+                <p className="mt-1 text-sm text-slate-600">{permission.collaboratorEmail} has {listShareRoles[permission.role].label.toLowerCase()} access.</p>
+              </div>
+              <button className="rounded-full bg-indigo-950 px-4 py-2 text-sm font-black text-white" type="submit">Revoke now</button>
+            </form>
+          ))}
+        </div>
+      </Card>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Account-bound contract</p>
