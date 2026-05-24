@@ -1308,6 +1308,40 @@ describe('fetchCoopProducts', () => {
     }]);
   });
 
+  it('emits separate Coop list and member price rows for MedMera offers', async () => {
+    const fetchImpl: typeof fetch = async () => new Response(JSON.stringify({
+      results: {
+        items: [{
+          id: '7310865005168',
+          ean: '7310865005168',
+          name: 'Smör Normalsaltat',
+          manufacturerName: 'Arla',
+          packageSizeInformation: '500 g',
+          salesPriceData: { b2cPrice: 61.45 },
+          comparativePriceData: { b2cPrice: 122.9 },
+          comparativePriceText: 'kr/kg',
+          onlinePromotions: [{
+            message: 'Medlemspris-Smör 45 kr/st',
+            priceData: { b2cPrice: 45 },
+            medMeraRequired: true
+          }]
+        }]
+      }
+    }), { status: 200, headers: { 'content-type': 'application/json' } });
+
+    const rows = await fetchCoopProducts({
+      fetchImpl,
+      subscriptionKey: 'public-test-key',
+      retrievedAt: '2026-05-21T01:30:00.000Z'
+    });
+
+    assert.equal(rows.length, 2);
+    assert.deepEqual(rows.map((row) => ({ price: row.price, promotionPrice: row.promotionPrice, medMeraRequired: row.medMeraRequired })), [
+      { price: 61.45, promotionPrice: null, medMeraRequired: false },
+      { price: 61.45, promotionPrice: 45, medMeraRequired: true }
+    ]);
+  });
+
   it('reads Coop personalization API settings from the public handla page', async () => {
     const fetchImpl: typeof fetch = async () => new Response(`
       <script>
