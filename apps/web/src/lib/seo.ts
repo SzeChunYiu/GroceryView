@@ -53,6 +53,10 @@ export const routeMetadataCatalog = {
     title: 'Basket ideas and import contracts | GroceryView',
     description: 'Plan student staples, basket imports, retailer handoff support, and verified account-bound basket review guardrails.'
   },
+  '/basket': {
+    title: 'Cross-chain cheapest basket calculator | GroceryView',
+    description: 'Add verified grocery products and compare the cheapest complete chain basket with a split basket built from current DB-backed price rows.'
+  },
   '/catalogue-savings': {
     title: 'Matched catalogue savings ledger | GroceryView',
     description: 'Compare matched Willys and Hemkop catalogue rows with savings totals, source caveats, and chain-level confidence.'
