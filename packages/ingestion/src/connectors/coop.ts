@@ -188,7 +188,13 @@ export const DEFAULT_COOP_PRODUCT_QUERIES = [
   'yoghurt',
   'banan',
   'ris',
-  'fisk'
+  'fisk',
+  'ost',
+  'bröd',
+  'frukt',
+  'grönsaker',
+  'kaffe',
+  'glass'
 ] as const;
 
 const COOP_REQUEST_TIMEOUT_MS = 20_000;

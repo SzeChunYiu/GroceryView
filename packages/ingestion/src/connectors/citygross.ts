@@ -101,10 +101,16 @@ export const DEFAULT_CITY_GROSS_PRODUCT_QUERIES = [
   'smor',
   'ost',
   'kyckling',
-  'yoghurt'
+  'yoghurt',
+  'brod',
+  'frukt',
+  'gronsaker',
+  'fisk',
+  'korv',
+  'glass'
 ] as const;
 export const DEFAULT_CITY_GROSS_LIVE_PRODUCT_MAX_STORES = 60;
-export const DEFAULT_CITY_GROSS_LIVE_PRODUCT_MAX_ROWS_PER_STORE = 260;
+export const DEFAULT_CITY_GROSS_LIVE_PRODUCT_MAX_ROWS_PER_STORE = 340;
 
 export type FetchCityGrossStoresOptions = {
   fetchImpl?: typeof fetch;
