@@ -13,6 +13,7 @@ import {
 
 const REPO_ROOT = new URL('../../', import.meta.url);
 const INGESTED_DIR = new URL('apps/web/src/lib/ingested/', REPO_ROOT);
+const GITHUB_BLOB_SOFT_LIMIT_BYTES = 95 * 1024 * 1024;
 
 const CITY_GROSS_QUERIES = [DEFAULT_CITY_GROSS_PRODUCT_QUERIES[0]];
 const HEMKOP_QUERIES = DEFAULT_HEMKOP_SEARCH_QUERIES;
@@ -436,7 +437,15 @@ async function writeIcaReklamblad(rows) {
 }
 
 async function writeGeneratedFile(fileName, lines) {
-  await writeFile(new URL(fileName, INGESTED_DIR), `${lines.join('\n')}\n`);
+  const content = `${lines.join('\n')}\n`;
+  const byteLength = Buffer.byteLength(content, 'utf8');
+  if (byteLength > GITHUB_BLOB_SOFT_LIMIT_BYTES) {
+    throw new Error(
+      `${fileName} would be ${(byteLength / 1024 / 1024).toFixed(1)} MiB; ` +
+      'trim rows per source or split source metadata from row fixtures before writing to avoid GitHub GH001.'
+    );
+  }
+  await writeFile(new URL(fileName, INGESTED_DIR), content);
 }
 
 function unique(values) {
