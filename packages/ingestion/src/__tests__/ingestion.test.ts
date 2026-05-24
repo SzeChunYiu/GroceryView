@@ -1298,11 +1298,10 @@ describe('fetchCoopWeeklyDiscounts', () => {
     });
 
     assert.deepEqual(rows.map((row) => [row.storeId, row.name, row.offerPrice, row.offerUnitPriceText]), [
-      ['216502', 'Kvistcocktailtomater', 14.9, '/ask'],
       ['216502', 'Hushållsost', 69, '/kg']
     ]);
-    assert.equal(rows[0]?.packageText, 'Spanien/Nederländerna/Marocko. Klass 1. 500 g.');
-    assert.equal(rows[1]?.flyerUrl, 'https://dr.coop.se/Butik/216502/period/180853/erbjudanden');
+    assert.equal(rows[0]?.ordinaryPrice, 116.41);
+    assert.equal(rows[0]?.flyerUrl, 'https://dr.coop.se/Butik/216502/period/180853/erbjudanden');
   });
 
   it('falls back to Coop DR flyer PDF text when a physical branch has no product API rows', async () => {
@@ -1341,6 +1340,7 @@ describe('fetchCoopWeeklyDiscounts', () => {
         'Kvistcocktailtomater',
         'Spanien/Nederländerna/Marocko. Klass 1. 500 g.',
         'Jfr-pris 29:80/kg.',
+        'Ord. pris 29:80/kg.',
         '14',
         '90',
         '/ask'
@@ -1355,6 +1355,7 @@ describe('fetchCoopWeeklyDiscounts', () => {
     assert.deepEqual(rows.map((row) => [row.storeId, row.name, row.offerPrice]), [
       ['216502', 'Kvistcocktailtomater', 14.9]
     ]);
+    assert.equal(rows[0]?.ordinaryPrice, 29.8);
   });
 
   it('tries the next Coop DR flyer PDF when the current flyer URL is an HTML placeholder', async () => {
@@ -1401,6 +1402,7 @@ describe('fetchCoopWeeklyDiscounts', () => {
       retrievedAt: '2026-05-23T01:45:00.000Z',
       pdfTextExtractor: async () => [
         'Kvistcocktailtomater',
+        'Ord. pris 29:80/kg.',
         '14',
         '90',
         '/ask'
@@ -1416,9 +1418,10 @@ describe('fetchCoopWeeklyDiscounts', () => {
     assert.deepEqual(rows.map((row) => [row.name, row.offerPrice, row.flyerUrl]), [
       ['Kvistcocktailtomater', 14.9, 'https://dr.coop.se/Butik/216502/period/180853/erbjudanden']
     ]);
+    assert.equal(rows[0]?.ordinaryPrice, 29.8);
   });
 
-  it('parses Coop DR flyers where product names and prices are separate columns', () => {
+  it('skips Coop DR columnar rows when no ordinary price is present', () => {
     const rows = parseCoopDrPdfTextOffers([
       'GRILL',
       'GLÄDJE',
@@ -1450,10 +1453,7 @@ describe('fetchCoopWeeklyDiscounts', () => {
       validTo: '2026-05-24T23:59:59'
     });
 
-    assert.deepEqual(rows.map((row) => [row.name, row.offerPrice, row.offerUnitPriceText]), [
-      ['Färsk kycklingbröstfilé', 109, '/kg'],
-      ['Ätmogen avokado 3-pack', 99, '']
-    ]);
+    assert.deepEqual(rows, []);
   });
 
   it('can expand Coop weekly discounts across the live store catalog', async () => {

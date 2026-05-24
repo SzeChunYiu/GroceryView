@@ -1393,6 +1393,8 @@ function parseCoopDrLinearPdfTextOffers(
     const nameIndex = findCoopDrOfferNameIndex(lines, index - 1);
     if (nameIndex === null) continue;
     const name = lines[nameIndex]!;
+    const ordinaryPrice = ordinaryPriceFromCoopDrLines(lines, nameIndex + 1, index);
+    if (ordinaryPrice === null || ordinaryPrice <= priceMatch.price) continue;
     const packageText = lines
       .slice(nameIndex + 1, index)
       .filter((line) => !isCoopDrNonProductLine(line))
@@ -1406,7 +1408,7 @@ function parseCoopDrLinearPdfTextOffers(
       name,
       brand: '',
       packageText,
-      ordinaryPrice: priceMatch.ordinaryPrice,
+      ordinaryPrice,
       ordinaryPriceText: '',
       offerPrice: priceMatch.price,
       offerPriceText: `${priceMatch.price.toFixed(2)} SEK`,
@@ -1539,52 +1541,10 @@ function parseCoopDrSequentialPdfTextOffers(
   options: ParseCoopDrPdfTextOffersOptions,
   maxRows: number
 ): CoopWeeklyDiscount[] {
-  const rows: CoopWeeklyDiscount[] = [];
-  for (const chunk of splitCoopDrPdfPages(lines)) {
-    if (rows.length >= maxRows) break;
-    const firstPriceIndex = chunk.findIndex((_, index) => coopDrOfferPriceAt(chunk, index) !== null);
-    if (firstPriceIndex <= 0) continue;
-    const names = chunk.slice(0, firstPriceIndex).filter(isCoopDrOfferNameCandidate);
-    const prices: CoopDrOfferPriceMatch[] = [];
-    for (let index = firstPriceIndex; index < chunk.length; index += 1) {
-      const price = coopDrOfferPriceAt(chunk, index);
-      if (!price) continue;
-      prices.push(price);
-      index = Math.max(index, price.nextIndex - 1);
-    }
-    const rowCount = Math.min(names.length, prices.length, maxRows - rows.length);
-    for (let index = 0; index < rowCount; index += 1) {
-      const name = names[index]!;
-      const price = prices[index]!;
-      const code = `dr:${options.storeId}:${stableCoopDrKey(`${name}:${price.price}:${options.validFrom}`)}`;
-      rows.push({
-        code,
-        ean: '',
-        name,
-        brand: '',
-        packageText: '',
-        ordinaryPrice: price.ordinaryPrice,
-        ordinaryPriceText: '',
-        offerPrice: price.price,
-        offerPriceText: `${price.price.toFixed(2)} SEK`,
-        offerUnitPrice: price.unitPrice,
-        offerUnitPriceText: price.unitText,
-        offerMechanicText: `${name} ${price.displayText}`.trim(),
-        promotionId: `dr:${options.storeId}:${stableCoopDrKey(`${name}:${price.displayText}:${options.validFrom}`)}`,
-        medMeraRequired: chunk.some((line) => line.trim().toLowerCase() === 'medlemspris'),
-        storeId: options.storeId,
-        storeName: options.storeName,
-        region: options.region,
-        validFrom: options.validFrom,
-        validTo: options.validTo,
-        flyerUrl: options.flyerUrl,
-        productSearchUrl: options.productSearchUrl,
-        sourceUrl: options.sourceUrl,
-        retrievedAt: options.retrievedAt
-      });
-    }
-  }
-  return rows;
+  void lines;
+  void options;
+  void maxRows;
+  return [];
 }
 
 function splitCoopDrPdfPages(lines: readonly string[]): string[][] {
@@ -1606,6 +1566,16 @@ function unitTextFromCoopDrLine(line: string): string {
   const normalized = line.trim().toLowerCase();
   if (/^\/(st|kg|ask|förp|liter|l|hg|påse|frp)$/.test(normalized)) return normalized;
   return '';
+}
+
+function ordinaryPriceFromCoopDrLines(lines: readonly string[], startIndex: number, endIndex: number): number | null {
+  const context = lines.slice(Math.max(0, startIndex), Math.max(startIndex, endIndex)).join(' ');
+  const match = context.match(/\bord\.\s*pris(?:\s*från)?\s+(\d{1,4})(?::(\d{2}))?/i);
+  if (!match) return null;
+  const kronor = Number(match[1]);
+  const ore = match[2] ? Number(match[2]) / 100 : 0;
+  const price = kronor + ore;
+  return Number.isFinite(price) ? price : null;
 }
 
 function isCoopDrNonProductLine(line: string): boolean {
