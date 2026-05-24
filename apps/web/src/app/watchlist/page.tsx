@@ -23,7 +23,7 @@ export default function WatchlistPage() {
       <Eyebrow>Watchlist price alerts</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Tracked products with notification-ready alerts</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
-        This page calls buildWatchlistAlerts with verified chain price rows, then runs planNotifications so set-target push and email rows respect user preferences and quiet-hour rules.
+        This page calls buildWatchlistAlerts with verified chain price rows, then runs planNotifications so set-target push and email rows respect user preferences and quiet-hour rules. Observed source rows only; no forecast or expected price claim is rendered for watchlist notifications.
       </p>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr_1fr]">
