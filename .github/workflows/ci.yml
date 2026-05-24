@@ -7,8 +7,15 @@ on:
 
 jobs:
   verify:
-    name: Test, build, and typecheck
+    name: Test, build, and typecheck (${{ matrix.country }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        country: [SE, NO, IS]
+    env:
+      GROCERYVIEW_TEST_COUNTRY: ${{ matrix.country }}
+      GROCERYVIEW_TEST_FIXTURE: tests/fixtures/nordic/${{ matrix.country }}.json
     steps:
       - name: Checkout
         uses: actions/checkout@v5
