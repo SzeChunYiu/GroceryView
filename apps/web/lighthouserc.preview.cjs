@@ -9,6 +9,7 @@ module.exports = {
     collect: {
       url: [previewUrl.replace(/\/$/, '')],
       numberOfRuns: 3,
+      outputDir: './.lighthouseci-preview',
       settings: {
         chromeFlags: '--headless=new --no-sandbox --disable-dev-shm-usage',
         onlyCategories: ['performance'],

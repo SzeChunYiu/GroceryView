@@ -67,4 +67,43 @@ jobs:
             throw new Error(`Timed out waiting for a successful Vercel Preview deployment for ${ref}.`);
 
       - name: Run Lighthouse CI against Vercel preview
-        run: npm run perf:lighthouse:preview -w @groceryview/web
+        run: |
+          mkdir -p apps/web/.lighthouseci-preview
+          npm run perf:lighthouse:preview -w @groceryview/web 2>&1 | tee apps/web/.lighthouseci-preview/lhci.log
+          echo "${PIPESTATUS[0]}" > apps/web/.lighthouseci-preview/lhci.exitcode
+          exit "$(cat apps/web/.lighthouseci-preview/lhci.exitcode)"
+
+      - name: Write Lighthouse failure summary
+        if: always()
+        run: |
+          summary_dir=apps/web/.lighthouseci-preview
+          mkdir -p "$summary_dir"
+          exit_code="unknown"
+          if [ -f "$summary_dir/lhci.exitcode" ]; then
+            exit_code="$(cat "$summary_dir/lhci.exitcode")"
+          fi
+
+          {
+            echo "# Lighthouse CI preview summary"
+            echo
+            echo "- Preview URL: ${LHCI_PREVIEW_URL:-not resolved}"
+            echo "- LHCI exit code: $exit_code"
+            echo "- Finished at: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo
+            echo "## Last LHCI log lines"
+            echo '```'
+            if [ -f "$summary_dir/lhci.log" ]; then
+              tail -n 120 "$summary_dir/lhci.log"
+            else
+              echo "LHCI log was not created."
+            fi
+            echo '```'
+          } > "$summary_dir/summary.txt"
+
+      - name: Upload Lighthouse preview artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-preview
+          path: apps/web/.lighthouseci-preview
+          if-no-files-found: warn
