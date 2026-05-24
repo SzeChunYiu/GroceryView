@@ -27,6 +27,14 @@ function NutritionCell({ item }: { item: ItemComparisonItem }) {
 }
 
 function StorePriceCell({ item }: { item: ItemComparisonItem }) {
+  if (item.storePrices.length === 0) {
+    return (
+      <p className="rounded-2xl bg-amber-50 p-3 text-xs font-bold leading-5 text-amber-950">
+        No store price row has evidence for the selected fulfillment filters.
+      </p>
+    );
+  }
+
   return (
     <div className="grid gap-2">
       {item.storePrices.map((price) => (
@@ -65,7 +73,7 @@ function TrendChartCell({ item }: { item: ItemComparisonItem }) {
   );
 }
 
-export function ItemComparisonTable({ items, maxItems, missingItemIds, sourceLabel, truncatedItemIds }: ItemComparisonView) {
+export function ItemComparisonTable({ activeFulfillmentFilterLabels, fulfillmentFilterSummary, items, maxItems, missingItemIds, sourceLabel, truncatedItemIds }: ItemComparisonView) {
   return (
     <section className="mt-6 overflow-hidden rounded-[2rem] border border-emerald-100 bg-white shadow-sm" data-item-comparison-table>
       <div className="border-b border-emerald-100 bg-emerald-50 px-5 py-4">
@@ -73,6 +81,11 @@ export function ItemComparisonTable({ items, maxItems, missingItemIds, sourceLab
         <p className="mt-2 text-sm font-semibold leading-6 text-emerald-900">
           Select up to four items to compare nutrition, price across stores, and trend charts from verified GroceryView sources.
         </p>
+        {activeFulfillmentFilterLabels.length > 0 ? (
+          <p className="mt-2 text-xs font-bold text-emerald-800">
+            Active filters: {activeFulfillmentFilterLabels.join(', ')} · {fulfillmentFilterSummary}
+          </p>
+        ) : null}
         <p className="mt-2 text-xs font-bold text-emerald-800">Source: {sourceLabel} · max {maxItems} items</p>
       </div>
       {items.length > 0 ? (
