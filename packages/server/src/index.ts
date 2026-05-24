@@ -584,6 +584,22 @@ function optionalIsoTimestamp(value: unknown, field: string): string | undefined
   return requiredIsoTimestamp(value, field);
 }
 
+function flyerOffersQueryFromSearchParams(params: URLSearchParams): FlyerOffersProviderQuery {
+  return {
+    asOf: optionalIsoTimestamp(params.get('asOf') ?? undefined, 'asOf'),
+    storeId: optionalString(params.get('storeId') ?? undefined, 'storeId'),
+    chain: optionalString(params.get('chain') ?? undefined, 'chain'),
+    category: optionalString(params.get('category') ?? undefined, 'category'),
+    productId: optionalString(params.get('productId') ?? undefined, 'productId')
+  };
+}
+
+function storeFlyerOffersQueryFromSearchParams(params: URLSearchParams): StoreFlyerOffersProviderQuery {
+  return {
+    asOf: optionalIsoTimestamp(params.get('asOf') ?? undefined, 'asOf')
+  };
+}
+
 
 function requiredBasketBridgeSourceKind(value: unknown): BasketImportExportRequest['source']['sourceKind'] {
   if (value === 'bookmarklet' || value === 'browser_extension' || value === 'copy_paste') return value;
@@ -2024,25 +2040,13 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
       if (method === 'GET' && path === '/api/retailers') return jsonResponse(api.getRetailers());
 
       if (method === 'GET' && path === '/api/deals/flyer-offers') {
-        const query = {
-          asOf: url.searchParams.get('asOf') ?? undefined,
-          storeId: url.searchParams.get('storeId') ?? undefined,
-          chain: url.searchParams.get('chain') ?? undefined,
-          category: url.searchParams.get('category') ?? undefined,
-          productId: url.searchParams.get('productId') ?? undefined
-        };
+        const query = flyerOffersQueryFromSearchParams(url.searchParams);
         if (!authOptions.flyerOffersProvider) return errorResponse(503, 'Flyer offers provider is not configured.');
         return cachedJsonResponse(authOptions.apiResponseCache, url, apiHotEndpointCacheTtlSeconds[path], () => authOptions.flyerOffersProvider!(query));
       }
 
       if (method === 'GET' && path === '/api/deals/discounts') {
-        const query = {
-          asOf: url.searchParams.get('asOf') ?? undefined,
-          storeId: url.searchParams.get('storeId') ?? undefined,
-          chain: url.searchParams.get('chain') ?? undefined,
-          category: url.searchParams.get('category') ?? undefined,
-          productId: url.searchParams.get('productId') ?? undefined
-        };
+        const query = flyerOffersQueryFromSearchParams(url.searchParams);
         if (!authOptions.flyerOffersProvider) return errorResponse(503, 'Discounts provider is not configured.');
         return cachedJsonResponse(authOptions.apiResponseCache, url, apiHotEndpointCacheTtlSeconds[path], () => authOptions.flyerOffersProvider!(query));
       }
@@ -2418,7 +2422,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
       if (method === 'GET' && storeFlyerOffersMatch) {
         const storeId = decodeURIComponent(storeFlyerOffersMatch[1]);
         if (!authOptions.storeFlyerOffersProvider) return errorResponse(503, 'Store flyer offers provider is not configured.');
-        const report = await authOptions.storeFlyerOffersProvider(storeId, { asOf: url.searchParams.get('asOf') ?? undefined });
+        const report = await authOptions.storeFlyerOffersProvider(storeId, storeFlyerOffersQueryFromSearchParams(url.searchParams));
         if (!report) return errorResponse(404, 'Store not found.');
         return jsonResponse(report);
       }
@@ -2427,7 +2431,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
       if (method === 'GET' && storeDiscountsMatch) {
         const storeId = decodeURIComponent(storeDiscountsMatch[1]);
         if (!authOptions.storeFlyerOffersProvider) return errorResponse(503, 'Store discounts provider is not configured.');
-        const report = await authOptions.storeFlyerOffersProvider(storeId, { asOf: url.searchParams.get('asOf') ?? undefined });
+        const report = await authOptions.storeFlyerOffersProvider(storeId, storeFlyerOffersQueryFromSearchParams(url.searchParams));
         if (!report) return errorResponse(404, 'Store not found.');
         return jsonResponse(report);
       }
