@@ -1,13 +1,12 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { VirtualizedProductGrid } from '@/components/data-grid';
 import { ProductPriceCards } from '@/components/product-price-cards';
 import { apohemSource } from '@/lib/ingested/apohem';
 import { adaptiveProductCards, buildProductSearchView, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
-
-const PRODUCTS_PER_PAGE = 50;
 
 export function generateMetadata() {
   return routeMetadata('/products');
@@ -24,15 +23,7 @@ type SearchParams = {
   inStockOnly?: string | string[];
   minConfidence?: string | string[];
   brand?: string | string[];
-  page?: string | string[];
 };
-
-function toPageNumber(value: string | string[] | undefined): number {
-  const raw = Array.isArray(value) ? value[0] : value;
-  const parsed = Number.parseInt(raw ?? '1', 10);
-  if (!Number.isFinite(parsed) || !Number.isInteger(parsed) || parsed <= 0) return 1;
-  return parsed;
-}
 
 function normalizeSelectedBrand(brand: string | string[] | undefined) {
   const requested = (Array.isArray(brand) ? brand[0] : brand)?.trim();
@@ -65,30 +56,14 @@ function copySearchParams(params: URLSearchParams, source: SearchParams) {
   setFirstParam(params, 'minConfidence', source.minConfidence);
 }
 
-function productsPageUrl(page: number, selectedBrand = '', searchParams: SearchParams = {}) {
-  const params = new URLSearchParams();
-  copySearchParams(params, searchParams);
-  if (selectedBrand) params.set('brand', selectedBrand);
-  if (page > 1) params.set('page', String(page));
-  const query = params.toString();
-  return query ? `/products?${query}` : '/products';
-}
-
 export default async function ProductsPage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
   const search = buildProductSearchView(resolvedSearchParams);
   const { categoryFacets, labelFacets, chainFacets, priceRange, inStockOnly, resultCards } = search;
-  const requestedPage = toPageNumber(resolvedSearchParams.page);
   const selectedBrand = normalizeSelectedBrand(resolvedSearchParams.brand);
   const productCards = selectedBrand
     ? adaptiveProductCards.filter((card) => card.brand === selectedBrand)
     : adaptiveProductCards;
-  const totalPages = Math.max(1, Math.ceil(resultCards.length / PRODUCTS_PER_PAGE));
-  const currentPage = Math.min(requestedPage, totalPages);
-  const pageStart = (currentPage - 1) * PRODUCTS_PER_PAGE;
-  const pagedResultCards = resultCards.slice(pageStart, pageStart + PRODUCTS_PER_PAGE);
-  const rangeStart = resultCards.length === 0 ? 0 : pageStart + 1;
-  const rangeEnd = Math.min(pageStart + PRODUCTS_PER_PAGE, resultCards.length);
   const defaultSearchCount = facetedProductSearch.resultCards.length;
 
   function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence', string>>) {
@@ -222,57 +197,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             <p className="mt-2 text-xs font-bold text-slate-600">Comparable unit filters cover kr/kg, kr/l, and per-unit rows. {inStockOnly.label} keeps unpriced catalog rows out of instant results.</p>
           </div>
         </div>
-        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {pagedResultCards.map((product) => (
-            <Link className="group rounded-2xl border border-violet-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-violet-700" href={`/products/${product.slug}`} key={product.slug}>
-              <div className="flex gap-3">
-                {product.imageUrl ? (
-                  <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-white p-2 ring-1 ring-violet-100">
-                    <Image alt={`${product.name} product image`} className="max-h-full max-w-full object-contain transition group-hover:scale-105" height={80} sizes="80px" src={product.imageUrl} width={80} />
-                  </div>
-                ) : null}
-                <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">{product.brand}</p>
-                    {product.isAvailable === false ? (
-                      <span className="rounded-full bg-rose-100 px-2 py-1 text-[0.65rem] font-black uppercase tracking-[0.14em] text-rose-900">Out of stock</span>
-                    ) : null}
-                  </div>
-                  <h3 className="mt-1 text-lg font-black text-slate-950">{product.name}</h3>
-                  <p className="mt-1 text-xs font-semibold text-slate-500">{product.categoryLabel}</p>
-                </div>
-              </div>
-              <div className="mt-4 grid gap-2 text-xs font-black text-slate-700">
-                <p>{product.cheapestPriceLabel} · {product.unitPriceLabel}</p>
-                <p>{product.chainLabel}</p>
-                <p className="text-violet-800">sourceTables: {product.sourceTables.join(' · ')}</p>
-              </div>
-            </Link>
-          ))}
-        </div>
-        {resultCards.length > PRODUCTS_PER_PAGE ? (
-          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 text-sm">
-            <p className="font-black text-slate-700">
-              Showing {rangeStart}-{rangeEnd} of {resultCards.length} instant products (page {currentPage}/{totalPages})
-            </p>
-            <div className="flex gap-3">
-              {currentPage > 1 ? (
-                <Link className="rounded-full bg-white px-4 py-2 shadow-sm" href={productsPageUrl(currentPage - 1, selectedBrand, resolvedSearchParams)}>
-                  Previous
-                </Link>
-              ) : (
-                <span className="rounded-full bg-slate-100 px-4 py-2 font-black text-slate-400">Previous</span>
-              )}
-              {currentPage < totalPages ? (
-                <Link className="rounded-full bg-indigo-700 px-4 py-2 text-white" href={productsPageUrl(currentPage + 1, selectedBrand, resolvedSearchParams)}>
-                  Next
-                </Link>
-              ) : (
-                <span className="rounded-full bg-slate-100 px-4 py-2 font-black text-slate-400">Next</span>
-              )}
-            </div>
-          </div>
-        ) : null}
+        <VirtualizedProductGrid rows={resultCards} />
       </Card>
       <Card className="mt-8 border-rose-200 bg-rose-50/70">
         <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
