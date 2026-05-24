@@ -21,12 +21,17 @@ describe('price alert management page', () => {
     assert.match(page, /routeMetadata\('\/alerts'\)/);
     assert.match(page, /AlertManagementPanel/);
     assert.match(page, /currentPriceText/);
+    assert.match(page, /lastObservedAt/);
     assert.match(page, /No synthetic prices/);
     assert.match(item, /export function AlertListItem/);
     assert.match(item, /fetch\(`\/api\/alerts\?userEmail=/);
+    assert.match(item, /staleAfterHours/);
+    assert.match(item, /const \[staleAfterHours, setStaleAfterHours\] = useState\(24\)/);
     assert.match(item, /method: 'DELETE'/);
     assert.match(item, /Target \{formatTargetPrice\(alert\.targetPrice\)\}/);
     assert.match(item, /product\.currentPrice <= alert\.targetPrice/);
+    assert.match(item, /product\.lastObservedAt/);
+    assert.match(item, /data-alert-freshness/);
     assert.match(item, /Delete alert/);
     assert.match(webStore, /listPriceAlerts/);
     assert.match(webStore, /deletePriceAlert/);

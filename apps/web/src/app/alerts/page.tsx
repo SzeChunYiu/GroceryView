@@ -7,14 +7,19 @@ export function generateMetadata() {
   return routeMetadata('/alerts');
 }
 
-const alertProductSummaries: AlertProductSummary[] = matchedChainProducts.slice(0, 120).map((product) => ({
-  productId: product.slug,
-  productName: product.name,
-  currentPrice: product.lowestPrice,
-  currentPriceText: formatSek(product.lowestPrice),
-  lowestChain: product.lowestChain,
-  productHref: `/products/${product.slug}`
-}));
+const alertProductSummaries: AlertProductSummary[] = matchedChainProducts.slice(0, 120).map((product) => {
+  const lastObservedAt = (product as { lastObservedAt?: string | number | Date }).lastObservedAt;
+
+  return {
+    productId: product.slug,
+    productName: product.name,
+    currentPrice: product.lowestPrice,
+    currentPriceText: formatSek(product.lowestPrice),
+    lastObservedAt: lastObservedAt ? new Date(lastObservedAt).toISOString() : undefined,
+    lowestChain: product.lowestChain,
+    productHref: `/products/${product.slug}`
+  };
+});
 
 export default function AlertsPage() {
   return (
