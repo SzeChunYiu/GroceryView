@@ -1,8 +1,9 @@
 import { ValidationPipe, type INestApplication } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { buildCorsOptions } from './middleware/cors.js';
 
 export function configureApp(app: INestApplication) {
-  app.enableCors();
+  app.enableCors(buildCorsOptions());
   app.useGlobalPipes(
     new ValidationPipe({
       forbidNonWhitelisted: true,

@@ -523,6 +523,30 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/users/demo/basket/stores/{storeId}/quote']);
   });
 
+  it('allows configured CORS origins and blocks others', async () => {
+    const allowedOrigin = 'https://grocery-web-mu.vercel.app';
+    await request(app.getHttpServer())
+      .get('/health')
+      .set('Origin', allowedOrigin)
+      .expect(200)
+      .expect('Access-Control-Allow-Origin', allowedOrigin);
+
+    const localhostOrigin = 'http://localhost:3000';
+    await request(app.getHttpServer())
+      .get('/health')
+      .set('Origin', localhostOrigin)
+      .expect(200)
+      .expect('Access-Control-Allow-Origin', localhostOrigin);
+
+    await request(app.getHttpServer())
+      .get('/health')
+      .set('Origin', 'https://evil.example.com')
+      .expect(200)
+      .then((response) => {
+        assert.equal(response.headers['access-control-allow-origin'], undefined);
+      });
+  });
+
   it('serves products, stores, prices, watchlists, baskets, and alerts', async () => {
     const market = await request(app.getHttpServer()).get('/market/overview').expect(200);
     assert.equal(market.body.city, 'Stockholm');
