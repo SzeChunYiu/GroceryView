@@ -1,17 +1,49 @@
-import { Controller, Get, NotFoundException, Param, Query, ServiceUnavailableException } from '@nestjs/common';
+import { BadRequestException, Controller, Get, NotFoundException, Param, Query, ServiceUnavailableException } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { allStores, groceryApi } from '../demo-data.js';
 import { DealsService } from '../deals/deals.service.js';
+import { NearestStoresService } from './nearest-stores.service.js';
 
 @ApiTags('stores')
 @Controller('stores')
 export class StoresController {
-  constructor(private readonly dealsService: DealsService) {}
+  constructor(
+    private readonly dealsService: DealsService,
+    private readonly nearestStoresService: NearestStoresService
+  ) {}
 
   @Get()
   @ApiOkResponse({ description: 'Store list' })
   list() {
     return allStores();
+  }
+
+  @Get('nearest')
+  @ApiOkResponse({ description: 'Nearest stores sorted by Haversine distance' })
+  async nearest(
+    @Query('lat') lat?: string,
+    @Query('lng') lng?: string,
+    @Query('radius') radius?: string,
+    @Query('chain') chain?: string
+  ) {
+    if (!this.nearestStoresService.isConfigured()) {
+      throw new ServiceUnavailableException('DATABASE_URL is required for nearest-store lookups.');
+    }
+
+    const latitude = parseRequiredFiniteQueryNumber(lat, 'lat');
+    const longitude = parseRequiredFiniteQueryNumber(lng, 'lng');
+    const radiusKm = parseRequiredFiniteQueryNumber(radius ?? '10', 'radius');
+    if (radiusKm <= 0) throw new BadRequestException('radius must be greater than 0.');
+    const normalizedChain = chain?.trim() || undefined;
+    const stores = await this.nearestStoresService.nearest({ latitude, longitude, radiusKm, chain: normalizedChain });
+
+    return {
+      lat: latitude,
+      lng: longitude,
+      radiusKm,
+      chain: normalizedChain ?? null,
+      stores
+    };
   }
 
   @Get(':id/deals')
@@ -71,4 +103,15 @@ export class StoresController {
     if (!detail) throw new NotFoundException('Store not found');
     return { ...detail, demo: true };
   }
+}
+
+function parseRequiredFiniteQueryNumber(value: string | undefined, name: string): number {
+  if (value === undefined || value.trim().length === 0) {
+    throw new BadRequestException(`${name} query parameter is required.`);
+  }
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) {
+    throw new BadRequestException(`${name} query parameter must be a finite number.`);
+  }
+  return parsed;
 }
