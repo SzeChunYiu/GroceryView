@@ -7004,6 +7004,13 @@ describe('daily ingestion runner', () => {
       productUrl: 'https://www.apohem.se/vark-feber/varktabletter/alvedon-tabletter-500-mg-paracetamol-20-st',
       imageUrl: 'https://www.apohem.se/globalassets/alvedon.png',
       isOtc: true,
+      channel: 'online',
+      format: 'apohem-online',
+      store_id: { id: 'apohem-online', region: 'SE-online' },
+      is_member_price: false,
+      is_coupon_price: false,
+      is_subscription_price: false,
+      is_clearance: false,
       sourceUrl: apohemSourceUrl,
       retrievedAt
     });
@@ -7023,6 +7030,13 @@ describe('daily ingestion runner', () => {
       productUrl: 'https://www.apotekhjartat.se/produkt/alvedon-500mg-20-tabletter/',
       imageUrl: 'https://www.apotekhjartat.se/assets/alvedon-hjartat.png',
       isOtc: true,
+      channel: 'online',
+      format: 'apotek-hjartat-online',
+      store_id: { id: 'apotek-hjartat-online', region: 'SE-online' },
+      is_member_price: false,
+      is_coupon_price: false,
+      is_subscription_price: false,
+      is_clearance: false,
       sourceUrl: apotekHjartatSourceUrl,
       retrievedAt
     });

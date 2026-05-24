@@ -18,6 +18,13 @@ export type ApohemProduct = {
   productUrl: string;
   imageUrl: string;
   isOtc: boolean;
+  channel: 'online';
+  format: 'apohem-online' | 'apotek-hjartat-online';
+  store_id: { id: string; region: 'SE-online' };
+  is_member_price: boolean;
+  is_coupon_price: boolean;
+  is_subscription_price: boolean;
+  is_clearance: boolean;
   sourceUrl: string;
   retrievedAt: string;
 };
@@ -212,6 +219,13 @@ export function normalizeApohemProduct(
     productUrl: absoluteUrl(product.url, APOHEM_BASE_URL),
     imageUrl: absoluteUrl(product.images?.[0]?.url, APOHEM_BASE_URL),
     isOtc: product.isotc === true,
+    channel: 'online',
+    format: 'apohem-online',
+    store_id: { id: 'apohem-online', region: 'SE-online' },
+    is_member_price: false,
+    is_coupon_price: false,
+    is_subscription_price: false,
+    is_clearance: false,
     sourceUrl,
     retrievedAt
   };
@@ -249,6 +263,13 @@ export function normalizeApotekHjartatProduct(
     productUrl: absoluteUrl(product.url, APOTEK_HJARTAT_BASE_URL),
     imageUrl: absoluteUrl(product.images?.[0]?.url ?? product.swatchImage?.url, APOTEK_HJARTAT_BASE_URL),
     isOtc: product.isOtcMedicine === true,
+    channel: 'online',
+    format: 'apotek-hjartat-online',
+    store_id: { id: 'apotek-hjartat-online', region: 'SE-online' },
+    is_member_price: false,
+    is_coupon_price: false,
+    is_subscription_price: false,
+    is_clearance: false,
     sourceUrl,
     retrievedAt
   };
