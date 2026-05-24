@@ -57,3 +57,16 @@ model UserStoreLoyaltyCard {
   @@index([storeId])
   @@map("user_store_loyalty_cards")
 }
+
+model StoreRating {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id")
+  storeId   String   @map("store_id")
+  rating    Int
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, storeId])
+  @@index([storeId])
+  @@map("store_ratings")
+}

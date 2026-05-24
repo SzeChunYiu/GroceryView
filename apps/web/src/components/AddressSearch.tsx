@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { FormEvent, useMemo, useState } from 'react';
 import { geocodeAddress, nearbyStores, type GeocodableStore, type GeocodeResult, type NearbyStore } from '@/lib/geocode';
+import { storeRatingSummaryForSlug } from '@/lib/store-ratings';
 
 type AddressSearchProps = {
   stores: GeocodableStore[];
@@ -83,13 +84,24 @@ export function AddressSearch({ stores }: AddressSearchProps) {
         <div className="rounded-3xl border border-emerald-100 bg-white p-4">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Nearby stores</p>
           <div className="mt-3 grid gap-3 md:grid-cols-2">
-            {nearby.map((store) => (
-              <Link className="rounded-2xl border border-slate-200 p-4 transition hover:border-emerald-700 hover:bg-emerald-50" href={`/stores/${store.slug}`} key={store.slug}>
-                <p className="font-black text-slate-950">{store.name}</p>
-                <p className="mt-1 text-sm font-semibold text-slate-600">{store.brand} · {locationLabel(store)}</p>
-                {result ? <p className="mt-2 text-xs font-black uppercase tracking-[0.14em] text-emerald-800">{store.distanceKm.toFixed(1)} km away</p> : null}
-              </Link>
-            ))}
+            {nearby.map((store) => {
+              const rating = storeRatingSummaryForSlug(store.slug);
+              return (
+                <Link className="rounded-2xl border border-slate-200 p-4 transition hover:border-emerald-700 hover:bg-emerald-50" href={`/stores/${store.slug}`} key={store.slug}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-black text-slate-950">{store.name}</p>
+                      <p className="mt-1 text-sm font-semibold text-slate-600">{store.brand} · {locationLabel(store)}</p>
+                    </div>
+                    <p className="rounded-full bg-yellow-50 px-3 py-1 text-sm font-black text-yellow-900" aria-label={`${rating.averageLabel} average rating`}>
+                      {rating.averageLabel}
+                    </p>
+                  </div>
+                  <p className="mt-2 text-sm font-black tracking-[0.14em] text-yellow-700">{rating.starLabel}</p>
+                  {result ? <p className="mt-2 text-xs font-black uppercase tracking-[0.14em] text-emerald-800">{store.distanceKm.toFixed(1)} km away</p> : null}
+                </Link>
+              );
+            })}
           </div>
         </div>
       </div>

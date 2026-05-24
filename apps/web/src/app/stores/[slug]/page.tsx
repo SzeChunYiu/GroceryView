@@ -13,6 +13,7 @@ import {
 } from '@/lib/verified-data';
 import { storePageViewScript } from '@/lib/analytics';
 import { metadataForStore } from '@/lib/seo';
+import { storeRatingSummaryForSlug } from '@/lib/store-ratings';
 
 type ConfidenceLevel = 'high' | 'medium' | 'low';
 
@@ -144,6 +145,8 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
   const pricePercentileRank = storePricePercentileRankFor(store);
   const openingHoursLabel = storeOpeningHoursLabel(store);
   const assortmentOverview = storeAssortmentOverviewForStore(store);
+  const ratingSummary = storeRatingSummaryForSlug(store.slug);
+  const ratingAction = `${process.env.GROCERYVIEW_SERVER_URL ?? ''}/stores/${encodeURIComponent(store.slug)}/ratings`;
   const storeViewAnalyticsScript = storePageViewScript({
     brand: store.brand,
     storeName: store.name,
@@ -158,6 +161,37 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
       <p className="mt-3 text-lg text-slate-700">
         {store.brand} · {store.format}
       </p>
+      <Card className="mt-6 border-yellow-200 bg-yellow-50">
+        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-yellow-800">User store rating</p>
+            <h2 className="mt-2 text-3xl font-black text-yellow-950">{ratingSummary.averageLabel}</h2>
+            <p className="mt-1 text-2xl tracking-[0.16em] text-yellow-700" aria-label={`${ratingSummary.averageLabel} average rating`}>
+              {ratingSummary.starLabel}
+            </p>
+            <p className="mt-2 text-sm font-semibold text-yellow-900">
+              Average from {ratingSummary.ratingCount.toLocaleString('sv-SE')} user ratings for this store.
+            </p>
+          </div>
+          <form action={ratingAction} className="rounded-[2rem] bg-white p-4 shadow-sm" method="post">
+            <input name="userId" type="hidden" value="demo-web-user" />
+            <fieldset>
+              <legend className="text-sm font-black text-slate-950">Rate this store</legend>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {[1, 2, 3, 4, 5].map((rating) => (
+                  <label className="rounded-full border border-yellow-200 px-3 py-2 text-sm font-black text-yellow-900" key={rating}>
+                    <input className="mr-1" name="rating" required type="radio" value={rating} />
+                    {rating}★
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+            <button className="mt-4 rounded-full bg-yellow-600 px-4 py-2 text-sm font-black text-white" type="submit">
+              Submit rating
+            </button>
+          </form>
+        </div>
+      </Card>
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <Card>
           <h2 className="text-2xl font-black">Location fields</h2>

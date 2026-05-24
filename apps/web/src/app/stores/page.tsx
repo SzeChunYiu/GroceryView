@@ -3,6 +3,7 @@ import { AddressSearch } from '@/components/AddressSearch';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { storeUniverse } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
+import { storeRatingSummaryForSlug } from '@/lib/store-ratings';
 
 export function generateMetadata() {
   return routeMetadata('/stores');
@@ -33,7 +34,23 @@ export default function StoresIndexPage() {
             </Link>
           </Card>
         ) : null}
-        <Card><h2 className="text-2xl font-black">Stores with coordinates</h2><div className="mt-4 grid gap-3 md:grid-cols-2">{storeUniverse.slice(0, 60).map((store) => <Link className="rounded-2xl border border-slate-200 p-4 hover:border-emerald-700" href={`/stores/${store.slug}`} key={store.slug}><p className="font-black">{store.name}</p><p className="text-sm text-slate-600">{store.brand} · {store.city || store.district || 'City not reported'}</p></Link>)}</div></Card>
+        <Card><h2 className="text-2xl font-black">Stores with coordinates</h2><div className="mt-4 grid gap-3 md:grid-cols-2">{storeUniverse.slice(0, 60).map((store) => {
+          const rating = storeRatingSummaryForSlug(store.slug);
+          return (
+            <Link className="rounded-2xl border border-slate-200 p-4 hover:border-emerald-700" href={`/stores/${store.slug}`} key={store.slug}>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="font-black">{store.name}</p>
+                  <p className="text-sm text-slate-600">{store.brand} · {store.city || store.district || 'City not reported'}</p>
+                </div>
+                <p className="rounded-full bg-yellow-50 px-3 py-1 text-sm font-black text-yellow-900" aria-label={`${rating.averageLabel} average rating`}>
+                  {rating.averageLabel}
+                </p>
+              </div>
+              <p className="mt-3 text-sm font-black tracking-[0.14em] text-yellow-700">{rating.starLabel}</p>
+            </Link>
+          );
+        })}</div></Card>
       </div>
     </PageShell>
   );
