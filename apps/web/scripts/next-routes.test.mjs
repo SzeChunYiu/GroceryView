@@ -3791,4 +3791,19 @@ ${seo}`;
     assert.match(productDetailRoute, /formatComparableUnitPrice/);
     assert.match(screenerRoute, /formatLocalizedUnitPrice/);
   });
+
+  it('adds structured rejection reasons to the admin search alias review queue', async () => {
+    const page = await read('src/app/admin/search-aliases/page.tsx');
+    const review = await read('src/lib/search-alias-review.ts');
+
+    assert.match(page, /Search alias review/);
+    assert.match(page, /name="rejectionReason"/);
+    assert.match(page, /buildSearchAliasRejection\('pending-no-result-alias', 'insufficient_confidence'\)/);
+    assert.match(review, /bad_query/);
+    assert.match(review, /wrong_product/);
+    assert.match(review, /duplicate_alias/);
+    assert.match(review, /insufficient_confidence/);
+    assert.match(review, /status: 'rejected'/);
+    assert.match(review, /rejectionReason: reason/);
+  });
 });
