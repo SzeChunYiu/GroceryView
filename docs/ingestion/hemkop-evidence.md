@@ -194,6 +194,26 @@ Sample rows:
 4. 2500299506 | 4798 | Kaffe | 59,95 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100
 5. 2500298024 | 4798 | Kycklinginnerfilé | 46,95 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100
 
+## Hemköp weekly discounts refresh 2026-05-25
+
+- Source: hemkop.se public Axfood campaign JSON
+- Store catalog source: https://www.hemkop.se/axfood/rest/store
+- Source URL pattern: https://www.hemkop.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100
+- Retrieved: 2026-05-24T22:11:12.471Z
+- Store count: 205
+- Source URLs fetched: 615
+- Real weekly discount rows fetched and wired: 55335
+- Current flyer rows for 25/05-2026-31/05-2026: 13470 rows across 204 stores
+- Web wire: apps/web/src/lib/ingested/hemkop.ts
+- Connector: packages/ingestion/src/connectors/hemkop.ts
+
+Sample current-week rows:
+1. 2500310779 | 4798 | Krossade tomater | 5 kr/st | 25/05-2026-31/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100
+2. 2500305800 | 4798 | Minutkyckling | 59,95 kr/st | 25/05-2026-31/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100
+3. 2500305832 | 4798 | Falukorv | 10 kr/st | 25/05-2026-31/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100
+4. 2500299308 | 4798 | Bregott | 39,95 kr/st | 25/05-2026-31/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100
+5. 2500310786 | 4798 | Vaniljhjärta | 6 kr/st | 25/05-2026-31/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100
+
 ## Hemköp weekly discounts 48-store expansion 2026-05-22
 
 - Source: hemkop.se public Axfood campaign JSON

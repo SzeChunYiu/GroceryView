@@ -256,6 +256,26 @@ Sample rows:
 4. 2500298388 | 2149 | Hushållspapper 12-pack, toalettpapper 18-pack | 59,90/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100
 5. 2500301201 | 2149 | Läsk 6-pack | Välj & blanda! 3 för 89,00 +pant | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100
 
+## Willys weekly discounts refresh 2026-05-25
+
+- Source: willys.se public Axfood campaign JSON
+- Store catalog source: https://www.willys.se/axfood/rest/store
+- Source URL pattern: https://www.willys.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100
+- Retrieved: 2026-05-24T22:11:12.471Z
+- Store count: 254
+- Source URLs fetched: 644
+- Real weekly discount rows fetched and wired: 46365
+- Current flyer rows for 25/05-2026-31/05-2026: 15843 rows across 242 stores
+- Web wire: apps/web/src/lib/ingested/willys.ts
+- Connector: packages/ingestion/src/connectors/willys.ts
+
+Sample current-week rows:
+1. 2500299274 | 2149 | Bregott | 37,80/st | 25/05-2026-31/05-2026 | https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100
+2. 2500299322 | 2149 | Sportbröd | 19,90/st | 25/05-2026-31/05-2026 | https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100
+3. 2500299444 | 2149 | Nötfärs | 89,90/st | 25/05-2026-31/05-2026 | https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100
+4. 2500299156 | 2149 | Lightdryck | Välj & blanda! 3 för 49,00 +pant | 25/05-2026-31/05-2026 | https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100
+5. 2500308119 | 2149 | Svensk gurka | 9,90/st | 25/05-2026-31/05-2026 | https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100
+
 ## Willys weekly discounts 60-store expansion 2026-05-22
 
 - Source: willys.se public Axfood campaign JSON
