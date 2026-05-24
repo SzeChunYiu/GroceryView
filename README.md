@@ -2,7 +2,7 @@
 
 > **Live status board — auto-generated, do not hand-edit.**
 > Regenerated from real signals (merged PRs, open PRs, GOAL.md, live prod HTML) by
-> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-24 03:10 UTC.
+> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-24 05:17 UTC.
 
 GroceryView turns grocery prices into a market: every product is a **ticker** with a
 price chart, chains/categories/brands have **indices**, deals get a **Buy/Wait**
@@ -13,7 +13,7 @@ Strategy + competitor teardown: [`GOAL.md`](GOAL.md) · [`COMPETITIVE-ANALYSIS.m
 
 - **Site:** [https://grocery-web-mu.vercel.app](https://grocery-web-mu.vercel.app) — `/` returns HTTP **200**
 - **Visible on homepage:** ~**24** store pages, ~**35** product pages
-- **Shipped `feat:`/`wire:` PRs to date:** **200**
+- **Shipped `feat:`/`wire:` PRs to date:** **195**
 
 ## 🛒 What shoppers get (consumer value)
 
@@ -42,6 +42,11 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 
 ## ✅ Recently shipped (last 15 merged `feat:`/`wire:` PRs)
 
+- #1543 feat(ingest): deepen Willys category product rows
+- #1537 feat: wire weekly basket strategy coverage
+- #1528 feat(ingest): deepen verified grocery data rows
+- #1529 feat(ingest): add Coop branch weekly flyer discounts
+- #1489 feat(ingest): expand ICA Toria store prices
 - #1524 feat(api): save authenticated settings preferences
 - #1520 feat(ingest): add Coop branch weekly flyer discounts
 - #1384 feat(ingest): expand Axfood weekly flyer discounts
@@ -52,14 +57,18 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 - #1483 feat(web): add cookies disclosure page
 - #1498 feat(web): add basket calculator page
 - #1487 feat(web): add product detail alias route
-- #1486 feat(ingestion): add City Gross bulk connector
-- #1485 feat(ingestion): wire Mathem daily connector
-- #1482 feat(account): add confirmed account deletion
-- #1481 feat(api): add notification inbox timing contract
-- #1479 feat(account): add GDPR data export settings
 
 ## 🔄 In progress (open PRs)
 
+- #1548 Add screener discount filter slider
+- #1544 [codex] Add Prisma test factories _(draft)_
+- #1541 test(api): cover items routes
+- #1540 [codex] Add local price statistics pages _(draft)_
+- #1538 feat: stream live product prices via WebSocket
+- #1536 feat(ingest): expand Axfood weekly flyer rows
+- #1535 Implement toast notifications for shopping list add/remove actions
+- #1534 feat: add rolling average deals endpoint _(draft)_
+- #1533 feat(web): wire pantry replenishment planner
 - #1526 feat(api): publish OpenAPI docs
 - #1525 lunarc/feat watchlist
 - #1522 Implement hidden item and store preferences
@@ -76,7 +85,6 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 - #1502 Add privacy and terms pages with footer links
 - #1495 Add store comparison e2e coverage
 - #1491 lunarc/feat store price percentile
-- #1489 feat(ingest): expand ICA Toria store prices
 - #1484 fix: add breadcrumb coverage for category and product pages
 - #1480 feat(web): group desktop navigation
 - #1478 chore: add Renovate configuration and validation
@@ -102,14 +110,6 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 - #1397 [codex] Back notification inbox with persisted rows _(draft)_
 - #1396 [codex] Make watchlist notification timing deterministic _(draft)_
 - #1394 test(web): add explicit deals→screener query contract check
-- #1391 test: cover DB IO hotspot compare CLI _(draft)_
-- #1389 Move deal screener contract to /screener
-- #1387 feat(pharmacy): apohem
-- #1383 Generate web price snapshot from Postgres
-- #1382 feat(fuel): add AdBlue grade catalog
-- #1381 Add country ingestion batch runner
-- #1377 feat(ingest): add ICA Vannas store price
-- #1376 ci: compare daily DB IO hotspot captures
 
 ## 📋 To-do (from GOAL.md backlog)
 
