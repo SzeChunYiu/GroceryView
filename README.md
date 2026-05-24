@@ -2,7 +2,7 @@
 
 > **Live status board — auto-generated, do not hand-edit.**
 > Regenerated from real signals (merged PRs, open PRs, GOAL.md, live prod HTML) by
-> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-24 05:17 UTC.
+> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-24 06:20 UTC.
 
 GroceryView turns grocery prices into a market: every product is a **ticker** with a
 price chart, chains/categories/brands have **indices**, deals get a **Buy/Wait**
@@ -13,7 +13,7 @@ Strategy + competitor teardown: [`GOAL.md`](GOAL.md) · [`COMPETITIVE-ANALYSIS.m
 
 - **Site:** [https://grocery-web-mu.vercel.app](https://grocery-web-mu.vercel.app) — `/` returns HTTP **200**
 - **Visible on homepage:** ~**24** store pages, ~**35** product pages
-- **Shipped `feat:`/`wire:` PRs to date:** **195**
+- **Shipped `feat:`/`wire:` PRs to date:** **190**
 
 ## 🛒 What shoppers get (consumer value)
 
@@ -42,6 +42,7 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 
 ## ✅ Recently shipped (last 15 merged `feat:`/`wire:` PRs)
 
+- #1536 feat(ingest): expand Axfood weekly flyer rows
 - #1543 feat(ingest): deepen Willys category product rows
 - #1537 feat: wire weekly basket strategy coverage
 - #1528 feat(ingest): deepen verified grocery data rows
@@ -56,16 +57,18 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 - #1500 feat(web): standardize unit price labels
 - #1483 feat(web): add cookies disclosure page
 - #1498 feat(web): add basket calculator page
-- #1487 feat(web): add product detail alias route
 
 ## 🔄 In progress (open PRs)
 
-- #1548 Add screener discount filter slider
+- #1558 Add CORS preflight allowlist assertions
+- #1557 test(web): add analytics consent gate test coverage
+- #1556 [codex] Add keyboard navigation to search results
+- #1555 Enrich API swagger parameter and response metadata
+- #1554 [codex] Add global skip link _(draft)_
 - #1544 [codex] Add Prisma test factories _(draft)_
 - #1541 test(api): cover items routes
 - #1540 [codex] Add local price statistics pages _(draft)_
 - #1538 feat: stream live product prices via WebSocket
-- #1536 feat(ingest): expand Axfood weekly flyer rows
 - #1535 Implement toast notifications for shopping list add/remove actions
 - #1534 feat: add rolling average deals endpoint _(draft)_
 - #1533 feat(web): wire pantry replenishment planner
@@ -107,9 +110,6 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 - #1403 feat(web): add EAN barcode search API route
 - #1401 Add product offer JSON-LD
 - #1400 [codex] Add notification inbox contract schema _(draft)_
-- #1397 [codex] Back notification inbox with persisted rows _(draft)_
-- #1396 [codex] Make watchlist notification timing deterministic _(draft)_
-- #1394 test(web): add explicit deals→screener query contract check
 
 ## 📋 To-do (from GOAL.md backlog)
 
