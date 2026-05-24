@@ -49,28 +49,35 @@ function basketHeatTone(tone: string) {
 }
 
 function buildDistrictHeatOverlay() {
-  const districts = new Map<string, { totalStores: number; coveredStores: number; indexTotal: number; chains: Set<string> }>();
+  const storeCountsByDistrict = new Map<string, number>();
   for (const store of storeUniverse) {
     const district = store.district || store.city || 'Unknown district';
-    const current = districts.get(district) ?? { totalStores: 0, coveredStores: 0, indexTotal: 0, chains: new Set<string>() };
-    current.totalStores += 1;
-    const chain = chainIndexByBrand.get(normaliseBrand(store.brand));
-    if (chain) {
-      current.coveredStores += 1;
-      current.indexTotal += chain.overallIndex;
-      current.chains.add(chain.chainId);
-    }
+    storeCountsByDistrict.set(district, (storeCountsByDistrict.get(district) ?? 0) + 1);
+  }
+
+  const districts = new Map<string, { coveredStores: number; indexTotal: number; observationCount: number; regularBaselines: number; chains: Set<string> }>();
+  for (const rank of storePricePercentileRanks) {
+    const district = rank.kommun || 'Unknown district';
+    const current = districts.get(district) ?? { coveredStores: 0, indexTotal: 0, observationCount: 0, regularBaselines: 0, chains: new Set<string>() };
+    current.coveredStores += 1;
+    current.indexTotal += rank.averageRelativeIndex;
+    current.observationCount += rank.matchedPerBranchObservationCount;
+    current.regularBaselines += rank.regularPriceObservationCount;
+    current.chains.add(rank.chain);
     districts.set(district, current);
   }
 
   return [...districts.entries()]
     .map(([district, row]) => ({
       district,
-      totalStores: row.totalStores,
+      totalStores: storeCountsByDistrict.get(district) ?? row.coveredStores,
       coveredStores: row.coveredStores,
       averageIndex: row.coveredStores > 0 ? row.indexTotal / row.coveredStores : 100,
       chainCount: row.chains.size,
-      coverageShare: row.totalStores > 0 ? row.coveredStores / row.totalStores : 0
+      observationCount: row.observationCount,
+      regularBaselines: row.regularBaselines,
+      coverageShare: (storeCountsByDistrict.get(district) ?? row.coveredStores) > 0 ? row.coveredStores / (storeCountsByDistrict.get(district) ?? row.coveredStores) : 0,
+      staleWarning: row.regularBaselines < row.coveredStores * 3 ? 'Limited regular-price baselines; keep this heat overlay labelled as partial.' : 'Per-branch observations include regular-price baselines.'
     }))
     .filter((row) => row.coveredStores > 0)
     .sort((a, b) => a.averageIndex - b.averageIndex || b.coveredStores - a.coveredStores)
@@ -219,10 +226,10 @@ export default function MapPage() {
           <div>
             <h2 className="text-2xl font-black">District price heat overlay</h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
-              District heat uses OSM store districts plus each store brand's chain-index proxy. It is not a branch-price claim; districts with missing chain coverage are excluded from the ranked overlay.
+              District heat uses matched per-branch Lidl offer observations grouped by district/kommun. It does not infer neighbourhood prices for stores without branch rows; coverage and stale-data warnings stay visible.
             </p>
           </div>
-          <p className="rounded-full bg-slate-100 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-slate-700">chain-index proxy</p>
+          <p className="rounded-full bg-slate-100 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-slate-700">per-branch observations</p>
         </div>
         <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {districtHeatOverlay.map((district) => (
@@ -234,7 +241,8 @@ export default function MapPage() {
                 </div>
                 <p className="text-3xl font-black">{district.averageIndex.toFixed(1)}</p>
               </div>
-              <p className="mt-3 text-xs font-semibold opacity-80">Coverage {formatPct(district.coverageShare * 100)} of OSM stores in district.</p>
+              <p className="mt-3 text-xs font-semibold opacity-80">Coverage {formatPct(district.coverageShare * 100)} of OSM stores in district · {district.observationCount} per-branch observations.</p>
+              <p className="mt-2 text-xs font-semibold opacity-80">Stale-data warning: {district.staleWarning}</p>
             </div>
           ))}
         </div>

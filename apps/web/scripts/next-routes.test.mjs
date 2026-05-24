@@ -2068,14 +2068,18 @@ ${seo}`;
     assert.doesNotMatch(map, /Math\.random/);
   });
 
-  it('surfaces a price-by-district heat overlay on the map without branch-price claims', async () => {
+  it('surfaces a price-by-district heat overlay on the map from branch observations', async () => {
     const route = await read('src/app/map/page.tsx');
     assert.match(route, /districtHeatOverlay/);
     assert.match(route, /buildDistrictHeatOverlay/);
     assert.match(route, /District price heat overlay/);
     assert.match(route, /district\.averageIndex\.toFixed/);
     assert.match(route, /district\.coveredStores/);
-    assert.match(route, /chain-index proxy/);
+    assert.match(route, /storePricePercentileRanks/);
+    assert.match(route, /matchedPerBranchObservationCount/);
+    assert.match(route, /regularPriceObservationCount/);
+    assert.match(route, /Stale-data warning/);
+    assert.match(route, /per-branch observations/);
   });
 
   it('surfaces a basket-cost heatmap by area from the weekly basket optimizer without branch-price invention', async () => {
