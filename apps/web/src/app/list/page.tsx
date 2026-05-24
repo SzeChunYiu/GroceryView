@@ -7,7 +7,17 @@ import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { useList } from '@/hooks/useList';
 
 export default function ShoppingListPage() {
-  const { addImportedItems, checkedCount, items, remainingCount, resetCheckedState, toggleItemChecked, totalCount } = useList();
+  const {
+    addImportedItems,
+    checkedCount,
+    copyReadonlyListUrl,
+    items,
+    readonlyListUrl,
+    remainingCount,
+    resetCheckedState,
+    toggleItemChecked,
+    totalCount
+  } = useList();
   const progress = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
 
   return (
@@ -30,6 +40,36 @@ export default function ShoppingListPage() {
         </div>
 
         <BulkImportDialog onImportItems={addImportedItems} />
+
+        <section className="mt-6 rounded-[1.75rem] border border-slate-200 bg-white/95 p-5 shadow-sm">
+          <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-center">
+            <div>
+              <h2 className="text-xl font-black tracking-tight text-slate-950">Share read-only list</h2>
+              <p className="mt-1 text-sm font-semibold leading-6 text-slate-700">
+                Copy the generated read-only link or show the QR-ready data block to hand this list to another phone without account setup.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <button
+                className="inline-flex items-center justify-center rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white transition hover:bg-emerald-900 disabled:cursor-not-allowed disabled:bg-slate-300"
+                disabled={!readonlyListUrl}
+                onClick={copyReadonlyListUrl}
+                type="button"
+              >
+                Copy read-only link
+              </button>
+              <div
+                aria-label="QR-ready list URL data block"
+                className="grid min-h-24 w-full max-w-sm grid-cols-[auto_1fr] gap-3 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-3 text-left sm:w-80"
+              >
+                <span className="grid h-16 w-16 place-items-center rounded-xl bg-white font-mono text-lg font-black text-emerald-900 shadow-inner">QR</span>
+                <code className="break-all text-xs font-bold leading-5 text-slate-700">
+                  {readonlyListUrl || 'Preparing read-only list URL...'}
+                </code>
+              </div>
+            </div>
+          </div>
+        </section>
 
         <section className="mt-6 rounded-[1.75rem] border border-emerald-200 bg-white/95 p-5 shadow-sm">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

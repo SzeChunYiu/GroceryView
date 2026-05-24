@@ -127,14 +127,25 @@ function persistCheckedState(items: ShoppingListItem[]) {
   }
 }
 
+function encodeReadOnlyList(items: ShoppingListItem[]): string {
+  const payload = JSON.stringify(items.map((item) => ({
+    detail: item.detail,
+    name: item.name,
+    quantity: item.quantity
+  })));
+  return btoa(unescape(encodeURIComponent(payload))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+}
+
 export function useList() {
   const [items, setItems] = useState<ShoppingListItem[]>(() => withCheckedState({}));
   const [hasLoadedBrowserState, setHasLoadedBrowserState] = useState(false);
+  const [shareOrigin, setShareOrigin] = useState('');
 
   useEffect(() => {
     try {
       const { checkedById, importedItems } = listStateFromStorage(localStorage.getItem(LIST_STORAGE_KEY));
       setItems(withCheckedState(checkedById, importedItems));
+      setShareOrigin(window.location.origin);
     } finally {
       setHasLoadedBrowserState(true);
     }
@@ -169,11 +180,26 @@ export function useList() {
   const checkedCount = useMemo(() => items.filter((item) => item.checked).length, [items]);
   const totalCount = items.length;
   const remainingCount = totalCount - checkedCount;
+  const readonlyListUrl = useMemo(() => {
+    if (!shareOrigin) return '';
+    const params = new URLSearchParams({
+      readonly: '1',
+      items: encodeReadOnlyList(items)
+    });
+    return `${shareOrigin}/list?${params.toString()}`;
+  }, [items, shareOrigin]);
+  const copyReadonlyListUrl = useCallback(async () => {
+    if (!readonlyListUrl) return false;
+    await navigator.clipboard.writeText(readonlyListUrl);
+    return true;
+  }, [readonlyListUrl]);
 
   return {
     addImportedItems,
     checkedCount,
+    copyReadonlyListUrl,
     items,
+    readonlyListUrl,
     remainingCount,
     resetCheckedState,
     toggleItemChecked,
