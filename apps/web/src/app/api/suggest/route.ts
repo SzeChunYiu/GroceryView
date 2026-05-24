@@ -1,13 +1,29 @@
 import { createPgQueryExecutor, type QueryExecutor } from '@groceryview/db';
 import { NextResponse } from 'next/server';
+import { adaptiveProductCards, categorySummaries } from '@/lib/verified-data';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const SUPPORTED_COUNTRIES = new Set(['SE', 'NO', 'IS']);
-const CACHE_TTL_MS = 60 * 1000;
+const SUGGESTION_LIMIT = 10;
+const CACHE_TTL_MS = 60_000;
+const CACHE_HEADERS = {
+  'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=60'
+};
 
 type CountryCode = 'SE' | 'NO' | 'IS';
+type SuggestionKind = 'product' | 'category';
+
+export type StaticSuggestion = {
+  type: SuggestionKind;
+  label: string;
+  href: string;
+  slug: string;
+  score: number;
+  match: 'prefix' | 'word-prefix' | 'contains';
+  detail?: string;
+};
 
 type PgPoolLike = {
   query(text: string, values: unknown[]): Promise<{ rows: unknown[] }>;
@@ -32,8 +48,11 @@ type SuggestionRow = {
 };
 
 type Suggestion = {
+  type: 'product';
   id: string;
   slug: string;
+  label: string;
+  href: string;
   name: string;
   brand: string | null;
   imageUrl: string | null;
@@ -57,9 +76,15 @@ type CacheEntry = {
   payload: SuggestPayload;
 };
 
+type CachedSuggestions = {
+  expiresAt: number;
+  suggestions: StaticSuggestion[];
+};
+
 let cachedDatabaseUrl: string | null = null;
 let cachedPool: PgPoolLike | null = null;
-const responseCache = new Map<string, CacheEntry>();
+const suggestionCache = new Map<string, CacheEntry>();
+const staticSuggestionCache = new Map<string, CachedSuggestions>();
 
 async function importPgModule(): Promise<PgModuleLike> {
   const loadModule = new Function('specifier', 'return import(specifier)') as (specifier: string) => Promise<unknown>;
@@ -74,9 +99,69 @@ async function executorForDatabaseUrl(databaseUrl: string) {
     const pg = await importPgModule();
     cachedPool = new pg.Pool({ connectionString: databaseUrl, max: 1 });
     cachedDatabaseUrl = databaseUrl;
-    responseCache.clear();
+    suggestionCache.clear();
   }
   return createPgQueryExecutor(cachedPool);
+}
+
+function normalizedSearchText(value: string) {
+  return value.trim().toLocaleLowerCase('sv-SE');
+}
+
+function matchScore(label: string, query: string) {
+  const normalizedLabel = normalizedSearchText(label);
+  if (normalizedLabel.startsWith(query)) return { score: 0, match: 'prefix' as const };
+  if (normalizedLabel.split(/\s+/).some((word) => word.startsWith(query))) return { score: 1, match: 'word-prefix' as const };
+  if (normalizedLabel.includes(query)) return { score: 2, match: 'contains' as const };
+  return null;
+}
+
+function compareSuggestions(left: StaticSuggestion, right: StaticSuggestion) {
+  return (
+    left.score - right.score
+    || (left.type === right.type ? 0 : left.type === 'product' ? -1 : 1)
+    || left.label.localeCompare(right.label, 'sv')
+    || left.slug.localeCompare(right.slug, 'sv')
+  );
+}
+
+function buildStaticSuggestions(query: string) {
+  const products = adaptiveProductCards.flatMap((product): StaticSuggestion[] => {
+    const match = matchScore(product.name, query);
+    if (!match) return [];
+    return [{
+      type: 'product',
+      label: product.name,
+      href: `/products/${product.slug}`,
+      slug: product.slug,
+      detail: product.brand,
+      ...match
+    }];
+  });
+
+  const categories = categorySummaries.flatMap((category): StaticSuggestion[] => {
+    const match = matchScore(category.label, query);
+    if (!match) return [];
+    return [{
+      type: 'category',
+      label: category.label,
+      href: `/categories/${category.slug}`,
+      slug: category.slug,
+      detail: `${category.openPriceRows + category.chainRows} verified rows`,
+      ...match
+    }];
+  });
+
+  return [...products, ...categories].sort(compareSuggestions).slice(0, SUGGESTION_LIMIT);
+}
+
+function cachedStaticSuggestions(query: string, now = Date.now()) {
+  const cached = staticSuggestionCache.get(query);
+  if (cached && cached.expiresAt > now) return cached.suggestions;
+
+  const suggestions = buildStaticSuggestions(query);
+  staticSuggestionCache.set(query, { expiresAt: now + CACHE_TTL_MS, suggestions });
+  return suggestions;
 }
 
 function parseCountry(searchParams: URLSearchParams): CountryCode | null {
@@ -84,12 +169,19 @@ function parseCountry(searchParams: URLSearchParams): CountryCode | null {
   return country && SUPPORTED_COUNTRIES.has(country) ? country as CountryCode : null;
 }
 
+function hasCountryParameter(searchParams: URLSearchParams) {
+  return searchParams.has('country');
+}
+
 function mapSuggestion(row: SuggestionRow): Suggestion {
   const minPrice = row.min_price === null ? null : Number(row.min_price);
   const searchRank = Number(row.search_rank ?? 0);
   return {
+    type: 'product',
     id: row.id,
     slug: row.slug,
+    label: row.name,
+    href: `/products/${row.slug}`,
     name: row.name,
     brand: row.brand,
     imageUrl: row.image_url,
@@ -103,7 +195,7 @@ function mapSuggestion(row: SuggestionRow): Suggestion {
 
 async function listSuggestions(executor: QueryExecutor, query: string, country: CountryCode): Promise<Suggestion[]> {
   const normalizedQuery = query.trim().replace(/\s+/g, ' ');
-  if (normalizedQuery.length < 2) return [];
+  if (normalizedQuery.length < 1) return [];
 
   const rows = await executor.query<SuggestionRow>(
     `/* country_scoped_suggest */
@@ -140,7 +232,7 @@ async function listSuggestions(executor: QueryExecutor, query: string, country: 
        from ranked
       where country_price_rank = 1
       order by search_rank desc, name asc
-      limit 8`,
+      limit ${SUGGESTION_LIMIT}`,
     [normalizedQuery, country]
   );
   return rows.map(mapSuggestion);
@@ -153,34 +245,50 @@ function payload(country: CountryCode, query: string, results: Suggestion[], err
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const country = parseCountry(searchParams);
-  const query = (searchParams.get('q') ?? '').trim();
+  const query = normalizedSearchText(searchParams.get('q') ?? '');
+
+  if (query.length < 1) {
+    return NextResponse.json(
+      { error: 'q query parameter must be at least 1 character.', query, suggestions: [] },
+      { status: 400, headers: CACHE_HEADERS }
+    );
+  }
+
+  if (!hasCountryParameter(searchParams)) {
+    return NextResponse.json(
+      {
+        query,
+        suggestions: cachedStaticSuggestions(query),
+        limit: SUGGESTION_LIMIT,
+        source: 'verified product and category snapshots'
+      },
+      { headers: CACHE_HEADERS }
+    );
+  }
 
   if (!country) {
     return NextResponse.json(
       { error: 'country_required_or_invalid', supportedCountries: [...SUPPORTED_COUNTRIES] },
-      { status: 400 }
+      { status: 400, headers: CACHE_HEADERS }
     );
   }
 
-  if (query.length < 2) return NextResponse.json(payload(country, query, []));
-
-  const cacheKey = `${country}:${query.toLocaleLowerCase('sv-SE')}`;
-  const cached = responseCache.get(cacheKey);
-  if (cached && cached.expiresAt > Date.now()) return NextResponse.json(cached.payload);
+  const cacheKey = `${country}:${query}`;
+  const cached = suggestionCache.get(cacheKey);
+  if (cached && cached.expiresAt > Date.now()) return NextResponse.json(cached.payload, { headers: CACHE_HEADERS });
 
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) {
-    return NextResponse.json(payload(country, query, [], 'suggest_database_unconfigured'), { status: 503 });
+    return NextResponse.json(payload(country, query, [], 'suggest_database_unconfigured'), { status: 503, headers: CACHE_HEADERS });
   }
 
   try {
     const executor = await executorForDatabaseUrl(databaseUrl);
     const results = await listSuggestions(executor, query, country);
     const response = payload(country, query, results);
-    responseCache.set(cacheKey, { expiresAt: Date.now() + CACHE_TTL_MS, payload: response });
-    return NextResponse.json(response);
-  } catch (error) {
-    console.error('Country-scoped suggest query failed', error instanceof Error ? { name: error.name } : { name: 'unknown' });
-    return NextResponse.json(payload(country, query, [], 'suggest_query_failed'), { status: 500 });
+    suggestionCache.set(cacheKey, { expiresAt: Date.now() + CACHE_TTL_MS, payload: response });
+    return NextResponse.json(response, { headers: CACHE_HEADERS });
+  } catch {
+    return NextResponse.json(payload(country, query, [], 'suggest_query_failed'), { status: 500, headers: CACHE_HEADERS });
   }
 }
