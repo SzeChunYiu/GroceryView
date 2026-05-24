@@ -10,6 +10,7 @@ import {
   buildCoopSearchUrl,
   buildCoopStoreInfoUrl,
   buildCoopStoresUrl,
+  buildScbCpiRequestBody,
   buildCityGrossProductsUrl,
   buildCityGrossStoresUrl,
   buildDailyConnectorConfigsFromEnv,
@@ -58,6 +59,7 @@ import {
   fetchBrandedSwedishFuelStations,
   fetchOverpassFuelStations,
   fetchOverpassGroceryStores,
+  fetchScbCpiBenchmarkObservations,
   fetchRetailerConnectorSnapshot,
   fetchCityGrossBulkProducts,
   fetchCityGrossProducts,
@@ -133,6 +135,7 @@ import {
   parseBrandedSwedishFuelStations,
   parseCoopDrPdfTextOffers,
   parseRetailerProductJsonSnapshot,
+  parseScbCpiJsonStat,
   persistOpenFoodFactsProductMetadata,
   parseSt1FuelPriceHtml,
   planIngestionBatch,
@@ -188,6 +191,58 @@ import {
   validateStoreLocatorFixtures
 } from '../index.js';
 import type { QueryExecutor } from '@groceryview/db';
+
+describe('fetchScbCpiBenchmarkObservations', () => {
+  it('maps SCB JSON-stat CPI values into benchmark observations without fabricating null periods', async () => {
+    const requestedBodies: unknown[] = [];
+    const payload = {
+      id: ['VaruTjanstegrupp', 'ContentsCode', 'Tid'],
+      size: [4, 1, 2],
+      dimension: {
+        VaruTjanstegrupp: { category: { index: { '00': 0, '01': 1, '06.1': 2, '07.2.2': 3 } } },
+        ContentsCode: { category: { index: { '0000080H': 0 } } },
+        Tid: { category: { index: { '2026M03': 0, '2026M04': 1 } } }
+      },
+      value: [125.1, 125.4, 132.2, null, 118.8, 119.1, 141.5, 140.9]
+    };
+    const fetchImpl: typeof fetch = async (_url, init) => {
+      requestedBodies.push(JSON.parse(String(init?.body)));
+      return new Response(JSON.stringify(payload), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchScbCpiBenchmarkObservations({
+      fetchImpl,
+      topPeriods: 2,
+      observedAt: '2026-05-24T16:45:00.000Z'
+    });
+
+    assert.deepEqual(requestedBodies, [buildScbCpiRequestBody({ topPeriods: 2 })]);
+    assert.deepEqual(rows.map((row) => [row.vertical, row.ecoicopCode, row.period, row.value]), [
+      ['overall', '00', '2026-03', 125.1],
+      ['overall', '00', '2026-04', 125.4],
+      ['food', '01', '2026-03', 132.2],
+      ['pharmaceutical', '06.1', '2026-03', 118.8],
+      ['pharmaceutical', '06.1', '2026-04', 119.1],
+      ['fuel', '07.2.2', '2026-03', 141.5],
+      ['fuel', '07.2.2', '2026-04', 140.9]
+    ]);
+  });
+
+  it('returns no SCB CPI rows for non-finite source values', () => {
+    const rows = parseScbCpiJsonStat({
+      id: ['VaruTjanstegrupp', 'ContentsCode', 'Tid'],
+      size: [1, 1, 1],
+      dimension: {
+        VaruTjanstegrupp: { category: { index: { '00': 0 } } },
+        ContentsCode: { category: { index: { '0000080H': 0 } } },
+        Tid: { category: { index: { '2026M04': 0 } } }
+      },
+      value: [null]
+    }, '2026-05-24T16:45:00.000Z');
+
+    assert.deepEqual(rows, []);
+  });
+});
 
 describe('confidenceForSource', () => {
   it('uses proposal confidence values by source type', () => {

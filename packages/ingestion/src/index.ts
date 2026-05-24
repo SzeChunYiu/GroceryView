@@ -86,6 +86,7 @@ import {
 } from './connectors/willys.js';
 import { fetchWillysBulkProducts } from './connectors/willys-bulk.js';
 
+export * from './connectors/benchmarks/scb-cpi.js';
 export * from './connectors/openfoodfacts.js';
 export * from './connectors/all-store-runner.js';
 export * from './connectors/overpass.js';

@@ -1,0 +1,24 @@
+name: Benchmark ingestion
+
+on:
+  schedule:
+    - cron: '42 4 15 * *'
+  workflow_dispatch:
+
+jobs:
+  scb-cpi:
+    name: Ingest SCB CPI benchmark
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build -w @groceryview/ingestion
+      - name: Fetch and persist SCB CPI
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: node scripts/ingestion/run-scb-cpi-benchmark.mjs
