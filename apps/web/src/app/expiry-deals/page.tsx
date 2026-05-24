@@ -105,7 +105,13 @@ export default function ExpiryDealsPage() {
         </div>
 
         <div className="mt-5 space-y-3">
-          {activeItems.map((item) => {
+          {activeItems.length === 0 ? (
+            <div className="rounded-lg border border-dashed border-emerald-200 bg-white p-6 text-center">
+              <p className="text-3xl" aria-hidden="true">🛒</p>
+              <h3 className="mt-2 text-xl font-black text-slate-950">No active expiry deals yet</h3>
+              <p className="mt-2 text-sm font-semibold text-slate-600">Check back after shoppers report new markdown stickers nearby.</p>
+            </div>
+          ) : activeItems.map((item) => {
             const confidence = confidenceFor(item);
             return (
               <Link className="block rounded-lg border border-emerald-100 bg-white p-4 shadow-sm hover:border-emerald-700" href={`/products/${item.productId}`} key={item.id}>
