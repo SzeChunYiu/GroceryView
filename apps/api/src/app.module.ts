@@ -23,6 +23,7 @@ import { PrivacyModule } from './privacy/privacy.module.js';
 import { ProductsModule } from './products/products.module.js';
 import { ReceiptsModule } from './receipts/receipts.module.js';
 import { RetailersModule } from './retailers/retailers.module.js';
+import { ScreenerModule } from './screener/screener.module.js';
 import { SettingsModule } from './settings/settings.module.js';
 import { StoresModule } from './stores/stores.module.js';
 import { UsersModule } from './users/users.module.js';
@@ -46,6 +47,7 @@ import { WatchlistsModule } from './watchlists/watchlists.module.js';
     ProductsModule,
     PrivacyModule,
     RetailersModule,
+    ScreenerModule,
     SettingsModule,
     StoresModule,
     PricesModule,

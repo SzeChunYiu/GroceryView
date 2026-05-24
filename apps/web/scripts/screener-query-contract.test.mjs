@@ -130,7 +130,7 @@ function rankedProductNames(html) {
   return [...tbody.matchAll(/<a\b[^>]*href="\/products\/[^"]+"[^>]*>([^<]+)<\/a>/g)].map((match) => match[1]);
 }
 
-async function renderScreenerPair() {
+async function renderScreenerSamples() {
   const nextStubs = await createNextStubs();
   const cleanupRuntime = installScreenerRuntime(nextStubs);
   try {
@@ -141,7 +141,9 @@ async function renderScreenerPair() {
     };
     return {
       defaultHtml: await render({}),
-      invalidHtml: await render({ sort: 'unknown', category: 'does-not-exist' })
+      invalidHtml: await render({ sort: 'unknown', category: 'does-not-exist' }),
+      filteredHtml: await render({ sort: 'biggest-drop', min_discount: '20' }),
+      invalidDiscountHtml: await render({ sort: 'biggest-drop', min_discount: 'not-a-number' })
     };
   } finally {
     cleanupRuntime();
@@ -151,7 +153,7 @@ async function renderScreenerPair() {
 
 describe('screener query contract', () => {
   it('renders invalid query values with the stable biggest-drop/all defaults', async () => {
-    const { defaultHtml, invalidHtml } = await renderScreenerPair();
+    const { defaultHtml, invalidHtml } = await renderScreenerSamples();
 
     assert.equal(summaryText(invalidHtml), summaryText(defaultHtml));
     assert.match(invalidHtml, /Showing \d+ rows sorted by biggest drop\./);
@@ -166,5 +168,27 @@ describe('screener query contract', () => {
       /<a class="[^"]*bg-emerald-900[^"]*" href="\/screener\?sort=biggest-drop">All<\/a>/
     );
     assert.doesNotMatch(invalidHtml, /does-not-exist|sort=unknown/);
+  });
+
+
+  it('normalizes min_discount and filters biggest-drop rows by price-history discount', async () => {
+    const { defaultHtml, filteredHtml, invalidDiscountHtml } = await renderScreenerSamples();
+    const defaultNames = rankedProductNames(defaultHtml);
+    const filteredNames = rankedProductNames(filteredHtml);
+
+    assert.equal(summaryText(invalidDiscountHtml), summaryText(defaultHtml));
+    assert.match(filteredHtml, /Minimum discount/);
+    assert.match(filteredHtml, /name="min_discount"/);
+    assert.match(filteredHtml, /type="range"/);
+    assert.match(filteredHtml, /min="0"/);
+    assert.match(filteredHtml, /max="50"/);
+    assert.match(filteredHtml, /value="20"/);
+    assert.match(filteredHtml, /20% or more/);
+    assert.match(filteredHtml, /with at least 20% discount/);
+    assert.match(filteredHtml, /30-day price drop from price_history|OpenPrices history/);
+    assert.ok(filteredNames.length > 0, '20% discount filter should keep verified drop rows');
+    assert.ok(filteredNames.length < defaultNames.length, '20% discount filter should remove weaker price-history drops');
+    assert.match(filteredHtml, /href="\/screener\?sort=cheapest-per-kg&amp;min_discount=20"/);
+    assert.match(filteredHtml, /href="\/screener\?sort=biggest-drop&amp;min_discount=20"/);
   });
 });
