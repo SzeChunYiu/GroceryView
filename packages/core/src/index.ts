@@ -1,3 +1,5 @@
+export * from './lib/rankers/percentOff.js';
+
 export type DealScoreInput = {
   currentCityPercentile: number;
   knownPromoHistoryPercentile: number;
