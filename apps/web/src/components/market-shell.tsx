@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { useEffect, useMemo, useState } from 'react';
 import { Card, Eyebrow, MetricGrid, PageShell, SourceCoverage, TopSpreads } from './data-ui';
 import { ProductPriceCards } from './product-price-cards';
 import { TrendingCarousel } from './TrendingCarousel';
@@ -6,6 +9,7 @@ import { buildChainIndexTrendSeries } from '@/lib/chain-index-data';
 import { defaultLocale, localeReadiness, localeTranslationGuardrails, localizedShellCopy } from '@/lib/i18n';
 import { basketCostHeatmap } from '@/lib/map-basket-cost-heatmap';
 import { mapChainIndexScores } from '@/lib/map-chain-index';
+import { loadPersistedVoiceFallback, persistVoiceFallback, requestVoiceSearchCapture, transcribeVoiceFallback } from '@/lib/search-voice';
 import {
   allStoreDailyRunnerReadiness,
   apiPerformanceReadiness,
@@ -128,6 +132,56 @@ const launchFixtureStores = [
   { slug: 'city-gross-stockholm', name: 'City Gross Stockholm', district: 'Stockholm County', fixture: 'City Gross Stockholm county locator result' }
 ];
 
+function VoiceSearchFallbackCard() {
+  const [captureStatus, setCaptureStatus] = useState('Tap to start voice search capture. If microphone access is blocked, type what you said below.');
+  const [fallbackDraft, setFallbackDraft] = useState('');
+  const fallbackTranscript = useMemo(() => transcribeVoiceFallback(fallbackDraft), [fallbackDraft]);
+
+  useEffect(() => {
+    setFallbackDraft(loadPersistedVoiceFallback());
+  }, []);
+
+  async function startVoiceCapture() {
+    const state = await requestVoiceSearchCapture();
+    setCaptureStatus(state === 'granted'
+      ? 'Microphone capture is available. Say the product name, then refine the transcript if needed.'
+      : 'Microphone permission was not granted. Saved text fallback keeps hands-free search recoverable.');
+  }
+
+  function updateFallback(value: string) {
+    setFallbackDraft(persistVoiceFallback(value));
+  }
+
+  return (
+    <Card className="mt-6 border-indigo-200 bg-indigo-50">
+      <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+        <div>
+          <Eyebrow>Voice search fallback</Eyebrow>
+          <h2 className="mt-2 text-3xl font-black tracking-tight">Capture voice intent, then persist a transcript fallback</h2>
+          <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-indigo-950">
+            Mobile shoppers can start microphone capture for hands-free search. When browser permissions are denied or unavailable, the typed transcript is saved locally and reused as the fallback query.
+          </p>
+        </div>
+        <button className="rounded-full bg-indigo-700 px-5 py-3 text-sm font-black text-white" onClick={startVoiceCapture} type="button">
+          Start voice search
+        </button>
+      </div>
+      <p aria-live="polite" className="mt-4 rounded-2xl bg-white/80 p-3 text-sm font-bold text-indigo-950" role="status">{captureStatus}</p>
+      <label className="mt-4 block text-sm font-black text-indigo-950" htmlFor="voice-search-fallback">
+        Permission fallback transcript
+      </label>
+      <textarea
+        className="mt-2 min-h-24 w-full rounded-2xl border border-indigo-200 bg-white p-3 text-sm font-semibold text-slate-800 outline-none focus:border-indigo-700"
+        id="voice-search-fallback"
+        onChange={(event) => updateFallback(event.target.value)}
+        placeholder="e.g. lactose-free milk under 25 kronor"
+        value={fallbackDraft}
+      />
+      {fallbackTranscript ? <p className="mt-3 rounded-2xl bg-white/80 p-3 text-sm font-bold text-indigo-950">Fallback query: {fallbackTranscript}</p> : null}
+    </Card>
+  );
+}
+
 function heatmapTileClass(heatScore: number) {
   if (heatScore >= 80) return 'border-rose-300 bg-rose-50 text-rose-950';
   if (heatScore >= 55) return 'border-amber-300 bg-amber-50 text-amber-950';
@@ -168,6 +222,8 @@ export function MarketShell() {
           </div>
         </Card>
       </section>
+
+      <VoiceSearchFallbackCard />
 
       <div className="mt-6"><MetricGrid /></div>
 
