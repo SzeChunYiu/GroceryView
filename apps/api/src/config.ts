@@ -5,9 +5,21 @@ export type ApiCorsConfig = {
   credentials: boolean;
 };
 
+export type RetailerScrapeScheduleConfig = {
+  cadence: 'daily' | 'weekly';
+  cron: string;
+  id: string;
+};
+
+export type ScrapeSchedulerConfig = {
+  enabled: boolean;
+  retailers: RetailerScrapeScheduleConfig[];
+};
+
 export type ApiConfig = {
   cors: ApiCorsConfig;
   requestLogging: RequestLoggingConfig;
+  scrapeScheduler: ScrapeSchedulerConfig;
 };
 
 
@@ -56,12 +68,26 @@ function parseBooleanFlag(value: string | undefined, defaultValue: boolean): boo
   return ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase());
 }
 
+function loadScrapeSchedulerConfig(env: NodeJS.ProcessEnv): ScrapeSchedulerConfig {
+  return {
+    enabled: parseBooleanFlag(env.SCRAPER_SCHEDULER_ENABLED, true),
+    retailers: [
+      { id: 'ica', cadence: 'daily', cron: env.SCRAPER_CRON_ICA?.trim() || '15 2 * * *' },
+      { id: 'willys', cadence: 'daily', cron: env.SCRAPER_CRON_WILLYS?.trim() || '30 2 * * *' },
+      { id: 'coop', cadence: 'daily', cron: env.SCRAPER_CRON_COOP?.trim() || '45 2 * * *' },
+      { id: 'hemkop', cadence: 'daily', cron: env.SCRAPER_CRON_HEMKOP?.trim() || '0 3 * * *' },
+      { id: 'specials', cadence: 'weekly', cron: env.SCRAPER_CRON_SPECIALS?.trim() || '0 4 * * 1' }
+    ]
+  };
+}
+
 export function loadApiConfig(env: NodeJS.ProcessEnv = process.env): ApiConfig {
   return {
     cors: loadCorsConfig(env),
     requestLogging: {
       enabled: parseBooleanFlag(env.REQUEST_LOGGING_ENABLED, true),
       serviceName: env.API_SERVICE_NAME?.trim() || 'groceryview-api'
-    }
+    },
+    scrapeScheduler: loadScrapeSchedulerConfig(env)
   };
 }
