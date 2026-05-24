@@ -21,6 +21,7 @@ import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
 import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
+import { predictShortWindowPriceDirection } from '@/lib/price-trend-predictions';
 import { metadataForProduct } from '@/lib/seo';
 
 export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
@@ -698,6 +699,17 @@ function priceChangeEventLogFor(product: NonNullable<ReturnType<typeof findProdu
   };
 }
 
+function priceTrendPredictionFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+  if ('lowestPrice' in product) {
+    return predictShortWindowPriceDirection([]);
+  }
+
+  return predictShortWindowPriceDirection(product.observations.map((observation) => ({
+    observedAt: observation.date,
+    price: observation.price
+  })));
+}
+
 function priceMoveNotesFor(product: NonNullable<ReturnType<typeof findProduct>>) {
   const priceChangeLog = priceChangeEventLogFor(product);
   const sourceProvenance = 'lowestPrice' in product
@@ -1075,6 +1087,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const priceVsUsualSignal = priceVsUsualSignalFor(product);
   const typicalRangeBand = priceTypicalRangeBandFor(product);
   const priceChangeLog = priceChangeEventLogFor(product);
+  const priceTrendPrediction = priceTrendPredictionFor(product);
   const priceMoveNotes = priceMoveNotesFor(product);
   const monthlySeasonality = seasonalMonthlyAveragesFor(product);
   const seasonalSalePattern = seasonalSalePatternFor(product);
@@ -1261,6 +1274,35 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
         <p className="mt-4 text-xs font-semibold text-slate-600">{itemSubstitutions.guardrail}</p>
       </Card>
       <PriceChartTerminal chart={priceChartTerminal} />
+      <Card className="mt-6 overflow-hidden border-emerald-200 bg-emerald-50/80">
+        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-800">price trend prediction</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Short-window expected price direction</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Uses only this product&apos;s dated price observations to estimate whether shoppers should delay, accelerate, or hold a purchase.
+            </p>
+          </div>
+          <div className="rounded-[2rem] bg-slate-950 p-5 text-right text-white shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-300">{priceTrendPrediction.available ? priceTrendPrediction.direction : 'withheld'}</p>
+            <p className="mt-2 text-3xl font-black">{priceTrendPrediction.action.replace('-', ' ')}</p>
+            <p className="mt-1 text-xs font-semibold text-slate-300">{priceTrendPrediction.observationCount} dated points</p>
+          </div>
+        </div>
+        {priceTrendPrediction.available ? (
+          <div className="mt-5 grid gap-3 md:grid-cols-4">
+            <p className="rounded-2xl bg-white/90 p-4 text-sm font-bold text-slate-700">Latest: <span className="block text-lg font-black text-slate-950">{formatSek(priceTrendPrediction.latestPrice)}</span></p>
+            <p className="rounded-2xl bg-white/90 p-4 text-sm font-bold text-slate-700">Recent avg: <span className="block text-lg font-black text-slate-950">{formatSek(priceTrendPrediction.recentAverage)}</span></p>
+            <p className="rounded-2xl bg-white/90 p-4 text-sm font-bold text-slate-700">Previous avg: <span className="block text-lg font-black text-slate-950">{formatSek(priceTrendPrediction.previousAverage)}</span></p>
+            <p className="rounded-2xl bg-white/90 p-4 text-sm font-bold text-slate-700">Expected move: <span className="block text-lg font-black text-emerald-900">{priceTrendPrediction.expectedChangePercent >= 0 ? '+' : ''}{formatPct(priceTrendPrediction.expectedChangePercent)}</span></p>
+          </div>
+        ) : (
+          <p className="mt-5 rounded-2xl bg-white/85 p-4 text-sm font-bold text-amber-950">{priceTrendPrediction.detail}</p>
+        )}
+        <p className="mt-4 text-xs font-semibold leading-5 text-slate-600">
+          {priceTrendPrediction.detail} Confidence {formatPct(priceTrendPrediction.confidence * 100)}. This is a lightweight direction estimate, not a guaranteed future price.
+        </p>
+      </Card>
       <Card className="mt-6 overflow-hidden border-cyan-200 bg-cyan-50/80">
         <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-start">
           <div>
