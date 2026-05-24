@@ -104,6 +104,12 @@ GroceryView ingestion layer pulls from (or could pull from). Each entry lists
 - **Lands in:** `packages/ingestion/src/connectors/st1-fuel.ts`, `infra/db/migrations/010_fuel_price_observations.sql`, and public route `/api/fuel` (also `/fuel` alias).
 - **Evidence:** `docs/ingestion/st1-fuel-evidence.md`.
 
+### 2.9 Bónus Iceland 🧪 verified-limited
+- **Endpoint:** `https://verslun.bonus.is/wp-json/wc/store/v1/products?per_page=100&page={n}` (public WooCommerce Store API).
+- **What it returns:** Small Bónus online-store product catalog; verification on 2026-05-24 reported 42 storefront rows.
+- **Per-branch granularity:** ❌ no — online-store stock and price metadata only, not branch grocery shelf evidence.
+- **Connector notes:** [`docs/connectors/bonus-is.md`](connectors/bonus-is.md).
+
 ---
 
 ## 3. Per-branch granularity — what's actually possible
