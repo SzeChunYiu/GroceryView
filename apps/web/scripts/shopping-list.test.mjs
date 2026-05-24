@@ -21,6 +21,10 @@ describe('shopping list route', () => {
     assert.match(page, /BulkImportDialog/);
     assert.match(page, /addImportedItems/);
     assert.match(page, /Shopping list/);
+    assert.match(page, /List budget buckets/);
+    assert.match(page, /budgetAlerts/);
+    assert.match(page, /budgetBuckets/);
+    assert.match(page, /role="status"/);
 
     assert.match(row, /'use client'/);
     assert.match(row, /type="checkbox"/);
@@ -28,6 +32,8 @@ describe('shopping list route', () => {
     assert.match(row, /onToggle\(item\.id\)/);
     assert.match(row, /line-through/);
     assert.match(row, /matchedProductSlug/);
+    assert.match(row, /estimatedPrice/);
+    assert.match(row, /category\} bucket/);
 
     assert.match(hook, /'use client'/);
     assert.match(hook, /localStorage\.getItem\(LIST_STORAGE_KEY\)/);
@@ -37,6 +43,10 @@ describe('shopping list route', () => {
     assert.match(hook, /addImportedItems/);
     assert.match(hook, /importSource: 'bulk-clipboard'/);
     assert.match(hook, /matchedProductSlug/);
+    assert.match(hook, /listCategoryBudgets/);
+    assert.match(hook, /summarizeListBudgetBuckets/);
+    assert.match(hook, /budgetAlerts/);
+    assert.match(hook, /estimatedTotal/);
 
     assert.match(bulkImport, /'use client'/);
     assert.match(bulkImport, /parseBulkImportLines/);
@@ -46,6 +56,8 @@ describe('shopping list route', () => {
     assert.match(bulkImport, /one item per line/i);
     assert.match(bulkImport, /matchedProductSlug/);
     assert.match(bulkImport, /unmatchedLines/);
+    assert.match(bulkImport, /estimatedPrice/);
+    assert.match(bulkImport, /category: match\?\.category/);
 
     assert.match(searchRoute, /searchRoutes/);
     assert.match(searchRoute, /products\/search\/list-import/);

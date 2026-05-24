@@ -2,6 +2,8 @@
 
 import type { ShoppingListItem } from '@/hooks/useList';
 
+const sekFormatter = new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 });
+
 type CheckableListItemProps = {
   item: ShoppingListItem;
   onToggle: (itemId: string) => void;
@@ -34,7 +36,7 @@ export function CheckableListItem({ item, onToggle }: Readonly<CheckableListItem
               item.checked ? 'line-through text-slate-500' : 'text-slate-700'
             }`}
           >
-            {item.quantity} · {item.detail}
+            {item.quantity} · {item.detail} · {item.category} bucket · est. {sekFormatter.format(item.estimatedPrice)}
           </span>
         </span>
       </label>
