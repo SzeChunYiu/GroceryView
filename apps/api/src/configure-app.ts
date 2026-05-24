@@ -12,7 +12,7 @@ export function configureApp(app: INestApplication, options: ConfigureAppOptions
   app.use(createRequestLoggingMiddleware(options.requestLogging ?? config.requestLogging));
   const allowedOrigins = new Set(config.cors.allowedOrigins);
   app.enableCors({
-    allowedHeaders: ['authorization', 'content-type', 'accept'],
+    allowedHeaders: ['authorization', 'content-type', 'accept', 'x-groceryview-locale'],
     credentials: config.cors.credentials,
     methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     optionsSuccessStatus: 204,

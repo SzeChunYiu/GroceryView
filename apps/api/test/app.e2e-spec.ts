@@ -57,7 +57,7 @@ class RecordingPriceHistoryExecutor {
     if (sql.includes('select store_id from favorite_stores')) {
       return [...(this.favoriteStoreRows.get(params[0] as string) ?? [])].sort().map((store_id) => ({ store_id })) as T[];
     }
-    if (sql.includes('latest_prices.observation_id') && sql.includes('products.canonical_name as product_name')) {
+    if (sql.includes('latest_prices.observation_id') && sql.includes(' as product_name')) {
       if (params[0] === 'missing-product') return [] as T[];
       return [
         {
@@ -570,7 +570,7 @@ describe('GroceryView API app', () => {
       .options('/health')
       .set('Origin', 'https://groceryview.se')
       .set('Access-Control-Request-Method', 'GET')
-      .set('Access-Control-Request-Headers', 'authorization,content-type')
+      .set('Access-Control-Request-Headers', 'authorization,content-type,x-groceryview-locale')
       .expect(204);
 
     assert.equal(productionPreflight.headers['access-control-allow-origin'], 'https://groceryview.se');
@@ -578,6 +578,7 @@ describe('GroceryView API app', () => {
     assert.match(productionPreflight.headers['access-control-allow-methods'] ?? '', /GET/);
     assert.match(productionPreflight.headers['access-control-allow-headers'] ?? '', /authorization/i);
     assert.match(productionPreflight.headers['access-control-allow-headers'] ?? '', /content-type/i);
+    assert.match(productionPreflight.headers['access-control-allow-headers'] ?? '', /x-groceryview-locale/i);
 
     const localResponse = await request(app.getHttpServer())
       .get('/health')

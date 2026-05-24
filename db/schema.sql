@@ -35,6 +35,8 @@ create table if not exists products (
   id text primary key,
   barcode text,
   canonical_name text not null,
+  name_sv text,
+  name_en text,
   domain text not null default 'grocery' check (domain in ('grocery', 'fuel', 'pharmacy')),
   fuel_grade_id text,
   brand text,

@@ -6,6 +6,7 @@ import {
   type ProductPriceHistoryPriceType
 } from '@groceryview/api';
 import { PostgresQueryExecutorService } from '../database/postgres-query-executor.service.js';
+import { localizedProductNameSql, type ProductNameLocale } from '../product-name-locale.js';
 
 type LatestPriceSqlRow = {
   product_id: string;
@@ -63,15 +64,16 @@ function mapRow(row: LatestPriceSqlRow): ProductLatestPriceInput {
 export class LatestPricesService {
   constructor(private readonly postgres: PostgresQueryExecutorService) {}
 
-  async getProductLatestPrices(productIdentifier: string): Promise<ProductLatestPrice[] | null> {
+  async getProductLatestPrices(productIdentifier: string, productNameLocale?: ProductNameLocale): Promise<ProductLatestPrice[] | null> {
     if (!this.postgres.isConfigured()) {
       throw new ServiceUnavailableException('DATABASE_URL is required for real latest-price data.');
     }
 
+    const productName = localizedProductNameSql('$2');
     const rows = await this.postgres.query<LatestPriceSqlRow>(
       `select products.id::text as product_id,
               products.slug as product_slug,
-              products.canonical_name as product_name,
+              ${productName} as product_name,
               latest_prices.observation_id::text,
               stores.slug as store_slug,
               stores.name as store_name,
@@ -90,7 +92,7 @@ export class LatestPricesService {
        left join stores on stores.id = latest_prices.store_id
        where products.slug = $1 or products.id::text = $1
        order by latest_prices.price nulls last, stores.name nulls last, latest_prices.price_type nulls last`,
-      [productIdentifier]
+      [productIdentifier, productNameLocale ?? null]
     );
 
     if (rows.length === 0) return null;

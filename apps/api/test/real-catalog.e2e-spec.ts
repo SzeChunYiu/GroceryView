@@ -12,11 +12,26 @@ type QueryCall = {
   params: unknown[];
 };
 
+function requestedLocale(params: unknown[]): 'sv' | 'en' | undefined {
+  return params.find((param): param is 'sv' | 'en' => param === 'sv' || param === 'en');
+}
+
+function localizedCanonicalRow<T extends { canonical_name: string; name_sv?: string | null; name_en?: string | null }>(
+  row: T,
+  locale: 'sv' | 'en' | undefined
+): T {
+  if (locale === 'en' && row.name_en) return { ...row, canonical_name: row.name_en };
+  if (locale === 'sv' && row.name_sv) return { ...row, canonical_name: row.name_sv };
+  return row;
+}
+
 const priceRows = [
   {
     product_id: 'product-milk',
     slug: 'standardmjolk-1l',
     canonical_name: 'Standardmjolk 3% 1 l',
+    name_sv: 'Standardmjölk 3% 1 l',
+    name_en: 'Whole milk 3% 1 l',
     brand: 'Arla',
     category_path: ['Dairy', 'Milk'],
     package_size: '1',
@@ -41,6 +56,8 @@ const priceRows = [
     product_id: 'product-milk',
     slug: 'standardmjolk-1l',
     canonical_name: 'Standardmjolk 3% 1 l',
+    name_sv: 'Standardmjölk 3% 1 l',
+    name_en: 'Whole milk 3% 1 l',
     brand: 'Arla',
     category_path: ['Dairy', 'Milk'],
     package_size: '1',
@@ -65,6 +82,8 @@ const priceRows = [
     product_id: 'product-butter',
     slug: 'smor-500g',
     canonical_name: 'Smor 500 g',
+    name_sv: 'Smör 500 g',
+    name_en: 'Butter 500 g',
     brand: null,
     category_path: ['Dairy', 'Butter'],
     package_size: '500',
@@ -92,6 +111,8 @@ const unpricedProductRows = [
     product_id: 'product-oats',
     slug: 'havregryn-1kg',
     canonical_name: 'Havregryn 1 kg',
+    name_sv: 'Havregryn 1 kg',
+    name_en: 'Oats 1 kg',
     brand: 'Axa',
     category_path: ['Pantry', 'Breakfast'],
     package_size: '1',
@@ -118,7 +139,9 @@ const productRows = [
   {
     id: 'product-milk',
     slug: 'standardmjolk-1l',
-    canonical_name: 'Standardmjolk 3% 1 l'
+    canonical_name: 'Standardmjolk 3% 1 l',
+    name_sv: 'Standardmjölk 3% 1 l',
+    name_en: 'Whole milk 3% 1 l'
   }
 ];
 
@@ -332,12 +355,14 @@ class FakePostgresQueryExecutorService {
       ];
       return rows
         .filter((row) => productRefs.includes(row.product_id) || productRefs.includes(row.slug))
-        .filter((row) => row.store_slug === null || storeSlugs === null || storeSlugs.includes(row.store_slug)) as T[];
+        .filter((row) => row.store_slug === null || storeSlugs === null || storeSlugs.includes(row.store_slug))
+        .map((row) => localizedCanonicalRow(row, requestedLocale(params))) as T[];
     }
-    if (sql.includes('latest_prices.observation_id') && sql.includes('products.canonical_name as product_name')) {
+    if (sql.includes('latest_prices.observation_id') && sql.includes(' as product_name')) {
       if (params[0] === 'missing-product') return [] as T[];
       return priceRows
         .filter((row) => row.product_id === 'product-milk')
+        .map((row) => localizedCanonicalRow(row, requestedLocale(params)))
         .map((row) => ({
           ...row,
           product_slug: row.slug,
@@ -367,8 +392,8 @@ class FakePostgresQueryExecutorService {
         .filter((row) => minConfidence === null || Number(row.confidence) >= Number(minConfidence))
         .slice(0, Number(limit)) as T[];
     }
-    if (sql.includes('where slug = $1 or id::text = $1')) return productRows as T[];
-    return priceRows as T[];
+    if (sql.includes('where slug = $1 or id::text = $1')) return productRows.map((row) => localizedCanonicalRow(row, requestedLocale(params))) as T[];
+    return priceRows.map((row) => localizedCanonicalRow(row, requestedLocale(params))) as T[];
   }
 }
 
@@ -421,6 +446,28 @@ describe('real catalog API endpoints', () => {
     assert.match(database.calls[0]?.sql ?? '', /latest_prices/i);
     assert.match(database.calls[0]?.sql ?? '', /from latest_prices filter_prices/i);
     assert.ok((database.calls[0]?.sql ?? '').indexOf('from latest_prices filter_prices') < (database.calls[0]?.sql ?? '').indexOf('limit $9'));
+  });
+
+  it('serves product names in the requested user language when product locale columns are present', async () => {
+    const search = await request(app.getHttpServer())
+      .get('/products/search/faceted?q=milk&limit=10')
+      .set('x-groceryview-locale', 'en')
+      .expect(200);
+
+    assert.equal(search.body.products[0].canonicalName, 'Whole milk 3% 1 l');
+    assert.match(database.calls.at(-1)?.sql ?? '', /products\.name_en/i);
+    assert.match(database.calls.at(-1)?.sql ?? '', /products\.name_sv/i);
+    assert.ok(database.calls.at(-1)?.params.includes('en'));
+
+    const history = await request(app.getHttpServer())
+      .get('/products/standardmjolk-1l/price-history?limit=1')
+      .set('Accept-Language', 'sv-SE,sv;q=0.9,en;q=0.8')
+      .expect(200);
+
+    assert.equal(history.body.productName, 'Standardmjölk 3% 1 l');
+    const productLookup = database.calls.find((call) => call.sql.includes('where slug = $1 or id::text = $1'));
+    assert.match(productLookup?.sql ?? '', /products\.name_sv/i);
+    assert.deepEqual(productLookup?.params, ['standardmjolk-1l', 'sv']);
   });
 
   it('rejects contradictory faceted price ranges before querying the catalog', async () => {
@@ -558,7 +605,7 @@ describe('real catalog API endpoints', () => {
 
     const productLookup = database.calls.find((call) => call.sql.includes('where slug = $1 or id::text = $1'));
     const observationsQuery = database.calls.find((call) => call.sql.includes('from observations'));
-    assert.deepEqual(productLookup?.params, ['standardmjolk-1l']);
+    assert.deepEqual(productLookup?.params, ['standardmjolk-1l', null]);
     assert.deepEqual(observationsQuery?.params, [
       'product-milk',
       'promotion',
@@ -627,7 +674,7 @@ describe('real catalog API endpoints', () => {
     assert.equal('demo' in response.body[0], false);
     assert.match(database.calls.at(-1)?.sql ?? '', /from products/i);
     assert.match(database.calls.at(-1)?.sql ?? '', /latest_prices/i);
-    assert.deepEqual(database.calls.at(-1)?.params, ['standardmjolk-1l']);
+    assert.deepEqual(database.calls.at(-1)?.params, ['standardmjolk-1l', null]);
   });
 
   it('serves product cheapest-now from persisted latest price rows', async () => {
@@ -647,7 +694,7 @@ describe('real catalog API endpoints', () => {
     assert.match(database.calls.at(-1)?.sql ?? '', /from products/i);
     assert.match(database.calls.at(-1)?.sql ?? '', /left join latest_prices/i);
     assert.match(database.calls.at(-1)?.sql ?? '', /latest_prices\.price > 0/i);
-    assert.deepEqual(database.calls.at(-1)?.params, ['standardmjolk-1l']);
+    assert.deepEqual(database.calls.at(-1)?.params, ['standardmjolk-1l', null]);
   });
 
   it('serves real chain, category, and brand indices from persisted price rows', async () => {

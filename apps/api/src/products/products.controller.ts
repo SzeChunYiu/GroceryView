@@ -1,7 +1,8 @@
-import { Controller, Get, NotFoundException, Param, Query } from '@nestjs/common';
+import { Controller, Get, Headers, NotFoundException, Param, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { facetedProductSearchEndpoint } from '@groceryview/api';
 import { allProducts, groceryApi } from '../demo-data.js';
+import { resolveProductNameLocale } from '../product-name-locale.js';
 import { RealCatalogService } from '../real-catalog/real-catalog.service.js';
 
 @ApiTags('products')
@@ -26,9 +27,24 @@ export class ProductsController {
     @Query('priceType') priceType?: string,
     @Query('minPrice') minPrice?: string,
     @Query('maxPrice') maxPrice?: string,
-    @Query('limit') limit?: string
+    @Query('limit') limit?: string,
+    @Query('locale') locale?: string,
+    @Headers('x-groceryview-locale') groceryViewLocale?: string,
+    @Headers('accept-language') acceptLanguage?: string,
+    @Headers('cookie') cookie?: string
   ) {
-    return this.realCatalog.facetedSearch({ q, category, brand, chain, store, priceType, minPrice, maxPrice, limit });
+    return this.realCatalog.facetedSearch({
+      q,
+      category,
+      brand,
+      chain,
+      store,
+      priceType,
+      minPrice,
+      maxPrice,
+      limit,
+      productNameLocale: resolveProductNameLocale({ locale, groceryViewLocale, acceptLanguage, cookie })
+    });
   }
 
   @Get(':id/terminal')

@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Headers, HttpCode, NotFoundException, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { IsArray, IsBoolean, IsNumber, IsOptional, IsString, Min, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 import { basketCompareEndpoint, savedBasketCompareEndpoint } from '@groceryview/api';
 import { groceryApi } from '../demo-data.js';
+import { resolveProductNameLocale } from '../product-name-locale.js';
 import { RealCatalogService } from '../real-catalog/real-catalog.service.js';
 
 class BasketItemDto {
@@ -277,19 +278,37 @@ export class RealBasketsController {
   @Post(basketCompareEndpoint.actionPath)
   @HttpCode(200)
   @ApiOkResponse({ description: 'Compare an arbitrary basket using persisted latest price rows' })
-  compare(@Body() body: CompareBasketRequestDto) {
-    return this.realCatalog.compareBasket({ items: body.items, storeSlugs: body.storeSlugs });
+  compare(
+    @Body() body: CompareBasketRequestDto,
+    @Query('locale') locale?: string,
+    @Headers('x-groceryview-locale') groceryViewLocale?: string,
+    @Headers('accept-language') acceptLanguage?: string,
+    @Headers('cookie') cookie?: string
+  ) {
+    return this.realCatalog.compareBasket({
+      items: body.items,
+      storeSlugs: body.storeSlugs,
+      productNameLocale: resolveProductNameLocale({ locale, groceryViewLocale, acceptLanguage, cookie })
+    });
   }
 
   @Get(savedBasketCompareEndpoint.actionPath)
   @ApiOkResponse({ description: 'Compare the latest saved user basket using persisted latest price rows' })
-  compareSaved(@Param('userId') userId: string, @Query('stores') stores?: string) {
+  compareSaved(
+    @Param('userId') userId: string,
+    @Query('stores') stores?: string,
+    @Query('locale') locale?: string,
+    @Headers('x-groceryview-locale') groceryViewLocale?: string,
+    @Headers('accept-language') acceptLanguage?: string,
+    @Headers('cookie') cookie?: string
+  ) {
     return this.realCatalog.compareSavedBasket(
       userId,
       stores
         ?.split(',')
         .map((store) => store.trim())
-        .filter(Boolean)
+        .filter(Boolean),
+      resolveProductNameLocale({ locale, groceryViewLocale, acceptLanguage, cookie })
     );
   }
 }

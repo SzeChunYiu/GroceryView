@@ -1,7 +1,8 @@
 import { Readable } from 'node:stream';
-import { BadRequestException, Controller, Get, NotFoundException, Param, Query, Res, StreamableFile } from '@nestjs/common';
+import { BadRequestException, Controller, Get, Headers, NotFoundException, Param, Query, Res, StreamableFile } from '@nestjs/common';
 import { ApiOkResponse, ApiProduces, ApiTags } from '@nestjs/swagger';
 import { groceryApi } from '../demo-data.js';
+import { resolveProductNameLocale } from '../product-name-locale.js';
 import { CheapestNowService } from './cheapest-now.service.js';
 import { LatestPricesService } from './latest-prices.service.js';
 import { PriceHistoryService, type ProductPriceHistoryFilter } from './price-history.service.js';
@@ -23,16 +24,34 @@ export class PricesController {
 
   @Get(productCheapestNowEndpoint.actionPath)
   @ApiOkResponse({ description: 'Cheapest current observed price per chain for one product' })
-  async cheapestNow(@Param('productId') productId: string) {
-    const cheapest = await this.cheapestNowService.getProductCheapestNow(productId);
+  async cheapestNow(
+    @Param('productId') productId: string,
+    @Query('locale') locale?: string,
+    @Headers('x-groceryview-locale') groceryViewLocale?: string,
+    @Headers('accept-language') acceptLanguage?: string,
+    @Headers('cookie') cookie?: string
+  ) {
+    const cheapest = await this.cheapestNowService.getProductCheapestNow(
+      productId,
+      resolveProductNameLocale({ locale, groceryViewLocale, acceptLanguage, cookie })
+    );
     if (!cheapest) throw new NotFoundException('Product not found');
     return cheapest;
   }
 
   @Get('prices')
   @ApiOkResponse({ description: 'Latest store prices with provenance' })
-  async latest(@Param('productId') productId: string) {
-    const prices = await this.latestPricesService.getProductLatestPrices(productId);
+  async latest(
+    @Param('productId') productId: string,
+    @Query('locale') locale?: string,
+    @Headers('x-groceryview-locale') groceryViewLocale?: string,
+    @Headers('accept-language') acceptLanguage?: string,
+    @Headers('cookie') cookie?: string
+  ) {
+    const prices = await this.latestPricesService.getProductLatestPrices(
+      productId,
+      resolveProductNameLocale({ locale, groceryViewLocale, acceptLanguage, cookie })
+    );
     if (!prices) throw new NotFoundException('Product not found');
     return prices;
   }
@@ -48,10 +67,18 @@ export class PricesController {
     @Query('minConfidence') minConfidence?: string,
     @Query('from') observedFrom?: string,
     @Query('to') observedTo?: string,
-    @Query('limit') limit?: string
+    @Query('limit') limit?: string,
+    @Query('locale') locale?: string,
+    @Headers('x-groceryview-locale') groceryViewLocale?: string,
+    @Headers('accept-language') acceptLanguage?: string,
+    @Headers('cookie') cookie?: string
   ) {
     const filter = parsePriceHistoryFilter({ priceType, chain, store, sourceRun, minConfidence, observedFrom, observedTo, limit });
-    const report = await this.priceHistory.getProductPriceHistory(productId, filter);
+    const report = await this.priceHistory.getProductPriceHistory(
+      productId,
+      filter,
+      resolveProductNameLocale({ locale, groceryViewLocale, acceptLanguage, cookie })
+    );
     if (!report) throw new NotFoundException('Product not found');
     return report;
   }
@@ -69,10 +96,18 @@ export class PricesController {
     @Query('minConfidence') minConfidence?: string,
     @Query('from') observedFrom?: string,
     @Query('to') observedTo?: string,
-    @Query('limit') limit?: string
+    @Query('limit') limit?: string,
+    @Query('locale') locale?: string,
+    @Headers('x-groceryview-locale') groceryViewLocale?: string,
+    @Headers('accept-language') acceptLanguage?: string,
+    @Headers('cookie') cookie?: string
   ) {
     const filter = parsePriceHistoryFilter({ priceType, chain, store, sourceRun, minConfidence, observedFrom, observedTo, limit });
-    const report = await this.priceHistory.getProductPriceHistory(productId, filter);
+    const report = await this.priceHistory.getProductPriceHistory(
+      productId,
+      filter,
+      resolveProductNameLocale({ locale, groceryViewLocale, acceptLanguage, cookie })
+    );
     if (!report) throw new NotFoundException('Product not found');
 
     response.setHeader('Content-Type', 'text/csv; charset=utf-8');
