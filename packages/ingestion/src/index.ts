@@ -3068,6 +3068,19 @@ function normalizeDailyExactMatchKey(value: string | undefined | null): string |
 type BatchRawRecordIdRow = { ordinal: number; id: string };
 type FuelPriceSourceIdRow = { id: string };
 type BatchProductIdRow = { slug: string; id: string };
+type DailyProductBatchRow = {
+  inputSlug: string;
+  targetSlug: string;
+  canonicalName: string;
+  brand: string | null;
+  barcode: string | null;
+  categoryId: string | null;
+  packageSize: number | null;
+  packageUnit: string | null;
+  comparableUnit: IngestedProduct['comparableUnit'];
+  domain: DailyIngestionDomain;
+  fuelGradeId: string | null;
+};
 
 function chunkDailyRows<T>(rows: T[], size = 250): T[][] {
   const chunks: T[][] = [];
@@ -3215,7 +3228,24 @@ async function upsertDailyProduct(executor: QueryExecutor, product: IngestedProd
 
 async function upsertDailyProductBatch(executor: QueryExecutor, products: IngestedProduct[], domain?: DailyIngestionDomain): Promise<Map<string, string>> {
   if (products.length === 0) return new Map();
-  const uniqueProducts = [...new Map(products.map((product) => [normalizeDailySlug(product.id), product])).values()];
+  const productRows = products.map<DailyProductBatchRow>((product) => {
+    const inputSlug = normalizeDailySlug(product.id);
+    const barcode = normalizeDailyExactMatchKey(product.barcode);
+    return {
+      inputSlug,
+      targetSlug: barcode ? normalizeDailySlug(`ean-${barcode}`) : inputSlug,
+      canonicalName: product.canonicalName,
+      brand: product.brand ?? null,
+      barcode,
+      categoryId: product.categoryId ?? null,
+      packageSize: product.packageSize ?? null,
+      packageUnit: product.packageUnit ?? null,
+      comparableUnit: product.comparableUnit,
+      domain: normalizeDailyDomain(domain),
+      fuelGradeId: product.fuelGradeId ?? null
+    };
+  });
+  const uniqueProducts = [...new Map(productRows.map((product) => [product.targetSlug, product])).values()];
   const ids = new Map<string, string>();
   for (const chunk of chunkDailyRows(uniqueProducts)) {
     const rows = await executor.query<BatchProductIdRow>(
@@ -3223,6 +3253,8 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
          select *
          from jsonb_to_recordset($1::jsonb) as x(
            slug text,
+           input_slug text,
+           batch_slug text,
            canonical_name text,
            brand text,
            barcode text,
@@ -3233,6 +3265,34 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
            domain text,
            fuel_grade_id text
          )
+       ),
+       batch_barcodes as (
+         select barcode, min(batch_slug) as batch_slug
+         from input
+         where barcode is not null
+         group by barcode
+       ),
+       resolved as (
+         select
+           input.slug as input_slug,
+           coalesce(existing.slug, batch_barcodes.batch_slug, input.slug) as target_slug,
+           input.canonical_name,
+           input.brand,
+           input.barcode,
+           input.category_id,
+           input.package_size,
+           input.package_unit,
+           input.comparable_unit,
+           input.domain,
+           input.fuel_grade_id
+         from input
+         left join products existing on existing.barcode = input.barcode
+         left join batch_barcodes on batch_barcodes.barcode = input.barcode
+       ),
+       deduped as (
+         select distinct on (target_slug) *
+         from resolved
+         order by target_slug, input_slug
        ),
        upserted as (
          insert into products(
@@ -3248,7 +3308,7 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
            fuel_grade_id
          )
          select
-           slug,
+           target_slug,
            canonical_name,
            brand,
            barcode,
@@ -3258,7 +3318,7 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
            comparable_unit,
            domain,
            fuel_grade_id
-         from input
+         from deduped
          on conflict (slug) do update set
            canonical_name = excluded.canonical_name,
            brand = excluded.brand,
@@ -3270,23 +3330,29 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
            domain = excluded.domain,
            fuel_grade_id = excluded.fuel_grade_id,
            updated_at = now()
-         returning slug, id
+         returning slug as target_slug, id
        )
-       select slug, id from upserted`,
+       select target_slug as slug, id from upserted`,
       [JSON.stringify(chunk.map((product) => ({
-        slug: normalizeDailySlug(product.id),
+        slug: product.targetSlug,
+        input_slug: product.inputSlug,
+        batch_slug: product.targetSlug,
         canonical_name: product.canonicalName,
-        brand: product.brand ?? null,
-        barcode: normalizeDailyExactMatchKey(product.barcode),
-        category_id: product.categoryId ?? null,
-        package_size: product.packageSize ?? null,
-        package_unit: product.packageUnit ?? null,
+        brand: product.brand,
+        barcode: product.barcode,
+        category_id: product.categoryId,
+        package_size: product.packageSize,
+        package_unit: product.packageUnit,
         comparable_unit: product.comparableUnit,
-        domain: normalizeDailyDomain(domain),
-        fuel_grade_id: product.fuelGradeId ?? null
+        domain: product.domain,
+        fuel_grade_id: product.fuelGradeId
       })))]
     );
-    for (const row of rows) ids.set(row.slug, row.id);
+    const idsByTargetSlug = new Map(rows.map((row) => [row.slug, row.id]));
+    for (const product of productRows) {
+      const id = idsByTargetSlug.get(product.targetSlug);
+      if (id) ids.set(product.inputSlug, id);
+    }
   }
   return ids;
 }
