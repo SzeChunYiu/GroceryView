@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, ServiceUnavailableException } from '@nestjs/common';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { IsArray, IsBoolean, IsIn, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { jsonArrayResponse, jsonCreatedResponse, jsonResponse, param } from '../openapi.js';
 import { groceryApi } from '../demo-data.js';
 import { WatchlistsService } from './watchlists.service.js';
 
@@ -82,14 +83,14 @@ export class WatchlistsController {
   constructor(private readonly watchlists: WatchlistsService) {}
 
   @Get()
-  @ApiOkResponse({ description: 'Demo user watchlist' })
+  @jsonArrayResponse('Demo user watchlist')
   async list() {
     if (this.watchlists.isConfigured()) return this.watchlists.list('demo');
     return groceryApi.getWatchlist('demo');
   }
 
   @Post()
-  @ApiCreatedResponse({ description: 'Watchlist item created' })
+  @jsonCreatedResponse('Watchlist item created')
   async create(@Body() body: WatchlistItemDto) {
     const item = { ...body, favoriteStoresOnly: body.favoriteStoresOnly ?? false };
     if (this.watchlists.isConfigured()) {
@@ -104,7 +105,7 @@ export class WatchlistsController {
   }
 
   @Get('price-alerts')
-  @ApiOkResponse({ description: 'Active real watchlist target-price alerts for the demo user' })
+  @jsonArrayResponse('Active real watchlist target-price alerts for the demo user')
   async priceAlerts() {
     if (!this.watchlists.isConfigured()) {
       throw new ServiceUnavailableException('DATABASE_URL is required for real watchlist price-alert data.');
@@ -113,7 +114,7 @@ export class WatchlistsController {
   }
 
   @Post('price-alerts')
-  @ApiCreatedResponse({ description: 'Watchlist target-price alert created' })
+  @jsonResponse('Watchlist target-price alert created')
   async createPriceAlert(@Body() body: WatchlistPriceAlertDto) {
     try {
       if (!this.watchlists.isConfigured()) {
@@ -132,7 +133,8 @@ export class WatchlistsController {
   }
 
   @Patch(':productId')
-  @ApiOkResponse({ description: 'Watchlist item updated' })
+  @param('productId', true, 'Product identifier for watchlist item to update.')
+  @jsonResponse('Watchlist item updated')
   async update(@Param('productId') productId: string, @Body() body: WatchlistPatchDto) {
     try {
       if (this.watchlists.isConfigured()) {
@@ -148,7 +150,8 @@ export class WatchlistsController {
   }
 
   @Delete(':productId')
-  @ApiOkResponse({ description: 'Watchlist item removed' })
+  @param('productId', true, 'Product identifier for watchlist item to delete.')
+  @jsonResponse('Watchlist item removed')
   async remove(@Param('productId') productId: string) {
     try {
       if (this.watchlists.isConfigured()) {

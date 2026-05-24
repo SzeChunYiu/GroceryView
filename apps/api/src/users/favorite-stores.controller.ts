@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, NotFoundException, Param, Post } from '@nestjs/common';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { IsString } from 'class-validator';
+import { jsonArrayResponse, jsonCreatedResponse, jsonResponse, param } from '../openapi.js';
 import { groceryApi } from '../demo-data.js';
 
 class FavoriteStoreDto {
@@ -23,13 +24,13 @@ function asStoreNotFound(error: unknown) {
 @Controller('users/demo/favorite-stores')
 export class FavoriteStoresController {
   @Get()
-  @ApiOkResponse({ description: 'Demo user favorite stores' })
+  @jsonArrayResponse('Demo user favorite stores')
   list() {
     return demoFavoriteStores();
   }
 
   @Post()
-  @ApiCreatedResponse({ description: 'Favorite store added' })
+  @jsonCreatedResponse('Favorite store added')
   add(@Body() body: FavoriteStoreDto) {
     try {
       groceryApi.addFavoriteStore('demo', body.storeId);
@@ -40,7 +41,8 @@ export class FavoriteStoresController {
   }
 
   @Delete(':storeId')
-  @ApiOkResponse({ description: 'Favorite store removed' })
+  @param('storeId', true, 'Store id for favorite removal scope.')
+  @jsonResponse('Favorite store removed')
   remove(@Param('storeId') storeId: string) {
     try {
       groceryApi.removeFavoriteStore('demo', storeId);

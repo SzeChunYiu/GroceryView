@@ -1,6 +1,7 @@
 import { BadRequestException, Controller, Get, Param, Query } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import type { FavoritesSortMode } from '@groceryview/db';
+import { jsonResponse, param, query } from '../openapi.js';
 import { validateNoUnexpectedQueryParameters } from '../middleware/validate.js';
 import { favoritesRoutes } from '../routes/favorites.js';
 import { FavoritesService } from './favorites.service.js';
@@ -18,7 +19,9 @@ export class FavoritesController {
   constructor(private readonly favorites: FavoritesService) {}
 
   @Get(favoritesRoutes.accountUserFavoritesPath)
-  @ApiOkResponse({ description: favoritesRoutes.description })
+  @jsonResponse(favoritesRoutes.description)
+  @param('userId', true, 'User id for demo favorites scope.')
+  @query('sort', false, 'Optional sort mode; one of name or price.')
   async list(@Param('userId') userId: string, @Query() query: Record<string, unknown>) {
     validateNoUnexpectedQueryParameters(query, favoritesRoutes.queryParams, favoritesRoutes.accountUserFavoritesPath);
     return this.favorites.list(userId, normalizeSort(query.sort));

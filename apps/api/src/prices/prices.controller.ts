@@ -1,6 +1,7 @@
 import { Readable } from 'node:stream';
 import { BadRequestException, Controller, Get, NotFoundException, Param, Query, Res, StreamableFile } from '@nestjs/common';
-import { ApiOkResponse, ApiProduces, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
+import { csvResponse, jsonArrayResponse, jsonResponse, param, query } from '../openapi.js';
 import { groceryApi } from '../demo-data.js';
 import { CheapestNowService } from './cheapest-now.service.js';
 import { LatestPricesService } from './latest-prices.service.js';
@@ -22,7 +23,8 @@ export class PricesController {
   ) {}
 
   @Get(productCheapestNowEndpoint.actionPath)
-  @ApiOkResponse({ description: 'Cheapest current observed price per chain for one product' })
+  @param('productId', true, 'Product identifier used to locate the cheapest currently observed price report.')
+  @jsonResponse('Cheapest current observed price per chain for one product')
   async cheapestNow(@Param('productId') productId: string) {
     const cheapest = await this.cheapestNowService.getProductCheapestNow(productId);
     if (!cheapest) throw new NotFoundException('Product not found');
@@ -30,7 +32,8 @@ export class PricesController {
   }
 
   @Get('prices')
-  @ApiOkResponse({ description: 'Latest store prices with provenance' })
+  @param('productId', true, 'Product identifier used for latest retail price snapshot.')
+  @jsonArrayResponse('Latest store prices with provenance')
   async latest(@Param('productId') productId: string) {
     const prices = await this.latestPricesService.getProductLatestPrices(productId);
     if (!prices) throw new NotFoundException('Product not found');
@@ -38,7 +41,16 @@ export class PricesController {
   }
 
   @Get(productPriceHistoryEndpoint.actionPath)
-  @ApiOkResponse({ description: 'Persisted product price observations over time' })
+  @param('productId', true, 'Product identifier used for price-history report.')
+  @query('priceType', false, 'Optional price type filter.', undefined, 'string')
+  @query('chain', false, 'Optional chain filter slug.')
+  @query('store', false, 'Optional store filter slug.')
+  @query('sourceRun', false, 'Optional source run identifier.')
+  @query('minConfidence', false, 'Optional minimum confidence threshold (0-1).', undefined, 'number')
+  @query('from', false, 'Optional inclusive start date (ISO timestamp).')
+  @query('to', false, 'Optional inclusive end date (ISO timestamp).')
+  @query('limit', false, 'Optional max results (1-1000).', undefined, 'integer')
+  @jsonResponse('Persisted product price observations over time')
   async priceHistoryReport(
     @Param('productId') productId: string,
     @Query('priceType') priceType?: string,
@@ -57,8 +69,16 @@ export class PricesController {
   }
 
   @Get('history.csv')
-  @ApiOkResponse({ description: 'Persisted product price history as CSV' })
-  @ApiProduces('text/csv')
+  @param('productId', true, 'Product identifier used for price-history CSV download.')
+  @query('priceType', false, 'Optional price type filter.', undefined, 'string')
+  @query('chain', false, 'Optional chain filter slug.')
+  @query('store', false, 'Optional store filter slug.')
+  @query('sourceRun', false, 'Optional source run identifier.')
+  @query('minConfidence', false, 'Optional minimum confidence threshold (0-1).', undefined, 'number')
+  @query('from', false, 'Optional inclusive start date (ISO timestamp).')
+  @query('to', false, 'Optional inclusive end date (ISO timestamp).')
+  @query('limit', false, 'Optional max rows (1-1000).', undefined, 'integer')
+  @csvResponse('Persisted product price history as CSV')
   async priceHistoryCsv(
     @Param('productId') productId: string,
     @Res({ passthrough: true }) response: { setHeader(name: string, value: string): void },
@@ -82,7 +102,8 @@ export class PricesController {
   }
 
   @Get('observations')
-  @ApiOkResponse({ description: 'Price observations' })
+  @param('productId', true, 'Product identifier used for raw observation list.')
+  @jsonArrayResponse('Price observations')
   observations(@Param('productId') productId: string) {
     const product = groceryApi.getProduct(productId);
     if (!product) throw new NotFoundException('Product not found');

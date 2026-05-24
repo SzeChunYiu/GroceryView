@@ -1,5 +1,6 @@
 import { BadRequestException, Controller, Get, Query } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
+import { jsonResponse, query } from '../openapi.js';
 import { groceryApi } from '../demo-data.js';
 
 function optionalPositiveNumber(value: string | undefined, field: string) {
@@ -20,7 +21,10 @@ function categoryFilter(value: string | string[] | undefined) {
 @Controller('users/demo/expiry-deals')
 export class ExpiryDealsController {
   @Get('radar')
-  @ApiOkResponse({ description: 'Demo expiry markdown radar with category, distance, and verification guardrails' })
+  @jsonResponse('Demo expiry markdown radar with category, distance, and verification guardrails')
+  @query('now', false, 'Optional ISO-8601 timestamp used as report cutoff.')
+  @query('category', false, 'Optional repeated or comma-separated category filter.')
+  @query('maxDistanceKm', false, 'Optional positive radius in kilometers.')
   radar(@Query('now') now?: string, @Query('category') category?: string | string[], @Query('maxDistanceKm') maxDistanceKm?: string) {
     return {
       ...groceryApi.getExpiryDealRadarReport('demo', {

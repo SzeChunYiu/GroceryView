@@ -1,5 +1,6 @@
 import { BadRequestException, Controller, Get, Query } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
+import { jsonResponse, query } from '../openapi.js';
 import { groceryApi } from '../demo-data.js';
 
 function optionalPositiveNumber(value: string | undefined, field: string) {
@@ -15,7 +16,9 @@ function optionalPositiveNumber(value: string | undefined, field: string) {
 @Controller('users/demo/meal-plans')
 export class MealPlansController {
   @Get('suggestions')
-  @ApiOkResponse({ description: 'Deal-based meal suggestions for the demo household' })
+  @jsonResponse('Deal-based meal suggestions for the demo household')
+  @query('maxMealCost', false, 'Optional maximum meal spend floor guard.', undefined, 'number')
+  @query('servings', false, 'Optional number of servings to optimize for.', undefined, 'number')
   suggestions(@Query('maxMealCost') maxMealCost?: string, @Query('servings') servings?: string) {
     return {
       ...groceryApi.getMealPlanSuggestionsReport('demo', {

@@ -1,5 +1,6 @@
 import { BadRequestException, Controller, Get, Query } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
+import { jsonResponse, query } from '../openapi.js';
 import { groceryApi } from '../demo-data.js';
 
 type NutritionMetric = 'protein' | 'calories' | 'fiber';
@@ -14,13 +15,14 @@ function optionalNutritionMetric(value?: string): NutritionMetric {
 @Controller()
 export class MarketController {
   @Get('market/overview')
-  @ApiOkResponse({ description: 'Stockholm grocery market overview' })
+  @jsonResponse('Stockholm grocery market overview')
   overview() {
     return { ...groceryApi.getMarketOverview(), demo: true };
   }
 
   @Get('nutrition/value')
-  @ApiOkResponse({ description: 'Nutrition per krona rankings with guardrails' })
+  @query('metric', false, 'Optional nutrition metric (protein, calories, fiber).')
+  @jsonResponse('Nutrition per krona rankings with guardrails')
   nutritionValue(@Query('metric') metric?: string) {
     return { ...groceryApi.getNutritionValueReport(optionalNutritionMetric(metric)), demo: true };
   }
