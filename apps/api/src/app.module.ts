@@ -21,6 +21,7 @@ import { PantryModule } from './pantry/pantry.module.js';
 import { PricesModule } from './prices/prices.module.js';
 import { PrivacyModule } from './privacy/privacy.module.js';
 import { ProductsModule } from './products/products.module.js';
+import { ImagesModule } from './routes/images.module.js';
 import { ReceiptsModule } from './receipts/receipts.module.js';
 import { RetailersModule } from './retailers/retailers.module.js';
 import { ScreenerModule } from './screener/screener.module.js';
@@ -45,6 +46,7 @@ import { WatchlistsModule } from './watchlists/watchlists.module.js';
     MealPlansModule,
     PantryModule,
     ProductsModule,
+    ImagesModule,
     PrivacyModule,
     RetailersModule,
     ScreenerModule,
