@@ -21,6 +21,7 @@ const appFiles = [
   'src/app/store-coverage/page.tsx',
   'src/app/openprices-depth/page.tsx',
   'src/app/settings/page.tsx',
+  'src/app/admin/moderation/page.tsx',
   'src/components/market-shell.tsx',
   'src/components/settings-data-export-actions.tsx',
   'src/components/data-ui.tsx',
@@ -545,6 +546,21 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(actions, /demo-data|sample-data|mock session/i);
     assert.match(server, /\/api\/human-review\/assignments/);
     assert.match(server, /Session user is not a registered human reviewer/);
+  });
+
+  it('surfaces adjustable moderation risk thresholds for admin review routing', async () => {
+    const communityReviews = await read('src/lib/community-reviews.ts');
+    const moderation = await read('src/app/admin/moderation/page.tsx');
+
+    assert.match(communityReviews, /export const MODERATION_RISK_THRESHOLDS/);
+    assert.match(communityReviews, /moderationRiskBand/);
+    assert.match(communityReviews, /MODERATION_RISK_THRESHOLDS\.high/);
+    assert.match(communityReviews, /MODERATION_RISK_THRESHOLDS\.medium/);
+    assert.match(moderation, /MODERATION_RISK_THRESHOLDS/);
+    assert.match(moderation, /Moderation risk thresholds/);
+    assert.match(moderation, /High risk starts at/);
+    assert.match(moderation, /tune review routing/);
+    assert.doesNotMatch(moderation, /@\/lib\/demo-data|@\/components\/sample-data/);
   });
 
 
