@@ -8,11 +8,13 @@ async function read(relative) {
 
 describe('shopping list route', () => {
   it('ships the requested route, checkable row component, and localStorage-backed hook', async () => {
-    const [page, row, hook, bulkImport, searchRoute] = await Promise.all([
+    const [page, row, hook, bulkImport, listGrid, listSequencing, searchRoute] = await Promise.all([
       read('src/app/list/page.tsx'),
       read('src/components/CheckableListItem.tsx'),
       read('src/hooks/useList.ts'),
       read('src/components/BulkImportDialog.tsx'),
+      read('src/components/list-grid.tsx'),
+      read('src/lib/list-sequencing.ts'),
       read('../../apps/api/src/routes/search.ts')
     ]);
 
@@ -37,6 +39,12 @@ describe('shopping list route', () => {
     assert.match(hook, /addImportedItems/);
     assert.match(hook, /importSource: 'bulk-clipboard'/);
     assert.match(hook, /matchedProductSlug/);
+    assert.match(hook, /LIST_AISLE_ROUTE_STORAGE_KEY/);
+    assert.match(hook, /localStorage\.getItem\(LIST_AISLE_ROUTE_STORAGE_KEY\)/);
+    assert.match(hook, /localStorage\.setItem\(LIST_AISLE_ROUTE_STORAGE_KEY/);
+    assert.match(hook, /sortShoppingItemsByAisle/);
+    assert.match(hook, /moveAisle/);
+    assert.match(hook, /aisleRoute/);
 
     assert.match(bulkImport, /'use client'/);
     assert.match(bulkImport, /parseBulkImportLines/);
@@ -46,6 +54,17 @@ describe('shopping list route', () => {
     assert.match(bulkImport, /one item per line/i);
     assert.match(bulkImport, /matchedProductSlug/);
     assert.match(bulkImport, /unmatchedLines/);
+
+    assert.match(listGrid, /Preferred store route/);
+    assert.match(listGrid, /storeAisleLayout/);
+    assert.match(listGrid, /onMoveAisle/);
+    assert.match(listGrid, /Move .* aisle earlier/);
+    assert.match(listGrid, /CheckableListItem/);
+
+    assert.match(listSequencing, /storeAisleLayout/);
+    assert.match(listSequencing, /normalizeStoreAisleRoute/);
+    assert.match(listSequencing, /sortShoppingItemsByAisle/);
+    assert.match(listSequencing, /moveStoreAisle/);
 
     assert.match(searchRoute, /searchRoutes/);
     assert.match(searchRoute, /products\/search\/list-import/);
