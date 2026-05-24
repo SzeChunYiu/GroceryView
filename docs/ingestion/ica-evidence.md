@@ -8,7 +8,8 @@
 - Stores fetched: 324
 - Connector: packages/ingestion/src/connectors/ica.ts
 - Web wire: apps/web/src/lib/ingested/ica.ts
-- Live verification: the latest expanded source URL returned HTTP 200 parseable public promotions JSON via `curl -A "GroceryView/0.1"` on 2026-05-24 Europe/Stockholm; the wired source row count is recorded below.
+- Live verification: latest check returned HTTP 200 parseable public promotions JSON via curl with user agent GroceryView/0.1 on 2026-05-24 Europe/Stockholm; member-only flags are derived from observed Stammispris/medlemspris promotion text and the wired source row count is recorded below.
+- Member-only handling: rows whose promotion description contains Stammispris or medlemspris now expose memberOnly: true alongside ordinary list-price rows.
 
 ## Source URLs
 
