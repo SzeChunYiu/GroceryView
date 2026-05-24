@@ -8,6 +8,14 @@ export type AuthenticatedRequest = {
   user?: SessionPayload;
 };
 
+export const priceAlertNotificationChannels = ['email', 'push'] as const;
+
+export type PriceAlertNotificationChannel = typeof priceAlertNotificationChannels[number];
+
+export function isPriceAlertNotificationChannel(value: unknown): value is PriceAlertNotificationChannel {
+  return typeof value === 'string' && priceAlertNotificationChannels.includes(value as PriceAlertNotificationChannel);
+}
+
 @Injectable()
 export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {

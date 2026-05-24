@@ -36,3 +36,18 @@ model Product {
 
   @@map("products")
 }
+
+model PriceAlert {
+  id                  String   @id @default(uuid()) @db.Uuid
+  userId              String   @map("user_id")
+  itemId              String   @map("item_id")
+  targetPrice         Decimal  @map("target_price") @db.Decimal(12, 2)
+  notificationChannel String   @map("notification_channel")
+  status              String   @default("active")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([itemId])
+  @@map("price_alerts")
+}
