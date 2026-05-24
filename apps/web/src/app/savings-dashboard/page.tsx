@@ -1,8 +1,12 @@
 import Link from 'next/link';
+import { calculatePersonalGroceryInflation } from '@groceryview/core';
+import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { elderlyFixedIncomeBudgetTracker, elderlyStaplesStabilityTracker, personalGroceryInflation, savingsDashboard, studentWeeklyBudgetTracker } from '@/lib/demo-data';
+import { elderlyFixedIncomeBudgetTracker, elderlyStaplesStabilityTracker, personalGroceryInflationInput, savingsDashboard, studentWeeklyBudgetTracker } from '@/lib/demo-data';
 import { ecoBasketScorecard } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
+
+type ConfidenceLevel = 'high' | 'medium' | 'low';
 
 export function generateMetadata() {
   return routeMetadata('/savings-dashboard');
@@ -23,7 +27,12 @@ function formatPercent(value: number) {
   return `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`;
 }
 
+function toConfidenceLevel(value: string): ConfidenceLevel {
+  return value === 'high' || value === 'medium' || value === 'low' ? value : 'low';
+}
+
 export default function SavingsDashboardPage() {
+  const personalGroceryInflation = calculatePersonalGroceryInflation(personalGroceryInflationInput);
   const topContributions = [...personalGroceryInflation.itemContributions]
     .sort((a, b) => Math.abs(b.changeAmount) - Math.abs(a.changeAmount))
     .slice(0, 5);
@@ -50,7 +59,13 @@ export default function SavingsDashboardPage() {
         <Card>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Coverage</p>
           <p className="mt-2 text-5xl font-black text-slate-950">{personalGroceryInflation.itemContributions.length}</p>
-          <p className="mt-3 font-semibold text-slate-700">priced basket lines · confidence: {personalGroceryInflation.confidence}</p>
+          <div className="mt-3">
+            <ConfidenceBadge
+              level={toConfidenceLevel(personalGroceryInflation.confidence)}
+              label={`${personalGroceryInflation.confidence} CPI confidence`}
+              sampleSize={personalGroceryInflation.itemContributions.length}
+            />
+          </div>
         </Card>
       </div>
 
@@ -63,7 +78,10 @@ export default function SavingsDashboardPage() {
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <Link className="text-lg font-black text-slate-950 hover:text-emerald-800" href={`/products/${item.productId}`}>{item.productName}</Link>
-                    <p className="text-sm text-slate-600">{item.category} · basket weight {(item.weight * 100).toFixed(0)}% · {item.confidence} confidence</p>
+                    <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-slate-600">
+                      <span>{item.category} · basket weight {(item.weight * 100).toFixed(0)}%</span>
+                      <ConfidenceBadge level={item.confidence} label={`${item.confidence} confidence`} />
+                    </div>
                   </div>
                   <p className="rounded-full bg-amber-50 px-3 py-1 font-black text-amber-950">{formatPercent(item.changePercent)}</p>
                 </div>

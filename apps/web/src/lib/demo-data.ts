@@ -2,7 +2,7 @@
 // Mirrors the store fixtures in packages/ingestion/src/index.ts.
 // Real prices replace these as packages/ingestion connectors come online.
 
-import { buildExpiryDealRadar, buildPriceChartSeries, buildWatchlistAlerts, calculateMealCostBreakdown, calculatePersonalGroceryInflation, compareBasketStrategies, planGroceryAlertChannelDefault, planNotifications, planPantryReplenishment, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeBudget, summarizeCategoryDealLeaders, summarizePriceHistory, summarizeStoreBasketCoverage, type BasketComparisonInput, type HouseholdSnapshot, type PantryDeal, type PantryInventoryItem, type PriceChartObservation, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
+import { buildExpiryDealRadar, buildPriceChartSeries, buildWatchlistAlerts, calculateMealCostBreakdown, calculatePersonalGroceryInflation, compareBasketStrategies, planGroceryAlertChannelDefault, planNotifications, planPantryReplenishment, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeBudget, summarizeCategoryDealLeaders, summarizePriceHistory, summarizeStoreBasketCoverage, type BasketComparisonInput, type HouseholdSnapshot, type PantryDeal, type PantryInventoryItem, type PersonalInflationInput, type PriceChartObservation, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
 
 export const products = [
   {
@@ -3102,7 +3102,7 @@ export const elderlyFixedIncomeBudgetTracker = {
   }
 };
 
-export const personalGroceryInflation = calculatePersonalGroceryInflation({
+export const personalGroceryInflationInput = {
   baseDate: 'previous weekly basket',
   currentDate: '2026-05-21 visible weekly basket',
   items: weeklyBasket.map((row) => {
@@ -3124,7 +3124,9 @@ export const personalGroceryInflation = calculatePersonalGroceryInflation({
   missingProductIds: weeklyBasket
     .filter((row) => !products.some((product) => product.slug === row.slug))
     .map((row) => row.slug)
-});
+} satisfies PersonalInflationInput;
+
+export const personalGroceryInflation = calculatePersonalGroceryInflation(personalGroceryInflationInput);
 
 
 const elderlyStaplesHistoryInputs = [
