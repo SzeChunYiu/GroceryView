@@ -23,6 +23,9 @@ import {
   buildHemkopStoresUrl,
   buildHemkopWeeklyDiscountsUrl,
   buildEmaginPdfUrl,
+  buildEniroDealsSeRegionUrl,
+  fetchEniroDealsSeOffers,
+  parseEniroDealsSeOffers,
   buildIcaStoreProductSearchUrl,
   buildIcaStorePromotionsUrl,
   buildLidlOfferPageUrl,
@@ -2574,6 +2577,81 @@ describe('fetchHemkopWeeklyDiscounts', () => {
     assert.deepEqual(rows.map((row) => row.storeId), [...DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_IDS]);
   });
 });
+
+describe('fetchEniroDealsSeOffers', () => {
+  it('builds Eniro regional deal listing URLs', () => {
+    assert.equal(buildEniroDealsSeRegionUrl('stockholm'), 'https://www.eniro.se/erbjudanden/stockholm');
+  });
+
+  it('parses Eniro local search deal listings from JSON-LD and preserves provenance', async () => {
+    const html = `
+      <html><head>
+        <script type="application/ld+json">
+          {
+            "@context":"https://schema.org",
+            "@graph":[
+              {
+                "@type":"Offer",
+                "id":"deal-ica-1",
+                "name":"Veckans fruktlåda",
+                "merchantName":"ICA Nära Testhallen",
+                "category":"Livsmedel",
+                "priceText":"49 kr",
+                "description":"Regionalt erbjudande från Eniro Local Search",
+                "validFrom":"2026-05-20",
+                "validThrough":"2026-05-26",
+                "url":"/erbjudanden/stockholm/deal-ica-1",
+                "image":"/images/deal-ica-1.jpg"
+              }
+            ]
+          }
+        </script>
+      </head></html>`;
+    const rows = parseEniroDealsSeOffers(html, {
+      sourceUrl: 'https://www.eniro.se/erbjudanden/stockholm',
+      retrievedAt: '2026-05-24T08:00:00.000Z'
+    });
+
+    assert.deepEqual(rows, [{
+      code: 'deal-ica-1',
+      title: 'Veckans fruktlåda',
+      merchantName: 'ICA Nära Testhallen',
+      category: 'Livsmedel',
+      region: 'stockholm',
+      priceText: '49 kr',
+      description: 'Regionalt erbjudande från Eniro Local Search',
+      validFrom: '2026-05-20',
+      validTo: '2026-05-26',
+      sourceUrl: 'https://www.eniro.se/erbjudanden/stockholm',
+      dealUrl: 'https://www.eniro.se/erbjudanden/stockholm/deal-ica-1',
+      imageUrl: 'https://www.eniro.se/images/deal-ica-1.jpg',
+      retrievedAt: '2026-05-24T08:00:00.000Z'
+    }]);
+  });
+
+  it('fetches and deduplicates Eniro deals across configured regions', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(`<script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{"deals":[{"id":"same-deal","title":"Kaffeerbjudande","companyName":"Hemköp Test","url":"/deal/same","price":"2 för 79 kr"}]}}}</script>`, {
+        status: 200,
+        headers: { 'content-type': 'text/html' }
+      });
+    };
+
+    const rows = await fetchEniroDealsSeOffers({
+      fetchImpl,
+      sourceUrls: ['https://www.eniro.se/erbjudanden/stockholm', 'https://www.eniro.se/erbjudanden/goteborg'],
+      retrievedAt: '2026-05-24T08:30:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, ['https://www.eniro.se/erbjudanden/stockholm', 'https://www.eniro.se/erbjudanden/goteborg']);
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0]?.code, 'same-deal');
+    assert.equal(rows[0]?.region, 'stockholm');
+  });
+});
+
 
 describe('fetchIcaProducts', () => {
   it('documents the ICA Maxi catalogue search probe as blocked before replacing promotions', () => {
