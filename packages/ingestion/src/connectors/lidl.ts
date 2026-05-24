@@ -81,18 +81,20 @@ type LidlPrice = {
 export const LIDL_BASE_URL = 'https://www.lidl.se';
 export const LIDL_STORES_PATH = '/s/sv-SE/butiker/';
 export const DEFAULT_LIDL_OFFER_PATHS = [
-  '/c/veckans-frukt-groent/a10094676',
-  '/c/lidl-plus-erbjudanden/a10094682',
-  '/c/veckans-blommor/a10094398',
-  '/c/bjud-pa-spaennande-smaker/a10094681',
-  '/c/fira-matriket-tre-ar-med-oss/a10094679',
-  '/c/mandag-soendag/a10094677',
-  '/c/torsdag-soendag/a10094678',
-  '/c/superklipp-fran-torsdag/a10094683',
-  '/c/xxl/a10094680',
   '/c/med-smak-av-alperna/a10094785',
   '/c/veckans-frukt-groent/a10094782',
-  '/c/lidl-plus-erbjudanden/a10094788'
+  '/c/lidl-plus-erbjudanden/a10094788',
+  '/c/mandag-soendag/a10094783',
+  '/c/superklipp-fran-torsdag/a10094787',
+  '/c/torsdag-soendag/a10094784',
+  '/c/veckans-blommor/a10094884',
+  '/c/veckans-frukt-groent/a10095523',
+  '/c/lidl-plus-erbjudanden/a10095527',
+  '/c/mandag-soendag/a10095524',
+  '/c/superklipp-fran-torsdag/a10095528',
+  '/c/torsdag-soendag/a10095525',
+  '/c/varma-haelsningar-fran-grekland/a10095526',
+  '/c/veckans-blommor/a10095391'
 ] as const;
 
 export type FetchLidlStoresOptions = {
