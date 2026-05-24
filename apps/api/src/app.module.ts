@@ -25,6 +25,7 @@ import { StoresModule } from './stores/stores.module.js';
 import { UsersModule } from './users/users.module.js';
 import { WatchlistsModule } from './watchlists/watchlists.module.js';
 import { AdminRoutesModule } from './routes/admin.js';
+import { FeedbackRoutesModule } from './routes/feedback.js';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { AdminRoutesModule } from './routes/admin.js';
     HouseholdsModule,
     LoyaltyModule,
     AdminRoutesModule,
+    FeedbackRoutesModule,
     MarketModule,
     MealPlansModule,
     PantryModule,

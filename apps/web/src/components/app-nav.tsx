@@ -70,7 +70,8 @@ const navGroups: NavGroup[] = [
       { href: '/watchlist', label: 'Watchlist', icon: Heart },
       { href: '/list', label: 'Shopping list', icon: ListChecks },
       { href: '/weekly-basket', label: 'Weekly basket', icon: ShoppingBasket },
-      { href: '/meal-planner', label: 'Meal planner', icon: Utensils }
+      { href: '/meal-planner', label: 'Meal planner', icon: Utensils },
+      { href: '/feedback', label: 'Feedback', icon: Heart }
     ]
   }
 ];
