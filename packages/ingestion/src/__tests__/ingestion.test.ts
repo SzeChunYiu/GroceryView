@@ -110,6 +110,7 @@ import {
   GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL,
   GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL,
   GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL,
+  GROCERYVIEW_DAILY_OB_IS_FUEL_PRICES_URL,
   GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL,
   GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL,
@@ -129,6 +130,7 @@ import {
   parseLidlStorePayload,
   parseOsmChainStores,
   parseOpenPricesSnapshot,
+  parseObIsFuelPricePage,
   parseOkq8FuelPricePage,
   parseBrandedSwedishFuelStations,
   parseCoopDrPdfTextOffers,
@@ -615,6 +617,71 @@ describe('OKQ8 fuel price connector', () => {
     ]);
     assert.equal(parsed.items.every((row) => row.sourceType === 'retailer_online_page'), true);
     assert.equal(parsed.items.every((row) => row.storeId === undefined), true);
+  });
+});
+
+describe('ÓB IS fuel price connector', () => {
+  const obIsFuelHtml = `
+    <table id="gas-prices">
+      <tbody>
+        <tr><th>Nafn stöðvar</th><th>Bensín</th><th>Dísel</th><th>Dísel lituð</th></tr>
+        <tr data-location="88">
+          <td>Akureyri Hlíðarbraut (lægsta verð ÓB, engir afslættir gilda)</td>
+          <td>205,50</td><td>246,70</td><td></td>
+        </tr>
+        <tr data-location="58">
+          <td>Þorlákshöfn</td><td>231,40</td><td>266,10</td><td>270,10</td>
+        </tr>
+      </tbody>
+    </table>`;
+
+  it('parses station fuel rows from the official ÓB price table', () => {
+    const rows = parseObIsFuelPricePage({
+      body: obIsFuelHtml,
+      capturedAt: '2026-05-24T19:54:01.000Z',
+      rawSnapshotRef: 'raw://ob-is-fuel/test'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.chainId, row.stationName, row.productId, row.pricePerLitre, row.currency]), [
+      ['ob-is', 'Akureyri Hlíðarbraut (lægsta verð ÓB, engir afslættir gilda)', 'fuel-95-e10', 205.5, 'ISK'],
+      ['ob-is', 'Akureyri Hlíðarbraut (lægsta verð ÓB, engir afslættir gilda)', 'fuel-diesel', 246.7, 'ISK'],
+      ['ob-is', 'Þorlákshöfn', 'fuel-95-e10', 231.4, 'ISK'],
+      ['ob-is', 'Þorlákshöfn', 'fuel-diesel', 266.1, 'ISK'],
+      ['ob-is', 'Þorlákshöfn', 'fuel-diesel', 270.1, 'ISK']
+    ]);
+    assert.equal(rows[0]?.sourceKind, 'operator_public_price_page');
+    assert.equal(rows[0]?.provenance.originalPriceText, '205,50');
+  });
+
+  it('adapts ÓB fuel rows into daily litre-priced fuel observations', async () => {
+    const snapshot = await fetchDailyConnectorSnapshot({
+      status: 'ready',
+      connectorId: 'ob-is-fuel-prices',
+      chainId: 'ob-is',
+      sourceType: 'retailer_online_page',
+      runKey: 'ob-is:retailer-online-page:ob-is-fuel-prices:2026-05-24',
+      sourceRunId: 'source-run:ob-is:retailer-online-page:ob-is-fuel-prices:2026-05-24',
+      provenance: {
+        sourceType: 'retailer_online_page',
+        sourceUrl: GROCERYVIEW_DAILY_OB_IS_FUEL_PRICES_URL,
+        capturedAt: '2026-05-24T19:54:01.000Z',
+        parserVersion: 'ob-is-fuel-prices-v1'
+      },
+      requiredActions: []
+    }, {
+      retrievedAt: '2026-05-24T19:54:01.000Z',
+      fetchImpl: async () => new Response(obIsFuelHtml, { status: 200, headers: { 'content-type': 'text/html' } })
+    });
+
+    const parsed = JSON.parse(snapshot.body) as { items: Array<{ chainId: string; productId: string; packageSize: number; packageUnit: string; price: number; sourceType: string }> };
+    assert.deepEqual(parsed.items.map((row) => [row.chainId, row.productId, row.packageSize, row.packageUnit, row.price]), [
+      ['ob-is', 'fuel-95-e10', 1, 'l', 205.5],
+      ['ob-is', 'fuel-diesel', 1, 'l', 246.7],
+      ['ob-is', 'fuel-95-e10', 1, 'l', 231.4],
+      ['ob-is', 'fuel-diesel', 1, 'l', 266.1],
+      ['ob-is', 'fuel-diesel', 1, 'l', 270.1]
+    ]);
+    assert.equal(parsed.items.every((row) => row.sourceType === 'retailer_online_page'), true);
   });
 });
 
@@ -6842,6 +6909,56 @@ describe('daily ingestion runner', () => {
       original_price_text: '18,89 kr',
       original_effective_date: '2026-05-22'
     });
+  });
+
+  it('materializes native ÓB IS fuel prices into domain=fuel litre observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-24T19:54:01.000Z',
+      connectors: [{
+        connectorId: 'ob-is-fuel-prices',
+        chainId: 'ob-is',
+        domain: 'fuel',
+        sourceType: 'retailer_online_page',
+        endpointUrl: GROCERYVIEW_DAILY_OB_IS_FUEL_PRICES_URL,
+        parserVersion: 'ob-is-fuel-prices-v1',
+        robotsTxtStatus: 'allow',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: false,
+        requireStoreScopedPrices: false,
+        stores: []
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return new Response(`
+          <table id="gas-prices">
+            <tr><th>Nafn stöðvar</th><th>Bensín</th><th>Dísel</th><th>Dísel lituð</th></tr>
+            <tr data-location="88"><td>Akureyri Hlíðarbraut</td><td>205,50</td><td>246,70</td><td></td></tr>
+            <tr data-location="58"><td>Þorlákshöfn</td><td>231,40</td><td>266,10</td><td>270,10</td></tr>
+          </table>
+        `, { status: 200, headers: { 'content-type': 'text/html' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 5);
+    assert.deepEqual(requestedUrls, [GROCERYVIEW_DAILY_OB_IS_FUEL_PRICES_URL]);
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.domain, 'fuel');
+    assert.equal(observation.price, 205.5);
+    assert.equal(observation.quantity, 1);
+    assert.equal(observation.quantity_unit, 'l');
+    assert.equal(firstBatchProduct(executor).fuel_grade_id, 'fuel-95-e10');
+    const fuelSourceInsert = executor.calls.find((call) => call.sql.includes('insert into fuel_price_sources'));
+    assert.deepEqual(fuelSourceInsert?.params.slice(0, 5), [
+      'operator_public_price_page',
+      'ob-is',
+      'ÓB',
+      GROCERYVIEW_DAILY_OB_IS_FUEL_PRICES_URL,
+      'ob-is-fuel-prices-v1'
+    ]);
   });
 
   it('materializes public pharmacy products as domain=pharmacy observations without prescription rows', async () => {
