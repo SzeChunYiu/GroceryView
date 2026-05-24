@@ -35,6 +35,7 @@ import {
   buildOpenFoodFactsProductUrl,
   buildOpenFoodFactsSwedenSearchUrl,
   buildOpenPricesConnectorUrl,
+  buildSevenElevenSeBusinessOrdersUrl,
   fetchSt1FuelPrices,
   cacheKeyForScbPxWebQueryFixture,
   cellCountForScbPxWebQueryFixture,
@@ -58,6 +59,7 @@ import {
   fetchBrandedSwedishFuelStations,
   fetchOverpassFuelStations,
   fetchOverpassGroceryStores,
+  fetchSevenElevenSeConvenienceProducts,
   fetchRetailerConnectorSnapshot,
   fetchCityGrossBulkProducts,
   fetchCityGrossProducts,
@@ -132,6 +134,7 @@ import {
   parseOpenPricesSnapshot,
   parseOkq8FuelPricePage,
   parseBrandedSwedishFuelStations,
+  parseSevenElevenSeConvenienceProducts,
   parseCoopDrPdfTextOffers,
   parseRetailerProductJsonSnapshot,
   persistOpenFoodFactsProductMetadata,
@@ -146,6 +149,8 @@ import {
   OVERPASS_INTERPRETER_URL,
   STOCKHOLM_FUEL_OVERPASS_QUERY,
   STOCKHOLM_GROCERY_OVERPASS_QUERY,
+  findSevenElevenSeAssortmentPdfUrl,
+  SEVEN_ELEVEN_SE_ASSORTMENT_PDF_URL,
   STORE_ENUMERATOR_OVERPASS_URL,
   SWEDEN_BRANDED_FUEL_STATIONS_OVERPASS_QUERY,
   SWEDEN_FUEL_OVERPASS_QUERY,
@@ -7505,4 +7510,73 @@ describe('daily ingestion runner', () => {
     assert.deepEqual(result.blockers, ['ica:robots_txt_allow_required', 'ica:legal_review_approval_required']);
     assert.equal(executor.calls.length, 0);
   });
+
+  it('parses and fetches 7-Eleven Sweden convenience assortment SKUs from the B2B PDF', async () => {
+    const retrievedAt = '2026-05-24T12:00:00.000Z';
+    const sourceUrl = buildSevenElevenSeBusinessOrdersUrl();
+    const pageHtml = `<a href="${SEVEN_ELEVEN_SE_ASSORTMENT_PDF_URL}">Meny företagsbeställning</a>`;
+    const pdfText = `
+      Ingredienser: Croissant, ost, skinka.
+      CROISSANTFRALLA OST & SKINKA 34-39:-
+      Ingredienser: 83,3% Äppeljuice 10% Mixad Ananas.
+      JUICE SPENAT ÄPPLE ANANAS CITRON RÅSAFT 32-37:- + pant
+      PANE LUNGO, PESTO MED MOZZARELLA, PARMESANKRÄM
+      & RUCCOLA 85-95:- LAKTO-VEGETARISK
+      CHIAPUDDING 34-39:-SURDEGSFRALLA RÅG ÄGG & KAVIAR 34-39:-
+    `;
+
+    assert.equal(findSevenElevenSeAssortmentPdfUrl(pageHtml, sourceUrl), SEVEN_ELEVEN_SE_ASSORTMENT_PDF_URL);
+
+    const parsed = parseSevenElevenSeConvenienceProducts(pdfText, {
+      sourceUrl,
+      pdfUrl: SEVEN_ELEVEN_SE_ASSORTMENT_PDF_URL,
+      retrievedAt,
+      rawSnapshotRef: 'raw://seven-eleven-se-assortment/test'
+    });
+
+    assert.equal(parsed.length, 5);
+    assert.deepEqual(parsed[0], {
+      productId: 'seven-eleven-se-croissantfralla-ost-skinka',
+      chainId: 'seven_eleven_se',
+      chainName: '7-Eleven Sweden',
+      name: 'CROISSANTFRALLA OST & SKINKA',
+      category: 'breakfast',
+      priceMin: 34,
+      priceMax: 39,
+      priceText: '34-39:-',
+      currency: 'SEK',
+      depositIncluded: false,
+      dietaryTags: [],
+      sourceUrl,
+      pdfUrl: SEVEN_ELEVEN_SE_ASSORTMENT_PDF_URL,
+      retrievedAt,
+      provenance: {
+        source: 'seven_eleven_se_b2b_assortment_pdf',
+        parserVersion: 'seven-eleven-se-b2b-assortment-v1',
+        rawSnapshotRef: 'raw://seven-eleven-se-assortment/test'
+      }
+    });
+    assert.equal(parsed[1].category, 'drink');
+    assert.equal(parsed[1].depositIncluded, true);
+    assert.equal(parsed[2].name, 'PANE LUNGO, PESTO MED MOZZARELLA, PARMESANKRÄM & RUCCOLA');
+    assert.deepEqual(parsed[2].dietaryTags, ['lacto_vegetarian', 'vegetarian']);
+    assert.equal(parsed[4].name, 'SURDEGSFRALLA RÅG ÄGG & KAVIAR');
+
+    const requestedUrls: string[] = [];
+    const fetched = await fetchSevenElevenSeConvenienceProducts({
+      retrievedAt,
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        if (String(url) === sourceUrl) {
+          return new Response(pageHtml, { status: 200, headers: { 'content-type': 'text/html' } });
+        }
+        return new Response(new Uint8Array([1, 2, 3]), { status: 200, headers: { 'content-type': 'application/pdf' } });
+      },
+      pdfTextExtractor: async () => pdfText
+    });
+
+    assert.deepEqual(requestedUrls, [sourceUrl, SEVEN_ELEVEN_SE_ASSORTMENT_PDF_URL]);
+    assert.equal(fetched.length, 5);
+  });
+
 });
