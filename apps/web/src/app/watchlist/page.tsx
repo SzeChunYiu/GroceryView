@@ -4,7 +4,7 @@ import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/componen
 import { NotificationInboxActions } from '@/components/notification-inbox-actions';
 import { babyDiaperPriceTracker, budgetEssentialsPriceDropAlerts, dealHunterNewProductPriceDropAlerts, weeklyPersonalizedEmailDigest } from '@/lib/demo-data';
 import { priceAlertThresholdPreferenceContract } from '@/lib/verified-data';
-import { confidenceForProduct, priceRowCount, priceSource, watchlistAlertBoard, watchlistItemForAlert } from '@/lib/watchlist-data';
+import { confidenceForProduct, priceRowCount, priceDropReasonForAlert, priceDropReasonForProduct, priceSource, watchlistAlertBoard, watchlistItemForAlert } from '@/lib/watchlist-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -70,6 +70,9 @@ export default function WatchlistPage() {
                 <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Store: {alert.trigger.storeName}</p>
                 <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Value: {String(alert.trigger.value)}</p>
                 <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Target: {watchlistItemForAlert(alert.productId)?.targetPrice ? formatSek(watchlistItemForAlert(alert.productId)!.targetPrice!) : 'No target'}</p>
+                <p className="rounded-2xl bg-amber-50 p-3 font-semibold text-amber-950 sm:col-span-4">
+                  Reason: {priceDropReasonForAlert(alert).label} · {priceDropReasonForAlert(alert).detail}
+                </p>
               </div>
             </Link>
           ))}
@@ -150,7 +153,8 @@ export default function WatchlistPage() {
               {dealHunterNewProductPriceDropAlerts.priceDropAlerts.map((alert) => (
                 <Link className="block rounded-2xl bg-amber-50 p-3 text-sm font-semibold hover:bg-amber-100" href={`/products/${alert.productId}`} key={`${alert.productId}-${alert.type}`}>
                   <strong>{alert.productName}</strong><br />{alert.message}<br />
-                  <span className="text-slate-600">{alert.triggerMetric}: {String(alert.triggerValue)} · {alert.source}</span>
+                  <span className="text-slate-600">{alert.triggerMetric}: {String(alert.triggerValue)} · {alert.source}</span><br />
+                  <span className="text-amber-900">Reason: {priceDropReasonForProduct(alert.productId, alert.triggerMetric, alert.source).label} · {priceDropReasonForProduct(alert.productId, alert.triggerMetric, alert.source).detail}</span>
                 </Link>
               ))}
             </div>
