@@ -8,6 +8,7 @@ export * from './queries/productSearch.js';
 export * from './queries/stores.js';
 export * from './queries/retailers.js';
 export * from './queries/users.js';
+export * from './queries/availability.js';
 export * from './seed/retailers.js';
 
 export type Migration = {
