@@ -540,9 +540,9 @@ Sample newly added rows:
 - Source: www.willys.se public Axfood campaign JSON
 - Store catalog source: https://www.willys.se/axfood/rest/store
 - Source URL pattern: https://www.willys.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100
-- Retrieved: 2026-05-24T12:27:35.330Z
+- Retrieved: 2026-05-24T17:05:34.313Z
 - Public store IDs with wired rows: 254
-- Source URLs fetched and cited in metadata: 646
+- Source URLs fetched and cited in metadata: 644 campaign pages, plus the store catalog URL and source URL pattern in metadata
 - Real weekly discount rows fetched and wired: 44241
 - Web wire: apps/web/src/lib/ingested/willys.ts
 - Connector: packages/ingestion/src/connectors/willys.ts
@@ -550,7 +550,7 @@ Sample newly added rows:
 
 Sample source inspection on 2026-05-24:
 - `curl -A "GroceryView/0.1" https://www.willys.se/axfood/rest/store` returned public JSON with 255 store rows.
-- `curl -A "GroceryView/0.1" "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=3"` returned public JSON with 3 result rows and 71 pages.
+- `curl -A "GroceryView/0.1" "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=3"` returned HTTP 200 public JSON with 3 result rows and 71 pages.
 
 Sample campaign row from the inspected endpoint:
 1. 2500306014 | 2149 | Grön sparris 250g | 29,90/st | https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=3
