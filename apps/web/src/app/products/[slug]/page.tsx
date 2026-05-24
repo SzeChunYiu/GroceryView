@@ -16,10 +16,11 @@ import {
   type ItemSubstitutionProduct
 } from '@groceryview/analytics';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { ConfidenceBadge } from '@/components/confidence-badge';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
-import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
+import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug, matchedChainProducts } from '@/lib/verified-data';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { metadataForProduct } from '@/lib/seo';
 
@@ -162,6 +163,19 @@ function productOfferBounds(product: NonNullable<ReturnType<typeof findProduct>>
   return { lowPrice: product.priceMin, highPrice: product.priceMax, offerCount: product.observationCount };
 }
 
+type ChainQuoteTableRow = {
+  chain: string;
+  price: number;
+  priceText: string;
+  priceUnit: string;
+  savings: number | null;
+  isCheapest: boolean;
+  unitPrice: { value: number; unit: string; source: string } | null;
+  deltaVsMedian: number | null;
+  confidenceLevel: 'high' | 'medium';
+  confidenceLabel: string;
+};
+
 function productJsonLdFor(product: NonNullable<ReturnType<typeof findProduct>>) {
   const bounds = productOfferBounds(product);
   return {
@@ -201,6 +215,85 @@ function jsonLd(value: unknown) {
 
 function formatComparableUnitPrice(value: number | null | undefined, unit: string | null | undefined) {
   return formatLocalizedUnitPrice(value, { locale: defaultLocale, currency: 'SEK', unit });
+}
+
+function unitPriceFromChainRow(
+  row: { price: number; priceUnit: string },
+  product: (typeof matchedChainProducts)[number]
+) {
+  const unitLabel = row.priceUnit.toLowerCase();
+  if (unitLabel.includes('/kg')) return { value: row.price, unit: 'kg', source: row.priceUnit };
+  if (unitLabel.includes('/l')) return { value: row.price, unit: 'l', source: row.priceUnit };
+
+  const packageEvidence = packageEvidenceFrom(product.subline);
+  if (!packageEvidence || row.price <= 0) return null;
+  if (packageEvidence.packageUnit === 'g') return { value: row.price / (packageEvidence.packageSize / 1000), unit: 'kg', source: product.subline };
+  if (packageEvidence.packageUnit === 'ml') return { value: row.price / (packageEvidence.packageSize / 1000), unit: 'l', source: product.subline };
+  if (packageEvidence.packageUnit === 'piece') return { value: row.price / packageEvidence.packageSize, unit: 'st', source: product.subline };
+  return null;
+}
+
+function chainQuoteTableFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+  if (!('lowestPrice' in product)) {
+    return { rows: [], medianPrice: null, medianUnitPrice: null };
+  }
+
+  const exactMatch = matchedChainProducts.find((candidate) => candidate.code === product.code && candidate.slug === product.slug);
+  if (!exactMatch) {
+    return { rows: [], medianPrice: null, medianUnitPrice: null };
+  }
+
+  const rawRows: ChainQuoteTableRow[] = chainPriceRows(exactMatch)
+    .filter((row) => Number.isFinite(row.price))
+    .map((row) => {
+      const unitPrice = unitPriceFromChainRow(row, exactMatch);
+      return {
+        chain: row.chain,
+        price: row.price,
+        priceText: row.priceText,
+        priceUnit: row.priceUnit,
+        savings: row.savings,
+        isCheapest: false,
+        unitPrice,
+        deltaVsMedian: null,
+        confidenceLevel: 'medium',
+        confidenceLabel: ''
+      };
+    });
+
+  if (rawRows.length === 0) {
+    return { rows: [], medianPrice: null, medianUnitPrice: null };
+  }
+
+  const unitRows = rawRows
+    .map((row) => ({ row, unitPrice: row.unitPrice }))
+    .filter((entry): entry is { row: ChainQuoteTableRow; unitPrice: NonNullable<ChainQuoteTableRow['unitPrice']> } => entry.unitPrice !== null);
+  const unitPriceUnits = new Set(unitRows.map((entry) => entry.unitPrice.unit));
+  const medianUnitPrice = unitPriceUnits.size === 1 ? medianFor(unitRows.map((entry) => entry.unitPrice.value)) : null;
+  const medianPrice = medianFor(rawRows.map((row) => row.price));
+  const cheapestPrice = Math.min(...rawRows.map((row) => row.price));
+  const confidenceLevel: 'high' | 'medium' = rawRows.length >= 2 ? 'high' : 'medium';
+  const confidenceLabel = rawRows.length >= 2 ? 'exact matched code' : 'single chain row';
+
+  const rows = rawRows.map((row) => {
+    const comparisonValue = row.unitPrice?.value ?? row.price;
+    const comparisonMedian = medianUnitPrice !== null ? medianUnitPrice : medianPrice;
+    const deltaVsMedian = comparisonMedian && comparisonMedian > 0 ? ((comparisonValue - comparisonMedian) / comparisonMedian) * 100 : null;
+
+    return {
+      ...row,
+      isCheapest: row.price === cheapestPrice,
+      deltaVsMedian,
+      confidenceLevel,
+      confidenceLabel
+    };
+  });
+
+  return {
+    rows,
+    medianPrice,
+    medianUnitPrice
+  };
 }
 
 function brandTierFor(brand: string, labels: string[] = []): BrandTier {
@@ -1081,6 +1174,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const crossChainHistoryOverlay = crossChainHistoryOverlayFor(product);
   const intraChainBranchSpread = intraChainBranchSpreadFor(product);
   const priceChartTerminal = priceChartTerminalFor(product);
+  const chainQuoteTable = chainQuoteTableFor(product);
   const commodityComparison = commodityComparisonForProduct(product.slug);
   const freshnessBadge = dataFreshnessBadges.find((badge) => badge.sourceKind === (isChain ? 'axfood' : 'openprices')) ?? dataFreshnessBadges[0]!;
   const productJsonLd = productJsonLdFor(product);
@@ -1113,6 +1207,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
             <div className="mt-4 grid gap-3">
               <p className="text-5xl font-black text-emerald-800">{formatSek(product.lowestPrice)}</p>
               <p className="font-semibold text-slate-700">Lowest chain: {product.lowestChain}. Highest observed chain price: {formatSek(product.highestPrice)}.</p>
+              <p className="text-sm font-bold text-slate-600">Chain price rows are sourced from exact matched chain catalogue entries only.</p>
               <p className="rounded-2xl bg-amber-50 p-4 font-black text-amber-950">Comparable spread: {formatPct(product.spreadPct)}. This is chain-wide catalogue evidence, not per-branch shelf evidence.</p>
             </div>
           ) : (
@@ -1590,17 +1685,79 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
         <p className="mt-4 text-xs font-semibold text-slate-500">{priceHistoryBadge.detail}</p>
       </Card>
       {isChain ? (
-        <Card className="mt-6">
-          <h2 className="text-2xl font-black">Chain price rows</h2>
-          <div className="mt-4 grid gap-3 md:grid-cols-2">
-            {chainPriceRows(product).map((row) => (
-              <div className="rounded-2xl border border-slate-200 p-4" key={row.chain}>
-                <p className="text-lg font-black capitalize">{row.chain}</p>
-                <p className="mt-1 text-3xl font-black text-emerald-800">{formatSek(row.price)}</p>
-                <p className="text-sm text-slate-600">{row.priceUnit || 'Unit not reported'}{row.savings ? ` · listed saving ${formatSek(row.savings)}` : ''}</p>
-              </div>
-            ))}
+        <Card className="mt-6 overflow-hidden border-lime-200 bg-lime-50/80">
+          <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-lime-800">cross-chain quote table</p>
+              <h2 className="mt-2 text-2xl font-black text-slate-950">Cross-chain quote table</h2>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+                Exact-matched products from matchedChainProducts power current per-chain prices and normalized unit-price calculations.
+              </p>
+            </div>
+            <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-lime-900">
+              Basket median
+              {chainQuoteTable.medianUnitPrice !== null && chainQuoteTable.rows[0]?.unitPrice
+                ? ` ${formatSek(chainQuoteTable.medianUnitPrice)} / ${chainQuoteTable.rows[0].unitPrice.unit}`
+                : chainQuoteTable.medianPrice !== null
+                  ? ` ${formatSek(chainQuoteTable.medianPrice)}`
+                  : ' not reported'}
+            </p>
           </div>
+          {chainQuoteTable.rows.length > 0 ? (
+            <div className="mt-5 overflow-x-auto rounded-2xl border border-lime-200 bg-white">
+              <table className="w-full min-w-[700px] text-left text-sm">
+                <thead className="bg-lime-50 text-xs font-black uppercase tracking-[0.18em] text-slate-500">
+                  <tr>
+                    <th className="px-4 py-3">Chain</th>
+                    <th className="px-4 py-3">Current price</th>
+                    <th className="px-4 py-3">Unit price</th>
+                    <th className="px-4 py-3">Δ vs basket median</th>
+                    <th className="px-4 py-3">Confidence</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-lime-200 bg-white">
+                  {chainQuoteTable.rows.map((row) => (
+                    <tr className={row.isCheapest ? 'bg-emerald-50/80' : undefined} key={row.chain}>
+                      <td className="px-4 py-4">
+                        <div className="flex items-center gap-2">
+                          <span className="text-base font-black capitalize text-slate-950">{row.chain}</span>
+                          {row.isCheapest ? (
+                            <span className="rounded-full bg-emerald-700 px-2 py-1 text-xs font-black uppercase tracking-[0.14em] text-white">Cheapest</span>
+                          ) : null}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4">
+                        <p className="text-lg font-black text-emerald-800">{formatSek(row.price)}</p>
+                        <p className="mt-1 text-xs font-semibold text-slate-500">{row.priceText}</p>
+                      </td>
+                      <td className="px-4 py-4">
+                        {row.unitPrice ? (
+                          <>
+                            <p className="font-black text-slate-950">{formatSek(row.unitPrice.value)} / {row.unitPrice.unit}</p>
+                            <p className="mt-1 text-xs font-semibold text-slate-500">from {row.unitPrice.source}</p>
+                          </>
+                        ) : (
+                          <p className="font-semibold text-slate-500">Not reported</p>
+                        )}
+                      </td>
+                      <td className="px-4 py-4">
+                        <span className={`font-black ${row.deltaVsMedian !== null && row.deltaVsMedian < 0 ? 'text-emerald-800' : 'text-slate-800'}`}>
+                          {row.deltaVsMedian !== null ? formatPct(row.deltaVsMedian) : 'Not reported'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4">
+                        <ConfidenceBadge level={row.confidenceLevel} label={row.confidenceLabel} sampleSize={chainQuoteTable.rows.length} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="mt-5 rounded-2xl bg-white p-4 text-sm font-bold text-lime-950">
+              No exact matched chain row exists in matchedChainProducts for this product, so a cross-chain quote table is unavailable.
+            </p>
+          )}
         </Card>
       ) : null}
     </PageShell>
