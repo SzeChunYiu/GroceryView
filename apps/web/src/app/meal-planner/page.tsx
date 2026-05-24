@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ConfidenceBadge } from '@/components/confidence-badge';
+import { MealPlanCheckoutAction } from '@/components/meal-plan-checkout-action';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { dealBasedMeals, familyMealPlannerFromDeals, freezerBatchCookPlanner, studentDealRecipes } from '@/lib/demo-data';
 import { extractIngredientsFromMealPlans, suggestBudgetAlternativesFromMealPlans } from '@/lib/meal-budgets';
@@ -28,6 +29,13 @@ export default function MealPlannerPage() {
   ];
   const extractedMealIngredients = extractIngredientsFromMealPlans(mealBudgetPlans);
   const budgetAlternatives = suggestBudgetAlternativesFromMealPlans(mealBudgetPlans);
+  const mealPlanCheckoutDays = familyMealPlannerFromDeals.meals.map((meal, index) => ({
+    id: `family-${index}`,
+    label: meal.weeknightSlot,
+    title: meal.title,
+    servings: familyMealPlannerFromDeals.servings,
+    ingredientCount: meal.ingredients.filter(Boolean).length
+  }));
 
   return (
     <PageShell>
@@ -85,6 +93,8 @@ export default function MealPlannerPage() {
           ))}
         </div>
       </Card>
+
+      <MealPlanCheckoutAction days={mealPlanCheckoutDays} />
 
       <Card className="mt-6 border-amber-200 bg-amber-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-800">Budget alternatives</p>
