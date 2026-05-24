@@ -1384,10 +1384,10 @@ describe('verified-data UI', () => {
     assert.match(generated, /"storeAccountId":"1003693"/);
     assert.match(generated, /ICA Supermarket Toria/);
     assert.match(generated, /"storeAccountId":"1003822"/);
-    assert.match(generated, /retrieved 2026-05-23T20:42:39\.000Z/);
+    assert.match(generated, /retrieved 2026-05-24T00:56:17\.000Z/);
     assert.match(summary, /AUTO-GENERATED summary from public ICA store-scoped promotions JSON/);
     assert.match(summary, /generatedFrom: 'apps\/web\/src\/lib\/ingested\/ica\.ts'/);
-    assert.match(summary, /totalRowCount: 93109/);
+    assert.match(summary, /totalRowCount: 93229/);
     assert.match(summary, /storeEndpointCount: 324/);
     assert.match(summary, /ICA Kvantum Tomelilla/);
     assert.match(summary, /storeAccountId: '1004070'/);
@@ -1395,7 +1395,7 @@ describe('verified-data UI', () => {
     assert.match(summary, /storeAccountId: '1003693'/);
     assert.match(summary, /ICA Supermarket Toria/);
     assert.match(summary, /storeAccountId: '1003822'/);
-    assert.match(summary, /retrievedAt: '2026-05-23T20:42:39\.000Z'/);
+    assert.match(summary, /retrievedAt: '2026-05-24T00:56:17\.000Z'/);
     assert.match(verified, /import \{ icaStorePromotionSourceSummary \} from '\.\/ingested\/ica-source-summary'/);
     assert.match(verified, /export const icaStorePromotionEvidence/);
     assert.match(verified, /latestStore/);
