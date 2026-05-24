@@ -1,5 +1,6 @@
 import { createPgQueryExecutor, searchProductsByText, type ProductSearchResult } from '@groceryview/db';
 import { NextResponse } from 'next/server';
+import { hasAllergenRiskText, isAllergenFilterEnabled } from '@/lib/allergen-filter';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -45,6 +46,7 @@ function responsePayload(query: string, results: ProductSearchResult[], error?: 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const query = (searchParams.get('q') ?? '').trim();
+  const excludeAllergens = isAllergenFilterEnabled(searchParams.get('excludeAllergens'));
 
   if (query.length < 2) {
     return NextResponse.json({ query, results: [], source: 'postgres.products_tsvector' });
@@ -60,7 +62,11 @@ export async function GET(request: Request) {
 
   try {
     const executor = await executorForDatabaseUrl(databaseUrl);
-    const results = await searchProductsByText(executor, query, { limit: 8 });
+    const rawResults = await searchProductsByText(executor, query, { limit: excludeAllergens ? 20 : 8 });
+    const results = (excludeAllergens
+      ? rawResults.filter((result) => !hasAllergenRiskText(result.name, result.brand))
+      : rawResults
+    ).slice(0, 8);
     return NextResponse.json({ query, results, source: 'postgres.products_tsvector' });
   } catch (error) {
     console.error('Product search query failed', error instanceof Error ? { name: error.name } : { name: 'unknown' });

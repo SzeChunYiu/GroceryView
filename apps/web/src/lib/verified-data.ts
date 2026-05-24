@@ -33,6 +33,7 @@ import {
   supportedCurrencies,
   unknownUnitPriceLabel
 } from './i18n';
+import { hasAllergenRiskText, isAllergenFilterEnabled } from './allergen-filter';
 
 const icaReklambladOffers = dbSiteIcaReklambladOffers.length > 0 ? dbSiteIcaReklambladOffers : staticIcaReklambladOffers;
 const icaReklambladSource = dbSiteIcaReklambladOffers.length > 0 ? dbSiteIcaReklambladSource : staticIcaReklambladSource;
@@ -517,6 +518,7 @@ export type ProductSearchUrlParams = {
   maxPrice?: SearchParamValue;
   inStockOnly?: SearchParamValue;
   minConfidence?: SearchParamValue;
+  excludeAllergens?: SearchParamValue;
 };
 
 function firstSearchValue(value: SearchParamValue): string {
@@ -550,7 +552,11 @@ function confidenceSearchValue(value: SearchParamValue): number | undefined {
 }
 
 function booleanSearchValue(value: SearchParamValue): boolean {
-  return ['1', 'true', 'yes', 'on'].includes(firstSearchValue(value).toLocaleLowerCase('sv-SE'));
+  return isAllergenFilterEnabled(firstSearchValue(value));
+}
+
+function facetedRowHasAllergenRisk(row: RealCatalogSearchPriceRow): boolean {
+  return hasAllergenRiskText(row.canonicalName, row.brand, row.categoryPath.join(' '));
 }
 
 function productSearchResultCards(searchResult: typeof rawFacetedProductSearch) {
@@ -587,8 +593,10 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
   const maxPrice = numericSearchValue(searchParams.maxPrice);
   const inStockOnly = booleanSearchValue(searchParams.inStockOnly);
   const minConfidence = confidenceSearchValue(searchParams.minConfidence);
+  const excludeAllergens = booleanSearchValue(searchParams.excludeAllergens);
+  const searchableRows = excludeAllergens ? facetedSearchRows.filter((row) => !facetedRowHasAllergenRisk(row)) : facetedSearchRows;
   const filters = { query, categories, labels, chains, minPrice, maxPrice, inStockOnly, minConfidence, limit: 100 };
-  const searchResult = buildFacetedProductSearch({ rows: facetedSearchRows, filters });
+  const searchResult = buildFacetedProductSearch({ rows: searchableRows, filters });
 
   const activeFilters = [
     query ? `q=${query}` : null,
@@ -602,6 +610,7 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
     minPrice !== undefined ? `min unit ${formatSek(minPrice)}` : null,
     maxPrice !== undefined ? `max unit ${formatSek(maxPrice)}` : null,
     inStockOnly ? 'priced/in-stock only' : null,
+    excludeAllergens ? 'allergen-risk excluded' : null,
     minConfidence !== undefined ? `confidence ≥ ${pct.format(minConfidence * 100)}%` : null
   ].filter((item): item is string => item !== null);
 
@@ -622,6 +631,11 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
       };
     }),
     priceRange: searchResult.facets.priceRange,
+    excludeAllergens: {
+      enabled: excludeAllergens,
+      label: 'Exclude common allergen-risk items',
+      hiddenProductCount: excludeAllergens ? new Set(facetedSearchRows.filter(facetedRowHasAllergenRisk).map((row) => row.productId)).size : 0
+    },
     inStockOnly: {
       label: 'In-stock / priced rows only',
       productCount: searchResult.evidence.pricedProductCount,
@@ -1653,9 +1667,12 @@ const privateLabelDupeRows = privateLabelDupeInputs
   })
   .sort((left, right) => right.savingsPercent - left.savingsPercent || left.sourceName.localeCompare(right.sourceName, 'sv'));
 
+const allergenSafePrivateLabelDupeRows = privateLabelDupeRows.filter((row) => !hasAllergenRiskText(row.sourceName, row.dupeName));
+
 export const privateLabelDupeFinder = {
   title: 'Private-label dupe finder',
   topDupes: privateLabelDupeRows.slice(0, 8),
+  allergenSafeTopDupes: allergenSafePrivateLabelDupeRows.slice(0, 8),
   sourceProductCount: new Set(privateLabelDupeRows.map((row) => row.sourceSlug)).size,
   privateLabelProductCount: new Set(privateLabelDupeRows.map((row) => row.dupeSlug)).size,
   categoryCount: new Set(privateLabelDupeRows.map((row) => privateLabelDupeProductBySlug.get(row.sourceSlug)?.category).filter(Boolean)).size,

@@ -4,6 +4,7 @@ import { COMPARE_CHAIN_ORDER, buildChainComparisonTable } from '@/lib/chain-comp
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, commodityComparisons, compareOverlayChart, formatPct, formatSek, matchedChainProducts, privateLabelDupeFinder } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
+import { isAllergenFilterEnabled } from '@/lib/allergen-filter';
 
 export function generateMetadata() {
   return routeMetadata('/compare');
@@ -19,11 +20,14 @@ function formatComparableUnitPrice(value: number | null | undefined, unitLabel: 
 
 type SearchParams = {
   products?: string | string[];
+  excludeAllergens?: string | string[];
 };
 
 export default async function ComparePage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
   const productsParam = resolvedSearchParams.products;
+  const excludeAllergens = isAllergenFilterEnabled(resolvedSearchParams.excludeAllergens);
+  const dupeRecommendations = excludeAllergens ? privateLabelDupeFinder.allergenSafeTopDupes : privateLabelDupeFinder.topDupes;
   const comparison = buildChainComparisonTable(productsParam);
   const packagedRows = comparison.products.filter((product) => product.matchType === 'packaged_barcode');
   const commodityRows = comparison.products.filter((product) => product.matchType === 'commodity_alias');
@@ -253,10 +257,21 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
               No brand-name row is paired with a private label unless recommendSmartSwaps clears same-category, package-size, lower unit-price, and private-label preference checks. The board shows dupes, not ingredient identity claims.
             </p>
           </div>
-          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-fuchsia-900 shadow-sm">{privateLabelDupeFinder.topDupes.length} verified dupes</p>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-fuchsia-900 shadow-sm">{dupeRecommendations.length} verified dupes</p>
         </div>
+        <form className="mt-4" method="get">
+          {typeof productsParam === 'string' ? <input name="products" type="hidden" value={productsParam} /> : null}
+          <label className="inline-flex items-start gap-2 rounded-2xl bg-white px-4 py-3 text-sm font-black text-fuchsia-950 shadow-sm">
+            <input className="mt-1" defaultChecked={excludeAllergens} name="excludeAllergens" type="checkbox" value="true" />
+            <span>
+              Allergen-aware recommendations
+              <span className="block text-xs font-semibold text-fuchsia-700">Exclude common risky items before showing smart swaps.</span>
+            </span>
+          </label>
+          <button className="ml-3 rounded-full bg-fuchsia-800 px-4 py-2 text-sm font-black text-white" type="submit">Apply</button>
+        </form>
         <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          {privateLabelDupeFinder.topDupes.map((dupe) => (
+          {dupeRecommendations.map((dupe) => (
             <Link className="rounded-2xl border border-fuchsia-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-fuchsia-700" href={`/products/${dupe.dupeSlug}`} key={`${dupe.sourceSlug}-${dupe.dupeSlug}`}>
               <p className="text-xs font-black uppercase tracking-[0.2em] text-fuchsia-800">{dupe.privateLabelTier.replaceAll('_', ' ')}</p>
               <h3 className="mt-2 text-lg font-black text-slate-950">{dupe.privateLabelBrand} dupe for {dupe.nationalBrand}</h3>

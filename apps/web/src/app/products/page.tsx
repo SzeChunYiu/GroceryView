@@ -23,6 +23,7 @@ type SearchParams = {
   maxPrice?: string | string[];
   inStockOnly?: string | string[];
   minConfidence?: string | string[];
+  excludeAllergens?: string | string[];
   brand?: string | string[];
   page?: string | string[];
 };
@@ -63,6 +64,7 @@ function copySearchParams(params: URLSearchParams, source: SearchParams) {
   setFirstParam(params, 'maxPrice', source.maxPrice);
   setFirstParam(params, 'inStockOnly', source.inStockOnly);
   setFirstParam(params, 'minConfidence', source.minConfidence);
+  setFirstParam(params, 'excludeAllergens', source.excludeAllergens);
 }
 
 function productsPageUrl(page: number, selectedBrand = '', searchParams: SearchParams = {}) {
@@ -91,7 +93,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const rangeEnd = Math.min(pageStart + PRODUCTS_PER_PAGE, resultCards.length);
   const defaultSearchCount = facetedProductSearch.resultCards.length;
 
-  function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence', string>>) {
+  function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence' | 'excludeAllergens', string>>) {
     const params = new URLSearchParams();
     copySearchParams(params, resolvedSearchParams);
     for (const [key, value] of Object.entries(overrides)) {
@@ -180,6 +182,15 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             <label className="flex items-center gap-2 rounded-2xl bg-violet-50 px-3 py-2 text-sm font-black text-violet-950">
               <input defaultChecked={search.filters.inStockOnly} name="inStockOnly" type="checkbox" value="true" />
               In-stock only
+            </label>
+            <label className="flex items-start gap-2 rounded-2xl bg-rose-50 px-3 py-2 text-sm font-black text-rose-950">
+              <input className="mt-1" defaultChecked={search.excludeAllergens.enabled} name="excludeAllergens" type="checkbox" value="true" />
+              <span>
+                Allergen-aware
+                <span className="block text-xs font-semibold text-rose-800">
+                  Hide common risky items{search.excludeAllergens.hiddenProductCount > 0 ? ` · ${search.excludeAllergens.hiddenProductCount.toLocaleString('sv-SE')} products` : ''}
+                </span>
+              </span>
             </label>
             <button className="rounded-full bg-violet-800 px-4 py-3 text-sm font-black text-white" type="submit">Apply filters</button>
           </div>

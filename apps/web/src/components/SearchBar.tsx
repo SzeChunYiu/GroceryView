@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Search } from 'lucide-react';
 import { useEffect, useId, useMemo, useState } from 'react';
+import { ALLERGEN_FILTER_PARAM, ALLERGEN_FILTER_STORAGE_KEY } from '@/lib/allergen-filter';
 
 type ProductSearchResult = {
   id: string;
@@ -27,10 +28,15 @@ export function SearchBar() {
   const inputId = useId();
   const listboxId = useId();
   const [query, setQuery] = useState('');
+  const [excludeAllergens, setExcludeAllergens] = useState(false);
   const [results, setResults] = useState<ProductSearchResult[]>([]);
   const [status, setStatus] = useState<SearchStatus>('idle');
   const trimmedQuery = useMemo(() => query.trim(), [query]);
   const shouldShowDropdown = status !== 'idle' && trimmedQuery.length >= MIN_QUERY_LENGTH;
+
+  useEffect(() => {
+    setExcludeAllergens(window.localStorage.getItem(ALLERGEN_FILTER_STORAGE_KEY) === 'true');
+  }, []);
 
   useEffect(() => {
     if (trimmedQuery.length < MIN_QUERY_LENGTH) {
@@ -43,7 +49,9 @@ export function SearchBar() {
     const timeout = window.setTimeout(async () => {
       setStatus('loading');
       try {
-        const response = await fetch(`/api/products?q=${encodeURIComponent(trimmedQuery)}`, {
+        const params = new URLSearchParams({ q: trimmedQuery });
+        if (excludeAllergens) params.set(ALLERGEN_FILTER_PARAM, 'true');
+        const response = await fetch(`/api/products?${params.toString()}`, {
           signal: controller.signal,
           headers: { Accept: 'application/json' }
         });
@@ -64,7 +72,12 @@ export function SearchBar() {
       window.clearTimeout(timeout);
       controller.abort();
     };
-  }, [trimmedQuery]);
+  }, [trimmedQuery, excludeAllergens]);
+
+  function handleAllergenToggle(checked: boolean) {
+    setExcludeAllergens(checked);
+    window.localStorage.setItem(ALLERGEN_FILTER_STORAGE_KEY, checked ? 'true' : 'false');
+  }
 
   return (
     <div className="relative w-full max-w-xl lg:w-[min(36vw,28rem)]">
@@ -86,6 +99,10 @@ export function SearchBar() {
           value={query}
         />
       </div>
+      <label className="mt-2 flex items-center gap-2 px-2 text-xs font-bold text-slate-600">
+        <input checked={excludeAllergens} onChange={(event) => handleAllergenToggle(event.target.checked)} type="checkbox" />
+        Exclude common allergen-risk items
+      </label>
 
       {shouldShowDropdown ? (
         <div
