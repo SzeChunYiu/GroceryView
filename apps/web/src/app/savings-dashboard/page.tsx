@@ -6,7 +6,24 @@ import { ecoBasketScorecard } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
-  return routeMetadata('/savings-dashboard');
+  const metadata = routeMetadata({
+    path: '/savings-dashboard',
+    title: 'Personal grocery inflation dashboard | GroceryView',
+    description: 'Track grocery inflation, fixed-income budgets, weekly student budgets, and staples price stability from real core summaries.',
+    imagePath: '/pwa-icon.svg',
+    imageAlt: 'GroceryView savings dashboard preview'
+  });
+  const openGraph = metadata.openGraph;
+
+  return {
+    ...metadata,
+    twitter: {
+      card: 'summary_large_image',
+      title: openGraph?.title ?? metadata.title,
+      description: openGraph?.description ?? metadata.description,
+      images: openGraph?.images
+    }
+  };
 }
 
 function formatSek(value: number | null | undefined) {
