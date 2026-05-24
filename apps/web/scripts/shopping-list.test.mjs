@@ -8,11 +8,12 @@ async function read(relative) {
 
 describe('shopping list route', () => {
   it('ships the requested route, checkable row component, and localStorage-backed hook', async () => {
-    const [page, row, hook, bulkImport, searchRoute] = await Promise.all([
+    const [page, row, hook, bulkImport, reorderSuggestions, searchRoute] = await Promise.all([
       read('src/app/list/page.tsx'),
       read('src/components/CheckableListItem.tsx'),
       read('src/hooks/useList.ts'),
       read('src/components/BulkImportDialog.tsx'),
+      read('src/lib/reorder-suggestions.ts'),
       read('../../apps/api/src/routes/search.ts')
     ]);
 
@@ -21,6 +22,10 @@ describe('shopping list route', () => {
     assert.match(page, /BulkImportDialog/);
     assert.match(page, /addImportedItems/);
     assert.match(page, /Shopping list/);
+    assert.match(page, /buildReorderWarnings/);
+    assert.match(page, /Predictive reorder warnings/);
+    assert.match(page, /Staple prices are climbing/);
+    assert.match(page, /never auto-change quantities/);
 
     assert.match(row, /'use client'/);
     assert.match(row, /type="checkbox"/);
@@ -46,6 +51,13 @@ describe('shopping list route', () => {
     assert.match(bulkImport, /one item per line/i);
     assert.match(bulkImport, /matchedProductSlug/);
     assert.match(bulkImport, /unmatchedLines/);
+
+    assert.match(reorderSuggestions, /stapleReorderSignals/);
+    assert.match(reorderSuggestions, /buildReorderWarnings/);
+    assert.match(reorderSuggestions, /sharpRiseThresholdPercent = 12/);
+    assert.match(reorderSuggestions, /cheapNowThresholdPercent = 4/);
+    assert.match(reorderSuggestions, /latestSignalPrice: latestPrice\.price/);
+    assert.match(reorderSuggestions, /recommendedQuantity: signal\.normalQuantity \+ 1/);
 
     assert.match(searchRoute, /searchRoutes/);
     assert.match(searchRoute, /products\/search\/list-import/);

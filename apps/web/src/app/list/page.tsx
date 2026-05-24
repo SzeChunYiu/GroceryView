@@ -5,10 +5,12 @@ import { AppNav } from '@/components/app-nav';
 import { BottomNav } from '@/components/bottom-nav';
 import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { useList } from '@/hooks/useList';
+import { buildReorderWarnings } from '@/lib/reorder-suggestions';
 
 export default function ShoppingListPage() {
   const { addImportedItems, checkedCount, items, remainingCount, resetCheckedState, toggleItemChecked, totalCount } = useList();
   const progress = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
+  const reorderWarnings = buildReorderWarnings(items.map((item) => ({ itemName: item.name, quantity: item.quantity }))).slice(0, 2);
 
   return (
     <div className="min-h-screen bg-[#f5f1e8] text-slate-950">
@@ -30,6 +32,33 @@ export default function ShoppingListPage() {
         </div>
 
         <BulkImportDialog onImportItems={addImportedItems} />
+
+        {reorderWarnings.length > 0 ? (
+          <section aria-label="Predictive reorder warnings" className="mt-6 rounded-[1.75rem] border border-amber-300 bg-amber-50 p-5 shadow-sm">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.22em] text-amber-800">Reorder warning</p>
+                <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Staple prices are climbing</h2>
+                <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+                  Increase quantity while the current list price is still below the latest staple signal. Suggestions stay on this list and never auto-change quantities.
+                </p>
+              </div>
+              <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-amber-900">{reorderWarnings.length} active</p>
+            </div>
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
+              {reorderWarnings.map((warning) => (
+                <article className="rounded-2xl border border-amber-200 bg-white p-4" key={warning.itemName}>
+                  <p className="text-sm font-black text-amber-900">{warning.trendLabel}</p>
+                  <h3 className="mt-2 text-xl font-black text-slate-950">{warning.itemName}</h3>
+                  <p className="mt-1 text-sm font-semibold text-slate-700">
+                    Add {warning.recommendedQuantity} {warning.unit}; current {warning.currentPrice.toFixed(2)} SEK versus latest signal {warning.latestSignalPrice.toFixed(2)} SEK and usual {warning.usualPrice.toFixed(2)} SEK.
+                  </p>
+                  <p className="mt-3 text-xs font-black uppercase tracking-[0.16em] text-slate-500">latest signal {warning.latestObservedAt}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         <section className="mt-6 rounded-[1.75rem] border border-emerald-200 bg-white/95 p-5 shadow-sm">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
