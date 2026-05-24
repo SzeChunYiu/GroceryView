@@ -82,6 +82,7 @@ import {
   ICA_MAXI_CATALOG_SEARCH_INVESTIGATION,
   ICA_PRODUCT_PAGE_SEARCH_PATH,
   fetchIcaReklambladOffers,
+  fetchReklambladSeOffers,
   fetchLidlBulkProducts,
   fetchWillysBulkProducts,
   fetchLidlOffers,
@@ -99,6 +100,8 @@ import {
   parseApohemProducts,
   parseApotekHjartatProducts,
   parseIcaReklambladOffers,
+  parseReklambladSeOffers,
+  reklambladSeOfferToParsedProduct,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
   GROCERYVIEW_DAILY_CITY_GROSS_BULK_PRODUCTS_URL,
@@ -2956,6 +2959,112 @@ describe('fetchIcaReklambladOffers', () => {
     assert.equal(requestedUrls[0], 'https://www.ica.se/erbjudanden/ica-focus-1004247/');
     assert.equal(rows.length, 1);
     assert.deepEqual(rows.map((row) => row.storeId), ['1735']);
+  });
+});
+
+describe('fetchReklambladSeOffers', () => {
+  const retrievedAt = '2026-05-25T01:15:00.000Z';
+  const reklambladHtml = `
+    <script>
+      window.__REKLAMBLAD_SE__ = {
+        "retailers": [{
+          "name": "ICA",
+          "flyers": [{
+            "flyerUrl": "/ica/reklamblad/vecka-22",
+            "validFrom": "2026-05-25",
+            "validTo": "2026-05-31",
+            "offers": [{
+              "offerId": "ica-coffee-450g",
+              "name": "Bryggkaffe",
+              "brand": "Zoégas",
+              "category": "Kaffe",
+              "packageText": "450 g",
+              "priceText": "2 för 99 kr",
+              "priceValue": 49.5,
+              "regularPrice": 64.9,
+              "imageUrl": "/images/coffee.jpg"
+            }, {
+              "offerId": "ica-coffee-450g",
+              "name": "Bryggkaffe",
+              "brand": "Zoégas",
+              "category": "Kaffe",
+              "packageText": "450 g",
+              "priceText": "2 för 99 kr",
+              "priceValue": 49.5,
+              "regularPrice": 64.9
+            }]
+          }]
+        }, {
+          "name": "Willys",
+          "flyers": [{
+            "flyerUrl": "https://reklamblad.se/willys/reklamblad/vecka-22",
+            "validFrom": "2026-05-25",
+            "validTo": "2026-05-31",
+            "offers": [{
+              "id": "willys-pasta-1kg",
+              "title": "Pasta",
+              "brand": "Garant",
+              "categoryName": "Skafferi",
+              "packageSize": "1 kg",
+              "offerText": "10 kr/st",
+              "price": 10,
+              "originalPrice": 16.9,
+              "productUrl": "/willys/pasta"
+            }]
+          }]
+        }]
+      };
+    </script>
+  `;
+
+  it('parses Reklamblad.se weekly flyer rows for supported grocery chains as deals', () => {
+    const rows = parseReklambladSeOffers(reklambladHtml, {
+      sourceUrl: 'https://reklamblad.se/matbutiker',
+      retrievedAt
+    });
+
+    assert.deepEqual(rows.map((row) => ({ chainId: row.chainId, code: row.code, name: row.name, price: row.price, isDeal: row.isDeal })), [
+      { chainId: 'ica', code: 'ica-coffee-450g', name: 'Bryggkaffe', price: 49.5, isDeal: true },
+      { chainId: 'willys', code: 'willys-pasta-1kg', name: 'Pasta', price: 10, isDeal: true }
+    ]);
+    assert.equal(rows[0].flyerUrl, 'https://reklamblad.se/ica/reklamblad/vecka-22');
+    assert.equal(rows[0].validFrom, '2026-05-25T00:00:00.000Z');
+    assert.equal(rows[0].validTo, '2026-05-31T00:00:00.000Z');
+    assert.equal(rows[0].imageUrl, 'https://reklamblad.se/images/coffee.jpg');
+  });
+
+  it('fetches chain pages with maxRows and cross-page dedupe preserved', async () => {
+    const requestedUrls: string[] = [];
+    const rows = await fetchReklambladSeOffers({
+      sourceUrls: ['https://reklamblad.se/ica', 'https://reklamblad.se/willys'],
+      maxRows: 2,
+      retrievedAt,
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return new Response(reklambladHtml, { status: 200, headers: { 'content-type': 'text/html' } });
+      }
+    });
+
+    assert.deepEqual(requestedUrls, ['https://reklamblad.se/ica']);
+    assert.deepEqual(rows.map((row) => row.code), ['ica-coffee-450g', 'willys-pasta-1kg']);
+  });
+
+  it('maps Reklamblad.se deals into flyer campaign parsed products for price observations', () => {
+    const [row] = parseReklambladSeOffers(reklambladHtml, {
+      sourceUrl: 'https://reklamblad.se/matbutiker',
+      retrievedAt,
+      maxRows: 1
+    });
+    const parsed = reklambladSeOfferToParsedProduct(row);
+
+    assert.equal(parsed.sourceType, 'flyer_campaign');
+    assert.equal(parsed.chainId, 'ica');
+    assert.equal(parsed.price, 49.5);
+    assert.equal(parsed.regularPrice, 64.9);
+    assert.equal(parsed.promoText, '2 för 99 kr');
+    assert.equal(parsed.packageSize, 450);
+    assert.equal(parsed.packageUnit, 'g');
+    assert.equal(parsed.validUntil, '2026-05-31T00:00:00.000Z');
   });
 });
 
