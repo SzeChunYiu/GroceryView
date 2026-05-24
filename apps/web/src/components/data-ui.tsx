@@ -12,6 +12,7 @@ import {
   unavailablePanels
 } from '@/lib/verified-data';
 import type { PrivateFeatureRoute } from '@/lib/verified-data';
+import { freshnessCopy, sourceLimitationCopy } from '@/lib/content-style';
 
 export function PageShell({ children }: Readonly<{ children: ReactNode }>) {
   return (
@@ -63,8 +64,8 @@ export function SourceCoverage() {
             <p className="text-sm font-black text-slate-950">{source.name}</p>
             <p className="mt-2 text-3xl font-black text-emerald-800">{source.rows.toLocaleString('sv-SE')}</p>
             <p className="text-sm font-semibold text-slate-700">{source.coverage}</p>
-            <p className="mt-3 text-sm leading-6 text-slate-600">Source: {source.source}. Freshness: {source.freshness}.</p>
-            <p className="mt-2 rounded-xl bg-amber-50 p-3 text-sm font-semibold text-amber-900">{source.caveat}</p>
+            <p className="mt-3 text-sm leading-6 text-slate-600">Source: {source.source}. {freshnessCopy(source.freshness)}.</p>
+            <p className="mt-2 rounded-xl bg-amber-50 p-3 text-sm font-semibold text-amber-900">{sourceLimitationCopy(source.caveat)}</p>
           </div>
         ))}
       </div>

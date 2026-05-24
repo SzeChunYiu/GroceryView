@@ -3609,6 +3609,7 @@ ${seo}`;
 
   it('surfaces verified catalogue savings on its own route', async () => {
     const route = await read('src/app/catalogue-savings/page.tsx');
+    const contentStyle = await read('src/lib/content-style.ts');
 
     assert.match(route, /chainSavingsLedger\.map/);
     assert.match(route, /matchedChainProducts/);
@@ -3616,7 +3617,8 @@ ${seo}`;
     assert.match(route, /SourceCoverage/);
     assert.match(route, /Matched catalogue savings ledger/);
     assert.match(route, /Claim boundary/);
-    assert.match(route, /store-specific availability/);
+    assert.match(route, /listedSavingsBoundaryCopy/);
+    assert.match(contentStyle, /store-specific availability/);
     assert.match(route, /@\/lib\/verified-data/);
     assert.doesNotMatch(route, /@\/lib\/demo-data/);
     assert.doesNotMatch(route, /@\/components\/sample-data/);
