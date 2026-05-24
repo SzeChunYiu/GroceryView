@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { NotificationInboxActions } from '@/components/notification-inbox-actions';
@@ -7,8 +8,20 @@ import { priceAlertThresholdPreferenceContract } from '@/lib/verified-data';
 import { confidenceForProduct, priceRowCount, priceSource, watchlistAlertBoard, watchlistItemForAlert } from '@/lib/watchlist-data';
 import { routeMetadata } from '@/lib/seo';
 
-export function generateMetadata() {
-  return routeMetadata('/watchlist');
+export function generateMetadata(): Metadata {
+  const metadata = routeMetadata('/watchlist');
+  const openGraphTitle = metadata.openGraph?.title;
+  const openGraphDescription = metadata.openGraph?.description;
+
+  return {
+    ...metadata,
+    twitter: {
+      card: 'summary_large_image',
+      title: typeof openGraphTitle === 'string' ? openGraphTitle : 'Watchlist price alerts | GroceryView',
+      description: openGraphDescription ?? metadata.description ?? 'Tracked grocery products with notification-ready watchlist price alerts.',
+      images: metadata.openGraph?.images ?? ['/og/watchlist.png'],
+    },
+  };
 }
 
 function formatSek(value: number) {
