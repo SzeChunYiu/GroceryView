@@ -36,6 +36,7 @@ import {
   buildOpenFoodFactsSwedenSearchUrl,
   buildOpenPricesConnectorUrl,
   fetchSt1FuelPrices,
+  fetchTenElevenIsStores,
   cacheKeyForScbPxWebQueryFixture,
   cellCountForScbPxWebQueryFixture,
   BRANDED_FUEL_STATIONS_OVERPASS_URL,
@@ -135,6 +136,7 @@ import {
   parseRetailerProductJsonSnapshot,
   persistOpenFoodFactsProductMetadata,
   parseSt1FuelPriceHtml,
+  parseTenElevenIsStores,
   planIngestionBatch,
   planOfferVisibilityBoundary,
   planRetailerConnectorRun,
@@ -180,6 +182,7 @@ import {
   validateStoreEnumerationResults,
   validateEnumeratedStores,
   ST1_FUEL_PRICE_URL,
+  TEN_ELEVEN_IS_SOURCE_URL,
   validateOfferSelectorFixtures,
   validateGroceryCategoryCoicopMappings,
   scbCoicopFoodCategoryCodes,
@@ -615,6 +618,74 @@ describe('OKQ8 fuel price connector', () => {
     ]);
     assert.equal(parsed.items.every((row) => row.sourceType === 'retailer_online_page'), true);
     assert.equal(parsed.items.every((row) => row.storeId === undefined), true);
+  });
+});
+
+describe('10-11 IS chain study connector', () => {
+  const tenElevenHomepage = `
+    <main>
+      <h1>&THORN;rj&aacute;r fr&aacute;b&aelig;rar sta&eth;setningar!</h1>
+      <section>
+        <h2>Laugavegur &aacute; m&oacute;ti Hlemmi</h2>
+        <p>Opnunart&iacute;mar: Verslun 24/7 Sbarro 11:00-20:00 B&aelig;jarins Beztu 11:00-22:00</p>
+        <a>Sko&eth;a &aacute; korti</a>
+      </section>
+      <section>
+        <h2>Sk&oacute;lav&ouml;r&eth;ust&iacute;gur 42</h2>
+        <p>Opnunart&iacute;mar: Verslun Virka daga: 8-23.30 Helgar: 9-23.30 Sbarro opnar br&aacute;&eth;um!</p>
+        <a>Sko&eth;a &aacute; korti</a>
+      </section>
+      <section>
+        <h2>Austurstr&aelig;ti &iacute; g&ouml;ngug&ouml;tu</h2>
+        <p>Opnunart&iacute;mar: Verslun 24/7 Sbarro sun-fim 10:00-22:00 og f&ouml;s-lau 10:00-04:00</p>
+        <a>Sko&eth;a &aacute; korti</a>
+      </section>
+    </main>
+  `;
+
+  it('parses only primary-source store rows and codifies documented no-price quirks', () => {
+    const rows = parseTenElevenIsStores(tenElevenHomepage, {
+      sourceUrl: TEN_ELEVEN_IS_SOURCE_URL,
+      capturedAt: '2026-05-24T12:00:00.000Z'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.storeId, row.channel, row.format, row.region, row.countryCode]), [
+      ['ten-eleven-is-laugavegur-hlemmur', 'store', 'convenience', 'capital-region', 'IS'],
+      ['ten-eleven-is-skolavordustigur-42', 'store', 'convenience', 'capital-region', 'IS'],
+      ['ten-eleven-is-austurstraeti', 'store', 'convenience', 'capital-region', 'IS']
+    ]);
+    assert.equal(rows[0].openingHours, '24/7');
+    assert.equal(rows[1].openingHours, 'Virka daga: 8-23.30 Helgar: 9-23.30');
+    assert.deepEqual(rows[0].pricingQuirks, {
+      hasPublishedOnlinePrices: false,
+      hasMemberPrice: false,
+      hasSubscriptionPrice: false,
+      hasCouponPrice: false,
+      hasClearancePrice: false,
+      hasMultiBuy: false,
+      hasCounterPrice: false,
+      hasB2BPrice: false
+    });
+    assert.match(rows[0].provenance.contentDigest.value, /^[a-f0-9]{64}$/);
+  });
+
+  it('fetches the public 10-11 source and fails closed on blocked source responses', async () => {
+    const requestedUrls: string[] = [];
+    const rows = await fetchTenElevenIsStores({
+      capturedAt: '2026-05-24T12:00:00.000Z',
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return new Response(tenElevenHomepage, { status: 200, headers: { 'content-type': 'text/html' } });
+      }
+    });
+
+    assert.deepEqual(requestedUrls, [TEN_ELEVEN_IS_SOURCE_URL]);
+    assert.equal(rows.length, 3);
+
+    await assert.rejects(
+      () => fetchTenElevenIsStores({ fetchImpl: async () => new Response('Forbidden', { status: 403 }) }),
+      /blocked/
+    );
   });
 });
 
