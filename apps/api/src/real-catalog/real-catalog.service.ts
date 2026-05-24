@@ -41,7 +41,17 @@ type BasketItemSqlRow = {
   quantity: string | number;
 };
 
+type PendingSearchAliasSqlRow = {
+  alias_id: string;
+  normalized_alias: string;
+  source_ref: string;
+  product_id: string | null;
+  reviewed_at: string | Date | null;
+  created_at: string | Date | null;
+};
+
 const allowedPriceTypes = new Set<RealCatalogPriceType>(['shelf', 'online', 'member', 'promotion', 'receipt', 'community', 'estimated']);
+const facetedSearchNoResultSourceRef = 'faceted-search:no-result';
 
 function csv(value: string | undefined): string[] {
   return (value ?? '')
@@ -193,6 +203,35 @@ export class RealCatalogService {
     });
   }
 
+  async listPendingSearchAliases(query: { limit?: string }) {
+    this.requireDatabase();
+    const limit = limitQuery(query.limit);
+    const rows = await this.database.query<PendingSearchAliasSqlRow>(this.pendingSearchAliasesSql(), [facetedSearchNoResultSourceRef, limit]);
+    return {
+      sourceRef: facetedSearchNoResultSourceRef,
+      aliases: rows.map((row) => this.mapPendingSearchAlias(row)),
+      evidence: { pendingCount: rows.length, sourceTables: ['aliases'] }
+    };
+  }
+
+  async approvePendingSearchAlias(input: { aliasId: string; productId: string; reviewedAt?: string }) {
+    const aliasId = input.aliasId.trim();
+    const productId = input.productId.trim();
+    if (!aliasId) throw new BadRequestException('aliasId is required.');
+    if (!productId) throw new BadRequestException('productId is required.');
+    const reviewedAt = input.reviewedAt?.trim() || new Date().toISOString();
+    if (Number.isNaN(Date.parse(reviewedAt))) throw new BadRequestException('reviewedAt must be an ISO date string.');
+    this.requireDatabase();
+    const rows = await this.database.query<PendingSearchAliasSqlRow>(this.approvePendingSearchAliasSql(), [
+      facetedSearchNoResultSourceRef,
+      aliasId,
+      productId,
+      reviewedAt
+    ]);
+    if (rows.length === 0) throw new NotFoundException('Pending search alias not found.');
+    return { sourceRef: facetedSearchNoResultSourceRef, alias: this.mapPendingSearchAlias(rows[0]), reviewed: true };
+  }
+
   async compareSavedBasket(userId: string, storeSlugs?: string[], productNameLocale?: ProductNameLocale) {
     this.requireDatabase();
     const basketRows = await this.database.query<BasketItemSqlRow>(
@@ -217,6 +256,46 @@ export class RealCatalogService {
       productNameLocale,
       items: basketRows.map((row) => ({ productId: row.product_id, quantity: Number(row.quantity) }))
     });
+  }
+
+  private mapPendingSearchAlias(row: PendingSearchAliasSqlRow) {
+    return {
+      aliasId: row.alias_id,
+      normalizedAlias: row.normalized_alias,
+      sourceRef: row.source_ref,
+      ...(row.product_id ? { productId: row.product_id } : {}),
+      ...(iso(row.reviewed_at) ? { reviewedAt: iso(row.reviewed_at) } : {}),
+      ...(iso(row.created_at) ? { createdAt: iso(row.created_at) } : {})
+    };
+  }
+
+  private pendingSearchAliasesSql(): string {
+    return `select aliases.id::text as alias_id,
+             aliases.normalized_alias,
+             aliases.source_ref,
+             aliases.product_id::text,
+             aliases.reviewed_at,
+             aliases.created_at
+      from aliases
+      where aliases.source_ref = $1
+        and (aliases.product_id is null or aliases.reviewed_at is null)
+      order by aliases.created_at desc nulls last, aliases.normalized_alias
+      limit $2`;
+  }
+
+  private approvePendingSearchAliasSql(): string {
+    return `update aliases
+      set product_id = $3,
+          reviewed_at = $4::timestamptz
+      where aliases.source_ref = $1
+        and aliases.id::text = $2
+        and (aliases.product_id is null or aliases.reviewed_at is null)
+      returning aliases.id::text as alias_id,
+                aliases.normalized_alias,
+                aliases.source_ref,
+                aliases.product_id::text,
+                aliases.reviewed_at,
+                aliases.created_at`;
   }
 
   private searchSql(): string {

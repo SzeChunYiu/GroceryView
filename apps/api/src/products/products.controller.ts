@@ -1,10 +1,16 @@
-import { Controller, Get, Headers, NotFoundException, Param, Query } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, Headers, NotFoundException, Param, Post, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { facetedProductSearchEndpoint } from '@groceryview/api';
 import { allProducts, groceryApi } from '../demo-data.js';
 import { resolveProductNameLocale } from '../product-name-locale.js';
 import { apiRouteTraceSpans, traceApiRoute } from '../instrumentation.js';
 import { RealCatalogService } from '../real-catalog/real-catalog.service.js';
+
+function requireAdminReviewer(value: string | undefined): void {
+  if (!['true', '1', 'reviewer'].includes((value ?? '').trim().toLowerCase())) {
+    throw new ForbiddenException('Admin reviewer credentials required.');
+  }
+}
 
 @ApiTags('products')
 @Controller('products')
@@ -46,6 +52,24 @@ export class ProductsController {
       limit,
       productNameLocale: resolveProductNameLocale({ locale, groceryViewLocale, acceptLanguage, cookie })
     }));
+  }
+
+  @Get('search/reviewer/aliases')
+  @ApiOkResponse({ description: 'Admin review queue for faceted-search no-result aliases' })
+  listPendingSearchAliases(@Headers('x-groceryview-admin') adminReviewer?: string, @Query('limit') limit?: string) {
+    requireAdminReviewer(adminReviewer);
+    return this.realCatalog.listPendingSearchAliases({ limit });
+  }
+
+  @Post('search/reviewer/aliases/:aliasId/approve')
+  @ApiOkResponse({ description: 'Admin approval for a pending faceted-search alias' })
+  approvePendingSearchAlias(
+    @Headers('x-groceryview-admin') adminReviewer: string | undefined,
+    @Param('aliasId') aliasId: string,
+    @Body() body: { productId?: string; reviewedAt?: string } = {}
+  ) {
+    requireAdminReviewer(adminReviewer);
+    return this.realCatalog.approvePendingSearchAlias({ aliasId, productId: body.productId ?? '', reviewedAt: body.reviewedAt });
   }
 
   @Get(':id/terminal')
