@@ -17,12 +17,27 @@ export type BulkImportedListItemInput = Omit<ShoppingListItem, 'checked'> & {
   importSource: 'bulk-clipboard';
 };
 
+export type ShoppingRouteMode = 'quick' | 'balanced' | 'accessible';
+
+export type ShoppingTripEstimate = {
+  activeItemCount: number;
+  aisleCount: number;
+  aisleTraversal: string[];
+  estimatedMinutes: number;
+};
+
 type PersistedListState = {
   checkedById?: Record<string, boolean>;
   importedItems?: BulkImportedListItemInput[];
 };
 
 export const LIST_STORAGE_KEY = 'groceryview:shopping-list:checked:v1';
+
+export const shoppingRouteModes: Array<{ description: string; label: string; value: ShoppingRouteMode }> = [
+  { description: 'Shortest route through the active aisles.', label: 'Quick route', value: 'quick' },
+  { description: 'Balanced pace with fewer missed-item backtracks.', label: 'Balanced route', value: 'balanced' },
+  { description: 'Adds extra time for wider turns and slower aisle changes.', label: 'Accessible route', value: 'accessible' }
+];
 
 const baseListItems: Omit<ShoppingListItem, 'checked'>[] = [
   {
@@ -127,9 +142,46 @@ function persistCheckedState(items: ShoppingListItem[]) {
   }
 }
 
+const aisleOrder = ['Produce', 'Pantry', 'Dairy', 'Frozen', 'Imported items'];
+
+function aisleForItem(item: ShoppingListItem): string {
+  const text = `${item.id} ${item.name} ${item.detail}`.toLowerCase();
+  if (/fruit|produce|vegetable|veg/.test(text)) return 'Produce';
+  if (/milk|fil|dairy|cheese|yogurt/.test(text)) return 'Dairy';
+  if (/frozen/.test(text)) return 'Frozen';
+  if (item.importSource === 'bulk-clipboard') return 'Imported items';
+  return 'Pantry';
+}
+
+function estimateShoppingTrip(items: ShoppingListItem[], routeMode: ShoppingRouteMode): ShoppingTripEstimate {
+  const activeItems = items.filter((item) => !item.checked);
+  const aisles = [...new Set(activeItems.map(aisleForItem))]
+    .sort((a, b) => aisleOrder.indexOf(a) - aisleOrder.indexOf(b));
+
+  if (activeItems.length === 0) {
+    return { activeItemCount: 0, aisleCount: 0, aisleTraversal: [], estimatedMinutes: 0 };
+  }
+
+  const modeSettings: Record<ShoppingRouteMode, { perAisle: number; perItem: number; setup: number }> = {
+    quick: { perAisle: 1, perItem: 2, setup: 2 },
+    balanced: { perAisle: 1.5, perItem: 2.5, setup: 3 },
+    accessible: { perAisle: 2, perItem: 3, setup: 4 }
+  };
+  const settings = modeSettings[routeMode];
+  const estimatedMinutes = Math.max(1, Math.ceil(settings.setup + activeItems.length * settings.perItem + aisles.length * settings.perAisle));
+
+  return {
+    activeItemCount: activeItems.length,
+    aisleCount: aisles.length,
+    aisleTraversal: aisles,
+    estimatedMinutes
+  };
+}
+
 export function useList() {
   const [items, setItems] = useState<ShoppingListItem[]>(() => withCheckedState({}));
   const [hasLoadedBrowserState, setHasLoadedBrowserState] = useState(false);
+  const [routeMode, setRouteMode] = useState<ShoppingRouteMode>('balanced');
 
   useEffect(() => {
     try {
@@ -169,6 +221,7 @@ export function useList() {
   const checkedCount = useMemo(() => items.filter((item) => item.checked).length, [items]);
   const totalCount = items.length;
   const remainingCount = totalCount - checkedCount;
+  const tripEstimate = useMemo(() => estimateShoppingTrip(items, routeMode), [items, routeMode]);
 
   return {
     addImportedItems,
@@ -176,7 +229,10 @@ export function useList() {
     items,
     remainingCount,
     resetCheckedState,
+    routeMode,
+    setRouteMode,
     toggleItemChecked,
-    totalCount
+    totalCount,
+    tripEstimate
   };
 }

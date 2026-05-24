@@ -4,10 +4,10 @@ import { CheckableListItem } from '@/components/CheckableListItem';
 import { AppNav } from '@/components/app-nav';
 import { BottomNav } from '@/components/bottom-nav';
 import { BulkImportDialog } from '@/components/BulkImportDialog';
-import { useList } from '@/hooks/useList';
+import { shoppingRouteModes, type ShoppingRouteMode, useList } from '@/hooks/useList';
 
 export default function ShoppingListPage() {
-  const { addImportedItems, checkedCount, items, remainingCount, resetCheckedState, toggleItemChecked, totalCount } = useList();
+  const { addImportedItems, checkedCount, items, remainingCount, resetCheckedState, routeMode, setRouteMode, toggleItemChecked, totalCount, tripEstimate } = useList();
   const progress = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
 
   return (
@@ -30,6 +30,44 @@ export default function ShoppingListPage() {
         </div>
 
         <BulkImportDialog onImportItems={addImportedItems} />
+
+        <section className="mt-6 rounded-[1.75rem] border border-amber-200 bg-amber-50 p-5 shadow-sm">
+          <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-800">Time-to-complete estimator</p>
+              <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">
+                {tripEstimate.estimatedMinutes > 0 ? `${tripEstimate.estimatedMinutes} min left` : 'Trip complete'}
+              </h2>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+                Estimated from {tripEstimate.activeItemCount} active item{tripEstimate.activeItemCount === 1 ? '' : 's'} across {tripEstimate.aisleCount} aisle{tripEstimate.aisleCount === 1 ? '' : 's'} using the selected route mode.
+              </p>
+            </div>
+            <label className="text-sm font-black text-slate-700">
+              Route mode
+              <select
+                className="mt-2 block w-full rounded-full border border-amber-200 bg-white px-4 py-2 text-sm font-black text-slate-900"
+                onChange={(event) => setRouteMode(event.target.value as ShoppingRouteMode)}
+                value={routeMode}
+              >
+                {shoppingRouteModes.map((mode) => (
+                  <option key={mode.value} value={mode.value}>{mode.label}</option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <div className="mt-4 grid gap-3 md:grid-cols-[1fr_2fr]">
+            <div className="rounded-2xl bg-white p-4">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-800">Aisle count</p>
+              <p className="mt-1 text-3xl font-black text-slate-950">{tripEstimate.aisleCount}</p>
+            </div>
+            <div className="rounded-2xl bg-white p-4">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-800">Aisle traversal</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">
+                {tripEstimate.aisleTraversal.length > 0 ? tripEstimate.aisleTraversal.join(' → ') : 'No active aisles remaining'}
+              </p>
+            </div>
+          </div>
+        </section>
 
         <section className="mt-6 rounded-[1.75rem] border border-emerald-200 bg-white/95 p-5 shadow-sm">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
