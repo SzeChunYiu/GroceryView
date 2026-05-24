@@ -1,3 +1,5 @@
+export * from './types/chain.js';
+
 export type DealScoreInput = {
   currentCityPercentile: number;
   knownPromoHistoryPercentile: number;

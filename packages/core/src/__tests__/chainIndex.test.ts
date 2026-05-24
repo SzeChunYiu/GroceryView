@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { calculateChainPriceIndex, type ChainPriceObservation } from '../index.js';
+import { calculateChainPriceIndex, isSpecialtyRetailerType, retailerTypeLabels, retailerTypes, type ChainPriceObservation } from '../index.js';
 
 function obs(chainId: string, category: string, unitPrice: number): ChainPriceObservation {
   return { chainId, category, unitPrice };
@@ -62,5 +62,26 @@ describe('calculateChainPriceIndex', () => {
     assert.equal(cell.confidence, 'low');
     // Raw ratio would be ~0.09 (index ~9); shrinkage must pull it far toward 100.
     assert.ok(cell.index > 60, `shrinkage should pull a 1-obs cell toward market (got ${cell.index})`);
+  });
+});
+
+describe('retailerTypes', () => {
+  it('includes specialty and health retailer variants for comparison badges', () => {
+    const expected = [
+      'ethnic_asian',
+      'ethnic_polish_eastern_european',
+      'ethnic_middle_eastern',
+      'ethnic_indian_south_asian',
+      'ethnic_latin',
+      'ethnic_african',
+      'health_food',
+      'kosher_halal'
+    ] as const;
+
+    for (const retailerType of expected) {
+      assert.ok(retailerTypes.includes(retailerType));
+      assert.ok(retailerTypeLabels[retailerType].length > 0);
+      assert.equal(isSpecialtyRetailerType(retailerType), true);
+    }
   });
 });
