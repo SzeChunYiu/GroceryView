@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { StoreList } from '@/components/store-list';
 import { storeUniverse } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -29,7 +30,7 @@ export default function StoresIndexPage() {
             </Link>
           </Card>
         ) : null}
-        <Card><h2 className="text-2xl font-black">Stores with coordinates</h2><div className="mt-4 grid gap-3 md:grid-cols-2">{storeUniverse.slice(0, 60).map((store) => <Link className="rounded-2xl border border-slate-200 p-4 hover:border-emerald-700" href={`/stores/${store.slug}`} key={store.slug}><p className="font-black">{store.name}</p><p className="text-sm text-slate-600">{store.brand} · {store.city || store.district || 'City not reported'}</p></Link>)}</div></Card>
+        <Card><h2 className="text-2xl font-black">Stores with coordinates</h2><StoreList stores={storeUniverse.slice(0, 60)} /></Card>
       </div>
     </PageShell>
   );

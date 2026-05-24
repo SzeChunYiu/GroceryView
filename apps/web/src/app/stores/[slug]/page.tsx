@@ -14,6 +14,52 @@ import { metadataForStore } from '@/lib/seo';
 
 type ConfidenceLevel = 'high' | 'medium' | 'low';
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function sourceFreshnessDays(retrievedDate: string) {
+  const retrievedAt = new Date(retrievedDate);
+  if (Number.isNaN(retrievedAt.getTime())) return null;
+  return Math.max(0, Math.floor((Date.now() - retrievedAt.getTime()) / DAY_MS));
+}
+
+function stockAvailabilityForStore(retrievedDate: string, branchItemCount: number) {
+  if (branchItemCount === 0) {
+    return {
+      label: 'Stock unknown',
+      detail: 'No branch-specific product rows are matched yet.',
+      className: 'bg-slate-100 text-slate-700'
+    };
+  }
+
+  const ageDays = sourceFreshnessDays(retrievedDate);
+  if (ageDays === null) {
+    return {
+      label: 'Stock unknown',
+      detail: 'Source freshness is unavailable.',
+      className: 'bg-slate-100 text-slate-700'
+    };
+  }
+  if (ageDays <= 14) {
+    return {
+      label: 'Likely in stock',
+      detail: `High confidence from branch data refreshed ${ageDays.toLocaleString('sv-SE')} days ago.`,
+      className: 'bg-emerald-100 text-emerald-800'
+    };
+  }
+  if (ageDays <= 45) {
+    return {
+      label: 'Check stock',
+      detail: `Medium confidence from branch data refreshed ${ageDays.toLocaleString('sv-SE')} days ago.`,
+      className: 'bg-amber-100 text-amber-900'
+    };
+  }
+  return {
+    label: 'Stock stale',
+    detail: `Low confidence because branch data is ${ageDays.toLocaleString('sv-SE')} days old.`,
+    className: 'bg-rose-100 text-rose-800'
+  };
+}
+
 function cohortKeyFor(store: (typeof storeUniverse)[number]) {
   return store.city || store.district || 'kommun not reported';
 }
@@ -128,6 +174,7 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
   const pricePercentileRank = storePricePercentileRankFor(store);
   const openingHoursLabel = storeOpeningHoursLabel(store);
   const assortmentOverview = storeAssortmentOverviewForStore(store);
+  const stockAvailability = stockAvailabilityForStore(store.retrievedDate, assortmentOverview.items.length);
 
   return (
     <PageShell>
@@ -172,6 +219,10 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
           <p className="mt-3 rounded-full bg-slate-100 px-3 py-2 text-sm font-black text-slate-800">
             {assortmentOverview.statusLabel}
           </p>
+          <p className={`mt-3 inline-flex rounded-full px-3 py-2 text-sm font-black ${stockAvailability.className}`}>
+            Branch stock: {stockAvailability.label}
+          </p>
+          <p className="mt-2 text-xs font-bold text-slate-500">{stockAvailability.detail}</p>
           <p className="mt-4 text-sm leading-6 text-slate-700">{assortmentOverview.sourceLabel}</p>
           {assortmentOverview.categories.length > 0 ? (
             <div className="mt-4 grid gap-3 md:grid-cols-2">
@@ -197,6 +248,9 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
                     {item.priceLabel} · {item.unitPriceLabel} · {item.packageLabel}
                   </p>
                   <p className="mt-1 text-xs font-bold text-slate-500">{item.validWindow}</p>
+                  <p className={`mt-2 inline-flex rounded-full px-3 py-1 text-xs font-black ${stockAvailability.className}`}>
+                    {stockAvailability.label} · {stockAvailability.detail}
+                  </p>
                 </div>
               ))}
             </div>
