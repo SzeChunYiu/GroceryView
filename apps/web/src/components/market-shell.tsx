@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { useEffect, useMemo, useState } from 'react';
 import { Card, Eyebrow, MetricGrid, PageShell, SourceCoverage, TopSpreads } from './data-ui';
 import { ProductPriceCards } from './product-price-cards';
 import { TrendingCarousel } from './TrendingCarousel';
@@ -43,6 +46,18 @@ import {
   timescaleDbEvaluation,
   webPerformanceBudgetGate
 } from '@/lib/verified-data';
+import {
+  USER_RECOMMENDATION_PREFERENCES_STORAGE_KEY,
+  USER_RECOMMENDATION_PREFERENCES_UPDATED_EVENT,
+  addRecommendationDislike,
+  createRecommendationDislikeSignal,
+  filterDislikedRecommendations,
+  parseUserRecommendationPreferences,
+  removeRecommendationDislike,
+  serializeUserRecommendationPreferences,
+  type RecommendationPreferenceItem,
+  type UserRecommendationPreferences
+} from '@/lib/user-preferences';
 
 const featureReadinessQueue = Object.entries(privateFeatureCopy).slice(0, 6);
 const homepageClaimLedger = sourceClaimLedger.slice(0, 3);
@@ -134,7 +149,68 @@ function heatmapTileClass(heatScore: number) {
   return 'border-emerald-300 bg-emerald-50 text-emerald-950';
 }
 
+function useRecommendationPreferences() {
+  const [preferences, setPreferences] = useState<UserRecommendationPreferences>({ dislikedRecommendations: [] });
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    function syncFromStorage() {
+      try {
+        setPreferences(parseUserRecommendationPreferences(localStorage.getItem(USER_RECOMMENDATION_PREFERENCES_STORAGE_KEY)));
+      } catch {
+        setPreferences({ dislikedRecommendations: [] });
+      } finally {
+        setIsReady(true);
+      }
+    }
+
+    syncFromStorage();
+    window.addEventListener('storage', syncFromStorage);
+    window.addEventListener(USER_RECOMMENDATION_PREFERENCES_UPDATED_EVENT, syncFromStorage);
+    return () => {
+      window.removeEventListener('storage', syncFromStorage);
+      window.removeEventListener(USER_RECOMMENDATION_PREFERENCES_UPDATED_EVENT, syncFromStorage);
+    };
+  }, []);
+
+  function persist(nextPreferences: UserRecommendationPreferences) {
+    setPreferences(nextPreferences);
+    localStorage.setItem(USER_RECOMMENDATION_PREFERENCES_STORAGE_KEY, serializeUserRecommendationPreferences(nextPreferences));
+    window.dispatchEvent(new CustomEvent(USER_RECOMMENDATION_PREFERENCES_UPDATED_EVENT));
+  }
+
+  return { isReady, persist, preferences };
+}
+
 export function MarketShell() {
+  const { isReady, persist, preferences } = useRecommendationPreferences();
+  const categoryDealPreferenceItems = useMemo(
+    () => categoryDealLeaders.slice(0, 8).map((leader) => ({
+      ...leader,
+      productId: leader.productSlug,
+      productName: leader.productName,
+      category: leader.categoryLabel,
+      brand: ''
+    })),
+    []
+  );
+  const visibleCategoryDealLeaders = useMemo(
+    () => filterDislikedRecommendations(categoryDealPreferenceItems, preferences),
+    [categoryDealPreferenceItems, preferences]
+  );
+  const suppressedCategoryDealLeaders = useMemo(
+    () => categoryDealPreferenceItems.filter((leader) => !visibleCategoryDealLeaders.some((visibleLeader) => visibleLeader.productId === leader.productId)),
+    [categoryDealPreferenceItems, visibleCategoryDealLeaders]
+  );
+
+  function dislikeCategoryDeal(leader: RecommendationPreferenceItem) {
+    persist(addRecommendationDislike(preferences, createRecommendationDislikeSignal(leader, 'market-shell-category-deals')));
+  }
+
+  function restoreCategoryDeal(productId: string) {
+    persist(removeRecommendationDislike(preferences, productId));
+  }
+
   return (
     <PageShell>
       <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-stretch">
@@ -873,28 +949,56 @@ export function MarketShell() {
       </Card>
 
       <Card className="mt-6">
-        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-          <div>
-            <Eyebrow>Today&apos;s best category deals</Eyebrow>
-            <h2 className="mt-2 text-2xl font-black tracking-tight">Category leaders from verified cross-chain spreads</h2>
+        <div data-market-category-deal-preferences-ready={isReady}>
+          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+            <div>
+              <Eyebrow>Today&apos;s best category deals</Eyebrow>
+              <h2 className="mt-2 text-2xl font-black tracking-tight">Category leaders from verified cross-chain spreads</h2>
+            </div>
+            <p className="max-w-xl text-sm leading-6 text-slate-600">
+              Calls summarizeCategoryDealLeaders with deal scores derived from visible Willys/Hemköp matched prices. Missing promo history stays covered by sourceConfidence labels.
+            </p>
           </div>
-          <p className="max-w-xl text-sm leading-6 text-slate-600">
-            Calls summarizeCategoryDealLeaders with deal scores derived from visible Willys/Hemköp matched prices. Missing promo history stays covered by sourceConfidence labels.
-          </p>
-        </div>
-        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          {categoryDealLeaders.slice(0, 8).map((leader) => (
-            <Link
-              className="rounded-2xl border border-slate-200 bg-slate-50 p-4 hover:border-emerald-700"
-              href={`/categories/${leader.categorySlug}`}
-              key={`${leader.categorySlug}-${leader.productSlug}`}
-            >
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{leader.categoryLabel}</p>
-              <p className="mt-2 font-black text-slate-950">{leader.productName}</p>
-              <p className="mt-3 text-2xl font-black text-emerald-800">{leader.signal}</p>
-              <p className="mt-2 text-sm font-semibold text-slate-600">{leader.evidenceLabel}</p>
-            </Link>
-          ))}
+          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            {visibleCategoryDealLeaders.map((leader) => (
+              <article
+                className="rounded-2xl border border-slate-200 bg-slate-50 p-4 hover:border-emerald-700"
+                data-product-slug={leader.productSlug}
+                key={`${leader.categorySlug}-${leader.productSlug}`}
+              >
+                <Link href={`/categories/${leader.categorySlug}`}>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{leader.categoryLabel}</p>
+                  <p className="mt-2 font-black text-slate-950">{leader.productName}</p>
+                  <p className="mt-3 text-2xl font-black text-emerald-800">{leader.signal}</p>
+                  <p className="mt-2 text-sm font-semibold text-slate-600">{leader.evidenceLabel}</p>
+                </Link>
+                <button
+                  className="mt-3 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-700 shadow-sm transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-800 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2"
+                  onClick={() => dislikeCategoryDeal(leader)}
+                  type="button"
+                >
+                  Hide deal
+                </button>
+              </article>
+            ))}
+          </div>
+          {suppressedCategoryDealLeaders.length > 0 ? (
+            <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-4">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Hidden category deals</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {suppressedCategoryDealLeaders.map((leader) => (
+                  <button
+                    className="rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-black text-slate-700 transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                    key={leader.productId}
+                    onClick={() => restoreCategoryDeal(leader.productId)}
+                    type="button"
+                  >
+                    Restore {leader.productName}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </div>
       </Card>
 
