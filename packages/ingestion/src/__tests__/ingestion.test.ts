@@ -2135,6 +2135,7 @@ describe('fetchHemkopProducts', () => {
       unitPriceUnit: 'kg',
       imageUrl: 'https://assets.axfood.se/image/upload/f_auto,t_200/07310130003547_C1R1_s03',
       labels: ['keyhole'],
+      channel: 'online',
       online: true,
       outOfStock: false,
       sourceUrl: buildHemkopSearchUrl('makaroner', 100, 0),
@@ -2398,6 +2399,9 @@ describe('fetchHemkopWeeklyDiscounts', () => {
       category: 'mejeri-ost-och-agg|smor',
       imageUrl: 'https://assets.axfood.se/image/upload/f_auto,t_200/07310865005168_C1L1_s01',
       labels: ['swedish_flag'],
+      channel: 'store',
+      is_member_price: true,
+      is_coupon_price: false,
       sourceUrl: buildHemkopWeeklyDiscountsUrl('4003', 1),
       retrievedAt: '2026-05-22T08:25:03.000Z'
     }]);

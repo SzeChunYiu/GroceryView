@@ -12,6 +12,7 @@ export type HemkopProduct = {
   unitPriceUnit: string;
   imageUrl: string;
   labels: string[];
+  channel: 'online';
   online: boolean;
   outOfStock: boolean;
   sourceUrl: string;
@@ -42,6 +43,9 @@ export type HemkopWeeklyDiscount = {
   category: string;
   imageUrl: string;
   labels: string[];
+  channel: 'store';
+  is_member_price: boolean;
+  is_coupon_price: boolean;
   sourceUrl: string;
   retrievedAt: string;
 };
@@ -718,6 +722,7 @@ export function normalizeHemkopProduct(
     unitPriceUnit: text(product.comparePriceUnit),
     imageUrl: text(product.image?.url),
     labels: stringArray(product.labels),
+    channel: 'online',
     online: product.online === true,
     outOfStock: product.outOfStock === true,
     sourceUrl,
@@ -739,6 +744,15 @@ export function normalizeHemkopWeeklyDiscount(
   if (!promotionCode || !productCode || !name || price === null) {
     return null;
   }
+  const promoText = [
+    promotion.campaignType,
+    promotion.promotionType,
+    promotion.cartLabel,
+    promotion.rewardLabel,
+    promotion.conditionLabel,
+    promotion.redeemLimitLabel,
+    product.name
+  ].map(text).join(' ').toLocaleLowerCase('sv-SE');
 
   return {
     code: promotionCode,
@@ -764,6 +778,9 @@ export function normalizeHemkopWeeklyDiscount(
     category: text(product.googleAnalyticsCategory),
     imageUrl: text(product.image?.url) || text(product.thumbnail?.url),
     labels: stringArray(product.labels),
+    channel: 'store',
+    is_member_price: /klubb|medlem|bonus|loyalty/.test(promoText),
+    is_coupon_price: /kupong|personlig/.test(promoText),
     sourceUrl,
     retrievedAt
   };
