@@ -67,7 +67,8 @@ function PriceHistorySparkline({ card }: Readonly<{ card: AdaptiveProductCard }>
       {path ? (
         <svg
           aria-label={`${card.name} 7-day price history sparkline`}
-          className="mt-2 h-11 w-full overflow-visible"
+          className="mt-2 h-11 w-full overflow-visible motion-reduce:transition-none"
+          data-chart-motion="static"
           preserveAspectRatio="none"
           role="img"
           viewBox="0 0 160 44"
@@ -130,7 +131,7 @@ export function ProductPriceCards({
             {compareModes.map((mode) => (
               <button
                 aria-pressed={compareMode === mode.value}
-                className={`rounded-full px-3 py-2 text-xs font-black transition ${compareMode === mode.value ? 'bg-slate-950 text-white' : 'bg-white text-slate-700 hover:bg-emerald-50'}`}
+                className={`rounded-full px-3 py-2 text-xs font-black motion-safe:transition ${compareMode === mode.value ? 'bg-slate-950 text-white' : 'bg-white text-slate-700 hover:bg-emerald-50'}`}
                 key={mode.value}
                 onClick={() => chooseMode(mode.value)}
                 title={mode.help}
@@ -150,7 +151,7 @@ export function ProductPriceCards({
               product={{ slug: card.slug, name: card.name, imageUrl: card.imageUrl }}
             />
             <LazyItemCard
-              className="block rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:-translate-y-0.5 hover:border-emerald-700"
+              className="block rounded-2xl border border-slate-200 bg-slate-50 p-4 motion-safe:transition motion-safe:hover:-translate-y-0.5 hover:border-emerald-700"
               compareMode={compareMode}
               href={`/products/${card.slug}`}
               itemId={card.slug}
