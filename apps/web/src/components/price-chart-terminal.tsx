@@ -22,6 +22,11 @@ export type PriceChartTerminalSeries = {
   points: Array<{
     time: string;
     value: number;
+    valueLabel?: string;
+    volatilityLowerBound?: number;
+    volatilityUpperBound?: number;
+    volatilityLowerBoundLabel?: string;
+    volatilityUpperBoundLabel?: string;
     confidence: number;
     provenanceLabel?: string;
   }>;
@@ -67,6 +72,16 @@ function chartColorFor(index: number) {
   return ['#047857', '#0f766e', '#2563eb', '#7c3aed'][index % 4]!;
 }
 
+function fallbackValueLabel(value: number) {
+  return Number.isInteger(value) ? value.toFixed(0) : value.toFixed(1);
+}
+
+function volatilityBandLabel(point: PriceChartTerminalSeries['points'][number]) {
+  const low = point.volatilityLowerBoundLabel ?? (point.volatilityLowerBound == null ? null : fallbackValueLabel(point.volatilityLowerBound));
+  const high = point.volatilityUpperBoundLabel ?? (point.volatilityUpperBound == null ? null : fallbackValueLabel(point.volatilityUpperBound));
+  return low && high ? `${low} → ${high}` : 'Not reported';
+}
+
 export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTerminalModel }>) {
   const [activeWindowLabel, setActiveWindowLabel] = useState(chart.defaultWindow);
   const [chartLoadError, setChartLoadError] = useState<string | null>(null);
@@ -78,6 +93,7 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
   );
   const firstSeries = activeWindow?.series[0];
   const latestPoint = firstSeries?.points.at(-1);
+  const latestPointValueLabel = latestPoint?.valueLabel ?? activeWindow?.latestValueLabel;
 
   useEffect(() => {
     const container = containerRef.current;
@@ -152,7 +168,7 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">{chart.caveat}</p>
         </div>
         <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm font-black text-emerald-100">
-          crosshair value readout: {latestPoint ? `${activeWindow.latestValueLabel} · ${latestPoint.time.slice(0, 10)}` : 'no point selected'}
+          crosshair value readout: {latestPoint ? `${latestPointValueLabel} · band ${volatilityBandLabel(latestPoint)} · ${latestPoint.time.slice(0, 10)}` : 'no point selected'}
         </div>
       </div>
 

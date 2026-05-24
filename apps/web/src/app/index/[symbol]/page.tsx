@@ -179,6 +179,31 @@ function fixedBasketForChain(chain: ChainPriceIndex): FixedBasketIndex {
   });
 }
 
+function indexValueLabel(value: number) {
+  return `${value.toFixed(1)} index`;
+}
+
+function addIndexPointLabels<T extends { value: number }>(points: T[]): Array<T & {
+  valueLabel: string;
+  volatilityLowerBound: number;
+  volatilityUpperBound: number;
+  volatilityLowerBoundLabel: string;
+  volatilityUpperBoundLabel: string;
+}> {
+  if (points.length === 0) return [];
+  const values = points.map((point) => point.value);
+  const lower = Math.min(...values);
+  const upper = Math.max(...values);
+  return points.map((point) => ({
+    ...point,
+    valueLabel: indexValueLabel(point.value),
+    volatilityLowerBound: lower,
+    volatilityUpperBound: upper,
+    volatilityLowerBoundLabel: indexValueLabel(lower),
+    volatilityUpperBoundLabel: indexValueLabel(upper)
+  }));
+}
+
 function emptyWindow(label: PriceChartTerminalWindow['label'], rangeLabel: string): PriceChartTerminalWindow {
   return {
     label,
@@ -193,10 +218,10 @@ function emptyWindow(label: PriceChartTerminalWindow['label'], rangeLabel: strin
 }
 
 function fixedBasketChart(index: FixedBasketIndex, rows: CategoryConstituent[]): PriceChartTerminalModel {
-  const points = [
+  const points = addIndexPointLabels([
     { time: index.baseDate, value: 100, confidence: 0.82, provenanceLabel: 'Higher matched chain price baseline' },
     { time: index.currentDate, value: index.value, confidence: 0.82, provenanceLabel: 'Lowest matched chain price basket' }
-  ];
+  ]);
   const window: PriceChartTerminalWindow = {
     label: 'ALL',
     rangeLabel: `${index.baseDate} to ${index.currentDate}`,
@@ -204,10 +229,10 @@ function fixedBasketChart(index: FixedBasketIndex, rows: CategoryConstituent[]):
     windowEnd: index.currentDate,
     pointCount: points.length,
     markerCount: 1,
-    latestValueLabel: index.value.toFixed(1),
+    latestValueLabel: indexValueLabel(index.value),
     latestObservedAt: index.currentDate,
-    lowValueLabel: Math.min(...points.map((point) => point.value)).toFixed(1),
-    highValueLabel: Math.max(...points.map((point) => point.value)).toFixed(1),
+    lowValueLabel: indexValueLabel(Math.min(...points.map((point) => point.value))),
+    highValueLabel: indexValueLabel(Math.max(...points.map((point) => point.value))),
     series: [
       {
         id: index.id,
@@ -252,12 +277,12 @@ function chainChart(chain: ChainPriceIndex): PriceChartTerminalModel {
     };
   }
 
-  const points = series.points.map((point) => ({
+  const points = addIndexPointLabels(series.points.map((point) => ({
     time: point.date,
     value: point.value,
     confidence: point.confidence === 'high' ? 0.9 : point.confidence === 'medium' ? 0.72 : 0.55,
     provenanceLabel: `${point.observations} observations`
-  }));
+  })));
   const values = points.map((point) => point.value);
   const window: PriceChartTerminalWindow = {
     label: 'ALL',
@@ -266,10 +291,10 @@ function chainChart(chain: ChainPriceIndex): PriceChartTerminalModel {
     windowEnd: points.at(-1)?.time,
     pointCount: points.length,
     markerCount: 1,
-    latestValueLabel: series.latestIndex.toFixed(1),
+    latestValueLabel: indexValueLabel(series.latestIndex),
     latestObservedAt: series.latestDate,
-    lowValueLabel: Math.min(...values).toFixed(1),
-    highValueLabel: Math.max(...values).toFixed(1),
+    lowValueLabel: indexValueLabel(Math.min(...values)),
+    highValueLabel: indexValueLabel(Math.max(...values)),
     series: [
       {
         id: chainSlug(chain.chainId),
