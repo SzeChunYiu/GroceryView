@@ -5,16 +5,22 @@ import {
   DEFAULT_CITY_GROSS_PRODUCT_QUERIES,
   DEFAULT_HEMKOP_SEARCH_QUERIES,
   DEFAULT_LIDL_OFFER_PATHS,
+  DEFAULT_MATHEM_SEARCH_PAGES,
+  DEFAULT_MATHEM_SEARCH_QUERIES,
   DEFAULT_MATSPAR_SEARCH_PAGES,
   DEFAULT_MATSPAR_SEARCH_QUERIES,
   DEFAULT_WILLYS_SEARCH_QUERIES,
+  DEFAULT_APOHEM_SOURCE_PATHS,
+  DEFAULT_APOTEK_HJARTAT_SEARCH_URLS,
   fetchCityGrossProductsForAllStores,
   fetchCoopProductsForAllStores,
   fetchCoopWeeklyDiscountsForAllStores,
   fetchHemkopProducts,
   fetchHemkopWeeklyDiscountsForAllStores,
   fetchLidlOffersForAllStores,
+  fetchMathemProducts,
   fetchMatsparProducts,
+  fetchPharmacyProducts,
   fetchWillysProducts,
   fetchWillysWeeklyDiscountsForAllStores
 } from '../../packages/ingestion/dist/index.js';
@@ -28,8 +34,12 @@ const COOP_WEEKLY_QUERIES = DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES;
 const WILLYS_QUERIES = DEFAULT_WILLYS_SEARCH_QUERIES;
 const HEMKOP_QUERIES = DEFAULT_HEMKOP_SEARCH_QUERIES;
 const LIDL_OFFER_PATHS = DEFAULT_LIDL_OFFER_PATHS;
+const MATHEM_QUERIES = DEFAULT_MATHEM_SEARCH_QUERIES;
+const MATHEM_PAGES = DEFAULT_MATHEM_SEARCH_PAGES;
 const MATSPAR_QUERIES = DEFAULT_MATSPAR_SEARCH_QUERIES;
 const MATSPAR_PAGES = DEFAULT_MATSPAR_SEARCH_PAGES;
+const APOHEM_SOURCE_PATHS = DEFAULT_APOHEM_SOURCE_PATHS;
+const APOTEK_HJARTAT_SEARCH_URLS = DEFAULT_APOTEK_HJARTAT_SEARCH_URLS;
 
 const retrievedAt = new Date().toISOString();
 
@@ -52,8 +62,8 @@ const coopProducts = await fetchCoopProductsForAllStores({
 });
 const coopWeeklyDiscounts = await fetchCoopWeeklyDiscountsForAllStores({
   productQueries: COOP_WEEKLY_QUERIES,
-  maxStores: 199,
-  maxRows: 4000,
+  maxStores: 204,
+  maxRows: 4200,
   retrievedAt
 });
 await writeCoop(coopProducts, coopWeeklyDiscounts);
@@ -84,20 +94,36 @@ const hemkopWeeklyDiscounts = await fetchHemkopWeeklyDiscountsForAllStores({
 await writeHemkop(hemkopProducts, hemkopWeeklyDiscounts);
 
 const lidlStoreOffers = await fetchLidlOffersForAllStores({
-  maxStores: 47,
+  maxStores: 40,
   offerPaths: LIDL_OFFER_PATHS,
-  maxRows: 150,
+  maxRows: 216,
   retrievedAt
 });
 await writeLidl(lidlStoreOffers);
 
+const mathemProducts = await fetchMathemProducts({
+  queries: MATHEM_QUERIES,
+  pages: MATHEM_PAGES,
+  maxRows: 9000,
+  retrievedAt
+});
+await writeMathem(mathemProducts);
+
 const matsparProducts = await fetchMatsparProducts({
   queries: MATSPAR_QUERIES,
   pages: MATSPAR_PAGES,
-  maxRows: 3000,
+  maxRows: 4000,
   retrievedAt
 });
 await writeMatspar(matsparProducts);
+
+const pharmacyProducts = await fetchPharmacyProducts({
+  sourcePaths: APOHEM_SOURCE_PATHS,
+  apotekHjartatUrls: APOTEK_HJARTAT_SEARCH_URLS,
+  maxRows: 900,
+  retrievedAt
+});
+await writeApohem(pharmacyProducts);
 
 console.log(JSON.stringify({
   retrievedAt,
@@ -109,7 +135,9 @@ console.log(JSON.stringify({
   hemkopProducts: hemkopProducts.length,
   hemkopWeeklyDiscounts: hemkopWeeklyDiscounts.length,
   lidlStoreOffers: lidlStoreOffers.length,
-  matsparProducts: matsparProducts.length
+  mathemProducts: mathemProducts.length,
+  matsparProducts: matsparProducts.length,
+  pharmacyProducts: pharmacyProducts.length
 }, null, 2));
 
 async function writeCityGross(rows) {
@@ -163,6 +191,11 @@ async function writeCoop(products, weeklyDiscounts) {
   const productStoreIds = unique(products.map((row) => row.storeId));
   const weeklySourceUrls = unique(weeklyDiscounts.map((row) => row.sourceUrl));
   const weeklyStoreIds = unique(weeklyDiscounts.map((row) => row.storeId));
+  const weeklyValidFroms = unique(weeklyDiscounts.map((row) => row.validFrom).filter(Boolean)).sort();
+  const weeklyValidTos = unique(weeklyDiscounts.map((row) => row.validTo).filter(Boolean)).sort();
+  const weeklyValidityText = weeklyValidFroms.length || weeklyValidTos.length
+    ? `, valid ${weeklyValidFroms[0] ?? 'unknown'} through ${weeklyValidTos.at(-1) ?? 'unknown'}`
+    : '';
   await writeGeneratedFile('coop.ts', [
     '// AUTO-GENERATED from Coop public personalization search API.',
     `// Product source URL pattern: https://external.api.coop.se/personalization/search/products?store={storeId}&device=desktop&direct=true&api-version=v1`,
@@ -173,7 +206,7 @@ async function writeCoop(products, weeklyDiscounts) {
     '//',
     `// Weekly discounts source URLs: ${weeklySourceUrls.join(' | ')}`,
     `// Weekly discounts retrieved: ${retrievedAt}`,
-    `// Weekly discounts row count: ${weeklyDiscounts.length} real current flyer discount rows for ${weeklyStoreIds.length} Coop branches.`,
+    `// Weekly discounts row count: ${weeklyDiscounts.length} real current flyer discount rows for ${weeklyStoreIds.length} Coop branches${weeklyValidityText}.`,
     '',
     'export type CoopIngestedProduct = {',
     '  code: string;',
@@ -241,7 +274,9 @@ async function writeCoop(products, weeklyDiscounts) {
       retrievedAt,
       rowCount: weeklyDiscounts.length,
       storeIds: weeklyStoreIds,
-      sourceUrls: weeklySourceUrls
+      sourceUrls: weeklySourceUrls,
+      validFroms: weeklyValidFroms,
+      validTos: weeklyValidTos
     })} as const;`,
     '',
     `export const coopProducts: CoopIngestedProduct[] = ${literal(products)};`,
@@ -476,6 +511,47 @@ async function writeLidl(rows) {
   ]);
 }
 
+async function writeMathem(rows) {
+  const sourceUrls = unique(rows.map((row) => row.sourceUrl));
+  await writeGeneratedFile('mathem.ts', [
+    '// AUTO-GENERATED from public Mathem search page __NEXT_DATA__.',
+    `// Source URL pattern: https://www.mathem.se/se/search/products/?q={query}`,
+    `// Source URLs: ${sourceUrls.join('; ')}`,
+    `// Retrieved: ${retrievedAt}`,
+    `// Row count: ${rows.length} real product rows fetched from mathem.se search.`,
+    '',
+    'export type MathemIngestedProduct = {',
+    '  code: string;',
+    '  name: string;',
+    '  brand: string;',
+    '  packageText: string;',
+    '  price: number;',
+    '  priceText: string;',
+    '  unitPrice: number | null;',
+    '  unitPriceText: string;',
+    '  unitPriceUnit: string;',
+    '  imageUrl: string;',
+    '  productUrl: string;',
+    '  available: boolean;',
+    '  sourceUrl: string;',
+    '  retrievedAt: string;',
+    '};',
+    '',
+    `export const mathemSource = ${literal({
+      source: 'mathem.se public search page __NEXT_DATA__',
+      retrievedAt,
+      rowCount: rows.length,
+      sourceUrlPattern: 'https://www.mathem.se/se/search/products/?q={query}',
+      queries: MATHEM_QUERIES,
+      pages: MATHEM_PAGES,
+      sourceUrls
+    })} as const;`,
+    '',
+    `export const mathemProducts: MathemIngestedProduct[] = ${literal(rows)};`,
+    ''
+  ]);
+}
+
 async function writeMatspar(rows) {
   const sourceUrls = unique(rows.map((row) => row.sourceUrl));
   await writeGeneratedFile('matspar.ts', [
@@ -512,6 +588,73 @@ async function writeMatspar(rows) {
     })} as const;`,
     '',
     `export const matsparProducts: MatsparIngestedProduct[] = ${literal(rows)};`,
+    ''
+  ]);
+}
+
+async function writeApohem(rows) {
+  const sourceUrls = unique(rows.map((row) => row.sourceUrl));
+  const chains = unique(rows.map((row) => row.chain)).sort();
+  const categories = unique(rows.map((row) => row.category)).sort();
+  const matchesByEan = new Map();
+  for (const row of rows) {
+    const match = matchesByEan.get(row.ean) ?? { ean: row.ean, chains: new Set(), names: new Set() };
+    match.chains.add(row.chain);
+    match.names.add(row.name);
+    matchesByEan.set(row.ean, match);
+  }
+  const eanMatches = [...matchesByEan.values()]
+    .filter((match) => match.chains.size > 1)
+    .map((match) => ({
+      ean: match.ean,
+      chains: [...match.chains].sort(),
+      names: [...match.names].sort()
+    }));
+  await writeGeneratedFile('apohem.ts', [
+    '// AUTO-GENERATED from public Apohem SSR pages and Apotek Hjärtat search HTML.',
+    `// Source URLs: ${sourceUrls.join(', ')}`,
+    `// Retrieved: ${retrievedAt}`,
+    `// Row count: ${rows.length} real OTC, supplement, and beauty pharmacy rows; all include EAN and exclude prescription products.`,
+    '',
+    "export type PharmacyChain = 'apohem' | 'apotek-hjartat';",
+    '',
+    "export type PharmacyProductCategory = 'otc' | 'supplement' | 'beauty';",
+    '',
+    'export type ApohemIngestedProduct = {',
+    '  chain: PharmacyChain;',
+    '  code: string;',
+    '  ean: string;',
+    '  name: string;',
+    '  brand: string;',
+    '  category: PharmacyProductCategory;',
+    '  price: number;',
+    '  priceText: string;',
+    '  originalPrice: number | null;',
+    '  originalPriceText: string;',
+    '  vatPercent: number | null;',
+    '  stockStatus: string;',
+    '  productUrl: string;',
+    '  imageUrl: string;',
+    '  isOtc: boolean;',
+    '  sourceUrl: string;',
+    '  retrievedAt: string;',
+    '};',
+    '',
+    `export const apohemSource = ${literal({
+      source: 'apohem.se public SSR CURRENT_PAGE + apotekhjartat.se public INITIAL_DATA search HTML',
+      retrievedAt,
+      rowCount: rows.length,
+      sourceUrls,
+      chains,
+      categories,
+      eanMatchCount: eanMatches.length
+    })} as const;`,
+    '',
+    `export const apohemEanMatches = ${literal(eanMatches)} as const;`,
+    '',
+    `export const apohemProducts: ApohemIngestedProduct[] = ${literal(rows)};`,
+    '',
+    'export const pharmacyProducts = apohemProducts;',
     ''
   ]);
 }

@@ -187,8 +187,8 @@ export const DEFAULT_MATHEM_SEARCH_QUERIES = [
   'kidneybonor',
   'kokosmjolk'
 ] as const;
-export const DEFAULT_MATHEM_SEARCH_PAGES = [1, 2] as const;
-export const DEFAULT_MATHEM_MAX_ROWS = 7000;
+export const DEFAULT_MATHEM_SEARCH_PAGES = [1, 2, 3] as const;
+export const DEFAULT_MATHEM_MAX_ROWS = 9000;
 
 export type FetchMathemProductsOptions = {
   fetchImpl?: typeof fetch;
