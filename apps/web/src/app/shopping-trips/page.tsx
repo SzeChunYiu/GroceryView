@@ -1,3 +1,4 @@
+import { BorderTripCalc } from '@/components/border-trip-calc';
 import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { basketTripCostContract, budgetCheapestStoreRoutingPlanner, deliveryVsInStoreComparison, elderlyNearestDeliveryPlanner, formatSek, fulfillmentSlotsContract } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
@@ -69,6 +70,7 @@ export default function FeaturePage() {
           ))}
         </div>
       </Card>
+      <BorderTripCalc />
       <Card className="mt-6 border-sky-200 bg-sky-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-800">Travel-cost optimizer</p>
         <h2 className="mt-2 text-2xl font-black tracking-tight">Basket + trip cost optimizer: {basketTripCostContract.title}</h2>
