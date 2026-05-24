@@ -19,6 +19,7 @@ import {
   type ImageCacheOptions as ProductImageCacheOptions,
   type ImageCacheProduct
 } from '@groceryview/image-cache';
+import { validateIngestRow } from './contract.js';
 import {
   fetchCityGrossProductsForAllStores,
   type CityGrossProduct
@@ -109,6 +110,7 @@ export * from './connectors/st1-fuel.js';
 export * from './connectors/willys.js';
 export * from './store-enumerator.js';
 export * from './unit-price.js';
+export * from './contract.js';
 
 export type SourceType =
   | 'official_api'
@@ -2951,8 +2953,13 @@ export function planIngestionBatch(inputs: RetailerProductInput[]): IngestionBat
   const accepted: IngestionOutput[] = [];
   const rejected: Array<{ input: RetailerProductInput; reason: string }> = [];
   for (const input of inputs) {
+    const validated = validateIngestRow(input);
+    if (!validated) {
+      rejected.push({ input, reason: 'Malformed ingest row.' });
+      continue;
+    }
     try {
-      accepted.push(ingestRetailerProduct(input));
+      accepted.push(ingestRetailerProduct(validated as RetailerProductInput));
     } catch (error) {
       rejected.push({ input, reason: error instanceof Error ? error.message : 'Unknown ingestion error.' });
     }

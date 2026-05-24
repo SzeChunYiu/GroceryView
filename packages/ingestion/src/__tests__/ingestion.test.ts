@@ -182,12 +182,38 @@ import {
   ST1_FUEL_PRICE_URL,
   validateOfferSelectorFixtures,
   validateGroceryCategoryCoicopMappings,
+  IngestRow,
+  validateIngestRow,
   scbCoicopFoodCategoryCodes,
   scbPxWebQueryFixtures,
   validateScbPxWebQueryFixtures,
   validateStoreLocatorFixtures
 } from '../index.js';
 import type { QueryExecutor } from '@groceryview/db';
+
+describe('IngestRow contract', () => {
+  it('accepts valid rows and rejects malformed connector rows at the boundary', () => {
+    const valid = {
+      sourceType: 'retailer_online_page',
+      observedAt: '2026-05-24T12:00:00.000Z',
+      parserVersion: 'contract-test-v1',
+      rawSnapshotRef: 'fixture.html',
+      chainId: 'ica',
+      rawName: 'Mjölk 1 l',
+      canonicalName: 'Mjölk',
+      productId: 'milk-1l',
+      categoryId: 'dairy',
+      packageSize: 1,
+      packageUnit: 'l',
+      price: 12.5
+    };
+
+    assert.equal(IngestRow.parse(valid).productId, 'milk-1l');
+    const logged: string[] = [];
+    assert.equal(validateIngestRow({ ...valid, price: -1 }, (message) => logged.push(message)), null);
+    assert.match(logged[0], /Rejected malformed ingest row/);
+  });
+});
 
 describe('confidenceForSource', () => {
   it('uses proposal confidence values by source type', () => {
