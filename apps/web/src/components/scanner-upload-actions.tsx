@@ -14,6 +14,7 @@ type ScanUploadTicket = {
 type ScanUploadTicketResponse =
   | { result: { status: 'ready'; ticket: ScanUploadTicket } }
   | { result: { status: 'failed_no_storage'; reason: string } };
+type BarcodeLookupResponse = { match: { name: string; slug: string } | null };
 
 function readSession(): BrowserSession {
   const accessToken = sessionStorage.getItem('groceryview:accessToken') || '';
@@ -179,6 +180,8 @@ export function ScannerUploadActions() {
     event.preventDefault();
     const session = requireSession();
     if (!session) return;
+    const lookup = await fetch(`/api/search?barcode=${encodeURIComponent(barcode)}`);
+    const lookupBody = lookup.ok ? (await lookup.json()) as BarcodeLookupResponse : { match: null };
     const { accessToken, userId } = session;
     const scanId = newScanId('barcode');
     const response = await fetch(`/api/scans/process?userId=${encodeURIComponent(userId)}`, {
@@ -186,7 +189,8 @@ export function ScannerUploadActions() {
       headers: { 'content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
       body: JSON.stringify({ scanId, kind: 'barcode', payload: barcode })
     });
-    await handleResponse(response, `Barcode processed for ${scanId}; review work items are returned when matching needs human review.`);
+    const lookupMessage = lookupBody.match ? ` Matched ${lookupBody.match.name} before scan processing.` : ' No product match was found before scan processing.';
+    await handleResponse(response, `Barcode processed for ${scanId}.${lookupMessage} Review work items are returned when matching needs human review.`);
   }
 
   return (
@@ -240,7 +244,7 @@ export function ScannerUploadActions() {
         <form className="rounded-2xl border border-slate-200 bg-slate-50 p-4 lg:col-span-2" data-testid="scanner-barcode-fallback" onSubmit={processBarcode}>
           <label className="text-sm font-black text-slate-950" htmlFor="barcode-payload">Barcode payload</label>
           <p className="mt-2 text-sm leading-6 text-slate-600">
-            Manual barcode fallback stays available on mobile when camera permission is denied or camera APIs are unavailable.
+            Manual barcode fallback first checks <code className="rounded bg-white px-1 py-0.5">/api/search?barcode=</code>, then sends the signed-in scan to processing when review evidence is needed.
           </p>
           <input
             className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-950"
