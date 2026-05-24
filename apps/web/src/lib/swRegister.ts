@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 
 let registrationStarted = false;
 
-export function registerOfflineItemPageServiceWorker() {
+export function registerOfflineServiceWorker() {
   if (registrationStarted) return;
   if (typeof window === 'undefined') return;
   if (!('serviceWorker' in navigator)) return;
@@ -13,7 +13,7 @@ export function registerOfflineItemPageServiceWorker() {
   registrationStarted = true;
   const register = () => {
     void navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch((error: unknown) => {
-      console.warn('GroceryView offline item-page service worker registration failed', error);
+      console.warn('GroceryView offline service worker registration failed', error);
     });
   };
 
@@ -26,7 +26,7 @@ export function registerOfflineItemPageServiceWorker() {
 
 export function ServiceWorkerRegistrar() {
   useEffect(() => {
-    registerOfflineItemPageServiceWorker();
+    registerOfflineServiceWorker();
   }, []);
 
   return null;
