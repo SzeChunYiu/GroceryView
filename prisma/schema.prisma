@@ -22,17 +22,34 @@ model Category {
 }
 
 model Product {
-  id             String   @id @default(uuid()) @db.Uuid
-  slug           String   @unique
-  canonicalName  String   @map("canonical_name")
-  nameSv         String?  @map("name_sv")
-  nameEn         String?  @map("name_en")
+  id             String       @id @default(uuid()) @db.Uuid
+  slug           String       @unique
+  canonicalName  String       @map("canonical_name")
+  nameSv         String?      @map("name_sv")
+  nameEn         String?      @map("name_en")
   brand          String?
-  categoryPath   String[] @default([]) @map("category_path")
-  comparableUnit String   @map("comparable_unit")
-  imageUrl       String?  @map("image_url")
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
+  categoryPath   String[]     @default([]) @map("category_path")
+  comparableUnit String       @map("comparable_unit")
+  imageUrl       String?      @map("image_url")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+  priceAlerts    PriceAlert[]
 
   @@map("products")
+}
+
+model PriceAlert {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id")
+  productId   String   @map("product_id") @db.Uuid
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  targetPrice Decimal  @map("target_price") @db.Decimal(10, 2)
+  channel     String
+  triggered   Boolean  @default(false)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([productId])
+  @@index([triggered])
+  @@map("price_alerts")
 }
