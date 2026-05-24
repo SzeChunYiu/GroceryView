@@ -19,9 +19,31 @@ const weeklyBasketConfidence = {
   caveat: 'The optimizer uses visible price rows for favorite stores only; missing store-product prices reduce coverage instead of being estimated.'
 };
 
+function WeeklyBasketEmptyState() {
+  return (
+    <PageShell>
+      <Eyebrow>Basket optimizer</Eyebrow>
+      <Card className="mt-6 text-center">
+        <div className="text-5xl" aria-hidden="true">🧺</div>
+        <h1 className="mt-4 text-3xl font-black tracking-tight text-slate-950">No weekly basket data yet</h1>
+        <Link className="mt-3 inline-block font-black text-emerald-800 hover:text-emerald-950" href="/products">Browse products to start building a weekly basket.</Link>
+      </Card>
+    </PageShell>
+  );
+}
+
 export default function WeeklyBasketPage() {
+  if (weeklyBasketOptimizerInput.items.length === 0) {
+    return <WeeklyBasketEmptyState />;
+  }
+
   const comparison = compareBasketStrategies(weeklyBasketOptimizerInput);
   const coverage = summarizeStoreBasketCoverage(weeklyBasketOptimizerInput);
+
+  if (comparison.cheapestByProduct.assignments.length === 0 || coverage.stores.length === 0) {
+    return <WeeklyBasketEmptyState />;
+  }
+
   const bestSingleStore = comparison.bestSingleStore;
 
   return (
