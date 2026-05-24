@@ -1262,6 +1262,8 @@ describe('verified-data UI', () => {
     assert.match(source, /ConfidenceBadge/);
     assert.match(source, /radarScore/);
     assert.match(source, /staleReportIds/);
+    assert.match(source, /formatDays\\(item\\.hoursUntilExpiry \\/ 24\\)/);
+    assert.match(source, /Expires in \\{formatDays\\(item\\.hoursUntilExpiry \\/ 24\\)\\} days/);
     assert.match(source, /near-expiry/i);
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
