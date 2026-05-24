@@ -5,6 +5,7 @@ import { ProductPriceCards } from '@/components/product-price-cards';
 import { apohemSource } from '@/lib/ingested/apohem';
 import { adaptiveProductCards, buildProductSearchView, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
+import { allergenPreferenceOptions, excludesAllergenPreferences, selectedAllergenPreferences } from '@/lib/allergen';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
 
 const PRODUCTS_PER_PAGE = 50;
@@ -18,6 +19,8 @@ type SearchParams = {
   category?: string | string[];
   label?: string | string[];
   dietary?: string | string[];
+  allergen?: string | string[];
+  intolerance?: string | string[];
   chain?: string | string[];
   minPrice?: string | string[];
   maxPrice?: string | string[];
@@ -58,6 +61,8 @@ function copySearchParams(params: URLSearchParams, source: SearchParams) {
   setFirstParam(params, 'category', source.category);
   setFirstParam(params, 'label', source.label);
   setAllParams(params, 'dietary', source.dietary);
+  setAllParams(params, 'allergen', source.allergen);
+  setAllParams(params, 'intolerance', source.intolerance);
   setFirstParam(params, 'chain', source.chain);
   setFirstParam(params, 'minPrice', source.minPrice);
   setFirstParam(params, 'maxPrice', source.maxPrice);
@@ -78,20 +83,25 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
   const search = buildProductSearchView(resolvedSearchParams);
   const { categoryFacets, labelFacets, chainFacets, priceRange, inStockOnly, resultCards } = search;
+  const selectedSafetyPreferences = [...selectedAllergenPreferences(resolvedSearchParams.allergen), ...selectedAllergenPreferences(resolvedSearchParams.intolerance)];
   const requestedPage = toPageNumber(resolvedSearchParams.page);
   const selectedBrand = normalizeSelectedBrand(resolvedSearchParams.brand);
   const productCards = selectedBrand
     ? adaptiveProductCards.filter((card) => card.brand === selectedBrand)
     : adaptiveProductCards;
-  const totalPages = Math.max(1, Math.ceil(resultCards.length / PRODUCTS_PER_PAGE));
+  const safetyFilteredResultCards = selectedSafetyPreferences.length > 0
+    ? resultCards.filter((product) => !excludesAllergenPreferences(product, selectedSafetyPreferences))
+    : resultCards;
+  const excludedSafetyCount = resultCards.length - safetyFilteredResultCards.length;
+  const totalPages = Math.max(1, Math.ceil(safetyFilteredResultCards.length / PRODUCTS_PER_PAGE));
   const currentPage = Math.min(requestedPage, totalPages);
   const pageStart = (currentPage - 1) * PRODUCTS_PER_PAGE;
-  const pagedResultCards = resultCards.slice(pageStart, pageStart + PRODUCTS_PER_PAGE);
-  const rangeStart = resultCards.length === 0 ? 0 : pageStart + 1;
-  const rangeEnd = Math.min(pageStart + PRODUCTS_PER_PAGE, resultCards.length);
+  const pagedResultCards = safetyFilteredResultCards.slice(pageStart, pageStart + PRODUCTS_PER_PAGE);
+  const rangeStart = safetyFilteredResultCards.length === 0 ? 0 : pageStart + 1;
+  const rangeEnd = Math.min(pageStart + PRODUCTS_PER_PAGE, safetyFilteredResultCards.length);
   const defaultSearchCount = facetedProductSearch.resultCards.length;
 
-  function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence', string>>) {
+  function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'dietary' | 'allergen' | 'intolerance' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence', string>>) {
     const params = new URLSearchParams();
     copySearchParams(params, resolvedSearchParams);
     for (const [key, value] of Object.entries(overrides)) {
@@ -176,6 +186,24 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
               Gluten-free, lactose-free, and vegan filters require verified label metadata or explicit product text; GroceryView does not infer dietary status from shopper profiles.
             </p>
           </div>
+          <div className="rounded-2xl border border-amber-100 bg-amber-50/80 p-3 lg:col-span-4">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-800">Allergen exclusions & intolerance tags</p>
+            <div className="mt-2 grid gap-2 sm:grid-cols-4">
+              {allergenPreferenceOptions.map((preference) => (
+                <label className="flex items-start gap-2 rounded-2xl bg-white px-3 py-2 text-sm font-black text-amber-950 shadow-sm" key={preference.value}>
+                  <input className="mt-1" defaultChecked={selectedSafetyPreferences.some((selected) => selected.value === preference.value)} name={preference.kind === 'intolerance' ? 'intolerance' : 'allergen'} type="checkbox" value={preference.value} />
+                  <span>
+                    {preference.label}
+                    <span className="block text-xs font-semibold text-amber-700">{preference.kind} · {preference.description}</span>
+                  </span>
+                </label>
+              ))}
+            </div>
+            <p className="mt-2 text-xs font-semibold leading-5 text-amber-900">
+              Selected account safety tags exclude matching product names, labels, brands, and categories from future search and recommendation requests. {excludedSafetyCount.toLocaleString('sv-SE')} products are hidden by the active safety profile.
+            </p>
+          </div>
+
           <div className="flex flex-col justify-end gap-2">
             <label className="flex items-center gap-2 rounded-2xl bg-violet-50 px-3 py-2 text-sm font-black text-violet-950">
               <input defaultChecked={search.filters.inStockOnly} name="inStockOnly" type="checkbox" value="true" />
@@ -185,7 +213,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           </div>
         </form>
         <div className="mt-4 flex flex-wrap gap-2">
-          {search.activeFilters.length > 0 ? search.activeFilters.map((filter) => (
+          {[...search.activeFilters, ...selectedSafetyPreferences.map((preference) => `${preference.kind}=${preference.label}`)].length > 0 ? [...search.activeFilters, ...selectedSafetyPreferences.map((preference) => `${preference.kind}=${preference.label}`)].map((filter) => (
             <span className="rounded-full bg-violet-900 px-3 py-1 text-xs font-black text-white" key={filter}>{filter}</span>
           )) : (
             <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-violet-900 shadow-sm">No active URL filters</span>
@@ -250,10 +278,10 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             </Link>
           ))}
         </div>
-        {resultCards.length > PRODUCTS_PER_PAGE ? (
+        {safetyFilteredResultCards.length > PRODUCTS_PER_PAGE ? (
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3 text-sm">
             <p className="font-black text-slate-700">
-              Showing {rangeStart}-{rangeEnd} of {resultCards.length} instant products (page {currentPage}/{totalPages})
+              Showing {rangeStart}-{rangeEnd} of {safetyFilteredResultCards.length} instant products (page {currentPage}/{totalPages})
             </p>
             <div className="flex gap-3">
               {currentPage > 1 ? (

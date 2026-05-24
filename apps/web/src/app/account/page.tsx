@@ -4,6 +4,7 @@ import { AdDisclosureActions } from '@/components/ad-disclosure-actions';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { routeMetadata } from '@/lib/seo';
+import { allergenPreferenceOptions, savedAllergenPreferenceProfile } from '@/lib/allergen';
 import { accountSavedShoppingContract, formatSek, savedBasketAutoReorderPlanner } from '@/lib/verified-data';
 import { planAccountDeletion } from '@groceryview/core';
 
@@ -51,6 +52,34 @@ export default function AccountPage() {
             <p className="font-black text-slate-950">Static snapshot remains closed</p>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
               {accountSavedShoppingContract.blockedInStaticSnapshot.map((blocker) => <li key={blocker}>{blocker}</li>)}
+            </ul>
+          </div>
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-amber-200 bg-amber-50">
+        <div className="grid gap-5 lg:grid-cols-[1fr_0.9fr]">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-800">Dietary safety profile</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">{savedAllergenPreferenceProfile.title}</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-700">
+              Account settings now persist known allergens and intolerance tags in <code className="rounded bg-white/80 px-1 py-0.5 text-amber-900">{savedAllergenPreferenceProfile.storageContract}</code>. These exclusions are applied to future search and recommendation requests before results are shown, reducing the chance of presenting unsuitable products.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {savedAllergenPreferenceProfile.selectedValues.map((value) => {
+                const preference = allergenPreferenceOptions.find((option) => option.value === value);
+                return preference ? <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-amber-950 shadow-sm" key={value}>{preference.label}</span> : null;
+              })}
+            </div>
+          </div>
+          <div className="rounded-2xl bg-white p-4 shadow-sm">
+            <p className="font-black text-slate-950">Applied to</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm font-semibold text-slate-700">
+              {savedAllergenPreferenceProfile.appliesTo.map((target) => <li key={target}>{target}</li>)}
+            </ul>
+            <p className="mt-4 font-black text-slate-950">Guardrails</p>
+            <ul className="mt-2 space-y-2 text-sm font-semibold text-slate-700">
+              {savedAllergenPreferenceProfile.guardrails.map((guardrail) => <li className="rounded-xl bg-amber-50 p-2" key={guardrail}>{guardrail}</li>)}
             </ul>
           </div>
         </div>
