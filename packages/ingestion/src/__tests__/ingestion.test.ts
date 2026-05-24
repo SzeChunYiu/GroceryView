@@ -188,6 +188,7 @@ import {
   validateStoreLocatorFixtures
 } from '../index.js';
 import type { QueryExecutor } from '@groceryview/db';
+import { HELIOS_NO_VERIFIED_PRODUCT_COUNT, parseHeliosNoProducts } from '../connectors/helios-no.js';
 
 describe('confidenceForSource', () => {
   it('uses proposal confidence values by source type', () => {
@@ -615,6 +616,23 @@ describe('OKQ8 fuel price connector', () => {
     ]);
     assert.equal(parsed.items.every((row) => row.sourceType === 'retailer_online_page'), true);
     assert.equal(parsed.items.every((row) => row.storeId === undefined), true);
+  });
+});
+
+describe('Helios NO health-food connector', () => {
+  it('parses unique Helios product rows and carries the verified catalogue count', () => {
+    const rows = parseHeliosNoProducts(`
+      {"Data":{"ArticleNumber":"1000719","EntityId":50520},"Name":"Helios Kombucha Lemonade","Description":null,"DescriptiveSize":"275 ml","Image":"/image.png","Url":"/produkter/kombucha/helios-kombucha-lemonade/","GroupID":53294}
+      {"Data":{"ArticleNumber":"1000719","EntityId":50520},"Name":"Helios Kombucha Lemonade","Description":null,"DescriptiveSize":"275 ml","Image":"/image.png","Url":"/produkter/drikke/helios-kombucha-lemonade/","GroupID":50364}
+      {"Data":{"ArticleNumber":"1002291","EntityId":117601},"Name":"Helios Tofu Røkt","Description":null,"DescriptiveSize":"250g","Image":"/image.png","Url":"/produkter/tofu/helios-tofu-rokt/","GroupID":53295}
+    `);
+
+    assert.equal(HELIOS_NO_VERIFIED_PRODUCT_COUNT, 130);
+    assert.deepEqual(rows.map((row) => [row.chainId, row.category, row.articleNumber, row.name, row.descriptiveSize]), [
+      ['helios-no', 'health_food', '1000719', 'Helios Kombucha Lemonade', '275 ml'],
+      ['helios-no', 'health_food', '1002291', 'Helios Tofu Røkt', '250g']
+    ]);
+    assert.equal(rows[0]?.sourceUrl, 'https://www.helios.no/produkter/kombucha/helios-kombucha-lemonade/');
   });
 });
 
