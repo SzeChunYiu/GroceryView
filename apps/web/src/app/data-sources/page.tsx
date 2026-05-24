@@ -16,6 +16,7 @@ import {
   sourceReadinessMatrix,
   sourceRouteMap,
   storeBrandLedger,
+  perChainConfidenceRows,
   timescaleDbEvaluation
 } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
@@ -40,6 +41,38 @@ export default function DataSourcesPage() {
         <Metric label="Source groups" value={sourceCoverage.length.toLocaleString('sv-SE')} />
         <Metric label="Brand ledgers" value={storeBrandLedger.length.toLocaleString('sv-SE')} />
       </div>
+
+
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50/70">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-800">Chain confidence</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Per-chain country coverage from checked-in evidence</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-700">Store, SKU, and observation counts are aggregated from generated OSM, Axfood, and OpenPrices data only. Unknown country-chain coverage is omitted instead of filled.</p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-emerald-900 shadow-sm">docs/chain-confidence.md</p>
+        </div>
+        <div className="mt-5 overflow-x-auto rounded-2xl border border-emerald-100 bg-white">
+          <table className="min-w-full text-left text-sm">
+            <thead className="bg-emerald-100 text-xs font-black uppercase tracking-[0.14em] text-emerald-950">
+              <tr><th className="p-3">Country</th><th className="p-3">Chain</th><th className="p-3">Stores</th><th className="p-3">SKUs</th><th className="p-3">Obs 7d</th><th className="p-3">Last observed</th></tr>
+            </thead>
+            <tbody>
+              {perChainConfidenceRows.map((row) => (
+                <tr className="border-t border-emerald-100" key={`${row.country}-${row.chain}`}>
+                  <td className="p-3 font-black">{row.country}</td>
+                  <td className="p-3 font-semibold">{row.chain}</td>
+                  <td className="p-3">{row.storeCount.toLocaleString('sv-SE')}</td>
+                  <td className="p-3">{row.skuCount.toLocaleString('sv-SE')}</td>
+                  <td className="p-3">{row.observationsLast7d.toLocaleString('sv-SE')}</td>
+                  <td className="p-3">{row.lastObservedAt ?? 'Not reported'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
 
       <Card className="mt-6 border-lime-200 bg-lime-50/70">
         <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">

@@ -1,6 +1,6 @@
 import { buildFacetedProductSearch, type RealCatalogSearchPriceRow } from '@groceryview/api';
 import { COMMODITIES, STAPLE_BASKET, SUPPORTED_PRICE_DOMAINS, type Commodity, type ComparableUnit } from '@groceryview/catalog';
-import { buildPriceChartSeries, buildWatchlistAlerts, calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type PriceChartObservation, type ProductMatchInput, type WatchlistItem, type WatchlistPriceType, type WatchlistProductSnapshot } from '@groceryview/core';
+import { buildPerChainConfidenceRows, buildPriceChartSeries, buildWatchlistAlerts, calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type PriceChartObservation, type ProductMatchInput, type WatchlistItem, type WatchlistPriceType, type WatchlistProductSnapshot } from '@groceryview/core';
 import { summarizeTrendingProductPriceChanges, type TrendingPriceChangePoint } from '@groceryview/db';
 import { planReceiptAliasGrowth } from '@groceryview/scanning';
 import { axfoodProducts } from './axfood-products';
@@ -2299,6 +2299,27 @@ export const openFoodFactsCatalogPreview = [...openFoodFactsCatalog]
   .slice(0, 12);
 
 export const storeUniverse = osmStores;
+
+export const perChainConfidenceRows = buildPerChainConfidenceRows([
+  ...storeUniverse.map((store) => ({
+    chain: store.brand || 'Unbranded',
+    country: 'SE',
+    observedAt: `${store.retrievedDate}T00:00:00.000Z`,
+    storeId: store.slug
+  })),
+  ...topChainSpreads.flatMap((product) => product.inChains.map((chain) => ({
+    chain,
+    country: 'SE',
+    sku: product.slug
+  }))),
+  ...freshestOpenPrices.map((product) => ({
+    chain: 'OpenPrices',
+    country: 'SE',
+    observedAt: product.lastObservedAt,
+    sku: product.slug
+  }))
+]);
+
 
 function normalizeStoreText(value: string) {
   return value
