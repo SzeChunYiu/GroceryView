@@ -7,6 +7,7 @@ const requiredFiles = [
   'src/app/products/[slug]/page.tsx',
   'src/app/stores/[slug]/page.tsx',
   'src/app/categories/[slug]/page.tsx',
+  'src/app/search/page.tsx',
   'src/app/providers.tsx',
   'tailwind.config.ts',
   'src/components/ui/button.tsx'

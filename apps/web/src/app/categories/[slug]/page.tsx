@@ -1,15 +1,43 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { pricedProducts, categoryLabels } from '@/lib/openprices-products';
+import { buildCategoryCanonicalPath, type SearchParamMap } from '@/lib/metadata-canonical';
 
 export const dynamic = 'force-static';
+
+type CategoryParams = {
+  slug: string;
+};
+
+type CategoryPageContext = {
+  params: Promise<CategoryParams>;
+  searchParams?: Promise<SearchParamMap>;
+};
+
+export async function generateMetadata({
+  params,
+  searchParams
+}: Readonly<CategoryPageContext>): Promise<Metadata> {
+  const [{ slug }, resolvedSearchParams] = await Promise.all([params, searchParams ?? Promise.resolve({})]);
+  const canonicalUrl = buildCategoryCanonicalPath(`/categories/${slug}`, resolvedSearchParams);
+
+  const label = categoryLabels[slug] || slug;
+
+  return {
+    title: `${label} category`,
+    alternates: {
+      canonical: canonicalUrl
+    }
+  };
+}
 
 export function generateStaticParams() {
   const slugs = new Set(pricedProducts.map((p) => p.category || 'pantry'));
   return [...slugs].map((slug) => ({ slug }));
 }
 
-export default async function CategoryPage({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
+export default async function CategoryPage({ params }: Readonly<{ params: Promise<CategoryParams> }>) {
   const { slug } = await params;
   const items = pricedProducts.filter((p) => (p.category || 'pantry') === slug);
   if (items.length === 0) notFound();
