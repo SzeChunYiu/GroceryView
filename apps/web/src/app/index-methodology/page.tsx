@@ -1,7 +1,11 @@
 import { calculateChainPriceIndex } from '@groceryview/core';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { ConfidenceBadge } from '@/components/confidence-badge';
-import { buildChainPriceObservations, buildMatchedBasketChainPriceObservations } from '@/lib/chain-index-data';
+import {
+  buildChainIndexTrendSeries,
+  buildChainPriceObservations,
+  buildMatchedBasketChainPriceObservations
+} from '@/lib/chain-index-data';
 import { coopSource } from '@/lib/ingested/coop';
 import { hemkopSource } from '@/lib/ingested/hemkop';
 import { matpriskollenSource } from '@/lib/ingested/matpriskollen';
@@ -23,6 +27,11 @@ const broadObservations = buildChainPriceObservations();
 const matchedBasketObservations = buildMatchedBasketChainPriceObservations();
 const indexObservations = [...broadObservations, ...matchedBasketObservations];
 const methodologyIndex = calculateChainPriceIndex(indexObservations);
+const campaignTrend = buildChainIndexTrendSeries();
+const campaignRebalanceDates = [...new Set(campaignTrend.series.flatMap((chain) => chain.points.map((point) => point.date)))].sort(
+  (left, right) => left.localeCompare(right)
+);
+const latestCampaignRebalanceDate = campaignRebalanceDates.at(-1);
 
 const activeSources = [
   {
@@ -238,6 +247,10 @@ export default function IndexMethodologyPage() {
             <p className="rounded-2xl bg-white/80 p-4">Rebalance trigger: when source modules are regenerated and the web build consumes the new files.</p>
             <p className="rounded-2xl bg-white/80 p-4">Constituent review: chains and categories are re-evaluated from current eligible rows; no chain, SKU, or category is manually forced into the index.</p>
             <p className="rounded-2xl bg-white/80 p-4">Weight update: category weights recompute from eligible row counts at each refresh, so stale or missing categories naturally lose weight.</p>
+            <p className="rounded-2xl bg-white/80 p-4">
+              Campaign tape cadence: {campaignTrend.dateCount} weekly campaign snapshots currently span {campaignTrend.chartWindowLabel}
+              {latestCampaignRebalanceDate ? `, with the latest rebalance point on ${formatDate(latestCampaignRebalanceDate)}` : ''}.
+            </p>
             <p className="rounded-2xl bg-white/80 p-4">Corporate action equivalent: matched Axfood rows can refine Willys/Hemkop basket coverage only when exact product-code matches exist in both chains.</p>
           </div>
         </Card>
