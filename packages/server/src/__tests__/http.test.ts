@@ -1633,6 +1633,87 @@ describe('createHttpHandler', () => {
     ]);
   });
 
+  it('gates OCR scan history reads and writes to active premium entitlements', async () => {
+    const requestedUserIds: string[] = [];
+    const api = createGroceryViewApi();
+    const handle = createHttpHandler(api, {
+      now: new Date('2026-05-20T13:00:00.000Z'),
+      subscriptionEntitlementRepository: {
+        async getSubscriptionEntitlement(userId) {
+          requestedUserIds.push(userId);
+          if (userId !== 'user-1') return null;
+          return {
+            userId,
+            tier: 'premium',
+            plan: 'premium_monthly',
+            status: 'active',
+            currentPeriodEndsAt: '2026-06-20T13:00:00.000Z',
+            provider: 'stripe_compatible',
+            providerCustomerId: 'cus_internal_only',
+            updatedAt: '2026-05-20T13:00:00.000Z'
+          };
+        }
+      }
+    });
+
+    const freeRead = await handle(new Request('http://localhost/api/scans/history?userId=user-2'));
+    assert.equal(freeRead.status, 402);
+    assert.deepEqual((await json(freeRead) as { access: { enforcementReasons: string[] } }).access.enforcementReasons, ['missing_subscription_entitlement']);
+
+    const saved = await handle(new Request('http://localhost/api/scans/history?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({
+        scanId: 'receipt-1',
+        kind: 'receipt',
+        uploadedAt: '2026-05-20T12:59:00.000Z',
+        result: {
+          status: 'parsed',
+          rows: [{ rawName: 'ZOEGAS 450G' }],
+          totalAmount: 49.9,
+          confidence: 0.91,
+          lowConfidenceRows: ['SMUDGED ITEM']
+        }
+      })
+    }));
+    assert.equal(saved.status, 201);
+    assert.deepEqual(await json(saved), {
+      userId: 'user-1',
+      item: {
+        scanId: 'receipt-1',
+        kind: 'receipt',
+        capturedAt: '2026-05-20T12:59:00.000Z',
+        status: 'parsed',
+        itemCount: 1,
+        totalAmount: 49.9,
+        confidence: 0.91,
+        lowConfidenceRows: ['SMUDGED ITEM']
+      }
+    });
+
+    const history = await json(await handle(new Request('http://localhost/api/scans/history?userId=user-1'))) as {
+      userId: string;
+      itemCount: number;
+      items: Array<Record<string, unknown>>;
+      guardrails: string[];
+    };
+    assert.equal(history.userId, 'user-1');
+    assert.equal(history.itemCount, 1);
+    assert.deepEqual(history.items, [
+      {
+        scanId: 'receipt-1',
+        kind: 'receipt',
+        capturedAt: '2026-05-20T12:59:00.000Z',
+        status: 'parsed',
+        itemCount: 1,
+        totalAmount: 49.9,
+        confidence: 0.91,
+        lowConfidenceRows: ['SMUDGED ITEM']
+      }
+    ]);
+    assert.equal(history.guardrails.some((guardrail) => /active premium entitlement/i.test(guardrail)), true);
+    assert.deepEqual(requestedUserIds, ['user-2', 'user-1', 'user-1']);
+  });
+
   it('serves account subscription access from user-scoped entitlements', async () => {
     const api = createGroceryViewApi();
     api.upsertSubscriptionEntitlement('user-1', {

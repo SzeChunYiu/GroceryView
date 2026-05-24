@@ -436,6 +436,13 @@ export function buildSubscriptionAccessPolicy(input: {
   };
 }
 
+export function hasActivePremiumEntitlement(input: {
+  entitlement?: SubscriptionEntitlementSnapshot | null;
+  now: string;
+}): boolean {
+  return buildSubscriptionAccessPolicy(input).premiumFeaturesEnabled;
+}
+
 export type SubscriptionCheckoutInput = {
   userId: string;
   plan: SubscriptionPlan;
