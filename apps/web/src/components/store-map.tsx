@@ -283,7 +283,7 @@ export function StoreMap() {
         setSelectedStoreSlug(String(p.slug ?? ''));
         const [lng, lat] = (f.geometry as GeoJSON.Point).coordinates;
         const directions = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
-        const where = [escapeHtml(p.address || ''), escapeHtml(p.district || '')]
+        const where = [escapeHtml(String(p.address || '')), escapeHtml(String(p.district || ''))]
           .filter(Boolean)
           .join(' · ');
         popup
@@ -291,14 +291,14 @@ export function StoreMap() {
           .setHTML(
             `<div style="font-family:inherit;min-width:180px">
                <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
-                 <span style="width:10px;height:10px;border-radius:50%;background:${escapeHtml(p.color)};display:inline-block"></span>
-                 <strong style="font-size:14px">${escapeHtml(p.name)}</strong>
+                 <span style="width:10px;height:10px;border-radius:50%;background:${escapeHtml(String(p.color || ''))};display:inline-block"></span>
+                 <strong style="font-size:14px">${escapeHtml(String(p.name || ''))}</strong>
                </div>
-              <div style="font-size:12px;color:#475569">${escapeHtml(p.brand)} · ${escapeHtml(p.format)}</div>
+              <div style="font-size:12px;color:#475569">${escapeHtml(String(p.brand || ''))} · ${escapeHtml(String(p.format || ''))}</div>
                ${p.chainIndex ? `<div style="font-size:12px;color:#475569;margin-top:2px">Chain index ${Number(p.chainIndex).toFixed(1)} (100 = market)</div>` : ''}
                ${where ? `<div style="font-size:12px;color:#64748b;margin-top:2px">${where}</div>` : ''}
                <a href="${directions}" target="_blank" rel="noopener noreferrer"
-                  data-store-directions="true" data-store-slug="${escapeHtml(p.slug || '')}" data-store-name="${escapeHtml(p.name || '')}" data-store-brand="${escapeHtml(p.brand || '')}"
+                  data-store-directions="true" data-store-slug="${escapeHtml(String(p.slug || ''))}" data-store-name="${escapeHtml(String(p.name || ''))}" data-store-brand="${escapeHtml(String(p.brand || ''))}"
                   style="display:inline-block;margin-top:8px;font-size:12px;font-weight:600;color:#1D8649">
                   Directions →</a>
              </div>`,
