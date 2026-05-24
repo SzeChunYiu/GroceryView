@@ -48,6 +48,13 @@ export default function LoginPage() {
           <button className="inline-flex h-11 items-center justify-center rounded-lg bg-zinc-950 px-4 text-sm font-semibold text-white transition hover:bg-zinc-800" type="button">
             Send sign-in link
           </button>
+          <p className="text-sm text-zinc-600">
+            Can&apos;t access your account?{' '}
+            <Link className="font-semibold text-emerald-700 hover:text-emerald-900" href="/reset-password">
+              Reset password
+            </Link>
+            .
+          </p>
         </form>
         <div className="mt-6 rounded-lg bg-zinc-50 p-4">
           <p className="text-sm font-semibold text-zinc-950">Demo access</p>
