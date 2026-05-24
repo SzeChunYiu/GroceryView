@@ -9,7 +9,7 @@
     "perf:lighthouse:ci": "lhci autorun --config=./lighthouserc.cjs",
     "perf:lighthouse:preview": "lhci autorun --config=./lighthouserc.preview.cjs",
     "start": "next start",
-    "test": "node --test scripts/*.test.mjs"
+    "test": "node --test scripts/*.test.mjs src/app/**/__tests__/*.test.mjs"
   },
   "dependencies": {
     "@groceryview/analytics": "0.1.0",
@@ -22,6 +22,7 @@
     "@tanstack/react-query": "^5.90.11",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "lightweight-charts": "^5.2.0",
     "lucide-react": "^0.561.0",
     "maplibre-gl": "^4.7.1",

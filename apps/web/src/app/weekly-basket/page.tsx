@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import { compareBasketStrategies, summarizeStoreBasketCoverage } from '@groceryview/core';
+import { formatRelative } from 'date-fns';
+import { sv } from 'date-fns/locale';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { budgetStretchKronaOptimizer, familyBulkUnitPriceComparison, loyaltyAdjustedBasketComparison, mealPrepBulkBuyOptimizer, multiWeekStockUpList, oneTapBasketOptimizer, savedBasketAutoReorderPlan, weeklyBasketOptimizerInput } from '@/lib/demo-data';
@@ -13,6 +15,12 @@ export function generateMetadata() {
 function formatSek(value: number) {
   return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);
 }
+
+const savedBasketReviewDateCopy = formatRelative(
+  new Date(2026, 4, 25, 8, 0, 0),
+  new Date(2026, 4, 24, 8, 0, 0),
+  { locale: sv }
+);
 
 const weeklyBasketConfidence = {
   level: 'medium' as const,
@@ -126,7 +134,7 @@ export default function WeeklyBasketPage() {
             <p className="text-sm font-black uppercase tracking-[0.2em] text-cyan-800">{savedBasketAutoReorderPlan.persona}</p>
             <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Saved basket auto-reorder readiness</h2>
             <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
-              Busy professionals can prepare the next {savedBasketAutoReorderPlan.readyAction.nextRunLabel} from a signed-in saved basket, but GroceryView only drafts the reviewed plan from compareBasketStrategies. No retailer checkout or payment is submitted automatically.
+              Busy professionals can prepare the next {savedBasketAutoReorderPlan.readyAction.nextRunLabel} ({savedBasketReviewDateCopy}) from a signed-in saved basket, but GroceryView only drafts the reviewed plan from compareBasketStrategies. No retailer checkout or payment is submitted automatically.
             </p>
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
               <p className="rounded-2xl bg-white p-4 shadow-sm">
