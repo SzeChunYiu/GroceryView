@@ -522,3 +522,19 @@ Sample newly added rows:
 3. 2500303259 | 2860 | Mozzarella | 2 för 20,00 | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2860&type=PERSONAL_GENERAL&page=0&size=100
 4. 2500297756 | 2860 | Crunchy fries | 19,90/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2860&type=PERSONAL_GENERAL&page=0&size=100
 5. 2500304262 | 2860 | Läsk 6-pack | Välj & blanda! 3 för 89,00 +pant | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2860&type=PERSONAL_GENERAL&page=0&size=100
+
+## Willys chain-wide bulk product fetch 2026-05-23
+
+- Source: www.willys.se public Axfood category/search JSON
+- Source URL pattern: https://www.willys.se/c/{category}?page={page}&size=100
+- Connector: packages/ingestion/src/connectors/willys-bulk.ts
+- Daily ingestion URL: groceryview://daily/willys/products/bulk
+- Retrieved: 2026-05-23T16:35:00.000Z
+- Real priced rows fetched in live verification: 100
+- Minimum live row gate: 100
+- Store fanout: no; rows are chain-level product observations unless an all-store Willys connector is configured separately
+- Persistence path: runDailyIngestion materializes rows as products, aliases, raw_records, and observations via @groceryview/db writers
+
+Sample live rows:
+1. 101860922_ST | Kyckling Bröstfilé | Top Choice | 56,68 kr | https://www.willys.se/c/kott-chark-och-fagel?page=0&size=100
+2. 101222270_ST | Kycklingfilé Svensk Fryst | Garant | 85,08 kr | https://www.willys.se/c/kott-chark-och-fagel?page=0&size=100

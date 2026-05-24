@@ -85,14 +85,53 @@ const CONNECTOR_TEMPLATES = [
     hasDataAgreement: true
   },
   {
-    connectorId: 'city-gross-public-products-all-stores',
+    connectorId: 'city-gross-products-bulk',
     chainId: 'city_gross',
     sourceType: 'official_api',
-    endpointUrl: 'groceryview://daily/city-gross/public-products/all-stores',
-    parserVersion: 'citygross-products-native-v1',
+    endpointUrl: 'groceryview://daily/city-gross/products/bulk',
+    parserVersion: 'citygross-bulk-native-v1',
     robotsTxtStatus: 'not_applicable',
     legalReviewStatus: 'approved',
     hasDataAgreement: true
+  },
+  {
+    connectorId: 'mathem-public-search',
+    chainId: 'mathem',
+    domain: 'grocery',
+    sourceType: 'retailer_online_page',
+    endpointUrl: 'groceryview://daily/mathem/products/public-search',
+    parserVersion: 'mathem-public-search-v1',
+    robotsTxtStatus: 'allow',
+    legalReviewStatus: 'approved',
+    hasDataAgreement: false,
+    requireStoreScopedPrices: false,
+    stores: []
+  },
+  {
+    connectorId: 'matspar-public-search',
+    chainId: 'matspar',
+    domain: 'grocery',
+    sourceType: 'retailer_online_page',
+    endpointUrl: 'groceryview://daily/matspar/products/public-search',
+    parserVersion: 'matspar-public-search-v1',
+    robotsTxtStatus: 'allow',
+    legalReviewStatus: 'approved',
+    hasDataAgreement: false,
+    requireStoreScopedPrices: false,
+    stores: []
+  },
+  {
+    connectorId: 'pharmacy-public-products',
+    chainId: 'pharmacy',
+    domain: 'pharmacy',
+    sourceType: 'retailer_online_page',
+    endpointUrl: 'groceryview://daily/pharmacy/products/public',
+    parserVersion: 'pharmacy-public-products-v1',
+    robotsTxtStatus: 'allow',
+    legalReviewStatus: 'approved',
+    hasDataAgreement: false,
+    requireStoreScopedPrices: false,
+    stores: []
   },
   {
     connectorId: 'okq8-fuel-prices',

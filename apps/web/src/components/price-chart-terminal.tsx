@@ -159,7 +159,7 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
       <div className="mt-5 flex flex-wrap gap-2" aria-label="Price chart timeframe selector">
         {chart.windows.map((window) => (
           <button
-            className={`rounded-full px-4 py-2 text-sm font-black transition ${
+            className={`rounded-full px-4 py-2 text-sm font-black motion-safe:transition ${
               window.label === activeWindow?.label
                 ? 'bg-emerald-300 text-emerald-950'
                 : 'border border-white/15 bg-white/10 text-slate-200 hover:border-emerald-300'

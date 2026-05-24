@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { ConsentManager } from '@/components/consent-manager';
+import { ServiceWorkerRegistrar } from '@/lib/swRegister';
 import { Providers } from './providers';
 import './globals.css';
 
@@ -44,6 +45,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         />
         <Providers>{children}</Providers>
         <ConsentManager />
+        <ServiceWorkerRegistrar />
       </body>
     </html>
   );

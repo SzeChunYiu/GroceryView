@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
+import { UnitPriceAlertActions, type SuggestedUnitPriceAlert } from '@/components/unit-price-alert-actions';
 import { chainPriceRows, formatPct, formatSek, matchedChainProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -12,6 +13,15 @@ export const dynamic = 'force-static';
 const alertRows = [...matchedChainProducts]
   .sort((a, b) => b.spreadPct - a.spreadPct)
   .slice(0, 18);
+
+const suggestedAlerts: SuggestedUnitPriceAlert[] = alertRows.slice(0, 6).map((product) => ({
+  productId: product.slug,
+  productName: product.name,
+  currentPriceText: formatSek(product.lowestPrice),
+  targetPrice: Math.max(product.lowestPrice * 0.95, 0.01).toFixed(2),
+  spreadText: formatPct(product.spreadPct),
+  lowestChain: product.lowestChain
+}));
 
 export default function UnitPriceAlertsPage() {
   const wideSpreadRows = alertRows.filter((product) => product.spreadPct >= 25).length;
@@ -32,6 +42,8 @@ export default function UnitPriceAlertsPage() {
         <Metric label="25%+ spreads" value={wideSpreadRows.toLocaleString('sv-SE')} />
         <Metric label="Lowest chain split" value={`W ${willysLowest} / H ${hemkopLowest}`} />
       </div>
+
+      <UnitPriceAlertActions suggestedAlerts={suggestedAlerts} />
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
         <Card>

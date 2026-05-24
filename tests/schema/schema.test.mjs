@@ -27,6 +27,7 @@ const requiredTables = [
   'subscription_entitlements',
   'notification_tasks',
   'notification_suppressions',
+  'notification_subscriptions',
   'human_reviewers',
   'human_review_assignments',
   'grocery_indices',
@@ -38,9 +39,12 @@ const requiredColumns = [
   'unit_price',
   'member_price',
   'source_type',
+  'domain',
   'confidence_score',
   'barcode',
   'canonical_name',
+  'name_sv',
+  'name_en',
   'private_label_owner',
   'match_confidence',
   'weekly_budget',
@@ -61,6 +65,7 @@ const requiredColumns = [
   'attempt_count',
   'max_attempts',
   'reason',
+  'chat_id',
   'base_date',
   'weight',
   'domain',
@@ -107,5 +112,11 @@ describe('db/schema.sql', () => {
     assert.match(schema, /source_kind in \('operator_public_price_page', 'crowd_station_report'\)/);
     assert.match(schema, /reporter_id text references community_reporter_trust/);
     assert.match(schema, /price_observation_id bigint not null references price_observations/);
+  });
+
+  it('deduplicates scraper price snapshots by product, store, and observed date', () => {
+    assert.match(schema, /create unique index if not exists price_observations_product_store_date_uidx/);
+    assert.match(schema, /on price_observations\s*\(\s*product_id,\s*chain_id,\s*store_id,\s*observed_at,\s*source_type\s*\)/);
+    assert.match(schema, /nulls not distinct/);
   });
 });

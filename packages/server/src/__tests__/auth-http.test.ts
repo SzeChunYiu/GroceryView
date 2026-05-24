@@ -15,6 +15,13 @@ describe('authenticated HTTP routes', () => {
 
     const unauthenticatedPrivacyExport = await handle(new Request('http://localhost/api/privacy/export?userId=user-1'));
     assert.equal(unauthenticatedPrivacyExport.status, 401);
+    const unauthenticatedSettingsExport = await handle(new Request('http://localhost/api/settings/data-export?userId=user-1'));
+    assert.equal(unauthenticatedSettingsExport.status, 401);
+    const unauthenticatedSettingsDelete = await handle(new Request('http://localhost/api/settings/account?userId=user-1', {
+      method: 'DELETE',
+      body: JSON.stringify({ confirmation: 'DELETE ACCOUNT' })
+    }));
+    assert.equal(unauthenticatedSettingsDelete.status, 401);
     const unauthenticatedPrivacyFulfillment = await handle(new Request('http://localhost/api/privacy/request-fulfillment?userId=user-1', {
       method: 'POST',
       body: JSON.stringify({ requests: [] })
@@ -25,6 +32,16 @@ describe('authenticated HTTP routes', () => {
       body: JSON.stringify({ householdId: 'house-1', name: 'Home', weeklyBudget: 100, approvalLimit: 100, reviewer: 'user-1', members: [{ userId: 'user-1', displayName: 'Alex' }], basketItems: [], sharedFavoriteStoreIds: [] })
     }));
     assert.equal(unauthenticatedHousehold.status, 401);
+    const unauthenticatedHouseholdJoin = await handle(new Request('http://localhost/api/households/join?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({ householdId: 'house-1', inviteToken: 'house-1:join', displayName: 'Alex' })
+    }));
+    assert.equal(unauthenticatedHouseholdJoin.status, 401);
+    const unauthenticatedHouseholdCheck = await handle(new Request('http://localhost/api/households/current/basket/check?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({ productId: 'milk', checked: true })
+    }));
+    assert.equal(unauthenticatedHouseholdCheck.status, 401);
     const unauthenticatedScan = await handle(new Request('http://localhost/api/scans/process?userId=user-1', {
       method: 'POST',
       body: JSON.stringify({ scanId: 'scan-1', kind: 'barcode', payload: '0735000123456' })
@@ -61,6 +78,16 @@ describe('authenticated HTTP routes', () => {
       headers: { authorization: `Bearer ${wrongUserToken}` }
     }));
     assert.equal(forbiddenPrivacyPlan.status, 403);
+    const forbiddenSettingsExport = await handle(new Request('http://localhost/api/settings/data-export?userId=user-1', {
+      headers: { authorization: `Bearer ${wrongUserToken}` }
+    }));
+    assert.equal(forbiddenSettingsExport.status, 403);
+    const forbiddenSettingsDelete = await handle(new Request('http://localhost/api/settings/account?userId=user-1', {
+      method: 'DELETE',
+      headers: { authorization: `Bearer ${wrongUserToken}` },
+      body: JSON.stringify({ confirmation: 'DELETE ACCOUNT' })
+    }));
+    assert.equal(forbiddenSettingsDelete.status, 403);
     const forbiddenPrivacyFulfillment = await handle(new Request('http://localhost/api/privacy/request-fulfillment?userId=user-1', {
       method: 'POST',
       headers: { authorization: `Bearer ${wrongUserToken}` },
@@ -73,6 +100,18 @@ describe('authenticated HTTP routes', () => {
       body: JSON.stringify({ householdId: 'house-1', name: 'Home', weeklyBudget: 100, approvalLimit: 100, reviewer: 'user-1', members: [{ userId: 'user-1', displayName: 'Alex' }], basketItems: [], sharedFavoriteStoreIds: [] })
     }));
     assert.equal(forbiddenHousehold.status, 403);
+    const forbiddenHouseholdJoin = await handle(new Request('http://localhost/api/households/join?userId=user-1', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${wrongUserToken}` },
+      body: JSON.stringify({ householdId: 'house-1', inviteToken: 'house-1:join', displayName: 'Alex' })
+    }));
+    assert.equal(forbiddenHouseholdJoin.status, 403);
+    const forbiddenHouseholdCheck = await handle(new Request('http://localhost/api/households/current/basket/check?userId=user-1', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${wrongUserToken}` },
+      body: JSON.stringify({ productId: 'milk', checked: true })
+    }));
+    assert.equal(forbiddenHouseholdCheck.status, 403);
     const forbiddenScan = await handle(new Request('http://localhost/api/scans/process?userId=user-1', {
       method: 'POST',
       headers: { authorization: `Bearer ${wrongUserToken}` },
@@ -117,6 +156,16 @@ describe('authenticated HTTP routes', () => {
       headers: { authorization: `Bearer ${token}` }
     }));
     assert.equal(authorizedPrivacyExport.status, 200);
+    const authorizedSettingsExport = await handle(new Request('http://localhost/api/settings/data-export?userId=user-1', {
+      headers: { authorization: `Bearer ${token}` }
+    }));
+    assert.equal(authorizedSettingsExport.status, 200);
+    const authorizedSettingsDelete = await handle(new Request('http://localhost/api/settings/account?userId=user-1', {
+      method: 'DELETE',
+      headers: { authorization: `Bearer ${token}` },
+      body: JSON.stringify({ confirmation: 'DELETE ACCOUNT' })
+    }));
+    assert.equal(authorizedSettingsDelete.status, 200);
     const authorizedPrivacyFulfillment = await handle(new Request('http://localhost/api/privacy/request-fulfillment?userId=user-1', {
       method: 'POST',
       headers: { authorization: `Bearer ${token}` },

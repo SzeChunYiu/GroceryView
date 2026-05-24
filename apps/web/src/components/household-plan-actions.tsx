@@ -29,6 +29,9 @@ export function HouseholdPlanActions() {
   const [householdName, setHouseholdName] = useState('My grocery household');
   const [weeklyBudget, setWeeklyBudget] = useState('1200');
   const [approvalLimit, setApprovalLimit] = useState('300');
+  const [inviteToken, setInviteToken] = useState('');
+  const [joinHouseholdId, setJoinHouseholdId] = useState('');
+  const [checkedProductId, setCheckedProductId] = useState('');
   const [status, setStatus] = useState<HouseholdStatus>('idle');
   const [message, setMessage] = useState('No anonymous household writes. Sign in first to load or save private household planning rows.');
 
@@ -77,6 +80,39 @@ export function HouseholdPlanActions() {
     await handleResponse(response, 'Household plan saved for the signed-in account with private rows still hidden from the static snapshot.');
   }
 
+  async function joinHousehold() {
+    const session = requireSession();
+    if (!session) return;
+    const { accessToken, userId } = session;
+    const response = await fetch(`/api/households/join?userId=${encodeURIComponent(userId)}`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+      body: JSON.stringify({
+        householdId: joinHouseholdId,
+        inviteToken,
+        displayName: 'Signed-in shopper',
+        role: 'editor'
+      })
+    });
+    await handleResponse(response, 'Invite accepted only after the signed-in account joins as a household editor.');
+  }
+
+  async function checkBasketItem() {
+    const session = requireSession();
+    if (!session) return;
+    const { accessToken, userId } = session;
+    const response = await fetch(`/api/households/current/basket/check?userId=${encodeURIComponent(userId)}`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+      body: JSON.stringify({
+        productId: checkedProductId,
+        checked: true,
+        checkedAt: new Date().toISOString()
+      })
+    });
+    await handleResponse(response, 'Shopping-list item checkedBy the signed-in household member and totals re-synced.');
+  }
+
   return (
     <section className="mt-6 rounded-3xl border border-violet-200 bg-white p-5 shadow-sm" aria-label="Household plan controls">
       <p className="text-sm font-black uppercase tracking-[0.2em] text-violet-800">Signed-in household actions</p>
@@ -121,6 +157,41 @@ export function HouseholdPlanActions() {
           <button className="rounded-full bg-violet-800 px-4 py-2 text-sm font-black text-white" disabled={!householdName.trim() || Number(weeklyBudget) <= 0 || Number(approvalLimit) <= 0} type="submit">Save household plan</button>
         </div>
       </form>
+      <div className="mt-4 grid gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 md:grid-cols-3">
+        <label className="text-sm font-black text-slate-950" htmlFor="household-join-id">
+          householdId to join
+          <input
+            className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-950"
+            id="household-join-id"
+            onChange={(event) => setJoinHouseholdId(event.target.value)}
+            value={joinHouseholdId}
+          />
+        </label>
+        <label className="text-sm font-black text-slate-950" htmlFor="household-invite-token">
+          inviteToken
+          <input
+            className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-950"
+            id="household-invite-token"
+            onChange={(event) => setInviteToken(event.target.value)}
+            value={inviteToken}
+          />
+        </label>
+        <div className="flex items-end">
+          <button className="rounded-full bg-indigo-700 px-4 py-2 text-sm font-black text-white disabled:bg-slate-300" disabled={!joinHouseholdId.trim() || !inviteToken.trim()} onClick={joinHousehold} type="button">Join household</button>
+        </div>
+        <label className="text-sm font-black text-slate-950 md:col-span-2" htmlFor="household-check-product">
+          Product id to check
+          <input
+            className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-950"
+            id="household-check-product"
+            onChange={(event) => setCheckedProductId(event.target.value)}
+            value={checkedProductId}
+          />
+        </label>
+        <div className="flex items-end">
+          <button className="rounded-full bg-emerald-700 px-4 py-2 text-sm font-black text-white disabled:bg-slate-300" disabled={!checkedProductId.trim()} onClick={checkBasketItem} type="button">Check shared item</button>
+        </div>
+      </div>
       <p className="mt-4 rounded-2xl bg-violet-50 p-3 text-sm font-bold text-violet-950" data-status={status}>{message}</p>
     </section>
   );

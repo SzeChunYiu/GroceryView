@@ -55,6 +55,21 @@ describe('production daily ingestion readiness runbook', () => {
     assert.match(runbook, /db_recovery_secret_invalid_format/);
   });
 
+  it('documents daily DB IO hotspot delta comparison evidence', () => {
+    assert.match(runbook, /npm run --silent ops:db-io-hotspots/);
+    assert.match(runbook, /npm run --silent ops:compare-db-io-hotspots --/);
+    assert.match(runbook, /--before \/tmp\/groceryview-db-io-hotspots-before\.json/);
+    assert.match(runbook, /--after \/tmp\/groceryview-db-io-hotspots-after\.json/);
+    assert.match(runbook, /--out \/tmp\/groceryview-db-io-hotspots-delta\.json/);
+    assert.match(runbook, /\/tmp\/daily-db-io-hotspots-before\.json/);
+    assert.match(runbook, /\/tmp\/daily-db-io-hotspots-after\.json/);
+    assert.match(runbook, /\/tmp\/daily-db-io-hotspots-delta\.json/);
+    assert.match(runbook, /groceryview-daily-db-io-hotspots/);
+    assert.match(runbook, /daily_db_io_hotspots_delta_missing_before_or_after/);
+    assert.ok(runbook.includes('Empty `hotspots[]` rows are'));
+    assert.match(runbook, /zero-row delta/);
+  });
+
 
   it('documents daily store enumeration evidence before connector validation', () => {
     assert.match(runbook, /npm run --silent ops:daily-connector-stores/);

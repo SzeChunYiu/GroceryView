@@ -1,6 +1,6 @@
 # Grocery Data Sources — Reverse-Engineering Inventory
 
-Updated: 2026-05-21 by operator. Add new sources here as you discover them.
+Updated: 2026-05-23 by operator. Add new sources here as you discover them.
 
 This document is the canonical inventory of every external data source the
 GroceryView ingestion layer pulls from (or could pull from). Each entry lists
@@ -83,8 +83,26 @@ GroceryView ingestion layer pulls from (or could pull from). Each entry lists
 - `coop.se/erbjudanden` — Coop offers.
 - `willys.se/erbjudanden`, `hemkop.se/erbjudanden` — already exposed as JSON at `/_next/data/{buildId}/sv/erbjudanden.json` per willys-mcp repo.
 
-### 2.8 Matspar / Matpriskollen ⏳ pending (competitor aggregators)
-- Match competitor sites to understand their schema; do NOT redistribute their proprietary aggregation. They proved the model works.
+### 2.8 Matspar ✅ shipped / Matpriskollen ⏳ pending (competitor aggregators)
+- **Matspar endpoint:** public search pages at `https://www.matspar.se/kategori?q={query}` with embedded `window.__PAGEDATA__` product rows.
+- **What Matspar returns:** Matspar product id, product name, brand, package text, current aggregate SEK price, median price, warehouse price coverage count, search URL, and product URL.
+- **Per-branch granularity:** ❌ no — this is an aggregate public search price, not a specific store or branch price.
+- **Guardrail:** the daily native connector enforces at least 100 real rows before persisting; rows keep Matspar product/source provenance and do not pretend to be per-store evidence.
+- **Lands in:** `packages/ingestion/src/connectors/matspar.ts`, daily DB observations through `groceryview://daily/matspar/products/public-search`, and the generated web artifact `apps/web/src/lib/ingested/matspar.ts`.
+- **Matpriskollen:** still useful for schema comparison, but not yet part of the daily DB connector set.
+
+---
+
+## 2F. Fuel prices
+
+### 2F.1 St1 Business listpris ✅ shipped
+- **Endpoint:** `https://st1.se/foretag/listpris`
+- **Method:** GET. **Headers:** browser-style `User-Agent`, `Accept: text/html`. Confirmed HTTP 200 on 2026-05-23 without login, captcha, or 403.
+- **What it returns:** Official St1 station list prices per litre for `Bensin 98`, `Bensin 95`, `E85`, `Diesel`, and `HVO100`; the page states the prices are valid from 23 May 2026.
+- **Per-branch granularity:** ❌ no — operator list price, not station-specific pump evidence.
+- **Source posture:** Operator source. Legal review status in this PR is `approved` for read-only public page capture; crowd fuel reports are modeled separately and require reporter provenance.
+- **Lands in:** `packages/ingestion/src/connectors/st1-fuel.ts`, `infra/db/migrations/010_fuel_price_observations.sql`, and public route `/api/fuel` (also `/fuel` alias).
+- **Evidence:** `docs/ingestion/st1-fuel-evidence.md`.
 
 ---
 

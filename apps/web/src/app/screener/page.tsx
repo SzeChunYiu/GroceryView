@@ -11,9 +11,24 @@ import {
   snapshot,
   topChainSpreads
 } from '@/lib/verified-data';
+import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
+import {
+  SCREENER_DEFAULT_CATEGORY,
+  SCREENER_MIN_DISCOUNT,
+  SCREENER_MAX_DISCOUNT,
+  SCREENER_MIN_DISCOUNT_PARAM,
+  SCREENER_SORT_OPTIONS,
+  normalizeScreenerCategory,
+  normalizeScreenerMinDiscount,
+  normalizeScreenerSort,
+  type ScreenerSortMode,
+  screenerCategoryHref,
+  screenerDiscountHref,
+  screenerSortHref
+} from '@/lib/screener-query';
 import { routeMetadata } from '@/lib/seo';
 
-type SortMode = 'biggest-drop' | 'cheapest-per-kg' | 'widest-spread';
+type SortMode = ScreenerSortMode;
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -28,6 +43,7 @@ type ScreenerRow = {
   priceLabel: string;
   compareLabel: string;
   evidenceLabel: string;
+  discountPercent: number;
   sortValues: Record<SortMode, number>;
   confidence: {
     level: 'high' | 'medium' | 'low';
@@ -36,30 +52,10 @@ type ScreenerRow = {
   };
 };
 
-const sortOptions = [
-  {
-    mode: 'biggest-drop',
-    label: 'Biggest drop',
-    detail: 'Latest observed negative move from priceDropMoversBoard.'
-  },
-  {
-    mode: 'cheapest-per-kg',
-    label: 'Cheapest per kg',
-    detail: 'Lowest comparable kg price from matched chain rows.'
-  },
-  {
-    mode: 'widest-spread',
-    label: 'Widest spread',
-    detail: 'Largest Willys/Hemkop spread from topChainSpreads.'
-  }
-] satisfies { mode: SortMode; label: string; detail: string }[];
+const sortOptions = SCREENER_SORT_OPTIONS;
 
 export function generateMetadata() {
-  return routeMetadata({
-    path: '/screener',
-    title: 'Verified deal screener | GroceryView',
-    description: 'Sort and filter verified grocery deal rows by biggest price drop, cheapest SEK per kg, and widest cross-chain spread.'
-  });
+  return routeMetadata('/screener');
 }
 
 function paramValue(value: string | string[] | undefined) {
@@ -67,23 +63,23 @@ function paramValue(value: string | string[] | undefined) {
 }
 
 function selectedMode(value: string | undefined): SortMode {
-  return sortOptions.some((option) => option.mode === value) ? value as SortMode : 'biggest-drop';
+  return normalizeScreenerSort(value);
 }
 
-function modeHref(mode: SortMode, category: string) {
-  const params = new URLSearchParams({ sort: mode });
-  if (category !== 'all') params.set('category', category);
-  return `/screener?${params.toString()}`;
+function modeHref(mode: SortMode, category: string, minDiscount = SCREENER_MIN_DISCOUNT) {
+  return screenerSortHref(mode, category, minDiscount);
 }
 
-function categoryHref(category: string, mode: SortMode) {
-  const params = new URLSearchParams({ sort: mode });
-  if (category !== 'all') params.set('category', category);
-  return `/screener?${params.toString()}`;
+function categoryHref(category: string, mode: SortMode, minDiscount = SCREENER_MIN_DISCOUNT) {
+  return screenerCategoryHref(category, mode, minDiscount);
 }
 
 function formatUnitPrice(value: number, unitLabel: string) {
-  return `${formatSek(value)}/${unitLabel.replace('kr/', '')}`;
+  return formatLocalizedUnitPrice(value, {
+    locale: defaultLocale,
+    currency: 'SEK',
+    unit: unitLabel.replace(/^kr\//, '')
+  });
 }
 
 function confidenceForSamples(sampleSize: number, mediumAt: number) {
@@ -94,6 +90,10 @@ function confidenceForSamples(sampleSize: number, mediumAt: number) {
 
 function slugFromLabel(label: string) {
   return label.toLowerCase().replace(/å/g, 'a').replace(/ä/g, 'a').replace(/ö/g, 'o').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+function discountPercentFromPriceHistory(changePercent: number) {
+  return changePercent < 0 ? Math.abs(changePercent) : 0;
 }
 
 const dropRows: ScreenerRow[] = priceDropMoversBoard.map((mover) => ({
@@ -107,6 +107,7 @@ const dropRows: ScreenerRow[] = priceDropMoversBoard.map((mover) => ({
   priceLabel: `${formatSek(mover.latestPrice)} now`,
   compareLabel: `${formatSek(mover.previousPrice)} previous`,
   evidenceLabel: `${mover.observedCount} dated points · ${mover.rawObservationCount} raw observations · ${mover.legalCopy}`,
+  discountPercent: discountPercentFromPriceHistory(mover.changePercent),
   sortValues: {
     'biggest-drop': Math.abs(mover.changePercent),
     'cheapest-per-kg': Number.POSITIVE_INFINITY,
@@ -133,6 +134,7 @@ const cheapestKgRows: ScreenerRow[] = topChainSpreads.flatMap((product) => {
     priceLabel: `${formatSek(product.lowestPrice)} at ${product.lowestChain}`,
     compareLabel: `${formatPct(product.spreadPct)} spread`,
     evidenceLabel: `${product.brand || 'Brand not reported'} · ${product.subline || unit.packageLabel} · ${product.inChains.length} matched chains`,
+    discountPercent: 0,
     sortValues: {
       'biggest-drop': 0,
       'cheapest-per-kg': unit.unitSortPrice,
@@ -157,6 +159,7 @@ const spreadRows: ScreenerRow[] = topChainSpreads.map((product) => ({
   priceLabel: `${formatSek(product.lowestPrice)} lowest`,
   compareLabel: `${formatSek(product.highestPrice)} highest`,
   evidenceLabel: `${product.lowestChain} lowest across ${product.inChains.join(' + ')} · ${product.subline || 'Package size not reported'}`,
+  discountPercent: 0,
   sortValues: {
     'biggest-drop': 0,
     'cheapest-per-kg': normalizeComparableUnitPrice(product.lowestPrice, product.subline)?.unitSortPrice ?? Number.POSITIVE_INFINITY,
@@ -187,8 +190,11 @@ const categoryOptions = [
 
 const leaderByCategory = new Map(categoryDealLeaders.map((leader) => [leader.categorySlug, leader]));
 
-function sortedRows(mode: SortMode, category: string) {
-  const filtered = rowsByMode[mode].filter((row) => category === 'all' || row.categorySlug === category);
+function sortedRows(mode: SortMode, category: string, minDiscount: number) {
+  const filtered = rowsByMode[mode].filter((row) => {
+    const categoryMatches = category === SCREENER_DEFAULT_CATEGORY || row.categorySlug === category;
+    return categoryMatches && row.discountPercent >= minDiscount;
+  });
   return [...filtered].sort((left, right) => {
     if (mode === 'cheapest-per-kg') {
       return left.sortValues[mode] - right.sortValues[mode] || left.productName.localeCompare(right.productName, 'sv');
@@ -200,12 +206,11 @@ function sortedRows(mode: SortMode, category: string) {
 export default async function ScreenerPage({ searchParams }: Readonly<{ searchParams?: Promise<SearchParams> }>) {
   const params = (await searchParams) ?? {};
   const mode = selectedMode(paramValue(params.sort));
-  const requestedCategory = paramValue(params.category) ?? 'all';
-  const category = requestedCategory === 'all' || categoryOptions.some((option) => option.slug === requestedCategory)
-    ? requestedCategory
-    : 'all';
-  const visibleRows = sortedRows(mode, category);
-  const selectedLeader = category !== 'all' ? leaderByCategory.get(category) : null;
+  const requestedCategory = paramValue(params.category) ?? SCREENER_DEFAULT_CATEGORY;
+  const category = normalizeScreenerCategory(requestedCategory, categoryOptions.map((option) => option.slug));
+  const minDiscount = normalizeScreenerMinDiscount(paramValue(params.min_discount));
+  const visibleRows = sortedRows(mode, category, minDiscount);
+  const selectedLeader = category !== SCREENER_DEFAULT_CATEGORY ? leaderByCategory.get(category) : null;
 
   return (
     <PageShell>
@@ -225,14 +230,14 @@ export default async function ScreenerPage({ searchParams }: Readonly<{ searchPa
       </div>
 
       <Card className="mt-6">
-        <div className="grid gap-4 lg:grid-cols-[1fr_0.8fr]">
+        <div className="grid gap-4 lg:grid-cols-[1fr_0.8fr_0.7fr]">
           <div>
             <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Sort</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {sortOptions.map((option) => (
                 <Link
                   className={`rounded-lg border px-4 py-2 text-sm font-black ${mode === option.mode ? 'border-slate-950 bg-slate-950 text-white' : 'border-slate-200 bg-slate-50 text-slate-800 hover:border-emerald-700'}`}
-                  href={modeHref(option.mode, category)}
+                  href={modeHref(option.mode, category, minDiscount)}
                   key={option.mode}
                 >
                   {option.label}
@@ -248,15 +253,15 @@ export default async function ScreenerPage({ searchParams }: Readonly<{ searchPa
             <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Category filter</p>
             <div className="mt-3 flex flex-wrap gap-2">
               <Link
-                className={`rounded-lg border px-3 py-2 text-xs font-black ${category === 'all' ? 'border-emerald-900 bg-emerald-900 text-white' : 'border-slate-200 bg-slate-50 text-slate-800 hover:border-emerald-700'}`}
-                href={categoryHref('all', mode)}
+                className={`rounded-lg border px-3 py-2 text-xs font-black ${category === SCREENER_DEFAULT_CATEGORY ? 'border-emerald-900 bg-emerald-900 text-white' : 'border-slate-200 bg-slate-50 text-slate-800 hover:border-emerald-700'}`}
+                href={categoryHref(SCREENER_DEFAULT_CATEGORY, mode, minDiscount)}
               >
                 All
               </Link>
               {categoryOptions.map((option) => (
                 <Link
                   className={`rounded-lg border px-3 py-2 text-xs font-black ${category === option.slug ? 'border-emerald-900 bg-emerald-900 text-white' : 'border-slate-200 bg-slate-50 text-slate-800 hover:border-emerald-700'}`}
-                  href={categoryHref(option.slug, mode)}
+                  href={categoryHref(option.slug, mode, minDiscount)}
                   key={option.slug}
                 >
                   {option.label}
@@ -264,6 +269,31 @@ export default async function ScreenerPage({ searchParams }: Readonly<{ searchPa
               ))}
             </div>
           </div>
+
+          <form action="/screener" method="get" className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4">
+            <input type="hidden" name="sort" value={mode} />
+            {category !== SCREENER_DEFAULT_CATEGORY ? <input type="hidden" name="category" value={category} /> : null}
+            <label className="text-sm font-black uppercase tracking-[0.2em] text-emerald-900" htmlFor="screener-min-discount">Minimum discount</label>
+            <input
+              className="mt-4 h-2 w-full accent-emerald-800"
+              defaultValue={minDiscount}
+              id="screener-min-discount"
+              max={SCREENER_MAX_DISCOUNT}
+              min={SCREENER_MIN_DISCOUNT}
+              name={SCREENER_MIN_DISCOUNT_PARAM}
+              step="1"
+              type="range"
+            />
+            <div className="mt-3 flex items-center justify-between gap-3">
+              <p className="text-sm font-black text-slate-950">{minDiscount}% or more</p>
+              <Link className="text-xs font-black uppercase tracking-[0.16em] text-emerald-900 underline decoration-emerald-300 underline-offset-4" href={screenerDiscountHref(SCREENER_MIN_DISCOUNT, mode, category)}>
+                Reset
+              </Link>
+            </div>
+            <button className="mt-3 w-full rounded-lg bg-emerald-900 px-4 py-2 text-sm font-black text-white" type="submit">
+              Apply discount filter
+            </button>
+          </form>
         </div>
       </Card>
 
@@ -273,7 +303,7 @@ export default async function ScreenerPage({ searchParams }: Readonly<{ searchPa
             <div>
               <h2 className="text-2xl font-black tracking-tight">Ranked deal table</h2>
               <p className="mt-1 text-sm font-semibold text-slate-600">
-                Showing {visibleRows.length} rows sorted by {sortOptions.find((option) => option.mode === mode)?.label.toLowerCase()}.
+                Showing {visibleRows.length} rows sorted by {sortOptions.find((option) => option.mode === mode)?.label.toLowerCase()}{minDiscount > 0 ? ` with at least ${minDiscount}% discount` : ''}.
               </p>
             </div>
             <ConfidenceBadge
@@ -284,9 +314,9 @@ export default async function ScreenerPage({ searchParams }: Readonly<{ searchPa
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[920px] border-collapse text-left text-sm">
-            <thead className="bg-slate-50 text-xs font-black uppercase tracking-[0.16em] text-slate-500">
+        <div className="overflow-hidden sm:overflow-x-auto">
+          <table className="w-full border-separate border-spacing-y-3 text-left text-sm sm:min-w-[920px] sm:border-collapse sm:border-spacing-y-0">
+            <thead className="hidden bg-slate-50 text-xs font-black uppercase tracking-[0.16em] text-slate-500 sm:table-header-group">
               <tr>
                 <th className="px-5 py-3">Product</th>
                 <th className="px-5 py-3">Signal</th>
@@ -295,23 +325,38 @@ export default async function ScreenerPage({ searchParams }: Readonly<{ searchPa
                 <th className="px-5 py-3">Confidence</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200">
-              {visibleRows.map((row) => (
-                <tr className="align-top hover:bg-emerald-50/50" key={row.id}>
-                  <td className="px-5 py-4">
+            <tbody className="block sm:table-row-group sm:divide-y sm:divide-slate-200">
+              {visibleRows.length === 0 ? (
+                <tr className="block rounded-2xl border border-slate-200 bg-white p-4 sm:table-row sm:border-0 sm:bg-transparent sm:p-0">
+                  <td className="block px-0 py-2 text-sm font-bold text-slate-600 sm:table-cell sm:px-5 sm:py-5" colSpan={5}>
+                    No verified screener rows match this category and minimum discount filter.
+                  </td>
+                </tr>
+              ) : visibleRows.map((row) => (
+                <tr className="block rounded-2xl border border-slate-200 bg-white p-4 align-top shadow-sm hover:bg-emerald-50/50 sm:table-row sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none" key={row.id}>
+                  <td className="block px-0 py-2 sm:table-cell sm:px-5 sm:py-4">
+                    <span className="mb-1 block text-[0.68rem] font-black uppercase tracking-[0.16em] text-slate-500 sm:hidden">Product</span>
                     <Link className="text-base font-black text-slate-950 underline decoration-slate-300 underline-offset-4 hover:text-emerald-800" href={`/products/${row.productSlug}`}>
                       {row.productName}
                     </Link>
                     <p className="mt-1 text-xs font-bold uppercase tracking-[0.14em] text-slate-500">{row.categoryLabel}</p>
                     <p className="mt-2 text-xs font-semibold text-slate-500">source: {row.source}</p>
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="block px-0 py-2 sm:table-cell sm:px-5 sm:py-4">
+                    <span className="mb-1 block text-[0.68rem] font-black uppercase tracking-[0.16em] text-slate-500 sm:hidden">Signal</span>
                     <p className="text-lg font-black text-emerald-800">{row.metricLabel}</p>
                     <p className="mt-2 max-w-xs text-xs font-semibold leading-5 text-slate-600">{row.evidenceLabel}</p>
                   </td>
-                  <td className="px-5 py-4 font-black text-slate-950">{row.priceLabel}</td>
-                  <td className="px-5 py-4 font-semibold text-slate-700">{row.compareLabel}</td>
-                  <td className="px-5 py-4">
+                  <td className="block px-0 py-2 font-black text-slate-950 sm:table-cell sm:px-5 sm:py-4">
+                    <span className="mb-1 block text-[0.68rem] font-black uppercase tracking-[0.16em] text-slate-500 sm:hidden">Price</span>
+                    {row.priceLabel}
+                  </td>
+                  <td className="block px-0 py-2 font-semibold text-slate-700 sm:table-cell sm:px-5 sm:py-4">
+                    <span className="mb-1 block text-[0.68rem] font-black uppercase tracking-[0.16em] text-slate-500 sm:hidden">Comparison</span>
+                    {row.compareLabel}
+                  </td>
+                  <td className="block px-0 py-2 sm:table-cell sm:px-5 sm:py-4">
+                    <span className="mb-1 block text-[0.68rem] font-black uppercase tracking-[0.16em] text-slate-500 sm:hidden">Confidence</span>
                     <ConfidenceBadge level={row.confidence.level} label={row.confidence.label} sampleSize={row.confidence.sampleSize} />
                   </td>
                 </tr>

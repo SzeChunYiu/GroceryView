@@ -12,6 +12,14 @@ import {
   type BlockedLocaleRoute,
   type SupportedLocale
 } from './i18n-routing';
+import {
+  formatPer100gUnitPriceLabel,
+  formatSourceUnitPriceText,
+  formatUnitPriceLabel,
+  normalizeUnitPriceDisplayUnit,
+  unknownUnitPriceLabel,
+  unitPriceDisplayUnits
+} from './unit-price-formatting.js';
 
 type GroceryMessages = typeof svMessages;
 export type LanguageAccessLocale = SupportedLocale | 'ar' | 'so';
@@ -132,11 +140,36 @@ export function formatLocalizedDate(value: string | Date | null | undefined, opt
 
 export function formatLocalizedUnitPrice(
   value: number | null | undefined,
-  options: LocalizedFormatOptions & { unit: string }
+  options: LocalizedFormatOptions & { unit: string | null | undefined; unknownLabel?: string }
 ) {
-  const money = formatLocalizedMoney(value, options);
-  return money === 'Not reported' ? money : `${money}/${options.unit}`;
+  const localeOption = localeOptionForFormat(options.locale);
+  return formatUnitPriceLabel(value, options.unit, {
+    locale: localeOption.htmlLang,
+    currency: normalizeCurrency(options.currency ?? localeOption.currency),
+    maximumFractionDigits: options.maximumFractionDigits,
+    unknownLabel: options.unknownLabel
+  });
 }
+
+export function formatLocalizedPer100gUnitPrice(
+  valuePerKg: number | null | undefined,
+  options: LocalizedFormatOptions & { unknownLabel?: string } = {}
+) {
+  const localeOption = localeOptionForFormat(options.locale);
+  return formatPer100gUnitPriceLabel(valuePerKg, {
+    locale: localeOption.htmlLang,
+    currency: normalizeCurrency(options.currency ?? localeOption.currency),
+    maximumFractionDigits: options.maximumFractionDigits,
+    unknownLabel: options.unknownLabel
+  });
+}
+
+export {
+  formatSourceUnitPriceText,
+  normalizeUnitPriceDisplayUnit,
+  unknownUnitPriceLabel,
+  unitPriceDisplayUnits
+};
 
 export const localizedShellCopy = supportedLocales.map((locale) => {
   const t = groceryTranslator(locale);

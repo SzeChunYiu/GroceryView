@@ -1,4 +1,22 @@
-export type DeliveryChannel = 'push' | 'email';
+export {
+  createTransactionalEmailClient,
+  type CreateTransactionalEmailClientOptions,
+  type TransactionalEmailClient,
+  type TransactionalEmailFetch,
+  type TransactionalEmailMessage,
+  type TransactionalEmailProvider
+} from './transactionalEmail.js';
+
+export {
+  createTelegramBotProvider,
+  planTelegramPriceAlertNotifications,
+  type PlanTelegramPriceAlertNotificationsInput,
+  type TelegramBotProviderOptions,
+  type TelegramNotificationSubscription,
+  type TelegramPriceAlert
+} from './telegram.js';
+
+export type DeliveryChannel = 'push' | 'email' | 'telegram';
 
 export type DeliveryNotification = {
   channel: DeliveryChannel;
@@ -13,6 +31,7 @@ export type DeliveryNotification = {
 export type NotificationSuppressionReason = 'unsubscribed' | 'bounce' | 'complaint';
 
 export type NotificationSuppression = {
+  id?: string;
   recipient: string;
   channel?: DeliveryChannel;
   reason: NotificationSuppressionReason;

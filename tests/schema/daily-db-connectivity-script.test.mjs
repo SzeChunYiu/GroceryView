@@ -11,6 +11,10 @@ import {
   printDailyDatabaseIoHotspots,
   redactDatabaseUrl
 } from '../../scripts/ops/check-daily-db-connectivity.mjs';
+import {
+  compareDailyDatabaseIoHotspots,
+  DB_IO_HOTSPOT_DELTA_COUNTERS
+} from '../../scripts/ops/compare-db-io-hotspots.mjs';
 
 const scriptSource = readFileSync(
   new URL('../../scripts/ops/check-daily-db-connectivity.mjs', import.meta.url),
@@ -222,6 +226,105 @@ describe('daily DB connectivity diagnostic script', () => {
     assert.match(calls[1].sql, /temp_blks_written/);
     assert.deepEqual(calls[1].params, [120, 5]);
     assert.equal(calls.at(-1).type, 'end');
+  });
+
+  it('compares shared daily DB IO hotspot queryid deltas', () => {
+    const result = compareDailyDatabaseIoHotspots(
+      {
+        status: 'ready',
+        hotspots: [
+          {
+            queryid: 'shared-query',
+            sharedBlksRead: 10,
+            sharedBlksWritten: 1,
+            localBlksRead: 2,
+            localBlksWritten: 3,
+            tempBlksRead: 4,
+            tempBlksWritten: 5,
+            blkReadTimeMs: 1.5,
+            blkWriteTimeMs: 2.25,
+            querySnippet: 'select before'
+          }
+        ]
+      },
+      {
+        status: 'ready',
+        hotspots: [
+          {
+            queryid: 'shared-query',
+            sharedBlksRead: 17,
+            sharedBlksWritten: 4,
+            localBlksRead: 5,
+            localBlksWritten: 9,
+            tempBlksRead: 4,
+            tempBlksWritten: 8,
+            blkReadTimeMs: 3.75,
+            blkWriteTimeMs: 2.5,
+            querySnippet: 'select after'
+          }
+        ]
+      },
+      new Date('2026-05-23T12:00:00.000Z')
+    );
+
+    assert.equal(result.status, 'compared');
+    assert.equal(result.comparedAt, '2026-05-23T12:00:00.000Z');
+    assert.equal(result.sharedQueryCount, 1);
+    assert.deepEqual(result.counters, DB_IO_HOTSPOT_DELTA_COUNTERS);
+    assert.equal(result.rows[0].queryid, 'shared-query');
+    assert.equal(result.rows[0].querySnippet, 'select after');
+    assert.deepEqual(result.rows[0].delta, {
+      sharedBlksRead: 7,
+      sharedBlksWritten: 3,
+      localBlksRead: 3,
+      localBlksWritten: 6,
+      tempBlksRead: 0,
+      tempBlksWritten: 3,
+      blkReadTimeMs: 2.25,
+      blkWriteTimeMs: 0.25
+    });
+  });
+
+  it('reports before-only and after-only daily DB IO hotspot query ids', () => {
+    const result = compareDailyDatabaseIoHotspots(
+      {
+        status: 'ready',
+        hotspots: [
+          { queryid: 'shared', sharedBlksRead: 1 },
+          { queryid: 'before-only-b', sharedBlksRead: 2 },
+          { queryid: 'before-only-a', sharedBlksRead: 3 }
+        ]
+      },
+      {
+        status: 'ready',
+        hotspots: [
+          { queryid: 'after-only-b', sharedBlksRead: 4 },
+          { queryid: 'shared', sharedBlksRead: 5 },
+          { queryid: 'after-only-a', sharedBlksRead: 6 }
+        ]
+      },
+      new Date('2026-05-23T12:00:00.000Z')
+    );
+
+    assert.deepEqual(result.beforeOnlyQueryIds, ['before-only-a', 'before-only-b']);
+    assert.deepEqual(result.afterOnlyQueryIds, ['after-only-a', 'after-only-b']);
+    assert.equal(result.sharedQueryCount, 1);
+  });
+
+  it('compares empty daily DB IO hotspot arrays as valid zero-row evidence', () => {
+    const result = compareDailyDatabaseIoHotspots(
+      { status: 'ready', hotspots: [] },
+      { status: 'ready', hotspots: [] },
+      new Date('2026-05-23T12:00:00.000Z')
+    );
+
+    assert.equal(result.status, 'compared');
+    assert.equal(result.beforeHotspotCount, 0);
+    assert.equal(result.afterHotspotCount, 0);
+    assert.equal(result.sharedQueryCount, 0);
+    assert.deepEqual(result.beforeOnlyQueryIds, []);
+    assert.deepEqual(result.afterOnlyQueryIds, []);
+    assert.deepEqual(result.rows, []);
   });
 
   it('uses a startup-sized retry window for database 57P03 recovery before failing closed', async () => {

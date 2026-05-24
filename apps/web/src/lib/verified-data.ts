@@ -1,6 +1,7 @@
 import { buildFacetedProductSearch, type RealCatalogSearchPriceRow } from '@groceryview/api';
 import { COMMODITIES, STAPLE_BASKET, SUPPORTED_PRICE_DOMAINS, type Commodity, type ComparableUnit } from '@groceryview/catalog';
 import { buildPriceChartSeries, buildWatchlistAlerts, calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type PriceChartObservation, type ProductMatchInput, type WatchlistItem, type WatchlistPriceType, type WatchlistProductSnapshot } from '@groceryview/core';
+import { summarizeTrendingProductPriceChanges, type TrendingPriceChangePoint } from '@groceryview/db';
 import { planReceiptAliasGrowth } from '@groceryview/scanning';
 import { axfoodProducts } from './axfood-products';
 import { icaStorePromotionSourceSummary } from './ingested/ica-source-summary';
@@ -27,8 +28,10 @@ import {
   defaultLocale,
   formatLocalizedDate,
   formatLocalizedMoney,
+  formatSourceUnitPriceText,
   formatLocalizedUnitPrice,
-  supportedCurrencies
+  supportedCurrencies,
+  unknownUnitPriceLabel
 } from './i18n';
 
 const icaReklambladOffers = dbSiteIcaReklambladOffers.length > 0 ? dbSiteIcaReklambladOffers : staticIcaReklambladOffers;
@@ -127,6 +130,8 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
+const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+
 function dailyObservedPricePoints(product: (typeof pricedProducts)[number]) {
   const pricesByDate = product.observations.reduce<Record<string, number[]>>((ledger, observation) => {
     if (!observation.date || !Number.isFinite(observation.price)) return ledger;
@@ -139,6 +144,41 @@ function dailyObservedPricePoints(product: (typeof pricedProducts)[number]) {
     price: median(prices),
     storeId: 'openprices-community'
   }));
+}
+
+function priceDropBadgeLabel(changePercent: number): string {
+  return `${Math.round(changePercent)}%`;
+}
+
+function priceDropFromThirtyDayHistory(product: (typeof productUniverse)[number]) {
+  if (!isOpenPricesProduct(product)) return null;
+  const priceHistory = dailyObservedPricePoints(product)
+    .sort((left, right) => Date.parse(left.observedAt) - Date.parse(right.observedAt));
+  const latest = priceHistory[priceHistory.length - 1];
+  if (!latest) return null;
+
+  const anchorDate = new Date(Date.parse(latest.observedAt) - thirtyDaysMs);
+  let anchor: (typeof priceHistory)[number] | null = null;
+  for (let index = priceHistory.length - 1; index >= 0; index -= 1) {
+    const point = priceHistory[index];
+    if (Date.parse(point.observedAt) <= anchorDate.getTime()) {
+      anchor = point;
+      break;
+    }
+  }
+  if (!anchor || anchor.price <= 0) return null;
+
+  const currentPrice = latest.price;
+  const price30dAgo = anchor.price;
+  const changePercent = ((currentPrice - price30dAgo) / price30dAgo) * 100;
+  if (changePercent >= -5) return null;
+
+  return {
+    percent: changePercent,
+    badge: priceDropBadgeLabel(changePercent),
+    anchorDate: anchor.observedAt.slice(0, 10),
+    label: `${priceDropBadgeLabel(changePercent)} 30-day price drop from price_history`
+  };
 }
 
 const compareOverlayProducts = [...pricedProducts]
@@ -223,13 +263,177 @@ export const topChainSpreads = [...matchedChainProducts].sort((a, b) => b.spread
 export const freshestOpenPrices = [...pricedProducts].sort((a, b) => b.lastObservedAt.localeCompare(a.lastObservedAt)).slice(0, 18);
 export const productUniverse = [...topChainSpreads, ...freshestOpenPrices].slice(0, 36);
 
+export const MAX_ITEM_COMPARISON_ITEMS = 4;
+
+type ItemComparisonProduct = (typeof axfoodProducts)[number] | (typeof pricedProducts)[number];
+
+function itemComparisonRequestValues(value: SearchParamValue | undefined) {
+  return listSearchValues(value)
+    .flatMap((item) => item.split(','))
+    .map((item) => item.trim())
+    .filter((item) => item.length > 0);
+}
+
+function findItemComparisonProduct(id: string): ItemComparisonProduct | undefined {
+  return axfoodProducts.find((product) => product.slug === id || product.code === id)
+    ?? pricedProducts.find((product) => product.slug === id || product.code === id);
+}
+
+function storePricesForItemComparison(product: ItemComparisonProduct) {
+  if (isOpenPricesProduct(product)) {
+    return [
+      { storeName: 'OpenPrices observed low', price: product.priceMin, priceLabel: formatSek(product.priceMin), unitLabel: 'SEK observed price' },
+      { storeName: 'OpenPrices observed median', price: product.priceMedian, priceLabel: formatSek(product.priceMedian), unitLabel: 'SEK observed price' },
+      { storeName: 'OpenPrices observed high', price: product.priceMax, priceLabel: formatSek(product.priceMax), unitLabel: 'SEK observed price' }
+    ];
+  }
+
+  return chainPriceRows(product).map((row) => ({
+    storeName: String(row.chain),
+    price: row.price,
+    priceLabel: row.priceText,
+    unitLabel: row.priceUnit
+  }));
+}
+
+function trendPointsForItemComparison(product: ItemComparisonProduct) {
+  if (isOpenPricesProduct(product)) {
+    return dailyObservedPricePoints(product)
+      .sort((left, right) => Date.parse(left.observedAt) - Date.parse(right.observedAt))
+      .slice(-6)
+      .map((point) => ({
+        label: point.observedAt.slice(0, 10),
+        price: point.price,
+        priceLabel: formatSek(point.price)
+      }));
+  }
+
+  return chainPriceRows(product).map((row) => ({
+    label: String(row.chain),
+    price: row.price,
+    priceLabel: row.priceText
+  }));
+}
+
+function nutritionForItemComparison(product: ItemComparisonProduct) {
+  if (isOpenPricesProduct(product)) {
+    return {
+      nutriScore: product.nutriscore?.toUpperCase() || 'Not reported',
+      category: labelFromSlug(product.category),
+      quantity: product.quantity || 'Quantity not reported',
+      labels: product.categories.slice(0, 4).map(labelFromSlug)
+    };
+  }
+
+  return {
+    nutriScore: product.labels.includes('keyhole') ? 'Keyhole labelled' : 'Not reported',
+    category: labelFromSlug(product.category),
+    quantity: product.subline || 'Quantity not reported',
+    labels: product.labels.slice(0, 4).map(labelFromSlug)
+  };
+}
+
+export function buildItemComparisonView(searchParams: { items?: SearchParamValue } = {}) {
+  const requestedItemIds = [...new Set(itemComparisonRequestValues(searchParams.items))];
+  const defaultItemIds = [
+    ...freshestOpenPrices.slice(0, 2).map((product) => product.slug),
+    ...topChainSpreads.slice(0, 2).map((product) => product.slug)
+  ];
+  const itemIds = (requestedItemIds.length > 0 ? requestedItemIds : defaultItemIds).slice(0, MAX_ITEM_COMPARISON_ITEMS);
+  const requestedOverflow = (requestedItemIds.length > 0 ? requestedItemIds : defaultItemIds).slice(MAX_ITEM_COMPARISON_ITEMS);
+  const matchedProducts = itemIds
+    .map((id) => ({ id, product: findItemComparisonProduct(id) }))
+    .filter((row): row is { id: string; product: ItemComparisonProduct } => row.product !== undefined);
+  const matchedIds = new Set(matchedProducts.map((row) => row.id));
+
+  return {
+    maxItems: MAX_ITEM_COMPARISON_ITEMS,
+    requestedItemIds,
+    missingItemIds: itemIds.filter((id) => !matchedIds.has(id)),
+    truncatedItemIds: requestedOverflow,
+    sourceLabel: 'Axfood chain snapshots + OpenPrices/OpenFoodFacts observed product rows',
+    items: matchedProducts.map(({ product }) => {
+      const storePrices = storePricesForItemComparison(product);
+      const trendPoints = trendPointsForItemComparison(product);
+      const nutrition = nutritionForItemComparison(product);
+      const cheapestPrice = storePrices
+        .filter((row) => Number.isFinite(row.price))
+        .sort((left, right) => left.price - right.price)[0];
+
+      return {
+        slug: product.slug,
+        name: product.name,
+        brand: isOpenPricesProduct(product) ? product.brands || 'Brand not reported' : product.brand || 'Brand not reported',
+        imageUrl: product.image,
+        nutrition,
+        storePrices,
+        trendPoints,
+        cheapestPriceLabel: cheapestPrice?.priceLabel ?? 'No price row',
+        cheapestStoreLabel: cheapestPrice?.storeName ?? 'No store row',
+        trendSummary: trendPoints.length > 1 ? `${trendPoints.length} observed trend points` : 'Current price evidence only'
+      };
+    })
+  };
+}
+
+const openPricesTrendingAsOfDate = pricedProducts.reduce((latest, product) => (
+  product.lastObservedAt > latest ? product.lastObservedAt : latest
+), '1970-01-01');
+const openPricesTrendingPoints: TrendingPriceChangePoint[] = pricedProducts.flatMap((product) => (
+  product.observations.map((observation) => ({
+    productId: product.code,
+    productSlug: product.slug,
+    productName: product.name,
+    ...(product.brands ? { brand: product.brands } : {}),
+    categoryLabel: labelFromSlug(product.category),
+    price: observation.price,
+    currency: observedSnapshotCurrency,
+    observedAt: `${observation.date}T00:00:00.000Z`,
+    chainSlug: 'openprices',
+    chainName: 'OpenPrices'
+  }))
+));
+
+export const homepageTrendingPriceChanges = summarizeTrendingProductPriceChanges({
+  points: openPricesTrendingPoints,
+  asOf: `${openPricesTrendingAsOfDate}T23:59:59.999Z`,
+  windowDays: 7,
+  limit: 10
+});
+
 const chainDisplayNames: Record<string, string> = {
   willys: 'Willys',
   hemkop: 'Hemköp'
 };
 
+export const commonDietaryFilterOptions = [
+  {
+    value: 'glutenfree',
+    label: 'Gluten-free',
+    evidenceLabels: ['glutenfree', 'crossed_ax'],
+    evidenceKeywords: ['glutenfri', 'glutenfritt', 'glutenfria', 'gluten-free']
+  },
+  {
+    value: 'laktosfree',
+    label: 'Lactose-free',
+    evidenceLabels: ['laktosfree'],
+    evidenceKeywords: ['laktosfri', 'laktosfritt', 'låg laktos', 'lactose-free']
+  },
+  {
+    value: 'vegan',
+    label: 'Vegan',
+    evidenceLabels: ['vegan', 'vegetarian'],
+    evidenceKeywords: ['vegan', 'vegansk', 'veganska']
+  }
+] as const;
+
+type CommonDietaryFilterValue = typeof commonDietaryFilterOptions[number]['value'];
+
 function readableLabel(label: string) {
+  const dietaryOption = commonDietaryFilterOptions.find((option) => option.value === label);
+  if (dietaryOption) return dietaryOption.label;
   const known: Record<string, string> = {
+    crossed_ax: 'Gluten-free',
     ecological: 'Ekologisk',
     eu_ecological: 'EU-ekologisk',
     fairtrade: 'Fairtrade',
@@ -249,6 +453,21 @@ function sortedCountFacets(counts: Map<string, number>) {
     .sort((left, right) => right.count - left.count || left.label.localeCompare(right.label, 'sv'));
 }
 
+function dietaryLabelsForProduct(product: (typeof axfoodProducts)[number]): CommonDietaryFilterValue[] {
+  const labels = new Set(product.labels.map((label) => label.toLocaleLowerCase('sv-SE')));
+  const evidenceText = `${product.name} ${product.brand} ${product.subline} ${product.category}`.toLocaleLowerCase('sv-SE');
+  return commonDietaryFilterOptions
+    .filter((option) => (
+      option.evidenceLabels.some((label) => labels.has(label))
+      || option.evidenceKeywords.some((keyword) => evidenceText.includes(keyword))
+    ))
+    .map((option) => option.value);
+}
+
+function productLabelsWithDietaryEvidence(product: (typeof axfoodProducts)[number]): string[] {
+  return [...new Set([...product.labels, ...dietaryLabelsForProduct(product)])].sort((left, right) => left.localeCompare(right, 'sv'));
+}
+
 export const facetedSearchRows: RealCatalogSearchPriceRow[] = axfoodProducts.flatMap((product) => {
   const packageAmount = unitAmountFromPackage(product.subline);
   return chainPriceRows(product).flatMap((priceRow) => {
@@ -262,6 +481,7 @@ export const facetedSearchRows: RealCatalogSearchPriceRow[] = axfoodProducts.fla
       canonicalName: product.name,
       brand: product.brand,
       categoryPath: [labelFromSlug(product.category)],
+      labels: productLabelsWithDietaryEvidence(product),
       ...(packageAmount ? { packageSize: packageAmount.amount, packageUnit: packageAmount.unit } : {}),
       comparableUnit,
       ...(product.image ? { imageUrl: product.image } : {}),
@@ -272,6 +492,7 @@ export const facetedSearchRows: RealCatalogSearchPriceRow[] = axfoodProducts.fla
       priceType: priceRow.savings ? 'promotion' : 'online',
       confidence: 0.95,
       observedAt: '2026-05-21T00:00:00.000Z',
+      isAvailable: priceRow.isAvailable !== false,
       chainId: priceRow.chain,
       chainSlug: priceRow.chain,
       chainName: chainDisplayNames[priceRow.chain] ?? priceRow.chain,
@@ -282,27 +503,58 @@ export const facetedSearchRows: RealCatalogSearchPriceRow[] = axfoodProducts.fla
   });
 });
 
-const rawFacetedProductSearch = buildFacetedProductSearch({ rows: facetedSearchRows, filters: { limit: 8 } });
-const facetedProductIds = new Set(rawFacetedProductSearch.products.map((product) => product.productId));
-const labelCounts = axfoodProducts.reduce<Map<string, number>>((counts, product) => {
-  if (!facetedProductIds.has(product.code)) return counts;
-  for (const label of product.labels) counts.set(label, (counts.get(label) ?? 0) + 1);
-  return counts;
-}, new Map());
+const rawFacetedProductSearch = buildFacetedProductSearch({ rows: facetedSearchRows });
 
-export const facetedProductSearch = {
-  ...rawFacetedProductSearch,
-  title: 'Instant faceted search',
-  categoryFacets: rawFacetedProductSearch.facets.categories.slice(0, 6),
-  chainFacets: rawFacetedProductSearch.facets.chains,
-  labelFacets: sortedCountFacets(labelCounts).slice(0, 8),
-  priceRange: rawFacetedProductSearch.facets.priceRange,
-  inStockOnly: {
-    label: 'In-stock / priced rows only',
-    productCount: rawFacetedProductSearch.evidence.pricedProductCount,
-    latestPriceCount: rawFacetedProductSearch.evidence.latestPriceCount
-  },
-  resultCards: rawFacetedProductSearch.products.slice(0, 6).map((product) => {
+type SearchParamValue = string | string[] | undefined;
+
+export type ProductSearchUrlParams = {
+  q?: SearchParamValue;
+  category?: SearchParamValue;
+  label?: SearchParamValue;
+  dietary?: SearchParamValue;
+  chain?: SearchParamValue;
+  minPrice?: SearchParamValue;
+  maxPrice?: SearchParamValue;
+  inStockOnly?: SearchParamValue;
+  minConfidence?: SearchParamValue;
+};
+
+function firstSearchValue(value: SearchParamValue): string {
+  const raw = Array.isArray(value) ? value[0] : value;
+  return raw?.trim() ?? '';
+}
+
+function listSearchValues(value: SearchParamValue): string[] {
+  const rawValues = Array.isArray(value) ? value : value ? [value] : [];
+  return [...new Set(rawValues.flatMap((item) => item.split(',')).map((item) => item.trim()).filter(Boolean))];
+}
+
+function dietarySearchValues(value: SearchParamValue): CommonDietaryFilterValue[] {
+  const requested = new Set(listSearchValues(value).map((item) => item.toLocaleLowerCase('sv-SE')));
+  return commonDietaryFilterOptions
+    .filter((option) => requested.has(option.value))
+    .map((option) => option.value);
+}
+
+function numericSearchValue(value: SearchParamValue): number | undefined {
+  const raw = firstSearchValue(value);
+  if (!raw) return undefined;
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : undefined;
+}
+
+function confidenceSearchValue(value: SearchParamValue): number | undefined {
+  const parsed = numericSearchValue(value);
+  if (parsed === undefined) return undefined;
+  return parsed > 1 ? Math.min(parsed / 100, 1) : Math.min(parsed, 1);
+}
+
+function booleanSearchValue(value: SearchParamValue): boolean {
+  return ['1', 'true', 'yes', 'on'].includes(firstSearchValue(value).toLocaleLowerCase('sv-SE'));
+}
+
+function productSearchResultCards(searchResult: typeof rawFacetedProductSearch) {
+  return searchResult.products.map((product) => {
     const cheapest = product.currentPrices[0] ?? null;
     return {
       slug: product.slug,
@@ -310,17 +562,79 @@ export const facetedProductSearch = {
       brand: product.brand ?? 'Brand not reported',
       imageUrl: product.imageUrl,
       categoryLabel: product.categoryPath[0] ?? 'Category not reported',
+      labels: product.labels.map(readableLabel),
       cheapestPriceLabel: formatSek(product.cheapestPrice),
       unitPriceLabel: cheapest ? formatLocalizedUnitPrice(cheapest.unitPrice, {
         locale: defaultLocale,
         currency: cheapest.currency,
         unit: product.comparableUnit
-      }) : 'No current price row',
+      }) : unknownUnitPriceLabel,
+      isAvailable: product.isAvailable,
       chainLabel: cheapest ? `${cheapest.chainName} · ${cheapest.priceType}` : 'Awaiting latest_prices row',
-      sourceTables: rawFacetedProductSearch.evidence.sourceTables
+      sourceTables: searchResult.evidence.sourceTables
     };
-  })
-};
+  });
+}
+
+export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}) {
+  const query = firstSearchValue(searchParams.q);
+  const categories = listSearchValues(searchParams.category);
+  const labelFilters = listSearchValues(searchParams.label);
+  const dietaryLabels = dietarySearchValues(searchParams.dietary);
+  const labels = [...new Set([...labelFilters, ...dietaryLabels])];
+  const chains = listSearchValues(searchParams.chain);
+  const minPrice = numericSearchValue(searchParams.minPrice);
+  const maxPrice = numericSearchValue(searchParams.maxPrice);
+  const inStockOnly = booleanSearchValue(searchParams.inStockOnly);
+  const minConfidence = confidenceSearchValue(searchParams.minConfidence);
+  const filters = { query, categories, labels, chains, minPrice, maxPrice, inStockOnly, minConfidence, limit: 100 };
+  const searchResult = buildFacetedProductSearch({ rows: facetedSearchRows, filters });
+
+  const activeFilters = [
+    query ? `q=${query}` : null,
+    ...categories.map((category) => `category=${category}`),
+    ...labelFilters.map((label) => `label=${readableLabel(label)}`),
+    ...dietaryLabels.map((dietaryLabel) => {
+      const dietaryFilterLabel = commonDietaryFilterOptions.find((option) => option.value === dietaryLabel)?.label ?? readableLabel(dietaryLabel);
+      return `dietary=${dietaryFilterLabel}`;
+    }),
+    ...chains.map((chain) => `chain=${chainDisplayNames[chain] ?? chain}`),
+    minPrice !== undefined ? `min unit ${formatSek(minPrice)}` : null,
+    maxPrice !== undefined ? `max unit ${formatSek(maxPrice)}` : null,
+    inStockOnly ? 'priced/in-stock only' : null,
+    minConfidence !== undefined ? `confidence ≥ ${pct.format(minConfidence * 100)}%` : null
+  ].filter((item): item is string => item !== null);
+
+  return {
+    ...searchResult,
+    title: 'Instant faceted search',
+    categoryFacets: searchResult.facets.categories.slice(0, 6),
+    chainFacets: searchResult.facets.chains,
+    labelFacets: searchResult.facets.labels.map((facet) => ({ ...facet, label: readableLabel(facet.value) })).slice(0, 8),
+    labelFilters,
+    dietaryFilters: commonDietaryFilterOptions.map((option) => {
+      const facet = searchResult.facets.labels.find((candidate) => candidate.value === option.value);
+      return {
+        ...option,
+        checked: dietaryLabels.includes(option.value),
+        count: facet?.count ?? 0,
+        evidenceSummary: option.evidenceLabels.join(' + ')
+      };
+    }),
+    priceRange: searchResult.facets.priceRange,
+    inStockOnly: {
+      label: 'In-stock / priced rows only',
+      productCount: searchResult.evidence.pricedProductCount,
+      latestPriceCount: searchResult.evidence.latestPriceCount,
+      availableLatestPriceCount: searchResult.evidence.availableLatestPriceCount,
+      outOfStockLatestPriceCount: searchResult.evidence.outOfStockLatestPriceCount
+    },
+    activeFilters,
+    resultCards: productSearchResultCards(searchResult)
+  };
+}
+
+export const facetedProductSearch = buildProductSearchView();
 
 type PricedChainRow = ReturnType<typeof chainPriceRows>[number] & { price: number };
 
@@ -394,7 +708,7 @@ export const watchlistHeartProducts = watchlistHeartSourceRows.map(({ product, c
       locale: defaultLocale,
       currency: observedSnapshotCurrency,
       unit: normalizedUnit.unitLabel.replace('kr/', '')
-    }) : 'Unit price not reported',
+    }) : unknownUnitPriceLabel,
     targetPrice: item.targetPrice ?? cheapest.price,
     targetPriceLabel: formatSek(item.targetPrice ?? cheapest.price),
     dealScore,
@@ -903,7 +1217,10 @@ export const deliveryVsInStoreComparison = {
     onlinePackageText: row.onlineProduct.packageText,
     onlinePrice: row.onlineProduct.price,
     onlinePriceText: row.onlineProduct.priceText,
-    onlineUnitPriceText: row.onlineProduct.unitPriceText,
+    onlineUnitPriceText: formatSourceUnitPriceText(row.onlineProduct.unitPriceText, row.onlineProduct.unitPriceUnit, {
+      locale: 'sv-SE',
+      currency: observedSnapshotCurrency
+    }),
     onlineSourceUrl: row.onlineProduct.sourceUrl,
     inStoreName: row.inStoreProduct.name,
     inStoreBrand: row.inStoreProduct.brand,
@@ -1589,18 +1906,64 @@ export type AdaptiveProductCard = {
   unitSortPrice: number | null;
   defaultCompareMode: 'total' | 'unit';
   cheapestUnitBadge: string | null;
+  priceDropPercent: number | null;
+  priceDropBadge: string | null;
+  priceDropLabel: string | null;
+  priceDropAnchorDate: string | null;
+  sparklineWindowDays: 7;
+  sparklinePoints: Array<{
+    date: string;
+    price: number;
+    priceLabel: string;
+  }>;
+  sparklineLabel: string;
+  isAvailable: boolean;
 };
+
+function isOpenPricesProduct(product: ItemComparisonProduct): product is (typeof pricedProducts)[number] {
+  return 'observations' in product;
+}
+
+function sevenDaySparklinePoints(product: (typeof productUniverse)[number]): AdaptiveProductCard['sparklinePoints'] {
+  if (!isOpenPricesProduct(product)) return [];
+
+  const latestObservedAt = product.lastObservedAt.includes('T')
+    ? product.lastObservedAt
+    : `${product.lastObservedAt}T00:00:00.000Z`;
+  const priceChartSeries = buildPriceChartSeries({
+    observations: compareOverlayObservationsFor(product),
+    asOf: latestObservedAt,
+    rangeDays: 7,
+    markerLimitPerSeries: 0
+  });
+  const series = priceChartSeries.series[0];
+  if (!series) return [];
+
+  return series.points
+    .slice(-7)
+    .map((point) => ({
+      date: point.time.slice(0, 10),
+      price: point.value,
+      priceLabel: formatSek(point.value)
+    }));
+}
+
 export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((product) => {
   const isChainProduct = 'lowestPrice' in product;
   const totalPrice = isChainProduct ? product.lowestPrice : product.priceMedian;
   const packageText = isChainProduct ? product.subline : product.quantity;
   const normalizedUnit = normalizeComparableUnitPrice(totalPrice, packageText);
   const productKind = adaptiveProductKind(product.category);
+  const isAvailable = isChainProduct
+    ? Object.values(product.chains).some((row) => typeof row.price === 'number' && row.price > 0 && row.isAvailable !== false)
+    : true;
   const peerUnitPrices = isChainProduct && normalizedUnit
     ? Object.values(product.chains)
       .map((row) => row.price === null ? null : normalizeComparableUnitPrice(row.price, packageText)?.unitPrice ?? null)
       .filter((value): value is number => typeof value === 'number' && Number.isFinite(value))
     : [];
+  const sparklinePoints = sevenDaySparklinePoints(product);
+  const priceDrop = priceDropFromThirtyDayHistory(product);
 
   return {
     slug: product.slug,
@@ -1614,17 +1977,38 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
       locale: defaultLocale,
       currency: observedSnapshotCurrency,
       unit: normalizedUnit.unitLabel.replace('kr/', '')
-    }) : 'Unit price not reported',
+    }) : unknownUnitPriceLabel,
     packageLabel: normalizedUnit?.packageLabel || packageText || 'Package size not reported',
     sourceLabel: isChainProduct ? `${product.lowestChain} lowest · ${formatPct(product.spreadPct)} spread` : `OpenPrices · ${product.observationCount.toLocaleString('sv-SE')} observations`,
     confidenceLabel: normalizedUnit ? `Derived from observed price + package size (${normalizedUnit.unitLabel})` : 'No synthetic unit prices: package quantity missing',
     totalSortPrice: totalPrice,
     unitSortPrice: normalizedUnit?.unitSortPrice ?? null,
     defaultCompareMode: productKind === 'commodity' ? 'unit' : 'total',
-    cheapestUnitBadge: normalizedUnit ? cheapestUnitBadge(normalizedUnit.unitPrice, peerUnitPrices, normalizedUnit.unitLabel) : null
+    cheapestUnitBadge: normalizedUnit ? cheapestUnitBadge(normalizedUnit.unitPrice, peerUnitPrices, normalizedUnit.unitLabel) : null,
+    priceDropPercent: priceDrop?.percent ?? null,
+    priceDropBadge: priceDrop?.badge ?? null,
+    priceDropLabel: priceDrop?.label ?? null,
+    priceDropAnchorDate: priceDrop?.anchorDate ?? null,
+    sparklineWindowDays: 7,
+    sparklinePoints,
+    sparklineLabel: sparklinePoints.length >= 2
+      ? `${sparklinePoints.length} observed daily points from price_daily/OpenPrices history`
+      : '7-day sparkline waits for at least two observed price-history points',
+    isAvailable
   };
 });
 export const homepageAdaptiveProductCards = adaptiveProductCards.slice(0, 6);
+export const productBrandFilterOptions = [...new Set(
+  adaptiveProductCards
+    .map((card) => card.brand.trim())
+    .filter((brand) => brand.length > 0 && brand !== 'Brand not reported')
+)]
+  .sort((left, right) => left.localeCompare(right, 'sv'))
+  .map((brand) => ({
+    value: brand,
+    label: brand,
+    productCount: adaptiveProductCards.filter((card) => card.brand === brand).length
+  }));
 
 const localeFormattingSampleCard = adaptiveProductCards.find((card) => card.unitSortPrice !== null) ?? adaptiveProductCards[0];
 const localeFormattingSampleDate = freshestOpenPrices[0]?.lastObservedAt ?? null;
@@ -1638,7 +2022,7 @@ export const localeFormattingShowcase = supportedCurrencies.map((currency) => {
       ? formatLocalizedMoney(localeFormattingSampleCard?.totalSortPrice, { locale: defaultLocale, currency })
       : 'No observed prices in this currency',
     unitPriceLabel: hasObservedRows
-      ? localeFormattingSampleCard?.unitPriceLabel ?? 'Unit price not reported'
+      ? localeFormattingSampleCard?.unitPriceLabel ?? unknownUnitPriceLabel
       : 'No unit price until observation lands',
     dateLabel: hasObservedRows
       ? formatLocalizedDate(localeFormattingSampleDate, { locale: defaultLocale })
@@ -1660,7 +2044,10 @@ const digitalCatalogueSampleOffers = icaReklambladOffers
     productName: [offer.brand, offer.name].filter(Boolean).join(' · '),
     category: offer.category || 'Category not reported',
     priceText: offer.priceText,
-    comparisonPrice: offer.comparisonPrice || 'Jämförpris not reported',
+    comparisonPrice: formatSourceUnitPriceText(offer.comparisonPrice, offer.comparisonPrice, {
+      locale: 'sv-SE',
+      currency: observedSnapshotCurrency
+    }),
     regularPriceText: offer.regularPriceText || 'Regular price not reported',
     validTo: offer.validTo,
     storeName: offer.storeName,
@@ -1834,7 +2221,10 @@ export const offerExpiryReminderBoard = {
       store: offer.store,
       category: offer.category,
       priceText: offer.priceText,
-      comparePriceText: offer.comparePriceText,
+      comparePriceText: formatSourceUnitPriceText(offer.comparePriceText, offer.comparePriceText, {
+        locale: 'sv-SE',
+        currency: observedSnapshotCurrency
+      }),
       validFrom: offer.validFrom,
       validTo: offer.validTo,
       sourceUrl: offer.sourceUrl,
@@ -2044,6 +2434,63 @@ export const storePricePercentileRanks = lidlStoreOfferSummaries
 
 export function storePricePercentileRankForStore(slug: string) {
   return storePricePercentileRanks.find((rank) => rank.osmSlug === slug) ?? null;
+}
+
+export function storeOpeningHoursLabel(store: (typeof storeUniverse)[number]) {
+  return 'openingHours' in store && typeof store.openingHours === 'string' && store.openingHours.trim().length > 0
+    ? store.openingHours
+    : 'Not reported by OSM';
+}
+
+export function storeAssortmentOverviewForStore(store: (typeof storeUniverse)[number]) {
+  const matchedLidlSummary = lidlStoreOfferSummaries.find((summary) => summary.matchedStore?.slug === store.slug);
+  const rows = matchedLidlSummary?.offers ?? [];
+  const items = rows
+    .map((offer) => ({
+      id: `${offer.storeId}:${offer.code}:${offer.validFrom}`,
+      name: offer.name,
+      category: offer.category || 'lidl-public-offers',
+      priceLabel: formatSek(offer.price),
+      unitPriceLabel: formatSourceUnitPriceText(offer.unitPriceText, offer.unitPriceText, {
+        locale: 'sv-SE',
+        currency: observedSnapshotCurrency
+      }),
+      packageLabel: offer.packageText || 'Package not reported',
+      validWindow: `${formatLocalizedDate(offer.validFrom, { locale: defaultLocale })} – ${formatLocalizedDate(offer.validTo, { locale: defaultLocale })}`,
+      sourceLabel: 'Lidl public branch offer row',
+      productUrl: offer.productUrl
+    }))
+    .sort((left, right) => left.category.localeCompare(right.category, 'sv') || left.name.localeCompare(right.name, 'sv'));
+
+  const categories = Object.values(
+    items.reduce<Record<string, { category: string; itemCount: number; items: typeof items }>>((ledger, item) => {
+      const row = ledger[item.category] ?? { category: item.category, itemCount: 0, items: [] as typeof items };
+      row.itemCount += 1;
+      row.items.push(item);
+      ledger[item.category] = row;
+      return ledger;
+    }, {})
+  ).sort((left, right) => left.category.localeCompare(right.category, 'sv'));
+
+  return {
+    statusLabel: items.length > 0
+      ? `${items.length.toLocaleString('sv-SE')} branch-specific assortment rows matched`
+      : 'No branch-specific assortment rows matched',
+    sourceLabel: items.length > 0
+      ? `${lidlSource.source} · ${matchedLidlSummary?.externalStoreId}`
+      : `${snapshot.osmSource}; no verified branch assortment feed matched this OSM store`,
+    openingHoursLabel: storeOpeningHoursLabel(store),
+    itemCount: items.length,
+    categoryCount: categories.length,
+    sortedBy: 'category_then_name' as const,
+    items,
+    categories,
+    guardrails: [
+      'Assortment overview only lists branch-specific assortment rows when a public store-offer feed is matched to this OSM store.',
+      'No branch-specific assortment rows are inferred from brand, address, nearby stores, or chain-wide catalogue data.',
+      'Opening hours stay as “Not reported by OSM” unless the store source provides them.'
+    ]
+  };
 }
 
 export const featuredStores = [...osmStores]
@@ -3708,19 +4155,21 @@ export const privateFeatureCopy: Record<PrivateFeatureRoute, { verifiedSurface: 
 
 export const browserExtensionOverlayContract = {
   title: 'Retailer browser overlay',
+  manifestPath: '/extension/manifest.json',
   assetPath: '/extension/retailer-overlay.js',
   apiEndpoint: '/api/products/{productId}/cheapest-now',
   productIdAttribute: 'data-groceryview-product-id',
+  detectionSignals: ['data-groceryview-product-id', 'JSON-LD gtin/ean', 'retailer sku', 'commodity alias'],
   supportedRetailers: [
     { chain: 'ICA', hostPattern: 'handlaprivatkund.ica.se', status: 'mapping-ready' },
     { chain: 'Coop', hostPattern: 'coop.se', status: 'mapping-ready' },
     { chain: 'Willys', hostPattern: 'willys.se', status: 'mapping-ready' }
   ],
-  confidenceRule: 'High when the cheapest-now API returns at least two observed chains for the exact product id; limited when chains are missing.',
+  confidenceRule: 'High for exact GroceryView/EAN matches when the cheapest-now API returns at least two observed chains; limited for commodity aliases or missing chains.',
   guardrails: [
     'No anonymous visitor identity, basket, or retailer account data is stored by the overlay.',
-    'Retailer pages must provide a mapped data-groceryview-product-id before any cheaper alternative is shown.',
-    'Missing product mappings stay silent instead of estimating alternatives from names alone.'
+    'Retailer pages must provide a mapped GroceryView id, EAN/GTIN, SKU, or safe commodity alias before any cheaper alternative is shown.',
+    'Missing product mappings stay silent instead of estimating prices from names alone.'
   ]
 };
 
@@ -3733,7 +4182,7 @@ export function findStore(slug: string) {
 }
 
 export function chainPriceRows(product: (typeof axfoodProducts)[number]) {
-  return Object.entries(product.chains)
-    .map(([chain, price]) => ({ chain, ...price }))
-    .filter((row) => typeof row.price === 'number');
+  const rows = Object.entries(product.chains).map(([chain, price]) => ({ chain, ...price }));
+
+  return rows.filter((row): row is (typeof rows)[number] & { price: number } => typeof row.price === 'number' && Number.isFinite(row.price));
 }

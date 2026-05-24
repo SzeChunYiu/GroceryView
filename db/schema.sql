@@ -35,6 +35,8 @@ create table if not exists products (
   id text primary key,
   barcode text,
   canonical_name text not null,
+  name_sv text,
+  name_en text,
   domain text not null default 'grocery' check (domain in ('grocery', 'fuel', 'pharmacy')),
   fuel_grade_id text,
   brand text,
@@ -158,6 +160,20 @@ create table if not exists watchlist_items (
   favorite_stores_only boolean not null default true,
   stock_up_allowed boolean not null default false,
   created_at timestamptz not null default now()
+);
+
+create table if not exists webhook_subscriptions (
+  id uuid primary key default gen_random_uuid(),
+  user_id text references app_users(id) on delete cascade,
+  product_id text references products(id),
+  chain text,
+  callback_url text not null,
+  secret text,
+  active boolean not null default true,
+  last_delivery_at timestamptz,
+  failure_count integer not null default 0,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
 );
 
 create table if not exists weekly_baskets (
@@ -297,7 +313,7 @@ create table if not exists fuel_price_source_observations (
 
 create table if not exists notification_tasks (
   id text primary key,
-  channel text not null check (channel in ('push', 'email')),
+  channel text not null check (channel in ('push', 'email', 'telegram')),
   type text not null,
   title text not null,
   body text not null,
@@ -314,10 +330,23 @@ create table if not exists notification_tasks (
 create table if not exists notification_suppressions (
   id text primary key,
   recipient text not null,
-  channel text check (channel in ('push', 'email')),
+  channel text check (channel in ('push', 'email', 'telegram')),
   reason text not null check (reason in ('unsubscribed', 'bounce', 'complaint')),
   active boolean not null default true,
   updated_at timestamptz not null
+);
+
+create table if not exists notification_subscriptions (
+  id text primary key,
+  user_id text not null,
+  channel text not null check (channel in ('push', 'email', 'telegram')),
+  recipient text not null,
+  chat_id text,
+  product_id text,
+  active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  check (channel <> 'telegram' or chat_id is not null)
 );
 
 create table if not exists human_reviewers (
@@ -365,6 +394,7 @@ create table if not exists grocery_index_components (
 create index if not exists price_observations_product_time_idx on price_observations(product_id, observed_at desc);
 create index if not exists price_observations_store_time_idx on price_observations(store_id, observed_at desc);
 create index if not exists price_observations_domain_time_idx on price_observations(domain, observed_at desc);
+create unique index if not exists price_observations_product_store_date_uidx on price_observations(product_id, chain_id, store_id, observed_at, source_type) nulls not distinct;
 create index if not exists promotion_observations_product_dates_idx on promotion_observations(product_id, promo_start, promo_end);
 create index if not exists products_category_idx on products(category_id);
 create index if not exists products_fuel_grade_idx on products(fuel_grade_id) where domain = 'fuel';
@@ -375,6 +405,8 @@ create index if not exists fuel_price_sources_kind_captured_idx on fuel_price_so
 create index if not exists fuel_price_source_observations_grade_idx on fuel_price_source_observations(fuel_grade_id, created_at desc);
 create index if not exists notification_tasks_status_send_idx on notification_tasks(status, send_at);
 create index if not exists notification_suppressions_active_recipient_idx on notification_suppressions(active, recipient);
+create index if not exists notification_subscriptions_active_product_idx on notification_subscriptions (active, product_id, channel);
+create index if not exists notification_subscriptions_user_idx on notification_subscriptions (user_id, channel, id);
 create index if not exists human_reviewers_role_active_idx on human_reviewers(role, active);
 create index if not exists human_review_assignments_status_due_idx on human_review_assignments(status, due_at);
 create index if not exists human_review_assignments_assignee_status_idx on human_review_assignments(assignee_id, status);

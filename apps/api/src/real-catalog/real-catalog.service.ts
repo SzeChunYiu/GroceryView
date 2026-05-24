@@ -8,6 +8,7 @@ import {
   type RealCatalogSearchPriceRow
 } from '@groceryview/api';
 import { PostgresQueryExecutorService } from '../database/postgres-query-executor.service.js';
+import { localizedProductNameSql, type ProductNameLocale } from '../product-name-locale.js';
 
 type CatalogPriceSqlRow = {
   product_id: string;
@@ -26,6 +27,7 @@ type CatalogPriceSqlRow = {
   price_type: RealCatalogPriceType | null;
   confidence: string | number | null;
   observed_at: string | Date | null;
+  is_available: boolean | null;
   chain_id: string | null;
   chain_slug: string | null;
   chain_name: string | null;
@@ -93,6 +95,7 @@ function mapCatalogRow(row: CatalogPriceSqlRow): RealCatalogSearchPriceRow {
     ...(row.price_type ? { priceType: row.price_type } : {}),
     ...(row.confidence === null ? {} : { confidence: Number(row.confidence) }),
     ...(iso(row.observed_at) ? { observedAt: iso(row.observed_at) } : {}),
+    ...(row.is_available === null ? {} : { isAvailable: row.is_available !== false }),
     ...(row.chain_id ? { chainId: row.chain_id } : {}),
     ...(row.chain_slug ? { chainSlug: row.chain_slug } : {}),
     ...(row.chain_name ? { chainName: row.chain_name } : {}),
@@ -116,6 +119,7 @@ export class RealCatalogService {
     minPrice?: string;
     maxPrice?: string;
     limit?: string;
+    productNameLocale?: ProductNameLocale;
   }) {
     const filters: FacetedProductSearchFilters = {
       query: query.q?.trim() ?? '',
@@ -146,7 +150,8 @@ export class RealCatalogService {
       priceTypeFilters.length > 0 ? priceTypeFilters : null,
       filters.minPrice ?? null,
       filters.maxPrice ?? null,
-      filters.limit
+      filters.limit,
+      query.productNameLocale ?? null
     ]);
     return buildFacetedProductSearch({ rows: rows.map(mapCatalogRow), filters });
   }
@@ -156,6 +161,7 @@ export class RealCatalogService {
     items: RealBasketCompareItem[];
     storeSlugs?: string[];
     basketSource?: 'request_body' | 'weekly_baskets';
+    productNameLocale?: ProductNameLocale;
   }) {
     if (input.items.length === 0) throw new BadRequestException('items must include at least one product.');
     for (const item of input.items) {
@@ -169,7 +175,8 @@ export class RealCatalogService {
     const storeSlugs = [...new Set((input.storeSlugs ?? []).map((storeSlug) => storeSlug.trim()).filter(Boolean))];
     const rows = await this.database.query<CatalogPriceSqlRow>(this.basketPriceSql(), [
       productRefs,
-      storeSlugs.length > 0 ? storeSlugs : null
+      storeSlugs.length > 0 ? storeSlugs : null,
+      input.productNameLocale ?? null
     ]);
     const mappedRows = rows.map(mapCatalogRow);
     const canonicalProductIds = new Map<string, string>();
@@ -186,7 +193,7 @@ export class RealCatalogService {
     });
   }
 
-  async compareSavedBasket(userId: string, storeSlugs?: string[]) {
+  async compareSavedBasket(userId: string, storeSlugs?: string[], productNameLocale?: ProductNameLocale) {
     this.requireDatabase();
     const basketRows = await this.database.query<BasketItemSqlRow>(
       `with latest_basket as (
@@ -207,11 +214,13 @@ export class RealCatalogService {
       userId,
       storeSlugs,
       basketSource: 'weekly_baskets',
+      productNameLocale,
       items: basketRows.map((row) => ({ productId: row.product_id, quantity: Number(row.quantity) }))
     });
   }
 
   private searchSql(): string {
+    const productName = localizedProductNameSql('$10');
     return `with matched_products as (
         select products.id
         from products
@@ -220,6 +229,8 @@ export class RealCatalogService {
             search.term is null
             or products.barcode = search.term
             or products.canonical_name ilike '%' || search.term || '%'
+            or products.name_sv ilike '%' || search.term || '%'
+            or products.name_en ilike '%' || search.term || '%'
             or products.slug ilike '%' || search.term || '%'
             or exists (
               select 1
@@ -245,12 +256,12 @@ export class RealCatalogService {
                 and ($8::numeric is null or filter_prices.price <= $8::numeric)
             )
           )
-        order by products.canonical_name, products.slug
+        order by ${productName}, products.slug
         limit $9
       )
       select products.id::text as product_id,
              products.slug,
-             products.canonical_name,
+             ${productName} as canonical_name,
              products.brand,
              products.category_path,
              products.package_size,
@@ -264,6 +275,7 @@ export class RealCatalogService {
              latest_prices.price_type,
              latest_prices.confidence,
              latest_prices.observed_at,
+             latest_prices.is_available,
              chains.id::text as chain_id,
              chains.slug as chain_slug,
              chains.name as chain_name,
@@ -280,7 +292,7 @@ export class RealCatalogService {
         and ($6::text[] is null or latest_prices.price_type = any($6::text[]))
         and ($7::numeric is null or latest_prices.price >= $7::numeric)
         and ($8::numeric is null or latest_prices.price <= $8::numeric)
-      order by products.canonical_name, latest_prices.price nulls last, stores.name nulls last`;
+      order by ${productName}, latest_prices.price nulls last, stores.name nulls last`;
   }
 
   private requireDatabase(): void {
@@ -290,9 +302,10 @@ export class RealCatalogService {
   }
 
   private basketPriceSql(): string {
+    const productName = localizedProductNameSql('$3');
     return `select products.id::text as product_id,
              products.slug,
-             products.canonical_name,
+             ${productName} as canonical_name,
              products.brand,
              products.category_path,
              products.package_size,
@@ -306,6 +319,7 @@ export class RealCatalogService {
              latest_prices.price_type,
              latest_prices.confidence,
              latest_prices.observed_at,
+             latest_prices.is_available,
              chains.id::text as chain_id,
              chains.slug as chain_slug,
              chains.name as chain_name,
@@ -327,6 +341,6 @@ export class RealCatalogService {
       left join chains on chains.id = latest_prices.chain_id
       left join stores on stores.id = latest_prices.store_id
       where (products.id::text = any($1::text[]) or products.slug = any($1::text[]))
-      order by products.canonical_name, latest_prices.price nulls last, stores.name nulls last`;
+      order by ${productName}, latest_prices.price nulls last, stores.name nulls last`;
   }
 }

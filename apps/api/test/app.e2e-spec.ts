@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, it } from 'node:test';
 import { type INestApplication } from '@nestjs/common';
 import { Test, type TestingModule } from '@nestjs/testing';
 import request from 'supertest';
+import { createSessionToken } from '@groceryview/auth';
 import { AppModule } from '../src/app.module.js';
 import { configureApp } from '../src/configure-app.js';
 import { PostgresQueryExecutorService } from '../src/database/postgres-query-executor.service.js';
@@ -18,6 +19,8 @@ class RecordingPriceHistoryExecutor {
     favorite_stores_only: boolean;
     allowed_price_types: string[] | null;
   }> = [];
+  preferenceRows = new Map<string, { preferred_currency: string; notification_channels: string[] }>();
+  favoriteStoreRows = new Map<string, string[]>();
 
   isConfigured(): boolean {
     return true;
@@ -25,7 +28,36 @@ class RecordingPriceHistoryExecutor {
 
   async query<T>(sql: string, params: unknown[] = []): Promise<T[]> {
     this.calls.push({ sql, params });
-    if (sql.includes('latest_prices.observation_id') && sql.includes('products.canonical_name as product_name')) {
+    if (sql.includes('insert into app_users')) return [] as T[];
+    if (sql.includes('insert into user_preferences')) {
+      const userId = params[0] as string;
+      const existing = this.preferenceRows.get(userId) ?? { preferred_currency: 'SEK', notification_channels: [] };
+      this.preferenceRows.set(userId, {
+        preferred_currency: (params[1] as string | null) ?? existing.preferred_currency,
+        notification_channels: (params[2] as string[] | null) ?? existing.notification_channels
+      });
+      return [] as T[];
+    }
+    if (sql.includes('select preferred_currency, notification_channels')) {
+      const row = this.preferenceRows.get(params[0] as string);
+      return (row ? [{ preferred_currency: row.preferred_currency, notification_channels: row.notification_channels }] : []) as T[];
+    }
+    if (sql.includes('delete from favorite_stores')) {
+      this.favoriteStoreRows.set(params[0] as string, []);
+      return [] as T[];
+    }
+    if (sql.includes('insert into favorite_stores')) {
+      const userId = params[0] as string;
+      const stores = this.favoriteStoreRows.get(userId) ?? [];
+      const storeId = params[1] as string;
+      if (!stores.includes(storeId)) stores.push(storeId);
+      this.favoriteStoreRows.set(userId, stores);
+      return [] as T[];
+    }
+    if (sql.includes('select store_id from favorite_stores')) {
+      return [...(this.favoriteStoreRows.get(params[0] as string) ?? [])].sort().map((store_id) => ({ store_id })) as T[];
+    }
+    if (sql.includes('latest_prices.observation_id') && sql.includes(' as product_name')) {
       if (params[0] === 'missing-product') return [] as T[];
       return [
         {
@@ -120,6 +152,34 @@ class RecordingPriceHistoryExecutor {
     }
     if (sql.includes('from favorite_stores')) {
       return [] as T[];
+    }
+    if (sql.includes('with store_locations') && sql.includes('distance_km')) {
+      return [
+        {
+          store_id: 'store-coop-odenplan',
+          store_slug: 'coop-odenplan',
+          store_name: 'Coop Odenplan',
+          chain_slug: 'coop',
+          chain_name: 'Coop',
+          address_line1: 'Odengatan 65',
+          city: 'Stockholm',
+          latitude: '59.342900',
+          longitude: '18.049400',
+          distance_km: '1.86'
+        },
+        {
+          store_id: 'store-ica-baronen',
+          store_slug: 'ica-baronen',
+          store_name: 'ICA Nära Baronen',
+          chain_slug: 'ica',
+          chain_name: 'ICA',
+          address_line1: 'Odengatan 40',
+          city: 'Stockholm',
+          latitude: '59.342900',
+          longitude: '18.047000',
+          distance_km: '1.94'
+        }
+      ] as T[];
     }
     if (sql.includes('from stores') && sql.includes('where stores.slug = $1')) {
       if (params[0] === 'missing-store') return [] as T[];
@@ -363,6 +423,53 @@ class RecordingPriceHistoryExecutor {
         }
       ] as T[];
     }
+    if (sql.includes('screener_discount_history')) {
+      const minDiscount = Number(params[0]);
+      const category = params[1] as string | null;
+      const limit = Number(params[2]);
+      const rows = [
+        {
+          product_id: 'product-private-label-milk',
+          product_slug: 'private-label-milk',
+          product_name: 'Garant Milk 1L',
+          brand: 'Garant',
+          category_label: 'dairy',
+          chain_slug: 'willys',
+          chain_name: 'Willys',
+          store_slug: 'willys-odenplan',
+          store_name: 'Willys Odenplan',
+          latest_price: '12.90',
+          previous_price: '19.90',
+          savings_amount: '7.00',
+          discount_percent: '35.18',
+          currency: 'SEK',
+          latest_observed_at: '2026-05-21T10:00:00.000Z',
+          observation_count: '4'
+        },
+        {
+          product_id: 'product-coffee',
+          product_slug: 'coffee',
+          product_name: 'Zoégas Coffee 450g',
+          brand: 'Zoégas',
+          category_label: 'coffee',
+          chain_slug: 'willys',
+          chain_name: 'Willys',
+          store_slug: 'willys-odenplan',
+          store_name: 'Willys Odenplan',
+          latest_price: '49.90',
+          previous_price: '59.90',
+          savings_amount: '10.00',
+          discount_percent: '16.69',
+          currency: 'SEK',
+          latest_observed_at: '2026-05-21T09:00:00.000Z',
+          observation_count: '3'
+        }
+      ];
+      return rows
+        .filter((row) => Number(row.discount_percent) >= minDiscount)
+        .filter((row) => category === null || row.category_label === category)
+        .slice(0, limit) as T[];
+    }
     if (sql.includes('from observations')) {
       return [
         {
@@ -432,8 +539,10 @@ class UnconfiguredPostgresExecutor {
 describe('GroceryView API app', () => {
   let app: INestApplication;
   let priceHistoryExecutor: RecordingPriceHistoryExecutor;
+  let previousAuthSecret: string | undefined;
 
   beforeEach(async () => {
+    previousAuthSecret = process.env.AUTH_SECRET;
     priceHistoryExecutor = new RecordingPriceHistoryExecutor();
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule]
@@ -449,6 +558,46 @@ describe('GroceryView API app', () => {
 
   afterEach(async () => {
     await app.close();
+    if (previousAuthSecret === undefined) {
+      delete process.env.AUTH_SECRET;
+    } else {
+      process.env.AUTH_SECRET = previousAuthSecret;
+    }
+  });
+
+  it('handles CORS preflight for production and local development origins with credentials', async () => {
+    const productionPreflight = await request(app.getHttpServer())
+      .options('/health')
+      .set('Origin', 'https://groceryview.se')
+      .set('Access-Control-Request-Method', 'GET')
+      .set('Access-Control-Request-Headers', 'authorization,content-type,x-groceryview-locale')
+      .expect(204);
+
+    assert.equal(productionPreflight.headers['access-control-allow-origin'], 'https://groceryview.se');
+    assert.equal(productionPreflight.headers['access-control-allow-credentials'], 'true');
+    assert.match(productionPreflight.headers['access-control-allow-methods'] ?? '', /GET/);
+    assert.match(productionPreflight.headers['access-control-allow-headers'] ?? '', /authorization/i);
+    assert.match(productionPreflight.headers['access-control-allow-headers'] ?? '', /content-type/i);
+    assert.match(productionPreflight.headers['access-control-allow-headers'] ?? '', /x-groceryview-locale/i);
+
+    const localResponse = await request(app.getHttpServer())
+      .get('/health')
+      .set('Origin', 'http://localhost:3000')
+      .expect(200);
+
+    assert.equal(localResponse.headers['access-control-allow-origin'], 'http://localhost:3000');
+    assert.equal(localResponse.headers['access-control-allow-credentials'], 'true');
+  });
+
+  it('does not expose CORS trust headers to blocked origins', async () => {
+    const blockedPreflight = await request(app.getHttpServer())
+      .options('/health')
+      .set('Origin', 'https://evil.example')
+      .set('Access-Control-Request-Method', 'GET')
+      .expect(404);
+
+    assert.equal(blockedPreflight.headers['access-control-allow-origin'], undefined);
+    assert.equal(blockedPreflight.headers['access-control-allow-credentials'], undefined);
   });
 
   it('serves health and OpenAPI docs', async () => {
@@ -459,6 +608,7 @@ describe('GroceryView API app', () => {
 
     const docs = await request(app.getHttpServer()).get('/api-json').expect(200);
     assert.equal(docs.body.info.title, 'GroceryView API');
+    assert.ok(docs.body.paths['/categories']);
     assert.ok(docs.body.paths['/categories/{category}/market']);
     assert.ok(docs.body.paths['/users/demo/account/subscription-access']);
     assert.ok(docs.body.paths['/users/demo/account/subscription-entitlement']);
@@ -481,8 +631,13 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/nutrition/value']);
     assert.ok(docs.body.paths['/users/demo/pantry/replenishment']);
     assert.ok(docs.body.paths['/prices/freshness']);
+    assert.ok(docs.body.paths['/screener']);
     assert.ok(docs.body.paths['/users/demo/privacy/export']);
     assert.ok(docs.body.paths['/users/demo/privacy/deletion-plan']);
+    assert.ok(docs.body.paths['/users/demo/settings/account']);
+    assert.ok(docs.body.paths['/users/demo/settings/data-export']);
+    assert.ok(docs.body.paths['/api/settings']);
+    assert.deepEqual(docs.body.paths['/api/settings'].patch.security, [{ bearer: [] }]);
     assert.ok(docs.body.paths['/products']);
     assert.ok(docs.body.paths['/products/{productId}/cheapest-now']);
     assert.ok(docs.body.paths['/products/{id}/terminal']);
@@ -494,8 +649,11 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/products/{id}/equivalents']);
     assert.ok(docs.body.paths['/products/{id}/history']);
     assert.ok(docs.body.paths['/products/{productId}/price-history']);
+    assert.ok(docs.body.paths['/products/{productId}/history.csv']);
     assert.ok(docs.body.paths['/users/demo/receipts/review']);
+    assert.ok(docs.body.paths['/retailers']);
     assert.ok(docs.body.paths['/stores']);
+    assert.ok(docs.body.paths['/stores/nearest']);
     assert.ok(docs.body.paths['/users/demo/basket/items/{productId}']);
     assert.ok(docs.body.paths['/stores/{id}/category-coverage']);
     assert.ok(docs.body.paths['/stores/{id}/coverage']);
@@ -519,6 +677,42 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/users/demo/basket/import-review']);
     assert.ok(docs.body.paths['/users/demo/basket/import-review/{reviewItemId}/decisions']);
     assert.ok(docs.body.paths['/users/demo/basket/stores/{storeId}/quote']);
+  });
+
+  it('saves authenticated user settings preferences through PATCH /api/settings', async () => {
+    process.env.AUTH_SECRET = 'test-auth-secret';
+    const token = await createSessionToken({ userId: 'user-settings-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'test-auth-secret');
+
+    await request(app.getHttpServer())
+      .patch('/api/settings')
+      .send({ currency: 'EUR', preferredStores: ['willys-odenplan', 'lidl-sveavagen'], notificationChannels: ['push', 'email'] })
+      .expect(401);
+
+    const response = await request(app.getHttpServer())
+      .patch('/api/settings')
+      .set('authorization', `Bearer ${token}`)
+      .send({ currency: 'EUR', preferredStores: ['willys-odenplan', 'lidl-sveavagen'], notificationChannels: ['push', 'email'] })
+      .expect(200);
+
+    assert.deepEqual(response.body, {
+      userId: 'user-settings-1',
+      currency: 'EUR',
+      preferredStores: ['lidl-sveavagen', 'willys-odenplan'],
+      notificationChannels: ['push', 'email']
+    });
+    assert.ok(priceHistoryExecutor.calls.some((call) => call.sql.includes('insert into user_preferences') && call.params[0] === 'user-settings-1'));
+    assert.deepEqual(
+      priceHistoryExecutor.calls
+        .filter((call) => call.sql.includes('insert into favorite_stores'))
+        .map((call) => call.params),
+      [['user-settings-1', 'willys-odenplan'], ['user-settings-1', 'lidl-sveavagen']]
+    );
+
+    await request(app.getHttpServer())
+      .patch('/api/settings')
+      .set('authorization', `Bearer ${token}`)
+      .send({ notificationChannels: ['sms'] })
+      .expect(400);
   });
 
   it('serves products, stores, prices, watchlists, baskets, and alerts', async () => {
@@ -551,6 +745,28 @@ describe('GroceryView API app', () => {
 
     const subscriptionEntitlement = await request(app.getHttpServer()).get('/users/demo/account/subscription-entitlement').expect(200);
     assert.deepEqual(subscriptionEntitlement.body, { userId: 'demo', entitlement: null, demo: true });
+
+    const settingsExport = await request(app.getHttpServer()).get('/users/demo/settings/data-export').expect(200);
+    assert.equal(settingsExport.body.userId, 'demo');
+    assert.equal(settingsExport.body.demo, true);
+    assert.deepEqual(settingsExport.body.sections.map((section: { name: string }) => section.name), [
+      'profile',
+      'lists',
+      'alerts',
+      'preferences',
+      'analytics_events',
+      'favorite_stores',
+      'watchlist',
+      'receipts',
+      'households'
+    ]);
+
+    const settingsDeletion = await request(app.getHttpServer()).delete('/users/demo/settings/account').send({ confirmation: 'DELETE ACCOUNT' }).expect(200);
+    assert.equal(settingsDeletion.body.userId, 'demo');
+    assert.equal(settingsDeletion.body.deleted, false);
+    assert.equal(settingsDeletion.body.destructiveAction, false);
+    assert.equal(settingsDeletion.body.requiresConfirmation, 'DELETE ACCOUNT');
+    assert.equal(settingsDeletion.body.demo, true);
 
     const mealPlan = await request(app.getHttpServer())
       .get('/users/demo/meal-plans/suggestions?maxMealCost=120&servings=4')
@@ -614,8 +830,42 @@ describe('GroceryView API app', () => {
     assert.equal(products.body[0].currentPrices[0].sourceType, 'demo_seed');
     assert.ok(products.body[0].currentPrices[0].provenance);
 
+    const retailers = await request(app.getHttpServer()).get('/retailers').expect(200);
+    assert.deepEqual(retailers.body.map((retailer: { id: string; name: string; logo: string; websiteUrl: string }) => [
+      retailer.id,
+      retailer.name,
+      retailer.logo,
+      retailer.websiteUrl
+    ]), [
+      ['city-gross', 'City Gross', '/retailers/city-gross.svg', 'https://www.citygross.se/'],
+      ['coop', 'Coop', '/retailers/coop.svg', 'https://www.coop.se/'],
+      ['hemkop', 'Hemköp', '/retailers/hemkop.svg', 'https://www.hemkop.se/'],
+      ['ica', 'ICA', '/retailers/ica.svg', 'https://www.ica.se/'],
+      ['lidl', 'Lidl', '/retailers/lidl.svg', 'https://www.lidl.se/'],
+      ['netto', 'Netto', '/retailers/netto.svg', 'https://www.coop.se/'],
+      ['willys', 'Willys', '/retailers/willys.svg', 'https://www.willys.se/']
+    ]);
+
+    const categories = await request(app.getHttpServer()).get('/categories').expect(200);
+    assert.deepEqual(categories.body, [
+      { id: 'coffee', name: 'Coffee', slug: 'coffee', parentId: null, itemCount: 1 },
+      { id: 'dairy', name: 'Dairy', slug: 'dairy', parentId: null, itemCount: 3 }
+    ]);
+
+    const invalidCategories = await request(app.getHttpServer()).get('/categories?unexpected=true').expect(400);
+    assert.match(invalidCategories.body.message, /unexpected query parameter/i);
+
     await request(app.getHttpServer()).get('/products/coffee').expect(200);
     await request(app.getHttpServer()).get('/stores/willys-odenplan').expect(200);
+
+    const nearestStores = await request(app.getHttpServer())
+      .get('/stores/nearest?lat=59.3293&lng=18.0686&radius=5&chain=coop')
+      .expect(200);
+    assert.deepEqual(nearestStores.body.stores.map((store: { slug: string; distanceKm: number }) => [store.slug, store.distanceKm]), [
+      ['coop-odenplan', 1.86],
+      ['ica-baronen', 1.94]
+    ]);
+    assert.equal(priceHistoryExecutor.calls.some((call) => call.params.join('|') === '59.3293|18.0686|5|coop'), true);
 
     const storeDeals = await request(app.getHttpServer()).get('/stores/willys-odenplan/deals').expect(200);
     assert.deepEqual(
@@ -672,6 +922,23 @@ describe('GroceryView API app', () => {
     ]);
     assert.equal(discounts.body.offers[0].sourceType, 'weekly_flyer');
     assert.equal(discounts.body.demo, undefined);
+
+
+    const screener = await request(app.getHttpServer())
+      .get('/screener?min_discount=20&category=dairy')
+      .expect(200);
+    assert.equal(screener.body.minDiscountPercent, 20);
+    assert.equal(screener.body.category, 'dairy');
+    assert.equal(screener.body.source, 'price_history');
+    assert.deepEqual(screener.body.items.map((item: { productSlug: string }) => item.productSlug), ['private-label-milk']);
+    assert.equal(screener.body.items[0].discountPercent, 35.18);
+    assert.match(screener.body.guardrails[0], /price_history/i);
+    const screenerCall = priceHistoryExecutor.calls.find((call) => call.sql.includes('screener_discount_history'));
+    assert.ok(screenerCall, 'screener API should query price_history discount history');
+    assert.match(screenerCall.sql, /with price_history as/i);
+    assert.match(screenerCall.sql, /from observations/i);
+    assert.match(screenerCall.sql, /discount_percent >= \$1/i);
+    assert.deepEqual(screenerCall.params, [20, 'dairy', 25]);
 
     const storeDiscounts = await request(app.getHttpServer())
       .get('/stores/willys-odenplan/discounts?asOf=2026-05-20T12:00:00.000Z')
@@ -738,6 +1005,23 @@ describe('GroceryView API app', () => {
     assert.match(priceHistoryExecutor.calls.at(-1)?.sql ?? '', /stores\.slug = \$4/);
     assert.match(priceHistoryExecutor.calls.at(-1)?.sql ?? '', /source_run_id::text = \$5/);
     assert.match(priceHistoryExecutor.calls.at(-1)?.sql ?? '', /observations\.confidence >= \$8::numeric/);
+
+    const priceHistoryCsv = await request(app.getHttpServer())
+      .get('/products/bryggkaffe-450g/history.csv?priceType=shelf&chain=willys&limit=5')
+      .expect(200);
+    assert.match(priceHistoryCsv.headers['content-type'], /^text\/csv/);
+    assert.equal(priceHistoryCsv.headers['content-disposition'], 'attachment; filename="bryggkaffe-450g-history.csv"');
+    assert.equal(
+      priceHistoryCsv.text,
+      [
+        'date,chain,price,unit',
+        '2026-05-01T09:00:00.000Z,chain-willys,59.9,133.11',
+        '2026-05-19T09:00:00.000Z,chain-willys,49.9,110.89',
+        ''
+      ].join('\n')
+    );
+    assert.deepEqual(priceHistoryExecutor.calls.at(-1)?.params, ['product-coffee', 'shelf', 'willys', null, null, null, null, null, 5]);
+    assert.match(priceHistoryExecutor.calls.at(-1)?.sql ?? '', /from observations/i);
 
     await request(app.getHttpServer())
       .get('/products/bryggkaffe-450g/price-history?from=2026-06-01T00:00:00.000Z&to=2026-05-01T00:00:00.000Z')
@@ -1412,6 +1696,8 @@ describe('GroceryView API real-only deal and alert endpoints', () => {
     await request(app.getHttpServer()).get('/deals/flyer-offers').expect(503);
     await request(app.getHttpServer()).get('/stores/willys-odenplan/discounts').expect(503);
     await request(app.getHttpServer()).get('/stores/willys-odenplan/flyer-offers').expect(503);
+    await request(app.getHttpServer()).get('/stores/nearest?lat=59.3293&lng=18.0686&radius=5').expect(503);
+    await request(app.getHttpServer()).get('/screener?min_discount=10').expect(503);
     await request(app.getHttpServer()).get('/users/demo/watchlist/price-alerts').expect(503);
     await request(app.getHttpServer())
       .post('/users/demo/watchlist/price-alerts')

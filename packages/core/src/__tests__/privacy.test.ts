@@ -9,10 +9,28 @@ describe('privacy controls', () => {
       favoriteStoreIds: ['willys-odenplan'],
       watchlistProductIds: ['coffee'],
       receiptIds: ['receipt-1'],
-      householdIds: ['house-1']
+      householdIds: ['house-1'],
+      lists: [{ id: 'current_basket', itemCount: 2 }],
+      alerts: [{ id: 'target-price-coffee', productId: 'coffee' }],
+      preferences: [{ name: 'budget', weeklyBudget: 800 }],
+      analyticsEvents: [{ event: 'settings_export_clicked', occurredAt: '2026-05-20T12:00:00.000Z' }]
     });
 
-    assert.deepEqual(exported.sections.map((section) => section.name), ['profile', 'favorite_stores', 'watchlist', 'receipts', 'households']);
+    assert.deepEqual(exported.sections.map((section) => section.name), [
+      'profile',
+      'lists',
+      'alerts',
+      'preferences',
+      'analytics_events',
+      'favorite_stores',
+      'watchlist',
+      'receipts',
+      'households'
+    ]);
+    assert.deepEqual(exported.sections.find((section) => section.name === 'lists')?.records, [{ id: 'current_basket', itemCount: 2 }]);
+    assert.deepEqual(exported.sections.find((section) => section.name === 'alerts')?.records, [{ id: 'target-price-coffee', productId: 'coffee' }]);
+    assert.deepEqual(exported.sections.find((section) => section.name === 'preferences')?.records, [{ name: 'budget', weeklyBudget: 800 }]);
+    assert.deepEqual(exported.sections.find((section) => section.name === 'analytics_events')?.records, [{ event: 'settings_export_clicked', occurredAt: '2026-05-20T12:00:00.000Z' }]);
   });
 
   it('plans account deletion across sensitive tables', () => {

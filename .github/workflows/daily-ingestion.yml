@@ -646,6 +646,16 @@ jobs:
           cat /tmp/daily-db-io-hotspots-after.json
           exit "${db_io_hotspots_after_status}"
 
+      - name: Compare daily DB IO hotspots
+        if: always()
+        run: |
+          set -euo pipefail
+          npm run --silent ops:compare-db-io-hotspots -- \
+            --before /tmp/daily-db-io-hotspots-before.json \
+            --after /tmp/daily-db-io-hotspots-after.json \
+            --out /tmp/daily-db-io-hotspots-delta.json
+          cat /tmp/daily-db-io-hotspots-delta.json
+
       - name: Upload daily DB IO hotspots
         if: always()
         uses: actions/upload-artifact@v4
@@ -654,6 +664,7 @@ jobs:
           path: |
             /tmp/daily-db-io-hotspots-before.json
             /tmp/daily-db-io-hotspots-after.json
+            /tmp/daily-db-io-hotspots-delta.json
           if-no-files-found: error
           retention-days: 14
 

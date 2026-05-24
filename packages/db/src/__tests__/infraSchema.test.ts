@@ -13,15 +13,18 @@ const pantryInventoryMigration = readFileSync(join(repoRoot, 'infra/db/migration
 const sourceRunsOfficialApiMigration = readFileSync(join(repoRoot, 'infra/db/migrations/006_source_runs_official_api.sql'), 'utf8').toLowerCase();
 const receiptUploadsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/007_receipt_uploads.sql'), 'utf8').toLowerCase();
 const householdPlansMigration = readFileSync(join(repoRoot, 'infra/db/migrations/008_household_plans.sql'), 'utf8').toLowerCase();
+const householdCollaborationRlsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/018_household_collaboration_rls.sql'), 'utf8').toLowerCase();
 const retailerSourcePoliciesMigration = readFileSync(join(repoRoot, 'infra/db/migrations/009_retailer_source_policies.sql'), 'utf8').toLowerCase();
 const basketImportReviewsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/010_basket_import_reviews.sql'), 'utf8').toLowerCase();
+const priceAlertsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/011_price_alerts.sql'), 'utf8').toLowerCase();
+const telegramNotificationsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/018_telegram_notifications.sql'), 'utf8').toLowerCase();
 const migrationsDir = join(repoRoot, 'infra/db/migrations');
 const allMigrations = readdirSync(migrationsDir)
   .filter((entry) => entry.endsWith('.sql') && !entry.startsWith('._'))
   .sort()
   .map((entry) => readFileSync(join(migrationsDir, entry), 'utf8').toLowerCase())
   .join('\n');
-const repositoryMigrations = `${repositoryMigration}\n${entitlementMigration}\n${alertRulesMigration}\n${pantryInventoryMigration}\n${receiptUploadsMigration}\n${householdPlansMigration}\n${basketImportReviewsMigration}`;
+const repositoryMigrations = `${repositoryMigration}\n${entitlementMigration}\n${alertRulesMigration}\n${pantryInventoryMigration}\n${receiptUploadsMigration}\n${householdPlansMigration}\n${basketImportReviewsMigration}\n${telegramNotificationsMigration}`;
 const sourcePolicyTables = ['retailer_source_policies'];
 const migrationVerifier = readFileSync(join(repoRoot, 'infra/db/scripts/verify-migrations.sh'), 'utf8').toLowerCase();
 const schemaDoc = readFileSync(join(repoRoot, 'infra/db/SCHEMA.md'), 'utf8').toLowerCase();
@@ -57,6 +60,7 @@ const repositoryTables = [
   'subscription_entitlements',
   'notification_tasks',
   'notification_suppressions',
+  'notification_subscriptions',
   'alert_rules',
   'pantry_items',
   'receipt_uploads',
@@ -110,6 +114,58 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(observations, /confidence numeric\(5, 4\) not null check \(confidence between 0 and 1\)/);
   });
 
+  it('tracks observed product availability without deleting price facts', () => {
+    assert.match(allMigrations, /alter table observations add column if not exists is_available boolean not null default true/);
+    assert.match(allMigrations, /alter table latest_prices add column if not exists is_available boolean not null default true/);
+    assert.match(schemaDoc, /is_available/);
+    assert.match(schemaDoc, /out-of-stock/i);
+  });
+
+  it('keeps connector observation writes idempotent without overwriting history', () => {
+    assert.equal(
+      readdirSync(migrationsDir).includes('019_price_snapshot_unique_index.sql'),
+      true,
+      'price snapshot unique index migration missing'
+    );
+    assert.match(allMigrations, /create unique index if not exists observations_connector_idempotency_idx/);
+    for (const column of [
+      'product_id',
+      'chain_id',
+      'store_id',
+      'domain',
+      'retailer_product_ref',
+      'price_type',
+      'observed_at',
+      'price',
+      'unit_price',
+      'currency',
+      'is_available',
+      'confidence',
+      'provenance'
+    ]) {
+      assert.match(allMigrations, new RegExp(`\\b${column}\\b`), `idempotency index missing ${column}`);
+    }
+    assert.match(allMigrations, /nulls not distinct/);
+    assert.match(allMigrations, /comment on index observations_connector_idempotency_idx is 'compound unique price snapshot guard/i);
+    assert.match(schemaDoc, /exact connector replay idempotency/);
+    assert.match(schemaDoc, /scraper upserts/i);
+  });
+
+  it('tracks observation availability through immutable rows, rollups, and static snapshots', () => {
+    for (const table of ['observations', 'latest_prices', 'observations_v2']) {
+      assert.match(
+        allMigrations,
+        new RegExp(`alter table ${table} add column if not exists is_available boolean not null default true`),
+        `${table}.is_available migration missing`
+      );
+    }
+    assert.match(allMigrations, /observations_connector_idempotency_idx[\s\S]*is_available/);
+    assert.match(allMigrations, /latest_prices_grocery_snapshot_idx[\s\S]*is_available/);
+    assert.match(schemaDoc, /observations\.is_available/);
+    assert.match(schemaDoc, /latest_prices\.is_available/);
+    assert.match(schemaDoc, /Out of stock/i);
+  });
+
   it('keeps latest prices derived from observations and uniquely addressable', () => {
     const latestPrices = tableDefinition('latest_prices');
     assert.match(latestPrices, /observation_id uuid not null references observations\(id\)/);
@@ -119,7 +175,7 @@ describe('infra/db PostgreSQL schema contract', () => {
   it('indexes latest_prices for bounded DB-backed site snapshot exports', () => {
     assert.match(allMigrations, /create index concurrently if not exists latest_prices_grocery_snapshot_idx/);
     assert.match(allMigrations, /on latest_prices \(domain, observed_at desc, product_id, chain_id, store_id, price_type\)/);
-    assert.match(allMigrations, /include \(observation_id, price, regular_price, unit_price, currency, confidence, provenance\)/);
+    assert.match(allMigrations, /include \(observation_id, price, regular_price, unit_price, currency, is_available, confidence, provenance\)/);
     assert.match(allMigrations, /where domain = 'grocery'/);
     assert.match(schemaDoc, /latest_prices_grocery_snapshot_idx/);
     assert.match(schemaDoc, /db-backed site snapshot exporter/i);
@@ -240,11 +296,16 @@ describe('infra/db PostgreSQL schema contract', () => {
       assert.match(repositoryMigrations, new RegExp(`create table if not exists ${table}\\b`), `${table} repository table missing`);
     }
     assert.match(repositoryTableDefinition('favorite_stores'), /primary key \(user_id, store_id\)/);
+    assert.match(repositoryTableDefinition('user_preferences'), /preferred_currency text not null default 'sek'/);
+    assert.match(repositoryTableDefinition('user_preferences'), /notification_channels text\[\] not null default array\[\]::text\[\]/);
+    assert.match(repositoryTableDefinition('user_preferences'), /notification_channels <@ array\['push', 'email', 'telegram'\]::text\[\]/);
     assert.match(repositoryTableDefinition('weekly_baskets'), /unique \(user_id, week_start\)/);
     assert.match(repositoryTableDefinition('subscription_entitlements'), /user_id text primary key references app_users\(id\) on delete cascade/);
     assert.match(repositoryTableDefinition('subscription_entitlements'), /provider_subscription_id text/);
     assert.match(repositoryTableDefinition('notification_tasks'), /status text not null check/);
-    assert.match(repositoryTableDefinition('notification_suppressions'), /channel text check \(channel in \('push', 'email'\)\)/);
+    assert.match(repositoryTableDefinition('notification_suppressions'), /channel text check \(channel in \('push', 'email', 'telegram'\)\)/);
+    assert.match(repositoryTableDefinition('notification_subscriptions'), /chat_id text/);
+    assert.match(repositoryTableDefinition('notification_subscriptions'), /check \(channel <> 'telegram' or chat_id is not null\)/);
     assert.match(repositoryTableDefinition('alert_rules'), /user_id text not null references app_users\(id\) on delete cascade/);
     assert.match(repositoryTableDefinition('alert_rules'), /alert_type text not null check/);
     assert.match(repositoryTableDefinition('alert_rules'), /deal_score_threshold integer check/);
@@ -275,6 +336,20 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(repositoryTableDefinition('household_favorite_stores'), /primary key \(household_id, store_id\)/);
   });
 
+  it('migrates web price alert subscriptions with account and product lookup indexes', () => {
+    assert.match(priceAlertsMigration, /create table if not exists price_alerts/);
+    assert.match(priceAlertsMigration, /id uuid primary key default gen_random_uuid\(\)/);
+    assert.match(priceAlertsMigration, /user_email text not null/);
+    assert.match(priceAlertsMigration, /product_id text not null/);
+    assert.match(priceAlertsMigration, /target_price numeric\(12, 2\) not null check \(target_price >= 0\)/);
+    assert.match(priceAlertsMigration, /created_at timestamptz not null default now\(\)/);
+    assert.match(priceAlertsMigration, /price_alerts_user_created_idx on price_alerts \(user_email, created_at desc, id\)/);
+    assert.match(priceAlertsMigration, /price_alerts_product_idx on price_alerts \(product_id, id\)/);
+    assert.match(schemaDoc, /### `price_alerts`/);
+    assert.match(schemaDoc, /target-price alert subscriptions captured by the web alert api/);
+    assert.match(migrationVerifier, /\bprice_alerts\b/);
+  });
+
   it('indexes repository workflow lookups used by adapters and workers', () => {
     assert.match(repositoryMigration, /watchlist_items_user_idx on watchlist_items \(user_id, id\)/);
     assert.match(repositoryMigration, /weekly_baskets_user_week_idx on weekly_baskets \(user_id, week_start desc\)/);
@@ -283,6 +358,7 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(entitlementMigration, /subscription_entitlements_status_idx on subscription_entitlements \(status, updated_at desc\)/);
     assert.match(repositoryMigration, /notification_tasks_due_idx on notification_tasks \(status, send_at, id\)/);
     assert.match(repositoryMigration, /notification_suppressions_active_idx on notification_suppressions \(active, recipient, channel, id\)/);
+    assert.match(telegramNotificationsMigration, /notification_subscriptions_active_product_idx on notification_subscriptions \(active, product_id, channel\)/);
     assert.match(alertRulesMigration, /alert_rules_active_user_idx on alert_rules \(user_id, active, product_id, alert_type, id\)/);
     assert.match(pantryInventoryMigration, /pantry_items_user_idx on pantry_items \(user_id, product_id\)/);
     assert.match(pantryInventoryMigration, /pantry_items_expiry_idx on pantry_items \(expires_on\) where expires_on is not null/);
@@ -293,6 +369,20 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(householdPlansMigration, /household_members_user_idx on household_members \(user_id, household_id\)/);
     assert.match(householdPlansMigration, /household_basket_items_product_idx on household_basket_items \(product_id, household_id\)/);
     assert.match(householdPlansMigration, /household_watchlist_items_product_idx on household_watchlist_items \(product_id, household_id\)/);
+  });
+
+  it('protects household collaboration tables with Supabase RLS and editor attribution columns', () => {
+    assert.match(householdCollaborationRlsMigration, /alter table household_members add column if not exists role text not null default 'editor'/);
+    assert.match(householdCollaborationRlsMigration, /alter table household_basket_items add column if not exists checked boolean not null default false/);
+    assert.match(householdCollaborationRlsMigration, /alter table household_basket_items add column if not exists checked_by text/);
+    assert.match(householdCollaborationRlsMigration, /alter table household_basket_items add column if not exists checked_at timestamptz/);
+    for (const table of ['household_plans', 'household_members', 'household_basket_items', 'household_watchlist_items', 'household_favorite_stores']) {
+      assert.match(householdCollaborationRlsMigration, new RegExp(`alter table ${table} enable row level security`));
+      assert.match(householdCollaborationRlsMigration, new RegExp(`household_${table}_member_select`));
+    }
+    assert.match(householdCollaborationRlsMigration, /auth\.uid\(\)::text/);
+    assert.match(householdCollaborationRlsMigration, /in \('owner', 'editor'\)/);
+    assert.match(householdCollaborationRlsMigration, /with check/);
   });
 
   it('keeps the migration verifier aligned with catalog and repository tables', () => {
