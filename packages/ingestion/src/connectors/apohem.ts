@@ -1,4 +1,4 @@
-export type PharmacyChain = 'apohem' | 'apotek-hjartat';
+export type PharmacyChain = 'apohem' | 'apotek-hjartat' | 'apotek-1';
 
 export type PharmacyProductCategory = 'otc' | 'supplement' | 'beauty';
 
@@ -65,16 +65,47 @@ type ApotekHjartatProduct = {
   };
 };
 
+type Apotek1Attribute = {
+  identifier?: unknown;
+  name?: unknown;
+  values?: Array<{ value?: unknown }>;
+};
+
+type Apotek1Price = {
+  usage?: unknown;
+  value?: unknown;
+  currency?: unknown;
+};
+
+type Apotek1Product = {
+  partNumber?: unknown;
+  singleSKUCatalogEntryID?: unknown;
+  name?: unknown;
+  manufacturer?: unknown;
+  seotoken?: unknown;
+  thumbnail?: unknown;
+  fullImage?: unknown;
+  buyable?: unknown;
+  price?: Apotek1Price[];
+  attributes?: Apotek1Attribute[];
+};
+
+type Apotek1SearchResponse = {
+  catalogEntryView?: Apotek1Product[];
+};
+
 export type FetchApohemProductsOptions = {
   fetchImpl?: typeof fetch;
   sourcePaths?: readonly string[];
   apotekHjartatUrls?: readonly string[];
+  apotek1Urls?: readonly string[];
   maxRows?: number;
   retrievedAt?: string;
 };
 
 export const APOHEM_BASE_URL = 'https://www.apohem.se';
 export const APOTEK_HJARTAT_BASE_URL = 'https://www.apotekhjartat.se';
+export const APOTEK_1_BASE_URL = 'https://www.apotek1.no';
 
 export const DEFAULT_APOHEM_SOURCE_PATHS = [
   '/sok?q=vitamin',
@@ -95,6 +126,24 @@ export const DEFAULT_APOTEK_HJARTAT_SEARCH_URLS = [
   'https://www.apotekhjartat.se/search?q=munvard',
   'https://www.apotekhjartat.se/search?q=pamol'
 ] as const;
+
+export const DEFAULT_APOTEK_1_SEARCH_QUERIES = [
+  'vitamin',
+  'solkrem',
+  'tannkrem',
+  'hudpleie',
+  'paracetamol',
+  'kosttilskudd'
+] as const;
+
+export function buildApotek1SearchUrl(query: string, pageNumber = 1, pageSize = 24): string {
+  const url = new URL('/search/resources/store/10151/productview/bySearchTerm/' + encodeURIComponent(query), APOTEK_1_BASE_URL);
+  url.searchParams.set('catalogId', '10051');
+  url.searchParams.set('langId', '-101');
+  url.searchParams.set('pageSize', String(pageSize));
+  url.searchParams.set('pageNumber', String(pageNumber));
+  return url.toString();
+}
 
 export async function fetchApohemProducts(options: FetchApohemProductsOptions = {}): Promise<ApohemProduct[]> {
   const fetchImpl = options.fetchImpl ?? fetch;
@@ -137,16 +186,39 @@ export async function fetchApotekHjartatProducts(options: FetchApohemProductsOpt
   return rows;
 }
 
+export async function fetchApotek1Products(options: FetchApohemProductsOptions = {}): Promise<ApohemProduct[]> {
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+  const rows: ApohemProduct[] = [];
+  const seen = new Set<string>();
+
+  const sourceUrls = options.apotek1Urls ?? DEFAULT_APOTEK_1_SEARCH_QUERIES.map((query) => buildApotek1SearchUrl(query));
+  for (const sourceUrl of sourceUrls) {
+    const response = await fetchImpl(sourceUrl, jsonHeaders());
+    if (!response.ok) {
+      throw new Error(`Apotek 1 search request failed for ${sourceUrl}: ${response.status}`);
+    }
+    addRows(rows, seen, parseApotek1Products(await response.text(), sourceUrl, retrievedAt), options.maxRows);
+    if (options.maxRows && rows.length >= options.maxRows) {
+      return rows;
+    }
+  }
+
+  return rows;
+}
+
 export async function fetchPharmacyProducts(options: FetchApohemProductsOptions = {}): Promise<ApohemProduct[]> {
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
-  const [apohemRows, hjartatRows] = await Promise.all([
+  const [apohemRows, hjartatRows, apotek1Rows] = await Promise.all([
     fetchApohemProducts({ ...options, retrievedAt }),
-    fetchApotekHjartatProducts({ ...options, retrievedAt })
+    fetchApotekHjartatProducts({ ...options, retrievedAt }),
+    fetchApotek1Products({ ...options, retrievedAt })
   ]);
   const rows: ApohemProduct[] = [];
   const seen = new Set<string>();
   addRows(rows, seen, apohemRows, options.maxRows);
   addRows(rows, seen, hjartatRows, options.maxRows);
+  addRows(rows, seen, apotek1Rows, options.maxRows);
   return rows;
 }
 
@@ -177,6 +249,13 @@ export function parseApotekHjartatProducts(html: string, sourceUrl: string, retr
 
   return products
     .map((product) => normalizeApotekHjartatProduct(product, sourceUrl, retrievedAt))
+    .filter((product): product is ApohemProduct => product !== null);
+}
+
+export function parseApotek1Products(json: string, sourceUrl: string, retrievedAt: string): ApohemProduct[] {
+  const data = JSON.parse(json) as Apotek1SearchResponse;
+  return (data.catalogEntryView ?? [])
+    .map((product) => normalizeApotek1Product(product, sourceUrl, retrievedAt))
     .filter((product): product is ApohemProduct => product !== null);
 }
 
@@ -254,6 +333,43 @@ export function normalizeApotekHjartatProduct(
   };
 }
 
+export function normalizeApotek1Product(
+  product: Apotek1Product,
+  sourceUrl: string,
+  retrievedAt: string
+): ApohemProduct | null {
+  if (attributeValue(product, 'ReceiptCode') === 'J' || attributeValue(product, 'receipt') === 'receipt') {
+    return null;
+  }
+  const ean = eanText(attributeValue(product, 'GTIN'));
+  const price = apotek1Price(product.price, 'Offer') ?? apotek1Price(product.price, 'Display');
+  const name = text(product.name);
+  if (!ean || !name || price === null) {
+    return null;
+  }
+  const originalPrice = apotek1Price(product.price, 'Display');
+
+  return {
+    chain: 'apotek-1',
+    code: text(product.singleSKUCatalogEntryID) || text(product.partNumber) || ean,
+    ean,
+    name,
+    brand: attributeValue(product, 'Merke') || text(product.manufacturer),
+    category: apotek1Category(product),
+    price,
+    priceText: `${price.toFixed(2)} NOK`,
+    originalPrice,
+    originalPriceText: originalPrice === null ? '' : `${originalPrice.toFixed(2)} NOK`,
+    vatPercent: null,
+    stockStatus: text(product.buyable) === 'true' ? 'buyable' : text(product.buyable),
+    productUrl: absoluteUrl(product.seotoken ? `/produkter/${text(product.seotoken)}` : '', APOTEK_1_BASE_URL),
+    imageUrl: absoluteUrl(product.thumbnail || product.fullImage, APOTEK_1_BASE_URL),
+    isOtc: attributeValue(product, 'ATC-kode') !== '',
+    sourceUrl,
+    retrievedAt
+  };
+}
+
 export function findPharmacyEanMatches(products: readonly ApohemProduct[]): ApohemProduct[] {
   const chainsByEan = new Map<string, Set<PharmacyChain>>();
   for (const product of products) {
@@ -282,6 +398,35 @@ function addRows(
       return;
     }
   }
+}
+
+function apotek1Category(product: Apotek1Product): PharmacyProductCategory {
+  if (attributeValue(product, 'ATC-kode')) {
+    return 'otc';
+  }
+  const categoryText = [
+    attributeValue(product, 'Produkttype'),
+    attributeValue(product, 'Primærfunksjon'),
+    attributeValue(product, 'Innhold'),
+    text(product.name)
+  ].join(' ').toLowerCase();
+  if (categoryText.includes('hud') || categoryText.includes('sol') || categoryText.includes('ansikt')) {
+    return 'beauty';
+  }
+  return 'supplement';
+}
+
+function apotek1Price(prices: Apotek1Price[] | undefined, usage: string): number | null {
+  const price = prices?.find((candidate) => text(candidate.usage).toLowerCase() === usage.toLowerCase());
+  return numberFromText(price?.value);
+}
+
+function attributeValue(product: Apotek1Product, identifier: string): string {
+  const normalized = identifier.toLowerCase();
+  const attribute = product.attributes?.find((candidate) => {
+    return text(candidate.identifier).toLowerCase().startsWith(normalized) || text(candidate.name).toLowerCase() === normalized;
+  });
+  return text(attribute?.values?.[0]?.value);
 }
 
 function apohemCategory(product: ApohemSearchProduct, sourceUrl: string): PharmacyProductCategory {
@@ -436,6 +581,15 @@ function htmlHeaders(): RequestInit {
   return {
     headers: {
       accept: 'text/html,application/xhtml+xml',
+      'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
+    }
+  };
+}
+
+function jsonHeaders(): RequestInit {
+  return {
+    headers: {
+      accept: 'application/json',
       'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
     }
   };

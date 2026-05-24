@@ -32,6 +32,7 @@ import {
   buildMatpriskollenStoresUrl,
   buildMathemSearchUrl,
   buildMatsparSearchUrl,
+  buildApotek1SearchUrl,
   buildOpenFoodFactsProductUrl,
   buildOpenFoodFactsSwedenSearchUrl,
   buildOpenPricesConnectorUrl,
@@ -96,6 +97,7 @@ import {
   fetchWillysWeeklyDiscounts,
   fetchWillysWeeklyDiscountsForAllStores,
   findPharmacyEanMatches,
+  parseApotek1Products,
   parseApohemProducts,
   parseApotekHjartatProducts,
   parseIcaReklambladOffers,
@@ -6848,7 +6850,8 @@ describe('daily ingestion runner', () => {
     const executor = new DailyIngestionExecutor();
     const requestedUrls: string[] = [];
     const apotekHjartatUrl = 'https://www.apotekhjartat.se/search?q=pamol';
-    const endpointUrl = `${GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL}?sourcePaths=/receptfritt&apotekHjartatUrls=${encodeURIComponent(apotekHjartatUrl)}`;
+    const apotek1Url = buildApotek1SearchUrl('vitamin', 1, 1);
+    const endpointUrl = `${GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL}?sourcePaths=/receptfritt&apotekHjartatUrls=${encodeURIComponent(apotekHjartatUrl)}&apotek1Urls=${encodeURIComponent(apotek1Url)}`;
     const result = await runDailyIngestion({
       executor,
       requestedAt: '2026-05-23T08:40:34.000Z',
@@ -6895,13 +6898,16 @@ describe('daily ingestion runner', () => {
             ]};</script>
           `, { status: 200, headers: { 'content-type': 'text/html' } });
         }
+        if (String(url).startsWith('https://www.apotek1.no/')) {
+          return Response.json({ catalogEntryView: [] });
+        }
         return new Response(`<script>window.INITIAL_DATA = JSON.parse('{"products":[]}');</script>`, { status: 200, headers: { 'content-type': 'text/html' } });
       }
     });
 
     assert.equal(result.status, 'succeeded');
     assert.equal(result.acceptedCount, 1);
-    assert.deepEqual(requestedUrls, ['https://www.apohem.se/receptfritt', apotekHjartatUrl]);
+    assert.deepEqual(requestedUrls, ['https://www.apohem.se/receptfritt', apotekHjartatUrl, apotek1Url]);
     assert.equal(executor.calls.some((call) => call.sql.includes('insert into stores')), false);
     const product = firstBatchProduct(executor);
     assert.equal(product.domain, 'pharmacy');
@@ -6916,10 +6922,11 @@ describe('daily ingestion runner', () => {
     assert.equal(observation.regular_price, 59);
   });
 
-  it('parses Apohem and Apotek Hjartat page fixtures with public EAN provenance only', () => {
+  it('parses public Apohem, Apotek Hjartat, and Apotek 1 fixtures with EAN provenance only', () => {
     const retrievedAt = '2026-05-23T08:40:34.000Z';
     const apohemSourceUrl = 'https://www.apohem.se/receptfritt';
     const apotekHjartatSourceUrl = 'https://www.apotekhjartat.se/search?q=pamol';
+    const apotek1SourceUrl = buildApotek1SearchUrl('vitamin', 1, 2);
     const sharedEan = '7046260976108';
     const apohemRows = parseApohemProducts(`
       <script>window.CURRENT_PAGE = {"listing":{"products":[
@@ -6985,9 +6992,43 @@ describe('daily ingestion runner', () => {
       apotekHjartatSourceUrl,
       retrievedAt
     );
+    const apotek1Rows = parseApotek1Products(JSON.stringify({
+      catalogEntryView: [{
+        partNumber: '817619p',
+        singleSKUCatalogEntryID: '817619',
+        name: 'COSRX The Vitamin C 13 serum 20 ml',
+        manufacturer: 'Apini AS',
+        seotoken: 'cosrx-the-vitamin-c-13-817619p',
+        thumbnail: '/wcsstore/ApoProductMaster/media/cosrx/200/250',
+        buyable: 'true',
+        price: [
+          { usage: 'Display', currency: 'NOK', value: '309.9' },
+          { usage: 'Offer', currency: 'NOK', value: '279,9' }
+        ],
+        attributes: [
+          { identifier: 'GTIN', name: 'GTIN', values: [{ value: '08800311121911' }] },
+          { identifier: 'Merke (22)', name: 'Merke', values: [{ value: 'COSRX' }] },
+          { identifier: 'Produkttype (1)', name: 'Produkttype', values: [{ value: 'Ansiktsserum' }] },
+          { identifier: 'ReceiptCode', name: 'ReceiptCode', values: [{ value: 'N' }] }
+        ]
+      }, {
+        partNumber: '217480p',
+        name: 'Vitamin B6-ratiopharm 40mg tabletter 100 enpac',
+        manufacturer: 'Grossister vgr 6',
+        seotoken: 'vitamin-b6-ratiopharm-tab-40mg-217480p',
+        buyable: 'true',
+        price: [{ usage: 'Offer', currency: 'NOK', value: '349.0' }],
+        attributes: [
+          { identifier: 'GTIN', name: 'GTIN', values: [{ value: '07038319116498' }] },
+          { identifier: 'ATC-kode', name: 'ATC-kode', values: [{ value: 'A11HA02' }] },
+          { identifier: 'ReceiptCode', name: 'ReceiptCode', values: [{ value: 'J' }] }
+        ]
+      }]
+    }), apotek1SourceUrl, retrievedAt);
 
     assert.equal(apohemRows.length, 1);
     assert.equal(apotekRows.length, 1);
+    assert.equal(apotek1Rows.length, 1);
     assert.deepEqual(apohemRows[0], {
       chain: 'apohem',
       code: 'apohem-alvedon-20',
@@ -7026,7 +7067,26 @@ describe('daily ingestion runner', () => {
       sourceUrl: apotekHjartatSourceUrl,
       retrievedAt
     });
-    assert.deepEqual(findPharmacyEanMatches([...apohemRows, ...apotekRows]).map((row) => row.sourceUrl), [
+    assert.deepEqual(apotek1Rows[0], {
+      chain: 'apotek-1',
+      code: '817619',
+      ean: '08800311121911',
+      name: 'COSRX The Vitamin C 13 serum 20 ml',
+      brand: 'COSRX',
+      category: 'beauty',
+      price: 279.9,
+      priceText: '279.90 NOK',
+      originalPrice: 309.9,
+      originalPriceText: '309.90 NOK',
+      vatPercent: null,
+      stockStatus: 'buyable',
+      productUrl: 'https://www.apotek1.no/produkter/cosrx-the-vitamin-c-13-817619p',
+      imageUrl: 'https://www.apotek1.no/wcsstore/ApoProductMaster/media/cosrx/200/250',
+      isOtc: false,
+      sourceUrl: apotek1SourceUrl,
+      retrievedAt
+    });
+    assert.deepEqual(findPharmacyEanMatches([...apohemRows, ...apotekRows, ...apotek1Rows]).map((row) => row.sourceUrl), [
       apohemSourceUrl,
       apotekHjartatSourceUrl
     ]);
