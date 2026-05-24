@@ -522,6 +522,7 @@ describe('verified-data UI', () => {
   it('ships signed-in price-report human review controls without anonymous moderation', async () => {
     const priceReports = await read('src/app/price-reports/page.tsx');
     const actions = await read('src/components/price-report-review-actions.tsx');
+    const communityReviews = await read('src/lib/community-reviews.ts');
     const server = await read('../../packages/server/src/index.ts');
 
     assert.match(priceReports, /PriceReportReviewActions/);
@@ -537,12 +538,22 @@ describe('verified-data UI', () => {
     assert.match(actions, /dismiss_community_report/);
     assert.match(actions, /needs_more_info/);
     assert.match(actions, /Request more info/);
+    assert.match(actions, /riskScore/);
+    assert.match(actions, /confidenceScore/);
+    assert.match(actions, /reviewAssignmentModerationScores/);
+    assert.match(actions, /moderationScoreSummary/);
+    assert.match(actions, /Risk score/);
+    assert.match(actions, /Confidence score/);
     assert.match(actions, /status.*in_progress/);
     assert.match(actions, /reviewedByHuman: true/);
     assert.match(actions, /Sign in first/);
     assert.match(actions, /No anonymous price-report moderation/);
     assert.doesNotMatch(actions, /localStorage\.setItem\('groceryview:userId'/);
     assert.doesNotMatch(actions, /demo-data|sample-data|mock session/i);
+    assert.match(communityReviews, /ReviewModerationScores/);
+    assert.match(communityReviews, /riskScore/);
+    assert.match(communityReviews, /confidenceScore/);
+    assert.match(communityReviews, /formatModerationScore/);
     assert.match(server, /\/api\/human-review\/assignments/);
     assert.match(server, /Session user is not a registered human reviewer/);
   });

@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { moderationScoreSummary, reviewAssignmentModerationScores } from '@/lib/community-reviews';
 
 type ReviewStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
 type BrowserSession = { accessToken: string; userId: string };
 type ReviewDecision = 'approve' | 'reject' | 'needs_more_info';
-type Assignment = { id: string; reviewId?: string; subjectType?: 'product_match' | 'community_report' | 'commodity_mapping'; subjectId?: string; priority?: string; reason?: string; assigneeId?: string; dueAt?: string; status?: string };
+type Assignment = { id: string; reviewId?: string; subjectType?: 'product_match' | 'community_report' | 'commodity_mapping'; subjectId?: string; priority?: string; reason?: string; assigneeId?: string; dueAt?: string; status?: string; riskScore?: number; confidenceScore?: number };
 type AssignmentResponse = { assignments?: Assignment[]; sla?: { status?: string; overdueAssignments?: number; breachedReviewIds?: string[] } };
 
 function readSession(): BrowserSession {
@@ -111,13 +112,17 @@ export function PriceReportReviewActions() {
 
       {queue?.assignments?.length ? (
         <ul className="mt-4 grid gap-3 lg:grid-cols-2">
-          {queue.assignments.slice(0, 4).map((assignment) => (
-            <li className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm" key={assignment.id}>
-              <p className="font-black text-slate-950">{assignment.subjectType ?? 'community_report'} · {assignment.priority ?? 'priority'}</p>
-              <p className="mt-1 text-slate-700">{assignment.reason ?? 'Needs human evidence review.'}</p>
-              <p className="mt-1 text-slate-600">{assignment.id} · due {assignment.dueAt ?? 'unassigned due date'}</p>
-            </li>
-          ))}
+          {queue.assignments.slice(0, 4).map((assignment) => {
+            const scores = reviewAssignmentModerationScores(assignment);
+            return (
+              <li className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm" key={assignment.id}>
+                <p className="font-black text-slate-950">{assignment.subjectType ?? 'community_report'} · {assignment.priority ?? 'priority'}</p>
+                <p className="mt-1 text-slate-700">{assignment.reason ?? 'Needs human evidence review.'}</p>
+                <p className="mt-1 font-black text-sky-900">{moderationScoreSummary(scores)}</p>
+                <p className="mt-1 text-slate-600">{assignment.id} · due {assignment.dueAt ?? 'unassigned due date'}</p>
+              </li>
+            );
+          })}
         </ul>
       ) : null}
 
