@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { ConsentManager } from '@/components/consent-manager';
 import { Providers } from './providers';
 import './globals.css';
+import { getSentryConfig } from '../../../../sentry.config';
 
 const siteUrl = 'https://grocery-web-mu.vercel.app';
 const organizationJsonLd = {
@@ -30,6 +31,13 @@ export const metadata: Metadata = {
   manifest: '/manifest.webmanifest'
 };
 
+const sentryConfig = getSentryConfig('web');
+const sentrySource = 'https://browser.sentry-cdn.com/7.120.4/bundle.min.js';
+const sentryInitScript = JSON.stringify({
+  ...sentryConfig,
+  dsn: sentryConfig.dsn ?? ''
+});
+
 function jsonLd(value: unknown) {
   return JSON.stringify(value).replace(/</g, '\\u003c');
 }
@@ -42,6 +50,17 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           dangerouslySetInnerHTML={{ __html: jsonLd([organizationJsonLd, websiteJsonLd]) }}
           type="application/ld+json"
         />
+        {sentryConfig.enabled && sentryConfig.dsn ? (
+          <>
+            <script src={sentrySource} crossOrigin="anonymous" defer />
+            <script
+              defer
+              dangerouslySetInnerHTML={{
+                __html: `if (window.Sentry) { window.Sentry.init(${sentryInitScript}); }`
+              }}
+            />
+          </>
+        ) : null}
         <Providers>{children}</Providers>
         <ConsentManager />
       </body>
