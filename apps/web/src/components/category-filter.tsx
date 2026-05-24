@@ -1,6 +1,6 @@
 'use client';
 
-import type { KeyboardEvent } from 'react';
+import { useId, type KeyboardEvent } from 'react';
 
 export type CategoryFilterOption = {
   id: string;
@@ -32,8 +32,9 @@ export function CategoryFilter({
   statusMessage,
   onSelect
 }: CategoryFilterProps) {
-  const describedById = 'category-filter-description';
-  const statusId = 'category-filter-status';
+  const baseId = useId();
+  const describedById = `${baseId}-description`;
+  const statusId = `${baseId}-status`;
   const selectedOption = options.find((option) => option.id === selectedCategoryId);
   const visibleStatus = statusMessage ?? (selectedOption ? `${selectedOption.label} category selected.` : 'No category filter selected.');
 
@@ -51,7 +52,7 @@ export function CategoryFilter({
       <div aria-describedby={`${describedById} ${statusId}`} aria-label="Available grocery categories" className="mt-4 flex flex-wrap gap-2" role="list">
         {options.map((option) => {
           const selected = option.id === selectedCategoryId;
-          const optionDescriptionId = `category-filter-${option.id}-description`;
+          const optionDescriptionId = `${baseId}-${option.id}-description`;
           const select = () => onSelect(option.id);
           return (
             <div key={option.id} role="listitem">
