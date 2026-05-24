@@ -15,17 +15,43 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Classify PR changes
+        id: changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          run_preview=false
+          while IFS= read -r name; do
+            case "$name" in
+              .github/workflows/lighthouse.yml|docs/data-sources.md|docs/ingestion/*|apps/web/src/lib/ingested/*|packages/ingestion/*|scripts/ingestion/*)
+                ;;
+              *)
+                run_preview=true
+                break
+                ;;
+            esac
+          done < <(git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}")
+          echo "run_preview=$run_preview" >> "$GITHUB_OUTPUT"
+          if [ "$run_preview" = "false" ]; then
+            echo "Skipping Vercel preview Lighthouse for ingestion-data-only PR."
+          fi
 
       - name: Setup Node
+        if: steps.changes.outputs.run_preview == 'true'
         uses: actions/setup-node@v5
         with:
           node-version: '22'
           cache: npm
 
       - name: Install dependencies
+        if: steps.changes.outputs.run_preview == 'true'
         run: npm ci
 
       - name: Resolve Vercel preview URL
+        if: steps.changes.outputs.run_preview == 'true'
         uses: actions/github-script@v8
         with:
           script: |
@@ -67,4 +93,5 @@ jobs:
             throw new Error(`Timed out waiting for a successful Vercel Preview deployment for ${ref}.`);
 
       - name: Run Lighthouse CI against Vercel preview
+        if: steps.changes.outputs.run_preview == 'true'
         run: npm run perf:lighthouse:preview -w @groceryview/web
