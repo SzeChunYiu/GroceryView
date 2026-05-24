@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { SavedViewActions } from '@/components/saved-view-actions';
 import { categorySummaries, dietaryScenarioFilters, formatPct, formatSek, immigrantAisleFinder, sustainableBrandFilter } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -12,6 +13,8 @@ export default function CategoriesIndexPage() {
     <PageShell>
       <Eyebrow>Categories</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Category coverage from verified product rows</h1>
+
+      <SavedViewActions alertEligible defaultLabel="Category filters" surface="categories" />
       <Card className="mt-6 border-orange-200 bg-orange-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-orange-800">Immigrants / new arrivals</p>
         <h2 className="mt-2 text-2xl font-black">Halal, kosher & ethnic aisle finder</h2>

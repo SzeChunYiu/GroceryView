@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { calculateBrandTierIndices } from '@groceryview/core';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { SavedViewActions } from '@/components/saved-view-actions';
 import { buildBrandTierPriceObservations } from '@/lib/chain-index-data';
 import { expiryDealRadar, expiryDealRadarReports, kidsSnackLunchboxDeals, singlePortionDealFinder } from '@/lib/demo-data';
 import { digitalCatalogueOfferBoard, flyerValidityCalendar, offerExpiryReminderBoard } from '@/lib/verified-data';
@@ -46,6 +47,8 @@ export default function DealsPage() {
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
         This page calls buildExpiryDealRadar with visible product rows plus timestamped expiry-sticker reports. Expired and stale evidence stays visible as coverage context, but it is not promoted as an active deal.
       </p>
+
+      <SavedViewActions alertEligible defaultLabel="Deals filters" surface="deals" />
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
