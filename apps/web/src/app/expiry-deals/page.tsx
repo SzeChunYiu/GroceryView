@@ -32,8 +32,10 @@ function formatSek(value: number) {
   return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);
 }
 
+const relativeTimeFormatter = new Intl.RelativeTimeFormat('sv-SE', { numeric: 'auto' });
+
 function formatDays(value: number) {
-  return new Intl.NumberFormat('sv-SE', { maximumFractionDigits: 1 }).format(value);
+  return relativeTimeFormatter.format(Math.round(value), 'day');
 }
 
 function sourceFor(reportId: string) {
@@ -126,7 +128,7 @@ export default function ExpiryDealsPage() {
                   </div>
                 </div>
                 <div className="mt-4 grid gap-2 text-sm font-semibold text-slate-700 md:grid-cols-3">
-                  <p className="rounded-lg bg-slate-50 p-3">Expires in {formatDays(item.hoursUntilExpiry / 24)} days</p>
+                  <p className="rounded-lg bg-slate-50 p-3">Expires in {formatDays(item.hoursUntilExpiry / 24)}</p>
                   <p className="rounded-lg bg-slate-50 p-3">{item.urgency.replace('_', ' ')}</p>
                   <p className="rounded-lg bg-slate-50 p-3">{item.verification.replace('_', ' ')}</p>
                 </div>

@@ -1257,15 +1257,25 @@ describe('verified-data UI', () => {
 
   it('surfaces a dedicated near-expiry deal radar page with confidence-backed core output', async () => {
     const source = await read('src/app/expiry-deals/page.tsx');
+    assert.match(source, /new Intl\\.RelativeTimeFormat\\('sv-SE'/);
     assert.match(source, /buildExpiryDealRadar/);
     assert.match(source, /expiryDealRadarReports/);
     assert.match(source, /ConfidenceBadge/);
     assert.match(source, /radarScore/);
     assert.match(source, /staleReportIds/);
     assert.match(source, /formatDays\\(item\\.hoursUntilExpiry \\/ 24\\)/);
-    assert.match(source, /Expires in \\{formatDays\\(item\\.hoursUntilExpiry \\/ 24\\)\\} days/);
+    assert.match(source, /Expires in \\{formatDays\\(item\\.hoursUntilExpiry \\/ 24\\)\\}/);
     assert.match(source, /near-expiry/i);
     assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
+  it('formats near-expiry expiry copy as Swedish relative days', async () => {
+    const source = await read('src/app/expiry-deals/page.tsx');
+    const formatter = new Intl.RelativeTimeFormat('sv-SE', { numeric: 'auto' });
+    const snapshot = `Expires in ${formatter.format(2, 'day')}`;
+    assert.equal(snapshot, 'Expires in om 2 dagar');
+    assert.match(source, /formatDays\\(value: number\\) \\{[\\s\\S]*relativeTimeFormatter\\.format\\(Math\\.round\\(value\\), 'day'\\)/);
+    assert.match(source, /Expires in \\{formatDays\\(item\\.hoursUntilExpiry \\/ 24\\)\\}/);
   });
 
   it('surfaces a deal screener landing card on the deals route with dedicated /screener navigation', async () => {
