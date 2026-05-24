@@ -73,7 +73,7 @@ function parseProductCard(chunk: string, sourceUrl: string, retrievedAt: string)
     || productCodeFromUrl(attributeValue(chunk, /<a\b[^>]*\bproduct-item-link\b[^>]*>/i, 'href'));
   const productUrl = absoluteUrl(attributeValue(chunk, /<a\b[^>]*\bproduct-item-link\b[^>]*>/i, 'href'), LLOYDS_APOTEK_BASE_URL);
   const imageUrl = absoluteUrl(attributeValue(chunk, /<img\b(?=[^>]*\b(?:small_image|object-contain|catalog\/product)\b)[^>]*>/i, 'src'), LLOYDS_APOTEK_BASE_URL);
-  const ean = eanFromImageUrl(imageUrl) || eanFromText(chunk);
+  const ean = eanFromImageUrl(imageUrl);
   const name = cleanText(innerHtml(chunk, /<a\b[^>]*\bproduct-item-link\b[^>]*>([\s\S]*?)<\/a>/i))
     || decodeHtml(attributeValue(chunk, /<img\b(?=[^>]*\b(?:small_image|object-contain|catalog\/product)\b)[^>]*>/i, 'alt'));
   const price = numberFromText(attributeValue(chunk, /<span\b(?=[^>]*data-price-type=["']finalPrice["'])[^>]*>/i, 'data-price-amount'));
