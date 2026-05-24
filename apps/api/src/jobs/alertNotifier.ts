@@ -23,7 +23,7 @@ export type TriggeredPriceAlertEmailSent = {
 export type TriggeredPriceAlertEmailSkipped = {
   recipientEmail: string;
   productId: string;
-  reason: 'not_price_threshold_alert';
+  reason: 'not_price_threshold_alert' | 'one_off_outlier';
 };
 
 export type NotifyTriggeredPriceAlertsResult = {
@@ -47,6 +47,15 @@ export async function notifyTriggeredPriceAlerts(
       continue;
     }
 
+    if (isOneOffOutlierAlert(notification.alert)) {
+      skipped.push({
+        recipientEmail: notification.recipientEmail,
+        productId: notification.alert.productId,
+        reason: 'one_off_outlier'
+      });
+      continue;
+    }
+
     const message = buildTriggeredPriceAlertEmail(notification, input.baseUrl, input.now);
     const messageId = await input.emailClient.send(message);
     sent.push({
@@ -66,6 +75,56 @@ export function isEmailNotifiablePriceAlert(alert: WatchlistAlert): boolean {
     typeof alert.trigger.value === 'number' &&
     typeof alert.trigger.threshold === 'number'
   );
+}
+
+export function isOneOffOutlierAlert(alert: WatchlistAlert): boolean {
+  if (!isEmailNotifiablePriceAlert(alert)) {
+    return false;
+  }
+
+  const trigger = alert.trigger as Record<string, unknown>;
+  const outlierStreak = numericTriggerField(trigger, ['outlierStreak', 'consecutiveOutlierCount', 'outlierCount']) ?? 1;
+  if (outlierStreak > 1) {
+    return false;
+  }
+
+  if (trigger.isOutlier === true || trigger.outlier === true || trigger.outlierWarning === true) {
+    return true;
+  }
+
+  if (typeof alert.trigger.value !== 'number') {
+    return false;
+  }
+
+  const value = alert.trigger.value;
+  const low = numericTriggerField(trigger, ['confidenceLow', 'lowerConfidenceBound', 'lowConfidence', 'bandLow']);
+  const high = numericTriggerField(trigger, ['confidenceHigh', 'upperConfidenceBound', 'highConfidence', 'bandHigh']);
+
+  if (low !== undefined && value < low) {
+    return true;
+  }
+
+  if (high !== undefined && value > high) {
+    return true;
+  }
+
+  const baseline = numericTriggerField(trigger, ['rollingAverage', 'rollingMean', 'rollingMedian', 'baselineValue', 'previousValue']);
+  if (baseline === undefined || baseline === 0) {
+    return false;
+  }
+
+  return Math.abs(value - baseline) / Math.abs(baseline) >= 0.35;
+}
+
+function numericTriggerField(trigger: Record<string, unknown>, names: string[]): number | undefined {
+  for (const name of names) {
+    const value = trigger[name];
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value;
+    }
+  }
+
+  return undefined;
 }
 
 export function buildTriggeredPriceAlertEmail(

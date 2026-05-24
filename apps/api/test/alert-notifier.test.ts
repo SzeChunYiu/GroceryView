@@ -56,6 +56,56 @@ describe('transactional price alert email notifier', () => {
     assert.equal(alertsRoutes.priceAlertEmailNotifierJob, 'jobs/alerts/price-email-notifier');
   });
 
+  it('suppresses one-off outlier price updates before sending alert emails', async () => {
+    const sentMessages: TransactionalEmailMessage[] = [];
+
+    const result = await notifyTriggeredPriceAlerts({
+      baseUrl: 'https://groceryview.se',
+      emailClient: {
+        send: async (message) => {
+          sentMessages.push(message);
+          return 'message-1';
+        }
+      },
+      notifications: [
+        {
+          recipientEmail: 'shopper@example.com',
+          alert: {
+            ...targetPriceAlert,
+            trigger: {
+              ...targetPriceAlert.trigger,
+              value: 9.9,
+              confidenceLow: 42,
+              confidenceHigh: 68,
+              outlierStreak: 1
+            } as WatchlistAlert['trigger']
+          }
+        },
+        {
+          recipientEmail: 'shopper@example.com',
+          alert: {
+            ...targetPriceAlert,
+            productId: 'coffee-450g-repeat',
+            trigger: {
+              ...targetPriceAlert.trigger,
+              value: 9.9,
+              confidenceLow: 42,
+              confidenceHigh: 68,
+              outlierStreak: 2
+            } as WatchlistAlert['trigger']
+          }
+        }
+      ],
+      now: '2026-05-24T02:00:00.000Z'
+    });
+
+    assert.equal(result.sent.length, 1);
+    assert.equal(result.skipped.length, 1);
+    assert.equal(result.skipped[0]?.reason, 'one_off_outlier');
+    assert.equal(result.skipped[0]?.productId, 'coffee-450g');
+    assert.equal(sentMessages[0]?.metadata?.productId, 'coffee-450g-repeat');
+  });
+
   it('formats Resend and Postmark transactional email requests without leaking API keys', async () => {
     const calls: Array<{ url: string; init: RequestInit }> = [];
 
