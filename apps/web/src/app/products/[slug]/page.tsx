@@ -3,12 +3,14 @@ import { notFound } from 'next/navigation';
 import {
   buildPriceChartSeries,
   calculateDealScore,
+  getBenchmarksFor,
   recommendSmartSwaps,
   scoreBand,
   summarizePriceHistory,
   summarizePriceHistoryConfidence,
   type BrandTier
 } from '@groceryview/core';
+import { BenchmarkLayerBadge } from '@/components/benchmark-layer-badge';
 import {
   buildItemSubstitutionSuggestions,
   detectSeasonalSalePattern,
@@ -43,6 +45,7 @@ const timeframeWindows = [
   { label: '1Y', rangeDays: 365, rangeLabel: 'last 365 days' },
   { label: 'ALL', rangeDays: undefined, rangeLabel: 'all observed points' }
 ] as const;
+const productBenchmarks = getBenchmarksFor('SE', 'grocery').filter((benchmark) => benchmark.status !== 'live').slice(0, 2);
 const historyWindowDefinitions = [
   { label: '30-day', rangeDays: 30, title: 'Observed 30-day low/high' },
   { label: '90-day', rangeDays: 90, title: 'Observed 90-day low/high' },
@@ -1092,6 +1095,17 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
       <Eyebrow>{isChain ? 'Axfood chain product' : 'OpenPrices product'}</Eyebrow>
       <h1 className="mt-2 max-w-4xl text-4xl font-black tracking-tight">{product.name}</h1>
       <p className="mt-3 text-lg text-slate-700">{isChain ? product.brand : product.brands || 'Brand not reported'} · {isChain ? product.subline : product.quantity || 'Quantity not reported'}</p>
+      <Card className="mt-6 border-blue-200 bg-blue-50">
+        <h2 className="text-xl font-black text-slate-950">Official benchmark exists for this category — ingestion planned</h2>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {productBenchmarks.map((benchmark) => (
+            <span className="inline-flex items-center gap-2" key={benchmark.id}>
+              <BenchmarkLayerBadge layer={benchmark.layer} />
+              <span className="text-sm font-bold text-slate-700">{benchmark.label}</span>
+            </span>
+          ))}
+        </div>
+      </Card>
       <div className="mt-6 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
         <Card>
           {product.image ? (

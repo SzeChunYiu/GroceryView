@@ -5077,3 +5077,7 @@ export function calculateChainPriceIndex(observations: ChainPriceObservation[]):
 
   return { chains, categories, marketReferenceByCategory, generatedFrom: usable.length };
 }
+
+export * from './types/benchmark.js';
+export { benchmarkRegistry } from './data/benchmarkRegistry.js';
+export { getBenchmarkCategories, getBenchmarksFor, linkBenchmarkToCommodity } from './lib/benchmarkRegistry.js';

@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { calculateBrandTierIndices, calculateChainPriceIndex } from '@groceryview/core';
+import { calculateBrandTierIndices, calculateChainPriceIndex, getBenchmarksFor } from '@groceryview/core';
+import { BenchmarkLayerBadge } from '@/components/benchmark-layer-badge';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
 import { buildBrandTierPriceObservations, buildChainIndexTrendSeries, buildChainPriceObservations, buildMatchedBasketChainPriceObservations } from '@/lib/chain-index-data';
@@ -29,6 +30,7 @@ const widgetSourceConfidence = matchedBasketRefinedIndex.chains.reduce(
 );
 
 const groceryIndexTickerWidget = buildGroceryIndexTickerWidget(widgetSourceConfidence);
+const chainIndexBenchmarks = getBenchmarksFor('SE', 'grocery').filter((benchmark) => benchmark.status !== 'live').slice(0, 2);
 
 function tierTone(value: number) {
   if (value < 95) return 'text-emerald-800 bg-emerald-50';
@@ -63,6 +65,17 @@ export default function ChainIndexPage() {
       <Eyebrow>Chain index</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Willys/Hemköp matched-product index</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">The index is computed only from products with the same Axfood code in both chain catalogues. It does not mix unmatched SKUs or branch-location data.</p>
+      <Card className="mt-6 border-blue-200 bg-blue-50">
+        <h2 className="text-xl font-black text-slate-950">Official benchmark exists for grocery categories — ingestion planned</h2>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {chainIndexBenchmarks.map((benchmark) => (
+            <span className="inline-flex items-center gap-2" key={benchmark.id}>
+              <BenchmarkLayerBadge layer={benchmark.layer} />
+              <span className="text-sm font-bold text-slate-700">{benchmark.label}</span>
+            </span>
+          ))}
+        </div>
+      </Card>
       <div className="mt-6 grid gap-4 md:grid-cols-3">
         <Card><p className="text-sm font-black text-slate-600">Matched products</p><p className="mt-2 text-4xl font-black text-emerald-800">{matchedChainProducts.length}</p></Card>
         <Card><p className="text-sm font-black text-slate-600">Average spread</p><p className="mt-2 text-4xl font-black text-emerald-800">{formatPct(averageSpread)}</p></Card>

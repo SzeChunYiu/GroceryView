@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import { getBenchmarksFor } from '@groceryview/core';
+import { BenchmarkLayerBadge } from '@/components/benchmark-layer-badge';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { formatFuelPrice, fuelPriceSourceSchema, fuelPriceTargetAlerts, verifiedFuelPriceObservations, verifiedFuelPriceSource } from '@/lib/fuel-prices';
 import { fuelStations, fuelStationSource, type FuelStationChain } from '@/lib/ingested/fuel-stations';
@@ -30,6 +32,7 @@ const fuelChainColors: Record<FuelStationChain, string> = {
   Qstar: '#6f42c1',
   Shell: '#ffd100'
 };
+const fuelBenchmarks = getBenchmarksFor('SE', 'fuel').filter((benchmark) => benchmark.status !== 'live').slice(0, 2);
 
 function fuelStationPosition(latitude: number, longitude: number) {
   const x = ((longitude - fuelMapBounds.minLon) / (fuelMapBounds.maxLon - fuelMapBounds.minLon)) * 100;
@@ -63,6 +66,17 @@ export default function FuelPage() {
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
         GroceryView now renders fuel only from domain=fuel observations with price per litre and source provenance. The first operator source is OKQ8&apos;s public fuel price page; crowd reports remain schema-ready but empty.
       </p>
+      <Card className="mt-6 border-orange-200 bg-orange-50">
+        <h2 className="text-xl font-black text-slate-950">Official benchmark exists for fuel — ingestion planned</h2>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {fuelBenchmarks.map((benchmark) => (
+            <span className="inline-flex items-center gap-2" key={benchmark.id}>
+              <BenchmarkLayerBadge layer={benchmark.layer} />
+              <span className="text-sm font-bold text-slate-700">{benchmark.label}</span>
+            </span>
+          ))}
+        </div>
+      </Card>
 
       <div className="mt-6 grid gap-4 md:grid-cols-3">
         <Card>
