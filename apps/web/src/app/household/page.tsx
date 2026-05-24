@@ -1,5 +1,6 @@
 import { Card, Eyebrow, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { HouseholdPlanActions } from '@/components/household-plan-actions';
+import { demoPantryStockLevels, getRecurringPantryTopUps, recurringPantryTemplates } from '@/lib/recurring-lists';
 import { formatPct, formatSek, shareableHouseholdListContract, sourceCoverage, topChainSpreads } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -46,6 +47,7 @@ const householdEvidence = [
 export default function FeaturePage() {
   const route = 'household';
   const planningRows = topChainSpreads.slice(0, 4);
+  const duePantryTopUps = getRecurringPantryTopUps(demoPantryStockLevels);
 
   return (
     <PageShell>
@@ -79,6 +81,36 @@ export default function FeaturePage() {
         <ul className="mt-4 grid gap-2 text-sm leading-6 text-slate-600 md:grid-cols-2">
           {shareableHouseholdListContract.guardrails.map((guardrail) => <li key={guardrail}>• {guardrail}</li>)}
         </ul>
+      </Card>
+
+
+      <Card className="mt-6">
+        <Eyebrow>Recurring pantry top-ups</Eyebrow>
+        <h2 className="mt-2 text-2xl font-black tracking-tight">templates auto-add low-stock essentials on their configured interval</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
+          Pantry templates keep staples on a recurring cadence, but only add items when the tracked pantry count is at or below the template threshold.
+        </p>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          {duePantryTopUps.map((template) => (
+            <div key={template.id} className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+              <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-700">Auto-add today</p>
+              <h3 className="mt-2 font-black text-slate-950">{template.title}</h3>
+              <p className="mt-1 text-sm text-slate-600">Every {template.intervalDays} days · last added {template.lastAddedOn}</p>
+              <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-700">
+                {template.items.map((item) => (
+                  <li key={item.name}>• {item.addQuantity} {item.name} when stock is ≤ {item.lowStockThreshold}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+          {recurringPantryTemplates.map((template) => (
+            <div key={template.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Template</p>
+              <h3 className="mt-2 font-black text-slate-950">{template.title}</h3>
+              <p className="mt-1 text-sm text-slate-600">Runs every {template.intervalDays} days · next run {template.nextAddOn}</p>
+            </div>
+          ))}
+        </div>
       </Card>
 
       <section className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
