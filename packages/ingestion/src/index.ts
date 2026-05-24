@@ -3317,6 +3317,11 @@ function dailyPayloadHash(payload: unknown): string {
   return `sha256:${createHash('sha256').update(JSON.stringify(payload)).digest('hex')}`;
 }
 
+function normalizeDailyExactMatchKey(value: string | undefined | null): string | null {
+  const normalized = value?.trim().toLowerCase();
+  return normalized ? normalized : null;
+}
+
 type BatchRawRecordIdRow = { ordinal: number; id: string };
 type FuelPriceSourceIdRow = { id: string };
 type BatchProductIdRow = { slug: string; id: string };
@@ -3483,7 +3488,7 @@ async function upsertDailyProduct(executor: QueryExecutor, product: IngestedProd
       normalizeDailySlug(product.id),
       product.canonicalName,
       product.brand ?? null,
-      product.barcode ?? null,
+      normalizeDailyExactMatchKey(product.barcode),
       product.categoryId ? [product.categoryId] : [],
       product.packageSize,
       product.packageUnit,
@@ -3592,7 +3597,7 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
         slug: normalizeDailySlug(product.id),
         canonical_name: product.canonicalName,
         brand: product.brand ?? null,
-        barcode: product.barcode ?? null,
+        barcode: normalizeDailyExactMatchKey(product.barcode),
         category_id: product.categoryId ?? null,
         package_size: product.packageSize ?? null,
         package_unit: product.packageUnit ?? null,
