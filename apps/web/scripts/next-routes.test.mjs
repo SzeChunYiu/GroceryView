@@ -194,6 +194,21 @@ describe('verified-data UI', () => {
     assert.match(scanning, /No scan upload storage provider configured/);
   });
 
+  it('surfaces accessible correction-status filters for premium OCR scan history', async () => {
+    const timeline = await read('src/components/ocr-scan-history-timeline.tsx');
+    const history = await read('src/lib/scanner-history.ts');
+
+    assert.match(timeline, /aria-label="Filter OCR scan history by correction status"/);
+    assert.match(timeline, /aria-pressed/);
+    assert.match(timeline, /Corrections pending/);
+    assert.match(timeline, /Corrected/);
+    assert.match(timeline, /Export ready/);
+    assert.match(history, /corrections_pending/);
+    assert.match(history, /corrected/);
+    assert.match(history, /export_ready/);
+    assert.match(history, /filterOcrScanHistoryByCorrectionStatus/);
+  });
+
 
 
   it('surfaces receipt-fed commodity alias growth without exposing private receipts', async () => {
