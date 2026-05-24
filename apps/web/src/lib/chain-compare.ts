@@ -9,6 +9,22 @@ export const COMPARE_CHAIN_ORDER = [
 ] as const;
 
 export type CompareChainId = (typeof COMPARE_CHAIN_ORDER)[number]['id'];
+type CompareChain = (typeof COMPARE_CHAIN_ORDER)[number];
+
+export type CompareStoreCapability = {
+  chainId: CompareChainId;
+  coupons: boolean;
+  delivery: boolean;
+  pickup: boolean;
+};
+
+export type CompareStoreCapabilityFilter = Partial<Pick<CompareStoreCapability, 'coupons' | 'delivery' | 'pickup'>>;
+
+export const dbSiteCompareStoreCapabilities = [
+  { chainId: 'ica', coupons: true, delivery: true, pickup: true },
+  { chainId: 'willys', coupons: true, delivery: true, pickup: true },
+  { chainId: 'coop', coupons: false, delivery: true, pickup: true }
+] as const satisfies readonly CompareStoreCapability[];
 
 export type ChainCompareCell = {
   chainId: CompareChainId;
@@ -41,10 +57,23 @@ export type ChainCompareProductRow = {
 export type ChainComparisonTable = {
   requestedIds: string[];
   missingProductIds: string[];
+  visibleChains: CompareChain[];
   products: ChainCompareProductRow[];
   sourceLabel: string;
   generatedAt: string | null;
 };
+
+function visibleCompareChains(filters: CompareStoreCapabilityFilter = {}): CompareChain[] {
+  const capabilitiesByChain = new Map(dbSiteCompareStoreCapabilities.map((row) => [row.chainId, row]));
+  return COMPARE_CHAIN_ORDER.filter((chain) => {
+    const capabilities = capabilitiesByChain.get(chain.id);
+    if (!capabilities) return false;
+    if (filters.coupons === true && !capabilities.coupons) return false;
+    if (filters.delivery === true && !capabilities.delivery) return false;
+    if (filters.pickup === true && !capabilities.pickup) return false;
+    return true;
+  });
+}
 
 function normalizeCompareId(value: string): string {
   return value.trim().toLowerCase();
@@ -132,8 +161,8 @@ function formatCommodityPricedCell(
   };
 }
 
-function comparePackagedProductRow(requestedId: string, product: AxfoodProduct): ChainCompareProductRow {
-  const cells = COMPARE_CHAIN_ORDER.map((chain) => {
+function comparePackagedProductRow(requestedId: string, product: AxfoodProduct, visibleChains: readonly CompareChain[]): ChainCompareProductRow {
+  const cells = visibleChains.map((chain) => {
     const price = product.chains[chain.id];
     return price ? formatPackagedPricedCell(chain.label, chain.id, product, price) : formatMissingCell(chain.label, chain.id);
   });
@@ -156,9 +185,14 @@ function comparePackagedProductRow(requestedId: string, product: AxfoodProduct):
   };
 }
 
-function compareCommodityProductRow(requestedId: string, product: AxfoodProduct, comparison: NonNullable<ReturnType<typeof commodityComparisonForProduct>>): ChainCompareProductRow {
+function compareCommodityProductRow(
+  requestedId: string,
+  product: AxfoodProduct,
+  comparison: NonNullable<ReturnType<typeof commodityComparisonForProduct>>,
+  visibleChains: readonly CompareChain[]
+): ChainCompareProductRow {
   const rowsByChain = new Map(comparison.rows.map((row) => [row.chainId, row]));
-  const cells = COMPARE_CHAIN_ORDER.map((chain) => {
+  const cells = visibleChains.map((chain) => {
     const row = rowsByChain.get(chain.id);
     return row
       ? formatCommodityPricedCell(chain.label, chain.id, comparison.comparableUnit, row)
@@ -183,18 +217,20 @@ function compareCommodityProductRow(requestedId: string, product: AxfoodProduct,
   };
 }
 
-function compareProductRow(requestedId: string, product: AxfoodProduct): ChainCompareProductRow {
+function compareProductRow(requestedId: string, product: AxfoodProduct, visibleChains: readonly CompareChain[]): ChainCompareProductRow {
   const commodityComparison = commodityComparisonForProduct(product.slug);
-  if (commodityComparison?.status === 'priced') return compareCommodityProductRow(requestedId, product, commodityComparison);
-  return comparePackagedProductRow(requestedId, product);
+  if (commodityComparison?.status === 'priced') return compareCommodityProductRow(requestedId, product, commodityComparison, visibleChains);
+  return comparePackagedProductRow(requestedId, product, visibleChains);
 }
 
 export function buildChainComparisonTable(
   productsParam: string | string[] | null | undefined,
-  products: readonly AxfoodProduct[] = axfoodProducts
+  products: readonly AxfoodProduct[] = axfoodProducts,
+  capabilityFilters: CompareStoreCapabilityFilter = {}
 ): ChainComparisonTable {
   const requestedIds = parseCompareProductsParam(productsParam);
   const byId = productLookup(products);
+  const visibleChains = visibleCompareChains(capabilityFilters);
   const rows: ChainCompareProductRow[] = [];
   const missingProductIds: string[] = [];
 
@@ -204,12 +240,13 @@ export function buildChainComparisonTable(
       missingProductIds.push(requestedId);
       continue;
     }
-    rows.push(compareProductRow(requestedId, product));
+    rows.push(compareProductRow(requestedId, product, visibleChains));
   }
 
   return {
     requestedIds,
     missingProductIds,
+    visibleChains,
     products: rows,
     sourceLabel: dbSiteSnapshotGeneratedAt
       ? 'postgres.latest_prices/observations via packages/db site snapshot'

@@ -2531,6 +2531,30 @@ ${seo}`;
     assert.doesNotMatch(compareLib, /Math\.random|placeholder|synthetic/i);
   });
 
+  it('guards compare store capability filters against unknown chain ids', async () => {
+    const compareLib = await read('src/lib/chain-compare.ts');
+    const knownChainIds = new Set([...compareLib.matchAll(/\{\s*id: '([^']+)', label:/g)].map((match) => match[1]));
+    const capabilityChainIds = [...compareLib.matchAll(/chainId: '([^']+)'/g)].map((match) => match[1]);
+
+    assert.ok(capabilityChainIds.length > 0);
+    assert.deepEqual(capabilityChainIds.filter((chainId) => !knownChainIds.has(chainId)), []);
+    assert.match(compareLib, /dbSiteCompareStoreCapabilities/);
+    assert.match(compareLib, /satisfies readonly CompareStoreCapability\[\]/);
+  });
+
+  it('filters compare visibleChains by generated coupons delivery and pickup capabilities', async () => {
+    const compareLib = await read('src/lib/chain-compare.ts');
+
+    assert.match(compareLib, /visibleCompareChains\(filters: CompareStoreCapabilityFilter = \{\}\)/);
+    assert.match(compareLib, /dbSiteCompareStoreCapabilities\.map\(\(row\) => \[row\.chainId, row\]\)/);
+    assert.match(compareLib, /filters\.coupons === true && !capabilities\.coupons/);
+    assert.match(compareLib, /filters\.delivery === true && !capabilities\.delivery/);
+    assert.match(compareLib, /filters\.pickup === true && !capabilities\.pickup/);
+    assert.match(compareLib, /visibleChains = visibleCompareChains\(capabilityFilters\)/);
+    assert.match(compareLib, /compareProductRow\(requestedId, product, visibleChains\)/);
+    assert.match(compareLib, /visibleChains,/);
+  });
+
   it('surfaces an item comparison route with four-item nutrition, store price, and trend coverage', async () => {
     const route = await read('src/app/compare-items/page.tsx');
     const table = await read('src/components/ItemComparisonTable.tsx');
