@@ -1902,12 +1902,14 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
           if (!authOptions.authSecret) return errorResponse(503, 'Auth secret is not configured.');
           if (!authOptions.authSessionExchange) return errorResponse(503, 'Auth session exchange is not configured.');
           const assertion = authProviderAssertionFromBody(await readJson(request));
-          let verified: VerifiedAuthProviderUser;
-          try {
-            verified = await authOptions.authSessionExchange.verify(assertion);
-          } catch {
-            return errorResponse(401, 'Auth provider assertion rejected.');
-          }
+          const verified = await (async (): Promise<VerifiedAuthProviderUser | undefined> => {
+            try {
+              return await authOptions.authSessionExchange.verify(assertion);
+            } catch {
+              return undefined;
+            }
+          })();
+          if (!verified) return errorResponse(401, 'Auth provider assertion rejected.');
           const userId = requiredString(verified.userId, 'verifiedUser.userId');
           const email = optionalString(verified.email, 'verifiedUser.email');
           const expiresAt = optionalIsoTimestamp(verified.expiresAt, 'verifiedUser.expiresAt') ?? defaultSessionExpiresAt(authOptions.now ?? new Date());
@@ -3328,12 +3330,13 @@ function parseCatalogCoverageTargets(value: string | undefined): Omit<CatalogCov
 
 function validatePublicWebUrl(publicWebUrl: string | undefined): void {
   if (!publicWebUrl) return;
-  let parsed: URL;
-  try {
-    parsed = new URL(publicWebUrl);
-  } catch {
-    throw new Error('PUBLIC_WEB_URL must be a valid absolute URL.');
-  }
+  const parsed = (() => {
+    try {
+      return new URL(publicWebUrl);
+    } catch {
+      throw new Error('PUBLIC_WEB_URL must be a valid absolute URL.');
+    }
+  })();
   if (!['http:', 'https:'].includes(parsed.protocol)) {
     throw new Error('PUBLIC_WEB_URL must use http or https.');
   }
