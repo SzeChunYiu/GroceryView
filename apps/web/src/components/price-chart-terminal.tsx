@@ -23,6 +23,8 @@ export type PriceChartTerminalSeries = {
     time: string;
     value: number;
     confidence: number;
+    lowerBound?: number;
+    upperBound?: number;
     provenanceLabel?: string;
   }>;
   markers: Array<{
@@ -65,6 +67,32 @@ function lineStyleFor(lineStyle: LineStyleName, lineStyles: LightweightChartsVal
 
 function chartColorFor(index: number) {
   return ['#047857', '#0f766e', '#2563eb', '#7c3aed'][index % 4]!;
+}
+
+function bandColorFor(index: number) {
+  return ['rgba(4, 120, 87, 0.38)', 'rgba(15, 118, 110, 0.38)', 'rgba(37, 99, 235, 0.34)', 'rgba(124, 58, 237, 0.34)'][index % 4]!;
+}
+
+function volatilityBandForPoint(point: PriceChartTerminalSeries['points'][number]) {
+  if (point.lowerBound !== undefined && point.upperBound !== undefined) {
+    return {
+      lower: point.lowerBound,
+      upper: point.upperBound
+    };
+  }
+  const confidence = Math.max(0, Math.min(1, point.confidence));
+  const margin = Math.max(0.03, (1 - confidence) * 0.18);
+  return {
+    lower: Math.max(0, Math.round((point.value * (1 - margin) + Number.EPSILON) * 100) / 100),
+    upper: Math.round((point.value * (1 + margin) + Number.EPSILON) * 100) / 100
+  };
+}
+
+function latestVolatilityBandLabel(series: PriceChartTerminalSeries) {
+  const point = series.points.at(-1);
+  if (!point) return 'no band';
+  const band = volatilityBandForPoint(point);
+  return `${band.lower.toLocaleString('sv-SE')}–${band.upper.toLocaleString('sv-SE')}`;
 }
 
 export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTerminalModel }>) {
@@ -114,6 +142,19 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
         });
 
         activeWindow.series.forEach((series, index) => {
+          const bandColor = bandColorFor(index);
+          const lowerBand = chartApi.addSeries(LineSeries, {
+            color: bandColor,
+            lineWidth: 1,
+            lineStyle: LineStyle.Dashed,
+            lastValueVisible: false,
+            priceLineVisible: false
+          });
+          lowerBand.setData(series.points.map((point) => ({
+            time: point.time.slice(0, 10),
+            value: volatilityBandForPoint(point).lower
+          })));
+
           const line = chartApi.addSeries(LineSeries, {
             color: chartColorFor(index),
             lineWidth: 3,
@@ -124,6 +165,18 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
           line.setData(series.points.map((point) => ({
             time: point.time.slice(0, 10),
             value: point.value
+          })));
+
+          const upperBand = chartApi.addSeries(LineSeries, {
+            color: bandColor,
+            lineWidth: 1,
+            lineStyle: LineStyle.Dashed,
+            lastValueVisible: false,
+            priceLineVisible: false
+          });
+          upperBand.setData(series.points.map((point) => ({
+            time: point.time.slice(0, 10),
+            value: volatilityBandForPoint(point).upper
           })));
         });
 
@@ -206,6 +259,9 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
               <div className="rounded-2xl border border-white/10 bg-white/10 p-4" key={series.id}>
                 <p className="text-sm font-black text-white">{series.storeName} · {series.sourceType}</p>
                 <p className="mt-1 text-xs font-semibold text-slate-300">lineStyle {series.lineStyle} · {series.points.length} points · {series.markers.length} markers</p>
+                <p className="mt-2 text-xs font-bold text-emerald-100">
+                  Expected band: {latestVolatilityBandLabel(series)} around latest observed price.
+                </p>
                 {series.markers.length > 0 ? (
                   <p className="mt-3 rounded-xl bg-slate-950/70 p-3 text-xs font-bold text-emerald-100">
                     Latest marker: {series.markers.at(-1)?.text} · {series.markers.at(-1)?.time.slice(0, 10)}
