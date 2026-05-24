@@ -74,6 +74,43 @@ function productsPageUrl(page: number, selectedBrand = '', searchParams: SearchP
   return query ? `/products?${query}` : '/products';
 }
 
+const ZERO_RESULT_RELATED_SEARCHES = [
+  { keywords: ['fil', 'milk', 'yogurt', 'cheese', 'lactose'], searches: ['lactosefri mjölk', 'yoghurt', 'ost'], categoryHints: ['dairy', 'mejeri', 'milk', 'cheese'] },
+  { keywords: ['apple', 'banana', 'fruit', 'greens', 'veg'], searches: ['äpplen', 'bananer', 'grönsaker'], categoryHints: ['fruit', 'vegetable', 'produce', 'frukt', 'grönt'] },
+  { keywords: ['oat', 'rice', 'pasta', 'flour', 'cereal'], searches: ['havregryn', 'pasta', 'ris'], categoryHints: ['pantry', 'breakfast', 'skafferi'] },
+  { keywords: ['coffee', 'tea', 'juice', 'drink', 'soda'], searches: ['kaffe', 'te', 'juice'], categoryHints: ['drink', 'coffee', 'beverage', 'dryck'] },
+  { keywords: ['frozen', 'pizza', 'meal', 'dinner'], searches: ['fryst pizza', 'färdigrätt', 'frysta grönsaker'], categoryHints: ['frozen', 'meal', 'fryst'] }
+];
+
+function relatedSearchFallback(query: string) {
+  const normalizedQuery = query.toLocaleLowerCase('sv-SE');
+
+  return ZERO_RESULT_RELATED_SEARCHES.find((fallback) => (
+    fallback.keywords.some((keyword) => normalizedQuery.includes(keyword))
+  )) ?? ZERO_RESULT_RELATED_SEARCHES[0];
+}
+
+function zeroResultCategoryShortcuts(query: string, selectedCategory: string | string[] | undefined) {
+  const normalizedQuery = query.toLocaleLowerCase('sv-SE');
+  const activeCategory = (Array.isArray(selectedCategory) ? selectedCategory[0] : selectedCategory)?.toLocaleLowerCase('sv-SE') ?? '';
+  const fallback = relatedSearchFallback(query);
+
+  return facetedProductSearch.categoryFacets
+    .map((facet) => {
+      const normalizedFacet = facet.value.toLocaleLowerCase('sv-SE');
+      const score = [
+        normalizedQuery && normalizedFacet.includes(normalizedQuery) ? 2 : 0,
+        fallback.categoryHints.some((hint) => normalizedFacet.includes(hint)) ? 3 : 0,
+        Math.min(facet.count / 100, 1)
+      ].reduce((total, value) => total + value, 0);
+
+      return { ...facet, score };
+    })
+    .filter((facet) => facet.value.toLocaleLowerCase('sv-SE') !== activeCategory)
+    .sort((left, right) => right.score - left.score || right.count - left.count)
+    .slice(0, 6);
+}
+
 export default async function ProductsPage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
   const search = buildProductSearchView(resolvedSearchParams);
@@ -90,6 +127,8 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const rangeStart = resultCards.length === 0 ? 0 : pageStart + 1;
   const rangeEnd = Math.min(pageStart + PRODUCTS_PER_PAGE, resultCards.length);
   const defaultSearchCount = facetedProductSearch.resultCards.length;
+  const zeroResultFallback = relatedSearchFallback(search.query);
+  const zeroResultCategories = zeroResultCategoryShortcuts(search.query, resolvedSearchParams.category);
 
   function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence', string>>) {
     const params = new URLSearchParams();
@@ -191,6 +230,37 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-violet-900 shadow-sm">No active URL filters</span>
           )}
         </div>
+        {resultCards.length === 0 ? (
+          <div className="mt-5 rounded-3xl border border-amber-200 bg-amber-50 p-5">
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-800">No exact matches</p>
+            <h3 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Keep browsing with related searches and category shortcuts</h3>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-amber-950">
+              No verified products matched the current filters. Try a nearby term or jump into a populated category without losing the verified-data guardrails.
+            </p>
+            <div className="mt-4 grid gap-4 lg:grid-cols-2">
+              <div>
+                <p className="text-sm font-black text-slate-950">Related searches</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {zeroResultFallback.searches.map((relatedSearch) => (
+                    <Link className="rounded-full bg-white px-3 py-2 text-xs font-black text-amber-950 shadow-sm" href={`/products?q=${encodeURIComponent(relatedSearch)}`} key={relatedSearch}>
+                      {relatedSearch}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-black text-slate-950">Category shortcuts</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {zeroResultCategories.map((category) => (
+                    <Link className="rounded-full bg-white px-3 py-2 text-xs font-black text-amber-950 shadow-sm" href={`/products?category=${encodeURIComponent(category.value)}`} key={category.value}>
+                      {category.value} · {category.count}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : null}
         <div className="mt-5 grid gap-3 lg:grid-cols-4">
           <div className="rounded-2xl border border-violet-100 bg-white p-4 shadow-sm">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">Category facets</p>
