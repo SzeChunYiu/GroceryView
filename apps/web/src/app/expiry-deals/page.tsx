@@ -1,6 +1,6 @@
-import Link from 'next/link';
 import { buildExpiryDealRadar } from '@groceryview/core';
 import { ConfidenceBadge } from '@/components/confidence-badge';
+import { ExpiryDealRow } from '@/components/expiry-deal-row';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { expiryDealRadarReports } from '@/lib/demo-data';
 import { routeMetadata } from '@/lib/seo';
@@ -28,32 +28,8 @@ export function generateMetadata() {
   return routeMetadata('/expiry-deals');
 }
 
-function formatSek(value: number) {
-  return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);
-}
-
-function formatHours(value: number) {
-  return new Intl.NumberFormat('sv-SE', { maximumFractionDigits: 1 }).format(value);
-}
-
 function sourceFor(reportId: string) {
   return expiryDealRadarReports.find((report) => report.id === reportId)?.source ?? 'timestamped expiry report';
-}
-
-function confidenceFor(item: { verification: 'verified' | 'needs_confirmation'; photoCount: number; verificationCount: number }) {
-  if (item.verification === 'verified') {
-    return {
-      level: 'high' as const,
-      label: item.photoCount > 0 ? 'photo verified' : 'multi-report verified',
-      sampleSize: item.verificationCount + item.photoCount
-    };
-  }
-
-  return {
-    level: 'low' as const,
-    label: 'needs confirmation',
-    sampleSize: item.verificationCount + item.photoCount
-  };
 }
 
 export default function ExpiryDealsPage() {
@@ -105,34 +81,9 @@ export default function ExpiryDealsPage() {
         </div>
 
         <div className="mt-5 space-y-3">
-          {activeItems.map((item) => {
-            const confidence = confidenceFor(item);
-            return (
-              <Link className="block rounded-lg border border-emerald-100 bg-white p-4 shadow-sm hover:border-emerald-700" href={`/products/${item.productId}`} key={item.id}>
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                  <div>
-                    <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{item.storeName} - {item.category}</p>
-                    <h3 className="mt-2 text-xl font-black text-slate-950">{item.productName}</h3>
-                    <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-600">{item.source}</p>
-                    <div className="mt-3">
-                      <ConfidenceBadge {...confidence} />
-                    </div>
-                  </div>
-                  <div className="grid min-w-64 grid-cols-2 gap-2 text-sm font-semibold text-slate-700">
-                    <p className="rounded-lg bg-emerald-50 p-3"><span className="block text-xs uppercase text-slate-500">Now</span>{formatSek(item.currentPrice)}</p>
-                    <p className="rounded-lg bg-emerald-50 p-3"><span className="block text-xs uppercase text-slate-500">Save</span>{formatSek(item.savings)}</p>
-                    <p className="rounded-lg bg-emerald-50 p-3"><span className="block text-xs uppercase text-slate-500">Markdown</span>{item.markdownPercent}%</p>
-                    <p className="rounded-lg bg-emerald-50 p-3"><span className="block text-xs uppercase text-slate-500">Score</span>{item.radarScore}</p>
-                  </div>
-                </div>
-                <div className="mt-4 grid gap-2 text-sm font-semibold text-slate-700 md:grid-cols-3">
-                  <p className="rounded-lg bg-slate-50 p-3">Expires in {formatHours(item.hoursUntilExpiry)} hours</p>
-                  <p className="rounded-lg bg-slate-50 p-3">{item.urgency.replace('_', ' ')}</p>
-                  <p className="rounded-lg bg-slate-50 p-3">{item.verification.replace('_', ' ')}</p>
-                </div>
-              </Link>
-            );
-          })}
+          {activeItems.map((item) => (
+            <ExpiryDealRow item={item} key={item.id} />
+          ))}
         </div>
       </Card>
 
