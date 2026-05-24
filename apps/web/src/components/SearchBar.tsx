@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Search } from 'lucide-react';
 import { useEffect, useId, useMemo, useState } from 'react';
+import { useSearchHistory } from '@/hooks/useSearchHistory';
 
 type ProductSearchResult = {
   id: string;
@@ -29,6 +30,7 @@ export function SearchBar() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<ProductSearchResult[]>([]);
   const [status, setStatus] = useState<SearchStatus>('idle');
+  const { addSearchQuery, history } = useSearchHistory();
   const trimmedQuery = useMemo(() => query.trim(), [query]);
   const shouldShowDropdown = status !== 'idle' && trimmedQuery.length >= MIN_QUERY_LENGTH;
 
@@ -50,6 +52,7 @@ export function SearchBar() {
         const payload = await response.json() as ProductSearchResponse;
         if (!response.ok || payload.error) throw new Error(payload.error ?? 'product_search_failed');
         if (controller.signal.aborted) return;
+        addSearchQuery(trimmedQuery);
         setResults(payload.results ?? []);
         setStatus((payload.results ?? []).length > 0 ? 'ready' : 'empty');
       } catch (error) {
@@ -64,7 +67,7 @@ export function SearchBar() {
       window.clearTimeout(timeout);
       controller.abort();
     };
-  }, [trimmedQuery]);
+  }, [addSearchQuery, trimmedQuery]);
 
   return (
     <div className="relative w-full max-w-xl lg:w-[min(36vw,28rem)]">
@@ -86,6 +89,21 @@ export function SearchBar() {
           value={query}
         />
       </div>
+
+      {history.length > 0 ? (
+        <div className="mt-2 flex flex-wrap gap-2" aria-label="Recently searched items">
+          {history.map((historyQuery) => (
+            <button
+              className="rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-900 transition hover:border-emerald-700 hover:bg-white"
+              key={historyQuery}
+              onClick={() => setQuery(historyQuery)}
+              type="button"
+            >
+              {historyQuery}
+            </button>
+          ))}
+        </div>
+      ) : null}
 
       {shouldShowDropdown ? (
         <div
