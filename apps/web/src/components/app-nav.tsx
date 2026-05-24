@@ -19,7 +19,7 @@ import {
   Tags,
   Utensils
 } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { SearchBar } from './SearchBar';
 import { LanguagePreferenceSwitcher } from '@/components/language-preference-switcher';
 import { defaultLocale, localeCookieName, localeStorageKey, normalizeLocale, type SupportedLocale } from '@/lib/i18n';
@@ -83,6 +83,7 @@ const navGroups: NavGroup[] = [
 ];
 
 const mobileNavItems = navGroups.flatMap((group) => group.items);
+const installBannerDismissedKey = 'groceryview:install-banner-dismissed';
 
 function readPersistedLocale(): SupportedLocale {
   const localStorageLocale = normalizeLocale(window.localStorage.getItem(localeStorageKey));
@@ -98,6 +99,51 @@ function readPersistedLocale(): SupportedLocale {
     ?.split('=')[1];
 
   return normalizeLocale(cookieLocale) ?? defaultLocale;
+}
+
+function isInstalledDisplayMode() {
+  return window.matchMedia('(display-mode: standalone)').matches || (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
+}
+
+function InstallBanner() {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    setIsVisible(window.localStorage.getItem(installBannerDismissedKey) !== 'true' && !isInstalledDisplayMode());
+  }, []);
+
+  if (!isVisible) return null;
+
+  function dismissBanner() {
+    window.localStorage.setItem(installBannerDismissedKey, 'true');
+    setIsVisible(false);
+  }
+
+  return (
+    <aside aria-label="Install GroceryView" className="mx-auto w-full max-w-7xl px-4 pb-4 sm:px-6 lg:px-8">
+      <div className="flex flex-col gap-3 rounded-2xl border border-emerald-200 bg-white/88 p-4 text-sm shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="font-black text-emerald-950">Add GroceryView to your home screen</p>
+          <p className="mt-1 font-semibold leading-6 text-slate-700">
+            iOS: tap Share, then Add to Home Screen. Android: open Chrome menu, then Install app.
+          </p>
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          <a className="rounded-full bg-emerald-700 px-4 py-2 font-black text-white" href="/manifest.webmanifest">
+            PWA ready
+          </a>
+          <button
+            aria-label="Dismiss install banner"
+            className="rounded-full border border-slate-200 px-3 py-2 font-black text-slate-600 transition hover:border-emerald-700 hover:text-emerald-900"
+            onClick={dismissBanner}
+            type="button"
+          >
+            ×
+          </button>
+        </div>
+      </div>
+    </aside>
+  );
 }
 
 export function AppNav() {
@@ -174,6 +220,7 @@ export function AppNav() {
           </div>
         </div>
       </nav>
+      <InstallBanner />
     </header>
   );
 }
