@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { afterEach, beforeEach, describe, it } from 'node:test';
+import { createAnalyticsConsentToken } from '../src/routes/analytics-consent.js';
 import { type INestApplication } from '@nestjs/common';
 import { Test, type TestingModule } from '@nestjs/testing';
 import request from 'supertest';
@@ -122,5 +123,38 @@ describe('GroceryView API app', () => {
   it('returns 404 for missing product terminal data', async () => {
     await request(app.getHttpServer()).get('/products/missing-product/terminal').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/spread').expect(404);
+  });
+
+  it('guards the item-card-impressions analytics endpoint by consent token', async () => {
+    const sampleImpressions = {
+      itemCards: [{ productId: 'coffee', storeId: 'willys-odenplan', position: 1 }]
+    };
+    const allowToken = createAnalyticsConsentToken({ consent: true });
+
+    const accepted = await request(app.getHttpServer())
+      .post('/api/analytics/item-card-impressions')
+      .set('x-analytics-consent', allowToken)
+      .send(sampleImpressions)
+      .expect(201);
+
+    assert.deepEqual(accepted.body, { accepted: 1 });
+
+    await request(app.getHttpServer())
+      .post('/api/analytics/item-card-impressions')
+      .send(sampleImpressions)
+      .expect(403);
+
+    const deniedToken = createAnalyticsConsentToken({ consent: false });
+    await request(app.getHttpServer())
+      .post('/api/analytics/item-card-impressions')
+      .set('x-analytics-consent', deniedToken)
+      .send(sampleImpressions)
+      .expect(400);
+
+    await request(app.getHttpServer())
+      .post('/api/analytics/item-card-impressions')
+      .set('x-analytics-consent', allowToken)
+      .send({ itemCards: [] })
+      .expect(400);
   });
 });
