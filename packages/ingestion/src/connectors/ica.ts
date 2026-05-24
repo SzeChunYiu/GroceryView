@@ -1543,6 +1543,11 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     regionId: DEFAULT_ICA_REGION_ID
   },
   {
+    storeAccountId: '16622',
+    storeName: 'ICA Kvantum Trossen',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
     storeAccountId: '1003911',
     storeName: 'ICA Nära Kilafors',
     regionId: DEFAULT_ICA_REGION_ID

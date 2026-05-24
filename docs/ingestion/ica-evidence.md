@@ -2,15 +2,17 @@
 
 - Source: ICA public store-scoped promotions JSON
 - Store locator source: https://handla.ica.se/api/store/v1?groupby=citygroup&customerType=B2C
-- Store locator retrieved: 2026-05-24T08:02:07.000Z
+- Store locator retrieved: 2026-05-24T10:36:18.000Z
 - Region ID: 6ae1c52a-99a8-4b19-9464-dd01274df39d
-- Real rows fetched: 93003
-- Stores fetched: 326
+- Real rows fetched: 93033
+- Stores fetched: 327
 - Connector: packages/ingestion/src/connectors/ica.ts
 - Web wire: apps/web/src/lib/ingested/ica.ts
-- Live verification: the latest newly added source URL returned HTTP 200 parseable public promotions JSON via `curl -A "GroceryView/0.1"` on 2026-05-24 Europe/Stockholm; the wired source row count is recorded below.
+- Live verification: the latest newly added source URL returned HTTP 200 parseable public promotions JSON via `curl -A "GroceryView/0.1"` on 2026-05-24 Europe/Stockholm; the handla.ica.se store locator returned accountId 16622, and the wired source row count is recorded below.
 
 ## Source URLs
+
+- Source URL (16622 ICA Kvantum Trossen, retrieved 2026-05-24T10:36:35.000Z, rows 30): https://handlaprivatkund.ica.se/stores/16622/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=30&maxPageSize=30
 
 - Source URL (1003390 ICA Kvantum Jätten, retrieved 2026-05-24T08:02:37.000Z, rows 19): https://handlaprivatkund.ica.se/stores/1003390/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=19&maxPageSize=19
 
