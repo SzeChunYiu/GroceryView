@@ -17,6 +17,18 @@ describe('calculateChainPriceIndex', () => {
     assert.equal(summary.generatedFrom, 0);
   });
 
+  it('does not create an index for a chain with no matched products', () => {
+    const summary = calculateChainPriceIndex([
+      obs('market', 'coffee', 100),
+      obs('market', 'coffee', 110),
+      { chainId: 'empty', category: 'coffee', unitPrice: 0 },
+      { chainId: 'empty', category: 'coffee', unitPrice: Number.NaN }
+    ]);
+
+    assert.equal(summary.chains.some((chain) => chain.chainId === 'empty'), false);
+    assert.ok(summary.chains.every((chain) => Number.isFinite(chain.overallIndex)));
+  });
+
   it('ranks a consistently cheaper chain below a pricier one on a 100-centred scale', () => {
     const observations: ChainPriceObservation[] = [];
     // Cheap chain: well below the market median in two well-covered categories.
