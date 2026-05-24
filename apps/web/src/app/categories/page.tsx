@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { buildDemoHouseholdCategorySignals, defaultHouseholdId, getHouseholdCategoryScore, rankCategoriesByPurchaseHistory } from '@/lib/personalization';
 import { categorySummaries, dietaryScenarioFilters, formatPct, formatSek, immigrantAisleFinder, sustainableBrandFilter } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -8,10 +9,16 @@ export function generateMetadata() {
 }
 
 export default function CategoriesIndexPage() {
+  const householdSignals = buildDemoHouseholdCategorySignals(categorySummaries);
+  const personalizedCategories = rankCategoriesByPurchaseHistory(categorySummaries, defaultHouseholdId, householdSignals);
+
   return (
     <PageShell>
       <Eyebrow>Categories</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Category coverage from verified product rows</h1>
+      <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+        Search categories are ranked for {defaultHouseholdId} using historical conversions and clicks so high-intent aisles appear first.
+      </p>
       <Card className="mt-6 border-orange-200 bg-orange-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-orange-800">Immigrants / new arrivals</p>
         <h2 className="mt-2 text-2xl font-black">Halal, kosher & ethnic aisle finder</h2>
@@ -76,10 +83,11 @@ export default function CategoriesIndexPage() {
       </Card>
 
       <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {categorySummaries.map((category) => (
+        {personalizedCategories.map((category) => (
           <Link href={`/categories/${category.slug}`} key={category.slug}>
             <Card className="h-full transition hover:-translate-y-0.5 hover:border-emerald-700">
-              <h2 className="text-2xl font-black">{category.label}</h2>
+              <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">History score {getHouseholdCategoryScore(category.slug, defaultHouseholdId, householdSignals)}</p>
+              <h2 className="mt-2 text-2xl font-black">{category.label}</h2>
               <p className="mt-3 text-sm leading-6 text-slate-600">{category.openPriceRows} OpenPrices rows and {category.chainRows} Axfood rows.</p>
               <div className="mt-4 flex justify-between gap-3 text-sm font-black"><span>{formatSek(category.medianPrice)}</span><span>{formatPct(category.strongestSpread)} max spread</span></div>
             </Card>
