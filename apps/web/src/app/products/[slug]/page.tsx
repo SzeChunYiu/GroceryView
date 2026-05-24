@@ -1183,6 +1183,25 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const product = findProduct(slug);
   if (!product) notFound();
   const isChain = 'lowestPrice' in product;
+  const primaryEvidenceCount = isChain ? chainPriceRows(product).length : product.observations.length;
+  if (primaryEvidenceCount === 0) {
+    const breadcrumbJsonLd = breadcrumbJsonLdFor(product);
+    return (
+      <PageShell>
+        <script dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbJsonLd) }} type="application/ld+json" />
+        <Eyebrow>{isChain ? 'Axfood chain product' : 'OpenPrices product'}</Eyebrow>
+        <Card className="mt-6 border-dashed border-slate-300 bg-slate-50 text-center">
+          <div aria-hidden="true" className="mx-auto flex size-14 items-center justify-center rounded-full bg-white text-3xl shadow-sm">
+            🛒
+          </div>
+          <h1 className="mt-4 text-3xl font-black tracking-tight text-slate-950">No verified product, deal, or store evidence yet for {product.name}</h1>
+          <Link className="mt-4 inline-flex rounded-full bg-emerald-800 px-5 py-3 text-sm font-black text-white" href="/products">
+            Browse verified products while we wait for store data.
+          </Link>
+        </Card>
+      </PageShell>
+    );
+  }
   const dealVerdict = dealScoreVerdictFor(product);
   const smartSwaps = smartSwapRecommendationsFor(product);
   const itemSubstitutions = itemSubstitutionSuggestionsFor(product);
