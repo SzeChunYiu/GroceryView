@@ -6,7 +6,24 @@ import { dietarySubstitutionAssistantContract } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
-  return routeMetadata('/meal-planner');
+  const metadata = routeMetadata({
+    path: '/meal-planner',
+    title: 'Deal-based grocery meal planner | GroceryView',
+    description: 'Build student and family meal ideas from verified deal rows, serving costs, leftovers, and source confidence.',
+    imagePath: '/pwa-icon.svg',
+    imageAlt: 'GroceryView meal planner preview'
+  });
+  const openGraph = metadata.openGraph;
+
+  return {
+    ...metadata,
+    twitter: {
+      card: 'summary_large_image',
+      title: openGraph?.title ?? metadata.title,
+      description: openGraph?.description ?? metadata.description,
+      images: openGraph?.images
+    }
+  };
 }
 
 function formatSek(value: number) {
