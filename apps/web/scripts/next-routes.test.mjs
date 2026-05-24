@@ -807,6 +807,33 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('ships a no-persistence cross-chain basket calculator from DB-backed current prices', async () => {
+    const route = await read('src/app/basket/page.tsx');
+    const calculator = await read('src/components/basket-calculator.tsx');
+    const seo = await read('src/lib/seo.ts');
+    const nav = await read('src/components/app-nav.tsx');
+
+    assert.match(route, /BasketCalculator/);
+    assert.match(route, /topChainSpreads\.slice\(0, 12\)/);
+    assert.match(route, /chainPriceRows\(product\)/);
+    assert.match(route, /postgres\.latest_prices/);
+    assert.match(route, /@\/lib\/verified-data/);
+    assert.doesNotMatch(route, /@\/lib\/demo-data/);
+    assert.doesNotMatch(route, /@\/components\/sample-data/);
+
+    assert.match(calculator, /'use client'/);
+    assert.match(calculator, /useState/);
+    assert.match(calculator, /compareBasketStrategies/);
+    assert.match(calculator, /summarizeStoreBasketCoverage/);
+    assert.match(calculator, /Best full-chain total/);
+    assert.match(calculator, /Cheapest split basket/);
+    assert.match(calculator, /No state persistence/);
+    assert.doesNotMatch(calculator, /localStorage|sessionStorage/);
+
+    assert.match(seo, /'\/basket'/);
+    assert.match(nav, /href: '\/basket'/);
+  });
+
   it('surfaces a budget stretch-krona basket optimizer using real basket strategy output', async () => {
     const source = await read('src/app/weekly-basket/page.tsx');
     const demo = await read('src/lib/demo-data.ts');
