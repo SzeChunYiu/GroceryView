@@ -144,7 +144,7 @@ Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `source_run_id`, `r
 
 Write policy: daily ingestion uses change-only writes. Before inserting a new immutable observation, the PostgreSQL writer compares the incoming `(product_id, chain_id, store_id, price_type)` price tuple with `latest_prices`; unchanged current snapshots reuse the existing `observation_id` instead of creating another daily duplicate. Changed rows keep temporal state by writing `valid_from` from source evidence or defaulting it to `observed_at`.
 
-Allowed `price_type` values: `shelf`, `online`, `member`, `promotion`, `receipt`, `community`, `estimated`.
+Allowed `price_type` values: `shelf`, `online`, `member`, `promotion`, `receipt`, `community`, `counter_meat`, `counter_deli`, `counter_fish`, `estimated`.
 
 Indexes: product/time, store/time, price type/time, provenance GIN, and `observations_connector_idempotency_idx` as the compound unique price snapshot guard for scraper upserts and exact connector replay idempotency without updating stored history.
 

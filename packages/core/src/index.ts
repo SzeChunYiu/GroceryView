@@ -2366,7 +2366,7 @@ export function searchProducts(products: SearchableProduct[], query: string): Se
   });
 }
 
-export type WatchlistPriceType = 'shelf' | 'member' | 'promotion' | 'estimated';
+export type WatchlistPriceType = 'shelf' | 'member' | 'promotion' | 'counter_meat' | 'counter_deli' | 'counter_fish' | 'estimated';
 
 export type WatchlistItem = {
   productId: string;

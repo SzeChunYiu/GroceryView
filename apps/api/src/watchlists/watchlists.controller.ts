@@ -4,7 +4,7 @@ import { IsArray, IsBoolean, IsIn, IsNumber, IsOptional, IsString, Min } from 'c
 import { groceryApi } from '../demo-data.js';
 import { WatchlistsService } from './watchlists.service.js';
 
-const allowedWatchlistPriceTypes = ['shelf', 'member', 'promotion', 'estimated'] as const;
+const allowedWatchlistPriceTypes = ['shelf', 'member', 'promotion', 'counter_meat', 'counter_deli', 'counter_fish', 'estimated'] as const;
 
 class WatchlistItemDto {
   @IsString()

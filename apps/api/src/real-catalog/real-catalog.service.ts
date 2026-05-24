@@ -41,7 +41,7 @@ type BasketItemSqlRow = {
   quantity: string | number;
 };
 
-const allowedPriceTypes = new Set<RealCatalogPriceType>(['shelf', 'online', 'member', 'promotion', 'receipt', 'community', 'estimated']);
+const allowedPriceTypes = new Set<RealCatalogPriceType>(['shelf', 'online', 'member', 'promotion', 'receipt', 'community', 'counter_meat', 'counter_deli', 'counter_fish', 'estimated']);
 
 function csv(value: string | undefined): string[] {
   return (value ?? '')
@@ -328,7 +328,7 @@ export class RealCatalogService {
              stores.name as store_name
       from products
       left join latest_prices on latest_prices.product_id = products.id
-        and latest_prices.price_type in ('shelf', 'online', 'member', 'promotion')
+        and latest_prices.price_type in ('shelf', 'online', 'member', 'promotion', 'counter_meat', 'counter_deli', 'counter_fish')
         and (
           $2::text[] is null
           or exists (

@@ -217,6 +217,24 @@ function chainDisplayName(row) {
   return CHAIN_DISPLAY_NAMES.get(chainKey) ?? row.chainName ?? chainKey;
 }
 
+function priceTypeLabel(priceType) {
+  return ({
+    counter_meat: 'Counter meat',
+    counter_deli: 'Counter deli',
+    counter_fish: 'Counter fish'
+  })[priceType] ?? String(priceType ?? 'shelf').replace(/_/g, ' ');
+}
+
+function chainPriceKey(row) {
+  const chainKey = slugPart(row.chainSlug);
+  return String(row.priceType ?? '').startsWith('counter_') ? `${chainKey}-${slugPart(row.priceType)}` : chainKey;
+}
+
+function chainPriceDisplayName(row) {
+  const base = chainDisplayName(row);
+  return String(row.priceType ?? '').startsWith('counter_') ? `${base} · ${priceTypeLabel(row.priceType)}` : base;
+}
+
 function packageLabel(row) {
   const size = row.packageSize;
   const unit = row.packageUnit;
@@ -238,6 +256,8 @@ function buildChainPrice(row) {
     price: row.price,
     priceText: formatSek(row.price),
     priceUnit: observedPriceUnit(row),
+    priceType: row.priceType,
+    priceTypeLabel: priceTypeLabel(row.priceType),
     isAvailable: row.isAvailable !== false,
     savings: typeof row.regularPrice === 'number' && row.regularPrice > row.price ? Math.round((row.regularPrice - row.price) * 100) / 100 : null,
     url: ''
@@ -293,8 +313,8 @@ export function buildDbSiteAxfoodProducts(rows) {
       labels: [],
       chains: {}
     };
-    const chainKey = slugPart(row.chainSlug);
-    const chainName = chainDisplayName(row);
+    const chainKey = chainPriceKey(row);
+    const chainName = chainPriceDisplayName(row);
     const current = product.chains[chainKey];
     if (
       !current ||

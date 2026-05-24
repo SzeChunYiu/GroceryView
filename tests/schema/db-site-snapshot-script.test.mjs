@@ -724,6 +724,8 @@ describe('DB-backed site snapshot export script', () => {
           price: 58.9,
           priceText: '58,90 kr',
           priceUnit: 'kr/st',
+          priceType: 'shelf',
+          priceTypeLabel: 'shelf',
           isAvailable: true,
           savings: null,
           url: ''
@@ -732,6 +734,8 @@ describe('DB-backed site snapshot export script', () => {
           price: 44.9,
           priceText: '44,90 kr',
           priceUnit: 'kr/st',
+          priceType: 'promotion',
+          priceTypeLabel: 'promotion',
           isAvailable: true,
           savings: 15,
           url: ''
@@ -743,6 +747,64 @@ describe('DB-backed site snapshot export script', () => {
       spreadPct: 31.2,
       inChains: ['hemkop', 'willys']
     }]);
+  });
+
+  it('keeps counter prices beside packaged shelf rows in generated product cards', () => {
+    const base = {
+      productSlug: 'laxfil-kilo',
+      canonicalName: 'Laxfile per kg',
+      brand: 'Fiskdisken',
+      categoryPath: ['Fisk'],
+      packageSize: 1,
+      packageUnit: 'kg',
+      comparableUnit: 'kg',
+      chainSlug: 'ica',
+      chainName: 'ICA',
+      currency: 'SEK',
+      observedAt: '2026-05-20T09:00:00.000Z',
+      confidence: 0.9,
+      provenance: {}
+    };
+
+    const rows = [
+      {
+        ...base,
+        priceType: 'shelf',
+        price: 189,
+        unitPrice: 189,
+        observationId: 'observation-shelf'
+      },
+      {
+        ...base,
+        priceType: 'counter_fish',
+        price: 219,
+        unitPrice: 219,
+        observationId: 'observation-counter'
+      }
+    ];
+
+    assert.deepEqual(buildDbSiteAxfoodProducts(rows)[0]?.chains, {
+      ica: {
+        price: 189,
+        priceText: '189 kr',
+        priceUnit: 'kr/st',
+        priceType: 'shelf',
+        priceTypeLabel: 'shelf',
+        isAvailable: true,
+        savings: null,
+        url: ''
+      },
+      'ica-counter-fish': {
+        price: 219,
+        priceText: '219 kr',
+        priceUnit: 'kr/st',
+        priceType: 'counter_fish',
+        priceTypeLabel: 'Counter fish',
+        isAvailable: true,
+        savings: null,
+        url: ''
+      }
+    });
   });
 
   it('renders the generated module imported by apps/web/src/lib/axfood-products.ts', () => {

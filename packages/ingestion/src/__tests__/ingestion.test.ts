@@ -5860,6 +5860,7 @@ describe('daily ingestion runner', () => {
           packageSize: 450,
           packageUnit: 'g',
           price: 49.9,
+          priceType: 'counter_deli',
           regularPrice: 69.9,
           isAvailable: false,
           promoText: 'Veckans erbjudande'
@@ -5905,9 +5906,10 @@ describe('daily ingestion runner', () => {
     const storeInsert = executor.calls.find((call) => call.sql.includes('insert into stores'));
     assert.equal(storeInsert?.params[0], 'willys-odenplan');
     const latestPriceInsert = executor.calls.find((call) => call.sql.includes('insert into latest_prices'));
-    const observationRows = JSON.parse(String(latestPriceInsert?.params[0])) as Array<{ store_id: string; domain: string; is_available?: boolean }>;
+    const observationRows = JSON.parse(String(latestPriceInsert?.params[0])) as Array<{ store_id: string; domain: string; price_type: string; is_available?: boolean }>;
     assert.equal(observationRows[0]?.store_id, 'store-db-2');
     assert.equal(observationRows[0]?.domain, 'grocery');
+    assert.equal(observationRows[0]?.price_type, 'counter_deli');
     assert.equal(observationRows[0]?.is_available, false);
   });
 

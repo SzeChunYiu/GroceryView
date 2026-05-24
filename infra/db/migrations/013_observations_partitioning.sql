@@ -15,7 +15,7 @@ create table if not exists observations_v2 (
   source_run_id uuid references source_runs(id) on delete set null,
   raw_record_id uuid references raw_records(id) on delete set null,
   retailer_product_ref text,
-  price_type text not null check (price_type in ('shelf', 'online', 'member', 'promotion', 'receipt', 'community', 'estimated')),
+  price_type text not null check (price_type in ('shelf', 'online', 'member', 'promotion', 'receipt', 'community', 'counter_meat', 'counter_deli', 'counter_fish', 'estimated')),
   price numeric(12, 2) not null check (price >= 0),
   regular_price numeric(12, 2) check (regular_price is null or regular_price >= 0),
   unit_price numeric(12, 4) not null check (unit_price >= 0),

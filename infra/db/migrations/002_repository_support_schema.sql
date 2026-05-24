@@ -33,7 +33,7 @@ create table if not exists watchlist_items (
   favorite_stores_only boolean not null default true,
   allowed_price_types text[] not null default array['shelf']::text[] check (
     cardinality(allowed_price_types) > 0
-    and allowed_price_types <@ array['shelf', 'member', 'promotion', 'estimated']::text[]
+    and allowed_price_types <@ array['shelf', 'member', 'promotion', 'counter_meat', 'counter_deli', 'counter_fish', 'estimated']::text[]
   ),
   created_at timestamptz not null default now()
 );

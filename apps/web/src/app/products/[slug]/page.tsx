@@ -1596,6 +1596,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
             {chainPriceRows(product).map((row) => (
               <div className="rounded-2xl border border-slate-200 p-4" key={row.chain}>
                 <p className="text-lg font-black capitalize">{row.chain}</p>
+                <p className="mt-1 text-xs font-black uppercase tracking-[0.16em] text-slate-500">{row.priceTypeLabel ?? row.priceType ?? 'shelf'}</p>
                 <p className="mt-1 text-3xl font-black text-emerald-800">{formatSek(row.price)}</p>
                 <p className="text-sm text-slate-600">{row.priceUnit || 'Unit not reported'}{row.savings ? ` · listed saving ${formatSek(row.savings)}` : ''}</p>
               </div>

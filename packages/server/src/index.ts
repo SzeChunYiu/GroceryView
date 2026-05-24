@@ -712,7 +712,7 @@ function cursorPaginatedEnvelope<T>(items: T[], params: URLSearchParams) {
   };
 }
 
-const watchlistPriceTypes = ['shelf', 'member', 'promotion', 'estimated'] as const satisfies readonly WatchlistPriceType[];
+const watchlistPriceTypes = ['shelf', 'member', 'promotion', 'counter_meat', 'counter_deli', 'counter_fish', 'estimated'] as const satisfies readonly WatchlistPriceType[];
 
 function optionalWatchlistPriceTypes(value: unknown): WatchlistPriceType[] | undefined {
   const values = optionalStringArray(value, 'allowedPriceTypes');
@@ -1023,7 +1023,7 @@ async function queryWatchlistPriceAlertsFromPostgres(
     guardrails: [
       'Watchlist target-price alerts are calculated from persisted latest_prices rows for saved watchlist items.',
       'Favorite-store alerts only fire when the current best eligible row belongs to a saved favorite store.',
-      'Allowed price types filter eligible shelf, member, promotion, and estimated rows before threshold evaluation.'
+      'Allowed price types filter eligible shelf, member, promotion, counter, and estimated rows before threshold evaluation.'
     ]
   };
 }

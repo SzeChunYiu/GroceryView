@@ -111,6 +111,9 @@ describe('infra/db PostgreSQL schema contract', () => {
       assert.match(observations, new RegExp(`\\b${column}\\b`), `observations.${column} missing`);
     }
     assert.match(observations, /price_type text not null check/);
+    assert.match(allMigrations, /counter_meat/);
+    assert.match(allMigrations, /counter_deli/);
+    assert.match(allMigrations, /counter_fish/);
     assert.match(observations, /confidence numeric\(5, 4\) not null check \(confidence between 0 and 1\)/);
   });
 
@@ -310,7 +313,7 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(repositoryTableDefinition('alert_rules'), /alert_type text not null check/);
     assert.match(repositoryTableDefinition('alert_rules'), /deal_score_threshold integer check/);
     assert.match(repositoryTableDefinition('watchlist_items'), /allowed_price_types text\[\] not null default array\['shelf'\]::text\[\]/);
-    assert.match(repositoryTableDefinition('watchlist_items'), /allowed_price_types <@ array\['shelf', 'member', 'promotion', 'estimated'\]::text\[\]/);
+    assert.match(repositoryTableDefinition('watchlist_items'), /allowed_price_types <@ array\['shelf', 'member', 'promotion', 'counter_meat', 'counter_deli', 'counter_fish', 'estimated'\]::text\[\]/);
     assert.match(tableDefinition('watchlists'), /allowed_price_types text\[\] not null default array\['shelf'\]::text\[\]/);
     assert.match(repositoryTableDefinition('basket_import_review_items'), /user_id text not null references app_users\(id\) on delete cascade/);
     assert.match(repositoryTableDefinition('basket_import_review_items'), /review_item_id text not null/);

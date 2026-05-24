@@ -407,7 +407,7 @@ describe('mobile app foundation', () => {
       targetPriceLabel: '55.00 SEK',
       alertDealScoreAt: 80,
       favoriteStoresOnly: true,
-      allowedPriceTypes: ['shelf', 'member', 'promotion', 'estimated'],
+      allowedPriceTypes: ['shelf', 'member', 'promotion', 'counter_meat', 'counter_deli', 'counter_fish', 'estimated'],
       bestPriceLabel: '49.90 SEK',
       bestStoreName: 'Willys Odenplan',
       dealScore: 82,

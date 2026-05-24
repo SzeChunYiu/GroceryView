@@ -152,9 +152,9 @@ describe('api contract schemas', () => {
         id: 'watch-2',
         userId: 'user-1',
         productId: 'coffee',
-        allowedPriceTypes: ['shelf', 'promotion']
+        allowedPriceTypes: ['shelf', 'promotion', 'counter_deli']
       }).allowedPriceTypes,
-      ['shelf', 'promotion']
+      ['shelf', 'promotion', 'counter_deli']
     );
     assert.equal(
       apiContractSchemas.watchlist.safeParse({
@@ -193,7 +193,7 @@ describe('api contract schemas', () => {
     assert.ok(price.required.includes('observedAt'));
     assert.ok(price.required.includes('sourceType'));
     assert.ok(price.required.includes('provenance'));
-    assert.deepEqual(price.properties.priceType.enum, ['shelf', 'member', 'promotion', 'estimated']);
+    assert.deepEqual(price.properties.priceType.enum, ['shelf', 'member', 'promotion', 'counter_meat', 'counter_deli', 'counter_fish', 'estimated']);
     assert.deepEqual(apiContractOpenApiComponents.FuelPriceObservation.properties.fuelGrade.enum, ['95', '98', 'diesel', 'hvo100', 'e85']);
     assert.deepEqual(apiContractOpenApiComponents.NotificationInboxResponse.properties.queue.items, {
       $ref: '#/components/schemas/NotificationInboxQueueItem'

@@ -100,7 +100,7 @@ create table if not exists observations (
   source_run_id uuid references source_runs(id) on delete set null,
   raw_record_id uuid references raw_records(id) on delete set null,
   retailer_product_ref text,
-  price_type text not null check (price_type in ('shelf', 'online', 'member', 'promotion', 'receipt', 'community', 'estimated')),
+  price_type text not null check (price_type in ('shelf', 'online', 'member', 'promotion', 'receipt', 'community', 'counter_meat', 'counter_deli', 'counter_fish', 'estimated')),
   price numeric(12, 2) not null check (price >= 0),
   regular_price numeric(12, 2) check (regular_price is null or regular_price >= 0),
   unit_price numeric(12, 4) not null check (unit_price >= 0),
@@ -125,7 +125,7 @@ create table if not exists latest_prices (
   product_id uuid not null references products(id) on delete cascade,
   chain_id uuid not null references chains(id) on delete cascade,
   store_id uuid references stores(id) on delete cascade,
-  price_type text not null check (price_type in ('shelf', 'online', 'member', 'promotion', 'receipt', 'community', 'estimated')),
+  price_type text not null check (price_type in ('shelf', 'online', 'member', 'promotion', 'receipt', 'community', 'counter_meat', 'counter_deli', 'counter_fish', 'estimated')),
   observation_id uuid not null references observations(id) on delete restrict,
   price numeric(12, 2) not null check (price >= 0),
   regular_price numeric(12, 2) check (regular_price is null or regular_price >= 0),
@@ -160,7 +160,7 @@ create table if not exists watchlists (
   include_member_prices boolean not null default false,
   allowed_price_types text[] not null default array['shelf']::text[] check (
     cardinality(allowed_price_types) > 0
-    and allowed_price_types <@ array['shelf', 'member', 'promotion', 'estimated']::text[]
+    and allowed_price_types <@ array['shelf', 'member', 'promotion', 'counter_meat', 'counter_deli', 'counter_fish', 'estimated']::text[]
   ),
   created_at timestamptz not null default now(),
   check (product_id is not null or category_path is not null)

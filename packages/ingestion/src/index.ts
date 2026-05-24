@@ -2475,6 +2475,7 @@ export function parseRetailerProductJsonSnapshot(snapshot: RetailerConnectorSnap
       packageSize: requiredNumber(record, 'packageSize', path),
       packageUnit: requiredString(record, 'packageUnit', path),
       price: requiredNumber(record, 'price', path),
+      priceType: optionalString(record, 'priceType', path) as PriceType | undefined,
       regularPrice: optionalNumber(record, 'regularPrice', path),
       promoText: optionalString(record, 'promoText', path),
       memberOnly: optionalBoolean(record, 'memberOnly', path),
@@ -2666,6 +2667,7 @@ export type RetailerProductInput = {
   packageSize: number;
   packageUnit: string;
   price: number;
+  priceType?: PriceType;
   regularPrice?: number;
   promoText?: string;
   memberOnly?: boolean;
@@ -2681,6 +2683,9 @@ export type PriceType =
   | 'flyer'
   | 'member'
   | 'in_store'
+  | 'counter_meat'
+  | 'counter_deli'
+  | 'counter_fish'
   | 'receipt'
   | 'shelf_photo'
   | 'manual'
@@ -2785,9 +2790,11 @@ function validateInput(input: RetailerProductInput): void {
   if (input.validFrom !== undefined && Number.isNaN(Date.parse(input.validFrom))) throw new Error('validFrom must be an ISO date.');
   if (input.validUntil !== undefined && Number.isNaN(Date.parse(input.validUntil))) throw new Error('validUntil must be an ISO date.');
   if (input.originCountry !== undefined && !/^[a-z]{2}$/i.test(input.originCountry)) throw new Error('originCountry must be an ISO-3166 alpha-2 code.');
+  if (input.priceType?.startsWith('counter_') && !input.storeId) throw new Error('counter price observations require storeId.');
 }
 
 function priceTypeForSource(input: RetailerProductInput, hasPromotion: boolean): PriceType {
+  if (input.priceType) return input.priceType;
   if (input.sourceType === 'estimated') return 'estimated';
   if (input.sourceType === 'receipt_scan') return 'receipt';
   if (input.sourceType === 'shelf_photo') return 'shelf_photo';
@@ -2917,8 +2924,8 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
       sourceRunId: input.sourceRunId,
       provenance,
       confidenceScore: confidence,
-      isOnlinePrice: input.sourceType === 'official_api' || input.sourceType === 'retailer_online_page',
-      isInstorePrice: input.sourceType === 'receipt_scan' || input.sourceType === 'shelf_photo' || input.sourceType === 'manual_user_report',
+      isOnlinePrice: !priceType.startsWith('counter_') && (input.sourceType === 'official_api' || input.sourceType === 'retailer_online_page'),
+      isInstorePrice: priceType.startsWith('counter_') || input.sourceType === 'receipt_scan' || input.sourceType === 'shelf_photo' || input.sourceType === 'manual_user_report',
       isAvailable: input.isAvailable ?? true,
       fuelSource: input.fuelSource
     },
@@ -3302,6 +3309,7 @@ function dbSourceTypeForConnector(sourceType: RetailerConnectorKind): SourceRunR
 
 function dbPriceTypeForIngested(priceType: PriceType): DbPriceType {
   if (priceType === 'online' || priceType === 'member' || priceType === 'receipt' || priceType === 'estimated') return priceType;
+  if (priceType === 'counter_meat' || priceType === 'counter_deli' || priceType === 'counter_fish') return priceType;
   if (priceType === 'flyer') return 'promotion';
   if (priceType === 'in_store' || priceType === 'shelf_photo') return 'shelf';
   return 'community';

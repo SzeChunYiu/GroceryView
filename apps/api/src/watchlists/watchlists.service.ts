@@ -88,7 +88,7 @@ export class WatchlistsService {
       guardrails: [
         'Watchlist target-price alerts are calculated from persisted latest_prices rows for saved watchlist items.',
         'Favorite-store alerts only fire when the current best eligible row belongs to a saved favorite store.',
-        'Allowed price types filter eligible shelf, member, promotion, and estimated rows before threshold evaluation.'
+        'Allowed price types filter eligible shelf, member, promotion, counter, and estimated rows before threshold evaluation.'
       ]
     };
   }

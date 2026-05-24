@@ -539,7 +539,7 @@ export function createMobileWatchlistViewModel(userId: string, api: MobileApi = 
         targetPriceLabel: item.targetPrice === undefined ? 'No target' : formatMobileMoney(item.targetPrice),
         alertDealScoreAt: item.alertDealScoreAt ?? null,
         favoriteStoresOnly: item.favoriteStoresOnly,
-        allowedPriceTypes: item.allowedPriceTypes ?? ['shelf', 'member', 'promotion', 'estimated'],
+        allowedPriceTypes: item.allowedPriceTypes ?? ['shelf', 'member', 'promotion', 'counter_meat', 'counter_deli', 'counter_fish', 'estimated'],
         bestPriceLabel: product ? formatPriceLabel(product.currentPrices[0]?.price ?? null) : 'No verified price',
         bestStoreName: product?.currentPrices[0]?.storeName ?? null,
         dealScore: product?.dealScore ?? 0,

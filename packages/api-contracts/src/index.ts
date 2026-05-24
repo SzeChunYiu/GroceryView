@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const idSchema = z.string().trim().min(1);
 export const isoDateTimeSchema = z.string().datetime({ offset: true });
 
-export const priceTypeSchema = z.enum(['shelf', 'member', 'promotion', 'estimated']);
+export const priceTypeSchema = z.enum(['shelf', 'member', 'promotion', 'counter_meat', 'counter_deli', 'counter_fish', 'estimated']);
 export const confidenceSchema = z.enum(['high', 'medium', 'low', 'unverified']);
 export const sourceTypeSchema = z.enum(['retailer_api', 'retailer_page', 'receipt_scan', 'manual_review', 'seed_stub']);
 export const priceDomainSchema = z.enum(['grocery', 'fuel', 'pharmacy']);

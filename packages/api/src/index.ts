@@ -324,6 +324,9 @@ export type CanonicalPriceType =
   | 'flyer'
   | 'member'
   | 'in_store'
+  | 'counter_meat'
+  | 'counter_deli'
+  | 'counter_fish'
   | 'receipt'
   | 'shelf_photo'
   | 'manual'
@@ -358,7 +361,7 @@ export type PriceConfidenceReason =
   | 'fixture_backed'
   | 'manual_entry';
 
-const watchlistPriceTypes = ['shelf', 'member', 'promotion', 'estimated'] as const satisfies readonly WatchlistPriceType[];
+const watchlistPriceTypes = ['shelf', 'member', 'promotion', 'counter_meat', 'counter_deli', 'counter_fish', 'estimated'] as const satisfies readonly WatchlistPriceType[];
 
 export type ContentDigest = {
   algorithm: 'sha-256' | 'sha-384' | 'sha-512';
@@ -420,6 +423,9 @@ const canonicalPriceTypes: CanonicalPriceType[] = [
   'flyer',
   'member',
   'in_store',
+  'counter_meat',
+  'counter_deli',
+  'counter_fish',
   'receipt',
   'shelf_photo',
   'manual',
@@ -817,9 +823,9 @@ export type ProductHistoryConfidenceReport = {
   guardrails: string[];
 };
 
-export type ProductPriceHistoryPriceType = 'shelf' | 'online' | 'member' | 'promotion' | 'receipt' | 'community' | 'estimated';
+export type ProductPriceHistoryPriceType = 'shelf' | 'online' | 'member' | 'promotion' | 'receipt' | 'community' | 'counter_meat' | 'counter_deli' | 'counter_fish' | 'estimated';
 
-export const productPriceHistoryPriceTypes = ['shelf', 'online', 'member', 'promotion', 'receipt', 'community', 'estimated'] as const satisfies readonly ProductPriceHistoryPriceType[];
+export const productPriceHistoryPriceTypes = ['shelf', 'online', 'member', 'promotion', 'receipt', 'community', 'counter_meat', 'counter_deli', 'counter_fish', 'estimated'] as const satisfies readonly ProductPriceHistoryPriceType[];
 
 export type ProductPriceHistoryObservationInput = {
   observationId: string;
@@ -1316,7 +1322,7 @@ export type NotificationInboxReport = {
   guardrails: string[];
 };
 
-export type RealCatalogPriceType = 'shelf' | 'online' | 'member' | 'promotion' | 'receipt' | 'community' | 'estimated';
+export type RealCatalogPriceType = 'shelf' | 'online' | 'member' | 'promotion' | 'receipt' | 'community' | 'counter_meat' | 'counter_deli' | 'counter_fish' | 'estimated';
 
 export type RealCatalogSearchPriceRow = {
   productId: string;

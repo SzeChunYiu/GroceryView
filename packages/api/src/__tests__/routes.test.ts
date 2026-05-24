@@ -145,7 +145,7 @@ describe('createGroceryViewApi', () => {
   });
 
   it('builds product price-history reports from persisted observation inputs', () => {
-    assert.deepEqual(productPriceHistoryPriceTypes, ['shelf', 'online', 'member', 'promotion', 'receipt', 'community', 'estimated']);
+    assert.deepEqual(productPriceHistoryPriceTypes, ['shelf', 'online', 'member', 'promotion', 'receipt', 'community', 'counter_meat', 'counter_deli', 'counter_fish', 'estimated']);
     assert.deepEqual(productPriceHistoryEndpoint, {
       method: 'GET',
       controllerPath: 'products/:productId',

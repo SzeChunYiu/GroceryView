@@ -238,7 +238,7 @@ export type SubscriptionEntitlementRecord = {
   updatedAt: string;
 };
 
-export type WatchlistAllowedPriceType = 'shelf' | 'member' | 'promotion' | 'estimated';
+export type WatchlistAllowedPriceType = 'shelf' | 'member' | 'promotion' | 'counter_meat' | 'counter_deli' | 'counter_fish' | 'estimated';
 
 export type WatchlistRecord = {
   productId: string;
@@ -351,7 +351,17 @@ export type HouseholdPlanRecord = {
   updatedAt: string;
 };
 
-export type PriceType = 'shelf' | 'online' | 'member' | 'promotion' | 'receipt' | 'community' | 'estimated';
+export type PriceType =
+  | 'shelf'
+  | 'online'
+  | 'member'
+  | 'promotion'
+  | 'receipt'
+  | 'community'
+  | 'counter_meat'
+  | 'counter_deli'
+  | 'counter_fish'
+  | 'estimated';
 
 export type ProductCatalogRecord = {
   productId: string;
@@ -1234,7 +1244,7 @@ function requireUser(users: Map<string, UserRecord>, userId: string): void {
   if (!users.has(userId)) throw new Error(`User not found: ${userId}`);
 }
 
-const watchlistAllowedPriceTypes = ['shelf', 'member', 'promotion', 'estimated'] as const satisfies readonly WatchlistAllowedPriceType[];
+const watchlistAllowedPriceTypes = ['shelf', 'member', 'promotion', 'counter_meat', 'counter_deli', 'counter_fish', 'estimated'] as const satisfies readonly WatchlistAllowedPriceType[];
 
 function normalizeWatchlistAllowedPriceTypes(value: readonly string[] | null | undefined): WatchlistAllowedPriceType[] {
   const priceTypes = value ?? ['shelf'];
