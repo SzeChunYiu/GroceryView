@@ -19,6 +19,7 @@ import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
+import { predictShortWindowPriceDirection } from '@/lib/price-prediction';
 import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { metadataForProduct } from '@/lib/seo';
@@ -1068,6 +1069,10 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   if (!product) notFound();
   const isChain = 'lowestPrice' in product;
   const dealVerdict = dealScoreVerdictFor(product);
+  const pricePrediction = predictShortWindowPriceDirection(isChain ? [] : product.observations.map((observation) => ({
+    observedAt: observation.date,
+    price: observation.price
+  })));
   const smartSwaps = smartSwapRecommendationsFor(product);
   const itemSubstitutions = itemSubstitutionSuggestionsFor(product);
   const priceHistoryBadge = priceHistoryBadgeFor(product);
@@ -1203,6 +1208,45 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           <p className="rounded-2xl bg-white/85 p-4 text-sm font-bold text-slate-700">confidence {formatPct(dealVerdict.confidence * 100)}</p>
           <p className="rounded-2xl bg-white/85 p-4 text-sm font-bold text-slate-700">{dealVerdict.evidence}</p>
         </div>
+      </Card>
+      <Card className="mt-6 overflow-hidden border-fuchsia-200 bg-fuchsia-50/80">
+        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-fuchsia-800">Price trend prediction</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">{pricePrediction.title}</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Computes a short-window expected price direction from recent dated snapshots so shoppers can decide whether to delay or accelerate a purchase.
+            </p>
+          </div>
+          <div className="rounded-[2rem] bg-white p-5 text-right shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-fuchsia-800">{pricePrediction.windowLabel}</p>
+            <p className="mt-2 text-3xl font-black text-slate-950">{pricePrediction.actionLabel}</p>
+            <p className="mt-1 text-sm font-semibold text-slate-600">{pricePrediction.confidenceLabel}</p>
+          </div>
+        </div>
+        {pricePrediction.available ? (
+          <div className="mt-5 grid gap-3 lg:grid-cols-[0.8fr_1.2fr]">
+            <div className="rounded-2xl bg-white/90 p-4 shadow-sm">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-fuchsia-800">{pricePrediction.directionLabel}</p>
+              <p className="mt-2 text-3xl font-black text-slate-950">{formatSek(pricePrediction.expectedPrice ?? pricePrediction.latestPrice ?? 0)}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-600">
+                Expected {formatPct(pricePrediction.expectedChangePercent ?? 0)} over the next short window from latest {formatSek(pricePrediction.latestPrice ?? 0)}.
+              </p>
+            </div>
+            <div className="grid gap-3 md:grid-cols-5">
+              {pricePrediction.snapshots.map((snapshot) => (
+                <div className="rounded-2xl bg-white/90 p-4 shadow-sm" key={`${snapshot.observedAt}-${snapshot.price}`}>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-fuchsia-800">{snapshot.marker}</p>
+                  <p className="mt-2 text-xl font-black text-slate-950">{formatSek(snapshot.price)}</p>
+                  <p className="mt-1 text-xs font-semibold text-slate-500">{snapshot.observedAt}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <p className="mt-5 rounded-2xl bg-white/85 p-4 text-sm font-bold text-fuchsia-950">{pricePrediction.detail}</p>
+        )}
+        <p className="mt-4 text-xs font-semibold leading-5 text-slate-600">{pricePrediction.detail}</p>
       </Card>
       <Card className="mt-6">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
