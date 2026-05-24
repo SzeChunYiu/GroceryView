@@ -1,13 +1,17 @@
 'use client';
 
-import { CheckableListItem } from '@/components/CheckableListItem';
 import { AppNav } from '@/components/app-nav';
 import { BottomNav } from '@/components/bottom-nav';
 import { BulkImportDialog } from '@/components/BulkImportDialog';
+import { QuantitySelector } from '@/components/QuantitySelector';
 import { useList } from '@/hooks/useList';
 
+function formatEstimatedCost(value: number) {
+  return new Intl.NumberFormat('sv-SE', { currency: 'SEK', maximumFractionDigits: 0, style: 'currency' }).format(value);
+}
+
 export default function ShoppingListPage() {
-  const { addImportedItems, checkedCount, items, remainingCount, resetCheckedState, toggleItemChecked, totalCount } = useList();
+  const { addImportedItems, checkedCount, items, remainingCount, resetCheckedState, toggleItemChecked, totalCost, totalCount, updateItemQuantity } = useList();
   const progress = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
 
   return (
@@ -26,6 +30,9 @@ export default function ShoppingListPage() {
             <p className="text-sm font-black uppercase tracking-[0.18em] text-emerald-800">Trip progress</p>
             <p className="mt-1 text-3xl font-black text-slate-950">{checkedCount}/{totalCount}</p>
             <p className="text-sm font-semibold text-slate-600">{remainingCount} left to collect</p>
+            <p className="mt-2 rounded-2xl bg-emerald-50 px-3 py-2 text-sm font-black text-emerald-950">
+              Estimated total {formatEstimatedCost(totalCost)}
+            </p>
           </div>
         </div>
 
@@ -61,7 +68,53 @@ export default function ShoppingListPage() {
 
           <ul className="mt-5 space-y-3">
             {items.map((item) => (
-              <CheckableListItem item={item} key={item.id} onToggle={toggleItemChecked} />
+              <li
+                className={`rounded-2xl border p-4 transition ${
+                  item.checked ? 'border-emerald-200 bg-emerald-50/80' : 'border-slate-200 bg-white'
+                }`}
+                key={item.id}
+              >
+                <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-center">
+                  <label className="flex cursor-pointer items-start gap-3">
+                    <input
+                      checked={item.checked}
+                      className="mt-1 h-5 w-5 rounded border-slate-300 text-emerald-800 focus:ring-emerald-700"
+                      onChange={() => toggleItemChecked(item.id)}
+                      type="checkbox"
+                    />
+                    <span className="min-w-0 flex-1">
+                      <span
+                        className={`block text-lg font-black text-slate-950 ${
+                          item.checked ? 'line-through decoration-2 decoration-emerald-700 text-slate-500' : ''
+                        }`}
+                      >
+                        {item.name}
+                      </span>
+                      <span
+                        className={`mt-1 block text-sm font-semibold ${
+                          item.checked ? 'line-through text-slate-500' : 'text-slate-700'
+                        }`}
+                      >
+                        {item.quantity} · {item.detail}
+                      </span>
+                      <span className="mt-2 block text-sm font-black text-emerald-900">
+                        Line estimate {formatEstimatedCost(item.unitPrice * item.quantityCount)}
+                      </span>
+                    </span>
+                  </label>
+                  <QuantitySelector
+                    itemId={item.id}
+                    label={item.name}
+                    onChange={updateItemQuantity}
+                    value={item.quantityCount}
+                  />
+                </div>
+                {item.matchedProductSlug ? (
+                  <p className="mt-3 rounded-xl bg-sky-50 px-3 py-2 text-xs font-black text-sky-900">
+                    Matched catalog product: {item.matchedProductName ?? item.matchedProductSlug} · matchedProductSlug: {item.matchedProductSlug}
+                  </p>
+                ) : null}
+              </li>
             ))}
           </ul>
         </section>
