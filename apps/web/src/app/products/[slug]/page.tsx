@@ -50,6 +50,32 @@ const historyWindowDefinitions = [
 ] as const;
 const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const;
 
+const crossRetailerComparisonTypes = new Set(['grocery', 'pharmacy', 'variety', 'cosmetics', 'ethnic', 'ethnic_grocery', 'health_food']);
+
+function retailerTypeForChainRow(row: ReturnType<typeof chainPriceRows>[number]) {
+  const explicit = (row as { retailer_type?: string; retailerType?: string }).retailer_type ?? (row as { retailerType?: string }).retailerType;
+  if (explicit) return explicit;
+  const chain = row.chain.toLowerCase();
+  if (chain.includes('apotek')) return 'pharmacy';
+  if (chain.includes('normal')) return 'variety';
+  if (chain.includes('kicks') || chain.includes('lyko')) return 'cosmetics';
+  if (chain.includes('orient') || chain.includes('asia') || chain.includes('matvärlden')) return 'ethnic_grocery';
+  if (chain.includes('life') || chain.includes('hälsokraft') || chain.includes('bodystore')) return 'health_food';
+  return 'grocery';
+}
+
+function effectiveUnitPriceForChainRow(row: ReturnType<typeof chainPriceRows>[number]) {
+  const unitPrice = (row as { unitPrice?: number; effectiveUnitPrice?: number }).effectiveUnitPrice ?? (row as { unitPrice?: number }).unitPrice;
+  return typeof unitPrice === 'number' && Number.isFinite(unitPrice) ? unitPrice : row.price;
+}
+
+function crossRetailerComparisonRows(product: NonNullable<ReturnType<typeof findProduct>>) {
+  return chainPriceRows(product)
+    .map((row) => ({ ...row, retailerType: retailerTypeForChainRow(row), effectiveUnitPrice: effectiveUnitPriceForChainRow(row) }))
+    .filter((row) => crossRetailerComparisonTypes.has(row.retailerType))
+    .sort((a, b) => a.effectiveUnitPrice - b.effectiveUnitPrice);
+}
+
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
@@ -1593,11 +1619,15 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
         <Card className="mt-6">
           <h2 className="text-2xl font-black">Chain price rows</h2>
           <div className="mt-4 grid gap-3 md:grid-cols-2">
-            {chainPriceRows(product).map((row) => (
+            {crossRetailerComparisonRows(product).map((row) => (
               <div className="rounded-2xl border border-slate-200 p-4" key={row.chain}>
-                <p className="text-lg font-black capitalize">{row.chain}</p>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-lg font-black capitalize">{row.chain}</p>
+                  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-slate-700">retailer_type {row.retailerType}</span>
+                </div>
                 <p className="mt-1 text-3xl font-black text-emerald-800">{formatSek(row.price)}</p>
                 <p className="text-sm text-slate-600">{row.priceUnit || 'Unit not reported'}{row.savings ? ` · listed saving ${formatSek(row.savings)}` : ''}</p>
+                <p className="mt-2 text-xs font-bold text-slate-500">Sorted by effective unit price: {formatSek(row.effectiveUnitPrice)}</p>
               </div>
             ))}
           </div>
