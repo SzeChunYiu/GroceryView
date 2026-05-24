@@ -4586,6 +4586,38 @@ describe('ingestRetailerProduct', () => {
     assert.equal(output.priceObservation.unitPrice, 39.9);
   });
 
+  it('classifies no-barcode loose bakery as a commodity using taxonomy aliases', () => {
+    const output = ingestRetailerProduct({
+      sourceType: 'shelf_photo',
+      observedAt: '2026-05-22T10:00:00.000Z',
+      parserVersion: 'bakery-shelf-v1',
+      rawSnapshotRef: 's3://groceryview-raw/store/bakery-2026-05-22.jpg',
+      chainId: 'coop',
+      storeId: 'coop-odenplan',
+      retailerProductId: 'coop-loose-baguette',
+      rawName: 'Baguette lösbakat',
+      canonicalName: 'Baguette',
+      productId: 'coop-baguette-loose',
+      categoryId: 'brod-kakor',
+      packageSize: 1,
+      packageUnit: 'piece',
+      price: 12.5,
+      variant: 'wheat',
+      isOrganic: false,
+      originCountry: 'SE'
+    });
+
+    assert.equal(output.product.productKind, 'commodity');
+    assert.equal(output.product.commodityId, 'baguette');
+    assert.equal(output.product.barcode, undefined);
+    assert.equal(output.product.variant, 'wheat');
+    assert.equal(output.product.isOrganic, false);
+    assert.equal(output.product.originCountry, 'SE');
+    assert.equal(output.priceObservation.priceType, 'shelf_photo');
+    assert.equal(output.priceObservation.unitPrice, 12.5);
+    assert.equal(output.alias.matchConfidence, 0.68);
+  });
+
   it('rejects records that cannot preserve parser and raw snapshot provenance', () => {
     assert.throws(() => ingestRetailerProduct({
       sourceType: 'manual_user_report',

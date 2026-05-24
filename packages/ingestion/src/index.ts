@@ -2829,10 +2829,11 @@ function resolveCommodity(input: RetailerProductInput): Commodity | null {
     return explicit;
   }
 
+  const hasNoBarcode = input.barcode === undefined || input.barcode.trim().length === 0;
   const haystack = normalizeSearchText(`${input.rawName} ${input.canonicalName} ${input.categoryId}`);
   return COMMODITIES.find((commodity) => {
     const hasNameMatch = commodityTerms(commodity).some((term) => term.length > 0 && haystack.includes(term));
-    return hasNameMatch && (categoryHintsMatch(input, commodity) || input.soldByWeight === true || input.productKind === 'commodity');
+    return hasNameMatch && (categoryHintsMatch(input, commodity) || hasNoBarcode || input.soldByWeight === true || input.productKind === 'commodity');
   }) ?? null;
 }
 
@@ -2842,7 +2843,8 @@ function classifyRetailerProduct(input: RetailerProductInput): {
   matchConfidence: number;
 } {
   const sourceConfidence = confidenceForSource(input.sourceType);
-  const requiresCommodityResolution = input.productKind === 'commodity' || input.soldByWeight === true || input.commodityId !== undefined;
+  const hasNoBarcode = input.barcode === undefined || input.barcode.trim().length === 0;
+  const requiresCommodityResolution = input.productKind === 'commodity' || hasNoBarcode || input.soldByWeight === true || input.commodityId !== undefined;
   if (!requiresCommodityResolution) return { productKind: 'branded', matchConfidence: sourceConfidence };
 
   const commodity = resolveCommodity(input);
