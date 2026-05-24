@@ -1,6 +1,8 @@
+import { Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { OriginFilter } from '@/components/origin-filter';
 import { ProductPriceCards } from '@/components/product-price-cards';
 import { apohemSource } from '@/lib/ingested/apohem';
 import { adaptiveProductCards, buildProductSearchView, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
@@ -23,6 +25,7 @@ type SearchParams = {
   maxPrice?: string | string[];
   inStockOnly?: string | string[];
   minConfidence?: string | string[];
+  origin?: string | string[];
   brand?: string | string[];
   page?: string | string[];
 };
@@ -63,6 +66,13 @@ function copySearchParams(params: URLSearchParams, source: SearchParams) {
   setFirstParam(params, 'maxPrice', source.maxPrice);
   setFirstParam(params, 'inStockOnly', source.inStockOnly);
   setFirstParam(params, 'minConfidence', source.minConfidence);
+  setAllParams(params, 'origin', source.origin);
+}
+
+function selectedOriginValues(origin: string | string[] | undefined) {
+  const rawValues = Array.isArray(origin) ? origin : origin ? [origin] : [];
+  const allowed = new Set(['SE', 'NO', 'IS', 'DK', 'FI', 'DE', 'NL', 'ES', 'IT', 'PL', 'IE']);
+  return [...new Set(rawValues.flatMap((item) => item.split(',')).map((item) => item.trim().toUpperCase()).filter((item) => allowed.has(item)))];
 }
 
 function productsPageUrl(page: number, selectedBrand = '', searchParams: SearchParams = {}) {
@@ -80,6 +90,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const { categoryFacets, labelFacets, chainFacets, priceRange, inStockOnly, resultCards } = search;
   const requestedPage = toPageNumber(resolvedSearchParams.page);
   const selectedBrand = normalizeSelectedBrand(resolvedSearchParams.brand);
+  const selectedOrigins = selectedOriginValues(resolvedSearchParams.origin);
   const productCards = selectedBrand
     ? adaptiveProductCards.filter((card) => card.brand === selectedBrand)
     : adaptiveProductCards;
@@ -91,7 +102,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const rangeEnd = Math.min(pageStart + PRODUCTS_PER_PAGE, resultCards.length);
   const defaultSearchCount = facetedProductSearch.resultCards.length;
 
-  function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence', string>>) {
+  function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence' | 'origin', string>>) {
     const params = new URLSearchParams();
     copySearchParams(params, resolvedSearchParams);
     for (const [key, value] of Object.entries(overrides)) {
@@ -138,11 +149,17 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             {inStockOnly.productCount.toLocaleString('sv-SE')} priced products · {inStockOnly.latestPriceCount.toLocaleString('sv-SE')} latest_prices rows
           </div>
         </div>
+        <div className="mt-5">
+          <Suspense fallback={<div className="rounded-3xl border border-amber-100 bg-white p-4 text-sm font-bold text-slate-600">Loading origin filters…</div>}>
+            <OriginFilter selected={selectedOrigins} />
+          </Suspense>
+        </div>
         <form action="/products" className="mt-5 grid gap-3 rounded-2xl border border-violet-100 bg-white p-4 shadow-sm lg:grid-cols-[1.2fr_0.6fr_0.6fr_0.6fr_auto]" method="get">
           {selectedBrand ? <input name="brand" type="hidden" value={selectedBrand} /> : null}
           {search.filters.categories.length > 0 ? <input name="category" type="hidden" value={search.filters.categories.join(',')} /> : null}
           {search.labelFilters.length > 0 ? <input name="label" type="hidden" value={search.labelFilters.join(',')} /> : null}
           {search.filters.chains.length > 0 ? <input name="chain" type="hidden" value={search.filters.chains.join(',')} /> : null}
+          {selectedOrigins.map((origin) => <input key={origin} name="origin" type="hidden" value={origin} />)}
           <label className="text-sm font-black text-slate-950" htmlFor="product-search-q">
             Search
             <input className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-950" defaultValue={search.query} id="product-search-q" name="q" />

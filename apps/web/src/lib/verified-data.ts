@@ -517,6 +517,7 @@ export type ProductSearchUrlParams = {
   maxPrice?: SearchParamValue;
   inStockOnly?: SearchParamValue;
   minConfidence?: SearchParamValue;
+  origin?: SearchParamValue;
 };
 
 function firstSearchValue(value: SearchParamValue): string {
@@ -553,8 +554,52 @@ function booleanSearchValue(value: SearchParamValue): boolean {
   return ['1', 'true', 'yes', 'on'].includes(firstSearchValue(value).toLocaleLowerCase('sv-SE'));
 }
 
-function productSearchResultCards(searchResult: typeof rawFacetedProductSearch) {
-  return searchResult.products.map((product) => {
+const originFilterOptions = ['SE', 'NO', 'IS', 'DK', 'FI', 'DE', 'NL', 'ES', 'IT', 'PL', 'IE'] as const;
+type OriginFilterCode = typeof originFilterOptions[number];
+
+function originSearchValues(value: SearchParamValue): OriginFilterCode[] {
+  const requested = new Set(listSearchValues(value).map((item) => item.toUpperCase()));
+  return originFilterOptions.filter((origin) => requested.has(origin));
+}
+
+const originEvidenceMatchers: Record<OriginFilterCode, RegExp[]> = {
+  SE: [/\b(se|sweden|svensk(?:t|a)?|sverige)\b/i],
+  NO: [/\b(no|norway|norsk(?:t|a)?|norge)\b/i],
+  IS: [/\b(is|iceland|isl[aä]ndsk(?:t|a)?|island)\b/i],
+  DK: [/\b(dk|denmark|dansk(?:t|a)?|danmark)\b/i],
+  FI: [/\b(fi|finland|finsk(?:t|a)?)\b/i],
+  DE: [/\b(de|germany|tysk(?:t|a)?|tyskland)\b/i],
+  NL: [/\b(nl|netherlands|dutch|holland|nederl[aä]nderna)\b/i],
+  ES: [/\b(es|spain|spansk(?:t|a)?|spanien)\b/i],
+  IT: [/\b(it|italy|italiensk(?:t|a)?|italien)\b/i],
+  PL: [/\b(pl|poland|polsk(?:t|a)?|polen)\b/i],
+  IE: [/\b(ie|ireland|irl[aä]ndsk(?:t|a)?|irland)\b/i]
+};
+
+function originCountriesForProduct(product: (typeof rawFacetedProductSearch.products)[number]): OriginFilterCode[] {
+  const labels = new Set(product.labels.map((label) => label.toLocaleLowerCase('sv-SE')));
+  const origins = new Set<OriginFilterCode>();
+
+  if (labels.has('swedish_flag') || labels.has('from_sweden') || labels.has('meat_from_sweden') || labels.has('milk_from_sweden')) {
+    origins.add('SE');
+  }
+
+  const evidenceText = [product.canonicalName, product.brand, ...product.categoryPath, ...product.labels].filter(Boolean).join(' ');
+  for (const origin of originFilterOptions) {
+    if (originEvidenceMatchers[origin].some((matcher) => matcher.test(evidenceText))) {
+      origins.add(origin);
+    }
+  }
+
+  return [...origins];
+}
+
+function productSearchResultCards(searchResult: typeof rawFacetedProductSearch, selectedOrigins: readonly OriginFilterCode[] = []) {
+  const products = selectedOrigins.length > 0
+    ? searchResult.products.filter((product) => originCountriesForProduct(product).some((origin) => selectedOrigins.includes(origin)))
+    : searchResult.products;
+
+  return products.map((product) => {
     const cheapest = product.currentPrices[0] ?? null;
     return {
       slug: product.slug,
@@ -587,6 +632,7 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
   const maxPrice = numericSearchValue(searchParams.maxPrice);
   const inStockOnly = booleanSearchValue(searchParams.inStockOnly);
   const minConfidence = confidenceSearchValue(searchParams.minConfidence);
+  const origins = originSearchValues(searchParams.origin);
   const filters = { query, categories, labels, chains, minPrice, maxPrice, inStockOnly, minConfidence, limit: 100 };
   const searchResult = buildFacetedProductSearch({ rows: facetedSearchRows, filters });
 
@@ -602,7 +648,8 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
     minPrice !== undefined ? `min unit ${formatSek(minPrice)}` : null,
     maxPrice !== undefined ? `max unit ${formatSek(maxPrice)}` : null,
     inStockOnly ? 'priced/in-stock only' : null,
-    minConfidence !== undefined ? `confidence ≥ ${pct.format(minConfidence * 100)}%` : null
+    minConfidence !== undefined ? `confidence ≥ ${pct.format(minConfidence * 100)}%` : null,
+    ...origins.map((origin) => `origin=${origin}`)
   ].filter((item): item is string => item !== null);
 
   return {
@@ -630,7 +677,8 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
       outOfStockLatestPriceCount: searchResult.evidence.outOfStockLatestPriceCount
     },
     activeFilters,
-    resultCards: productSearchResultCards(searchResult)
+    originFilters: origins,
+    resultCards: productSearchResultCards(searchResult, origins)
   };
 }
 
