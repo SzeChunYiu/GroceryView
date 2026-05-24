@@ -3,6 +3,7 @@ import { buildUserAccountDeletionQueries } from './queries/users.js';
 
 export * from './queries/categories.js';
 export * from './queries/favorites.js';
+export * from './queries/pricingVolatility.js';
 export * from './queries/productSearch.js';
 export * from './queries/stores.js';
 export * from './queries/retailers.js';
