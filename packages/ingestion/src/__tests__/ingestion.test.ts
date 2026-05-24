@@ -98,6 +98,7 @@ import {
   findPharmacyEanMatches,
   parseApohemProducts,
   parseApotekHjartatProducts,
+  parseVitusapotekProducts,
   parseIcaReklambladOffers,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
@@ -7307,5 +7308,30 @@ describe('daily ingestion runner', () => {
     assert.equal(result.status, 'blocked');
     assert.deepEqual(result.blockers, ['ica:robots_txt_allow_required', 'ica:legal_review_approval_required']);
     assert.equal(executor.calls.length, 0);
+  });
+});
+
+describe('Vitusapotek NO connector', () => {
+  it('normalizes Norwegian pharmacy products with NO/NOK chain metadata', () => {
+    const rows = parseVitusapotekProducts(`
+      <script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{"products":[{
+        "id":"vit-123",
+        "ean":"7046110000001",
+        "name":"Paracet 500 mg tabletter",
+        "brand":"Karo Pharma",
+        "price":{"value":49.9},
+        "originalPrice":"59,90",
+        "url":"/paracet-500mg/p/123",
+        "imageUrl":"/images/paracet.jpg",
+        "stockStatus":"in_stock"
+      }]}}}</script>
+    `, 'https://www.vitusapotek.no/search?text=paracet', '2026-05-24T12:00:00.000Z');
+
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0]!.country, 'NO');
+    assert.equal(rows[0]!.currency, 'NOK');
+    assert.equal(rows[0]!.chain, 'vitusapotek');
+    assert.equal(rows[0]!.price, 49.9);
+    assert.equal(rows[0]!.productUrl, 'https://www.vitusapotek.no/paracet-500mg/p/123');
   });
 });
