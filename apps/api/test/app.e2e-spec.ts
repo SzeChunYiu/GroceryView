@@ -119,6 +119,28 @@ describe('GroceryView API app', () => {
       .expect(400);
   });
 
+  it('allows localhost:3000 through CORS', async () => {
+    await request(app.getHttpServer())
+      .get('/health')
+      .set('Origin', 'http://localhost:3000')
+      .expect(200)
+      .expect('Access-Control-Allow-Origin', 'http://localhost:3000');
+  });
+
+  it('blocks unknown CORS origins', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/health')
+      .set('Origin', 'https://evil.example.com')
+      .expect((res) => {
+        assert.notEqual(res.status, 200);
+      });
+
+    assert.ok(
+      !response.headers['access-control-allow-origin'],
+      'unexpected CORS header for blocked origin'
+    );
+  });
+
   it('returns 404 for missing product terminal data', async () => {
     await request(app.getHttpServer()).get('/products/missing-product/terminal').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/spread').expect(404);
