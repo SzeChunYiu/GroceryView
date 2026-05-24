@@ -15,13 +15,16 @@ import {
   midsommarSeasonalHoliday,
   type ItemSubstitutionProduct
 } from '@groceryview/analytics';
-import { Card, Eyebrow, PageShell } from '@/components/data-ui';
-import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
+import { Card, PageShell } from '@/components/data-ui';
+import type { PriceChartTerminalModel, PriceChartTerminalWindow } from '@/components/price-chart-terminal';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
 import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { metadataForProduct } from '@/lib/seo';
+import { ProductHeader } from './product-header';
+import { ProductHistoryChart } from './product-history-chart';
+import { ProductPriceTable } from './product-price-table';
 
 export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
   const { slug } = await params;
@@ -1089,66 +1092,32 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
     <PageShell>
       <script dangerouslySetInnerHTML={{ __html: jsonLd(productJsonLd) }} type="application/ld+json" />
       <script dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbJsonLd) }} type="application/ld+json" />
-      <Eyebrow>{isChain ? 'Axfood chain product' : 'OpenPrices product'}</Eyebrow>
-      <h1 className="mt-2 max-w-4xl text-4xl font-black tracking-tight">{product.name}</h1>
-      <p className="mt-3 text-lg text-slate-700">{isChain ? product.brand : product.brands || 'Brand not reported'} · {isChain ? product.subline : product.quantity || 'Quantity not reported'}</p>
-      <div className="mt-6 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-        <Card>
-          {product.image ? (
-            <img
-              alt={product.name}
-              className="mb-5 aspect-square w-full rounded-[2rem] border border-slate-100 bg-slate-50 object-contain p-4 shadow-inner"
-              decoding="async"
-              loading="lazy"
-              referrerPolicy="no-referrer"
-              src={product.image}
-            />
-          ) : (
-            <div className="mb-5 rounded-[2rem] border border-dashed border-slate-200 bg-slate-50 p-6 text-center text-sm font-bold text-slate-500">
-              Product image not reported by the current verified source.
-            </div>
-          )}
-          <h2 className="text-2xl font-black">Primary price evidence</h2>
-          {isChain ? (
-            <div className="mt-4 grid gap-3">
-              <p className="text-5xl font-black text-emerald-800">{formatSek(product.lowestPrice)}</p>
-              <p className="font-semibold text-slate-700">Lowest chain: {product.lowestChain}. Highest observed chain price: {formatSek(product.highestPrice)}.</p>
-              <p className="rounded-2xl bg-amber-50 p-4 font-black text-amber-950">Comparable spread: {formatPct(product.spreadPct)}. This is chain-wide catalogue evidence, not per-branch shelf evidence.</p>
-            </div>
-          ) : (
-            <div className="mt-4 grid gap-3">
-              <p className="text-5xl font-black text-emerald-800">{formatSek(product.priceMedian)}</p>
-              <p className="font-semibold text-slate-700">Observed {product.observationCount} time(s); latest observation {product.lastObservedAt}.</p>
-              <p className="rounded-2xl bg-amber-50 p-4 font-black text-amber-950">Range: {formatSek(product.priceMin)} to {formatSek(product.priceMax)}. Community OpenPrices data is displayed with explicit count and date.</p>
-            </div>
-          )}
-        </Card>
-        <Card>
-          <h2 className="text-2xl font-black">Source fields</h2>
-          <dl className="mt-4 grid gap-3 text-sm">
-            <div className="rounded-2xl bg-slate-50 p-4"><dt className="font-black">Code</dt><dd>{product.code}</dd></div>
-            <div className="rounded-2xl bg-slate-50 p-4"><dt className="font-black">Category</dt><dd>{labelFromSlug(product.category)}</dd></div>
-            <div className="rounded-2xl bg-slate-50 p-4"><dt className="font-black">Source</dt><dd>{isChain ? 'Willys/Hemköp public search snapshot' : 'OpenPrices / Open Food Facts SEK observation'}</dd></div>
-          </dl>
-        </Card>
-      </div>
-      <Card className="mt-6 border-slate-200 bg-slate-50">
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div>
-            <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-500">Data freshness badge</p>
-            <h2 className="mt-2 text-2xl font-black text-slate-950">{freshnessBadge.sourceName}</h2>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">{freshnessBadge.caveat}</p>
-          </div>
-          <Link className="rounded-full bg-white px-4 py-2 text-sm font-black text-emerald-800 underline decoration-emerald-300 underline-offset-4" href={freshnessBadge.evidenceRoute}>
-            Check source route
-          </Link>
-        </div>
-        <div className="mt-5 grid gap-3 md:grid-cols-3">
-          <p className="rounded-2xl bg-white p-4 text-sm font-bold text-slate-700">Freshness: {freshnessBadge.freshnessLabel}</p>
-          <p className="rounded-2xl bg-white p-4 text-sm font-bold text-slate-700">Coverage: {freshnessBadge.coverageLabel}</p>
-          <p className="rounded-2xl bg-white p-4 text-sm font-bold text-slate-700">Confidence: {freshnessBadge.confidenceBadge}</p>
-        </div>
-      </Card>
+      <ProductHeader
+        freshnessBadge={freshnessBadge}
+        image={product.image}
+        kindLabel={isChain ? 'Axfood chain product' : 'OpenPrices product'}
+        name={product.name}
+        primaryEvidence={isChain ? {
+          mode: 'chain',
+          lowestPriceLabel: formatSek(product.lowestPrice),
+          lowestChain: product.lowestChain,
+          highestPriceLabel: formatSek(product.highestPrice),
+          spreadLabel: formatPct(product.spreadPct)
+        } : {
+          mode: 'openprices',
+          medianPriceLabel: formatSek(product.priceMedian),
+          observationCount: product.observationCount,
+          lastObservedAt: product.lastObservedAt,
+          priceMinLabel: formatSek(product.priceMin),
+          priceMaxLabel: formatSek(product.priceMax)
+        }}
+        sourceFields={{
+          code: product.code,
+          categoryLabel: labelFromSlug(product.category),
+          sourceLabel: isChain ? 'Willys/Hemköp public search snapshot' : 'OpenPrices / Open Food Facts SEK observation'
+        }}
+        subtitle={`${isChain ? product.brand : product.brands || 'Brand not reported'} · ${isChain ? product.subline : product.quantity || 'Quantity not reported'}`}
+      />
       {commodityComparison ? (
         <Card className="mt-6 border-lime-200 bg-lime-50/70">
           <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-start">
@@ -1260,47 +1229,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
         )}
         <p className="mt-4 text-xs font-semibold text-slate-600">{itemSubstitutions.guardrail}</p>
       </Card>
-      <PriceChartTerminal chart={priceChartTerminal} />
-      <Card className="mt-6 overflow-hidden border-cyan-200 bg-cyan-50/80">
-        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-start">
-          <div>
-            <p className="text-xs font-black uppercase tracking-[0.22em] text-cyan-800">cross-chain history overlay</p>
-            <h2 className="mt-2 text-2xl font-black text-slate-950">Per-chain dated price tape coverage</h2>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
-              Uses buildPriceChartSeries only when at least two chains have dated observations for the same product. No forecast or synthetic chain history is shown.
-            </p>
-          </div>
-          <div className="rounded-[2rem] bg-slate-950 p-5 text-right text-white shadow-sm">
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-300">{crossChainHistoryOverlay.title}</p>
-            <p className="mt-2 text-3xl font-black">{crossChainHistoryOverlay.chainCount} sources</p>
-            <p className="mt-1 text-xs font-semibold text-slate-300">{crossChainHistoryOverlay.observationCount} dated points</p>
-          </div>
-        </div>
-        {crossChainHistoryOverlay.available ? (
-          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {crossChainHistoryOverlay.crossChainOverlaySeries.map((series) => (
-              <div className="rounded-2xl bg-white/90 p-4 shadow-sm" key={`${series.chainLabel}-${series.lineStyle}`}>
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">{series.chainLabel}</p>
-                <p className="mt-2 text-2xl font-black text-slate-950">{series.latestPriceLabel}</p>
-                <p className="mt-2 text-sm font-semibold text-slate-600">{series.pointCount} points · lineStyle {series.lineStyle}</p>
-                <p className="mt-2 text-sm font-bold text-slate-700">Range {series.lowValueLabel}–{series.highValueLabel}</p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {crossChainHistoryOverlay.chainHistoryCoverageRows.map((row) => (
-              <div className="rounded-2xl bg-white/90 p-4 shadow-sm" key={`${row.chainLabel}-${row.lineStyle}`}>
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">{row.chainLabel}</p>
-                <p className="mt-2 text-2xl font-black text-slate-950">{row.latestPriceLabel}</p>
-                <p className="mt-2 text-sm font-semibold text-slate-600">{row.pointCount} dated points · {row.lineStyle}</p>
-                <p className="mt-2 text-xs font-semibold leading-5 text-slate-500">{row.detail}</p>
-              </div>
-            ))}
-          </div>
-        )}
-        <p className="mt-4 text-xs font-semibold leading-5 text-slate-600">{crossChainHistoryOverlay.detail}</p>
-      </Card>
+      <ProductHistoryChart chart={priceChartTerminal} crossChainHistoryOverlay={crossChainHistoryOverlay} />
       <Card className="mt-6 overflow-hidden border-sky-200 bg-sky-50/80">
         <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-start">
           <div>
@@ -1589,20 +1518,14 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
         )}
         <p className="mt-4 text-xs font-semibold text-slate-500">{priceHistoryBadge.detail}</p>
       </Card>
-      {isChain ? (
-        <Card className="mt-6">
-          <h2 className="text-2xl font-black">Chain price rows</h2>
-          <div className="mt-4 grid gap-3 md:grid-cols-2">
-            {chainPriceRows(product).map((row) => (
-              <div className="rounded-2xl border border-slate-200 p-4" key={row.chain}>
-                <p className="text-lg font-black capitalize">{row.chain}</p>
-                <p className="mt-1 text-3xl font-black text-emerald-800">{formatSek(row.price)}</p>
-                <p className="text-sm text-slate-600">{row.priceUnit || 'Unit not reported'}{row.savings ? ` · listed saving ${formatSek(row.savings)}` : ''}</p>
-              </div>
-            ))}
-          </div>
-        </Card>
-      ) : null}
+      <ProductPriceTable
+        rows={isChain ? chainPriceRows(product).map((row) => ({
+          chain: row.chain,
+          priceLabel: formatSek(row.price),
+          priceUnit: row.priceUnit,
+          savingsLabel: row.savings ? formatSek(row.savings) : null
+        })) : []}
+      />
     </PageShell>
   );
 }
