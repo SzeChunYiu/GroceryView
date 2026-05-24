@@ -69,6 +69,10 @@ import {
   type FuelPriceObservation
 } from './connectors/okq8-fuel.js';
 import {
+  fetchShellSeFuelPrices,
+  type ShellSeFuelObservation
+} from './connectors/shell-se.js';
+import {
   fetchMathemProducts,
   type MathemProduct
 } from './connectors/mathem.js';
@@ -106,6 +110,7 @@ export * from './connectors/willys-bulk.js';
 export * from './connectors/apohem.js';
 export * from './connectors/okq8-fuel.js';
 export * from './connectors/st1-fuel.js';
+export * from './connectors/shell-se.js';
 export * from './connectors/willys.js';
 export * from './store-enumerator.js';
 export * from './unit-price.js';
@@ -2001,6 +2006,33 @@ function okq8FuelPriceToDailyItem(row: FuelPriceObservation): RetailerConnectorP
   };
 }
 
+function shellSeFuelPriceToDailyItem(row: ShellSeFuelObservation): RetailerConnectorParsedProduct {
+  return {
+    sourceType: 'retailer_online_page',
+    observedAt: row.observedAt,
+    chainId: row.chainId,
+    retailerProductId: row.productId,
+    rawName: row.gradeLabel,
+    canonicalName: row.gradeLabel,
+    productId: row.productId,
+    categoryId: 'fuel',
+    fuelGradeId: row.productId,
+    fuelSource: {
+      sourceKind: row.sourceKind,
+      fuelGradeId: row.productId,
+      originalPriceText: row.provenance.originalPriceText,
+      originalEffectiveDate: row.provenance.originalEffectiveDate
+    },
+    brand: row.legacyBrandName,
+    packageSize: 1,
+    packageUnit: 'l',
+    price: row.pricePerLitre,
+    memberOnly: false,
+    validFrom: row.effectiveFrom,
+    sourceUrl: row.sourceUrl
+  };
+}
+
 function pharmacyProductToDailyItem(row: ApohemProduct): RetailerConnectorParsedProduct {
   const quantity = parseNativePackageText(row.name);
   const barcode = validDailyBarcode(row.ean);
@@ -2265,6 +2297,15 @@ export async function fetchDailyConnectorSnapshot(
       sourceUrl: OKQ8_FUEL_PRICES_URL
     });
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(okq8FuelPriceToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_SHELL_SE_FUEL_PRICES_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_SHELL_SE_FUEL_PRICES_URL}?`)) {
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchShellSeFuelPrices({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      capturedAt: retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(shellSeFuelPriceToDailyItem) });
   }
 
   if (sourceUrl === GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL}?`)) {
@@ -3113,6 +3154,7 @@ export const GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL = 'groceryview://d
 export const GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL = 'groceryview://daily/mathem/products/public-search';
 export const GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL = 'groceryview://daily/matspar/products/public-search';
 export const GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL = OKQ8_FUEL_PRICES_URL;
+export const GROCERYVIEW_DAILY_SHELL_SE_FUEL_PRICES_URL = 'groceryview://daily/shell-se/fuel-prices';
 export const GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL = 'groceryview://daily/pharmacy/products/public';
 
 const requireForDailyIngestion = createRequire(import.meta.url);

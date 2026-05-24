@@ -111,6 +111,7 @@ import {
   GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL,
   GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL,
   GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL,
+  GROCERYVIEW_DAILY_SHELL_SE_FUEL_PRICES_URL,
   GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL,
@@ -130,6 +131,9 @@ import {
   parseOsmChainStores,
   parseOpenPricesSnapshot,
   parseOkq8FuelPricePage,
+  parseShellSeStationLocatorHtml,
+  mapSt1FuelPricesToShellSe,
+  fetchShellSeSelectConvenienceForAllStations,
   parseBrandedSwedishFuelStations,
   parseCoopDrPdfTextOffers,
   parseRetailerProductJsonSnapshot,
@@ -180,6 +184,7 @@ import {
   validateStoreEnumerationResults,
   validateEnumeratedStores,
   ST1_FUEL_PRICE_URL,
+  SHELL_SE_ST1_STATION_LOCATOR_URL,
   validateOfferSelectorFixtures,
   validateGroceryCategoryCoicopMappings,
   scbCoicopFoodCategoryCodes,
@@ -679,6 +684,149 @@ describe('St1 fuel price connector', () => {
       () => fetchSt1FuelPrices({ fetchImpl: async () => new Response('Forbidden', { status: 403 }) }),
       /blocked or unavailable/
     );
+  });
+});
+
+describe('Shell SE fuel/convenience connector', () => {
+  const st1ListPriceRows = parseSt1FuelPriceHtml(`
+    <main>
+      <h1>St1 listpris St1-stationer</h1>
+      <p>Listpriser gällande från 23 maj 2026</p>
+      <table>
+        <tr><td>Bensin 98</td><td>20,19 kr</td></tr>
+        <tr><td>Bensin 95</td><td>18,89 kr</td></tr>
+        <tr><td>E85</td><td>15,84 kr</td></tr>
+        <tr><td>Diesel</td><td>21,34 kr</td></tr>
+        <tr><td>HVO100</td><td>29,74 kr</td></tr>
+      </table>
+    </main>
+  `, {
+    sourceUrl: ST1_FUEL_PRICE_URL,
+    retrievedAt: '2026-05-23T13:42:57.000Z'
+  });
+
+  it('maps St1 operator fuel prices to the legacy Shell SE chain without fabricating prices', () => {
+    const rows = mapSt1FuelPricesToShellSe(st1ListPriceRows, {
+      capturedAt: '2026-05-23T13:43:00.000Z',
+      rawSnapshotRef: 'raw://shell-se/test'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.chainId, row.productId, row.pricePerLitre, row.operatorName, row.legacyBrandName]), [
+      ['shell-se', 'fuel-98', 20.19, 'St1 Sverige AB', 'Shell Sverige'],
+      ['shell-se', 'fuel-95-e10', 18.89, 'St1 Sverige AB', 'Shell Sverige'],
+      ['shell-se', 'fuel-e85', 15.84, 'St1 Sverige AB', 'Shell Sverige'],
+      ['shell-se', 'fuel-diesel', 21.34, 'St1 Sverige AB', 'Shell Sverige'],
+      ['shell-se', 'fuel-hvo100', 29.74, 'St1 Sverige AB', 'Shell Sverige']
+    ]);
+    assert.equal(rows.every((row) => row.provenance.source === 'shell_se_st1_fuel_prices'), true);
+    assert.match(rows[0].provenance.note, /rebrand/i);
+  });
+
+  it('parses the St1 station locator cards that Shell.se points Swedish users to, including Select convenience signals', () => {
+    const rows = parseShellSeStationLocatorHtml({
+      retrievedAt: '2026-05-23T14:00:00.000Z',
+      sourceUrl: SHELL_SE_ST1_STATION_LOCATOR_URL,
+      html: `
+        <button class="station">
+          <img class="logo" src="/images/st1-dsc/stationlocator/st1-logo.webp">
+          <div class="text">
+            <h4 class="title"> St1 Stockholm Sveavägen </h4>
+            <span class="description">Shell Select shop och kaffe</span>
+            <span class="open-hours">Öppen 24h</span>
+          </div>
+          <svg><use href="/_nuxt/default-fill.svg#sprite-default-fill/cup"></use></svg>
+          <a href="https://maps.google.com/?daddr=59.3372390000,18.0581710000">Rutt</a>
+        </button>
+        <button class="station">
+          <div class="text">
+            <h4 class="title"> St1 Truck Arvika </h4>
+            <span class="open-hours">06:00 - 22:00</span>
+          </div>
+          <a href="https://maps.google.com/?daddr=59.6477000000,12.6174000000">Rutt</a>
+        </button>
+      `
+    });
+
+    assert.equal(rows.length, 2);
+    assert.deepEqual(rows.map((row) => [row.chainId, row.name, row.hasFuel, row.hasSelectConvenience]), [
+      ['shell-se', 'St1 Stockholm Sveavägen', true, true],
+      ['shell-se', 'St1 Truck Arvika', true, false]
+    ]);
+    assert.equal(rows[0].latitude, 59.337239);
+    assert.equal(rows[0].longitude, 18.058171);
+    assert.match(rows[0].stationId, /^shell-se:st1-stockholm-sveavagen:/);
+  });
+
+  it('runs Select convenience availability through the all-store runner without inventing menu prices', async () => {
+    const stations = parseShellSeStationLocatorHtml({
+      retrievedAt: '2026-05-23T14:00:00.000Z',
+      sourceUrl: SHELL_SE_ST1_STATION_LOCATOR_URL,
+      html: `
+        <button class="station">
+          <h4 class="title"> St1 Stockholm Sveavägen </h4>
+          <span class="description">Shell Select shop och kaffe</span>
+          <span class="open-hours">Öppen 24h</span>
+          <a href="https://maps.google.com/?daddr=59.3372390000,18.0581710000">Rutt</a>
+        </button>
+        <button class="station">
+          <h4 class="title"> St1 Truck Arvika </h4>
+          <span class="open-hours">06:00 - 22:00</span>
+          <a href="https://maps.google.com/?daddr=59.6477000000,12.6174000000">Rutt</a>
+        </button>
+      `
+    });
+
+    const rows = await fetchShellSeSelectConvenienceForAllStations({
+      stations,
+      retrievedAt: '2026-05-23T14:05:00.000Z',
+      storeConcurrency: 2
+    });
+
+    assert.deepEqual(rows.map((row) => [row.stationId, row.productId, row.available]), [
+      [stations[0].stationId, 'shell-select-convenience', true]
+    ]);
+    assert.match(rows[0].provenance.note, /no menu prices are inferred/i);
+  });
+
+  it('adapts Shell SE fuel prices into daily litre-priced observations', async () => {
+    const snapshot = await fetchDailyConnectorSnapshot({
+      status: 'ready',
+      connectorId: 'shell-se-fuel-prices',
+      chainId: 'shell-se',
+      sourceType: 'retailer_online_page',
+      runKey: 'shell-se:retailer-online-page:fuel-prices:2026-05-23',
+      sourceRunId: 'source-run:shell-se:retailer-online-page:fuel-prices:2026-05-23',
+      provenance: {
+        sourceType: 'retailer_online_page',
+        sourceUrl: GROCERYVIEW_DAILY_SHELL_SE_FUEL_PRICES_URL,
+        capturedAt: '2026-05-23T13:42:57.000Z',
+        parserVersion: 'shell-se-st1-fuel-v1'
+      },
+      requiredActions: []
+    }, {
+      retrievedAt: '2026-05-23T13:42:57.000Z',
+      fetchImpl: async () => new Response(`
+        <main>
+          <p>Listpriser gällande från 23 maj 2026</p>
+          <table>
+            <tr><td>Bensin 98</td><td>20,19 kr</td></tr>
+            <tr><td>Bensin 95</td><td>18,89 kr</td></tr>
+            <tr><td>E85</td><td>15,84 kr</td></tr>
+            <tr><td>Diesel</td><td>21,34 kr</td></tr>
+            <tr><td>HVO100</td><td>29,74 kr</td></tr>
+          </table>
+        </main>
+      `, { status: 200, headers: { 'content-type': 'text/html' } })
+    });
+
+    const parsed = JSON.parse(snapshot.body) as { items: Array<{ chainId: string; productId: string; packageSize: number; packageUnit: string; price: number; brand: string }> };
+    assert.deepEqual(parsed.items.map((row) => [row.chainId, row.productId, row.packageSize, row.packageUnit, row.price, row.brand]), [
+      ['shell-se', 'fuel-98', 1, 'l', 20.19, 'Shell Sverige'],
+      ['shell-se', 'fuel-95-e10', 1, 'l', 18.89, 'Shell Sverige'],
+      ['shell-se', 'fuel-e85', 1, 'l', 15.84, 'Shell Sverige'],
+      ['shell-se', 'fuel-diesel', 1, 'l', 21.34, 'Shell Sverige'],
+      ['shell-se', 'fuel-hvo100', 1, 'l', 29.74, 'Shell Sverige']
+    ]);
   });
 });
 
