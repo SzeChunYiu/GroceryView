@@ -1,4 +1,5 @@
 import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { BudgetMeter } from '@/components/budget-meter';
 import { basketTripCostContract, budgetCheapestStoreRoutingPlanner, deliveryVsInStoreComparison, elderlyNearestDeliveryPlanner, formatSek, fulfillmentSlotsContract } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -186,6 +187,9 @@ export default function FeaturePage() {
           </div>
         </div>
         <p className="mt-4 text-sm font-semibold text-slate-700">{budgetCheapestStoreRoutingPlanner.nextStep}</p>
+        <div className="mt-5">
+          <BudgetMeter />
+        </div>
       </Card>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
