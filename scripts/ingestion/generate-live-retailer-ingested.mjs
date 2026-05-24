@@ -225,7 +225,7 @@ if (shouldRun('apohem')) {
   const pharmacyProducts = await fetchPharmacyProducts({
     sourcePaths: APOHEM_SOURCE_PATHS,
     apotekHjartatUrls: APOTEK_HJARTAT_SEARCH_URLS,
-    maxRows: 1200,
+    maxRows: 2000,
     retrievedAt
   });
   await writeApohem(pharmacyProducts);
