@@ -32,6 +32,7 @@ import {
   buildMatpriskollenStoresUrl,
   buildMathemSearchUrl,
   buildMatsparSearchUrl,
+  buildSsbCpi03013Request,
   buildOpenFoodFactsProductUrl,
   buildOpenFoodFactsSwedenSearchUrl,
   buildOpenPricesConnectorUrl,
@@ -90,6 +91,7 @@ import {
   fetchMathemProducts,
   fetchMatpriskollenOffers,
   fetchMatsparProducts,
+  parseSsbCpi03013,
   fetchWillysProducts,
   fetchWillysProductsForAllStores,
   fetchWillysStores,
@@ -7307,5 +7309,27 @@ describe('daily ingestion runner', () => {
     assert.equal(result.status, 'blocked');
     assert.deepEqual(result.blockers, ['ica:robots_txt_allow_required', 'ica:legal_review_approval_required']);
     assert.equal(executor.calls.length, 0);
+  });
+});
+
+describe('parseSsbCpi03013', () => {
+  it('maps JSON-stat CPI values into benchmark observation rows without interpolation', () => {
+    const rows = parseSsbCpi03013({
+      id: ['Konsumgrp', 'ContentsCode', 'Tid'],
+      size: [2, 1, 2],
+      dimension: {
+        Konsumgrp: { category: { index: { '01': 0, '07.2.2': 1 } } },
+        ContentsCode: { category: { index: { KpiIndMnd: 0 } } },
+        Tid: { category: { index: { '2026M01': 0, '2026M02': 1 } } }
+      },
+      value: [131.2, null, 149.5, 150.1]
+    }, '2026-05-24T16:00:00.000Z');
+
+    assert.deepEqual(rows, [
+      { source_id: 'SSB_CPI_03013', country: 'NO', vertical: 'food', ecoicop_code: '01', period: '2026-01', value: 131.2, unit: 'index', observed_at: '2026-05-24T16:00:00.000Z' },
+      { source_id: 'SSB_CPI_03013', country: 'NO', vertical: 'fuel', ecoicop_code: '07.2.2', period: '2026-01', value: 149.5, unit: 'index', observed_at: '2026-05-24T16:00:00.000Z' },
+      { source_id: 'SSB_CPI_03013', country: 'NO', vertical: 'fuel', ecoicop_code: '07.2.2', period: '2026-02', value: 150.1, unit: 'index', observed_at: '2026-05-24T16:00:00.000Z' }
+    ]);
+    assert.deepEqual(buildSsbCpi03013Request({ periods: ['2026M01'] }).query[2], { code: 'Tid', selection: { filter: 'item', values: ['2026M01'] } });
   });
 });
