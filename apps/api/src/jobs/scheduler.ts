@@ -12,6 +12,13 @@ type Timer = ReturnType<typeof setTimeout>;
 
 const MAX_LOOKAHEAD_MINUTES = 366 * 24 * 60;
 
+export const NETTO_SWEDEN_SCRAPE_JOB_NAME = 'scrape:netto-se';
+export const DEFAULT_NETTO_SWEDEN_DAILY_CRON = '10 4 * * *';
+
+export function nettoSwedenDailyCron(env: NodeJS.ProcessEnv = process.env): string {
+  return env.SCRAPER_CRON_NETTO_SE?.trim() || DEFAULT_NETTO_SWEDEN_DAILY_CRON;
+}
+
 function fieldMatches(field: string, value: number, min: number, max: number): boolean {
   return field.split(',').some((part) => {
     const trimmed = part.trim();

@@ -1,4 +1,5 @@
 import { type RequestLoggingConfig } from './middleware/logger.js';
+import { nettoSwedenDailyCron } from './jobs/scheduler.js';
 
 export type ApiCorsConfig = {
   allowedOrigins: string[];
@@ -76,6 +77,7 @@ function loadScrapeSchedulerConfig(env: NodeJS.ProcessEnv): ScrapeSchedulerConfi
       { id: 'willys', cadence: 'daily', cron: env.SCRAPER_CRON_WILLYS?.trim() || '30 2 * * *' },
       { id: 'coop', cadence: 'daily', cron: env.SCRAPER_CRON_COOP?.trim() || '45 2 * * *' },
       { id: 'hemkop', cadence: 'daily', cron: env.SCRAPER_CRON_HEMKOP?.trim() || '0 3 * * *' },
+      { id: 'netto-se', cadence: 'daily', cron: nettoSwedenDailyCron(env) },
       { id: 'specials', cadence: 'weekly', cron: env.SCRAPER_CRON_SPECIALS?.trim() || '0 4 * * 1' }
     ]
   };
