@@ -1,5 +1,6 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { ConsentManager } from '@/components/consent-manager';
+import { PwaInstall } from '@/components/pwa-install';
 import { ServiceWorkerRegistrar } from '@/lib/swRegister';
 import { Providers } from './providers';
 import './globals.css';
@@ -26,17 +27,37 @@ const websiteJsonLd = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+  applicationName: 'GroceryView',
   title: 'GroceryView',
   description: 'Sweden grocery price intelligence for products, stores, and weekly baskets.',
   manifest: '/manifest.webmanifest',
+  icons: {
+    icon: [{ url: '/pwa-icon.svg', type: 'image/svg+xml' }],
+    apple: [{ url: '/pwa-maskable-icon.svg', type: 'image/svg+xml' }]
+  },
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'default',
+    statusBarStyle: 'black-translucent',
     title: 'GroceryView'
   },
+  formatDetection: {
+    telephone: false
+  },
   other: {
-    'mobile-web-app-capable': 'yes'
+    'apple-mobile-web-app-capable': 'yes',
+    'mobile-web-app-capable': 'yes',
+    'msapplication-TileColor': '#064e3b'
   }
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f8fafc' },
+    { media: '(prefers-color-scheme: dark)', color: '#064e3b' }
+  ]
 };
 
 function jsonLd(value: unknown) {
@@ -53,6 +74,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         />
         <Providers>{children}</Providers>
         <ConsentManager />
+        <PwaInstall />
         <ServiceWorkerRegistrar />
       </body>
     </html>
