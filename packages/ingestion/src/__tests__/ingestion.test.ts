@@ -5372,8 +5372,11 @@ class DailyIngestionExecutor implements QueryExecutor {
     if (sql.includes('insert into chains')) return [{ id: `chain-db-${++this.sequence}` }] as T[];
     if (sql.includes('insert into stores')) return [{ id: `store-db-${++this.sequence}` }] as T[];
     if (sql.includes('jsonb_to_recordset') && sql.includes('insert into products')) {
-      const products = JSON.parse(String(params[0])) as Array<{ slug: string }>;
-      return products.map((product) => ({ slug: product.slug, id: `product-db-${product.slug}` })) as T[];
+      const products = JSON.parse(String(params[0])) as Array<{ slug: string; barcode?: string | null }>;
+      return products.map((product) => ({
+        slug: product.slug,
+        id: product.barcode ? `product-db-ean-${product.barcode}` : `product-db-${product.slug}`
+      })) as T[];
     }
     if (sql.includes('insert into products')) return [{ id: `product-db-${++this.sequence}` }] as T[];
     if (sql.includes('jsonb_to_recordset') && sql.includes('insert into aliases')) return [] as T[];
@@ -6021,6 +6024,73 @@ describe('daily ingestion runner', () => {
     assert.equal(executor.calls.filter((call) => call.sql.includes('insert into stores')).length, 1);
     assert.equal(executor.calls.filter((call) => call.sql.includes('insert into products')).length, 1);
     assert.equal(executor.calls.filter((call) => call.sql.includes('insert into aliases')).length, 1);
+  });
+
+  it('deduplicates daily scraped products by EAN barcode before writing dependent rows', async () => {
+    const executor = new DailyIngestionExecutor();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-21T03:17:00.000Z',
+      connectors: [
+        {
+          connectorId: 'willys-normalized-json',
+          chainId: 'willys',
+          sourceType: 'official_api',
+          endpointUrl: 'https://sources.example.test/willys/products.json',
+          parserVersion: 'normalized-json-v1',
+          robotsTxtStatus: 'not_applicable',
+          legalReviewStatus: 'approved',
+          hasDataAgreement: true,
+          stores: [{ storeId: '2110', name: 'Willys Kungsbacka Hede', address: 'Tölöleden 3', city: 'Kungsbacka' }]
+        }
+      ],
+      fetchImpl: async () => new Response(JSON.stringify({
+        items: [
+          {
+            storeId: '2110',
+            retailerProductId: 'wil-pasta-1',
+            rawName: 'Ideal Makaroner 750g',
+            canonicalName: 'Ideal Makaroner',
+            productId: 'willys-ideal-makaroner-750g',
+            categoryId: 'pasta',
+            brand: 'Kungsörnen',
+            barcode: '7310130003547',
+            packageSize: 750,
+            packageUnit: 'g',
+            price: 18.9
+          },
+          {
+            storeId: '2110',
+            retailerProductId: 'wil-pasta-2',
+            rawName: 'Kungsörnen Idealmakaroner 750 g',
+            canonicalName: 'Ideal Makaroner',
+            productId: 'willys-kungsornen-idealmakaroner',
+            categoryId: 'pasta',
+            brand: 'Kungsörnen',
+            barcode: '7310130003547',
+            packageSize: 750,
+            packageUnit: 'g',
+            price: 17.9
+          }
+        ]
+      }), { status: 200, headers: { 'content-type': 'application/json' } })
+    });
+
+    assert.equal(result.acceptedCount, 2);
+    const productInsert = executor.calls.find((call) => call.sql.includes('jsonb_to_recordset') && call.sql.includes('insert into products'));
+    assert.ok(productInsert, 'daily ingestion should batch upsert products');
+    assert.match(productInsert.sql, /left join products existing on existing\.barcode = input\.barcode/);
+    assert.match(productInsert.sql, /batch_barcodes as/);
+    assert.match(productInsert.sql, /coalesce\(existing\.slug, batch_barcodes\.batch_slug, input\.slug\) as target_slug/);
+    const aliasInsert = executor.calls.find((call) => call.sql.includes('jsonb_to_recordset') && call.sql.includes('insert into aliases'));
+    assert.ok(aliasInsert, 'daily ingestion should batch upsert aliases');
+    const aliases = JSON.parse(String(aliasInsert.params[0])) as Array<{ product_id: string }>;
+    assert.deepEqual(aliases.map((alias) => alias.product_id), [
+      'product-db-ean-7310130003547',
+      'product-db-ean-7310130003547'
+    ]);
+    const observations = firstBatchObservation(executor);
+    assert.equal(observations.product_id, 'product-db-ean-7310130003547');
   });
 
   it('upserts every configured daily store before writing partial store-scoped observations', async () => {

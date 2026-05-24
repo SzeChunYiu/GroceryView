@@ -3422,30 +3422,63 @@ function validateConfiguredStoreObservationCoverage(config: DailyIngestionConnec
 
 async function upsertDailyProduct(executor: QueryExecutor, product: IngestedProduct, domain?: DailyIngestionDomain): Promise<string> {
   const rows = await executor.query<IdRow>(
-    `insert into products(
-       slug,
-       canonical_name,
-       brand,
-       barcode,
-       category_path,
-       package_size,
-       package_unit,
-       comparable_unit,
-       domain,
-       fuel_grade_id
-     ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-     on conflict (slug) do update set
-       canonical_name = excluded.canonical_name,
-       brand = excluded.brand,
-       barcode = excluded.barcode,
-       category_path = excluded.category_path,
-       package_size = excluded.package_size,
-       package_unit = excluded.package_unit,
-       comparable_unit = excluded.comparable_unit,
-       domain = excluded.domain,
-       fuel_grade_id = excluded.fuel_grade_id,
-       updated_at = now()
-     returning id`,
+    `with input as (
+       select
+         $1::text as slug,
+         $2::text as canonical_name,
+         $3::text as brand,
+         $4::text as barcode,
+         $5::text[] as category_path,
+         $6::numeric as package_size,
+         $7::text as package_unit,
+         $8::text as comparable_unit,
+         $9::text as domain,
+         $10::text as fuel_grade_id
+     ),
+     matched as (
+       select input.*, coalesce(existing.slug, input.slug) as target_slug
+       from input
+       left join products existing on existing.barcode = input.barcode and input.barcode is not null
+     ),
+     upserted as (
+       insert into products(
+         slug,
+         canonical_name,
+         brand,
+         barcode,
+         category_path,
+         package_size,
+         package_unit,
+         comparable_unit,
+         domain,
+         fuel_grade_id
+       )
+       select
+         target_slug,
+         canonical_name,
+         brand,
+         barcode,
+         category_path,
+         package_size,
+         package_unit,
+         comparable_unit,
+         domain,
+         fuel_grade_id
+       from matched
+       on conflict (slug) do update set
+         canonical_name = excluded.canonical_name,
+         brand = excluded.brand,
+         barcode = excluded.barcode,
+         category_path = excluded.category_path,
+         package_size = excluded.package_size,
+         package_unit = excluded.package_unit,
+         comparable_unit = excluded.comparable_unit,
+         domain = excluded.domain,
+         fuel_grade_id = excluded.fuel_grade_id,
+         updated_at = now()
+       returning id
+     )
+     select id from upserted`,
     [
       normalizeDailySlug(product.id),
       product.canonicalName,
@@ -3486,6 +3519,33 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
            fuel_grade_id text
          )
        ),
+       batch_barcodes as (
+         select barcode, min(slug) as batch_slug
+         from input
+         where barcode is not null
+         group by barcode
+       ),
+       matched as (
+         select input.*, coalesce(existing.slug, batch_barcodes.batch_slug, input.slug) as target_slug
+         from input
+         left join products existing on existing.barcode = input.barcode and input.barcode is not null
+         left join batch_barcodes on batch_barcodes.barcode = input.barcode
+       ),
+       deduplicated as (
+         select distinct on (target_slug)
+           target_slug,
+           canonical_name,
+           brand,
+           barcode,
+           category_id,
+           package_size,
+           package_unit,
+           comparable_unit,
+           domain,
+           fuel_grade_id
+         from matched
+         order by target_slug, slug
+       ),
        upserted as (
          insert into products(
            slug,
@@ -3500,7 +3560,7 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
            fuel_grade_id
          )
          select
-           slug,
+           target_slug,
            canonical_name,
            brand,
            barcode,
@@ -3510,7 +3570,7 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
            comparable_unit,
            domain,
            fuel_grade_id
-         from input
+         from deduplicated
          on conflict (slug) do update set
            canonical_name = excluded.canonical_name,
            brand = excluded.brand,
@@ -3524,7 +3584,10 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
            updated_at = now()
          returning slug, id
        )
-       select slug, id from upserted`,
+       select matched.slug, upserted.id
+       from matched
+       join upserted on upserted.slug = matched.target_slug
+       order by matched.slug`,
       [JSON.stringify(chunk.map((product) => ({
         slug: normalizeDailySlug(product.id),
         canonical_name: product.canonicalName,
