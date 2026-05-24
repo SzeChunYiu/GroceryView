@@ -3,6 +3,7 @@ import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { StoreMap } from '@/components/store-map';
 import { buildChainPriceObservations } from '@/lib/chain-index-data';
 import { basketCostHeatmap } from '@/lib/map-basket-cost-heatmap';
+import { createRouteRankedStores } from '@/lib/routing';
 import { formatPct, storePricePercentileRanks, storeUniverse } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -16,6 +17,7 @@ const cheapestChainNearMe = chainIndexSummary.chains[0];
 const cheapestBranchNearMe = storePricePercentileRanks[0] ?? null;
 const districtHeatOverlay = buildDistrictHeatOverlay();
 const regionalPriceStatisticsGate = buildRegionalPriceStatisticsGate();
+const routeRankedStores = createRouteRankedStores(storeUniverse);
 
 function normaliseBrand(brand: string) {
   const lower = brand.toLowerCase();
@@ -125,13 +127,13 @@ function buildRegionalPriceStatisticsGate() {
 }
 
 export default function MapPage() {
-  const visibleStores = storeUniverse.slice(0, 80);
+  const visibleStores = routeRankedStores.slice(0, 80);
   return (
     <PageShell>
       <Eyebrow>Map data</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Store coordinates with chain-index signals</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
-        The website has verified latitude and longitude for OSM stores. Markers are colored by the chain-level price index only; branch-level prices, route times, and store quality scores are not invented.
+        The website has verified latitude and longitude for OSM stores. Markers are colored by the chain-level price index, and route cards are sorted by estimated walking/car travel time from a visible sample origin.
       </p>
 
       <Card className="mt-6 overflow-hidden border-slate-200 bg-slate-950 p-0 text-white">
@@ -331,8 +333,17 @@ export default function MapPage() {
       </Card>
 
       <Card className="mt-6">
+        <div className="mb-4 flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-black">Route-aware store ranking</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Stores are ordered by the fastest estimated walk/drive route from {visibleStores[0]?.route.originLabel ?? 'the sample origin'}; no private shopper location is read.
+            </p>
+          </div>
+          <p className="rounded-full bg-slate-100 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-slate-700">fastest route first</p>
+        </div>
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          {visibleStores.map((store) => {
+          {visibleStores.map(({ store, route }) => {
             const chain = chainIndexByBrand.get(normaliseBrand(store.brand));
             return (
               <div className={`rounded-2xl border p-4 ${markerTone(chain?.overallIndex)}`} key={store.slug}>
@@ -344,6 +355,8 @@ export default function MapPage() {
                   </div>
                   <span className="rounded-full bg-white/80 px-2 py-1 text-xs font-black">{chain ? chain.overallIndex.toFixed(0) : '—'}</span>
                 </div>
+                <p className="mt-3 text-sm font-black opacity-90">{route.routeLabel}</p>
+                <p className="mt-1 text-xs font-semibold opacity-80">Walk {route.walkingMinutes} min · Drive {route.drivingMinutes} min</p>
                 <p className="mt-3 text-xs font-semibold opacity-80">{chain ? `${formatPct(chain.overallIndex - 100)} vs market index · ${chain.confidence} confidence` : 'No chain-index coverage for this brand'}</p>
               </div>
             );
