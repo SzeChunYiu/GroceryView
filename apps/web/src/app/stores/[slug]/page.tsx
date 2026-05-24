@@ -231,6 +231,10 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
             />
           </div>
           <p className="mt-4 leading-7 text-cyan-950">{pricePercentileRank.detail}</p>
+          <p className="mt-3 text-sm font-bold leading-6 text-cyan-900">
+            Ranked badges unlock only from per-branch Lidl offer observations or real
+            matchedChainProducts/categorySummaries price-index rows; otherwise the page keeps the percentile withheld.
+          </p>
           {pricePercentileRank.isRanked ? (
             <div className="mt-4 grid gap-3 md:grid-cols-3">
               <div className="rounded-2xl border border-cyan-200 bg-white p-4">
