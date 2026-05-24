@@ -3969,7 +3969,7 @@ export function reviewReceiptScan(input: ReceiptReviewInput): ReceiptReview {
 export type HouseholdMember = {
   userId: string;
   displayName: string;
-  role?: 'owner' | 'editor' | 'viewer';
+  role?: 'owner' | 'editor' | 'commenter' | 'viewer';
 };
 
 export type HouseholdBasketItem = {
@@ -4013,7 +4013,7 @@ export function createHouseholdState(input: {
   };
   const canEdit = (userId: string): boolean => {
     const member = input.members.find((candidate) => candidate.userId === userId);
-    return member?.role !== 'viewer';
+    return member?.role !== 'viewer' && member?.role !== 'commenter';
   };
   const cloneBasketItem = (item: HouseholdBasketItem): HouseholdBasketItem => ({
     productId: item.productId,
@@ -4100,7 +4100,7 @@ export function summarizeHousehold(snapshot: HouseholdSnapshot, priceByProductId
 }
 
 
-export type ShareableHouseholdListRole = 'viewer' | 'editor';
+export type ShareableHouseholdListRole = 'viewer' | 'commenter' | 'editor';
 
 export type ShareableHouseholdListRecipient = {
   userId?: string;
@@ -4112,6 +4112,7 @@ export type ShareableHouseholdListPermission = {
   recipient: string;
   role: ShareableHouseholdListRole;
   canEdit: boolean;
+  canComment: boolean;
   reason: string;
 };
 
@@ -4143,11 +4144,19 @@ export function planShareableHouseholdList(snapshot: HouseholdSnapshot, input: {
     const recipientId = recipient.userId ?? recipient.email ?? 'unknown-recipient';
     const isHouseholdMember = !!recipient.userId && memberIds.has(recipient.userId);
     const canEdit = recipient.role === 'editor' && isHouseholdMember;
+    const canComment = recipient.role === 'commenter' || canEdit;
     return {
       recipient: recipientId,
       role: recipient.role,
       canEdit,
-      reason: canEdit ? 'household_member_editor' : recipient.role === 'editor' ? 'external_or_unknown_view_only' : 'viewer_permission'
+      canComment,
+      reason: canEdit
+        ? 'household_member_editor'
+        : recipient.role === 'commenter'
+          ? 'comment_only_permission'
+          : recipient.role === 'editor'
+            ? 'external_or_unknown_view_only'
+            : 'viewer_permission'
     };
   });
 
@@ -4164,7 +4173,7 @@ export function planShareableHouseholdList(snapshot: HouseholdSnapshot, input: {
     blockers,
     guardrails: [
       'No anonymous household edits: requester identity must match a signed-in household member before sharing.',
-      'External invite links are view-only until the recipient signs in and joins the household.',
+      'External invite links can view or comment, but cannot edit until the recipient signs in and joins the household.',
       'Shared lists expose product ids, quantities, and store preferences only after an expiring share token is minted server-side.'
     ]
   };
