@@ -69,6 +69,11 @@ import {
   type FuelPriceObservation
 } from './connectors/okq8-fuel.js';
 import {
+  CIRCLE_K_SE_FUEL_PRICES_URL,
+  fetchCircleKSeRows,
+  type CircleKSeRow
+} from './connectors/circle-k-se.js';
+import {
   fetchMathemProducts,
   type MathemProduct
 } from './connectors/mathem.js';
@@ -105,6 +110,7 @@ export * from './connectors/lidl-bulk.js';
 export * from './connectors/willys-bulk.js';
 export * from './connectors/apohem.js';
 export * from './connectors/okq8-fuel.js';
+export * from './connectors/circle-k-se.js';
 export * from './connectors/st1-fuel.js';
 export * from './connectors/willys.js';
 export * from './store-enumerator.js';
@@ -1974,6 +1980,47 @@ function mathemProductToDailyItem(row: MathemProduct): RetailerConnectorParsedPr
   };
 }
 
+function circleKSeRowToDailyItem(row: CircleKSeRow): RetailerConnectorParsedProduct {
+  if (row.domain === 'fuel') {
+    return {
+      sourceType: 'retailer_online_page',
+      observedAt: row.observedAt,
+      chainId: row.chainId,
+      retailerProductId: row.productId,
+      rawName: row.gradeLabel,
+      canonicalName: row.gradeLabel,
+      productId: row.productId,
+      categoryId: 'fuel',
+      fuelGradeId: row.productId,
+      fuelSource: { sourceKind: row.sourceKind, fuelGradeId: row.productId, originalPriceText: row.provenance.originalPriceText, originalEffectiveDate: row.effectiveFrom },
+      brand: row.operatorName,
+      packageSize: 1,
+      packageUnit: row.unit,
+      price: row.pricePerUnit,
+      memberOnly: false,
+      validFrom: row.effectiveFrom,
+      sourceUrl: row.sourceUrl
+    };
+  }
+  return {
+    sourceType: 'retailer_online_page',
+    observedAt: row.observedAt,
+    chainId: row.chainId,
+    retailerProductId: row.retailerProductId,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: row.retailerProductId,
+    categoryId: `convenience-${row.category}`,
+    brand: 'Circle K',
+    packageSize: row.packageSize,
+    packageUnit: row.packageUnit,
+    price: row.price ?? 0,
+    memberOnly: false,
+    isAvailable: true,
+    sourceUrl: row.sourceUrl
+  };
+}
+
 function okq8FuelPriceToDailyItem(row: FuelPriceObservation): RetailerConnectorParsedProduct {
   return {
     sourceType: 'retailer_online_page',
@@ -2255,6 +2302,18 @@ export async function fetchDailyConnectorSnapshot(
       retrievedAt
     });
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(matsparProductToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_CIRCLE_K_SE_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_CIRCLE_K_SE_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchCircleKSeRows({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      capturedAt: retrievedAt,
+      fuelUrl: url.searchParams.get('fuelUrl') ?? CIRCLE_K_SE_FUEL_PRICES_URL,
+      convenienceUrls: dailyNativeStringListParam(url, 'convenienceUrls')
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(circleKSeRowToDailyItem) });
   }
 
   if (sourceUrl === GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL}?`)) {
@@ -3113,6 +3172,7 @@ export const GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL = 'groceryview://d
 export const GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL = 'groceryview://daily/mathem/products/public-search';
 export const GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL = 'groceryview://daily/matspar/products/public-search';
 export const GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL = OKQ8_FUEL_PRICES_URL;
+export const GROCERYVIEW_DAILY_CIRCLE_K_SE_URL = 'groceryview://daily/circle-k/se/fuel-convenience';
 export const GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL = 'groceryview://daily/pharmacy/products/public';
 
 const requireForDailyIngestion = createRequire(import.meta.url);

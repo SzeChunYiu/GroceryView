@@ -54,6 +54,11 @@ import {
   fetchOpenFoodFactsProducts,
   fetchOpenFoodFactsSwedenCatalog,
   fetchOkq8FuelPrices,
+  fetchCircleKSeFuelPrices,
+  fetchCircleKSeRows,
+  GROCERYVIEW_DAILY_CIRCLE_K_SE_URL,
+  parseCircleKSeConveniencePage,
+  parseCircleKSeFuelPrices,
   fetchOpenFoodFactsRetailerEnrichments,
   fetchBrandedSwedishFuelStations,
   fetchOverpassFuelStations,
@@ -615,6 +620,97 @@ describe('OKQ8 fuel price connector', () => {
     ]);
     assert.equal(parsed.items.every((row) => row.sourceType === 'retailer_online_page'), true);
     assert.equal(parsed.items.every((row) => row.storeId === undefined), true);
+  });
+});
+
+describe('Circle K SE fuel and convenience connector', () => {
+  const circleKFuelHtml = `
+    <main>
+      Produktnamn: miles 95 | Pris: 18,89 | Ändringsdatum: 2026-05-22 | Enhet: kr/l
+      Produktnamn: miles+ Diesel | Pris: 22,14 | Ändringsdatum: 2026-05-21 | Enhet: kr/l
+      Produktnamn: HVO100 | Pris: 29,89 | Ändringsdatum: 2026-05-21 | Enhet: kr/l
+    </main>`;
+  const circleKConvenienceHtml = `
+    <section>
+      Produkt: Kaffe stor | Pris: 25 kr
+      Erbjudande: Grillad korv med bröd | Pris: 29 kr
+      Sandwich kyckling från 59 kr
+    </section>`;
+
+  it('parses Circle K public fuel prices tagged as chain circle-k in Sweden', () => {
+    const rows = parseCircleKSeFuelPrices({
+      body: circleKFuelHtml,
+      capturedAt: '2026-05-24T09:00:00.000Z',
+      rawSnapshotRef: 'raw://circle-k-se/fuel/test'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.chainId, row.productId, row.pricePerUnit, row.unit, row.effectiveFrom]), [
+      ['circle-k', 'fuel-95-e10', 18.89, 'l', '2026-05-22'],
+      ['circle-k', 'fuel-diesel-plus', 22.14, 'l', '2026-05-21'],
+      ['circle-k', 'fuel-hvo100', 29.89, 'l', '2026-05-21']
+    ]);
+    assert.equal(rows[0]?.operatorName, 'Circle K Sverige AB');
+    assert.equal(rows[0]?.provenance.source, 'circle_k_se_fuel_prices');
+  });
+
+  it('parses Circle K convenience snacks, drinks, and sandwiches from public pages', () => {
+    const rows = parseCircleKSeConveniencePage({
+      body: circleKConvenienceHtml,
+      sourceUrl: 'https://www.circlek.se/erbjudanden',
+      capturedAt: '2026-05-24T09:00:00.000Z',
+      rawSnapshotRef: 'raw://circle-k-se/convenience/test'
+    });
+
+    assert.equal(rows.every((row) => row.chainId === 'circle-k' && row.country === 'SE'), true);
+    assert.equal(rows.find((row) => row.name === 'Kaffe stor')?.category, 'coffee');
+    assert.equal(rows.find((row) => row.name === 'Grillad korv med bröd')?.price, 29);
+    assert.equal(rows.find((row) => row.name === 'Sandwich kyckling')?.category, 'food');
+  });
+
+  it('fetches Circle K fuel and convenience rows and adapts them into a daily snapshot', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(String(url).includes('fuel') ? circleKFuelHtml : circleKConvenienceHtml, {
+        status: 200,
+        headers: { 'content-type': 'text/html' }
+      });
+    };
+
+    const rows = await fetchCircleKSeRows({
+      fetchImpl,
+      capturedAt: '2026-05-24T09:00:00.000Z',
+      fuelUrl: 'https://circlek.test/fuel',
+      convenienceUrls: ['https://circlek.test/offers']
+    });
+    assert.equal(rows.length >= 6, true);
+
+    const snapshot = await fetchDailyConnectorSnapshot({
+      status: 'ready',
+      connectorId: 'circle-k-se-fuel-convenience',
+      chainId: 'circle-k',
+      sourceType: 'retailer_online_page',
+      runKey: 'circle-k:se:2026-05-24',
+      sourceRunId: 'source-run:circle-k:se:2026-05-24',
+      provenance: {
+        sourceType: 'retailer_online_page',
+        sourceUrl: `${GROCERYVIEW_DAILY_CIRCLE_K_SE_URL}?fuelUrl=https%3A%2F%2Fcirclek.test%2Ffuel&convenienceUrls=https%3A%2F%2Fcirclek.test%2Foffers`,
+        capturedAt: '2026-05-24T09:00:00.000Z',
+        parserVersion: 'circle-k-se-v1'
+      },
+      requiredActions: []
+    }, { retrievedAt: '2026-05-24T09:00:00.000Z', fetchImpl });
+
+    const parsed = JSON.parse(snapshot.body) as { items: Array<{ chainId: string; productId: string; categoryId: string; packageUnit: string; price: number }> };
+    assert.equal(parsed.items.some((row) => row.chainId === 'circle-k' && row.productId === 'fuel-95-e10' && row.packageUnit === 'l' && row.price === 18.89), true);
+    assert.equal(parsed.items.some((row) => row.chainId === 'circle-k' && row.categoryId === 'convenience-coffee' && row.price === 25), true);
+  });
+
+  it('fails closed on blocked Circle K responses', async () => {
+    await assert.rejects(
+      () => fetchCircleKSeFuelPrices({ fetchImpl: async () => new Response('Forbidden', { status: 403 }) }),
+      /blocked with HTTP 403/
+    );
   });
 });
 
