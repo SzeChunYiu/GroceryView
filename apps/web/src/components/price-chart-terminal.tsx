@@ -19,18 +19,22 @@ export type PriceChartTerminalSeries = {
   storeName: string;
   sourceType: string;
   lineStyle: LineStyleName;
-  points: Array<{
-    time: string;
-    value: number;
-    confidence: number;
-    provenanceLabel?: string;
-  }>;
+  points: PriceChartTerminalPoint[];
   markers: Array<{
     time: string;
     text: string;
     color: string;
     provenanceLabel?: string;
   }>;
+};
+
+export type PriceChartTerminalPoint = {
+  time: string;
+  value: number;
+  confidence: number;
+  provenanceLabel?: string;
+  volatilityLowerLabel?: string;
+  volatilityUpperLabel?: string;
 };
 
 export type PriceChartTerminalWindow = {
@@ -67,17 +71,62 @@ function chartColorFor(index: number) {
   return ['#047857', '#0f766e', '#2563eb', '#7c3aed'][index % 4]!;
 }
 
+export function latestChartPointForWindow(window: PriceChartTerminalWindow | undefined) {
+  return window?.series[0]?.points.at(-1);
+}
+
+function crosshairTimeLabel(time: unknown) {
+  if (typeof time === 'string') return time.slice(0, 10);
+  if (
+    typeof time === 'object' &&
+    time !== null &&
+    'year' in time &&
+    'month' in time &&
+    'day' in time &&
+    typeof time.year === 'number' &&
+    typeof time.month === 'number' &&
+    typeof time.day === 'number'
+  ) {
+    return `${time.year}-${String(time.month).padStart(2, '0')}-${String(time.day).padStart(2, '0')}`;
+  }
+  return null;
+}
+
+export function chartPointForCrosshairTime(window: PriceChartTerminalWindow | undefined, time: unknown) {
+  const timeLabel = crosshairTimeLabel(time);
+  if (!timeLabel) return undefined;
+  return window?.series
+    .flatMap((series) => series.points)
+    .find((point) => point.time.slice(0, 10) === timeLabel);
+}
+
+export function volatilityReadoutForPoint(point: PriceChartTerminalPoint | undefined) {
+  if (!point?.volatilityLowerLabel || !point.volatilityUpperLabel) return null;
+  return `volatility ${point.volatilityLowerLabel} → ${point.volatilityUpperLabel}`;
+}
+
+export function priceChartReadoutForWindow(
+  window: PriceChartTerminalWindow | undefined,
+  selectedPoint?: PriceChartTerminalPoint | null
+) {
+  const point = selectedPoint ?? latestChartPointForWindow(window);
+  if (!window || !point) return 'no point selected';
+  return [window.latestValueLabel, point.time.slice(0, 10), volatilityReadoutForPoint(point)]
+    .filter(Boolean)
+    .join(' · ');
+}
+
 export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTerminalModel }>) {
   const [activeWindowLabel, setActiveWindowLabel] = useState(chart.defaultWindow);
   const [chartLoadError, setChartLoadError] = useState<string | null>(null);
   const [chartLoadStatus, setChartLoadStatus] = useState<ChartLoadStatus>('idle');
+  const [selectedReadoutPoint, setSelectedReadoutPoint] = useState<PriceChartTerminalPoint | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const activeWindow = useMemo(
     () => chart.windows.find((window) => window.label === activeWindowLabel) ?? chart.windows[0],
     [activeWindowLabel, chart.windows]
   );
-  const firstSeries = activeWindow?.series[0];
-  const latestPoint = firstSeries?.points.at(-1);
+  const crosshairReadout = priceChartReadoutForWindow(activeWindow, selectedReadoutPoint);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -85,6 +134,7 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
 
     let isDisposed = false;
     let removeChart: (() => void) | undefined;
+    setSelectedReadoutPoint(null);
     setChartLoadError(null);
     setChartLoadStatus('loading');
 
@@ -128,6 +178,10 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
         });
 
         chartApi.timeScale().fitContent();
+        chartApi.subscribeCrosshairMove((param) => {
+          if (isDisposed) return;
+          setSelectedReadoutPoint(chartPointForCrosshairTime(activeWindow, param.time) ?? null);
+        });
         removeChart = () => chartApi.remove();
         setChartLoadStatus('ready');
       })
@@ -152,7 +206,7 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">{chart.caveat}</p>
         </div>
         <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm font-black text-emerald-100">
-          crosshair value readout: {latestPoint ? `${activeWindow.latestValueLabel} · ${latestPoint.time.slice(0, 10)}` : 'no point selected'}
+          crosshair value readout: {crosshairReadout}
         </div>
       </div>
 
