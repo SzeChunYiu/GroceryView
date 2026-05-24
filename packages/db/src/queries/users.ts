@@ -20,6 +20,19 @@ export type UserAccountDeletionQuery = {
   values: [userId: string];
 };
 
+export type AdminUserListQuery = {
+  sql: string;
+  values: [limit: number, offset: number];
+};
+
+export type AdminUserAction = 'disable_account' | 'resend_verification';
+
+export type AdminUserActionQuery = {
+  action: AdminUserAction;
+  sql: string;
+  values: [userId: string];
+};
+
 export function buildUserDataExportQueries(userId: string): UserDataExportQuery[] {
   return [
     {
@@ -117,4 +130,75 @@ export function buildUserAccountDeletionQueries(userId: string): UserAccountDele
       values: [userId]
     }
   ];
+}
+
+export function buildAdminUserListQuery(limit = 50, offset = 0): AdminUserListQuery {
+  const parsedLimit = Number.isFinite(limit) ? Math.trunc(limit) : 50;
+  const parsedOffset = Number.isFinite(offset) ? Math.trunc(offset) : 0;
+  const normalizedLimit = Math.min(Math.max(parsedLimit, 1), 100);
+  const normalizedOffset = Math.max(parsedOffset, 0);
+
+  return {
+    sql: `select app_users.id,
+                 app_users.email,
+                 app_users.created_at,
+                 app_users.disabled_at,
+                 app_users.verification_sent_at,
+                 count(watchlist_items.id) filter (
+                   where watchlist_items.target_price is not null
+                      or watchlist_items.alert_deal_score_at is not null
+                 )::integer as active_alert_count
+            from app_users
+            left join watchlist_items on watchlist_items.user_id = app_users.id
+           group by app_users.id, app_users.email, app_users.created_at, app_users.disabled_at, app_users.verification_sent_at
+           order by app_users.created_at desc, app_users.id
+           limit $1 offset $2`,
+    values: [normalizedLimit, normalizedOffset]
+  };
+}
+
+export function buildDisableAdminUserQuery(userId: string): AdminUserActionQuery {
+  return {
+    action: 'disable_account',
+    sql: `update app_users
+             set disabled_at = coalesce(disabled_at, now())
+           where id = $1
+       returning id,
+                 email,
+                 created_at,
+                 disabled_at,
+                 verification_sent_at,
+                 (
+                   select count(watchlist_items.id) filter (
+                     where watchlist_items.target_price is not null
+                        or watchlist_items.alert_deal_score_at is not null
+                   )::integer
+                     from watchlist_items
+                    where watchlist_items.user_id = app_users.id
+                 ) as active_alert_count`,
+    values: [userId]
+  };
+}
+
+export function buildResendVerificationAdminUserQuery(userId: string): AdminUserActionQuery {
+  return {
+    action: 'resend_verification',
+    sql: `update app_users
+             set verification_sent_at = now()
+           where id = $1
+       returning id,
+                 email,
+                 created_at,
+                 disabled_at,
+                 verification_sent_at,
+                 (
+                   select count(watchlist_items.id) filter (
+                     where watchlist_items.target_price is not null
+                        or watchlist_items.alert_deal_score_at is not null
+                   )::integer
+                     from watchlist_items
+                    where watchlist_items.user_id = app_users.id
+                 ) as active_alert_count`,
+    values: [userId]
+  };
 }

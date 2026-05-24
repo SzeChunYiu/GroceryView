@@ -18,6 +18,23 @@ class RecordingPriceHistoryExecutor {
     favorite_stores_only: boolean;
     allowed_price_types: string[] | null;
   }> = [];
+  adminUserRows: Array<{
+    id: string;
+    email: string | null;
+    created_at: string;
+    disabled_at: string | null;
+    verification_sent_at: string | null;
+    active_alert_count: number;
+  }> = [
+    {
+      id: 'user-1',
+      email: 'user@example.com',
+      created_at: '2026-05-20T12:00:00.000Z',
+      disabled_at: null,
+      verification_sent_at: null,
+      active_alert_count: 2
+    }
+  ];
 
   isConfigured(): boolean {
     return true;
@@ -25,6 +42,21 @@ class RecordingPriceHistoryExecutor {
 
   async query<T>(sql: string, params: unknown[] = []): Promise<T[]> {
     this.calls.push({ sql, params });
+    if (sql.includes('from app_users') && sql.includes('active_alert_count')) {
+      return this.adminUserRows as T[];
+    }
+    if (sql.includes('update app_users') && sql.includes('disabled_at = coalesce')) {
+      const user = this.adminUserRows.find((row) => row.id === params[0]);
+      if (!user) return [] as T[];
+      user.disabled_at = '2026-05-24T01:40:00.000Z';
+      return [user] as T[];
+    }
+    if (sql.includes('update app_users') && sql.includes('verification_sent_at = now()')) {
+      const user = this.adminUserRows.find((row) => row.id === params[0]);
+      if (!user) return [] as T[];
+      user.verification_sent_at = '2026-05-24T01:41:00.000Z';
+      return [user] as T[];
+    }
     if (sql.includes('latest_prices.observation_id') && sql.includes('products.canonical_name as product_name')) {
       if (params[0] === 'missing-product') return [] as T[];
       return [
@@ -486,6 +518,9 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/users/demo/privacy/deletion-plan']);
     assert.ok(docs.body.paths['/users/demo/settings/account']);
     assert.ok(docs.body.paths['/users/demo/settings/data-export']);
+    assert.ok(docs.body.paths['/admin/users']);
+    assert.ok(docs.body.paths['/admin/users/{userId}/disable']);
+    assert.ok(docs.body.paths['/admin/users/{userId}/resend-verification']);
     assert.ok(docs.body.paths['/products']);
     assert.ok(docs.body.paths['/products/{productId}/cheapest-now']);
     assert.ok(docs.body.paths['/products/{id}/terminal']);
@@ -578,6 +613,23 @@ describe('GroceryView API app', () => {
     assert.equal(settingsDeletion.body.destructiveAction, false);
     assert.equal(settingsDeletion.body.requiresConfirmation, 'DELETE ACCOUNT');
     assert.equal(settingsDeletion.body.demo, true);
+
+    const adminUsers = await request(app.getHttpServer()).get('/admin/users?limit=500&offset=-4').expect(200);
+    assert.equal(adminUsers.body.limit, 100);
+    assert.equal(adminUsers.body.offset, 0);
+    assert.equal(adminUsers.body.users[0].email, 'user@example.com');
+    assert.equal(adminUsers.body.users[0].registeredAt, '2026-05-20T12:00:00.000Z');
+    assert.equal(adminUsers.body.users[0].activeAlertCount, 2);
+    assert.equal(adminUsers.body.users[0].status, 'active');
+
+    const disabledUser = await request(app.getHttpServer()).post('/admin/users/user-1/disable').expect(200);
+    assert.equal(disabledUser.body.action, 'disable_account');
+    assert.equal(disabledUser.body.user.status, 'disabled');
+    assert.equal(disabledUser.body.user.disabledAt, '2026-05-24T01:40:00.000Z');
+
+    const verificationResend = await request(app.getHttpServer()).post('/admin/users/user-1/resend-verification').expect(200);
+    assert.equal(verificationResend.body.action, 'resend_verification');
+    assert.equal(verificationResend.body.user.verificationSentAt, '2026-05-24T01:41:00.000Z');
 
     const mealPlan = await request(app.getHttpServer())
       .get('/users/demo/meal-plans/suggestions?maxMealCost=120&servings=4')
@@ -1485,5 +1537,6 @@ describe('GroceryView API real-only deal and alert endpoints', () => {
       .post('/users/demo/watchlist/price-alerts')
       .send({ productId: 'coffee', targetPrice: 50 })
       .expect(503);
+    await request(app.getHttpServer()).get('/admin/users').expect(503);
   });
 });

@@ -108,6 +108,8 @@ create table if not exists promotion_observations (
 create table if not exists app_users (
   id text primary key,
   email text unique,
+  disabled_at timestamptz,
+  verification_sent_at timestamptz,
   created_at timestamptz not null default now()
 );
 
