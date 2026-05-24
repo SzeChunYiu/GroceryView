@@ -342,6 +342,12 @@ Account-scoped delivery destinations for notification fanout. Telegram rows stor
 
 Key columns: `user_id`, `channel`, `recipient`, `chat_id`, `product_id`, `active`.
 
+### `push_notification_subscriptions`
+
+Account-level mobile push permission and Expo token registrations for alerts and reminders.
+
+Key columns: `user_id`, `provider`, `push_token`, `platform`, `device_id`, `permission_status`, `alerts_enabled`, `reminders_enabled`, `active`, `revoked_at`.
+
 ### `subscription_entitlements`
 
 Provider-neutral premium subscription entitlement state.

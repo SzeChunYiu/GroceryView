@@ -147,6 +147,7 @@ export type AuthOptions = {
     listDueNotificationTasks(now: string): Promise<PersistedNotificationTask[]>;
     listActiveNotificationSuppressions(): Promise<NotificationSuppression[]>;
   };
+  pushNotificationSubscriptionRepository?: PushNotificationSubscriptionRepository;
   billingWebhookSecret?: string;
   billingPriceIdPlanMap?: Partial<Record<string, SubscriptionPlan>>;
   billingSubscriptionSink?: {
@@ -197,6 +198,30 @@ export type SubscriptionEntitlementLookupRecord = SubscriptionEntitlementSnapsho
   providerSubscriptionId?: string;
 };
 
+export type PushNotificationPermissionStatus = 'granted' | 'denied' | 'prompt' | 'default';
+
+export type PushNotificationSubscriptionRecord = {
+  id: string;
+  userId: string;
+  provider: 'expo';
+  pushToken: string;
+  platform?: 'ios' | 'android' | 'web';
+  deviceId?: string;
+  permissionStatus: PushNotificationPermissionStatus;
+  alertsEnabled: boolean;
+  remindersEnabled: boolean;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+  revokedAt?: string;
+};
+
+export type PushNotificationSubscriptionRepository = {
+  listPushNotificationSubscriptions(userId: string): Promise<PushNotificationSubscriptionRecord[]>;
+  upsertPushNotificationSubscription(subscription: PushNotificationSubscriptionRecord): Promise<void>;
+  deactivatePushNotificationSubscription(userId: string, id: string, revokedAt: string): Promise<PushNotificationSubscriptionRecord | null>;
+};
+
 export type RuntimePersistenceRepository = {
   getSubscriptionEntitlement(userId: string): Promise<SubscriptionEntitlementLookupRecord | null>;
   upsertSubscriptionEntitlement(entitlement: BillingSubscriptionEntitlementMutation): Promise<void>;
@@ -218,6 +243,9 @@ export type RuntimePersistenceRepository = {
   listDueNotificationTasks?(now: string): Promise<PersistedNotificationTask[]>;
   listActiveNotificationSuppressions?(): Promise<NotificationSuppression[]>;
   upsertNotificationTask?(task: PersistedNotificationTask): Promise<void>;
+  listPushNotificationSubscriptions?(userId: string): Promise<PushNotificationSubscriptionRecord[]>;
+  upsertPushNotificationSubscription?(subscription: PushNotificationSubscriptionRecord): Promise<void>;
+  deactivatePushNotificationSubscription?(userId: string, id: string, revokedAt: string): Promise<PushNotificationSubscriptionRecord | null>;
 };
 
 type RuntimeWatchlistRepository = {
@@ -485,6 +513,17 @@ function optionalDeliveryChannel(value: unknown): DeliveryChannel | undefined {
   if (value === undefined) return undefined;
   if (value === 'push' || value === 'email' || value === 'telegram') return value;
   throw new Error('channel must be push, email, or telegram.');
+}
+
+function requiredPushNotificationPermissionStatus(value: unknown): PushNotificationPermissionStatus {
+  if (value === 'granted' || value === 'denied' || value === 'prompt' || value === 'default') return value;
+  throw new Error('permissionStatus must be granted, denied, prompt, or default.');
+}
+
+function optionalPushNotificationPlatform(value: unknown): PushNotificationSubscriptionRecord['platform'] | undefined {
+  if (value === undefined) return undefined;
+  if (value === 'ios' || value === 'android' || value === 'web') return value;
+  throw new Error('platform must be ios, android, or web.');
 }
 
 function optionalNutritionMetric(value: string | null): 'protein' | 'calories' | 'fiber' {
@@ -2006,6 +2045,63 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
           return jsonResponse(api.getNotificationInboxReport(user, { now, tasks, suppressions }));
         }
       }
+      if (path === '/api/account/push-notifications') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        const repository = authOptions.pushNotificationSubscriptionRepository;
+        if (!repository) return errorResponse(503, 'Push notification subscription repository is not configured.');
+        if (method === 'GET') {
+          const subscriptions = await repository.listPushNotificationSubscriptions(user);
+          return jsonResponse({
+            userId: user,
+            active: subscriptions.some((subscription) => subscription.active && subscription.permissionStatus === 'granted'),
+            subscriptions
+          });
+        }
+        if (method === 'POST') {
+          const body = await readJson(request);
+          const pushToken = requiredString(body.pushToken ?? body.token, 'pushToken');
+          const permissionStatus = requiredPushNotificationPermissionStatus(body.permissionStatus ?? body.permission);
+          const consentGranted = requiredBoolean(body.consentGranted, 'consentGranted');
+          const now = (authOptions.now ?? new Date()).toISOString();
+          const id = optionalString(body.subscriptionId ?? body.id, 'subscriptionId') ?? `push:${hashHex(`${user}:${pushToken}`)}`;
+          const platform = optionalPushNotificationPlatform(body.platform);
+          const deviceId = optionalString(body.deviceId, 'deviceId');
+          const subscription: PushNotificationSubscriptionRecord = {
+            id,
+            userId: user,
+            provider: 'expo',
+            pushToken,
+            ...(platform ? { platform } : {}),
+            ...(deviceId ? { deviceId } : {}),
+            permissionStatus,
+            alertsEnabled: body.alertsEnabled === undefined ? true : requiredBoolean(body.alertsEnabled, 'alertsEnabled'),
+            remindersEnabled: body.remindersEnabled === undefined ? true : requiredBoolean(body.remindersEnabled, 'remindersEnabled'),
+            active: consentGranted && permissionStatus === 'granted' && (body.active === undefined ? true : requiredBoolean(body.active, 'active')),
+            createdAt: now,
+            updatedAt: now,
+            ...(consentGranted && permissionStatus === 'granted' ? {} : { revokedAt: now })
+          };
+          await repository.upsertPushNotificationSubscription(subscription);
+          return jsonResponse({
+            userId: user,
+            subscription
+          }, { status: 201 });
+        }
+        if (method === 'DELETE') {
+          const body = await readJson(request);
+          const pushToken = optionalString(body.pushToken ?? body.token, 'pushToken');
+          const id = optionalString(body.subscriptionId ?? body.id, 'subscriptionId') ?? (pushToken ? `push:${hashHex(`${user}:${pushToken}`)}` : undefined);
+          if (!id) return errorResponse(400, 'subscriptionId or pushToken is required.');
+          const revokedAt = (authOptions.now ?? new Date()).toISOString();
+          const subscription = await repository.deactivatePushNotificationSubscription(user, id, revokedAt);
+          return subscription
+            ? jsonResponse({ userId: user, subscription })
+            : errorResponse(404, 'Push notification subscription not found.');
+        }
+      }
       if (path === '/api/receipts/review') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
@@ -3122,6 +3218,11 @@ export function buildOpenApiDocument(): OpenApiDocument {
           'NotificationInboxResponse'
         )
       },
+      '/api/account/push-notifications': {
+        get: protectedOperation('List push notification consent and active device tokens for the signed-in account.'),
+        post: protectedOperation('Register or update push notification consent and a device token for alerts and reminders.'),
+        delete: protectedOperation('Deactivate a push notification device token for the signed-in account.')
+      },
       '/api/receipts/review': { get: protectedOperation('Get receipt review budget impact, match confidence, and writeback guardrails.') },
       '/api/categories': { get: publicOperation('List the category tree with product counts for navigation and filter sidebars.') },
       '/api/categories/{category}/market': { get: publicOperation('Get category market report with current price, 1M move, 52-week range, and verified evidence.') },
@@ -3657,6 +3758,18 @@ export function buildRepositoryBackedAuthOptions(
           notificationInboxRepository: {
             listDueNotificationTasks: (now) => repository.listDueNotificationTasks!(now),
             listActiveNotificationSuppressions: () => repository.listActiveNotificationSuppressions!()
+          }
+        }
+      : {}),
+    ...(repository.listPushNotificationSubscriptions &&
+    repository.upsertPushNotificationSubscription &&
+    repository.deactivatePushNotificationSubscription
+      ? {
+          pushNotificationSubscriptionRepository: {
+            listPushNotificationSubscriptions: (userId) => repository.listPushNotificationSubscriptions!(userId),
+            upsertPushNotificationSubscription: (subscription) => repository.upsertPushNotificationSubscription!(subscription),
+            deactivatePushNotificationSubscription: (userId, id, revokedAt) =>
+              repository.deactivatePushNotificationSubscription!(userId, id, revokedAt)
           }
         }
       : {}),

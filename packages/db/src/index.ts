@@ -961,6 +961,22 @@ export type NotificationSuppressionRecord = {
   updatedAt: string;
 };
 
+export type PushNotificationSubscriptionRecord = {
+  id: string;
+  userId: string;
+  provider: 'expo';
+  pushToken: string;
+  platform?: 'ios' | 'android' | 'web';
+  deviceId?: string;
+  permissionStatus: 'granted' | 'denied' | 'prompt' | 'default';
+  alertsEnabled: boolean;
+  remindersEnabled: boolean;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+  revokedAt?: string;
+};
+
 export type AlertRuleRecord = {
   id: string;
   userId: string;
@@ -1018,6 +1034,9 @@ export type GroceryViewRepository = {
   listDueNotificationTasks(now: string): Promise<NotificationTaskRecord[]>;
   upsertNotificationSuppression(suppression: NotificationSuppressionRecord): Promise<void>;
   listActiveNotificationSuppressions(): Promise<NotificationSuppressionRecord[]>;
+  upsertPushNotificationSubscription(subscription: PushNotificationSubscriptionRecord): Promise<void>;
+  listPushNotificationSubscriptions(userId: string): Promise<PushNotificationSubscriptionRecord[]>;
+  deactivatePushNotificationSubscription(userId: string, id: string, revokedAt: string): Promise<PushNotificationSubscriptionRecord | null>;
   upsertAlertRule(rule: AlertRuleRecord): Promise<void>;
   listActiveAlertRules(userId: string): Promise<AlertRuleRecord[]>;
   saveHumanReviewAssignment(assignment: HumanReviewAssignmentRecord): Promise<void>;
@@ -1607,6 +1626,21 @@ type NotificationSuppressionRow = {
   reason: NotificationSuppressionRecord['reason'];
   active: boolean;
   updated_at: string | Date;
+};
+type PushNotificationSubscriptionRow = {
+  id: string;
+  user_id: string;
+  provider: PushNotificationSubscriptionRecord['provider'];
+  push_token: string;
+  platform: PushNotificationSubscriptionRecord['platform'] | null;
+  device_id: string | null;
+  permission_status: PushNotificationSubscriptionRecord['permissionStatus'];
+  alerts_enabled: boolean;
+  reminders_enabled: boolean;
+  active: boolean;
+  created_at: string | Date;
+  updated_at: string | Date;
+  revoked_at: string | Date | null;
 };
 type AlertRuleRow = {
   id: string;
@@ -2296,6 +2330,24 @@ function mapNotificationSuppression(row: NotificationSuppressionRow): Notificati
     reason: row.reason,
     active: row.active,
     updatedAt: asIso(row.updated_at)
+  };
+}
+
+function mapPushNotificationSubscription(row: PushNotificationSubscriptionRow): PushNotificationSubscriptionRecord {
+  return {
+    id: row.id,
+    userId: row.user_id,
+    provider: row.provider,
+    pushToken: row.push_token,
+    ...(row.platform ? { platform: row.platform } : {}),
+    ...(row.device_id ? { deviceId: row.device_id } : {}),
+    permissionStatus: row.permission_status,
+    alertsEnabled: row.alerts_enabled,
+    remindersEnabled: row.reminders_enabled,
+    active: row.active,
+    createdAt: asIso(row.created_at),
+    updatedAt: asIso(row.updated_at),
+    ...(row.revoked_at ? { revokedAt: asIso(row.revoked_at) } : {})
   };
 }
 
@@ -3006,6 +3058,115 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
          order by recipient, coalesce(channel, ''), id`
       );
       return rows.map(mapNotificationSuppression);
+    },
+
+    async upsertPushNotificationSubscription(subscription) {
+      await executor.query(
+        `insert into push_notification_subscriptions(
+           id, user_id, provider, push_token, platform, device_id, permission_status, alerts_enabled, reminders_enabled, active, created_at, updated_at, revoked_at
+         ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+         on conflict (id) do update set
+           user_id = excluded.user_id,
+           provider = excluded.provider,
+           push_token = excluded.push_token,
+           platform = excluded.platform,
+           device_id = excluded.device_id,
+           permission_status = excluded.permission_status,
+           alerts_enabled = excluded.alerts_enabled,
+           reminders_enabled = excluded.reminders_enabled,
+           active = excluded.active,
+           updated_at = excluded.updated_at,
+           revoked_at = excluded.revoked_at`,
+        [
+          subscription.id,
+          subscription.userId,
+          subscription.provider,
+          subscription.pushToken,
+          subscription.platform ?? null,
+          subscription.deviceId ?? null,
+          subscription.permissionStatus,
+          subscription.alertsEnabled,
+          subscription.remindersEnabled,
+          subscription.active,
+          subscription.createdAt,
+          subscription.updatedAt,
+          subscription.revokedAt ?? null
+        ]
+      );
+      await executor.query(
+        `insert into notification_subscriptions(id, user_id, channel, recipient, active, created_at, updated_at)
+         values ($1, $2, 'push', $3, $4, $5, $6)
+         on conflict (id) do update set
+           user_id = excluded.user_id,
+           recipient = excluded.recipient,
+           active = excluded.active,
+           updated_at = excluded.updated_at`,
+        [
+          subscription.id,
+          subscription.userId,
+          subscription.pushToken,
+          subscription.active && subscription.permissionStatus === 'granted' && (subscription.alertsEnabled || subscription.remindersEnabled),
+          subscription.createdAt,
+          subscription.updatedAt
+        ]
+      );
+    },
+
+    async listPushNotificationSubscriptions(userId) {
+      const rows = await executor.query<PushNotificationSubscriptionRow>(
+        `select id,
+                user_id,
+                provider,
+                push_token,
+                platform,
+                device_id,
+                permission_status,
+                alerts_enabled,
+                reminders_enabled,
+                active,
+                created_at,
+                updated_at,
+                revoked_at
+         from push_notification_subscriptions
+         where user_id = $1
+         order by active desc, updated_at desc, id`,
+        [userId]
+      );
+      return rows.map(mapPushNotificationSubscription);
+    },
+
+    async deactivatePushNotificationSubscription(userId, id, revokedAt) {
+      const rows = await executor.query<PushNotificationSubscriptionRow>(
+        `update push_notification_subscriptions
+         set active = false,
+             permission_status = 'denied',
+             updated_at = $3,
+             revoked_at = $3
+         where user_id = $1 and id = $2
+         returning id,
+                   user_id,
+                   provider,
+                   push_token,
+                   platform,
+                   device_id,
+                   permission_status,
+                   alerts_enabled,
+                   reminders_enabled,
+                   active,
+                   created_at,
+                   updated_at,
+                   revoked_at`,
+        [userId, id, revokedAt]
+      );
+      await executor.query(
+        `update notification_subscriptions
+         set active = false,
+             updated_at = $3
+         where user_id = $1 and id = $2 and channel = 'push'`,
+        [userId, id, revokedAt]
+      );
+      const row = rows[0];
+      return row ? mapPushNotificationSubscription(row) : null;
     },
 
     async upsertAlertRule(rule) {

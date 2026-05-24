@@ -349,6 +349,22 @@ create table if not exists notification_subscriptions (
   check (channel <> 'telegram' or chat_id is not null)
 );
 
+create table if not exists push_notification_subscriptions (
+  id text primary key,
+  user_id text not null references app_users(id) on delete cascade,
+  provider text not null default 'expo' check (provider in ('expo')),
+  push_token text not null,
+  platform text check (platform in ('ios', 'android', 'web')),
+  device_id text,
+  permission_status text not null check (permission_status in ('granted', 'denied', 'prompt', 'default')),
+  alerts_enabled boolean not null default true,
+  reminders_enabled boolean not null default true,
+  active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  revoked_at timestamptz
+);
+
 create table if not exists human_reviewers (
   id text primary key,
   role text not null check (role in ('viewer', 'moderator', 'lead')),
@@ -407,6 +423,8 @@ create index if not exists notification_tasks_status_send_idx on notification_ta
 create index if not exists notification_suppressions_active_recipient_idx on notification_suppressions(active, recipient);
 create index if not exists notification_subscriptions_active_product_idx on notification_subscriptions (active, product_id, channel);
 create index if not exists notification_subscriptions_user_idx on notification_subscriptions (user_id, channel, id);
+create index if not exists push_notification_subscriptions_user_active_idx on push_notification_subscriptions (user_id, active, updated_at desc);
+create index if not exists push_notification_subscriptions_token_idx on push_notification_subscriptions (provider, push_token);
 create index if not exists human_reviewers_role_active_idx on human_reviewers(role, active);
 create index if not exists human_review_assignments_status_due_idx on human_review_assignments(status, due_at);
 create index if not exists human_review_assignments_assignee_status_idx on human_review_assignments(assignee_id, status);
