@@ -79,6 +79,27 @@ describe('verified-data UI', () => {
     assert.match(verified, /outOfStockLatestPriceCount/);
   });
 
+
+  it('renders distinct product-page labels for shelf and counter price rows', async () => {
+    const productPage = await read('src/app/products/[slug]/page.tsx');
+    const generatedProductRows = [
+      { chain: 'hemkop', priceType: 'shelf', priceUnit: 'kr/st' },
+      { chain: 'hemkop', priceType: 'counter_fish', priceUnit: 'kr/kg' },
+      { chain: 'hemkop', priceType: 'counter_deli', priceUnit: 'kr/kg' }
+    ];
+    const expectedVisibleLabels = ['Shelf price', 'Counter fish price', 'Counter deli price'];
+
+    assert.equal(new Set(expectedVisibleLabels).size, generatedProductRows.length);
+    assert.match(productPage, /counterPriceLabelForRow/);
+    assert.match(productPage, /counterPriceEvidenceKind/);
+    assert.match(productPage, /priceType \?\? rowWithEvidence\.priceKind \?\? rowWithEvidence\.sourceType \?\? rowWithEvidence\.observationType/);
+    assert.match(productPage, /shelf: 'Shelf price'/);
+    assert.match(productPage, /counter_fish: 'Counter fish price'/);
+    assert.match(productPage, /counter_deli: 'Counter deli price'/);
+    assert.match(productPage, /key=\{`\$\{row\.chain\}-\$\{counterPriceLabel\}`\}/);
+    assert.match(productPage, /\{counterPriceLabel\}<\/p>/);
+  });
+
   it('makes unavailable private features fail closed instead of showing fabricated rows', async () => {
     const featureRoutes = ['scanner','household','coupon-stacks','price-reports','shopping-trips','privacy'];
     const verified = await read('src/lib/verified-data.ts');

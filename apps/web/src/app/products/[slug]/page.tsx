@@ -203,6 +203,33 @@ function formatComparableUnitPrice(value: number | null | undefined, unit: strin
   return formatLocalizedUnitPrice(value, { locale: defaultLocale, currency: 'SEK', unit });
 }
 
+type ChainPriceRow = ReturnType<typeof chainPriceRows>[number];
+type ChainPriceRowWithEvidence = ChainPriceRow & {
+  priceType?: string | null;
+  priceKind?: string | null;
+  sourceType?: string | null;
+  observationType?: string | null;
+};
+
+const counterPriceEvidenceLabels: Record<string, string> = {
+  shelf: 'Shelf price',
+  counter_fish: 'Counter fish price',
+  counter_deli: 'Counter deli price',
+  counter_meat: 'Counter meat price',
+  counter_weight: 'Counter weighted price'
+};
+
+function counterPriceEvidenceKind(row: ChainPriceRow): keyof typeof counterPriceEvidenceLabels {
+  const rowWithEvidence = row as ChainPriceRowWithEvidence;
+  const explicitKind = rowWithEvidence.priceType ?? rowWithEvidence.priceKind ?? rowWithEvidence.sourceType ?? rowWithEvidence.observationType;
+  if (explicitKind === 'counter_fish' || explicitKind === 'counter_deli' || explicitKind === 'counter_meat' || explicitKind === 'shelf') return explicitKind;
+  return row.priceUnit === 'kr/kg' ? 'counter_weight' : 'shelf';
+}
+
+function counterPriceLabelForRow(row: ChainPriceRow) {
+  return counterPriceEvidenceLabels[counterPriceEvidenceKind(row)];
+}
+
 function brandTierFor(brand: string, labels: string[] = []): BrandTier {
   const lower = brand.toLowerCase();
   const isRetailerPrivateLabel = lower.includes('garant') || lower.includes('ica') || lower.includes('coop') || lower.includes('änglamark');
@@ -1593,13 +1620,17 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
         <Card className="mt-6">
           <h2 className="text-2xl font-black">Chain price rows</h2>
           <div className="mt-4 grid gap-3 md:grid-cols-2">
-            {chainPriceRows(product).map((row) => (
-              <div className="rounded-2xl border border-slate-200 p-4" key={row.chain}>
-                <p className="text-lg font-black capitalize">{row.chain}</p>
-                <p className="mt-1 text-3xl font-black text-emerald-800">{formatSek(row.price)}</p>
-                <p className="text-sm text-slate-600">{row.priceUnit || 'Unit not reported'}{row.savings ? ` · listed saving ${formatSek(row.savings)}` : ''}</p>
-              </div>
-            ))}
+            {chainPriceRows(product).map((row) => {
+              const counterPriceLabel = counterPriceLabelForRow(row);
+              return (
+                <div className="rounded-2xl border border-slate-200 p-4" key={`${row.chain}-${counterPriceLabel}`}>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">{counterPriceLabel}</p>
+                  <p className="mt-1 text-lg font-black capitalize">{row.chain}</p>
+                  <p className="mt-1 text-3xl font-black text-emerald-800">{formatSek(row.price)}</p>
+                  <p className="text-sm text-slate-600">{row.priceUnit || 'Unit not reported'}{row.savings ? ` · listed saving ${formatSek(row.savings)}` : ''}</p>
+                </div>
+              );
+            })}
           </div>
         </Card>
       ) : null}
