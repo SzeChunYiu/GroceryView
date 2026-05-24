@@ -143,6 +143,7 @@ import {
   offerVisibilityBoundaryPlans,
   OPENFOODFACTS_EXPORT_URL,
   OVERPASS_INTERPRETER_URL,
+  parseApoteketSeProductPage,
   STOCKHOLM_FUEL_OVERPASS_QUERY,
   STOCKHOLM_GROCERY_OVERPASS_QUERY,
   STORE_ENUMERATOR_OVERPASS_URL,
@@ -198,6 +199,49 @@ describe('confidenceForSource', () => {
     assert.equal(confidenceForSource('flyer_campaign'), 0.7);
     assert.equal(confidenceForSource('manual_user_report'), 0.5);
     assert.equal(confidenceForSource('estimated'), 0.25);
+  });
+});
+
+describe('Apoteket SE connector', () => {
+  it('emits separate online and store rows with justified promo flags', () => {
+    const rows = parseApoteketSeProductPage(`
+      <script type="application/ld+json" id="product-schema">{
+        "@context":"https://schema.org",
+        "@type":"Product",
+        "name":"Apoteket Snabbförband S 5 x 7,2 cm, 5 st",
+        "category":"Sår, bett & stick > Sår & förband",
+        "gtin":"7313272431759",
+        "productID":"243175",
+        "sku":"243175",
+        "brand":{"@type":"Brand","name":"Apoteket"},
+        "offers":{
+          "@type":"Offer",
+          "url":"/produkt/apoteket-sterilt-snabbforband-5-st-ask-243175/",
+          "price":"25.00",
+          "priceCurrency":"SEK",
+          "priceSpecification":{"@type":"UnitPriceSpecification","price":"35.00","priceCurrency":"SEK"}
+        }
+      }</script>
+      <h1>Apoteket Snabbförband S 5 x 7,2 cm, 5 st</h1>
+      <p>20% vid köp av 2</p>
+      <p>Kod: MEDLEM</p>
+      <p>Medlemspris</p>
+      <div>Webbpris</div><div>25 kr</div>
+      <div>Butikspris: 35&nbsp;kr,</div>
+      <div>Jmfs.pris: 5 kr / st</div>
+    `, 'https://www.apoteket.se/produkt/apoteket-sterilt-snabbforband-5-st-ask-243175/', '2026-05-24T12:00:00.000Z');
+
+    assert.equal(rows.length, 2);
+    assert.equal(rows[0]?.channel, 'online');
+    assert.equal(rows[0]?.price, 25);
+    assert.equal(rows[0]?.regularPrice, 35);
+    assert.equal(rows[0]?.is_member_price, true);
+    assert.equal(rows[0]?.is_coupon_price, true);
+    assert.deepEqual(rows[0]?.multi_buy, { quantity: 2, discountPercent: 20, text: '20% vid köp av 2' });
+    assert.equal(rows[1]?.channel, 'store');
+    assert.equal(rows[1]?.price, 35);
+    assert.equal(rows[1]?.format, null);
+    assert.equal(rows[1]?.regionTag, null);
   });
 });
 
