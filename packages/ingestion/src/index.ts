@@ -1761,7 +1761,9 @@ function hemkopStoreProductToDailyItem(row: HemkopStoreProduct): RetailerConnect
     packageSize: quantity.packageSize,
     packageUnit: quantity.packageUnit,
     price: row.price,
-    memberOnly: false,
+    regularPrice: row.regularPrice,
+    promoText: row.promoText,
+    memberOnly: row.memberOnly,
     observedAt: row.retrievedAt,
     sourceUrl: row.sourceUrl,
     imageUrl: row.imageUrl || undefined

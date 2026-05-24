@@ -2191,6 +2191,7 @@ describe('fetchHemkopProducts', () => {
       priceText: '14,14 kr',
       unitPriceText: '18,85 kr',
       unitPriceUnit: 'kg',
+      memberOnly: false,
       imageUrl: 'https://assets.axfood.se/image/upload/f_auto,t_200/07310130003547_C1R1_s03',
       labels: ['keyhole'],
       online: true,
@@ -2198,6 +2199,67 @@ describe('fetchHemkopProducts', () => {
       sourceUrl: buildHemkopSearchUrl('makaroner', 100, 0),
       retrievedAt: '2026-05-21T00:45:00.000Z'
     }]);
+  });
+
+  it('emits separate list and Hemkop member price rows when loyalty pricing is present', async () => {
+    const fetchImpl: typeof fetch = async () => new Response(JSON.stringify({
+      results: [{
+        code: '101241262_ST',
+        name: 'Mollbergs Mörkrost Bryggkaffe',
+        manufacturer: 'Zoégas',
+        productLine2: 'ZOÉGAS, 450g',
+        googleAnalyticsCategory: 'skafferi|kaffe',
+        priceValue: 83.23,
+        price: '83,23 kr',
+        comparePrice: '184,96 kr',
+        comparePriceUnit: 'kg',
+        image: { url: 'https://assets.axfood.se/image/upload/f_auto,t_200/07310730345021_C1L1_s01' },
+        potentialPromotions: [{
+          campaignType: 'LOYALTY',
+          promotionType: 'MixMatchPricePromotion',
+          rewardLabel: '59,95 kr',
+          textLabel: 'Klubbpris',
+          comparePrice: '133,22 kr',
+          price: { value: 59.95, formattedValue: '59,95 kr' }
+        }]
+      }]
+    }), { status: 200, headers: { 'content-type': 'application/json' } });
+
+    const rows = await fetchHemkopProducts({
+      queries: ['kaffe'],
+      fetchImpl,
+      pageSize: 100,
+      retrievedAt: '2026-05-24T12:00:00.000Z'
+    });
+
+    assert.deepEqual(rows.map((row) => ({
+      code: row.code,
+      price: row.price,
+      regularPrice: row.regularPrice,
+      memberOnly: row.memberOnly,
+      priceText: row.priceText,
+      unitPriceText: row.unitPriceText,
+      promoText: row.promoText
+    })), [
+      {
+        code: '101241262_ST',
+        price: 83.23,
+        regularPrice: undefined,
+        memberOnly: false,
+        priceText: '83,23 kr',
+        unitPriceText: '184,96 kr',
+        promoText: undefined
+      },
+      {
+        code: '101241262_ST',
+        price: 59.95,
+        regularPrice: 83.23,
+        memberOnly: true,
+        priceText: '59,95 kr',
+        unitPriceText: '133,22 kr',
+        promoText: 'Klubbpris · 59,95 kr'
+      }
+    ]);
   });
 
   it('paginates Hemkop search rows until reported pages are exhausted', async () => {
@@ -5568,6 +5630,11 @@ function firstBatchObservation(executor: DailyIngestionExecutor) {
   return observations[0] ?? {};
 }
 
+function batchObservations(executor: DailyIngestionExecutor) {
+  const observationInsert = executor.calls.find((call) => call.sql.includes('insert into observations'));
+  return JSON.parse(String(observationInsert?.params[0])) as Array<Record<string, unknown>>;
+}
+
 function firstBatchProduct(executor: DailyIngestionExecutor) {
   const productInsert = executor.calls.find((call) => call.sql.includes('jsonb_to_recordset') && call.sql.includes('insert into products'));
   const products = JSON.parse(String(productInsert?.params[0])) as Array<Record<string, unknown>>;
@@ -6794,6 +6861,59 @@ describe('daily ingestion runner', () => {
     const observation = firstBatchObservation(executor);
     assert.equal(observation.store_id, 'store-db-2');
     assert.equal(observation.price, 14.14);
+  });
+
+  it('materializes native Hemkop loyalty prices as separate member observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-24T13:47:00.000Z',
+      connectors: [{
+        connectorId: 'hemkop-products-all-stores',
+        chainId: 'hemkop',
+        sourceType: 'official_api',
+        endpointUrl: `${GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_PRODUCTS_URL}?queries=kaffe&maxStores=1&maxRowsPerStore=2`,
+        parserVersion: 'hemkop-products-native-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: '4003', name: 'Hemköp Göteborg Masthuggstorget', address: 'Masthuggstorget 3', city: 'Göteborg' }]
+      }],
+      fetchImpl: async (url) => {
+        if (String(url).includes('/axfood/rest/store')) {
+          return new Response(JSON.stringify([
+            { storeId: '4003', name: 'Hemköp Göteborg Masthuggstorget', address: { line1: 'Masthuggstorget 3', town: 'Göteborg' }, onlineStore: true }
+          ]), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        return new Response(JSON.stringify({ results: [{
+          code: '101241262_ST',
+          name: 'Mollbergs Mörkrost Bryggkaffe',
+          manufacturer: 'Zoégas',
+          productLine2: '450g',
+          googleAnalyticsCategory: 'Skafferi',
+          priceValue: 83.23,
+          price: '83,23 kr',
+          potentialPromotions: [{
+            campaignType: 'LOYALTY',
+            rewardLabel: '59,95 kr',
+            textLabel: 'Klubbpris',
+            price: { value: 59.95, formattedValue: '59,95 kr' }
+          }]
+        }] }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 2);
+    assert.deepEqual(batchObservations(executor).map((observation) => ({
+      price: observation.price,
+      regularPrice: observation.regular_price,
+      priceType: observation.price_type,
+      memberRequired: observation.member_required
+    })), [
+      { price: 83.23, regularPrice: undefined, priceType: 'online', memberRequired: false },
+      { price: 59.95, regularPrice: 83.23, priceType: 'member', memberRequired: true }
+    ]);
   });
 
   it('materializes native Hemkop all-store weekly offers into daily database observations', async () => {

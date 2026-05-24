@@ -10,6 +10,9 @@ export type HemkopProduct = {
   priceText: string;
   unitPriceText: string;
   unitPriceUnit: string;
+  regularPrice?: number;
+  promoText?: string;
+  memberOnly: boolean;
   imageUrl: string;
   labels: string[];
   online: boolean;
@@ -79,10 +82,25 @@ type HemkopSearchProduct = {
   price?: unknown;
   comparePrice?: unknown;
   comparePriceUnit?: unknown;
+  potentialPromotions?: HemkopPotentialPromotion[];
   image?: { url?: unknown };
   labels?: unknown;
   online?: unknown;
   outOfStock?: unknown;
+};
+
+type HemkopPotentialPromotion = {
+  campaignType?: unknown;
+  conditionLabel?: unknown;
+  rewardLabel?: unknown;
+  cartLabel?: unknown;
+  textLabel?: unknown;
+  textLabelGenerated?: unknown;
+  comparePrice?: unknown;
+  price?: {
+    value?: unknown;
+    formattedValue?: unknown;
+  } | unknown;
 };
 
 type HemkopSearchResponse = {
@@ -467,11 +485,13 @@ export async function fetchHemkopProducts(options: FetchHemkopProductsOptions = 
         pageCount = responsePageCount && responsePageCount > 0 ? responsePageCount : page + 1;
 
         for (const product of results) {
-          const row = normalizeHemkopProduct(product, sourceUrl, retrievedAt);
-          if (!row || seenCodes.has(row.code)) continue;
-          seenCodes.add(row.code);
-          rows.push(row);
-          if (rows.length >= maxRows) return rows;
+          for (const row of normalizeHemkopProduct(product, sourceUrl, retrievedAt)) {
+            const rowKey = `${row.code}:${row.memberOnly ? 'member' : 'list'}`;
+            if (seenCodes.has(rowKey)) continue;
+            seenCodes.add(rowKey);
+            rows.push(row);
+            if (rows.length >= maxRows) return rows;
+          }
         }
 
         if (results.length === 0) break;
@@ -508,11 +528,13 @@ export async function fetchHemkopProducts(options: FetchHemkopProductsOptions = 
       pageCount = responsePageCount && responsePageCount > 0 ? responsePageCount : page + 1;
 
       for (const product of results) {
-        const row = normalizeHemkopProduct(product, sourceUrl, retrievedAt);
-        if (!row || seenCodes.has(row.code)) continue;
-        seenCodes.add(row.code);
-        rows.push(row);
-        if (rows.length >= maxRows) return rows;
+        for (const row of normalizeHemkopProduct(product, sourceUrl, retrievedAt)) {
+          const rowKey = `${row.code}:${row.memberOnly ? 'member' : 'list'}`;
+          if (seenCodes.has(rowKey)) continue;
+          seenCodes.add(rowKey);
+          rows.push(row);
+          if (rows.length >= maxRows) return rows;
+        }
       }
 
       if (results.length === 0) break;
@@ -698,15 +720,15 @@ export function normalizeHemkopProduct(
   product: HemkopSearchProduct,
   sourceUrl: string,
   retrievedAt: string
-): HemkopProduct | null {
+): HemkopProduct[] {
   const code = text(product.code);
   const name = text(product.name);
   const price = numberOrNull(product.priceValue);
   if (!code || !name || price === null) {
-    return null;
+    return [];
   }
 
-  return {
+  const baseRow: HemkopProduct = {
     code,
     name,
     brand: text(product.manufacturer),
@@ -716,6 +738,7 @@ export function normalizeHemkopProduct(
     priceText: text(product.price),
     unitPriceText: text(product.comparePrice),
     unitPriceUnit: text(product.comparePriceUnit),
+    memberOnly: false,
     imageUrl: text(product.image?.url),
     labels: stringArray(product.labels),
     online: product.online === true,
@@ -723,6 +746,42 @@ export function normalizeHemkopProduct(
     sourceUrl,
     retrievedAt
   };
+  const memberPromotion = (product.potentialPromotions ?? []).find((promotion) => {
+    const label = `${text(promotion.textLabel)} ${text(promotion.textLabelGenerated)}`.toLowerCase();
+    return text(promotion.campaignType).toUpperCase() === 'LOYALTY' || label.includes('klubbpris') || label.includes('medlemspris');
+  });
+  const memberPrice = memberPromotion ? promotionPriceValue(memberPromotion) : null;
+  if (!memberPromotion || memberPrice === null || memberPrice >= price) {
+    return [baseRow];
+  }
+
+  return [baseRow, {
+    ...baseRow,
+    price: memberPrice,
+    priceText: promotionPriceText(memberPromotion) || `${memberPrice.toFixed(2)} kr`,
+    unitPriceText: text(memberPromotion.comparePrice) || baseRow.unitPriceText,
+    regularPrice: price,
+    promoText: [
+      text(memberPromotion.textLabel) || text(memberPromotion.textLabelGenerated),
+      text(memberPromotion.conditionLabel),
+      text(memberPromotion.rewardLabel) || text(memberPromotion.cartLabel)
+    ].filter(Boolean).join(' · '),
+    memberOnly: true
+  }];
+}
+
+function promotionPriceValue(promotion: HemkopPotentialPromotion): number | null {
+  if (typeof promotion.price === 'object' && promotion.price !== null) {
+    return numberOrNull((promotion.price as { value?: unknown }).value);
+  }
+  return numberOrNull(promotion.price);
+}
+
+function promotionPriceText(promotion: HemkopPotentialPromotion): string {
+  if (typeof promotion.price === 'object' && promotion.price !== null) {
+    return text((promotion.price as { formattedValue?: unknown }).formattedValue);
+  }
+  return text(promotion.rewardLabel) || text(promotion.cartLabel);
 }
 
 export function normalizeHemkopWeeklyDiscount(
