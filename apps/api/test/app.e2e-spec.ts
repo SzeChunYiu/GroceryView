@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, it } from 'node:test';
 import { type INestApplication } from '@nestjs/common';
 import { Test, type TestingModule } from '@nestjs/testing';
 import request from 'supertest';
+import { createSessionToken } from '@groceryview/auth';
 import { AppModule } from '../src/app.module.js';
 import { configureApp } from '../src/configure-app.js';
 import { PostgresQueryExecutorService } from '../src/database/postgres-query-executor.service.js';
@@ -18,6 +19,8 @@ class RecordingPriceHistoryExecutor {
     favorite_stores_only: boolean;
     allowed_price_types: string[] | null;
   }> = [];
+  preferenceRows = new Map<string, { preferred_currency: string; notification_channels: string[] }>();
+  favoriteStoreRows = new Map<string, string[]>();
 
   isConfigured(): boolean {
     return true;
@@ -25,6 +28,35 @@ class RecordingPriceHistoryExecutor {
 
   async query<T>(sql: string, params: unknown[] = []): Promise<T[]> {
     this.calls.push({ sql, params });
+    if (sql.includes('insert into app_users')) return [] as T[];
+    if (sql.includes('insert into user_preferences')) {
+      const userId = params[0] as string;
+      const existing = this.preferenceRows.get(userId) ?? { preferred_currency: 'SEK', notification_channels: [] };
+      this.preferenceRows.set(userId, {
+        preferred_currency: (params[1] as string | null) ?? existing.preferred_currency,
+        notification_channels: (params[2] as string[] | null) ?? existing.notification_channels
+      });
+      return [] as T[];
+    }
+    if (sql.includes('select preferred_currency, notification_channels')) {
+      const row = this.preferenceRows.get(params[0] as string);
+      return (row ? [{ preferred_currency: row.preferred_currency, notification_channels: row.notification_channels }] : []) as T[];
+    }
+    if (sql.includes('delete from favorite_stores')) {
+      this.favoriteStoreRows.set(params[0] as string, []);
+      return [] as T[];
+    }
+    if (sql.includes('insert into favorite_stores')) {
+      const userId = params[0] as string;
+      const stores = this.favoriteStoreRows.get(userId) ?? [];
+      const storeId = params[1] as string;
+      if (!stores.includes(storeId)) stores.push(storeId);
+      this.favoriteStoreRows.set(userId, stores);
+      return [] as T[];
+    }
+    if (sql.includes('select store_id from favorite_stores')) {
+      return [...(this.favoriteStoreRows.get(params[0] as string) ?? [])].sort().map((store_id) => ({ store_id })) as T[];
+    }
     if (sql.includes('latest_prices.observation_id') && sql.includes('products.canonical_name as product_name')) {
       if (params[0] === 'missing-product') return [] as T[];
       return [
@@ -432,8 +464,10 @@ class UnconfiguredPostgresExecutor {
 describe('GroceryView API app', () => {
   let app: INestApplication;
   let priceHistoryExecutor: RecordingPriceHistoryExecutor;
+  let previousAuthSecret: string | undefined;
 
   beforeEach(async () => {
+    previousAuthSecret = process.env.AUTH_SECRET;
     priceHistoryExecutor = new RecordingPriceHistoryExecutor();
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule]
@@ -449,6 +483,11 @@ describe('GroceryView API app', () => {
 
   afterEach(async () => {
     await app.close();
+    if (previousAuthSecret === undefined) {
+      delete process.env.AUTH_SECRET;
+    } else {
+      process.env.AUTH_SECRET = previousAuthSecret;
+    }
   });
 
   it('serves health and OpenAPI docs', async () => {
@@ -486,6 +525,8 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/users/demo/privacy/deletion-plan']);
     assert.ok(docs.body.paths['/users/demo/settings/account']);
     assert.ok(docs.body.paths['/users/demo/settings/data-export']);
+    assert.ok(docs.body.paths['/api/settings']);
+    assert.deepEqual(docs.body.paths['/api/settings'].patch.security, [{ bearer: [] }]);
     assert.ok(docs.body.paths['/products']);
     assert.ok(docs.body.paths['/products/{productId}/cheapest-now']);
     assert.ok(docs.body.paths['/products/{id}/terminal']);
@@ -524,6 +565,42 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/users/demo/basket/import-review']);
     assert.ok(docs.body.paths['/users/demo/basket/import-review/{reviewItemId}/decisions']);
     assert.ok(docs.body.paths['/users/demo/basket/stores/{storeId}/quote']);
+  });
+
+  it('saves authenticated user settings preferences through PATCH /api/settings', async () => {
+    process.env.AUTH_SECRET = 'test-auth-secret';
+    const token = await createSessionToken({ userId: 'user-settings-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'test-auth-secret');
+
+    await request(app.getHttpServer())
+      .patch('/api/settings')
+      .send({ currency: 'EUR', preferredStores: ['willys-odenplan', 'lidl-sveavagen'], notificationChannels: ['push', 'email'] })
+      .expect(401);
+
+    const response = await request(app.getHttpServer())
+      .patch('/api/settings')
+      .set('authorization', `Bearer ${token}`)
+      .send({ currency: 'EUR', preferredStores: ['willys-odenplan', 'lidl-sveavagen'], notificationChannels: ['push', 'email'] })
+      .expect(200);
+
+    assert.deepEqual(response.body, {
+      userId: 'user-settings-1',
+      currency: 'EUR',
+      preferredStores: ['lidl-sveavagen', 'willys-odenplan'],
+      notificationChannels: ['push', 'email']
+    });
+    assert.ok(priceHistoryExecutor.calls.some((call) => call.sql.includes('insert into user_preferences') && call.params[0] === 'user-settings-1'));
+    assert.deepEqual(
+      priceHistoryExecutor.calls
+        .filter((call) => call.sql.includes('insert into favorite_stores'))
+        .map((call) => call.params),
+      [['user-settings-1', 'willys-odenplan'], ['user-settings-1', 'lidl-sveavagen']]
+    );
+
+    await request(app.getHttpServer())
+      .patch('/api/settings')
+      .set('authorization', `Bearer ${token}`)
+      .send({ notificationChannels: ['sms'] })
+      .expect(400);
   });
 
   it('serves products, stores, prices, watchlists, baskets, and alerts', async () => {

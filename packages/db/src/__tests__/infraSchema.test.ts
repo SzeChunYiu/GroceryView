@@ -296,6 +296,9 @@ describe('infra/db PostgreSQL schema contract', () => {
       assert.match(repositoryMigrations, new RegExp(`create table if not exists ${table}\\b`), `${table} repository table missing`);
     }
     assert.match(repositoryTableDefinition('favorite_stores'), /primary key \(user_id, store_id\)/);
+    assert.match(repositoryTableDefinition('user_preferences'), /preferred_currency text not null default 'sek'/);
+    assert.match(repositoryTableDefinition('user_preferences'), /notification_channels text\[\] not null default array\[\]::text\[\]/);
+    assert.match(repositoryTableDefinition('user_preferences'), /notification_channels <@ array\['push', 'email', 'telegram'\]::text\[\]/);
     assert.match(repositoryTableDefinition('weekly_baskets'), /unique \(user_id, week_start\)/);
     assert.match(repositoryTableDefinition('subscription_entitlements'), /user_id text primary key references app_users\(id\) on delete cascade/);
     assert.match(repositoryTableDefinition('subscription_entitlements'), /provider_subscription_id text/);
