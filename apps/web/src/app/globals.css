@@ -38,3 +38,19 @@ button, input, select, textarea { font: inherit; }
     transition-duration: 1ms !important;
   }
 }
+
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid #065f46;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.22);
+}
+
+:where(input, select, textarea) {
+  color: #0f172a;
+  background-color: #ffffff;
+}
+
+:where(input, select, textarea)::placeholder {
+  color: #475569;
+  opacity: 1;
+}
