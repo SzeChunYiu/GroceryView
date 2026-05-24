@@ -32,6 +32,7 @@ import {
   buildMatpriskollenStoresUrl,
   buildMathemSearchUrl,
   buildMatsparSearchUrl,
+  buildSnabbgrossCategoryUrl,
   buildOpenFoodFactsProductUrl,
   buildOpenFoodFactsSwedenSearchUrl,
   buildOpenPricesConnectorUrl,
@@ -90,6 +91,9 @@ import {
   fetchMathemProducts,
   fetchMatpriskollenOffers,
   fetchMatsparProducts,
+  fetchSnabbgrossProducts,
+  fetchSnabbgrossProductsForAllStores,
+  fetchSnabbgrossStores,
   fetchWillysProducts,
   fetchWillysProductsForAllStores,
   fetchWillysStores,
@@ -110,6 +114,7 @@ import {
   GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL,
   GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL,
   GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL,
+  GROCERYVIEW_DAILY_SNABBGROSS_ALL_STORE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL,
   GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL,
@@ -3761,6 +3766,132 @@ describe('fetchCoopProductsForAllStores', () => {
     assert.deepEqual(requestedProductUrls, [buildHemkopCategoryUrl('mejeri-ost-och-agg', 100, 0, '4003')]);
   });
 
+});
+
+describe('fetchSnabbgrossProducts', () => {
+  const storeFinderHtml = `
+    <input type="hidden" class="js-storefinder-stores" value='
+      {"total":2,"data":[
+        {"displayName":"Stockholm Årsta","name":"6009","line1":"Partihandlarvägen 50","town":"Stockholm","postalCode":"120 44","latitude":"59.2945","longitude":"18.0491"},
+        {"displayName":"Uppsala","name":"6007","line1":"Rapsgatan 1","town":"Uppsala","postalCode":"754 50","latitude":"59.8586","longitude":"17.6389"}
+      ]}' />
+  `;
+  const productHtml = `
+    <main>
+      <div class="product_item_reference_logged_out js-product-list-item ">
+        <a class="thumb" href="/V%C3%A5rt-sortiment/Fryst/Fryst-potatis/Super-Crunch/produkt/101284149_ST">
+          <img src="https://assets.axfood.se/image/upload/f_auto,t_155/08710449938124_C1N1_s01" />
+        </a>
+        <a class="name" href="/V%C3%A5rt-sortiment/Fryst/Fryst-potatis/Super-Crunch/produkt/101284149_ST">
+          <div class="text-left">Super Crunch 9,5mm Frysta</div>
+        </a>
+        <div class="name_ordinary">Aviko&nbsp;<span class="js-list-commercial-name3">2,5kg</span></div>
+        <span class="js-product-price font-bold product-price campaign-price-red no-margin">219,60&nbsp;kr/låda</span>
+        <div class="price-per-kilo"><span>Jmf.pris 21,96&nbsp;kr<span class="small_letters">/ KG</span></span></div>
+        <span class="js-product-regularprice-value">287,60&nbsp;kr/låda</span>
+        <div class="campaign-end-date">Priset gäller t.o.m&nbsp;2026.05.31</div>
+      </div>
+    </main>
+  `;
+
+  it('fetches Snabbgross stores from the public store finder JSON island', async () => {
+    const stores = await fetchSnabbgrossStores({
+      fetchImpl: async () => new Response(storeFinderHtml, { status: 200, headers: { 'content-type': 'text/html' } }),
+      retrievedAt: '2026-05-24T11:00:00.000Z'
+    });
+
+    assert.deepEqual(stores[0], {
+      country: 'SE',
+      currency: 'SEK',
+      chain: 'snabbgross',
+      storeId: '6009',
+      name: 'Stockholm Årsta',
+      address: 'Partihandlarvägen 50',
+      city: 'Stockholm',
+      postalCode: '120 44',
+      latitude: 59.2945,
+      longitude: 18.0491,
+      sourceUrl: 'https://www.snabbgross.se/butik-sok',
+      retrievedAt: '2026-05-24T11:00:00.000Z'
+    });
+  });
+
+  it('fetches Snabbgross product rows with country currency and chain provenance', async () => {
+    const requestedUrls: string[] = [];
+    const rows = await fetchSnabbgrossProducts({
+      categoryPaths: ['N00'],
+      storeId: '6009',
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return new Response(productHtml, { status: 200, headers: { 'content-type': 'text/html' } });
+      },
+      retrievedAt: '2026-05-24T11:05:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [buildSnabbgrossCategoryUrl('N00', '6009')]);
+    assert.equal(rows[0]?.country, 'SE');
+    assert.equal(rows[0]?.currency, 'SEK');
+    assert.equal(rows[0]?.chain, 'snabbgross');
+    assert.equal(rows[0]?.code, '101284149_ST');
+    assert.equal(rows[0]?.price, 219.6);
+    assert.equal(rows[0]?.regularPriceText, '287,60 kr/låda');
+    assert.equal(rows[0]?.validUntil, '2026.05.31');
+  });
+
+  it('fans Snabbgross branch products through the all-store runner', async () => {
+    const requestedUrls: string[] = [];
+    const rows = await fetchSnabbgrossProductsForAllStores({
+      maxStores: 2,
+      maxRowsPerStore: 1,
+      categoryPaths: ['N00'],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        if (String(url).includes('/butik-sok')) {
+          return new Response(storeFinderHtml, { status: 200, headers: { 'content-type': 'text/html' } });
+        }
+        return new Response(productHtml, { status: 200, headers: { 'content-type': 'text/html' } });
+      },
+      retrievedAt: '2026-05-24T11:10:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      'https://www.snabbgross.se/butik-sok',
+      buildSnabbgrossCategoryUrl('N00', '6009'),
+      buildSnabbgrossCategoryUrl('N00', '6007')
+    ]);
+    assert.deepEqual(rows.map((row) => [row.storeId, row.storeName, row.city]), [
+      ['6009', 'Stockholm Årsta', 'Stockholm'],
+      ['6007', 'Uppsala', 'Uppsala']
+    ]);
+  });
+
+  it('adapts Snabbgross all-store products into daily native connector rows', async () => {
+    const snapshot = await fetchDailyConnectorSnapshot({
+      status: 'ready',
+      connectorId: 'snabbgross-products',
+      chainId: 'snabbgross',
+      sourceType: 'retailer_online_page',
+      runKey: 'snabbgross:retailer-online-page:products:2026-05-24',
+      sourceRunId: 'source-run:snabbgross:retailer-online-page:products:2026-05-24',
+      provenance: {
+        sourceType: 'retailer_online_page',
+        sourceUrl: `${GROCERYVIEW_DAILY_SNABBGROSS_ALL_STORE_PRODUCTS_URL}?maxStores=1&maxRowsPerStore=1&categoryPaths=N00`,
+        capturedAt: '2026-05-24T11:15:00.000Z',
+        parserVersion: 'snabbgross-se-v1'
+      },
+      requiredActions: []
+    }, {
+      retrievedAt: '2026-05-24T11:15:00.000Z',
+      fetchImpl: async (url) => String(url).includes('/butik-sok')
+        ? new Response(storeFinderHtml, { status: 200, headers: { 'content-type': 'text/html' } })
+        : new Response(productHtml, { status: 200, headers: { 'content-type': 'text/html' } })
+    });
+
+    const parsed = JSON.parse(snapshot.body) as { items: Array<{ chainId: string; storeId: string; retailerProductId: string; price: number; regularPrice?: number }> };
+    assert.deepEqual(parsed.items.map((row) => [row.chainId, row.storeId, row.retailerProductId, row.price, row.regularPrice]), [
+      ['snabbgross', '6009', '101284149_ST', 219.6, 287.6]
+    ]);
+  });
 });
 
 describe('fetchWillysProductsForAllStores', () => {

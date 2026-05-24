@@ -78,6 +78,10 @@ import {
   type MatsparProduct
 } from './connectors/matspar.js';
 import {
+  fetchSnabbgrossProductsForAllStores,
+  type SnabbgrossStoreProduct
+} from './connectors/snabbgross-se.js';
+import {
   fetchWillysProductsForAllStores,
   fetchWillysWeeklyDiscountsForAllStores,
   type WillysProduct,
@@ -106,6 +110,7 @@ export * from './connectors/willys-bulk.js';
 export * from './connectors/apohem.js';
 export * from './connectors/okq8-fuel.js';
 export * from './connectors/st1-fuel.js';
+export * from './connectors/snabbgross-se.js';
 export * from './connectors/willys.js';
 export * from './store-enumerator.js';
 export * from './unit-price.js';
@@ -1793,6 +1798,32 @@ function hemkopWeeklyDiscountToDailyItem(row: HemkopWeeklyDiscount): RetailerCon
   };
 }
 
+function snabbgrossStoreProductToDailyItem(row: SnabbgrossStoreProduct): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageText);
+  const barcode = validDailyBarcode(extractOpenFoodFactsBarcodeFromAxfoodImageUrl(row.imageUrl));
+  const regularPrice = nativePriceFromText(row.regularPriceText);
+  return {
+    chainId: row.chain,
+    storeId: row.storeId,
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: dailyProductIdForBarcode('snabbgross', row.code, barcode),
+    categoryId: stableKeyPart(row.category || 'snabbgross-products'),
+    barcode,
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price,
+    regularPrice: regularPrice !== undefined && regularPrice > row.price ? regularPrice : undefined,
+    promoText: row.validUntil ? `Valid until ${row.validUntil}` : undefined,
+    memberOnly: false,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.sourceUrl,
+    imageUrl: row.imageUrl || undefined
+  };
+}
+
 function icaProductToDailyItem(row: IcaProduct): RetailerConnectorParsedProduct {
   const quantity = parseNativePackageText(row.packageSize);
   const price = row.promoPrice ?? row.price;
@@ -2145,6 +2176,20 @@ export async function fetchDailyConnectorSnapshot(
       retrievedAt
     });
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(hemkopWeeklyDiscountToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_SNABBGROSS_ALL_STORE_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_SNABBGROSS_ALL_STORE_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchSnabbgrossProductsForAllStores({
+      ...runnerControlsFromUrl(url),
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxStores: dailyNativeNumberParam(url, 'maxStores'),
+      maxRowsPerStore: dailyNativeNumberParam(url, 'maxRowsPerStore'),
+      categoryPaths: dailyNativeStringListParam(url, 'categoryPaths'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(snabbgrossStoreProductToDailyItem) });
   }
 
   if (sourceUrl === GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL}?`)) {
@@ -3110,6 +3155,7 @@ export const GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview:/
 export const GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/coop/products/all-stores';
 export const GROCERYVIEW_DAILY_CITY_GROSS_BULK_PRODUCTS_URL = 'groceryview://daily/city-gross/products/bulk';
 export const GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL = 'groceryview://daily/city-gross/public-products/all-stores';
+export const GROCERYVIEW_DAILY_SNABBGROSS_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/snabbgross/products/all-stores';
 export const GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL = 'groceryview://daily/mathem/products/public-search';
 export const GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL = 'groceryview://daily/matspar/products/public-search';
 export const GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL = OKQ8_FUEL_PRICES_URL;
