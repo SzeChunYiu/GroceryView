@@ -121,6 +121,18 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(schemaDoc, /out-of-stock/i);
   });
 
+  it('tracks observation-level origin and certification evidence', () => {
+    assert.match(allMigrations, /alter table observations add column if not exists origin_country char\(2\)/);
+    assert.match(allMigrations, /alter table observations add column if not exists cert_level text check/);
+    assert.match(allMigrations, /alter table observations_v2 add column if not exists origin_country char\(2\)/);
+    assert.match(allMigrations, /alter table observations_v2 add column if not exists cert_level text check/);
+    assert.match(allMigrations, /create index if not exists observations_origin_cert_idx on observations \(origin_country, cert_level\)/);
+    assert.match(allMigrations, /observations_connector_idempotency_idx[\s\S]*origin_country[\s\S]*cert_level/);
+    assert.match(schemaDoc, /observations\.origin_country/);
+    assert.match(schemaDoc, /observations\.cert_level/);
+    assert.match(schemaDoc, /grown\/raised country/);
+  });
+
   it('keeps connector observation writes idempotent without overwriting history', () => {
     assert.equal(
       readdirSync(migrationsDir).includes('019_price_snapshot_unique_index.sql'),

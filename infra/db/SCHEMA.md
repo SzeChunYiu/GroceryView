@@ -18,12 +18,14 @@ Price and ingestion records expose provenance directly:
 - `raw_records.provenance`: raw payload metadata such as fetch URL, capture timestamp, parser version, and source checksum.
 - `retailer_source_policies.provenance`: source-policy metadata such as robots crawl evidence, reviewer, policy matrix version, and source-policy notes.
 - `observations.provenance`: normalized price metadata such as extraction rule, original displayed price, campaign identifiers, and review notes.
+- `observations.origin_country` and `observations.cert_level`: observation-level product origin and certification evidence from the same source row when a connector exposes it. `origin_country` is the grown/raised country, not the sale market.
 - `latest_prices.provenance`: copied from the winning observation so API callers can show source context without joining.
 - `fuel_price_sources.provenance`: source-level fuel evidence such as operator page, crowd reporter metadata, legal review, and policy notes.
 - `fuel_price_source_observations`: links fuel source evidence to immutable `domain='fuel'` observations while preserving the original source price text.
 
 Every price-bearing row carries `price_type`, `confidence`, `observed_at`, and `provenance` either directly or through its referenced observation.
 Fuel-domain rows carry litre unit prices through immutable `domain = fuel` observations and fuel source links.
+Grocery rows may also carry nullable origin/certification evidence: `origin_country` uses ISO-3166 alpha-2 and `cert_level` is limited to `krav`, `eu_eco`, `free_range`, `asc`, `msc`, `rainforest_alliance`, `fairtrade`, or `conventional`.
 
 ## Partitioning Plan
 
@@ -37,6 +39,8 @@ Migration 013 builds the first time-series partition lane without breaking exist
 6. `drop_observations_partitions_before(cutoff_month)` is the retention tiering hook: operators can archive a month, then perform retention by partition drop instead of row deletes.
 
 The same monthly range partition and retention by partition drop pattern can be reused for long-term raw payload retention in `raw_records` if retailer capture volume grows faster than normalized observations.
+
+Migration 023 mirrors `observations.origin_country` and `observations.cert_level` into `observations_v2` and indexes `(origin_country, cert_level)` for origin/certification filters without moving those fields onto products. This keeps country-of-origin attached to the exact price observation because retailers may expose different origin lots over time.
 
 ## Deal Score Boundary
 

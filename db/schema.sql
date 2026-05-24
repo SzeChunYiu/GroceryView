@@ -86,6 +86,19 @@ create table if not exists price_observations (
   confidence_score numeric(5, 4) not null check (confidence_score between 0 and 1),
   is_online_price boolean not null default false,
   is_instore_price boolean not null default false,
+  origin_country char(2) check (origin_country is null or origin_country ~ '^[A-Z]{2}$'),
+  cert_level text check (
+    cert_level is null or cert_level in (
+      'krav',
+      'eu_eco',
+      'free_range',
+      'asc',
+      'msc',
+      'rainforest_alliance',
+      'fairtrade',
+      'conventional'
+    )
+  ),
   created_at timestamptz not null default now()
 );
 
@@ -394,6 +407,7 @@ create table if not exists grocery_index_components (
 create index if not exists price_observations_product_time_idx on price_observations(product_id, observed_at desc);
 create index if not exists price_observations_store_time_idx on price_observations(store_id, observed_at desc);
 create index if not exists price_observations_domain_time_idx on price_observations(domain, observed_at desc);
+create index if not exists price_observations_origin_cert_idx on price_observations(origin_country, cert_level);
 create unique index if not exists price_observations_product_store_date_uidx on price_observations(product_id, chain_id, store_id, observed_at, source_type) nulls not distinct;
 create index if not exists promotion_observations_product_dates_idx on promotion_observations(product_id, promo_start, promo_end);
 create index if not exists products_category_idx on products(category_id);

@@ -1708,8 +1708,10 @@ describe('persistOpenPricesArtifact', () => {
       'SEK'
     ]);
     assert.equal(observationInsert.params[18], true);
-    assert.equal(observationInsert.params[19], '2026-05-19T00:00:00.000Z');
-    assert.equal(observationInsert.params[22], 0.95);
+    assert.equal(observationInsert.params[19], null);
+    assert.equal(observationInsert.params[20], null);
+    assert.equal(observationInsert.params[21], '2026-05-19T00:00:00.000Z');
+    assert.equal(observationInsert.params[24], 0.95);
     assert.equal(executor.calls.some((call) => /update observations\b/.test(call.sql)), false);
 
     const latestInsert = executor.calls.find((call) => call.sql.includes('insert into latest_prices'));
@@ -1759,7 +1761,9 @@ describe('createPostgresPriceObservationWriter', () => {
 
     assert.match(executor.calls[0]!.sql, /insert into observations/);
     assert.equal(executor.calls[0]!.params[18], true);
-    assert.equal(executor.calls[0]!.params[19], '2026-05-21T08:00:00.000Z');
+    assert.equal(executor.calls[0]!.params[19], null);
+    assert.equal(executor.calls[0]!.params[20], null);
+    assert.equal(executor.calls[0]!.params[21], '2026-05-21T08:00:00.000Z');
     assert.match(executor.calls[1]!.sql, /insert into latest_prices/);
     assert.equal(executor.calls[1]!.params[5], 'observation-1');
   });
@@ -1798,7 +1802,7 @@ describe('createPostgresPriceObservationWriter', () => {
     );
 
     assert.match(executor.calls[0]!.sql, /insert into observations/);
-    assert.match(executor.calls[0]!.sql, /on conflict \(\s*product_id,\s*chain_id,\s*store_id,\s*domain,\s*retailer_product_ref,\s*price_type,\s*observed_at,\s*price,\s*unit_price,\s*currency,\s*is_available,\s*confidence,\s*provenance\s*\) do nothing/);
+    assert.match(executor.calls[0]!.sql, /on conflict \(\s*product_id,\s*chain_id,\s*store_id,\s*domain,\s*retailer_product_ref,\s*price_type,\s*observed_at,\s*price,\s*unit_price,\s*currency,\s*is_available,\s*origin_country,\s*cert_level,\s*confidence,\s*provenance\s*\) do nothing/);
     assert.match(executor.calls[0]!.sql, /returning id/);
     assert.deepEqual(executor.calls[0]!.params.slice(0, 12), [
       'product-1',
@@ -1815,7 +1819,9 @@ describe('createPostgresPriceObservationWriter', () => {
       'SEK'
     ]);
     assert.equal(executor.calls[0]!.params[18], false);
-    assert.equal(executor.calls[0]!.params[23], JSON.stringify({ sourceType: 'retailer_api', sourceName: 'Willys', extractionRule: 'weekly-offers-v1' }));
+    assert.equal(executor.calls[0]!.params[19], null);
+    assert.equal(executor.calls[0]!.params[20], null);
+    assert.equal(executor.calls[0]!.params[25], JSON.stringify({ sourceType: 'retailer_api', sourceName: 'Willys', extractionRule: 'weekly-offers-v1' }));
 
     assert.match(executor.calls[1]!.sql, /insert into latest_prices/);
     assert.match(executor.calls[1]!.sql, /on conflict \(product_id, chain_id, store_id, price_type\) do update/);
@@ -1881,6 +1887,8 @@ describe('createPostgresPriceObservationWriter', () => {
       110.8889,
       'SEK',
       false,
+      null,
+      null,
       0.91,
       JSON.stringify({ sourceType: 'retailer_api', sourceName: 'Willys', replay: true })
     ]);
@@ -1943,6 +1951,8 @@ describe('createPostgresPriceObservationWriter', () => {
           promotionText: 'Veckans erbjudande',
           memberRequired: false,
           isAvailable: false,
+          originCountry: 'SE',
+          certLevel: 'krav',
           observedAt: '2026-05-21T03:17:00.000Z',
           confidence: 0.95,
           provenance: { connectorId: 'willys-normalized-json', runKey: 'willys:2026-05-21' }
@@ -1974,9 +1984,11 @@ describe('createPostgresPriceObservationWriter', () => {
     assert.match(executor.calls[0]!.sql, /price numeric\(12, 2\)/);
     assert.match(executor.calls[0]!.sql, /unit_price numeric\(12, 4\)/);
     assert.match(executor.calls[0]!.sql, /is_available boolean/);
+    assert.match(executor.calls[0]!.sql, /origin_country char\(2\)/);
+    assert.match(executor.calls[0]!.sql, /cert_level text/);
     assert.match(executor.calls[0]!.sql, /confidence numeric\(5, 4\)/);
     assert.match(executor.calls[0]!.sql, /domain text/);
-    assert.match(executor.calls[0]!.sql, /partition by product_id, chain_id, store_id, domain, price_type, observed_at, retailer_product_ref, price, unit_price, currency, is_available, confidence, provenance/);
+    assert.match(executor.calls[0]!.sql, /partition by product_id, chain_id, store_id, domain, price_type, observed_at, retailer_product_ref, price, unit_price, currency, is_available, origin_country, cert_level, confidence, provenance/);
     assert.match(executor.calls[0]!.sql, /join observations on observations\.product_id = ranked_input\.product_id/);
     assert.match(executor.calls[0]!.sql, /and observations\.domain = ranked_input\.domain/);
     assert.match(executor.calls[0]!.sql, /and observations\.retailer_product_ref is not distinct from ranked_input\.retailer_product_ref/);
@@ -1984,6 +1996,8 @@ describe('createPostgresPriceObservationWriter', () => {
     assert.match(executor.calls[0]!.sql, /and observations\.unit_price = ranked_input\.unit_price/);
     assert.match(executor.calls[0]!.sql, /and observations\.currency = ranked_input\.currency/);
     assert.match(executor.calls[0]!.sql, /and observations\.is_available = ranked_input\.is_available/);
+    assert.match(executor.calls[0]!.sql, /and observations\.origin_country is not distinct from ranked_input\.origin_country/);
+    assert.match(executor.calls[0]!.sql, /and observations\.cert_level is not distinct from ranked_input\.cert_level/);
     assert.match(executor.calls[0]!.sql, /and observations\.confidence = ranked_input\.confidence/);
     assert.match(executor.calls[0]!.sql, /and observations\.provenance = ranked_input\.provenance/);
     assert.match(executor.calls[0]!.sql, /where input_rank = 1/);
@@ -1994,7 +2008,7 @@ describe('createPostgresPriceObservationWriter', () => {
     );
     assert.match(
       observationsInsertSql,
-      /on conflict \(\s*product_id,\s*chain_id,\s*store_id,\s*domain,\s*retailer_product_ref,\s*price_type,\s*observed_at,\s*price,\s*unit_price,\s*currency,\s*is_available,\s*confidence,\s*provenance\s*\) do nothing/
+      /on conflict \(\s*product_id,\s*chain_id,\s*store_id,\s*domain,\s*retailer_product_ref,\s*price_type,\s*observed_at,\s*price,\s*unit_price,\s*currency,\s*is_available,\s*origin_country,\s*cert_level,\s*confidence,\s*provenance\s*\) do nothing/
     );
     assert.match(executor.calls[0]!.sql, /insert into latest_prices/);
     assert.match(executor.calls[0]!.sql, /where latest_prices\.observed_at <= excluded\.observed_at/);
@@ -2022,6 +2036,8 @@ describe('createPostgresPriceObservationWriter', () => {
       promotion_ends_on: null,
       member_required: false,
       is_available: false,
+      origin_country: 'SE',
+      cert_level: 'krav',
       observed_at: '2026-05-21T03:17:00.000Z',
       valid_from: null,
       valid_until: null,

@@ -4573,7 +4573,8 @@ describe('ingestRetailerProduct', () => {
       soldByWeight: true,
       variant: 'vine',
       isOrganic: false,
-      originCountry: 'SE'
+      originCountry: 'SE',
+      certLevel: 'eu_eco'
     });
 
     assert.equal(output.product.productKind, 'commodity');
@@ -4581,6 +4582,8 @@ describe('ingestRetailerProduct', () => {
     assert.equal(output.product.variant, 'vine');
     assert.equal(output.product.isOrganic, false);
     assert.equal(output.product.originCountry, 'SE');
+    assert.equal(output.priceObservation.originCountry, 'SE');
+    assert.equal(output.priceObservation.certLevel, 'eu_eco');
     assert.equal(output.alias.matchConfidence, 0.68);
     assert.equal(output.priceObservation.confidenceScore, 0.68);
     assert.equal(output.priceObservation.unitPrice, 39.9);
@@ -5862,6 +5865,8 @@ describe('daily ingestion runner', () => {
           price: 49.9,
           regularPrice: 69.9,
           isAvailable: false,
+          originCountry: 'SE',
+          certLevel: 'krav',
           promoText: 'Veckans erbjudande'
         }]
       }), { status: 200, headers: { 'content-type': 'application/json' } })
@@ -5893,9 +5898,11 @@ describe('daily ingestion runner', () => {
     const rawRows = JSON.parse(String(rawRecordInsert?.params[1])) as Array<{ payload: Record<string, unknown> }>;
     assert.equal('product' in rawRows[0]!.payload, false);
     assert.deepEqual(Object.keys(rawRows[0]!.payload).sort(), [
+      'certLevel',
       'chainId',
       'isAvailable',
       'observedAt',
+      'originCountry',
       'price',
       'priceType',
       'productId',
@@ -5905,10 +5912,12 @@ describe('daily ingestion runner', () => {
     const storeInsert = executor.calls.find((call) => call.sql.includes('insert into stores'));
     assert.equal(storeInsert?.params[0], 'willys-odenplan');
     const latestPriceInsert = executor.calls.find((call) => call.sql.includes('insert into latest_prices'));
-    const observationRows = JSON.parse(String(latestPriceInsert?.params[0])) as Array<{ store_id: string; domain: string; is_available?: boolean }>;
+    const observationRows = JSON.parse(String(latestPriceInsert?.params[0])) as Array<{ store_id: string; domain: string; is_available?: boolean; origin_country?: string; cert_level?: string }>;
     assert.equal(observationRows[0]?.store_id, 'store-db-2');
     assert.equal(observationRows[0]?.domain, 'grocery');
     assert.equal(observationRows[0]?.is_available, false);
+    assert.equal(observationRows[0]?.origin_country, 'SE');
+    assert.equal(observationRows[0]?.cert_level, 'krav');
   });
 
   it('caches and rewrites product image URLs while persisting daily connector runs when enabled', async () => {

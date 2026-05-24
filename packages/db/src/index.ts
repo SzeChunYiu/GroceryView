@@ -505,6 +505,16 @@ export type PostgresProductAliasRepository = {
   findProductAliases(filter: ProductAliasLookupFilter): Promise<ProductAliasRecord[]>;
 };
 
+export type CertificationLevel =
+  | 'krav'
+  | 'eu_eco'
+  | 'free_range'
+  | 'asc'
+  | 'msc'
+  | 'rainforest_alliance'
+  | 'fairtrade'
+  | 'conventional';
+
 export type PriceObservationRecord = {
   productId: string;
   chainId: string;
@@ -525,6 +535,8 @@ export type PriceObservationRecord = {
   promotionEndsOn?: string;
   memberRequired?: boolean;
   isAvailable?: boolean;
+  originCountry?: string;
+  certLevel?: CertificationLevel;
   observedAt: string;
   validFrom?: string;
   validUntil?: string;
@@ -1739,6 +1751,8 @@ type PriceObservationHistoryRow = {
   promotion_ends_on: string | Date | null;
   member_required: boolean;
   is_available: boolean;
+  origin_country: string | null;
+  cert_level: CertificationLevel | null;
   observed_at: string | Date;
   valid_from: string | Date | null;
   valid_until: string | Date | null;
@@ -2106,6 +2120,8 @@ function mapPriceObservationHistory(row: PriceObservationHistoryRow): PriceObser
     ...(optionalIso(row.promotion_ends_on) ? { promotionEndsOn: optionalIso(row.promotion_ends_on) } : {}),
     memberRequired: row.member_required,
     isAvailable: row.is_available !== false,
+    ...(row.origin_country ? { originCountry: row.origin_country } : {}),
+    ...(row.cert_level ? { certLevel: row.cert_level } : {}),
     observedAt: asIso(row.observed_at),
     ...(optionalIso(row.valid_from) ? { validFrom: optionalIso(row.valid_from) } : {}),
     ...(optionalIso(row.valid_until) ? { validUntil: optionalIso(row.valid_until) } : {}),
@@ -4054,8 +4070,10 @@ async function findExistingObservationId(executor: QueryExecutor, observation: P
        and unit_price = $9
        and currency = $10
        and is_available = $11
-       and confidence = $12
-       and provenance = $13::jsonb
+       and origin_country is not distinct from $12
+       and cert_level is not distinct from $13
+       and confidence = $14
+       and provenance = $15::jsonb
      order by id
      limit 1`,
     [
@@ -4070,6 +4088,8 @@ async function findExistingObservationId(executor: QueryExecutor, observation: P
       observation.unitPrice,
       observation.currency ?? 'SEK',
       observation.isAvailable ?? true,
+      observation.originCountry?.toUpperCase() ?? null,
+      observation.certLevel ?? null,
       observation.confidence,
       JSON.stringify(observation.provenance)
     ]
@@ -4228,6 +4248,8 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            promotion_ends_on,
            member_required,
            is_available,
+           origin_country,
+           cert_level,
            observed_at,
            valid_from,
            valid_until,
@@ -4235,7 +4257,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            provenance
          ) values (
            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12,
-           $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24::jsonb
+           $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26::jsonb
          )
          on conflict (
            product_id,
@@ -4249,6 +4271,8 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            unit_price,
            currency,
            is_available,
+           origin_country,
+           cert_level,
            confidence,
            provenance
          ) do nothing
@@ -4273,6 +4297,8 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
           observation.promotionEndsOn ?? null,
           observation.memberRequired ?? false,
           observation.isAvailable ?? true,
+          observation.originCountry?.toUpperCase() ?? null,
+          observation.certLevel ?? null,
           observation.observedAt,
           observation.validFrom ?? observation.observedAt,
           observation.validUntil ?? null,
@@ -4360,6 +4386,8 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              promotion_ends_on date,
              member_required boolean,
              is_available boolean,
+             origin_country char(2),
+             cert_level text,
              observed_at timestamptz,
              valid_from timestamptz,
              valid_until timestamptz,
@@ -4370,7 +4398,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
          ranked_input as (
            select input.*,
                   row_number() over (
-                    partition by product_id, chain_id, store_id, domain, price_type, observed_at, retailer_product_ref, price, unit_price, currency, is_available, confidence, provenance
+                    partition by product_id, chain_id, store_id, domain, price_type, observed_at, retailer_product_ref, price, unit_price, currency, is_available, origin_country, cert_level, confidence, provenance
                     order by ordinal
                   ) as input_rank
            from input
@@ -4389,6 +4417,8 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
                   observations.unit_price,
                   observations.currency,
                   observations.is_available,
+                  observations.origin_country,
+                  observations.cert_level,
                   observations.observed_at,
                   observations.confidence,
                   observations.provenance
@@ -4404,6 +4434,8 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              and observations.unit_price = ranked_input.unit_price
              and observations.currency = ranked_input.currency
              and observations.is_available = ranked_input.is_available
+             and observations.origin_country is not distinct from ranked_input.origin_country
+             and observations.cert_level is not distinct from ranked_input.cert_level
              and observations.confidence = ranked_input.confidence
              and observations.provenance = ranked_input.provenance
            order by ranked_input.ordinal, observations.created_at, observations.id
@@ -4429,6 +4461,8 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              promotion_ends_on,
              member_required,
              is_available,
+             origin_country,
+             cert_level,
              observed_at,
              valid_from,
              valid_until,
@@ -4455,6 +4489,8 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              promotion_ends_on,
              member_required,
              is_available,
+             origin_country,
+             cert_level,
              observed_at,
              valid_from,
              valid_until,
@@ -4479,10 +4515,12 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              unit_price,
              currency,
              is_available,
+             origin_country,
+             cert_level,
              confidence,
              provenance
            ) do nothing
-           returning id, product_id, chain_id, store_id, domain, retailer_product_ref, price_type, price, regular_price, unit_price, currency, is_available, observed_at, confidence, provenance
+           returning id, product_id, chain_id, store_id, domain, retailer_product_ref, price_type, price, regular_price, unit_price, currency, is_available, origin_country, cert_level, observed_at, confidence, provenance
          ),
          written as (
            select ranked_input.ordinal,
@@ -4497,6 +4535,8 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
                   coalesce(inserted.unit_price, existing.unit_price) as unit_price,
                   coalesce(inserted.currency, existing.currency) as currency,
                   coalesce(inserted.is_available, existing.is_available) as is_available,
+                  coalesce(inserted.origin_country, existing.origin_country) as origin_country,
+                  coalesce(inserted.cert_level, existing.cert_level) as cert_level,
                   coalesce(inserted.observed_at, existing.observed_at) as observed_at,
                   coalesce(inserted.confidence, existing.confidence) as confidence,
                   coalesce(inserted.provenance, existing.provenance) as provenance
@@ -4513,6 +4553,8 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              and inserted.unit_price = ranked_input.unit_price
              and inserted.currency = ranked_input.currency
              and inserted.is_available = ranked_input.is_available
+             and inserted.origin_country is not distinct from ranked_input.origin_country
+             and inserted.cert_level is not distinct from ranked_input.cert_level
              and inserted.confidence = ranked_input.confidence
              and inserted.provenance = ranked_input.provenance
            where inserted.id is not null or existing.id is not null
@@ -4607,6 +4649,8 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
           promotion_ends_on: observation.promotionEndsOn ?? null,
           member_required: observation.memberRequired ?? false,
           is_available: observation.isAvailable ?? true,
+          origin_country: observation.originCountry?.toUpperCase() ?? null,
+          cert_level: observation.certLevel ?? null,
           observed_at: observation.observedAt,
           valid_from: observation.validFrom ?? null,
           valid_until: observation.validUntil ?? null,
@@ -4888,6 +4932,8 @@ export function createPostgresPriceReader(executor: QueryExecutor): PostgresPric
                 promotion_ends_on,
                 member_required,
                 is_available,
+                origin_country,
+                cert_level,
                 observed_at,
                 valid_from,
                 valid_until,

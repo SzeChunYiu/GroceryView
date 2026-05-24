@@ -7,6 +7,7 @@ import {
   createPostgresPriceObservationWriter,
   createPostgresProductAliasRepository,
   createPostgresSourceRecordWriter,
+  type CertificationLevel,
   type PriceType as DbPriceType,
   type PriceObservationRecord,
   type QueryExecutor,
@@ -1672,6 +1673,49 @@ function validDailyBarcode(value: string | undefined): string | undefined {
   return barcode && /^\d{8,14}$/.test(barcode) ? barcode : undefined;
 }
 
+function certLevelFromText(values: readonly string[]): CertificationLevel | undefined {
+  const text = values.join(' ').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
+  if (/\bkrav\b/.test(text)) return 'krav';
+  if (/\brainforest[\s_-]*alliance\b/.test(text)) return 'rainforest_alliance';
+  if (/\bfair[\s_-]*trade\b|\bfairtrade\b/.test(text)) return 'fairtrade';
+  if (/\bfree[\s_-]*range\b|\bfrigaende\b/.test(text)) return 'free_range';
+  if (/\basc\b/.test(text)) return 'asc';
+  if (/\bmsc\b/.test(text)) return 'msc';
+  if (/\beu[\s_-]*(eco|organic)\b|\bekologisk\b|\borganic\b|\beko\b/.test(text)) return 'eu_eco';
+  if (/\bconventional\b|\bkonventionell\b/.test(text)) return 'conventional';
+  return undefined;
+}
+
+function originCountryFromText(value: string): string | undefined {
+  const normalized = value.trim().toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
+  if (!normalized) return undefined;
+  if (/^[a-z]{2}$/i.test(normalized)) return normalized.toUpperCase();
+  const countryCodes: Record<string, string> = {
+    danmark: 'DK',
+    denmark: 'DK',
+    finland: 'FI',
+    frankrike: 'FR',
+    france: 'FR',
+    italien: 'IT',
+    italy: 'IT',
+    marocko: 'MA',
+    morocco: 'MA',
+    nederlander: 'NL',
+    netherlands: 'NL',
+    norge: 'NO',
+    norway: 'NO',
+    polen: 'PL',
+    poland: 'PL',
+    spanien: 'ES',
+    spain: 'ES',
+    sverige: 'SE',
+    sweden: 'SE',
+    tyskland: 'DE',
+    germany: 'DE'
+  };
+  return countryCodes[normalized];
+}
+
 function dailyProductIdForBarcode(prefix: string, fallback: string, barcode?: string): string {
   const normalizedBarcode = validDailyBarcode(barcode);
   return normalizedBarcode ? `ean-${stableKeyPart(normalizedBarcode)}` : `${prefix}-${stableKeyPart(fallback)}`;
@@ -1696,6 +1740,7 @@ function willysWeeklyDiscountToDailyItem(row: WillysWeeklyDiscount): RetailerCon
     regularPrice: regularPrice !== undefined && regularPrice > row.price ? regularPrice : undefined,
     promoText: row.conditionText || row.priceText || undefined,
     memberOnly: false,
+    certLevel: certLevelFromText(row.labels),
     observedAt: row.retrievedAt,
     sourceUrl: row.sourceUrl,
     imageUrl: row.imageUrl || undefined
@@ -1718,6 +1763,7 @@ function willysStoreProductToDailyItem(row: WillysStoreProduct): RetailerConnect
     packageUnit: quantity.packageUnit,
     price: row.price,
     memberOnly: false,
+    certLevel: certLevelFromText(row.labels),
     observedAt: row.retrievedAt,
     sourceUrl: row.sourceUrl,
     imageUrl: row.imageUrl || undefined
@@ -1739,6 +1785,7 @@ function willysBulkProductToDailyItem(row: WillysProduct): RetailerConnectorPars
     packageUnit: quantity.packageUnit,
     price: row.price,
     memberOnly: false,
+    certLevel: certLevelFromText(row.labels),
     observedAt: row.retrievedAt,
     sourceUrl: row.sourceUrl,
     imageUrl: row.imageUrl || undefined
@@ -1762,6 +1809,7 @@ function hemkopStoreProductToDailyItem(row: HemkopStoreProduct): RetailerConnect
     packageUnit: quantity.packageUnit,
     price: row.price,
     memberOnly: false,
+    certLevel: certLevelFromText(row.labels),
     observedAt: row.retrievedAt,
     sourceUrl: row.sourceUrl,
     imageUrl: row.imageUrl || undefined
@@ -1787,6 +1835,7 @@ function hemkopWeeklyDiscountToDailyItem(row: HemkopWeeklyDiscount): RetailerCon
     regularPrice: regularPrice !== undefined && regularPrice > row.price ? regularPrice : undefined,
     promoText: row.conditionText || row.priceText || undefined,
     memberOnly: false,
+    certLevel: certLevelFromText(row.labels),
     observedAt: row.retrievedAt,
     sourceUrl: row.sourceUrl,
     imageUrl: row.imageUrl || undefined
@@ -1813,6 +1862,7 @@ function icaProductToDailyItem(row: IcaProduct): RetailerConnectorParsedProduct 
     regularPrice: row.promoPrice !== null && row.price !== null && row.price > row.promoPrice ? row.price : undefined,
     promoText: row.promotionDescription || undefined,
     memberOnly: false,
+    originCountry: originCountryFromText(row.countryOfOrigin),
     observedAt: row.retrievedAt,
     sourceUrl: row.sourceUrl,
     imageUrl: row.imageUrl || undefined
@@ -2472,6 +2522,8 @@ export function parseRetailerProductJsonSnapshot(snapshot: RetailerConnectorSnap
       fuelGradeId: optionalString(record, 'fuelGradeId', path) as FuelGradeId | undefined,
       fuelSource: optionalFuelSource(record, path),
       brand: optionalString(record, 'brand', path),
+      originCountry: optionalString(record, 'originCountry', path),
+      certLevel: optionalString(record, 'certLevel', path) as CertificationLevel | undefined,
       packageSize: requiredNumber(record, 'packageSize', path),
       packageUnit: requiredString(record, 'packageUnit', path),
       price: requiredNumber(record, 'price', path),
@@ -2662,6 +2714,7 @@ export type RetailerProductInput = {
   variant?: string;
   isOrganic?: boolean;
   originCountry?: string;
+  certLevel?: CertificationLevel;
   soldByWeight?: boolean;
   packageSize: number;
   packageUnit: string;
@@ -2747,6 +2800,8 @@ export type IngestedPriceObservation = {
   isOnlinePrice: boolean;
   isInstorePrice: boolean;
   isAvailable: boolean;
+  originCountry?: string;
+  certLevel?: CertificationLevel;
   fuelSource?: RetailerProductInput['fuelSource'];
 };
 
@@ -2785,6 +2840,9 @@ function validateInput(input: RetailerProductInput): void {
   if (input.validFrom !== undefined && Number.isNaN(Date.parse(input.validFrom))) throw new Error('validFrom must be an ISO date.');
   if (input.validUntil !== undefined && Number.isNaN(Date.parse(input.validUntil))) throw new Error('validUntil must be an ISO date.');
   if (input.originCountry !== undefined && !/^[a-z]{2}$/i.test(input.originCountry)) throw new Error('originCountry must be an ISO-3166 alpha-2 code.');
+  if (input.certLevel !== undefined && !['krav', 'eu_eco', 'free_range', 'asc', 'msc', 'rainforest_alliance', 'fairtrade', 'conventional'].includes(input.certLevel)) {
+    throw new Error('certLevel must be a supported certification level.');
+  }
 }
 
 function priceTypeForSource(input: RetailerProductInput, hasPromotion: boolean): PriceType {
@@ -2920,6 +2978,8 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
       isOnlinePrice: input.sourceType === 'official_api' || input.sourceType === 'retailer_online_page',
       isInstorePrice: input.sourceType === 'receipt_scan' || input.sourceType === 'shelf_photo' || input.sourceType === 'manual_user_report',
       isAvailable: input.isAvailable ?? true,
+      originCountry: input.originCountry?.toUpperCase(),
+      certLevel: input.certLevel,
       fuelSource: input.fuelSource
     },
     promotionObservation: hasPromotion
@@ -4160,6 +4220,8 @@ async function persistDailyConnectorOutput(input: {
         priceType: accepted.priceObservation.priceType,
         price: accepted.priceObservation.price,
         isAvailable: accepted.priceObservation.isAvailable,
+        originCountry: accepted.priceObservation.originCountry,
+        certLevel: accepted.priceObservation.certLevel,
         observedAt: accepted.priceObservation.observedAt
       };
       const rawProvenance = {
@@ -4208,6 +4270,8 @@ async function persistDailyConnectorOutput(input: {
         promotionEndsOn: accepted.promotionObservation?.validUntil?.slice(0, 10),
         memberRequired: accepted.promotionObservation?.memberOnly ?? false,
         isAvailable: accepted.priceObservation.isAvailable,
+        originCountry: accepted.priceObservation.originCountry,
+        certLevel: accepted.priceObservation.certLevel,
         observedAt: accepted.priceObservation.observedAt,
         validFrom: accepted.priceObservation.validFrom,
         validUntil: accepted.priceObservation.validUntil,
