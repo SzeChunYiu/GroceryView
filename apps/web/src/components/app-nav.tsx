@@ -69,6 +69,7 @@ const navGroups: NavGroup[] = [
     items: [
       { href: '/savings-dashboard', label: 'Savings', icon: PiggyBank },
       { href: '/alerts', label: 'Alerts', icon: Bell },
+      { href: '/favorites', label: 'Favorites', icon: Heart },
       { href: '/watchlist', label: 'Watchlist', icon: Heart },
       { href: '/list', label: 'Shopping list', icon: ListChecks },
       { href: '/basket', label: 'Basket', icon: ShoppingBasket },

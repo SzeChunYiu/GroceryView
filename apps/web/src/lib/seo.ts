@@ -101,6 +101,11 @@ export const routeMetadataCatalog = {
     title: 'Near-expiry grocery deal radar | GroceryView',
     description: 'Surface near-expiry markdowns from timestamped product rows with verification, stale evidence, and confidence labels.'
   },
+  '/favorites': {
+    title: 'Favorite grocery items | GroceryView',
+    description: 'View signed-in bookmarked products with current cheapest price and store evidence.',
+    noIndex: true
+  },
   '/fuel': {
     title: 'Fuel prices by grade | GroceryView',
     description: 'View source-backed fuel observations by grade with price per litre, domain=fuel modeling, and operator provenance.'
