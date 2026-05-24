@@ -2135,11 +2135,30 @@ describe('fetchHemkopProducts', () => {
       unitPriceUnit: 'kg',
       imageUrl: 'https://assets.axfood.se/image/upload/f_auto,t_200/07310130003547_C1R1_s03',
       labels: ['keyhole'],
+      certificationLabels: [],
       online: true,
       outOfStock: false,
       sourceUrl: buildHemkopSearchUrl('makaroner', 100, 0),
       retrievedAt: '2026-05-21T00:45:00.000Z'
     }]);
+  });
+
+  it('normalizes explicit Axfood KRAV and Fairtrade product certification labels', async () => {
+    const rows = await fetchHemkopProducts({
+      queries: ['kaffe'],
+      fetchImpl: async () => new Response(JSON.stringify({
+        results: [{
+          code: 'hemkop-certified-coffee',
+          name: 'Certifierat kaffe',
+          priceValue: 49.9,
+          labels: ['KRAV', 'Fairtrade', 'keyhole']
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } }),
+      retrievedAt: '2026-05-21T00:45:00.000Z'
+    });
+
+    assert.deepEqual(rows[0]?.labels, ['KRAV', 'Fairtrade', 'keyhole']);
+    assert.deepEqual(rows[0]?.certificationLabels, ['fairtrade', 'krav']);
   });
 
   it('paginates Hemkop search rows until reported pages are exhausted', async () => {
@@ -2398,6 +2417,7 @@ describe('fetchHemkopWeeklyDiscounts', () => {
       category: 'mejeri-ost-och-agg|smor',
       imageUrl: 'https://assets.axfood.se/image/upload/f_auto,t_200/07310865005168_C1L1_s01',
       labels: ['swedish_flag'],
+      certificationLabels: [],
       sourceUrl: buildHemkopWeeklyDiscountsUrl('4003', 1),
       retrievedAt: '2026-05-22T08:25:03.000Z'
     }]);
@@ -2586,6 +2606,7 @@ describe('fetchIcaProducts', () => {
       productUrl: 'https://handlaprivatkund.ica.se/stores/1004599/products/2077461/details',
       packageSize: '0.5kg',
       countryOfOrigin: 'Marocko',
+      countryOfOriginCode: 'MA',
       price: 37.9,
       priceCurrency: 'SEK',
       unitPrice: 75.8,
@@ -2625,6 +2646,40 @@ describe('fetchIcaProducts', () => {
     });
 
     assert.equal(rows.length, 1);
+  });
+
+  it('normalizes additional ICA country-of-origin fixture values to ISO country codes', async () => {
+    const fetchImpl: typeof fetch = async () => Response.json({
+      productGroups: [{
+        type: 'FRUIT',
+        decoratedProducts: [{
+          productId: 'ica-grape-product',
+          retailerProductId: 'ica-grape-retailer',
+          name: 'Vindruvor Chile',
+          packSizeDescription: '500 g',
+          countryOfOrigin: 'Chile',
+          price: { amount: 29.9, currency: 'SEK' }
+        }, {
+          productId: 'ica-asparagus-product',
+          retailerProductId: 'ica-asparagus-retailer',
+          name: 'Sparris Peru',
+          packSizeDescription: '250 g',
+          countryOfOrigin: 'Peru',
+          price: { amount: 34.9, currency: 'SEK' }
+        }]
+      }]
+    });
+
+    const rows = await fetchIcaProducts({
+      fetchImpl,
+      retrievedAt: '2026-05-22T08:28:14.000Z',
+      maxRows: 2
+    });
+
+    assert.deepEqual(rows.map((row) => [row.countryOfOrigin, row.countryOfOriginCode]), [
+      ['Chile', 'CL'],
+      ['Peru', 'PE']
+    ]);
   });
 
   it('fetches configured ICA store-scoped promotion batches', async () => {
@@ -4183,6 +4238,7 @@ describe('fetchWillysProducts', () => {
       unitPriceUnit: 'kg',
       imageUrl: 'https://assets.axfood.se/image/upload/f_auto,t_200/07310130003547_C1R1_s03',
       labels: ['keyhole'],
+      certificationLabels: [],
       online: true,
       outOfStock: false,
       sourceUrl: buildWillysSearchUrl('makaroner'),
@@ -4278,9 +4334,34 @@ describe('fetchWillysWeeklyDiscounts', () => {
       category: 'frukt-och-gront|gronsaker',
       imageUrl: 'https://assets.axfood.se/image/upload/f_auto,t_200/07311042002680_C1N0_s01',
       labels: ['keyhole'],
+      certificationLabels: [],
       sourceUrl: buildWillysWeeklyDiscountsUrl('2110', 1),
       retrievedAt: '2026-05-22T08:25:03.000Z'
     }]);
+  });
+
+  it('normalizes explicit Axfood MSC and ASC weekly-offer certification labels', async () => {
+    const rows = await fetchWillysWeeklyDiscounts({
+      storeId: '2110',
+      maxRows: 1,
+      fetchImpl: async () => new Response(JSON.stringify({
+        results: [{
+          name: 'Certifierad fisk',
+          priceNoUnit: '59.9',
+          labels: ['MSC', 'ASC', 'swedish_flag'],
+          potentialPromotions: [{
+            code: 'cert-fish-promo',
+            mainProductCode: 'cert-fish-product',
+            name: 'Certifierad fisk',
+            price: 49.9
+          }]
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } }),
+      retrievedAt: '2026-05-22T08:25:03.000Z'
+    });
+
+    assert.deepEqual(rows[0]?.labels, ['MSC', 'ASC', 'swedish_flag']);
+    assert.deepEqual(rows[0]?.certificationLabels, ['asc', 'msc']);
   });
 
   it('paginates Willys Axfood weekly discounts until reported pages are exhausted', async () => {
@@ -5435,6 +5516,12 @@ function firstBatchProduct(executor: DailyIngestionExecutor) {
   return products[0] ?? {};
 }
 
+function firstBatchRawPayload(executor: DailyIngestionExecutor) {
+  const rawRecordInsert = executor.calls.find((call) => call.sql.includes('jsonb_to_recordset') && call.sql.includes('insert into raw_records'));
+  const records = JSON.parse(String(rawRecordInsert?.params[1])) as Array<{ payload: Record<string, unknown> }>;
+  return records[0]?.payload ?? {};
+}
+
 describe('persistOpenFoodFactsProductMetadata', () => {
   it('updates existing DB products by barcode with real OpenFoodFacts nutrition provenance', async () => {
     const executor = new DailyIngestionExecutor();
@@ -5893,6 +5980,7 @@ describe('daily ingestion runner', () => {
     const rawRows = JSON.parse(String(rawRecordInsert?.params[1])) as Array<{ payload: Record<string, unknown> }>;
     assert.equal('product' in rawRows[0]!.payload, false);
     assert.deepEqual(Object.keys(rawRows[0]!.payload).sort(), [
+      'certificationLabels',
       'chainId',
       'isAvailable',
       'observedAt',
@@ -6225,6 +6313,7 @@ describe('daily ingestion runner', () => {
               brand: 'ICA',
               image: { src: 'https://assets.ica.se/coffee.png' },
               packSizeDescription: '450 g',
+              countryOfOrigin: 'Chile',
               price: { amount: 59.9, currency: 'SEK' },
               promoPrice: { amount: 44.9, currency: 'SEK' },
               unitPrice: { price: { amount: 133.11, currency: 'SEK' }, unit: 'kg' },
@@ -6244,6 +6333,10 @@ describe('daily ingestion runner', () => {
     assert.equal(observation.store_id, 'store-db-2');
     assert.equal(observation.price, 44.9);
     assert.equal(observation.regular_price, 59.9);
+    assert.equal(firstBatchProduct(executor).origin_country, 'CL');
+    const rawPayload = firstBatchRawPayload(executor);
+    assert.equal(rawPayload.originCountry, 'CL');
+    assert.equal(rawPayload.originCountrySource, 'Chile');
   });
 
   it('materializes native Willys all-store branch product prices into daily database observations', async () => {
@@ -6278,7 +6371,8 @@ describe('daily ingestion runner', () => {
           priceValue: 70.88,
           price: '70,88 kr',
           comparePrice: '157,51 kr/kg',
-          googleAnalyticsCategory: 'Kaffe'
+          googleAnalyticsCategory: 'Kaffe',
+          labels: ['KRAV', 'Fairtrade']
         }] }), { status: 200, headers: { 'content-type': 'application/json' } });
       }
     });
@@ -6292,6 +6386,8 @@ describe('daily ingestion runner', () => {
     const observation = firstBatchObservation(executor);
     assert.equal(observation.store_id, 'store-db-2');
     assert.equal(observation.price, 70.88);
+    assert.deepEqual(firstBatchProduct(executor).is_organic, true);
+    assert.deepEqual(firstBatchRawPayload(executor).certificationLabels, ['fairtrade', 'krav']);
   });
 
   it('materializes native Willys bulk product prices into chain-level daily database observations', async () => {

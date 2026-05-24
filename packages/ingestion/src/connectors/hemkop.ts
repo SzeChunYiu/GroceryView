@@ -12,6 +12,7 @@ export type HemkopProduct = {
   unitPriceUnit: string;
   imageUrl: string;
   labels: string[];
+  certificationLabels: string[];
   online: boolean;
   outOfStock: boolean;
   sourceUrl: string;
@@ -42,6 +43,7 @@ export type HemkopWeeklyDiscount = {
   category: string;
   imageUrl: string;
   labels: string[];
+  certificationLabels: string[];
   sourceUrl: string;
   retrievedAt: string;
 };
@@ -158,6 +160,23 @@ type HemkopStoreApiRow = {
   clickAndCollect?: unknown;
   flyerURL?: unknown;
 };
+
+const AXFOOD_CERTIFICATION_LABELS: Readonly<Record<string, string>> = {
+  asc: 'asc',
+  fairtrade: 'fairtrade',
+  krav: 'krav',
+  msc: 'msc'
+};
+
+function normalizeAxfoodCertificationLabels(labels: readonly string[]): string[] {
+  const seen = new Set<string>();
+  for (const label of labels) {
+    const normalized = label.trim().toLocaleLowerCase('sv-SE').replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+    const certification = AXFOOD_CERTIFICATION_LABELS[normalized];
+    if (certification) seen.add(certification);
+  }
+  return [...seen].sort();
+}
 
 export const HEMKOP_SEARCH_BASE_URL = 'https://www.hemkop.se/search';
 export const HEMKOP_WEEKLY_DISCOUNTS_BASE_URL = 'https://www.hemkop.se/search/campaigns/offline';
@@ -718,6 +737,7 @@ export function normalizeHemkopProduct(
     unitPriceUnit: text(product.comparePriceUnit),
     imageUrl: text(product.image?.url),
     labels: stringArray(product.labels),
+    certificationLabels: normalizeAxfoodCertificationLabels(stringArray(product.labels)),
     online: product.online === true,
     outOfStock: product.outOfStock === true,
     sourceUrl,
@@ -764,6 +784,7 @@ export function normalizeHemkopWeeklyDiscount(
     category: text(product.googleAnalyticsCategory),
     imageUrl: text(product.image?.url) || text(product.thumbnail?.url),
     labels: stringArray(product.labels),
+    certificationLabels: normalizeAxfoodCertificationLabels(stringArray(product.labels)),
     sourceUrl,
     retrievedAt
   };

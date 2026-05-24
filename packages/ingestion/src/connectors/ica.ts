@@ -11,6 +11,7 @@ export type IcaProduct = {
   productUrl: string;
   packageSize: string;
   countryOfOrigin: string;
+  countryOfOriginCode: string;
   price: number | null;
   priceCurrency: string;
   unitPrice: number | null;
@@ -34,6 +35,46 @@ export const DEFAULT_ICA_STORE_ACCOUNT_ID = '1004599';
 export const DEFAULT_ICA_STORE_NAME = 'ICA Kvantum Kungsholmen';
 export const DEFAULT_ICA_REGION_ID = '6ae1c52a-99a8-4b19-9464-dd01274df39d';
 export const DEFAULT_ICA_MAX_PRODUCTS = 300;
+export const ICA_COUNTRY_OF_ORIGIN_CODES: Readonly<Record<string, string>> = {
+  belgien: 'BE',
+  brasilien: 'BR',
+  chile: 'CL',
+  colombia: 'CO',
+  costa_rica: 'CR',
+  danmark: 'DK',
+  ecuador: 'EC',
+  egypten: 'EG',
+  finland: 'FI',
+  frankrike: 'FR',
+  grekland: 'GR',
+  italien: 'IT',
+  marocko: 'MA',
+  nederlanderna: 'NL',
+  nederländerna: 'NL',
+  holland: 'NL',
+  norge: 'NO',
+  peru: 'PE',
+  polen: 'PL',
+  portugal: 'PT',
+  spanien: 'ES',
+  storbritannien: 'GB',
+  sverige: 'SE',
+  sydafrika: 'ZA',
+  turkiet: 'TR',
+  tyskland: 'DE'
+};
+
+export function normalizeIcaCountryOfOrigin(value: string): string | undefined {
+  const normalized = value
+    .trim()
+    .toLocaleLowerCase('sv-SE')
+    .normalize('NFC')
+    .replace(/[^a-zäö0-9]+/gi, '_')
+    .replace(/^_+|_+$/g, '');
+  if (!normalized || (normalized.includes('_') && !ICA_COUNTRY_OF_ORIGIN_CODES[normalized])) return undefined;
+  return ICA_COUNTRY_OF_ORIGIN_CODES[normalized];
+}
+
 
 export type IcaStoreConfig = {
   storeAccountId: string;
@@ -1818,6 +1859,7 @@ export function parseIcaStorePromotions(payload: unknown, options: ParseIcaStore
         productUrl: buildIcaStoreProductUrl(options.storeAccountId, retailerProductId),
         packageSize: text(product.packSizeDescription),
         countryOfOrigin: text(product.countryOfOrigin),
+        countryOfOriginCode: normalizeIcaCountryOfOrigin(text(product.countryOfOrigin)) ?? '',
         price: price.amount,
         priceCurrency: price.currency,
         unitPrice: unitPrice.amount,

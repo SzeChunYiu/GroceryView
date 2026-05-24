@@ -1698,7 +1698,8 @@ function willysWeeklyDiscountToDailyItem(row: WillysWeeklyDiscount): RetailerCon
     memberOnly: false,
     observedAt: row.retrievedAt,
     sourceUrl: row.sourceUrl,
-    imageUrl: row.imageUrl || undefined
+    imageUrl: row.imageUrl || undefined,
+    certificationLabels: row.certificationLabels
   };
 }
 
@@ -1720,7 +1721,8 @@ function willysStoreProductToDailyItem(row: WillysStoreProduct): RetailerConnect
     memberOnly: false,
     observedAt: row.retrievedAt,
     sourceUrl: row.sourceUrl,
-    imageUrl: row.imageUrl || undefined
+    imageUrl: row.imageUrl || undefined,
+    certificationLabels: row.certificationLabels
   };
 }
 
@@ -1741,7 +1743,8 @@ function willysBulkProductToDailyItem(row: WillysProduct): RetailerConnectorPars
     memberOnly: false,
     observedAt: row.retrievedAt,
     sourceUrl: row.sourceUrl,
-    imageUrl: row.imageUrl || undefined
+    imageUrl: row.imageUrl || undefined,
+    certificationLabels: row.certificationLabels
   };
 }
 
@@ -1764,7 +1767,8 @@ function hemkopStoreProductToDailyItem(row: HemkopStoreProduct): RetailerConnect
     memberOnly: false,
     observedAt: row.retrievedAt,
     sourceUrl: row.sourceUrl,
-    imageUrl: row.imageUrl || undefined
+    imageUrl: row.imageUrl || undefined,
+    certificationLabels: row.certificationLabels
   };
 }
 
@@ -1789,7 +1793,8 @@ function hemkopWeeklyDiscountToDailyItem(row: HemkopWeeklyDiscount): RetailerCon
     memberOnly: false,
     observedAt: row.retrievedAt,
     sourceUrl: row.sourceUrl,
-    imageUrl: row.imageUrl || undefined
+    imageUrl: row.imageUrl || undefined,
+    certificationLabels: row.certificationLabels
   };
 }
 
@@ -1815,7 +1820,9 @@ function icaProductToDailyItem(row: IcaProduct): RetailerConnectorParsedProduct 
     memberOnly: false,
     observedAt: row.retrievedAt,
     sourceUrl: row.sourceUrl,
-    imageUrl: row.imageUrl || undefined
+    imageUrl: row.imageUrl || undefined,
+    originCountry: row.countryOfOriginCode || undefined,
+    originCountrySource: row.countryOfOrigin || undefined
   };
 }
 
@@ -2662,6 +2669,8 @@ export type RetailerProductInput = {
   variant?: string;
   isOrganic?: boolean;
   originCountry?: string;
+  originCountrySource?: string;
+  certificationLabels?: string[];
   soldByWeight?: boolean;
   packageSize: number;
   packageUnit: string;
@@ -2707,6 +2716,8 @@ export type IngestedProduct = {
   variant?: string;
   isOrganic: boolean;
   originCountry?: string;
+  originCountrySource?: string;
+  certificationLabels: string[];
   packageSize: number;
   packageUnit: string;
   comparableUnit: string;
@@ -2785,7 +2796,9 @@ function validateInput(input: RetailerProductInput): void {
   if (input.validFrom !== undefined && Number.isNaN(Date.parse(input.validFrom))) throw new Error('validFrom must be an ISO date.');
   if (input.validUntil !== undefined && Number.isNaN(Date.parse(input.validUntil))) throw new Error('validUntil must be an ISO date.');
   if (input.originCountry !== undefined && !/^[a-z]{2}$/i.test(input.originCountry)) throw new Error('originCountry must be an ISO-3166 alpha-2 code.');
+  if (input.certificationLabels?.some((label) => !/^[a-z0-9_:-]+$/i.test(label))) throw new Error('certificationLabels must be stable label identifiers.');
 }
+
 
 function priceTypeForSource(input: RetailerProductInput, hasPromotion: boolean): PriceType {
   if (input.sourceType === 'estimated') return 'estimated';
@@ -2881,8 +2894,10 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
       commodityId: classification.commodityId,
       fuelGradeId: input.fuelGradeId,
       variant: input.variant,
-      isOrganic: input.isOrganic ?? (/\b(eko|ekologisk|organic)\b/i.test(input.rawName) || /\b(eko|ekologisk|organic)\b/i.test(input.canonicalName)),
+      isOrganic: input.isOrganic ?? (/\b(eko|ekologisk|organic)\b/i.test(input.rawName) || /\b(eko|ekologisk|organic)\b/i.test(input.canonicalName) || (input.certificationLabels ?? []).includes('krav')),
       originCountry: input.originCountry?.toUpperCase(),
+      originCountrySource: input.originCountrySource?.trim() || undefined,
+      certificationLabels: [...new Set(input.certificationLabels ?? [])].sort(),
       packageSize: input.packageSize,
       packageUnit: input.packageUnit,
       comparableUnit: normalized.comparableUnit,
@@ -3433,7 +3448,9 @@ async function upsertDailyProduct(executor: QueryExecutor, product: IngestedProd
          $7::text as package_unit,
          $8::text as comparable_unit,
          $9::text as domain,
-         $10::text as fuel_grade_id
+         $10::boolean as is_organic,
+         $11::text as origin_country,
+         $12::text as fuel_grade_id
      ),
      matched as (
        select input.*, coalesce(existing.slug, input.slug) as target_slug
@@ -3451,6 +3468,8 @@ async function upsertDailyProduct(executor: QueryExecutor, product: IngestedProd
          package_unit,
          comparable_unit,
          domain,
+         is_organic,
+         origin_country,
          fuel_grade_id
        )
        select
@@ -3463,6 +3482,8 @@ async function upsertDailyProduct(executor: QueryExecutor, product: IngestedProd
          package_unit,
          comparable_unit,
          domain,
+         is_organic,
+         origin_country,
          fuel_grade_id
        from matched
        on conflict (slug) do update set
@@ -3474,6 +3495,8 @@ async function upsertDailyProduct(executor: QueryExecutor, product: IngestedProd
          package_unit = excluded.package_unit,
          comparable_unit = excluded.comparable_unit,
          domain = excluded.domain,
+         is_organic = excluded.is_organic,
+         origin_country = excluded.origin_country,
          fuel_grade_id = excluded.fuel_grade_id,
          updated_at = now()
        returning id
@@ -3489,6 +3512,8 @@ async function upsertDailyProduct(executor: QueryExecutor, product: IngestedProd
       product.packageUnit,
       product.comparableUnit,
       normalizeDailyDomain(domain),
+      product.isOrganic,
+      product.originCountry ?? null,
       product.fuelGradeId ?? null
     ]
   );
@@ -3516,6 +3541,8 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
            package_unit text,
            comparable_unit text,
            domain text,
+           is_organic boolean,
+           origin_country text,
            fuel_grade_id text
          )
        ),
@@ -3542,6 +3569,8 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
            package_unit,
            comparable_unit,
            domain,
+           is_organic,
+           origin_country,
            fuel_grade_id
          from matched
          order by target_slug, slug
@@ -3557,6 +3586,8 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
            package_unit,
            comparable_unit,
            domain,
+           is_organic,
+           origin_country,
            fuel_grade_id
          )
          select
@@ -3569,6 +3600,8 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
            package_unit,
            comparable_unit,
            domain,
+           is_organic,
+           origin_country,
            fuel_grade_id
          from deduplicated
          on conflict (slug) do update set
@@ -3580,6 +3613,8 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
            package_unit = excluded.package_unit,
            comparable_unit = excluded.comparable_unit,
            domain = excluded.domain,
+           is_organic = excluded.is_organic,
+           origin_country = excluded.origin_country,
            fuel_grade_id = excluded.fuel_grade_id,
            updated_at = now()
          returning slug, id
@@ -3598,6 +3633,8 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
         package_unit: product.packageUnit ?? null,
         comparable_unit: product.comparableUnit,
         domain: normalizeDailyDomain(domain),
+        is_organic: product.isOrganic,
+        origin_country: product.originCountry ?? null,
         fuel_grade_id: product.fuelGradeId ?? null
       })))]
     );
@@ -4160,7 +4197,10 @@ async function persistDailyConnectorOutput(input: {
         priceType: accepted.priceObservation.priceType,
         price: accepted.priceObservation.price,
         isAvailable: accepted.priceObservation.isAvailable,
-        observedAt: accepted.priceObservation.observedAt
+        observedAt: accepted.priceObservation.observedAt,
+        originCountry: accepted.product.originCountry,
+        originCountrySource: accepted.product.originCountrySource,
+        certificationLabels: accepted.product.certificationLabels
       };
       const rawProvenance = {
         sourceType: accepted.priceObservation.provenance.sourceType,
@@ -4186,7 +4226,9 @@ async function persistDailyConnectorOutput(input: {
           storeId: accepted.priceObservation.storeId ?? null,
           observedAt: accepted.priceObservation.observedAt,
           price: accepted.priceObservation.price,
-          isAvailable: accepted.priceObservation.isAvailable
+          isAvailable: accepted.priceObservation.isAvailable,
+          originCountry: accepted.product.originCountry ?? null,
+          certificationLabels: accepted.product.certificationLabels
         }),
         provenance: rawProvenance
       });
