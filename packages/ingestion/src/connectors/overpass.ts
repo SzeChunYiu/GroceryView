@@ -42,6 +42,26 @@ export type OverpassFuelStation = {
   retrievedAt: string;
 };
 
+export type OverpassPoiAuditKind = 'shop' | 'amenity';
+
+export type OverpassPoiAudit = {
+  osmType: OsmType;
+  osmId: number;
+  name: string;
+  brand: string;
+  operator: string;
+  kind: OverpassPoiAuditKind;
+  category: string;
+  latitude: number;
+  longitude: number;
+  street: string;
+  houseNumber: string;
+  postcode: string;
+  city: string;
+  sourceUrl: string;
+  retrievedAt: string;
+};
+
 type OverpassElement = {
   type?: unknown;
   id?: unknown;
@@ -90,6 +110,18 @@ area["ISO3166-1"="SE"][admin_level=2]->.searchArea;
   node["amenity"="fuel"](area.searchArea);
   way["amenity"="fuel"](area.searchArea);
   relation["amenity"="fuel"](area.searchArea);
+);
+out center tags;`;
+
+export const SWEDEN_POI_AUDIT_OVERPASS_QUERY = `[out:json][timeout:180];
+area["ISO3166-1"="SE"][admin_level=2]->.searchArea;
+(
+  node["shop"~"^(supermarket|convenience|grocery|deli|greengrocer|butcher|bakery)$"](area.searchArea);
+  way["shop"~"^(supermarket|convenience|grocery|deli|greengrocer|butcher|bakery)$"](area.searchArea);
+  relation["shop"~"^(supermarket|convenience|grocery|deli|greengrocer|butcher|bakery)$"](area.searchArea);
+  node["amenity"~"^(pharmacy|fuel)$"](area.searchArea);
+  way["amenity"~"^(pharmacy|fuel)$"](area.searchArea);
+  relation["amenity"~"^(pharmacy|fuel)$"](area.searchArea);
 );
 out center tags;`;
 
@@ -232,6 +264,76 @@ export async function fetchOverpassFuelStations(options: FetchOverpassFuelStatio
 
   const payload = await response.json() as OverpassResponse;
   return parseOverpassFuelStations(payload, retrievedAt);
+}
+
+export type FetchOverpassPoiAuditOptions = {
+  fetchImpl?: typeof fetch;
+  query?: string;
+  retrievedAt?: string;
+};
+
+export async function fetchOverpassPoiAudit(options: FetchOverpassPoiAuditOptions = {}): Promise<OverpassPoiAudit[]> {
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const query = options.query ?? SWEDEN_POI_AUDIT_OVERPASS_QUERY;
+  const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+  const body = new URLSearchParams({ data: query });
+  const response = await fetchImpl(OVERPASS_INTERPRETER_URL, {
+    method: 'POST',
+    body,
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/x-www-form-urlencoded;charset=UTF-8',
+      'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`Overpass POI audit request failed: ${response.status}`);
+  }
+
+  const payload = await response.json() as OverpassResponse;
+  return parseOverpassPoiAudit(payload, retrievedAt);
+}
+
+export function parseOverpassPoiAudit(payload: OverpassResponse, retrievedAt: string): OverpassPoiAudit[] {
+  return (payload.elements ?? [])
+    .map((element) => normalizeOverpassPoiAuditElement(element, retrievedAt))
+    .filter((poi): poi is OverpassPoiAudit => poi !== null);
+}
+
+export function normalizeOverpassPoiAuditElement(element: OverpassElement, retrievedAt: string): OverpassPoiAudit | null {
+  const osmType = asOsmType(element.type);
+  const osmId = typeof element.id === 'number' ? element.id : null;
+  const tags = element.tags ?? {};
+  const latitude = numberOrNull(element.lat) ?? numberOrNull(element.center?.lat);
+  const longitude = numberOrNull(element.lon) ?? numberOrNull(element.center?.lon);
+  const shop = text(tags.shop);
+  const amenity = text(tags.amenity);
+  const kind: OverpassPoiAuditKind | null = shop ? 'shop' : amenity ? 'amenity' : null;
+  const category = shop || amenity;
+  const name = text(tags.name) || text(tags.brand) || text(tags.operator) || `${category} ${osmType}/${osmId}`;
+
+  if (!osmType || osmId === null || latitude === null || longitude === null || !kind || !category) {
+    return null;
+  }
+
+  return {
+    osmType,
+    osmId,
+    name,
+    brand: text(tags.brand),
+    operator: text(tags.operator),
+    kind,
+    category,
+    latitude,
+    longitude,
+    street: text(tags['addr:street']),
+    houseNumber: text(tags['addr:housenumber']),
+    postcode: text(tags['addr:postcode']),
+    city: text(tags['addr:city']),
+    sourceUrl: OVERPASS_INTERPRETER_URL,
+    retrievedAt
+  };
 }
 
 export function parseOverpassFuelStations(payload: OverpassResponse, retrievedAt: string): OverpassFuelStation[] {
