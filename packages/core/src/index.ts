@@ -1,3 +1,4 @@
+export * from './lib/rankers/nearby.js';
 export type DealScoreInput = {
   currentCityPercentile: number;
   knownPromoHistoryPercentile: number;
