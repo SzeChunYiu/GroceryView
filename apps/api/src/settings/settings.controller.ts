@@ -1,11 +1,17 @@
-import { Body, Controller, Delete, Get, HttpCode, Patch, Req, ServiceUnavailableException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Req, ServiceUnavailableException, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { planAccountDeletion } from '@groceryview/core';
-import { IsArray, IsIn, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsIn, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { AuthGuard, authenticatedUserId, type AuthenticatedRequest } from '../middleware/auth.js';
 import { settingsRoutes } from '../routes/settings.js';
 import { buildDemoUserDataExport } from './data-export.js';
 import { allowedNotificationChannels, allowedPreferenceCurrencies, SettingsService } from './settings.service.js';
+
+class ApiKeyCreateDto {
+  @IsString()
+  @IsNotEmpty()
+  label!: string;
+}
 
 class SettingsPatchDto {
   @IsOptional()
@@ -47,6 +53,37 @@ export class AuthenticatedSettingsController {
       throw new ServiceUnavailableException('DATABASE_URL is required to save authenticated settings.');
     }
     return this.settings.savePreferences(authenticatedUserId(request), body);
+  }
+
+  @Get(settingsRoutes.apiKeys)
+  @UseGuards(AuthGuard)
+  @ApiOkResponse({ description: settingsRoutes.apiKeysReadDescription })
+  async listApiKeys(@Req() request: AuthenticatedRequest) {
+    if (!this.settings.isConfigured()) {
+      throw new ServiceUnavailableException('DATABASE_URL is required to read authenticated API keys.');
+    }
+    return this.settings.listApiKeys(authenticatedUserId(request));
+  }
+
+  @Post(settingsRoutes.apiKeys)
+  @UseGuards(AuthGuard)
+  @ApiOkResponse({ description: settingsRoutes.apiKeysCreateDescription })
+  async createApiKey(@Req() request: AuthenticatedRequest, @Body() body: ApiKeyCreateDto) {
+    if (!this.settings.isConfigured()) {
+      throw new ServiceUnavailableException('DATABASE_URL is required to create authenticated API keys.');
+    }
+    return this.settings.createApiKey(authenticatedUserId(request), body.label);
+  }
+
+  @Delete(settingsRoutes.apiKey)
+  @HttpCode(200)
+  @UseGuards(AuthGuard)
+  @ApiOkResponse({ description: settingsRoutes.apiKeysRevokeDescription })
+  async revokeApiKey(@Req() request: AuthenticatedRequest, @Param('keyId') keyId: string) {
+    if (!this.settings.isConfigured()) {
+      throw new ServiceUnavailableException('DATABASE_URL is required to revoke authenticated API keys.');
+    }
+    return this.settings.revokeApiKey(authenticatedUserId(request), keyId);
   }
 }
 

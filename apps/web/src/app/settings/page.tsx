@@ -1,4 +1,5 @@
 import { buildPrivacyExport } from '@groceryview/core';
+import Link from 'next/link';
 import { SettingsDataExportActions } from '@/components/settings-data-export-actions';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { routeMetadata } from '@/lib/seo';
@@ -37,6 +38,17 @@ export default function SettingsPage() {
       </p>
 
       <SettingsDataExportActions />
+
+      <Card className="mt-6 border-sky-200 bg-sky-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-900">Developer API access</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Generate and revoke API keys</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+          Advanced users can create a plaintext GroceryView API key once, review stored key prefixes, and revoke developer access from their signed-in settings.
+        </p>
+        <Link className="mt-4 inline-flex rounded-full bg-sky-700 px-5 py-3 text-sm font-black text-white shadow-sm transition hover:bg-sky-800" href="/settings/api-keys">
+          Manage API keys
+        </Link>
+      </Card>
 
       <Card className="mt-6 border-amber-200 bg-amber-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-900">Form error announcements</p>
