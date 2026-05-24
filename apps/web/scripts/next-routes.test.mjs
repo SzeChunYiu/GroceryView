@@ -1786,6 +1786,32 @@ describe('verified-data UI', () => {
     assert.match(sitemap, /entry\('\/seasonal-calendar'/);
   });
 
+  it('surfaces holiday sale pattern detection on item pages without unsupported forecast claims', async () => {
+    const analytics = await read('../../packages/analytics/src/seasonality.ts');
+    const analyticsPackage = await read('../../packages/analytics/package.json');
+    const itemPage = await read('src/app/items/[id]/page.tsx');
+    const productPage = await read('src/app/products/[slug]/page.tsx');
+    const itemsRoute = await read('../../apps/api/src/routes/items.ts');
+
+    assert.match(analyticsPackage, /@groceryview\/analytics/);
+    assert.match(analytics, /export function detectSeasonalSalePattern/);
+    assert.match(analytics, /midsommarSeasonalHoliday/);
+    assert.match(analytics, /leadWindowDays/);
+    assert.match(analytics, /Likely on sale before Midsommar/);
+    assert.match(analytics, /minSeasonCount/);
+    assert.match(itemPage, /products\/\[slug\]\/page/);
+    assert.match(itemPage, /generateProductMetadata/);
+    assert.match(productPage, /detectSeasonalSalePattern/);
+    assert.match(productPage, /midsommarSeasonalHoliday/);
+    assert.match(productPage, /seasonalSalePattern/);
+    assert.match(productPage, /Likely on sale before Midsommar/);
+    assert.match(productPage, /explicit historical holiday-window price evidence/);
+    assert.match(itemsRoute, /itemsRoutes/);
+    assert.match(itemsRoute, /seasonalSalePattern/);
+    assert.match(itemsRoute, /midsommar/);
+    assert.match(itemsRoute, /holidayWindow/);
+  });
+
   it('surfaces eco-conscious local and seasonal picks without origin or carbon invention', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/seasonal-calendar/page.tsx');
@@ -2963,6 +2989,7 @@ ${seo}`;
       'src/app/favorites/page.tsx',
       'src/app/household/page.tsx',
       'src/app/items/page.tsx',
+      'src/app/items/[id]/page.tsx',
       'src/app/login/page.tsx',
       'src/app/map/page.tsx',
       'src/app/meal-planner/page.tsx',

@@ -9,6 +9,7 @@ import {
   summarizePriceHistoryConfidence,
   type BrandTier
 } from '@groceryview/core';
+import { detectSeasonalSalePattern, midsommarSeasonalHoliday } from '@groceryview/analytics';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
 import { axfoodProducts } from '@/lib/axfood-products';
@@ -772,6 +773,20 @@ function seasonalMonthlyAveragesFor(product: NonNullable<ReturnType<typeof findP
   };
 }
 
+function seasonalSalePatternFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+  return detectSeasonalSalePattern({
+    productId: product.slug,
+    productName: product.name,
+    holiday: midsommarSeasonalHoliday,
+    observations: 'lowestPrice' in product
+      ? []
+      : product.observations.map((observation) => ({
+        observedAt: observation.date,
+        price: observation.price
+      }))
+  });
+}
+
 function crossChainHistoryOverlayFor(product: NonNullable<ReturnType<typeof findProduct>>) {
   const emptyCrossChainOverlaySeries: {
     chainLabel: string;
@@ -1016,6 +1031,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const priceChangeLog = priceChangeEventLogFor(product);
   const priceMoveNotes = priceMoveNotesFor(product);
   const monthlySeasonality = seasonalMonthlyAveragesFor(product);
+  const seasonalSalePattern = seasonalSalePatternFor(product);
   const crossChainHistoryOverlay = crossChainHistoryOverlayFor(product);
   const intraChainBranchSpread = intraChainBranchSpreadFor(product);
   const priceChartTerminal = priceChartTerminalFor(product);
@@ -1382,6 +1398,49 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           <p className="mt-5 rounded-2xl bg-white/85 p-4 text-sm font-bold text-amber-950">{monthlySeasonality.detail}</p>
         )}
         <p className="mt-4 text-xs font-semibold leading-5 text-slate-600">{monthlySeasonality.detail}</p>
+      </Card>
+      <Card className="mt-6 overflow-hidden border-lime-200 bg-lime-50/80">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-lime-800">seasonalSalePattern · Midsommar</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Holiday sale pattern detection</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              {seasonalSalePattern.available
+                ? 'Likely on sale before Midsommar, based on repeated historical holiday-window discounts.'
+                : seasonalSalePattern.detail}
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-lime-900">
+            {seasonalSalePattern.qualifiedSeasonCount}/{seasonalSalePattern.holiday.minSeasonCount} discounted windows · {seasonalSalePattern.windowLabel}
+          </p>
+        </div>
+        {seasonalSalePattern.available ? (
+          <div className="mt-5 grid gap-3 lg:grid-cols-[0.8fr_1.2fr]">
+            <div className="rounded-2xl bg-white/90 p-4 shadow-sm">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-800">{seasonalSalePattern.hint}</p>
+              <p className="mt-2 text-3xl font-black text-slate-950">{formatPct(seasonalSalePattern.averageDiscountPercent)} avg historical discount</p>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+                Best holiday-window price: {formatSek(seasonalSalePattern.bestObservedPrice)} on {seasonalSalePattern.bestObservedAt ?? 'Not reported'}.
+              </p>
+              <p className="mt-3 text-xs font-black uppercase tracking-[0.16em] text-slate-500">{seasonalSalePattern.evidenceLabel}</p>
+            </div>
+            <div className="grid gap-3 md:grid-cols-2">
+              {seasonalSalePattern.evidence.map((row) => (
+                <div className="rounded-2xl bg-white/90 p-4 shadow-sm" key={`${row.year}-${row.observedAt}`}>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-800">{row.year} · {row.daysBeforeHoliday} days before Midsommar</p>
+                  <p className="mt-2 text-2xl font-black text-slate-950">{formatSek(row.price)}</p>
+                  <p className="mt-2 text-sm font-bold text-slate-700">{formatPct(row.discountPercent)} below non-holiday median</p>
+                  <p className="mt-2 text-xs font-semibold text-slate-500">Observed at {row.observedAt}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <p className="mt-5 rounded-2xl bg-white/85 p-4 text-sm font-bold text-lime-950">{seasonalSalePattern.detail}</p>
+        )}
+        <p className="mt-4 text-xs font-semibold leading-5 text-slate-600">
+          Requires explicit historical holiday-window price evidence before showing a hint. {seasonalSalePattern.guardrail}
+        </p>
       </Card>
       <Card className="mt-6 border-indigo-200 bg-indigo-50/70">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">

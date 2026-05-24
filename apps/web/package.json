@@ -12,6 +12,7 @@
     "test": "node --test scripts/*.test.mjs"
   },
   "dependencies": {
+    "@groceryview/analytics": "0.1.0",
     "@groceryview/api": "0.1.0",
     "@groceryview/catalog": "0.1.0",
     "@groceryview/core": "0.1.0",
