@@ -172,6 +172,15 @@ export function ProductPriceCards({
                 {card.isAvailable === false ? (
                   <span className="rounded-full bg-rose-100 px-3 py-1 text-[0.7rem] font-black text-rose-900">Out of stock</span>
                 ) : null}
+                {card.priceDropBadge ? (
+                  <span
+                    aria-label={`${card.name} ${card.priceDropLabel ?? '30-day price drop from price_history'}`}
+                    className="rounded-full bg-emerald-100 px-3 py-1 text-[0.7rem] font-black text-emerald-950"
+                    title={`30-day price drop from price_history${card.priceDropAnchorDate ? ` since ${card.priceDropAnchorDate}` : ''}`}
+                  >
+                    {card.priceDropBadge}
+                  </span>
+                ) : null}
                 <span className="rounded-full bg-white px-3 py-1 text-[0.7rem] font-black text-slate-700">{resolvedMode(card, compareMode)}</span>
               </div>
             </div>
