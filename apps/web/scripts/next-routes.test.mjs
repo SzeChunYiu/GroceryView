@@ -6,6 +6,7 @@ const appFiles = [
   'src/app/page.tsx',
   'src/app/products/page.tsx',
   'src/app/products/[slug]/page.tsx',
+  'src/app/product/[id]/page.tsx',
   'src/app/stores/page.tsx',
   'src/app/stores/[slug]/page.tsx',
   'src/app/categories/page.tsx',
@@ -806,6 +807,33 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('ships a no-persistence cross-chain basket calculator from DB-backed current prices', async () => {
+    const route = await read('src/app/basket/page.tsx');
+    const calculator = await read('src/components/basket-calculator.tsx');
+    const seo = await read('src/lib/seo.ts');
+    const nav = await read('src/components/app-nav.tsx');
+
+    assert.match(route, /BasketCalculator/);
+    assert.match(route, /topChainSpreads\.slice\(0, 12\)/);
+    assert.match(route, /chainPriceRows\(product\)/);
+    assert.match(route, /postgres\.latest_prices/);
+    assert.match(route, /@\/lib\/verified-data/);
+    assert.doesNotMatch(route, /@\/lib\/demo-data/);
+    assert.doesNotMatch(route, /@\/components\/sample-data/);
+
+    assert.match(calculator, /'use client'/);
+    assert.match(calculator, /useState/);
+    assert.match(calculator, /compareBasketStrategies/);
+    assert.match(calculator, /summarizeStoreBasketCoverage/);
+    assert.match(calculator, /Best full-chain total/);
+    assert.match(calculator, /Cheapest split basket/);
+    assert.match(calculator, /No state persistence/);
+    assert.doesNotMatch(calculator, /localStorage|sessionStorage/);
+
+    assert.match(seo, /'\/basket'/);
+    assert.match(nav, /href: '\/basket'/);
+  });
+
   it('surfaces a budget stretch-krona basket optimizer using real basket strategy output', async () => {
     const source = await read('src/app/weekly-basket/page.tsx');
     const demo = await read('src/lib/demo-data.ts');
@@ -874,6 +902,7 @@ describe('verified-data UI', () => {
 
   it('surfaces cross-chain commodity comparison by comparable unit on compare and product routes', async () => {
     const verified = await read('src/lib/verified-data.ts');
+    const chainCompare = await read('src/lib/chain-compare.ts');
     const compare = await read('src/app/compare/page.tsx');
     const product = await read('src/app/products/[slug]/page.tsx');
 
@@ -881,8 +910,14 @@ describe('verified-data UI', () => {
     assert.match(verified, /commodityComparisons/);
     assert.match(verified, /commodityComparisonForProduct/);
     assert.match(verified, /commodity\/alias match/);
+    assert.match(chainCompare, /commodityComparisonForProduct/);
+    assert.match(chainCompare, /matchType: 'commodity_alias'/);
+    assert.match(chainCompare, /unitLabel: `commodity\/alias kr\/\$\{comparableUnit\}`/);
     assert.match(compare, /commodityComparisons/);
     assert.match(compare, /Cross-chain commodity comparison/);
+    assert.match(compare, /Commodity\/alias unit-price matches/);
+    assert.match(compare, /Packaged\/barcode matches/);
+    assert.match(compare, /sourceConfidence \{formatPct\(cell\.sourceConfidence \* 100\)\}/);
     assert.match(compare, /kr\/\{comparison\.comparableUnit\}/);
     assert.match(product, /commodityComparisonForProduct/);
     assert.match(product, /Cheapest chain for this commodity/);
@@ -2380,7 +2415,9 @@ ${seo}`;
     assert.match(route, /productsParam/);
     assert.match(route, /Chain comparison table/);
     assert.match(route, /<table/);
-    assert.match(route, /comparison\.products\.map/);
+    assert.match(route, /comparison\.products\.filter/);
+    assert.match(route, /rowSections\.map/);
+    assert.match(route, /section\.rows\.map/);
     assert.match(route, /ICA/);
     assert.match(route, /Willys/);
     assert.match(route, /Coop/);
@@ -2612,6 +2649,25 @@ ${seo}`;
     assert.match(productRoute, /'@type': 'BreadcrumbList'/);
     assert.match(productRoute, /application\/ld\+json/);
     assert.doesNotMatch(productRoute, /@\/lib\/demo-data|@\/components\/sample-data/);
+  });
+
+  it('ships a product detail alias with visible image, current chain prices, and full price-history chart', async () => {
+    const canonicalProductRoute = await read('src/app/products/[slug]/page.tsx');
+    const singularProductRoute = await read('src/app/product/[id]/page.tsx');
+
+    assert.match(singularProductRoute, /ProductPage/);
+    assert.match(singularProductRoute, /generateProductMetadata/);
+    assert.match(singularProductRoute, /params\.then\(\(\{ id \}\) => \(\{ slug: id \}\)\)/);
+
+    assert.match(canonicalProductRoute, /<img/);
+    assert.match(canonicalProductRoute, /src=\{product\.image/);
+    assert.match(canonicalProductRoute, /alt=\{product\.name\}/);
+    assert.match(canonicalProductRoute, /Primary price evidence/);
+    assert.match(canonicalProductRoute, /Chain price rows/);
+    assert.match(canonicalProductRoute, /chainPriceRows\(product\)/);
+    assert.match(canonicalProductRoute, /PriceChartTerminal/);
+    assert.match(canonicalProductRoute, /rangeDays: 90/);
+    assert.doesNotMatch(canonicalProductRoute, /@\/lib\/demo-data|@\/components\/sample-data/);
   });
 
   it('renders category pages with a DB hierarchy-backed breadcrumb component', async () => {
@@ -2900,6 +2956,28 @@ ${seo}`;
     assert.match(maskableIcon, /maskable GroceryView icon/);
   });
 
+  it('registers a service worker that caches the last 50 item pages for offline browsing', async () => {
+    assert.equal(await fileExists('public/sw.js'), true, 'service worker should be served from /sw.js');
+    assert.equal(await fileExists('src/lib/swRegister.ts'), true, 'browser registration helper should exist');
+
+    const worker = await read('public/sw.js');
+    const registrar = await read('src/lib/swRegister.ts');
+    const layout = await read('src/app/layout.tsx');
+
+    assert.match(worker, /MAX_ITEM_PAGE_CACHE_ENTRIES = 50/);
+    assert.match(worker, /ITEM_PAGE_CACHE_NAME/);
+    assert.match(worker, /isItemPageRequest/);
+    assert.match(worker, /\\\/products\\\/\[\^\/\]\+/);
+    assert.match(worker, /\\\/product\\\/\[\^\/\]\+/);
+    assert.match(worker, /trimItemPageCache/);
+    assert.match(worker, /cache\.keys\(\)/);
+    assert.match(worker, /event\.respondWith/);
+    assert.match(worker, /ignoreSearch: true/);
+    assert.match(registrar, /navigator\.serviceWorker\.register\('\/sw\.js'/);
+    assert.match(registrar, /ServiceWorkerRegistrar/);
+    assert.match(layout, /ServiceWorkerRegistrar/);
+  });
+
 
   it('ships dynamic product OG price images from verified price data', async () => {
     const ogPath = 'src/app/products/[slug]/opengraph-image.tsx';
@@ -3094,6 +3172,9 @@ ${seo}`;
     assert.match(verified, /imageAlt/);
     assert.match(verified, /sparklinePoints/);
     assert.match(verified, /sparklineWindowDays: 7/);
+    assert.match(verified, /priceDropFromThirtyDayHistory/);
+    assert.match(verified, /currentPrice - price30dAgo/);
+    assert.match(verified, /priceDropBadge/);
     assert.match(verified, /isAvailable/);
     assert.match(products, /ProductPriceCards/);
     assert.match(products, /adaptiveProductCards/);
@@ -3108,6 +3189,9 @@ ${seo}`;
     assert.match(cards, /next\/image/);
     assert.match(cards, /<Image/);
     assert.match(cards, /PriceHistorySparkline/);
+    assert.match(cards, /card\.priceDropBadge/);
+    assert.match(cards, /30-day price drop from price_history/);
+    assert.match(cards, /bg-emerald-100/);
     assert.match(cards, /<svg/);
     assert.match(cards, /7-day price history/);
     assert.match(cards, /Compare by:/);
@@ -3298,11 +3382,18 @@ ${seo}`;
 
   it('surfaces brand-tier indices on the chain index route using the real core brand-tier output', async () => {
     const source = await read('src/app/chain-index/page.tsx');
+    const chainData = await read('src/lib/chain-index-data.ts');
+    assert.match(source, /ConfidenceBadge/);
     assert.match(source, /calculateBrandTierIndices/);
     assert.match(source, /buildBrandTierPriceObservations/);
+    assert.match(source, /brandTierObservations/);
     assert.match(source, /brandTierSummary/);
+    assert.match(source, /brandTierConfidenceLevel/);
     assert.match(source, /privateLabelSavingsPercent/);
     assert.match(source, /premiumGapPercent/);
+    assert.match(chainData, /axfoodProducts\.filter/);
+    assert.match(chainData, /product\.inChains\.length > 1/);
+    assert.doesNotMatch(chainData, /const BRAND_TIER_OBSERVATIONS/);
   });
 
   it('refines the chain index with matched-basket observations on the 100-centred scale', async () => {
@@ -3499,8 +3590,12 @@ ${seo}`;
 
   it('ships locale-aware money date and unit formatters for observation currencies', async () => {
     const i18n = await read('src/lib/i18n.ts');
+    const unitPriceFormatting = await read('src/lib/unit-price-formatting.js');
     const verified = await read('src/lib/verified-data.ts');
     const marketShell = await read('src/components/market-shell.tsx');
+    const compareRoute = await read('src/app/compare/page.tsx');
+    const productDetailRoute = await read('src/app/products/[slug]/page.tsx');
+    const screenerRoute = await read('src/app/screener/page.tsx');
 
     assert.match(i18n, /supportedCurrencies = \['SEK', 'NOK', 'DKK', 'EUR', 'ISK'\]/);
     assert.match(i18n, /export type SupportedCurrency/);
@@ -3509,15 +3604,27 @@ ${seo}`;
     assert.match(i18n, /formatLocalizedMoney/);
     assert.match(i18n, /formatLocalizedDate/);
     assert.match(i18n, /formatLocalizedUnitPrice/);
+    assert.match(i18n, /formatLocalizedPer100gUnitPrice/);
+    assert.match(i18n, /unknownUnitPriceLabel/);
+    assert.match(unitPriceFormatting, /Jämförpris saknas/);
+    assert.match(unitPriceFormatting, /formatUnitPriceLabel/);
+    assert.match(unitPriceFormatting, /formatSourceUnitPriceText/);
+    assert.match(unitPriceFormatting, /formatPer100gUnitPriceLabel/);
     assert.match(i18n, /Intl\.NumberFormat\(localeOption\.htmlLang/);
+    assert.match(verified, /unknownUnitPriceLabel/);
+    assert.match(verified, /formatSourceUnitPriceText/);
     assert.match(verified, /formatLocalizedMoney/);
     assert.match(verified, /formatLocalizedDate/);
     assert.match(verified, /formatLocalizedUnitPrice/);
+    assert.doesNotMatch(verified, /Unit price not reported|No current price row|Jämförpris not reported/);
     assert.match(verified, /localeFormattingShowcase/);
     assert.match(verified, /currencyFromObservation\(\{ currency: 'SEK' \}\)/);
     assert.match(marketShell, /localeFormattingShowcase/);
     assert.match(marketShell, /Multi-currency display follows observation currency/);
     assert.match(marketShell, /SEK · NOK · DKK · EUR · ISK/);
     assert.match(marketShell, /No currency conversion or fake price/);
+    assert.match(compareRoute, /formatComparableUnitPrice/);
+    assert.match(productDetailRoute, /formatComparableUnitPrice/);
+    assert.match(screenerRoute, /formatLocalizedUnitPrice/);
   });
 });

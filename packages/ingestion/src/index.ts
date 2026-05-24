@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { dirname } from 'node:path';
+import { dirname, join } from 'node:path';
 import {
   createPgQueryExecutor,
   createPostgresPriceObservationWriter,
@@ -15,9 +15,15 @@ import {
 } from '@groceryview/db';
 import { COMMODITIES, findCommodity, type Commodity } from '@groceryview/catalog';
 import {
+  cacheAndRewriteProductImages,
+  type ImageCacheOptions as ProductImageCacheOptions,
+  type ImageCacheProduct
+} from '@groceryview/image-cache';
+import {
   fetchCityGrossProductsForAllStores,
   type CityGrossProduct
 } from './connectors/citygross.js';
+import { fetchCityGrossBulkProducts } from './connectors/citygross-bulk.js';
 import type { AllStoreTaskRunnerControls } from './connectors/all-store-runner.js';
 import {
   fetchCoopProductsForAllStores,
@@ -63,6 +69,10 @@ import {
   type FuelPriceObservation
 } from './connectors/okq8-fuel.js';
 import {
+  fetchMathemProducts,
+  type MathemProduct
+} from './connectors/mathem.js';
+import {
   fetchMatsparProducts,
   MATSPAR_MINIMUM_ROWS,
   type MatsparProduct
@@ -81,6 +91,7 @@ export * from './connectors/all-store-runner.js';
 export * from './connectors/overpass.js';
 export * from './connectors/fuel-stations.js';
 export * from './connectors/citygross.js';
+export * from './connectors/citygross-bulk.js';
 export * from './connectors/coop.js';
 export * from './connectors/hemkop.js';
 export * from './connectors/ica.js';
@@ -1686,7 +1697,8 @@ function willysWeeklyDiscountToDailyItem(row: WillysWeeklyDiscount): RetailerCon
     promoText: row.conditionText || row.priceText || undefined,
     memberOnly: false,
     observedAt: row.retrievedAt,
-    sourceUrl: row.sourceUrl
+    sourceUrl: row.sourceUrl,
+    imageUrl: row.imageUrl || undefined
   };
 }
 
@@ -1707,7 +1719,8 @@ function willysStoreProductToDailyItem(row: WillysStoreProduct): RetailerConnect
     price: row.price,
     memberOnly: false,
     observedAt: row.retrievedAt,
-    sourceUrl: row.sourceUrl
+    sourceUrl: row.sourceUrl,
+    imageUrl: row.imageUrl || undefined
   };
 }
 
@@ -1727,7 +1740,8 @@ function willysBulkProductToDailyItem(row: WillysProduct): RetailerConnectorPars
     price: row.price,
     memberOnly: false,
     observedAt: row.retrievedAt,
-    sourceUrl: row.sourceUrl
+    sourceUrl: row.sourceUrl,
+    imageUrl: row.imageUrl || undefined
   };
 }
 
@@ -1749,7 +1763,8 @@ function hemkopStoreProductToDailyItem(row: HemkopStoreProduct): RetailerConnect
     price: row.price,
     memberOnly: false,
     observedAt: row.retrievedAt,
-    sourceUrl: row.sourceUrl
+    sourceUrl: row.sourceUrl,
+    imageUrl: row.imageUrl || undefined
   };
 }
 
@@ -1773,7 +1788,8 @@ function hemkopWeeklyDiscountToDailyItem(row: HemkopWeeklyDiscount): RetailerCon
     promoText: row.conditionText || row.priceText || undefined,
     memberOnly: false,
     observedAt: row.retrievedAt,
-    sourceUrl: row.sourceUrl
+    sourceUrl: row.sourceUrl,
+    imageUrl: row.imageUrl || undefined
   };
 }
 
@@ -1798,7 +1814,8 @@ function icaProductToDailyItem(row: IcaProduct): RetailerConnectorParsedProduct 
     promoText: row.promotionDescription || undefined,
     memberOnly: false,
     observedAt: row.retrievedAt,
-    sourceUrl: row.sourceUrl
+    sourceUrl: row.sourceUrl,
+    imageUrl: row.imageUrl || undefined
   };
 }
 
@@ -1847,7 +1864,8 @@ function coopStoreProductToDailyItem(row: CoopStoreProduct): RetailerConnectorPa
     memberOnly: row.medMeraRequired,
     isAvailable: row.availableOnline,
     observedAt: row.retrievedAt,
-    sourceUrl: row.sourceUrl
+    sourceUrl: row.sourceUrl,
+    imageUrl: row.imageUrl || undefined
   };
 }
 
@@ -1868,7 +1886,8 @@ function lidlStoreOfferToDailyItem(row: LidlStoreOffer): RetailerConnectorParsed
     promoText: row.promotionText || undefined,
     memberOnly: row.memberOnly,
     observedAt: row.retrievedAt,
-    sourceUrl: row.sourceUrl
+    sourceUrl: row.sourceUrl,
+    imageUrl: row.imageUrl || undefined
   };
 }
 
@@ -1891,7 +1910,8 @@ function cityGrossProductToDailyItem(row: CityGrossProduct): RetailerConnectorPa
     promoText: row.regularPrice !== null && row.regularPrice > row.price ? 'City Gross discounted public price' : undefined,
     memberOnly: false,
     observedAt: row.retrievedAt,
-    sourceUrl: row.sourceUrl
+    sourceUrl: row.sourceUrl,
+    imageUrl: row.imageUrl || undefined
   };
 }
 
@@ -1921,6 +1941,36 @@ function matsparProductToDailyItem(row: MatsparProduct): RetailerConnectorParsed
     isAvailable: true,
     observedAt: row.retrievedAt,
     sourceUrl: row.productUrl || row.sourceUrl
+  };
+}
+
+function mathemCategoryId(row: MathemProduct): string {
+  try {
+    const query = new URL(row.sourceUrl).searchParams.get('q');
+    if (query?.trim()) return `mathem-${stableKeyPart(query)}`;
+  } catch {
+    // Keep a stable category even if a captured row has a malformed source URL.
+  }
+  return 'mathem-public-search';
+}
+
+function mathemProductToDailyItem(row: MathemProduct): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageText);
+  return {
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: `mathem-${stableKeyPart(row.code)}`,
+    categoryId: mathemCategoryId(row),
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price,
+    memberOnly: false,
+    isAvailable: row.available,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.productUrl || row.sourceUrl,
+    imageUrl: row.imageUrl || undefined
   };
 }
 
@@ -1971,7 +2021,8 @@ function pharmacyProductToDailyItem(row: ApohemProduct): RetailerConnectorParsed
     memberOnly: false,
     isAvailable: availabilityFromStockStatus(row.stockStatus) ?? true,
     observedAt: row.retrievedAt,
-    sourceUrl: row.sourceUrl
+    sourceUrl: row.sourceUrl,
+    imageUrl: row.imageUrl || undefined
   };
 }
 
@@ -2148,6 +2199,22 @@ export async function fetchDailyConnectorSnapshot(
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(lidlStoreOfferToDailyItem) });
   }
 
+  if (sourceUrl === GROCERYVIEW_DAILY_CITY_GROSS_BULK_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_CITY_GROSS_BULK_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchCityGrossBulkProducts({
+      ...runnerControlsFromUrl(url),
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxStores: dailyNativeNumberParam(url, 'maxStores'),
+      maxRowsPerStore: dailyNativeNumberParam(url, 'maxRowsPerStore'),
+      minRows: dailyNativeNumberParam(url, 'minRows'),
+      pageSize: dailyNativeNumberParam(url, 'pageSize'),
+      queries: dailyNativeStringListParam(url, 'queries'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(cityGrossProductToDailyItem) });
+  }
+
   if (sourceUrl === GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL}?`)) {
     const url = new URL(sourceUrl);
     const retrievedAt = options.retrievedAt ?? new Date().toISOString();
@@ -2161,6 +2228,19 @@ export async function fetchDailyConnectorSnapshot(
       retrievedAt
     });
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(cityGrossProductToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchMathemProducts({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      queries: dailyNativeStringListParam(url, 'queries'),
+      pages: dailyNativeNumberListParam(url, 'pages'),
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(mathemProductToDailyItem) });
   }
 
   if (sourceUrl === GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL}?`)) {
@@ -2402,7 +2482,8 @@ export function parseRetailerProductJsonSnapshot(snapshot: RetailerConnectorSnap
       validFrom: optionalString(record, 'validFrom', path),
       validUntil: optionalString(record, 'validUntil', path),
       observedAt: optionalString(record, 'observedAt', path),
-      sourceUrl: optionalString(record, 'sourceUrl', path)
+      sourceUrl: optionalString(record, 'sourceUrl', path),
+      imageUrl: optionalString(record, 'imageUrl', path)
     };
   });
 }
@@ -2592,6 +2673,7 @@ export type RetailerProductInput = {
   validFrom?: string;
   validUntil?: string;
   sourceUrl?: string;
+  imageUrl?: string;
 };
 
 export type PriceType =
@@ -2628,6 +2710,7 @@ export type IngestedProduct = {
   packageSize: number;
   packageUnit: string;
   comparableUnit: string;
+  imageUrl?: string;
 };
 
 export type IngestedAlias = {
@@ -2802,7 +2885,8 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
       originCountry: input.originCountry?.toUpperCase(),
       packageSize: input.packageSize,
       packageUnit: input.packageUnit,
-      comparableUnit: normalized.comparableUnit
+      comparableUnit: normalized.comparableUnit,
+      imageUrl: input.imageUrl?.trim() || undefined
     },
     alias: {
       rawName: input.rawName,
@@ -2914,7 +2998,10 @@ export type DailyIngestionEnv = Partial<Record<
   | 'GROCERYVIEW_DAILY_STORE_CONCURRENCY'
   | 'GROCERYVIEW_DAILY_STORE_START_DELAY_MS'
   | 'GROCERYVIEW_DAILY_STORE_RETRY_ATTEMPTS'
-  | 'GROCERYVIEW_DAILY_STORE_RETRY_BASE_DELAY_MS',
+  | 'GROCERYVIEW_DAILY_STORE_RETRY_BASE_DELAY_MS'
+  | 'GROCERYVIEW_IMAGE_CACHE_ENABLED'
+  | 'GROCERYVIEW_IMAGE_CACHE_PUBLIC_DIR'
+  | 'GROCERYVIEW_IMAGE_CACHE_MAX_BYTES',
   string
 >>;
 
@@ -2935,6 +3022,8 @@ export type DailyIngestionEnvConfig = {
   };
 };
 
+export type DailyIngestionImageCacheOptions = ProductImageCacheOptions & { enabled?: boolean };
+
 export type DailyIngestionRunInput = {
   executor: QueryExecutor;
   requestedAt: string;
@@ -2950,6 +3039,8 @@ export type DailyIngestionRunInput = {
   connectorRetryBaseDelayMs?: number;
   /** File path for durable blocker diagnostics when a country-wide run is partial or blocked. */
   blockerLogPath?: string;
+  /** Optional product image cache that downloads external product images and rewrites products.image_url at ingest time. */
+  imageCache?: false | DailyIngestionImageCacheOptions;
 };
 
 export type DailyIngestionConnectorSummary = {
@@ -3017,7 +3108,9 @@ export const GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL = 'groceryview://daily/i
 export const GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL = 'groceryview://daily/lidl/public-offers/all-stores';
 export const GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/coop/weekly-offers/all-stores';
 export const GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/coop/products/all-stores';
+export const GROCERYVIEW_DAILY_CITY_GROSS_BULK_PRODUCTS_URL = 'groceryview://daily/city-gross/products/bulk';
 export const GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL = 'groceryview://daily/city-gross/public-products/all-stores';
+export const GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL = 'groceryview://daily/mathem/products/public-search';
 export const GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL = 'groceryview://daily/matspar/products/public-search';
 export const GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL = OKQ8_FUEL_PRICES_URL;
 export const GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL = 'groceryview://daily/pharmacy/products/public';
@@ -3114,6 +3207,19 @@ function dailyRunnerIntegerFromEnv(value: string | undefined, fallback?: number)
   const parsed = Number(trimmed);
   if (!Number.isFinite(parsed)) return fallback;
   return Math.max(0, Math.floor(parsed));
+}
+
+function dailyEnvFlagEnabled(value: string | undefined): boolean {
+  return /^(1|true|yes|on)$/i.test(value?.trim() ?? '');
+}
+
+function buildDailyImageCacheOptionsFromEnv(env: DailyIngestionEnv): false | DailyIngestionImageCacheOptions {
+  if (!dailyEnvFlagEnabled(env.GROCERYVIEW_IMAGE_CACHE_ENABLED)) return false;
+  return {
+    enabled: true,
+    publicDir: env.GROCERYVIEW_IMAGE_CACHE_PUBLIC_DIR?.trim() || join(process.cwd(), 'apps/web/public'),
+    maxBytes: dailyRunnerIntegerFromEnv(env.GROCERYVIEW_IMAGE_CACHE_MAX_BYTES)
+  };
 }
 
 function definedAllStoreRunnerControls(input: AllStoreTaskRunnerControls): AllStoreTaskRunnerControls {
@@ -3754,7 +3860,7 @@ async function persistDailyConnectorOutput(input: {
   executor: QueryExecutor;
   config: DailyIngestionConnectorConfig;
   result: RetailerConnectorRunResult;
-}): Promise<Pick<DailyIngestionRunResult, 'sourceRunIds' | 'rawRecordIds' | 'observationIds' | 'acceptedCount' | 'rejectedCount'>> {
+}): Promise<Pick<DailyIngestionRunResult, 'sourceRunIds' | 'rawRecordIds' | 'observationIds' | 'acceptedCount' | 'rejectedCount'> & { imageCacheProducts: ImageCacheProduct[] }> {
   const { executor, config, result } = input;
   const domain = normalizeDailyDomain(config.domain);
   await executor.query('set default_transaction_read_only=off');
@@ -3956,6 +4062,7 @@ async function persistDailyConnectorOutput(input: {
     }
 
     const productIdsBySlug = await upsertDailyProductBatch(executor, result.ingestion.accepted.map((accepted) => accepted.product), domain);
+    const imageCacheProducts: ImageCacheProduct[] = [];
     const aliasesToUpsert: Parameters<typeof upsertDailyAliasBatch>[1] = [];
     for (const accepted of result.ingestion.accepted) {
       const productId = productIdsBySlug.get(normalizeDailySlug(accepted.product.id));
@@ -3967,6 +4074,9 @@ async function persistDailyConnectorOutput(input: {
         sourceRef: result.plan.runKey,
         matchConfidence: accepted.alias.matchConfidence
       });
+      if (accepted.product.imageUrl?.trim()) {
+        imageCacheProducts.push({ productId, imageUrl: accepted.product.imageUrl });
+      }
     }
     await upsertDailyAliasBatch(executor, aliasesToUpsert);
 
@@ -4079,7 +4189,8 @@ async function persistDailyConnectorOutput(input: {
       rawRecordIds,
       observationIds,
       acceptedCount: result.acceptedCount,
-      rejectedCount: result.rejectedCount
+      rejectedCount: result.rejectedCount,
+      imageCacheProducts
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
@@ -4096,6 +4207,7 @@ async function persistDailyConnectorOutput(input: {
 type DailyConnectorRunPersistenceResult = Pick<DailyIngestionRunResult, 'sourceRunIds' | 'rawRecordIds' | 'observationIds' | 'acceptedCount' | 'rejectedCount'> & {
   blockers: string[];
   persistedRuns: number;
+  imageCacheProducts?: ImageCacheProduct[];
 };
 
 function writeDailyIngestionBlockerLog(path: string, result: DailyIngestionRunResult, requestedAt: string): void {
@@ -4333,6 +4445,7 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
   const rawRecordIds: string[] = [];
   const observationIds: string[] = [];
   const chainSummaries: DailyIngestionConnectorSummary[] = [];
+  const imageCacheProducts: ImageCacheProduct[] = [];
   let persistedRuns = 0;
   let acceptedCount = 0;
   let rejectedCount = 0;
@@ -4348,6 +4461,7 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
     sourceRunIds.push(...result.sourceRunIds);
     rawRecordIds.push(...result.rawRecordIds);
     observationIds.push(...result.observationIds);
+    imageCacheProducts.push(...(result.imageCacheProducts ?? []));
     chainSummaries.push({
       connectorId: config.connectorId,
       chainId: config.chainId,
@@ -4360,6 +4474,20 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
       rawRecordIds: [...result.rawRecordIds],
       observationIds: [...result.observationIds]
     });
+  }
+
+  if (input.imageCache && input.imageCache.enabled !== false && imageCacheProducts.length > 0) {
+    try {
+      const imageCacheResult = await cacheAndRewriteProductImages(input.executor, imageCacheProducts, {
+        fetchImpl: input.fetchImpl,
+        ...input.imageCache
+      });
+      process.stderr.write(`[daily-ingestion] cached product images: cached=${imageCacheResult.cachedImages.length} updated=${imageCacheResult.updatedProductIds.length} skipped=${imageCacheResult.skippedProductIds.length}\n`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      blockers.push(`image_cache_failed:${message}`);
+      process.stderr.write(`[daily-ingestion] image cache failed: ${message}\n`);
+    }
   }
 
   const runResult: DailyIngestionRunResult = {
@@ -4399,6 +4527,7 @@ export async function runDailyIngestionFromEnv(env: DailyIngestionEnv = process.
       executor,
       requestedAt: new Date().toISOString(),
       connectors,
+      imageCache: buildDailyImageCacheOptionsFromEnv(env),
       ...runtimeOptions
     });
   } finally {

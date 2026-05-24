@@ -11,6 +11,7 @@ import {
   snapshot,
   topChainSpreads
 } from '@/lib/verified-data';
+import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { SCREENER_DEFAULT_CATEGORY, SCREENER_SORT_OPTIONS, normalizeScreenerCategory, normalizeScreenerSort, type ScreenerSortMode, screenerCategoryHref, screenerSortHref } from '@/lib/screener-query';
 import { routeMetadata } from '@/lib/seo';
 
@@ -60,7 +61,11 @@ function categoryHref(category: string, mode: SortMode) {
 }
 
 function formatUnitPrice(value: number, unitLabel: string) {
-  return `${formatSek(value)}/${unitLabel.replace('kr/', '')}`;
+  return formatLocalizedUnitPrice(value, {
+    locale: defaultLocale,
+    currency: 'SEK',
+    unit: unitLabel.replace(/^kr\//, '')
+  });
 }
 
 function confidenceForSamples(sampleSize: number, mediumAt: number) {

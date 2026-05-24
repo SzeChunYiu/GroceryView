@@ -71,6 +71,7 @@ const navGroups: NavGroup[] = [
       { href: '/alerts', label: 'Alerts', icon: Bell },
       { href: '/watchlist', label: 'Watchlist', icon: Heart },
       { href: '/list', label: 'Shopping list', icon: ListChecks },
+      { href: '/basket', label: 'Basket', icon: ShoppingBasket },
       { href: '/weekly-basket', label: 'Weekly basket', icon: ShoppingBasket },
       { href: '/meal-planner', label: 'Meal planner', icon: Utensils }
     ]

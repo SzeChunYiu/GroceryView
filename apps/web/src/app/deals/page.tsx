@@ -4,6 +4,7 @@ import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/componen
 import { buildBrandTierPriceObservations } from '@/lib/chain-index-data';
 import { expiryDealRadar, expiryDealRadarReports, kidsSnackLunchboxDeals, singlePortionDealFinder } from '@/lib/demo-data';
 import { digitalCatalogueOfferBoard, flyerValidityCalendar, offerExpiryReminderBoard } from '@/lib/verified-data';
+import { unknownUnitPriceLabel } from '@/lib/i18n';
 import { routeMetadata } from '@/lib/seo';
 import { screenerDefaultHref } from '@/lib/screener-query';
 
@@ -202,7 +203,7 @@ export default function DealsPage() {
               <div className="mt-3 grid gap-2 text-xs text-slate-700 sm:grid-cols-2">
                 <p className="rounded-2xl bg-amber-100 p-3 font-semibold">validFrom {offer.validFrom}</p>
                 <p className="rounded-2xl bg-amber-100 p-3 font-semibold">validTo {offer.validTo}</p>
-                <p className="rounded-2xl bg-amber-100 p-3 font-semibold">{offer.comparePriceText || 'Compare price not reported'}</p>
+                <p className="rounded-2xl bg-amber-100 p-3 font-semibold">{offer.comparePriceText || unknownUnitPriceLabel}</p>
                 <p className="rounded-2xl bg-amber-100 p-3 font-semibold">{offer.requiresMembershipCard ? 'Membership card needed' : 'No membership flag'} · {offer.requiresCoupon ? 'coupon needed' : 'no coupon flag'}</p>
               </div>
               <p className="mt-3 break-all text-xs font-semibold text-slate-600">sourceUrl: {offer.sourceUrl}</p>

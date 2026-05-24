@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { calculateBrandTierIndices, calculateChainPriceIndex } from '@groceryview/core';
+import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
 import { buildBrandTierPriceObservations, buildChainIndexTrendSeries, buildChainPriceObservations, buildMatchedBasketChainPriceObservations } from '@/lib/chain-index-data';
 import { buildGroceryIndexTickerWidget } from '@/lib/grocery-index-widget';
@@ -10,7 +11,8 @@ export function generateMetadata() {
   return routeMetadata('/chain-index');
 }
 
-const brandTierSummary = calculateBrandTierIndices(buildBrandTierPriceObservations());
+const brandTierObservations = buildBrandTierPriceObservations();
+const brandTierSummary = calculateBrandTierIndices(brandTierObservations);
 const matchedBasketObservations = buildMatchedBasketChainPriceObservations();
 const matchedBasketRefinedIndex = calculateChainPriceIndex([
   ...buildChainPriceObservations(),
@@ -33,6 +35,18 @@ function tierTone(value: number) {
   if (value > 105) return 'text-rose-800 bg-rose-50';
   return 'text-slate-800 bg-slate-50';
 }
+
+function confidenceLevelForCategoryCount(categoryCount: number): 'high' | 'medium' | 'low' {
+  if (categoryCount >= 5) return 'high';
+  if (categoryCount >= 2) return 'medium';
+  return 'low';
+}
+
+const brandTierConfidenceLevel = brandTierSummary.indices.every((tier) => confidenceLevelForCategoryCount(tier.categoryCount) === 'high')
+  ? 'high'
+  : brandTierSummary.indices.some((tier) => tier.categoryCount > 0)
+    ? 'medium'
+    : 'low';
 
 function heatTileTone(value: number) {
   if (value >= 80) return 'border-rose-200 bg-rose-50 text-rose-950';
@@ -248,8 +262,20 @@ export default function ChainIndexPage() {
             <Eyebrow>Brand-tier index</Eyebrow>
             <h2 className="mt-2 text-3xl font-black tracking-tight text-emerald-950">Budget vs premium basket pressure</h2>
             <p className="mt-3 text-sm leading-6 text-emerald-950">
-              This section calls calculateBrandTierIndices with buildBrandTierPriceObservations, so private-label, budget, national, and premium tiers are compared through the same fixed-basket index engine instead of hardcoded ranking copy.
+              This section calls calculateBrandTierIndices with buildBrandTierPriceObservations, so budget private-label, mid-market national, and premium tiers are compared by chain/category from real matched Axfood products instead of hardcoded ranking copy.
             </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <ConfidenceBadge
+                label="real matched brand-tier basket"
+                level={brandTierConfidenceLevel}
+                sampleSize={brandTierObservations.length}
+              />
+              <ConfidenceBadge
+                label={`${brandTierSummary.indices.length} tier indices`}
+                level="medium"
+                sampleSize={brandTierSummary.highestSavingsCategories.length}
+              />
+            </div>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="rounded-2xl bg-white/80 p-4">
@@ -281,6 +307,13 @@ export default function ChainIndexPage() {
                   <div>
                     <p className="text-lg font-black">{tier.label}</p>
                     <p className="mt-1 text-sm font-semibold">{tier.categoryCount} categories · movement {formatPct(tier.movementPercent)}</p>
+                    <div className="mt-3">
+                      <ConfidenceBadge
+                        label="matched categories"
+                        level={confidenceLevelForCategoryCount(tier.categoryCount)}
+                        sampleSize={tier.categoryCount}
+                      />
+                    </div>
                   </div>
                   <p className="text-3xl font-black">{tier.value.toFixed(1)}</p>
                 </div>

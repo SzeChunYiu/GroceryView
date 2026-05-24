@@ -28,8 +28,10 @@ import {
   defaultLocale,
   formatLocalizedDate,
   formatLocalizedMoney,
+  formatSourceUnitPriceText,
   formatLocalizedUnitPrice,
-  supportedCurrencies
+  supportedCurrencies,
+  unknownUnitPriceLabel
 } from './i18n';
 
 const icaReklambladOffers = dbSiteIcaReklambladOffers.length > 0 ? dbSiteIcaReklambladOffers : staticIcaReklambladOffers;
@@ -128,6 +130,8 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
+const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+
 function dailyObservedPricePoints(product: (typeof pricedProducts)[number]) {
   const pricesByDate = product.observations.reduce<Record<string, number[]>>((ledger, observation) => {
     if (!observation.date || !Number.isFinite(observation.price)) return ledger;
@@ -140,6 +144,41 @@ function dailyObservedPricePoints(product: (typeof pricedProducts)[number]) {
     price: median(prices),
     storeId: 'openprices-community'
   }));
+}
+
+function priceDropBadgeLabel(changePercent: number): string {
+  return `${Math.round(changePercent)}%`;
+}
+
+function priceDropFromThirtyDayHistory(product: (typeof productUniverse)[number]) {
+  if (!isOpenPricesProduct(product)) return null;
+  const priceHistory = dailyObservedPricePoints(product)
+    .sort((left, right) => Date.parse(left.observedAt) - Date.parse(right.observedAt));
+  const latest = priceHistory[priceHistory.length - 1];
+  if (!latest) return null;
+
+  const anchorDate = new Date(Date.parse(latest.observedAt) - thirtyDaysMs);
+  let anchor: (typeof priceHistory)[number] | null = null;
+  for (let index = priceHistory.length - 1; index >= 0; index -= 1) {
+    const point = priceHistory[index];
+    if (Date.parse(point.observedAt) <= anchorDate.getTime()) {
+      anchor = point;
+      break;
+    }
+  }
+  if (!anchor || anchor.price <= 0) return null;
+
+  const currentPrice = latest.price;
+  const price30dAgo = anchor.price;
+  const changePercent = ((currentPrice - price30dAgo) / price30dAgo) * 100;
+  if (changePercent >= -5) return null;
+
+  return {
+    percent: changePercent,
+    badge: priceDropBadgeLabel(changePercent),
+    anchorDate: anchor.observedAt.slice(0, 10),
+    label: `${priceDropBadgeLabel(changePercent)} 30-day price drop from price_history`
+  };
 }
 
 const compareOverlayProducts = [...pricedProducts]
@@ -416,7 +455,7 @@ function productSearchResultCards(searchResult: typeof rawFacetedProductSearch) 
         locale: defaultLocale,
         currency: cheapest.currency,
         unit: product.comparableUnit
-      }) : 'No current price row',
+      }) : unknownUnitPriceLabel,
       isAvailable: product.isAvailable,
       chainLabel: cheapest ? `${cheapest.chainName} · ${cheapest.priceType}` : 'Awaiting latest_prices row',
       sourceTables: searchResult.evidence.sourceTables
@@ -556,7 +595,7 @@ export const watchlistHeartProducts = watchlistHeartSourceRows.map(({ product, c
       locale: defaultLocale,
       currency: observedSnapshotCurrency,
       unit: normalizedUnit.unitLabel.replace('kr/', '')
-    }) : 'Unit price not reported',
+    }) : unknownUnitPriceLabel,
     targetPrice: item.targetPrice ?? cheapest.price,
     targetPriceLabel: formatSek(item.targetPrice ?? cheapest.price),
     dealScore,
@@ -1065,7 +1104,10 @@ export const deliveryVsInStoreComparison = {
     onlinePackageText: row.onlineProduct.packageText,
     onlinePrice: row.onlineProduct.price,
     onlinePriceText: row.onlineProduct.priceText,
-    onlineUnitPriceText: row.onlineProduct.unitPriceText,
+    onlineUnitPriceText: formatSourceUnitPriceText(row.onlineProduct.unitPriceText, row.onlineProduct.unitPriceUnit, {
+      locale: 'sv-SE',
+      currency: observedSnapshotCurrency
+    }),
     onlineSourceUrl: row.onlineProduct.sourceUrl,
     inStoreName: row.inStoreProduct.name,
     inStoreBrand: row.inStoreProduct.brand,
@@ -1751,6 +1793,10 @@ export type AdaptiveProductCard = {
   unitSortPrice: number | null;
   defaultCompareMode: 'total' | 'unit';
   cheapestUnitBadge: string | null;
+  priceDropPercent: number | null;
+  priceDropBadge: string | null;
+  priceDropLabel: string | null;
+  priceDropAnchorDate: string | null;
   sparklineWindowDays: 7;
   sparklinePoints: Array<{
     date: string;
@@ -1804,6 +1850,7 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
       .filter((value): value is number => typeof value === 'number' && Number.isFinite(value))
     : [];
   const sparklinePoints = sevenDaySparklinePoints(product);
+  const priceDrop = priceDropFromThirtyDayHistory(product);
 
   return {
     slug: product.slug,
@@ -1817,7 +1864,7 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
       locale: defaultLocale,
       currency: observedSnapshotCurrency,
       unit: normalizedUnit.unitLabel.replace('kr/', '')
-    }) : 'Unit price not reported',
+    }) : unknownUnitPriceLabel,
     packageLabel: normalizedUnit?.packageLabel || packageText || 'Package size not reported',
     sourceLabel: isChainProduct ? `${product.lowestChain} lowest · ${formatPct(product.spreadPct)} spread` : `OpenPrices · ${product.observationCount.toLocaleString('sv-SE')} observations`,
     confidenceLabel: normalizedUnit ? `Derived from observed price + package size (${normalizedUnit.unitLabel})` : 'No synthetic unit prices: package quantity missing',
@@ -1825,6 +1872,10 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
     unitSortPrice: normalizedUnit?.unitSortPrice ?? null,
     defaultCompareMode: productKind === 'commodity' ? 'unit' : 'total',
     cheapestUnitBadge: normalizedUnit ? cheapestUnitBadge(normalizedUnit.unitPrice, peerUnitPrices, normalizedUnit.unitLabel) : null,
+    priceDropPercent: priceDrop?.percent ?? null,
+    priceDropBadge: priceDrop?.badge ?? null,
+    priceDropLabel: priceDrop?.label ?? null,
+    priceDropAnchorDate: priceDrop?.anchorDate ?? null,
     sparklineWindowDays: 7,
     sparklinePoints,
     sparklineLabel: sparklinePoints.length >= 2
@@ -1858,7 +1909,7 @@ export const localeFormattingShowcase = supportedCurrencies.map((currency) => {
       ? formatLocalizedMoney(localeFormattingSampleCard?.totalSortPrice, { locale: defaultLocale, currency })
       : 'No observed prices in this currency',
     unitPriceLabel: hasObservedRows
-      ? localeFormattingSampleCard?.unitPriceLabel ?? 'Unit price not reported'
+      ? localeFormattingSampleCard?.unitPriceLabel ?? unknownUnitPriceLabel
       : 'No unit price until observation lands',
     dateLabel: hasObservedRows
       ? formatLocalizedDate(localeFormattingSampleDate, { locale: defaultLocale })
@@ -1880,7 +1931,10 @@ const digitalCatalogueSampleOffers = icaReklambladOffers
     productName: [offer.brand, offer.name].filter(Boolean).join(' · '),
     category: offer.category || 'Category not reported',
     priceText: offer.priceText,
-    comparisonPrice: offer.comparisonPrice || 'Jämförpris not reported',
+    comparisonPrice: formatSourceUnitPriceText(offer.comparisonPrice, offer.comparisonPrice, {
+      locale: 'sv-SE',
+      currency: observedSnapshotCurrency
+    }),
     regularPriceText: offer.regularPriceText || 'Regular price not reported',
     validTo: offer.validTo,
     storeName: offer.storeName,
@@ -2054,7 +2108,10 @@ export const offerExpiryReminderBoard = {
       store: offer.store,
       category: offer.category,
       priceText: offer.priceText,
-      comparePriceText: offer.comparePriceText,
+      comparePriceText: formatSourceUnitPriceText(offer.comparePriceText, offer.comparePriceText, {
+        locale: 'sv-SE',
+        currency: observedSnapshotCurrency
+      }),
       validFrom: offer.validFrom,
       validTo: offer.validTo,
       sourceUrl: offer.sourceUrl,
@@ -2281,7 +2338,10 @@ export function storeAssortmentOverviewForStore(store: (typeof storeUniverse)[nu
       name: offer.name,
       category: offer.category || 'lidl-public-offers',
       priceLabel: formatSek(offer.price),
-      unitPriceLabel: offer.unitPriceText || 'Unit price not reported',
+      unitPriceLabel: formatSourceUnitPriceText(offer.unitPriceText, offer.unitPriceText, {
+        locale: 'sv-SE',
+        currency: observedSnapshotCurrency
+      }),
       packageLabel: offer.packageText || 'Package not reported',
       validWindow: `${formatLocalizedDate(offer.validFrom, { locale: defaultLocale })} – ${formatLocalizedDate(offer.validTo, { locale: defaultLocale })}`,
       sourceLabel: 'Lidl public branch offer row',

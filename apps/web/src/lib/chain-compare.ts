@@ -1,5 +1,6 @@
 import { axfoodProducts, type AxfoodProduct, type ChainPrice } from './axfood-products';
 import { dbSiteSnapshotGeneratedAt } from './generated/db-site-products';
+import { commodityComparisonForProduct } from './verified-data';
 
 export const COMPARE_CHAIN_ORDER = [
   { id: 'ica', label: 'ICA' },
@@ -17,6 +18,9 @@ export type ChainCompareCell = {
   unitLabel: string;
   status: 'priced' | 'missing';
   sourceUrl: string;
+  productSlug: string | null;
+  productName: string | null;
+  sourceConfidence: number | null;
 };
 
 export type ChainCompareProductRow = {
@@ -26,6 +30,9 @@ export type ChainCompareProductRow = {
   productName: string;
   brand: string;
   packageLabel: string;
+  matchType: 'packaged_barcode' | 'commodity_alias';
+  matchLabel: string;
+  confidenceLabel: string;
   cells: ChainCompareCell[];
   bestChainName: string;
   bestPriceText: string;
@@ -74,11 +81,14 @@ function formatMissingCell(chainName: string, chainId: CompareChainId): ChainCom
     priceText: 'No DB price row',
     unitLabel: 'packages/db row missing',
     status: 'missing',
-    sourceUrl: ''
+    sourceUrl: '',
+    productSlug: null,
+    productName: null,
+    sourceConfidence: null
   };
 }
 
-function formatPricedCell(chainName: string, chainId: CompareChainId, price: ChainPrice): ChainCompareCell {
+function formatPackagedPricedCell(chainName: string, chainId: CompareChainId, product: AxfoodProduct, price: ChainPrice): ChainCompareCell {
   if (typeof price.price !== 'number' || !Number.isFinite(price.price)) return formatMissingCell(chainName, chainId);
   return {
     chainId,
@@ -87,14 +97,45 @@ function formatPricedCell(chainName: string, chainId: CompareChainId, price: Cha
     priceText: price.priceText || `${price.price.toLocaleString('sv-SE')} kr`,
     unitLabel: price.priceUnit || 'kr/st',
     status: 'priced',
-    sourceUrl: price.url
+    sourceUrl: price.url,
+    productSlug: product.slug,
+    productName: product.name,
+    sourceConfidence: null
   };
 }
 
-function compareProductRow(requestedId: string, product: AxfoodProduct): ChainCompareProductRow {
+function formatCommodityMissingCell(chainName: string, chainId: CompareChainId, comparableUnit: string): ChainCompareCell {
+  return {
+    ...formatMissingCell(chainName, chainId),
+    priceText: 'No commodity row',
+    unitLabel: `No confidence-cleared kr/${comparableUnit} evidence`
+  };
+}
+
+function formatCommodityPricedCell(
+  chainName: string,
+  chainId: CompareChainId,
+  comparableUnit: string,
+  row: NonNullable<ReturnType<typeof commodityComparisonForProduct>>['rows'][number]
+): ChainCompareCell {
+  return {
+    chainId,
+    chainName,
+    price: row.unitPrice,
+    priceText: `${row.unitPrice.toLocaleString('sv-SE')} kr`,
+    unitLabel: `commodity/alias kr/${comparableUnit}`,
+    status: 'priced',
+    sourceUrl: '',
+    productSlug: row.productId,
+    productName: row.productName,
+    sourceConfidence: row.sourceConfidence
+  };
+}
+
+function comparePackagedProductRow(requestedId: string, product: AxfoodProduct): ChainCompareProductRow {
   const cells = COMPARE_CHAIN_ORDER.map((chain) => {
     const price = product.chains[chain.id];
-    return price ? formatPricedCell(chain.label, chain.id, price) : formatMissingCell(chain.label, chain.id);
+    return price ? formatPackagedPricedCell(chain.label, chain.id, product, price) : formatMissingCell(chain.label, chain.id);
   });
   const pricedCells = cells.filter((cell) => cell.price !== null);
   const bestCell = pricedCells.sort((left, right) => (left.price ?? Number.POSITIVE_INFINITY) - (right.price ?? Number.POSITIVE_INFINITY))[0];
@@ -106,10 +147,46 @@ function compareProductRow(requestedId: string, product: AxfoodProduct): ChainCo
     productName: product.name,
     brand: product.brand,
     packageLabel: product.subline,
+    matchType: 'packaged_barcode',
+    matchLabel: 'Packaged/barcode match',
+    confidenceLabel: `${pricedCells.length} exact chain price row(s); ranked by reported pack price.`,
     cells,
     bestChainName: bestCell?.chainName ?? 'Awaiting DB row',
     bestPriceText: bestCell?.priceText ?? 'No chain price yet'
   };
+}
+
+function compareCommodityProductRow(requestedId: string, product: AxfoodProduct, comparison: NonNullable<ReturnType<typeof commodityComparisonForProduct>>): ChainCompareProductRow {
+  const rowsByChain = new Map(comparison.rows.map((row) => [row.chainId, row]));
+  const cells = COMPARE_CHAIN_ORDER.map((chain) => {
+    const row = rowsByChain.get(chain.id);
+    return row
+      ? formatCommodityPricedCell(chain.label, chain.id, comparison.comparableUnit, row)
+      : formatCommodityMissingCell(chain.label, chain.id, comparison.comparableUnit);
+  });
+  const pricedCells = cells.filter((cell) => cell.price !== null);
+  const bestCell = pricedCells.sort((left, right) => (left.price ?? Number.POSITIVE_INFINITY) - (right.price ?? Number.POSITIVE_INFINITY))[0];
+
+  return {
+    requestedId,
+    productId: product.code,
+    productSlug: product.slug,
+    productName: product.name,
+    brand: product.brand,
+    packageLabel: product.subline,
+    matchType: 'commodity_alias',
+    matchLabel: `${comparison.commodityName} commodity/alias match`,
+    confidenceLabel: comparison.confidenceLabel,
+    cells,
+    bestChainName: bestCell?.chainName ?? 'Awaiting commodity coverage',
+    bestPriceText: bestCell ? `${bestCell.priceText} / ${comparison.comparableUnit}` : `No kr/${comparison.comparableUnit} commodity price yet`
+  };
+}
+
+function compareProductRow(requestedId: string, product: AxfoodProduct): ChainCompareProductRow {
+  const commodityComparison = commodityComparisonForProduct(product.slug);
+  if (commodityComparison?.status === 'priced') return compareCommodityProductRow(requestedId, product, commodityComparison);
+  return comparePackagedProductRow(requestedId, product);
 }
 
 export function buildChainComparisonTable(

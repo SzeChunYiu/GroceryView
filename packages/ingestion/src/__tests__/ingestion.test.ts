@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
@@ -14,6 +14,7 @@ import {
   buildCityGrossStoresUrl,
   buildDailyConnectorConfigsFromEnv,
   buildDailyIngestionPostgresPoolConfig,
+  CITY_GROSS_BULK_MINIMUM_ROWS,
   createDailyIngestionQueryExecutor,
   DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_IDS,
   DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_IDS,
@@ -58,6 +59,7 @@ import {
   fetchOverpassFuelStations,
   fetchOverpassGroceryStores,
   fetchRetailerConnectorSnapshot,
+  fetchCityGrossBulkProducts,
   fetchCityGrossProducts,
   fetchCityGrossProductsForAllStores,
   fetchCityGrossStores,
@@ -99,13 +101,14 @@ import {
   parseIcaReklambladOffers,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
-  GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL,
+  GROCERYVIEW_DAILY_CITY_GROSS_BULK_PRODUCTS_URL,
   GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL,
   GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL,
   GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL,
   GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL,
+  GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL,
   GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL,
   GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL,
   GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL,
@@ -3278,6 +3281,85 @@ describe('fetchCityGrossProducts', () => {
     ]);
   });
 
+describe('fetchCityGrossBulkProducts', () => {
+  it('fetches City Gross full branch catalogs across stores and enforces the bulk row floor', async () => {
+    assert.equal(CITY_GROSS_BULK_MINIMUM_ROWS, 100);
+
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url).includes('/PageData/stores')) {
+        return new Response(JSON.stringify([
+          { data: { storeName: 'City Gross Borås', siteId: 21, url: '/butiker/boras/', storeLocation: { coordinates: '57.7141742,12.8669819' } } }
+        ]), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      const skip = Number(new URL(String(url)).searchParams.get('skip') ?? '0');
+      return new Response(JSON.stringify({
+        items: [{
+          id: `citygross-bulk-${skip}`,
+          name: `City Gross bulk ${skip}`,
+          brand: 'Garant',
+          category: 'Pantry',
+          descriptiveSize: '1 st',
+          productStoreDetails: {
+            prices: { currentPrice: { price: skip === 0 ? 10 : 11, unit: 'PCE' } }
+          }
+        }],
+        totalCount: 2
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCityGrossBulkProducts({
+      fetchImpl,
+      maxStores: 1,
+      pageSize: 1,
+      minRows: 2,
+      retrievedAt: '2026-05-23T20:20:30.000Z'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.storeId, row.code, row.price]), [
+      ['21', 'citygross-bulk-0', 10],
+      ['21', 'citygross-bulk-1', 11]
+    ]);
+    assert.deepEqual(requestedUrls, [
+      buildCityGrossStoresUrl(),
+      buildCityGrossProductsUrl({ siteId: '21', take: 1, skip: 0 }),
+      buildCityGrossProductsUrl({ siteId: '21', take: 1, skip: 1 })
+    ]);
+  });
+
+  it('fails closed when the City Gross bulk fetch returns fewer than the required real rows', async () => {
+    const fetchImpl: typeof fetch = async (url) => {
+      if (String(url).includes('/PageData/stores')) {
+        return new Response(JSON.stringify([
+          { data: { storeName: 'City Gross Borås', siteId: 21, url: '/butiker/boras/' } }
+        ]), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      return new Response(JSON.stringify({
+        items: [{
+          id: 'too-small-citygross-bulk-row',
+          name: 'Too small City Gross bulk row',
+          productStoreDetails: {
+            prices: { currentPrice: { price: 10, unit: 'PCE' } }
+          }
+        }],
+        totalCount: 1
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    await assert.rejects(
+      () => fetchCityGrossBulkProducts({
+        fetchImpl,
+        maxStores: 1,
+        pageSize: 1,
+        minRows: 2,
+        retrievedAt: '2026-05-23T20:21:00.000Z'
+      }),
+      /City Gross bulk fetch returned only 1 rows; minimum required is 2/
+    );
+  });
+});
+
 describe('fetchLidlStores', () => {
   it('discovers Lidl public store detail pages and normalizes branch metadata', async () => {
     const requestedUrls: string[] = [];
@@ -5284,6 +5366,7 @@ class DailyIngestionExecutor implements QueryExecutor {
       { id: 'product-db-ean-7310130003547', slug: 'ean-7310130003547', barcode: '7310130003547', canonical_name: 'Ideal Makaroner', brand: 'Kungsörnen' },
       { id: 'product-db-ean-7310130000000', slug: 'ean-7310130000000', barcode: '7310130000000', canonical_name: 'Missing Nutrition', brand: 'Testbrand' }
     ] as T[];
+    if (sql.includes('update products') && sql.includes('set image_url = $1')) return [{ id: params[1] }] as T[];
     if (sql.includes('update products') && params[0] === '7310130003547') return [{ id: 'product-db-ean-7310130003547' }] as T[];
     if (sql.includes('update products')) return [] as T[];
     if (sql.includes('insert into chains')) return [{ id: `chain-db-${++this.sequence}` }] as T[];
@@ -5825,6 +5908,66 @@ describe('daily ingestion runner', () => {
     assert.equal(observationRows[0]?.is_available, false);
   });
 
+  it('caches and rewrites product image URLs while persisting daily connector runs when enabled', async () => {
+    const executor = new DailyIngestionExecutor();
+    const publicDir = mkdtempSync(join(tmpdir(), 'grocery-daily-image-cache-'));
+    const imageBytes = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
+
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-21T03:17:00.000Z',
+      connectors: [
+        {
+          connectorId: 'willys-normalized-json',
+          chainId: 'willys',
+          sourceType: 'official_api',
+          endpointUrl: 'https://sources.example.test/willys/products.json',
+          parserVersion: 'normalized-json-v1',
+          robotsTxtStatus: 'not_applicable',
+          legalReviewStatus: 'approved',
+          hasDataAgreement: true,
+          stores: [{ storeId: 'willys-odenplan', name: 'Willys Odenplan', address: 'Odenplan', city: 'Stockholm' }]
+        }
+      ],
+      fetchImpl: async (url) => {
+        if (String(url).includes('cdn.example.test')) {
+          return new Response(imageBytes, {
+            status: 200,
+            headers: {
+              'content-type': 'image/png',
+              'content-length': String(imageBytes.byteLength)
+            }
+          });
+        }
+
+        return new Response(JSON.stringify({
+          items: [{
+            storeId: 'willys-odenplan',
+            retailerProductId: 'wil-zoegas-450',
+            rawName: 'Zoégas Skånerost 450g',
+            canonicalName: 'Zoégas Coffee 450g',
+            productId: 'zoegas-coffee-450g',
+            categoryId: 'coffee',
+            brand: 'Zoégas',
+            packageSize: 450,
+            packageUnit: 'g',
+            price: 49.9,
+            imageUrl: 'https://cdn.example.test/zoegas.png'
+          }]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      },
+      imageCache: { enabled: true, publicDir }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    const imageRewrite = executor.calls.find((call) => call.sql.includes('update products') && call.sql.includes('set image_url = $1'));
+    assert.ok(imageRewrite, 'daily ingestion should rewrite product image_url to the cached public URL');
+    assert.match(String(imageRewrite.params[0]), /^\/images\/products\/product-db-zoegas-coffee-450g-[a-f0-9]{16}\.png$/);
+    assert.equal(imageRewrite.params[1], 'product-db-zoegas-coffee-450g');
+    assert.equal(imageRewrite.params[2], 'https://cdn.example.test/zoegas.png');
+    assert.equal(readdirSync(join(publicDir, 'images', 'products')).length, 1);
+  });
+
   it('reuses daily chain, store, and product ids while persisting a connector batch', async () => {
     const executor = new DailyIngestionExecutor();
     const result = await runDailyIngestion({
@@ -6196,6 +6339,94 @@ describe('daily ingestion runner', () => {
     });
   });
 
+  it('materializes native Mathem public product prices into daily database observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const nextData = {
+      props: {
+        pageProps: {
+          dehydratedState: {
+            queries: [{
+              state: {
+                data: {
+                  items: [{
+                    id: 6448,
+                    type: 'product',
+                    attributes: {
+                      id: 6448,
+                      fullName: 'Kungsörnen Gammaldags Idealmakaroner',
+                      brand: 'Kungsörnen',
+                      nameExtra: '1300 g',
+                      frontUrl: 'https://www.mathem.se/se/products/6448-kungsornen-gammaldags-idealmakaroner/',
+                      grossPrice: '22.24',
+                      grossUnitPrice: '17.11',
+                      unitPriceQuantityAbbreviation: 'kg',
+                      currency: 'SEK',
+                      availability: { isAvailable: true },
+                      images: [{ thumbnail: { url: 'https://images.mathem.se/product.jpg' } }]
+                    }
+                  }]
+                }
+              }
+            }]
+          }
+        }
+      }
+    };
+
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-23T18:05:00.000Z',
+      connectors: [{
+        connectorId: 'mathem-public-search',
+        chainId: 'mathem',
+        sourceType: 'retailer_online_page',
+        endpointUrl: `${GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL}?queries=makaroner&maxRows=1`,
+        parserVersion: 'mathem-public-search-v1',
+        robotsTxtStatus: 'allow',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: false,
+        requireStoreScopedPrices: false,
+        stores: []
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return new Response(`<script id="__NEXT_DATA__" type="application/json">${JSON.stringify(nextData)}</script>`, {
+          status: 200,
+          headers: { 'content-type': 'text/html' }
+        });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.deepEqual(requestedUrls, [buildMathemSearchUrl('makaroner')]);
+    const product = firstBatchProduct(executor);
+    assert.equal(product.slug, 'mathem-6448');
+    assert.equal(product.brand, 'Kungsörnen');
+    assert.equal(product.category_id, 'mathem-makaroner');
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.store_id, null);
+    assert.equal(observation.retailer_product_ref, '6448');
+    assert.equal(observation.price, 22.24);
+    assert.equal(observation.quantity, 1300);
+    assert.equal(observation.quantity_unit, 'g');
+    assert.equal(observation.is_available, true);
+    assert.equal(observation.domain, 'grocery');
+    const provenance = observation.provenance as Record<string, unknown>;
+    assert.deepEqual(provenance, {
+      sourceType: 'retailer_online_page',
+      sourceUrl: 'https://www.mathem.se/se/products/6448-kungsornen-gammaldags-idealmakaroner/',
+      parserVersion: 'mathem-public-search-v1',
+      rawSnapshotRef: String(provenance.rawSnapshotRef),
+      chainId: 'mathem',
+      cadence: 'daily',
+      connectorId: 'mathem-public-search',
+      runKey: 'mathem:retailer-online-page:mathem-public-search:2026-05-23',
+      domain: 'grocery'
+    });
+  });
+
   it('materializes native Coop all-store branch product prices into daily database observations', async () => {
     const executor = new DailyIngestionExecutor();
     const requestedUrls: string[] = [];
@@ -6423,18 +6654,18 @@ describe('daily ingestion runner', () => {
     assert.equal(observation.valid_until, '2026-05-24T23:59:59');
   });
 
-  it('materializes native City Gross all-store public product prices into daily database observations', async () => {
+  it('materializes native City Gross bulk public product prices into daily database observations', async () => {
     const executor = new DailyIngestionExecutor();
     const requestedUrls: string[] = [];
     const result = await runDailyIngestion({
       executor,
       requestedAt: '2026-05-22T12:45:00.000Z',
       connectors: [{
-        connectorId: 'city-gross-public-products-all-stores',
+        connectorId: 'city-gross-products-bulk',
         chainId: 'city_gross',
         sourceType: 'official_api',
-        endpointUrl: `${GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL}?queries=kaffe&maxStores=1&maxRowsPerStore=1`,
-        parserVersion: 'citygross-products-native-v1',
+        endpointUrl: `${GROCERYVIEW_DAILY_CITY_GROSS_BULK_PRODUCTS_URL}?maxStores=1&maxRowsPerStore=1&minRows=1`,
+        parserVersion: 'citygross-bulk-native-v1',
         robotsTxtStatus: 'not_applicable',
         legalReviewStatus: 'approved',
         hasDataAgreement: true,
@@ -6472,7 +6703,7 @@ describe('daily ingestion runner', () => {
     assert.equal(result.acceptedCount, 1);
     assert.deepEqual(requestedUrls, [
       buildCityGrossStoresUrl(),
-      buildCityGrossProductsUrl({ siteId: '21', query: 'kaffe', take: 1, skip: 0 })
+      buildCityGrossProductsUrl({ siteId: '21', take: 1, skip: 0 })
     ]);
     const observation = firstBatchObservation(executor);
     assert.equal(observation.store_id, 'store-db-2');

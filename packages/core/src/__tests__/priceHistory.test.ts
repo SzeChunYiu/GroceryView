@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildPriceChartSeries, priceChartLineStyle, summarizePriceHistory, summarizePriceHistoryConfidence } from '../index.js';
+import { buildPriceChartSeries, planMultiWeekStockUpList, priceChartLineStyle, summarizePriceHistory, summarizePriceHistoryConfidence } from '../index.js';
 
 describe('summarizePriceHistory', () => {
   it('summarizes latest price movement and new-low status from unordered observations', () => {
@@ -243,5 +243,74 @@ describe('summarizePriceHistoryConfidence', () => {
     assert.equal(memberExcluded.confidenceState, 'member_price_excluded');
     assert.equal(memberExcluded.detailCopy, 'Personalized or login-only offers are not included in this default history.');
     assert.equal(memberExcluded.canClaimLowestInWindow, false);
+  });
+});
+
+describe('planMultiWeekStockUpList', () => {
+  it('uses historical low and typical price context without forecasting', () => {
+    const plan = planMultiWeekStockUpList({
+      asOf: '2026-05-21T00:00:00.000Z',
+      planningWeeks: 3,
+      weeklyBudget: 900,
+      items: [
+        {
+          productId: 'zoegas-coffee-450g',
+          productName: 'Zoegas Coffee 450g',
+          storeName: 'Willys Odenplan',
+          weeklyNeedUnits: 0.45,
+          packageUnits: 0.45,
+          comparableUnit: 'kg',
+          currentUnitPrice: 110.89,
+          history: [
+            { observedAt: '2026-03-05T09:00:00.000Z', unitPrice: 139.78, sourceType: 'shelf', confidence: 0.9 },
+            { observedAt: '2026-03-28T09:00:00.000Z', unitPrice: 133.11, sourceType: 'shelf', confidence: 0.9 },
+            { observedAt: '2026-04-20T09:00:00.000Z', unitPrice: 122, sourceType: 'member', confidence: 0.86 },
+            { observedAt: '2026-05-20T09:00:00.000Z', unitPrice: 110.89, sourceType: 'member', confidence: 0.86 }
+          ],
+          seasonalityNote: 'Observed spring campaign rows only; no summer price projection.'
+        }
+      ]
+    });
+
+    assert.equal(plan.rows[0].typicalUnitPrice, 127.56);
+    assert.equal(plan.rows[0].historicalLowUnitPrice, 110.89);
+    assert.equal(plan.rows[0].currentVsTypicalPercent, -13.07);
+    assert.equal(plan.rows[0].currentVsHistoricalLowPercent, 0);
+    assert.equal(plan.rows[0].packagesNeeded, 3);
+    assert.equal(plan.rows[0].upfrontCost, 149.7);
+    assert.equal(plan.rows[0].weeklyBudgetSharePercent, 5.54);
+    assert.equal(plan.coverage.confidence, 'medium');
+    assert.ok(plan.guardrails.includes('No price forecast is produced or implied.'));
+    assert.match(plan.rows[0].contextLabel, /not a forecast/);
+  });
+
+  it('caps a row to storage limits and lowers confidence for sparse history', () => {
+    const plan = planMultiWeekStockUpList({
+      asOf: '2026-05-20T00:00:00.000Z',
+      planningWeeks: 4,
+      weeklyBudget: 800,
+      items: [
+        {
+          productId: 'garant-ekologisk-tofu-270g',
+          productName: 'Garant Ekologisk Tofu',
+          storeName: 'Willys Odenplan',
+          weeklyNeedUnits: 0.54,
+          packageUnits: 0.27,
+          comparableUnit: 'kg',
+          currentUnitPrice: 81.11,
+          storageLimitWeeks: 2,
+          history: [
+            { observedAt: '2026-05-01T09:00:00.000Z', unitPrice: 92.22, sourceType: 'shelf', confidence: 0.7 },
+            { observedAt: '2026-05-20T09:00:00.000Z', unitPrice: 81.11, sourceType: 'shelf', confidence: 0.7 }
+          ]
+        }
+      ]
+    });
+
+    assert.equal(plan.rows[0].planningWeeks, 2);
+    assert.equal(plan.rows[0].packagesNeeded, 4);
+    assert.equal(plan.rows[0].confidence, 'low');
+    assert.match(plan.rows[0].reviewTrigger, /Storage limit caps this at 2 weeks/);
+    assert.equal(plan.weeklyEquivalentCost, 21.9);
   });
 });
