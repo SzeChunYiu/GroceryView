@@ -15,7 +15,7 @@ import type { PrivateFeatureRoute } from '@/lib/verified-data';
 
 export function PageShell({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <div className="min-h-screen bg-[#f5f1e8] text-slate-950">
+    <div className="min-h-screen bg-[#f5f1e8] text-slate-950 dark:bg-slate-950 dark:text-slate-50">
       <AppNav />
       <main className="mx-auto w-full max-w-7xl px-4 pb-20 pt-6 sm:px-6 lg:px-8 lg:pb-6">{children}</main>
       <BottomNav />
@@ -28,7 +28,7 @@ export function Eyebrow({ children }: Readonly<{ children: ReactNode }>) {
 }
 
 export function Card({ children, className = '' }: Readonly<{ children: ReactNode; className?: string }>) {
-  return <section className={`rounded-[1.75rem] border border-slate-200 bg-white/88 p-5 shadow-sm ${className}`}>{children}</section>;
+  return <section className={`rounded-[1.75rem] border border-slate-200 bg-white/88 p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/88 ${className}`}>{children}</section>;
 }
 
 export function MetricGrid() {

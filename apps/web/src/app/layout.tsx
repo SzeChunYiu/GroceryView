@@ -35,9 +35,26 @@ function jsonLd(value: unknown) {
   return JSON.stringify(value).replace(/</g, '\\u003c');
 }
 
+const noFlashThemeScript = `
+(() => {
+  try {
+    const theme = window.localStorage.getItem('groceryview:theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const resolvedTheme = theme === 'dark' || (theme !== 'light' && prefersDark) ? 'dark' : 'light';
+    document.documentElement.classList.toggle('dark', resolvedTheme === 'dark');
+    document.documentElement.style.colorScheme = resolvedTheme;
+  } catch {
+    document.documentElement.classList.remove('dark');
+  }
+})();
+`;
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="sv">
+    <html lang="sv" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: noFlashThemeScript }} />
+      </head>
       <body>
         <script
           dangerouslySetInnerHTML={{ __html: jsonLd([organizationJsonLd, websiteJsonLd]) }}
