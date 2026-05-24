@@ -68,3 +68,11 @@ jobs:
 
       - name: Run Lighthouse CI against Vercel preview
         run: npm run perf:lighthouse:preview -w @groceryview/web
+
+      - name: Upload Lighthouse preview artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-preview
+          path: apps/web/.lighthouseci-preview
+          if-no-files-found: ignore
