@@ -7,10 +7,19 @@ export type TriggeredPriceAlertEmailNotification = {
   itemUrl?: string;
 };
 
+export type TriggeredRestockAlertEmailNotification = TriggeredPriceAlertEmailNotification;
+
 export type NotifyTriggeredPriceAlertsInput = {
   baseUrl: string;
   emailClient: TransactionalEmailClient;
   notifications: TriggeredPriceAlertEmailNotification[];
+  now: string;
+};
+
+export type NotifyTriggeredRestockAlertsInput = {
+  baseUrl: string;
+  emailClient: TransactionalEmailClient;
+  notifications: TriggeredRestockAlertEmailNotification[];
   now: string;
 };
 
@@ -23,13 +32,15 @@ export type TriggeredPriceAlertEmailSent = {
 export type TriggeredPriceAlertEmailSkipped = {
   recipientEmail: string;
   productId: string;
-  reason: 'not_price_threshold_alert';
+  reason: 'not_price_threshold_alert' | 'not_restock_alert';
 };
 
 export type NotifyTriggeredPriceAlertsResult = {
   sent: TriggeredPriceAlertEmailSent[];
   skipped: TriggeredPriceAlertEmailSkipped[];
 };
+
+export type NotifyTriggeredRestockAlertsResult = NotifyTriggeredPriceAlertsResult;
 
 export async function notifyTriggeredPriceAlerts(
   input: NotifyTriggeredPriceAlertsInput
@@ -59,12 +70,49 @@ export async function notifyTriggeredPriceAlerts(
   return { sent, skipped };
 }
 
+export async function notifyTriggeredRestockAlerts(
+  input: NotifyTriggeredRestockAlertsInput
+): Promise<NotifyTriggeredRestockAlertsResult> {
+  const sent: TriggeredPriceAlertEmailSent[] = [];
+  const skipped: TriggeredPriceAlertEmailSkipped[] = [];
+
+  for (const notification of input.notifications) {
+    if (!isEmailNotifiableRestockAlert(notification.alert)) {
+      skipped.push({
+        recipientEmail: notification.recipientEmail,
+        productId: notification.alert.productId,
+        reason: 'not_restock_alert'
+      });
+      continue;
+    }
+
+    const message = buildTriggeredRestockAlertEmail(notification, input.baseUrl, input.now);
+    const messageId = await input.emailClient.send(message);
+    sent.push({
+      recipientEmail: notification.recipientEmail,
+      productId: notification.alert.productId,
+      messageId
+    });
+  }
+
+  return { sent, skipped };
+}
+
 export function isEmailNotifiablePriceAlert(alert: WatchlistAlert): boolean {
   return (
     alert.type === 'target_price' &&
     alert.trigger.metric === 'price' &&
     typeof alert.trigger.value === 'number' &&
     typeof alert.trigger.threshold === 'number'
+  );
+}
+
+export function isEmailNotifiableRestockAlert(alert: WatchlistAlert): boolean {
+  const trigger = alert.trigger as { metric?: string; value?: unknown };
+  return (
+    ['restock', 'back_in_stock', 'availability'].includes(String(alert.type)) &&
+    trigger.metric === 'availability' &&
+    (trigger.value === true || trigger.value === 'available' || trigger.value === 'in_stock')
   );
 }
 
@@ -94,6 +142,36 @@ export function buildTriggeredPriceAlertEmail(
     text: lines.join('\n'),
     metadata: {
       type: alert.type,
+      productId: alert.productId,
+      sendAt: now
+    }
+  };
+}
+
+export function buildTriggeredRestockAlertEmail(
+  notification: TriggeredRestockAlertEmailNotification,
+  baseUrl: string,
+  now: string
+): TransactionalEmailMessage {
+  const { alert } = notification;
+  const itemUrl = notification.itemUrl ?? buildProductUrl(baseUrl, alert.productId);
+  const trigger = alert.trigger as { storeName?: string };
+  const storeSuffix = trigger.storeName ? ` at ${trigger.storeName}` : ' at a watched store';
+  const lines = [
+    alert.message,
+    '',
+    `${alert.productName} is back in stock${storeSuffix}.`,
+    `Open item: ${itemUrl}`,
+    '',
+    `Sent at: ${now}`
+  ];
+
+  return {
+    to: notification.recipientEmail,
+    subject: `${alert.productName} is back in stock`,
+    text: lines.join('\n'),
+    metadata: {
+      type: String(alert.type),
       productId: alert.productId,
       sendAt: now
     }
