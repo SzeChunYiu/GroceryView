@@ -212,6 +212,24 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(scanner, /@\/lib\/demo-data|@\/components\/sample-data/);
   });
 
+  it('wires signed-in search alias review UI to pending and decision endpoints', async () => {
+    const page = await read('src/app/admin/search-aliases/page.tsx');
+    const review = await read('src/lib/search-alias-review.ts');
+
+    assert.match(page, /loadPendingSearchAliases/);
+    assert.match(page, /postSearchAliasDecision/);
+    assert.match(page, /signed-in reviewers/i);
+    assert.match(page, /Approve alias/);
+    assert.match(page, /Reject alias/);
+    assert.match(review, /pendingSearchAliasesEndpoint/);
+    assert.match(review, /approvePendingSearchAliasEndpoint/);
+    assert.match(review, /approve_pending_search_alias/);
+    assert.match(review, /credentials: 'include'/);
+    assert.match(review, /method: 'POST'/);
+    assert.match(review, /Sign in first/);
+  });
+
+
   it('ships signed-in privacy request controls without destructive anonymous actions', async () => {
     const privacy = await read('src/app/privacy/page.tsx');
     const actions = await read('src/components/privacy-request-actions.tsx');
