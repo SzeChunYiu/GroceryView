@@ -1832,6 +1832,27 @@ describe('verified-data UI', () => {
     assert.match(itemsRoute, /maxSuggestions: 3/);
   });
 
+  it('surfaces a public shareable cheapest-current-deal link on item pages', async () => {
+    const shareItem = await read('src/lib/shareItem.ts');
+    const itemPage = await read('src/app/items/[id]/page.tsx');
+    const productPage = await read('src/app/products/[slug]/page.tsx');
+    const itemsRoute = await read('../../apps/api/src/routes/items.ts');
+
+    assert.match(shareItem, /export function cheapestCurrentDealForItem/);
+    assert.match(shareItem, /share=deal/);
+    assert.match(shareItem, /without logging in/i);
+    assert.doesNotMatch(shareItem, /localStorage|sessionStorage|Authorization/);
+    assert.match(itemPage, /products\/\[slug\]\/page/);
+    assert.match(itemPage, /share=deal/);
+    assert.match(productPage, /cheapestCurrentDealForItem/);
+    assert.match(productPage, /shareableItemDealFor/);
+    assert.match(productPage, /Shareable cheapest current deal/);
+    assert.match(productPage, /Anyone can open this link without logging in/);
+    assert.match(itemsRoute, /shareableDeal/);
+    assert.match(itemsRoute, /shareUrl/);
+    assert.match(itemsRoute, /without logging in/i);
+  });
+
   it('surfaces eco-conscious local and seasonal picks without origin or carbon invention', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/seasonal-calendar/page.tsx');

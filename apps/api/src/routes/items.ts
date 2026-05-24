@@ -3,9 +3,10 @@ export const itemsRoutes = {
   detailAlias: 'items/:id',
   seasonalSalePattern: 'items/:id/seasonal-sale-pattern',
   substitutionSuggestions: 'items/:id/substitution-suggestions',
+  shareableDeal: 'items/:id/shareable-deal',
   holidayWindow: 'midsommar',
-  description: 'Item detail, seasonalSalePattern metadata, and substitutionSuggestions backed by explicit current price evidence.',
-  queryParams: ['holiday'],
+  description: 'Item detail, seasonalSalePattern metadata, substitutionSuggestions, and public shareableDeal metadata backed by explicit current price evidence.',
+  queryParams: ['holiday', 'share', 'source', 'price', 'currency', 'observedAt'],
   maxSuggestions: 3,
   responseFields: [
     'available',
@@ -19,7 +20,11 @@ export const itemsRoutes = {
     'suggestions',
     'currentPrice',
     'savingsPercent',
+    'sourceId',
+    'sourceName',
+    'sharePath',
+    'shareUrl',
     'guardrail'
   ],
-  guardrail: 'No seasonal sale hint is returned without repeated explicit historical holiday-window price evidence. Substitution suggestions only return same-category, in-stock items with a verified lower current price.'
+  guardrail: 'No seasonal sale hint is returned without repeated explicit historical holiday-window price evidence. Substitution suggestions only return same-category, in-stock items with a verified lower current price. Shareable deal links are public and can be opened without logging in; they never include account, alert, basket, or session state.'
 } as const;

@@ -22,6 +22,7 @@ import { pricedProducts } from '@/lib/openprices-products';
 import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { metadataForProduct } from '@/lib/seo';
+import { cheapestCurrentDealForItem } from '@/lib/shareItem';
 
 export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
   const { slug } = await params;
@@ -160,6 +161,35 @@ function productOfferBounds(product: NonNullable<ReturnType<typeof findProduct>>
   }
 
   return { lowPrice: product.priceMin, highPrice: product.priceMax, offerCount: product.observationCount };
+}
+
+function shareableItemDealFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+  const candidates = 'lowestPrice' in product
+    ? chainPriceRows(product).map((row) => ({
+      sourceId: String(row.chain),
+      sourceName: String(row.chain),
+      price: row.price,
+      currency: 'SEK',
+      isAvailable: row.isAvailable !== false
+    }))
+    : (() => {
+      const latest = latestObservationFor(product);
+      return [{
+        sourceId: 'openprices-community',
+        sourceName: 'OpenPrices latest observation',
+        price: latest?.price ?? product.priceMedian,
+        currency: 'SEK',
+        observedAt: latest?.date ?? product.lastObservedAt,
+        isAvailable: product.observationCount > 0
+      }];
+    })();
+
+  return cheapestCurrentDealForItem({
+    itemId: product.slug,
+    itemName: product.name,
+    baseUrl: siteUrl,
+    candidates
+  });
 }
 
 function productJsonLdFor(product: NonNullable<ReturnType<typeof findProduct>>) {
@@ -1082,6 +1112,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const intraChainBranchSpread = intraChainBranchSpreadFor(product);
   const priceChartTerminal = priceChartTerminalFor(product);
   const commodityComparison = commodityComparisonForProduct(product.slug);
+  const shareableDeal = shareableItemDealFor(product);
   const freshnessBadge = dataFreshnessBadges.find((badge) => badge.sourceKind === (isChain ? 'axfood' : 'openprices')) ?? dataFreshnessBadges[0]!;
   const productJsonLd = productJsonLdFor(product);
   const breadcrumbJsonLd = breadcrumbJsonLdFor(product);
@@ -1132,6 +1163,38 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           </dl>
         </Card>
       </div>
+      <Card className="mt-6 border-emerald-200 bg-emerald-50/70">
+        <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-center">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-800">Public item deal share</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Shareable cheapest current deal</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Anyone can open this link without logging in. It points to this public item page with the visible cheapest current deal source and price in the URL.
+            </p>
+          </div>
+          {shareableDeal ? (
+            <Link className="rounded-full bg-emerald-700 px-5 py-3 text-sm font-black text-white shadow-sm" href={shareableDeal.sharePath}>
+              Open public deal link
+            </Link>
+          ) : null}
+        </div>
+        {shareableDeal ? (
+          <div className="mt-5 grid gap-3 lg:grid-cols-[1fr_1fr]">
+            <div className="rounded-2xl bg-white p-4 text-sm font-bold text-slate-700">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{shareableDeal.sourceName}</p>
+              <p className="mt-2 text-3xl font-black text-slate-950">{formatSek(shareableDeal.price)}</p>
+              <p className="mt-1 text-xs font-semibold text-slate-500">{shareableDeal.observedAt ? `Observed ${shareableDeal.observedAt}` : 'Current chain snapshot'}</p>
+            </div>
+            <div className="overflow-hidden rounded-2xl bg-slate-950 p-4 text-sm font-semibold text-emerald-50">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-300">shareUrl</p>
+              <code className="mt-2 block break-all">{shareableDeal.shareUrl}</code>
+            </div>
+          </div>
+        ) : (
+          <p className="mt-5 rounded-2xl bg-white p-4 text-sm font-bold text-amber-950">No public share link is shown until a verified current deal price is available.</p>
+        )}
+        <p className="mt-4 text-xs font-semibold text-slate-600">{shareableDeal?.guardrail ?? 'Share links stay public-only and never include account, alert, basket, or session state.'}</p>
+      </Card>
       <Card className="mt-6 border-slate-200 bg-slate-50">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
