@@ -2956,6 +2956,28 @@ ${seo}`;
     assert.match(maskableIcon, /maskable GroceryView icon/);
   });
 
+  it('registers a service worker that caches the last 50 item pages for offline browsing', async () => {
+    assert.equal(await fileExists('public/sw.js'), true, 'service worker should be served from /sw.js');
+    assert.equal(await fileExists('src/lib/swRegister.ts'), true, 'browser registration helper should exist');
+
+    const worker = await read('public/sw.js');
+    const registrar = await read('src/lib/swRegister.ts');
+    const layout = await read('src/app/layout.tsx');
+
+    assert.match(worker, /MAX_ITEM_PAGE_CACHE_ENTRIES = 50/);
+    assert.match(worker, /ITEM_PAGE_CACHE_NAME/);
+    assert.match(worker, /isItemPageRequest/);
+    assert.match(worker, /\\\/products\\\/\[\^\/\]\+/);
+    assert.match(worker, /\\\/product\\\/\[\^\/\]\+/);
+    assert.match(worker, /trimItemPageCache/);
+    assert.match(worker, /cache\.keys\(\)/);
+    assert.match(worker, /event\.respondWith/);
+    assert.match(worker, /ignoreSearch: true/);
+    assert.match(registrar, /navigator\.serviceWorker\.register\('\/sw\.js'/);
+    assert.match(registrar, /ServiceWorkerRegistrar/);
+    assert.match(layout, /ServiceWorkerRegistrar/);
+  });
+
 
   it('ships dynamic product OG price images from verified price data', async () => {
     const ogPath = 'src/app/products/[slug]/opengraph-image.tsx';
