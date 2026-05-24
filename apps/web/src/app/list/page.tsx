@@ -6,8 +6,10 @@ import { BottomNav } from '@/components/bottom-nav';
 import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { useList } from '@/hooks/useList';
 
+const sekFormatter = new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 });
+
 export default function ShoppingListPage() {
-  const { addImportedItems, checkedCount, items, remainingCount, resetCheckedState, toggleItemChecked, totalCount } = useList();
+  const { addImportedItems, budgetAlerts, budgetBuckets, checkedCount, estimatedTotal, items, remainingCount, resetCheckedState, toggleItemChecked, totalCount } = useList();
   const progress = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
 
   return (
@@ -30,6 +32,38 @@ export default function ShoppingListPage() {
         </div>
 
         <BulkImportDialog onImportItems={addImportedItems} />
+
+        <section className="mt-6 rounded-[1.75rem] border border-amber-200 bg-white/95 p-5 shadow-sm" aria-labelledby="list-budget-heading">
+          <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-800">List budget buckets</p>
+              <h2 className="mt-1 text-2xl font-black tracking-tight text-slate-950" id="list-budget-heading">Category budget before checkout</h2>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+                Category-specific budgets update while you edit the list, using matched catalog estimates for imported rows and starter-item estimates for the default basket.
+              </p>
+            </div>
+            <div className="rounded-2xl bg-amber-50 p-4 text-right">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-800">Estimated list total</p>
+              <p className="mt-1 text-3xl font-black text-slate-950">{sekFormatter.format(estimatedTotal)}</p>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{budgetAlerts.length} overspend alert(s)</p>
+            </div>
+          </div>
+          <div aria-live="polite" className={budgetAlerts.length > 0 ? 'mt-4 rounded-2xl bg-rose-50 p-3 text-sm font-black text-rose-900' : 'mt-4 rounded-2xl bg-emerald-50 p-3 text-sm font-black text-emerald-900'} role="status">
+            {budgetAlerts.length > 0
+              ? `Overspend warning: ${budgetAlerts.map((bucket) => `${bucket.category} ${sekFormatter.format(Math.abs(bucket.remaining))} over`).join(', ')}.`
+              : 'All category buckets are within budget.'}
+          </div>
+          <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            {budgetBuckets.map((bucket) => (
+              <div className={bucket.status === 'over' ? 'rounded-2xl border border-rose-200 bg-rose-50 p-4' : 'rounded-2xl border border-slate-200 bg-slate-50 p-4'} key={bucket.category}>
+                <p className="text-sm font-black capitalize text-slate-950">{bucket.category}</p>
+                <p className={bucket.status === 'over' ? 'mt-2 text-2xl font-black text-rose-800' : 'mt-2 text-2xl font-black text-emerald-800'}>{sekFormatter.format(bucket.spent)}</p>
+                <p className="mt-1 text-sm font-semibold text-slate-600">Budget {sekFormatter.format(bucket.budget)} · {bucket.itemCount} item(s)</p>
+                <p className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-slate-500">{bucket.status === 'over' ? `${sekFormatter.format(Math.abs(bucket.remaining))} over` : `${sekFormatter.format(bucket.remaining)} left`}</p>
+              </div>
+            ))}
+          </div>
+        </section>
 
         <section className="mt-6 rounded-[1.75rem] border border-emerald-200 bg-white/95 p-5 shadow-sm">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
