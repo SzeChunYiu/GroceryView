@@ -11,6 +11,7 @@ import { openFoodFactsCatalog } from './openfoodfacts-catalog';
 import { lidlStoreOffers as staticLidlStoreOffers, lidlSource as staticLidlSource } from './ingested/lidl';
 import { matpriskollenOffers as staticMatpriskollenOffers } from './ingested/matpriskollen';
 import { verifiedFuelPriceObservations, verifiedFuelPriceSource } from './fuel-prices';
+import { allergenRiskGroups, allergenRisksForProduct, allergenSearchValues, type AllergenRiskGroupValue } from './search-filters';
 import {
   dbSiteIcaReklambladOffers,
   dbSiteIcaReklambladSource,
@@ -504,6 +505,14 @@ export const facetedSearchRows: RealCatalogSearchPriceRow[] = axfoodProducts.fla
 });
 
 const rawFacetedProductSearch = buildFacetedProductSearch({ rows: facetedSearchRows });
+const productAllergenRisks = new Map<string, AllergenRiskGroupValue[]>(axfoodProducts.map((product) => [product.slug, allergenRisksForProduct(product)] as const));
+const facetedProductSlugs = [...new Set(facetedSearchRows.map((row) => row.slug))];
+const allergenRiskProductCounts = new Map<AllergenRiskGroupValue, number>(
+  allergenRiskGroups.map((group) => [
+    group.value,
+    facetedProductSlugs.filter((slug) => productAllergenRisks.get(slug)?.includes(group.value)).length
+  ] as const)
+);
 
 type SearchParamValue = string | string[] | undefined;
 
@@ -512,6 +521,7 @@ export type ProductSearchUrlParams = {
   category?: SearchParamValue;
   label?: SearchParamValue;
   dietary?: SearchParamValue;
+  allergen?: SearchParamValue;
   chain?: SearchParamValue;
   minPrice?: SearchParamValue;
   maxPrice?: SearchParamValue;
@@ -582,13 +592,17 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
   const labelFilters = listSearchValues(searchParams.label);
   const dietaryLabels = dietarySearchValues(searchParams.dietary);
   const labels = [...new Set([...labelFilters, ...dietaryLabels])];
+  const excludedAllergenRisks = allergenSearchValues(searchParams.allergen);
   const chains = listSearchValues(searchParams.chain);
   const minPrice = numericSearchValue(searchParams.minPrice);
   const maxPrice = numericSearchValue(searchParams.maxPrice);
   const inStockOnly = booleanSearchValue(searchParams.inStockOnly);
   const minConfidence = confidenceSearchValue(searchParams.minConfidence);
   const filters = { query, categories, labels, chains, minPrice, maxPrice, inStockOnly, minConfidence, limit: 100 };
-  const searchResult = buildFacetedProductSearch({ rows: facetedSearchRows, filters });
+  const searchRows = excludedAllergenRisks.length
+    ? facetedSearchRows.filter((row) => !excludedAllergenRisks.some((group) => productAllergenRisks.get(row.slug)?.includes(group)))
+    : facetedSearchRows;
+  const searchResult = buildFacetedProductSearch({ rows: searchRows, filters });
 
   const activeFilters = [
     query ? `q=${query}` : null,
@@ -597,6 +611,10 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
     ...dietaryLabels.map((dietaryLabel) => {
       const dietaryFilterLabel = commonDietaryFilterOptions.find((option) => option.value === dietaryLabel)?.label ?? readableLabel(dietaryLabel);
       return `dietary=${dietaryFilterLabel}`;
+    }),
+    ...excludedAllergenRisks.map((group) => {
+      const groupLabel = allergenRiskGroups.find((option) => option.value === group)?.label ?? readableLabel(group);
+      return `avoids ${groupLabel}`;
     }),
     ...chains.map((chain) => `chain=${chainDisplayNames[chain] ?? chain}`),
     minPrice !== undefined ? `min unit ${formatSek(minPrice)}` : null,
@@ -621,6 +639,11 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
         evidenceSummary: option.evidenceLabels.join(' + ')
       };
     }),
+    allergenFilters: allergenRiskGroups.map((group) => ({
+      ...group,
+      checked: excludedAllergenRisks.includes(group.value),
+      count: allergenRiskProductCounts.get(group.value) ?? 0
+    })),
     priceRange: searchResult.facets.priceRange,
     inStockOnly: {
       label: 'In-stock / priced rows only',

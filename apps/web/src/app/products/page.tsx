@@ -18,6 +18,7 @@ type SearchParams = {
   category?: string | string[];
   label?: string | string[];
   dietary?: string | string[];
+  allergen?: string | string[];
   chain?: string | string[];
   minPrice?: string | string[];
   maxPrice?: string | string[];
@@ -58,6 +59,7 @@ function copySearchParams(params: URLSearchParams, source: SearchParams) {
   setFirstParam(params, 'category', source.category);
   setFirstParam(params, 'label', source.label);
   setAllParams(params, 'dietary', source.dietary);
+  setAllParams(params, 'allergen', source.allergen);
   setFirstParam(params, 'chain', source.chain);
   setFirstParam(params, 'minPrice', source.minPrice);
   setFirstParam(params, 'maxPrice', source.maxPrice);
@@ -91,7 +93,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const rangeEnd = Math.min(pageStart + PRODUCTS_PER_PAGE, resultCards.length);
   const defaultSearchCount = facetedProductSearch.resultCards.length;
 
-  function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence', string>>) {
+  function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'dietary' | 'allergen' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence', string>>) {
     const params = new URLSearchParams();
     copySearchParams(params, resolvedSearchParams);
     for (const [key, value] of Object.entries(overrides)) {
@@ -174,6 +176,23 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             </div>
             <p className="mt-2 text-xs font-semibold leading-5 text-emerald-900">
               Gluten-free, lactose-free, and vegan filters require verified label metadata or explicit product text; GroceryView does not infer dietary status from shopper profiles.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-amber-100 bg-amber-50/80 p-3 lg:col-span-4">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-800">Avoid allergen groups</p>
+            <div className="mt-2 grid gap-2 sm:grid-cols-4">
+              {search.allergenFilters.map((filter) => (
+                <label className="flex items-start gap-2 rounded-2xl bg-white px-3 py-2 text-sm font-black text-amber-950 shadow-sm" key={filter.value}>
+                  <input className="mt-1" defaultChecked={filter.checked} name="allergen" type="checkbox" value={filter.value} />
+                  <span>
+                    {filter.label}
+                    <span className="block text-xs font-semibold text-amber-700">{filter.count.toLocaleString('sv-SE')} possible risk products</span>
+                  </span>
+                </label>
+              ))}
+            </div>
+            <p className="mt-2 text-xs font-semibold leading-5 text-amber-900">
+              Each checkbox is URL-backed and excludes products with matching allergen risk text while keeping pagination and facet links on the same filtered result set.
             </p>
           </div>
           <div className="flex flex-col justify-end gap-2">
