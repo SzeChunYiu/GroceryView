@@ -106,6 +106,8 @@ import {
   type ScanUploadStorage
 } from '@groceryview/scanning';
 
+export * from './lib/receiptOCR.js';
+
 export type HttpHandler = (request: Request) => Promise<Response>;
 
 export type AuthOptions = {
