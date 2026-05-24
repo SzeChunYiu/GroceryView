@@ -4,7 +4,7 @@ export const siteUrl = 'https://grocery-web-mu.vercel.app';
 export const siteName = 'GroceryView';
 
 const defaultDescription = 'Verified Swedish grocery price intelligence with product tickers, chain comparisons, store coverage, and confidence-labelled savings signals.';
-const localeNegotiatedCurrentRouteCaveat = 'Locale-negotiated current route hreflang alternates share the canonical URL until native route translations exist beyond /sv and /en.';
+const hreflangRoutePolicy = 'Swedish and English hreflang alternates use explicit /sv and /en locale route variants.';
 
 type RouteMetadataConfig = {
   path: string;
@@ -236,19 +236,21 @@ function absoluteUrl(path: string) {
   return new URL(path, siteUrl).toString();
 }
 
-export function languageAlternateUrls(path: string) {
-  if (path === '/' || path === '') {
-    return {
-      'sv-SE': absoluteUrl('/sv'),
-      'en-SE': absoluteUrl('/en'),
-      'x-default': absoluteUrl('/')
-    };
-  }
+function pathWithoutLocale(path: string) {
+  const normalized = path.startsWith('/') ? path : `/${path}`;
+  return normalized.replace(/^\/(?:sv|en)(?=\/|$)/, '') || '/';
+}
 
+export function localizedHreflangPath(locale: 'sv' | 'en', path: string) {
+  const basePath = pathWithoutLocale(path);
+  return basePath === '/' ? `/${locale}` : `/${locale}${basePath}`;
+}
+
+export function languageAlternateUrls(path: string) {
   return {
-    'sv-SE': absoluteUrl(path),
-    'en-SE': absoluteUrl(path),
-    'x-default': absoluteUrl(path)
+    'sv-SE': absoluteUrl(localizedHreflangPath('sv', path)),
+    'en-SE': absoluteUrl(localizedHreflangPath('en', path)),
+    'x-default': absoluteUrl(pathWithoutLocale(path))
   };
 }
 
@@ -283,7 +285,7 @@ export function routeMetadata(route: keyof typeof routeMetadataCatalog | RouteMe
     manifest: '/manifest.webmanifest',
     alternates: { canonical: canonical, languages: languageAlternateUrls(config.path) },
     other: {
-      'x-groceryview-hreflang-boundary': localeNegotiatedCurrentRouteCaveat
+      'x-groceryview-hreflang-boundary': hreflangRoutePolicy
     },
     openGraph: {
       title,

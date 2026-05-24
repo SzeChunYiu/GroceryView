@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import { ConsentManager } from '@/components/consent-manager';
+import { languageAlternateUrls, siteUrl } from '@/lib/seo';
 import { ServiceWorkerRegistrar } from '@/lib/swRegister';
 import { Providers } from './providers';
 import './globals.css';
 
-const siteUrl = 'https://grocery-web-mu.vercel.app';
 const organizationJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
@@ -28,7 +28,11 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: 'GroceryView',
   description: 'Sweden grocery price intelligence for products, stores, and weekly baskets.',
-  manifest: '/manifest.webmanifest'
+  manifest: '/manifest.webmanifest',
+  alternates: {
+    canonical: siteUrl,
+    languages: languageAlternateUrls('/')
+  }
 };
 
 function jsonLd(value: unknown) {
