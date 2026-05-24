@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { PiggyBank } from 'lucide-react';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { elderlyFixedIncomeBudgetTracker, elderlyStaplesStabilityTracker, personalGroceryInflation, savingsDashboard, studentWeeklyBudgetTracker } from '@/lib/demo-data';
@@ -22,6 +23,20 @@ function formatSignedSek(value: number) {
 
 function formatPercent(value: number) {
   return `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`;
+}
+
+
+function SavingsEmptyState() {
+  return (
+    <div className="rounded-3xl border border-dashed border-emerald-200 bg-emerald-50/70 p-6 text-center">
+      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-white text-emerald-800 shadow-sm">
+        <PiggyBank className="h-6 w-6" aria-hidden="true" />
+      </div>
+      <h3 className="mt-4 text-xl font-black text-slate-950">No savings drivers yet</h3>
+      <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">Add verified basket products to unlock personal inflation drivers and savings watchpoints.</p>
+      <Link className="mt-4 inline-flex rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" href="/products">Browse verified products</Link>
+    </div>
+  );
 }
 
 export default function SavingsDashboardPage() {
@@ -66,7 +81,7 @@ export default function SavingsDashboardPage() {
         <Card>
           <h2 className="text-2xl font-black">Largest basket drivers</h2>
           <div className="mt-4 space-y-3">
-            {topContributions.map((item) => (
+            {topContributions.length > 0 ? topContributions.map((item) => (
               <div className="rounded-2xl border border-slate-200 p-4" key={item.productId}>
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
@@ -80,7 +95,7 @@ export default function SavingsDashboardPage() {
                 </div>
                 <p className="mt-2 text-sm font-semibold text-slate-700">Contribution: {formatSignedSek(item.changeAmount)}</p>
               </div>
-            ))}
+            )) : <SavingsEmptyState />}
           </div>
         </Card>
 
