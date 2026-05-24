@@ -15,6 +15,7 @@ export type CoopProduct = {
   promotionText: string;
   promotionPrice: number | null;
   medMeraRequired: boolean;
+  isMemberPrice: boolean;
   availableOnline: boolean;
   sourceUrl: string;
   productUrl: string;
@@ -946,11 +947,14 @@ export async function fetchCoopProductsByCategory(input: FetchCoopProductCatalog
     const payload = JSON.parse(textPayload) as CoopSearchResponse;
     const products = payload.results?.items ?? [];
     for (const product of products) {
-      const row = normalizeCoopProduct(product, sourceUrl, retrievedAt);
-      if (!row || seenCodes.has(row.code)) continue;
-      seenCodes.add(row.code);
-      rows.push(row);
-      if (rows.length >= maxRows) return rows;
+      const productRows = normalizeCoopProductRows(product, sourceUrl, retrievedAt);
+      for (const row of productRows) {
+        const rowKey = row.code + ':' + String(row.isMemberPrice);
+        if (seenCodes.has(rowKey)) continue;
+        seenCodes.add(rowKey);
+        rows.push(row);
+        if (rows.length >= maxRows) return rows;
+      }
     }
     const total = numberOrNull(payload.results?.count);
     if (products.length < take || (total !== null && skip + products.length >= total)) break;
@@ -1001,14 +1005,17 @@ export async function fetchCoopProducts(options: FetchCoopProductsOptions = {}):
   const seenCodes = new Set<string>();
 
   for (const product of payload.results?.items ?? []) {
-    const row = normalizeCoopProduct(product, sourceUrl, retrievedAt);
-    if (!row || seenCodes.has(row.code)) {
-      continue;
-    }
-    seenCodes.add(row.code);
-    rows.push(row);
-    if (rows.length >= maxRows) {
-      return rows;
+    const productRows = normalizeCoopProductRows(product, sourceUrl, retrievedAt);
+    for (const row of productRows) {
+      const rowKey = row.code + ':' + String(row.isMemberPrice);
+      if (seenCodes.has(rowKey)) {
+        continue;
+      }
+      seenCodes.add(rowKey);
+      rows.push(row);
+      if (rows.length >= maxRows) {
+        return rows;
+      }
     }
   }
 
@@ -1695,12 +1702,42 @@ export function normalizeCoopProduct(
     promotionText: text(promotion?.message),
     promotionPrice: numberOrNull(promotion?.priceData?.b2cPrice),
     medMeraRequired: promotion?.medMeraRequired === true,
+    isMemberPrice: false,
     availableOnline: product.availableOnline === true,
     sourceUrl,
     productUrl: buildCoopProductUrl(categoryPath, name, code),
     imageUrl: text(product.imageUrl),
     retrievedAt
   };
+}
+
+export function normalizeCoopProductRows(
+  product: CoopSearchProduct,
+  sourceUrl: string,
+  retrievedAt: string
+): CoopProduct[] {
+  const listPriceRow = normalizeCoopProduct(product, sourceUrl, retrievedAt);
+  if (!listPriceRow) return [];
+
+  const memberPromotion = product.onlinePromotions?.find((promotion) => (
+    promotion.medMeraRequired === true
+    && numberOrNull(promotion.priceData?.b2cPrice) !== null
+  ));
+  const memberPrice = numberOrNull(memberPromotion?.priceData?.b2cPrice);
+  if (memberPrice === null || memberPrice === listPriceRow.price) return [listPriceRow];
+
+  return [
+    { ...listPriceRow, promotionText: '', promotionPrice: null, medMeraRequired: false, isMemberPrice: false },
+    {
+      ...listPriceRow,
+      price: memberPrice,
+      priceText: memberPrice.toFixed(2) + ' SEK',
+      promotionText: text(memberPromotion?.message),
+      promotionPrice: memberPrice,
+      medMeraRequired: true,
+      isMemberPrice: true
+    }
+  ];
 }
 
 export function normalizeCoopStore(

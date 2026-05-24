@@ -1300,6 +1300,7 @@ describe('fetchCoopProducts', () => {
       promotionText: 'Arvid Nordquist 2 för 130-2 för 130:-',
       promotionPrice: 130,
       medMeraRequired: false,
+      isMemberPrice: false,
       availableOnline: true,
       sourceUrl: buildCoopSearchUrl(),
       productUrl: 'https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-mellanrost-7310760012896/',
@@ -6707,21 +6708,25 @@ describe('daily ingestion runner', () => {
     });
 
     assert.equal(result.status, 'succeeded');
-    assert.equal(result.acceptedCount, 1);
+    assert.equal(result.acceptedCount, 2);
     assert.deepEqual(requestedUrls, [
       buildCoopStoresUrl(),
       buildCoopStoreInfoUrl('251300'),
       buildCoopStoreInfoUrl('251300'),
       buildCoopSearchUrl('251300')
     ]);
-    const observation = firstBatchObservation(executor);
-    assert.equal(observation.store_id, 'store-db-2');
-    assert.equal(observation.price, 45);
-    assert.equal(observation.member_required, true);
-    assert.equal(observation.promotion_starts_on, '2026-05-18');
-    assert.equal(observation.promotion_ends_on, '2026-05-24');
-    assert.equal(observation.valid_from, '2026-05-18T00:00:00');
-    assert.equal(observation.valid_until, '2026-05-24T23:59:59');
+    const observationInsert = executor.calls.find((call) => call.sql.includes('insert into observations'));
+    const observations = JSON.parse(String(observationInsert?.params[0])) as Array<Record<string, unknown>>;
+    assert.equal(observations[0]?.store_id, 'store-db-2');
+    assert.equal(observations[0]?.price, 61.45);
+    assert.equal(observations[0]?.member_required, false);
+    assert.equal(observations[1]?.store_id, 'store-db-2');
+    assert.equal(observations[1]?.price, 45);
+    assert.equal(observations[1]?.member_required, true);
+    assert.equal(observations[1]?.promotion_starts_on, '2026-05-18');
+    assert.equal(observations[1]?.promotion_ends_on, '2026-05-24');
+    assert.equal(observations[1]?.valid_from, '2026-05-18T00:00:00');
+    assert.equal(observations[1]?.valid_until, '2026-05-24T23:59:59');
   });
 
   it('materializes native City Gross bulk public product prices into daily database observations', async () => {

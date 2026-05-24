@@ -1849,7 +1849,7 @@ function coopStoreProductToDailyItem(row: CoopStoreProduct): RetailerConnectorPa
   const barcode = validDailyBarcode(row.ean);
   return {
     storeId: row.storeId,
-    retailerProductId: row.code,
+    retailerProductId: row.isMemberPrice ? row.code + ':member' : row.code,
     rawName: row.name,
     canonicalName: row.name,
     productId: dailyProductIdForBarcode('coop', row.ean || row.code, barcode),
