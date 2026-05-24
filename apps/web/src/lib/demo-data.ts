@@ -502,7 +502,7 @@ export const savingsPlaybook = [
     trigger: 'Coffee index is 8.4% under baseline',
     action: 'Buy one extra Zoegas pack at Willys before promo expiry',
     impact: '-10.00 SEK vs usual shelf',
-    href: '/products/zoegas-coffee-450g'
+    href: '/items/zoegas-coffee-450g'
   },
   {
     title: 'Breakfast basket shift',
@@ -516,7 +516,7 @@ export const savingsPlaybook = [
     trigger: 'Matmissionen rice is 7.2% below recent pantry index',
     action: 'Split pantry top-ups from dairy trips when the route is practical',
     impact: '-9.00 SEK vs big-box rice',
-    href: '/products/eldorado-basmati-rice-1kg'
+    href: '/items/eldorado-basmati-rice-1kg'
   },
   {
     title: 'Butter caution flag',

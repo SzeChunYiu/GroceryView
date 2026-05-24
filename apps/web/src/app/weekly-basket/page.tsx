@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { ArrowDownRight, ArrowUpRight, ShoppingBasket } from "lucide-react";
 import { basketItems, formatSek } from "@/components/sample-data";
+import { itemDetailHref } from "@/lib/item-route";
+import { products } from "@/lib/demo-data";
+
+const productByName = new Map(products.map((product) => [product.name, product]));
 
 export default function WeeklyBasketPage() {
   const currentTotal = basketItems.reduce((sum, item) => sum + item.currentPrice, 0);
@@ -35,7 +39,10 @@ export default function WeeklyBasketPage() {
 
           return (
             <article className="grid gap-3 border-b border-zinc-200 px-5 py-4 last:border-b-0 md:grid-cols-[1.2fr_0.6fr_0.8fr_0.8fr_0.9fr]" key={item.name}>
-              <Link className="font-semibold text-zinc-950 hover:text-emerald-700" href={`/products/${item.name.toLowerCase().replaceAll(" ", "-")}`}>
+              <Link
+                className="font-semibold text-zinc-950 hover:text-emerald-700"
+                href={itemDetailHref(productByName.get(item.name) ? { slug: productByName.get(item.name)!.slug } : { name: item.name })}
+              >
                 {item.name}
               </Link>
               <span className="text-zinc-600">{item.quantity}</span>

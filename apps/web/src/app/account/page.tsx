@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { Bell, CheckCircle2, Clock, Mail, Smartphone } from "lucide-react";
 import { basketItems, formatSek } from "@/components/sample-data";
+import { itemDetailHref } from "@/lib/item-route";
+import { products } from "@/lib/demo-data";
+
+const productSlugByName = new Map(products.map((product) => [product.name, product.slug]));
 
 const alertRules = [
   { label: "Coffee drops below median", channel: "Push", threshold: "Under 52 kr", status: "Active" },
@@ -35,7 +39,11 @@ export default function AccountPage() {
           <p className="mt-2 text-sm text-zinc-500">Current price across tracked staples</p>
           <div className="mt-5 grid gap-3">
             {basketItems.slice(0, 3).map((item) => (
-              <Link className="rounded-lg bg-zinc-50 p-3 transition hover:bg-zinc-100" href={`/products/${item.name.toLowerCase().replaceAll(" ", "-")}`} key={item.name}>
+              <Link
+                className="rounded-lg bg-zinc-50 p-3 transition hover:bg-zinc-100"
+                href={itemDetailHref({ slug: productSlugByName.get(item.name), name: item.name })}
+                key={item.name}
+              >
                 <div className="flex items-center justify-between gap-4">
                   <span className="font-semibold text-zinc-950">{item.name}</span>
                   <span className="tabular-nums text-zinc-700">{formatSek(item.currentPrice)}</span>

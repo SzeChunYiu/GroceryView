@@ -13,6 +13,7 @@ import {
 } from '@/lib/demo-data';
 import { categoryLabels, pricedProducts } from '@/lib/openprices-products';
 import { osmStores } from '@/lib/osm-stores';
+import { itemDetailHref, itemDetailIdFor } from '@/lib/item-route';
 
 const totalObservedPrices = pricedProducts.reduce((sum, product) => sum + product.observationCount, 0);
 const latestPriceDate = pricedProducts.reduce(
@@ -39,7 +40,7 @@ export function MarketShell() {
           GroceryView
         </Link>
         <div className="flex gap-3 text-sm font-semibold text-market-ink/70">
-          <Link href="/products/zoegas-coffee-450g">Products</Link>
+          <Link href={itemDetailHref({ slug: products[0]?.slug })}>Products</Link>
           <Link href="/stores/willys-odenplan">Stores</Link>
           <Link href="/categories/coffee">Categories</Link>
         </div>
@@ -74,7 +75,7 @@ export function MarketShell() {
       </section>
 
       <section className="grid gap-4 md:grid-cols-3">
-        <FeatureCard icon={<BarChart3 size={20} />} title="Product terminal" href="/products/zoegas-coffee-450g">
+        <FeatureCard icon={<BarChart3 size={20} />} title="Product terminal" href={itemDetailHref({ slug: products[0]?.slug })}>
           Current price, unit price, source timestamp, and confidence labels are first-class page content.
         </FeatureCard>
         <FeatureCard icon={<MapPin size={20} />} title="Store profile" href="/stores/willys-odenplan">
@@ -115,7 +116,7 @@ export function MarketShell() {
               <span className="mt-2 block text-xs font-bold text-market-ink/50">{deal.band.label}</span>
             </div>
             <div className="min-w-0">
-              <Link href={`/products/${deal.productId}`} className="block truncate font-black hover:text-market-mint">
+              <Link href={itemDetailHref({ slug: deal.productId })} className="block truncate font-black hover:text-market-mint">
                 {deal.productName}
               </Link>
               <Link href={`/stores/${deal.storeId}`} className="mt-1 block truncate text-xs font-bold text-market-ink/55">
@@ -305,7 +306,7 @@ export function MarketShell() {
         {products.map((product) => (
           <Link
             key={product.slug}
-            href={`/products/${product.slug}`}
+            href={itemDetailHref({ slug: product.slug })}
             className="grid grid-cols-[1fr_1fr_1fr] px-4 py-4 text-sm hover:bg-market-oat/45"
           >
             <span className="font-bold">{product.ticker}</span>
@@ -338,7 +339,7 @@ export function MarketShell() {
           return (
             <Link
               key={item.slug}
-              href={`/products/${item.slug}`}
+              href={itemDetailHref({ slug: item.slug, code: product ? itemDetailIdFor(product) : item.slug })}
               className="grid grid-cols-[1fr_auto_auto_auto] gap-3 px-4 py-4 text-sm hover:bg-market-oat/45"
             >
               <span className="font-bold">{product?.ticker ?? item.slug}</span>
