@@ -52,7 +52,8 @@ const navGroups: NavGroup[] = [
     icon: PackageSearch,
     items: [
       { href: '/products', label: 'Browse', icon: PackageSearch },
-      { href: '/compare', label: 'Compare', icon: ListChecks }
+      { href: '/compare', label: 'Compare', icon: ListChecks },
+      { href: '/compare-items', label: 'Compare items', icon: ListChecks }
     ]
   },
   {

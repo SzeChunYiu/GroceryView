@@ -2458,6 +2458,43 @@ ${seo}`;
     assert.doesNotMatch(compareLib, /Math\.random|placeholder|synthetic/i);
   });
 
+  it('surfaces an item comparison route with four-item nutrition, store price, and trend coverage', async () => {
+    const route = await read('src/app/compare-items/page.tsx');
+    const table = await read('src/components/ItemComparisonTable.tsx');
+    const verified = await read('src/lib/verified-data.ts');
+    const nav = await read('src/components/app-nav.tsx');
+    const seo = await read('src/lib/seo.ts');
+    const sitemap = await read('src/app/sitemap.ts');
+    const apiCompare = await read('../../apps/api/src/routes/compare.ts');
+
+    assert.match(route, /routeMetadata\('\/compare-items'\)/);
+    assert.match(route, /buildItemComparisonView/);
+    assert.match(route, /ItemComparisonTable/);
+    assert.match(route, /items\?: string \| string\[\]/);
+    assert.match(route, /up to four items/i);
+    assert.match(table, /export function ItemComparisonTable/);
+    assert.match(table, /data-item-comparison-table/);
+    assert.match(table, /Nutrition/);
+    assert.match(table, /Price across stores/);
+    assert.match(table, /Trend charts/);
+    assert.match(table, /trendPoints/);
+    assert.match(verified, /MAX_ITEM_COMPARISON_ITEMS = 4/);
+    assert.match(verified, /export function buildItemComparisonView/);
+    assert.match(verified, /slice\(0, MAX_ITEM_COMPARISON_ITEMS\)/);
+    assert.match(verified, /nutriScore/);
+    assert.match(verified, /storePrices/);
+    assert.match(verified, /trendPoints/);
+    assert.match(apiCompare, /compareRoutes/);
+    assert.match(apiCompare, /itemComparison/);
+    assert.match(apiCompare, /maxItems: 4/);
+    assert.match(apiCompare, /nutrition/);
+    assert.match(apiCompare, /storePrices/);
+    assert.match(apiCompare, /trendPoints/);
+    assert.match(nav, /href: '\/compare-items'/);
+    assert.match(seo, /'\/compare-items'/);
+    assert.match(sitemap, /entry\('\/compare-items'/);
+  });
+
   it('surfaces a compare-overlay chart from real price chart series output', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/compare/page.tsx');
@@ -2892,6 +2929,7 @@ ${seo}`;
       'src/app/chain-coverage/page.tsx',
       'src/app/chain-index/page.tsx',
       'src/app/compare/page.tsx',
+      'src/app/compare-items/page.tsx',
       'src/app/coupon-stacks/page.tsx',
       'src/app/cookies/page.tsx',
       'src/app/data-sources/page.tsx',

@@ -89,6 +89,10 @@ export const routeMetadataCatalog = {
     title: 'Compare grocery prices across chains | GroceryView',
     description: 'See matched Willys and Hemkop products, cheapest-chain highlights, catalogue savings, and real cross-chain price spreads.'
   },
+  '/compare-items': {
+    title: 'Compare grocery items side by side | GroceryView',
+    description: 'Compare up to four verified grocery items by nutrition labels, store price evidence, and observed trend charts.'
+  },
   '/coupon-stacks': {
     title: 'Coupon stack evidence gate | GroceryView',
     description: 'Coupon stacking is blocked from public rendering until verified production coupon and retailer records are available.'

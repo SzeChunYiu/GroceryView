@@ -263,6 +263,119 @@ export const topChainSpreads = [...matchedChainProducts].sort((a, b) => b.spread
 export const freshestOpenPrices = [...pricedProducts].sort((a, b) => b.lastObservedAt.localeCompare(a.lastObservedAt)).slice(0, 18);
 export const productUniverse = [...topChainSpreads, ...freshestOpenPrices].slice(0, 36);
 
+export const MAX_ITEM_COMPARISON_ITEMS = 4;
+
+type ItemComparisonProduct = (typeof axfoodProducts)[number] | (typeof pricedProducts)[number];
+
+function itemComparisonRequestValues(value: SearchParamValue | undefined) {
+  return listSearchValues(value)
+    .flatMap((item) => item.split(','))
+    .map((item) => item.trim())
+    .filter((item) => item.length > 0);
+}
+
+function findItemComparisonProduct(id: string): ItemComparisonProduct | undefined {
+  return axfoodProducts.find((product) => product.slug === id || product.code === id)
+    ?? pricedProducts.find((product) => product.slug === id || product.code === id);
+}
+
+function storePricesForItemComparison(product: ItemComparisonProduct) {
+  if (isOpenPricesProduct(product)) {
+    return [
+      { storeName: 'OpenPrices observed low', price: product.priceMin, priceLabel: formatSek(product.priceMin), unitLabel: 'SEK observed price' },
+      { storeName: 'OpenPrices observed median', price: product.priceMedian, priceLabel: formatSek(product.priceMedian), unitLabel: 'SEK observed price' },
+      { storeName: 'OpenPrices observed high', price: product.priceMax, priceLabel: formatSek(product.priceMax), unitLabel: 'SEK observed price' }
+    ];
+  }
+
+  return chainPriceRows(product).map((row) => ({
+    storeName: String(row.chain),
+    price: row.price,
+    priceLabel: row.priceText,
+    unitLabel: row.priceUnit
+  }));
+}
+
+function trendPointsForItemComparison(product: ItemComparisonProduct) {
+  if (isOpenPricesProduct(product)) {
+    return dailyObservedPricePoints(product)
+      .sort((left, right) => Date.parse(left.observedAt) - Date.parse(right.observedAt))
+      .slice(-6)
+      .map((point) => ({
+        label: point.observedAt.slice(0, 10),
+        price: point.price,
+        priceLabel: formatSek(point.price)
+      }));
+  }
+
+  return chainPriceRows(product).map((row) => ({
+    label: String(row.chain),
+    price: row.price,
+    priceLabel: row.priceText
+  }));
+}
+
+function nutritionForItemComparison(product: ItemComparisonProduct) {
+  if (isOpenPricesProduct(product)) {
+    return {
+      nutriScore: product.nutriscore?.toUpperCase() || 'Not reported',
+      category: labelFromSlug(product.category),
+      quantity: product.quantity || 'Quantity not reported',
+      labels: product.categories.slice(0, 4).map(labelFromSlug)
+    };
+  }
+
+  return {
+    nutriScore: product.labels.includes('keyhole') ? 'Keyhole labelled' : 'Not reported',
+    category: labelFromSlug(product.category),
+    quantity: product.subline || 'Quantity not reported',
+    labels: product.labels.slice(0, 4).map(labelFromSlug)
+  };
+}
+
+export function buildItemComparisonView(searchParams: { items?: SearchParamValue } = {}) {
+  const requestedItemIds = [...new Set(itemComparisonRequestValues(searchParams.items))];
+  const defaultItemIds = [
+    ...freshestOpenPrices.slice(0, 2).map((product) => product.slug),
+    ...topChainSpreads.slice(0, 2).map((product) => product.slug)
+  ];
+  const itemIds = (requestedItemIds.length > 0 ? requestedItemIds : defaultItemIds).slice(0, MAX_ITEM_COMPARISON_ITEMS);
+  const requestedOverflow = (requestedItemIds.length > 0 ? requestedItemIds : defaultItemIds).slice(MAX_ITEM_COMPARISON_ITEMS);
+  const matchedProducts = itemIds
+    .map((id) => ({ id, product: findItemComparisonProduct(id) }))
+    .filter((row): row is { id: string; product: ItemComparisonProduct } => row.product !== undefined);
+  const matchedIds = new Set(matchedProducts.map((row) => row.id));
+
+  return {
+    maxItems: MAX_ITEM_COMPARISON_ITEMS,
+    requestedItemIds,
+    missingItemIds: itemIds.filter((id) => !matchedIds.has(id)),
+    truncatedItemIds: requestedOverflow,
+    sourceLabel: 'Axfood chain snapshots + OpenPrices/OpenFoodFacts observed product rows',
+    items: matchedProducts.map(({ product }) => {
+      const storePrices = storePricesForItemComparison(product);
+      const trendPoints = trendPointsForItemComparison(product);
+      const nutrition = nutritionForItemComparison(product);
+      const cheapestPrice = storePrices
+        .filter((row) => Number.isFinite(row.price))
+        .sort((left, right) => left.price - right.price)[0];
+
+      return {
+        slug: product.slug,
+        name: product.name,
+        brand: isOpenPricesProduct(product) ? product.brands || 'Brand not reported' : product.brand || 'Brand not reported',
+        imageUrl: product.image,
+        nutrition,
+        storePrices,
+        trendPoints,
+        cheapestPriceLabel: cheapestPrice?.priceLabel ?? 'No price row',
+        cheapestStoreLabel: cheapestPrice?.storeName ?? 'No store row',
+        trendSummary: trendPoints.length > 1 ? `${trendPoints.length} observed trend points` : 'Current price evidence only'
+      };
+    })
+  };
+}
+
 const openPricesTrendingAsOfDate = pricedProducts.reduce((latest, product) => (
   product.lastObservedAt > latest ? product.lastObservedAt : latest
 ), '1970-01-01');
@@ -1807,7 +1920,7 @@ export type AdaptiveProductCard = {
   isAvailable: boolean;
 };
 
-function isOpenPricesProduct(product: (typeof productUniverse)[number]): product is (typeof pricedProducts)[number] {
+function isOpenPricesProduct(product: ItemComparisonProduct): product is (typeof pricedProducts)[number] {
   return 'observations' in product;
 }
 
@@ -4069,7 +4182,7 @@ export function findStore(slug: string) {
 }
 
 export function chainPriceRows(product: (typeof axfoodProducts)[number]) {
-  return Object.entries(product.chains)
-    .map(([chain, price]) => ({ chain, ...price }))
-    .filter((row) => typeof row.price === 'number');
+  const rows = Object.entries(product.chains).map(([chain, price]) => ({ chain, ...price }));
+
+  return rows.filter((row): row is (typeof rows)[number] & { price: number } => typeof row.price === 'number' && Number.isFinite(row.price));
 }
