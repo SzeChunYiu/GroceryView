@@ -65,15 +65,15 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(joined, /products \} from ['"]@\/lib\/demo-data/);
   });
 
-  it('surfaces latest_prices availability as an out-of-stock product card badge', async () => {
+  it('surfaces latest_prices availability as an unavailable product card badge', async () => {
     const productCards = await read('src/components/product-price-cards.tsx');
     const productsPage = await read('src/app/products/page.tsx');
     const verified = await read('src/lib/verified-data.ts');
 
     assert.match(productCards, /card\.isAvailable === false/);
-    assert.match(productCards, /Out of stock/);
+    assert.match(productCards, /Unavailable/);
     assert.match(productsPage, /product\.isAvailable === false/);
-    assert.match(productsPage, /Out of stock/);
+    assert.match(productsPage, /Unavailable/);
     assert.match(verified, /isAvailable/);
     assert.match(verified, /outOfStockLatestPriceCount/);
   });
@@ -3177,7 +3177,7 @@ ${seo}`;
     assert.match(cards, /unitSortPrice/);
     assert.match(cards, /totalSortPrice/);
     assert.match(cards, /cheapest-per-unit/);
-    assert.match(cards, /Out of stock/);
+    assert.match(cards, /Unavailable/);
     assert.match(cards, /No synthetic product images/);
     assert.match(cards, /No synthetic unit prices/);
   });

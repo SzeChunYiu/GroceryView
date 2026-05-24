@@ -1527,6 +1527,10 @@ function rowSearchHaystack(row: RealCatalogSearchPriceRow): string {
   ].join(' ').toLocaleLowerCase('sv-SE');
 }
 
+function hasCurrentAvailablePrice(row: RealCatalogSearchPriceRow): boolean {
+  return row.isAvailable !== false;
+}
+
 export function buildFacetedProductSearch(input: {
   rows: RealCatalogSearchPriceRow[];
   filters?: FacetedProductSearchFilters;
@@ -1612,9 +1616,11 @@ export function buildFacetedProductSearch(input: {
       const isAvailable = row.isAvailable ?? true;
       if (isAvailable) availableLatestPriceCount += 1;
       else outOfStockLatestPriceCount += 1;
-      product.cheapestPrice = product.cheapestPrice === null ? row.price : Math.min(product.cheapestPrice, row.price);
-      minObservedUnitPrice = minObservedUnitPrice === null ? row.unitPrice : Math.min(minObservedUnitPrice, row.unitPrice);
-      maxObservedUnitPrice = maxObservedUnitPrice === null ? row.unitPrice : Math.max(maxObservedUnitPrice, row.unitPrice);
+      if (isAvailable) {
+        product.cheapestPrice = product.cheapestPrice === null ? row.price : Math.min(product.cheapestPrice, row.price);
+        minObservedUnitPrice = minObservedUnitPrice === null ? row.unitPrice : Math.min(minObservedUnitPrice, row.unitPrice);
+        maxObservedUnitPrice = maxObservedUnitPrice === null ? row.unitPrice : Math.max(maxObservedUnitPrice, row.unitPrice);
+      }
       product.currentPrices.push({
         observationId: row.observationId,
         price: row.price,
@@ -1647,7 +1653,10 @@ export function buildFacetedProductSearch(input: {
     .map((product) => ({
       ...product,
       isAvailable: product.currentPrices.length === 0 ? null : product.currentPrices.some((price) => price.isAvailable),
-      currentPrices: product.currentPrices.sort((a, b) => a.price - b.price || b.observedAt.localeCompare(a.observedAt))
+      currentPrices: product.currentPrices.sort((a, b) => {
+        if (a.isAvailable !== b.isAvailable) return a.isAvailable ? -1 : 1;
+        return a.price - b.price || b.observedAt.localeCompare(a.observedAt);
+      })
     }))
     .sort((a, b) => {
       if (a.cheapestPrice === null && b.cheapestPrice !== null) return 1;
@@ -1711,7 +1720,7 @@ export function buildRealBasketComparison(input: RealBasketCompareInput): RealBa
     if (!itemOrder.has(row.productId)) continue;
     productNames.set(row.productId, { slug: row.slug, canonicalName: row.canonicalName });
     if (selectedStoreSlugs.length > 0 && (!row.storeSlug || !selectedStoreSlugs.includes(row.storeSlug))) continue;
-    if (!row.observationId || typeof row.price !== 'number') continue;
+    if (!row.observationId || typeof row.price !== 'number' || !hasCurrentAvailablePrice(row)) continue;
     const rows = rowsByProduct.get(row.productId) ?? [];
     rows.push(row);
     rowsByProduct.set(row.productId, rows);

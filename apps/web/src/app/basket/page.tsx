@@ -31,7 +31,8 @@ const basketProducts: BasketCalculatorProduct[] = topChainSpreads.slice(0, 12).m
     price: row.price ?? 0,
     priceText: row.priceText,
     priceUnit: row.priceUnit,
-    savings: row.savings
+    savings: row.savings,
+    isAvailable: row.isAvailable
   }))
 }));
 

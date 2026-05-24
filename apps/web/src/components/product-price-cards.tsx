@@ -175,7 +175,7 @@ export function ProductPriceCards({
               </div>
               <div className="flex flex-col items-end gap-2">
                 {card.isAvailable === false ? (
-                  <span className="rounded-full bg-rose-100 px-3 py-1 text-[0.7rem] font-black text-rose-900">Out of stock</span>
+                  <span className="rounded-full bg-rose-100 px-3 py-1 text-[0.7rem] font-black text-rose-900">Unavailable</span>
                 ) : null}
                 {card.priceDropBadge ? (
                   <span

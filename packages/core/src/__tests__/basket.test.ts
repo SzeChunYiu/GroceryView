@@ -613,6 +613,36 @@ describe('compareBasketStrategies', () => {
       'bread@coop-medborgarplatsen'
     ]);
   });
+
+  it('excludes unavailable store prices from split and single-store basket totals', () => {
+    const result = compareBasketStrategies({
+      favoriteStoreIds: ['willys-odenplan', 'coop-odenplan'],
+      items: [
+        {
+          productId: 'coffee',
+          quantity: 1,
+          prices: [
+            { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 49.9 },
+            { storeId: 'coop-odenplan', storeName: 'Coop Odenplan', price: 1, isAvailable: false }
+          ]
+        },
+        {
+          productId: 'milk',
+          quantity: 2,
+          prices: [
+            { storeId: 'coop-odenplan', storeName: 'Coop Odenplan', price: 13.9 }
+          ]
+        }
+      ]
+    });
+
+    assert.equal(result.cheapestByProduct.total, 77.7);
+    assert.deepEqual(result.cheapestByProduct.assignments.map((assignment) => assignment.storeId), [
+      'willys-odenplan',
+      'coop-odenplan'
+    ]);
+    assert.equal(result.bestSingleStore, undefined);
+  });
 });
 
 describe('summarizeStoreBasketCoverage', () => {
@@ -694,6 +724,31 @@ describe('summarizeStoreBasketCoverage', () => {
         coveragePercent: 100
       },
       fullCoverageStoreIds: ['willys-odenplan']
+    });
+  });
+
+  it('treats unavailable store prices as missing coverage', () => {
+    const summary = summarizeStoreBasketCoverage({
+      favoriteStoreIds: ['willys-odenplan', 'coop-odenplan'],
+      items: [
+        {
+          productId: 'coffee',
+          quantity: 1,
+          prices: [
+            { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 49.9 },
+            { storeId: 'coop-odenplan', storeName: 'Coop Odenplan', price: 1, isAvailable: false }
+          ]
+        }
+      ]
+    });
+
+    assert.deepEqual(summary.stores.find((store) => store.storeId === 'coop-odenplan'), {
+      storeId: 'coop-odenplan',
+      storeName: 'Coop Odenplan',
+      knownTotal: 0,
+      availableProductIds: [],
+      missingProductIds: ['coffee'],
+      coveragePercent: 0
     });
   });
 });

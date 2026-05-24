@@ -383,8 +383,50 @@ describe('createGroceryViewApi', () => {
 
     assert.equal(result.products[0]?.currentPrices[0]?.isAvailable, false);
     assert.equal(result.products[0]?.isAvailable, false);
+    assert.equal(result.products[0]?.cheapestPrice, null);
+    assert.deepEqual(result.facets.priceRange, { min: null, max: null });
     assert.equal(result.evidence.availableLatestPriceCount, 0);
     assert.equal(result.evidence.outOfStockLatestPriceCount, 1);
+  });
+
+  it('excludes unavailable latest price rows from basket calculations', () => {
+    const report = buildRealBasketComparison({
+      selectedStoreSlugs: ['coop-odenplan'],
+      items: [
+        { productId: 'product-milk', quantity: 2 },
+        { productId: 'product-butter', quantity: 1 }
+      ],
+      latestPrices: [
+        ...realRows,
+        {
+          productId: 'product-butter',
+          slug: 'smor-500g',
+          canonicalName: 'Smor 500 g',
+          categoryPath: ['Dairy', 'Butter'],
+          packageSize: 500,
+          packageUnit: 'g',
+          comparableUnit: 'kg',
+          observationId: 'obs-butter-coop-unavailable',
+          price: 1,
+          unitPrice: 2,
+          currency: 'SEK',
+          priceType: 'shelf',
+          confidence: 0.94,
+          observedAt: '2026-05-21T09:30:00.000Z',
+          isAvailable: false,
+          chainId: 'chain-coop',
+          chainSlug: 'coop',
+          chainName: 'Coop',
+          storeId: 'store-coop',
+          storeSlug: 'coop-odenplan',
+          storeName: 'Coop Odenplan'
+        }
+      ]
+    });
+
+    assert.equal(report.strategies[0]?.assignments.find((assignment) => assignment.productId === 'product-butter')?.priceLabel, 'missing_price');
+    assert.equal(report.strategies[1]?.assignments.find((assignment) => assignment.productId === 'product-butter')?.priceLabel, 'missing_price');
+    assert.deepEqual(report.strategies[1]?.missingProductIds, ['product-butter']);
   });
 
   it('keeps unpriced catalog rows unpriced in faceted search responses', () => {

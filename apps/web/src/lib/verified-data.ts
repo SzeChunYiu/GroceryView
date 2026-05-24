@@ -442,7 +442,8 @@ function booleanSearchValue(value: SearchParamValue): boolean {
 
 function productSearchResultCards(searchResult: typeof rawFacetedProductSearch) {
   return searchResult.products.map((product) => {
-    const cheapest = product.currentPrices[0] ?? null;
+    const cheapest = product.currentPrices.find((price) => price.isAvailable) ?? null;
+    const unavailable = product.isAvailable === false;
     return {
       slug: product.slug,
       name: product.canonicalName,
@@ -450,14 +451,14 @@ function productSearchResultCards(searchResult: typeof rawFacetedProductSearch) 
       imageUrl: product.imageUrl,
       categoryLabel: product.categoryPath[0] ?? 'Category not reported',
       labels: product.labels.map(readableLabel),
-      cheapestPriceLabel: formatSek(product.cheapestPrice),
+      cheapestPriceLabel: unavailable ? 'Unavailable' : formatSek(product.cheapestPrice),
       unitPriceLabel: cheapest ? formatLocalizedUnitPrice(cheapest.unitPrice, {
         locale: defaultLocale,
         currency: cheapest.currency,
         unit: product.comparableUnit
-      }) : unknownUnitPriceLabel,
+      }) : unavailable ? 'Unavailable' : unknownUnitPriceLabel,
       isAvailable: product.isAvailable,
-      chainLabel: cheapest ? `${cheapest.chainName} · ${cheapest.priceType}` : 'Awaiting latest_prices row',
+      chainLabel: cheapest ? `${cheapest.chainName} · ${cheapest.priceType}` : unavailable ? 'Unavailable at reporting stores' : 'Awaiting latest_prices row',
       sourceTables: searchResult.evidence.sourceTables
     };
   });
@@ -595,7 +596,7 @@ export const watchlistHeartProducts = watchlistHeartSourceRows.map(({ product, c
       locale: defaultLocale,
       currency: observedSnapshotCurrency,
       unit: normalizedUnit.unitLabel.replace('kr/', '')
-    }) : unknownUnitPriceLabel,
+    }) : isAvailable ? unknownUnitPriceLabel : 'Unavailable',
     targetPrice: item.targetPrice ?? cheapest.price,
     targetPriceLabel: formatSek(item.targetPrice ?? cheapest.price),
     dealScore,
@@ -1837,16 +1838,19 @@ function sevenDaySparklinePoints(product: (typeof productUniverse)[number]): Ada
 
 export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((product) => {
   const isChainProduct = 'lowestPrice' in product;
-  const totalPrice = isChainProduct ? product.lowestPrice : product.priceMedian;
+  const availableChainRows = isChainProduct
+    ? Object.values(product.chains).filter((row) => typeof row.price === 'number' && row.price > 0 && row.isAvailable !== false)
+    : [];
+  const isAvailable = isChainProduct ? availableChainRows.length > 0 : true;
+  const totalPrice = isChainProduct
+    ? Math.min(...availableChainRows.map((row) => row.price as number))
+    : product.priceMedian;
   const packageText = isChainProduct ? product.subline : product.quantity;
-  const normalizedUnit = normalizeComparableUnitPrice(totalPrice, packageText);
+  const normalizedUnit = isAvailable ? normalizeComparableUnitPrice(totalPrice, packageText) : null;
   const productKind = adaptiveProductKind(product.category);
-  const isAvailable = isChainProduct
-    ? Object.values(product.chains).some((row) => typeof row.price === 'number' && row.price > 0 && row.isAvailable !== false)
-    : true;
   const peerUnitPrices = isChainProduct && normalizedUnit
-    ? Object.values(product.chains)
-      .map((row) => row.price === null ? null : normalizeComparableUnitPrice(row.price, packageText)?.unitPrice ?? null)
+    ? availableChainRows
+      .map((row) => normalizeComparableUnitPrice(row.price as number, packageText)?.unitPrice ?? null)
       .filter((value): value is number => typeof value === 'number' && Number.isFinite(value))
     : [];
   const sparklinePoints = sevenDaySparklinePoints(product);
@@ -1859,16 +1863,16 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
     imageUrl: product.image || null,
     imageAlt: product.image ? `${product.name} product image from ${isChainProduct ? 'Axfood' : 'OpenPrices/OpenFoodFacts'} source data` : null,
     productKind,
-    totalPriceLabel: formatSek(totalPrice),
+    totalPriceLabel: isAvailable ? formatSek(totalPrice) : 'Unavailable',
     unitPriceLabel: normalizedUnit ? formatLocalizedUnitPrice(normalizedUnit.unitPrice, {
       locale: defaultLocale,
       currency: observedSnapshotCurrency,
       unit: normalizedUnit.unitLabel.replace('kr/', '')
     }) : unknownUnitPriceLabel,
     packageLabel: normalizedUnit?.packageLabel || packageText || 'Package size not reported',
-    sourceLabel: isChainProduct ? `${product.lowestChain} lowest · ${formatPct(product.spreadPct)} spread` : `OpenPrices · ${product.observationCount.toLocaleString('sv-SE')} observations`,
-    confidenceLabel: normalizedUnit ? `Derived from observed price + package size (${normalizedUnit.unitLabel})` : 'No synthetic unit prices: package quantity missing',
-    totalSortPrice: totalPrice,
+    sourceLabel: isChainProduct && isAvailable ? `${product.lowestChain} lowest · ${formatPct(product.spreadPct)} spread` : isChainProduct ? 'No recent available chain snapshot' : `OpenPrices · ${product.observationCount.toLocaleString('sv-SE')} observations`,
+    confidenceLabel: normalizedUnit ? `Derived from observed price + package size (${normalizedUnit.unitLabel})` : isAvailable ? 'No synthetic unit prices: package quantity missing' : 'Unavailable rows are excluded from price calculations',
+    totalSortPrice: isAvailable ? totalPrice : Number.POSITIVE_INFINITY,
     unitSortPrice: normalizedUnit?.unitSortPrice ?? null,
     defaultCompareMode: productKind === 'commodity' ? 'unit' : 'total',
     cheapestUnitBadge: normalizedUnit ? cheapestUnitBadge(normalizedUnit.unitPrice, peerUnitPrices, normalizedUnit.unitLabel) : null,

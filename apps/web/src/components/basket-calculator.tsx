@@ -11,6 +11,7 @@ export type BasketCalculatorPriceRow = {
   priceText: string;
   priceUnit: string;
   savings: number | null;
+  isAvailable?: boolean;
 };
 
 export type BasketCalculatorProduct = {
@@ -64,7 +65,8 @@ export function BasketCalculator({ products, sourceLabel }: Readonly<BasketCalcu
         storeId: price.chainId,
         storeName: price.chainName,
         price: price.price,
-        priceType: price.savings ? 'promotion' as const : 'shelf' as const
+        priceType: price.savings ? 'promotion' as const : 'shelf' as const,
+        isAvailable: price.isAvailable
       }))
     }))
   }), [chains, selectedProducts]);
@@ -152,8 +154,8 @@ export function BasketCalculator({ products, sourceLabel }: Readonly<BasketCalcu
                   <span className="mt-1 block text-sm font-semibold text-slate-600">{product.brand || 'Brand not reported'} · {product.packageLabel}</span>
                   <span className="mt-2 flex flex-wrap gap-2 text-xs font-black uppercase tracking-[0.12em] text-slate-500">
                     {product.prices.map((price) => (
-                      <span className="rounded-full bg-slate-100 px-2 py-1" key={`${product.id}-${price.chainId}`}>
-                        {price.chainName}: {formatSek(price.price)}
+                      <span className={`rounded-full px-2 py-1 ${price.isAvailable === false ? 'bg-rose-100 text-rose-900' : 'bg-slate-100'}`} key={`${product.id}-${price.chainId}`}>
+                        {price.chainName}: {price.isAvailable === false ? 'Unavailable' : formatSek(price.price)}
                       </span>
                     ))}
                   </span>

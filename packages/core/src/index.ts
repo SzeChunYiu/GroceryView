@@ -263,6 +263,7 @@ export type StorePrice = {
   price: number;
   priceType?: WatchlistPriceType;
   distanceKm?: number;
+  isAvailable?: boolean;
 };
 
 export type BasketInputItem = {
@@ -1199,7 +1200,7 @@ export function compareBasketStrategies(input: BasketComparisonInput): BasketCom
   let memberSavingsTotal = 0;
 
   for (const item of input.items) {
-    const favoritePrices = item.prices.filter((price) => favoriteSet.has(price.storeId));
+    const favoritePrices = item.prices.filter((price) => favoriteSet.has(price.storeId) && price.isAvailable !== false);
     const eligiblePrices = favoritePrices.filter((price) => {
       if (price.priceType !== 'member') return true;
       const isEnabled = enabledMemberSet.has(price.storeId);
@@ -1299,7 +1300,7 @@ export function summarizeStoreBasketCoverage(input: BasketComparisonInput): Stor
       const coverage = coverageByStore.get(storeId);
       if (!coverage) continue;
 
-      const price = item.prices.find((candidate) => candidate.storeId === storeId);
+      const price = item.prices.find((candidate) => candidate.storeId === storeId && candidate.isAvailable !== false);
       if (!price) {
         coverage.missingProductIds.push(item.productId);
         continue;
