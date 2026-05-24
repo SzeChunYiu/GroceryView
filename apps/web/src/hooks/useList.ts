@@ -24,6 +24,63 @@ type PersistedListState = {
 
 export const LIST_STORAGE_KEY = 'groceryview:shopping-list:checked:v1';
 
+export const BUDGET_HISTORY_STORAGE_KEY = 'groceryview:shopping-list:budget-history:v1';
+export const BUDGET_HISTORY_SAVE_DELAY_MS = 400;
+
+export type BudgetHistorySnapshot = {
+  checkedCount: number;
+  remainingCount: number;
+  savedAt: string;
+  total: number;
+  totalCount: number;
+};
+
+export function budgetSnapshotSignature(snapshot: Pick<BudgetHistorySnapshot, 'checkedCount' | 'remainingCount' | 'total' | 'totalCount'>) {
+  return [snapshot.total, snapshot.checkedCount, snapshot.totalCount, snapshot.remainingCount].join(':');
+}
+
+function budgetHistoryFromStorage(value: string | null): BudgetHistorySnapshot[] {
+  if (!value) return [];
+
+  try {
+    const parsed = JSON.parse(value) as BudgetHistorySnapshot[] | null;
+    return Array.isArray(parsed)
+      ? parsed.filter((snapshot): snapshot is BudgetHistorySnapshot => (
+        snapshot !== null
+        && typeof snapshot === 'object'
+        && typeof snapshot.checkedCount === 'number'
+        && typeof snapshot.remainingCount === 'number'
+        && typeof snapshot.savedAt === 'string'
+        && typeof snapshot.total === 'number'
+        && typeof snapshot.totalCount === 'number'
+      ))
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+export function appendBudgetSnapshotIfChanged(history: BudgetHistorySnapshot[], nextSnapshot: BudgetHistorySnapshot) {
+  const lastSnapshot = history[history.length - 1];
+  if (!lastSnapshot) return [nextSnapshot];
+  if (budgetSnapshotSignature(lastSnapshot) === budgetSnapshotSignature(nextSnapshot)) return history;
+  if (lastSnapshot.total === nextSnapshot.total) return history;
+
+  return [...history, nextSnapshot];
+}
+
+function persistBudgetSnapshot(nextSnapshot: BudgetHistorySnapshot) {
+  try {
+    const history = budgetHistoryFromStorage(localStorage.getItem(BUDGET_HISTORY_STORAGE_KEY));
+    const nextHistory = appendBudgetSnapshotIfChanged(history, nextSnapshot);
+    if (nextHistory !== history) {
+      localStorage.setItem(BUDGET_HISTORY_STORAGE_KEY, JSON.stringify(nextHistory));
+    }
+  } catch {
+    // Keep the list UI usable even if budget history persistence is unavailable.
+  }
+}
+
 const baseListItems: Omit<ShoppingListItem, 'checked'>[] = [
   {
     id: 'coffee-weekly-top-up',
@@ -169,6 +226,25 @@ export function useList() {
   const checkedCount = useMemo(() => items.filter((item) => item.checked).length, [items]);
   const totalCount = items.length;
   const remainingCount = totalCount - checkedCount;
+  const budgetSnapshot = useMemo(() => ({
+    checkedCount,
+    remainingCount,
+    total: totalCount,
+    totalCount
+  }), [checkedCount, remainingCount, totalCount]);
+
+  useEffect(() => {
+    if (!hasLoadedBrowserState) return undefined;
+
+    const timeoutId = window.setTimeout(() => {
+      persistBudgetSnapshot({
+        ...budgetSnapshot,
+        savedAt: new Date().toISOString()
+      });
+    }, BUDGET_HISTORY_SAVE_DELAY_MS);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [budgetSnapshot, hasLoadedBrowserState]);
 
   return {
     addImportedItems,
