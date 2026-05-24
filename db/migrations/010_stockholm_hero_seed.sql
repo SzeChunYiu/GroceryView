@@ -4,6 +4,7 @@ insert into chains(id, name, country_code) values
   ('coop', 'Coop', 'SE'),
   ('hemkop', 'Hemköp', 'SE'),
   ('lidl', 'Lidl', 'SE'),
+  ('netto', 'Netto', 'SE'),
   ('citygross', 'City Gross', 'SE')
 on conflict (id) do update set
   name = excluded.name,

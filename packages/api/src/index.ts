@@ -1866,6 +1866,7 @@ const retailers: Retailer[] = [
   { id: 'hemkop', name: 'Hemköp', logo: '/retailers/hemkop.svg', websiteUrl: 'https://www.hemkop.se/' },
   { id: 'ica', name: 'ICA', logo: '/retailers/ica.svg', websiteUrl: 'https://www.ica.se/' },
   { id: 'lidl', name: 'Lidl', logo: '/retailers/lidl.svg', websiteUrl: 'https://www.lidl.se/' },
+  { id: 'netto', name: 'Netto', logo: '/retailers/netto.svg', websiteUrl: 'https://www.coop.se/' },
   { id: 'willys', name: 'Willys', logo: '/retailers/willys.svg', websiteUrl: 'https://www.willys.se/' }
 ];
 

@@ -52,7 +52,7 @@ Migration 014 adds the fuel source contract. `fuel_grades` is the only supported
 
 ### `chains`
 
-Retail banners such as ICA, Willys, Coop, Lidl, Hemkop, and City Gross.
+Retail banners such as ICA, Willys, Coop, Lidl, Hemkop, Netto, and City Gross.
 
 Key columns: `slug`, `name`, `domain`, `country_code`, `website_url`.
 

@@ -109,6 +109,7 @@ REQUIRED_SEED_CHAIN_SLUGS=(
   coop
   hemkop
   lidl
+  netto
   city-gross
 )
 
@@ -353,7 +354,7 @@ if [ "${#SEEDS[@]}" -gt 0 ]; then
   positioned_stores_count="$(docker exec "$CONTAINER_NAME" psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "select count(*) from stores where position is not null")"
   products_count="$(docker exec "$CONTAINER_NAME" psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "select count(*) from products")"
 
-  if [ "$chains_count" -lt 6 ] || [ "$positioned_stores_count" -lt 6 ] || [ "$products_count" -lt 20 ]; then
+  if [ "$chains_count" -lt 7 ] || [ "$positioned_stores_count" -lt 6 ] || [ "$products_count" -lt 20 ]; then
     echo "seed assertion failed: chains=$chains_count positioned_stores=$positioned_stores_count products=$products_count" >&2
     exit 1
   fi

@@ -6,6 +6,7 @@ export * from './queries/favorites.js';
 export * from './queries/stores.js';
 export * from './queries/retailers.js';
 export * from './queries/users.js';
+export * from './seed/retailers.js';
 
 export type Migration = {
   version: string;

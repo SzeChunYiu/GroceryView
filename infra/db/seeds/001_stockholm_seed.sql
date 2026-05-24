@@ -6,6 +6,7 @@
 -- Hemkop Stockholm Torsplan, Norra Stationsgatan 80c: https://www.hemkop.se/butik/4190
 -- Lidl Sveavagen 59: https://www.lidl.se/s/sv-SE/butiker/stockholm/sveavaegen-59/
 -- City Gross Bromma, Ulvsundavagen 189D: https://www.eniro.se/city%2Bgross%2Bbromma/7817119/firma
+-- Netto Sweden legacy banner: acquired by Coop in 2019; seeded at chain level for historical comparison metadata.
 
 begin;
 
@@ -15,6 +16,7 @@ insert into chains (slug, name, country_code, website_url) values
   ('coop', 'Coop', 'SE', 'https://www.coop.se/'),
   ('hemkop', 'Hemkop', 'SE', 'https://www.hemkop.se/'),
   ('lidl', 'Lidl', 'SE', 'https://www.lidl.se/'),
+  ('netto', 'Netto', 'SE', 'https://www.coop.se/'),
   ('city-gross', 'City Gross', 'SE', 'https://www.citygross.se/')
 on conflict (slug) do update set
   name = excluded.name,
