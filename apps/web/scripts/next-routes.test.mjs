@@ -3268,6 +3268,27 @@ ${seo}`;
     assert.doesNotMatch(api, /Math\.random|placeholder/i);
   });
 
+  it('ships a cached product and category typeahead suggest API', async () => {
+    assert.equal(await fileExists('src/app/api/suggest/route.ts'), true);
+    const route = await read('src/app/api/suggest/route.ts');
+
+    assert.match(route, /adaptiveProductCards/);
+    assert.match(route, /categorySummaries/);
+    assert.match(route, /searchParams\.get\('q'\)/);
+    assert.match(route, /query\.length < 1/);
+    assert.match(route, /SUGGESTION_LIMIT = 10/);
+    assert.match(route, /CACHE_TTL_MS = 60_000/);
+    assert.match(route, /suggestionCache/);
+    assert.match(route, /startsWith\(query\)/);
+    assert.match(route, /word\.startsWith\(query\)/);
+    assert.match(route, /includes\(query\)/);
+    assert.match(route, /\/products\/\$\{product\.slug\}/);
+    assert.match(route, /\/categories\/\$\{category\.slug\}/);
+    assert.match(route, /s-maxage=60/);
+    assert.doesNotMatch(route, /console\./);
+    assert.doesNotMatch(route, /TODO/);
+  });
+
   it('adds common dietary allergen checkbox filters to product listing search', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const products = await read('src/app/products/page.tsx');
