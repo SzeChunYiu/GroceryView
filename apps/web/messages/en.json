@@ -20,5 +20,12 @@
     "label": "Language",
     "persisted": "The language preference is stored locally and in the NEXT_LOCALE cookie.",
     "guardrail": "Arabic and Somali stay blocked until reviewed translations are available."
+  },
+  "empty-state": {
+    "eyebrow": "Empty state",
+    "title": "No grocery rows to show yet",
+    "body": "Try adjusting filters, broadening the search, or checking back when more verified grocery prices are available.",
+    "primaryAction": "Browse products",
+    "secondaryAction": "Clear filters"
   }
 }
