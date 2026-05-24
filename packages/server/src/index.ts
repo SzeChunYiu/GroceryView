@@ -1845,6 +1845,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
     const preferences = budgetSummary.weeklyBudget > 0 || budgetSummary.monthlyBudget > 0
       ? [{ weeklyBudget: budgetSummary.weeklyBudget, monthlyBudget: budgetSummary.monthlyBudget }]
       : [];
+    const apiWithFriendSignals = api as typeof api & { getFriendSharedDealSignals?: (userId: string) => unknown[] };
 
     return buildPrivacyExport(
       {
@@ -1856,7 +1857,8 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         favoriteStoreIds: api.getFavoriteStores(user).map((store) => store.id),
         watchlistProductIds: watchlist.items.map((item) => item.productId),
         receiptIds: [],
-        householdIds: householdPlan ? [householdPlan.household.id] : []
+        householdIds: householdPlan ? [householdPlan.household.id] : [],
+        friendSharedDealSignals: apiWithFriendSignals.getFriendSharedDealSignals?.(user) ?? []
       },
       (authOptions.now ?? new Date()).toISOString()
     );
@@ -3160,10 +3162,10 @@ export function buildOpenApiDocument(): OpenApiDocument {
       },
       '/api/households/join': { post: protectedOperation('Join an existing household from a signed-in invite token.') },
       '/api/households/current/basket/check': { post: protectedOperation('Check or uncheck a shared household shopping-list item with member attribution.') },
-      '/api/privacy/export': { get: protectedOperation('Export signed-in user profile, favorite-store, watchlist, receipt, and household data.') },
+      '/api/privacy/export': { get: protectedOperation('Export signed-in user profile, favorite-store, watchlist, receipt, household, and friend-shared deal signal data.') },
       '/api/settings/account': { delete: protectedOperation('Delete the signed-in account after confirmation, wiping lists, alerts, preferences, and profile rows.') },
       '/api/settings/data-export': { get: protectedOperation('Download my data JSON export with lists, alerts, preferences, and analytics event records.') },
-      '/api/privacy/deletion-plan': { post: protectedOperation('Plan account deletion without performing a destructive delete.') },
+      '/api/privacy/deletion-plan': { post: protectedOperation('Plan account deletion, including friend-shared deal signals, without performing a destructive delete.') },
       '/api/privacy/request-fulfillment': { post: protectedOperation('Classify privacy export, deletion, and ad opt-out requests by fulfillment deadline.') },
       '/api/scans/process': { post: protectedOperation('Process barcode or receipt scan payloads through configured providers and return review routing work.') },
       '/api/scans/upload-url': { post: protectedOperation('Create a private upload ticket for barcode or receipt scan payload storage.') },
