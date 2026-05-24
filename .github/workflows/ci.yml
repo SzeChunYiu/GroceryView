@@ -23,6 +23,12 @@ jobs:
         run: npm test
       - name: Build workspaces
         run: npm run build
+      - name: Link checker guardrails
+        timeout-minutes: 2
+        env:
+          CHECK_LINKS_REQUEST_TIMEOUT_MS: '10000'
+          CHECK_LINKS_MAX_PAGES: '50000'
+        run: node scripts/checkLinks.ts apps/web/.next/routes-manifest.json https://grocery-web-mu.vercel.app/sitemap.xml
       - name: Next profile bundle budget
         run: npm run perf:bundle:profile -w @groceryview/web
       - name: Lighthouse performance budget
