@@ -17,6 +17,26 @@ function formatComparableUnitPrice(value: number | null | undefined, unitLabel: 
   });
 }
 
+const cheapestChainAnswerRows = matchedChainProducts.slice(0, 8).map((product) => {
+  const pricedRows = chainPriceRows(product)
+    .filter((row) => typeof row.price === 'number')
+    .sort((left, right) => (left.price ?? Number.POSITIVE_INFINITY) - (right.price ?? Number.POSITIVE_INFINITY));
+  const cheapest = pricedRows[0];
+  const median = pricedRows[Math.floor(pricedRows.length / 2)]?.price ?? cheapest?.price ?? product.lowestPrice;
+  const cheapestPrice = cheapest?.price ?? product.lowestPrice;
+
+  return {
+    productSlug: product.slug,
+    productName: product.name,
+    cheapestChain: cheapest?.chain ?? product.lowestChain,
+    cheapestPrice,
+    unitPriceLabel: cheapest?.priceUnit ?? 'kr/st',
+    deltaVsMedian: Math.max(0, median - cheapestPrice),
+    coverageLabel: `${pricedRows.length} matched chain rows`,
+    chainRows: pricedRows
+  };
+});
+
 type SearchParams = {
   products?: string | string[];
 };
@@ -47,6 +67,36 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
       <Eyebrow>Willys vs Hemköp</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Comparable chain prices</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">Rows appear only when the same Axfood product code is present in both chain catalogues. Savings are not shown across unmatched products.</p>
+      <Card className="mt-6 border-cyan-200 bg-cyan-50/75">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-cyan-800">Who is cheapest right now?</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Cheapest chain answer board</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Cross-chain matched-product rows show every available chain price, the current best chain, unit-price evidence, and the delta vs median/current best.
+              This is the compare-route summary, not the product-page quote table.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-cyan-900 shadow-sm">{cheapestChainAnswerRows.length} real matched products</p>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {cheapestChainAnswerRows.map((item) => (
+            <Link className="rounded-2xl border border-cyan-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-700" href={`/products/${item.productSlug}`} key={item.productSlug}>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-800">{item.cheapestChain}</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{item.productName}</h3>
+              <p className="mt-2 rounded-xl bg-cyan-50 p-3 font-black text-cyan-950">Current best {formatSek(item.cheapestPrice)}</p>
+              <p className="mt-2 text-xs font-semibold text-slate-500">
+                {item.unitPriceLabel} · delta vs median {formatSek(item.deltaVsMedian)} · {item.coverageLabel}
+              </p>
+              <div className="mt-3 grid gap-2 text-xs font-bold text-slate-700">
+                {item.chainRows.map((row) => (
+                  <p className="rounded-xl bg-slate-50 px-3 py-2 capitalize" key={`${item.productSlug}-${row.chain}`}>{row.chain}: {formatSek(row.price)}</p>
+                ))}
+              </div>
+            </Link>
+          ))}
+        </div>
+      </Card>
       <Card className="mt-6 overflow-hidden border-emerald-200 bg-gradient-to-br from-white via-emerald-50 to-sky-50">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
           <div>
