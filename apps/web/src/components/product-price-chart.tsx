@@ -8,6 +8,8 @@ import {
   createChart,
   createSeriesMarkers,
 } from "lightweight-charts";
+import locale from "@/locales/sv.json";
+import { EmptyState } from "./EmptyState";
 
 type Range = "7D" | "30D" | "90D" | "1Y";
 
@@ -257,10 +259,14 @@ export function ProductPriceChart() {
         color: store.color,
         value: latest?.value ?? 0,
         priceType: latest?.priceType ?? "estimated",
-        confidence: latest ? confidenceDescription(latest.confidence) : "No data",
+        confidence: latest ? confidenceDescription(latest.confidence) : locale.errors.noData,
       };
     });
   }, [currentRange]);
+
+  if (currentRange.stores.length === 0) {
+    return <EmptyState />;
+  }
 
   useEffect(() => {
     const container = chartContainerRef.current;

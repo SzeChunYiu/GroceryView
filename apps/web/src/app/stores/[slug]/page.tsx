@@ -1,6 +1,7 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
 import { stores } from '@/lib/demo-data';
+import { EmptyState } from '@/components/EmptyState';
+import locale from '@/locales/sv.json';
 
 export function generateStaticParams() {
   return stores.map((store) => ({ slug: store.slug }));
@@ -9,7 +10,9 @@ export function generateStaticParams() {
 export default async function StorePage({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
   const { slug } = await params;
   const store = stores.find((item) => item.slug === slug);
-  if (!store) notFound();
+  if (!store) {
+    return <EmptyState title={locale.notFound.title} message={locale.notFound.message} />;
+  }
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-8">

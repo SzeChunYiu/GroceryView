@@ -1,6 +1,7 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
 import { products } from '@/lib/demo-data';
+import { EmptyState } from '@/components/EmptyState';
+import locale from '@/locales/sv.json';
 
 export function generateStaticParams() {
   return products.map((product) => ({ slug: product.slug }));
@@ -9,7 +10,9 @@ export function generateStaticParams() {
 export default async function ProductPage({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
   const { slug } = await params;
   const product = products.find((item) => item.slug === slug);
-  if (!product) notFound();
+  if (!product) {
+    return <EmptyState title={locale.notFound.title} message={locale.notFound.message} />;
+  }
   const apiProductId = product.slug === 'zoegas-coffee-450g' ? 'coffee' : null;
 
   return (

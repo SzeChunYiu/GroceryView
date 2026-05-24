@@ -1,6 +1,7 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
 import { pricedProducts, categoryLabels } from '@/lib/openprices-products';
+import { EmptyState } from '@/components/EmptyState';
+import locale from '@/locales/sv.json';
 
 export const dynamic = 'force-static';
 
@@ -12,7 +13,9 @@ export function generateStaticParams() {
 export default async function CategoryPage({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
   const { slug } = await params;
   const items = pricedProducts.filter((p) => (p.category || 'pantry') === slug);
-  if (items.length === 0) notFound();
+  if (items.length === 0) {
+    return <EmptyState title={locale.notFound.title} message={locale.notFound.message} />;
+  }
   const label = categoryLabels[slug] || slug;
 
   return (

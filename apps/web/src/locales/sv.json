@@ -1,0 +1,16 @@
+{
+  "errors": {
+    "title": "Något gick fel",
+    "message": "Det gick inte att ladda det här avsnittet. Försök igen om en stund.",
+    "retry": "Försök igen",
+    "noData": "Ingen data"
+  },
+  "emptyState": {
+    "title": "Inget resultat",
+    "message": "Det finns inget innehåll att visa just nu."
+  },
+  "notFound": {
+    "title": "Innehållet hittades inte",
+    "message": "Vi kan inte hitta den begärda sidan."
+  }
+}
