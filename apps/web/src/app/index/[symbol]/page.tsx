@@ -97,10 +97,52 @@ export async function generateMetadata({ params }: Readonly<{ params: Promise<{ 
   const chain = chainsBySlug.get(symbol);
   if (!category && !chain) notFound();
 
-  const label = category?.label ?? `${chain?.chainId ?? symbol} chain index`;
+  if (category) {
+    const fixedBasket = fixedBasketFor(category);
+    const title = `${category.label} | GroceryView`;
+    const description = fixedBasket
+      ? `${category.description} ${fixedBasket.rows.length.toLocaleString('sv-SE')} matched rows; index ${fixedBasket.index.value.toFixed(1)}.`
+      : category.description;
+    const imageAlt = `${category.label} index ${fixedBasket?.index.value.toFixed(1) ?? 'not available'}`;
+
+    return {
+      title,
+      description,
+      openGraph: {
+        title: category.label,
+        description,
+        images: [
+          {
+            url: `/pwa-icon.svg?index=${encodeURIComponent(category.symbol)}`,
+            width: 1200,
+            height: 630,
+            alt: imageAlt
+          }
+        ]
+      }
+    };
+  }
+
+  if (!chain) notFound();
+
+  const title = `${chain.chainId} chain index | GroceryView`;
+  const description = `${chain.chainId} chain index ${chain.overallIndex.toFixed(1)} from ${chain.observations.toLocaleString('sv-SE')} observations across ${chain.categoriesCovered} categories.`;
+
   return {
-    title: `${label} | GroceryView`,
-    description: 'Observed GroceryView price index page with fixed-basket and chain-price index calculations.'
+    title,
+    description,
+    openGraph: {
+      title: `${chain.chainId} chain index`,
+      description,
+      images: [
+        {
+          url: `/pwa-icon.svg?index=${encodeURIComponent(chainSlug(chain.chainId))}`,
+          width: 1200,
+          height: 630,
+          alt: `${chain.chainId} index ${chain.overallIndex.toFixed(1)}`
+        }
+      ]
+    }
   };
 }
 
