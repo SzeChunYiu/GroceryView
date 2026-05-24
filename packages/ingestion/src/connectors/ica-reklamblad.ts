@@ -112,7 +112,7 @@ export const DEFAULT_ICA_REKLAMBLAD_OFFER_PAGE_URLS = [
   'https://www.ica.se/erbjudanden/ica-kvantum-flygfyren-1003532/',
   'https://www.ica.se/erbjudanden/maxi-ica-stormarknad-kungalv-1004392/'
 ] as const;
-export const DEFAULT_ICA_REKLAMBLAD_MAX_ROWS = 5000;
+export const DEFAULT_ICA_REKLAMBLAD_MAX_ROWS = 7000;
 export const EMAGIN_PDF_API_BASE_URL = 'https://api.e-magin.se/api/pdf/';
 
 export type FetchIcaReklambladOffersOptions = {
