@@ -22,6 +22,10 @@ type PersistedListState = {
   importedItems?: BulkImportedListItemInput[];
 };
 
+type UseListOptions = {
+  readOnly?: boolean;
+};
+
 export const LIST_STORAGE_KEY = 'groceryview:shopping-list:checked:v1';
 
 const baseListItems: Omit<ShoppingListItem, 'checked'>[] = [
@@ -127,7 +131,7 @@ function persistCheckedState(items: ShoppingListItem[]) {
   }
 }
 
-export function useList() {
+export function useList({ readOnly = false }: UseListOptions = {}) {
   const [items, setItems] = useState<ShoppingListItem[]>(() => withCheckedState({}));
   const [hasLoadedBrowserState, setHasLoadedBrowserState] = useState(false);
 
@@ -142,20 +146,24 @@ export function useList() {
 
   useEffect(() => {
     if (!hasLoadedBrowserState) return;
+    if (readOnly) return;
     persistCheckedState(items);
-  }, [hasLoadedBrowserState, items]);
+  }, [hasLoadedBrowserState, items, readOnly]);
 
   const toggleItemChecked = useCallback((itemId: string) => {
+    if (readOnly) return;
     setItems((currentItems) => currentItems.map((item) => (
       item.id === itemId ? { ...item, checked: !item.checked } : item
     )));
-  }, []);
+  }, [readOnly]);
 
   const resetCheckedState = useCallback(() => {
+    if (readOnly) return;
     setItems((currentItems) => currentItems.map((item) => ({ ...item, checked: false })));
-  }, []);
+  }, [readOnly]);
 
   const addImportedItems = useCallback((importedItems: BulkImportedListItemInput[]) => {
+    if (readOnly) return;
     setItems((currentItems) => {
       const existingIds = new Set(currentItems.map((item) => item.id));
       const nextImportedItems = importedItems
@@ -164,7 +172,7 @@ export function useList() {
 
       return [...currentItems, ...nextImportedItems];
     });
-  }, []);
+  }, [readOnly]);
 
   const checkedCount = useMemo(() => items.filter((item) => item.checked).length, [items]);
   const totalCount = items.length;
