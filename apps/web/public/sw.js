@@ -9,6 +9,7 @@ const ITEM_PAGE_PATTERNS = [
   /^\/prisjamforelse\/[^/]+\/?$/,
   /^\/[^/]+\/billigaste\/[^/]+\/?$/
 ];
+const FLYER_READY_MESSAGE_TYPE = 'groceryview:flyer-ready';
 
 function isItemPageRequest(request) {
   if (request.method !== 'GET') return false;
@@ -90,4 +91,66 @@ self.addEventListener('fetch', (event) => {
   if (!isItemPageRequest(event.request)) return;
 
   event.respondWith(itemPageNetworkFirst(event.request));
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data?.type !== FLYER_READY_MESSAGE_TYPE) return;
+
+  const payload = event.data.payload || {};
+  const title = payload.title || 'Your weekly MyFlyer is ready';
+  const url = payload.url || '/';
+
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body: payload.body || 'New GroceryView deals are ready.',
+      tag: payload.tag || 'groceryview-my-flyer-ready',
+      renotify: true,
+      icon: '/pwa-icon.svg',
+      badge: '/pwa-maskable-icon.svg',
+      data: {
+        url,
+        flyerVersion: payload.flyerVersion || ''
+      }
+    })
+  );
+});
+
+self.addEventListener('push', (event) => {
+  let payload = {};
+  try {
+    payload = event.data ? event.data.json() : {};
+  } catch {
+    payload = { body: event.data?.text() };
+  }
+
+  if (payload.type && payload.type !== FLYER_READY_MESSAGE_TYPE) return;
+
+  const title = payload.title || 'Your weekly MyFlyer is ready';
+  const url = payload.url || '/';
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body: payload.body || 'New GroceryView deals are ready.',
+      tag: payload.tag || 'groceryview-my-flyer-ready',
+      renotify: true,
+      icon: '/pwa-icon.svg',
+      badge: '/pwa-maskable-icon.svg',
+      data: {
+        url,
+        flyerVersion: payload.flyerVersion || ''
+      }
+    })
+  );
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  const targetUrl = new URL(event.notification.data?.url || '/', self.location.origin).toString();
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
+      const existingClient = clients.find((client) => client.url === targetUrl);
+      if (existingClient) return existingClient.focus();
+      return self.clients.openWindow(targetUrl);
+    })
+  );
 });

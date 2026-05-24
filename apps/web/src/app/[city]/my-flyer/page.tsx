@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { MyFlyerPushOptIn } from '@/components/my-flyer-push-opt-in';
 import { axfoodProducts } from '@/lib/axfood-products';
 import './print-import.css';
 
@@ -26,6 +27,10 @@ function printablePrice(product: (typeof axfoodProducts)[number]) {
   };
 }
 
+function maxFlyerSavings(rows: ReadonlyArray<{ offer: ReturnType<typeof printablePrice> }>) {
+  return rows.reduce((maxSavings, row) => Math.max(maxSavings, row.offer.savings ?? 0), 0);
+}
+
 const flyerProducts = axfoodProducts
   .filter((product) => product.image && product.lowestPrice > 0)
   .slice(0, 8)
@@ -44,6 +49,8 @@ export default async function MyFlyerPage({ params }: MyFlyerPageProps) {
   const { city } = await params;
   const marketName = titleCaseSegment(city || 'se');
   const totalSavings = flyerProducts.reduce((sum, row) => sum + (row.offer.savings ?? 0), 0);
+  const maxSavings = maxFlyerSavings(flyerProducts);
+  const flyerVersion = `${city || 'se'}-${generatedAt}-${flyerProducts.length}-${Math.round(maxSavings)}`;
 
   return (
     <main className="my-flyer-page min-h-screen bg-[#f4efe5] px-4 py-8 text-slate-950 sm:px-6 lg:px-8">
@@ -92,6 +99,8 @@ export default async function MyFlyerPage({ params }: MyFlyerPageProps) {
         <div aria-label="Sponsored placement" className="my-flyer-ad mb-6 rounded-3xl border border-dashed border-orange-300 bg-orange-50 p-4 text-sm font-bold text-orange-800" data-ad data-print-hide>
           Screen-only promo rail hidden by the MyFlyer print stylesheet.
         </div>
+
+        <MyFlyerPushOptIn dealCount={flyerProducts.length} flyerVersion={flyerVersion} maxSavingsKr={maxSavings} />
 
         <section className="my-flyer-print-grid grid gap-4 lg:grid-cols-2">
           {flyerProducts.map(({ product, offer }) => (
