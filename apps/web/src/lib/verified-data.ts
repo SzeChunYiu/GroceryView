@@ -3722,12 +3722,13 @@ export const shareableHouseholdListContract = {
   corePlanner: 'planShareableHouseholdList',
   roles: [
     { role: 'viewer', canEdit: false, label: 'Can view checked items, quantities, store groups, and missing-price blockers.' },
+    { role: 'commenter', canEdit: false, label: 'Can add list notes without changing quantities, checked state, or account data.' },
     { role: 'editor', canEdit: true, label: 'Can edit quantities only after the signed-in user is already a household member.' }
   ],
   requiredInputs: [
     'signed-in requester userId from the authenticated session',
     'household membership from account storage before any share token is minted',
-    'recipient user id or invite email plus viewer/editor role',
+    'recipient user id or invite email plus viewer/commenter/editor role',
     'server-minted expiring share token before a public link can open the list'
   ],
   guardrails: [

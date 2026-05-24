@@ -328,8 +328,14 @@ export default async function ScreenerPage({ searchParams }: Readonly<{ searchPa
             <tbody className="block sm:table-row-group sm:divide-y sm:divide-slate-200">
               {visibleRows.length === 0 ? (
                 <tr className="block rounded-2xl border border-slate-200 bg-white p-4 sm:table-row sm:border-0 sm:bg-transparent sm:p-0">
-                  <td className="block px-0 py-2 text-sm font-bold text-slate-600 sm:table-cell sm:px-5 sm:py-5" colSpan={5}>
-                    No verified screener rows match this category and minimum discount filter.
+                  <td className="block px-0 py-8 text-center sm:table-cell sm:px-5 sm:py-10" colSpan={5}>
+                    <div className="mx-auto max-w-md">
+                      <span aria-hidden="true" className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 text-2xl">
+                        🛒
+                      </span>
+                      <h3 className="mt-4 text-lg font-black text-slate-950">No verified deals match these filters</h3>
+                      <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">Try All categories or reset the discount filter to broaden the screener.</p>
+                    </div>
                   </td>
                 </tr>
               ) : visibleRows.map((row) => (
