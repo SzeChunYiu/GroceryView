@@ -1,0 +1,1234 @@
+openapi: 3.0.0
+paths:
+  /:
+    get:
+      operationId: AppController_root
+      parameters: []
+      responses:
+        "200":
+          description: API entrypoint
+      tags:
+        - root
+  /users/demo/account/subscription-access:
+    get:
+      operationId: AccountController_subscriptionAccess
+      parameters:
+        - name: now
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Demo account subscription access policy
+      tags: &a1
+        - account
+  /users/demo/account/subscription-entitlement:
+    get:
+      operationId: AccountController_subscriptionEntitlement
+      parameters: []
+      responses:
+        "200":
+          description: Demo account subscription entitlement snapshot
+      tags: *a1
+  /users/demo/ads/disclosure:
+    get:
+      operationId: AdsController_disclosure
+      parameters: []
+      responses:
+        "200":
+          description: Demo account ad disclosure status and ranking separation guardrails
+      tags:
+        - ads
+  /deals/flyer-offers:
+    get:
+      operationId: DealsController_flyerOffers
+      parameters:
+        - name: asOf
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: storeId
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: chain
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: category
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: productId
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Active per-branch weekly flyer offers with source evidence
+      tags: &a2
+        - deals
+  /deals/discounts:
+    get:
+      operationId: DealsController_discounts
+      parameters:
+        - name: asOf
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: storeId
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: chain
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: category
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: productId
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Active per-branch weekly discounts with source evidence
+      tags: *a2
+  /users/demo/expiry-deals/radar:
+    get:
+      operationId: ExpiryDealsController_radar
+      parameters:
+        - name: now
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: maxDistanceKm
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Demo expiry markdown radar with category, distance, and
+            verification guardrails
+      tags:
+        - expiry-deals
+  /health:
+    get:
+      operationId: HealthController_health
+      parameters: []
+      responses:
+        "200":
+          description: Service health
+      tags:
+        - health
+  /users/demo/households/current:
+    get:
+      operationId: HouseholdsController_current
+      parameters: []
+      responses:
+        "200":
+          description: Current demo household plan
+      tags: &a3
+        - households
+    put:
+      operationId: HouseholdsController_upsert
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HouseholdPlanDto"
+      responses:
+        "200":
+          description: Create or replace the current demo household plan
+      tags: *a3
+  /users/demo/loyalty/offers:
+    get:
+      operationId: LoyaltyController_offers
+      parameters: []
+      responses:
+        "200":
+          description: Demo household loyalty offers with savings and action requirements
+      tags:
+        - loyalty
+  /market/overview:
+    get:
+      operationId: MarketController_overview
+      parameters: []
+      responses:
+        "200":
+          description: Stockholm grocery market overview
+      tags: &a4
+        - market
+  /nutrition/value:
+    get:
+      operationId: MarketController_nutritionValue
+      parameters:
+        - name: metric
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Nutrition per krona rankings with guardrails
+      tags: *a4
+  /indices:
+    get:
+      operationId: IndicesController_list
+      parameters: []
+      responses:
+        "200":
+          description: List grocery indices
+      tags: &a5
+        - market
+  /indices/chains:
+    get:
+      operationId: IndicesController_chains
+      parameters: []
+      responses:
+        "200":
+          description: Current chain price indices from observed product prices
+      tags: *a5
+  /indices/categories:
+    get:
+      operationId: IndicesController_categories
+      parameters: []
+      responses:
+        "200":
+          description: Category price indices from product price history and current prices
+      tags: *a5
+  /indices/brands:
+    get:
+      operationId: IndicesController_brands
+      parameters: []
+      responses:
+        "200":
+          description: Brand-tier price indices from product price history and current
+            prices
+      tags: *a5
+  /indices/{id}:
+    get:
+      operationId: IndicesController_detail
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Grocery index detail
+      tags: *a5
+  /categories/{category}/market:
+    get:
+      operationId: CategoriesController_market
+      parameters:
+        - name: category
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Category market report with verified price and deal evidence
+      tags: &a16
+        - categories
+  /users/demo/meal-plans/suggestions:
+    get:
+      operationId: MealPlansController_suggestions
+      parameters:
+        - name: maxMealCost
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: servings
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Deal-based meal suggestions for the demo household
+      tags:
+        - meal-plans
+  /users/demo/pantry/replenishment:
+    get:
+      operationId: PantryController_replenishment
+      parameters:
+        - name: asOf
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Demo household pantry replenishment plan
+      tags:
+        - pantry
+  /products:
+    get:
+      operationId: ProductsController_list
+      parameters: []
+      responses:
+        "200":
+          description: Searchable product list
+      tags: &a6
+        - products
+  /products/search/faceted:
+    get:
+      operationId: ProductsController_facetedSearch
+      parameters:
+        - name: q
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: category
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: brand
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: chain
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: store
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: priceType
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: minPrice
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: maxPrice
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: limit
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Real faceted product search from persisted catalog and latest prices
+      tags: *a6
+  /products/{id}/terminal:
+    get:
+      operationId: ProductsController_terminal
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: asOf
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Product price terminal distribution, quote, and chart data
+      tags: *a6
+  /products/{id}/spread:
+    get:
+      operationId: ProductsController_spread
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Current verified store price spread for a product
+      tags: *a6
+  /products/{id}/store-savings:
+    get:
+      operationId: ProductsController_storeSavings
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Product store savings against the highest current verified quote
+      tags: *a6
+  /products/{id}/history-summary:
+    get:
+      operationId: ProductsController_historySummary
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Product price history summary and movement guardrails
+      tags: *a6
+  /products/{id}/history-confidence:
+    get:
+      operationId: ProductsController_historyConfidence
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Product price history confidence disclosure and claim guardrails
+      tags: *a6
+  /products/{id}/deal-score:
+    get:
+      operationId: ProductsController_dealScore
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: distanceKm
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Deal Score v1 report with customer-facing reasons
+      tags: *a6
+  /products/{id}/equivalents:
+    get:
+      operationId: ProductsController_equivalents
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Comparable same-category product alternatives
+      tags: *a6
+  /products/{id}/history:
+    get:
+      operationId: ProductsController_history
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Raw product price history points
+      tags: *a6
+  /products/{id}:
+    get:
+      operationId: ProductsController_detail
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Product detail data
+      tags: *a6
+  /users/demo/privacy/export:
+    get:
+      operationId: PrivacyController_export
+      parameters: []
+      responses:
+        "200":
+          description: Demo user privacy export summary
+      tags: &a7
+        - privacy
+  /users/demo/privacy/deletion-plan:
+    post:
+      operationId: PrivacyController_deletionPlan
+      parameters: []
+      responses:
+        "200":
+          description: Demo user account deletion plan without destructive action
+      tags: *a7
+  /retailers:
+    get:
+      operationId: RetailersController_list
+      parameters: []
+      responses:
+        "200":
+          description: Supported retailer list with id, name, logo, and website URL metadata
+      tags:
+        - retailers
+  /users/demo/settings/data-export:
+    get:
+      operationId: SettingsController_dataExport
+      parameters: []
+      responses:
+        "200":
+          description: Download my data JSON export with lists, alerts, preferences, and
+            analytics events
+      tags: &a8
+        - settings
+  /users/demo/settings/account:
+    delete:
+      operationId: SettingsController_accountDeletion
+      parameters: []
+      responses:
+        "200":
+          description: Delete my account confirmation contract for lists, alerts,
+            preferences, and account profile rows
+      tags: *a8
+  /stores:
+    get:
+      operationId: StoresController_list
+      parameters: []
+      responses:
+        "200":
+          description: Store list
+      tags: &a9
+        - stores
+  /stores/{id}/deals:
+    get:
+      operationId: StoresController_deals
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Ranked in-store deals for one store
+      tags: *a9
+  /stores/{id}/deal-summary:
+    get:
+      operationId: StoresController_dealSummary
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Store deal summary with category leaders and score guardrails
+      tags: *a9
+  /stores/{id}/flyer-offers:
+    get:
+      operationId: StoresController_flyerOffers
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: asOf
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Active weekly flyer offers captured for one branch
+      tags: *a9
+  /stores/{id}/discounts:
+    get:
+      operationId: StoresController_discounts
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: asOf
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Active weekly discounts captured for one branch
+      tags: *a9
+  /stores/{id}/coverage:
+    get:
+      operationId: StoresController_coverage
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Verified shelf price coverage for one store
+      tags: *a9
+  /stores/{id}/category-coverage:
+    get:
+      operationId: StoresController_categoryCoverage
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Verified shelf price coverage grouped by category for one store
+      tags: *a9
+  /stores/{id}:
+    get:
+      operationId: StoresController_detail
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Store detail with opening hours and assortment overview
+      tags: *a9
+  /products/{productId}/cheapest-now:
+    get:
+      operationId: PricesController_cheapestNow
+      parameters:
+        - name: productId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Cheapest current observed price per chain for one product
+      tags: &a10
+        - prices
+  /products/{productId}/prices:
+    get:
+      operationId: PricesController_latest
+      parameters:
+        - name: productId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Latest store prices with provenance
+      tags: *a10
+  /products/{productId}/price-history:
+    get:
+      operationId: PricesController_priceHistoryReport
+      parameters:
+        - name: productId
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: priceType
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: chain
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: store
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: sourceRun
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: minConfidence
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: from
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: to
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: limit
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Persisted product price observations over time
+      tags: *a10
+  /products/{productId}/history.csv:
+    get:
+      operationId: PricesController_priceHistoryCsv
+      parameters:
+        - name: productId
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: priceType
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: chain
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: store
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: sourceRun
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: minConfidence
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: from
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: to
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: limit
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Persisted product price history as CSV
+      tags: *a10
+  /products/{productId}/observations:
+    get:
+      operationId: PricesController_observations
+      parameters:
+        - name: productId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Price observations
+      tags: *a10
+  /prices/freshness:
+    get:
+      operationId: PriceFreshnessController_freshness
+      parameters:
+        - name: asOf
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Price freshness and stale-price backfill queue
+      tags:
+        - prices
+  /users/demo/favorite-stores:
+    get:
+      operationId: FavoriteStoresController_list
+      parameters: []
+      responses:
+        "200":
+          description: Demo user favorite stores
+      tags: &a11
+        - favorite-stores
+    post:
+      operationId: FavoriteStoresController_add
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FavoriteStoreDto"
+      responses:
+        "201":
+          description: Favorite store added
+      tags: *a11
+  /users/demo/favorite-stores/{storeId}:
+    delete:
+      operationId: FavoriteStoresController_remove
+      parameters:
+        - name: storeId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Favorite store removed
+      tags: *a11
+  /users/demo/receipts/review:
+    get:
+      operationId: ReceiptsController_review
+      parameters: []
+      responses:
+        "200":
+          description: Demo receipt review report with budget impact and writeback
+            guardrails
+      tags:
+        - receipts
+  /users/demo/watchlist:
+    get:
+      operationId: WatchlistsController_list
+      parameters: []
+      responses:
+        "200":
+          description: Demo user watchlist
+      tags: &a12
+        - watchlists
+    post:
+      operationId: WatchlistsController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WatchlistItemDto"
+      responses:
+        "201":
+          description: Watchlist item created
+      tags: *a12
+  /users/demo/watchlist/price-alerts:
+    get:
+      operationId: WatchlistsController_priceAlerts
+      parameters: []
+      responses:
+        "200":
+          description: Active real watchlist target-price alerts for the demo user
+      tags: *a12
+    post:
+      operationId: WatchlistsController_createPriceAlert
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WatchlistPriceAlertDto"
+      responses:
+        "201":
+          description: Watchlist target-price alert created
+      tags: *a12
+  /users/demo/watchlist/{productId}:
+    patch:
+      operationId: WatchlistsController_update
+      parameters:
+        - name: productId
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WatchlistPatchDto"
+      responses:
+        "200":
+          description: Watchlist item updated
+      tags: *a12
+    delete:
+      operationId: WatchlistsController_remove
+      parameters:
+        - name: productId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Watchlist item removed
+      tags: *a12
+  /users/demo/basket:
+    get:
+      operationId: BasketsController_basket
+      parameters: []
+      responses:
+        "200":
+          description: Demo user basket
+      tags: &a13
+        - baskets
+  /users/demo/basket/comparison:
+    get:
+      operationId: BasketsController_comparison
+      parameters: []
+      responses:
+        "200":
+          description: Basket price comparison
+      tags: *a13
+  /users/demo/basket/local-offers:
+    get:
+      operationId: BasketsController_localOffers
+      parameters:
+        - name: asOf
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Ranked local offer basket coverage
+      tags: *a13
+  /users/demo/basket/import-export:
+    post:
+      operationId: BasketsController_importExport
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BasketImportExportDto"
+      responses:
+        "201":
+          description: Import consented bookmarklet or extension basket rows for review
+      tags: *a13
+  /users/demo/basket/import-review:
+    get:
+      operationId: BasketsController_importReview
+      parameters: []
+      responses:
+        "200":
+          description: Account-bound retailer basket import review rows
+      tags: *a13
+  /users/demo/basket/import-review/{reviewItemId}/decisions:
+    post:
+      operationId: BasketsController_importReviewDecision
+      parameters:
+        - name: reviewItemId
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BasketImportReviewDecisionDto"
+      responses:
+        "201":
+          description: Resolve an account-bound retailer basket import review row
+      tags: *a13
+  /users/demo/basket/handoff/{retailerId}:
+    get:
+      operationId: BasketsController_handoff
+      parameters:
+        - name: retailerId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Retailer handoff actions and support matrix guardrails
+      tags: *a13
+  /users/demo/basket/transfer/{retailerId}:
+    get:
+      operationId: BasketsController_transfer
+      parameters:
+        - name: retailerId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Secure retailer basket transfer preflight
+      tags: *a13
+  /users/demo/basket/fulfillment-slots/{retailerId}/{storeId}:
+    get:
+      operationId: BasketsController_fulfillmentSlots
+      parameters:
+        - name: retailerId
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: storeId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Fulfillment slot evidence without reservation claims
+      tags: *a13
+  /users/demo/basket/trip-cost:
+    get:
+      operationId: BasketsController_tripCost
+      parameters:
+        - name: travelMode
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: transitFare
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Basket plus travel-cost optimizer
+      tags: *a13
+  /users/demo/basket/recurring-digest:
+    get:
+      operationId: BasketsController_recurringDigest
+      parameters:
+        - name: cadence
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: lastPurchasedAt
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Recurring basket changes since last shop
+      tags: *a13
+  /users/demo/basket/stores/{storeId}/quote:
+    get:
+      operationId: BasketsController_storeQuote
+      parameters:
+        - name: storeId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Quote the demo basket at one store
+      tags: *a13
+  /users/demo/basket/items:
+    post:
+      operationId: BasketsController_addItem
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BasketItemDto"
+      responses:
+        "201":
+          description: Basket item created
+      tags: *a13
+  /users/demo/basket/items/{productId}:
+    patch:
+      operationId: BasketsController_updateItem
+      parameters:
+        - name: productId
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BasketItemQuantityDto"
+      responses:
+        "200":
+          description: Basket item quantity updated
+      tags: *a13
+    delete:
+      operationId: BasketsController_removeItem
+      parameters:
+        - name: productId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Basket item removed
+      tags: *a13
+  /baskets/compare:
+    post:
+      operationId: RealBasketsController_compare
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompareBasketRequestDto"
+      responses:
+        "200":
+          description: Compare an arbitrary basket using persisted latest price rows
+      tags: &a14
+        - baskets
+  /users/{userId}/basket/compare:
+    get:
+      operationId: RealBasketsController_compareSaved
+      parameters:
+        - name: userId
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: stores
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Compare the latest saved user basket using persisted latest price
+            rows
+      tags: *a14
+  /users/demo/budget/summary:
+    get:
+      operationId: BudgetsController_summary
+      parameters: []
+      responses:
+        "200":
+          description: Demo household budget summary with current basket estimate
+      tags: &a15
+        - budgets
+  /users/demo/budget/categories:
+    get:
+      operationId: BudgetsController_categories
+      parameters: []
+      responses:
+        "200":
+          description: Demo household category budget summary from the current basket
+      tags: *a15
+  /categories:
+    get:
+      operationId: CategoriesController_list
+      parameters: []
+      responses:
+        "200":
+          description: Full category tree with id, name, slug, parentId, and itemCount
+            metadata
+      tags: *a16
+  /users/demo/alerts:
+    get:
+      operationId: AlertsController_list
+      parameters: []
+      responses:
+        "200":
+          description: Demo user alert stream
+      tags: &a17
+        - alerts
+  /users/demo/alerts/inbox:
+    get:
+      operationId: AlertsController_inbox
+      parameters: []
+      responses:
+        "200":
+          description: Demo user notification inbox queue
+      tags: *a17
+info:
+  title: GroceryView API
+  description: HTTP API for GroceryView products, stores, prices, users,
+    watchlists, baskets, and alerts.
+  version: 0.1.0
+  contact: {}
+tags: []
+servers: []
+components:
+  schemas:
+    HouseholdPlanDto:
+      type: object
+      properties: {}
+    FavoriteStoreDto:
+      type: object
+      properties: {}
+    WatchlistItemDto:
+      type: object
+      properties: {}
+    WatchlistPriceAlertDto:
+      type: object
+      properties: {}
+    WatchlistPatchDto:
+      type: object
+      properties: {}
+    BasketImportExportDto:
+      type: object
+      properties: {}
+    BasketImportReviewDecisionDto:
+      type: object
+      properties: {}
+    BasketItemDto:
+      type: object
+      properties: {}
+    BasketItemQuantityDto:
+      type: object
+      properties: {}
+    CompareBasketRequestDto:
+      type: object
+      properties: {}

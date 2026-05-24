@@ -6,6 +6,7 @@ import request from 'supertest';
 import { AppModule } from '../src/app.module.js';
 import { configureApp } from '../src/configure-app.js';
 import { PostgresQueryExecutorService } from '../src/database/postgres-query-executor.service.js';
+import { openApiJsonPath, openApiYamlPath, swaggerUiPath } from '../src/openapi.js';
 
 class RecordingPriceHistoryExecutor {
   calls: Array<{ sql: string; params: unknown[] }> = [];
@@ -1390,6 +1391,107 @@ describe('GroceryView API app', () => {
       .post('/users/demo/basket/items')
       .send({ productId: 'coffee', quantity: 0 })
       .expect(400);
+  });
+
+  it('publishes Swagger UI plus OpenAPI JSON and YAML docs for every API route', async () => {
+    await request(app.getHttpServer()).get(`/${swaggerUiPath}`).expect(200);
+
+    const openApi = await request(app.getHttpServer()).get(`/${openApiJsonPath}`).expect(200);
+    assert.equal(openApi.body.openapi, '3.0.0');
+    assert.equal(openApi.body.info.title, 'GroceryView API');
+
+    const expectedOperations: Array<[string, string]> = [
+      ['get', '/'],
+      ['get', '/users/demo/account/subscription-access'],
+      ['get', '/users/demo/account/subscription-entitlement'],
+      ['get', '/users/demo/ads/disclosure'],
+      ['get', '/users/demo/alerts'],
+      ['get', '/users/demo/alerts/inbox'],
+      ['get', '/users/demo/basket'],
+      ['get', '/users/demo/basket/comparison'],
+      ['get', '/users/demo/basket/fulfillment-slots/{retailerId}/{storeId}'],
+      ['get', '/users/demo/basket/handoff/{retailerId}'],
+      ['get', '/users/demo/basket/import-review'],
+      ['post', '/users/demo/basket/import-review/{reviewItemId}/decisions'],
+      ['post', '/users/demo/basket/import-export'],
+      ['delete', '/users/demo/basket/items/{productId}'],
+      ['patch', '/users/demo/basket/items/{productId}'],
+      ['post', '/users/demo/basket/items'],
+      ['get', '/users/demo/basket/local-offers'],
+      ['get', '/users/demo/basket/recurring-digest'],
+      ['get', '/users/demo/basket/stores/{storeId}/quote'],
+      ['get', '/users/demo/basket/transfer/{retailerId}'],
+      ['get', '/users/demo/basket/trip-cost'],
+      ['post', '/baskets/compare'],
+      ['get', '/users/{userId}/basket/compare'],
+      ['get', '/users/demo/budget/categories'],
+      ['get', '/users/demo/budget/summary'],
+      ['get', '/categories'],
+      ['get', '/categories/{category}/market'],
+      ['get', '/deals/discounts'],
+      ['get', '/deals/flyer-offers'],
+      ['get', '/users/demo/expiry-deals/radar'],
+      ['get', '/health'],
+      ['get', '/users/demo/households/current'],
+      ['put', '/users/demo/households/current'],
+      ['get', '/users/demo/loyalty/offers'],
+      ['get', '/indices'],
+      ['get', '/indices/brands'],
+      ['get', '/indices/categories'],
+      ['get', '/indices/chains'],
+      ['get', '/indices/{id}'],
+      ['get', '/market/overview'],
+      ['get', '/nutrition/value'],
+      ['get', '/users/demo/meal-plans/suggestions'],
+      ['get', '/users/demo/pantry/replenishment'],
+      ['get', '/prices/freshness'],
+      ['get', '/users/demo/privacy/export'],
+      ['post', '/users/demo/privacy/deletion-plan'],
+      ['get', '/products'],
+      ['get', '/products/search/faceted'],
+      ['get', '/products/{id}'],
+      ['get', '/products/{id}/deal-score'],
+      ['get', '/products/{id}/equivalents'],
+      ['get', '/products/{id}/history'],
+      ['get', '/products/{id}/history-confidence'],
+      ['get', '/products/{id}/history-summary'],
+      ['get', '/products/{id}/spread'],
+      ['get', '/products/{id}/store-savings'],
+      ['get', '/products/{id}/terminal'],
+      ['get', '/products/{productId}/cheapest-now'],
+      ['get', '/products/{productId}/history.csv'],
+      ['get', '/products/{productId}/observations'],
+      ['get', '/products/{productId}/price-history'],
+      ['get', '/products/{productId}/prices'],
+      ['get', '/users/demo/receipts/review'],
+      ['get', '/retailers'],
+      ['delete', '/users/demo/settings/account'],
+      ['get', '/users/demo/settings/data-export'],
+      ['get', '/stores'],
+      ['get', '/stores/{id}'],
+      ['get', '/stores/{id}/category-coverage'],
+      ['get', '/stores/{id}/coverage'],
+      ['get', '/stores/{id}/deal-summary'],
+      ['get', '/stores/{id}/deals'],
+      ['get', '/stores/{id}/discounts'],
+      ['get', '/stores/{id}/flyer-offers'],
+      ['delete', '/users/demo/favorite-stores/{storeId}'],
+      ['get', '/users/demo/favorite-stores'],
+      ['post', '/users/demo/favorite-stores'],
+      ['get', '/users/demo/watchlist'],
+      ['delete', '/users/demo/watchlist/{productId}'],
+      ['patch', '/users/demo/watchlist/{productId}'],
+      ['get', '/users/demo/watchlist/price-alerts'],
+      ['post', '/users/demo/watchlist/price-alerts']
+    ];
+
+    for (const [method, path] of expectedOperations) {
+      assert.ok(openApi.body.paths[path]?.[method], `${method.toUpperCase()} ${path} is missing from OpenAPI docs`);
+    }
+
+    const yaml = await request(app.getHttpServer()).get(`/${openApiYamlPath}`).expect(200);
+    assert.match(yaml.text, /openapi: 3\.0\.0/);
+    assert.match(yaml.text, /\/products\/\{productId\}\/price-history:/);
   });
 
   it('returns 404 for missing product terminal data', async () => {
