@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import {
@@ -26,11 +27,26 @@ import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { normalizeUnitPriceForPackageText, packageEvidenceFromText } from '@/lib/normalization';
 import { metadataForProduct } from '@/lib/seo';
 
-export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
+export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>): Promise<Metadata> {
   const { slug } = await params;
   const product = findProduct(slug);
   if (!product) notFound();
-  return metadataForProduct(product);
+
+  const metadata = metadataForProduct(product);
+  const openGraph = metadata.openGraph;
+  const twitterImages = openGraph?.images
+    ? (openGraph.images as NonNullable<Metadata['twitter']>['images'])
+    : undefined;
+
+  return {
+    ...metadata,
+    twitter: {
+      card: 'summary_large_image',
+      title: openGraph?.title ?? metadata.title ?? `${product.name} price ticker | GroceryView`,
+      description: openGraph?.description ?? metadata.description ?? undefined,
+      images: twitterImages
+    }
+  };
 }
 
 const REQUIRED_CHAIN_COVERAGE = 6;
