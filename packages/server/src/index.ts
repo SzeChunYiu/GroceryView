@@ -420,12 +420,27 @@ function errorResponse(status: number, error: string): Response {
   return jsonResponse({ error }, { status });
 }
 
+class MalformedPostBodyError extends Error {
+  readonly code = 'malformed_post_body';
+
+  constructor(readonly reason: string) {
+    super('Invalid JSON body.');
+  }
+}
+
+function malformedPostBodyResponse(error: MalformedPostBodyError): Response {
+  return jsonResponse(
+    { error: error.message, code: error.code, details: { reason: error.reason } },
+    { status: 400 }
+  );
+}
+
 async function readJson(request: Request): Promise<JsonRecord> {
   try {
     if (!request.body) return {};
     return parseJsonObject(await request.text());
   } catch (error) {
-    throw new Error(`Invalid JSON: ${error instanceof Error ? error.message : 'parse failed'}`);
+    throw new MalformedPostBodyError(error instanceof Error ? error.message : 'parse failed');
   }
 }
 
@@ -3000,6 +3015,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
 
       return errorResponse(404, `Route not found: ${method} ${path}`);
     } catch (error) {
+      if (error instanceof MalformedPostBodyError) return malformedPostBodyResponse(error);
       return errorResponse(400, error instanceof Error ? error.message : 'Bad request.');
     }
   };
