@@ -160,9 +160,12 @@ describe('verified-data UI', () => {
   it('ships signed-in scanner upload and barcode processing controls without anonymous uploads', async () => {
     const scanner = await read('src/app/scanner/page.tsx');
     const actions = await read('src/components/scanner-upload-actions.tsx');
+    const history = await read('src/components/ocr-scan-history-timeline.tsx');
+    const helper = await read('src/lib/scanner-history.ts');
     const scanning = await read('../../packages/scanning/src/index.ts');
 
     assert.match(scanner, /ScannerUploadActions/);
+    assert.match(scanner, /OcrScanHistoryTimeline/);
     assert.match(actions, /'use client'/);
     assert.match(actions, /sessionStorage\.getItem\('groceryview:accessToken'/);
     assert.match(actions, /sessionStorage\.getItem\('groceryview:userId'/);
@@ -191,6 +194,14 @@ describe('verified-data UI', () => {
     assert.match(actions, /No anonymous scan uploads/);
     assert.doesNotMatch(actions, /localStorage\.setItem\('groceryview:userId'/);
     assert.doesNotMatch(actions, /demo-data|sample-data|mock session/i);
+    assert.match(history, /'use client'/);
+    assert.match(history, /sessionStorage\.getItem\('groceryview:accessToken'/);
+    assert.match(history, /sessionStorage\.getItem\('groceryview:userId'/);
+    assert.match(history, /fetchScannerHistory/);
+    assert.match(history, /redacted fallback/);
+    assert.match(helper, /\/api\/scans\/history\?userId=\$\{encodeURIComponent\(userId\)\}/);
+    assert.match(helper, /Authorization: `Bearer \$\{accessToken\}`/);
+    assert.match(helper, /cache: 'no-store'/);
     assert.match(scanning, /No scan upload storage provider configured/);
   });
 

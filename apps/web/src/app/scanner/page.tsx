@@ -1,4 +1,5 @@
 import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { OcrScanHistoryTimeline } from '@/components/ocr-scan-history-timeline';
 import { ScannerUploadActions } from '@/components/scanner-upload-actions';
 import { routeMetadata } from '@/lib/seo';
 import { receiptFedAliasGrowthPlan } from '@/lib/verified-data';
@@ -60,6 +61,7 @@ export default function ScannerPage() {
         </div>
       </Card>
       <ScannerUploadActions />
+      <OcrScanHistoryTimeline />
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
         <TopSpreads limit={5} />
         <SourceCoverage />
