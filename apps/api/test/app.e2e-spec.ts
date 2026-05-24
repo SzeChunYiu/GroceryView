@@ -35,6 +35,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/products']);
     assert.ok(docs.body.paths['/products/{id}/terminal']);
     assert.ok(docs.body.paths['/products/{id}/spread']);
+    assert.ok(docs.body.paths['/items/{itemId}/observations']);
     assert.ok(docs.body.paths['/stores']);
   });
 
@@ -122,5 +123,57 @@ describe('GroceryView API app', () => {
   it('returns 404 for missing product terminal data', async () => {
     await request(app.getHttpServer()).get('/products/missing-product/terminal').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/spread').expect(404);
+  });
+
+  it('supports price lookup for historical date boundaries', async () => {
+    const atDate = await request(app.getHttpServer())
+      .get('/products/coffee/observations?atDate=2026-05-10')
+      .expect(200);
+
+    assert.equal(atDate.body.length, 1);
+    assert.equal(atDate.body[0].productId, 'coffee');
+    assert.equal(atDate.body[0].price, 59.9);
+    assert.equal(atDate.body[0].observedAt, '2026-05-01T09:00:00Z');
+
+    const afterAll = await request(app.getHttpServer())
+      .get('/products/coffee/observations?atDate=2026-05-30')
+      .expect(200);
+    assert.equal(afterAll.body.length, 1);
+    assert.equal(afterAll.body[0].price, 49.9);
+
+    const beforeAll = await request(app.getHttpServer())
+      .get('/products/coffee/observations?atDate=2026-03-20')
+      .expect(200);
+    assert.equal(beforeAll.body.length, 0);
+  });
+
+  it('returns 400 for malformed observation lookup date', async () => {
+    await request(app.getHttpServer()).get('/products/coffee/observations?atDate=invalid').expect(400);
+  });
+
+  it('supports item-route price lookup for historical date boundaries', async () => {
+    const atDate = await request(app.getHttpServer())
+      .get('/items/coffee/observations?atDate=2026-05-10')
+      .expect(200);
+
+    assert.equal(atDate.body.length, 1);
+    assert.equal(atDate.body[0].itemId, 'coffee');
+    assert.equal(atDate.body[0].price, 59.9);
+    assert.equal(atDate.body[0].observedAt, '2026-05-01T09:00:00Z');
+
+    const afterAll = await request(app.getHttpServer())
+      .get('/items/coffee/observations?atDate=2026-05-30')
+      .expect(200);
+    assert.equal(afterAll.body.length, 1);
+    assert.equal(afterAll.body[0].price, 49.9);
+
+    const beforeAll = await request(app.getHttpServer())
+      .get('/items/coffee/observations?atDate=2026-03-20')
+      .expect(200);
+    assert.equal(beforeAll.body.length, 0);
+  });
+
+  it('returns 400 for malformed item-route historical date lookup', async () => {
+    await request(app.getHttpServer()).get('/items/coffee/observations?atDate=invalid').expect(400);
   });
 });
