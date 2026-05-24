@@ -1,0 +1,73 @@
+.grocery-search-form {
+  display: grid;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.grocery-search-input-wrap {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid rgb(226 232 240 / 1);
+  border-radius: 1rem;
+  background: #fff;
+}
+
+.grocery-search-input {
+  width: 100%;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: #0f172a;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.grocery-search-input::placeholder {
+  color: rgb(100 116 139 / 1);
+}
+
+.grocery-search-submit {
+  justify-self: start;
+  border: 0;
+  border-radius: 9999px;
+  padding: 0.65rem 1.1rem;
+  font-size: 0.875rem;
+  font-weight: 900;
+  color: #f8fafc;
+  background: #0f172a;
+  cursor: pointer;
+}
+
+.grocery-search-submit:hover,
+.grocery-search-submit:focus-visible {
+  background: #0f172a;
+  filter: brightness(0.92);
+}
+
+.grocery-search-advanced {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: #14532d;
+  background: #ecfdf5;
+}
+
+@media (min-width: 640px) {
+  .grocery-search-form {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+  }
+
+  .grocery-search-submit,
+  .grocery-search-advanced {
+    justify-self: end;
+  }
+}

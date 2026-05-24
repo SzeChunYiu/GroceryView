@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { ConsentManager } from '@/components/consent-manager';
 import { Providers } from './providers';
 import './globals.css';
+import '../styles/global.css';
 
 const siteUrl = 'https://grocery-web-mu.vercel.app';
 const organizationJsonLd = {
