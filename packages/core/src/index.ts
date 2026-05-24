@@ -5128,6 +5128,8 @@ export function calculateChainPriceIndex(observations: ChainPriceObservation[]):
     }
 
     byCategory.sort((a, b) => a.category.localeCompare(b.category));
+    if (byCategory.length === 0) continue;
+
     const overall = roundMoney(weightedGeometricMean(ratios, weights) * 100) || 100;
     const totalObs = rows.length;
     const confidence =
