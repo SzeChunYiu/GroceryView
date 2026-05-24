@@ -1,11 +1,20 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { COMPARE_CHAIN_ORDER, buildChainComparisonTable } from '@/lib/chain-compare';
+import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, commodityComparisons, compareOverlayChart, formatPct, formatSek, matchedChainProducts, privateLabelDupeFinder } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
   return routeMetadata('/compare');
+}
+
+function formatComparableUnitPrice(value: number | null | undefined, unitLabel: string | null | undefined) {
+  return formatLocalizedUnitPrice(value, {
+    locale: defaultLocale,
+    currency: 'SEK',
+    unit: unitLabel?.replace(/^kr\//, '') ?? null
+  });
 }
 
 type SearchParams = {
@@ -216,7 +225,7 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
               <p className="mt-1 text-sm font-semibold text-slate-600">{dupe.sourceName} → {dupe.dupeName}</p>
               <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
                 <p className="rounded-xl bg-fuchsia-50 p-3 font-black text-fuchsia-950">Save {formatPct(dupe.savingsPercent)}</p>
-                <p className="rounded-xl bg-slate-50 p-3 font-black text-slate-950">{formatSek(dupe.dupeUnitPrice)} {dupe.unitLabel}</p>
+                <p className="rounded-xl bg-slate-50 p-3 font-black text-slate-950">{formatComparableUnitPrice(dupe.dupeUnitPrice, dupe.unitLabel)}</p>
               </div>
               <p className="mt-3 text-xs font-semibold text-slate-500">name evidence {dupe.nameEvidence.join(', ')} · confidence {dupe.confidence} · {dupe.reason}</p>
             </Link>
@@ -241,7 +250,7 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
               <h3 className="mt-2 text-lg font-black text-slate-950">{comparison.cheapestChain?.chainName ?? 'Coverage blocked'}</h3>
               <p className="mt-1 text-sm font-semibold text-slate-600">{comparison.cheapestChain?.productName ?? 'No chain clears coverage'}</p>
               <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
-                <p className="rounded-xl bg-lime-50 p-3 font-black text-lime-950">Cheapest {formatSek(comparison.cheapestChain?.unitPrice)}</p>
+                <p className="rounded-xl bg-lime-50 p-3 font-black text-lime-950">Cheapest {formatComparableUnitPrice(comparison.cheapestChain?.unitPrice, comparison.comparableUnit)}</p>
                 <p className="rounded-xl bg-white p-3 font-black text-slate-950">{formatPct(comparison.cheapestChain?.savingsVsNextPercent)} vs next</p>
               </div>
               <p className="mt-3 text-xs font-semibold text-slate-500">{comparison.confidenceLabel}</p>

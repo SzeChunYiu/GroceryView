@@ -11,7 +11,7 @@ const storageKey = 'groceryview:product-card-compare-mode';
 const compareModes: Array<{ label: string; value: CompareMode; help: string }> = [
   { label: 'Adaptive', value: 'adaptive', help: 'Commodity cards lead with unit price; branded cards lead with total price.' },
   { label: 'Total', value: 'total', help: 'Sort and lead every card by the observed pack price.' },
-  { label: 'Per kg / l / st', value: 'unit', help: 'Sort and lead every card by comparable unit price when package size is known.' }
+  { label: 'Per kg / l / st / 100 g', value: 'unit', help: 'Sort and lead every card by comparable jämförpris when package size is known.' }
 ];
 
 function resolvedMode(card: AdaptiveProductCard, compareMode: CompareMode): 'total' | 'unit' {

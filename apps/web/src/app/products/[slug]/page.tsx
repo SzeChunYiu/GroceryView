@@ -14,6 +14,7 @@ import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTermin
 import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
 import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
+import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { metadataForProduct } from '@/lib/seo';
 
 export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
@@ -160,6 +161,10 @@ function breadcrumbJsonLdFor(product: NonNullable<ReturnType<typeof findProduct>
 
 function jsonLd(value: unknown) {
   return JSON.stringify(value).replace(/</g, '\\u003c');
+}
+
+function formatComparableUnitPrice(value: number | null | undefined, unit: string | null | undefined) {
+  return formatLocalizedUnitPrice(value, { locale: defaultLocale, currency: 'SEK', unit });
 }
 
 function brandTierFor(brand: string, labels: string[] = []): BrandTier {
@@ -1104,7 +1109,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
                 <Link className="rounded-2xl border border-lime-100 bg-white p-4 shadow-sm transition hover:border-lime-700" href={`/products/${row.productId}`} key={`${row.chainId}-${row.productId}`}>
                   <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-800">#{row.rank} · {row.chainName}</p>
                   <h3 className="mt-2 text-lg font-black text-slate-950">{row.productName}</h3>
-                  <p className="mt-2 text-2xl font-black text-emerald-800">{formatSek(row.unitPrice)} / {row.comparableUnit}</p>
+                  <p className="mt-2 text-2xl font-black text-emerald-800">{formatComparableUnitPrice(row.unitPrice, row.comparableUnit)}</p>
                   <p className="mt-2 text-sm font-semibold text-slate-600">sourceConfidence {formatPct(row.sourceConfidence * 100)} · save {formatPct(row.savingsVsNextPercent)} vs next chain</p>
                   <p className="mt-2 text-xs font-semibold text-slate-500">{row.variant ?? 'Variant not reported'} {row.originCountry ? `· origin ${row.originCountry}` : ''}</p>
                 </Link>
