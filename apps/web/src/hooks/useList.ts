@@ -28,12 +28,21 @@ export type ListBudgetBucket = {
   status: 'under' | 'over';
 };
 
+export type ListBudgetHistorySnapshot = {
+  buckets: ListBudgetBucket[];
+  capturedAt: string;
+  estimatedTotal: number;
+  overspendCategories: string[];
+};
+
 type PersistedListState = {
+  budgetHistory?: ListBudgetHistorySnapshot[];
   checkedById?: Record<string, boolean>;
   importedItems?: BulkImportedListItemInput[];
 };
 
 export const LIST_STORAGE_KEY = 'groceryview:shopping-list:checked:v1';
+export const MAX_BUDGET_HISTORY_SNAPSHOTS = 6;
 
 export const listCategoryBudgets: Record<string, number> = {
   breakfast: 50,
@@ -88,8 +97,67 @@ const baseListItems: Omit<ShoppingListItem, 'checked'>[] = [
   }
 ];
 
+function isBudgetBucket(value: unknown): value is ListBudgetBucket {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const bucket = value as Partial<ListBudgetBucket>;
+
+  return (
+    typeof bucket.budget === 'number'
+    && Number.isFinite(bucket.budget)
+    && typeof bucket.category === 'string'
+    && typeof bucket.itemCount === 'number'
+    && Number.isFinite(bucket.itemCount)
+    && typeof bucket.remaining === 'number'
+    && Number.isFinite(bucket.remaining)
+    && typeof bucket.spent === 'number'
+    && Number.isFinite(bucket.spent)
+    && (bucket.status === 'under' || bucket.status === 'over')
+  );
+}
+
+function sanitizeBudgetHistory(value: unknown): ListBudgetHistorySnapshot[] {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .filter((snapshot): snapshot is ListBudgetHistorySnapshot => {
+      if (!snapshot || typeof snapshot !== 'object' || Array.isArray(snapshot)) return false;
+      const candidate = snapshot as Partial<ListBudgetHistorySnapshot>;
+
+      return (
+        typeof candidate.capturedAt === 'string'
+        && !Number.isNaN(Date.parse(candidate.capturedAt))
+        && typeof candidate.estimatedTotal === 'number'
+        && Number.isFinite(candidate.estimatedTotal)
+        && Array.isArray(candidate.buckets)
+        && candidate.buckets.every(isBudgetBucket)
+        && Array.isArray(candidate.overspendCategories)
+        && candidate.overspendCategories.every((category) => typeof category === 'string')
+      );
+    })
+    .slice(0, MAX_BUDGET_HISTORY_SNAPSHOTS)
+    .map((snapshot) => ({
+      buckets: snapshot.buckets,
+      capturedAt: snapshot.capturedAt,
+      estimatedTotal: snapshot.estimatedTotal,
+      overspendCategories: snapshot.overspendCategories
+    }));
+}
+
+function createBudgetHistorySnapshot(
+  buckets: ListBudgetBucket[],
+  estimatedTotal: number,
+  capturedAt = new Date().toISOString()
+): ListBudgetHistorySnapshot {
+  return {
+    buckets,
+    capturedAt,
+    estimatedTotal,
+    overspendCategories: buckets.filter((bucket) => bucket.status === 'over').map((bucket) => bucket.category)
+  };
+}
+
 function listStateFromStorage(value: string | null): Required<PersistedListState> {
-  const empty = { checkedById: {}, importedItems: [] };
+  const empty = { budgetHistory: [], checkedById: {}, importedItems: [] };
   if (!value) return empty;
 
   try {
@@ -101,6 +169,7 @@ function listStateFromStorage(value: string | null): Required<PersistedListState
 
     const maybeCheckedById = 'checkedById' in parsed ? parsed.checkedById : parsed;
     const maybeImportedItems = 'importedItems' in parsed ? parsed.importedItems : [];
+    const maybeBudgetHistory = 'budgetHistory' in parsed ? parsed.budgetHistory : [];
 
     const checkedById = maybeCheckedById && typeof maybeCheckedById === 'object' && !Array.isArray(maybeCheckedById)
       ? Object.fromEntries(
@@ -126,8 +195,9 @@ function listStateFromStorage(value: string | null): Required<PersistedListState
           estimatedPrice: typeof item.estimatedPrice === 'number' && Number.isFinite(item.estimatedPrice) ? item.estimatedPrice : 0
         }))
       : [];
+    const budgetHistory = sanitizeBudgetHistory(maybeBudgetHistory);
 
-    return { checkedById, importedItems };
+    return { budgetHistory, checkedById, importedItems };
   } catch {
     return empty;
   }
@@ -144,7 +214,7 @@ function withCheckedState(checkedById: Record<string, boolean>, importedItems: B
   }));
 }
 
-function persistCheckedState(items: ShoppingListItem[]) {
+function persistCheckedState(items: ShoppingListItem[], budgetHistory: ListBudgetHistorySnapshot[]) {
   try {
     const checkedById = Object.fromEntries(items.map((item) => [item.id, item.checked]));
     const importedItems = items
@@ -160,12 +230,15 @@ function persistCheckedState(items: ShoppingListItem[]) {
         name: item.name,
         quantity: item.quantity
       }));
-    localStorage.setItem(LIST_STORAGE_KEY, JSON.stringify({ checkedById, importedItems }));
+    localStorage.setItem(LIST_STORAGE_KEY, JSON.stringify({
+      budgetHistory: budgetHistory.slice(0, MAX_BUDGET_HISTORY_SNAPSHOTS),
+      checkedById,
+      importedItems
+    }));
   } catch {
     // Keep the check-off UI usable even when a browser blocks localStorage.
   }
 }
-
 
 export function summarizeListBudgetBuckets(items: ShoppingListItem[]): ListBudgetBucket[] {
   const byCategory = new Map<string, { itemCount: number; spent: number }>();
@@ -196,11 +269,13 @@ export function summarizeListBudgetBuckets(items: ShoppingListItem[]): ListBudge
 
 export function useList() {
   const [items, setItems] = useState<ShoppingListItem[]>(() => withCheckedState({}));
+  const [budgetHistory, setBudgetHistory] = useState<ListBudgetHistorySnapshot[]>([]);
   const [hasLoadedBrowserState, setHasLoadedBrowserState] = useState(false);
 
   useEffect(() => {
     try {
-      const { checkedById, importedItems } = listStateFromStorage(localStorage.getItem(LIST_STORAGE_KEY));
+      const { budgetHistory: storedBudgetHistory, checkedById, importedItems } = listStateFromStorage(localStorage.getItem(LIST_STORAGE_KEY));
+      setBudgetHistory(storedBudgetHistory);
       setItems(withCheckedState(checkedById, importedItems));
     } finally {
       setHasLoadedBrowserState(true);
@@ -209,8 +284,8 @@ export function useList() {
 
   useEffect(() => {
     if (!hasLoadedBrowserState) return;
-    persistCheckedState(items);
-  }, [hasLoadedBrowserState, items]);
+    persistCheckedState(items, budgetHistory);
+  }, [budgetHistory, hasLoadedBrowserState, items]);
 
   const toggleItemChecked = useCallback((itemId: string) => {
     setItems((currentItems) => currentItems.map((item) => (
@@ -239,16 +314,24 @@ export function useList() {
   const estimatedTotal = useMemo(() => Math.round(items.reduce((sum, item) => sum + item.estimatedPrice, 0) * 100) / 100, [items]);
   const totalCount = items.length;
   const remainingCount = totalCount - checkedCount;
+  const saveBudgetSnapshot = useCallback(() => {
+    setBudgetHistory((currentHistory) => [
+      createBudgetHistorySnapshot(budgetBuckets, estimatedTotal),
+      ...currentHistory
+    ].slice(0, MAX_BUDGET_HISTORY_SNAPSHOTS));
+  }, [budgetBuckets, estimatedTotal]);
 
   return {
     addImportedItems,
     budgetAlerts,
     budgetBuckets,
+    budgetHistory,
     checkedCount,
     estimatedTotal,
     items,
     remainingCount,
     resetCheckedState,
+    saveBudgetSnapshot,
     toggleItemChecked,
     totalCount
   };

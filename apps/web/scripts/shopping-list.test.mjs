@@ -24,6 +24,10 @@ describe('shopping list route', () => {
     assert.match(page, /List budget buckets/);
     assert.match(page, /budgetAlerts/);
     assert.match(page, /budgetBuckets/);
+    assert.match(page, /budgetHistory/);
+    assert.match(page, /Save budget snapshot/);
+    assert.match(page, /Recent budget snapshots/);
+    assert.match(page, /budgetHistory\.map/);
     assert.match(page, /role="status"/);
 
     assert.match(row, /'use client'/);
@@ -47,6 +51,11 @@ describe('shopping list route', () => {
     assert.match(hook, /summarizeListBudgetBuckets/);
     assert.match(hook, /budgetAlerts/);
     assert.match(hook, /estimatedTotal/);
+    assert.match(hook, /ListBudgetHistorySnapshot/);
+    assert.match(hook, /MAX_BUDGET_HISTORY_SNAPSHOTS/);
+    assert.match(hook, /budgetHistory/);
+    assert.match(hook, /capturedAt/);
+    assert.match(hook, /saveBudgetSnapshot/);
 
     assert.match(bulkImport, /'use client'/);
     assert.match(bulkImport, /parseBulkImportLines/);
