@@ -3,10 +3,11 @@
 import { CheckableListItem } from '@/components/CheckableListItem';
 import { AppNav } from '@/components/app-nav';
 import { BottomNav } from '@/components/bottom-nav';
+import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { useList } from '@/hooks/useList';
 
 export default function ShoppingListPage() {
-  const { checkedCount, items, remainingCount, resetCheckedState, toggleItemChecked, totalCount } = useList();
+  const { addImportedItems, checkedCount, items, remainingCount, resetCheckedState, toggleItemChecked, totalCount } = useList();
   const progress = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
 
   return (
@@ -27,6 +28,8 @@ export default function ShoppingListPage() {
             <p className="text-sm font-semibold text-slate-600">{remainingCount} left to collect</p>
           </div>
         </div>
+
+        <BulkImportDialog onImportItems={addImportedItems} />
 
         <section className="mt-6 rounded-[1.75rem] border border-emerald-200 bg-white/95 p-5 shadow-sm">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

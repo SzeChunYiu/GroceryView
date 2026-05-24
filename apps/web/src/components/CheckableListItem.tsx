@@ -38,6 +38,11 @@ export function CheckableListItem({ item, onToggle }: Readonly<CheckableListItem
           </span>
         </span>
       </label>
+      {item.matchedProductSlug ? (
+        <p className="mt-3 rounded-xl bg-sky-50 px-3 py-2 text-xs font-black text-sky-900">
+          Matched catalog product: {item.matchedProductName ?? item.matchedProductSlug} · matchedProductSlug: {item.matchedProductSlug}
+        </p>
+      ) : null}
     </li>
   );
 }
