@@ -6,12 +6,23 @@ export type MatsparProduct = {
   countryFrom: string;
   price: number;
   priceText: string;
+  channel: 'online';
+  isComparisonPrice: true;
+  isRetailerPrice: false;
+  is_member_price?: true;
   medianPrice: number | null;
+  multi_buy: MatsparMultiBuyPromotion | null;
+  pricePointCount: number;
   warehousePriceCount: number;
   sourceUrl: string;
   productUrl: string;
   imageHash: string;
   retrievedAt: string;
+};
+
+export type MatsparMultiBuyPromotion = {
+  minimum_quantity: number;
+  unit_price: number;
 };
 
 type MatsparPageData = {
@@ -31,7 +42,16 @@ type MatsparPageProduct = {
   slug?: unknown;
   price?: unknown;
   median_price?: unknown;
+  prices?: Record<string, unknown>;
+  promo?: Record<string, MatsparPagePromotion>;
   w_prices?: Record<string, unknown>;
+};
+
+type MatsparPagePromotion = {
+  afteramount?: unknown;
+  bonuscard?: unknown;
+  price?: unknown;
+  type?: unknown;
 };
 
 export const MATSPAR_SEARCH_BASE_URL = 'https://www.matspar.se/kategori';
@@ -191,6 +211,10 @@ export function normalizeMatsparProduct(
   }
 
   const medianPrice = oreToSek(product.median_price);
+  const multiBuy = parseMatsparMultiBuy(product.promo);
+  const hasMemberPrice = Object.values(product.promo ?? {}).some((promotion) => promotion?.bonuscard === true);
+  const pricePointCount = countPricePoints(product.prices ?? product.w_prices);
+
   return {
     code,
     name,
@@ -199,13 +223,39 @@ export function normalizeMatsparProduct(
     countryFrom: text(product.country_from),
     price,
     priceText: `${price.toFixed(2)} SEK`,
+    channel: 'online',
+    isComparisonPrice: true,
+    isRetailerPrice: false,
+    ...(hasMemberPrice ? { is_member_price: true as const } : {}),
     medianPrice,
-    warehousePriceCount: product.w_prices && typeof product.w_prices === 'object' ? Object.keys(product.w_prices).length : 0,
+    multi_buy: multiBuy,
+    pricePointCount,
+    warehousePriceCount: pricePointCount,
     sourceUrl,
     productUrl: buildMatsparProductUrl(product.slug),
     imageHash: text(product.image),
     retrievedAt
   };
+}
+
+function parseMatsparMultiBuy(promotions: Record<string, MatsparPagePromotion> | undefined): MatsparMultiBuyPromotion | null {
+  for (const promotion of Object.values(promotions ?? {})) {
+    const minimumQuantity = integerOrNull(promotion.afteramount);
+    const unitPrice = oreToSek(promotion.price);
+    if (promotion.type === 'X_FOR_FIXED' && minimumQuantity !== null && unitPrice !== null) {
+      return { minimum_quantity: minimumQuantity, unit_price: unitPrice };
+    }
+  }
+  return null;
+}
+
+function countPricePoints(prices: Record<string, unknown> | undefined): number {
+  return prices && typeof prices === 'object' ? Object.keys(prices).length : 0;
+}
+
+function integerOrNull(value: unknown): number | null {
+  const numeric = typeof value === 'number' ? value : Number.parseInt(text(value), 10);
+  return Number.isInteger(numeric) ? numeric : null;
 }
 
 function buildMatsparProductUrl(slug: unknown): string {

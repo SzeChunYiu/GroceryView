@@ -3987,6 +3987,8 @@ describe('fetchMatsparProducts', () => {
           slug: 'produkt/snabbmakaroner-750-g-kungsornen',
           price: 1500,
           median_price: 1750,
+          prices: { 1886: 1665, 1887: 1877, 1888: 1500 },
+          promo: { 1888: { afteramount: 3, bonuscard: true, price: 1000, type: 'X_FOR_FIXED' } },
           w_prices: { 1886: 1665, 1887: 1877 }
         }]
       }
@@ -4015,8 +4017,14 @@ describe('fetchMatsparProducts', () => {
       countryFrom: 'Sverige',
       price: 15,
       priceText: '15.00 SEK',
+      channel: 'online',
+      isComparisonPrice: true,
+      isRetailerPrice: false,
+      is_member_price: true,
       medianPrice: 17.5,
-      warehousePriceCount: 2,
+      multi_buy: { minimum_quantity: 3, unit_price: 10 },
+      pricePointCount: 3,
+      warehousePriceCount: 3,
       sourceUrl: buildMatsparSearchUrl('makaroner'),
       productUrl: 'https://www.matspar.se/produkt/snabbmakaroner-750-g-kungsornen',
       imageHash: '6204b6c746fe26cfce7c4246c2f3a29f',
