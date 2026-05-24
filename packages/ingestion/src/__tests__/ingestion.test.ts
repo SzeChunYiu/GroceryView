@@ -185,7 +185,8 @@ import {
   scbCoicopFoodCategoryCodes,
   scbPxWebQueryFixtures,
   validateScbPxWebQueryFixtures,
-  validateStoreLocatorFixtures
+  validateStoreLocatorFixtures,
+  DOCMORRIS_SE_STATIC_ROWS
 } from '../index.js';
 import type { QueryExecutor } from '@groceryview/db';
 
@@ -7307,5 +7308,20 @@ describe('daily ingestion runner', () => {
     assert.equal(result.status, 'blocked');
     assert.deepEqual(result.blockers, ['ica:robots_txt_allow_required', 'ica:legal_review_approval_required']);
     assert.equal(executor.calls.length, 0);
+  });
+});
+
+
+describe('DocMorris SE pricing quirks', () => {
+  it('codifies only official online subscription and coupon rows', () => {
+    const subscription = DOCMORRIS_SE_STATIC_ROWS.find((row) => row.id === 'docmorris-se-rezept-abo');
+    assert.equal(subscription?.channel, 'online');
+    assert.equal(subscription?.format, 'docmorris-online');
+    assert.equal(subscription?.store_id.region, 'EU-cross-border');
+    assert.equal(subscription?.is_subscription_price, true);
+
+    const coupon = DOCMORRIS_SE_STATIC_ROWS.find((row) => row.id === 'docmorris-se-newsletter-voucher-5eur');
+    assert.equal(coupon?.is_coupon_price, true);
+    assert.equal(coupon?.coupon_value, 5);
   });
 });
