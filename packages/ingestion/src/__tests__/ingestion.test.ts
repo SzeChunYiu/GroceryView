@@ -115,6 +115,7 @@ import {
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL,
   GROCERYVIEW_DAILY_WILLYS_BULK_PRODUCTS_URL,
+  LLOYDS_APOTEK_SE_CAMPAIGNS_URL,
   WILLYS_BULK_MINIMUM_ROWS,
   ingestRetailerProduct,
   locatorFixturesCanAffectDealScore,
@@ -165,6 +166,7 @@ import {
   extractLidlBulkOfferPaths,
   parseLidlCityStores,
   parseLidlOverviewLinks,
+  parseLloydsApotekSeCampaignRows,
   parseOsmSupermarkets,
   parseOverpassFuelStations,
   parseOverpassGroceryStores,
@@ -180,6 +182,7 @@ import {
   validateStoreEnumerationResults,
   validateEnumeratedStores,
   ST1_FUEL_PRICE_URL,
+  fetchLloydsApotekSeCampaignRows,
   validateOfferSelectorFixtures,
   validateGroceryCategoryCoicopMappings,
   scbCoicopFoodCategoryCodes,
@@ -678,6 +681,83 @@ describe('St1 fuel price connector', () => {
     await assert.rejects(
       () => fetchSt1FuelPrices({ fetchImpl: async () => new Response('Forbidden', { status: 403 }) }),
       /blocked or unavailable/
+    );
+  });
+});
+
+describe('Lloyds Apotek SE connector', () => {
+  const campaignHtml = `
+    <main>
+      <h2>Aktuella kampanjer</h2>
+      <article>
+        <h3>Bepanthen salva, 100 g</h3>
+        <p>Kampanjpris 103,20 kr Ord.pris 129,00 kr</p>
+      </article>
+      <article>
+        <h3>Dermix Absolut Torr Antiperspirant Deodorant Roll-On, 35 ml</h3>
+        <p>Kampanjpris 44,25 kr Ord.pris 59,00 kr</p>
+      </article>
+      <article>
+        <h3>Berocca</h3>
+        <p>3 för 2 på alla 15-pack</p>
+      </article>
+      <article>
+        <h3>V6 Ask</h3>
+        <p>2 för 50 kr</p>
+      </article>
+    </main>
+  `;
+
+  it('emits online campaign rows and justified multi-buy fields from visible source text', () => {
+    const rows = parseLloydsApotekSeCampaignRows({
+      body: campaignHtml,
+      sourceUrl: LLOYDS_APOTEK_SE_CAMPAIGNS_URL
+    });
+
+    assert.deepEqual(rows.map((row) => row.productName), [
+      'Bepanthen salva, 100 g',
+      'Dermix Absolut Torr Antiperspirant Deodorant Roll-On, 35 ml',
+      'Berocca',
+      'V6 Ask'
+    ]);
+    assert.deepEqual(rows.map((row) => row.channel), ['online', 'online', 'online', 'online']);
+    assert.deepEqual(rows[0], {
+      chainId: 'lloyds_apotek_se',
+      sourceUrl: LLOYDS_APOTEK_SE_CAMPAIGNS_URL,
+      productName: 'Bepanthen salva, 100 g',
+      channel: 'online',
+      currency: 'SEK',
+      price: 103.2,
+      regularPrice: 129,
+      is_campaign_price: true
+    });
+    assert.deepEqual(rows[2]?.multi_buy, {
+      quantity: 3,
+      payForQuantity: 2,
+      text: '3 för 2 på alla 15-pack'
+    });
+    assert.deepEqual(rows[3]?.multi_buy, {
+      quantity: 2,
+      totalPrice: 50,
+      text: '2 för 50 kr'
+    });
+  });
+
+  it('fetches the DOZ campaign page and fails closed on blocked responses', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(campaignHtml, { status: 200, headers: { 'content-type': 'text/html' } });
+    };
+
+    const rows = await fetchLloydsApotekSeCampaignRows({ fetchImpl });
+
+    assert.deepEqual(requestedUrls, [LLOYDS_APOTEK_SE_CAMPAIGNS_URL]);
+    assert.equal(rows.find((row) => row.productName === 'Bepanthen salva, 100 g')?.is_campaign_price, true);
+    assert.equal(rows.find((row) => row.productName === 'V6 Ask')?.multi_buy?.totalPrice, 50);
+    await assert.rejects(
+      () => fetchLloydsApotekSeCampaignRows({ fetchImpl: async () => new Response('Forbidden', { status: 403 }) }),
+      /blocked with HTTP 403/
     );
   });
 });
