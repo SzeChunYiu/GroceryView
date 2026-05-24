@@ -11,6 +11,11 @@ export const itemsRoutes = {
   localizedProductNameColumns: ['name_sv', 'name_en'],
   localizedResponseFields: ['canonicalName', 'productName'],
   maxSuggestions: 3,
+  streaming: {
+    renderer: 'react-server-components',
+    suspenseBoundary: 'item-list',
+    shellFirst: true
+  },
   responseFields: [
     'available',
     'holiday',
