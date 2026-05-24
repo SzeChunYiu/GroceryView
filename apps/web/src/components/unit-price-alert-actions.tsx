@@ -1,6 +1,7 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
+import { trackPriceAlertFunnelStep } from '@/lib/analytics';
 
 export type SuggestedUnitPriceAlert = {
   productId: string;
@@ -33,6 +34,18 @@ export function UnitPriceAlertActions({ suggestedAlerts }: Readonly<{ suggestedA
   const [alerts, setAlerts] = useState<PriceAlert[]>([]);
   const [status, setStatus] = useState<UnitPriceAlertStatus>('idle');
   const [message, setMessage] = useState('Sign in or enter alert email first. No anonymous unit price alert writes are sent to the alert API.');
+  const hasTrackedDialogOpen = useRef(false);
+
+  useEffect(() => {
+    if (hasTrackedDialogOpen.current || !productId) return;
+    hasTrackedDialogOpen.current = true;
+    trackPriceAlertFunnelStep({
+      productId,
+      source: 'unit-price-alert-actions',
+      step: 'dialog_open',
+      targetPrice: Number.isFinite(Number(targetPrice)) ? Number(targetPrice) : undefined
+    });
+  }, [productId, targetPrice]);
 
   function requireAlertEmail(): boolean {
     if (!userEmail.trim()) {
@@ -72,6 +85,12 @@ export function UnitPriceAlertActions({ suggestedAlerts }: Readonly<{ suggestedA
 
   async function createAlert(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    trackPriceAlertFunnelStep({
+      productId,
+      source: 'unit-price-alert-actions',
+      step: 'form_submit',
+      targetPrice: Number.isFinite(Number(targetPrice)) ? Number(targetPrice) : undefined
+    });
     if (!requireAlertInput()) return;
 
     setStatus('loading');
@@ -87,6 +106,12 @@ export function UnitPriceAlertActions({ suggestedAlerts }: Readonly<{ suggestedA
     }
 
     const alert = (await response.json()) as PriceAlert;
+    trackPriceAlertFunnelStep({
+      productId: alert.productId,
+      source: 'unit-price-alert-actions',
+      step: 'success',
+      targetPrice: alert.targetPrice
+    });
     setAlerts((current) => [alert, ...current.filter((row) => row.id !== alert.id)]);
     setStatus('saved');
     setMessage(`Created ${formatTargetPrice(alert.targetPrice)} alert for ${alert.productId}.`);
@@ -166,7 +191,18 @@ export function UnitPriceAlertActions({ suggestedAlerts }: Readonly<{ suggestedA
         </label>
 
         <div className="flex items-end gap-2">
-          <button className="rounded-full bg-amber-800 px-4 py-3 text-sm font-black text-white" type="submit">Create alert</button>
+          <button
+            className="rounded-full bg-amber-800 px-4 py-3 text-sm font-black text-white"
+            onClick={() => trackPriceAlertFunnelStep({
+              productId,
+              source: 'unit-price-alert-actions',
+              step: 'button_click',
+              targetPrice: Number.isFinite(Number(targetPrice)) ? Number(targetPrice) : undefined
+            })}
+            type="submit"
+          >
+            Create alert
+          </button>
           <button className="rounded-full border border-amber-300 px-4 py-3 text-sm font-black text-amber-950" onClick={loadAlerts} type="button">Load</button>
         </div>
       </form>
