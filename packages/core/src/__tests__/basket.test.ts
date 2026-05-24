@@ -672,6 +672,40 @@ describe('summarizeStoreBasketCoverage', () => {
     });
   });
 
+  it('filters store coverage to the requested country and currency', () => {
+    const summary = summarizeStoreBasketCoverage({
+      country: 'SE',
+      currency: 'SEK',
+      favoriteStoreIds: ['willys-odenplan'],
+      items: [
+        {
+          productId: 'coffee',
+          quantity: 1,
+          prices: [
+            { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 49.9, country: 'SE', currency: 'SEK' },
+            { storeId: 'willys-odenplan', storeName: 'Willys Oslo', price: 39.9, country: 'NO', currency: 'NOK' }
+          ]
+        },
+        {
+          productId: 'milk',
+          quantity: 1,
+          prices: [
+            { storeId: 'willys-odenplan', storeName: 'Willys Oslo', price: 19.9, country: 'NO', currency: 'NOK' }
+          ]
+        }
+      ]
+    });
+
+    assert.deepEqual(summary.bestCoverage, {
+      storeId: 'willys-odenplan',
+      storeName: 'Willys Odenplan',
+      knownTotal: 49.9,
+      availableProductIds: ['coffee'],
+      missingProductIds: ['milk'],
+      coveragePercent: 50
+    });
+  });
+
   it('handles an empty basket as full coverage for favorite stores', () => {
     assert.deepEqual(summarizeStoreBasketCoverage({
       favoriteStoreIds: ['willys-odenplan'],
