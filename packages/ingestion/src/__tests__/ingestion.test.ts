@@ -36,6 +36,8 @@ import {
   buildOpenFoodFactsSwedenSearchUrl,
   buildOpenPricesConnectorUrl,
   fetchSt1FuelPrices,
+  CIRCLE_K_NO_CONVENIENCE_URL,
+  CIRCLE_K_NO_FUEL_PRICES_URL,
   cacheKeyForScbPxWebQueryFixture,
   cellCountForScbPxWebQueryFixture,
   BRANDED_FUEL_STATIONS_OVERPASS_URL,
@@ -130,6 +132,9 @@ import {
   parseOsmChainStores,
   parseOpenPricesSnapshot,
   parseOkq8FuelPricePage,
+  parseCircleKNoConvenienceProducts,
+  parseCircleKNoFuelPrices,
+  fetchCircleKNoFuelPrices,
   parseBrandedSwedishFuelStations,
   parseCoopDrPdfTextOffers,
   parseRetailerProductJsonSnapshot,
@@ -679,6 +684,69 @@ describe('St1 fuel price connector', () => {
       () => fetchSt1FuelPrices({ fetchImpl: async () => new Response('Forbidden', { status: 403 }) }),
       /blocked or unavailable/
     );
+  });
+});
+
+describe('Circle K NO connector', () => {
+  const circleKNoFuelHtml = `
+    <main>
+      <h1>Drivstoffpriser</h1>
+      <table>
+        <tr><th>Produkt</th><th>Pris inkl. mva</th><th>Gjelder fra</th><th>Enhet</th></tr>
+        <tr><td>miles 95</td><td>21,49</td><td>2026-05-23</td><td>NOK/l</td></tr>
+        <tr><td>miles diesel</td><td>20,39</td><td>23.05.2026</td><td>NOK/l</td></tr>
+        <tr><td>HVO100</td><td>27,10</td><td>2026-05-22</td><td>NOK/l</td></tr>
+      </table>
+    </main>
+  `;
+
+  it('parses Norwegian Circle K per-litre fuel prices without station-level inventions', () => {
+    const rows = parseCircleKNoFuelPrices({
+      body: circleKNoFuelHtml,
+      capturedAt: '2026-05-24T10:00:00.000Z',
+      sourceUrl: CIRCLE_K_NO_FUEL_PRICES_URL
+    });
+
+    assert.deepEqual(rows.map((row) => [row.chainId, row.grade, row.pricePerLitre, row.currency, row.unit]), [
+      ['circle_k_no', '95', 21.49, 'NOK', 'l'],
+      ['circle_k_no', 'diesel', 20.39, 'NOK', 'l'],
+      ['circle_k_no', 'hvo100', 27.1, 'NOK', 'l']
+    ]);
+    assert.equal(rows[1]!.validFrom, '2026-05-23');
+    assert.equal(rows[0]!.sourceUrl, CIRCLE_K_NO_FUEL_PRICES_URL);
+    assert.equal(rows.every((row) => row.provenance.source === 'circle_k_no_fuel_prices'), true);
+  });
+
+  it('fetches Circle K NO fuel and fails closed on blocked source responses', async () => {
+    const rows = await fetchCircleKNoFuelPrices({
+      capturedAt: '2026-05-24T10:00:00.000Z',
+      fetchImpl: async () => new Response(circleKNoFuelHtml, { status: 200, headers: { 'content-type': 'text/html' } })
+    });
+
+    assert.equal(rows.length, 3);
+    assert.equal(rows[0]?.operatorName, 'Circle K Norge');
+    await assert.rejects(
+      () => fetchCircleKNoFuelPrices({ fetchImpl: async () => new Response('Forbidden', { status: 403 }) }),
+      /blocked with HTTP 403/
+    );
+  });
+
+  it('extracts public Circle K NO convenience item names without prices', () => {
+    const rows = parseCircleKNoConvenienceProducts({
+      body: `
+        <script type="application/ld+json">{"@type":"ItemList","itemListElement":[{"@type":"ListItem","item":{"@type":"Product","name":"Burger"}},{"@type":"ListItem","item":{"@type":"Product","name":"Kaffeavtale"}}]}</script>
+        <h2>Vaffel</h2>
+      `,
+      capturedAt: '2026-05-24T10:00:00.000Z',
+      sourceUrl: CIRCLE_K_NO_CONVENIENCE_URL
+    });
+
+    assert.deepEqual(rows.map((row) => [row.domain, row.name, row.sourceUrl]), [
+      ['convenience', 'Burger', CIRCLE_K_NO_CONVENIENCE_URL],
+      ['convenience', 'Kaffeavtale', CIRCLE_K_NO_CONVENIENCE_URL],
+      ['convenience', 'Vaffel', CIRCLE_K_NO_CONVENIENCE_URL]
+    ]);
+    assert.equal(rows.every((row) => row.confidence === 0.7), true);
   });
 });
 
