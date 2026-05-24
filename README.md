@@ -2,7 +2,7 @@
 
 > **Live status board — auto-generated, do not hand-edit.**
 > Regenerated from real signals (merged PRs, open PRs, GOAL.md, live prod HTML) by
-> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-24 01:05 UTC.
+> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-24 03:10 UTC.
 
 GroceryView turns grocery prices into a market: every product is a **ticker** with a
 price chart, chains/categories/brands have **indices**, deals get a **Buy/Wait**
@@ -13,7 +13,7 @@ Strategy + competitor teardown: [`GOAL.md`](GOAL.md) · [`COMPETITIVE-ANALYSIS.m
 
 - **Site:** [https://grocery-web-mu.vercel.app](https://grocery-web-mu.vercel.app) — `/` returns HTTP **200**
 - **Visible on homepage:** ~**24** store pages, ~**35** product pages
-- **Shipped `feat:`/`wire:` PRs to date:** **207**
+- **Shipped `feat:`/`wire:` PRs to date:** **200**
 
 ## 🛒 What shoppers get (consumer value)
 
@@ -42,31 +42,42 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 
 ## ✅ Recently shipped (last 15 merged `feat:`/`wire:` PRs)
 
+- #1524 feat(api): save authenticated settings preferences
+- #1520 feat(ingest): add Coop branch weekly flyer discounts
+- #1384 feat(ingest): expand Axfood weekly flyer discounts
+- #1503 feat(ingestion): cache product images during daily runs
+- #1497 feat: add multi-week price planning
+- #1496 feat(web): compare commodity rows by unit price
+- #1500 feat(web): standardize unit price labels
+- #1483 feat(web): add cookies disclosure page
+- #1498 feat(web): add basket calculator page
+- #1487 feat(web): add product detail alias route
+- #1486 feat(ingestion): add City Gross bulk connector
 - #1485 feat(ingestion): wire Mathem daily connector
 - #1482 feat(account): add confirmed account deletion
 - #1481 feat(api): add notification inbox timing contract
 - #1479 feat(account): add GDPR data export settings
-- #1470 feat(api): add category tree endpoint
-- #1469 feat(web): add dietary product filters
-- #1468 feat: add household shared list collaboration
-- #1466 feat(api): add supported retailers endpoint
-- #1464 feat(web): add price change webhook
-- #1461 feat(stores): add store detail assortment overview
-- #1460 feat(web): add checkable shopping list
-- #1457 feat: add URL-backed faceted product search
-- #1455 feat(ingest): persist Matspar daily prices
-- #1451 feat: wire unit price alerts to API
-- #1450 feat(web): add price history CSV export
 
 ## 🔄 In progress (open PRs)
 
-- #1490 lunarc/feat account deletion
+- #1526 feat(api): publish OpenAPI docs
+- #1525 lunarc/feat watchlist
+- #1522 Implement hidden item and store preferences
+- #1521 [ticket-cn070-p28] Implement admin role-based access control
+- #1517 api: restrict CORS to production and localhost
+- #1516 feat(ingest): add Coop Hushallsost flyer discounts _(draft)_
+- #1515 [codex] Add preferred stores picker _(draft)_
+- #1513 lunarc/feat savings dashboard
+- #1512 lunarc/feat expiry deals
+- #1511 feat(ingest): add ICA Kvantum Tranas store promotions
+- #1510 Handle unavailable product prices
+- #1508 Build admin user management page
+- #1507 lunarc/feat bottom nav
+- #1502 Add privacy and terms pages with footer links
+- #1495 Add store comparison e2e coverage
+- #1491 lunarc/feat store price percentile
 - #1489 feat(ingest): expand ICA Toria store prices
-- #1488 feat(ingestion): wire Mathem daily connector
-- #1487 feat(web): add product detail alias route
-- #1486 feat(ingestion): add City Gross bulk connector
 - #1484 fix: add breadcrumb coverage for category and product pages
-- #1483 feat(web): add cookies disclosure page
 - #1480 feat(web): group desktop navigation
 - #1478 chore: add Renovate configuration and validation
 - #1477 lunarc/feat screener
@@ -94,22 +105,11 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 - #1391 test: cover DB IO hotspot compare CLI _(draft)_
 - #1389 Move deal screener contract to /screener
 - #1387 feat(pharmacy): apohem
-- #1384 feat(ingest): expand Axfood weekly flyer discounts
 - #1383 Generate web price snapshot from Postgres
 - #1382 feat(fuel): add AdBlue grade catalog
 - #1381 Add country ingestion batch runner
 - #1377 feat(ingest): add ICA Vannas store price
 - #1376 ci: compare daily DB IO hotspot captures
-- #1373 feat(ingest): deepen Lidl store offer rows
-- #1371 test(ingest): smoke DB snapshot cache bypass _(draft)_
-- #1367 ops: capture db IO hotspots
-- #1365 feat(ingest): add ICA Toria store promotions
-- #1360 test(ingest): verify ICA source summary sync _(draft)_
-- #1358 Keep DB cutover audit scoped
-- #1349 Wire meal cost breakdown route
-- #1348 lunarc/feat product cross chain table
-- #1347 feat(ingest): expand Axfood weekly flyer discounts
-- #1344 feat(web): wire meal planner deal suggestions
 
 ## 📋 To-do (from GOAL.md backlog)
 
