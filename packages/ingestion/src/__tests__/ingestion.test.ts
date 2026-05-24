@@ -58,6 +58,7 @@ import {
   fetchBrandedSwedishFuelStations,
   fetchOverpassFuelStations,
   fetchOverpassGroceryStores,
+  fetchRustaNoProducts,
   fetchRetailerConnectorSnapshot,
   fetchCityGrossBulkProducts,
   fetchCityGrossProducts,
@@ -133,6 +134,7 @@ import {
   parseBrandedSwedishFuelStations,
   parseCoopDrPdfTextOffers,
   parseRetailerProductJsonSnapshot,
+  parseRustaNoProductListingPage,
   persistOpenFoodFactsProductMetadata,
   parseSt1FuelPriceHtml,
   planIngestionBatch,
@@ -198,6 +200,101 @@ describe('confidenceForSource', () => {
     assert.equal(confidenceForSource('flyer_campaign'), 0.7);
     assert.equal(confidenceForSource('manual_user_report'), 0.5);
     assert.equal(confidenceForSource('estimated'), 0.25);
+  });
+});
+
+describe('Rusta Norway connector', () => {
+  const categoryUrl = 'https://www.rusta.com/nb-no/fritid/hobby-og-handverk/garn';
+  const listingHtml = `
+    <html>
+      <head>
+        <script type="application/ld+json">
+          {
+            "name": "Garn",
+            "mainEntity": {
+              "itemListElement": [
+                {
+                  "position": 1,
+                  "url": "https://www.rusta.com/nb-no/fritid/hobby-og-handverk/garn/garn-moa-100-g-cerise-506013940101",
+                  "item": {
+                    "name": "Garn Moa",
+                    "sku": "506013940101",
+                    "offers": [
+                      {
+                        "@type": "Offer",
+                        "availability": "https://schema.org/InStock",
+                        "price": "49.90",
+                        "priceCurrency": "NOK"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "position": 2,
+                  "url": "https://www.rusta.com/nb-no/fritid/hobby-og-handverk/garn/garn-ullis-100-g-svart-506013950101",
+                  "item": {
+                    "name": "Garn Ullis",
+                    "sku": "506013950101",
+                    "offers": [
+                      {
+                        "@type": "Offer",
+                        "availability": "https://schema.org/InStock",
+                        "price": "59.90",
+                        "priceCurrency": "NOK"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        </script>
+      </head>
+    </html>
+  `;
+
+  it('parses Rusta Norway JSON-LD product listing prices', () => {
+    const rows = parseRustaNoProductListingPage(listingHtml, {
+      sourceUrl: categoryUrl,
+      capturedAt: '2026-05-24T17:00:00.000Z'
+    });
+
+    assert.equal(rows.length, 2);
+    assert.equal(rows[0]?.domain, 'variety_retail');
+    assert.equal(rows[0]?.chainId, 'rusta_no');
+    assert.equal(rows[0]?.country, 'NO');
+    assert.equal(rows[0]?.productName, 'Garn Moa');
+    assert.equal(rows[0]?.sku, '506013940101');
+    assert.equal(rows[0]?.categoryName, 'Garn');
+    assert.equal(rows[0]?.position, 1);
+    assert.equal(rows[0]?.price, 49.9);
+    assert.equal(rows[0]?.currency, 'NOK');
+    assert.equal(rows[0]?.availability, 'https://schema.org/InStock');
+    assert.match(rows[0]?.productUrl ?? '', /garn-moa/);
+    assert.equal(rows[0]?.sourceUrl, categoryUrl);
+    assert.equal(rows[0]?.capturedAt, '2026-05-24T17:00:00.000Z');
+    assert.equal(rows[0]?.provenance.source, 'rusta_no_json_ld_product_list');
+    assert.equal(rows[0]?.provenance.parserVersion, 'rusta-no-jsonld-v1');
+    assert.equal(rows[0]?.provenance.originalPrice, '49.90');
+  });
+
+  it('fetches configured Rusta Norway category URLs', async () => {
+    const rows = await fetchRustaNoProducts({
+      categoryUrls: [categoryUrl],
+      capturedAt: '2026-05-24T17:00:00.000Z',
+      fetchImpl: async (url) => {
+        assert.equal(String(url), categoryUrl);
+        return {
+          ok: true,
+          status: 200,
+          text: async () => listingHtml
+        } as Response;
+      }
+    });
+
+    assert.equal(rows.length, 2);
+    assert.equal(rows[1]?.productName, 'Garn Ullis');
+    assert.equal(rows[1]?.price, 59.9);
   });
 });
 
