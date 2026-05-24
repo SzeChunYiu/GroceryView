@@ -1766,8 +1766,10 @@ export const freshFoodStapleBasket = STAPLE_BASKET.map((commodity) => ({
   categoryPath: commodity.categoryPath.join(' › '),
   is_staple: commodity.isStaple === true
 }));
+type FreshFoodStapleConstituent = (typeof freshFoodStapleBasket)[number] & { observationCount: number };
 
 const freshFoodStapleIds = new Set(freshFoodStapleBasket.map((commodity) => commodity.slug));
+const freshFoodStapleById = new Map(freshFoodStapleBasket.map((commodity) => [commodity.slug, commodity]));
 
 export const freshFoodChainIndexObservations: ChainPriceObservation[] = commodityPriceObservations
   .filter((observation) => observation.sourceConfidence >= 0.6 && freshFoodStapleIds.has(observation.commodityId))
@@ -1779,6 +1781,25 @@ export const freshFoodChainIndexObservations: ChainPriceObservation[] = commodit
 
 const freshFoodCoveredStapleIds = new Set(freshFoodChainIndexObservations.map((observation) => observation.category));
 const freshFoodIndexReport = calculateChainPriceIndex(freshFoodChainIndexObservations);
+const freshFoodChainConstituents = freshFoodIndexReport.chains.map((chain) => {
+  const counts = new Map<string, number>();
+  for (const observation of freshFoodChainIndexObservations.filter((row) => row.chainId === chain.chainId)) {
+    counts.set(observation.category, (counts.get(observation.category) ?? 0) + 1);
+  }
+
+  const staples: FreshFoodStapleConstituent[] = [...counts.entries()]
+    .flatMap(([slug, observationCount]) => {
+      const commodity = freshFoodStapleById.get(slug);
+      return commodity ? [{ ...commodity, observationCount }] : [];
+    })
+    .sort((left, right) => left.label.localeCompare(right.label, 'sv'));
+
+  return {
+    chainId: chain.chainId,
+    coverageLabel: `${staples.length}/${freshFoodStapleBasket.length} staple constituents`,
+    staples
+  };
+});
 
 export const freshFoodChainIndex = {
   title: 'Fresh-food staple basket index',
@@ -1791,6 +1812,7 @@ export const freshFoodChainIndex = {
   coverageLabel: `${freshFoodCoveredStapleIds.size}/${freshFoodStapleBasket.length} is_staple commodities have confidence-cleared unit-price evidence`,
   unitLabels: [...new Set(freshFoodStapleBasket.map((commodity) => `kr/${commodity.comparableUnit}`))],
   report: freshFoodIndexReport,
+  chainConstituents: freshFoodChainConstituents,
   guardrails: [
     'No forecast: the fresh-food index is a 100-centred snapshot from observed unit prices only.',
     'Only commodity observations with sourceConfidence >= 0.6 enter the index.',

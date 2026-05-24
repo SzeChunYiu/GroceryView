@@ -202,13 +202,24 @@ export default function ChainIndexPage() {
           </div>
         </div>
         <div className="mt-5 grid gap-3 lg:grid-cols-3">
-          {freshFoodChainIndex.report.chains.slice(0, 6).map((chain) => (
-            <div className="rounded-2xl bg-white/80 p-4" key={chain.chainId}>
-              <p className="text-sm font-black uppercase tracking-[0.18em] text-lime-700">{chain.chainId}</p>
-              <p className="mt-2 text-4xl font-black text-lime-950">{chain.overallIndex.toFixed(1)}</p>
-              <p className="mt-1 text-sm font-semibold text-lime-900">{chain.confidence} confidence · {chain.categoriesCovered} staple categories · {chain.observations} rows</p>
-            </div>
-          ))}
+          {freshFoodChainIndex.report.chains.slice(0, 6).map((chain) => {
+            const constituents = freshFoodChainIndex.chainConstituents.find((entry) => entry.chainId === chain.chainId);
+            return (
+              <div className="rounded-2xl bg-white/80 p-4" key={chain.chainId}>
+                <p className="text-sm font-black uppercase tracking-[0.18em] text-lime-700">{chain.chainId}</p>
+                <p className="mt-2 text-4xl font-black text-lime-950">{chain.overallIndex.toFixed(1)}</p>
+                <p className="mt-1 text-sm font-semibold text-lime-900">{chain.confidence} confidence · {chain.categoriesCovered} staple categories · {chain.observations} rows</p>
+                <p className="mt-3 rounded-xl bg-lime-100 p-2 text-xs font-black text-lime-950">{constituents?.coverageLabel ?? `0/${freshFoodChainIndex.totalStapleCount} staple constituents`}</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {constituents?.staples.slice(0, 5).map((staple) => (
+                    <span className="rounded-full bg-white px-2 py-1 text-xs font-bold text-lime-950" key={`${chain.chainId}-${staple.slug}`}>
+                      {staple.label} · {staple.observationCount} row{staple.observationCount === 1 ? '' : 's'}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
         <div className="mt-5 grid gap-3 lg:grid-cols-2">
           <div className="rounded-2xl bg-white/80 p-4">
