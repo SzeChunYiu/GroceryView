@@ -1,29 +1,34 @@
-import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { fetchMlynNoStores, parseMlynNoLocations } from '../connectors/mlyn-no.js';
+import assert from 'node:assert/strict';
+import { fetchMlynNoProducts, parseMlynNoProducts } from '../connectors/mlyn-no.js';
 
-const fixture = `
-  <script type="application/ld+json">
-    {"@type":"Store","name":"Mlyn Oslo","address":{"streetAddress":"Testgata 1","postalCode":"0001","addressLocality":"Oslo"}}
-  </script>
-  <div data-store-name="Mlyn Drammen" data-address="Tollbugata 1" data-city="Drammen"></div>
-`;
+const productFixture = `
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"ItemList","itemListElement":[{"@type":"Product","name":"Pierogi ruskie","sku":"MLYN-PIEROGI","brand":{"name":"Mlyn"},"image":"/pierogi.jpg","offers":{"price":"59,90 kr","priceCurrency":"NOK","url":"/products/pierogi-ruskie"}}]}
+</script>`;
 
-describe('Mlyn NO connector', () => {
-  it('normalizes multiple Polish/Eastern European grocery locations', () => {
-    const stores = parseMlynNoLocations(fixture, 'https://example.test/mlyn', '2026-05-24T15:00:00.000Z');
-    assert.equal(stores.length, 2);
-    assert.deepEqual(stores.map((store) => store.city), ['Drammen', 'Oslo']);
-    assert.ok(stores.every((store) => store.category === 'ethnic_polish_eastern_european'));
+describe('Mlyn Norway connector', () => {
+  it('normalizes Eastern European grocery products for one Mlyn location', () => {
+    const rows = parseMlynNoProducts(productFixture, { id: 'mlyn-oslo', name: 'Mlyn Oslo', url: 'https://mlyn.no/oslo' }, '2026-05-24T00:00:00.000Z');
+
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0]?.chain, 'mlyn-no');
+    assert.equal(rows[0]?.country, 'NO');
+    assert.equal(rows[0]?.category, 'ethnic_polish_eastern_european');
+    assert.equal(rows[0]?.price, 59.9);
+    assert.equal(rows[0]?.productUrl, 'https://mlyn.no/products/pierogi-ruskie');
   });
 
-  it('fails closed unless at least two locations are verified', async () => {
-    await assert.rejects(
-      fetchMlynNoStores(['https://example.test/mlyn'], {
-        fetchImpl: async () => new Response('<div data-store-name="Mlyn Oslo" data-address="Testgata 1" data-city="Oslo"></div>', { status: 200 }),
-        retrievedAt: '2026-05-24T15:00:00.000Z'
-      }),
-      /multiple verified locations/
-    );
+  it('keeps the same SKU separate across multiple configured locations', async () => {
+    const rows = await fetchMlynNoProducts({
+      fetchImpl: async () => new Response(productFixture, { status: 200 }),
+      retrievedAt: '2026-05-24T00:00:00.000Z',
+      stores: [
+        { id: 'mlyn-oslo', name: 'Mlyn Oslo', url: 'https://mlyn.no/oslo' },
+        { id: 'mlyn-nettbutikk', name: 'Mlyn nettbutikk', url: 'https://mlyn.no/collections/all' }
+      ]
+    });
+
+    assert.deepEqual(rows.map((row) => row.storeId), ['mlyn-oslo', 'mlyn-nettbutikk']);
   });
 });
