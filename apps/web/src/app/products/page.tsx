@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { ProductPriceCards } from '@/components/product-price-cards';
 import { apohemSource } from '@/lib/ingested/apohem';
+import { lekiaSeDiscountSummary, lekiaSeSource } from '@/lib/ingested/lekia-se';
 import { adaptiveProductCards, buildProductSearchView, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
@@ -121,6 +122,64 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           <Link className="rounded-full bg-indigo-700 px-5 py-3 text-center text-sm font-black text-white" href="/pharmacy">
             Open pharmacy catalog
           </Link>
+        </div>
+      </Card>
+      <Card className="mt-8 border-fuchsia-200 bg-fuchsia-50/70">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-fuchsia-800">Specialty catalog</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Lekia toy rows with visible discounts</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              {lekiaSeSource.rowCount.toLocaleString('sv-SE')} real Lekia homepage product rows are wired from the generated specialty catalog module.
+              {` ${lekiaSeDiscountSummary.discountedProductCount.toLocaleString('sv-SE')} rows carry retailer discount prices, and ${lekiaSeDiscountSummary.clickAndCollectProductCount.toLocaleString('sv-SE')} rows expose click-and-collect evidence.`}
+            </p>
+            <p className="mt-2 max-w-3xl text-xs font-bold leading-5 text-fuchsia-950">
+              Source: <a className="underline decoration-fuchsia-400 underline-offset-4" href={lekiaSeSource.sourceUrl}>{lekiaSeSource.sourceUrl}</a> · retrieved {lekiaSeSource.retrievedAt}.
+              No product rows are fabricated; unavailable shelf, basket, or checkout claims stay out of this summary.
+            </p>
+          </div>
+          <div className="grid gap-2 text-sm font-black text-fuchsia-950 sm:grid-cols-2 lg:min-w-72">
+            <span className="rounded-2xl bg-white px-4 py-3 shadow-sm">{lekiaSeSource.rowCount.toLocaleString('sv-SE')} products</span>
+            <span className="rounded-2xl bg-white px-4 py-3 shadow-sm">{lekiaSeDiscountSummary.inStockProductCount.toLocaleString('sv-SE')} in stock</span>
+            <span className="rounded-2xl bg-white px-4 py-3 shadow-sm">{lekiaSeDiscountSummary.discountedProductCount.toLocaleString('sv-SE')} discounted</span>
+            <span className="rounded-2xl bg-white px-4 py-3 shadow-sm">{lekiaSeSource.railTitles.length.toLocaleString('sv-SE')} source rails</span>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-[1fr_0.8fr]">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-fuchsia-800">Product preview</p>
+            <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {lekiaSeDiscountSummary.previewProducts.map((product) => (
+                <a className="rounded-2xl border border-fuchsia-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-fuchsia-700" href={product.productUrl} key={product.articleNumber}>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-fuchsia-700">{product.brand || 'Brand not reported'}</p>
+                  <h3 className="mt-2 line-clamp-2 text-base font-black text-slate-950">{product.name}</h3>
+                  <p className="mt-1 text-xs font-semibold text-slate-500">{product.category || 'Category not reported'} · {product.sourceSections.join(' · ')}</p>
+                  <p className="mt-3 text-sm font-black text-slate-900">
+                    {formatSek(product.priceSek)}
+                    {product.discountPercent !== null ? <span className="ml-2 rounded-full bg-rose-100 px-2 py-1 text-xs text-rose-900">-{product.discountPercent.toFixed(1)}%</span> : null}
+                  </p>
+                  <p className="mt-3 break-all text-xs font-semibold text-slate-600">sourceUrl: {product.sourceUrl}</p>
+                </a>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-2xl border border-fuchsia-100 bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-fuchsia-800">Top discount rows</p>
+            <div className="mt-3 grid gap-3">
+              {lekiaSeDiscountSummary.topDiscountedProducts.map((product) => (
+                <a className="rounded-2xl bg-fuchsia-50 p-3 text-sm font-semibold text-slate-700" href={product.productUrl} key={product.articleNumber}>
+                  <span className="block text-xs font-black uppercase tracking-[0.18em] text-fuchsia-700">{product.brand || 'Brand not reported'} · {product.articleNumber}</span>
+                  <span className="mt-1 block font-black text-slate-950">{product.name}</span>
+                  <span className="mt-1 block">
+                    {formatSek(product.priceSek)} now · {formatSek(product.regularPriceSek)} regular · {product.discountPercent?.toFixed(1)}% off
+                  </span>
+                </a>
+              ))}
+            </div>
+            <p className="mt-4 rounded-2xl bg-fuchsia-100 p-3 text-xs font-bold leading-5 text-fuchsia-950">
+              Discount percentages are derived only when Lekia supplied both regular and discount SEK prices in the same fetched row.
+            </p>
+          </div>
         </div>
       </Card>
       <Card className="mt-8 border-violet-200 bg-violet-50/70">
