@@ -208,7 +208,7 @@ export const DEFAULT_MATHEM_SEARCH_QUERIES = [
   'katt'
 ] as const;
 export const DEFAULT_MATHEM_SEARCH_PAGES = [1, 2, 3] as const;
-export const DEFAULT_MATHEM_MAX_ROWS = 9000;
+export const DEFAULT_MATHEM_MAX_ROWS = 11000;
 const MATHEM_REQUEST_TIMEOUT_MS = 45_000;
 
 export type FetchMathemProductsOptions = {
