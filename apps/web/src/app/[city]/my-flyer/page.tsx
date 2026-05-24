@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { axfoodProducts } from '@/lib/axfood-products';
+import { DownloadPdfButton } from './download-pdf-button';
 import './print-import.css';
 
 type MyFlyerPageProps = Readonly<{ params: Promise<{ city: string }> }>;
@@ -52,9 +53,7 @@ export default async function MyFlyerPage({ params }: MyFlyerPageProps) {
           <a className="text-sm font-black uppercase tracking-[0.2em] text-orange-700" href="/">
             GroceryView
           </a>
-          <button className="rounded-full bg-slate-950 px-5 py-2 text-sm font-black uppercase tracking-[0.14em] text-white" type="button">
-            Print flyer
-          </button>
+          <DownloadPdfButton city={city || 'se'} />
         </div>
 
         <header className="my-flyer-print-header grid gap-6 border-b-4 border-slate-950 pb-6 lg:grid-cols-[1fr_auto]">
