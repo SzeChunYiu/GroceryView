@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { ProductPriceCards } from '@/components/product-price-cards';
 import { apohemSource } from '@/lib/ingested/apohem';
+import { adaptiveSortPresets, getAdaptiveSortPreset, sortByAdaptivePriceSensitivity } from '@/lib/personalization';
 import { adaptiveProductCards, buildProductSearchView, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
@@ -24,6 +25,7 @@ type SearchParams = {
   inStockOnly?: string | string[];
   minConfidence?: string | string[];
   brand?: string | string[];
+  budgetProfile?: string | string[];
   page?: string | string[];
 };
 
@@ -63,6 +65,7 @@ function copySearchParams(params: URLSearchParams, source: SearchParams) {
   setFirstParam(params, 'maxPrice', source.maxPrice);
   setFirstParam(params, 'inStockOnly', source.inStockOnly);
   setFirstParam(params, 'minConfidence', source.minConfidence);
+  setFirstParam(params, 'budgetProfile', source.budgetProfile);
 }
 
 function productsPageUrl(page: number, selectedBrand = '', searchParams: SearchParams = {}) {
@@ -80,18 +83,20 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const { categoryFacets, labelFacets, chainFacets, priceRange, inStockOnly, resultCards } = search;
   const requestedPage = toPageNumber(resolvedSearchParams.page);
   const selectedBrand = normalizeSelectedBrand(resolvedSearchParams.brand);
+  const adaptiveSortPreset = getAdaptiveSortPreset(resolvedSearchParams.budgetProfile);
+  const sortedResultCards = sortByAdaptivePriceSensitivity(resultCards, adaptiveSortPreset);
   const productCards = selectedBrand
     ? adaptiveProductCards.filter((card) => card.brand === selectedBrand)
     : adaptiveProductCards;
-  const totalPages = Math.max(1, Math.ceil(resultCards.length / PRODUCTS_PER_PAGE));
+  const totalPages = Math.max(1, Math.ceil(sortedResultCards.length / PRODUCTS_PER_PAGE));
   const currentPage = Math.min(requestedPage, totalPages);
   const pageStart = (currentPage - 1) * PRODUCTS_PER_PAGE;
-  const pagedResultCards = resultCards.slice(pageStart, pageStart + PRODUCTS_PER_PAGE);
-  const rangeStart = resultCards.length === 0 ? 0 : pageStart + 1;
-  const rangeEnd = Math.min(pageStart + PRODUCTS_PER_PAGE, resultCards.length);
+  const pagedResultCards = sortedResultCards.slice(pageStart, pageStart + PRODUCTS_PER_PAGE);
+  const rangeStart = sortedResultCards.length === 0 ? 0 : pageStart + 1;
+  const rangeEnd = Math.min(pageStart + PRODUCTS_PER_PAGE, sortedResultCards.length);
   const defaultSearchCount = facetedProductSearch.resultCards.length;
 
-  function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence', string>>) {
+  function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence' | 'budgetProfile', string>>) {
     const params = new URLSearchParams();
     copySearchParams(params, resolvedSearchParams);
     for (const [key, value] of Object.entries(overrides)) {
@@ -138,7 +143,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             {inStockOnly.productCount.toLocaleString('sv-SE')} priced products · {inStockOnly.latestPriceCount.toLocaleString('sv-SE')} latest_prices rows
           </div>
         </div>
-        <form action="/products" className="mt-5 grid gap-3 rounded-2xl border border-violet-100 bg-white p-4 shadow-sm lg:grid-cols-[1.2fr_0.6fr_0.6fr_0.6fr_auto]" method="get">
+        <form action="/products" className="mt-5 grid gap-3 rounded-2xl border border-violet-100 bg-white p-4 shadow-sm lg:grid-cols-[1.2fr_0.6fr_0.6fr_0.6fr_0.7fr_auto]" method="get">
           {selectedBrand ? <input name="brand" type="hidden" value={selectedBrand} /> : null}
           {search.filters.categories.length > 0 ? <input name="category" type="hidden" value={search.filters.categories.join(',')} /> : null}
           {search.labelFilters.length > 0 ? <input name="label" type="hidden" value={search.labelFilters.join(',')} /> : null}
@@ -158,6 +163,14 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           <label className="text-sm font-black text-slate-950" htmlFor="product-search-confidence">
             Min confidence
             <input className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-950" defaultValue={search.filters.minConfidence ?? ''} id="product-search-confidence" max="1" min="0" name="minConfidence" step="0.01" type="number" />
+          </label>
+          <label className="text-sm font-black text-slate-950" htmlFor="product-search-budget-profile">
+            Budget sort
+            <select className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-950" defaultValue={adaptiveSortPreset.id} id="product-search-budget-profile" name="budgetProfile">
+              {adaptiveSortPresets.map((preset) => (
+                <option key={preset.id} value={preset.id}>{preset.label}</option>
+              ))}
+            </select>
           </label>
           <div className="rounded-2xl border border-emerald-100 bg-emerald-50/80 p-3 lg:col-span-4">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Dietary filters</p>
@@ -185,6 +198,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           </div>
         </form>
         <div className="mt-4 flex flex-wrap gap-2">
+          <span className="rounded-full bg-indigo-900 px-3 py-1 text-xs font-black text-white">{adaptiveSortPreset.label}: discount {Math.round(adaptiveSortPreset.weights.discount * 100)}% · shelf {Math.round(adaptiveSortPreset.weights.absoluteCost * 100)}% · unit {Math.round(adaptiveSortPreset.weights.unitEfficiency * 100)}%</span>
           {search.activeFilters.length > 0 ? search.activeFilters.map((filter) => (
             <span className="rounded-full bg-violet-900 px-3 py-1 text-xs font-black text-white" key={filter}>{filter}</span>
           )) : (
@@ -250,10 +264,10 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             </Link>
           ))}
         </div>
-        {resultCards.length > PRODUCTS_PER_PAGE ? (
+        {sortedResultCards.length > PRODUCTS_PER_PAGE ? (
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3 text-sm">
             <p className="font-black text-slate-700">
-              Showing {rangeStart}-{rangeEnd} of {resultCards.length} instant products (page {currentPage}/{totalPages})
+              Showing {rangeStart}-{rangeEnd} of {sortedResultCards.length} instant products (page {currentPage}/{totalPages})
             </p>
             <div className="flex gap-3">
               {currentPage > 1 ? (
