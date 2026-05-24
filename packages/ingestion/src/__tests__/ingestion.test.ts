@@ -185,7 +185,8 @@ import {
   scbCoicopFoodCategoryCodes,
   scbPxWebQueryFixtures,
   validateScbPxWebQueryFixtures,
-  validateStoreLocatorFixtures
+  validateStoreLocatorFixtures,
+  parseMacSeProducts
 } from '../index.js';
 import type { QueryExecutor } from '@groceryview/db';
 
@@ -7307,5 +7308,37 @@ describe('daily ingestion runner', () => {
     assert.equal(result.status, 'blocked');
     assert.deepEqual(result.blockers, ['ica:robots_txt_allow_required', 'ica:legal_review_approval_required']);
     assert.equal(executor.calls.length, 0);
+  });
+});
+
+
+describe('MAC Cosmetics SE connector', () => {
+  it('parses Swedish cosmetics product JSON-LD rows', () => {
+    const rows = parseMacSeProducts(`
+      <script type="application/ld+json">{
+        "@type":"Product",
+        "sku":"mac-lipstick-ruby-woo",
+        "name":"Retro Matte Lipstick Ruby Woo",
+        "image":"/media/ruby.png",
+        "url":"/product/retro-matte-lipstick-ruby-woo",
+        "offers":{"price":"285","priceCurrency":"SEK"}
+      }</script>
+    `, 'https://www.maccosmetics.se/product/retro-matte-lipstick-ruby-woo', '2026-05-24T10:00:00.000Z');
+
+    assert.deepEqual(rows, [{
+      country: 'SE',
+      currency: 'SEK',
+      chain: 'mac-cosmetics',
+      retailer_type: 'cosmetics',
+      code: 'mac-lipstick-ruby-woo',
+      name: 'Retro Matte Lipstick Ruby Woo',
+      brand: 'MAC Cosmetics',
+      category: 'cosmetics',
+      price: 285,
+      productUrl: 'https://www.maccosmetics.se/product/retro-matte-lipstick-ruby-woo',
+      imageUrl: 'https://www.maccosmetics.se/media/ruby.png',
+      sourceUrl: 'https://www.maccosmetics.se/product/retro-matte-lipstick-ruby-woo',
+      retrievedAt: '2026-05-24T10:00:00.000Z'
+    }]);
   });
 });
