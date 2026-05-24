@@ -76,6 +76,13 @@ export default function FeaturePage() {
             </div>
           ))}
         </div>
+        <div className="mt-4 rounded-2xl border border-blue-200 bg-blue-50 p-4">
+          <p className="text-sm font-black uppercase tracking-[0.2em] text-blue-800">Shared-list activity stream</p>
+          <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{shareableHouseholdListContract.activityStream.label}</p>
+          <p className="mt-2 text-xs font-black text-blue-950">
+            {shareableHouseholdListContract.activityStream.actions.join(' / ')} · {shareableHouseholdListContract.activityStream.requiredFields.join(', ')}
+          </p>
+        </div>
         <ul className="mt-4 grid gap-2 text-sm leading-6 text-slate-600 md:grid-cols-2">
           {shareableHouseholdListContract.guardrails.map((guardrail) => <li key={guardrail}>• {guardrail}</li>)}
         </ul>

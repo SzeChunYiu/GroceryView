@@ -75,6 +75,58 @@ describe('household mode', () => {
     );
   });
 
+  it('publishes shared-list activity when collaborators add and remove items', () => {
+    const household = createHouseholdState({
+      id: 'house-1',
+      name: 'Odenplan Household',
+      weeklyBudget: 1200,
+      members: [
+        { userId: 'owner', displayName: 'Owner', role: 'owner' },
+        { userId: 'partner', displayName: 'Partner', role: 'editor' },
+        { userId: 'viewer', displayName: 'Viewer', role: 'viewer' }
+      ]
+    });
+
+    household.addBasketItem({
+      productId: 'milk',
+      quantity: 2,
+      addedBy: 'owner',
+      addedAt: '2026-05-23T09:00:00.000Z',
+      sourceListId: 'weekly-shop'
+    });
+    household.removeBasketItem({
+      productId: 'milk',
+      removedBy: 'partner',
+      removedAt: '2026-05-23T10:00:00.000Z'
+    });
+
+    const snapshot = household.snapshot();
+    assert.deepEqual(snapshot.basketItems, []);
+    assert.deepEqual(snapshot.activityEvents, [
+      {
+        action: 'item_added',
+        actorUserId: 'owner',
+        occurredAt: '2026-05-23T09:00:00.000Z',
+        productId: 'milk',
+        quantity: 2,
+        sourceListId: 'weekly-shop'
+      },
+      {
+        action: 'item_removed',
+        actorUserId: 'partner',
+        occurredAt: '2026-05-23T10:00:00.000Z',
+        productId: 'milk',
+        quantity: 2,
+        sourceListId: 'weekly-shop'
+      }
+    ]);
+
+    assert.throws(
+      () => household.removeBasketItem({ productId: 'coffee', removedBy: 'viewer' }),
+      /cannot edit household shopping list/
+    );
+  });
+
   it('plans shareable household lists with role-based permissions and no anonymous edits', () => {
     const household = createHouseholdState({
       id: 'house-1',

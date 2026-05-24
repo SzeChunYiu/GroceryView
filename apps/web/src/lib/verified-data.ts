@@ -3593,6 +3593,12 @@ export const shareableHouseholdListContract = {
     { role: 'viewer', canEdit: false, label: 'Can view checked items, quantities, store groups, and missing-price blockers.' },
     { role: 'editor', canEdit: true, label: 'Can edit quantities only after the signed-in user is already a household member.' }
   ],
+  activityStream: {
+    eventSource: 'HouseholdSnapshot.activityEvents',
+    actions: ['item_added', 'item_removed'],
+    requiredFields: ['actorUserId', 'occurredAt', 'sourceListId', 'productId', 'quantity'],
+    label: 'Collaborator add/remove activity shows who changed a shared list, when it happened, and which source list was touched.'
+  },
   requiredInputs: [
     'signed-in requester userId from the authenticated session',
     'household membership from account storage before any share token is minted',

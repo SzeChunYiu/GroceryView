@@ -1085,9 +1085,11 @@ function householdPlanRequestFromBody(body: JsonRecord): HouseholdPlanRequest {
       productId: requiredString(item.productId, 'basketItems.productId'),
       quantity: requiredNumber(item.quantity, 'basketItems.quantity'),
       addedBy: requiredString(item.addedBy, 'basketItems.addedBy'),
+      ...(item.addedAt === undefined ? {} : { addedAt: requiredString(item.addedAt, 'basketItems.addedAt') }),
       ...(item.checked === undefined ? {} : { checked: requiredBoolean(item.checked, 'basketItems.checked') }),
       ...(item.checkedBy === undefined ? {} : { checkedBy: requiredString(item.checkedBy, 'basketItems.checkedBy') }),
-      ...(item.checkedAt === undefined ? {} : { checkedAt: requiredString(item.checkedAt, 'basketItems.checkedAt') })
+      ...(item.checkedAt === undefined ? {} : { checkedAt: requiredString(item.checkedAt, 'basketItems.checkedAt') }),
+      ...(item.sourceListId === undefined ? {} : { sourceListId: requiredString(item.sourceListId, 'basketItems.sourceListId') })
     })),
     watchlistItems: (optionalRecordArray(body.watchlistItems, 'watchlistItems') ?? []).map((item) => {
       const targetPrice = optionalNumber(item.targetPrice, 'watchlistItems.targetPrice');

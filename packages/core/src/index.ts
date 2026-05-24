@@ -3902,9 +3902,11 @@ export type HouseholdBasketItem = {
   productId: string;
   quantity: number;
   addedBy: string;
+  addedAt?: string;
   checked?: boolean;
   checkedBy?: string;
   checkedAt?: string;
+  sourceListId?: string;
 };
 
 export type HouseholdWatchlistItem = {
@@ -3921,6 +3923,16 @@ export type HouseholdSnapshot = {
   basketItems: HouseholdBasketItem[];
   watchlistItems: HouseholdWatchlistItem[];
   sharedFavoriteStoreIds: string[];
+  activityEvents: HouseholdListActivityEvent[];
+};
+
+export type HouseholdListActivityEvent = {
+  action: 'item_added' | 'item_removed';
+  actorUserId: string;
+  occurredAt: string;
+  productId: string;
+  quantity: number;
+  sourceListId: string;
 };
 
 export function createHouseholdState(input: {
@@ -3931,6 +3943,7 @@ export function createHouseholdState(input: {
 }) {
   const basketItems: HouseholdBasketItem[] = [];
   const watchlistItems: HouseholdWatchlistItem[] = [];
+  const activityEvents: HouseholdListActivityEvent[] = [];
   let sharedFavoriteStoreIds: string[] = [];
   const memberIds = new Set(input.members.map((member) => member.userId));
 
@@ -3945,9 +3958,14 @@ export function createHouseholdState(input: {
     productId: item.productId,
     quantity: item.quantity,
     addedBy: item.addedBy,
+    ...(item.addedAt ? { addedAt: item.addedAt } : {}),
     checked: item.checked ?? false,
     ...(item.checkedBy ? { checkedBy: item.checkedBy } : {}),
-    ...(item.checkedAt ? { checkedAt: item.checkedAt } : {})
+    ...(item.checkedAt ? { checkedAt: item.checkedAt } : {}),
+    ...(item.sourceListId ? { sourceListId: item.sourceListId } : {})
+  });
+  const recordActivityEvent = (event: HouseholdListActivityEvent): void => {
+    activityEvents.push({ ...event });
   });
 
   return {
@@ -3958,7 +3976,31 @@ export function createHouseholdState(input: {
         if (!canEdit(item.checkedBy)) throw new Error('viewer cannot edit household shopping list');
       }
       if (item.checked && !item.checkedBy) throw new Error('checked household basket items require checkedBy');
-      basketItems.push(cloneBasketItem(item));
+      const sourceListId = item.sourceListId ?? 'shared-household-list';
+      basketItems.push(cloneBasketItem({ ...item, sourceListId }));
+      recordActivityEvent({
+        action: 'item_added',
+        actorUserId: item.addedBy,
+        occurredAt: item.addedAt ?? new Date().toISOString(),
+        productId: item.productId,
+        quantity: item.quantity,
+        sourceListId
+      });
+    },
+    removeBasketItem(input: { productId: string; removedBy: string; removedAt?: string; sourceListId?: string }) {
+      requireMember(input.removedBy);
+      if (!canEdit(input.removedBy)) throw new Error('viewer cannot edit household shopping list');
+      const index = basketItems.findIndex((candidate) => candidate.productId === input.productId);
+      if (index < 0) throw new Error(`Household basket item not found: ${input.productId}`);
+      const [removedItem] = basketItems.splice(index, 1);
+      recordActivityEvent({
+        action: 'item_removed',
+        actorUserId: input.removedBy,
+        occurredAt: input.removedAt ?? new Date().toISOString(),
+        productId: removedItem.productId,
+        quantity: removedItem.quantity,
+        sourceListId: input.sourceListId ?? removedItem.sourceListId ?? 'shared-household-list'
+      });
     },
     checkBasketItem(input: { productId: string; checked: boolean; checkedBy: string; checkedAt?: string }) {
       requireMember(input.checkedBy);
@@ -3989,7 +4031,8 @@ export function createHouseholdState(input: {
         members: input.members.map((member) => ({ ...member })),
         basketItems: basketItems.map(cloneBasketItem),
         watchlistItems: watchlistItems.map((item) => ({ ...item })),
-        sharedFavoriteStoreIds: [...sharedFavoriteStoreIds]
+        sharedFavoriteStoreIds: [...sharedFavoriteStoreIds],
+        activityEvents: activityEvents.map((event) => ({ ...event }))
       };
     }
   };

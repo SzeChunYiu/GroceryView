@@ -144,12 +144,16 @@ describe('verified-data UI', () => {
     const core = await read('../../packages/core/src/index.ts');
 
     assert.match(core, /planShareableHouseholdList/);
+    assert.match(core, /HouseholdListActivityEvent/);
+    assert.match(core, /removeBasketItem/);
     assert.match(core, /external_invite_cannot_edit/);
     assert.match(core, /requester_not_household_member/);
     assert.match(household, /shareableHouseholdListContract/);
     assert.match(household, /Shareable household lists/);
     assert.match(household, /role-based permissions/);
     assert.match(household, /No anonymous household edits/);
+    assert.match(household, /Shared-list activity stream/);
+    assert.match(household, /activityStream/);
     assert.match(household, /viewer/);
     assert.match(household, /editor/);
     assert.doesNotMatch(household, /@\/lib\/demo-data|@\/components\/sample-data/);

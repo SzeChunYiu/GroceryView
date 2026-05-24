@@ -3963,7 +3963,8 @@ export const pantryReplenishmentInput: {
       { productId: 'barilla-spaghetti-1kg', addedBy: 'member-1', targetPrice: 29 },
       { productId: 'felix-ketchup-1kg', addedBy: 'member-2', targetPrice: 34 }
     ],
-    sharedFavoriteStoreIds: ['matmissionen-hagersten', 'city-gross-stockholm', 'hemkop-hornstull']
+    sharedFavoriteStoreIds: ['matmissionen-hagersten', 'city-gross-stockholm', 'hemkop-hornstull'],
+    activityEvents: []
   },
   pantry: [
     { productId: 'eldorado-basmati-rice-1kg', name: 'Eldorado Basmati Rice 1kg', category: 'pantry', quantity: 0.5, unit: 'kg', minimumQuantity: 1, targetQuantity: 2, lastPurchasedAt: '2026-05-09T12:00:00.000Z' },

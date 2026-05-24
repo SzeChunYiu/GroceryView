@@ -3364,9 +3364,11 @@ function normalizeHouseholdPlan(userId: string, input: HouseholdPlanRequest): Ho
       productId: item.productId,
       quantity: item.quantity,
       addedBy: item.addedBy,
+      ...(item.addedAt ? { addedAt: item.addedAt } : {}),
       checked: item.checked ?? false,
       ...(item.checkedBy ? { checkedBy: item.checkedBy } : {}),
-      ...(item.checkedAt ? { checkedAt: item.checkedAt } : {})
+      ...(item.checkedAt ? { checkedAt: item.checkedAt } : {}),
+      ...(item.sourceListId ? { sourceListId: item.sourceListId } : {})
     });
   }
 
@@ -4448,7 +4450,8 @@ export function createGroceryViewApi() {
         members: [{ userId, displayName: userId }],
         basketItems: basketItems.map((item) => ({ productId: item.productId, quantity: item.quantity, addedBy: userId })),
         watchlistItems: (watchlists.get(userId) ?? []).map((item) => ({ productId: item.productId, targetPrice: item.targetPrice, addedBy: userId })),
-        sharedFavoriteStoreIds: this.getFavoriteStores(userId).map((store) => store.id)
+        sharedFavoriteStoreIds: this.getFavoriteStores(userId).map((store) => store.id),
+        activityEvents: []
       };
       const deals = products.flatMap((product) => {
         const bestPrice = bestPriceFor(product);
