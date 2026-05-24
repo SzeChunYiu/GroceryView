@@ -18,6 +18,7 @@ import {
   fetchCityGrossProductsForAllStores,
   type CityGrossProduct
 } from './connectors/citygross.js';
+import { normalizeBrand } from './brandNormalizer.js';
 import type { AllStoreTaskRunnerControls } from './connectors/all-store-runner.js';
 import {
   fetchCoopProductsForAllStores,
@@ -1572,8 +1573,10 @@ function normalizeSnapshot(fetchResult: RetailerConnectorFetchResult, plan: Reta
 }
 
 function normalizeParsedProduct(row: RetailerConnectorParsedProduct, plan: RetailerConnectorRunPlan, snapshot: RetailerConnectorSnapshot): RetailerProductInput {
+  const normalizedBrand = row.brand ? normalizeBrand(row.brand) : undefined;
   return {
     ...row,
+    brand: normalizedBrand,
     sourceType: row.sourceType ?? plan.sourceType,
     observedAt: row.observedAt ?? snapshot.retrievedAt,
     parserVersion: row.parserVersion ?? plan.provenance.parserVersion,
@@ -2774,6 +2777,7 @@ function classifyRetailerProduct(input: RetailerProductInput): {
 export function ingestRetailerProduct(input: RetailerProductInput): IngestionOutput {
   validateInput(input);
   const classification = classifyRetailerProduct(input);
+  const normalizedBrand = input.brand ? normalizeBrand(input.brand) : undefined;
   const confidence = classification.matchConfidence;
   const normalized = normalizeUnitPrice(input);
   const hasPromotion = input.regularPrice !== undefined && input.regularPrice > input.price;
@@ -2791,7 +2795,7 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
     product: {
       id: input.productId,
       canonicalName: input.canonicalName,
-      brand: input.brand,
+      brand: normalizedBrand,
       barcode: input.barcode,
       categoryId: input.categoryId,
       productKind: classification.productKind,

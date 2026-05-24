@@ -54,6 +54,18 @@ create table if not exists products (
   created_at timestamptz not null default now()
 );
 
+create table if not exists brand_aliases (
+  canonical_brand text not null,
+  alias text not null,
+  normalized_alias text not null unique,
+  created_at timestamptz not null default now(),
+  created_by text,
+  source text not null default 'seed',
+  note text
+);
+
+create unique index if not exists brand_aliases_canonical_alias_idx on brand_aliases (canonical_brand, alias);
+
 create table if not exists product_aliases (
   id bigserial primary key,
   raw_name text not null,

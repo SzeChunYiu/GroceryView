@@ -5023,6 +5023,51 @@ describe('runRetailerConnector', () => {
     });
   });
 
+  it('normalizes aliased brand names from connector rows before ingestion', async () => {
+    const result = await runRetailerConnector({
+      connectorId: 'Willys API v1',
+      requestedAt: '2026-05-19T18:00:00.000Z',
+      chainId: 'willys',
+      sourceType: 'official_api',
+      robotsTxtStatus: 'not_applicable',
+      legalReviewStatus: 'approved',
+      hasDataAgreement: true,
+      endpointUrl: 'https://api.example.test/willys/products',
+      parserVersion: 'willys-api-v1',
+      fetcher: async (plan) => ({
+        statusCode: 200,
+        body: '{"items":[{"id":"wil-zoegas-450"}]}',
+        contentType: 'application/json',
+        retrievedAt: plan.provenance.capturedAt,
+        sourceUrl: plan.provenance.sourceUrl,
+        rawSnapshotRef: `s3://groceryview-raw/${plan.runKey}.json`
+      }),
+      parser: (snapshot) => {
+        assert.equal(snapshot.statusCode, 200);
+        assert.equal(snapshot.rawSnapshotRef, 's3://groceryview-raw/willys:official-api:willys-api-v1:2026-05-19.json');
+        return [{
+          storeId: 'willys-odenplan',
+          retailerProductId: 'wil-zoegas-450',
+          rawName: 'Örtagste',
+          canonicalName: 'Örtagste',
+          productId: 'tea-ora-450g',
+          categoryId: 'tea',
+          brand: 'Arla Foods',
+          packageSize: 450,
+          packageUnit: 'g',
+          price: 49.9,
+          regularPrice: 69.9,
+          promoText: 'Veckans erbjudande'
+        }];
+      }
+    });
+
+    assert.equal(result.status, 'completed');
+    assert.equal(result.acceptedCount, 1);
+    assert.equal(result.ingestion.accepted[0].product.brand, 'Arla');
+    assert.equal(result.ingestion.accepted[0].alias.rawName, 'Örtagste');
+  });
+
   it('does not fetch when source access gates block the connector', async () => {
     const result = await runRetailerConnector({
       connectorId: 'ica-page',
