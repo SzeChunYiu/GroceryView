@@ -125,6 +125,8 @@ import {
   parseAxfoodStoreList,
   parseCityGrossSites,
   parseIcaStoreList,
+  parseFlyerPdf,
+  parseFlyerText,
   parseLidlStoreDirectoryLinks,
   parseLidlStorePayload,
   parseOsmChainStores,
@@ -4833,6 +4835,35 @@ describe('offer selector fixtures', () => {
     assert.ok(byChain.get('lidl')?.reviewFlags.includes('member_only_or_personalized'));
     assert.equal(byChain.get('city_gross')?.artifactFormat, 'react_shell');
     assert.ok(byChain.get('city_gross')?.reviewFlags.includes('skeleton_or_error_state'));
+  });
+});
+
+
+describe('flyer PDF OCR parser', () => {
+  it('extracts promotion candidates with confidence and manual-review flags', async () => {
+    const rows = parseFlyerText(`
+      Ekologiska bananer 19,90 kr/kg
+      Smör normalsaltat 45:- medlem
+      123 999
+    `, { sourceUrl: 'https://example.test/flyer.pdf', capturedAt: '2026-05-24T12:00:00.000Z' });
+
+    assert.equal(rows[0].rowType, 'flyer_promotion_extraction');
+    assert.equal(rows[0].promotionRouterInput.rowType, 'promotion_candidate');
+    assert.equal(rows[0].promotionRouterInput.sourceKind, 'flyer_ocr');
+    assert.equal(rows.some((row) => row.manualReviewRequired), true);
+    assert.ok(rows.find((row) => row.productName === 'Ekologiska bananer'));
+  });
+
+  it('routes PDF bytes through an injectable local OCR text extractor', async () => {
+    const rows = await parseFlyerPdf(new Uint8Array([1, 2, 3]), {
+      sourceUrl: 'https://example.test/flyer.pdf',
+      capturedAt: '2026-05-24T12:00:00.000Z',
+      textExtractor: async () => ({ text: 'Kaffe mellanrost 59 kr/st', tool: 'pdftotext' })
+    });
+
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].ocrTool, 'pdftotext');
+    assert.equal(rows[0].price, 59);
   });
 });
 
