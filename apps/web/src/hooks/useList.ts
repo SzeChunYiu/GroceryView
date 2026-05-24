@@ -6,7 +6,7 @@ export type ShoppingListItem = {
   checked: boolean;
   detail: string;
   id: string;
-  importSource?: 'starter' | 'bulk-clipboard';
+  importSource?: 'starter' | 'bulk-clipboard' | 'recurring-template';
   matchedProductName?: string;
   matchedProductSlug?: string;
   name: string;
@@ -17,9 +17,27 @@ export type BulkImportedListItemInput = Omit<ShoppingListItem, 'checked'> & {
   importSource: 'bulk-clipboard';
 };
 
+type UserCreatedListItemInput = Omit<ShoppingListItem, 'checked'> & {
+  importSource: 'bulk-clipboard' | 'recurring-template';
+};
+
+export type RecurringListFrequency = 'weekly' | 'biweekly';
+
+type RecurringTemplateItem = Omit<ShoppingListItem, 'checked' | 'id' | 'importSource'>;
+
+export type RecurringListTemplate = {
+  createdAt: string;
+  frequency: RecurringListFrequency;
+  id: string;
+  items: RecurringTemplateItem[];
+  lastGeneratedAt?: string;
+  name: string;
+};
+
 type PersistedListState = {
   checkedById?: Record<string, boolean>;
-  importedItems?: BulkImportedListItemInput[];
+  importedItems?: UserCreatedListItemInput[];
+  recurringTemplates?: RecurringListTemplate[];
 };
 
 export const LIST_STORAGE_KEY = 'groceryview:shopping-list:checked:v1';
@@ -58,7 +76,7 @@ const baseListItems: Omit<ShoppingListItem, 'checked'>[] = [
 ];
 
 function listStateFromStorage(value: string | null): Required<PersistedListState> {
-  const empty = { checkedById: {}, importedItems: [] };
+  const empty = { checkedById: {}, importedItems: [], recurringTemplates: [] };
   if (!value) return empty;
 
   try {
@@ -70,6 +88,7 @@ function listStateFromStorage(value: string | null): Required<PersistedListState
 
     const maybeCheckedById = 'checkedById' in parsed ? parsed.checkedById : parsed;
     const maybeImportedItems = 'importedItems' in parsed ? parsed.importedItems : [];
+    const maybeRecurringTemplates = 'recurringTemplates' in parsed ? parsed.recurringTemplates : [];
 
     const checkedById = maybeCheckedById && typeof maybeCheckedById === 'object' && !Array.isArray(maybeCheckedById)
       ? Object.fromEntries(
@@ -79,10 +98,10 @@ function listStateFromStorage(value: string | null): Required<PersistedListState
       : {};
 
     const importedItems = Array.isArray(maybeImportedItems)
-      ? maybeImportedItems.filter((item): item is BulkImportedListItemInput => (
+      ? maybeImportedItems.filter((item): item is UserCreatedListItemInput => (
         item !== null
         && typeof item === 'object'
-        && item.importSource === 'bulk-clipboard'
+        && (item.importSource === 'bulk-clipboard' || item.importSource === 'recurring-template')
         && typeof item.id === 'string'
         && typeof item.name === 'string'
         && typeof item.quantity === 'string'
@@ -90,13 +109,32 @@ function listStateFromStorage(value: string | null): Required<PersistedListState
       ))
       : [];
 
-    return { checkedById, importedItems };
+    const recurringTemplates = Array.isArray(maybeRecurringTemplates)
+      ? maybeRecurringTemplates.filter((template): template is RecurringListTemplate => (
+        template !== null
+        && typeof template === 'object'
+        && typeof template.id === 'string'
+        && typeof template.name === 'string'
+        && (template.frequency === 'weekly' || template.frequency === 'biweekly')
+        && typeof template.createdAt === 'string'
+        && Array.isArray(template.items)
+        && template.items.every((item) => (
+          item !== null
+          && typeof item === 'object'
+          && typeof item.name === 'string'
+          && typeof item.quantity === 'string'
+          && typeof item.detail === 'string'
+        ))
+      ))
+      : [];
+
+    return { checkedById, importedItems, recurringTemplates };
   } catch {
     return empty;
   }
 }
 
-function withCheckedState(checkedById: Record<string, boolean>, importedItems: BulkImportedListItemInput[] = []): ShoppingListItem[] {
+function withCheckedState(checkedById: Record<string, boolean>, importedItems: UserCreatedListItemInput[] = []): ShoppingListItem[] {
   const uniqueItems = new Map<string, Omit<ShoppingListItem, 'checked'>>();
   for (const item of baseListItems) uniqueItems.set(item.id, item);
   for (const item of importedItems) uniqueItems.set(item.id, item);
@@ -107,34 +145,46 @@ function withCheckedState(checkedById: Record<string, boolean>, importedItems: B
   }));
 }
 
-function persistCheckedState(items: ShoppingListItem[]) {
+function persistCheckedState(items: ShoppingListItem[], recurringTemplates: RecurringListTemplate[]) {
   try {
     const checkedById = Object.fromEntries(items.map((item) => [item.id, item.checked]));
     const importedItems = items
-      .filter((item) => item.importSource === 'bulk-clipboard')
+      .filter((item) => item.importSource === 'bulk-clipboard' || item.importSource === 'recurring-template')
       .map((item) => ({
         detail: item.detail,
         id: item.id,
-        importSource: 'bulk-clipboard' as const,
+        importSource: item.importSource as 'bulk-clipboard' | 'recurring-template',
         matchedProductName: item.matchedProductName,
         matchedProductSlug: item.matchedProductSlug,
         name: item.name,
         quantity: item.quantity
       }));
-    localStorage.setItem(LIST_STORAGE_KEY, JSON.stringify({ checkedById, importedItems }));
+    localStorage.setItem(LIST_STORAGE_KEY, JSON.stringify({ checkedById, importedItems, recurringTemplates }));
   } catch {
     // Keep the check-off UI usable even when a browser blocks localStorage.
   }
 }
 
+function slugifyListPart(value: string) {
+  return value
+    .toLocaleLowerCase('sv-SE')
+    .normalize('NFKD')
+    .replace(/\p{Diacritic}/gu, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 40) || 'item';
+}
+
 export function useList() {
   const [items, setItems] = useState<ShoppingListItem[]>(() => withCheckedState({}));
+  const [recurringTemplates, setRecurringTemplates] = useState<RecurringListTemplate[]>([]);
   const [hasLoadedBrowserState, setHasLoadedBrowserState] = useState(false);
 
   useEffect(() => {
     try {
-      const { checkedById, importedItems } = listStateFromStorage(localStorage.getItem(LIST_STORAGE_KEY));
+      const { checkedById, importedItems, recurringTemplates: storedRecurringTemplates } = listStateFromStorage(localStorage.getItem(LIST_STORAGE_KEY));
       setItems(withCheckedState(checkedById, importedItems));
+      setRecurringTemplates(storedRecurringTemplates);
     } finally {
       setHasLoadedBrowserState(true);
     }
@@ -142,8 +192,8 @@ export function useList() {
 
   useEffect(() => {
     if (!hasLoadedBrowserState) return;
-    persistCheckedState(items);
-  }, [hasLoadedBrowserState, items]);
+    persistCheckedState(items, recurringTemplates);
+  }, [hasLoadedBrowserState, items, recurringTemplates]);
 
   const toggleItemChecked = useCallback((itemId: string) => {
     setItems((currentItems) => currentItems.map((item) => (
@@ -166,6 +216,49 @@ export function useList() {
     });
   }, []);
 
+  const saveRecurringTemplate = useCallback((name: string, frequency: RecurringListFrequency) => {
+    const now = new Date().toISOString();
+    const templateItems = items.map((item) => ({
+      detail: item.detail,
+      matchedProductName: item.matchedProductName,
+      matchedProductSlug: item.matchedProductSlug,
+      name: item.name,
+      quantity: item.quantity
+    }));
+    const templateName = name.trim() || `${frequency === 'weekly' ? 'Weekly' : 'Biweekly'} shopping list`;
+
+    setRecurringTemplates((currentTemplates) => [
+      {
+        createdAt: now,
+        frequency,
+        id: `recurring-template-${Date.now()}-${slugifyListPart(templateName)}`,
+        items: templateItems,
+        name: templateName
+      },
+      ...currentTemplates
+    ]);
+  }, [items]);
+
+  const generateNextRecurringList = useCallback((templateId: string) => {
+    const template = recurringTemplates.find((candidate) => candidate.id === templateId);
+    if (!template) return;
+
+    const now = new Date().toISOString();
+    const generationId = Date.now();
+    const generatedItems: ShoppingListItem[] = template.items.map((item, index) => ({
+      ...item,
+      checked: false,
+      detail: `${item.detail} · Generated from ${template.frequency} recurring list`,
+      id: `recurring-${template.id}-${generationId}-${index}-${slugifyListPart(item.name)}`,
+      importSource: 'recurring-template'
+    }));
+
+    setItems((currentItems) => [...currentItems, ...generatedItems]);
+    setRecurringTemplates((currentTemplates) => currentTemplates.map((candidate) => (
+      candidate.id === templateId ? { ...candidate, lastGeneratedAt: now } : candidate
+    )));
+  }, [recurringTemplates]);
+
   const checkedCount = useMemo(() => items.filter((item) => item.checked).length, [items]);
   const totalCount = items.length;
   const remainingCount = totalCount - checkedCount;
@@ -173,9 +266,12 @@ export function useList() {
   return {
     addImportedItems,
     checkedCount,
+    generateNextRecurringList,
     items,
     remainingCount,
+    recurringTemplates,
     resetCheckedState,
+    saveRecurringTemplate,
     toggleItemChecked,
     totalCount
   };
