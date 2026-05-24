@@ -33,6 +33,22 @@ model Product {
   imageUrl       String?  @map("image_url")
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
+  storeAvailability ProductStoreAvailability[]
 
   @@map("products")
+}
+
+model ProductStoreAvailability {
+  productId   String   @map("product_id") @db.Uuid
+  storeId     String   @map("store_id")
+  isAvailable Boolean  @default(true) @map("is_available")
+  lastSeenAt  DateTime @default(now()) @map("last_seen_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([productId, storeId])
+  @@index([storeId])
+  @@index([isAvailable, lastSeenAt])
+  @@map("product_store_availability")
 }
