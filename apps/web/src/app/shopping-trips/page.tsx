@@ -1,5 +1,6 @@
 import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { basketTripCostContract, budgetCheapestStoreRoutingPlanner, deliveryVsInStoreComparison, elderlyNearestDeliveryPlanner, formatSek, fulfillmentSlotsContract } from '@/lib/verified-data';
+import { sampleTripReconciliation } from '@/lib/reconciliation';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -54,6 +55,41 @@ export default function FeaturePage() {
               {basketTripCostContract.blockedInStaticSnapshot.map((blocker) => <li key={blocker}>{blocker}</li>)}
             </ul>
           </div>
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-sky-200 bg-sky-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-800">End-of-trip reconciliation</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight">Receipt check against the planned basket</h2>
+        <p className="mt-3 text-sm leading-6 text-slate-700">
+          The shopping list now includes an end-of-trip screen where shoppers can mark purchased quantities, compare them with planned items, and capture mismatches for future budget and prediction tuning.
+        </p>
+        <div className="mt-4 grid gap-4 md:grid-cols-4">
+          <div className="rounded-2xl bg-white p-4">
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-sky-800">Accuracy</p>
+            <p className="mt-1 text-2xl font-black text-slate-950">{sampleTripReconciliation.accuracyPercent}%</p>
+          </div>
+          <div className="rounded-2xl bg-white p-4">
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-sky-800">Matched</p>
+            <p className="mt-1 text-2xl font-black text-slate-950">{sampleTripReconciliation.matchedItemCount}/{sampleTripReconciliation.plannedItemCount}</p>
+          </div>
+          <div className="rounded-2xl bg-white p-4">
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-sky-800">Needs review</p>
+            <p className="mt-1 text-2xl font-black text-slate-950">{sampleTripReconciliation.missingItemCount}</p>
+          </div>
+          <div className="rounded-2xl bg-white p-4">
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-sky-800">Qty delta</p>
+            <p className="mt-1 text-2xl font-black text-slate-950">{sampleTripReconciliation.totalDelta}</p>
+          </div>
+        </div>
+        <div className="mt-4 divide-y divide-sky-100 overflow-hidden rounded-2xl bg-white">
+          {sampleTripReconciliation.rows.map((row) => (
+            <div className="grid grid-cols-[1fr_auto_auto] gap-3 px-4 py-3 text-sm" key={row.id}>
+              <p className="font-black text-slate-950">{row.name}</p>
+              <p className="font-semibold text-slate-700">Planned {row.plannedQuantity} · Bought {row.purchasedQuantity}</p>
+              <p className="font-black capitalize text-sky-900">{row.status}</p>
+            </div>
+          ))}
         </div>
       </Card>
 
