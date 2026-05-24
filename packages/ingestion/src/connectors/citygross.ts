@@ -21,6 +21,7 @@ export type CityGrossProduct = {
   packageText: string;
   storeId: string;
   price: number;
+  is_member_price: boolean;
   regularPrice: number | null;
   unitPrice: number | null;
   unitPriceUnit: string;
@@ -57,6 +58,8 @@ type CityGrossProductApiRow = {
   productStoreDetails?: {
     prices?: {
       currentPrice?: CityGrossPrice;
+      memberPrice?: CityGrossPrice | null;
+      membershipPrice?: CityGrossPrice | null;
       ordinaryPrice?: CityGrossPrice | null;
     };
   };
@@ -67,6 +70,11 @@ type CityGrossPrice = {
   unit?: unknown;
   comparativePrice?: unknown;
   comparativePriceUnit?: unknown;
+  isMemberPrice?: unknown;
+  label?: unknown;
+  priceType?: unknown;
+  text?: unknown;
+  type?: unknown;
 };
 
 export const CITY_GROSS_BASE_URL = 'https://www.citygross.se';
@@ -182,11 +190,13 @@ export async function fetchCityGrossProducts(options: FetchCityGrossProductsOpti
     const payload = await response.json() as CityGrossProductResponse;
     const items = payload.items ?? [];
     for (const item of items) {
-      const row = normalizeCityGrossProduct(item, options.siteId, sourceUrl, retrievedAt);
-      if (!row || seen.has(row.code)) continue;
-      seen.add(row.code);
-      rows.push(row);
-      if (rows.length >= maxRows) return rows;
+      for (const row of normalizeCityGrossProductRows(item, options.siteId, sourceUrl, retrievedAt)) {
+        const key = `${row.code}:${row.is_member_price}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        rows.push(row);
+        if (rows.length >= maxRows) return rows;
+      }
     }
     const totalCount = numberOrNull(payload.totalCount);
     if (items.length === 0 || items.length < pageSize) break;
@@ -233,7 +243,7 @@ export async function fetchCityGrossProductsForAllStores(
   const rows: CityGrossProduct[] = [];
   const seen = new Set<string>();
   for (const product of fetchedRows) {
-    const key = `${product.storeId}:${product.code}`;
+    const key = `${product.storeId}:${product.code}:${product.is_member_price}`;
     if (seen.has(key)) continue;
     seen.add(key);
     rows.push(product);
@@ -272,15 +282,32 @@ export function normalizeCityGrossProduct(
   sourceUrl: string,
   retrievedAt: string
 ): CityGrossProduct | null {
+  return normalizeCityGrossProductRows(product, storeId, sourceUrl, retrievedAt)[0] ?? null;
+}
+
+export function normalizeCityGrossProductRows(
+  product: CityGrossProductApiRow,
+  storeId: string,
+  sourceUrl: string,
+  retrievedAt: string
+): CityGrossProduct[] {
   const code = text(product.id);
   const name = text(product.name);
-  const currentPrice = product.productStoreDetails?.prices?.currentPrice;
-  const price = numberOrNull(currentPrice?.price);
-  if (!code || !name || price === null) return null;
-  const regularPrice = numberOrNull(product.productStoreDetails?.prices?.ordinaryPrice?.price);
+  const prices = product.productStoreDetails?.prices;
+  const currentPrice = prices?.currentPrice;
+  const ordinaryPrice = prices?.ordinaryPrice ?? null;
+  const explicitMemberPrice = prices?.memberPrice ?? prices?.membershipPrice ?? null;
+  const currentPriceValue = numberOrNull(currentPrice?.price);
+  const ordinaryPriceValue = numberOrNull(ordinaryPrice?.price);
+  const explicitMemberPriceValue = numberOrNull(explicitMemberPrice?.price);
+  const inferredCurrentMemberPrice = explicitMemberPriceValue === null && currentPriceValue !== null && ordinaryPriceValue !== null && currentPriceValue < ordinaryPriceValue;
+  const memberPrice = explicitMemberPrice ?? (inferredCurrentMemberPrice || priceLooksMemberOnly(currentPrice) ? currentPrice : null);
+  const memberPriceValue = explicitMemberPriceValue ?? (memberPrice === currentPrice ? currentPriceValue : numberOrNull(memberPrice?.price));
+  const listPriceValue = ordinaryPriceValue ?? (memberPrice === currentPrice ? null : currentPriceValue);
+  if (!code || !name || listPriceValue === null) return [];
   const productPath = text(product.url);
   const imageUrl = text(product.images?.[0]?.url);
-  return {
+  const base = {
     code,
     gtin: text(product.gtin),
     name,
@@ -288,16 +315,39 @@ export function normalizeCityGrossProduct(
     category: text(product.category),
     packageText: text(product.descriptiveSize),
     storeId,
-    price,
-    regularPrice,
-    unitPrice: numberOrNull(currentPrice?.comparativePrice),
-    unitPriceUnit: text(currentPrice?.comparativePriceUnit),
-    priceText: `${price.toFixed(2)} SEK`,
     productUrl: productPath ? new URL(productPath, CITY_GROSS_BASE_URL).toString() : '',
     imageUrl: imageUrl ? new URL(imageUrl.startsWith('/') ? imageUrl : `/images/${imageUrl}`, CITY_GROSS_BASE_URL).toString() : '',
     sourceUrl,
     retrievedAt
   };
+  const rows: CityGrossProduct[] = [{
+    ...base,
+    price: listPriceValue,
+    is_member_price: false,
+    regularPrice: null,
+    unitPrice: numberOrNull((ordinaryPrice ?? currentPrice)?.comparativePrice),
+    unitPriceUnit: text((ordinaryPrice ?? currentPrice)?.comparativePriceUnit),
+    priceText: `${listPriceValue.toFixed(2)} SEK`
+  }];
+  if (memberPriceValue !== null && memberPriceValue !== listPriceValue) {
+    rows.push({
+      ...base,
+      price: memberPriceValue,
+      is_member_price: true,
+      regularPrice: listPriceValue,
+      unitPrice: numberOrNull((memberPrice ?? currentPrice)?.comparativePrice),
+      unitPriceUnit: text((memberPrice ?? currentPrice)?.comparativePriceUnit),
+      priceText: `${memberPriceValue.toFixed(2)} SEK medlemspris`
+    });
+  }
+  return rows;
+}
+
+function priceLooksMemberOnly(price: CityGrossPrice | undefined): boolean {
+  if (!price) return false;
+  if (price.isMemberPrice === true) return true;
+  const marker = [price.label, price.priceType, price.text, price.type].map(text).join(' ').toLowerCase();
+  return /medlem|member|loyalty/.test(marker);
 }
 
 function parseCoordinates(value: string): [number | null, number | null] {
