@@ -1,3 +1,6 @@
+export { parseFixedOffPromotion } from './lib/promotionParsers/fixedOff.js';
+export type { FixedOffPromotion } from './lib/promotionParsers/fixedOff.js';
+
 export type DealScoreInput = {
   currentCityPercentile: number;
   knownPromoHistoryPercentile: number;
