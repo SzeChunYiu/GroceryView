@@ -1,3 +1,5 @@
+import { useId } from "react";
+
 type ConfidenceBadgeProps = {
   level: "high" | "medium" | "low";
   label: string;
@@ -11,6 +13,8 @@ const levelClasses: Record<ConfidenceBadgeProps["level"], string> = {
 };
 
 export function ConfidenceBadge({ level, label, sampleSize }: ConfidenceBadgeProps) {
+  const tooltipId = useId();
+
   return (
     <span
       className={`inline-flex items-center gap-2 rounded-lg border px-3 py-1 text-xs font-semibold uppercase tracking-wide ${levelClasses[level]}`}
@@ -18,6 +22,18 @@ export function ConfidenceBadge({ level, label, sampleSize }: ConfidenceBadgePro
       <span className="h-2 w-2 rounded-full bg-current" aria-hidden="true" />
       {label}
       {sampleSize !== undefined ? <span className="normal-case tracking-normal">n={sampleSize}</span> : null}
+      <button
+        type="button"
+        aria-label="Confidence details"
+        aria-describedby={tooltipId}
+        tabIndex={-1}
+        className="rounded-full border border-current px-1 text-[10px] leading-none"
+      >
+        ?
+      </button>
+      <span id={tooltipId} role="tooltip" className="sr-only normal-case tracking-normal">
+        {label} confidence score{sampleSize !== undefined ? ` based on ${sampleSize} samples` : ""}.
+      </span>
     </span>
   );
 }
