@@ -14,6 +14,11 @@ const accountDeletionConfirmations = [
   'Acknowledge that receipt, basket, watchlist, and preference history cannot be restored after execution.',
   'Type DELETE ACCOUNT before the destructive job can be queued.'
 ];
+const bestTimeToBuyAlertRules = [
+  { label: 'Favorite ICA + dairy', stores: ['ICA Nära', 'ICA Maxi'], categories: ['Dairy', 'Breakfast'], confidence: 0.82 },
+  { label: 'Discount stores + pantry', stores: ['Willys', 'Lidl'], categories: ['Pantry', 'Frozen'], confidence: 0.78 },
+  { label: 'Weekend produce watch', stores: ['Coop', 'Hemköp'], categories: ['Produce'], confidence: 0.74 }
+];
 
 export function generateMetadata() {
   return routeMetadata('/account');
@@ -102,6 +107,33 @@ export default function AccountPage() {
               ))}
             </div>
           </div>
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-amber-200 bg-amber-50">
+        <div className="grid gap-5 lg:grid-cols-[1fr_0.85fr]">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-800">Best-time-to-buy alerts</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Target stores, categories, and confidence</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-700">
+              Signed-in shoppers can define notification rules through <code className="rounded bg-white/80 px-1 py-0.5 text-amber-900">/api/alerts/best-time</code>. Each rule requires target stores, watched categories, and a confidence threshold before a price-drop window can trigger an alert.
+            </p>
+          </div>
+          <div className="rounded-[1.5rem] border border-amber-100 bg-white p-4 shadow-sm">
+            <p className="text-sm font-black text-slate-950">Default confidence guardrail</p>
+            <p className="mt-2 text-3xl font-black text-amber-900">75%</p>
+            <p className="mt-1 text-sm font-semibold text-slate-600">Rules can raise or lower the threshold between 50% and 99% confidence.</p>
+          </div>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          {bestTimeToBuyAlertRules.map((rule) => (
+            <div className="rounded-2xl bg-white p-4 shadow-sm" key={rule.label}>
+              <p className="font-black text-slate-950">{rule.label}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">Stores: {rule.stores.join(', ')}</p>
+              <p className="mt-1 text-sm font-semibold text-slate-700">Categories: {rule.categories.join(', ')}</p>
+              <p className="mt-3 rounded-full bg-amber-100 px-3 py-2 text-xs font-black text-amber-950">Notify at {(rule.confidence * 100).toFixed(0)}% confidence</p>
+            </div>
+          ))}
         </div>
       </Card>
 
