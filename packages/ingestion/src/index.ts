@@ -69,6 +69,11 @@ import {
   type FuelPriceObservation
 } from './connectors/okq8-fuel.js';
 import {
+  fetchSevenElevenSeConvenienceProducts,
+  SEVEN_ELEVEN_SE_SORTIMENT_URL,
+  type SevenElevenSeConvenienceProduct
+} from './connectors/seven-eleven-se.js';
+import {
   fetchMathemProducts,
   type MathemProduct
 } from './connectors/mathem.js';
@@ -105,6 +110,7 @@ export * from './connectors/lidl-bulk.js';
 export * from './connectors/willys-bulk.js';
 export * from './connectors/apohem.js';
 export * from './connectors/okq8-fuel.js';
+export * from './connectors/seven-eleven-se.js';
 export * from './connectors/st1-fuel.js';
 export * from './connectors/willys.js';
 export * from './store-enumerator.js';
@@ -2001,6 +2007,26 @@ function okq8FuelPriceToDailyItem(row: FuelPriceObservation): RetailerConnectorP
   };
 }
 
+function sevenElevenSeProductToDailyItem(row: SevenElevenSeConvenienceProduct): RetailerConnectorParsedProduct {
+  return {
+    chainId: row.chainId,
+    retailerProductId: row.retailerProductId,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: row.retailerProductId,
+    categoryId: `seven-eleven-se-${row.category}`,
+    brand: '7-Eleven',
+    packageSize: 1,
+    packageUnit: 'piece',
+    price: row.price,
+    promoText: row.priceQualifier === 'from' ? `7-Eleven public from-price for ${row.categoryLabel}` : undefined,
+    memberOnly: false,
+    isAvailable: true,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.sourceUrl
+  };
+}
+
 function pharmacyProductToDailyItem(row: ApohemProduct): RetailerConnectorParsedProduct {
   const quantity = parseNativePackageText(row.name);
   const barcode = validDailyBarcode(row.ean);
@@ -2265,6 +2291,16 @@ export async function fetchDailyConnectorSnapshot(
       sourceUrl: OKQ8_FUEL_PRICES_URL
     });
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(okq8FuelPriceToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_SEVEN_ELEVEN_SE_CONVENIENCE_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_SEVEN_ELEVEN_SE_CONVENIENCE_URL}?`)) {
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchSevenElevenSeConvenienceProducts({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      retrievedAt,
+      sourceUrl: SEVEN_ELEVEN_SE_SORTIMENT_URL
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(sevenElevenSeProductToDailyItem) });
   }
 
   if (sourceUrl === GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL}?`)) {
@@ -3113,6 +3149,7 @@ export const GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL = 'groceryview://d
 export const GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL = 'groceryview://daily/mathem/products/public-search';
 export const GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL = 'groceryview://daily/matspar/products/public-search';
 export const GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL = OKQ8_FUEL_PRICES_URL;
+export const GROCERYVIEW_DAILY_SEVEN_ELEVEN_SE_CONVENIENCE_URL = SEVEN_ELEVEN_SE_SORTIMENT_URL;
 export const GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL = 'groceryview://daily/pharmacy/products/public';
 
 const requireForDailyIngestion = createRequire(import.meta.url);

@@ -121,6 +121,19 @@ const CONNECTOR_TEMPLATES = [
     stores: []
   },
   {
+    connectorId: 'seven-eleven-se-convenience-products',
+    chainId: 'seven_eleven_se',
+    domain: 'grocery',
+    sourceType: 'retailer_online_page',
+    endpointUrl: 'https://7-eleven.se/vart-sortiment/',
+    parserVersion: 'seven-eleven-se-sortiment-v1',
+    robotsTxtStatus: 'allow',
+    legalReviewStatus: 'approved',
+    hasDataAgreement: false,
+    requireStoreScopedPrices: false,
+    stores: []
+  },
+  {
     connectorId: 'pharmacy-public-products',
     chainId: 'pharmacy',
     domain: 'pharmacy',

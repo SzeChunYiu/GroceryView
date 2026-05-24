@@ -29,6 +29,7 @@ describe('daily connectors export script', () => {
       'city_gross',
       'mathem',
       'matspar',
+      'seven_eleven_se',
       'pharmacy',
       'okq8'
     ]);
@@ -44,6 +45,7 @@ describe('daily connectors export script', () => {
       'city-gross-products-bulk',
       'mathem-public-search',
       'matspar-public-search',
+      'seven-eleven-se-convenience-products',
       'pharmacy-public-products',
       'okq8-fuel-prices'
     ]);
@@ -61,6 +63,10 @@ describe('daily connectors export script', () => {
     assert.equal(matsparConnector.domain, 'grocery');
     assert.equal(matsparConnector.requireStoreScopedPrices, false);
     assert.deepEqual(matsparConnector.stores, []);
+    const sevenElevenConnector = connectors.find((connector) => connector.connectorId === 'seven-eleven-se-convenience-products');
+    assert.equal(sevenElevenConnector.domain, 'grocery');
+    assert.equal(sevenElevenConnector.requireStoreScopedPrices, false);
+    assert.deepEqual(sevenElevenConnector.stores, []);
     const mathemConnector = connectors.find((connector) => connector.connectorId === 'mathem-public-search');
     assert.equal(mathemConnector.domain, 'grocery');
     assert.equal(mathemConnector.requireStoreScopedPrices, false);
@@ -85,6 +91,7 @@ describe('daily connectors export script', () => {
       'groceryview://daily/city-gross/products/bulk',
       'groceryview://daily/mathem/products/public-search',
       'groceryview://daily/matspar/products/public-search',
+      'https://7-eleven.se/vart-sortiment/',
       'groceryview://daily/pharmacy/products/public',
       'https://www.okq8.se/foretag/priser/'
     ]);
@@ -100,6 +107,7 @@ describe('daily connectors export script', () => {
       'citygross-bulk-native-v1',
       'mathem-public-search-v1',
       'matspar-public-search-v1',
+      'seven-eleven-se-sortiment-v1',
       'pharmacy-public-products-v1',
       'okq8-fuel-prices-v1'
     ]);

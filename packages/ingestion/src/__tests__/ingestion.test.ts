@@ -54,6 +54,7 @@ import {
   fetchOpenFoodFactsProducts,
   fetchOpenFoodFactsSwedenCatalog,
   fetchOkq8FuelPrices,
+  fetchSevenElevenSeConvenienceProducts,
   fetchOpenFoodFactsRetailerEnrichments,
   fetchBrandedSwedishFuelStations,
   fetchOverpassFuelStations,
@@ -112,6 +113,7 @@ import {
   GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL,
   GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL,
   GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL,
+  GROCERYVIEW_DAILY_SEVEN_ELEVEN_SE_CONVENIENCE_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL,
   GROCERYVIEW_DAILY_WILLYS_BULK_PRODUCTS_URL,
@@ -131,6 +133,7 @@ import {
   parseOsmChainStores,
   parseOpenPricesSnapshot,
   parseOkq8FuelPricePage,
+  parseSevenElevenSeSortimentPage,
   parseBrandedSwedishFuelStations,
   parseCoopDrPdfTextOffers,
   parseRetailerProductJsonSnapshot,
@@ -615,6 +618,103 @@ describe('OKQ8 fuel price connector', () => {
       ['okq8', 'fuel-e85', 1, 'l', 15.84]
     ]);
     assert.equal(parsed.items.every((row) => row.sourceType === 'retailer_online_page'), true);
+    assert.equal(parsed.items.every((row) => row.storeId === undefined), true);
+  });
+});
+
+describe('7-Eleven SE convenience connector', () => {
+  const sevenElevenSortimentHtml = `
+    <div class="redactor-wrapper block-wrapper">
+      <p class="redactor-ingress"><strong>Sallad: Från 99 kr</strong></p>
+      <figure id="post-6627 media-6627" class="align-none"></figure>
+      <ul>
+        <li><strong>Caesar med grillad kyckling,</strong> parmesan &amp; krutonger</li>
+        <li><strong>Rökt lax med DQL,</strong> senapskräm &amp; grillad morot</li>
+      </ul>
+      <p class="redactor-ingress"><strong>Bowls: 109 kr</strong></p>
+      <figure id="post-6630 media-6630" class="align-none"></figure>
+      <ul>
+        <li><strong>Citron- &amp; kumminmarinerad kyckling,</strong> bulgur, tzatziki, granatäpple &amp; marconamandel</li>
+      </ul>
+      <p class="redactor-ingress"><strong>Liten Bowl : 69 kr</strong></p>
+      <figure id="post-6629 media-6629" class="align-none"></figure>
+      <ul>
+        <li><strong>Marinerade glasnudlar &amp; grillad kyckling,</strong> sesamdressing, sesammarinerad broccoli, furikake &amp; picklad chili</li>
+      </ul>
+      <p class="redactor-ingress"><strong>Wraps: 82 kr</strong></p>
+      <figure id="post-6626 media-6626" class="align-none"></figure>
+      <ul>
+        <li><strong>Mexican &#8211; Mexbönröra, DQL,</strong> vegansk cheddar, jalapeño, picklad rödlök &amp; chili</li>
+      </ul>
+      <p class="redactor-ingress"><strong>Pane Lungo: 82 kr</strong></p>
+      <figure id="post-6628 media-6628" class="align-none"></figure>
+      <ul>
+        <li><strong>Mozzarella &amp; pesto</strong> med Schiacciata, parmesankräm &amp; ruccola</li>
+      </ul>
+      <p>Avvikelser i sortimentet kan förekomma. Priserna gäller inte i våra flygplatsbutiker.</p>
+    </div>`;
+
+  it('parses public convenience SKUs and excludes fuel-domain rows', () => {
+    const rows = parseSevenElevenSeSortimentPage({
+      body: sevenElevenSortimentHtml,
+      retrievedAt: '2026-05-25T08:00:00.000Z',
+      rawSnapshotRef: 'raw://seven-eleven-se/test'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.chainId, row.category, row.price, row.packageText]), [
+      ['seven_eleven_se', 'salad', 99, '1 st'],
+      ['seven_eleven_se', 'salad', 99, '1 st'],
+      ['seven_eleven_se', 'bowl', 109, '1 st'],
+      ['seven_eleven_se', 'small-bowl', 69, '1 st'],
+      ['seven_eleven_se', 'wrap', 82, '1 st'],
+      ['seven_eleven_se', 'pane-lungo', 82, '1 st']
+    ]);
+    assert.equal(rows.some((row) => /fuel|bensin|diesel/i.test(row.name)), false);
+    assert.equal(rows[0]?.priceQualifier, 'from');
+    assert.equal(rows[2]?.priceQualifier, 'fixed');
+    assert.match(rows[4]?.name ?? '', /Mexican – Mexbönröra/);
+  });
+
+  it('fetches and rejects blocked sortiment responses', async () => {
+    await assert.rejects(
+      fetchSevenElevenSeConvenienceProducts({
+        retrievedAt: '2026-05-25T08:00:00.000Z',
+        fetchImpl: async () => new Response('captcha', { status: 403 })
+      }),
+      /blocked with HTTP 403/
+    );
+  });
+
+  it('adapts 7-Eleven SE convenience rows into daily grocery observations', async () => {
+    const snapshot = await fetchDailyConnectorSnapshot({
+      status: 'ready',
+      connectorId: 'seven-eleven-se-convenience-products',
+      chainId: 'seven_eleven_se',
+      sourceType: 'retailer_online_page',
+      runKey: 'seven-eleven-se:retailer-online-page:seven-eleven-se-convenience-products:2026-05-25',
+      sourceRunId: 'source-run:seven-eleven-se:retailer-online-page:seven-eleven-se-convenience-products:2026-05-25',
+      provenance: {
+        sourceType: 'retailer_online_page',
+        sourceUrl: GROCERYVIEW_DAILY_SEVEN_ELEVEN_SE_CONVENIENCE_URL,
+        capturedAt: '2026-05-25T08:00:00.000Z',
+        parserVersion: 'seven-eleven-se-sortiment-v1'
+      },
+      requiredActions: []
+    }, {
+      retrievedAt: '2026-05-25T08:00:00.000Z',
+      fetchImpl: async () => new Response(sevenElevenSortimentHtml, { status: 200, headers: { 'content-type': 'text/html' } })
+    });
+
+    const parsed = JSON.parse(snapshot.body) as { items: Array<{ chainId: string; productId: string; categoryId: string; packageSize: number; packageUnit: string; price: number; storeId?: string }> };
+    assert.deepEqual(parsed.items.map((row) => [row.chainId, row.categoryId, row.packageSize, row.packageUnit, row.price]), [
+      ['seven_eleven_se', 'seven-eleven-se-salad', 1, 'piece', 99],
+      ['seven_eleven_se', 'seven-eleven-se-salad', 1, 'piece', 99],
+      ['seven_eleven_se', 'seven-eleven-se-bowl', 1, 'piece', 109],
+      ['seven_eleven_se', 'seven-eleven-se-small-bowl', 1, 'piece', 69],
+      ['seven_eleven_se', 'seven-eleven-se-wrap', 1, 'piece', 82],
+      ['seven_eleven_se', 'seven-eleven-se-pane-lungo', 1, 'piece', 82]
+    ]);
+    assert.equal(parsed.items.every((row) => row.productId.startsWith('seven-eleven-se-')), true);
     assert.equal(parsed.items.every((row) => row.storeId === undefined), true);
   });
 });
