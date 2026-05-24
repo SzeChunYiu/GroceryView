@@ -3260,14 +3260,31 @@ export const publicApiDirectory = {
       supports: 'observed price history with provenance, price type, source confidence, and no synthetic forecast rows'
     },
     {
+      label: 'Product volatility',
+      path: '/api/products/{id}/volatility',
+      supports: 'volatility score, observed inputWindow, cache contract, ETag revalidation, and no forecast-only rows'
+    },
+    {
       label: 'Nutrition per krona',
       path: '/api/nutrition/value',
       supports: 'nutrition per krona rankings for protein, calories, fiber, sugar, and salt warning guardrails'
     }
   ],
+  volatilityContract: {
+    path: '/api/products/{id}/volatility',
+    cacheContract: 'Cache-Control: public, s-maxage=300, stale-while-revalidate=900 for identical product and inputWindow requests.',
+    etagBehavior: 'ETag varies by product id, normalized inputWindow, source snapshot, and volatility payload; clients should send If-None-Match and accept 304 Not Modified when the observation window is unchanged.',
+    inputWindowFields: [
+      { name: 'inputWindow.startDate', meaning: 'inclusive first observed price date used to compute the volatility score' },
+      { name: 'inputWindow.endDate', meaning: 'inclusive last observed price date used to compute the volatility score' },
+      { name: 'inputWindow.lookbackDays', meaning: 'requested historical observation window after server-side normalization' },
+      { name: 'inputWindow.observationCount', meaning: 'number of verified price observations included in the score' }
+    ]
+  },
   guardrails: [
     'All listed endpoints are unauthenticated public read endpoints in the OpenAPI document.',
     'Account, basket, watchlist, privacy, and human-review APIs stay bearer-auth protected.',
+    'Volatility scores must publish cache, ETag, and inputWindow semantics so clients can revalidate the same historical observation window safely.',
     'Prices and nutrition values are served with provenance/guardrails; missing data remains absent instead of filled with estimates.'
   ]
 };

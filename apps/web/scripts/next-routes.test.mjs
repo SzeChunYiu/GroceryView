@@ -3528,10 +3528,21 @@ ${seo}`;
     assert.match(verified, /export const publicApiDirectory/);
     assert.match(verified, /price-history/);
     assert.match(verified, /nutrition per krona/i);
+    assert.match(verified, /volatilityContract/);
+    assert.match(verified, /Cache-Control: public, s-maxage=300, stale-while-revalidate=900/);
+    assert.match(verified, /ETag varies by product id, normalized inputWindow/);
+    assert.match(verified, /inputWindow\.startDate/);
+    assert.match(verified, /inputWindow\.endDate/);
+    assert.match(verified, /inputWindow\.lookbackDays/);
+    assert.match(verified, /inputWindow\.observationCount/);
     assert.match(route, /Public price\/nutrition API/);
     assert.match(route, /\/api\/openapi\.json/);
     assert.match(route, /\/api\/products\/\{id\}\/terminal/);
     assert.match(route, /\/api\/nutrition\/value/);
+    assert.match(route, /Volatility endpoint cache contract/);
+    assert.match(route, /publicApiDirectory\.volatilityContract\.cacheContract/);
+    assert.match(route, /publicApiDirectory\.volatilityContract\.etagBehavior/);
+    assert.match(route, /inputWindowFields\.map/);
   });
 
   it('surfaces the fail-closed API performance readiness contract', async () => {

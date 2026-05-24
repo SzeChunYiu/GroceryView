@@ -198,6 +198,20 @@ export default function DataSourcesPage() {
             </section>
           ))}
         </div>
+        <section className="mt-5 rounded-2xl border border-sky-100 bg-white p-4 shadow-sm">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-sky-800">Volatility endpoint cache contract</p>
+          <p className="mt-2 font-mono text-sm font-black text-slate-950">{publicApiDirectory.volatilityContract.path}</p>
+          <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{publicApiDirectory.volatilityContract.cacheContract}</p>
+          <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{publicApiDirectory.volatilityContract.etagBehavior}</p>
+          <div className="mt-4 grid gap-2 md:grid-cols-2">
+            {publicApiDirectory.volatilityContract.inputWindowFields.map((field) => (
+              <div className="rounded-xl bg-sky-50 p-3" key={field.name}>
+                <p className="font-mono text-xs font-black text-sky-950">{field.name}</p>
+                <p className="mt-1 text-sm font-semibold leading-6 text-slate-700">{field.meaning}</p>
+              </div>
+            ))}
+          </div>
+        </section>
         <ul className="mt-4 grid gap-2 text-sm font-semibold leading-6 text-slate-700 md:grid-cols-3">
           {publicApiDirectory.guardrails.map((guardrail) => (
             <li className="rounded-2xl bg-white p-3" key={guardrail}>• {guardrail}</li>
