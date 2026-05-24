@@ -19,5 +19,8 @@
     "@groceryview/notifications": "0.1.0",
     "@groceryview/scanning": "0.1.0",
     "pg": "^8.21.0"
+  },
+  "devDependencies": {
+    "zod": "^3.25.76"
   }
 }
