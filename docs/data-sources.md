@@ -65,11 +65,14 @@ GroceryView ingestion layer pulls from (or could pull from). Each entry lists
 - **Current generated slice:** 1,214 products from the existing OpenPrices/OpenFoodFacts-backed module when the live API cannot return a stable >=900-row tranche.
 - **Guardrail:** metadata only — names, brands, quantities, category tags, labels/images/URLs where available. It does not claim current prices, store availability, retailer assortment, or nutrition completeness.
 
-### 2.4 ICA Handla 🧪 verified (next on the queue)
-- **Endpoint pattern:** `https://handla.api.ica.se/api/...` (per `svendahlstrand/ica-api` reverse-engineering project). Public until Apr 2024 schema change — needs re-probing.
-- **Auth:** `AuthenticationTicket` cookie obtained from `/api/login/...` (anonymous ticket may work for read).
-- **Per-branch granularity:** ✅ YES — ICA stores are franchise-owned; each store has its own catalog with store-specific prices. The handla flow asks you to pick a store first.
-- **Strategy:** iterate over store IDs (from §1.3 ICA store-locator) → fetch each store's catalog → write per-branch price rows keyed by `osm_id` × `ean`.
+### 2.4 ICA Handla 🧪 verified (store-scoped promotions connector)
+- **Endpoint:** `https://handlaprivatkund.ica.se/stores/{storeAccountId}/api/product-listing-pages/v1/pages/promotions?regionId=...`
+- **Auth:** no user credentials for the approved connector path; requests use public web JSON headers and store referer.
+- **Per-branch granularity:** ✅ YES — ICA stores are franchise-owned; every row is tied to a selected `storeAccountId`, `storeName`, and `regionId`.
+- **What it returns:** store promotion product groups with regular price, unit price, promotion price, promotion description, product/store identifiers, image, package size, and country-of-origin fields where present.
+- **Known blocker:** the broader `/api/webproductpagews/v6/product-pages/search` endpoint remains WAF-blocked for the approved unauthenticated path, so the native connector deliberately uses store promotions until a supported catalog-search contract exists.
+- **Lands in:** `packages/ingestion/src/connectors/ica.ts`; daily DB observations through `ica-store-promotions-native-v1`.
+- **Connector doc:** [`docs/connectors/ica.md`](connectors/ica.md).
 
 ### 2.5 Coop online 🧪 verified-as-different
 - `coop.se/handla` rendered via Hybris commerce platform (`/ws/v2/coop/...` pattern; first probe returned 404, needs more discovery).
