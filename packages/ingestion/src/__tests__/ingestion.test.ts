@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 import {
+  buildBabyshopSearchUrl,
   buildCoopCategoryProductsUrl,
   buildCoopCategoryTreeUrl,
   buildCoopSearchUrl,
@@ -55,6 +56,7 @@ import {
   fetchOpenFoodFactsSwedenCatalog,
   fetchOkq8FuelPrices,
   fetchOpenFoodFactsRetailerEnrichments,
+  fetchBabyshopProducts,
   fetchBrandedSwedishFuelStations,
   fetchOverpassFuelStations,
   fetchOverpassGroceryStores,
@@ -123,6 +125,7 @@ import {
   offerSelectorFixtures,
   offerSelectorFixturesCanEmitOfferFacts,
   parseAxfoodStoreList,
+  parseBabyshopProducts,
   parseCityGrossSites,
   parseIcaStoreList,
   parseLidlStoreDirectoryLinks,
@@ -2957,6 +2960,67 @@ describe('fetchMathemProducts', () => {
     });
 
     assert.equal(rows.length, 1);
+  });
+});
+
+describe('fetchBabyshopProducts', () => {
+  it('parses BabyShop specialty baby goods from JSON-LD', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(`
+        <script type="application/ld+json">{
+          "@context":"https://schema.org",
+          "@type":"ItemList",
+          "itemListElement":[{
+            "@type":"Product",
+            "sku":"bs-bottle-260",
+            "name":"Nappflaska 260 ml",
+            "brand":{"name":"BabyShop"},
+            "category":"Baby/Nappflaskor",
+            "description":"Flaska 260 ml",
+            "image":"/images/bottle.png",
+            "url":"/sv/nappflaska-260-ml/p/bs-bottle-260",
+            "offers":{"@type":"Offer","price":"129,00","priceCurrency":"SEK"}
+          }]
+        }</script>
+      `, { status: 200, headers: { 'content-type': 'text/html' } });
+    };
+
+    const rows = await fetchBabyshopProducts({
+      queries: ['nappflaska'],
+      fetchImpl,
+      retrievedAt: '2026-05-24T16:20:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [buildBabyshopSearchUrl('nappflaska')]);
+    assert.deepEqual(rows, [{
+      code: 'bs-bottle-260',
+      name: 'Nappflaska 260 ml',
+      brand: 'BabyShop',
+      packageText: '260 ml',
+      category: 'Baby/Nappflaskor',
+      price: 129,
+      priceText: '129.00 SEK',
+      currency: 'SEK',
+      country: 'SE',
+      productUrl: 'https://www.babyshop.com/sv/nappflaska-260-ml/p/bs-bottle-260',
+      imageUrl: 'https://www.babyshop.com/images/bottle.png',
+      sourceUrl: buildBabyshopSearchUrl('nappflaska'),
+      retrievedAt: '2026-05-24T16:20:00.000Z'
+    }]);
+  });
+
+  it('deduplicates BabyShop products across embedded sources', () => {
+    const rows = parseBabyshopProducts(`
+      <script type="application/ld+json">[
+        {"@type":"Product","sku":"same","name":"Same","offers":{"price":10}},
+        {"@type":"Product","sku":"same","name":"Same","offers":{"price":10}}
+      ]</script>
+    `, buildBabyshopSearchUrl('same'), '2026-05-24T16:20:00.000Z');
+
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0]?.country, 'SE');
   });
 });
 
