@@ -3139,6 +3139,24 @@ ${seo}`;
   });
 
 
+  it('embeds Google Maps pins and directions on store detail pages', async () => {
+    const storePage = await read('src/app/stores/[slug]/page.tsx');
+    const storeMap = await read('src/components/StoreMap.tsx');
+    const mapsConfig = await read('src/lib/mapsConfig.ts');
+
+    assert.match(storePage, /StoreMap/);
+    assert.match(storePage, /store\.lat/);
+    assert.match(storePage, /store\.lng/);
+    assert.match(storeMap, /iframe/);
+    assert.match(storeMap, /Google Maps location/);
+    assert.match(storeMap, /Open Google Maps directions/);
+    assert.match(mapsConfig, /googleMapsEmbedUrl/);
+    assert.match(mapsConfig, /output=embed/);
+    assert.match(mapsConfig, /googleMapsDirectionsUrl/);
+    assert.match(mapsConfig, /api=1&destination/);
+  });
+
+
   it('ships dynamic product OG price images from verified price data', async () => {
     const ogPath = 'src/app/products/[slug]/opengraph-image.tsx';
     assert.equal(await fileExists(ogPath), true, 'product pages should expose a dynamic opengraph-image route');

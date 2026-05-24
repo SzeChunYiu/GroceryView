@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { StoreMap } from '@/components/StoreMap';
 import { osmStores } from '@/lib/osm-stores';
 import {
   findStore,
@@ -157,6 +158,16 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
               </dd>
             </div>
           </dl>
+        </Card>
+        <Card className="lg:col-span-2">
+          <p className="text-sm font-black uppercase tracking-[0.18em] text-slate-500">Google Maps store pin</p>
+          <h2 className="mt-2 text-2xl font-black">Location map and directions</h2>
+          <p className="mt-3 text-sm leading-6 text-slate-700">
+            Embedded Google Maps uses the verified OSM latitude/longitude for this store and links out to turn-by-turn directions.
+          </p>
+          <div className="mt-4">
+            <StoreMap store={{ name: store.name, address: store.address, lat: store.lat, lng: store.lng }} />
+          </div>
         </Card>
         <Card>
           <h2 className="text-2xl font-black">Opening hours</h2>
