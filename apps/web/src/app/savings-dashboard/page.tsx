@@ -87,12 +87,16 @@ export default function SavingsDashboardPage() {
         <Card>
           <h2 className="text-2xl font-black">Category pressure</h2>
           <div className="mt-4 space-y-3">
-            {personalGroceryInflation.categoryContributions.map((category) => (
-              <div className="rounded-2xl bg-slate-50 p-4" key={category.category}>
-                <p className="font-black">{category.category}</p>
-                <p className="text-sm text-slate-600">{formatPercent(category.changePercent)} on {formatSek(category.spend)} baseline spend</p>
-              </div>
-            ))}
+            {personalGroceryInflation.categoryContributions.length > 0 ? (
+              personalGroceryInflation.categoryContributions.map((category) => (
+                <div className="rounded-2xl bg-slate-50 p-4" key={category.category}>
+                  <p className="font-black">{category.category}</p>
+                  <p className="text-sm text-slate-600">{formatPercent(category.changePercent)} on {formatSek(category.spend)} baseline spend</p>
+                </div>
+              ))
+            ) : (
+              <p className="rounded-2xl bg-slate-50 p-4 text-sm font-bold text-slate-700">No category contribution data is available yet.</p>
+            )}
           </div>
           {personalGroceryInflation.missingProductIds.length > 0 ? (
             <p className="mt-4 rounded-2xl bg-rose-50 p-4 text-sm font-bold text-rose-950">Missing from CPI coverage: {personalGroceryInflation.missingProductIds.join(', ')}</p>
