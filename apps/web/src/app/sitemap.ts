@@ -91,6 +91,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     entry('/alerts', 0.72, 'daily'),
     entry('/fuel', 0.7, 'weekly'),
     entry('/pharmacy', 0.7, 'weekly'),
+    entry('/pricing', 0.72, 'weekly'),
     entry('/seasonal-calendar', 0.89, 'weekly'),
     entry('/meal-cost', 0.88, 'daily'),
     entry('/weekly-basket', 0.85, 'daily'),
