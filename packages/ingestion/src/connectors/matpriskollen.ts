@@ -14,6 +14,13 @@ export type MatpriskollenOffer = {
   origin: string;
   requiresMembershipCard: boolean;
   requiresCoupon: boolean;
+  is_member_price: boolean;
+  is_coupon_price: boolean;
+  channel: 'store';
+  format: string;
+  freshness: 'weekly_flyer';
+  storeRegion: string;
+  store_id: { id: string; region: string };
   validFrom: string;
   validTo: string;
   sourceUrl: string;
@@ -193,7 +200,8 @@ export async function fetchMatpriskollenOffers(
           retrievedAt,
           storeName: text(payload.storeName) || storeName,
           storeKey,
-          storeId: text(store.id)
+          storeId: text(store.id),
+          storeRegion: region.name ?? `${region.lat},${region.lon}`
         });
         if (!row) {
           continue;
@@ -222,6 +230,7 @@ export function normalizeMatpriskollenOffer(
     storeName: string;
     storeKey: string;
     storeId: string;
+    storeRegion?: string;
   }
 ): MatpriskollenOffer | null {
   const code = text(offer.key ?? offer.id);
@@ -249,6 +258,13 @@ export function normalizeMatpriskollenOffer(
     origin: text(offer.product?.origin),
     requiresMembershipCard: Boolean(offer.requiresMembershipCard),
     requiresCoupon: Boolean(offer.requiresCoupon),
+    is_member_price: Boolean(offer.requiresMembershipCard),
+    is_coupon_price: Boolean(offer.requiresCoupon),
+    channel: 'store',
+    format: formatFromStoreName(context.storeName),
+    freshness: 'weekly_flyer',
+    storeRegion: context.storeRegion ?? 'unknown',
+    store_id: { id: text(offer.store_id) || context.storeId, region: context.storeRegion ?? 'unknown' },
     validFrom: unixSecondsToIso(offer.validFrom),
     validTo: unixSecondsToIso(offer.validTo),
     sourceUrl: context.sourceUrl,
@@ -273,4 +289,21 @@ function numberValue(value: unknown): number {
 
 function text(value: unknown): string {
   return typeof value === 'string' ? value.trim() : typeof value === 'number' ? String(value) : '';
+}
+
+function formatFromStoreName(storeName: string): string {
+  const value = storeName.toLowerCase();
+  if (/ica\s+n[äa]ra/.test(value)) return 'ica-nara';
+  if (/ica\s+supermarket/.test(value)) return 'ica-supermarket';
+  if (/ica\s+kvantum/.test(value)) return 'ica-kvantum';
+  if (/ica\s+maxi/.test(value)) return 'ica-maxi';
+  if (/stora\s+coop/.test(value)) return 'stora-coop';
+  if (/coop\s+x[:-]?tra/.test(value)) return 'coop-xtra';
+  if (/coop/.test(value)) return 'coop';
+  if (/willys/.test(value)) return 'willys';
+  if (/hemk[oö]p/.test(value)) return 'hemkop';
+  if (/city\s+gross/.test(value)) return 'city-gross';
+  if (/lidl/.test(value)) return 'lidl';
+  if (/tempo/.test(value)) return 'tempo';
+  return 'unknown';
 }
