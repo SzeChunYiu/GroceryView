@@ -5,6 +5,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 import {
+  buildApoteksgruppenDualChannelRows,
+  parseApoteksgruppenOfferText,
   buildCoopCategoryProductsUrl,
   buildCoopCategoryTreeUrl,
   buildCoopSearchUrl,
@@ -188,6 +190,38 @@ import {
   validateStoreLocatorFixtures
 } from '../index.js';
 import type { QueryExecutor } from '@groceryview/db';
+
+
+describe('Apoteksgruppen/Kronans pricing quirks', () => {
+  it('emits separate online and store rows when both prices are observed', () => {
+    const rows = buildApoteksgruppenDualChannelRows({
+      productName: 'Solskydd SPF 50',
+      onlinePrice: 99,
+      storePrice: 129,
+      store_id: 'kronans-stockholm-city',
+      region: 'Stockholm',
+      sourceUrl: 'https://www.kronansapotek.se/villkor/kopvillkor/'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.channel, row.price, row.store_id, row.region]), [
+      ['online', 99, 'kronans-stockholm-city', 'Stockholm'],
+      ['store', 129, 'kronans-stockholm-city', 'Stockholm']
+    ]);
+    assert.equal(rows.every((row) => row.is_subscription_price === false), true);
+  });
+
+  it('flags member and multi-buy offers only from explicit source text', () => {
+    const rows = parseApoteksgruppenOfferText(`
+      För våra klubbmedlemmar 20%
+      Vårt eget varumärke 3 för 2
+      Thermacell Köp 2 få 25%
+    `, 'https://www.kronansapotek.se/erbjudanden/');
+
+    assert.equal(rows.find((row) => row.is_member_price)?.is_member_price, true);
+    assert.deepEqual(rows.filter((row) => row.multi_buy).map((row) => row.multi_buy?.minimumQuantity), [3, 2]);
+    assert.equal(rows.every((row) => row.is_coupon_price === false && row.is_clearance === false), true);
+  });
+});
 
 describe('confidenceForSource', () => {
   it('uses proposal confidence values by source type', () => {
