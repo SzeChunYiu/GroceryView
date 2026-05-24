@@ -2806,6 +2806,19 @@ ${seo}`;
     assert.doesNotMatch(canonicalProductRoute, /@\/lib\/demo-data|@\/components\/sample-data/);
   });
 
+  it('ships accessible category filter controls', async () => {
+    const source = await read('src/components/category-filter.tsx');
+
+    assert.match(source, /aria-label=\{label\}/);
+    assert.match(source, /aria-describedby=\{describedById\}/);
+    assert.match(source, /role="list"/);
+    assert.match(source, /role="listitem"/);
+    assert.match(source, /role="status"/);
+    assert.match(source, /aria-live="polite"/);
+    assert.match(source, /focus-visible:ring-4/);
+    assert.match(source, /onKeyDown=\{\(event\) => handleKeyboardSelect\(event, select\)\}/);
+  });
+
   it('renders category pages with a DB hierarchy-backed breadcrumb component', async () => {
     const categoryRoute = await read('src/app/categories/[slug]/page.tsx');
     const breadcrumb = await read('src/components/Breadcrumb.tsx');
