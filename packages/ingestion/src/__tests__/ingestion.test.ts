@@ -187,7 +187,108 @@ import {
   validateScbPxWebQueryFixtures,
   validateStoreLocatorFixtures
 } from '../index.js';
+import {
+  buildIcelandPoiAuditOverpassQuery,
+  ICELAND_OVERPASS_BBOX,
+  runIcelandPoiAudit,
+  summarizeIcelandPoiAudit
+} from '../jobs/is-poi-audit.js';
 import type { QueryExecutor } from '@groceryview/db';
+
+describe('Iceland POI audit job', () => {
+  const retrievedAt = '2026-05-24T15:30:00.000Z';
+
+  it('builds an Iceland bounding-box Overpass query for shops, pharmacies, and fuel', () => {
+    const query = buildIcelandPoiAuditOverpassQuery();
+
+    assert.match(query, new RegExp(`node\\["shop"~"\\^\\(supermarket\\|convenience\\|grocery\\)\\$"\\]\\(${ICELAND_OVERPASS_BBOX}\\)`));
+    assert.match(query, new RegExp(`way\\["amenity"="pharmacy"\\]\\(${ICELAND_OVERPASS_BBOX}\\)`));
+    assert.match(query, new RegExp(`relation\\["shop"="chemist"\\]\\(${ICELAND_OVERPASS_BBOX}\\)`));
+    assert.match(query, new RegExp(`node\\["amenity"="fuel"\\]\\(${ICELAND_OVERPASS_BBOX}\\)`));
+    assert.match(query, /out center tags;/);
+  });
+
+  it('summarizes Iceland POIs and reports supermarkets outside linked brands', () => {
+    const report = summarizeIcelandPoiAudit({
+      elements: [
+        {
+          type: 'node',
+          id: 101,
+          lat: 64.1466,
+          lon: -21.9426,
+          tags: {
+            shop: 'supermarket',
+            name: 'Bónus Laugavegur',
+            brand: 'Bónus',
+            'addr:city': 'Reykjavík',
+            'addr:postcode': '101'
+          }
+        },
+        {
+          type: 'way',
+          id: 102,
+          center: { lat: 64.13, lon: -21.9 },
+          tags: { shop: 'grocery', name: 'Local Market' }
+        },
+        {
+          type: 'node',
+          id: 201,
+          lat: 64.15,
+          lon: -21.94,
+          tags: { amenity: 'pharmacy', name: 'Apótek' }
+        },
+        {
+          type: 'relation',
+          id: 202,
+          center: { lat: 64.14, lon: -21.91 },
+          tags: { shop: 'chemist', name: 'Lyfja' }
+        },
+        {
+          type: 'node',
+          id: 301,
+          lat: 64.12,
+          lon: -21.88,
+          tags: { amenity: 'fuel', operator: 'Orkan' }
+        },
+        {
+          type: 'node',
+          id: 401,
+          lat: 64.12,
+          lon: -21.88,
+          tags: { shop: 'clothes', name: 'Ignored' }
+        }
+      ]
+    }, retrievedAt);
+
+    assert.deepEqual(report.counts, { supermarket: 2, pharmacy: 2, fuel: 1 });
+    assert.deepEqual(report.unlinkedSupermarkets.map((row) => [row.osmType, row.osmId, row.name]), [
+      ['way', 102, 'Local Market']
+    ]);
+    assert.equal(report.unlinkedSupermarkets[0]?.retrievedAt, retrievedAt);
+  });
+
+  it('posts the Iceland audit query to Overpass and rejects failed responses', async () => {
+    const postedBodies: string[] = [];
+    const fetchImpl: typeof fetch = async (_url, init) => {
+      postedBodies.push(String(init?.body));
+      return new Response(JSON.stringify({
+        elements: [{ type: 'node', id: 1, lat: 64.1, lon: -21.9, tags: { amenity: 'fuel', name: 'Fuel' } }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const report = await runIcelandPoiAudit({ fetchImpl, retrievedAt });
+
+    assert.equal(report.counts.fuel, 1);
+    assert.match(postedBodies[0] ?? '', /63\.0%2C-25\.0%2C67\.0%2C-13\.0|63\.0,-25\.0,67\.0,-13\.0/);
+    await assert.rejects(
+      runIcelandPoiAudit({
+        fetchImpl: async () => new Response('blocked', { status: 503 }),
+        retrievedAt
+      }),
+      /Iceland POI Overpass audit failed: 503/
+    );
+  });
+});
 
 describe('confidenceForSource', () => {
   it('uses proposal confidence values by source type', () => {
