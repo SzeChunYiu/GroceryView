@@ -10,6 +10,38 @@ export const COMPARE_CHAIN_ORDER = [
 
 export type CompareChainId = (typeof COMPARE_CHAIN_ORDER)[number]['id'];
 
+export type ChainComparisonStoreFilters = {
+  coupons?: boolean;
+  delivery?: boolean;
+  pickup?: boolean;
+};
+
+export const COMPARE_STORE_CAPABILITIES: Record<CompareChainId, {
+  coupons: boolean;
+  delivery: boolean;
+  pickup: boolean;
+  evidenceLabel: string;
+}> = {
+  ica: {
+    coupons: true,
+    delivery: true,
+    pickup: true,
+    evidenceLabel: 'ICA store-scoped promotions plus delivery/pickup checkout capability evidence'
+  },
+  willys: {
+    coupons: true,
+    delivery: true,
+    pickup: true,
+    evidenceLabel: 'Willys online catalogue rows with coupon and fulfillment capability evidence'
+  },
+  coop: {
+    coupons: false,
+    delivery: true,
+    pickup: false,
+    evidenceLabel: 'Coop price rows with delivery capability evidence; coupon and pickup flags not verified here'
+  }
+};
+
 export type ChainCompareCell = {
   chainId: CompareChainId;
   chainName: string;
@@ -42,9 +74,49 @@ export type ChainComparisonTable = {
   requestedIds: string[];
   missingProductIds: string[];
   products: ChainCompareProductRow[];
+  storeFilters: {
+    coupons: boolean;
+    delivery: boolean;
+    pickup: boolean;
+    activeLabels: string[];
+    visibleChains: Array<{ id: CompareChainId; label: string; evidenceLabel: string }>;
+  };
   sourceLabel: string;
   generatedAt: string | null;
 };
+
+function normalizedStoreFilters(filters: ChainComparisonStoreFilters = {}) {
+  const normalized = {
+    coupons: filters.coupons === true,
+    delivery: filters.delivery === true,
+    pickup: filters.pickup === true
+  };
+  return {
+    ...normalized,
+    activeLabels: [
+      normalized.coupons ? 'available coupons' : null,
+      normalized.delivery ? 'home delivery' : null,
+      normalized.pickup ? 'pickup' : null
+    ].filter((label): label is string => label !== null)
+  };
+}
+
+function chainMatchesStoreFilters(chainId: CompareChainId, filters: ReturnType<typeof normalizedStoreFilters>): boolean {
+  const capabilities = COMPARE_STORE_CAPABILITIES[chainId];
+  if (filters.coupons && !capabilities.coupons) return false;
+  if (filters.delivery && !capabilities.delivery) return false;
+  if (filters.pickup && !capabilities.pickup) return false;
+  return true;
+}
+
+function visibleCompareChains(filters: ReturnType<typeof normalizedStoreFilters>) {
+  return COMPARE_CHAIN_ORDER
+    .filter((chain) => chainMatchesStoreFilters(chain.id, filters))
+    .map((chain) => ({
+      ...chain,
+      evidenceLabel: COMPARE_STORE_CAPABILITIES[chain.id].evidenceLabel
+    }));
+}
 
 function normalizeCompareId(value: string): string {
   return value.trim().toLowerCase();
@@ -132,8 +204,8 @@ function formatCommodityPricedCell(
   };
 }
 
-function comparePackagedProductRow(requestedId: string, product: AxfoodProduct): ChainCompareProductRow {
-  const cells = COMPARE_CHAIN_ORDER.map((chain) => {
+function comparePackagedProductRow(requestedId: string, product: AxfoodProduct, chains = COMPARE_CHAIN_ORDER): ChainCompareProductRow {
+  const cells = chains.map((chain) => {
     const price = product.chains[chain.id];
     return price ? formatPackagedPricedCell(chain.label, chain.id, product, price) : formatMissingCell(chain.label, chain.id);
   });
@@ -156,9 +228,14 @@ function comparePackagedProductRow(requestedId: string, product: AxfoodProduct):
   };
 }
 
-function compareCommodityProductRow(requestedId: string, product: AxfoodProduct, comparison: NonNullable<ReturnType<typeof commodityComparisonForProduct>>): ChainCompareProductRow {
+function compareCommodityProductRow(
+  requestedId: string,
+  product: AxfoodProduct,
+  comparison: NonNullable<ReturnType<typeof commodityComparisonForProduct>>,
+  chains = COMPARE_CHAIN_ORDER
+): ChainCompareProductRow {
   const rowsByChain = new Map(comparison.rows.map((row) => [row.chainId, row]));
-  const cells = COMPARE_CHAIN_ORDER.map((chain) => {
+  const cells = chains.map((chain) => {
     const row = rowsByChain.get(chain.id);
     return row
       ? formatCommodityPricedCell(chain.label, chain.id, comparison.comparableUnit, row)
@@ -183,20 +260,23 @@ function compareCommodityProductRow(requestedId: string, product: AxfoodProduct,
   };
 }
 
-function compareProductRow(requestedId: string, product: AxfoodProduct): ChainCompareProductRow {
+function compareProductRow(requestedId: string, product: AxfoodProduct, chains = COMPARE_CHAIN_ORDER): ChainCompareProductRow {
   const commodityComparison = commodityComparisonForProduct(product.slug);
-  if (commodityComparison?.status === 'priced') return compareCommodityProductRow(requestedId, product, commodityComparison);
-  return comparePackagedProductRow(requestedId, product);
+  if (commodityComparison?.status === 'priced') return compareCommodityProductRow(requestedId, product, commodityComparison, chains);
+  return comparePackagedProductRow(requestedId, product, chains);
 }
 
 export function buildChainComparisonTable(
   productsParam: string | string[] | null | undefined,
-  products: readonly AxfoodProduct[] = axfoodProducts
+  products: readonly AxfoodProduct[] = axfoodProducts,
+  storeFiltersInput: ChainComparisonStoreFilters = {}
 ): ChainComparisonTable {
   const requestedIds = parseCompareProductsParam(productsParam);
   const byId = productLookup(products);
   const rows: ChainCompareProductRow[] = [];
   const missingProductIds: string[] = [];
+  const storeFilters = normalizedStoreFilters(storeFiltersInput);
+  const chains = visibleCompareChains(storeFilters);
 
   for (const requestedId of requestedIds) {
     const product = byId.get(requestedId);
@@ -204,13 +284,20 @@ export function buildChainComparisonTable(
       missingProductIds.push(requestedId);
       continue;
     }
-    rows.push(compareProductRow(requestedId, product));
+    rows.push(compareProductRow(requestedId, product, chains));
   }
 
   return {
     requestedIds,
     missingProductIds,
     products: rows,
+    storeFilters: {
+      coupons: storeFilters.coupons,
+      delivery: storeFilters.delivery,
+      pickup: storeFilters.pickup,
+      activeLabels: storeFilters.activeLabels,
+      visibleChains: chains.map((chain) => ({ id: chain.id, label: chain.label, evidenceLabel: chain.evidenceLabel }))
+    },
     sourceLabel: dbSiteSnapshotGeneratedAt
       ? 'postgres.latest_prices/observations via packages/db site snapshot'
       : 'local bundled chain catalogue; production builds prefer packages/db snapshot rows',
