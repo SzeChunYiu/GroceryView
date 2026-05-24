@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
+import { Footer } from '@/components/Footer';
 import { ConsentManager } from '@/components/consent-manager';
 import { Providers } from './providers';
+import { ToastProvider } from '@/components/Toast';
 import './globals.css';
+import '@/styles/footer.css';
 
 const siteUrl = 'https://grocery-web-mu.vercel.app';
 const organizationJsonLd = {
@@ -42,7 +45,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           dangerouslySetInnerHTML={{ __html: jsonLd([organizationJsonLd, websiteJsonLd]) }}
           type="application/ld+json"
         />
-        <Providers>{children}</Providers>
+        <ToastProvider>
+          <Providers>{children}</Providers>
+          <Footer />
+        </ToastProvider>
         <ConsentManager />
       </body>
     </html>
