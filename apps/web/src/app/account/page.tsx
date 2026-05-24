@@ -3,6 +3,7 @@ import { AccountMutationActions } from '@/components/account-mutation-actions';
 import { AdDisclosureActions } from '@/components/ad-disclosure-actions';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { pastPurchaseReorderSuggestions, reorderSuggestionSummary } from '@/lib/reorder-suggestions';
 import { routeMetadata } from '@/lib/seo';
 import { accountSavedShoppingContract, formatSek, savedBasketAutoReorderPlanner } from '@/lib/verified-data';
 import { planAccountDeletion } from '@groceryview/core';
@@ -102,6 +103,42 @@ export default function AccountPage() {
               ))}
             </div>
           </div>
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-amber-200 bg-amber-50">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-800">Frequency + recency</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">{reorderSuggestionSummary.title}</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+              GroceryView now uses past purchase cadence to propose reorder candidates before a staple is missed. {reorderSuggestionSummary.basis}
+            </p>
+          </div>
+          <ConfidenceBadge level="high" label="Reorder candidates" sampleSize={pastPurchaseReorderSuggestions.length} />
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          <p className="rounded-2xl bg-white p-4 text-sm font-semibold leading-6 text-slate-700 shadow-sm">
+            <span className="block font-black text-slate-950">List level</span>
+            {reorderSuggestionSummary.listLevel}
+          </p>
+          <p className="rounded-2xl bg-white p-4 text-sm font-semibold leading-6 text-slate-700 shadow-sm">
+            <span className="block font-black text-slate-950">Product-card level</span>
+            {reorderSuggestionSummary.productCardLevel}
+          </p>
+        </div>
+        <div className="mt-4 grid gap-3 lg:grid-cols-3">
+          {pastPurchaseReorderSuggestions.map((suggestion) => (
+            <div className="rounded-2xl bg-white p-4 shadow-sm" key={suggestion.productId}>
+              <div className="flex items-start justify-between gap-3">
+                <p className="font-black text-slate-950">{suggestion.productName}</p>
+                <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-black text-amber-900">{suggestion.reorderScore}</span>
+              </div>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{suggestion.reason}</p>
+              <p className="mt-3 rounded-2xl bg-amber-50 p-3 text-sm font-black text-amber-950">{suggestion.listActionLabel}</p>
+              <p className="mt-2 text-xs font-bold leading-5 text-slate-600">{suggestion.productCardPrompt}</p>
+            </div>
+          ))}
         </div>
       </Card>
 
