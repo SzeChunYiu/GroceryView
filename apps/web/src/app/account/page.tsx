@@ -4,6 +4,7 @@ import { AdDisclosureActions } from '@/components/ad-disclosure-actions';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { routeMetadata } from '@/lib/seo';
+import { dietaryProfileOnboarding } from '@/lib/user-preferences';
 import { accountSavedShoppingContract, formatSek, savedBasketAutoReorderPlanner } from '@/lib/verified-data';
 import { planAccountDeletion } from '@groceryview/core';
 
@@ -54,6 +55,23 @@ export default function AccountPage() {
             </ul>
           </div>
         </div>
+      </Card>
+
+      <Card className="mt-6 border-lime-200 bg-lime-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-lime-800">Account onboarding</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">{dietaryProfileOnboarding.title}</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">{dietaryProfileOnboarding.summary}</p>
+        <div className="mt-4 grid gap-3 md:grid-cols-4">
+          {dietaryProfileOnboarding.preferences.map((preference) => (
+            <div className="rounded-2xl bg-white p-4 shadow-sm" key={preference.key}>
+              <p className="text-base font-black text-slate-950">{preference.label}</p>
+              <p className="mt-2 text-sm leading-6 text-slate-700">{preference.helper}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 text-sm font-bold text-lime-950">
+          Used for: {dietaryProfileOnboarding.downstreamUses.join(' · ')}
+        </p>
       </Card>
 
       <Card className="mt-6 border-sky-200 bg-sky-50">
