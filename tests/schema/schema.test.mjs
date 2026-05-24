@@ -3,6 +3,29 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const schema = readFileSync(new URL('../../db/schema.sql', import.meta.url), 'utf8').toLowerCase();
+const initialMigration = readFileSync(
+  new URL('../../infra/db/migrations/001_groceryview_schema.sql', import.meta.url),
+  'utf8'
+).toLowerCase();
+
+const normalizeSql = (sql) => sql.replace(/--.*$/gm, '').replace(/\s+/g, ' ').trim();
+
+const extractIndexStatement = (sql, indexName) => {
+  const normalized = normalizeSql(sql);
+  const escapedIndexName = indexName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const match = normalized.match(new RegExp(`create unique index if not exists ${escapedIndexName}\\b[^;]*;?`, 'i'));
+  return match?.[0] ?? '';
+};
+
+const barcodeUniqueIndexSemantics = (sql) => {
+  const statement = extractIndexStatement(sql, 'products_barcode_unique_idx');
+  return {
+    statement,
+    name: /create unique index if not exists products_barcode_unique_idx\b/.test(statement),
+    tableAndColumn: /on products\s*\(\s*barcode\s*\)/.test(statement),
+    partialNotNull: /where barcode is not null\b/.test(statement)
+  };
+};
 
 const requiredTables = [
   'chains',
@@ -85,6 +108,17 @@ describe('db/schema.sql', () => {
     for (const column of requiredColumns) {
       assert.match(schema, new RegExp(`\\b${column}\\b`), `${column} column missing`);
     }
+  });
+
+
+  it('keeps barcode unique-index semantics in parity between canonical schema and initial migration', () => {
+    const schemaSemantics = barcodeUniqueIndexSemantics(schema);
+    const migrationSemantics = barcodeUniqueIndexSemantics(initialMigration);
+
+    assert.deepEqual(schemaSemantics, migrationSemantics);
+    assert.equal(schemaSemantics.name, true, 'products_barcode_unique_idx must be present');
+    assert.equal(schemaSemantics.tableAndColumn, true, 'index must target products(barcode)');
+    assert.equal(schemaSemantics.partialNotNull, true, 'index must be partial: where barcode is not null');
   });
 
   it('allows suppressed notification task state for terminal unsubscribe handling', () => {
