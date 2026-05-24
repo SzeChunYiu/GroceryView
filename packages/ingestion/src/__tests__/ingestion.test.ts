@@ -7,6 +7,7 @@ import { gzipSync } from 'node:zlib';
 import {
   buildCoopCategoryProductsUrl,
   buildCoopCategoryTreeUrl,
+  buildCoopMedlemOffersUrl,
   buildCoopSearchUrl,
   buildCoopStoreInfoUrl,
   buildCoopStoresUrl,
@@ -71,6 +72,7 @@ import {
   fetchCoopStores,
   fetchCoopWeeklyDiscounts,
   fetchCoopWeeklyDiscountsForAllStores,
+  fetchCoopMedlemOffersSe,
   fetchDailyConnectorSnapshot,
   fetchHemkopProducts,
   fetchHemkopProductsForAllStores,
@@ -132,6 +134,7 @@ import {
   parseOkq8FuelPricePage,
   parseBrandedSwedishFuelStations,
   parseCoopDrPdfTextOffers,
+  parseCoopMedlemOffersPayload,
   parseRetailerProductJsonSnapshot,
   persistOpenFoodFactsProductMetadata,
   parseSt1FuelPriceHtml,
@@ -1412,6 +1415,73 @@ describe('fetchCoopProducts', () => {
 });
 
 describe('fetchCoopWeeklyDiscounts', () => {
+  it('fetches Coop Medlem direct app offers per region and format through promotionRouter', async () => {
+    const requestedUrls: string[] = [];
+    const fixture = {
+      offers: [{
+        offerId: 'medlem-kaffe-1',
+        productName: 'Bryggkaffe',
+        brand: 'Coop',
+        packageText: '450 g',
+        category: 'kaffe',
+        priceText: '2 för 89 kr',
+        mechanicText: 'Medlemspris 2 för 89 kr',
+        validFrom: '2026-05-25',
+        validTo: '2026-05-31',
+        memberRequired: true,
+        imageUrl: 'https://www.coop.se/kaffe.png'
+      }]
+    };
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(JSON.stringify(fixture), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCoopMedlemOffersSe({
+      regions: ['stockholm', 'malmo'],
+      formats: ['app', 'web'],
+      fetchImpl,
+      retrievedAt: '2026-05-24T10:00:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildCoopMedlemOffersUrl('stockholm', 'app'),
+      buildCoopMedlemOffersUrl('stockholm', 'web'),
+      buildCoopMedlemOffersUrl('malmo', 'app'),
+      buildCoopMedlemOffersUrl('malmo', 'web')
+    ]);
+    assert.equal(rows.length, 4);
+    assert.deepEqual(rows[0]?.structuredPromotion, {
+      router: 'promotionRouter',
+      priceType: 'promotion',
+      promotionKind: 'member_offer',
+      memberRequired: true,
+      price: 89,
+      priceText: '2 för 89 kr',
+      mechanicText: 'Medlemspris 2 för 89 kr',
+      validFrom: '2026-05-25',
+      validTo: '2026-05-31'
+    });
+  });
+
+  it('parses embedded Coop Medlem offer fixtures into structured promotion rows', () => {
+    const rows = parseCoopMedlemOffersPayload(`
+      <script id="__COOP_MEDLEM_OFFERS__" type="application/json">
+        {"offers":[{"id":"member-banana","name":"Banan","priceText":"19,90 kr/kg","validFrom":"2026-05-25","validTo":"2026-05-31","memberRequired":false}]}
+      </script>
+    `, {
+      region: 'stockholm',
+      format: 'app',
+      sourceUrl: buildCoopMedlemOffersUrl('stockholm', 'app'),
+      retrievedAt: '2026-05-24T10:00:00.000Z'
+    });
+
+    assert.equal(rows[0]?.offerId, 'member-banana');
+    assert.equal(rows[0]?.structuredPromotion.router, 'promotionRouter');
+    assert.equal(rows[0]?.structuredPromotion.price, 19.9);
+    assert.equal(rows[0]?.structuredPromotion.memberRequired, false);
+  });
+
   it('fetches Coop weekly discounts for multiple public flyer branches', async () => {
     const requestedUrls: string[] = [];
     const fetchImpl: typeof fetch = async (url, init) => {
