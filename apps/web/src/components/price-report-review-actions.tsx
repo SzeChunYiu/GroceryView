@@ -1,6 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import {
+  applyCommunityReviewVote,
+  communityReviewTrustScore,
+  defaultCommunityPriceReviews,
+  sortCommunityReviewsByTrust,
+  type CommunityPriceReview,
+  type CommunityReviewVote
+} from '@/lib/reviews';
 
 type ReviewStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
 type BrowserSession = { accessToken: string; userId: string };
@@ -16,6 +24,7 @@ function readSession(): BrowserSession {
 
 export function PriceReportReviewActions() {
   const [assignmentId, setAssignmentId] = useState('');
+  const [communityReviews, setCommunityReviews] = useState<CommunityPriceReview[]>(() => sortCommunityReviewsByTrust(defaultCommunityPriceReviews));
   const [notes, setNotes] = useState('Verified community price evidence against source material.');
   const [status, setStatus] = useState<ReviewStatus>('idle');
   const [message, setMessage] = useState('No anonymous price-report moderation. Sign in first as a registered reviewer.');
@@ -71,6 +80,24 @@ export function PriceReportReviewActions() {
     setMessage(`${decision} decision accepted with reviewedByHuman: true writeback. needs_more_info leaves assignment status in_progress; community_report approvals map to accept_community_report and rejections map to dismiss_community_report; commodity_mapping approvals map to approve_commodity_mapping and rejections map to reject_commodity_mapping.`);
   }
 
+  async function voteCommunityReview(reviewId: string, vote: CommunityReviewVote) {
+    setCommunityReviews((currentReviews) => applyCommunityReviewVote(currentReviews, reviewId, vote));
+    const response = await fetch('/api/reviews/vote', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ reviewId, vote })
+    });
+    if (!response.ok) {
+      setStatus('error');
+      setMessage('Community review vote was rejected. Refresh before trying again.');
+      return;
+    }
+    const body = await response.json() as { reviews?: CommunityPriceReview[] };
+    if (body.reviews) setCommunityReviews(sortCommunityReviewsByTrust(body.reviews));
+    setStatus('ready');
+    setMessage(`${vote === 'upvote' ? 'Helpful' : 'Not helpful'} vote saved. Most trusted community price reviews are sorted first.`);
+  }
+
   return (
     <section className="mt-6 rounded-3xl border border-sky-200 bg-white p-5 shadow-sm" aria-label="Price report human review controls">
       <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-800">Signed-in reviewer actions</p>
@@ -107,6 +134,33 @@ export function PriceReportReviewActions() {
         <button className="rounded-full border border-slate-300 px-4 py-2 text-sm font-black text-slate-800" disabled={!assignmentId.trim()} onClick={() => decideReview('approve')} type="button">Approve evidence</button>
         <button className="rounded-full border border-slate-300 px-4 py-2 text-sm font-black text-slate-800" disabled={!assignmentId.trim()} onClick={() => decideReview('reject')} type="button">Reject evidence</button>
         <button className="rounded-full border border-amber-300 px-4 py-2 text-sm font-black text-amber-900" disabled={!assignmentId.trim()} onClick={() => decideReview('needs_more_info')} type="button">Request more info</button>
+      </div>
+
+      <div className="mt-6 rounded-3xl border border-emerald-200 bg-emerald-50/70 p-4" aria-label="Community review helpfulness voting">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Community helpfulness voting</p>
+        <h3 className="mt-2 text-xl font-black tracking-tight text-slate-950">Most trusted price reviews first</h3>
+        <p className="mt-2 text-sm leading-6 text-slate-700">
+          Upvote useful price evidence or downvote noisy reports. The list is immediately re-ranked by trust score before shoppers use community contributions.
+        </p>
+        <ul className="mt-4 grid gap-3 lg:grid-cols-3">
+          {communityReviews.map((review) => (
+            <li className="rounded-2xl border border-emerald-200 bg-white p-4 text-sm shadow-sm" key={review.id}>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="font-black text-slate-950">{review.productName}</p>
+                  <p className="mt-1 font-semibold text-slate-700">{review.priceLabel} · {review.storeName}</p>
+                </div>
+                <p className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-900">Trust {communityReviewTrustScore(review)}</p>
+              </div>
+              <p className="mt-3 text-slate-700">{review.body}</p>
+              <p className="mt-2 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">{review.reviewerLabel} · {review.upvotes} up · {review.downvotes} down</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <button className="rounded-full border border-emerald-300 px-3 py-1.5 text-xs font-black text-emerald-900" onClick={() => voteCommunityReview(review.id, 'upvote')} type="button">Helpful</button>
+                <button className="rounded-full border border-slate-300 px-3 py-1.5 text-xs font-black text-slate-700" onClick={() => voteCommunityReview(review.id, 'downvote')} type="button">Not helpful</button>
+              </div>
+            </li>
+          ))}
+        </ul>
       </div>
 
       {queue?.assignments?.length ? (
