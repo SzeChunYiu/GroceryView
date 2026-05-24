@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { planPantryReplenishment } from '@groceryview/core';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { pantryReplenishmentInput } from '@/lib/demo-data';
+import { pantryReplenishmentInput, pantryReplenishmentPlan } from '@/lib/demo-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -23,8 +23,7 @@ export default function PantryPlannerPage() {
   const plan = planPantryReplenishment(pantryReplenishmentInput);
   const { householdId, replenishment, expiringSoonProductIds } = plan;
   const coverage = {
-    visiblePantryItems: pantryReplenishmentInput.pantry.length,
-    dealBackedItems: pantryReplenishmentInput.deals.length,
+    ...pantryReplenishmentPlan.coverage,
     confidence: 'medium' as const,
     caveat: 'Uses visible pantry fixtures, household basket rows, usage events, and current deal rows only; missing authenticated inventory remains excluded.'
   };
