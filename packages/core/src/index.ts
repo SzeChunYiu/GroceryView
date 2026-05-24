@@ -1755,15 +1755,24 @@ export type FixedBasketIndex = {
   label: string;
   baseDate: string;
   currentDate: string;
-  value: number;
-  movementPercent: number;
+  value: number | null;
+  movementPercent: number | null;
   confidence: 'low' | 'medium' | 'high';
   components: IndexComponent[];
 };
 
 export function calculateFixedBasketIndex(input: FixedBasketIndexInput): FixedBasketIndex {
   if (input.components.length === 0) {
-    throw new Error('At least one component is required to calculate an index.');
+    return {
+      id: input.id,
+      label: input.label,
+      baseDate: input.baseDate,
+      currentDate: input.currentDate,
+      value: null,
+      movementPercent: null,
+      confidence: 'low',
+      components: input.components
+    };
   }
   const base = input.components.reduce((sum, component) => sum + component.baseUnitPrice * component.weight, 0);
   const current = input.components.reduce((sum, component) => sum + component.currentUnitPrice * component.weight, 0);
@@ -2265,8 +2274,8 @@ export function calculateBrandTierIndices(observations: BrandTierPriceObservatio
     .map((index) => ({
       brandTier: index.id.replace('-index', '') as BrandTier,
       label: index.label,
-      value: index.value,
-      movementPercent: index.movementPercent,
+      value: index.value ?? 0,
+      movementPercent: index.movementPercent ?? 0,
       categoryCount: index.components.length
     }))
     .sort((a, b) => a.value - b.value);

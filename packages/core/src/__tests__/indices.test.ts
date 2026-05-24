@@ -20,6 +20,20 @@ describe('calculateFixedBasketIndex', () => {
     assert.equal(index.confidence, 'medium');
   });
 
+  it('returns a low-confidence null index for an empty fixed basket', () => {
+    const index = calculateFixedBasketIndex({
+      id: 'empty-index',
+      label: 'Empty Index',
+      baseDate: '2026-01-01',
+      currentDate: '2026-05-19',
+      components: []
+    });
+
+    assert.equal(index.value, null);
+    assert.equal(index.movementPercent, null);
+    assert.equal(index.confidence, 'low');
+  });
+
   it('separates brand-tier indices and summarizes private-label savings', () => {
     const summary = calculateBrandTierIndices([
       { brandTier: 'national', category: 'Coffee', baseUnitPrice: 100, currentUnitPrice: 110 },
