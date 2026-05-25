@@ -2,8 +2,10 @@ import Link from 'next/link';
 import { compareBasketStrategies, summarizeStoreBasketCoverage } from '@groceryview/core';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { ExpiringPromotionRail } from '@/components/expiring-promotion-rail';
 import { StockUpListActions } from '@/components/stock-up-list-actions';
-import { budgetStretchKronaOptimizer, familyBulkUnitPriceComparison, loyaltyAdjustedBasketComparison, mealPrepBulkBuyOptimizer, multiWeekStockUpList, oneTapBasketOptimizer, savedBasketAutoReorderPlan, weeklyBasketOptimizerInput } from '@/lib/demo-data';
+import { budgetStretchKronaOptimizer, expiryDealReports, familyBulkUnitPriceComparison, loyaltyAdjustedBasketComparison, mealPrepBulkBuyOptimizer, multiWeekStockUpList, oneTapBasketOptimizer, savedBasketAutoReorderPlan, weeklyBasket, weeklyBasketOptimizerInput } from '@/lib/demo-data';
+import { buildExpiringPromotionRail } from '@/lib/deal-context';
 import { weeklyRecurringBasketPlan } from '@/lib/recurring-basket';
 import { recurringBasketDigestContract, weeklyBasketChangeDigest } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
@@ -41,6 +43,12 @@ export default function WeeklyBasketPage() {
 
   const comparison = compareBasketStrategies(weeklyBasketOptimizerInput);
   const coverage = summarizeStoreBasketCoverage(weeklyBasketOptimizerInput);
+  const promotionSnapshotAt = new Date(Math.max(...expiryDealReports.map((report) => Date.parse(report.reportedAt))));
+  const expiringPromotions = buildExpiringPromotionRail({
+    basketProductIds: [...weeklyBasketOptimizerInput.items.map((item) => item.productId), ...weeklyBasket.map((item) => item.slug)],
+    now: promotionSnapshotAt,
+    promotions: expiryDealReports
+  });
 
   if (comparison.cheapestByProduct.assignments.length === 0 || coverage.stores.length === 0) {
     return <WeeklyBasketEmptyState />;
@@ -55,6 +63,8 @@ export default function WeeklyBasketPage() {
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
         This page calls compareBasketStrategies and summarizeStoreBasketCoverage with visible favorite-store price rows, showing split-shop savings and store coverage without estimating missing prices.
       </p>
+
+      <ExpiringPromotionRail items={expiringPromotions} snapshotLabel={`Snapshot ${promotionSnapshotAt.toISOString().slice(0, 10)}`} />
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr_1fr]">
         <Card>

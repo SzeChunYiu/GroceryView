@@ -3,13 +3,31 @@
 import { useGeolocation } from '@/hooks/useGeolocation';
 import type { StoreReliabilityScore } from '@/lib/freshness';
 
+type RouteHint = {
+  label: string;
+  minutes: number;
+  distanceLabel: string;
+};
+
 type StoreDistanceCardProps = {
   fallbackLabel?: string;
   reliability?: StoreReliabilityScore;
+  routeHints?: RouteHint[];
   storeName?: string;
 };
 
-export function StoreDistanceCard({ fallbackLabel = 'Search by city or choose a store manually.', reliability, storeName = 'nearby store' }: StoreDistanceCardProps) {
+const defaultRouteHints: RouteHint[] = [
+  { label: 'Walk', minutes: 8, distanceLabel: '0.6 km' },
+  { label: 'Drive', minutes: 4, distanceLabel: '0.6 km' },
+  { label: 'Transit', minutes: 7, distanceLabel: '0.6 km' }
+];
+
+export function StoreDistanceCard({
+  fallbackLabel = 'Search by city or choose a store manually.',
+  reliability,
+  routeHints = defaultRouteHints,
+  storeName = 'nearby store'
+}: StoreDistanceCardProps) {
   const { attempts, error, isLoading, position, requestLocation, retryGuidance } = useGeolocation();
   const showFallback = Boolean(error && attempts > 0);
 
@@ -28,6 +46,15 @@ export function StoreDistanceCard({ fallbackLabel = 'Search by city or choose a 
           Location ready within {Math.round(position.accuracy)} m accuracy: {position.latitude.toFixed(4)}, {position.longitude.toFixed(4)}.
         </p>
       ) : null}
+      <div className="mt-4 grid gap-2 sm:grid-cols-3" aria-label="Nearest store route estimates">
+        {routeHints.map((hint) => (
+          <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-3" key={hint.label}>
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">{hint.label}</p>
+            <p className="mt-1 text-lg font-black text-emerald-950">{hint.minutes} min</p>
+            <p className="mt-1 text-xs font-semibold text-emerald-900">{hint.distanceLabel} estimate</p>
+          </div>
+        ))}
+      </div>
       {showFallback ? (
         <div className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 p-3 text-sm font-semibold text-amber-950" role="alert">
           <p className="font-black">{error?.message}</p>

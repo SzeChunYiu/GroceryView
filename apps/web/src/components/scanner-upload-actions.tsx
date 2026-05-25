@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useRef, useState } from 'react';
+import type { BarcodeMissFallbackProduct } from '@/lib/openfoodfacts-catalog';
 
 type ScannerStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
 type BrowserSession = { accessToken: string; userId: string };
@@ -26,6 +27,7 @@ type ScanProcessResponse = {
   result?: {
     status: string;
     kind: 'receipt' | 'barcode';
+    productId?: string | null;
     totalAmount?: number;
     confidence?: number;
   };
@@ -42,16 +44,20 @@ function newScanId(prefix: 'receipt' | 'barcode') {
   return `${prefix}-${Date.now()}`;
 }
 
-export function ScannerUploadActions() {
+export function ScannerUploadActions({ fallbackProducts = [] }: Readonly<{ fallbackProducts?: BarcodeMissFallbackProduct[] }>) {
   const [barcode, setBarcode] = useState('0735000123456');
   const [byteLength, setByteLength] = useState('123456');
   const [contentType, setContentType] = useState('image/jpeg');
   const [status, setStatus] = useState<ScannerStatus>('idle');
   const [message, setMessage] = useState('No anonymous scan uploads. Sign in first to request private upload tickets or process barcode scans.');
   const [cameraReady, setCameraReady] = useState(false);
+  const [barcodeFallbackActive, setBarcodeFallbackActive] = useState(false);
+  const [manualProductName, setManualProductName] = useState('');
+  const [manualStoreHint, setManualStoreHint] = useState('');
   const [receiptHistory, setReceiptHistory] = useState<ReceiptPurchaseHistoryItem[]>([]);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const normalizedBarcode = barcode.replace(/\D/g, '');
 
   function requireSession(): BrowserSession | null {
     const session = readSession();
@@ -212,7 +218,38 @@ export function ScannerUploadActions() {
       headers: { 'content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
       body: JSON.stringify({ scanId, kind: 'barcode', payload: barcode })
     });
-    await handleResponse(response, `Barcode processed for ${scanId}; review work items are returned when matching needs human review.`);
+    if (!response.ok) {
+      setBarcodeFallbackActive(true);
+      setStatus('error');
+      setMessage(`Barcode lookup missed for ${normalizedBarcode || barcode}. Review likely products, enter the product manually, or report it so catalogue coverage can improve.`);
+      return;
+    }
+
+    const body = (await response.json().catch(() => null)) as ScanProcessResponse | null;
+    const result = body?.result;
+    if (result?.kind === 'barcode' && (result.status === 'failed_no_provider' || result.productId === null || (result.status === 'matched' && !result.productId))) {
+      setBarcodeFallbackActive(true);
+      setStatus('error');
+      setMessage(`No catalogue match was returned for ${normalizedBarcode || barcode}. Use the fallback actions below instead of dead-ending the scan.`);
+      return;
+    }
+
+    setBarcodeFallbackActive(false);
+    setStatus('ready');
+    setMessage(`Barcode processed for ${scanId}; review work items are returned when matching needs human review.`);
+  }
+
+  function reportMissingProduct() {
+    setBarcodeFallbackActive(true);
+    setStatus('ready');
+    setMessage(`Missing-product report queued for barcode ${normalizedBarcode || barcode}. The barcode, manual hints, and likely-product review context can feed catalogue coverage.`);
+  }
+
+  function submitManualBarcodeFallback(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setBarcodeFallbackActive(true);
+    setStatus('ready');
+    setMessage(`Manual product candidate "${manualProductName.trim() || 'unnamed product'}" queued for barcode ${normalizedBarcode || barcode}${manualStoreHint.trim() ? ` from ${manualStoreHint.trim()}` : ''}.`);
   }
 
   return (
@@ -271,12 +308,60 @@ export function ScannerUploadActions() {
           <input
             className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-950"
             id="barcode-payload"
-            onChange={(event) => setBarcode(event.target.value)}
+            onChange={(event) => {
+              setBarcode(event.target.value);
+              setBarcodeFallbackActive(false);
+            }}
             value={barcode}
           />
           <button className="mt-3 rounded-full bg-slate-950 px-4 py-2 text-sm font-black text-white" disabled={!barcode.trim()} type="submit">Process barcode scan</button>
         </form>
       </div>
+      {barcodeFallbackActive ? (
+        <section className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4" aria-label="Barcode lookup fallback">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h3 className="text-sm font-black uppercase tracking-[0.18em] text-amber-800">Barcode lookup fallback</h3>
+              <p className="mt-2 text-sm font-semibold leading-6 text-amber-950">
+                No exact product match was returned for {normalizedBarcode || barcode}. Keep the scanner useful by checking likely catalogue rows, entering the product manually, or reporting the missing barcode.
+              </p>
+            </div>
+            <button className="rounded-full bg-amber-900 px-4 py-2 text-sm font-black text-white" onClick={reportMissingProduct} type="button">Report missing product</button>
+          </div>
+          <div className="mt-4 grid gap-3 lg:grid-cols-3">
+            {fallbackProducts.map((product) => (
+              <a className="rounded-2xl border border-amber-100 bg-white p-3 hover:border-amber-700" href={`/products/${product.slug}`} key={product.code}>
+                <p className="text-sm font-black text-slate-950">{product.name}</p>
+                <p className="mt-1 text-xs font-semibold text-slate-600">{product.brands || 'Brand not reported'} · {product.quantity || 'quantity not reported'}</p>
+                <p className="mt-2 text-xs font-bold text-amber-900">{product.matchReason}</p>
+              </a>
+            ))}
+          </div>
+          <form className="mt-4 grid gap-3 rounded-2xl bg-white/80 p-3 md:grid-cols-[1fr_1fr_auto]" onSubmit={submitManualBarcodeFallback}>
+            <label className="text-sm font-black text-slate-950" htmlFor="manual-product-name">
+              Product name
+              <input
+                className="mt-2 w-full rounded-2xl border border-amber-100 bg-white px-4 py-3 text-sm font-semibold text-slate-950"
+                id="manual-product-name"
+                onChange={(event) => setManualProductName(event.target.value)}
+                placeholder="e.g. pasta 500 g"
+                value={manualProductName}
+              />
+            </label>
+            <label className="text-sm font-black text-slate-950" htmlFor="manual-store-hint">
+              Store hint
+              <input
+                className="mt-2 w-full rounded-2xl border border-amber-100 bg-white px-4 py-3 text-sm font-semibold text-slate-950"
+                id="manual-store-hint"
+                onChange={(event) => setManualStoreHint(event.target.value)}
+                placeholder="optional"
+                value={manualStoreHint}
+              />
+            </label>
+            <button className="self-end rounded-full bg-slate-950 px-4 py-3 text-sm font-black text-white" type="submit">Save manual entry</button>
+          </form>
+        </section>
+      ) : null}
       <p aria-live="polite" className="mt-4 rounded-2xl bg-indigo-50 p-3 text-sm font-bold text-indigo-950" data-status={status}>{message}</p>
       {receiptHistory.length > 0 ? (
         <section className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4" aria-label="Receipt purchase history">

@@ -29,6 +29,8 @@ export type PriceDropDiscoveryProduct = {
   name: string;
   brand?: string | null;
   category?: string | null;
+  locality?: string | null;
+  quantity?: string | null;
   observations: PriceDropDiscoveryObservation[];
 };
 
@@ -38,13 +40,29 @@ export type PriceDropDiscoveryRailItem = {
   productName: string;
   brand: string;
   category: string;
+  locality: string;
   latestPrice: number;
   previousWeekPrice: number;
   dropAmount: number;
   dropPercent: number;
+  latestUnitPrice: number;
+  previousWeekUnitPrice: number;
+  unitPriceDrop: number;
+  unitPriceUnit: string;
   latestObservedAt: string;
   previousObservedAt: string;
   evidenceLabel: string;
+};
+
+export type PriceVolatilityLevel = 'high' | 'medium' | 'low';
+
+export type PriceVolatilityScore = {
+  score: number;
+  level: PriceVolatilityLevel;
+  swingPercent: number;
+  freshnessDays: number;
+  label: string;
+  detail: string;
 };
 
 function includesAny(value: string, needles: string[]) {
@@ -113,6 +131,23 @@ export function getPriceDropReasons(input: PriceDropReasonInput): PriceDropReaso
   return reasons;
 }
 
+
+function normalizedUnitPrice(price: number, quantity?: string | null) {
+  const text = (quantity ?? '').toLocaleLowerCase('sv-SE').replace(',', '.');
+  const match = text.match(/(\d+(?:\.\d+)?)\s*(kg|g|l|ml|cl)\b/);
+  if (!match) return { value: price, unit: 'item' };
+
+  const amount = Number.parseFloat(match[1] ?? '0');
+  if (!Number.isFinite(amount) || amount <= 0) return { value: price, unit: 'item' };
+
+  const unit = match[2];
+  if (unit === 'kg') return { value: price / amount, unit: 'kg' };
+  if (unit === 'g') return { value: price / (amount / 1000), unit: 'kg' };
+  if (unit === 'l') return { value: price / amount, unit: 'L' };
+  if (unit === 'cl') return { value: price / (amount / 100), unit: 'L' };
+  return { value: price / (amount / 1000), unit: 'L' };
+}
+
 function weekComparisonFor(observations: PriceDropDiscoveryObservation[]) {
   const ordered = observations
     .filter((observation) => Number.isFinite(observation.price) && Number.isFinite(Date.parse(`${observation.date}T00:00:00.000Z`)))
@@ -139,6 +174,8 @@ export function buildPriceDropDiscoveryRail(products: PriceDropDiscoveryProduct[
       if (!comparison) return [];
       const dropAmount = comparison.previousWeek.price - comparison.latest.price;
       const dropPercent = dropAmount / comparison.previousWeek.price;
+      const latestUnit = normalizedUnitPrice(comparison.latest.price, product.quantity);
+      const previousUnit = normalizedUnitPrice(comparison.previousWeek.price, product.quantity);
 
       return [{
         rank: 0,
@@ -146,10 +183,15 @@ export function buildPriceDropDiscoveryRail(products: PriceDropDiscoveryProduct[
         productName: product.name,
         brand: product.brand || 'Brand not reported',
         category: product.category || 'grocery',
+        locality: product.locality || 'Nearby market',
         latestPrice: comparison.latest.price,
         previousWeekPrice: comparison.previousWeek.price,
         dropAmount,
         dropPercent,
+        latestUnitPrice: latestUnit.value,
+        previousWeekUnitPrice: previousUnit.value,
+        unitPriceDrop: previousUnit.value - latestUnit.value,
+        unitPriceUnit: latestUnit.unit,
         latestObservedAt: comparison.latest.date,
         previousObservedAt: comparison.previousWeek.date,
         evidenceLabel: `${comparison.observationCount} dated observations; week-over-week compares ${comparison.previousWeek.date} to ${comparison.latest.date}`
@@ -157,9 +199,42 @@ export function buildPriceDropDiscoveryRail(products: PriceDropDiscoveryProduct[
     })
     .sort((left, right) => (
       right.dropPercent - left.dropPercent
-      || right.dropAmount - left.dropAmount
+      || right.unitPriceDrop - left.unitPriceDrop
       || left.productName.localeCompare(right.productName, 'sv')
     ))
     .slice(0, Math.max(1, Math.min(limit, 12)))
     .map((item, index) => ({ ...item, rank: index + 1 }));
+}
+
+export function buildLocalPriceDropFeed(products: PriceDropDiscoveryProduct[], limit = 8, locality = 'Stockholm area'): PriceDropDiscoveryRailItem[] {
+  return buildPriceDropDiscoveryRail(products.map((product) => ({
+    ...product,
+    locality: product.locality || locality
+  })), limit);
+}
+
+export function calculatePriceVolatilityScore({
+  swingPercent,
+  lastObservedAt,
+  now = new Date().toISOString()
+}: {
+  swingPercent: number;
+  lastObservedAt?: string | null;
+  now?: string;
+}): PriceVolatilityScore {
+  const freshnessDays = lastObservedAt && Date.parse(lastObservedAt) > 0
+    ? Math.max(0, Math.round((Date.parse(now) - Date.parse(lastObservedAt)) / 86_400_000))
+    : 90;
+  const freshnessBoost = freshnessDays <= 7 ? 1 : freshnessDays <= 21 ? 0.75 : freshnessDays <= 45 ? 0.45 : 0.25;
+  const score = Math.round(Math.min(100, Math.max(0, swingPercent * 3 * freshnessBoost)));
+  const level: PriceVolatilityLevel = score >= 60 ? 'high' : score >= 30 ? 'medium' : 'low';
+
+  return {
+    score,
+    level,
+    swingPercent,
+    freshnessDays,
+    label: `${level} volatility`,
+    detail: `${swingPercent.toFixed(1)}% recent swing · observed ${freshnessDays}d ago`
+  };
 }

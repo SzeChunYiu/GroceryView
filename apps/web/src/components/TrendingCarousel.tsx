@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { ArrowDownRight, ArrowUpRight, History } from 'lucide-react';
 import type { TrendingProductPriceChange } from '@groceryview/db';
-import { buildCitySearchTrends } from '@/lib/trends';
-import { TrendingSearchModule } from '@/app/page-sections/trending';
+import { buildBrandLeaderboardTrends, buildCitySearchTrends } from '@/lib/trends';
+import { BrandLeaderboardModule, TrendingSearchModule } from '@/app/page-sections/trending';
 import type { PersonalizedReorderItem } from '@/lib/personalization';
 
 function formatMoney(value: number, currency: string) {
@@ -61,11 +61,13 @@ export function TrendingCarousel({ items, reorderItems = [] }: Readonly<{
   reorderItems?: PersonalizedReorderItem[];
 }>) {
   const searchFeed = buildCitySearchTrends({ city: 'stockholm', limit: 6 });
+  const brandFeed = buildBrandLeaderboardTrends({ city: 'stockholm', limit: 5 });
 
   if (items.length === 0) {
     return (
       <>
         <PersonalizedReorderRail items={reorderItems} />
+        <BrandLeaderboardModule feed={brandFeed} />
         <TrendingSearchModule feed={searchFeed} />
       </>
     );
@@ -129,6 +131,7 @@ export function TrendingCarousel({ items, reorderItems = [] }: Readonly<{
           })}
         </div>
       </section>
+      <BrandLeaderboardModule feed={brandFeed} />
       <TrendingSearchModule feed={searchFeed} />
     </>
   );

@@ -8,6 +8,7 @@ import {
   Database,
   Flame,
   Heart,
+  ScanLine,
   Map,
   Newspaper,
   PackageSearch,
@@ -19,9 +20,10 @@ import {
   Utensils
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { SearchBar } from './SearchBar';
 import { LanguagePreferenceSwitcher } from '@/components/language-preference-switcher';
+import { trackPwaInstallAnalytics } from '@/lib/analytics';
 import { defaultLocale, localeCookieName, localeStorageKey, normalizeLocale, type SupportedLocale } from '@/lib/i18n';
 
 type NavItem = {
@@ -67,12 +69,21 @@ const navGroups: NavGroup[] = [
     ]
   },
   {
+    label: 'Trip',
+    icon: ScanLine,
+    items: [
+      { href: '/scanner', label: 'Scanner', icon: ScanLine },
+      { href: '/list', label: 'Current list', icon: ShoppingBasket },
+      { href: '/screener', label: 'Nearby deals', icon: Tags },
+      { href: '/watchlist', label: 'Watchlist', icon: Heart }
+    ]
+  },
+  {
     label: 'Personal',
     icon: Heart,
     items: [
       { href: '/savings-dashboard', label: 'Savings', icon: PiggyBank },
       { href: '/stockholm/my-flyer', label: 'My Flyer', icon: Newspaper, match: 'my-flyer' },
-      { href: '/watchlist', label: 'Watchlist', icon: Heart },
       { href: '/weekly-basket', label: 'Weekly basket', icon: ShoppingBasket },
       { href: '/meal-planner', label: 'Meal planner', icon: Utensils },
       { href: '/pantry-inventory', label: 'Pantry inventory', icon: ShoppingBasket }
@@ -103,6 +114,13 @@ function isInstalledDisplayMode() {
   return window.matchMedia('(display-mode: standalone)').matches || (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
 }
 
+function installBannerPlatform() {
+  const userAgent = window.navigator.userAgent;
+  if (/iphone|ipad|ipod/i.test(userAgent)) return 'ios';
+  if (/android/i.test(userAgent)) return 'android';
+  return 'desktop';
+}
+
 function isNavItemActive(item: NavItem, pathname: string) {
   if (item.match === 'my-flyer') return pathname === item.href || pathname.endsWith('/my-flyer');
   if (item.match === 'exact' || item.href === '/') return pathname === item.href;
@@ -127,14 +145,32 @@ function navItemClassName(isActive: boolean, surface: 'mobile' | 'menu') {
 
 function InstallBanner() {
   const [isVisible, setIsVisible] = useState(false);
+  const trackedViewRef = useRef(false);
 
   useEffect(() => {
     setIsVisible(window.localStorage.getItem(installBannerDismissedKey) !== 'true' && !isInstalledDisplayMode());
   }, []);
 
+  useEffect(() => {
+    if (!isVisible || trackedViewRef.current) return;
+    trackedViewRef.current = true;
+    trackPwaInstallAnalytics({
+      action: 'prompt_impression',
+      canInstall: false,
+      platform: installBannerPlatform(),
+      source: 'install_banner'
+    });
+  }, [isVisible]);
+
   if (!isVisible) return null;
 
   function dismissBanner() {
+    trackPwaInstallAnalytics({
+      action: 'banner_dismissed',
+      canInstall: false,
+      platform: installBannerPlatform(),
+      source: 'install_banner'
+    });
     window.localStorage.setItem(installBannerDismissedKey, 'true');
     setIsVisible(false);
   }

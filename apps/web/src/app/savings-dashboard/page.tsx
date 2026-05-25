@@ -2,12 +2,13 @@ import Link from 'next/link';
 import { PiggyBank } from 'lucide-react';
 import { CategoryInflationCard } from '@/components/category-inflation-card';
 import { ConfidenceBadge } from '@/components/confidence-badge';
-import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { Card, Eyebrow, PageShell, RoutePerformanceBudgetPanel, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { elderlyFixedIncomeBudgetTracker, elderlyStaplesStabilityTracker, grocerySpendForecast, personalGroceryInflation, savingsDashboard, studentWeeklyBudgetTracker } from '@/lib/demo-data';
 import { buildCategoryInflationTrends } from '@/lib/trends';
 import { ecoBasketScorecard } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
+import { recentRoutePerformanceBudgetReports } from '@/lib/telemetry';
 
 export function generateMetadata() {
   const metadata = routeMetadata({
@@ -74,6 +75,7 @@ export default function SavingsDashboardPage() {
     .slice(0, 5);
   const visibleWatchpoints = savingsDashboard.watchpoints.slice(0, 4);
   const categoryInflationTrends = buildCategoryInflationTrends({ limit: 4 });
+  const forecastReceiptCount = grocerySpendForecast.confidenceDrivers.receiptCount;
 
   return (
     <PageShell>
@@ -109,6 +111,10 @@ export default function SavingsDashboardPage() {
         </Card>
       </div>
 
+      <div className="mt-6">
+        <RoutePerformanceBudgetPanel reports={recentRoutePerformanceBudgetReports} />
+      </div>
+
       <section className="mt-6">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
@@ -137,7 +143,7 @@ export default function SavingsDashboardPage() {
           <ConfidenceBadge
             level={grocerySpendForecast.confidence}
             label={`${grocerySpendForecast.confidence} forecast confidence`}
-            sampleSize={grocerySpendForecast.monthSummaries.reduce((sum, month) => sum + month.receiptCount, 0)}
+            sampleSize={forecastReceiptCount}
           />
         </div>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
@@ -163,9 +169,47 @@ export default function SavingsDashboardPage() {
             </div>
           ))}
         </div>
-        {grocerySpendForecast.warnings.length > 0 ? (
-          <p className="mt-4 rounded-2xl bg-amber-50 p-4 text-sm font-bold text-amber-950">{grocerySpendForecast.warnings.join(' ')}</p>
-        ) : null}
+        <details className="mt-4 rounded-2xl border border-emerald-200 bg-white/90 p-4">
+          <summary className="cursor-pointer text-sm font-black uppercase tracking-[0.16em] text-emerald-900">Explain forecast confidence</summary>
+          <div className="mt-4 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+            <div>
+              <p className="text-sm font-bold text-slate-700">
+                Confidence is based on {grocerySpendForecast.confidenceDrivers.observedMonths} observed months and {forecastReceiptCount} receipts. High confidence requires at least {grocerySpendForecast.confidenceDrivers.highThresholdMonths} months and {grocerySpendForecast.confidenceDrivers.highThresholdReceipts} receipts; medium starts at {grocerySpendForecast.confidenceDrivers.mediumThresholdMonths} months and {grocerySpendForecast.confidenceDrivers.mediumThresholdReceipts} receipts.
+              </p>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                {grocerySpendForecast.monthSummaries.map((month) => (
+                  <div className="rounded-xl bg-emerald-50 p-3 text-sm font-semibold text-slate-700" key={`confidence-${month.month}`}>
+                    <span className="font-black text-slate-950">{month.month}</span>: {month.receiptCount} receipts · {formatSek(month.spend)}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="rounded-2xl bg-slate-50 p-4">
+              <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">Skipped rows</p>
+              {grocerySpendForecast.skippedRows.length > 0 ? (
+                <ul className="mt-2 space-y-2 text-sm font-semibold text-slate-700">
+                  {grocerySpendForecast.skippedRows.map((row, index) => (
+                    <li key={`${row.receiptId ?? row.purchasedAt}-${row.reason}-${index}`}>
+                      <span className="font-black text-slate-950">{row.receiptId ?? row.purchasedAt}</span>: {row.detail}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-2 text-sm font-semibold text-slate-700">No purchase_history rows were skipped before computing this forecast.</p>
+              )}
+              {grocerySpendForecast.warnings.length > 0 ? (
+                <div className="mt-3 rounded-xl bg-amber-50 p-3 text-sm font-bold text-amber-950">
+                  <p className="font-black">Warnings</p>
+                  <ul className="mt-1 list-disc space-y-1 pl-4">
+                    {grocerySpendForecast.warnings.map((warning, index) => <li key={`${warning}-${index}`}>{warning}</li>)}
+                  </ul>
+                </div>
+              ) : (
+                <p className="mt-3 rounded-xl bg-emerald-50 p-3 text-sm font-bold text-emerald-950">No warnings: all counted receipts are dated on or before the forecast as-of date and have valid spend.</p>
+              )}
+            </div>
+          </div>
+        </details>
       </Card>
 
       <Card className="mt-6 border-violet-200 bg-violet-50">

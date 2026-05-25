@@ -1,6 +1,8 @@
 import Link from 'next/link';
-import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { Card, Eyebrow, PageShell, SourceFreshnessStatusBadge } from '@/components/data-ui';
+import { DataGrid, dataGridActionClass } from '@/components/data-grid';
 import { axfoodProducts } from '@/lib/axfood-products';
+import { buildDuplicateReviewRows, type ProductRecord } from '@/lib/deduplicate-products';
 import { buildUnitNormalizationQaReport } from '@/lib/normalization';
 import { pricedProducts } from '@/lib/openprices-products';
 import {
@@ -22,7 +24,7 @@ import {
   timescaleDbEvaluation
 } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
-import { partnerOnboardingIntake } from '@/lib/source-health';
+import { partnerOnboardingIntake, sourceFreshnessSlaDashboard, sourceFreshnessSlaSummary } from '@/lib/source-health';
 
 const unitNormalizationQaReport = buildUnitNormalizationQaReport([
   ...axfoodProducts.map((product) => ({
@@ -38,6 +40,33 @@ const unitNormalizationQaReport = buildUnitNormalizationQaReport([
     price: product.priceMedian
   }))
 ]);
+
+const duplicateReviewProducts: ProductRecord[] = [
+  ...axfoodProducts.slice(0, 120).map((product) => ({
+    id: `axfood:${product.code}`,
+    name: product.name,
+    brand: product.brand,
+    category: product.category,
+    size: product.subline,
+    upc: product.code
+  })),
+  ...pricedProducts.slice(0, 120).map((product) => ({
+    id: `openprices:${product.code}`,
+    name: product.name,
+    brand: product.brands,
+    category: product.category,
+    size: product.quantity,
+    upc: product.code
+  }))
+];
+
+const duplicateReviewRows = buildDuplicateReviewRows(duplicateReviewProducts, 0.45).slice(0, 8);
+
+const duplicateReviewActionLabels = {
+  merge: 'Merge',
+  ignore: 'Ignore',
+  confidence: 'Check confidence'
+};
 
 export function generateMetadata() {
   return routeMetadata('/data-sources');
@@ -59,6 +88,115 @@ export default function DataSourcesPage() {
         <Metric label="Source groups" value={sourceCoverage.length.toLocaleString('sv-SE')} />
         <Metric label="Brand ledgers" value={storeBrandLedger.length.toLocaleString('sv-SE')} />
       </div>
+
+      <Card className="mt-6 border-cyan-200 bg-cyan-50/70">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-cyan-800">Source freshness SLA</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Ingest lag, rows, and failure status by chain</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Each visible source now reports its latest successful ingest, row count, SLA target, and failure status before stale inputs can silently drive price comparison claims.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-cyan-950 shadow-sm">
+            monitored {sourceFreshnessSlaSummary.monitoredAt}
+          </p>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          <Metric label="Monitored sources" value={sourceFreshnessSlaSummary.sourceCount.toLocaleString('sv-SE')} />
+          <Metric label="Rows under SLA" value={sourceFreshnessSlaSummary.rowCount.toLocaleString('sv-SE')} />
+          <Metric label="SLA breaches" value={sourceFreshnessSlaSummary.breachedSourceCount.toLocaleString('sv-SE')} />
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-2">
+          {sourceFreshnessSlaDashboard.map((source) => (
+            <section className="rounded-2xl border border-cyan-100 bg-white p-4 shadow-sm" key={`${source.chain}-${source.dataSource}`}>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">{source.chain}</p>
+                  <h3 className="mt-2 text-lg font-black text-slate-950">{source.dataSource}</h3>
+                </div>
+                <SourceFreshnessStatusBadge status={source.status} />
+              </div>
+              <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                <div className="rounded-xl bg-cyan-50 p-3">
+                  <p className="text-xs font-black uppercase tracking-[0.14em] text-cyan-800">Ingest lag</p>
+                  <p className="mt-1 text-lg font-black text-cyan-950">{source.ingestLagHours}h</p>
+                </div>
+                <div className="rounded-xl bg-slate-50 p-3">
+                  <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-600">Rows</p>
+                  <p className="mt-1 text-lg font-black text-slate-950">{source.rowCount.toLocaleString('sv-SE')}</p>
+                </div>
+                <div className="rounded-xl bg-slate-50 p-3">
+                  <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-600">SLA target</p>
+                  <p className="mt-1 text-lg font-black text-slate-950">{source.expectedRefreshHours}h</p>
+                </div>
+              </div>
+              <p className="mt-4 text-sm font-semibold leading-6 text-slate-700">
+                Latest successful ingest: {source.lastSuccessfulIngestAt}
+              </p>
+              <p className="mt-2 rounded-xl bg-amber-50 p-3 text-sm font-semibold leading-6 text-amber-950">
+                Failure status: {source.failureStatus}
+              </p>
+            </section>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-sky-200 bg-sky-50/70">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-sky-800">Admin duplicate review</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Suspected duplicate product clusters</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Reviewers can triage likely duplicate catalog records before fragmented price history reaches search: merge strong matches, ignore weak pairs, or send borderline confidence scores back to source QA.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-sky-900 shadow-sm">
+            {duplicateReviewRows.length.toLocaleString('sv-SE')} clusters queued
+          </p>
+        </div>
+        <DataGrid className="mt-5 overflow-x-auto bg-white" dense>
+          <table>
+            <thead>
+              <tr className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">
+                <th>Source record</th>
+                <th>Possible duplicate</th>
+                <th>Confidence</th>
+                <th>Signals</th>
+                <th>Review actions</th>
+              </tr>
+            </thead>
+            <tbody className="text-sm font-semibold text-slate-700">
+              {duplicateReviewRows.map((candidate) => (
+                <tr key={candidate.id}>
+                  <td>
+                    <p className="font-black text-slate-950">{candidate.source.name}</p>
+                    <p className="text-xs text-slate-500">{candidate.source.brand || 'Unknown brand'} · {candidate.source.size || 'size missing'}</p>
+                  </td>
+                  <td>
+                    <p className="font-black text-slate-950">{candidate.match.name}</p>
+                    <p className="text-xs text-slate-500">{candidate.match.brand || 'Unknown brand'} · {candidate.match.size || 'size missing'}</p>
+                  </td>
+                  <td>
+                    <p className="font-black text-sky-900">{Math.round(candidate.confidence * 100)}%</p>
+                    <p className="text-xs text-slate-500">{candidate.confidenceLabel}</p>
+                  </td>
+                  <td>{candidate.signals.join(', ') || 'similar names'}</td>
+                  <td>
+                    <div className="flex flex-wrap gap-2">
+                      <button className={`${dataGridActionClass} bg-emerald-50 text-emerald-800`} type="button">Merge</button>
+                      <button className={`${dataGridActionClass} bg-white`} type="button">Ignore</button>
+                      <button className={`${dataGridActionClass} bg-amber-50 text-amber-800`} type="button">
+                        {duplicateReviewActionLabels[candidate.recommendedAction]}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </DataGrid>
+      </Card>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50/70">
         <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
