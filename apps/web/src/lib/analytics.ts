@@ -402,6 +402,41 @@ export function trackDealShare(event: Omit<DealShareEvent, 'observedAt' | 'refer
   }).catch(() => undefined);
 }
 
+export type SponsoredPlacementImpression = {
+  label: string;
+  observedAt: string;
+  placementId: string;
+  provider: string;
+  separatedFromOrganicRankings: boolean;
+  surface: string;
+};
+
+const sponsoredPlacementImpressionEndpoint = '/api/analytics/sponsored-placement-impressions';
+
+export function trackSponsoredPlacementImpression(event: Omit<SponsoredPlacementImpression, 'observedAt'>) {
+  if (typeof window === 'undefined') return;
+
+  const payloadEvent: SponsoredPlacementImpression = {
+    ...event,
+    observedAt: new Date().toISOString()
+  };
+
+  window.dispatchEvent(new CustomEvent('groceryview:sponsored-placement-impression', { detail: payloadEvent }));
+  const payload = JSON.stringify({ event: payloadEvent });
+
+  if (navigator.sendBeacon) {
+    const sent = navigator.sendBeacon(sponsoredPlacementImpressionEndpoint, new Blob([payload], { type: 'application/json' }));
+    if (sent) return;
+  }
+
+  void fetch(sponsoredPlacementImpressionEndpoint, {
+    body: payload,
+    headers: { 'content-type': 'application/json' },
+    keepalive: true,
+    method: 'POST'
+  }).catch(() => undefined);
+}
+
 export type AffiliateLinkMetadata = {
   placement: 'deal_card' | 'store_link' | 'source_link';
   surface: string;

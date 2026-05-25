@@ -18,9 +18,17 @@
 
 import { useState } from "react";
 
+import {
+  buildBasketCouponStackOptimizer,
+  type BasketChainPrice,
+  type BasketStackOffer,
+} from "@/lib/deal-context";
+
 export type BasketBuilderProduct = {
   id: string;
   name: string;
+  chainPrices?: BasketChainPrice[];
+  dealStackOffers?: BasketStackOffer[];
 };
 
 export function addBasketBuilderProduct<T extends BasketBuilderProduct>(
@@ -42,6 +50,11 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
   products,
 }: BasketBuilderProps<T>) {
   const [basketProducts, setBasketProducts] = useState<T[]>([]);
+  const chainStacks = buildBasketCouponStackOptimizer({
+    items: basketProducts,
+    offers: basketProducts.flatMap((product) => product.dealStackOffers ?? []),
+  });
+  const bestChainStack = chainStacks[0];
 
   function add(product: T) {
     setBasketProducts((current) => addBasketBuilderProduct(current, product));
@@ -66,6 +79,25 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
           <li key={product.id}>{product.name}</li>
         ))}
       </ul>
+
+      {bestChainStack ? (
+        <section aria-label="Cheapest coupon stack by chain">
+          <h3>Cheapest valid coupon stack</h3>
+          <p>
+            {bestChainStack.chain}: {bestChainStack.totalLabel}
+            {bestChainStack.savings > 0
+              ? ` after ${bestChainStack.savingsLabel} in loyalty, coupon, and promotion savings`
+              : " with no eligible stacked savings"}
+          </p>
+          <ul>
+            {chainStacks.map((stack) => (
+              <li key={stack.chain}>
+                {stack.chain}: {stack.totalLabel} ({stack.savingsLabel} saved)
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
     </section>
   );
 }
