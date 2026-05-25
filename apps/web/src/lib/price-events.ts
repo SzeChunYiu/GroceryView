@@ -163,3 +163,32 @@ export function buildPriceDropDiscoveryRail(products: PriceDropDiscoveryProduct[
     .slice(0, Math.max(1, Math.min(limit, 12)))
     .map((item, index) => ({ ...item, rank: index + 1 }));
 }
+
+export type PriceDropDigestItem = PriceDropDiscoveryRailItem & {
+  store: string;
+  savingsBand: '10%+' | '20%+' | '30%+';
+};
+
+export type PriceDropDigestFilters = {
+  category?: string;
+  savings?: string;
+  store?: string;
+};
+
+export function buildPriceDropDigest(
+  products: PriceDropDiscoveryProduct[],
+  filters: PriceDropDigestFilters = {},
+  limit = 18
+): PriceDropDigestItem[] {
+  return buildPriceDropDiscoveryRail(products, 24)
+    .map((item) => ({
+      ...item,
+      store: item.brand.split(',')[0]?.trim() || 'Verified stores',
+      savingsBand: item.dropPercent >= 0.3 ? '30%+' : item.dropPercent >= 0.2 ? '20%+' : '10%+'
+    } satisfies PriceDropDigestItem))
+    .filter((item) => !filters.category || item.category === filters.category)
+    .filter((item) => !filters.store || item.store === filters.store)
+    .filter((item) => !filters.savings || item.savingsBand === filters.savings)
+    .sort((left, right) => right.latestObservedAt.localeCompare(left.latestObservedAt) || right.dropAmount - left.dropAmount)
+    .slice(0, Math.max(1, Math.min(limit, 24)));
+}
