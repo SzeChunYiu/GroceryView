@@ -313,11 +313,15 @@ export const routeMetadataCatalog = {
   },
   '/watchlist': {
     title: 'Grocery watchlist price alerts | GroceryView',
-    description: 'Track watchlist alerts, weekly personalised email digests, diaper price drops, budget essentials, and planned notifications from verified price rows.'
+    description: 'Track watchlist alerts, weekly personalised email digests, diaper price drops, budget essentials, and planned notifications from verified price rows.',
+    imagePath: '/pwa-icon.svg',
+    imageAlt: 'GroceryView watchlist price alerts'
   },
   '/weekly-basket': {
     title: 'Weekly grocery basket optimizer | GroceryView',
-    description: 'Compare weekly basket strategies, split-shop savings, family-pack unit prices, and recurring digest signals.'
+    description: 'Compare weekly basket strategies, split-shop savings, family-pack unit prices, and recurring digest signals.',
+    imagePath: '/pwa-icon.svg',
+    imageAlt: 'GroceryView weekly basket optimizer'
   }
 } satisfies Record<string, Omit<RouteMetadataConfig, 'path'>>;
 

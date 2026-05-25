@@ -3322,6 +3322,8 @@ ${seo}`;
     assert.match(seo, /alternates: \{ canonical:/);
     assert.match(seo, /openGraph:/);
     assert.match(seo, /twitter:/);
+    assert.match(seo, /'\/watchlist': \{[\s\S]*imagePath: '\/pwa-icon\.svg'[\s\S]*imageAlt: 'GroceryView watchlist price alerts'/);
+    assert.match(seo, /'\/weekly-basket': \{[\s\S]*imagePath: '\/pwa-icon\.svg'[\s\S]*imageAlt: 'GroceryView weekly basket optimizer'/);
     assert.match(seo, /robots:/);
     assert.match(seo, /GroceryView/);
 
