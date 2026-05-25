@@ -49,7 +49,7 @@ describe('verified-data UI', () => {
     assert.match(nav, /label: 'Markets'[\s\S]*label: 'Overview'[\s\S]*label: 'Chain index'[\s\S]*label: 'Categories'[\s\S]*label: 'Heatmap'[\s\S]*label: 'Screener'/);
     assert.match(nav, /label: 'Products'[\s\S]*label: 'Browse'[\s\S]*label: 'Compare'/);
     assert.match(nav, /label: 'Stores'[\s\S]*label: 'Map'[\s\S]*label: 'Stores'/);
-    assert.match(nav, /label: 'Personal'[\s\S]*label: 'Savings'[\s\S]*label: 'Watchlist'[\s\S]*label: 'Weekly basket'[\s\S]*label: 'Meal planner'/);
+    assert.match(nav, /label: 'Personal'[\s\S]*label: 'Savings'[\s\S]*label: 'My Flyer'[\s\S]*label: 'Watchlist'[\s\S]*label: 'Weekly basket'[\s\S]*label: 'Meal planner'/);
     assert.match(nav, /aria-haspopup="true"/);
     assert.match(nav, /group-focus-within:visible/);
     assert.match(nav, /group-hover:visible/);
@@ -2026,6 +2026,7 @@ ${seo}`;
     assert.match(bottomNav, /Markets/);
     assert.match(bottomNav, /Search/);
     assert.match(bottomNav, /Map/);
+    assert.match(bottomNav, /My Flyer/);
     assert.match(bottomNav, /Watchlist/);
     assert.match(bottomNav, /Me/);
     assert.match(dataUi, /import \{ BottomNav \} from '\.\/bottom-nav'/);

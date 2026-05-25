@@ -1,16 +1,22 @@
 'use client';
 
 import Link from 'next/link';
-import { Map, Search, Store, User, Watch } from 'lucide-react';
+import { Map, Newspaper, Search, Store, User, Watch } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 const bottomNavItems = [
   { href: '/', label: 'Markets', icon: Store, exact: true },
   { href: '/products', label: 'Search', icon: Search },
   { href: '/map', label: 'Map', icon: Map },
+  { href: '/stockholm/my-flyer', label: 'My Flyer', icon: Newspaper, match: 'my-flyer' },
   { href: '/watchlist', label: 'Watchlist', icon: Watch },
   { href: '/account', label: 'Me', icon: User }
 ];
+
+function isBottomNavItemActive(item: (typeof bottomNavItems)[number], pathname: string) {
+  if ('match' in item && item.match === 'my-flyer') return pathname === item.href || pathname.endsWith('/my-flyer');
+  return 'exact' in item && item.exact ? pathname === item.href : pathname === item.href || pathname.startsWith(`${item.href}/`);
+}
 
 export function BottomNav() {
   const pathname = usePathname();
@@ -20,10 +26,10 @@ export function BottomNav() {
       aria-label="Primary mobile navigation"
       className="fixed inset-x-3 bottom-3 z-30 rounded-[1.5rem] border border-white/45 bg-white/72 px-2 py-2 shadow-[0_18px_45px_rgba(15,23,42,0.22)] backdrop-blur-xl supports-[backdrop-filter]:bg-white/58 lg:hidden"
     >
-      <div className="grid grid-cols-5 gap-1">
+      <div className="grid grid-cols-6 gap-1">
         {bottomNavItems.map((item) => {
           const Icon = item.icon;
-          const isActive = item.exact ? pathname === item.href : pathname === item.href || pathname.startsWith(`${item.href}/`);
+          const isActive = isBottomNavItemActive(item, pathname);
 
           return (
             <Link
