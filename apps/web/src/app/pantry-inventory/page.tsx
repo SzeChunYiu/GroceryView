@@ -2,9 +2,10 @@
 
 import { useMemo, useState, type ReactNode } from 'react';
 import Link from 'next/link';
+import type { PantryDeal } from '@groceryview/core';
 import { AppNav } from '@/components/app-nav';
 import { BottomNav } from '@/components/bottom-nav';
-import { buildExpiryReminder, type PantryExpiryUrgency } from '@/lib/pantry';
+import { buildPantryDealEvidenceMap, buildExpiryReminder, type PantryExpiryUrgency } from '@/lib/pantry';
 
 type PantryStatus = 'stocked' | 'consumed' | 'low' | 'replenished';
 
@@ -47,16 +48,30 @@ const initialPantryItems: PantryInventoryItem[] = [
   { id: 'frozen-veg', name: 'Frozen vegetables', aisle: 'Freezer', quantity: '1 bag', expiresAt: null, recipeHref: '/meal-planner?ingredient=frozen-veg', replacementHref: '/deals?replace=frozen-veg', status: 'stocked' }
 ];
 
+const currentPantryDeals = [
+  { productId: 'oats', storeId: 'willys-stockholm', storeName: 'Willys Stockholm', price: 24.9, dealScore: 82 },
+  { productId: 'milk', storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', price: 17.5, dealScore: 76 }
+] satisfies PantryDeal[];
+
 function Card({ children, className = '' }: Readonly<{ children: ReactNode; className?: string }>) {
   return <section className={`rounded-[1.75rem] border border-slate-200 bg-white/88 p-5 shadow-sm ${className}`}>{children}</section>;
 }
 
+function formatDealPrice(price: number) {
+  return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(price);
+}
+
 export default function PantryInventoryPage() {
   const [items, setItems] = useState(initialPantryItems);
+  const dealEvidenceByProduct = useMemo(() => buildPantryDealEvidenceMap(
+    currentPantryDeals,
+    Object.fromEntries(items.map((item) => [item.id, item.replacementHref]))
+  ), [items]);
   const itemsWithExpiry = useMemo(() => items.map((item) => ({
     ...item,
+    dealEvidence: dealEvidenceByProduct[item.id],
     expiryReminder: buildExpiryReminder({ expiresAt: item.expiresAt })
-  })), [items]);
+  })), [dealEvidenceByProduct, items]);
   const statusCounts = useMemo(() => items.reduce<Record<PantryStatus, number>>((counts, item) => {
     counts[item.status] += 1;
     return counts;
@@ -108,47 +123,57 @@ export default function PantryInventoryPage() {
           </div>
 
           <div className="mt-5 space-y-3">
-            {itemsWithExpiry.map((item) => (
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4" key={item.id}>
-                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                  <div>
-                    <p className="text-xl font-black text-slate-950">{item.name}</p>
-                    <p className="mt-1 text-sm font-semibold text-slate-700">{item.quantity} · {item.aisle}</p>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      <span className={`inline-flex rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.14em] ${expiryStyles[item.expiryReminder.urgency]}`}>
-                        {item.expiryReminder.label}
-                      </span>
-                      {item.expiryReminder.urgency === 'expired' || item.expiryReminder.urgency === 'use-soon' ? (
-                        <>
-                          <Link className="inline-flex rounded-full bg-white px-3 py-1 text-xs font-black text-emerald-900 transition hover:text-emerald-700" href={item.recipeHref}>Recipe ideas</Link>
-                          <Link className="inline-flex rounded-full bg-white px-3 py-1 text-xs font-black text-emerald-900 transition hover:text-emerald-700" href={item.replacementHref}>Replacement deals</Link>
-                        </>
+            {itemsWithExpiry.map((item) => {
+              const dealEvidence = item.dealEvidence;
+
+              return (
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4" key={item.id}>
+                  <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                    <div>
+                      <p className="text-xl font-black text-slate-950">{item.name}</p>
+                      <p className="mt-1 text-sm font-semibold text-slate-700">{item.quantity} · {item.aisle}</p>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        <span className={`inline-flex rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.14em] ${expiryStyles[item.expiryReminder.urgency]}`}>
+                          {item.expiryReminder.label}
+                        </span>
+                        {item.expiryReminder.urgency === 'expired' || item.expiryReminder.urgency === 'use-soon' ? (
+                          <>
+                            <Link className="inline-flex rounded-full bg-white px-3 py-1 text-xs font-black text-emerald-900 transition hover:text-emerald-700" href={item.recipeHref}>Recipe ideas</Link>
+                            <Link className="inline-flex rounded-full bg-white px-3 py-1 text-xs font-black text-emerald-900 transition hover:text-emerald-700" href={item.replacementHref}>Replacement deals</Link>
+                          </>
+                        ) : null}
+                      </div>
+                      {dealEvidence ? (
+                        <Link className="mt-3 block rounded-2xl border border-emerald-100 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-emerald-500" href={dealEvidence.href}>
+                          Deal evidence: {dealEvidence.storeName} · {formatDealPrice(dealEvidence.price)} · score {dealEvidence.dealScore ?? 'n/a'}
+                          <span className="block text-xs font-bold text-slate-500">Link target: {dealEvidence.href}</span>
+                        </Link>
                       ) : null}
                     </div>
+                    <span className={`inline-flex w-fit rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.18em] ${statusStyles[item.status]}`}>
+                      {statusLabels[item.status]}
+                    </span>
                   </div>
-                  <span className={`inline-flex w-fit rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.18em] ${statusStyles[item.status]}`}>
-                    {statusLabels[item.status]}
-                  </span>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {(['consumed', 'low', 'replenished'] as PantryStatus[]).map((status) => (
+                      <button
+                        aria-pressed={item.status === status}
+                        className={`rounded-full px-4 py-2 text-sm font-black transition ${
+                          item.status === status
+                            ? 'bg-emerald-800 text-white'
+                            : 'border border-slate-200 bg-white text-slate-700 hover:border-emerald-700 hover:text-emerald-900'
+                        }`}
+                        key={status}
+                        onClick={() => markItem(item.id, status)}
+                        type="button"
+                      >
+                        Mark {statusLabels[status].toLowerCase()}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {(['consumed', 'low', 'replenished'] as PantryStatus[]).map((status) => (
-                    <button
-                      aria-pressed={item.status === status}
-                      className={`rounded-full px-4 py-2 text-sm font-black transition ${
-                        item.status === status
-                          ? 'bg-emerald-800 text-white'
-                          : 'border border-slate-200 bg-white text-slate-700 hover:border-emerald-700 hover:text-emerald-900'
-                      }`}
-                      key={status}
-                      onClick={() => markItem(item.id, status)}
-                      type="button"
-                    >
-                      Mark {statusLabels[status].toLowerCase()}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </Card>
       </main>
