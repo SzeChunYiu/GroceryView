@@ -61,6 +61,7 @@ import {
   fetchOpenFoodFactsRetailerEnrichments,
   fetchBrandedSwedishFuelStations,
   fetchApoteketSeProducts,
+  fetchApohemProducts,
   fetchOverpassFuelStations,
   fetchOverpassGroceryStores,
   fetchSevenElevenSeConvenienceProducts,
@@ -7384,6 +7385,58 @@ describe('daily ingestion runner', () => {
     assert.equal(observation.store_id, null);
     assert.equal(observation.price, 49);
     assert.equal(observation.regular_price, 59);
+  });
+
+  it('pages Apohem search results from recordSetCount/pageSize while preserving maxRows and dedupe', async () => {
+    const retrievedAt = '2026-05-23T08:40:34.000Z';
+    const requestedUrls: string[] = [];
+    const product = (ean: string, name: string, price: number) => ({
+      url: `/produkt/${ean}`,
+      displayName: name,
+      brandName: 'Apohem',
+      code: `apohem-${ean}`,
+      variationEAN: ean,
+      price: { current: { inclVat: price, vatPercent: 12 } },
+      stock: { status: 'in_stock' },
+      isotc: true,
+      isPrescriptionProduct: false
+    });
+    const page = (products: unknown[], skip: number) => new Response(`
+      <script>window.CURRENT_PAGE = ${JSON.stringify({
+        listing: {
+          recordSetCount: 4,
+          pageSize: 2,
+          skip,
+          products
+        }
+      })};</script>
+    `, { status: 200, headers: { 'content-type': 'text/html' } });
+
+    const rows = await fetchApohemProducts({
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        if (String(url).includes('skip=2')) {
+          return page([
+            product('7046260976102', 'Apohem duplicate 20 st', 51),
+            product('7046260976103', 'Apohem page two 20 st', 52)
+          ], 2);
+        }
+        return page([
+          product('7046260976101', 'Apohem page one 20 st', 49),
+          product('7046260976102', 'Apohem duplicate 20 st', 50)
+        ], 0);
+      },
+      maxRows: 3,
+      retrievedAt,
+      sourcePaths: ['/sok?q=vitamin']
+    });
+
+    assert.deepEqual(requestedUrls, [
+      'https://www.apohem.se/sok?q=vitamin',
+      'https://www.apohem.se/sok?q=vitamin&skip=2&count=4'
+    ]);
+    assert.deepEqual(rows.map((row) => row.ean), ['7046260976101', '7046260976102', '7046260976103']);
+    assert.equal(rows[2].sourceUrl, 'https://www.apohem.se/sok?q=vitamin&skip=2&count=4');
   });
 
   it('dispatches Apoteket SE public product rows through the daily native connector', async () => {
