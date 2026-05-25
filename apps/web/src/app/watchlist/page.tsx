@@ -24,7 +24,7 @@ export default function WatchlistPage() {
       <Eyebrow>Watchlist price alerts</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Tracked products with notification-ready alerts</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
-        This page calls buildWatchlistAlerts with verified chain price rows, then runs planNotifications so set-target push and email rows respect user preferences and quiet-hour rules. Predictive drop alerts also surface model-forecast savings windows before a current threshold is crossed.
+        This page calls buildWatchlistAlerts with verified chain price rows, then runs planNotifications so set-target push and email rows respect user preferences and quiet-hour rules. Predictive drop alerts use historical source rows and observed price history before surfacing model-forecast savings windows.
       </p>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr_1fr]">
