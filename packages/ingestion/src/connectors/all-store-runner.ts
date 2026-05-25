@@ -11,6 +11,12 @@ export type AllStoreTaskFailure = {
   error: string;
 };
 
+export const ALL_STORE_RUNNER_CHAINWIDE_CATALOG_CONNECTORS = [
+  'seven-eleven-se-convenience-products'
+] as const;
+
+export type AllStoreRunnerChainwideCatalogConnector = typeof ALL_STORE_RUNNER_CHAINWIDE_CATALOG_CONNECTORS[number];
+
 function normalizeRunnerInteger(value: number | undefined, fallback: number): number {
   if (value === undefined || !Number.isFinite(value)) return fallback;
   return Math.max(0, Math.floor(value));

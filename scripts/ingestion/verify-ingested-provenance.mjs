@@ -53,6 +53,18 @@ const DATASETS = [
     key: ['sourceUrl', 'code', 'storeId', 'price']
   },
   {
+    file: 'okq8-fuel-prices.ts',
+    rows: 'okq8FuelPriceObservations',
+    source: 'okq8FuelPriceSource',
+    key: ['sourceUrl', 'productId', 'effectiveFrom', 'pricePerLitre']
+  },
+  {
+    file: 'st1-fuel-prices.ts',
+    rows: 'st1FuelPriceObservations',
+    source: 'st1FuelPriceSource',
+    key: ['sourceUrl', 'grade', 'validFrom', 'pricePerLitre']
+  },
+  {
     file: 'mathem.ts',
     rows: 'mathemProducts',
     source: 'mathemSource',
@@ -89,6 +101,12 @@ const DATASETS = [
     key: ['sourceUrl', 'osmType', 'osmId']
   },
   {
+    file: 'seven-eleven-se.ts',
+    rows: 'sevenElevenSeProducts',
+    source: 'sevenElevenSeSource',
+    key: ['sourceUrl', 'pdfUrl', 'productId', 'priceText']
+  },
+  {
     file: 'willys.ts',
     rows: 'willysProducts',
     source: 'willysSource',
@@ -120,6 +138,9 @@ for (const dataset of DATASETS) {
   const invalidSourceMetadataUrl = sourceUrls(source).filter((url) => !isHttpUrl(url)).length;
   const missingSourceRetrievedAt = sourceMetadataItems(source).filter((item) => !hasText(item.retrievedAt)).length;
   const invalidSourceRetrievedAt = sourceMetadataItems(source).filter((item) => hasText(item.retrievedAt) && !isIsoDateTime(item.retrievedAt)).length;
+  const header = headerProvenance(text);
+  const missingHeaderSourceUrl = header.sourceUrlCount === 0;
+  const missingHeaderRetrievedAt = header.retrievedAtCount === 0;
 
   if (sourceRowCount !== rows.length) {
     failures.push(`${label} rowCount mismatch: source metadata=${sourceRowCount}, rows=${rows.length}`);
@@ -142,6 +163,12 @@ for (const dataset of DATASETS) {
   if (missingSourceMetadata) {
     failures.push(`${label} source metadata does not cite a source URL`);
   }
+  if (missingHeaderSourceUrl) {
+    failures.push(`${label} file header does not cite a source URL`);
+  }
+  if (missingHeaderRetrievedAt) {
+    failures.push(`${label} file header does not cite retrievedAt`);
+  }
   if (invalidSourceMetadataUrl > 0) {
     failures.push(`${label} source metadata has ${invalidSourceMetadataUrl} non-HTTP URL values`);
   }
@@ -162,6 +189,8 @@ for (const dataset of DATASETS) {
     invalidRetrievedAt,
     duplicateKeys,
     sourceMetadataUrlCount: sourceUrls(source).length,
+    headerSourceUrlCount: header.sourceUrlCount,
+    headerRetrievedAtCount: header.retrievedAtCount,
     invalidSourceMetadataUrl,
     missingSourceRetrievedAt,
     invalidSourceRetrievedAt
@@ -257,6 +286,15 @@ function sourceUrls(source) {
 
 function sourceMetadataItems(source) {
   return Array.isArray(source) ? source : [source];
+}
+
+function headerProvenance(text) {
+  const headerLines = text.split('\n').slice(0, 80).filter((line) => line.startsWith('//'));
+  const sourceUrlCount = headerLines.filter((line) => /https?:\/\//u.test(line)).length;
+  const retrievedAtCount = headerLines.filter((line) => (
+    /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z/u.test(line)
+  )).length;
+  return { sourceUrlCount, retrievedAtCount };
 }
 
 function hasText(value) {

@@ -3,6 +3,7 @@ import { calculateChainPriceIndex, type ChainCategoryIndex, type ChainPriceIndex
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { buildChainPriceObservations, buildMatchedBasketChainPriceObservations } from '@/lib/chain-index-data';
+import { priceStateToken } from '@/lib/color-vision-palette';
 import { categorySummaries } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -102,7 +103,7 @@ export default function HeatmapPage() {
           <Eyebrow>TradingView-style heatmap</Eyebrow>
           <h1 className="mt-2 text-4xl font-black tracking-tight">Category x chain price index grid</h1>
           <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
-            Rows are verified categorySummaries, columns are calculateChainPriceIndex chains, and each covered cell links to its index symbol. Green is below 96, amber is 96-103, and red is above 103 on the 100-centred market scale.
+            Rows are verified categorySummaries, columns are calculateChainPriceIndex chains, and each covered cell links to its index symbol. Each cell pairs color with a text/state marker: ↓ cheaper than market below 96, → market range from 96-103, and ↑ more expensive above 103 on the 100-centred market scale.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -159,13 +160,18 @@ export default function HeatmapPage() {
                   </th>
                   {row.cells.map(({ chain, cell }) => {
                     const symbol = indexSymbol(chain.chainId, row.slug);
+                    const stateToken = priceStateToken(cell?.index);
                     return (
                       <td className="border-b border-slate-200 bg-slate-50 p-1.5" key={`${row.slug}-${chain.chainId}`}>
                         <Link
-                          aria-label={`${row.label} ${chain.chainId} index ${cell ? cell.index.toFixed(1) : 'not available'}`}
+                          aria-label={`${row.label} ${chain.chainId} index ${cell ? cell.index.toFixed(1) : 'not available'}: ${stateToken.label}. ${stateToken.meaning}.`}
                           className={`block min-h-24 rounded-lg border p-3 transition ${indexTone(cell?.index ?? null)}`}
                           href={`/index/${symbol}`}
                         >
+                          <span className="mb-2 inline-flex items-center gap-1 rounded-full bg-white/75 px-2 py-1 text-[0.65rem] font-black uppercase tracking-[0.12em]">
+                            <span aria-hidden="true">{stateToken.indicator}</span>
+                            {stateToken.label}
+                          </span>
                           <span className="block text-2xl font-black">{cell ? cell.index.toFixed(1) : 'n/a'}</span>
                           {cell ? (
                             <>

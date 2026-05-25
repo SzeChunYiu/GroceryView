@@ -4,13 +4,12 @@ import Link from 'next/link';
 import type { LucideIcon } from 'lucide-react';
 import {
   BarChart3,
-  Bell,
   ChevronDown,
   Database,
   Flame,
   Heart,
-  ListChecks,
   Map,
+  Newspaper,
   PackageSearch,
   PiggyBank,
   Search,
@@ -19,6 +18,7 @@ import {
   Tags,
   Utensils
 } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { SearchBar } from './SearchBar';
 import { LanguagePreferenceSwitcher } from '@/components/language-preference-switcher';
@@ -28,6 +28,7 @@ type NavItem = {
   href: string;
   icon: LucideIcon;
   label: string;
+  match?: 'exact' | 'my-flyer';
 };
 
 type NavGroup = {
@@ -43,6 +44,7 @@ const navGroups: NavGroup[] = [
     items: [
       { href: '/', label: 'Overview', icon: BarChart3 },
       { href: '/chain-index', label: 'Chain index', icon: Database },
+      { href: '/analytics/funnel', label: 'Funnel', icon: BarChart3 },
       { href: '/categories', label: 'Categories', icon: Tags },
       { href: '/heatmap', label: 'Heatmap', icon: Flame },
       { href: '/screener', label: 'Screener', icon: Search }
@@ -53,8 +55,7 @@ const navGroups: NavGroup[] = [
     icon: PackageSearch,
     items: [
       { href: '/products', label: 'Browse', icon: PackageSearch },
-      { href: '/compare', label: 'Compare', icon: ListChecks },
-      { href: '/compare-items', label: 'Compare items', icon: ListChecks }
+      { href: '/compare', label: 'Compare', icon: Tags }
     ]
   },
   {
@@ -70,12 +71,8 @@ const navGroups: NavGroup[] = [
     icon: Heart,
     items: [
       { href: '/savings-dashboard', label: 'Savings', icon: PiggyBank },
-      { href: '/alerts', label: 'Alerts', icon: Bell },
-      { href: '/favorites', label: 'Favorites', icon: Heart },
-      { href: '/favourites', label: 'Favourites', icon: Heart },
+      { href: '/stockholm/my-flyer', label: 'My Flyer', icon: Newspaper, match: 'my-flyer' },
       { href: '/watchlist', label: 'Watchlist', icon: Heart },
-      { href: '/list', label: 'Shopping list', icon: ListChecks },
-      { href: '/basket', label: 'Basket', icon: ShoppingBasket },
       { href: '/weekly-basket', label: 'Weekly basket', icon: ShoppingBasket },
       { href: '/meal-planner', label: 'Meal planner', icon: Utensils },
       { href: '/pantry-inventory', label: 'Pantry inventory', icon: ShoppingBasket }
@@ -104,6 +101,28 @@ function readPersistedLocale(): SupportedLocale {
 
 function isInstalledDisplayMode() {
   return window.matchMedia('(display-mode: standalone)').matches || (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
+}
+
+function isNavItemActive(item: NavItem, pathname: string) {
+  if (item.match === 'my-flyer') return pathname === item.href || pathname.endsWith('/my-flyer');
+  if (item.match === 'exact' || item.href === '/') return pathname === item.href;
+  return pathname === item.href || pathname.startsWith(`${item.href}/`);
+}
+
+function navItemClassName(isActive: boolean, surface: 'mobile' | 'menu') {
+  if (surface === 'mobile') {
+    return `inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-sm font-black transition ${
+      isActive
+        ? 'border-emerald-800 bg-emerald-800 text-white shadow-sm'
+        : 'border-slate-200 bg-white text-slate-700 hover:border-emerald-700 hover:text-emerald-900'
+    }`;
+  }
+
+  return `flex items-center gap-3 rounded-md px-3 py-2 text-sm font-black transition focus:outline-none ${
+    isActive
+      ? 'bg-emerald-800 text-white'
+      : 'text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 focus:bg-emerald-50 focus:text-emerald-900'
+  }`;
 }
 
 function InstallBanner() {
@@ -148,6 +167,8 @@ function InstallBanner() {
 }
 
 export function AppNav() {
+  const pathname = usePathname();
+
   useEffect(() => {
     document.documentElement.lang = readPersistedLocale();
 
@@ -178,8 +199,9 @@ export function AppNav() {
           <div className="flex gap-2 overflow-x-auto pb-1 lg:hidden">
             {mobileNavItems.map((item) => {
               const Icon = item.icon;
+              const isActive = isNavItemActive(item, pathname);
               return (
-                <Link className="inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-black text-slate-700 transition hover:border-emerald-700 hover:text-emerald-900" href={item.href} key={`${item.href}-${item.label}`}>
+                <Link aria-current={isActive ? 'page' : undefined} className={navItemClassName(isActive, 'mobile')} href={item.href} key={`${item.href}-${item.label}`}>
                   <Icon className="h-4 w-4" aria-hidden="true" />
                   {item.label}
                 </Link>
@@ -189,11 +211,16 @@ export function AppNav() {
           <div className="hidden gap-2 lg:flex lg:justify-end">
             {navGroups.map((group) => {
               const GroupIcon = group.icon;
+              const isGroupActive = group.items.some((item) => isNavItemActive(item, pathname));
               return (
                 <div className="group relative" key={group.label}>
                   <button
                     aria-haspopup="true"
-                    className="inline-flex h-10 shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 text-sm font-black text-slate-700 transition hover:border-emerald-700 hover:text-emerald-900 focus:border-emerald-700 focus:text-emerald-900 focus:outline-none"
+                    className={`inline-flex h-10 shrink-0 items-center gap-2 rounded-full border px-3 text-sm font-black transition focus:border-emerald-700 focus:text-emerald-900 focus:outline-none ${
+                      isGroupActive
+                        ? 'border-emerald-800 bg-emerald-800 text-white shadow-sm'
+                        : 'border-slate-200 bg-white text-slate-700 hover:border-emerald-700 hover:text-emerald-900'
+                    }`}
                     type="button"
                   >
                     <GroupIcon className="h-4 w-4" aria-hidden="true" />
@@ -203,13 +230,15 @@ export function AppNav() {
                   <div className="invisible absolute right-0 top-full z-30 mt-2 w-56 rounded-lg border border-slate-200 bg-white p-2 opacity-0 shadow-xl shadow-slate-900/10 transition group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
                     {group.items.map((item) => {
                       const Icon = item.icon;
+                      const isActive = isNavItemActive(item, pathname);
                       return (
                         <Link
-                          className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-black text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-900 focus:bg-emerald-50 focus:text-emerald-900 focus:outline-none"
+                          aria-current={isActive ? 'page' : undefined}
+                          className={navItemClassName(isActive, 'menu')}
                           href={item.href}
                           key={`${group.label}-${item.href}-${item.label}`}
                         >
-                          <Icon className="h-4 w-4 text-slate-500" aria-hidden="true" />
+                          <Icon className={`h-4 w-4 ${isActive ? 'text-white' : 'text-slate-500'}`} aria-hidden="true" />
                           {item.label}
                         </Link>
                       );

@@ -70,6 +70,93 @@ describe('createHttpHandler', () => {
     }
   });
 
+  it('accepts contact requests without echoing messages and returns structured validation errors', async () => {
+    const handle = createHttpHandler(undefined, { now: new Date('2026-05-20T08:00:00.000Z') });
+    const validBody = {
+      name: 'Ada Shopper',
+      email: 'ada@example.com',
+      subject: 'Question about price alerts',
+      message: 'Please tell me how grocery price alerts work.',
+      consent: true,
+      source: 'web'
+    };
+
+    const accepted = await handle(new Request('http://localhost/api/contact', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-forwarded-for': '203.0.113.10' },
+      body: JSON.stringify(validBody)
+    }));
+    assert.equal(accepted.status, 202);
+    const acceptedBody = await json(accepted) as { ok: boolean; status: string; requestId: string; receivedAt: string };
+    assert.deepEqual(acceptedBody, {
+      ok: true,
+      status: 'accepted',
+      requestId: 'contact_1a1cf37d882c8365',
+      receivedAt: '2026-05-20T08:00:00.000Z'
+    });
+    assert.equal(JSON.stringify(acceptedBody).includes(validBody.message), false);
+    assert.equal(JSON.stringify(acceptedBody).includes(validBody.email), false);
+
+    const invalid = await handle(new Request('http://localhost/api/contact', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-forwarded-for': '203.0.113.11' },
+      body: JSON.stringify({ ...validBody, email: 'not-an-email', message: 'short' })
+    }));
+    assert.equal(invalid.status, 400);
+    const invalidBody = await json(invalid) as { ok: boolean; error: { code: string; details: Array<{ path: string }> } };
+    assert.equal(invalidBody.ok, false);
+    assert.equal(invalidBody.error.code, 'validation_failed');
+    assert.deepEqual(invalidBody.error.details.map((detail) => detail.path), ['email', 'message']);
+
+    const unsupported = await handle(new Request('http://localhost/api/contact', {
+      method: 'POST',
+      headers: { 'content-type': 'text/plain', 'x-forwarded-for': '203.0.113.12' },
+      body: 'hello'
+    }));
+    assert.equal(unsupported.status, 415);
+    assert.equal(((await json(unsupported) as { error: { code: string } }).error.code), 'unsupported_media_type');
+
+    const tooLarge = await handle(new Request('http://localhost/api/contact', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-forwarded-for': '203.0.113.13' },
+      body: JSON.stringify({ ...validBody, message: 'x'.repeat(9000) })
+    }));
+    assert.equal(tooLarge.status, 413);
+    assert.equal(((await json(tooLarge) as { error: { code: string } }).error.code), 'payload_too_large');
+
+    for (let index = 0; index < 5; index += 1) {
+      const response = await handle(new Request('http://localhost/api/contact', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'x-forwarded-for': '203.0.113.14' },
+        body: JSON.stringify({ ...validBody, message: `Valid contact message ${index}.` })
+      }));
+      assert.equal(response.status, 202);
+    }
+    const rateLimited = await handle(new Request('http://localhost/api/contact', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-forwarded-for': '203.0.113.14' },
+      body: JSON.stringify(validBody)
+    }));
+    assert.equal(rateLimited.status, 429);
+    assert.equal(rateLimited.headers.get('retry-after'), '3600');
+    assert.equal(((await json(rateLimited) as { error: { code: string } }).error.code), 'contact_rate_limited');
+
+    const previousDisabled = process.env.CONTACT_FORM_DISABLED;
+    process.env.CONTACT_FORM_DISABLED = 'true';
+    try {
+      const unavailable = await handle(new Request('http://localhost/api/contact', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'x-forwarded-for': '203.0.113.15' },
+        body: JSON.stringify(validBody)
+      }));
+      assert.equal(unavailable.status, 503);
+      assert.equal(((await json(unavailable) as { error: { code: string } }).error.code), 'contact_unavailable');
+    } finally {
+      if (previousDisabled === undefined) delete process.env.CONTACT_FORM_DISABLED;
+      else process.env.CONTACT_FORM_DISABLED = previousDisabled;
+    }
+  });
+
   it('exchanges verified auth provider assertions for bearer sessions', async () => {
     const handle = createHttpHandler(undefined, {
       authSecret: 'session-secret',
@@ -427,6 +514,10 @@ describe('createHttpHandler', () => {
       ['milk', 'willys-odenplan'],
       ['butter', 'willys-odenplan']
     ]);
+
+    const deals = await handle(new Request('http://localhost/api/deals?category=dairy'));
+    assert.equal(deals.status, 503);
+    assert.deepEqual(await json(deals), { error: 'Deals provider is not configured.' });
 
     const flyerOffers = await handle(new Request('http://localhost/api/deals/flyer-offers?chain=willys&asOf=2026-05-20T12:00:00.000Z'));
     assert.equal(flyerOffers.status, 503);
@@ -841,6 +932,46 @@ describe('createHttpHandler', () => {
     assert.equal(second.status, 200);
     assert.equal(second.headers.get('x-groceryview-cache'), 'hit');
     assert.deepEqual(await json(second), firstBody);
+  });
+
+  it('serves provider-backed rolling-average deals', async () => {
+    const handle = createHttpHandler(undefined, {
+      dealsProvider: async (query) => ({
+        asOf: '2026-05-24T12:00:00.000Z',
+        filters: query.category ? { category: query.category } : {},
+        dealCount: 1,
+        sortedBy: 'discount_percentage_desc',
+        windowDays: 30,
+        deals: [
+          {
+            productId: 'product-private-label-milk',
+            productSlug: 'private-label-milk',
+            productName: 'Garant Milk 1L',
+            category: 'dairy',
+            categoryPath: ['dairy'],
+            storeId: 'store-willys',
+            storeSlug: 'willys-odenplan',
+            storeName: 'Willys Odenplan',
+            chainId: 'chain-willys',
+            chainSlug: 'willys',
+            chainName: 'Willys',
+            currentPrice: 12.9,
+            rollingAveragePrice: 19.9,
+            discountPercentage: 35.18,
+            currency: 'SEK',
+            observedAt: '2026-05-21T10:00:00.000Z'
+          }
+        ]
+      })
+    });
+
+    const response = await handle(new Request('http://localhost/api/deals?category=dairy'));
+    assert.equal(response.status, 200);
+    const body = await json(response) as { filters: { category: string }; deals: Array<{ productId: string; discountPercentage: number }> };
+    assert.deepEqual(body.filters, { category: 'dairy' });
+    assert.deepEqual(body.deals.map((deal) => [deal.productId, deal.discountPercentage]), [
+      ['product-private-label-milk', 35.18]
+    ]);
   });
 
   it('returns cursor-paginated product envelopes for public product listing and search', async () => {

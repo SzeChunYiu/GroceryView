@@ -1,5 +1,6 @@
 import { BasketCalculator, type BasketCalculatorProduct } from '@/components/basket-calculator';
 import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
+import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { dbSiteSnapshotGeneratedAt } from '@/lib/generated/db-site-products';
 import { routeMetadata } from '@/lib/seo';
 import { chainPriceRows, formatPct, labelFromSlug, matchedChainProducts, topChainSpreads } from '@/lib/verified-data';
@@ -47,6 +48,7 @@ export default function BasketPage() {
 
   return (
     <PageShell>
+      <FunnelStepBeacon step="basket_view" />
       <Eyebrow>Basket calculator</Eyebrow>
       <div className="mt-2 grid gap-6 lg:grid-cols-[1fr_0.7fr] lg:items-end">
         <div>

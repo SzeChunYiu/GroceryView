@@ -28,6 +28,9 @@ import {
   buildLidlOfferPageUrl,
   buildLidlStoreDetailPayloadUrl,
   buildLidlStoresUrl,
+  buildLocalFoodNodesNodesUrl,
+  buildLocalFoodNodesProductsUrl,
+  buildSevenElevenNoStoresUrl,
   buildMatpriskollenStoreOffersUrl,
   buildMatpriskollenStoresUrl,
   buildMathemSearchUrl,
@@ -35,6 +38,7 @@ import {
   buildOpenFoodFactsProductUrl,
   buildOpenFoodFactsSwedenSearchUrl,
   buildOpenPricesConnectorUrl,
+  buildSevenElevenSeBusinessOrdersUrl,
   fetchSt1FuelPrices,
   cacheKeyForScbPxWebQueryFixture,
   cellCountForScbPxWebQueryFixture,
@@ -56,8 +60,10 @@ import {
   fetchOkq8FuelPrices,
   fetchOpenFoodFactsRetailerEnrichments,
   fetchBrandedSwedishFuelStations,
+  fetchApoteketSeProducts,
   fetchOverpassFuelStations,
   fetchOverpassGroceryStores,
+  fetchSevenElevenSeConvenienceProducts,
   fetchRetailerConnectorSnapshot,
   fetchCityGrossBulkProducts,
   fetchCityGrossProducts,
@@ -87,6 +93,8 @@ import {
   fetchLidlOffers,
   fetchLidlOffersForAllStores,
   fetchLidlStores,
+  fetchLocalFoodNodesProductsForAllNodes,
+  fetchSevenElevenNoStores,
   fetchMathemProducts,
   fetchMatpriskollenOffers,
   fetchMatsparProducts,
@@ -96,8 +104,11 @@ import {
   fetchWillysWeeklyDiscounts,
   fetchWillysWeeklyDiscountsForAllStores,
   findPharmacyEanMatches,
+  parseApoteketSeProducts,
   parseApohemProducts,
   parseApotekHjartatProducts,
+  fetchLyfOgHeilsaProducts,
+  parseLyfOgHeilsaProducts,
   parseIcaReklambladOffers,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
@@ -108,9 +119,12 @@ import {
   GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL,
   GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL,
   GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL,
+  GROCERYVIEW_DAILY_LOCALFOODNODES_SE_PRODUCTS_URL,
+  GROCERYVIEW_DAILY_LYF_OG_HEILSA_IS_PRODUCTS_URL,
   GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL,
   GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL,
   GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL,
+  GROCERYVIEW_DAILY_APOTEKET_SE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL,
@@ -120,6 +134,8 @@ import {
   locatorFixturesCanAffectDealScore,
   normaliseUnitPrice,
   normalizeUnitPrice,
+  extractDiaperDeclaredSize,
+  extractDiaperPackageCount,
   parseDiaperPackageClass,
   offerSelectorFixtures,
   offerSelectorFixturesCanEmitOfferFacts,
@@ -128,10 +144,12 @@ import {
   parseIcaStoreList,
   parseLidlStoreDirectoryLinks,
   parseLidlStorePayload,
+  parseSevenElevenNoStores,
   parseOsmChainStores,
   parseOpenPricesSnapshot,
   parseOkq8FuelPricePage,
   parseBrandedSwedishFuelStations,
+  parseSevenElevenSeConvenienceProducts,
   parseCoopDrPdfTextOffers,
   parseRetailerProductJsonSnapshot,
   persistOpenFoodFactsProductMetadata,
@@ -146,6 +164,8 @@ import {
   OVERPASS_INTERPRETER_URL,
   STOCKHOLM_FUEL_OVERPASS_QUERY,
   STOCKHOLM_GROCERY_OVERPASS_QUERY,
+  findSevenElevenSeAssortmentPdfUrl,
+  SEVEN_ELEVEN_SE_ASSORTMENT_PDF_URL,
   STORE_ENUMERATOR_OVERPASS_URL,
   SWEDEN_BRANDED_FUEL_STATIONS_OVERPASS_QUERY,
   SWEDEN_FUEL_OVERPASS_QUERY,
@@ -730,7 +750,20 @@ describe('fetchOpenFoodFactsProducts', () => {
       quantity: '1 l',
       categories: ['en:beverages', 'en:dairy-substitutes'],
       labels: ['en:vegan'],
+      allergens: [],
+      traces: [],
+      additives: [],
+      countries: [],
+      stores: [],
+      origins: [],
+      manufacturingPlaces: [],
+      packaging: [],
+      ingredientsText: '',
+      servingSize: '',
       nutriscoreGrade: 'd',
+      novaGroup: null,
+      ecoscoreGrade: 'unknown',
+      dataQualityTags: [],
       nutritionPer100g: {
         energyKj: 180,
         energyKcal: 43,
@@ -1916,7 +1949,7 @@ describe('fetchOverpassGroceryStores', () => {
   it('ships a Sweden-wide query for the nationwide OSM store refresh', () => {
     assert.match(SWEDEN_GROCERY_OVERPASS_QUERY, /ISO3166-1"="SE/);
     assert.match(SWEDEN_GROCERY_OVERPASS_QUERY, /admin_level=2/);
-    assert.match(SWEDEN_GROCERY_OVERPASS_QUERY, /shop"~"\^\(supermarket\|convenience\|grocery\)\$/);
+    assert.match(SWEDEN_GROCERY_OVERPASS_QUERY, /shop"~"\^\(supermarket\|convenience\|grocery\|greengrocer\)\$/);
     assert.doesNotMatch(SWEDEN_GROCERY_OVERPASS_QUERY, /ISO3166-2"="SE-AB/);
     assert.match(STOCKHOLM_GROCERY_OVERPASS_QUERY, /ISO3166-2"="SE-AB/);
     assert.equal(SWEDISH_COUNTY_ISO3166_2_CODES.length, 21);
@@ -3255,6 +3288,18 @@ describe('fetchCityGrossProducts', () => {
       unitPrice: 136.96,
       unitPriceUnit: 'KGM',
       priceText: '31.50 SEK',
+      hasPromotion: false,
+      hasDiscount: true,
+      isMembersOnlyPrice: false,
+      isLongTimeDiscount: false,
+      isCurrentWeekDiscount: false,
+      promotionPrice: null,
+      promotionUnitPrice: null,
+      promotionUnitPriceUnit: '',
+      promotionMinQuantity: null,
+      promotionFrom: '',
+      promotionTo: '',
+      superCategory: '',
       productUrl: 'https://www.citygross.se/matvaror/skafferiet/del-monte-pear-halves-in-juice-p100001971_ST',
       imageUrl: 'https://www.citygross.se/images/24000124962_C1N1.jpg',
       sourceUrl: buildCityGrossProductsUrl({ siteId: '21', query: 'kaffe', take: 1, skip: 0 }),
@@ -4603,6 +4648,17 @@ describe('normalizeUnitPrice', () => {
     assert.deepEqual(normaliseUnitPrice(29.94, '6-pack'), { unitPrice: 4.99, comparableUnit: 'piece' });
   });
 
+  it('exposes focused diaper count and declared-size extraction helpers', () => {
+    assert.equal(extractDiaperPackageCount('Strl 4 + 39p'), 39);
+    assert.equal(extractDiaperPackageCount('37 per frp'), 37);
+    assert.equal(extractDiaperPackageCount('Comfort2 3-6kg + 47p'), 47);
+    assert.equal(extractDiaperPackageCount('2x37p'), 74);
+    assert.equal(extractDiaperDeclaredSize('Strl 4 + 39p'), 4);
+    assert.equal(extractDiaperDeclaredSize('Comfort2 3-6kg + 47p'), 2);
+    assert.equal(extractDiaperDeclaredSize('37 per frp'), null);
+    assert.equal(extractDiaperDeclaredSize('2x37p'), null);
+  });
+
   it('extracts diaper package counts and supported size classes from retailer text', () => {
     assert.deepEqual(parseDiaperPackageClass('Strl 4 + 39p'), {
       diaperCount: 39,
@@ -5512,10 +5568,22 @@ class DailyIngestionExecutor implements QueryExecutor {
     if (sql.includes('insert into stores')) return [{ id: `store-db-${++this.sequence}` }] as T[];
     if (sql.includes('jsonb_to_recordset') && sql.includes('insert into products')) {
       const products = JSON.parse(String(params[0])) as Array<{ slug: string; barcode?: string | null }>;
-      return products.map((product) => ({
-        slug: product.slug,
-        id: product.barcode ? `product-db-ean-${product.barcode}` : `product-db-${product.slug}`
-      })) as T[];
+      const existingSlugByBarcode = new Map([
+        ['7310130003547', 'ean-7310130003547'],
+        ['7310130000000', 'ean-7310130000000']
+      ]);
+      const batchSlugByBarcode = new Map<string, string>();
+      for (const product of products) {
+        if (!product.barcode) continue;
+        const current = batchSlugByBarcode.get(product.barcode);
+        if (current === undefined || product.slug < current) batchSlugByBarcode.set(product.barcode, product.slug);
+      }
+      return products.map((product) => {
+        const targetSlug = product.barcode
+          ? existingSlugByBarcode.get(product.barcode) ?? batchSlugByBarcode.get(product.barcode) ?? product.slug
+          : product.slug;
+        return { slug: product.slug, id: `product-db-${targetSlug}` };
+      }) as T[];
     }
     if (sql.includes('insert into products')) return [{ id: `product-db-${++this.sequence}` }] as T[];
     if (sql.includes('jsonb_to_recordset') && sql.includes('insert into aliases')) return [] as T[];
@@ -6285,10 +6353,79 @@ describe('daily ingestion runner', () => {
     assert.ok(aliasInsert, 'daily ingestion should batch upsert aliases');
     const aliases = JSON.parse(String(aliasInsert.params[0])) as Array<{ product_id: string }>;
     assert.deepEqual(aliases.map((alias) => alias.product_id), [
-      'product-db-ean-ean-case-001',
-      'product-db-ean-ean-case-001'
+      'product-db-willys-barcode-case-1',
+      'product-db-willys-barcode-case-1'
     ]);
   });
+
+  it('keeps daily products with null and empty barcodes on separate slug upsert paths', async () => {
+    const executor = new DailyIngestionExecutor();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-21T03:17:00.000Z',
+      connectors: [
+        {
+          connectorId: 'willys-normalized-json',
+          chainId: 'willys',
+          sourceType: 'official_api',
+          endpointUrl: 'https://sources.example.test/willys/products.json',
+          parserVersion: 'normalized-json-v1',
+          robotsTxtStatus: 'not_applicable',
+          legalReviewStatus: 'approved',
+          hasDataAgreement: true,
+          stores: [{ storeId: '2110', name: 'Willys Kungsbacka Hede', address: 'Tölöleden 3', city: 'Kungsbacka' }]
+        }
+      ],
+      fetchImpl: async () => new Response(JSON.stringify({
+        items: [
+          {
+            storeId: '2110',
+            retailerProductId: 'wil-null-barcode-1',
+            rawName: 'Loose Apple Red',
+            canonicalName: 'Loose Apple Red',
+            productId: 'willys-loose-apple-red',
+            categoryId: 'produce',
+            barcode: null,
+            packageSize: 1,
+            packageUnit: 'kg',
+            price: 24.9
+          },
+          {
+            storeId: '2110',
+            retailerProductId: 'wil-empty-barcode-2',
+            rawName: 'Loose Apple Green',
+            canonicalName: 'Loose Apple Green',
+            productId: 'willys-loose-apple-green',
+            categoryId: 'produce',
+            barcode: '   ',
+            packageSize: 1,
+            packageUnit: 'kg',
+            price: 22.9
+          }
+        ]
+      }), { status: 200, headers: { 'content-type': 'application/json' } })
+    });
+
+    assert.equal(result.acceptedCount, 2);
+    const productInsert = executor.calls.find((call) => call.sql.includes('jsonb_to_recordset') && call.sql.includes('insert into products'));
+    assert.ok(productInsert, 'daily ingestion should batch upsert null-barcode products');
+    assert.match(productInsert.sql, /where barcode is not null/);
+    assert.match(productInsert.sql, /left join products existing on existing\.barcode = input\.barcode and input\.barcode is not null/);
+    const products = JSON.parse(String(productInsert.params[0])) as Array<{ slug: string; barcode: string | null }>;
+    assert.deepEqual(products.map((product) => [product.slug, product.barcode]), [
+      ['willys-loose-apple-red', null],
+      ['willys-loose-apple-green', null]
+    ]);
+
+    const aliasInsert = executor.calls.find((call) => call.sql.includes('jsonb_to_recordset') && call.sql.includes('insert into aliases'));
+    assert.ok(aliasInsert, 'daily ingestion should batch upsert aliases for both null-barcode rows');
+    const aliases = JSON.parse(String(aliasInsert.params[0])) as Array<{ product_id: string }>;
+    assert.deepEqual(aliases.map((alias) => alias.product_id), [
+      'product-db-willys-loose-apple-red',
+      'product-db-willys-loose-apple-green'
+    ]);
+  });
+
 
   it('upserts every configured daily store before writing partial store-scoped observations', async () => {
     const executor = new DailyIngestionExecutor();
@@ -7041,6 +7178,142 @@ describe('daily ingestion runner', () => {
     });
   });
 
+  it('parses Lyf og heilsa Gatsby page-data fixtures and fetches public IS pharmacy products', async () => {
+    const retrievedAt = '2026-05-24T10:15:00.000Z';
+    const sourceUrl = 'https://www.lyfogheilsa.is/page-data/gamla-apot/page-data.json';
+    const pageData = JSON.stringify({
+      result: {
+        data: {
+          prismicBrandPage: {
+            data: {
+              body: [{
+                items: [{
+                  productGroup: {
+                    productGroupId: '2076',
+                    title: 'GAMLA APÓTEKIÐ Sárakrem 50ml',
+                    fullPrice: 1699,
+                    discountPrice: 1299,
+                    discountPercent: 24,
+                    category: { slug: 'hudvorur' },
+                    images: [{ largeUrl: 'https://cdn.lyfogheilsa.is/sarakrem.jpg' }]
+                  }
+                }, {
+                  productGroup: {
+                    productGroupId: '3001',
+                    title: 'NOW D-Vítamín 100 töflur',
+                    fullPrice: '2.499',
+                    discountPrice: '2.499',
+                    discountPercent: 0,
+                    category: { slug: 'vitamin-og-baetiefni' },
+                    images: []
+                  }
+                }]
+              }]
+            }
+          }
+        }
+      }
+    });
+
+    const rows = parseLyfOgHeilsaProducts(pageData, sourceUrl, retrievedAt);
+    assert.equal(rows.length, 2);
+    assert.deepEqual(rows[0], {
+      chain: 'lyf-og-heilsa-is',
+      code: '2076',
+      name: 'GAMLA APÓTEKIÐ Sárakrem 50ml',
+      category: 'otc',
+      categorySlug: 'hudvorur',
+      price: 1299,
+      priceText: '1299 ISK',
+      originalPrice: 1699,
+      originalPriceText: '1699 ISK',
+      discountPercent: 24,
+      productUrl: 'https://www.lyfogheilsa.is/gamla-apot#product-2076',
+      imageUrl: 'https://cdn.lyfogheilsa.is/sarakrem.jpg',
+      sourceUrl,
+      retrievedAt
+    });
+    assert.equal(rows[1].category, 'supplement');
+
+    const requestedUrls: string[] = [];
+    const fetched = await fetchLyfOgHeilsaProducts({
+      sourcePaths: ['/page-data/gamla-apot/page-data.json'],
+      retrievedAt,
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return new Response(pageData, { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+    assert.deepEqual(requestedUrls, [sourceUrl]);
+    assert.equal(fetched.length, 2);
+    assert.equal(fetched[0].code, '2076');
+  });
+
+  it('materializes Lyf og heilsa public page-data products as IS pharmacy observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const endpointUrl = `${GROCERYVIEW_DAILY_LYF_OG_HEILSA_IS_PRODUCTS_URL}?sourcePaths=/page-data/gamla-apot/page-data.json`;
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-24T10:15:00.000Z',
+      connectors: [{
+        connectorId: 'lyf-og-heilsa-is-public-products',
+        chainId: 'lyf-og-heilsa-is',
+        domain: 'pharmacy',
+        sourceType: 'retailer_online_page',
+        endpointUrl,
+        parserVersion: 'lyf-og-heilsa-is-page-data-v1',
+        robotsTxtStatus: 'allow',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: false,
+        requireStoreScopedPrices: false,
+        stores: []
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return new Response(JSON.stringify({
+          result: {
+            data: {
+              prismicBrandPage: {
+                data: {
+                  body: [{
+                    items: [{
+                      productGroup: {
+                        productGroupId: '2076',
+                        title: 'GAMLA APÓTEKIÐ Sárakrem 50ml',
+                        fullPrice: 1699,
+                        discountPrice: 1299,
+                        discountPercent: 24,
+                        category: { slug: 'hudvorur' },
+                        images: [{ largeUrl: 'https://cdn.lyfogheilsa.is/sarakrem.jpg' }]
+                      }
+                    }]
+                  }]
+                }
+              }
+            }
+          }
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.deepEqual(requestedUrls, ['https://www.lyfogheilsa.is/page-data/gamla-apot/page-data.json']);
+    const chainInsert = executor.calls.find((call) => call.sql.includes('insert into chains'));
+    assert.deepEqual(chainInsert?.params, ['lyf-og-heilsa-is', 'lyf-og-heilsa-is', 'pharmacy']);
+    const product = firstBatchProduct(executor);
+    assert.equal(product.domain, 'pharmacy');
+    assert.equal(product.category_id, 'pharmacy-otc');
+    assert.equal(product.package_size, 50);
+    assert.equal(product.package_unit, 'ml');
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.domain, 'pharmacy');
+    assert.equal(observation.store_id, null);
+    assert.equal(observation.price, 1299);
+    assert.equal(observation.regular_price, 1699);
+  });
+
   it('materializes public pharmacy products as domain=pharmacy observations without prescription rows', async () => {
     const executor = new DailyIngestionExecutor();
     const requestedUrls: string[] = [];
@@ -7111,6 +7384,64 @@ describe('daily ingestion runner', () => {
     assert.equal(observation.store_id, null);
     assert.equal(observation.price, 49);
     assert.equal(observation.regular_price, 59);
+  });
+
+  it('dispatches Apoteket SE public product rows through the daily native connector', async () => {
+    const executor = new DailyIngestionExecutor();
+    const sourceUrl = 'https://www.apoteket.se/sok/?q=vitamin';
+    const endpointUrl = `${GROCERYVIEW_DAILY_APOTEKET_SE_PRODUCTS_URL}?sourceUrls=${encodeURIComponent(sourceUrl)}`;
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-23T08:40:34.000Z',
+      connectors: [{
+        connectorId: 'apoteket-se-public-products',
+        chainId: 'apoteket',
+        domain: 'pharmacy',
+        sourceType: 'retailer_online_page',
+        endpointUrl,
+        parserVersion: 'apoteket-se-public-products-v1',
+        robotsTxtStatus: 'allow',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: false,
+        requireStoreScopedPrices: false,
+        stores: []
+      }],
+      fetchImpl: async (url) => {
+        assert.equal(String(url), sourceUrl);
+        return new Response(`
+          <script type="application/json">{
+            "products": [
+              {
+                "productName": "Apoteket D-vitamin 100 tabletter",
+                "price": { "amount": "79,90", "currency": "SEK" },
+                "packageSize": "100 tabletter",
+                "url": "/produkt/apoteket-d-vitamin-100-tabletter/",
+                "isPrescriptionProduct": false
+              },
+              {
+                "productName": "Receptbelagd vara",
+                "price": { "amount": 199, "currency": "SEK" },
+                "packageSize": "10 tabletter",
+                "isPrescriptionProduct": true
+              }
+            ]
+          }</script>
+        `, { status: 200, headers: { 'content-type': 'text/html' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    const product = firstBatchProduct(executor);
+    assert.equal(product.domain, 'pharmacy');
+    assert.equal(product.category_id, 'pharmacy-public');
+    assert.equal(product.package_size, 100);
+    assert.equal(product.package_unit, 'piece');
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.chain_id, 'chain-db-1');
+    assert.equal(observation.domain, 'pharmacy');
+    assert.equal(observation.store_id, null);
+    assert.equal(observation.price, 79.9);
   });
 
   it('parses Apohem and Apotek Hjartat page fixtures with public EAN provenance only', () => {
@@ -7227,6 +7558,59 @@ describe('daily ingestion runner', () => {
       apohemSourceUrl,
       apotekHjartatSourceUrl
     ]);
+  });
+
+  it('parses Apoteket SE fixtures into public pharmacy price-list rows', async () => {
+    const sourceUrl = 'https://www.apoteket.se/sok/?q=vitamin';
+    const observedAt = '2026-05-23T08:40:34.000Z';
+    const html = `
+      <script>self.__next_f.push([1, "payload:{\\"products\\":[{\\"name\\":\\"Apoteket C-vitamin 20 brustabletter\\",\\"price\\":{\\"amount\\":\\"42,50\\",\\"currency\\":\\"SEK\\"},\\"unit\\":\\"20 tabletter\\",\\"href\\":\\"/produkt/c-vitamin/\\"},{\\"name\\":\\"Rx only\\",\\"price\\":99,\\"requiresPrescription\\":true}]}"])</script>
+      <script type="application/json">{
+        "items": [{
+          "product_name": "Apoteket Tandkräm Fluor 125 ml",
+          "price_sek": 29.9,
+          "unit": "125 ml",
+          "source_url": "https://www.apoteket.se/produkt/tandkram/"
+        }]
+      }</script>
+    `;
+
+    const rows = parseApoteketSeProducts(html, sourceUrl, observedAt);
+
+    assert.deepEqual(rows, [
+      {
+        country: 'SE',
+        currency: 'SEK',
+        chain: 'apoteket',
+        product_name: 'Apoteket C-vitamin 20 brustabletter',
+        price_sek: 42.5,
+        unit: '20 tabletter',
+        observed_at: observedAt,
+        source_url: 'https://www.apoteket.se/produkt/c-vitamin/'
+      },
+      {
+        country: 'SE',
+        currency: 'SEK',
+        chain: 'apoteket',
+        product_name: 'Apoteket Tandkräm Fluor 125 ml',
+        price_sek: 29.9,
+        unit: '125 ml',
+        observed_at: observedAt,
+        source_url: 'https://www.apoteket.se/produkt/tandkram/'
+      }
+    ]);
+
+    const requestedUrls: string[] = [];
+    const fetched = await fetchApoteketSeProducts({
+      sourceUrls: [sourceUrl],
+      observedAt,
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return new Response(html, { status: 200, headers: { 'content-type': 'text/html' } });
+      }
+    });
+    assert.deepEqual(requestedUrls, [sourceUrl]);
+    assert.equal(fetched.length, 2);
   });
 
   it('materializes native Lidl all-store public offer prices into daily database observations', async () => {
@@ -7426,6 +7810,137 @@ describe('daily ingestion runner', () => {
     assert.equal(executor.calls.length, 0);
   });
 
+  it('fetches LocalFoodNodes SE products across nodes with all-store runner semantics', async () => {
+    const requestedUrls: string[] = [];
+    const retrievedAt = '2026-05-25T09:00:00.000Z';
+    const fetchImpl: typeof fetch = async (url) => {
+      const requestUrl = String(url);
+      requestedUrls.push(requestUrl);
+      if (requestUrl === buildLocalFoodNodesNodesUrl()) {
+        return Response.json({
+          nodes: [{
+            id: 'se-gothenburg-node',
+            name: 'Göteborg REKO-ring',
+            city: 'Göteborg',
+            country: 'SE',
+            url: '/nodes/se-gothenburg-node'
+          }]
+        });
+      }
+      if (requestUrl === buildLocalFoodNodesProductsUrl({ nodeId: 'se-gothenburg-node' })) {
+        return Response.json({
+          products: [{
+            id: 'lfn-carrot-1kg',
+            name: 'Morötter 1 kg',
+            producer: { name: 'Björkbacka gård' },
+            category: 'Grönsaker',
+            unit: '1 kg',
+            price: 35,
+            currency: 'SEK',
+            available: true,
+            url: '/products/lfn-carrot-1kg',
+            images: [{ url: '/images/carrot.jpg' }]
+          }]
+        });
+      }
+      return new Response('not found', { status: 404 });
+    };
+
+    const rows = await fetchLocalFoodNodesProductsForAllNodes({
+      fetchImpl,
+      maxNodes: 1,
+      maxRowsPerNode: 1,
+      retrievedAt
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildLocalFoodNodesNodesUrl(),
+      buildLocalFoodNodesProductsUrl({ nodeId: 'se-gothenburg-node' })
+    ]);
+    assert.equal(rows.length, 1);
+    const row = rows[0];
+    assert.ok(row);
+    assert.deepEqual(row, {
+      country: 'SE',
+      currency: 'SEK',
+      chain: 'localfoodnodes',
+      code: 'lfn-carrot-1kg',
+      name: 'Morötter 1 kg',
+      brand: 'Björkbacka gård',
+      category: 'Grönsaker',
+      packageText: '1 kg',
+      price: 35,
+      priceText: '35 SEK',
+      unitPrice: null,
+      unitPriceUnit: '1 kg',
+      storeId: 'se-gothenburg-node',
+      storeName: 'Göteborg REKO-ring',
+      nodeId: 'se-gothenburg-node',
+      nodeName: 'Göteborg REKO-ring',
+      producer: 'Björkbacka gård',
+      available: true,
+      productUrl: 'https://localfoodnodes.com/products/lfn-carrot-1kg',
+      imageUrl: 'https://localfoodnodes.com/images/carrot.jpg',
+      sourceUrl: 'https://localfoodnodes.com/api/nodes/se-gothenburg-node/products',
+      retrievedAt
+    });
+  });
+
+  it('materializes native LocalFoodNodes SE products into daily database observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-25T09:00:00.000Z',
+      connectors: [{
+        connectorId: 'localfoodnodes-se-products',
+        chainId: 'localfoodnodes',
+        sourceType: 'official_api',
+        endpointUrl: `${GROCERYVIEW_DAILY_LOCALFOODNODES_SE_PRODUCTS_URL}?maxNodes=1&maxRowsPerNode=1`,
+        parserVersion: 'native-localfoodnodes-se-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{
+          storeId: 'se-gothenburg-node',
+          name: 'Göteborg REKO-ring',
+          address: 'Göteborg',
+          city: 'Göteborg'
+        }]
+      }],
+      fetchImpl: async (url) => {
+        const requestUrl = String(url);
+        if (requestUrl === buildLocalFoodNodesNodesUrl()) {
+          return Response.json({
+            nodes: [{ id: 'se-gothenburg-node', name: 'Göteborg REKO-ring', city: 'Göteborg', country: 'SE' }]
+          });
+        }
+        if (requestUrl === buildLocalFoodNodesProductsUrl({ nodeId: 'se-gothenburg-node' })) {
+          return Response.json({
+            products: [{
+              id: 'lfn-potato-2kg',
+              name: 'Potatis 2 kg',
+              producer: { name: 'Västkustens gård' },
+              category: 'Rotfrukter',
+              unit: '2 kg',
+              price: '49 SEK',
+              currency: 'SEK',
+              available: true,
+              url: '/products/lfn-potato-2kg'
+            }]
+          });
+        }
+        return new Response('not found', { status: 404 });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.equal(result.rejectedCount, 0);
+    const observationInsert = executor.calls.find((call) => call.sql.includes('insert into observations'));
+    assert.ok(observationInsert, 'LocalFoodNodes connector should persist observations');
+    assert.match(JSON.stringify(observationInsert.params), /lfn-potato-2kg/);
+  });
+
   it('marks the source run failed when daily observation persistence aborts after run creation', async () => {
     class FailingObservationExecutor extends DailyIngestionExecutor {
       async query<T>(sql: string, params: unknown[] = []) {
@@ -7505,4 +8020,117 @@ describe('daily ingestion runner', () => {
     assert.deepEqual(result.blockers, ['ica:robots_txt_allow_required', 'ica:legal_review_approval_required']);
     assert.equal(executor.calls.length, 0);
   });
+
+
+  it('parses and fetches 7-Eleven Sweden convenience assortment SKUs from the B2B PDF', async () => {
+    const retrievedAt = '2026-05-24T12:00:00.000Z';
+    const sourceUrl = buildSevenElevenSeBusinessOrdersUrl();
+    const pageHtml = `<a href="${SEVEN_ELEVEN_SE_ASSORTMENT_PDF_URL}">Meny företagsbeställning</a>`;
+    const pdfText = `
+      Ingredienser: Croissant, ost, skinka.
+      CROISSANTFRALLA OST & SKINKA 34-39:-
+      Ingredienser: 83,3% Äppeljuice 10% Mixad Ananas.
+      JUICE SPENAT ÄPPLE ANANAS CITRON RÅSAFT 32-37:- + pant
+      PANE LUNGO, PESTO MED MOZZARELLA, PARMESANKRÄM
+      & RUCCOLA 85-95:- LAKTO-VEGETARISK
+      CHIAPUDDING 34-39:-SURDEGSFRALLA RÅG ÄGG & KAVIAR 34-39:-
+    `;
+
+    assert.equal(findSevenElevenSeAssortmentPdfUrl(pageHtml, sourceUrl), SEVEN_ELEVEN_SE_ASSORTMENT_PDF_URL);
+
+    const parsed = parseSevenElevenSeConvenienceProducts(pdfText, {
+      sourceUrl,
+      pdfUrl: SEVEN_ELEVEN_SE_ASSORTMENT_PDF_URL,
+      retrievedAt,
+      rawSnapshotRef: 'raw://seven-eleven-se-assortment/test'
+    });
+
+    assert.equal(parsed.length, 5);
+    assert.deepEqual(parsed[0], {
+      productId: 'seven-eleven-se-croissantfralla-ost-skinka',
+      chainId: 'seven_eleven_se',
+      chainName: '7-Eleven Sweden',
+      name: 'CROISSANTFRALLA OST & SKINKA',
+      category: 'breakfast',
+      priceMin: 34,
+      priceMax: 39,
+      priceText: '34-39:-',
+      currency: 'SEK',
+      depositIncluded: false,
+      dietaryTags: [],
+      sourceUrl,
+      pdfUrl: SEVEN_ELEVEN_SE_ASSORTMENT_PDF_URL,
+      retrievedAt,
+      provenance: {
+        source: 'seven_eleven_se_b2b_assortment_pdf',
+        parserVersion: 'seven-eleven-se-b2b-assortment-v1',
+        rawSnapshotRef: 'raw://seven-eleven-se-assortment/test'
+      }
+    });
+    assert.equal(parsed[1].category, 'drink');
+    assert.equal(parsed[1].depositIncluded, true);
+    assert.equal(parsed[2].name, 'PANE LUNGO, PESTO MED MOZZARELLA, PARMESANKRÄM & RUCCOLA');
+    assert.deepEqual(parsed[2].dietaryTags, ['lacto_vegetarian', 'vegetarian']);
+    assert.equal(parsed[4].name, 'SURDEGSFRALLA RÅG ÄGG & KAVIAR');
+
+    const requestedUrls: string[] = [];
+    const fetched = await fetchSevenElevenSeConvenienceProducts({
+      retrievedAt,
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        if (String(url) === sourceUrl) {
+          return new Response(pageHtml, { status: 200, headers: { 'content-type': 'text/html' } });
+        }
+        return new Response(new Uint8Array([1, 2, 3]), { status: 200, headers: { 'content-type': 'application/pdf' } });
+      },
+      pdfTextExtractor: async () => pdfText
+    });
+
+    assert.deepEqual(requestedUrls, [sourceUrl, SEVEN_ELEVEN_SE_ASSORTMENT_PDF_URL]);
+    assert.equal(fetched.length, 5);
+  });
+
+
+  it('parses and fetches 7-Eleven Norway store directory rows', async () => {
+    const retrievedAt = '2026-05-24T12:00:00.000Z';
+    const html = `
+      <ol id="Maps-1133-list">
+        <li data-lat="69.648515" data-lng="18.955042" data-title="7-Eleven Domkirkeplassen" data-storeid="7153" data-department="7">
+          <header><h3 class="name">7-Eleven Domkirkeplassen</h3></header>
+          <div class="adr"><div class="street-address">Storgata 61</div><div class="postal"><span class="locality">TROMSØ</span></div></div>
+        </li>
+        <li data-lat="59.932893" data-lng="10.860874" data-title="Alfaset" data-storeid="7547" data-department="77">
+          <header><h3 class="name">Alfaset</h3></header>
+          <div class="adr"><div class="street-address">Nedre Kallbakvei 98</div><div class="postal"><span class="locality">OSLO</span></div></div>
+        </li>
+      </ol>`;
+
+    const rows = parseSevenElevenNoStores(html, buildSevenElevenNoStoresUrl(), retrievedAt);
+    assert.equal(rows.length, 2);
+    assert.deepEqual(rows[0], {
+      storeId: '7153',
+      name: '7-Eleven Domkirkeplassen',
+      chain: '7-eleven',
+      department: '7',
+      address: 'Storgata 61',
+      city: 'TROMSØ',
+      latitude: 69.648515,
+      longitude: 18.955042,
+      sourceUrl: buildSevenElevenNoStoresUrl(),
+      retrievedAt
+    });
+    assert.equal(rows[1].chain, 'uno-x-7-eleven');
+
+    const requestedUrls: string[] = [];
+    const fetched = await fetchSevenElevenNoStores({
+      retrievedAt,
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return new Response(html, { status: 200, headers: { 'content-type': 'text/html' } });
+      }
+    });
+    assert.deepEqual(requestedUrls, [buildSevenElevenNoStoresUrl()]);
+    assert.equal(fetched.length, 2);
+  });
+
 });

@@ -6,7 +6,7 @@ export type ShoppingListItem = {
   checked: boolean;
   detail: string;
   id: string;
-  importSource?: 'starter' | 'bulk-clipboard';
+  importSource?: 'starter' | 'bulk-clipboard' | 'item-detail';
   matchedProductName?: string;
   matchedProductSlug?: string;
   name: string;
@@ -17,21 +17,31 @@ export type BulkImportedListItemInput = Omit<ShoppingListItem, 'checked'> & {
   importSource: 'bulk-clipboard';
 };
 
+export type ProductListItemInput = Omit<ShoppingListItem, 'checked' | 'id' | 'importSource' | 'matchedProductName' | 'matchedProductSlug'> & {
+  productId: string;
+};
+
+type PersistedCustomListItemInput = BulkImportedListItemInput | (Omit<ShoppingListItem, 'checked'> & {
+  importSource: 'item-detail';
+});
+
 export type ShareLinkState = {
   error: string | null;
   expiresAt: string | null;
   isExpired: boolean;
   isValid: boolean;
+  sharedItems: PersistedCustomListItemInput[];
   token: string;
 };
 
 type PersistedListState = {
   checkedById?: Record<string, boolean>;
-  importedItems?: BulkImportedListItemInput[];
+  importedItems?: PersistedCustomListItemInput[];
 };
 
 type SignedSharePayload = {
   expiresAt?: string | null;
+  items?: PersistedCustomListItemInput[];
   listId?: string;
 };
 
@@ -150,10 +160,10 @@ function listStateFromStorage(value: string | null): Required<PersistedListState
       : {};
 
     const importedItems = Array.isArray(maybeImportedItems)
-      ? maybeImportedItems.filter((item): item is BulkImportedListItemInput => (
+      ? maybeImportedItems.filter((item): item is PersistedCustomListItemInput => (
         item !== null
         && typeof item === 'object'
-        && item.importSource === 'bulk-clipboard'
+        && (item.importSource === 'bulk-clipboard' || item.importSource === 'item-detail')
         && typeof item.id === 'string'
         && typeof item.name === 'string'
         && typeof item.quantity === 'string'
@@ -167,7 +177,7 @@ function listStateFromStorage(value: string | null): Required<PersistedListState
   }
 }
 
-function withCheckedState(checkedById: Record<string, boolean>, importedItems: BulkImportedListItemInput[] = []): ShoppingListItem[] {
+function withCheckedState(checkedById: Record<string, boolean>, importedItems: PersistedCustomListItemInput[] = []): ShoppingListItem[] {
   const uniqueItems = new Map<string, Omit<ShoppingListItem, 'checked'>>();
   for (const item of baseListItems) uniqueItems.set(item.id, item);
   for (const item of importedItems) uniqueItems.set(item.id, item);
@@ -205,12 +215,12 @@ async function hmacSignature(encodedPayload: string) {
 async function verifyShareToken(token: string): Promise<ShareLinkState> {
   const [encodedPayload, signature, extra] = token.split('.');
   if (!encodedPayload || !signature || extra !== undefined) {
-    return { token, expiresAt: null, isExpired: false, isValid: false, error: 'Invalid read-only list link signature.' };
+    return { token, expiresAt: null, isExpired: false, isValid: false, sharedItems: [], error: 'Invalid read-only list link signature.' };
   }
 
   const expectedSignature = await hmacSignature(encodedPayload);
   if (signature !== expectedSignature) {
-    return { token, expiresAt: null, isExpired: false, isValid: false, error: 'Invalid read-only list link signature.' };
+    return { token, expiresAt: null, isExpired: false, isValid: false, sharedItems: [], error: 'Invalid read-only list link signature.' };
   }
 
   const payload = JSON.parse(decodeBase64Url(encodedPayload)) as SignedSharePayload;
@@ -218,11 +228,24 @@ async function verifyShareToken(token: string): Promise<ShareLinkState> {
   const expiresAtMs = expiresAt ? Date.parse(expiresAt) : Number.POSITIVE_INFINITY;
   const isExpired = Number.isFinite(expiresAtMs) && expiresAtMs <= Date.now();
 
+  const sharedItems = Array.isArray(payload.items)
+    ? payload.items.filter((item): item is PersistedCustomListItemInput => (
+      item !== null
+      && typeof item === 'object'
+      && (item.importSource === 'bulk-clipboard' || item.importSource === 'item-detail')
+      && typeof item.id === 'string'
+      && typeof item.name === 'string'
+      && typeof item.quantity === 'string'
+      && typeof item.detail === 'string'
+    ))
+    : [];
+
   return {
     token,
     expiresAt,
     isExpired,
     isValid: !isExpired,
+    sharedItems,
     error: isExpired ? 'This read-only shopping list link has expired.' : null
   };
 }
@@ -232,10 +255,11 @@ function persistCheckedState(items: ShoppingListItem[]) {
     const checkedById = Object.fromEntries(items.map((item) => [item.id, item.checked]));
     const importedItems = items
       .filter((item) => item.importSource === 'bulk-clipboard')
+      .concat(items.filter((item) => item.importSource === 'item-detail'))
       .map((item) => ({
         detail: item.detail,
         id: item.id,
-        importSource: 'bulk-clipboard' as const,
+        importSource: item.importSource,
         matchedProductName: item.matchedProductName,
         matchedProductSlug: item.matchedProductSlug,
         name: item.name,
@@ -245,6 +269,10 @@ function persistCheckedState(items: ShoppingListItem[]) {
   } catch {
     // Keep the check-off UI usable even when a browser blocks localStorage.
   }
+}
+
+function productListItemId(productId: string): string {
+  return `product:${productId.trim().toLowerCase()}`;
 }
 
 export function useList() {
@@ -263,6 +291,10 @@ export function useList() {
           const verifiedShare = await verifyShareToken(token);
           if (!cancelled) setShareLink(verifiedShare);
           if (!verifiedShare.isValid) return;
+          if (verifiedShare.sharedItems.length > 0) {
+            if (!cancelled) setItems(withCheckedState({}, verifiedShare.sharedItems));
+            return;
+          }
         }
         if (!cancelled) setItems(withCheckedState(checkedById, importedItems));
       } finally {
@@ -303,6 +335,27 @@ export function useList() {
     });
   }, []);
 
+  const addProductItem = useCallback((input: ProductListItemInput) => {
+    const item: PersistedCustomListItemInput = {
+      detail: input.detail,
+      id: productListItemId(input.productId),
+      importSource: 'item-detail',
+      matchedProductName: input.name,
+      matchedProductSlug: input.productId,
+      name: input.name,
+      quantity: input.quantity
+    };
+    const alreadyOnList = items.some((currentItem) => currentItem.id === item.id);
+    if (!alreadyOnList) {
+      setItems((currentItems) => (
+        currentItems.some((currentItem) => currentItem.id === item.id)
+          ? currentItems
+          : [...currentItems, { ...item, checked: false }]
+      ));
+    }
+    return { added: !alreadyOnList, item };
+  }, [items]);
+
   const checkedCount = useMemo(() => items.filter((item) => item.checked).length, [items]);
   const totalCount = items.length;
   const remainingCount = totalCount - checkedCount;
@@ -327,8 +380,10 @@ export function useList() {
   }, [budgetSnapshot, hasLoadedBrowserState]);
 
   return {
+    addProductItem,
     addImportedItems,
     checkedCount,
+    hasLoadedBrowserState,
     items,
     remainingCount,
     resetCheckedState,

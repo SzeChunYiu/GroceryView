@@ -1,6 +1,10 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
 import {
   buildSupabaseDirectConnectionString,
@@ -19,6 +23,9 @@ import {
 const scriptSource = readFileSync(
   new URL('../../scripts/ops/check-daily-db-connectivity.mjs', import.meta.url),
   'utf8'
+);
+const compareDbIoHotspotsScriptPath = fileURLToPath(
+  new URL('../../scripts/ops/compare-db-io-hotspots.mjs', import.meta.url)
 );
 
 describe('daily DB connectivity diagnostic script', () => {
@@ -325,6 +332,110 @@ describe('daily DB connectivity diagnostic script', () => {
     assert.deepEqual(result.beforeOnlyQueryIds, []);
     assert.deepEqual(result.afterOnlyQueryIds, []);
     assert.deepEqual(result.rows, []);
+  });
+
+  it('writes DB IO hotspot CLI fixture deltas and skips missing inputs without DATABASE_URL', () => {
+    const tempDir = mkdtempSync(join(tmpdir(), 'groceryview-db-io-hotspots-'));
+    try {
+      const beforePath = join(tempDir, 'before.json');
+      const afterPath = join(tempDir, 'after.json');
+      const outPath = join(tempDir, 'delta.json');
+      writeFileSync(
+        beforePath,
+        JSON.stringify({
+          status: 'ready',
+          hotspots: [
+            {
+              queryid: 'shared-query',
+              sharedBlksRead: 10,
+              sharedBlksWritten: 1,
+              localBlksRead: 2,
+              localBlksWritten: 3,
+              tempBlksRead: 4,
+              tempBlksWritten: 5,
+              blkReadTimeMs: 1.5,
+              blkWriteTimeMs: 2.25,
+              querySnippet: 'select before'
+            },
+            { queryid: 'before-only', sharedBlksRead: 8 }
+          ]
+        })
+      );
+      writeFileSync(
+        afterPath,
+        JSON.stringify({
+          status: 'ready',
+          hotspots: [
+            {
+              queryid: 'shared-query',
+              sharedBlksRead: 17,
+              sharedBlksWritten: 4,
+              localBlksRead: 5,
+              localBlksWritten: 9,
+              tempBlksRead: 4,
+              tempBlksWritten: 8,
+              blkReadTimeMs: 3.75,
+              blkWriteTimeMs: 2.5,
+              querySnippet: 'select after'
+            },
+            { queryid: 'after-only', sharedBlksRead: 11 }
+          ]
+        })
+      );
+
+      const env = { ...process.env };
+      delete env.DATABASE_URL;
+      const run = spawnSync(
+        process.execPath,
+        [compareDbIoHotspotsScriptPath, '--before', beforePath, '--after', afterPath, '--out', outPath],
+        { encoding: 'utf8', env }
+      );
+
+      assert.equal(run.status, 0, run.stderr);
+      assert.equal(run.stderr, '');
+      const stdoutBody = JSON.parse(run.stdout);
+      const outBody = JSON.parse(readFileSync(outPath, 'utf8'));
+      assert.deepEqual(outBody, stdoutBody);
+      assert.equal(outBody.status, 'compared');
+      assert.equal(outBody.beforeHotspotCount, 2);
+      assert.equal(outBody.afterHotspotCount, 2);
+      assert.deepEqual(outBody.beforeOnlyQueryIds, ['before-only']);
+      assert.deepEqual(outBody.afterOnlyQueryIds, ['after-only']);
+      assert.deepEqual(outBody.rows[0].delta, {
+        sharedBlksRead: 7,
+        sharedBlksWritten: 3,
+        localBlksRead: 3,
+        localBlksWritten: 6,
+        tempBlksRead: 0,
+        tempBlksWritten: 3,
+        blkReadTimeMs: 2.25,
+        blkWriteTimeMs: 0.25
+      });
+
+      const missingOutPath = join(tempDir, 'missing-delta.json');
+      const missingRun = spawnSync(
+        process.execPath,
+        [
+          compareDbIoHotspotsScriptPath,
+          '--before',
+          join(tempDir, 'missing-before.json'),
+          '--after',
+          afterPath,
+          '--out',
+          missingOutPath
+        ],
+        { encoding: 'utf8', env }
+      );
+
+      assert.equal(missingRun.status, 0, missingRun.stderr);
+      assert.equal(missingRun.stderr, '');
+      const missingBody = JSON.parse(readFileSync(missingOutPath, 'utf8'));
+      assert.equal(missingBody.status, 'skipped');
+      assert.equal(missingBody.blocker, 'daily_db_io_hotspots_delta_missing_before_or_after');
+      assert.equal(JSON.parse(missingRun.stdout).status, 'skipped');
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
   });
 
   it('uses a startup-sized retry window for database 57P03 recovery before failing closed', async () => {

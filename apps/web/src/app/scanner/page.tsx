@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { OcrScanHistoryTimeline } from '@/components/ocr-scan-history-timeline';
 import { ScannerUploadActions } from '@/components/scanner-upload-actions';
@@ -11,6 +12,20 @@ export function generateMetadata() {
 export const dynamic = 'force-static';
 
 const route = 'scanner';
+
+
+const premiumOcrScanHistory = {
+  tier: 'Premium OCR history',
+  entitlement: 'premium',
+  retainedDays: 365,
+  includedTools: ['scan history timeline', 'advanced line-item corrections', 'corrected receipt row export'],
+  upgradeReason: 'Frequent barcode and receipt users can revisit prior OCR runs and fix recurring retailer aliases without exposing private receipts publicly.',
+  guardrails: [
+    'Requires a signed-in account with an active premium entitlement before scan history is stored.',
+    'Free accounts can process a scan but saved OCR history and advanced correction drafts stay locked.',
+    'Static scanner pages never render private receipt images, extracted lines, or correction history.'
+  ]
+};
 
 export default function ScannerPage() {
   return (
@@ -37,6 +52,7 @@ export default function ScannerPage() {
             <div className="rounded-2xl bg-white/80 p-4">
               <p className="text-xs font-black uppercase tracking-[0.18em] text-indigo-700">Review action</p>
               <p className="mt-2 break-all text-lg font-black text-indigo-950">{receiptFedAliasGrowthPlan.reviewAction}</p>
+              <p className="mt-2 text-sm font-semibold text-indigo-900">{receiptFedAliasGrowthPlan.reviewQueue} · {receiptFedAliasGrowthPlan.trustTable}</p>
             </div>
           </div>
         </div>
@@ -46,7 +62,13 @@ export default function ScannerPage() {
               <p className="text-sm font-black text-slate-950">{candidate.normalizedAlias}</p>
               <p className="mt-1 text-sm font-semibold text-slate-600">{candidate.chainLabel} · {candidate.itemTotal} kr · {candidate.quantity} {candidate.comparableUnit}</p>
               <p className="mt-2 text-2xl font-black text-indigo-950">{candidate.unitPrice} kr/{candidate.comparableUnit}</p>
-              <p className="mt-2 text-sm leading-6 text-slate-700">Priority {candidate.priority}; evidence {candidate.evidence.join(' · ')}</p>
+              <p className="mt-2 text-sm leading-6 text-slate-700">
+                Priority {candidate.priority}; confidence {Math.round(candidate.confidence * 100)}%; reporter trust {Math.round(candidate.sourceTrust * 100)}%
+                {candidate.reporterId ? `; reporter ${candidate.reporterId}` : ''}
+              </p>
+              <p className="mt-2 text-sm leading-6 text-slate-700">
+                Evidence text: {candidate.evidenceText}. Private image evidence is {candidate.evidenceImageUri ? 'attached to the review item' : 'not available'} and not rendered publicly.
+              </p>
             </div>
           ))}
         </div>
@@ -59,6 +81,28 @@ export default function ScannerPage() {
           </ul>
           <p className="mt-3 text-sm font-bold text-indigo-950">Next runtime step: {receiptFedAliasGrowthPlan.nextRuntimeStep}</p>
         </div>
+      </Card>
+      <Card className="mt-6 border-emerald-200 bg-emerald-50/70">
+        <div className="grid gap-5 lg:grid-cols-[1fr_0.8fr] lg:items-start">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-800">Premium scan tools</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">OCR scan history and advanced corrections</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-700">
+              {premiumOcrScanHistory.upgradeReason} Premium keeps {premiumOcrScanHistory.retainedDays} days of account-bound scan history for {premiumOcrScanHistory.includedTools.join(', ')}.
+            </p>
+          </div>
+          <Link className="rounded-full bg-emerald-900 px-5 py-3 text-center text-sm font-black text-white shadow-sm" href="/pricing">
+            Compare premium plans
+          </Link>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          {premiumOcrScanHistory.includedTools.map((tool) => (
+            <p className="rounded-2xl bg-white/80 p-3 text-sm font-black capitalize text-emerald-950" key={tool}>{tool}</p>
+          ))}
+        </div>
+        <ul className="mt-4 space-y-2 text-sm font-semibold leading-6 text-emerald-950">
+          {premiumOcrScanHistory.guardrails.map((guardrail) => <li key={guardrail}>• {guardrail}</li>)}
+        </ul>
       </Card>
       <ScannerUploadActions />
       <OcrScanHistoryTimeline />

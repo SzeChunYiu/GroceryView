@@ -2,6 +2,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ChainFilterInput } from './chain-filter-input';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { PriceReportReviewActions } from '@/components/price-report-review-actions';
+import { OriginFilter, type OriginFilterCode } from '@/components/origin-filter';
 import { ProductPriceCards } from '@/components/product-price-cards';
 import { apohemSource } from '@/lib/ingested/apohem';
 import { adaptiveProductCards, buildProductSearchView, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
@@ -18,6 +20,7 @@ type SearchParams = {
   q?: string | string[];
   category?: string | string[];
   label?: string | string[];
+  origin?: string | string[];
   dietary?: string | string[];
   chain?: string | string[];
   minPrice?: string | string[];
@@ -58,6 +61,7 @@ function copySearchParams(params: URLSearchParams, source: SearchParams) {
   setFirstParam(params, 'q', source.q);
   setFirstParam(params, 'category', source.category);
   setFirstParam(params, 'label', source.label);
+  setAllParams(params, 'origin', source.origin);
   setAllParams(params, 'dietary', source.dietary);
   setFirstParam(params, 'chain', source.chain);
   setFirstParam(params, 'minPrice', source.minPrice);
@@ -115,7 +119,7 @@ function zeroResultCategoryShortcuts(query: string, selectedCategory: string | s
 export default async function ProductsPage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
   const search = buildProductSearchView(resolvedSearchParams);
-  const { categoryFacets, labelFacets, chainFacets, priceRange, inStockOnly, resultCards } = search;
+  const { categoryFacets, labelFacets, originFacets, chainFacets, priceRange, inStockOnly, resultCards } = search;
   const requestedPage = toPageNumber(resolvedSearchParams.page);
   const selectedBrand = normalizeSelectedBrand(resolvedSearchParams.brand);
   const productCards = selectedBrand
@@ -132,7 +136,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const zeroResultFallback = relatedSearchFallback(search.query);
   const zeroResultCategories = zeroResultCategoryShortcuts(search.query, resolvedSearchParams.category);
 
-  function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence', string>>) {
+  function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'origin' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence', string>>) {
     const params = new URLSearchParams();
     copySearchParams(params, resolvedSearchParams);
     for (const [key, value] of Object.entries(overrides)) {
@@ -183,6 +187,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           {selectedBrand ? <input name="brand" type="hidden" value={selectedBrand} /> : null}
           {search.filters.categories.length > 0 ? <input name="category" type="hidden" value={search.filters.categories.join(',')} /> : null}
           {search.labelFilters.length > 0 ? <input name="label" type="hidden" value={search.labelFilters.join(',')} /> : null}
+          {search.originFilters.map((origin) => <input key={origin} name="origin" type="hidden" value={origin} />)}
           <ChainFilterInput chains={search.filters.chains} products={chainFilterProducts} />
           <label className="text-sm font-black text-slate-950" htmlFor="product-search-q">
             Search
@@ -232,6 +237,11 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-violet-900 shadow-sm">No active URL filters</span>
           )}
         </div>
+        <OriginFilter
+          className="mt-5"
+          counts={Object.fromEntries(originFacets.map((facet) => [facet.value, facet.count])) as Partial<Record<OriginFilterCode, number>>}
+          selected={search.originFilters}
+        />
         {resultCards.length === 0 ? (
           <div className="mt-5 rounded-3xl border border-amber-200 bg-amber-50 p-5">
             <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-800">No exact matches</p>
@@ -349,6 +359,24 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           </div>
         ) : null}
       </Card>
+
+      <Card className="mt-8 border-violet-200 bg-violet-50/70">
+        <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-violet-800">Community validation</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Review prompts after a price report</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Product pages now ask shoppers to rate price accuracy, product quality, and store experience after they submit or verify a report.
+              These prompts improve trust in crowdsourced grocery data without publishing anonymous moderation decisions.
+            </p>
+          </div>
+          <Link className="rounded-full bg-violet-800 px-5 py-3 text-sm font-black text-white" href="/price-reports">
+            Open price reports
+          </Link>
+        </div>
+        <PriceReportReviewActions />
+      </Card>
+
       <Card className="mt-8 border-rose-200 bg-rose-50/70">
         <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
           <div>

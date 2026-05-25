@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import {
@@ -16,6 +17,7 @@ import {
   type ItemSubstitutionProduct
 } from '@groceryview/analytics';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { PriceIntelligenceCard, type PriceIntelligenceScoreCard } from '@/components/price-intelligence-card';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
 import { axfoodProducts } from '@/lib/axfood-products';
@@ -1187,6 +1189,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
     const breadcrumbJsonLd = breadcrumbJsonLdFor(product);
     return (
       <PageShell>
+        <FunnelStepBeacon step="product_view" />
         <script dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbJsonLd) }} type="application/ld+json" />
         <Eyebrow>{isChain ? 'Axfood chain product' : 'OpenPrices product'}</Eyebrow>
         <Card className="mt-6 border-dashed border-slate-300 bg-slate-50 text-center">
@@ -1223,6 +1226,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const breadcrumbJsonLd = breadcrumbJsonLdFor(product);
   return (
     <PageShell>
+      <FunnelStepBeacon step="product_view" />
       <script dangerouslySetInnerHTML={{ __html: jsonLd(productJsonLd) }} type="application/ld+json" />
       <script dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbJsonLd) }} type="application/ld+json" />
       <Eyebrow>{isChain ? 'Axfood chain product' : 'OpenPrices product'}</Eyebrow>
@@ -1231,14 +1235,16 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
       <div className="mt-6 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
         <Card>
           {product.image ? (
-            <img
-              alt={product.name}
-              className="mb-5 aspect-square w-full rounded-[2rem] border border-slate-100 bg-slate-50 object-contain p-4 shadow-inner"
-              decoding="async"
-              loading="lazy"
-              referrerPolicy="no-referrer"
-              src={product.image}
-            />
+            <div className="relative mb-5 aspect-square w-full overflow-hidden rounded-[2rem] border border-slate-100 bg-slate-50 shadow-inner">
+              <Image
+                alt={product.name}
+                className="object-contain p-4"
+                fill
+                referrerPolicy="no-referrer"
+                sizes="(min-width: 1024px) 38vw, 100vw"
+                src={product.image}
+              />
+            </div>
           ) : (
             <div className="mb-5 rounded-[2rem] border border-dashed border-slate-200 bg-slate-50 p-6 text-center text-sm font-bold text-slate-500">
               Product image not reported by the current verified source.

@@ -1,0 +1,63 @@
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    color: #0f172a !important;
+    font-size: 11pt;
+  }
+
+  .print\:hidden,
+  nav,
+  [data-print-hidden='true'] {
+    display: none !important;
+  }
+
+  .shopping-list-print-page {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+
+  .shopping-list-print-card {
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+    padding: 0 !important;
+  }
+
+  .shopping-list-print-header {
+    border-bottom: 1px solid #cbd5e1;
+    padding: 0 0 6mm !important;
+  }
+
+  .shopping-list-print-items {
+    margin-top: 6mm !important;
+  }
+
+  .shopping-list-print-items li {
+    background: #fff !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+    margin-bottom: 3mm;
+    padding: 4mm !important;
+  }
+
+  .shopping-list-print-items input[type='checkbox'] {
+    appearance: none;
+    border: 1.5pt solid #0f172a;
+    height: 12pt;
+    width: 12pt;
+  }
+
+  a {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+}

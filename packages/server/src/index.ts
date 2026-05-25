@@ -1,7 +1,9 @@
+import { Buffer } from 'node:buffer';
 import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
+import { z, type ZodIssue } from 'zod';
 import { pathToFileURL } from 'node:url';
 import {
   buildFlyerOfferReport,
@@ -32,11 +34,13 @@ import {
   createPostgresCatalogReader,
   createPostgresRepository,
   createPostgresSourceRecordReader,
+  queryRollingAverageDealReport,
   buildUserAccountDeletionQueries,
   type BudgetRecord,
   type PgLikeClient,
   type PostgresIntegrationReadinessReport,
   type QueryExecutor,
+  type RollingAverageDealReport,
   type SourceRunHealthCheckResult,
   type SourceRunHealthReport
 } from '@groceryview/db';
@@ -167,11 +171,24 @@ export type AuthOptions = {
   scanUploadCorsReadinessProvider?: () => Promise<ScanUploadCorsReadinessReport>;
   scanUploadWriteReadinessProvider?: () => Promise<ScanUploadWriteReadinessReport>;
   flyerOffersProvider?: (query: FlyerOffersProviderQuery) => Promise<FlyerOfferReport>;
+  dealsProvider?: (query: DealsProviderQuery) => Promise<RollingAverageDealReport>;
   storeFlyerOffersProvider?: (storeId: string, query: StoreFlyerOffersProviderQuery) => Promise<StoreFlyerOfferReport | null>;
   watchlistPriceAlertsProvider?: (userId: string) => Promise<WatchlistPriceAlertReport>;
   watchlistPriceAlertWriter?: (userId: string, request: WatchlistPriceAlertRequest) => Promise<WatchlistPriceAlertReport>;
   scanProviders?: ScanProviders;
   scanUploadStorage?: ScanUploadStorage;
+};
+
+export const GROCERYVIEW_API_VERSION = '0.1.0';
+export const GROCERYVIEW_OPENAPI_VERSION = '3.1.0';
+
+export type ApiVersionReport = {
+  service: 'groceryview-server';
+  apiVersion: typeof GROCERYVIEW_API_VERSION;
+  openApiVersion: typeof GROCERYVIEW_OPENAPI_VERSION;
+  runtime?: {
+    environment: RuntimeConfig['nodeEnv'];
+  };
 };
 
 export type AuthProvider = 'magic_link' | 'passkey' | 'oidc';
@@ -252,6 +269,7 @@ export type RuntimeHandlerOptions = {
   scanUploadCorsReadinessProvider?: () => Promise<ScanUploadCorsReadinessReport>;
   scanUploadWriteReadinessProvider?: () => Promise<ScanUploadWriteReadinessReport>;
   flyerOffersProvider?: (query: FlyerOffersProviderQuery) => Promise<FlyerOfferReport>;
+  dealsProvider?: (query: DealsProviderQuery) => Promise<RollingAverageDealReport>;
   storeFlyerOffersProvider?: (storeId: string, query: StoreFlyerOffersProviderQuery) => Promise<StoreFlyerOfferReport | null>;
   watchlistPriceAlertsProvider?: (userId: string) => Promise<WatchlistPriceAlertReport>;
   watchlistPriceAlertWriter?: (userId: string, request: WatchlistPriceAlertRequest) => Promise<WatchlistPriceAlertReport>;
@@ -268,6 +286,10 @@ export type FlyerOffersProviderQuery = {
   chain?: string;
   category?: string;
   productId?: string;
+};
+
+export type DealsProviderQuery = {
+  category?: string;
 };
 
 export type StoreFlyerOffersProviderQuery = {
@@ -381,6 +403,7 @@ function jsonTextResponse(body: string, init: ResponseInit = {}): Response {
 const apiHotEndpointCacheTtlSeconds: Readonly<Record<string, number>> = {
   '/api/market/overview': 60,
   '/api/indices': 300,
+  '/api/deals': 300,
   '/api/deals/flyer-offers': 300,
   '/api/deals/discounts': 300
 };
@@ -419,6 +442,111 @@ async function cachedJsonResponse(cache: ApiResponseCache | undefined, url: URL,
 
 function errorResponse(status: number, error: string): Response {
   return jsonResponse({ error }, { status });
+}
+
+const contactRequestMaxBytes = 8 * 1024;
+const contactRateLimitWindowMs = 60 * 60 * 1000;
+const contactRateLimitMaxRequests = 5;
+
+const contactRequestSchema = z.object({
+  name: z.string().trim().min(1).max(120),
+  email: z.string().trim().email().max(254),
+  subject: z.string().trim().min(1).max(160).optional(),
+  message: z.string().trim().min(10).max(4000),
+  consent: z.literal(true),
+  source: z.enum(['web', 'mobile']).optional()
+}).strict();
+
+type ContactRateLimitEntry = {
+  windowStartedAt: number;
+  count: number;
+};
+
+const contactRateLimitBuckets = new Map<string, ContactRateLimitEntry>();
+
+function structuredContactError(status: number, code: string, message: string, details?: unknown, headers?: HeadersInit): Response {
+  return jsonResponse({ ok: false, error: { code, message, ...(details === undefined ? {} : { details }) } }, { status, headers });
+}
+
+function contactValidationDetails(issues: ZodIssue[]) {
+  return issues.map((issue) => ({
+    path: issue.path.join('.') || 'body',
+    code: issue.code,
+    message: issue.message
+  }));
+}
+
+function contactClientKey(request: Request): string {
+  const forwardedFor = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
+  return forwardedFor || request.headers.get('x-real-ip')?.trim() || 'anonymous';
+}
+
+function contactRateLimitResponse(request: Request, now: Date): Response | null {
+  const key = contactClientKey(request);
+  const nowMs = now.getTime();
+  const current = contactRateLimitBuckets.get(key);
+  const bucket = current && nowMs - current.windowStartedAt < contactRateLimitWindowMs
+    ? current
+    : { windowStartedAt: nowMs, count: 0 };
+  bucket.count += 1;
+  contactRateLimitBuckets.set(key, bucket);
+  if (bucket.count <= contactRateLimitMaxRequests) return null;
+  const retryAfterSeconds = Math.max(1, Math.ceil((bucket.windowStartedAt + contactRateLimitWindowMs - nowMs) / 1000));
+  return structuredContactError(
+    429,
+    'contact_rate_limited',
+    'Too many contact requests. Please try again later.',
+    { retryAfterSeconds },
+    { 'retry-after': String(retryAfterSeconds) }
+  );
+}
+
+async function contactRequestFromBody(request: Request): Promise<z.infer<typeof contactRequestSchema> | Response> {
+  const contentType = request.headers.get('content-type') ?? '';
+  if (!/^application\/json(?:\s*;|$)/i.test(contentType)) {
+    return structuredContactError(415, 'unsupported_media_type', 'POST /api/contact requires an application/json request body.');
+  }
+
+  const contentLength = request.headers.get('content-length');
+  if (contentLength !== null && Number(contentLength) > contactRequestMaxBytes) {
+    return structuredContactError(413, 'payload_too_large', 'Contact request body exceeds the 8 KiB limit.');
+  }
+
+  const text = await request.text();
+  if (Buffer.byteLength(text, 'utf8') > contactRequestMaxBytes) {
+    return structuredContactError(413, 'payload_too_large', 'Contact request body exceeds the 8 KiB limit.');
+  }
+
+  let body: unknown;
+  try {
+    body = JSON.parse(text);
+  } catch {
+    return structuredContactError(400, 'invalid_json', 'Request body must be valid JSON.');
+  }
+
+  const parsed = contactRequestSchema.safeParse(body);
+  if (!parsed.success) {
+    return structuredContactError(400, 'validation_failed', 'Contact request body failed validation.', contactValidationDetails(parsed.error.issues));
+  }
+  return parsed.data;
+}
+
+async function contactAcknowledgement(request: Request, now: Date): Promise<Response> {
+  if (process.env.CONTACT_FORM_DISABLED === 'true') {
+    return structuredContactError(503, 'contact_unavailable', 'Contact intake is temporarily unavailable.');
+  }
+  const rateLimited = contactRateLimitResponse(request, now);
+  if (rateLimited) return rateLimited;
+
+  const body = await contactRequestFromBody(request);
+  if (body instanceof Response) return body;
+
+  const digest = createHash('sha256')
+    .update(`${body.email}\0${body.name}\0${body.subject ?? ''}\0${now.toISOString()}`)
+    .digest('hex')
+    .slice(0, 16);
+
+  return jsonResponse({ ok: true, status: 'accepted', requestId: `contact_${digest}`, receivedAt: now.toISOString() }, { status: 202 });
 }
 
 class MalformedPostBodyError extends Error {
@@ -921,6 +1049,10 @@ async function queryFlyerOffersFromPostgres(executor: QueryExecutor, query: Flye
     },
     observations: rows.map(flyerObservationFromSql)
   });
+}
+
+async function queryDealsFromPostgres(executor: QueryExecutor, query: DealsProviderQuery): Promise<RollingAverageDealReport> {
+  return queryRollingAverageDealReport(executor, query);
 }
 
 async function queryStoreFlyerOffersFromPostgres(
@@ -1943,6 +2075,27 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         );
       }
 
+      if (method === 'GET' && path === '/api/version') {
+        const includeRuntime = url.searchParams.get('includeRuntime');
+        if (includeRuntime !== null && includeRuntime !== 'true' && includeRuntime !== 'false') {
+          return errorResponse(400, 'includeRuntime must be true or false.');
+        }
+        const runtimeConfig = authOptions.runtimeConfig;
+        const body: ApiVersionReport = {
+          service: 'groceryview-server',
+          apiVersion: GROCERYVIEW_API_VERSION,
+          openApiVersion: GROCERYVIEW_OPENAPI_VERSION,
+          ...(includeRuntime === 'true'
+            ? {
+                runtime: {
+                  environment: runtimeConfig?.nodeEnv ?? ((process.env.NODE_ENV ?? 'development') as RuntimeConfig['nodeEnv'])
+                }
+              }
+            : {})
+        };
+        return jsonResponse(body);
+      }
+
       if (path === '/api/auth/session') {
         if (method === 'POST') {
           if (!authOptions.authSecret) return errorResponse(503, 'Auth secret is not configured.');
@@ -1966,6 +2119,17 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
             expiresAt
           });
         }
+      }
+
+      if (path === '/api/contact') {
+        if (method === 'POST') {
+          try {
+            return await contactAcknowledgement(request, authOptions.now ?? new Date());
+          } catch {
+            return structuredContactError(500, 'contact_internal_error', 'Contact request could not be accepted.');
+          }
+        }
+        return structuredContactError(405, 'method_not_allowed', 'POST /api/contact is the only supported contact method.');
       }
 
       if (method === 'GET' && path === '/api/openapi.json') return jsonResponse(buildOpenApiDocument());
@@ -2068,6 +2232,14 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
       if (method === 'GET' && path === '/api/categories') return jsonResponse(api.getCategories());
       if (method === 'GET' && path === '/api/stores') return jsonResponse(api.getStores());
       if (method === 'GET' && path === '/api/retailers') return jsonResponse(api.getRetailers());
+
+      if (method === 'GET' && path === '/api/deals') {
+        const query = {
+          category: url.searchParams.get('category') ?? undefined
+        };
+        if (!authOptions.dealsProvider) return errorResponse(503, 'Deals provider is not configured.');
+        return cachedJsonResponse(authOptions.apiResponseCache, url, apiHotEndpointCacheTtlSeconds[path], () => authOptions.dealsProvider!(query));
+      }
 
       if (method === 'GET' && path === '/api/deals/flyer-offers') {
         const query = {
@@ -3155,8 +3327,8 @@ const operationWithJsonResponse = (operation: OpenApiOperation, schemaName: keyo
 
 export function buildOpenApiDocument(): OpenApiDocument {
   return {
-    openapi: '3.1.0',
-    info: { title: 'GroceryView API', version: '0.1.0' },
+    openapi: GROCERYVIEW_OPENAPI_VERSION,
+    info: { title: 'GroceryView API', version: GROCERYVIEW_API_VERSION },
     components: {
       securitySchemes: {
         bearerAuth: { type: 'http', scheme: 'bearer' },
@@ -3169,6 +3341,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
     },
     paths: {
       '/api/health': { get: publicOperation('Get API runtime health without exposing secrets.') },
+      '/api/version': { get: publicOperation('Get API and OpenAPI version metadata without exposing secrets.') },
       '/api/openapi.json': { get: publicOperation('Get the public OpenAPI document for developer price and nutrition API integrations.') },
       '/api/auth/session': { post: publicOperation('Exchange a verified auth provider assertion for a short-lived bearer session.') },
       '/api/fuel': { get: publicOperation('Get per-grade fuel price observations with operator and crowd-source provenance.') },
@@ -3191,6 +3364,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/receipts/review': { get: protectedOperation('Get receipt review budget impact, match confidence, and writeback guardrails.') },
       '/api/categories': { get: publicOperation('List the category tree with product counts for navigation and filter sidebars.') },
       '/api/categories/{category}/market': { get: publicOperation('Get category market report with current price, 1M move, 52-week range, and verified evidence.') },
+      '/api/deals': { get: publicOperation('Get current items priced below their 30-day rolling average, sorted by discount percentage.') },
       '/api/deals/discounts': { get: publicOperation('Get active weekly discounts by branch, chain, category, or product with source evidence.') },
       '/api/deals/flyer-offers': { get: publicOperation('Get active weekly flyer offers by branch, chain, category, or product with source evidence.') },
       '/api/retailers': { get: publicOperation('List supported retailers with logo and website metadata.') },
@@ -3210,6 +3384,9 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/products/search': { get: publicOperation('Search products.') },
       '/api/products/{id}': { get: publicOperation('Get product detail.') },
       '/api/products/{id}/deal-score': { get: publicOperation('Get Deal Score v1 report with customer-facing reasons.') },
+      '/api/contact': {
+        post: publicOperation('Accept a contact form request and return an asynchronous acknowledgement without echoing the message body.')
+      },
       '/api/products/{id}/equivalents': { get: publicOperation('Get comparable products in the same category.') },
       '/api/products/{id}/price-spread': { get: publicOperation('Get product price spread across current verified store quotes.') },
       '/api/products/{id}/cheapest-now': { get: publicOperation('Get the cheapest current product quote by observed chain for retailer overlays.') },
@@ -3735,6 +3912,7 @@ export function buildRuntimeAuthOptions(config: RuntimeConfig, options: RuntimeH
       now: options.now
     })),
     flyerOffersProvider: options.flyerOffersProvider,
+    dealsProvider: options.dealsProvider,
     storeFlyerOffersProvider: options.storeFlyerOffersProvider,
     watchlistPriceAlertsProvider: options.watchlistPriceAlertsProvider,
     watchlistPriceAlertWriter: options.watchlistPriceAlertWriter,
@@ -3816,6 +3994,7 @@ function createRuntimeRepositoryResource(config: RuntimeConfig, options: Runtime
   sourceRunHealthProvider?: () => Promise<SourceRunHealthCheckResult>;
   catalogCoverageProvider?: () => Promise<CatalogCoverageReport>;
   flyerOffersProvider?: (query: FlyerOffersProviderQuery) => Promise<FlyerOfferReport>;
+  dealsProvider?: (query: DealsProviderQuery) => Promise<RollingAverageDealReport>;
   storeFlyerOffersProvider?: (storeId: string, query: StoreFlyerOffersProviderQuery) => Promise<StoreFlyerOfferReport | null>;
   watchlistPriceAlertsProvider?: (userId: string) => Promise<WatchlistPriceAlertReport>;
   watchlistPriceAlertWriter?: (userId: string, request: WatchlistPriceAlertRequest) => Promise<WatchlistPriceAlertReport>;
@@ -3852,6 +4031,7 @@ function createRuntimeRepositoryResource(config: RuntimeConfig, options: Runtime
         }
       : {}),
     flyerOffersProvider: (query) => queryFlyerOffersFromPostgres(executor, query),
+    dealsProvider: (query) => queryDealsFromPostgres(executor, query),
     storeFlyerOffersProvider: (storeId, query) => queryStoreFlyerOffersFromPostgres(executor, storeId, query),
     watchlistPriceAlertsProvider: (userId) => queryWatchlistPriceAlertsFromPostgres(executor, repository, userId),
     watchlistPriceAlertWriter: (userId, request) => upsertWatchlistPriceAlertInPostgres(executor, repository, userId, request),
@@ -3872,6 +4052,7 @@ function createRuntimeHttpServiceFromConfig(config: RuntimeConfig, options: Runt
     catalogCoverageProvider: options.catalogCoverageProvider ?? resource.catalogCoverageProvider,
     scanProviderReadinessProvider: options.scanProviderReadinessProvider,
     flyerOffersProvider: options.flyerOffersProvider ?? resource.flyerOffersProvider,
+    dealsProvider: options.dealsProvider ?? resource.dealsProvider,
     storeFlyerOffersProvider: options.storeFlyerOffersProvider ?? resource.storeFlyerOffersProvider,
     watchlistPriceAlertsProvider: options.watchlistPriceAlertsProvider ?? resource.watchlistPriceAlertsProvider,
     watchlistPriceAlertWriter: options.watchlistPriceAlertWriter ?? resource.watchlistPriceAlertWriter

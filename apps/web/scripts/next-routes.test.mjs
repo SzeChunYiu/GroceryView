@@ -16,6 +16,7 @@ const appFiles = [
   'src/app/catalogue-savings/page.tsx',
   'src/app/chain-index/page.tsx',
   'src/app/chain-coverage/page.tsx',
+  'src/app/coverage/page.tsx',
   'src/app/map/page.tsx',
   'src/app/data-sources/page.tsx',
   'src/app/store-coverage/page.tsx',
@@ -42,6 +43,20 @@ async function fileExists(relative) {
 }
 
 describe('verified-data UI', () => {
+  it('ships the requested grouped desktop navigation without legacy personal-product links', async () => {
+    const nav = await read('src/components/app-nav.tsx');
+
+    assert.match(nav, /label: 'Markets'[\s\S]*label: 'Overview'[\s\S]*label: 'Chain index'[\s\S]*label: 'Categories'[\s\S]*label: 'Heatmap'[\s\S]*label: 'Screener'/);
+    assert.match(nav, /label: 'Products'[\s\S]*label: 'Browse'[\s\S]*label: 'Compare'/);
+    assert.match(nav, /label: 'Stores'[\s\S]*label: 'Map'[\s\S]*label: 'Stores'/);
+    assert.match(nav, /label: 'Personal'[\s\S]*label: 'Savings'[\s\S]*label: 'My Flyer'[\s\S]*label: 'Watchlist'[\s\S]*label: 'Weekly basket'[\s\S]*label: 'Meal planner'/);
+    assert.match(nav, /aria-haspopup="true"/);
+    assert.match(nav, /group-focus-within:visible/);
+    assert.match(nav, /group-hover:visible/);
+    assert.match(nav, /from 'lucide-react'/);
+    assert.doesNotMatch(nav, /label: 'Compare items'|label: 'Alerts'|label: 'Favorites'|label: 'Favourites'|label: 'Shopping list'|label: 'Basket'/);
+  });
+
   it('keeps core routes backed by generated verified datasets', async () => {
     for (const file of appFiles) assert.ok((await read(file)).length > 0, `${file} should not be empty`);
     const verified = await read('src/lib/verified-data.ts');
@@ -207,6 +222,25 @@ describe('verified-data UI', () => {
   });
 
 
+
+  it('surfaces premium OCR scan history on scanner and pricing routes', async () => {
+    const scanner = await read('src/app/scanner/page.tsx');
+    const pricing = await read('src/app/pricing/page.tsx');
+    const seo = await read('src/lib/seo.ts');
+    const sitemap = await read('src/app/sitemap.ts');
+
+    assert.match(scanner, /premiumOcrScanHistory/);
+    assert.match(scanner, /OCR scan history and advanced corrections/);
+    assert.match(scanner, /active premium entitlement/);
+    assert.match(scanner, /href="\/pricing"/);
+    assert.match(pricing, /Premium OCR history/);
+    assert.match(pricing, /Private OCR scan history timeline/);
+    assert.match(pricing, /Advanced line-item correction tools/);
+    assert.match(pricing, /No OCR scan history storage/);
+    assert.match(pricing, /routeMetadata\('\/pricing'\)/);
+    assert.match(seo, /'\/pricing'/);
+    assert.match(sitemap, /entry\('\/pricing'/);
+  });
 
   it('surfaces receipt-fed commodity alias growth without exposing private receipts', async () => {
     const verified = await read('src/lib/verified-data.ts');
@@ -381,7 +415,7 @@ describe('verified-data UI', () => {
     assert.match(page, /cheapestStoreName/);
     assert.match(page, /signed-in/i);
     assert.match(page, /No anonymous favorites/);
-    assert.match(nav, /href: '\/favorites'/);
+    assert.doesNotMatch(nav, /href: '\/favorites'/);
     assert.match(apiRoute, /favoritesRoutes/);
     assert.match(apiRoute, /users\/\{userId\}\/favorites/);
     assert.match(apiRoute, /sort: \['name', 'price'\]/);
@@ -557,6 +591,28 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(actions, /demo-data|sample-data|mock session/i);
     assert.match(server, /\/api\/human-review\/assignments/);
     assert.match(server, /Session user is not a registered human reviewer/);
+  });
+
+  it('surfaces community review prompts on product pages after price reports', async () => {
+    const communityReviews = await read('src/lib/community-reviews.ts');
+    const actions = await read('src/components/price-report-review-actions.tsx');
+    const products = await read('src/app/products/page.tsx');
+
+    assert.match(communityReviews, /COMMUNITY_REVIEW_PROMPTS/);
+    assert.match(communityReviews, /price_accuracy/);
+    assert.match(communityReviews, /product_quality/);
+    assert.match(communityReviews, /store_experience/);
+    assert.match(communityReviews, /crowdsourced grocery data becomes more trustworthy/);
+    assert.match(actions, /COMMUNITY_REVIEW_PROMPTS/);
+    assert.match(actions, /Community validation prompts/);
+    assert.match(actions, /aria-label=\{`\$\{prompt\.label\} rating`\}/);
+    assert.match(communityReviews, /Price accuracy/);
+    assert.match(communityReviews, /Product quality/);
+    assert.match(communityReviews, /Store experience/);
+    assert.match(products, /PriceReportReviewActions/);
+    assert.match(products, /Review prompts after a price report/);
+    assert.match(products, /price accuracy, product quality, and store experience/);
+    assert.doesNotMatch(products, /@\/lib\/demo-data|@\/components\/sample-data/);
   });
 
   it('surfaces adjustable moderation risk thresholds for admin review routing', async () => {
@@ -834,16 +890,22 @@ describe('verified-data UI', () => {
   it('surfaces a multi-week stock-up list with forecast claims blocked', async () => {
     const demo = await read('src/lib/demo-data.ts');
     const source = await read('src/app/weekly-basket/page.tsx');
+    const actions = await read('src/components/stock-up-list-actions.tsx');
 
     assert.match(demo, /export const multiWeekStockUpList = /);
     assert.match(demo, /observedHistoryWindow/);
     assert.match(demo, /noForecastReason/);
     assert.match(demo, /reviewTrigger/);
     assert.match(source, /multiWeekStockUpList/);
+    assert.match(source, /StockUpListActions/);
     assert.match(source, /Multi-week stock-up list/);
     assert.match(source, /planningWeeks/);
     assert.match(source, /No price forecast/);
     assert.match(source, /observedHistoryWindow/);
+    assert.match(actions, /groceryview:accessToken/);
+    assert.match(actions, /basket\/stock-up-list\/rows/);
+    assert.match(actions, /No stock-up row is saved anonymously or to local storage/);
+    assert.match(actions, /Historical low and typical prices remain labelled as observed facts, not forecasts/);
     assert.doesNotMatch(source, /future price prediction|forecasted price/i);
   });
 
@@ -884,7 +946,7 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(calculator, /localStorage|sessionStorage/);
 
     assert.match(seo, /'\/basket'/);
-    assert.match(nav, /href: '\/basket'/);
+    assert.doesNotMatch(nav, /href: '\/basket'/);
   });
 
   it('surfaces a budget stretch-krona basket optimizer using real basket strategy output', async () => {
@@ -1075,20 +1137,6 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(route, /NoVerifiedData/);
   });
 
-  it('surfaces deal-hunter specialty and premium tier tracking from the real brand-tier index', async () => {
-    const route = await read('src/app/deals/page.tsx');
-
-    assert.match(route, /calculateBrandTierIndices/);
-    assert.match(route, /buildBrandTierPriceObservations/);
-    assert.match(route, /premiumTierTracking/);
-    assert.match(route, /Specialty & premium tier tracking/);
-    assert.match(route, /premiumGapPercent/);
-    assert.match(route, /premium tier/i);
-    assert.match(route, /specialty basket/i);
-    assert.match(route, /not a forecast/i);
-    assert.match(route, /observed brand-tier basket/i);
-    assert.doesNotMatch(route, /NoVerifiedData/);
-  });
 
   it('surfaces account-safe custom price alert thresholds on the watchlist route', async () => {
     const verified = await read('src/lib/verified-data.ts');
@@ -1273,14 +1321,6 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
-  it('surfaces expiry deal radar on the deals route using the real core radar output', async () => {
-    const source = await read('src/app/deals/page.tsx');
-    assert.match(source, /expiryDealRadar/);
-    assert.match(source, /buildExpiryDealRadar/);
-    assert.match(source, /radarScore/);
-    assert.match(source, /staleReportIds/);
-    assert.doesNotMatch(source, /NoVerifiedData/);
-  });
 
   it('surfaces a dedicated near-expiry deal radar page with confidence-backed core output', async () => {
     const source = await read('src/app/expiry-deals/page.tsx');
@@ -1293,13 +1333,12 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
-  it('surfaces a deal screener landing card on the deals route with dedicated /screener navigation', async () => {
+  it('redirects the legacy deals route to the verified deal screener', async () => {
     const route = await read('src/app/deals/page.tsx');
-    assert.match(route, /Deal screener/);
-    assert.match(route, /Dedicated verified screener/i);
-    assert.match(route, /Open verified deal screener/);
-    assert.match(route, /screenerDefaultHref\(\)/);
-    assert.doesNotMatch(route, /dealScreener/);
+
+    assert.match(route, /redirect\('\/screener'\)/);
+    assert.match(route, /generateMetadata/);
+    assert.match(route, /routeMetadata\('\/deals'\)/);
   });
 
   it('surfaces a verified deal screener on the dedicated screener route', async () => {
@@ -1390,38 +1429,7 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(route, /process\.env\.DATABASE_URL.*json/i);
   });
 
-  it('surfaces offer expiry reminders from real Matpriskollen validity windows', async () => {
-    const verified = await read('src/lib/verified-data.ts');
-    const route = await read('src/app/deals/page.tsx');
 
-    assert.match(verified, /matpriskollenOffers/);
-    assert.match(verified, /offerExpiryReminderBoard/);
-    assert.match(verified, /validFrom/);
-    assert.match(verified, /validTo/);
-    assert.match(route, /Offer expiry reminders/);
-    assert.match(route, /validTo/);
-    assert.match(route, /No deal starts tomorrow claim/);
-    assert.match(route, /sourceUrl/);
-    assert.doesNotMatch(route, /@\/components\/sample-data/);
-  });
-
-  it('surfaces ICA e-magin digital-catalog offers from generated weekly offer rows', async () => {
-    const verified = await read('src/lib/verified-data.ts');
-    const shell = await read('src/components/market-shell.tsx');
-    const deals = await read('src/app/deals/page.tsx');
-
-    assert.match(verified, /icaReklambladOffers/);
-    assert.match(verified, /digitalCatalogueOfferBoard/);
-    assert.match(verified, /flyerPdfUrl/);
-    assert.match(verified, /sourceUrl/);
-    assert.match(shell, /Flyer \/ digital-catalog ingestion/);
-    assert.match(shell, /Open e-magin flyer/);
-    assert.match(shell, /offer price text, jämförpris, ordinary price/i);
-    assert.match(deals, /ICA e-magin catalogue offers/);
-    assert.match(deals, /real weekly offer rows/);
-    assert.match(deals, /flyerPdfUrl retained/);
-    assert.doesNotMatch(shell, /@\/lib\/demo-data|@\/components\/sample-data/);
-  });
 
   it('wires the latest ICA store-scoped promotion import to visible source surfaces', async () => {
     const generated = await read('src/lib/ingested/ica.ts');
@@ -1430,24 +1438,32 @@ describe('verified-data UI', () => {
     const shell = await read('src/components/market-shell.tsx');
     const dataSources = await read('src/app/data-sources/page.tsx');
 
-    assert.match(generated, /ICA Kvantum Tomelilla/);
-    assert.match(generated, /"storeAccountId":"1004070"/);
-    assert.match(generated, /ICA Supermarket Tierp/);
-    assert.match(generated, /"storeAccountId":"1003693"/);
     assert.match(generated, /ICA Supermarket Toria/);
     assert.match(generated, /"storeAccountId":"1003822"/);
-    assert.match(generated, /retrieved 2026-05-24T00:56:17\.000Z/);
+    assert.match(generated, /ICA Kvantum Tranås/);
+    assert.match(generated, /"storeAccountId":"1003829"/);
+    assert.match(generated, /ICA Kvantum Jätten/);
+    assert.match(generated, /"storeAccountId":"1003390"/);
+    assert.match(generated, /ICA Kvantum Kungsholmen/);
+    assert.match(generated, /"storeAccountId":"1004599"/);
+    assert.match(generated, /ICA Focus/);
+    assert.match(generated, /"storeAccountId":"1004247"/);
+    assert.match(generated, /retrieved 2026-05-24T11:31:10\.000Z/);
     assert.match(summary, /AUTO-GENERATED summary from public ICA store-scoped promotions JSON/);
     assert.match(summary, /generatedFrom: 'apps\/web\/src\/lib\/ingested\/ica\.ts'/);
-    assert.match(summary, /totalRowCount: 93229/);
-    assert.match(summary, /storeEndpointCount: 324/);
-    assert.match(summary, /ICA Kvantum Tomelilla/);
-    assert.match(summary, /storeAccountId: '1004070'/);
-    assert.match(summary, /ICA Supermarket Tierp/);
-    assert.match(summary, /storeAccountId: '1003693'/);
+    assert.match(summary, /totalRowCount: 87000/);
+    assert.match(summary, /storeEndpointCount: 294/);
+    assert.match(summary, /ICA Kvantum Jätten/);
+    assert.match(summary, /storeAccountId: '1003390'/);
+    assert.match(summary, /ICA Kvantum Tranås/);
+    assert.match(summary, /storeAccountId: '1003829'/);
     assert.match(summary, /ICA Supermarket Toria/);
     assert.match(summary, /storeAccountId: '1003822'/);
-    assert.match(summary, /retrievedAt: '2026-05-24T00:56:17\.000Z'/);
+    assert.match(summary, /ICA Kvantum Kungsholmen/);
+    assert.match(summary, /storeAccountId: '1004599'/);
+    assert.match(summary, /ICA Focus/);
+    assert.match(summary, /storeAccountId: '1004247'/);
+    assert.match(summary, /retrievedAt: '2026-05-24T08:02:37\.000Z'/);
     assert.match(verified, /import \{ icaStorePromotionSourceSummary \} from '\.\/ingested\/ica-source-summary'/);
     assert.match(verified, /export const icaStorePromotionEvidence/);
     assert.match(verified, /latestStore/);
@@ -1502,38 +1518,8 @@ describe('verified-data UI', () => {
 
 
 
-  it('surfaces a retailer flyer validity calendar without unsupported tomorrow claims', async () => {
-    const verified = await read('src/lib/verified-data.ts');
-    const route = await read('src/app/deals/page.tsx');
 
-    assert.match(verified, /flyerValidityCalendar/);
-    assert.match(verified, /validityDays/);
-    assert.match(verified, /startsTomorrow/);
-    assert.match(verified, /matpriskollenOffers/);
-    assert.match(route, /Flyer validity calendar/);
-    assert.match(route, /Starts tomorrow/);
-    assert.match(route, /unsupportedTomorrowClaim/);
-    assert.match(route, /validFrom/);
-    assert.match(route, /validTo/);
-  });
 
-  it('surfaces a student single-portion deal finder using real deal ranking output', async () => {
-    const source = await read('src/app/deals/page.tsx');
-    assert.match(source, /singlePortionDealFinder/);
-    assert.match(source, /rankDealOpportunities/);
-    assert.match(source, /Single-portion deals/);
-    assert.match(source, /portionLabel/);
-    assert.doesNotMatch(source, /NoVerifiedData/);
-  });
-
-  it('surfaces a kids snack and lunchbox deal feed using real deal ranking output', async () => {
-    const source = await read('src/app/deals/page.tsx');
-    assert.match(source, /kidsSnackLunchboxDeals/);
-    assert.match(source, /rankDealOpportunities/);
-    assert.match(source, /Kids snack & lunchbox deals/);
-    assert.match(source, /lunchboxFit/);
-    assert.doesNotMatch(source, /NoVerifiedData/);
-  });
 
   it('surfaces nutrition per krona on the nutrition value route using the real core ranking output', async () => {
     const source = await read('src/app/nutrition-value/page.tsx');
@@ -2068,6 +2054,7 @@ ${seo}`;
     assert.match(bottomNav, /Markets/);
     assert.match(bottomNav, /Search/);
     assert.match(bottomNav, /Map/);
+    assert.match(bottomNav, /My Flyer/);
     assert.match(bottomNav, /Watchlist/);
     assert.match(bottomNav, /Me/);
     assert.match(dataUi, /import \{ BottomNav \} from '\.\/bottom-nav'/);
@@ -2613,7 +2600,7 @@ ${seo}`;
     assert.match(apiCompare, /nutrition/);
     assert.match(apiCompare, /storePrices/);
     assert.match(apiCompare, /trendPoints/);
-    assert.match(nav, /href: '\/compare-items'/);
+    assert.doesNotMatch(nav, /href: '\/compare-items'/);
     assert.match(seo, /'\/compare-items'/);
     assert.match(sitemap, /entry\('\/compare-items'/);
   });
@@ -2863,7 +2850,7 @@ ${seo}`;
     assert.match(singularProductRoute, /generateProductMetadata/);
     assert.match(singularProductRoute, /params\.then\(\(\{ id \}\) => \(\{ slug: id \}\)\)/);
 
-    assert.match(canonicalProductRoute, /<img/);
+    assert.match(canonicalProductRoute, /<Image/);
     assert.match(canonicalProductRoute, /src=\{product\.image/);
     assert.match(canonicalProductRoute, /alt=\{product\.name\}/);
     assert.match(canonicalProductRoute, /Primary price evidence/);
@@ -3055,6 +3042,16 @@ ${seo}`;
     assert.doesNotMatch(sitemap, /osmStores\.slice\(0,\s*80\)/);
   });
 
+  it('emits sitemap entries for Nordic country terms URLs', async () => {
+    const sitemap = await read('src/app/sitemap.ts');
+
+    assert.match(sitemap, /countryTermsRoutes/);
+    for (const country of ['sweden', 'norway', 'denmark', 'finland', 'iceland']) {
+      assert.match(sitemap, new RegExp(`'${country}'`));
+    }
+    assert.match(sitemap, /entry\(`\/\$\{country\}\/terms`, 0\.52, 'monthly'\)/);
+  });
+
   it('keeps public item and search entry points in sitemap and canonical metadata coverage', async () => {
     const seo = await read('src/lib/seo.ts');
     const sitemap = await read('src/app/sitemap.ts');
@@ -3088,6 +3085,7 @@ ${seo}`;
       'src/app/chain-index/page.tsx',
       'src/app/compare/page.tsx',
       'src/app/compare-items/page.tsx',
+      'src/app/coverage/page.tsx',
       'src/app/coupon-stacks/page.tsx',
       'src/app/cookies/page.tsx',
       'src/app/data-sources/page.tsx',
@@ -3105,6 +3103,7 @@ ${seo}`;
       'src/app/pantry-planner/page.tsx',
       'src/app/pharmacy/page.tsx',
       'src/app/price-reports/page.tsx',
+      'src/app/pricing/page.tsx',
       'src/app/privacy/page.tsx',
       'src/app/prisjamforelse/[slug]/page.tsx',
       'src/app/products/page.tsx',
@@ -3172,6 +3171,26 @@ ${seo}`;
     assert.match(localeHome, /\/sv/);
     assert.match(localeHome, /\/en/);
     assert.doesNotMatch(seo, /NoVerifiedData/);
+  });
+
+  it('keeps programmatic city/product SEO pages canonicalized behind coverage guards', async () => {
+    const seo = await read('src/lib/seo.ts');
+    const landing = await read('src/lib/seo-landing-pages.ts');
+
+    assert.match(seo, /canonicalPath\?: string/);
+    assert.match(seo, /const alternatePath = config\.canonicalPath \?\? config\.path/);
+    assert.match(seo, /canonical: canonical, languages: languageAlternateUrls\(alternatePath\)/);
+    assert.match(seo, /follow: config\.noIndexFollow \?\? false/);
+
+    assert.match(landing, /programmaticSeoIndexingGuard/);
+    assert.match(landing, /minimumVerifiedChainRows: 2/);
+    assert.match(landing, /minimumCityVerifiedChainRows: 3/);
+    assert.match(landing, /hasCitySpecificAvailability: false/);
+    assert.match(landing, /cityCheapestLandingSeoDecision/);
+    assert.match(landing, /canonicalPath: indexable \? cityPath : fallbackCanonicalPath/);
+    assert.match(landing, /noIndex: !indexable/);
+    assert.match(landing, /metadataForCityCheapestLanding/);
+    assert.match(landing, /noIndexFollow: seoDecision\.noIndexFollow/);
   });
 
   it('ships an installable PWA-first web manifest for mobile grocery checks', async () => {
@@ -3351,12 +3370,13 @@ ${seo}`;
     assert.match(api, /row\.labels/);
     assert.match(api, /row\.unitPrice/);
     assert.match(verified, /buildProductSearchView/);
-    assert.match(verified, /const filters = \{ query, categories, labels, chains, minPrice, maxPrice, inStockOnly, minConfidence/);
+    assert.match(verified, /const filters = \{ query, categories, labels, originCountries, chains, minPrice, maxPrice, inStockOnly, minConfidence/);
     assert.match(verified, /buildFacetedProductSearch\(\{ rows: facetedSearchRows, filters/);
     assert.match(products, /type SearchParams = \{/);
     assert.match(products, /q\?: string \| string\[\]/);
     assert.match(products, /category\?: string \| string\[\]/);
     assert.match(products, /label\?: string \| string\[\]/);
+    assert.match(products, /origin\?: string \| string\[\]/);
     assert.match(products, /chain\?: string \| string\[\]/);
     assert.match(products, /minPrice\?: string \| string\[\]/);
     assert.match(products, /maxPrice\?: string \| string\[\]/);
@@ -3675,6 +3695,27 @@ ${seo}`;
     assert.match(route, /Claim boundary/);
     assert.match(route, /per-store availability/);
     assert.match(route, /@\/lib\/verified-data/);
+    assert.doesNotMatch(route, /@\/lib\/demo-data/);
+    assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
+  it('surfaces per-class freshness lag on the coverage route', async () => {
+    const route = await read('src/app/coverage/page.tsx');
+    const verified = await read('src/lib/verified-data.ts');
+    const docs = await read('../../docs/qa/fresh-lag.md');
+    const sitemap = await read('src/app/sitemap.ts');
+
+    assert.match(verified, /perClassFreshnessLagReport/);
+    assert.match(verified, /freshnessLagSummary/);
+    assert.match(verified, /freshWindowDays: freshnessLagWindowDays/);
+    assert.match(route, /perClassFreshnessLagReport\.map/);
+    assert.match(route, /observations older than/);
+    assert.match(route, /SourceCoverage/);
+    assert.match(route, /routeMetadata\('\/coverage'\)/);
+    assert.match(sitemap, /entry\('\/coverage'/);
+    assert.match(docs, /Per-class freshness lag report/);
+    assert.match(docs, /observations older than 7 days are stale/);
+    assert.match(docs, /\/coverage/);
     assert.doesNotMatch(route, /@\/lib\/demo-data/);
     assert.doesNotMatch(route, /@\/components\/sample-data/);
   });

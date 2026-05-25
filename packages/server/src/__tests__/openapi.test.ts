@@ -34,6 +34,8 @@ describe('buildOpenApiDocument', () => {
       '/api/budget/summary',
       '/api/categories',
       '/api/categories/{category}/market',
+      '/api/contact',
+      '/api/deals',
       '/api/deals/discounts',
       '/api/deals/flyer-offers',
       '/api/expiry-deals/radar',
@@ -97,6 +99,7 @@ describe('buildOpenApiDocument', () => {
       '/api/stores/{id}/price-coverage',
       '/api/users/{userId}/favorite-stores',
       '/api/users/{userId}/favorite-stores/{storeId}',
+      '/api/version',
       '/api/watchlist',
       '/api/watchlist/items/{productId}',
       '/api/watchlist/price-alerts',
@@ -112,6 +115,8 @@ describe('buildOpenApiDocument', () => {
     assert.deepEqual(doc.paths['/api/ads/disclosure'].get?.security, [{ bearerAuth: [] }]);
     assert.match(doc.paths['/api/ads/disclosure'].get?.summary ?? '', /ad disclosure/i);
     assert.equal(doc.paths['/api/auth/session'].post?.security, undefined);
+    assert.equal(doc.paths['/api/contact'].post?.security, undefined);
+    assert.match(doc.paths['/api/contact'].post?.summary ?? '', /contact form/i);
     assert.deepEqual(doc.paths['/api/billing/checkout-sessions'].post?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/billing/portal-sessions'].post?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/billing/subscription-events'].post?.security, [{ billingWebhookSignature: [] }, { stripeWebhookSignature: [] }]);
@@ -198,6 +203,8 @@ describe('buildOpenApiDocument', () => {
     assert.equal(doc.components.schemas.NotificationInboxResponse.properties.generatedAt.format, 'date-time');
     assert.equal(doc.components.schemas.NotificationInboxQueueItem.properties.sendAt.format, 'date-time');
     assert.match(doc.paths['/api/health'].get?.summary ?? '', /without exposing secrets/i);
+    assert.equal(doc.paths['/api/version'].get?.security, undefined);
+    assert.match(doc.paths['/api/version'].get?.summary ?? '', /version metadata/i);
     assert.equal(doc.paths['/api/products/{id}/terminal'].get?.security, undefined);
     assert.match(doc.paths['/api/products/{id}/terminal'].get?.summary ?? '', /price terminal/i);
     assert.equal(doc.paths['/api/products/{id}/history-summary'].get?.security, undefined);
@@ -239,6 +246,8 @@ describe('buildOpenApiDocument', () => {
     assert.match(doc.paths['/api/stores/{id}/flyer-offers'].get?.summary ?? '', /flyer offers/i);
     assert.equal(doc.paths['/api/stores/{id}/discounts'].get?.security, undefined);
     assert.match(doc.paths['/api/stores/{id}/discounts'].get?.summary ?? '', /discounts/i);
+    assert.equal(doc.paths['/api/deals'].get?.security, undefined);
+    assert.match(doc.paths['/api/deals'].get?.summary ?? '', /30-day rolling average/i);
     assert.equal(doc.paths['/api/deals/flyer-offers'].get?.security, undefined);
     assert.match(doc.paths['/api/deals/flyer-offers'].get?.summary ?? '', /flyer offers/i);
     assert.equal(doc.paths['/api/deals/discounts'].get?.security, undefined);

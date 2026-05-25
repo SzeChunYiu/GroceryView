@@ -3,12 +3,14 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 type ShareLinkRequest = {
   expiresAt?: string | null;
+  items?: unknown[];
   listId?: string;
 };
 
 type ShareTokenPayload = {
   createdAt: string;
   expiresAt: string | null;
+  items: unknown[];
   listId: string;
 };
 
@@ -36,6 +38,7 @@ export async function POST(request: NextRequest) {
   const payload: ShareTokenPayload = {
     createdAt: new Date().toISOString(),
     expiresAt: normalizedExpiry(body.expiresAt),
+    items: Array.isArray(body.items) ? body.items.slice(0, 50) : [],
     listId: body.listId?.trim() || 'local-shopping-list',
   };
   const encodedPayload = encodeBase64Url(JSON.stringify(payload));

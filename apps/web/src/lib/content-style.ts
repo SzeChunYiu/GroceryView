@@ -91,6 +91,16 @@ export const priceIntelligenceTerminologySeeds = {
   }
 } as const;
 
+export type PriceIntelligenceTerminologyLocale = keyof typeof priceIntelligenceTerminologySeeds;
+export type PriceIntelligenceTerminology = typeof priceIntelligenceTerminologySeeds[PriceIntelligenceTerminologyLocale];
+
+export function priceIntelligenceTerminologyForLocale(locale: string | null | undefined): PriceIntelligenceTerminology {
+  const normalized = locale?.toLocaleLowerCase('en-US').split('-')[0] as PriceIntelligenceTerminologyLocale | undefined;
+  return normalized && normalized in priceIntelligenceTerminologySeeds
+    ? priceIntelligenceTerminologySeeds[normalized]
+    : priceIntelligenceTerminologySeeds.en;
+}
+
 export function confidenceCopy(level: ConfidenceLevel, sampleSize?: number) {
   const sample = sampleSize === undefined ? 'sample size not reported' : `${sampleSize} source rows`;
   return `${level} source confidence (${sample})`;

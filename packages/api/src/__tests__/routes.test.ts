@@ -33,6 +33,7 @@ describe('createGroceryViewApi', () => {
       canonicalName: 'Standardmjolk 3% 1 l',
       brand: 'Arla',
       categoryPath: ['Dairy', 'Milk'],
+      originCountry: 'SE',
       packageSize: 1,
       packageUnit: 'l',
       comparableUnit: 'l',
@@ -56,6 +57,7 @@ describe('createGroceryViewApi', () => {
       canonicalName: 'Standardmjolk 3% 1 l',
       brand: 'Arla',
       categoryPath: ['Dairy', 'Milk'],
+      originCountry: 'SE',
       packageSize: 1,
       packageUnit: 'l',
       comparableUnit: 'l',
@@ -78,6 +80,7 @@ describe('createGroceryViewApi', () => {
       slug: 'smor-500g',
       canonicalName: 'Smor 500 g',
       categoryPath: ['Dairy', 'Butter'],
+      originCountry: 'DK',
       packageSize: 500,
       packageUnit: 'g',
       comparableUnit: 'kg',
@@ -241,12 +244,12 @@ describe('createGroceryViewApi', () => {
       controllerPath: 'products',
       actionPath: 'search/faceted',
       path: '/products/search/faceted',
-      queryParams: ['q', 'category', 'brand', 'label', 'chain', 'store', 'priceType', 'minPrice', 'maxPrice', 'inStockOnly', 'minConfidence', 'limit']
+      queryParams: ['q', 'category', 'brand', 'label', 'origin', 'chain', 'store', 'priceType', 'minPrice', 'maxPrice', 'inStockOnly', 'minConfidence', 'limit']
     });
 
     const result = buildFacetedProductSearch({
       rows: realRows,
-      filters: { query: 'mjolk', categories: ['Dairy'], chains: ['willys'], limit: 10 }
+      filters: { query: 'mjolk', categories: ['Dairy'], originCountries: ['SE'], chains: ['willys'], limit: 10 }
     });
 
     assert.equal(result.count, 1);
@@ -255,8 +258,11 @@ describe('createGroceryViewApi', () => {
     assert.equal(result.products[0]?.currentPrices[0]?.observationId, 'obs-milk-willys');
     assert.equal(result.products[0]?.currentPrices[0]?.isAvailable, true);
     assert.deepEqual(result.filters.labels, []);
+    assert.deepEqual(result.filters.originCountries, ['SE']);
+    assert.equal(result.products[0]?.originCountry, 'SE');
     assert.equal(result.products[0]?.currentPrices.some((price) => price.chainSlug === 'coop'), false);
     assert.deepEqual(result.facets.categories.find((facet) => facet.value === 'Dairy'), { value: 'Dairy', count: 1 });
+    assert.deepEqual(result.facets.origins.find((facet) => facet.value === 'SE'), { value: 'SE', count: 1 });
     assert.deepEqual(result.facets.chains.find((facet) => facet.value === 'willys'), { value: 'willys', label: 'Willys', count: 1 });
     assert.deepEqual(result.facets.priceRange, { min: 14.9, max: 14.9 });
     assert.deepEqual(result.evidence.sourceTables, ['products', 'latest_prices', 'chains', 'stores']);
@@ -1021,9 +1027,20 @@ describe('createGroceryViewApi', () => {
       topOfferId: 'flyer-willys-odenplan-coffee-2026w21',
       topDealScore: 82
     }]);
-    assert.deepEqual(report.offers.map((offer) => [offer.offerId, offer.storeId, offer.productId, offer.savings, offer.discountPercent, offer.sourceRunId]), [
-      ['flyer-willys-odenplan-coffee-2026w21', 'willys-odenplan', 'coffee', 15, 23.1, 'source-run-willys-flyer-2026-05-19'],
-      ['flyer-willys-odenplan-private-label-milk-2026w21', 'willys-odenplan', 'private-label-milk', 7, 35.2, 'source-run-willys-flyer-2026-05-19']
+    assert.deepEqual(report.offers.map((offer) => [
+      offer.offerId,
+      offer.storeId,
+      offer.productId,
+      offer.savings,
+      offer.discountPercent,
+      offer.sourceRunId,
+      offer.packageQuantity,
+      offer.packageUnit,
+      offer.effectiveUnitPrice,
+      offer.effectiveUnitPriceUnit
+    ]), [
+      ['flyer-willys-odenplan-coffee-2026w21', 'willys-odenplan', 'coffee', 15, 23.1, 'source-run-willys-flyer-2026-05-19', 450, 'g', 110.89, 'kg'],
+      ['flyer-willys-odenplan-private-label-milk-2026w21', 'willys-odenplan', 'private-label-milk', 7, 35.2, 'source-run-willys-flyer-2026-05-19', 1, 'l', 12.9, 'l']
     ]);
     assert.match(report.guardrails[0], /validity window/i);
 
@@ -1057,6 +1074,10 @@ describe('createGroceryViewApi', () => {
         productSlug: 'coffee',
         productName: 'Zoégas Coffee 450g',
         categoryPath: ['coffee'],
+        packageSize: 450,
+        packageUnit: 'g',
+        unitPrice: 110.89,
+        comparableUnit: 'kg',
         chainId: 'chain-willys',
         chainSlug: 'willys',
         chainName: 'Willys',
@@ -1072,6 +1093,10 @@ describe('createGroceryViewApi', () => {
     assert.equal(report.offers[0]?.sourceRunId, 'run-weekly-leaflet');
     assert.equal(report.offers[0]?.savings, 15);
     assert.equal(report.offers[0]?.sourceUrl, 'https://example.test/flyer');
+    assert.equal(report.offers[0]?.packageQuantity, 450);
+    assert.equal(report.offers[0]?.packageUnit, 'g');
+    assert.equal(report.offers[0]?.effectiveUnitPrice, 110.89);
+    assert.equal(report.offers[0]?.effectiveUnitPriceUnit, 'kg');
   });
 
   it('serves pantry replenishment plans with live deal and basket duplicate context', () => {

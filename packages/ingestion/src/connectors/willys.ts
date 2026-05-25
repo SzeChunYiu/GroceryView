@@ -416,9 +416,16 @@ export const DEFAULT_WILLYS_SEARCH_QUERIES = [
   'knackebrod',
   'mineralvatten',
   'havredryck',
-  'toalettpapper'
+  'toalettpapper',
+  'couscous',
+  'tomatkross',
+  'makrill',
+  'torsk',
+  'flaskfile'
 ] as const;
-export const DEFAULT_WILLYS_PRODUCTS_MAX_ROWS = 1200;
+export const DEFAULT_WILLYS_LIVE_PRODUCT_MAX_ROWS = 12000;
+export const DEFAULT_WILLYS_LIVE_WEEKLY_DISCOUNT_MAX_ROWS = 70000;
+export const DEFAULT_WILLYS_PRODUCTS_MAX_ROWS = 500;
 export const DEFAULT_WILLYS_CATEGORY_PAGE_SIZE = 100;
 
 export type FetchWillysProductsOptions = {
@@ -555,7 +562,7 @@ export async function fetchWillysStores(options: FetchWillysStoresOptions = {}):
 
 export async function fetchWillysProducts(options: FetchWillysProductsOptions = {}): Promise<WillysProduct[]> {
   const fetchImpl = withWillysRequestTimeout(options.fetchImpl ?? fetch);
-  const maxRows = options.maxRows ?? DEFAULT_WILLYS_PRODUCTS_MAX_ROWS;
+  const maxRows = options.maxRows ?? Number.POSITIVE_INFINITY;
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const rows: WillysProduct[] = [];
   const seenCodes = new Set<string>();

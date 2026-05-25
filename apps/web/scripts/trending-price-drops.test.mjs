@@ -22,6 +22,7 @@ test('city dashboard ships a trending price-drop engine, API feed, and concise c
   const trends = await read('src/lib/trends.ts');
   const route = await read('src/app/api/feed/trending/route.ts');
   const section = await read('src/app/page-sections/trending.tsx');
+  const carousel = await read('src/components/TrendingCarousel.tsx');
   const shell = await read('src/components/market-shell.tsx');
 
   assert.match(trends, /export function buildCityPriceDropTrends/);
@@ -48,6 +49,17 @@ test('city dashboard ships a trending price-drop engine, API feed, and concise c
   assert.match(section, /card\.confidenceLabel/);
   assert.match(section, /card\.confidenceScore\.toFixed\(2\)/);
   assert.match(section, /card\.urgencyLabel/);
+
+  assert.match(trends, /export function buildCitySearchTrends/);
+  assert.match(trends, /CitySearchTrendFeed/);
+  assert.match(trends, /citySearchTrendHref/);
+  assert.match(trends, /verified product observation momentum grouped into local query topics/);
+  assert.match(section, /export function TrendingSearchModule/);
+  assert.match(section, /data-trending-search-module/);
+  assert.match(section, /data-trending-search-grid/);
+  assert.match(section, /trend\.resultHref/);
+  assert.match(carousel, /buildCitySearchTrends\(\{ city: 'stockholm', limit: 6 \}\)/);
+  assert.match(carousel, /<TrendingSearchModule feed=\{searchFeed\} \/>/);
 
   assert.match(shell, /import \{ TrendingPriceDropCards \} from '@\/app\/page-sections\/trending'/);
   assert.match(shell, /<TrendingPriceDropCards city="stockholm" \/>/);

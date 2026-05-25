@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { compareBasketStrategies, summarizeStoreBasketCoverage } from '@groceryview/core';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { StockUpListActions } from '@/components/stock-up-list-actions';
 import { budgetStretchKronaOptimizer, familyBulkUnitPriceComparison, loyaltyAdjustedBasketComparison, mealPrepBulkBuyOptimizer, multiWeekStockUpList, oneTapBasketOptimizer, savedBasketAutoReorderPlan, weeklyBasketOptimizerInput } from '@/lib/demo-data';
 import { weeklyRecurringBasketPlan } from '@/lib/recurring-basket';
 import { recurringBasketDigestContract, weeklyBasketChangeDigest } from '@/lib/verified-data';
@@ -494,6 +495,25 @@ export default function WeeklyBasketPage() {
             ))}
           </ul>
         </div>
+        <StockUpListActions
+          draftRows={multiWeekStockUpList.rows.map((row) => ({
+            productId: row.productId,
+            productName: row.productName,
+            storeName: row.storeName,
+            planningWeeks: row.planningWeeks,
+            weeklyNeedUnits: row.plannedUnits / row.planningWeeks,
+            packageUnits: Math.max(row.plannedUnits / row.packagesNeeded, 0.001),
+            comparableUnit: row.comparableUnit,
+            currentUnitPrice: row.currentUnitPrice,
+            historicalLowUnitPrice: row.historicalLowUnitPrice,
+            typicalUnitPrice: row.typicalUnitPrice,
+            confidence: row.confidence,
+            historyWindowStart: row.historyWindowStart,
+            historyWindowEnd: row.historyWindowEnd,
+            noForecastReason: multiWeekStockUpList.noForecastReason,
+            reviewTrigger: row.reviewTrigger
+          }))}
+        />
       </Card>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">

@@ -3,7 +3,9 @@ import { buildUserAccountDeletionQueries } from './queries/users.js';
 
 export * from './client.js';
 export * from './queries/categories.js';
+export * from './queries/deals.js';
 export * from './queries/favorites.js';
+export * from './queries/personalized.js';
 export * from './queries/productSearch.js';
 export * from './queries/stores.js';
 export * from './queries/retailers.js';
@@ -361,7 +363,7 @@ export type ProductCatalogRecord = {
   brand?: string;
   brandOwner?: string;
   privateLabelOwner?: string;
-  barcode?: string;
+  barcode?: string | null;
   categoryPath: string[];
   packageSize?: number;
   packageUnit?: string;
@@ -2151,7 +2153,7 @@ function mapProductCatalog(row: ProductCatalogRow): ProductCatalogRecord {
     ...(row.brand ? { brand: row.brand } : {}),
     ...(row.brand_owner ? { brandOwner: row.brand_owner } : {}),
     ...(row.private_label_owner ? { privateLabelOwner: row.private_label_owner } : {}),
-    ...(row.barcode ? { barcode: row.barcode } : {}),
+    barcode: row.barcode,
     categoryPath: [...row.category_path],
     ...(row.package_size === null ? {} : { packageSize: Number(row.package_size) }),
     ...(row.package_unit ? { packageUnit: row.package_unit } : {}),

@@ -58,9 +58,23 @@ import {
   DEFAULT_APOTEK_HJARTAT_SEARCH_URLS
 } from './connectors/apohem.js';
 import {
+  DEFAULT_APOTEKET_SE_SOURCE_URLS,
+  fetchApoteketSeProducts,
+  type ApoteketSeProductRow
+} from './connectors/apoteket-se.js';
+import {
   fetchLidlOffersForAllStores,
   type LidlStoreOffer
 } from './connectors/lidl.js';
+import {
+  fetchLocalFoodNodesProductsForAllNodes,
+  type LocalFoodNodesProduct
+} from './connectors/localfoodnodes-se.js';
+import {
+  DEFAULT_LYF_OG_HEILSA_PAGE_DATA_PATHS,
+  fetchLyfOgHeilsaProducts,
+  type LyfOgHeilsaProduct
+} from './connectors/lyfogheilsa-is.js';
 import {
   fetchOkq8FuelPrices,
   OKQ8_FUEL_PRICES_URL,
@@ -68,6 +82,10 @@ import {
   type FuelPriceSourceKind,
   type FuelPriceObservation
 } from './connectors/okq8-fuel.js';
+import {
+  fetchSevenElevenSeConvenienceProducts,
+  type SevenElevenSeProduct
+} from './connectors/seven-eleven-se.js';
 import {
   fetchMathemProducts,
   type MathemProduct
@@ -98,15 +116,22 @@ export * from './connectors/ica.js';
 export * from './connectors/ica-bulk.js';
 export * from './connectors/ica-reklamblad.js';
 export * from './connectors/lidl.js';
+export * from './connectors/localfoodnodes-se.js';
+export * from './connectors/seven-eleven-no.js';
+export * from './connectors/lyfogheilsa-is.js';
 export * from './connectors/mathem.js';
 export * from './connectors/matpriskollen.js';
 export * from './connectors/matspar.js';
+export * from './connectors/meny-no.js';
 export * from './connectors/lidl-bulk.js';
 export * from './connectors/willys-bulk.js';
 export * from './connectors/apohem.js';
+export * from './connectors/apoteket-se.js';
 export * from './connectors/okq8-fuel.js';
+export * from './connectors/seven-eleven-se.js';
 export * from './connectors/st1-fuel.js';
 export * from './connectors/willys.js';
+export * from './store-enumerator.js';
 export * from './store-enumerator.js';
 export * from './unit-price.js';
 
@@ -1629,10 +1654,24 @@ type ParsedPackageQuantity = {
 };
 
 function parseNativePackageText(value: string): ParsedPackageQuantity {
-  const match = value.match(/(\d+(?:[,.]\d+)?)\s*(kg|g|gram|l|liter|ml|st|styck|pcs|piece|pack)\b/i);
+  const match = value.match(/(\d+(?:[,.]\d+)?)\s*(kg|g|gram|l|liter|ml|st|styck|pcs|piece|pack|tablett|tabletter|kapsel|kapslar|portion|portioner)\b/i);
   if (!match) return { packageSize: 1, packageUnit: 'piece' };
   const unit = match[2].toLowerCase();
-  const packageUnit = unit === 'st' || unit === 'styck' || unit === 'pack' ? 'piece' : unit === 'liter' ? 'l' : unit === 'gram' ? 'g' : unit;
+  const packageUnit = unit === 'st'
+    || unit === 'styck'
+    || unit === 'pack'
+    || unit === 'tablett'
+    || unit === 'tabletter'
+    || unit === 'kapsel'
+    || unit === 'kapslar'
+    || unit === 'portion'
+    || unit === 'portioner'
+    ? 'piece'
+    : unit === 'liter'
+      ? 'l'
+      : unit === 'gram'
+        ? 'g'
+        : unit;
   return { packageSize: Number(match[1].replace(',', '.')), packageUnit };
 }
 
@@ -1891,6 +1930,28 @@ function lidlStoreOfferToDailyItem(row: LidlStoreOffer): RetailerConnectorParsed
   };
 }
 
+function localFoodNodesProductToDailyItem(row: LocalFoodNodesProduct): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageText);
+  return {
+    chainId: row.chain,
+    storeId: row.storeId,
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: `localfoodnodes-${stableKeyPart(row.code)}`,
+    categoryId: stableKeyPart(row.category || 'localfoodnodes-products'),
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price,
+    memberOnly: false,
+    isAvailable: row.available,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.productUrl || row.sourceUrl,
+    imageUrl: row.imageUrl || undefined
+  };
+}
+
 function cityGrossProductToDailyItem(row: CityGrossProduct): RetailerConnectorParsedProduct {
   const quantity = parseNativePackageText(row.packageText);
   const barcode = validDailyBarcode(row.gtin);
@@ -2001,6 +2062,52 @@ function okq8FuelPriceToDailyItem(row: FuelPriceObservation): RetailerConnectorP
   };
 }
 
+function sevenElevenSeProductToDailyItem(row: SevenElevenSeProduct): RetailerConnectorParsedProduct {
+  return {
+    sourceType: 'retailer_online_page',
+    observedAt: row.retrievedAt,
+    chainId: row.chainId,
+    retailerProductId: row.productId,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: row.productId,
+    categoryId: `convenience-${row.category}`,
+    brand: row.chainName,
+    packageSize: 1,
+    packageUnit: 'each',
+    price: row.priceMin,
+    regularPrice: row.priceMax > row.priceMin ? row.priceMax : undefined,
+    promoText: row.priceMax > row.priceMin ? `7-Eleven Sweden B2B range ${row.priceText}` : undefined,
+    memberOnly: false,
+    isAvailable: true,
+    sourceUrl: row.pdfUrl
+  };
+}
+
+function lyfOgHeilsaProductToDailyItem(row: LyfOgHeilsaProduct): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.name);
+  return {
+    sourceType: 'retailer_online_page',
+    chainId: row.chain,
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: `lyf-og-heilsa-is-${stableKeyPart(row.code)}`,
+    categoryId: `pharmacy-${stableKeyPart(row.category)}`,
+    brand: undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price,
+    regularPrice: row.originalPrice !== null && row.originalPrice > row.price ? row.originalPrice : undefined,
+    promoText: row.originalPrice !== null && row.originalPrice > row.price ? 'Public Lyf og heilsa discounted price' : undefined,
+    memberOnly: false,
+    isAvailable: true,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.sourceUrl,
+    imageUrl: row.imageUrl || undefined
+  };
+}
+
 function pharmacyProductToDailyItem(row: ApohemProduct): RetailerConnectorParsedProduct {
   const quantity = parseNativePackageText(row.name);
   const barcode = validDailyBarcode(row.ean);
@@ -2023,6 +2130,27 @@ function pharmacyProductToDailyItem(row: ApohemProduct): RetailerConnectorParsed
     observedAt: row.retrievedAt,
     sourceUrl: row.sourceUrl,
     imageUrl: row.imageUrl || undefined
+  };
+}
+
+function apoteketSeProductToDailyItem(row: ApoteketSeProductRow): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(`${row.product_name} ${row.unit}`);
+  return {
+    sourceType: 'retailer_online_page',
+    observedAt: row.observed_at,
+    chainId: row.chain,
+    storeId: row.store_id,
+    retailerProductId: stableKeyPart(`${row.product_name}-${row.unit}`),
+    rawName: row.product_name,
+    canonicalName: row.product_name,
+    productId: `apoteket-${stableKeyPart(row.product_name)}`,
+    categoryId: 'pharmacy-public',
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price_sek,
+    memberOnly: false,
+    isAvailable: true,
+    sourceUrl: row.source_url
   };
 }
 
@@ -2199,6 +2327,21 @@ export async function fetchDailyConnectorSnapshot(
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(lidlStoreOfferToDailyItem) });
   }
 
+  if (sourceUrl === GROCERYVIEW_DAILY_LOCALFOODNODES_SE_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_LOCALFOODNODES_SE_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchLocalFoodNodesProductsForAllNodes({
+      ...runnerControlsFromUrl(url),
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxNodes: dailyNativeNumberParam(url, 'maxNodes'),
+      maxRowsPerNode: dailyNativeNumberParam(url, 'maxRowsPerNode'),
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      country: url.searchParams.get('country') ?? undefined,
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(localFoodNodesProductToDailyItem) });
+  }
+
   if (sourceUrl === GROCERYVIEW_DAILY_CITY_GROSS_BULK_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_CITY_GROSS_BULK_PRODUCTS_URL}?`)) {
     const url = new URL(sourceUrl);
     const retrievedAt = options.retrievedAt ?? new Date().toISOString();
@@ -2267,6 +2410,30 @@ export async function fetchDailyConnectorSnapshot(
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(okq8FuelPriceToDailyItem) });
   }
 
+  if (sourceUrl === GROCERYVIEW_DAILY_SEVEN_ELEVEN_SE_CONVENIENCE_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_SEVEN_ELEVEN_SE_CONVENIENCE_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchSevenElevenSeConvenienceProducts({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      pdfUrl: url.searchParams.get('pdfUrl') ?? undefined,
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(sevenElevenSeProductToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_LYF_OG_HEILSA_IS_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_LYF_OG_HEILSA_IS_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchLyfOgHeilsaProducts({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      sourcePaths: dailyNativeStringListParam(url, 'sourcePaths') ?? DEFAULT_LYF_OG_HEILSA_PAGE_DATA_PATHS,
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(lyfOgHeilsaProductToDailyItem) });
+  }
+
   if (sourceUrl === GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL}?`)) {
     const url = new URL(sourceUrl);
     const retrievedAt = options.retrievedAt ?? new Date().toISOString();
@@ -2278,6 +2445,18 @@ export async function fetchDailyConnectorSnapshot(
       retrievedAt
     });
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(pharmacyProductToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_APOTEKET_SE_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_APOTEKET_SE_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchApoteketSeProducts({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      sourceUrls: dailyNativeStringListParam(url, 'sourceUrls') ?? DEFAULT_APOTEKET_SE_SOURCE_URLS,
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      observedAt: retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(apoteketSeProductToDailyItem) });
   }
 
   return await fetchRetailerConnectorSnapshot(plan, options);
@@ -3106,6 +3285,8 @@ export const GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_PRODUCTS_URL = 'groceryview://da
 export const GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/hemkop/weekly-offers/all-stores';
 export const GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL = 'groceryview://daily/ica/store-promotions/default-stores';
 export const GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL = 'groceryview://daily/lidl/public-offers/all-stores';
+export const GROCERYVIEW_DAILY_LOCALFOODNODES_SE_PRODUCTS_URL = 'groceryview://daily/localfoodnodes/se/products/all-nodes';
+export const GROCERYVIEW_DAILY_LYF_OG_HEILSA_IS_PRODUCTS_URL = 'groceryview://daily/is/lyfogheilsa/products/public';
 export const GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/coop/weekly-offers/all-stores';
 export const GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/coop/products/all-stores';
 export const GROCERYVIEW_DAILY_CITY_GROSS_BULK_PRODUCTS_URL = 'groceryview://daily/city-gross/products/bulk';
@@ -3113,7 +3294,9 @@ export const GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL = 'groceryview://d
 export const GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL = 'groceryview://daily/mathem/products/public-search';
 export const GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL = 'groceryview://daily/matspar/products/public-search';
 export const GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL = OKQ8_FUEL_PRICES_URL;
+export const GROCERYVIEW_DAILY_SEVEN_ELEVEN_SE_CONVENIENCE_PRODUCTS_URL = 'groceryview://daily/seven-eleven-se/convenience-products';
 export const GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL = 'groceryview://daily/pharmacy/products/public';
+export const GROCERYVIEW_DAILY_APOTEKET_SE_PRODUCTS_URL = 'groceryview://daily/apoteket-se/products/public';
 
 const requireForDailyIngestion = createRequire(import.meta.url);
 
@@ -4614,3 +4797,6 @@ if (process.argv[1] && import.meta.url === new URL(process.argv[1], 'file:').hre
       process.exitCode = 1;
     });
 }
+
+export * from './connectors/benchmarks/tlv-medicines.js';
+export * from './connectors/benchmarks/registry.js';

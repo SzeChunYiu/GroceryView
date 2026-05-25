@@ -17,6 +17,7 @@ export type CityGrossProduct = {
   gtin: string;
   name: string;
   brand: string;
+  superCategory: string;
   category: string;
   packageText: string;
   storeId: string;
@@ -24,6 +25,17 @@ export type CityGrossProduct = {
   regularPrice: number | null;
   unitPrice: number | null;
   unitPriceUnit: string;
+  hasDiscount: boolean;
+  hasPromotion: boolean;
+  isCurrentWeekDiscount: boolean;
+  isLongTimeDiscount: boolean;
+  isMembersOnlyPrice: boolean;
+  promotionFrom: string;
+  promotionTo: string;
+  promotionMinQuantity: number | null;
+  promotionPrice: number | null;
+  promotionUnitPrice: number | null;
+  promotionUnitPriceUnit: string;
   priceText: string;
   productUrl: string;
   imageUrl: string;
@@ -50,14 +62,22 @@ type CityGrossProductApiRow = {
   gtin?: unknown;
   name?: unknown;
   brand?: unknown;
+  superCategory?: unknown;
   category?: unknown;
   descriptiveSize?: unknown;
   url?: unknown;
   images?: Array<{ url?: unknown }>;
   productStoreDetails?: {
+    p_has_current_week_only_discount?: unknown;
+    p_has_long_time_discount?: unknown;
+    p_has_members_only_price?: unknown;
     prices?: {
       currentPrice?: CityGrossPrice;
       ordinaryPrice?: CityGrossPrice | null;
+      hasDiscount?: unknown;
+      hasPromotion?: unknown;
+      activePromotion?: CityGrossPromotion | null;
+      promotions?: CityGrossPromotion[];
     };
   };
 };
@@ -69,22 +89,40 @@ type CityGrossPrice = {
   comparativePriceUnit?: unknown;
 };
 
+type CityGrossPromotion = {
+  from?: unknown;
+  to?: unknown;
+  minQuantity?: unknown;
+  priceDetails?: CityGrossPrice | null;
+};
+
 export const CITY_GROSS_BASE_URL = 'https://www.citygross.se';
 export const CITY_GROSS_API_BASE_URL = 'https://www.citygross.se/api/v1';
 export const CITY_GROSS_STORES_PATH = 'PageData/stores';
 export const CITY_GROSS_PRODUCTS_PATH = 'Loop54/products';
 export const DEFAULT_CITY_GROSS_PRODUCT_PAGE_SIZE = 100;
+export const CITY_GROSS_GROCERY_SUPER_CATEGORIES = [
+  'Skafferiet',
+  'Mejeri, ost & ägg',
+  'Bröd & bageri',
+  'Bröd & Bageri',
+  'Frukt & grönt',
+  'Godis',
+  'Chark',
+  'Chark & pålägg',
+  'Fryst',
+  'Dryck',
+  'Kyld färdigmat',
+  'Snacks',
+  'Kött & fågel',
+  'Fisk & Skaldjur'
+] as const;
 
 export const DEFAULT_CITY_GROSS_PRODUCT_QUERIES = [
-  'kaffe',
-  'mjolk',
-  'pasta',
-  'ris',
-  'smor',
-  'ost',
-  'kyckling',
-  'yoghurt'
+  ''
 ] as const;
+export const DEFAULT_CITY_GROSS_LIVE_PRODUCT_MAX_STORES = 95;
+export const DEFAULT_CITY_GROSS_LIVE_PRODUCT_MAX_ROWS_PER_STORE = 1500;
 
 export type FetchCityGrossStoresOptions = {
   fetchImpl?: typeof fetch;
@@ -274,10 +312,20 @@ export function normalizeCityGrossProduct(
 ): CityGrossProduct | null {
   const code = text(product.id);
   const name = text(product.name);
-  const currentPrice = product.productStoreDetails?.prices?.currentPrice;
+  const superCategory = text(product.superCategory);
+  const productStoreDetails = product.productStoreDetails;
+  const prices = productStoreDetails?.prices;
+  const currentPrice = prices?.currentPrice;
   const price = numberOrNull(currentPrice?.price);
   if (!code || !name || price === null) return null;
-  const regularPrice = numberOrNull(product.productStoreDetails?.prices?.ordinaryPrice?.price);
+  if (superCategory && !isCityGrossGrocerySuperCategory(superCategory)) return null;
+  const regularPrice = numberOrNull(prices?.ordinaryPrice?.price);
+  const activePromotion = prices?.activePromotion ?? prices?.promotions?.[0] ?? null;
+  const promotionPriceDetails = activePromotion?.priceDetails ?? null;
+  const promotionPrice = numberOrNull(promotionPriceDetails?.price);
+  const promotionUnitPrice = numberOrNull(promotionPriceDetails?.comparativePrice);
+  const hasPromotion = booleanValue(prices?.hasPromotion) || activePromotion !== null;
+  const hasDiscount = booleanValue(prices?.hasDiscount) || hasPromotion || (regularPrice !== null && regularPrice > price);
   const productPath = text(product.url);
   const imageUrl = text(product.images?.[0]?.url);
   return {
@@ -285,6 +333,7 @@ export function normalizeCityGrossProduct(
     gtin: text(product.gtin),
     name,
     brand: text(product.brand),
+    superCategory,
     category: text(product.category),
     packageText: text(product.descriptiveSize),
     storeId,
@@ -292,12 +341,28 @@ export function normalizeCityGrossProduct(
     regularPrice,
     unitPrice: numberOrNull(currentPrice?.comparativePrice),
     unitPriceUnit: text(currentPrice?.comparativePriceUnit),
+    hasDiscount,
+    hasPromotion,
+    isCurrentWeekDiscount: booleanValue(productStoreDetails?.p_has_current_week_only_discount),
+    isLongTimeDiscount: booleanValue(productStoreDetails?.p_has_long_time_discount),
+    isMembersOnlyPrice: booleanValue(productStoreDetails?.p_has_members_only_price),
+    promotionFrom: text(activePromotion?.from),
+    promotionTo: text(activePromotion?.to),
+    promotionMinQuantity: numberOrNull(activePromotion?.minQuantity),
+    promotionPrice,
+    promotionUnitPrice,
+    promotionUnitPriceUnit: text(promotionPriceDetails?.comparativePriceUnit),
     priceText: `${price.toFixed(2)} SEK`,
     productUrl: productPath ? new URL(productPath, CITY_GROSS_BASE_URL).toString() : '',
     imageUrl: imageUrl ? new URL(imageUrl.startsWith('/') ? imageUrl : `/images/${imageUrl}`, CITY_GROSS_BASE_URL).toString() : '',
     sourceUrl,
     retrievedAt
   };
+}
+
+function isCityGrossGrocerySuperCategory(value: string): boolean {
+  const normalized = value.toLocaleLowerCase('sv-SE');
+  return CITY_GROSS_GROCERY_SUPER_CATEGORIES.some((category) => category.toLocaleLowerCase('sv-SE') === normalized);
 }
 
 function parseCoordinates(value: string): [number | null, number | null] {
@@ -312,4 +377,8 @@ function text(value: unknown): string {
 function numberOrNull(value: unknown): number | null {
   const parsed = typeof value === 'number' ? value : typeof value === 'string' && value.trim() ? Number(value) : Number.NaN;
   return Number.isFinite(parsed) ? parsed : null;
+}
+
+function booleanValue(value: unknown): boolean {
+  return value === true || value === 'true';
 }

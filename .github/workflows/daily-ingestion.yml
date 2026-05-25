@@ -622,6 +622,20 @@ jobs:
           GROCERYVIEW_DB_IO_HOTSPOTS_LIMIT: ${{ vars.GROCERYVIEW_DB_IO_HOTSPOTS_LIMIT || '20' }}
         run: |
           set -euo pipefail
+          if [ -s /tmp/daily-ingestion-result.json ]; then
+            ingestion_status="$(node -e "const body=require('/tmp/daily-ingestion-result.json'); process.stdout.write(String(body.status ?? 'unknown'))")"
+            if [ "${ingestion_status}" != "succeeded" ]; then
+              cat > /tmp/daily-db-io-hotspots-after.json <<EOF
+          {
+            "status": "skipped",
+            "blocker": "daily_db_io_hotspots_after_skipped_after_ingestion_not_succeeded",
+            "ingestionStatus": "${ingestion_status}"
+          }
+          EOF
+              cat /tmp/daily-db-io-hotspots-after.json
+              exit 0
+            fi
+          fi
           if [ -z "${DATABASE_URL:-}" ]; then
             cat > /tmp/daily-db-io-hotspots-after.json <<EOF
           {

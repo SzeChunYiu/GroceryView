@@ -1,6 +1,12 @@
 import { googleMapsDirectionsUrl, googleMapsEmbedUrl, type StoreMapLocation } from '@/lib/mapsConfig';
+import type { StoreDistanceRow } from '@/lib/store-distance';
 
-export function StoreMap({ store }: Readonly<{ store: StoreMapLocation }>) {
+type StoreMapProps = {
+  store: StoreMapLocation;
+  routeRecommendation?: Pick<StoreDistanceRow, 'basketTotalSek' | 'openingStatusLabel' | 'recommendationLabel' | 'routeScore' | 'totalMinutes' | 'travelCostSek'>;
+};
+
+export function StoreMap({ store, routeRecommendation }: Readonly<StoreMapProps>) {
   const embedUrl = googleMapsEmbedUrl(store);
   const directionsUrl = googleMapsDirectionsUrl(store);
 
@@ -27,6 +33,17 @@ export function StoreMap({ store }: Readonly<{ store: StoreMapLocation }>) {
           Open Google Maps directions
         </a>
       </div>
+      {routeRecommendation ? (
+        <div className="border-t border-slate-100 bg-cyan-50 p-4" data-store-detail-route-aware-recommendation="true">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">Route-aware store recommendation</p>
+          <p className="mt-2 text-sm font-semibold leading-6 text-cyan-950">
+            Score {routeRecommendation.routeScore.toFixed(0)} combines route time ({routeRecommendation.totalMinutes} min),
+            basket cost ({routeRecommendation.basketTotalSek.toFixed(2)} SEK), trip cost ({routeRecommendation.travelCostSek.toFixed(1)} SEK),
+            and opening status ({routeRecommendation.openingStatusLabel}).
+          </p>
+          <p className="mt-1 text-xs font-semibold text-cyan-900">{routeRecommendation.recommendationLabel}</p>
+        </div>
+      ) : null}
     </div>
   );
 }

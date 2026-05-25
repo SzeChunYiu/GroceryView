@@ -12,10 +12,10 @@ describe('PostgreSQL product search query', () => {
 
     assert.ok(query);
     assert.deepEqual(query.values, ['Zoégas coffee', 12]);
-    assert.match(query.sql, /websearch_to_tsquery\('simple', \$1\)/);
-    assert.match(query.sql, /to_tsvector\('simple', coalesce\(products\.canonical_name, ''\) \|\| ' ' \|\| coalesce\(products\.brand, ''\)\)/);
+    assert.match(query.sql, /websearch_to_tsquery\('simple', unaccent\(\$1\)\)/);
+    assert.match(query.sql, /to_tsvector\('simple', unaccent\(coalesce\(products\.canonical_name, ''\) \|\| ' ' \|\| coalesce\(products\.name_sv, ''\) \|\| ' ' \|\| coalesce\(products\.name_en, ''\) \|\| ' ' \|\| coalesce\(products\.brand, ''\)\)\)/);
     assert.match(query.sql, /products\.domain = 'grocery'/);
-    assert.match(query.sql, /order by search_rank desc, products\.canonical_name asc/);
+    assert.match(query.sql, /order by search_rank desc, similarity\(lower\(unaccent\(coalesce\(products\.canonical_name, ''\).*products\.canonical_name asc/s);
     assert.match(query.sql, /limit \$2/);
   });
 

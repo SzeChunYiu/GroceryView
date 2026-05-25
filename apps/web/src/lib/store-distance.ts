@@ -1,4 +1,5 @@
 export type StoreTravelMode = 'walk' | 'drive';
+export type StoreOpeningStatus = 'open_now' | 'closing_soon' | 'closed' | 'unknown';
 
 type ProductParam = string | string[] | undefined;
 
@@ -12,14 +13,71 @@ export type StoreDistanceRow = {
   driveMinutes: number;
   pickupMinutes: number;
   totalMinutes: number;
+  basketTotalSek: number;
+  travelCostSek: number;
+  routeAwareTotalSek: number;
+  routeScore: number;
+  openingStatus: StoreOpeningStatus;
+  openingStatusLabel: string;
+  openingPenaltyMinutes: number;
   coverageLabel: string;
+  recommendationLabel: string;
+  routeRankInputs: string[];
 };
 
 const storeRouteSeeds = [
-  { id: 'willys-triangeln', storeName: 'Willys Triangeln', chainName: 'Willys', areaLabel: 'Triangeln', distanceMeters: 450, walkMinutes: 6, driveMinutes: 4 },
-  { id: 'hemkop-city', storeName: 'Hemköp City', chainName: 'Hemköp', areaLabel: 'City', distanceMeters: 850, walkMinutes: 11, driveMinutes: 5 },
-  { id: 'ica-malmborgs', storeName: 'ICA Malmborgs', chainName: 'ICA', areaLabel: 'Caroli', distanceMeters: 1200, walkMinutes: 16, driveMinutes: 7 },
-  { id: 'coop-centralen', storeName: 'Coop Centralen', chainName: 'Coop', areaLabel: 'Centralen', distanceMeters: 1500, walkMinutes: 20, driveMinutes: 8 }
+  {
+    id: 'willys-triangeln',
+    storeName: 'Willys Triangeln',
+    chainName: 'Willys',
+    areaLabel: 'Triangeln',
+    distanceMeters: 450,
+    walkMinutes: 6,
+    driveMinutes: 4,
+    basketBaseSek: 338.9,
+    basketPerProductSek: 1.2,
+    openingStatus: 'open_now',
+    openingStatusLabel: 'Open now · closes 22:00'
+  },
+  {
+    id: 'hemkop-city',
+    storeName: 'Hemköp City',
+    chainName: 'Hemköp',
+    areaLabel: 'City',
+    distanceMeters: 850,
+    walkMinutes: 11,
+    driveMinutes: 5,
+    basketBaseSek: 319.4,
+    basketPerProductSek: 0.9,
+    openingStatus: 'closing_soon',
+    openingStatusLabel: 'Closing soon · verify before leaving'
+  },
+  {
+    id: 'ica-malmborgs',
+    storeName: 'ICA Malmborgs',
+    chainName: 'ICA',
+    areaLabel: 'Caroli',
+    distanceMeters: 1200,
+    walkMinutes: 16,
+    driveMinutes: 7,
+    basketBaseSek: 329.8,
+    basketPerProductSek: 1.5,
+    openingStatus: 'open_now',
+    openingStatusLabel: 'Open now · closes 23:00'
+  },
+  {
+    id: 'coop-centralen',
+    storeName: 'Coop Centralen',
+    chainName: 'Coop',
+    areaLabel: 'Centralen',
+    distanceMeters: 1500,
+    walkMinutes: 20,
+    driveMinutes: 8,
+    basketBaseSek: 314.5,
+    basketPerProductSek: 1.1,
+    openingStatus: 'closed',
+    openingStatusLabel: 'Closed now · next opening must be checked'
+  }
 ] as const;
 
 function firstParam(value: ProductParam) {
@@ -37,28 +95,70 @@ export function normalizeStoreTravelMode(mode: ProductParam): StoreTravelMode {
   return firstParam(mode) === 'drive' ? 'drive' : 'walk';
 }
 
+function openingPenaltyMinutes(status: StoreOpeningStatus): number {
+  if (status === 'open_now') return 0;
+  if (status === 'closing_soon') return 12;
+  if (status === 'closed') return 75;
+  return 20;
+}
+
+function travelCostSek(distanceMeters: number, routeMinutes: number, mode: StoreTravelMode): number {
+  if (mode === 'drive') return Number(((distanceMeters / 1000) * 3.8 + routeMinutes * 0.9).toFixed(1));
+  return Number((routeMinutes * 0.55).toFixed(1));
+}
+
+function routeRecommendationLabel(row: Pick<StoreDistanceRow, 'openingStatus' | 'routeAwareTotalSek' | 'totalMinutes'>): string {
+  if (row.openingStatus === 'closed') return 'Hold: cheapest basket is not actionable while the store is closed.';
+  if (row.openingStatus === 'closing_soon') return 'Check hours: basket savings may be lost if the route misses closing time.';
+  return `Recommended route candidate: ${row.totalMinutes} min and ${row.routeAwareTotalSek.toFixed(2)} SEK basket+trip total.`;
+}
+
 export function buildStoreDistanceCompare(products: ProductParam, mode: ProductParam) {
   const selectedProductIds = parseSelectedProducts(products);
   const travelMode = normalizeStoreTravelMode(mode);
   const pickupMinutes = Math.max(3, selectedProductIds.length * 2);
   const productLabel = selectedProductIds.length === 1 ? '1 selected product' : `${selectedProductIds.length || 'sample'} selected products`;
+  const pricedProductCount = Math.max(selectedProductIds.length, 3);
 
   const rows: StoreDistanceRow[] = storeRouteSeeds
     .map((store) => {
       const routeMinutes = travelMode === 'drive' ? store.driveMinutes : store.walkMinutes;
-      return {
+      const openingPenalty = openingPenaltyMinutes(store.openingStatus);
+      const basketTotalSek = Number((store.basketBaseSek + pricedProductCount * store.basketPerProductSek).toFixed(2));
+      const tripCostSek = travelCostSek(store.distanceMeters, routeMinutes, travelMode);
+      const routeAwareTotalSek = Number((basketTotalSek + tripCostSek).toFixed(2));
+      const totalMinutes = routeMinutes + pickupMinutes + openingPenalty;
+      const routeScore = Number((routeAwareTotalSek + totalMinutes * 1.35 + openingPenalty * 1.8).toFixed(2));
+      const row = {
         ...store,
         pickupMinutes,
-        totalMinutes: routeMinutes + pickupMinutes,
-        coverageLabel: `${productLabel} · ${store.chainName} route-time sort`
+        totalMinutes,
+        basketTotalSek,
+        travelCostSek: tripCostSek,
+        routeAwareTotalSek,
+        routeScore,
+        openingPenaltyMinutes: openingPenalty,
+        coverageLabel: `${productLabel} · route-aware sort combines distance, basket cost, and opening status`,
+        recommendationLabel: '',
+        routeRankInputs: [
+          `${travelMode} route ${routeMinutes} min`,
+          `basket ${basketTotalSek.toFixed(2)} SEK`,
+          store.openingStatusLabel
+        ]
+      };
+
+      return {
+        ...row,
+        recommendationLabel: routeRecommendationLabel(row)
       };
     })
-    .sort((left, right) => left.totalMinutes - right.totalMinutes || left.distanceMeters - right.distanceMeters);
+    .sort((left, right) => left.routeScore - right.routeScore || left.totalMinutes - right.totalMinutes || left.distanceMeters - right.distanceMeters);
 
   return {
     mode: travelMode,
     selectedProductIds,
     rows,
-    summary: `${rows[0]?.storeName ?? 'No store'} is fastest by estimated ${travelMode} time for this basket.`
+    routeRankInputs: ['distance / route minutes', 'known basket total', 'opening status penalty'],
+    summary: `${rows[0]?.storeName ?? 'No store'} is best by route-aware ${travelMode} score after combining distance, basket cost, and opening status.`
   };
 }

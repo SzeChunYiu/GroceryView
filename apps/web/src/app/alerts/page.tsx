@@ -1,5 +1,6 @@
 import { AlertManagementPanel, type AlertProductSummary } from '@/components/AlertListItem';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { formatSek, matchedChainProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -24,6 +25,7 @@ const alertProductSummaries: AlertProductSummary[] = matchedChainProducts.slice(
 export default function AlertsPage() {
   return (
     <PageShell>
+      <FunnelStepBeacon step="watchlist_alert" />
       <Eyebrow>Price alerts</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Manage active price alerts</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">

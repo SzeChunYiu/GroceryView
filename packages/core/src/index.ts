@@ -1,4 +1,8 @@
+import { paydayRankScore, resolvePaydayContext } from './lib/rankers/payday.js';
+
 export * from './lib/rankers/nearby.js';
+export * from './lib/rankers/premium.js';
+export * from './lib/rankers/myBasket.js';
 export type DealScoreInput = {
   currentCityPercentile: number;
   knownPromoHistoryPercentile: number;
@@ -217,6 +221,8 @@ export type DealOpportunityInput = {
   dealScore: number;
   sourceConfidence: number;
   sponsoredPlacement?: boolean;
+  productCategory?: string;
+  category?: string;
 };
 
 export type DealOpportunity = DealOpportunityInput & {
@@ -247,9 +253,12 @@ export function rankDealOpportunities(input: {
   deals: DealOpportunityInput[];
   minimumDealScore?: number;
   minimumSourceConfidence?: number;
+  countryCode?: string;
+  rankedAt?: string | Date;
 }): DealOpportunity[] {
   const minimumDealScore = input.minimumDealScore ?? 60;
   const minimumSourceConfidence = input.minimumSourceConfidence ?? 0.5;
+  const paydayContext = resolvePaydayContext(input.countryCode, input.rankedAt);
 
   return input.deals
     .filter((deal) => !deal.sponsoredPlacement)
@@ -269,6 +278,9 @@ export function rankDealOpportunities(input: {
       };
     })
     .sort((a, b) => {
+      const aRankScore = paydayRankScore(a, paydayContext);
+      const bRankScore = paydayRankScore(b, paydayContext);
+      if (bRankScore !== aRankScore) return bRankScore - aRankScore;
       if (b.dealScore !== a.dealScore) return b.dealScore - a.dealScore;
       if (b.discountPercent !== a.discountPercent) return b.discountPercent - a.discountPercent;
       return a.productName.localeCompare(b.productName);
@@ -5165,3 +5177,5 @@ export function calculateChainPriceIndex(observations: ChainPriceObservation[]):
   return { chains, categories, marketReferenceByCategory, generatedFrom: usable.length };
 }
 export * from './lib/extractors/loosePacked.js';
+
+export * from './lib/loyaltyROI.js';

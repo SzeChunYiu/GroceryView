@@ -5,6 +5,10 @@ import {
   type FlyerOfferReport,
   type StoreFlyerOfferReport
 } from '@groceryview/api';
+import {
+  queryRollingAverageDealReport,
+  type RollingAverageDealReport
+} from '@groceryview/db';
 import { PostgresQueryExecutorService } from '../database/postgres-query-executor.service.js';
 
 type FlyerOfferSqlRow = {
@@ -167,6 +171,14 @@ export class DealsService {
       },
       observations: rows.map(mapRow)
     });
+  }
+
+  async rollingAverageDeals(query: { category?: string } = {}): Promise<RollingAverageDealReport> {
+    if (!this.postgres.isConfigured()) {
+      throw new ServiceUnavailableException('DATABASE_URL is required for real deal data.');
+    }
+
+    return queryRollingAverageDealReport(this.postgres, query);
   }
 
   async storeFlyerOffers(storeId: string, query: { asOf?: string }): Promise<StoreFlyerOfferReport | null> {

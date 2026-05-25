@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { NotificationInboxActions } from '@/components/notification-inbox-actions';
 import { babyDiaperPriceTracker, budgetEssentialsPriceDropAlerts, dealHunterNewProductPriceDropAlerts, weeklyPersonalizedEmailDigest } from '@/lib/demo-data';
 import { samplePredictiveDropAlerts } from '@/lib/alert-scheduler';
@@ -21,10 +22,12 @@ export default function WatchlistPage() {
 
   return (
     <PageShell>
+      <FunnelStepBeacon step="watchlist_alert" />
       <Eyebrow>Watchlist price alerts</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Tracked products with notification-ready alerts</h1>
+      {/* Forecast-style alert copy must stay tied to observed historical source rows. */}
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
-        This page calls buildWatchlistAlerts with verified chain price rows, then runs planNotifications so set-target push and email rows respect user preferences and quiet-hour rules. Predictive drop alerts also surface model-forecast savings windows before a current threshold is crossed, with every claim framed against historical observed source rows rather than a guarantee.
+        This page calls buildWatchlistAlerts with verified chain price rows, then runs planNotifications so set-target push and email rows respect user preferences and quiet-hour rules. Historical wait-window alerts also surface patterns derived from observed source rows before a current threshold is crossed; no forecast is shown without dated observation evidence.
       </p>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr_1fr]">
@@ -36,7 +39,7 @@ export default function WatchlistPage() {
         <Card>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Active alerts</p>
           <p className="mt-2 text-5xl font-black text-emerald-800">{watchlistAlerts.length}</p>
-          <p className="mt-3 font-semibold text-slate-700">set-target and forecasted price signals only when observed source rows pass core rules.</p>
+          <p className="mt-3 font-semibold text-slate-700">set-target and historical price signals only when core rules pass.</p>
         </Card>
         <Card>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Planned notifications</p>
@@ -81,10 +84,10 @@ export default function WatchlistPage() {
       </Card>
 
       <Card className="mt-6 border-cyan-200 bg-cyan-50">
-        <p className="text-sm font-black uppercase tracking-[0.2em] text-cyan-800">Predictive drop alerts</p>
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-cyan-800">Historical drop alerts</p>
         <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Wait-window recommendations</h2>
         <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
-          Forecasted drops are generated before current threshold alerts fire, and the copy labels them as historical observed source-row signals so shoppers can wait for near-term savings windows instead of buying right before a likely discount.
+          No forecast claim: wait-window rows are generated from observed historical source rows before current threshold alerts fire, so shoppers can see factual dated savings context instead of a prediction.
         </p>
         <div className="mt-4 grid gap-3 lg:grid-cols-3">
           {samplePredictiveDropAlerts.map((alert) => (
@@ -98,7 +101,7 @@ export default function WatchlistPage() {
               </div>
               <p className="mt-3 text-sm font-semibold leading-6 text-slate-700">{alert.message}</p>
               <div className="mt-3 grid gap-2 text-sm text-slate-700">
-                <p className="rounded-2xl bg-cyan-100 p-3 font-semibold">Forecast price: {formatSek(alert.trigger.predictedPrice)}</p>
+                <p className="rounded-2xl bg-cyan-100 p-3 font-semibold">Historical target price: {formatSek(alert.trigger.predictedPrice)}</p>
                 <p className="rounded-2xl bg-cyan-100 p-3 font-semibold">Savings window: {alert.trigger.predictedDate}</p>
                 <p className="rounded-2xl bg-white p-3 font-black text-cyan-950">Model confidence {Math.round(alert.trigger.modelConfidence * 100)}%</p>
               </div>

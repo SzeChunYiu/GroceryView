@@ -70,6 +70,12 @@ function diaperSizeClassFor(size: number | null): DiaperSizeClass | null {
   return `diaper-size-${size}` as DiaperSizeClass;
 }
 
+export function extractDiaperPackageCount(packageText: string): number | null {
+  const normalized = normalizeDiaperPackageText(packageText);
+  if (!normalized) return null;
+  return parseDiaperCount(normalized);
+}
+
 function parseDiaperCount(normalized: string): number | null {
   const multiPackMatch = normalized.match(/\b(\d+)\s*[x×]\s*(\d+)\s*(?:p|st|pcs|pieces?|blojor|diapers?)\b/u);
   if (multiPackMatch) return Number(multiPackMatch[1]!) * Number(multiPackMatch[2]!);
@@ -81,6 +87,12 @@ function parseDiaperCount(normalized: string): number | null {
   if (pieceCountMatch) return Number(pieceCountMatch[1]!);
 
   return null;
+}
+
+export function extractDiaperDeclaredSize(packageText: string): number | null {
+  const normalized = normalizeDiaperPackageText(packageText);
+  if (!normalized) return null;
+  return parseDiaperDeclaredSize(normalized);
 }
 
 function parseDiaperDeclaredSize(normalized: string): number | null {

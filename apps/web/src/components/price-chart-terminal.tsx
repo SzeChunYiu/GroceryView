@@ -1,6 +1,8 @@
 'use client';
 
 import { type KeyboardEvent, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { formatPriceChartTerminalReadout } from '../lib/price-chart-terminal-readout.js';
+export { formatPriceChartTerminalReadout, priceChartTerminalLatestPoint } from '../lib/price-chart-terminal-readout.js';
 
 /**
  * Renders the interactive price-history terminal for a product, including
@@ -122,8 +124,7 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
     () => chart.windows.find((window) => window.label === activeWindowLabel) ?? chart.windows[0],
     [activeWindowLabel, chart.windows]
   );
-  const firstSeries = activeWindow?.series[0];
-  const latestPoint = firstSeries?.points.at(-1);
+  const latestReadout = formatPriceChartTerminalReadout(activeWindow);
   const handleWindowKeyDown = (
     event: KeyboardEvent<HTMLButtonElement>,
     windowLabel: PriceChartTerminalWindow['label']
@@ -232,7 +233,7 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
           <p className="mt-2 text-xs font-black uppercase tracking-[0.18em] text-emerald-200">{chart.sourceLabel}</p>
         </div>
         <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm font-black text-emerald-100">
-          crosshair value readout: {latestPoint ? `${activeWindow.latestValueLabel} · ${latestPoint.time.slice(0, 10)}` : 'no point selected'}
+          crosshair value readout: {latestReadout}
         </div>
       </div>
 

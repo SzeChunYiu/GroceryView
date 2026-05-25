@@ -1,8 +1,11 @@
 import type { Metadata } from 'next';
 import { ConsentManager } from '@/components/consent-manager';
+import { SkipLink } from '@/components/SkipLink';
 import { ServiceWorkerRegistrar } from '@/lib/swRegister';
 import { Providers } from './providers';
 import './globals.css';
+import '@/styles/print.css';
+import '../styles/a11y.css';
 
 const siteUrl = 'https://grocery-web-mu.vercel.app';
 const organizationJsonLd = {
@@ -47,11 +50,14 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="sv">
       <body>
+        <SkipLink />
         <script
           dangerouslySetInnerHTML={{ __html: jsonLd([organizationJsonLd, websiteJsonLd]) }}
           type="application/ld+json"
         />
-        <Providers>{children}</Providers>
+        <div id="main-content" tabIndex={-1}>
+          <Providers>{children}</Providers>
+        </div>
         <ConsentManager />
         <ServiceWorkerRegistrar />
       </body>

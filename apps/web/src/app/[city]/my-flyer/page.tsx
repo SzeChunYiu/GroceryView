@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { MyFlyerPushActions } from '@/components/my-flyer-push-actions';
 import { axfoodProducts } from '@/lib/axfood-products';
 import './print-import.css';
 
@@ -6,6 +7,7 @@ type MyFlyerPageProps = Readonly<{ params: Promise<{ city: string }> }>;
 
 const visibleChains = ['willys', 'hemkop'] as const;
 const generatedAt = '2026-05-24';
+const notificationVapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? '';
 
 function titleCaseSegment(value: string) {
   return value
@@ -88,6 +90,14 @@ export default async function MyFlyerPage({ params }: MyFlyerPageProps) {
             <span className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Print layout</span>
           </div>
         </section>
+
+        <MyFlyerPushActions
+          city={city}
+          country="se"
+          defaultAlgorithm="watchlist_first"
+          limit={flyerProducts.length}
+          vapidPublicKey={notificationVapidPublicKey}
+        />
 
         <div aria-label="Sponsored placement" className="my-flyer-ad mb-6 rounded-3xl border border-dashed border-orange-300 bg-orange-50 p-4 text-sm font-bold text-orange-800" data-ad data-print-hide>
           Screen-only promo rail hidden by the MyFlyer print stylesheet.

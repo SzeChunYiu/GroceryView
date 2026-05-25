@@ -84,7 +84,33 @@ export const DEFAULT_APOHEM_SOURCE_PATHS = [
   '/sok?q=munvard',
   '/vitaminer-kosttillskott',
   '/hudvard',
-  '/receptfritt'
+  '/receptfritt',
+  '/sok?q=omega',
+  '/sok?q=magnesium',
+  '/sok?q=forband',
+  '/sok?q=allergi',
+  '/sok?q=smartlindring',
+  '/sok?q=feber',
+  '/sok?q=forkylning',
+  '/sok?q=halsont',
+  '/sok?q=vark',
+  '/sok?q=diarre',
+  '/sok?q=gasbesvar',
+  '/sok?q=nikotin',
+  '/sok?q=ogon',
+  '/sok?q=sarvard',
+  '/sok?q=brannskada',
+  '/sok?q=lus',
+  '/sok?q=nasal',
+  '/sok?q=hosta',
+  '/sok?q=probiotika',
+  '/sok?q=ansiktskram',
+  '/sok?q=schampo',
+  '/sok?q=deodorant',
+  '/sok?q=alvedon',
+  '/sok?q=ipren',
+  '/sok?q=plaster',
+  '/sok?q=handkram'
 ] as const;
 
 export const DEFAULT_APOTEK_HJARTAT_SEARCH_URLS = [
@@ -93,7 +119,30 @@ export const DEFAULT_APOTEK_HJARTAT_SEARCH_URLS = [
   'https://www.apotekhjartat.se/search?q=solskydd',
   'https://www.apotekhjartat.se/search?q=tandkram',
   'https://www.apotekhjartat.se/search?q=munvard',
-  'https://www.apotekhjartat.se/search?q=pamol'
+  'https://www.apotekhjartat.se/search?q=pamol',
+  'https://www.apotekhjartat.se/search?q=omega',
+  'https://www.apotekhjartat.se/search?q=magnesium',
+  'https://www.apotekhjartat.se/search?q=allergi',
+  'https://www.apotekhjartat.se/search?q=smartlindring',
+  'https://www.apotekhjartat.se/search?q=feber',
+  'https://www.apotekhjartat.se/search?q=forkylning',
+  'https://www.apotekhjartat.se/search?q=halsont',
+  'https://www.apotekhjartat.se/search?q=vark',
+  'https://www.apotekhjartat.se/search?q=diarre',
+  'https://www.apotekhjartat.se/search?q=gasbesvar',
+  'https://www.apotekhjartat.se/search?q=ogon',
+  'https://www.apotekhjartat.se/search?q=sarvard',
+  'https://www.apotekhjartat.se/search?q=brannskada',
+  'https://www.apotekhjartat.se/search?q=nasal',
+  'https://www.apotekhjartat.se/search?q=hosta',
+  'https://www.apotekhjartat.se/search?q=probiotika',
+  'https://www.apotekhjartat.se/search?q=ansiktskram',
+  'https://www.apotekhjartat.se/search?q=schampo',
+  'https://www.apotekhjartat.se/search?q=deodorant',
+  'https://www.apotekhjartat.se/search?q=alvedon',
+  'https://www.apotekhjartat.se/search?q=ipren',
+  'https://www.apotekhjartat.se/search?q=plaster',
+  'https://www.apotekhjartat.se/search?q=handkram'
 ] as const;
 
 export async function fetchApohemProducts(options: FetchApohemProductsOptions = {}): Promise<ApohemProduct[]> {
@@ -436,7 +485,7 @@ function htmlHeaders(): RequestInit {
   return {
     headers: {
       accept: 'text/html,application/xhtml+xml',
-      'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
+      'user-agent': 'GroceryView/0.1'
     }
   };
 }

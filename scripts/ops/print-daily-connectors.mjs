@@ -134,6 +134,19 @@ const CONNECTOR_TEMPLATES = [
     stores: []
   },
   {
+    connectorId: 'apoteket-se-public-products',
+    chainId: 'apoteket',
+    domain: 'pharmacy',
+    sourceType: 'retailer_online_page',
+    endpointUrl: 'groceryview://daily/apoteket-se/products/public',
+    parserVersion: 'apoteket-se-public-products-v1',
+    robotsTxtStatus: 'allow',
+    legalReviewStatus: 'approved',
+    hasDataAgreement: false,
+    requireStoreScopedPrices: false,
+    stores: []
+  },
+  {
     connectorId: 'okq8-fuel-prices',
     chainId: 'okq8',
     domain: 'fuel',
