@@ -2897,7 +2897,7 @@ export const chainCategoryCoverage = Object.values(
 )
   .map((row) => ({
     slug: row.slug,
-    label: labelFromSlug(row.slug),
+    label: labelFromSlug(row.slug) || 'Unclassified',
     chainRows: row.chainRows,
     matchedProducts: row.matchedProducts,
     averageSpread: row.matchedProducts ? row.spreadTotal / row.matchedProducts : 0,
@@ -2953,6 +2953,91 @@ export const openPriceObservationDepth = Object.values(
   }))
   .sort((a, b) => b.observationTotal - a.observationTotal || a.label.localeCompare(b.label, 'sv'))
   .slice(0, 6);
+
+const freshnessLagAsOf = '2026-05-25';
+const freshnessLagWindowDays = 7;
+const freshnessLagWindowMs = freshnessLagWindowDays * 24 * 60 * 60 * 1000;
+const axfoodObservedAt = '2026-05-21';
+const freshnessLagAsOfTime = Date.parse(`${freshnessLagAsOf}T00:00:00.000Z`);
+
+function isFreshLagObservation(date: string) {
+  const observedTime = Date.parse(`${date}T00:00:00.000Z`);
+  return Number.isFinite(observedTime)
+    && observedTime <= freshnessLagAsOfTime
+    && freshnessLagAsOfTime - observedTime < freshnessLagWindowMs;
+}
+
+export const perClassFreshnessLagReport = Object.values(
+  [
+    ...pricedProducts.flatMap((product) =>
+      product.observations.map((observation) => ({
+        slug: product.category,
+        observedAt: observation.date,
+        source: 'OpenPrices'
+      }))
+    ),
+    ...axfoodProducts.map((product) => ({
+      slug: product.category,
+      observedAt: axfoodObservedAt,
+      source: 'Axfood'
+    }))
+  ].reduce<Record<string, {
+    slug: string;
+    observationCount: number;
+    freshObservationCount: number;
+    latestObservedAt: string;
+    sourceCounts: Record<string, number>;
+  }>>((ledger, observation) => {
+    const row = ledger[observation.slug] ?? {
+      slug: observation.slug,
+      observationCount: 0,
+      freshObservationCount: 0,
+      latestObservedAt: '',
+      sourceCounts: {}
+    };
+
+    row.observationCount += 1;
+    row.freshObservationCount += isFreshLagObservation(observation.observedAt) ? 1 : 0;
+    if (observation.observedAt > row.latestObservedAt) row.latestObservedAt = observation.observedAt;
+    row.sourceCounts[observation.source] = (row.sourceCounts[observation.source] ?? 0) + 1;
+    ledger[observation.slug] = row;
+    return ledger;
+  }, {})
+)
+  .map((row) => ({
+    slug: row.slug,
+    label: labelFromSlug(row.slug),
+    observationCount: row.observationCount,
+    freshObservationCount: row.freshObservationCount,
+    staleObservationCount: row.observationCount - row.freshObservationCount,
+    freshPercent: row.observationCount ? (row.freshObservationCount / row.observationCount) * 100 : 0,
+    latestObservedAt: row.latestObservedAt || 'Not reported',
+    sourceBreakdown: Object.entries(row.sourceCounts)
+      .sort(([left], [right]) => left.localeCompare(right, 'sv'))
+      .map(([source, count]) => `${source} ${count.toLocaleString('sv-SE')}`)
+      .join(' · '),
+    status: row.freshObservationCount === 0
+      ? 'stale'
+      : row.freshObservationCount === row.observationCount
+        ? 'fresh'
+        : 'mixed'
+  }))
+  .sort((a, b) => a.freshPercent - b.freshPercent || b.observationCount - a.observationCount || a.label.localeCompare(b.label, 'sv'));
+
+const freshnessLagObservationTotal = perClassFreshnessLagReport.reduce((sum, row) => sum + row.observationCount, 0);
+const freshnessLagFreshTotal = perClassFreshnessLagReport.reduce((sum, row) => sum + row.freshObservationCount, 0);
+
+export const freshnessLagSummary = {
+  asOf: freshnessLagAsOf,
+  freshWindowDays: freshnessLagWindowDays,
+  observationCount: freshnessLagObservationTotal,
+  freshObservationCount: freshnessLagFreshTotal,
+  staleObservationCount: freshnessLagObservationTotal - freshnessLagFreshTotal,
+  freshPercent: freshnessLagObservationTotal ? (freshnessLagFreshTotal / freshnessLagObservationTotal) * 100 : 0,
+  classCount: perClassFreshnessLagReport.length,
+  staleClassCount: perClassFreshnessLagReport.filter((row) => row.status === 'stale').length,
+  claimBoundary: 'Freshness lag is computed from dated OpenPrices observations plus the dated Axfood chain snapshot; classes without a dated observation stay stale until the next source refresh.'
+};
 
 export const priceDropMoversBoard = pricedProducts
   .flatMap((product) => {

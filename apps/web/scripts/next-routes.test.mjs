@@ -16,6 +16,7 @@ const appFiles = [
   'src/app/catalogue-savings/page.tsx',
   'src/app/chain-index/page.tsx',
   'src/app/chain-coverage/page.tsx',
+  'src/app/coverage/page.tsx',
   'src/app/map/page.tsx',
   'src/app/data-sources/page.tsx',
   'src/app/store-coverage/page.tsx',
@@ -3024,6 +3025,7 @@ ${seo}`;
       'src/app/chain-index/page.tsx',
       'src/app/compare/page.tsx',
       'src/app/compare-items/page.tsx',
+      'src/app/coverage/page.tsx',
       'src/app/coupon-stacks/page.tsx',
       'src/app/cookies/page.tsx',
       'src/app/data-sources/page.tsx',
@@ -3632,6 +3634,27 @@ ${seo}`;
     assert.match(route, /Claim boundary/);
     assert.match(route, /per-store availability/);
     assert.match(route, /@\/lib\/verified-data/);
+    assert.doesNotMatch(route, /@\/lib\/demo-data/);
+    assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
+  it('surfaces per-class freshness lag on the coverage route', async () => {
+    const route = await read('src/app/coverage/page.tsx');
+    const verified = await read('src/lib/verified-data.ts');
+    const docs = await read('../../docs/qa/fresh-lag.md');
+    const sitemap = await read('src/app/sitemap.ts');
+
+    assert.match(verified, /perClassFreshnessLagReport/);
+    assert.match(verified, /freshnessLagSummary/);
+    assert.match(verified, /freshWindowDays: freshnessLagWindowDays/);
+    assert.match(route, /perClassFreshnessLagReport\.map/);
+    assert.match(route, /observations older than/);
+    assert.match(route, /SourceCoverage/);
+    assert.match(route, /routeMetadata\('\/coverage'\)/);
+    assert.match(sitemap, /entry\('\/coverage'/);
+    assert.match(docs, /Per-class freshness lag report/);
+    assert.match(docs, /observations older than 7 days are stale/);
+    assert.match(docs, /\/coverage/);
     assert.doesNotMatch(route, /@\/lib\/demo-data/);
     assert.doesNotMatch(route, /@\/components\/sample-data/);
   });
