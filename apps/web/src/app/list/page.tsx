@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { ListCard } from '@/components/list-card';
 import { ListSharePreview } from '@/components/list-share-preview';
 import { createPublicListShareToken, publicListSharePath, type PublicListShareItem } from '@/lib/list-permissions';
-import { storeLayoutDepartments, type StoreLayoutChain } from '@/lib/trip-planner';
+import { storeLayoutDepartments, storeLayoutDepartmentsForOrder, type StoreLayoutChain, type StoreLayoutGroupOrder } from '@/lib/trip-planner';
 import { metadataForShoppingListShare } from '@/lib/seo';
 
 const demoItems = [
@@ -25,6 +25,7 @@ const publicDemoShareItems: PublicListShareItem[] = demoItems.map((item) => ({
 
 type ListPageSearchParams = {
   chain?: string | string[];
+  groupOrder?: string | string[];
   share?: string | string[];
 };
 
@@ -35,6 +36,11 @@ function normalizeChain(chain: string | string[] | undefined): StoreLayoutChain 
   return storeChains.find((value) => value === requested) ?? 'ica';
 }
 
+function normalizeGroupOrder(groupOrder: string | string[] | undefined): StoreLayoutGroupOrder {
+  const requested = Array.isArray(groupOrder) ? groupOrder[0] : groupOrder;
+  return requested === 'reverse-layout' ? 'reverse-layout' : 'store-layout';
+}
+
 export async function generateMetadata({ searchParams }: { searchParams?: Promise<ListPageSearchParams> }): Promise<Metadata> {
   const resolvedSearchParams = await (searchParams ?? Promise.resolve({}));
   return metadataForShoppingListShare(resolvedSearchParams.share);
@@ -43,6 +49,7 @@ export async function generateMetadata({ searchParams }: { searchParams?: Promis
 export default async function ShoppingListPage({ searchParams }: { searchParams?: Promise<ListPageSearchParams> }) {
   const resolvedSearchParams = await (searchParams ?? Promise.resolve({}));
   const selectedChain = normalizeChain(resolvedSearchParams.chain);
+  const groupOrder = normalizeGroupOrder(resolvedSearchParams.groupOrder);
   const shareToken = Array.isArray(resolvedSearchParams.share) ? resolvedSearchParams.share[0] : resolvedSearchParams.share;
   const publicShareToken = shareToken ?? createPublicListShareToken({
     expiresAt: '2026-06-30T23:59:59.000Z',
@@ -74,13 +81,20 @@ export default async function ShoppingListPage({ searchParams }: { searchParams?
               {storeChains.map((chain) => <option key={chain} value={chain}>{chain.toUpperCase()}</option>)}
             </select>
           </label>
+          <label className="text-sm font-semibold text-slate-700" htmlFor="list-group-order">
+            Group order
+            <select className="mt-1 block rounded-md border border-emerald-200 bg-white px-3 py-2 text-slate-950" defaultValue={groupOrder} id="list-group-order" name="groupOrder">
+              <option value="store-layout">Entrance to checkout</option>
+              <option value="reverse-layout">Checkout to entrance</option>
+            </select>
+          </label>
           <button className="rounded-full bg-emerald-700 px-4 py-2 text-sm font-bold text-white" type="submit">Apply layout</button>
         </form>
         <p className="mt-3 text-sm text-emerald-950">
-          Approximate route: {storeLayoutDepartments[selectedChain].map((department) => department.label).join(' → ')}.
+          Approximate route: {storeLayoutDepartmentsForOrder(selectedChain, groupOrder).map((department) => department.label).join(' → ')}.
         </p>
       </section>
-      <ListCard currentRole="guardian" items={demoItems} publicShareHref={publicShareHref} selectedChain={selectedChain} />
+      <ListCard currentRole="guardian" groupOrder={groupOrder} items={demoItems} publicShareHref={publicShareHref} selectedChain={selectedChain} />
     </div>
   );
 }
