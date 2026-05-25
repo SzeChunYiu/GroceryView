@@ -15,6 +15,11 @@ type Timer = ReturnType<typeof setTimeout>;
 
 const MAX_LOOKAHEAD_MINUTES = 366 * 24 * 60;
 
+export function scrapeCronJobName(retailer: string): string {
+  if (retailer === 'ica-maxi') return ICA_MAXI_SCRAPE_JOB_NAME;
+  return `scrape:${retailer}`;
+}
+
 function fieldMatches(field: string, value: number, min: number, max: number): boolean {
   return field.split(',').some((part) => {
     const trimmed = part.trim();

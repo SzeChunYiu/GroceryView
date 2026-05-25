@@ -1,5 +1,5 @@
 import type { ScrapeSchedulerConfig } from '../config.js';
-import { CronScrapeScheduler, type CronJob, type ScheduledCronJob } from './scheduler.js';
+import { CronScrapeScheduler, scrapeCronJobName, type CronJob, type ScheduledCronJob } from './scheduler.js';
 
 export type RetailerScrapeJob = {
   cadence: 'daily' | 'weekly';
@@ -21,7 +21,7 @@ export function cronJobsForScrapeQueue(config: ScrapeSchedulerConfig, runner: Sc
   if (!config.enabled) return [];
   return jobsFromScrapeConfig(config).map((job) => ({
     expression: job.cron,
-    name: `scrape:${job.retailer}`,
+    name: scrapeCronJobName(job.retailer),
     run: () => runner(job)
   }));
 }
