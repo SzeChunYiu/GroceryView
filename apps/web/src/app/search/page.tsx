@@ -1,4 +1,5 @@
 import ProductsPage from '../products/page';
+import { CategoryFilterSidebar } from '@/components/FilterPanel';
 import { SearchRecoveryPanel } from '@/components/data-ui';
 import { RecentSearchReplayPills } from '@/components/SearchBar';
 import { SaveSearchSubscriptionButton } from '@/components/saved-search-subscriptions';
@@ -12,6 +13,11 @@ import { buildProductSearchView } from '@/lib/verified-data';
 
 type SearchPageParams = Record<string, string | string[] | undefined>;
 const emptySearchPageParams: SearchPageParams = {};
+
+function listSearchValues(value: string | string[] | undefined): string[] {
+  const values = Array.isArray(value) ? value : value ? [value] : [];
+  return [...new Set(values.flatMap((item) => item.split(',')).map((item) => item.trim()).filter(Boolean))];
+}
 
 export async function generateMetadata({ searchParams }: { searchParams?: Promise<SearchPageParams> }) {
   const resolvedSearchParams = await (searchParams ?? Promise.resolve(emptySearchPageParams));
@@ -81,9 +87,18 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
           </div>
         </section>
       ) : null}
-      <section aria-label="Search results with virtualized product rendering">
-        <ProductsPage searchParams={Promise.resolve(resolvedSearchParams)} />
-      </section>
+      <div className="mx-auto grid w-full max-w-7xl gap-5 px-4 sm:px-6 lg:grid-cols-[17rem_minmax(0,1fr)] lg:px-8">
+        <CategoryFilterSidebar
+          basePath="/search"
+          categoryFacets={searchView.facets.categories}
+          resultCount={searchView.resultCards.length}
+          searchParams={resolvedSearchParams}
+          selectedCategories={listSearchValues(resolvedSearchParams.category)}
+        />
+        <section aria-label="Search results with virtualized product rendering" className="min-w-0">
+          <ProductsPage searchParams={Promise.resolve(resolvedSearchParams)} />
+        </section>
+      </div>
     </>
   );
 }

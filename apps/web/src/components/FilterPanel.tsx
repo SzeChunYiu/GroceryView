@@ -20,10 +20,20 @@ type ActiveFilterChipsProps = {
   chips: readonly RemovableSearchFilterChip[];
 };
 
+type SearchParamValue = string | string[] | undefined;
+
 type FacetOption = {
   value: string;
   label?: string;
   count?: number;
+};
+
+type CategoryFilterSidebarProps = {
+  basePath: string;
+  categoryFacets: readonly FacetOption[];
+  resultCount: number;
+  searchParams: Record<string, SearchParamValue>;
+  selectedCategories?: readonly string[];
 };
 
 type DietaryFacetOption = FacetOption & {
@@ -171,6 +181,96 @@ export function ActiveFilterChips({ chips }: ActiveFilterChipsProps) {
 
 function optionLabel(option: FacetOption) {
   return option.label ?? option.value;
+}
+
+function appendSearchParamValues(params: URLSearchParams, key: string, value: SearchParamValue) {
+  const values = Array.isArray(value) ? value : value ? [value] : [];
+  for (const item of values.flatMap((entry) => entry.split(','))) {
+    const trimmed = item.trim();
+    if (trimmed) params.append(key, trimmed);
+  }
+}
+
+function categorySidebarHref(input: {
+  basePath: string;
+  searchParams: Record<string, SearchParamValue>;
+  selectedCategories: readonly string[];
+  value: string;
+}) {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(input.searchParams)) {
+    if (key === 'category' || key === 'page') continue;
+    appendSearchParamValues(params, key, value);
+  }
+
+  const nextCategories = input.selectedCategories.includes(input.value)
+    ? input.selectedCategories.filter((category) => category !== input.value)
+    : [...input.selectedCategories, input.value];
+  for (const category of nextCategories) params.append('category', category);
+
+  const query = params.toString();
+  return query ? `${input.basePath}?${query}` : input.basePath;
+}
+
+function categorySidebarClearHref(basePath: string, searchParams: Record<string, SearchParamValue>) {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(searchParams)) {
+    if (key === 'category' || key === 'page') continue;
+    appendSearchParamValues(params, key, value);
+  }
+  const query = params.toString();
+  return query ? `${basePath}?${query}` : basePath;
+}
+
+export function CategoryFilterSidebar({
+  basePath,
+  categoryFacets,
+  resultCount,
+  searchParams,
+  selectedCategories = []
+}: CategoryFilterSidebarProps) {
+  const selectedCategorySet = new Set(selectedCategories);
+
+  return (
+    <aside className="lg:sticky lg:top-24 lg:self-start" aria-label="Category result filters">
+      <details className="rounded-2xl border border-emerald-200 bg-white p-4 shadow-sm" open>
+        <summary className="cursor-pointer text-sm font-black uppercase tracking-[0.18em] text-emerald-800">
+          Categories
+        </summary>
+        <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+          {resultCount.toLocaleString('sv-SE')} verified results match the current search. Select one or more categories to narrow them.
+        </p>
+        <div className="mt-4 grid gap-2">
+          {categoryFacets.map((facet) => {
+            const checked = selectedCategorySet.has(facet.value);
+            return (
+              <Link
+                aria-pressed={checked}
+                className={`flex items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm font-black transition ${checked ? 'bg-emerald-700 text-white' : 'bg-emerald-50 text-emerald-950 hover:bg-emerald-100'}`}
+                href={categorySidebarHref({ basePath, searchParams, selectedCategories, value: facet.value })}
+                key={facet.value}
+              >
+                <span className="flex min-w-0 items-center gap-2">
+                  <span aria-hidden="true" className={`flex size-4 shrink-0 items-center justify-center rounded border ${checked ? 'border-white bg-white text-emerald-800' : 'border-emerald-300 bg-white'}`}>
+                    {checked ? 'x' : ''}
+                  </span>
+                  <span className="truncate">{optionLabel(facet)}</span>
+                </span>
+                <span className={`shrink-0 rounded-full px-2 py-1 text-xs ${checked ? 'bg-white/20 text-white' : 'bg-white text-emerald-800'}`}>
+                  {(facet.count ?? 0).toLocaleString('sv-SE')}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+        {selectedCategories.length > 0 ? (
+          <Link className="mt-4 inline-flex rounded-full bg-slate-100 px-4 py-2 text-xs font-black text-slate-800" href={categorySidebarClearHref(basePath, searchParams)}>
+            Clear categories
+          </Link>
+        ) : null}
+      </details>
+    </aside>
+  );
 }
 
 export function AdvancedFilterDrawer({
