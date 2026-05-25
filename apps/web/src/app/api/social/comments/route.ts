@@ -1,9 +1,13 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { createSocialComment, listSocialComments } from '@/lib/social';
+import { createSocialComment, listSharedFriendPriceSightings, listSocialComments } from '@/lib/social';
 
 export async function GET(request: NextRequest) {
   const postId = request.nextUrl.searchParams.get('postId') ?? undefined;
-  return NextResponse.json({ comments: listSocialComments(postId) });
+  const productSlug = request.nextUrl.searchParams.get('productSlug') ?? undefined;
+  return NextResponse.json({
+    comments: listSocialComments(postId),
+    friendPriceSightings: listSharedFriendPriceSightings({ postId, productSlug })
+  });
 }
 
 export async function POST(request: NextRequest) {
