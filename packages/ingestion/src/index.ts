@@ -141,6 +141,7 @@ export * from './connectors/ica.js';
 export * from './connectors/ica-bulk.js';
 export * from './connectors/ica-reklamblad.js';
 export * from './connectors/kronans-apotek-se.js';
+export * from './connectors/kassalapp-no.js';
 export {
   ICA_STAMMIS_OFFERS_URL,
   fetchIcaStammisOffers,
