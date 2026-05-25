@@ -241,7 +241,12 @@ export function buildMyFlyerPayload(query: MyFlyerQuery, asOf = new Date()): MyF
     }
   });
 
-  const rows = myBasketPromos
+  const rankedOffers = [
+    ...myBasketPromos,
+    ...sourceOffers.filter((offer) => !myBasketPromos.some((ranked) => ranked.offerId === offer.offerId))
+  ];
+
+  const rows = rankedOffers
     .map((offer) => scoreOffer(offer, query, asOfMs))
     .sort((left, right) =>
       query.algorithm === 'organic_eco'
