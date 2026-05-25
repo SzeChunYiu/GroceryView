@@ -24,6 +24,7 @@ Price and ingestion records expose provenance directly:
 
 Every price-bearing row carries `price_type`, `confidence`, `observed_at`, and `provenance` either directly or through its referenced observation.
 Fuel-domain rows carry litre unit prices through immutable `domain = fuel` observations and fuel source links.
+Fresh-product rows can also carry observation-level `origin_country` (ISO-3166 alpha-2 grow/raise country) and `cert_level` (`krav`, `eu_eco`, `free_range`, `asc`, `msc`, `rainforest_alliance`, `fairtrade`, or `conventional`) when a chain exposes those values.
 
 ## Partitioning Plan
 
@@ -140,7 +141,9 @@ Indexes: `fuel_price_source_observations_grade_idx`.
 
 Immutable normalized price facts. This is the canonical table for historical charts and price provenance.
 
-Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `source_run_id`, `raw_record_id`, `retailer_product_ref`, `price_type`, `price`, `regular_price`, `unit_price`, `currency`, `quantity`, `quantity_unit`, promotion fields, `member_required`, `is_available`, `observed_at`, validity window fields, `confidence`, `provenance`.
+Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `source_run_id`, `raw_record_id`, `retailer_product_ref`, `origin_country`, `cert_level`, `price_type`, `price`, `regular_price`, `unit_price`, `currency`, `quantity`, `quantity_unit`, promotion fields, `member_required`, `is_available`, `observed_at`, validity window fields, `confidence`, `provenance`.
+
+Fresh-product origin/certification columns live on the observation because country-of-origin and certification can vary by chain, batch, or date even when the catalog product is the same.
 
 `observations.is_available` defaults true for historical rows and is set false when connector evidence shows a product is out-of-stock, not found, or backed by an empty stock response. The field is part of connector replay idempotency so a stock-state change can append an immutable fact without overwriting price history.
 
@@ -148,17 +151,17 @@ Write policy: daily ingestion uses change-only writes. Before inserting a new im
 
 Allowed `price_type` values: `shelf`, `online`, `member`, `promotion`, `receipt`, `community`, `estimated`.
 
-Indexes: product/time, store/time, price type/time, provenance GIN, and `observations_connector_idempotency_idx` as the compound unique price snapshot guard for scraper upserts and exact connector replay idempotency without updating stored history.
+Indexes: product/time, store/time, price type/time, origin/certification, provenance GIN, and `observations_connector_idempotency_idx` as the compound unique price snapshot guard for scraper upserts and exact connector replay idempotency without updating stored history.
 
 ### `observations_v2`
 
 Range-partitioned monthly mirror of immutable `observations` for high-volume history reads. It is populated by `observations_partition_lane_sync`, which calls `ensure_observations_monthly_partition()` before copying inserts and updates from the canonical table.
 
-Key columns: same price, source, availability, provenance, validity, domain, and observed-time fields as `observations`. The partitioned primary key is `(id, observed_at)` because PostgreSQL range-partitioned unique keys must include the partition key.
+Key columns: same price, source, availability, origin/certification, provenance, validity, domain, and observed-time fields as `observations`. The partitioned primary key is `(id, observed_at)` because PostgreSQL range-partitioned unique keys must include the partition key.
 
 Partitions: monthly range partitions named `observations_YYYY_MM`, plus `observations_default` for rows outside the pre-created window. Operators should drain the default partition by creating the matching monthly partition before long-term retention.
 
-Indexes: parent and per-partition product/time, store/time, price type/time, domain/time, provenance GIN, and `observed_at` BRIN. Retention uses `drop_observations_partitions_before(cutoff_month)` after archive/downsample handoff.
+Indexes: parent and per-partition product/time, store/time, price type/time, domain/time, origin/certification, provenance GIN, and `observed_at` BRIN. Retention uses `drop_observations_partitions_before(cutoff_month)` after archive/downsample handoff.
 
 ### `latest_prices`
 

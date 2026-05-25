@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { access, readFile, readFileSync } from 'node:fs';
-import { dirname, join, normalize } from 'node:path';
+import { dirname, join, normalize, relative } from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import test from 'node:test';
@@ -9,7 +9,7 @@ import vm from 'node:vm';
 const require = createRequire(import.meta.url);
 const ts = require('typescript');
 const root = new URL('../', import.meta.url);
-const rootPath = fileURLToPath(root);
+const rootPath = fileURLToPath(root).replace(/[/\\]$/, '');
 const moduleCache = new Map();
 
 const read = (relative) => new Promise((resolve, reject) => {

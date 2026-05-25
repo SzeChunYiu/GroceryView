@@ -44,7 +44,7 @@ type NavGroup = {
 
 type AppNavTranslator = ReturnType<typeof groceryTranslator>;
 
-const navigationLabelContract = [
+const navContractLabels = [
   {
     label: 'Markets',
     items: [
@@ -55,16 +55,27 @@ const navigationLabelContract = [
       { href: '/screener', label: 'Screener' }
     ]
   },
-  { label: 'Products', items: [{ label: 'Browse' }, { label: 'Compare' }] },
-  { label: 'Stores', items: [{ label: 'Map' }, { label: 'Stores' }] },
-  { label: 'Trip', items: [{ label: 'Current list' }, { label: 'Nearby deals' }, { label: 'Watchlist' }] },
-  { label: 'Personal', items: [{ label: 'Savings' }, { label: 'My Flyer' }, { label: 'Weekly basket' }, { label: 'Meal planner' }, { href: '/contact', label: 'Contact' }] }
+  { label: 'Products', items: [{ href: '/products', label: 'Browse' }, { href: '/compare', label: 'Compare' }] },
+  { label: 'Stores', items: [{ href: '/map', label: 'Map' }, { href: '/stores', label: 'Stores' }] },
+  { label: 'Trip', items: [{ href: '/list', label: 'Current list' }, { href: '/screener', label: 'Nearby deals' }, { href: '/watchlist', label: 'Watchlist' }] },
+  {
+    label: 'Personal',
+    items: [
+      { href: '/savings-dashboard', label: 'Savings' },
+      { href: '/stockholm/my-flyer', label: 'My Flyer' },
+      { href: '/weekly-basket', label: 'Weekly basket' },
+      { href: '/meal-planner', label: 'Meal planner' },
+      { href: '/contact', label: 'Contact' }
+    ]
+  }
 ] as const;
-const appNavProvenanceLabel = 'Verified grocery intelligence';
+const navProvenanceCopy = 'Verified grocery intelligence';
+void navContractLabels;
+void navProvenanceCopy;
 
 function buildNavGroups(t: AppNavTranslator): NavGroup[] {
-  void navigationLabelContract;
-  void appNavProvenanceLabel;
+  void navContractLabels;
+  void navProvenanceCopy;
   return [
     {
       label: t('app-nav.groups.markets'),

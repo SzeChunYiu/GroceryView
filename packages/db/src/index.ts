@@ -1,5 +1,5 @@
-import { createHash } from 'node:crypto';
 import { buildUserAccountDeletionQueries } from './queries/users.js';
+import { contentHashForPayload } from './content-hash.js';
 
 export * from './client.js';
 export * from './queries/categories.js';
@@ -3088,9 +3088,6 @@ function normalizeAlias(value: string): string {
   return normalized;
 }
 
-function contentHashForPayload(payload: unknown): string {
-  return `sha256:${createHash('sha256').update(JSON.stringify(payload)).digest('hex')}`;
-}
 
 function mapOpenPricesPriceType(value: string): PriceType {
   if (value === 'online' || value === 'member' || value === 'receipt' || value === 'estimated') return value;

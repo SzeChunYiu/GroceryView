@@ -9,7 +9,6 @@ import { buildMisspelledQueryRecovery, expandGrocerySearchQueryWithTelemetry, ty
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-void buildMisspelledQueryRecovery;
 void fuzzyProductSearchQueries;
 void rankFuzzyProductResults;
 
@@ -131,7 +130,7 @@ function responsePayload(
     matchedAliases: expansion.matchedAliases,
     matchedFuzzyAliases: expansion.matchedFuzzyAliases,
     matchedSynonyms: expansion.matchedSynonyms,
-    queryRecovery: null,
+    queryRecovery: buildMisspelledQueryRecovery(query),
     results,
     performanceTelemetry: {
       cacheHit: telemetry.cacheHit,

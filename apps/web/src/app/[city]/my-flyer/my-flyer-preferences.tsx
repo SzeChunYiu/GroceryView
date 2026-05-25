@@ -82,7 +82,7 @@ export function MyFlyerPreferences({ defaultCountry, defaultAlgorithm }: MyFlyer
           <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">MyFlyer preferences</p>
           <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Account-synced flyer controls</h2>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
-            Country, favorite stores, home location, household size, diet filters, and algorithm choice are sent to the MyFlyer preference API with the signed-in bearer token. This form does not write localStorage-only preferences.
+            Country, Favorite stores, home location, household size, diet filters, and algorithm choice are sent to the MyFlyer preference API with the signed-in bearer token. This form does not write localStorage-only preferences.
           </p>
         </div>
         <button className="rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" onClick={savePreferences} type="button">

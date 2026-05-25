@@ -2,6 +2,7 @@ import { buildFacetedProductSearch, type RealCatalogSearchPriceRow } from '@groc
 import { COMMODITIES, STAPLE_BASKET, SUPPORTED_PRICE_DOMAINS, type Commodity, type ComparableUnit } from '@groceryview/catalog';
 import { buildPriceChartSeries, buildWatchlistAlerts, calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, suggestFriendSharedDeals, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type PriceChartObservation, type ProductMatchInput, type WatchlistItem, type WatchlistPriceType, type WatchlistProductSnapshot } from '@groceryview/core';
 import { planReceiptAliasGrowth } from '@groceryview/scanning';
+import { calculateCarbonScore, type ProductCarbonScore } from '../../../../packages/core/src/lib/carbonScore';
 import { axfoodProducts } from './axfood-products';
 import { icaStorePromotionSourceSummary } from './ingested/ica-source-summary';
 import { icaReklambladOffers as staticIcaReklambladOffers, icaReklambladSource as staticIcaReklambladSource } from './ingested/ica-reklamblad';
@@ -733,17 +734,19 @@ export type ProductSearchUrlParams = {
   maxPrice?: SearchParamValue;
   inStockOnly?: SearchParamValue;
   minConfidence?: SearchParamValue;
+  minCarbonScore?: SearchParamValue;
   sort?: SearchParamValue;
 };
 
-export type ProductSearchSortOption = 'relevance' | 'unit_price_asc' | 'confidence_desc' | 'newest_observation' | 'nearest_store';
+export type ProductSearchSortOption = 'relevance' | 'unit_price_asc' | 'confidence_desc' | 'newest_observation' | 'nearest_store' | 'carbon_score_desc';
 
 export const productSearchSortOptions: Array<{ value: ProductSearchSortOption; label: string; description: string }> = [
   { value: 'relevance', label: 'Relevance', description: 'Keep the verified search relevance and price order.' },
   { value: 'unit_price_asc', label: 'Lowest unit price', description: 'Prioritize the cheapest comparable kr/kg, kr/l, or each price.' },
   { value: 'confidence_desc', label: 'Highest confidence', description: 'Prioritize rows with the strongest price observation confidence.' },
   { value: 'newest_observation', label: 'Newest observation', description: 'Prioritize recently observed prices.' },
-  { value: 'nearest_store', label: 'Nearest store', description: 'Use location-aware store ranking when location is available.' }
+  { value: 'nearest_store', label: 'Nearest store', description: 'Use location-aware store ranking when location is available.' },
+  { value: 'carbon_score_desc', label: 'Best eco score', description: 'Prioritize the strongest carbon-footprint score from OpenFoodFacts-style evidence and origin heuristics.' }
 ];
 
 function productSearchSortValue(value: SearchParamValue): ProductSearchSortOption {
@@ -841,18 +844,30 @@ function nearestStoreRankFor(product: (typeof rawFacetedProductSearch.products)[
   return ranks.length ? Math.min(...ranks) : Number.MAX_SAFE_INTEGER;
 }
 
-function productSearchResultCards(searchResult: typeof rawFacetedProductSearch, sort: ProductSearchSortOption = 'relevance') {
+function carbonScoreForFacetedProduct(product: (typeof rawFacetedProductSearch.products)[number]): ProductCarbonScore {
+  return calculateCarbonScore({
+    categories: product.categoryPath,
+    labels: product.labels,
+    originCountry: product.originCountry,
+    marketCountry: 'SE',
+    frozen: product.categoryPath.some((category) => category.toLocaleLowerCase('sv-SE').includes('frozen'))
+  });
+}
+
+function productSearchResultCards(searchResult: typeof rawFacetedProductSearch, sort: ProductSearchSortOption = 'relevance', minCarbonScore?: number) {
   const cards = searchResult.products.map((product, relevanceIndex) => {
     const cheapest = product.currentPrices[0] ?? null;
     const lowestUnitPrice = product.currentPrices.reduce((lowest, price) => Math.min(lowest, price.unitPrice), Number.POSITIVE_INFINITY);
     const highestConfidence = product.currentPrices.reduce((highest, price) => Math.max(highest, price.confidence), 0);
     const newestObservedAt = product.currentPrices.reduce((newest, price) => price.observedAt > newest ? price.observedAt : newest, '');
     const volatilityBadge = classifyRecentPriceVariance(product.currentPrices);
+    const carbonScore = carbonScoreForFacetedProduct(product);
     return {
       slug: product.slug,
       name: product.canonicalName,
       brand: product.brand ?? 'Brand not reported',
       imageUrl: product.imageUrl,
+      carbonScore,
       categoryLabel: product.categoryPath[0] ?? 'Category not reported',
       labels: product.labels.map(readableLabel),
       cheapestPriceLabel: formatSek(product.cheapestPrice),
@@ -877,13 +892,14 @@ function productSearchResultCards(searchResult: typeof rawFacetedProductSearch, 
       sortRelevanceIndex: relevanceIndex,
       sortUnitPrice: Number.isFinite(lowestUnitPrice) ? lowestUnitPrice : Number.MAX_SAFE_INTEGER
     };
-  });
+  }).filter((card) => minCarbonScore === undefined || card.carbonScore.score >= minCarbonScore);
 
   return cards.sort((left, right) => {
     if (sort === 'unit_price_asc' && left.sortUnitPrice !== right.sortUnitPrice) return left.sortUnitPrice - right.sortUnitPrice;
     if (sort === 'confidence_desc' && left.sortConfidence !== right.sortConfidence) return right.sortConfidence - left.sortConfidence;
     if (sort === 'newest_observation' && left.sortNewestObservedAt !== right.sortNewestObservedAt) return right.sortNewestObservedAt.localeCompare(left.sortNewestObservedAt);
     if (sort === 'nearest_store' && left.sortNearestStoreRank !== right.sortNearestStoreRank) return left.sortNearestStoreRank - right.sortNearestStoreRank;
+    if (sort === 'carbon_score_desc' && left.carbonScore.score !== right.carbonScore.score) return right.carbonScore.score - left.carbonScore.score;
     return left.sortRelevanceIndex - right.sortRelevanceIndex;
   });
 }
@@ -900,6 +916,7 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
   const maxPrice = numericSearchValue(searchParams.maxPrice);
   const inStockOnly = booleanSearchValue(searchParams.inStockOnly);
   const minConfidence = confidenceSearchValue(searchParams.minConfidence);
+  const minCarbonScore = numericSearchValue(searchParams.minCarbonScore);
   const sort = productSearchSortValue(searchParams.sort);
   const filters = { query, categories, labels, originCountries, chains, minPrice, maxPrice, inStockOnly, minConfidence, limit: 100 };
   const searchResult = buildFacetedProductSearch({ rows: facetedSearchRows, filters });
@@ -918,6 +935,7 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
     maxPrice !== undefined ? `max unit ${formatSek(maxPrice)}` : null,
     inStockOnly ? 'priced/in-stock only' : null,
     minConfidence !== undefined ? `confidence ≥ ${pct.format(minConfidence * 100)}%` : null,
+    minCarbonScore !== undefined ? `eco score ≥ ${minCarbonScore}` : null,
     sort !== 'relevance' ? `sort=${productSearchSortOptions.find((option) => option.value === sort)?.label ?? sort}` : null
   ].filter((item): item is string => item !== null);
 
@@ -957,7 +975,7 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
       outOfStockLatestPriceCount: searchResult.evidence.outOfStockLatestPriceCount
     },
     activeFilters,
-    resultCards: productSearchResultCards(searchResult, sort)
+    resultCards: productSearchResultCards(searchResult, sort, minCarbonScore)
   };
 }
 
@@ -2258,6 +2276,7 @@ export type AdaptiveProductCard = {
   isAvailable: boolean;
   safetyProfile: OpenFoodFactsSafetyProfile;
   safetyEvidenceLabel: string;
+  carbonScore: ProductCarbonScore;
 };
 
 function isOpenPricesProduct(product: ItemComparisonProduct): product is (typeof pricedProducts)[number] {
@@ -2359,6 +2378,19 @@ function confidenceLevelForEvidence(sourceCount: number, hasNormalizedUnit: bool
   return 'low';
 }
 
+function carbonScoreForProduct(product: (typeof productUniverse)[number]): ProductCarbonScore {
+  const isChainProduct = 'lowestPrice' in product;
+  const categoryEvidence = isChainProduct ? [labelFromSlug(product.category), product.category] : [product.category, ...product.categories];
+  const labelEvidence = isChainProduct ? product.labels : [];
+  return calculateCarbonScore({
+    categories: categoryEvidence,
+    labels: labelEvidence,
+    originCountry: isChainProduct ? product.originCountry : originCountryForBarcode(product.code),
+    marketCountry: 'SE',
+    frozen: categoryEvidence.some((category) => category.toLocaleLowerCase('sv-SE').includes('frozen'))
+  });
+}
+
 export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((product) => {
   const isChainProduct = 'lowestPrice' in product;
   const totalPrice = isChainProduct ? product.lowestPrice : product.priceMedian;
@@ -2376,6 +2408,7 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
   const sparklinePoints = sevenDaySparklinePoints(product);
   const priceDrop = priceDropFromThirtyDayHistory(product);
   const safetyProfile = safetyProfileForProduct(product);
+  const carbonScore = carbonScoreForProduct(product);
   const sourceCount = isChainProduct
     ? Object.values(product.chains).filter((row) => typeof row.price === 'number' && Number.isFinite(row.price) && row.price > 0).length
     : product.observationCount;
@@ -2438,7 +2471,8 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
     safetyProfile,
     safetyEvidenceLabel: safetyProfile.evidenceLabels.length > 0
       ? `OpenFoodFacts/Axfood label evidence: ${safetyProfile.evidenceLabels.slice(0, 3).join(', ')}`
-      : 'No verified allergen or dietary label evidence found'
+      : 'No verified allergen or dietary label evidence found',
+    carbonScore
   };
 });
 export function withProductSearchExplanationBadges<T extends AdaptiveProductCard>(cards: T[], query: string): Array<T & { searchExplanationBadges?: SearchExplanationBadge[] }> {

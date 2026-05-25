@@ -1,0 +1,1 @@
+- PR #1575: decision=rescued; outcome=added completion log entry; attribution=ticket-cn070-p11.

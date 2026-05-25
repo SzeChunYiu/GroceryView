@@ -37,6 +37,7 @@ type SearchParams = {
   maxPrice?: string | string[];
   inStockOnly?: string | string[];
   minConfidence?: string | string[];
+  minCarbonScore?: string | string[];
   brand?: string | string[];
   sort?: string | string[];
   page?: string | string[];
@@ -79,6 +80,7 @@ function copySearchParams(params: URLSearchParams, source: SearchParams) {
   setFirstParam(params, 'maxPrice', source.maxPrice);
   setFirstParam(params, 'inStockOnly', source.inStockOnly);
   setFirstParam(params, 'minConfidence', source.minConfidence);
+  setFirstParam(params, 'minCarbonScore', source.minCarbonScore);
   setFirstParam(params, 'sort', source.sort);
 }
 
@@ -220,12 +222,16 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             {inStockOnly.productCount.toLocaleString('sv-SE')} priced products · {inStockOnly.latestPriceCount.toLocaleString('sv-SE')} latest_prices rows
           </div>
         </div>
-        <form action="/products" className="mt-5 grid gap-3 rounded-2xl border border-violet-100 bg-white p-4 shadow-sm lg:grid-cols-[1.2fr_auto]" method="get">
+        <form action="/products" className="mt-5 grid gap-3 rounded-2xl border border-violet-100 bg-white p-4 shadow-sm lg:grid-cols-[1.2fr_180px_auto]" method="get">
           {search.originFilters.map((origin) => <input key={origin} name="origin" type="hidden" value={origin} />)}
           {search.sort !== 'relevance' ? <input name="sort" type="hidden" value={search.sort} /> : null}
           <label className="text-sm font-black text-slate-950" htmlFor="product-search-q">
             Search
             <input className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-950" defaultValue={search.query} id="product-search-q" name="q" />
+          </label>
+          <label className="text-sm font-black text-slate-950" htmlFor="product-min-carbon-score">
+            Min eco score
+            <input className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-950" defaultValue={resolvedSearchParams.minCarbonScore ?? ''} id="product-min-carbon-score" inputMode="numeric" max={100} min={0} name="minCarbonScore" placeholder="0–100" type="number" />
           </label>
           <div className="flex flex-col justify-end gap-2">
             <button className="rounded-full bg-violet-800 px-4 py-3 text-sm font-black text-white" type="submit">Apply filters</button>

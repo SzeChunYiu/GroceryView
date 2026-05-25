@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import { ConfidenceBadge } from './confidence-badge';
+import { EcoBadge } from './eco-badge';
 import { LazyItemCard } from './LazyItemCard';
 import { FavouriteProductToggle } from './favourite-product-toggle';
 import { readStoredSafetyPreferences, SAFETY_PREFERENCES_CHANGED_EVENT, type ProductSafetyPreferences } from './cert-filter';
@@ -391,6 +392,9 @@ export function ProductPriceCards({
             <p className="mt-4 text-3xl font-black text-emerald-800">{primaryLabel(card, compareMode)}</p>
             <p className="mt-1 text-sm font-semibold text-slate-700">{secondaryLabel(card, compareMode)}</p>
             {/* cheapest-per-unit */}
+            <div className="mt-3">
+              <EcoBadge score={card.carbonScore} />
+            </div>
             {card.cheapestUnitBadge ? (
               <p className="mt-2 inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-950" data-testid="cheapest-per-unit">{card.cheapestUnitBadge}</p>
             ) : null}

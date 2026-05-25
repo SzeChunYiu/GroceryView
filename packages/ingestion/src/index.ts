@@ -19,6 +19,7 @@ import {
   type ImageCacheOptions as ProductImageCacheOptions,
   type ImageCacheProduct
 } from '@groceryview/image-cache';
+import { formatIngestRowZodIssues, ingestRowSchema } from './contract.js';
 import {
   fetchCityGrossProductsForAllStores,
   type CityGrossProduct
@@ -113,6 +114,7 @@ export * from './connectors/openfoodfacts.js';
 export * from './connectors/all-store-runner.js';
 export * from './connectors/overpass.js';
 export * from './connectors/fuel-stations.js';
+export * from './jobs/is-poi-audit.js';
 export * from './connectors/citygross.js';
 export * from './connectors/citygross-bulk.js';
 export * from './connectors/coop.js';
@@ -124,6 +126,7 @@ export * from './connectors/lidl.js';
 export * from './connectors/localfoodnodes-se.js';
 export * from './connectors/seven-eleven-no.js';
 export * from './connectors/lyfogheilsa-is.js';
+export * from './connectors/mast-recalls-is.js';
 export * from './connectors/mathem.js';
 export * from './connectors/matpriskollen.js';
 export * from './connectors/matspar.js';
@@ -132,6 +135,7 @@ export * from './connectors/lidl-bulk.js';
 export * from './connectors/willys-bulk.js';
 export * from './connectors/apohem.js';
 export * from './connectors/bonus-is.js';
+export * from './connectors/atlantsolia-is.js';
 export * from './connectors/apoteket-se.js';
 export * from './connectors/okq8-fuel.js';
 export * from './connectors/ob-is-fuel.js';
@@ -3257,7 +3261,22 @@ export type IngestionBatchPlan = {
 export function planIngestionBatch(inputs: RetailerProductInput[]): IngestionBatchPlan {
   const accepted: IngestionOutput[] = [];
   const rejected: Array<{ input: RetailerProductInput; reason: string }> = [];
-  for (const input of inputs) {
+  for (const [index, input] of inputs.entries()) {
+    const contractResult = ingestRowSchema.safeParse(input);
+    if (!contractResult.success) {
+      const reason = 'Ingest row contract violation: ' + formatIngestRowZodIssues(contractResult.error.issues);
+      console.error('[ingestion-contract] rejected malformed connector row', {
+        index,
+        issues: contractResult.error.issues.map((issue) => ({
+          path: issue.path.join('.'),
+          code: issue.code,
+          message: issue.message
+        }))
+      });
+      rejected.push({ input, reason });
+      continue;
+    }
+
     try {
       accepted.push(ingestRetailerProduct(input));
     } catch (error) {
@@ -3435,6 +3454,7 @@ export const GROCERYVIEW_DAILY_CITY_GROSS_BULK_PRODUCTS_URL = 'groceryview://dai
 export const GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL = 'groceryview://daily/city-gross/public-products/all-stores';
 export const GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL = 'groceryview://daily/mathem/products/public-search';
 export const GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL = 'groceryview://daily/matspar/products/public-search';
+export const GROCERYVIEW_DAILY_SNABBGROSS_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/snabbgross/products/all-stores';
 export const GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL = OKQ8_FUEL_PRICES_URL;
 export const GROCERYVIEW_DAILY_OB_IS_FUEL_PRICES_URL = OB_IS_FUEL_PRICES_URL;
 export const GROCERYVIEW_DAILY_SEVEN_ELEVEN_SE_CONVENIENCE_PRODUCTS_URL = 'groceryview://daily/seven-eleven-se/convenience-products';
