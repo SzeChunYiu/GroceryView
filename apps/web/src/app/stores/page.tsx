@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { AddressSearch } from '@/components/AddressSearch';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { osmStoreHolidayWarningLabel, osmStoreOpeningHoursLabel } from '@/lib/osm-stores';
 import { storeUniverse } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -12,6 +13,8 @@ export default function StoresIndexPage() {
   const brandCounts = [...storeUniverse.reduce((map, store) => map.set(store.brand, (map.get(store.brand) ?? 0) + 1), new Map<string, number>())]
     .sort((a, b) => b[1] - a[1]);
   const hasIcaBrandCoverage = brandCounts.some(([brand]) => brand.toLowerCase().includes('ica'));
+  const storesWithHours = storeUniverse.filter((store) => osmStoreOpeningHoursLabel(store) !== 'Hours not reported by OSM').length;
+  const holidayWarning = osmStoreHolidayWarningLabel(storeUniverse[0]);
 
   return (
     <PageShell>
@@ -22,7 +25,7 @@ export default function StoresIndexPage() {
         <AddressSearch stores={storeUniverse} />
       </div>
       <div className="mt-6 grid gap-6 lg:grid-cols-[0.7fr_1.3fr]">
-        <Card><h2 className="text-2xl font-black">Brand coverage</h2><div className="mt-4 flex flex-wrap gap-2">{brandCounts.slice(0, 18).map(([brand, count]) => <span className="rounded-full bg-slate-100 px-3 py-2 text-sm font-black" key={brand}>{brand}: {count}</span>)}</div></Card>
+        <Card><h2 className="text-2xl font-black">Brand coverage</h2><p className="mt-3 text-sm font-bold text-slate-700">{storesWithHours.toLocaleString('sv-SE')} stores include explicit OSM opening hours. {holidayWarning}</p><div className="mt-4 flex flex-wrap gap-2">{brandCounts.slice(0, 18).map(([brand, count]) => <span className="rounded-full bg-slate-100 px-3 py-2 text-sm font-black" key={brand}>{brand}: {count}</span>)}</div></Card>
         {hasIcaBrandCoverage ? (
           <Card>
             <p className="text-sm font-black uppercase tracking-[0.18em] text-slate-500">ICA chain locator</p>
@@ -33,7 +36,7 @@ export default function StoresIndexPage() {
             </Link>
           </Card>
         ) : null}
-        <Card><h2 className="text-2xl font-black">Stores with coordinates</h2><div className="mt-4 grid gap-3 md:grid-cols-2">{storeUniverse.slice(0, 60).map((store) => <Link className="rounded-2xl border border-slate-200 p-4 hover:border-emerald-700" href={`/stores/${store.slug}`} key={store.slug}><p className="font-black">{store.name}</p><p className="text-sm text-slate-600">{store.brand} · {store.city || store.district || 'City not reported'}</p></Link>)}</div></Card>
+        <Card><h2 className="text-2xl font-black">Stores with coordinates</h2><div className="mt-4 grid gap-3 md:grid-cols-2">{storeUniverse.slice(0, 60).map((store) => <Link className="rounded-2xl border border-slate-200 p-4 hover:border-emerald-700" href={`/stores/${store.slug}`} key={store.slug}><p className="font-black">{store.name}</p><p className="text-sm text-slate-600">{store.brand} · {store.city || store.district || 'City not reported'}</p><p className="mt-2 text-xs font-bold text-slate-500">Hours: {osmStoreOpeningHoursLabel(store)} · {osmStoreHolidayWarningLabel(store)}</p></Link>)}</div></Card>
       </div>
     </PageShell>
   );
