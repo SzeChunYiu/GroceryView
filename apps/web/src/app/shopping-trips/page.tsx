@@ -1,4 +1,5 @@
 import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { BorderTripCalc } from '@/components/border-trip-calc';
 import { ConsentedShoppingTripPlanner } from '@/hooks/useGeolocation';
 import { defaultStoreRouteChecklist, osmStores } from '@/lib/osm-stores';
 import { basketTripCostContract, budgetCheapestStoreRoutingPlanner, deliveryVsInStoreComparison, elderlyNearestDeliveryPlanner, formatSek, fulfillmentSlotsContract } from '@/lib/verified-data';
@@ -43,6 +44,9 @@ export default function FeaturePage() {
   return (
     <PageShell>
       <NoVerifiedData route={route} title={`${titles[route]} has no private production records in this static snapshot`} />
+      <div className="mt-6">
+        <BorderTripCalc />
+      </div>
       <Card className="mt-6 border-indigo-200 bg-indigo-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-indigo-800">Time-to-complete estimator</p>
         <h2 className="mt-2 text-2xl font-black tracking-tight">Active-list aisle traversal and completion time</h2>
