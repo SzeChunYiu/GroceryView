@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
+import { getStockConfidenceIndicator, type StockConfidenceState } from "../lib/source-health";
 
 type FreshnessVote = "fresh" | "outdated";
 
@@ -11,6 +12,10 @@ export type StoreProductRowProps = {
   storeName?: string;
   priceLabel?: string;
   shelfLifeDays?: number;
+  isAvailable?: boolean | null;
+  observedAt?: string | null;
+  sourceRetrievedAt?: string | null;
+  recentObservationCount?: number | null;
   className?: string;
 };
 
@@ -23,6 +28,10 @@ export function StoreProductRow({
   storeName,
   priceLabel,
   shelfLifeDays,
+  isAvailable,
+  observedAt,
+  sourceRetrievedAt,
+  recentObservationCount,
   className,
 }: StoreProductRowProps) {
   const noteId = useId();
@@ -30,6 +39,12 @@ export function StoreProductRow({
   const [days, setDays] = useState(shelfLifeDays?.toString() ?? "");
   const [note, setNote] = useState("");
   const [status, setStatus] = useState<SubmitState>("idle");
+  const stockConfidence = getStockConfidenceIndicator({
+    isAvailable,
+    observedAt,
+    sourceRetrievedAt,
+    recentObservationCount,
+  });
 
   async function submitFreshness() {
     setStatus("saving");
@@ -64,6 +79,7 @@ export function StoreProductRow({
         <h3>{productName}</h3>
         {storeName ? <p>{storeName}</p> : null}
         {priceLabel ? <p>{priceLabel}</p> : null}
+        <StockConfidenceBadge confidence={stockConfidence} />
       </div>
 
       <fieldset>
@@ -116,6 +132,29 @@ export function StoreProductRow({
       {status === "saved" ? <p role="status">Freshness signal saved.</p> : null}
       {status === "error" ? <p role="alert">Could not save freshness signal.</p> : null}
     </article>
+  );
+}
+
+function StockConfidenceBadge({
+  confidence,
+}: {
+  confidence: ReturnType<typeof getStockConfidenceIndicator>;
+}) {
+  const stateClassName: Record<StockConfidenceState, string> = {
+    "in-stock": "border-emerald-200 bg-emerald-50 text-emerald-950",
+    uncertain: "border-amber-200 bg-amber-50 text-amber-950",
+    stale: "border-rose-200 bg-rose-50 text-rose-950",
+  };
+
+  return (
+    <p
+      aria-label={`${confidence.label}. ${confidence.detail}`}
+      className={`mt-2 rounded-full border px-3 py-1 text-xs font-bold ${stateClassName[confidence.state]}`}
+      data-stock-confidence={confidence.state}
+      title={confidence.detail}
+    >
+      {confidence.label}
+    </p>
   );
 }
 

@@ -12,6 +12,11 @@ const DAY_IN_MS = 24 * 60 * 60 * 1000;
 const AGING_AFTER_DAYS = 2;
 const STALE_AFTER_DAYS = 7;
 
+export const stockConfidenceFreshnessWindows = {
+  agingAfterDays: AGING_AFTER_DAYS,
+  staleAfterDays: STALE_AFTER_DAYS,
+};
+
 export function getScrapeAgeInDays(
   scrapedAt: string | number | Date | null | undefined,
   now: Date = new Date(),
@@ -88,4 +93,9 @@ export function getPriceFreshness(
     refreshHint: "Recently refreshed price.",
     isStale: false,
   };
+}
+
+export function isStockFreshEnoughForTravel(scrapedAt: string | number | Date | null | undefined, now: Date = new Date()): boolean {
+  const freshness = getPriceFreshness(scrapedAt, now);
+  return freshness.level === "fresh" || freshness.level === "aging";
 }
