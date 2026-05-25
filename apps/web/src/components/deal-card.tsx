@@ -37,7 +37,11 @@ type DealCardProps = {
   outboundStoreUrl?: string;
   affiliateCampaignId?: string;
   sharePath?: string;
+  categoryLabel?: string;
+  replacementLabel?: string;
+  sourceLabel?: string;
   sponsoredPlacement?: SponsoredDealPlacement;
+  dealEndsAt?: string;
 };
 
 function formatPrice(value: number, locale: string, currency: string) {
@@ -111,7 +115,11 @@ export function DealCard({
   outboundStoreUrl,
   affiliateCampaignId,
   sharePath,
-  sponsoredPlacement
+  categoryLabel,
+  replacementLabel,
+  sourceLabel,
+  sponsoredPlacement,
+  dealEndsAt
 }: DealCardProps) {
   const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle');
   const context = buildDealContext({ currentPrice, discountStartedAt, priceHistory, currency, locale });
@@ -144,6 +152,16 @@ export function DealCard({
   const sponsoredSurface = sponsoredPlacement?.surface ?? 'discovery_rail';
   const sponsoredPlacementId = sponsoredPlacement?.placementId ?? analyticsDealId;
   const separatedFromOrganicRankings = true;
+  const countdownLabel = useMemo(() => {
+    if (!dealEndsAt) return null;
+    const endsAt = new Date(dealEndsAt).getTime();
+    if (!Number.isFinite(endsAt)) return null;
+    const hoursRemaining = Math.ceil((endsAt - Date.now()) / (60 * 60 * 1000));
+    if (hoursRemaining <= 0) return 'Ends today';
+    if (hoursRemaining <= 24) return `Ends in ${hoursRemaining}h`;
+    const daysRemaining = Math.ceil(hoursRemaining / 24);
+    return daysRemaining <= 7 ? `Ends in ${daysRemaining}d` : null;
+  }, [dealEndsAt]);
 
   useEffect(() => {
     if (!sponsoredProvider) return;
@@ -188,7 +206,11 @@ export function DealCard({
       ) : null}
       <div className="flex items-start justify-between gap-3">
         <div>
+          {replacementLabel ? (
+            <p className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{replacementLabel}</p>
+          ) : null}
           <h3 className="text-base font-semibold text-market-ink">{title}</h3>
+          {categoryLabel ? <p className="mt-1 text-xs font-bold uppercase tracking-[0.14em] text-market-ink/55">{categoryLabel}</p> : null}
           <p className="mt-2 text-2xl font-bold text-market-ink">{formatPrice(currentPrice, locale, currency)}</p>
           {originalPrice ? (
             <p className="text-sm text-market-ink/60">
@@ -196,12 +218,22 @@ export function DealCard({
             </p>
           ) : null}
         </div>
-        {context.isNewLowestPrice ? (
-          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">New low</span>
-        ) : null}
+        <div className="flex flex-col items-end gap-2">
+          {countdownLabel ? (
+            <span className="rounded-full bg-rose-100 px-3 py-1 text-xs font-black text-rose-800">{countdownLabel}</span>
+          ) : null}
+          {context.isNewLowestPrice ? (
+            <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">New low</span>
+          ) : null}
+        </div>
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2" aria-label="Deal history context">
+        {sourceLabel ? (
+          <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-900">
+            {sourceLabel}
+          </span>
+        ) : null}
         {context.streakLabel ? (
           <span className="rounded-full bg-market-mint/15 px-3 py-1 text-xs font-semibold text-market-ink">
             {context.streakLabel}

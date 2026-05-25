@@ -1,4 +1,10 @@
-export type SharedListActivityKind = 'item_added' | 'item_checked' | 'item_edited' | 'item_removed';
+export type SharedListActivityKind =
+  | 'item_added'
+  | 'item_checked'
+  | 'item_completed'
+  | 'item_edited'
+  | 'item_removed'
+  | 'price_alert_changed';
 
 export type SharedListActor = {
   id: string;
@@ -92,10 +98,18 @@ export function publishSharedListItemChecked(input: SharedListActivityInput): Sh
   return publishSharedListActivity('item_checked', input);
 }
 
+export function publishSharedListItemCompleted(input: SharedListActivityInput): SharedListActivityEvent {
+  return publishSharedListActivity('item_completed', input);
+}
+
 export function publishSharedListItemEdited(input: SharedListActivityInput): SharedListActivityEvent {
   return publishSharedListActivity('item_edited', input);
 }
 
 export function publishSharedListItemRemoved(input: SharedListActivityInput): SharedListActivityEvent {
   return publishSharedListActivity('item_removed', input);
+}
+
+export function publishSharedListPriceAlertChanged(input: SharedListActivityInput): SharedListActivityEvent {
+  return publishSharedListActivity('price_alert_changed', input);
 }
