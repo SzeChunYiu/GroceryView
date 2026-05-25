@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'GroceryView verified grocery terminal',
     short_name: 'GroceryView',
-    description: 'Install GroceryView for mobile-first Swedish grocery price checks, saved lists, favourites, and offline store trips.',
+    description: 'Install GroceryView for mobile-first Swedish grocery price checks, saved lists, favourites, cached product details, and offline store trips.',
     id: '/',
     start_url: '/',
     scope: '/',

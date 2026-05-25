@@ -31,9 +31,11 @@ import {
   DEFAULT_WILLYS_LIVE_WEEKLY_DISCOUNT_MAX_ROWS,
   DEFAULT_APOHEM_SOURCE_PATHS,
   DEFAULT_APOTEK_HJARTAT_SEARCH_URLS,
+  DEFAULT_BONUS_IS_PRODUCT_URLS,
   fetchCityGrossProductsForAllStores,
   fetchCoopProductsForAllStores,
   fetchCoopWeeklyDiscountsForAllStores,
+  fetchBonusIsProducts,
   fetchHemkopProducts,
   fetchHemkopWeeklyDiscountsForAllStores,
   fetchLidlOffersForAllStores,
@@ -76,6 +78,7 @@ const MATSPAR_QUERIES = DEFAULT_MATSPAR_SEARCH_QUERIES;
 const MATSPAR_PAGES = DEFAULT_MATSPAR_SEARCH_PAGES;
 const APOHEM_SOURCE_PATHS = DEFAULT_APOHEM_SOURCE_PATHS;
 const APOTEK_HJARTAT_SEARCH_URLS = DEFAULT_APOTEK_HJARTAT_SEARCH_URLS;
+const BONUS_IS_MAX_ROWS = 1200;
 
 const retrievedAt = new Date().toISOString();
 
@@ -207,6 +210,16 @@ if (shouldRun('openfoodfacts')) {
   });
   await writeOpenFoodFacts(openFoodFactsProducts, pageEvents);
   summary.openFoodFactsProducts = openFoodFactsProducts.length;
+}
+
+if (shouldRun('bonus-is')) {
+  const bonusIsProducts = await fetchBonusIsProducts({
+    sourceUrls: DEFAULT_BONUS_IS_PRODUCT_URLS,
+    maxRows: BONUS_IS_MAX_ROWS,
+    retrievedAt
+  });
+  await writeBonusIs(bonusIsProducts);
+  summary.bonusIsProducts = bonusIsProducts.length;
 }
 
 if (shouldRun('ica-reklamblad')) {
@@ -929,6 +942,42 @@ async function writeOpenFoodFacts(rows, pageEvents) {
     })} as const;`,
     '',
     `export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = ${literal(ingestedRows)};`,
+    ''
+  ]);
+}
+
+async function writeBonusIs(rows) {
+  const sourceUrls = unique(rows.map((row) => row.sourceUrl));
+  await writeGeneratedFile('bonus-is.ts', [
+    '// AUTO-GENERATED from Bónus Iceland public WooCommerce storefront pages.',
+    `// sourceUrl: ${sourceUrls[0] ?? DEFAULT_BONUS_IS_PRODUCT_URLS[0]}`,
+    `// retrievedAt: ${retrievedAt}`,
+    `// Source URLs: ${(sourceUrls.length > 0 ? sourceUrls : DEFAULT_BONUS_IS_PRODUCT_URLS).join('; ')}`,
+    `// Retrieved: ${retrievedAt}`,
+    `// Row count: ${rows.length} real Bónus Iceland product rows fetched from verslun.bonus.is storefront pages.`,
+    '',
+    'export type BonusIsIngestedProduct = {',
+    "  chain: 'bonus-is';",
+    '  code: string;',
+    '  name: string;',
+    '  price: number;',
+    '  priceText: string;',
+    '  productUrl: string;',
+    '  imageUrl: string;',
+    '  inStock: boolean;',
+    '  sourceUrl: string;',
+    '  retrievedAt: string;',
+    '};',
+    '',
+    `export const bonusIsSource = ${literal({
+      source: 'Bónus Iceland public WooCommerce storefront pages',
+      retrievedAt,
+      rowCount: rows.length,
+      maxRows: BONUS_IS_MAX_ROWS,
+      sourceUrls: sourceUrls.length > 0 ? sourceUrls : [...DEFAULT_BONUS_IS_PRODUCT_URLS]
+    })} as const;`,
+    '',
+    `export const bonusIsProducts: BonusIsIngestedProduct[] = ${literal(rows)};`,
     ''
   ]);
 }
