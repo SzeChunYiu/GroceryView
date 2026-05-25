@@ -3,6 +3,17 @@ import { buildCityPriceDropTrends } from '@/lib/trends';
 
 export const dynamic = 'force-static';
 
+function normalizeFilterSlug(value: string | null) {
+  return value?.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-') ?? '';
+}
+
+function cardMatchesFilter(card: ReturnType<typeof buildCityPriceDropTrends>['cards'][number], filters: { category: string; chain: string }) {
+  const categorySlug = normalizeFilterSlug(card.categoryLabel);
+  const sourceSlug = normalizeFilterSlug(card.sourceLabel);
+  return (!filters.category || categorySlug === filters.category)
+    && (!filters.chain || sourceSlug.includes(filters.chain));
+}
+
 function parseLimit(value: string | null) {
   if (!value) return 6;
   const parsed = Number.parseInt(value, 10);
@@ -14,6 +25,15 @@ export function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const city = searchParams.get('city') ?? 'stockholm';
   const limit = parseLimit(searchParams.get('limit'));
+  const filters = {
+    category: normalizeFilterSlug(searchParams.get('category')),
+    chain: normalizeFilterSlug(searchParams.get('chain'))
+  };
+  const feed = buildCityPriceDropTrends({ city, limit: filters.category || filters.chain ? 12 : limit });
+  const cards = feed.cards
+    .filter((card) => cardMatchesFilter(card, filters))
+    .slice(0, limit)
+    .map((card, index) => ({ ...card, rank: index + 1 }));
 
-  return NextResponse.json(buildCityPriceDropTrends({ city, limit }));
+  return NextResponse.json({ ...feed, filters, cards });
 }

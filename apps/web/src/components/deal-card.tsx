@@ -45,6 +45,7 @@ type DealCardProps = {
   productHref?: string;
   rankLabel?: string;
   categoryLabel?: string;
+  chainLabel?: string;
   imageAlt?: string;
   imageUrl?: string | null;
   localityLabel?: string;
@@ -143,6 +144,7 @@ export function DealCard({
   productHref,
   rankLabel,
   categoryLabel,
+  chainLabel,
   imageAlt,
   imageUrl,
   localityLabel,
@@ -189,7 +191,7 @@ export function DealCard({
   const sponsoredSurface = sponsoredPlacement?.surface ?? 'discovery_rail';
   const sponsoredPlacementId = sponsoredPlacement?.placementId ?? analyticsDealId;
   const separatedFromOrganicRankings = true;
-  const metaLabel = [rankLabel, categoryLabel, localityLabel].filter(Boolean).join(' · ');
+  const metaLabel = [rankLabel, chainLabel, categoryLabel, localityLabel].filter(Boolean).join(' · ');
   const priceFreshnessObservedAt = freshnessObservedAt ?? discountStartedAt ?? priceHistory?.at(-1)?.observedAt ?? null;
   const priceFreshness = getPriceFreshness(priceFreshnessObservedAt);
   const priceVerificationLabel = verificationLabel
