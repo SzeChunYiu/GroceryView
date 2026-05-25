@@ -214,3 +214,71 @@ export function sortItemsByStoreLayout<TItem extends { name: string }>(items: TI
     return leftIndex - rightIndex || left.name.localeCompare(right.name, 'sv-SE');
   });
 }
+
+export type SplitTripBasketItem = {
+  id: string;
+  name: string;
+  prices: Record<string, number>;
+};
+
+export type SplitTripStore = {
+  id: string;
+  label: string;
+  routeOrder: number;
+  travelCost: number;
+};
+
+export type SplitTripPlan = {
+  assignments: Array<{ itemId: string; itemName: string; storeId: string; price: number }>;
+  effectiveTotal: number;
+  mode: 'single-store' | 'split-trip';
+  routeLegs: string[];
+  savingsVsSingleStore: number;
+};
+
+function storeBasketTotal(items: SplitTripBasketItem[], storeId: string) {
+  return items.reduce((total, item) => total + (item.prices[storeId] ?? Number.POSITIVE_INFINITY), 0);
+}
+
+export function planSplitTrip(
+  items: SplitTripBasketItem[],
+  stores: SplitTripStore[],
+  options: { minimumSavings: number } = { minimumSavings: 0 }
+): SplitTripPlan {
+  const orderedStores = [...stores].sort((left, right) => left.routeOrder - right.routeOrder || left.label.localeCompare(right.label, 'sv-SE'));
+  const singleStore = orderedStores
+    .map((store) => ({ store, total: storeBasketTotal(items, store.id) + store.travelCost }))
+    .sort((left, right) => left.total - right.total)[0];
+
+  if (!singleStore || !Number.isFinite(singleStore.total)) {
+    throw new Error('At least one store must price every basket item.');
+  }
+
+  const assignments = items.map((item) => {
+    const [storeId, price] = Object.entries(item.prices).sort((left, right) => left[1] - right[1] || left[0].localeCompare(right[0], 'sv-SE'))[0];
+    return { itemId: item.id, itemName: item.name, storeId, price };
+  });
+  const usedStoreIds = new Set(assignments.map((assignment) => assignment.storeId));
+  const routeLegs = orderedStores.filter((store) => usedStoreIds.has(store.id)).map((store) => store.id);
+  const splitTotal = assignments.reduce((total, assignment) => total + assignment.price, 0)
+    + orderedStores.filter((store) => usedStoreIds.has(store.id)).reduce((total, store) => total + store.travelCost, 0);
+  const savingsVsSingleStore = Number((singleStore.total - splitTotal).toFixed(2));
+
+  if (savingsVsSingleStore < options.minimumSavings) {
+    return {
+      assignments: items.map((item) => ({ itemId: item.id, itemName: item.name, storeId: singleStore.store.id, price: item.prices[singleStore.store.id] })),
+      effectiveTotal: Number(singleStore.total.toFixed(2)),
+      mode: 'single-store',
+      routeLegs: [singleStore.store.id],
+      savingsVsSingleStore: 0
+    };
+  }
+
+  return {
+    assignments,
+    effectiveTotal: Number(splitTotal.toFixed(2)),
+    mode: 'split-trip',
+    routeLegs,
+    savingsVsSingleStore
+  };
+}
