@@ -5,6 +5,8 @@ import {
   applyCommunityReviewVote,
   communityReviewTrustScore,
   defaultCommunityPriceReviews,
+  moderationStatusLabel,
+  reportCommunityPriceReview,
   sortCommunityReviewsByTrust,
   type CommunityPriceReview,
   type CommunityReviewVote
@@ -99,6 +101,14 @@ export function PriceReportReviewActions() {
     setMessage(`${vote === 'upvote' ? 'Helpful' : 'Not helpful'} vote saved. Most trusted community price reviews are sorted first.`);
   }
 
+  function reportSuspiciousReview(reviewId: string) {
+    setCommunityReviews((currentReviews) =>
+      reportCommunityPriceReview(currentReviews, reviewId, 'Community flagged suspicious price evidence or review content.')
+    );
+    setStatus('ready');
+    setMessage('Suspicious community price report flagged. Moderation status is visible here and in /admin/reports.');
+  }
+
   return (
     <section className="mt-6 rounded-3xl border border-sky-200 bg-white p-5 shadow-sm" aria-label="Price report human review controls">
       <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-800">Signed-in reviewer actions</p>
@@ -182,13 +192,22 @@ export function PriceReportReviewActions() {
                   <p className="font-black text-slate-950">{review.productName}</p>
                   <p className="mt-1 font-semibold text-slate-700">{review.priceLabel} · {review.storeName}</p>
                 </div>
-                <p className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-900">Trust {communityReviewTrustScore(review)}</p>
+                <div className="text-right">
+                  <p className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-900">Trust {communityReviewTrustScore(review)}</p>
+                  <p className="mt-2 rounded-full bg-amber-100 px-3 py-1 text-xs font-black text-amber-900">{moderationStatusLabel(review.moderationStatus)}</p>
+                </div>
               </div>
               <p className="mt-3 text-slate-700">{review.body}</p>
+              {review.lastReportReason ? (
+                <p className="mt-2 rounded-xl bg-amber-50 p-3 text-xs font-bold text-amber-950">
+                  Report reason: {review.lastReportReason}
+                </p>
+              ) : null}
               <p className="mt-2 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">{review.reviewerLabel} · {review.upvotes} up · {review.downvotes} down</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 <button className="rounded-full border border-emerald-300 px-3 py-1.5 text-xs font-black text-emerald-900" onClick={() => voteCommunityReview(review.id, 'upvote')} type="button">Helpful</button>
                 <button className="rounded-full border border-slate-300 px-3 py-1.5 text-xs font-black text-slate-700" onClick={() => voteCommunityReview(review.id, 'downvote')} type="button">Not helpful</button>
+                <button className="rounded-full border border-amber-300 px-3 py-1.5 text-xs font-black text-amber-900" onClick={() => reportSuspiciousReview(review.id)} type="button">Report suspicious</button>
               </div>
             </li>
           ))}
