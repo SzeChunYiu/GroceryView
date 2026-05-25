@@ -32,6 +32,9 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
   const productsParam = resolvedSearchParams.products;
   const comparison = buildChainComparisonTable(productsParam);
   const basketStoreComparison = buildBasketStoreComparison(productsParam);
+  const cheapestBasketStore = basketStoreComparison.stores.find((store) => store.highlightLabels.includes('Cheapest'));
+  const closestBasketStore = basketStoreComparison.stores.find((store) => store.highlightLabels.includes('Closest'));
+  const bestStockedBasketStore = basketStoreComparison.stores.find((store) => store.highlightLabels.includes('Best stocked'));
   const storeDistance = buildStoreDistanceCompare(productsParam, resolvedSearchParams.routeMode);
   const packagedRows = comparison.products.filter((product) => product.matchType === 'packaged_barcode');
   const commodityRows = comparison.products.filter((product) => product.matchType === 'commodity_alias');
@@ -166,6 +169,23 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
           items={[]}
         />
         <p className="mt-3 text-sm font-semibold leading-6 text-slate-600">{basketStoreComparison.summary}</p>
+        <div className="mt-3 grid gap-3 md:grid-cols-3">
+          <Card className="border-emerald-200 bg-emerald-50">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Cheapest basket</p>
+            <p className="mt-2 text-xl font-black text-emerald-950">{cheapestBasketStore?.storeName ?? 'Add basket items'}</p>
+            <p className="mt-1 text-sm font-semibold text-emerald-900">{cheapestBasketStore?.totalText ?? 'No comparable total yet'}</p>
+          </Card>
+          <Card className="border-cyan-200 bg-cyan-50">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">Closest option</p>
+            <p className="mt-2 text-xl font-black text-cyan-950">{closestBasketStore?.storeName ?? 'Add basket items'}</p>
+            <p className="mt-1 text-sm font-semibold text-cyan-900">{closestBasketStore?.distanceText ?? 'Distance pending'}</p>
+          </Card>
+          <Card className="border-indigo-200 bg-indigo-50">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-indigo-800">Best stocked</p>
+            <p className="mt-2 text-xl font-black text-indigo-950">{bestStockedBasketStore?.storeName ?? 'Add basket items'}</p>
+            <p className="mt-1 text-sm font-semibold text-indigo-900">{bestStockedBasketStore?.coverageLabel ?? 'Coverage pending'}</p>
+          </Card>
+        </div>
       </div>
       <Card className="mt-6 border-cyan-200 bg-cyan-50/70">
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
