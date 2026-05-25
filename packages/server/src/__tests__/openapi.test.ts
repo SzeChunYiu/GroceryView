@@ -99,6 +99,7 @@ describe('buildOpenApiDocument', () => {
       '/api/stores/{id}/price-coverage',
       '/api/users/{userId}/favorite-stores',
       '/api/users/{userId}/favorite-stores/{storeId}',
+      '/api/version',
       '/api/watchlist',
       '/api/watchlist/items/{productId}',
       '/api/watchlist/price-alerts',
@@ -202,6 +203,8 @@ describe('buildOpenApiDocument', () => {
     assert.equal(doc.components.schemas.NotificationInboxResponse.properties.generatedAt.format, 'date-time');
     assert.equal(doc.components.schemas.NotificationInboxQueueItem.properties.sendAt.format, 'date-time');
     assert.match(doc.paths['/api/health'].get?.summary ?? '', /without exposing secrets/i);
+    assert.equal(doc.paths['/api/version'].get?.security, undefined);
+    assert.match(doc.paths['/api/version'].get?.summary ?? '', /version metadata/i);
     assert.equal(doc.paths['/api/products/{id}/terminal'].get?.security, undefined);
     assert.match(doc.paths['/api/products/{id}/terminal'].get?.summary ?? '', /price terminal/i);
     assert.equal(doc.paths['/api/products/{id}/history-summary'].get?.security, undefined);
