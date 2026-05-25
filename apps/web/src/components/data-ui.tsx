@@ -79,6 +79,40 @@ export function StatusBadge({ children, tone = 'neutral' }: Readonly<{ children:
   return <span className={`rounded-full border px-3 py-1 text-xs font-black uppercase tracking-[0.14em] ${toneClass}`}>{children}</span>;
 }
 
+export function SearchRecoveryPanel({
+  didYouMean,
+  popularAlternatives,
+  query,
+  searchPath = '/search'
+}: Readonly<{
+  didYouMean: string[];
+  popularAlternatives: string[];
+  query: string;
+  searchPath?: string;
+}>) {
+  const suggestions = [
+    ...didYouMean.map((value) => ({ value, label: 'Did you mean' })),
+    ...popularAlternatives.map((value) => ({ value, label: 'Popular alternative' }))
+  ].filter((suggestion, index, values) => values.findIndex((value) => value.value.toLocaleLowerCase('sv-SE') === suggestion.value.toLocaleLowerCase('sv-SE')) === index);
+
+  if (!query.trim() || suggestions.length === 0) return null;
+
+  return (
+    <Card className="mt-4 border-amber-200 bg-amber-50">
+      <Eyebrow>Search recovery</Eyebrow>
+      <h2 className="mt-2 text-xl font-black tracking-tight text-slate-950">No exact matches for “{query}”</h2>
+      <p className="mt-2 text-sm font-semibold leading-6 text-amber-950">Try a corrected spelling or a common grocery term from the verified catalogue.</p>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {suggestions.map((suggestion) => (
+          <Link className="rounded-full bg-white px-3 py-2 text-xs font-black text-amber-950 shadow-sm" href={`${searchPath}?q=${encodeURIComponent(suggestion.value)}`} key={`${suggestion.label}-${suggestion.value}`}>
+            {suggestion.label}: {suggestion.value}
+          </Link>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
 export function MetricGrid() {
   return (
     <div className="grid gap-3 md:grid-cols-4">

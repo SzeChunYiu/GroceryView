@@ -340,17 +340,19 @@ describe('verified-data UI', () => {
 
     assert.match(settings, /DietaryProfileOnboarding/);
     assert.match(settings, /Dietary profile for onboarding and settings edits/);
-    assert.match(settings, /Save allergies, diets, and avoided ingredients/);
+    assert.match(settings, /Save dietary exclusions, certification preferences, and nutrition priorities/);
     assert.match(picker, /export function DietaryProfileOnboarding/);
     assert.match(picker, /Allergy preferences/);
     assert.match(picker, /Diet preferences/);
     assert.match(picker, /Avoided ingredients/);
+    assert.match(picker, /Default nutrition priorities/);
     assert.match(picker, /saveDietaryProfilePreferences/);
     assert.match(preferences, /DIETARY_PROFILE_STORAGE_KEY/);
     assert.match(preferences, /DietaryProfilePreferences/);
     assert.match(preferences, /allergies: string\[\]/);
     assert.match(preferences, /diets: string\[\]/);
     assert.match(preferences, /avoidedIngredients: string\[\]/);
+    assert.match(preferences, /nutritionPriorities: string\[\]/);
     assert.match(preferences, /onboardingCompleted/);
   });
 

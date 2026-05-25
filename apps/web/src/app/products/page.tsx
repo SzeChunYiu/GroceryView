@@ -13,6 +13,7 @@ import { adaptiveProductCards, buildProductSearchView, facetedProductSearch, for
 import { publicCatalogueRevalidateSeconds, routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
 import { buildRemovableSearchFilterChips } from '@/lib/search-filters';
+import { buildSearchFilterPreset } from '@/lib/search-presets';
 
 const PRODUCTS_PER_PAGE = 50;
 
@@ -150,6 +151,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
       brand: Object.fromEntries(productBrandFilterOptions.map((brand) => [brand.value, brand.label]))
     }
   });
+  const currentSearchPreset = buildSearchFilterPreset(resolvedSearchParams);
   const volatilityBadgeCounts = resultCards.reduce<Record<string, number>>((counts, product) => {
     const status = product.volatilityBadge?.status ?? 'insufficient';
     counts[status] = (counts[status] ?? 0) + 1;
@@ -217,6 +219,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             brandOptions={productBrandFilterOptions.slice(0, 24)}
             categoryFacets={categoryFacets}
             chainFacets={chainFacets}
+            currentPreset={currentSearchPreset}
             dietaryFilters={search.dietaryFilters}
             inStockOnly={search.filters.inStockOnly}
             labelFacets={labelFacets}

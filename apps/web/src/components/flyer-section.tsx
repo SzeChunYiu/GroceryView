@@ -1,3 +1,6 @@
+'use client';
+
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { cn } from '@/lib/utils';
 
 export type FlyerSectionPromo = {
@@ -74,6 +77,39 @@ function promoSavings(promo: FlyerSectionPromo) {
   return promo.savingsText ?? promo.discountText ?? null;
 }
 
+function LazyPromoImage({
+  alt,
+  priority,
+  src
+}: Readonly<{
+  alt: string;
+  priority: boolean;
+  src: string;
+}>) {
+  const { isIntersecting, ref } = useIntersectionObserver<HTMLDivElement>({
+    freezeOnceVisible: true,
+    rootMargin: '200px'
+  });
+  const shouldLoad = priority || isIntersecting;
+
+  return (
+    <div className="h-full w-full bg-gradient-to-br from-emerald-50 to-white" ref={ref}>
+      {shouldLoad ? (
+        <img
+          alt={alt}
+          className="h-full w-full object-cover"
+          decoding="async"
+          fetchPriority={priority ? 'high' : 'auto'}
+          loading={priority ? 'eager' : 'lazy'}
+          src={src}
+        />
+      ) : (
+        <div className="h-full w-full animate-pulse bg-gradient-to-r from-emerald-50 via-white to-emerald-100" aria-hidden="true" />
+      )}
+    </div>
+  );
+}
+
 export function FlyerSection({
   heading,
   title,
@@ -116,7 +152,7 @@ export function FlyerSection({
                 <div className="flex min-w-0 flex-1 gap-3">
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-emerald-100 bg-white text-sm font-black text-emerald-900 shadow-sm">
                     {promo.imageUrl ? (
-                      <img alt={promo.imageAlt ?? ''} className="h-full w-full object-cover" src={promo.imageUrl} />
+                      <LazyPromoImage alt={promo.imageAlt ?? ''} priority={index < 2} src={promo.imageUrl} />
                     ) : (
                       <span aria-hidden="true">#{rank}</span>
                     )}

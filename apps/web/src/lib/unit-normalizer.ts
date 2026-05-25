@@ -210,6 +210,64 @@ export function areCompatibleUnits(
   return Boolean(leftUnit && rightUnit && leftUnit.canonicalUnit === rightUnit.canonicalUnit);
 }
 
+
+export type MealPlanIngredientQuantity = {
+  name: string;
+  quantity: number;
+  unit: string;
+  mealTitle?: string;
+};
+
+export type MergedMealPlanBasketIngredient = {
+  name: string;
+  quantity: number;
+  unit: CanonicalUnit;
+  quantityLabel: string;
+  mealTitles: string[];
+};
+
+function mealIngredientKey(name: string, unit: CanonicalUnit) {
+  return `${name.trim().toLowerCase()}::${unit}`;
+}
+
+export function mergeMealPlanIngredientsForWeeklyBasket(
+  ingredients: readonly MealPlanIngredientQuantity[],
+): MergedMealPlanBasketIngredient[] {
+  const merged = new Map<string, MergedMealPlanBasketIngredient>();
+
+  for (const ingredient of ingredients) {
+    const normalized = normalizeQuantity(ingredient.quantity, ingredient.unit);
+    const name = ingredient.name.trim();
+    if (!name || !normalized) continue;
+
+    const key = mealIngredientKey(name, normalized.unit);
+    const current = merged.get(key);
+    const mealTitles = ingredient.mealTitle ? [ingredient.mealTitle] : [];
+
+    if (!current) {
+      merged.set(key, {
+        name,
+        quantity: normalized.value,
+        unit: normalized.unit,
+        quantityLabel: '',
+        mealTitles,
+      });
+      continue;
+    }
+
+    current.quantity += normalized.value;
+    current.mealTitles = [...new Set([...current.mealTitles, ...mealTitles])];
+  }
+
+  return [...merged.values()]
+    .map((ingredient) => ({
+      ...ingredient,
+      quantity: Number(ingredient.quantity.toFixed(3)),
+      quantityLabel: `${Number(ingredient.quantity.toFixed(3)).toLocaleString("sv-SE", { maximumFractionDigits: 3 })} ${ingredient.unit}`,
+    }))
+    .sort((left, right) => left.name.localeCompare(right.name, "sv-SE"));
+}
+
 export type ParsedPackageSize = {
   quantity: number;
   unit: CanonicalUnit;
@@ -243,5 +301,6 @@ export const unitNormalizer = Object.freeze({
   normalizeUnitPrice,
   areCompatibleUnits,
   parsePackageSize,
+  mergeMealPlanIngredientsForWeeklyBasket,
   unitNormalizationQaSeverity,
 });
