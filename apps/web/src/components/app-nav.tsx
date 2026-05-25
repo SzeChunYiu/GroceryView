@@ -50,14 +50,15 @@ const navContractLabels = [
     items: [
       { href: '/', label: 'Overview' },
       { href: '/chain-index', label: 'Chain index' },
+      { href: '/analytics/funnel', label: 'Funnel' },
       { href: '/categories', label: 'Categories' },
       { href: '/heatmap', label: 'Heatmap' },
       { href: '/screener', label: 'Screener' }
     ]
   },
-  { label: 'Products', items: [{ href: '/products', label: 'Browse' }, { href: '/compare', label: 'Compare' }] },
+  { label: 'Products', items: [{ href: '/products', label: 'Browse' }, { href: '/new-arrivals', label: 'New arrivals' }, { href: '/compare', label: 'Compare' }] },
   { label: 'Stores', items: [{ href: '/map', label: 'Map' }, { href: '/stores', label: 'Stores' }] },
-  { label: 'Trip', items: [{ href: '/list', label: 'Current list' }, { href: '/screener', label: 'Nearby deals' }, { href: '/watchlist', label: 'Watchlist' }] },
+  { label: 'Trip', items: [{ href: '/scanner', label: 'Scanner' }, { href: '/list', label: 'Current list' }, { href: '/screener', label: 'Nearby deals' }, { href: '/watchlist', label: 'Watchlist' }] },
   {
     label: 'Personal',
     items: [
@@ -65,6 +66,7 @@ const navContractLabels = [
       { href: '/stockholm/my-flyer', label: 'My Flyer' },
       { href: '/weekly-basket', label: 'Weekly basket' },
       { href: '/meal-planner', label: 'Meal planner' },
+      { href: '/pantry-inventory', label: 'Pantry inventory' },
       { href: '/contact', label: 'Contact' }
     ]
   }
