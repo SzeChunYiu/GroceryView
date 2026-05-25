@@ -238,3 +238,26 @@ export function calculatePriceVolatilityScore({
     detail: `${swingPercent.toFixed(1)}% recent swing · observed ${freshnessDays}d ago`
   };
 }
+
+export function buildPriceHistorySparklinePath(
+  points: Array<{ price?: number; value?: number }>,
+  width = 160,
+  height = 44
+) {
+  const validPoints = points
+    .map((point) => ({ price: point.price ?? point.value }))
+    .filter((point): point is { price: number } => Number.isFinite(point.price));
+  if (validPoints.length < 2) return null;
+  const prices = validPoints.map((point) => point.price);
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
+  const range = max - min || 1;
+
+  return validPoints
+    .map((point, index) => {
+      const x = (index / (validPoints.length - 1)) * width;
+      const y = height - ((point.price - min) / range) * height;
+      return `${index === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`;
+    })
+    .join(' ');
+}

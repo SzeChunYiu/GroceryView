@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { LazyItemCard } from './LazyItemCard';
 import { FavouriteProductToggle } from './favourite-product-toggle';
 import { readStoredSafetyPreferences, SAFETY_PREFERENCES_CHANGED_EVENT, type ProductSafetyPreferences } from './cert-filter';
+import { buildPriceHistorySparklinePath } from '@/lib/price-events';
 import { volatilityBadgeMethodology } from '@/lib/price-intelligence';
 import type { SearchExplanationBadge } from '@/lib/search-filters';
 import { listFriendPriceSightingsForProduct } from '@/lib/social';
@@ -80,18 +81,7 @@ function SafetyWarningBanner({ card, preferences }: Readonly<{ card: AdaptivePro
 }
 
 function sparklinePath(points: AdaptiveProductCard['sparklinePoints'], width = 160, height = 44) {
-  if (points.length < 2) return null;
-  const prices = points.map((point) => point.price);
-  const min = Math.min(...prices);
-  const max = Math.max(...prices);
-  const range = max - min || 1;
-  return points
-    .map((point, index) => {
-      const x = (index / (points.length - 1)) * width;
-      const y = height - ((point.price - min) / range) * height;
-      return `${index === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`;
-    })
-    .join(' ');
+  return buildPriceHistorySparklinePath(points, width, height);
 }
 
 function PriceHistorySparkline({ card }: Readonly<{ card: AdaptiveProductCard }>) {

@@ -1,6 +1,7 @@
 'use client';
 
 import { type KeyboardEvent, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { buildPriceHistorySparklinePath } from '@/lib/price-events';
 import { formatPriceChartTerminalReadout } from '../lib/price-chart-terminal-readout.js';
 export { formatPriceChartTerminalReadout, priceChartTerminalLatestPoint } from '../lib/price-chart-terminal-readout.js';
 
@@ -481,6 +482,17 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
               <div className="rounded-2xl border border-white/10 bg-white/10 p-4" key={series.id}>
                 <p className="text-sm font-black text-white">{series.storeName} · {series.sourceType}</p>
                 <p className="mt-1 text-xs font-semibold text-slate-300">lineStyle {series.lineStyle} · {series.points.length} points · {series.markers.length} markers</p>
+                {buildPriceHistorySparklinePath(series.points) ? (
+                  <svg
+                    aria-label={`${series.storeName} compact price history sparkline`}
+                    className="mt-3 h-11 w-full rounded-xl bg-slate-950/60 p-1"
+                    preserveAspectRatio="none"
+                    role="img"
+                    viewBox="0 0 160 44"
+                  >
+                    <path d={buildPriceHistorySparklinePath(series.points) ?? ''} fill="none" stroke="#6ee7b7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" vectorEffect="non-scaling-stroke" />
+                  </svg>
+                ) : null}
                 <p className="mt-2 text-xs font-bold text-emerald-100">
                   Expected band: {latestVolatilityBandLabel(series)} around latest observed price.
                 </p>
