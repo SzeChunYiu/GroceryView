@@ -2,6 +2,8 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { BadgeCheck, ExternalLink, Pill, Sparkles, Tablets } from 'lucide-react';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { PharmacyTargetAlertControls, type PharmacyTargetAlertProduct } from '@/components/pharmacy-target-alerts';
+import { TerminalQuoteTable, TerminalTickerCard, type TerminalQuoteRow } from '@/components/terminal-surface';
 import {
   apohemEanMatches,
   apohemProducts,
@@ -9,6 +11,8 @@ import {
   type ApohemIngestedProduct,
   type PharmacyProductCategory
 } from '@/lib/ingested/apohem';
+import { buildPriceHistorySparklinePath } from '@/lib/price-events';
+import { categoryLabels as openPriceCategoryLabels, pricedProducts } from '@/lib/openprices-products';
 import { formatSek, multiVerticalDomainFoundation, pharmacyOtcEvidenceBoard } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -18,7 +22,7 @@ export function generateMetadata() {
   return routeMetadata('/pharmacy');
 }
 
-const categoryLabels: Record<PharmacyProductCategory, string> = {
+const pharmacyCategoryLabels: Record<PharmacyProductCategory, string> = {
   otc: 'OTC',
   supplement: 'Supplements',
   beauty: 'Beauty'
@@ -38,6 +42,7 @@ const chainLabels: Record<ApohemIngestedProduct['chain'], string> = {
 const categories: PharmacyProductCategory[] = ['otc', 'supplement', 'beauty'];
 const sourceHostnames = apohemSource.sourceUrls.map((sourceUrl) => new URL(sourceUrl).hostname);
 const uniqueSourceHostnames = [...new Set(sourceHostnames)];
+const pricedProductBySlug = new Map(pricedProducts.map((product) => [product.slug, product]));
 
 function countBy<T extends string>(rows: readonly ApohemIngestedProduct[], key: (row: ApohemIngestedProduct) => T) {
   return rows.reduce<Record<T, number>>((counts, row) => {
@@ -61,6 +66,89 @@ function sourceLabel(sourceUrl: string) {
   const url = new URL(sourceUrl);
   return `${url.hostname}${url.pathname}`;
 }
+
+function chainCoverage(rows: readonly ApohemIngestedProduct[]) {
+  return [...new Set(rows.map((row) => row.chain))];
+}
+
+function cheapestPharmacyComparisons() {
+  const byEan = new Map<string, ApohemIngestedProduct[]>();
+  for (const product of apohemProducts) {
+    if (!product.isOtc || product.category !== 'otc' || !Number.isFinite(product.price) || product.price <= 0) continue;
+    byEan.set(product.ean, [...(byEan.get(product.ean) ?? []), product]);
+  }
+
+  return [...byEan.entries()]
+    .map(([ean, rows]) => {
+      const uniqueChains = chainCoverage(rows);
+      if (uniqueChains.length < 2) return null;
+      const sortedRows = [...rows].sort((left, right) => left.price - right.price || chainLabels[left.chain].localeCompare(chainLabels[right.chain], 'sv'));
+      const cheapest = sortedRows[0];
+      const highest = sortedRows.at(-1);
+      if (!cheapest || !highest) return null;
+      const spread = highest.price - cheapest.price;
+      return {
+        ean,
+        name: cheapest.name,
+        brand: cheapest.brand || cheapest.code,
+        rows: sortedRows,
+        cheapest,
+        highest,
+        spread,
+        spreadPct: cheapest.price > 0 ? (spread / cheapest.price) * 100 : 0
+      };
+    })
+    .filter((row): row is NonNullable<typeof row> => row !== null)
+    .sort((left, right) => right.spread - left.spread || right.spreadPct - left.spreadPct || left.name.localeCompare(right.name, 'sv'))
+    .slice(0, 6);
+}
+
+const pharmacyComparisons = cheapestPharmacyComparisons();
+
+function comparisonQuoteRows(rows: readonly ApohemIngestedProduct[], cheapestPrice: number): TerminalQuoteRow[] {
+  return rows.map((row) => ({
+    id: `${row.chain}-${row.ean}`,
+    label: chainLabels[row.chain],
+    quote: row.priceText,
+    comparisonLabel: row.price === cheapestPrice ? 'Cheapest public row' : `${formatSek(row.price - cheapestPrice)} above cheapest`,
+    confidence: 'high',
+    freshnessLabel: `Retrieved ${formatDate(row.retrievedAt)}`,
+    sourceLabel: sourceLabel(row.sourceUrl),
+    href: row.productUrl
+  }));
+}
+
+const pharmacyAlertProducts: PharmacyTargetAlertProduct[] = pharmacyComparisons.map((comparison) => ({
+  ean: comparison.ean,
+  name: comparison.name,
+  chainLabel: chainLabels[comparison.cheapest.chain],
+  currentPrice: comparison.cheapest.price,
+  currentPriceText: comparison.cheapest.priceText,
+  retrievedAt: comparison.cheapest.retrievedAt,
+  sourceUrl: comparison.cheapest.sourceUrl
+}));
+
+const pharmacyOtcHistoryRows = pharmacyOtcEvidenceBoard.rows
+  .map((row) => {
+    const product = pricedProductBySlug.get(row.slug);
+    if (!product || product.observations.length < 2) return null;
+    const observations = [...product.observations]
+      .filter((observation) => Number.isFinite(observation.price))
+      .sort((left, right) => left.date.localeCompare(right.date))
+      .slice(-8);
+    const path = buildPriceHistorySparklinePath(observations, 220, 64);
+    if (!path) return null;
+    return {
+      ...row,
+      category: openPriceCategoryLabels[product.category] ?? product.category,
+      observations,
+      path,
+      latestPrice: observations.at(-1)?.price ?? row.priceMedian,
+      firstPrice: observations[0]?.price ?? row.priceMedian
+    };
+  })
+  .filter((row): row is NonNullable<typeof row> => row !== null)
+  .slice(0, 4);
 
 function DomainFoundationSummary({ domainSlug }: Readonly<{ domainSlug: 'pharmacy' }>) {
   const domain = multiVerticalDomainFoundation.find((candidate) => candidate.slug === domainSlug)!;
@@ -157,12 +245,93 @@ export default function PharmacyPage() {
         </p>
       </Card>
 
+      <section className="rounded-lg border border-emerald-200 bg-emerald-50 p-5" aria-label="Cheapest OTC pharmacy comparison">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <Eyebrow>Exact EAN comparison</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black text-emerald-950">Cheapest public pharmacy rows for matched OTC products</h2>
+            <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-emerald-950">
+              Rows compare only identical EANs that appear in both Apohem and Apotek Hjärtat public source captures. Cheapest means lowest source-backed catalog price in the retrieved snapshot, not a stock or suitability recommendation.
+            </p>
+          </div>
+          <p className="rounded-2xl bg-white p-4 text-center text-sm font-black text-emerald-950 shadow-sm">
+            {pharmacyComparisons.length} exact OTC comparisons · {apohemEanMatches.length.toLocaleString()} cross-chain EAN matches
+          </p>
+        </div>
+
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {pharmacyComparisons.slice(0, 3).map((comparison) => (
+            <TerminalTickerCard
+              confidence="high"
+              deltaLabel={`${formatSek(comparison.spread)} gap to highest matched row`}
+              detail={`${comparison.brand} · EAN ${comparison.ean} · ${comparison.rows.length} public rows`}
+              freshnessLabel={`Retrieved ${formatDate(comparison.cheapest.retrievedAt)}`}
+              href={comparison.cheapest.productUrl}
+              key={comparison.ean}
+              label={`Cheapest ${chainLabels[comparison.cheapest.chain]}`}
+              sourceLabel={sourceLabel(comparison.cheapest.sourceUrl)}
+              value={comparison.cheapest.priceText}
+            />
+          ))}
+        </div>
+
+        <div className="mt-5 grid gap-4 lg:grid-cols-2">
+          {pharmacyComparisons.slice(0, 4).map((comparison) => (
+            <TerminalQuoteTable
+              caption={`${comparison.name} exact-EAN pharmacy quotes`}
+              key={comparison.ean}
+              rows={comparisonQuoteRows(comparison.rows, comparison.cheapest.price)}
+            />
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-lg border border-sky-200 bg-sky-50 p-5" aria-label="Pharmacy OTC price history and alerts">
+        <div className="grid gap-4 lg:grid-cols-[1fr_0.9fr] lg:items-start">
+          <div>
+            <Eyebrow>OTC history and alerts</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black text-sky-950">Observed OTC history with target price alerts</h2>
+            <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-sky-950">
+              History charts use dated OpenPrices observations for OTC evidence rows. Target alerts save only a local preference against the cheapest public pharmacy row until account-backed pharmacy alert delivery is available.
+            </p>
+          </div>
+          <PharmacyTargetAlertControls products={pharmacyAlertProducts} />
+        </div>
+
+        <div className="mt-5 grid gap-4 lg:grid-cols-2">
+          {pharmacyOtcHistoryRows.map((row) => (
+            <Link className="rounded-2xl border border-sky-100 bg-white p-4 shadow-sm hover:border-sky-700" href={`/products/${row.slug}`} key={row.slug}>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-sky-800">{row.category}</p>
+                  <h3 className="mt-2 text-lg font-black text-slate-950">{row.name}</h3>
+                  <p className="mt-1 text-sm font-semibold text-slate-600">{row.brand} · EAN {row.code}</p>
+                </div>
+                <div className="rounded-2xl bg-sky-50 p-3 text-right">
+                  <p className="text-xs font-black uppercase tracking-[0.14em] text-sky-700">Latest observed</p>
+                  <p className="text-xl font-black text-sky-950">{formatSek(row.latestPrice)}</p>
+                </div>
+              </div>
+              <svg aria-label={`${row.name} observed OTC price history`} className="mt-4 h-20 w-full rounded-2xl bg-slate-50 p-3" preserveAspectRatio="none" viewBox="0 0 220 64">
+                <path d={row.path} fill="none" stroke="#0369a1" strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" vectorEffect="non-scaling-stroke" />
+              </svg>
+              <div className="mt-3 grid gap-2 text-xs font-semibold text-slate-600 sm:grid-cols-3">
+                <p className="rounded-2xl bg-slate-50 p-3">First {formatSek(row.firstPrice)}</p>
+                <p className="rounded-2xl bg-slate-50 p-3">Range {formatSek(row.priceMin)} to {formatSek(row.priceMax)}</p>
+                <p className="rounded-2xl bg-slate-50 p-3">Last {row.lastObservedAt}</p>
+              </div>
+              <p className="mt-3 text-xs font-bold uppercase tracking-[0.14em] text-slate-500">{row.confidence} · no medical advice</p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         {categories.map((category) => (
           <MetricTile
             key={category}
             icon={categoryIcons[category]}
-            label={categoryLabels[category]}
+            label={pharmacyCategoryLabels[category]}
             value={String(countsByCategory[category] ?? 0)}
           />
         ))}
@@ -193,7 +362,7 @@ export default function PharmacyPage() {
       </section>
 
       {categories.map((category) => (
-        <ProductSection key={category} title={categoryLabels[category]} products={categoryRows(category)} />
+        <ProductSection key={category} title={pharmacyCategoryLabels[category]} products={categoryRows(category)} />
       ))}
 
       <section className="rounded-lg border border-market-ink/10 bg-white">
