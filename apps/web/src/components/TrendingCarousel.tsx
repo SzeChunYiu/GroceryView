@@ -81,6 +81,12 @@ export function TrendingCarousel({ items }: Readonly<{ items: TrendingProductPri
                 <p className="mt-2 text-xs font-semibold leading-5 text-slate-500">
                   {formatPercent(item.changePercent)} from {formatMoney(item.previousPrice, item.currency)} · latest {item.latestObservedAt.slice(0, 10)}
                 </p>
+                <div className="mt-3 rounded-xl border border-cyan-100 bg-white p-3 text-xs font-bold leading-5 text-slate-600">
+                  <p className="text-cyan-900">Item detail: Stockholm · observed chain</p>
+                  <p>
+                    Week-over-week movement is explained from {formatMoney(item.previousPrice, item.currency)} to {formatMoney(item.latestPrice, item.currency)} so shoppers can act on the product-level opportunity today.
+                  </p>
+                </div>
               </Link>
             );
           })}

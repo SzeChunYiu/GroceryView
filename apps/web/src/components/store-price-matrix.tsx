@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { ConfidenceBadge } from '@/components/confidence-badge';
+import type { ConfidenceLevel } from '@/lib/content-style';
 import type { ChainPriceComparisonMode, ChainPriceModeQuote } from '@/lib/chain-compare';
 
 const chainPriceMatrixModes: Array<{ id: ChainPriceComparisonMode; label: string; guardrail: string }> = [
@@ -16,14 +18,23 @@ export type StorePriceMatrixChain = {
   label: string;
 };
 
+type StorePriceMatrixFreshness = {
+  freshnessObservedAt?: string | number | Date | null;
+  verificationLabel?: string;
+};
+
+type StorePriceMatrixQuote = ChainPriceModeQuote & StorePriceMatrixFreshness;
+
 type StorePriceMatrixCell = {
   chainId: string;
+  freshnessObservedAt?: string | number | Date | null;
   priceText?: string;
-  priceModes?: ChainPriceModeQuote[];
+  priceModes?: StorePriceMatrixQuote[];
   productName?: string | null;
   productSlug?: string | null;
   status: string;
   unitLabel?: string | null;
+  verificationLabel?: string;
 };
 
 export type StorePriceMatrixProduct = {
@@ -37,6 +48,8 @@ export type StorePriceMatrixProduct = {
 type StorePriceMatrixProps = {
   chains: ReadonlyArray<StorePriceMatrixChain>;
   products: ReadonlyArray<StorePriceMatrixProduct>;
+  sourceGeneratedAt?: string | number | Date | null;
+  sourceLabel?: string;
 };
 
 function formatStoreUnit(cell: StorePriceMatrixCell | undefined) {
@@ -51,7 +64,19 @@ function selectedQuote(cell: StorePriceMatrixCell | undefined, mode: ChainPriceC
   return cell?.priceModes?.find((quote) => quote.mode === mode) ?? null;
 }
 
-export function StorePriceMatrix({ chains, products }: StorePriceMatrixProps) {
+function priceStatusLevel(status: string | undefined): ConfidenceLevel {
+  if (status === 'priced') return 'high';
+  if (status === 'account_required') return 'medium';
+  return 'low';
+}
+
+function priceStatusLabel(status: string | undefined) {
+  if (status === 'priced') return 'Price freshness';
+  if (status === 'account_required') return 'Verification required';
+  return 'Price missing';
+}
+
+export function StorePriceMatrix({ chains, products, sourceGeneratedAt, sourceLabel }: StorePriceMatrixProps) {
   const [comparisonMode, setComparisonMode] = useState<ChainPriceComparisonMode>('regular');
   if (products.length === 0) {
     return null;
@@ -102,10 +127,22 @@ export function StorePriceMatrix({ chains, products }: StorePriceMatrixProps) {
                   const cell = product.cells.find((item) => item.chainId === chain.id);
                   const quote = selectedQuote(cell, comparisonMode);
                   const cellStatus = quote?.status ?? cell?.status;
+                  const cellFreshnessObservedAt = quote?.freshnessObservedAt ?? cell?.freshnessObservedAt ?? sourceGeneratedAt ?? null;
+                  const cellVerificationLabel = quote?.verificationLabel
+                    ?? cell?.verificationLabel
+                    ?? (cellStatus === 'priced' ? `Source: ${sourceLabel ?? 'priced catalogue row'}` : 'Source evidence pending');
                   return (
                     <td className="min-w-48 px-4 py-4" key={`${product.productSlug}-${chain.id}`}>
                       <p className={cellStatus === 'priced' ? 'font-black text-emerald-900' : cellStatus === 'account_required' ? 'font-black text-amber-900' : 'font-black text-slate-400'}>{quote?.priceText ?? cell?.priceText ?? 'Missing'}</p>
                       <p className="mt-1 text-xs font-semibold text-slate-500">{formatStoreUnit(cell)}</p>
+                      <div className="mt-2">
+                        <ConfidenceBadge
+                          label={priceStatusLabel(cellStatus)}
+                          level={priceStatusLevel(cellStatus)}
+                          observedAt={cellFreshnessObservedAt}
+                          verificationLabel={cellVerificationLabel}
+                        />
+                      </div>
                       {quote?.guardrail ? (
                         <p className="mt-1 text-xs font-semibold leading-5 text-slate-500">{quote.guardrail}</p>
                       ) : null}

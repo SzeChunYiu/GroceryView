@@ -29,6 +29,23 @@ export type PredictiveDropAlert = {
   };
 };
 
+export type AlertExplanationTimelineStep = {
+  label: string;
+  detail: string;
+  kind: 'source_price' | 'threshold' | 'prediction' | 'seasonality' | 'volatility' | 'flyer_window';
+};
+
+export type BestTimeAlertExplanationInput = {
+  categoryLabel?: string;
+  decisionLabel?: string;
+  flyerWindowLabel?: string;
+  observedPriceCount?: number | null;
+  observedRangeLabel?: string;
+  productName: string;
+  seasonalityLabel?: string;
+  volatilityScore?: number | null;
+};
+
 type PredictiveDropAlertOptions = {
   now?: Date;
   daysAhead?: number;
@@ -96,6 +113,71 @@ export function buildPredictiveDropAlerts(forecasts: PredictiveDropForecast[], o
       },
     }));
 }
+
+export function buildAlertExplanationTimeline({
+  productName,
+  currentPriceText,
+  lowestChain,
+  targetPriceText,
+  lastObservedAt,
+  predictionSource = 'No prediction model input attached'
+}: {
+  productName: string;
+  currentPriceText: string;
+  lowestChain: string;
+  targetPriceText: string;
+  lastObservedAt?: string;
+  predictionSource?: string;
+}): AlertExplanationTimelineStep[] {
+  return [
+    {
+      kind: 'source_price',
+      label: 'Source price checked',
+      detail: `${lowestChain} current price for ${productName}: ${currentPriceText}${lastObservedAt ? ` observed ${lastObservedAt}` : ''}.`
+    },
+    {
+      kind: 'threshold',
+      label: 'Threshold compared',
+      detail: `Alert target is ${targetPriceText}; the alert fires only when verified price evidence is at or below this threshold.`
+    },
+    {
+      kind: 'prediction',
+      label: 'Prediction inputs',
+      detail: predictionSource
+    }
+  ];
+}
+
+export function buildBestTimeAlertExplanationTimeline(input: BestTimeAlertExplanationInput): AlertExplanationTimelineStep[] {
+  const categoryLabel = input.categoryLabel?.trim() || 'the product category';
+  const volatilityScore = typeof input.volatilityScore === 'number' && Number.isFinite(input.volatilityScore)
+    ? input.volatilityScore
+    : null;
+  const observedPriceCount = typeof input.observedPriceCount === 'number' && Number.isFinite(input.observedPriceCount)
+    ? input.observedPriceCount
+    : null;
+
+  return [
+    {
+      kind: 'seasonality',
+      label: 'Seasonality checked',
+      detail: input.seasonalityLabel ?? `${input.productName} is compared against ${categoryLabel} timing context before a best-time alert recommends buying now or waiting.`
+    },
+    {
+      kind: 'volatility',
+      label: 'Volatility checked',
+      detail: `Recent price movement is part of the timing decision${volatilityScore === null ? '' : ` (volatility score ${volatilityScore})`}${observedPriceCount === null ? '' : ` from ${observedPriceCount} observed price point${observedPriceCount === 1 ? '' : 's'}`}${input.observedRangeLabel ? `; observed range ${input.observedRangeLabel}` : ''}.`
+    },
+    {
+      kind: 'flyer_window',
+      label: 'Flyer window checked',
+      detail: input.flyerWindowLabel
+        ? `Known flyer windows say: ${input.flyerWindowLabel}.`
+        : `No known flyer window was supplied, so ${input.decisionLabel ?? 'the alert'} relies on observed price and seasonality signals instead of inventing a promotion.`
+    }
+  ];
+}
+
 
 export const samplePredictiveDropForecasts: PredictiveDropForecast[] = [
   {

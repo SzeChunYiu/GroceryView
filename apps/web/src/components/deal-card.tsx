@@ -1,7 +1,9 @@
 'use client';
 
+import Image from 'next/image';
 import type { ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
+import { ConfidenceBadge } from '@/components/confidence-badge';
 import {
   affiliateDisclosureLabel,
   buildAffiliateOutboundUrl,
@@ -10,7 +12,9 @@ import {
   trackDealShare,
   trackSponsoredPlacementImpression
 } from '@/lib/analytics';
+import type { ConfidenceLevel } from '@/lib/content-style';
 import { buildDealContext, type DealHistoryPoint } from '@/lib/deal-context';
+import { getPriceFreshness, type FreshnessLevel } from '@/lib/freshness';
 import { dealShareUrl } from '@/lib/seo';
 
 export type SponsoredDealPlacement = {
@@ -37,14 +41,31 @@ type DealCardProps = {
   outboundStoreUrl?: string;
   affiliateCampaignId?: string;
   sharePath?: string;
+  productHref?: string;
+  rankLabel?: string;
   categoryLabel?: string;
+  imageAlt?: string;
+  imageUrl?: string | null;
+  localityLabel?: string;
+  dropPercentLabel?: string;
+  unitPriceDropLabel?: string;
+  evidenceLabel?: string;
+  freshnessObservedAt?: string | number | Date | null;
   replacementLabel?: string;
   sourceLabel?: string;
   sponsoredPlacement?: SponsoredDealPlacement;
+  dealEndsAt?: string;
+  verificationLabel?: string;
 };
 
 function formatPrice(value: number, locale: string, currency: string) {
   return new Intl.NumberFormat(locale, { currency, style: 'currency' }).format(value);
+}
+
+function freshnessConfidenceLevel(level: FreshnessLevel): ConfidenceLevel {
+  if (level === 'fresh') return 'high';
+  if (level === 'aging') return 'medium';
+  return 'low';
 }
 
 function outboundMetadata({
@@ -114,10 +135,21 @@ export function DealCard({
   outboundStoreUrl,
   affiliateCampaignId,
   sharePath,
+  productHref,
+  rankLabel,
   categoryLabel,
+  imageAlt,
+  imageUrl,
+  localityLabel,
+  dropPercentLabel,
+  unitPriceDropLabel,
+  evidenceLabel,
+  freshnessObservedAt,
   replacementLabel,
   sourceLabel,
-  sponsoredPlacement
+  sponsoredPlacement,
+  dealEndsAt,
+  verificationLabel
 }: DealCardProps) {
   const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle');
   const context = buildDealContext({ currentPrice, discountStartedAt, priceHistory, currency, locale });
@@ -150,6 +182,21 @@ export function DealCard({
   const sponsoredSurface = sponsoredPlacement?.surface ?? 'discovery_rail';
   const sponsoredPlacementId = sponsoredPlacement?.placementId ?? analyticsDealId;
   const separatedFromOrganicRankings = true;
+  const metaLabel = [rankLabel, categoryLabel, localityLabel].filter(Boolean).join(' · ');
+  const priceFreshnessObservedAt = freshnessObservedAt ?? discountStartedAt ?? priceHistory?.at(-1)?.observedAt ?? null;
+  const priceFreshness = getPriceFreshness(priceFreshnessObservedAt);
+  const priceVerificationLabel = verificationLabel
+    ?? (sourceLabel ? `Source: ${sourceLabel}` : retailerName !== 'the retailer' ? `Source: ${retailerName}` : 'Source evidence pending');
+  const countdownLabel = useMemo(() => {
+    if (!dealEndsAt) return null;
+    const endsAt = new Date(dealEndsAt).getTime();
+    if (!Number.isFinite(endsAt)) return null;
+    const hoursRemaining = Math.ceil((endsAt - Date.now()) / (60 * 60 * 1000));
+    if (hoursRemaining <= 0) return 'Ends today';
+    if (hoursRemaining <= 24) return `Ends in ${hoursRemaining}h`;
+    const daysRemaining = Math.ceil(hoursRemaining / 24);
+    return daysRemaining <= 7 ? `Ends in ${daysRemaining}d` : null;
+  }, [dealEndsAt]);
 
   useEffect(() => {
     if (!sponsoredProvider) return;
@@ -193,28 +240,74 @@ export function DealCard({
         </div>
       ) : null}
       <div className="flex items-start justify-between gap-3">
+        {imageUrl ? (
+          <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl bg-white p-2 ring-1 ring-market-ink/10">
+            <Image
+              alt={imageAlt ?? `${title} deal image`}
+              className="max-h-full max-w-full object-contain"
+              height={96}
+              loading="lazy"
+              placeholder="empty"
+              sizes="(min-width: 768px) 96px, 80px"
+              src={imageUrl}
+              width={96}
+            />
+          </div>
+        ) : null}
         <div>
           {replacementLabel ? (
             <p className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{replacementLabel}</p>
           ) : null}
-          <h3 className="text-base font-semibold text-market-ink">{title}</h3>
-          {categoryLabel ? <p className="mt-1 text-xs font-bold uppercase tracking-[0.14em] text-market-ink/55">{categoryLabel}</p> : null}
+          {metaLabel ? (
+            <p className="mb-2 text-xs font-black uppercase tracking-[0.16em] text-emerald-800">{metaLabel}</p>
+          ) : null}
+          <h3 className="text-base font-semibold text-market-ink">
+            {productHref ? (
+              <a className="hover:text-emerald-700 hover:underline" href={productHref}>
+                {title}
+              </a>
+            ) : title}
+          </h3>
           <p className="mt-2 text-2xl font-bold text-market-ink">{formatPrice(currentPrice, locale, currency)}</p>
+          <div className="mt-2">
+            <ConfidenceBadge
+              label="Price freshness"
+              level={freshnessConfidenceLevel(priceFreshness.level)}
+              observedAt={priceFreshnessObservedAt}
+              sampleSize={priceHistory ? priceHistory.length + 1 : undefined}
+              verificationLabel={priceVerificationLabel}
+            />
+          </div>
           {originalPrice ? (
             <p className="text-sm text-market-ink/60">
               Was <span className="line-through">{formatPrice(originalPrice, locale, currency)}</span>
             </p>
           ) : null}
         </div>
-        {context.isNewLowestPrice ? (
-          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">New low</span>
-        ) : null}
+        <div className="flex flex-col items-end gap-2">
+          {countdownLabel ? (
+            <span className="rounded-full bg-rose-100 px-3 py-1 text-xs font-black text-rose-800">{countdownLabel}</span>
+          ) : null}
+          {context.isNewLowestPrice ? (
+            <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">New low</span>
+          ) : null}
+        </div>
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2" aria-label="Deal history context">
         {sourceLabel ? (
           <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-900">
             {sourceLabel}
+          </span>
+        ) : null}
+        {dropPercentLabel ? (
+          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-900">
+            {dropPercentLabel}
+          </span>
+        ) : null}
+        {unitPriceDropLabel ? (
+          <span className="rounded-full bg-market-mint/15 px-3 py-1 text-xs font-semibold text-market-ink">
+            {unitPriceDropLabel}
           </span>
         ) : null}
         {context.streakLabel ? (
@@ -228,6 +321,12 @@ export function DealCard({
           </span>
         ) : null}
       </div>
+
+      {evidenceLabel ? (
+        <p className="mt-3 rounded-2xl bg-slate-50 px-3 py-2 text-xs font-semibold leading-5 text-market-ink/70">
+          {evidenceLabel}
+        </p>
+      ) : null}
 
       {dealLinkMetadata || storeLinkMetadata ? (
         <div className="mt-4 flex flex-wrap gap-3" aria-label="Outbound store and deal links with affiliate disclosure">

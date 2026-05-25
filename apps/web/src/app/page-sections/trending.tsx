@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import { ArrowDownRight, BadgeCheck, BarChart3, Clock3, ListPlus, MapPin, Search, TrendingUp } from 'lucide-react';
-import { buildPriceDropDiscoveryRail } from '@/lib/price-events';
+import { buildPriceDropDiscoveryRail, buildTrendingItemDetailCards } from '@/lib/price-events';
 import { buildCityPriceDropTrends, type BrandLeaderboardTrendFeed, type CityPriceDropTrend, type CitySearchTrendFeed } from '@/lib/trends';
 import { categoryLabels, pricedProducts } from '@/lib/openprices-products';
+import type { CategoryTrendingShelf } from '@/lib/grocery-index-widget';
 
 function formatSek(value: number) {
   return new Intl.NumberFormat('sv-SE', {
@@ -30,13 +31,16 @@ function confidenceClass(card: CityPriceDropTrend) {
   return 'bg-amber-100 text-amber-950';
 }
 
-const discoveryRailItems = buildPriceDropDiscoveryRail(pricedProducts.map((product) => ({
+const priceEventProducts = pricedProducts.map((product) => ({
   slug: product.slug,
   name: product.name,
   brand: product.brands,
   category: categoryLabels[product.category] ?? product.category,
   observations: product.observations
-})), 6);
+}));
+
+const discoveryRailItems = buildPriceDropDiscoveryRail(priceEventProducts, 6);
+const trendingItemDetailCards = buildTrendingItemDetailCards(priceEventProducts, 4, 'Stockholm');
 
 export function PriceDropDiscoveryRail() {
   if (discoveryRailItems.length === 0) return null;
@@ -54,6 +58,28 @@ export function PriceDropDiscoveryRail() {
           </p>
         </div>
         <div className="mt-4 flex gap-3 overflow-x-auto pb-2" data-price-drop-discovery-track>
+          {trendingItemDetailCards.map((item) => (
+            <Link
+              className="min-w-[17rem] rounded-2xl border border-cyan-200 bg-cyan-50 p-4 transition hover:-translate-y-0.5 hover:border-cyan-700"
+              data-trending-item-detail-card={item.rank}
+              href={`/products/${item.productSlug}`}
+              key={`detail-${item.productSlug}`}
+            >
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">#{item.rank} · {item.city}</p>
+              <h3 className="mt-2 line-clamp-2 text-lg font-black leading-6 text-slate-950">{item.productName}</h3>
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <div className="rounded-xl bg-white p-3">
+                  <p className="text-xs font-bold text-slate-500">Chain</p>
+                  <p className="mt-1 text-sm font-black text-slate-950">{item.chain}</p>
+                </div>
+                <div className="rounded-xl bg-white p-3">
+                  <p className="text-xs font-bold text-slate-500">WoW move</p>
+                  <p className="mt-1 text-sm font-black text-emerald-800">{formatPercent(Math.abs(item.weekOverWeekChangePercent))} down</p>
+                </div>
+              </div>
+              <p className="mt-3 text-xs font-semibold leading-5 text-slate-600">{item.explanation}</p>
+            </Link>
+          ))}
           {discoveryRailItems.map((item) => (
             <Link
               className="min-w-[17rem] rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:-translate-y-0.5 hover:border-emerald-700"
@@ -278,6 +304,57 @@ export function TrendingPriceDropCards({ city = 'stockholm' }: Readonly<{ city?:
               {card.confidenceDetail}; source {card.sourceLabel}.
             </p>
           </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ShelfColumn({ title, items }: Readonly<{ title: string; items: CategoryTrendingShelf['fastRising'] }>) {
+  if (items.length === 0) return null;
+
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-4">
+      <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{title}</p>
+      <div className="mt-3 space-y-3">
+        {items.map((item) => (
+          <Link className="block rounded-xl bg-slate-50 p-3 hover:bg-emerald-50" href={`/products/${item.slug}`} key={item.slug}>
+            <p className="font-black text-slate-950">{item.name}</p>
+            <p className="mt-1 text-sm font-semibold text-slate-600">{item.brand} · {formatSek(item.price)}</p>
+            <p className="mt-1 text-xs font-bold text-slate-500">{item.metric}</p>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function CategoryTrendingShelves({ shelves }: Readonly<{ shelves: CategoryTrendingShelf[] }>) {
+  if (shelves.length === 0) return null;
+
+  return (
+    <section className="mt-6 rounded-[1.75rem] border border-emerald-200 bg-emerald-50 p-5" aria-label="Trending category shelves">
+      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-800">Dynamic category shelves</p>
+          <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Fast-rising, newly discounted, and stable staples</h2>
+        </div>
+        <p className="max-w-2xl text-sm font-semibold leading-6 text-slate-700">
+          Shelves are derived from verified OpenPrices observation counts, latest price drops, and products repeatedly priced near their low.
+        </p>
+      </div>
+      <div className="mt-5 space-y-4">
+        {shelves.map((shelf) => (
+          <div className="rounded-[1.5rem] border border-emerald-100 bg-white/70 p-4" key={shelf.slug}>
+            <Link className="text-xl font-black text-slate-950 hover:text-emerald-800" href={`/categories/${shelf.slug}`}>
+              {shelf.label}
+            </Link>
+            <div className="mt-4 grid gap-3 lg:grid-cols-3">
+              <ShelfColumn title="Fast-rising searches" items={shelf.fastRising} />
+              <ShelfColumn title="Newly discounted items" items={shelf.newlyDiscounted} />
+              <ShelfColumn title="Stable low-price staples" items={shelf.stableLowPriceStaples} />
+            </div>
+          </div>
         ))}
       </div>
     </section>
