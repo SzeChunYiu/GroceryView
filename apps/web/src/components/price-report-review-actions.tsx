@@ -16,7 +16,7 @@ import { COMMUNITY_REVIEW_PROMPT_COPY, COMMUNITY_REVIEW_PROMPTS } from '@/lib/co
 type ReviewStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
 type BrowserSession = { accessToken: string; userId: string };
 type ReviewDecision = 'approve' | 'reject' | 'needs_more_info';
-type Assignment = { id: string; reviewId?: string; subjectType?: 'product_match' | 'community_report' | 'commodity_mapping'; subjectId?: string; priority?: string; reason?: string; assigneeId?: string; dueAt?: string; status?: string };
+type Assignment = { id: string; reviewId?: string; subjectType?: 'product_match' | 'community_report' | 'commodity_mapping' | 'price_report' | 'duplicate_product_report'; subjectId?: string; priority?: string; reason?: string; assigneeId?: string; dueAt?: string; status?: string };
 type AssignmentResponse = { assignments?: Assignment[]; sla?: { status?: string; overdueAssignments?: number; breachedReviewIds?: string[] } };
 
 function readSession(): BrowserSession {
@@ -80,7 +80,7 @@ export function PriceReportReviewActions() {
       return;
     }
     setStatus('ready');
-    setMessage(`${decision} decision accepted with reviewedByHuman: true writeback. needs_more_info leaves assignment status in_progress; community_report approvals map to accept_community_report and rejections map to dismiss_community_report; commodity_mapping approvals map to approve_commodity_mapping and rejections map to reject_commodity_mapping.`);
+    setMessage(`${decision} decision accepted with reviewedByHuman: true writeback. needs_more_info leaves assignment status in_progress; community_report and price_report approvals map to accept_community_report and rejections map to dismiss_community_report; duplicate_product_report decisions route to catalog merge review; commodity_mapping approvals map to approve_commodity_mapping and rejections map to reject_commodity_mapping.`);
   }
 
   async function voteCommunityReview(reviewId: string, vote: CommunityReviewVote) {
@@ -106,7 +106,7 @@ export function PriceReportReviewActions() {
       reportCommunityPriceReview(currentReviews, reviewId, 'Community flagged suspicious price evidence or review content.')
     );
     setStatus('ready');
-    setMessage('Suspicious community price report flagged. Moderation status is visible here and in /admin/reports.');
+    setMessage('Suspicious community price report flagged. Moderation status is visible here and in the unified /admin queue.');
   }
 
   return (
@@ -114,7 +114,7 @@ export function PriceReportReviewActions() {
       <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-800">Signed-in reviewer actions</p>
       <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Community price-report review queue</h2>
       <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
-        These controls use the sessionStorage bearer token to load protected human-review assignments and submit moderator decisions. The public page stays fail-closed; only registered reviewers can approve product matches, community reports, or commodity_mapping tasks.
+        These controls use the sessionStorage bearer token to load protected human-review assignments and submit moderator decisions. The public page stays fail-closed; only registered reviewers can approve product matches, community reports, price reports, duplicate product reports, or commodity_mapping tasks.
       </p>
       <div className="mt-4 flex flex-wrap gap-2">
         <button className="rounded-full bg-sky-800 px-4 py-2 text-sm font-black text-white" onClick={loadAssignments} type="button">Load signed-in review queue</button>

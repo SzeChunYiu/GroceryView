@@ -47,6 +47,17 @@ export type PriceDropDiscoveryRailItem = {
   evidenceLabel: string;
 };
 
+export type PriceVolatilityLevel = 'high' | 'medium' | 'low';
+
+export type PriceVolatilityScore = {
+  score: number;
+  level: PriceVolatilityLevel;
+  swingPercent: number;
+  freshnessDays: number;
+  label: string;
+  detail: string;
+};
+
 function includesAny(value: string, needles: string[]) {
   return needles.some((needle) => value.includes(needle));
 }
@@ -162,4 +173,30 @@ export function buildPriceDropDiscoveryRail(products: PriceDropDiscoveryProduct[
     ))
     .slice(0, Math.max(1, Math.min(limit, 12)))
     .map((item, index) => ({ ...item, rank: index + 1 }));
+}
+
+export function calculatePriceVolatilityScore({
+  swingPercent,
+  lastObservedAt,
+  now = new Date().toISOString()
+}: {
+  swingPercent: number;
+  lastObservedAt?: string | null;
+  now?: string;
+}): PriceVolatilityScore {
+  const freshnessDays = lastObservedAt && Date.parse(lastObservedAt) > 0
+    ? Math.max(0, Math.round((Date.parse(now) - Date.parse(lastObservedAt)) / 86_400_000))
+    : 90;
+  const freshnessBoost = freshnessDays <= 7 ? 1 : freshnessDays <= 21 ? 0.75 : freshnessDays <= 45 ? 0.45 : 0.25;
+  const score = Math.round(Math.min(100, Math.max(0, swingPercent * 3 * freshnessBoost)));
+  const level: PriceVolatilityLevel = score >= 60 ? 'high' : score >= 30 ? 'medium' : 'low';
+
+  return {
+    score,
+    level,
+    swingPercent,
+    freshnessDays,
+    label: `${level} volatility`,
+    detail: `${swingPercent.toFixed(1)}% recent swing · observed ${freshnessDays}d ago`
+  };
 }
