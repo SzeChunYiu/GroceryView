@@ -3038,6 +3038,18 @@ ${seo}`;
     assert.doesNotMatch(sitemap, /osmStores\.slice\(0,\s*80\)/);
   });
 
+  it('normalizes localized Nordic country terms route aliases and keeps unsupported countries notFound gated', async () => {
+    const route = await read('src/app/[country]/terms/page.tsx');
+
+    assert.match(route, /normalizeCountryTermsSlug/);
+    assert.match(route, /notFound\(\)/);
+    for (const alias of ['norge', 'norway', 'island', 'iceland', 'sweden', 'denmark', 'finland']) {
+      assert.match(route, new RegExp(`'${alias}'`));
+    }
+    assert.match(route, /includes\(normalized\)/);
+    assert.match(route, /generateStaticParams/);
+  });
+
   it('keeps public item and search entry points in sitemap and canonical metadata coverage', async () => {
     const seo = await read('src/lib/seo.ts');
     const sitemap = await read('src/app/sitemap.ts');
