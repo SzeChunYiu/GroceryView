@@ -10,7 +10,7 @@ import { buildExpiringPromotionRail } from '@/lib/deal-context';
 import { buildBasketForecastSummary } from '@/lib/basket-forecast';
 import { weeklyRecurringBasketPlan } from '@/lib/recurring-basket';
 import { mergeMealPlanIngredientsForWeeklyBasket } from '@/lib/unit-normalizer';
-import { recurringBasketDigestContract, weeklyBasketChangeDigest } from '@/lib/verified-data';
+import { recurringBasketDigestContract, weeklyBasketChangeDigest, weeklyBasketLiveStockUpEvidence, weeklyBasketLiveStockUpHistoryByProductId } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -30,7 +30,8 @@ function loadWeeklyBasketStockUpPlan() {
   api.updateBudget(userId, { weeklyBudget: 1150, monthlyBudget: 4600 });
   return api.getMultiWeekStockUpPlan(userId, {
     asOf: '2026-05-20T12:00:00.000Z',
-    planningWeeks: 3
+    planningWeeks: 3,
+    historyByProductId: weeklyBasketLiveStockUpHistoryByProductId
   });
 }
 
@@ -595,7 +596,7 @@ export default async function WeeklyBasketPage({
             <p className="text-sm font-black uppercase tracking-[0.2em] text-orange-800">Signed-in basket planner</p>
             <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Multi-week stock-up list</h2>
             <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
-              This planningWeeks view blocks price outlook claims. No price forecast is shown; low and typical prices are historical observed unit-price facts, while budget impact is today&apos;s stock-up cost spread across the plan.
+              This planningWeeks view blocks price outlook claims. No price forecast is shown; low and typical prices are historical observed unit-price facts from persisted latest_prices/observations snapshots when enough history exists, while budget impact is today&apos;s stock-up cost spread across the plan.
             </p>
           </div>
           <div className="grid gap-2 sm:grid-cols-3 lg:min-w-[34rem]">
@@ -621,7 +622,7 @@ export default async function WeeklyBasketPage({
           ))}
         </div>
         <div className="mt-4 grid gap-3 lg:grid-cols-[0.8fr_1fr]">
-          <p className="rounded-2xl bg-white p-4 text-sm font-black text-orange-950">{stockUpNoForecastReason} Coverage: {multiWeekStockUpList.coverage.confidence} confidence across {multiWeekStockUpList.coverage.observedItemCount}/{multiWeekStockUpList.coverage.totalItemCount} items.</p>
+          <p className="rounded-2xl bg-white p-4 text-sm font-black text-orange-950">{stockUpNoForecastReason} Coverage: {multiWeekStockUpList.coverage.confidence} confidence across {multiWeekStockUpList.coverage.observedItemCount}/{multiWeekStockUpList.coverage.totalItemCount} items. {weeklyBasketLiveStockUpEvidence.caveat}</p>
           <ul className="grid gap-2 text-sm font-semibold text-slate-700 md:grid-cols-2">
             {multiWeekStockUpList.guardrails.map((guardrail) => (
               <li className="rounded-2xl bg-white p-3" key={guardrail}>{guardrail}</li>
