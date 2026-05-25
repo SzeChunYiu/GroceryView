@@ -230,12 +230,12 @@ export default async function WeeklyBasketPage({
       </Card>
 
       <Card className="mt-6 border-sky-200 bg-sky-50/70">
-        <div className="grid gap-5 lg:grid-cols-[1fr_0.85fr] lg:items-start">
+        <div className="grid gap-5 lg:grid-cols-[1fr_0.85fr] lg:items-start" data-one-tap-basket-optimizer>
           <div>
             <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-800">{oneTapBasketOptimizer.persona}</p>
             <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">One-tap basket optimizer</h2>
             <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
-              Busy shoppers can see the readyAction from compareBasketStrategies before any signed-in account mutation. The tap applies the reviewed cheapest plan to a saved basket; it is not a retailer checkout or automatic purchase.
+              Busy shoppers can choose cheapest single store, split shop, or preferred chains before applying the reviewed readyAction from compareBasketStrategies. Manual overrides stay pinned, and the tap is not a retailer checkout or automatic purchase.
             </p>
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
               <p className="rounded-2xl bg-white p-4 shadow-sm">
@@ -250,6 +250,16 @@ export default async function WeeklyBasketPage({
                 <span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">Coverage rows</span>
                 <span className="mt-1 block text-2xl font-black text-slate-950">{oneTapBasketOptimizer.coverage.stores.length} stores</span>
               </p>
+            </div>
+            <div className="mt-4 grid gap-3 lg:grid-cols-3">
+              {oneTapBasketOptimizer.scopeOptions.map((option) => (
+                <div className="rounded-2xl border border-sky-100 bg-white p-4 shadow-sm" data-one-tap-scope={option.scope} key={option.scope}>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-sky-800">{option.label}</p>
+                  <p className="mt-2 text-2xl font-black text-slate-950">{formatSek(option.total)}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-700">{option.storeCount} store{option.storeCount === 1 ? '' : 's'} · saves {formatSek(option.savingsVsBestSingleStore)}</p>
+                  <p className="mt-3 rounded-xl bg-sky-50 p-3 text-xs font-bold leading-5 text-sky-950">{option.confidenceLabel}</p>
+                </div>
+              ))}
             </div>
             <div className="mt-4 grid gap-2 text-sm font-semibold text-slate-700 sm:grid-cols-2">
               {oneTapBasketOptimizer.quickestPath.map((line) => (
@@ -268,6 +278,14 @@ export default async function WeeklyBasketPage({
                 <li className="rounded-2xl bg-sky-50 p-3" key={guardrail}>{guardrail}</li>
               ))}
             </ul>
+            <div className="mt-4 space-y-2">
+              {oneTapBasketOptimizer.manualOverrides.map((override) => (
+                <Link className="block rounded-2xl bg-slate-50 p-3 text-sm font-semibold text-slate-700 hover:bg-sky-50" data-preserved-manual-override={override.productId} href={`/products/${override.productId}`} key={override.productId}>
+                  <span className="block font-black text-slate-950">{override.productId}</span>
+                  <span className="mt-1 block">{override.preservedStoreName} · {override.reason}</span>
+                </Link>
+              ))}
+            </div>
             <p className="mt-3 text-sm font-black text-sky-950">Signed-in saved baskets are required before GroceryView can prepare the one-tap mutation.</p>
           </div>
         </div>
