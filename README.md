@@ -84,6 +84,7 @@ npm run ingest:verify
 ## Per-package docs and contribution guides
 
 - Contributor workflow: [`CONTRIBUTING.md`](CONTRIBUTING.md)
+- Project standards for tested, documented, and optimized changes: [`docs/PROJECT_STANDARDS.md`](docs/PROJECT_STANDARDS.md)
 - Server package notes: [`packages/server/README.md`](packages/server/README.md)
 - Operational runbooks: [`docs/ops`](docs/ops)
 - Ingestion scripts: [`scripts/ingestion`](scripts/ingestion)

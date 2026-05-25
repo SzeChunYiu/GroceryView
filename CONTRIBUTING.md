@@ -60,3 +60,8 @@ Keep changes scoped and small. Prefer workspace-specific commands while iteratin
 then run the broader checks when a change touches shared packages or contracts.
 Document new scripts, routes, schemas, or public package APIs near the code that
 introduces them.
+
+Every pull request must satisfy the tested, documented, and optimized bar in
+[`docs/PROJECT_STANDARDS.md`](docs/PROJECT_STANDARDS.md). Use the PR template to
+record the specific test, documentation, and optimization evidence for the atoms
+you changed.
