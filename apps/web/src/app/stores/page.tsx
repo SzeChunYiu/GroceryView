@@ -3,7 +3,9 @@ import { AddressSearch } from '@/components/AddressSearch';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { getStoreReliabilityScore } from '@/lib/freshness';
 import { storeAssortmentOverviewForStore, storeUniverse } from '@/lib/verified-data';
-import { routeMetadata } from '@/lib/seo';
+import { publicCatalogueRevalidateSeconds, routeMetadata } from '@/lib/seo';
+
+export const revalidate = publicCatalogueRevalidateSeconds;
 
 export function generateMetadata() {
   return routeMetadata('/stores');
