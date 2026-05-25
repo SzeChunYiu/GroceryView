@@ -2,6 +2,7 @@ import { googleMapsDirectionsUrl, googleMapsEmbedUrl, type StoreMapLocation } fr
 import type { StoreDistanceRow, StoreRouteEstimate } from '@/lib/store-distance';
 
 type RouteMapRecommendation = Pick<StoreDistanceRow, 'basketTotalSek' | 'openingStatusLabel' | 'recommendationLabel' | 'routeScore' | 'totalMinutes' | 'travelCostSek'> & {
+  expectedBasketSavingsSek?: number;
   routeEstimates?: StoreRouteEstimate[];
 };
 
@@ -42,7 +43,7 @@ export function StoreMap({ store, routeRecommendation }: Readonly<StoreMapProps>
           <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">Route-aware store recommendation</p>
           <p className="mt-2 text-sm font-semibold leading-6 text-cyan-950">
             Score {routeRecommendation.routeScore.toFixed(0)} combines route time ({routeRecommendation.totalMinutes} min),
-            basket cost ({routeRecommendation.basketTotalSek.toFixed(2)} SEK), trip cost ({routeRecommendation.travelCostSek.toFixed(1)} SEK),
+            basket cost ({routeRecommendation.basketTotalSek.toFixed(2)} SEK), expected savings ({(routeRecommendation.expectedBasketSavingsSek ?? 0).toFixed(2)} SEK), trip cost ({routeRecommendation.travelCostSek.toFixed(1)} SEK),
             and opening status ({routeRecommendation.openingStatusLabel}).
           </p>
           <p className="mt-1 text-xs font-semibold text-cyan-900">{routeRecommendation.recommendationLabel}</p>

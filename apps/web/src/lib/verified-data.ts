@@ -23,6 +23,7 @@ import {
 } from './generated/db-site-ingested-overrides';
 import { dbSiteHomepageTrendingPriceChanges } from './generated/db-site-trending-price-changes';
 import { categoryLabels, pricedProducts } from './openprices-products';
+import { classifyRecentPriceVariance } from './price-intelligence';
 import { allergenRiskBadgesForText } from './search-filters';
 import { osmStores } from './osm-stores';
 import {
@@ -588,7 +589,23 @@ export type ProductSearchUrlParams = {
   maxPrice?: SearchParamValue;
   inStockOnly?: SearchParamValue;
   minConfidence?: SearchParamValue;
+  sort?: SearchParamValue;
 };
+
+export type ProductSearchSortOption = 'relevance' | 'unit_price_asc' | 'confidence_desc' | 'newest_observation' | 'nearest_store';
+
+export const productSearchSortOptions: Array<{ value: ProductSearchSortOption; label: string; description: string }> = [
+  { value: 'relevance', label: 'Relevance', description: 'Keep the verified search relevance and price order.' },
+  { value: 'unit_price_asc', label: 'Lowest unit price', description: 'Prioritize the cheapest comparable kr/kg, kr/l, or each price.' },
+  { value: 'confidence_desc', label: 'Highest confidence', description: 'Prioritize rows with the strongest price observation confidence.' },
+  { value: 'newest_observation', label: 'Newest observation', description: 'Prioritize recently observed prices.' },
+  { value: 'nearest_store', label: 'Nearest store', description: 'Use location-aware store ranking when location is available.' }
+];
+
+function productSearchSortValue(value: SearchParamValue): ProductSearchSortOption {
+  const requested = firstSearchValue(value);
+  return productSearchSortOptions.some((option) => option.value === requested) ? requested as ProductSearchSortOption : 'relevance';
+}
 
 function firstSearchValue(value: SearchParamValue): string {
   const raw = Array.isArray(value) ? value[0] : value;
@@ -670,9 +687,23 @@ function booleanSearchValue(value: SearchParamValue): boolean {
   return ['1', 'true', 'yes', 'on'].includes(firstSearchValue(value).toLocaleLowerCase('sv-SE'));
 }
 
-function productSearchResultCards(searchResult: typeof rawFacetedProductSearch) {
-  return searchResult.products.map((product) => {
+function nearestStoreRankFor(product: (typeof rawFacetedProductSearch.products)[number]) {
+  const nearestChainOrder = ['willys', 'hemköp', 'ica', 'coop', 'lidl'];
+  const ranks = product.currentPrices.map((price) => {
+    const chain = price.chainSlug.toLocaleLowerCase('sv-SE');
+    const chainRank = nearestChainOrder.findIndex((candidate) => chain.includes(candidate));
+    return chainRank === -1 ? nearestChainOrder.length : chainRank;
+  });
+  return ranks.length ? Math.min(...ranks) : Number.MAX_SAFE_INTEGER;
+}
+
+function productSearchResultCards(searchResult: typeof rawFacetedProductSearch, sort: ProductSearchSortOption = 'relevance') {
+  const cards = searchResult.products.map((product, relevanceIndex) => {
     const cheapest = product.currentPrices[0] ?? null;
+    const lowestUnitPrice = product.currentPrices.reduce((lowest, price) => Math.min(lowest, price.unitPrice), Number.POSITIVE_INFINITY);
+    const highestConfidence = product.currentPrices.reduce((highest, price) => Math.max(highest, price.confidence), 0);
+    const newestObservedAt = product.currentPrices.reduce((newest, price) => price.observedAt > newest ? price.observedAt : newest, '');
+    const volatilityBadge = classifyRecentPriceVariance(product.currentPrices);
     return {
       slug: product.slug,
       name: product.canonicalName,
@@ -688,14 +719,28 @@ function productSearchResultCards(searchResult: typeof rawFacetedProductSearch) 
       }) : unknownUnitPriceLabel,
       isAvailable: product.isAvailable,
       chainLabel: cheapest ? `${cheapest.chainName} · ${cheapest.priceType}` : 'Awaiting latest_prices row',
+      volatilityBadge,
       sourceTables: searchResult.evidence.sourceTables,
       allergenRiskBadges: allergenRiskBadgesForText([
         product.canonicalName,
         product.brand,
         product.categoryPath.join(' '),
         product.labels.join(' ')
-      ])
+      ]),
+      sortConfidence: highestConfidence,
+      sortNearestStoreRank: nearestStoreRankFor(product),
+      sortNewestObservedAt: newestObservedAt,
+      sortRelevanceIndex: relevanceIndex,
+      sortUnitPrice: Number.isFinite(lowestUnitPrice) ? lowestUnitPrice : Number.MAX_SAFE_INTEGER
     };
+  });
+
+  return cards.sort((left, right) => {
+    if (sort === 'unit_price_asc' && left.sortUnitPrice !== right.sortUnitPrice) return left.sortUnitPrice - right.sortUnitPrice;
+    if (sort === 'confidence_desc' && left.sortConfidence !== right.sortConfidence) return right.sortConfidence - left.sortConfidence;
+    if (sort === 'newest_observation' && left.sortNewestObservedAt !== right.sortNewestObservedAt) return right.sortNewestObservedAt.localeCompare(left.sortNewestObservedAt);
+    if (sort === 'nearest_store' && left.sortNearestStoreRank !== right.sortNearestStoreRank) return left.sortNearestStoreRank - right.sortNearestStoreRank;
+    return left.sortRelevanceIndex - right.sortRelevanceIndex;
   });
 }
 
@@ -711,6 +756,7 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
   const maxPrice = numericSearchValue(searchParams.maxPrice);
   const inStockOnly = booleanSearchValue(searchParams.inStockOnly);
   const minConfidence = confidenceSearchValue(searchParams.minConfidence);
+  const sort = productSearchSortValue(searchParams.sort);
   const filters = { query, categories, labels, originCountries, chains, minPrice, maxPrice, inStockOnly, minConfidence, limit: 100 };
   const searchResult = buildFacetedProductSearch({ rows: facetedSearchRows, filters });
 
@@ -727,12 +773,15 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
     minPrice !== undefined ? `min unit ${formatSek(minPrice)}` : null,
     maxPrice !== undefined ? `max unit ${formatSek(maxPrice)}` : null,
     inStockOnly ? 'priced/in-stock only' : null,
-    minConfidence !== undefined ? `confidence ≥ ${pct.format(minConfidence * 100)}%` : null
+    minConfidence !== undefined ? `confidence ≥ ${pct.format(minConfidence * 100)}%` : null,
+    sort !== 'relevance' ? `sort=${productSearchSortOptions.find((option) => option.value === sort)?.label ?? sort}` : null
   ].filter((item): item is string => item !== null);
 
   return {
     ...searchResult,
     title: 'Instant faceted search',
+    sort,
+    sortOptions: productSearchSortOptions,
     categoryFacets: searchResult.facets.categories.slice(0, 6),
     chainFacets: searchResult.facets.chains,
     labelFacets: searchResult.facets.labels.map((facet) => ({ ...facet, label: readableLabel(facet.value) })).slice(0, 8),
@@ -764,7 +813,7 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
       outOfStockLatestPriceCount: searchResult.evidence.outOfStockLatestPriceCount
     },
     activeFilters,
-    resultCards: productSearchResultCards(searchResult)
+    resultCards: productSearchResultCards(searchResult, sort)
   };
 }
 
@@ -2036,6 +2085,17 @@ export type AdaptiveProductCard = {
   packageLabel: string;
   sourceLabel: string;
   confidenceLabel: string;
+  confidenceLevel: 'high' | 'medium' | 'low';
+  confidenceDrilldown: {
+    sourceCount: number;
+    observationAgeLabel: string;
+    normalizationQuality: string;
+    reviewStatus: string;
+    rows: Array<{
+      label: string;
+      value: string;
+    }>;
+  };
   totalSortPrice: number;
   unitSortPrice: number | null;
   defaultCompareMode: 'total' | 'unit';
@@ -2141,6 +2201,20 @@ function sevenDaySparklinePoints(product: (typeof productUniverse)[number]): Ada
     }));
 }
 
+function observationAgeLabel(observedAt: string, asOf = '2026-05-25') {
+  const observedTime = Date.parse(observedAt.includes('T') ? observedAt : `${observedAt}T00:00:00.000Z`);
+  const asOfTime = Date.parse(`${asOf}T00:00:00.000Z`);
+  if (!Number.isFinite(observedTime) || !Number.isFinite(asOfTime)) return 'Observation age not reported';
+  const ageDays = Math.max(0, Math.round((asOfTime - observedTime) / (24 * 60 * 60 * 1000)));
+  return ageDays === 0 ? 'Observed today' : `Observed ${ageDays} day${ageDays === 1 ? '' : 's'} before ${asOf}`;
+}
+
+function confidenceLevelForEvidence(sourceCount: number, hasNormalizedUnit: boolean): AdaptiveProductCard['confidenceLevel'] {
+  if (sourceCount >= 8 && hasNormalizedUnit) return 'high';
+  if (sourceCount >= 2 || hasNormalizedUnit) return 'medium';
+  return 'low';
+}
+
 export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((product) => {
   const isChainProduct = 'lowestPrice' in product;
   const totalPrice = isChainProduct ? product.lowestPrice : product.priceMedian;
@@ -2158,6 +2232,32 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
   const sparklinePoints = sevenDaySparklinePoints(product);
   const priceDrop = priceDropFromThirtyDayHistory(product);
   const safetyProfile = safetyProfileForProduct(product);
+  const sourceCount = isChainProduct
+    ? Object.values(product.chains).filter((row) => typeof row.price === 'number' && Number.isFinite(row.price) && row.price > 0).length
+    : product.observationCount;
+  const latestObservedAt = isChainProduct ? '2026-05-21' : product.lastObservedAt;
+  const observationAge = observationAgeLabel(latestObservedAt);
+  const normalizationQuality = normalizedUnit
+    ? `Package parsed as ${normalizedUnit.packageLabel}; comparable ${normalizedUnit.unitLabel} retained.`
+    : 'Package quantity missing or unparsable; comparable unit price is withheld.';
+  const reviewStatus = isChainProduct
+    ? 'Retailer catalog row accepted from Axfood source data; no community-review flag is attached.'
+    : openFoodFactsSafetyByCode.has(product.code)
+      ? 'OpenFoodFacts metadata linked for source review context.'
+      : 'OpenPrices observation has no linked OpenFoodFacts review metadata yet.';
+  const confidenceLevel = confidenceLevelForEvidence(sourceCount, Boolean(normalizedUnit));
+  const confidenceDrilldown = {
+    sourceCount,
+    observationAgeLabel: observationAge,
+    normalizationQuality,
+    reviewStatus,
+    rows: [
+      { label: 'Source count', value: `${sourceCount.toLocaleString('sv-SE')} ${isChainProduct ? 'chain price row(s)' : 'OpenPrices observation(s)'}` },
+      { label: 'Observation age', value: observationAge },
+      { label: 'Normalization quality', value: normalizationQuality },
+      { label: 'Review status', value: reviewStatus }
+    ]
+  };
 
   return {
     slug: product.slug,
@@ -2175,6 +2275,8 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
     packageLabel: normalizedUnit?.packageLabel || packageText || 'Package size not reported',
     sourceLabel: isChainProduct ? `${product.lowestChain} lowest · ${formatPct(product.spreadPct)} spread` : `OpenPrices · ${product.observationCount.toLocaleString('sv-SE')} observations`,
     confidenceLabel: normalizedUnit ? `Derived from observed price + package size (${normalizedUnit.unitLabel})` : 'No synthetic unit prices: package quantity missing',
+    confidenceLevel,
+    confidenceDrilldown,
     totalSortPrice: totalPrice,
     unitSortPrice: normalizedUnit?.unitSortPrice ?? null,
     defaultCompareMode: productKind === 'commodity' ? 'unit' : 'total',
@@ -4561,6 +4663,37 @@ export const sourceDiscrepancyReportOptions = [
   { id: 'wrong_unit', label: 'Wrong unit', reviewerHint: 'Check package text, normalized unit, and unit-price conversion.' },
   { id: 'missing_image', label: 'Missing image', reviewerHint: 'Confirm the source image URL is absent or broken before requesting a refresh.' },
   { id: 'unavailable_product', label: 'Unavailable product', reviewerHint: 'Verify store availability or stale catalogue rows before hiding the item.' }
+] as const;
+
+export const storeProductStockFreshnessExamples = [
+  {
+    productId: 'demo-live-stock',
+    storeId: 'willys',
+    availability: 'live',
+    observedAt: '2026-05-25T08:00:00.000Z',
+    source: 'retailer store feed'
+  },
+  {
+    productId: 'demo-stale-stock',
+    storeId: 'hemkop',
+    availability: 'stale',
+    observedAt: '2026-05-12T08:00:00.000Z',
+    source: 'retailer store feed'
+  },
+  {
+    productId: 'demo-inferred-stock',
+    storeId: 'willys',
+    availability: 'inferred',
+    observedAt: null,
+    source: 'priced row without stock field'
+  },
+  {
+    productId: 'demo-unavailable-stock',
+    storeId: 'hemkop',
+    availability: 'unavailable',
+    observedAt: '2026-05-25T08:00:00.000Z',
+    source: 'retailer store feed'
+  }
 ] as const;
 
 export const sourceDiscrepancyReviewContract = {

@@ -11,6 +11,7 @@ type RouteHint = {
 };
 
 type StoreDistanceCardProps = {
+  expectedBasketSavingsSek?: number;
   fallbackLabel?: string;
   inventoryConfidence?: StoreInventoryConfidence;
   reliability?: StoreReliabilityScore;
@@ -25,6 +26,7 @@ const defaultRouteHints: RouteHint[] = [
 ];
 
 export function StoreDistanceCard({
+  expectedBasketSavingsSek = 0,
   fallbackLabel = 'Search by city or choose a store manually.',
   inventoryConfidence,
   reliability,
@@ -40,6 +42,9 @@ export function StoreDistanceCard({
       <h2 className="mt-2 text-xl font-black text-slate-950">Check distance to {storeName}</h2>
       <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">
         Use your location to estimate nearby store distance, or fall back to manual search if permission, timeout, or browser support gets in the way.
+      </p>
+      <p className="mt-3 rounded-2xl bg-cyan-50 p-3 text-sm font-black text-cyan-950">
+        Expected basket savings: {expectedBasketSavingsSek.toFixed(2)} SEK before travel cost.
       </p>
       <button className="mt-4 rounded-full bg-emerald-900 px-4 py-2 text-sm font-black text-white disabled:opacity-60" disabled={isLoading} onClick={requestLocation} type="button">
         {isLoading ? 'Checking location…' : attempts > 0 ? 'Retry location' : 'Use my location'}

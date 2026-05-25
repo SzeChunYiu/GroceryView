@@ -91,6 +91,7 @@ export type BasketStoreComparisonStore = {
   highlightLabels: string[];
   availableCount: number;
   missingCount: number;
+  substitutionCount: number;
   coverageLabel: string;
   missingProductNames: string[];
   substitutions: BasketStoreSubstitutionExplanation[];
@@ -327,7 +328,7 @@ export function buildBasketStoreComparison(
   products: readonly AxfoodProduct[] = axfoodProducts
 ): BasketStoreComparison {
   const comparison = buildChainComparisonTable(productsParam, products);
-  const rows = new Map<CompareChainId, Omit<BasketStoreComparisonStore, 'rankLabel' | 'totalText' | 'distanceText' | 'stockLabel' | 'highlightLabels' | 'coverageLabel'>>();
+  const rows = new Map<CompareChainId, Omit<BasketStoreComparisonStore, 'rankLabel' | 'totalText' | 'distanceText' | 'stockLabel' | 'highlightLabels' | 'substitutionCount' | 'coverageLabel'>>();
 
   for (const chain of COMPARE_CHAIN_ORDER) {
     const context = nearbyChainStoreContext[chain.id];
@@ -433,6 +434,7 @@ export function buildBasketStoreComparison(
       distanceText: `${store.distanceKm.toLocaleString('sv-SE', { maximumFractionDigits: 1 })} km away`,
       stockLabel: `${store.stockScore}/100 stock readiness`,
       highlightLabels,
+      substitutionCount: store.substitutions.length,
       coverageLabel: itemCount === 0
         ? 'Add products to compare basket coverage'
         : `${store.availableCount}/${itemCount} basket items priced`
@@ -450,6 +452,6 @@ export function buildBasketStoreComparison(
     sourceLabel: comparison.sourceLabel,
     summary: bestStore && itemCount > 0
       ? `${bestStore.storeName} is cheapest at ${bestStore.totalText}; ${closestStore?.storeName ?? 'the nearest matched store'} is closest at ${closestStore?.distanceText ?? 'distance not reported'}; ${bestStockedStore?.storeName ?? 'the best-stocked matched store'} has ${bestStockedStore?.coverageLabel ?? 'stock coverage not reported'}. Missing rows stay visible and substitutions point to the cheapest observed chain row.`
-      : 'Add product ids to compare full basket totals across nearby stores.'
+      : 'Add product ids to compare full basket totals across selected chains.'
   };
 }

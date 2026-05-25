@@ -4,13 +4,17 @@ import { ActiveFilterChips, AdvancedFilterDrawer } from '@/components/FilterPane
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { PriceReportReviewActions } from '@/components/price-report-review-actions';
 import { OriginFilter, type OriginFilterCode } from '@/components/origin-filter';
+import { ProductSortSelect } from '@/components/product-sort-select';
 import { ProductPriceCards } from '@/components/product-price-cards';
+import { SavedSearchAction } from '@/components/saved-search-action';
 import { VirtualizedProductGrid } from '@/components/LazyItemCard';
 import { apohemSource } from '@/lib/ingested/apohem';
+import { buildSavedSearchSubscription } from '@/lib/alert-scheduler';
 import { adaptiveProductCards, buildProductSearchView, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
 import { publicCatalogueRevalidateSeconds, routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
 import { buildRemovableSearchFilterChips } from '@/lib/search-filters';
+import { buildSearchFilterPreset } from '@/lib/search-presets';
 
 const PRODUCTS_PER_PAGE = 50;
 
@@ -32,6 +36,7 @@ type SearchParams = {
   inStockOnly?: string | string[];
   minConfidence?: string | string[];
   brand?: string | string[];
+  sort?: string | string[];
   page?: string | string[];
 };
 
@@ -72,6 +77,7 @@ function copySearchParams(params: URLSearchParams, source: SearchParams) {
   setFirstParam(params, 'maxPrice', source.maxPrice);
   setFirstParam(params, 'inStockOnly', source.inStockOnly);
   setFirstParam(params, 'minConfidence', source.minConfidence);
+  setFirstParam(params, 'sort', source.sort);
 }
 
 function productsPageUrl(page: number, selectedBrand = '', searchParams: SearchParams = {}) {
@@ -134,9 +140,11 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const pageStart = (currentPage - 1) * PRODUCTS_PER_PAGE;
   const rangeStart = resultCards.length === 0 ? 0 : pageStart + 1;
   const rangeEnd = Math.min(pageStart + PRODUCTS_PER_PAGE, resultCards.length);
+  const virtualizedResultLabel = `Virtualized product results, ${resultCards.length.toLocaleString('sv-SE')} matches`;
   const defaultSearchCount = facetedProductSearch.resultCards.length;
   const zeroResultFallback = relatedSearchFallback(search.query);
   const zeroResultCategories = zeroResultCategoryShortcuts(search.query, resolvedSearchParams.category);
+  const savedSearchSubscription = buildSavedSearchSubscription({ searchParams: resolvedSearchParams, path: '/products' });
   const activeFilterChips = buildRemovableSearchFilterChips(resolvedSearchParams, {
     basePath: '/products',
     labels: {
@@ -146,6 +154,12 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
       brand: Object.fromEntries(productBrandFilterOptions.map((brand) => [brand.value, brand.label]))
     }
   });
+  const currentSearchPreset = buildSearchFilterPreset(resolvedSearchParams);
+  const volatilityBadgeCounts = resultCards.reduce<Record<string, number>>((counts, product) => {
+    const status = product.volatilityBadge?.status ?? 'insufficient';
+    counts[status] = (counts[status] ?? 0) + 1;
+    return counts;
+  }, {});
 
   function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'origin' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence', string>>) {
     const params = new URLSearchParams();
@@ -196,6 +210,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
         </div>
         <form action="/products" className="mt-5 grid gap-3 rounded-2xl border border-violet-100 bg-white p-4 shadow-sm lg:grid-cols-[1.2fr_auto]" method="get">
           {search.originFilters.map((origin) => <input key={origin} name="origin" type="hidden" value={origin} />)}
+          {search.sort !== 'relevance' ? <input name="sort" type="hidden" value={search.sort} /> : null}
           <label className="text-sm font-black text-slate-950" htmlFor="product-search-q">
             Search
             <input className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-950" defaultValue={search.query} id="product-search-q" name="q" />
@@ -208,6 +223,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             brandOptions={productBrandFilterOptions.slice(0, 24)}
             categoryFacets={categoryFacets}
             chainFacets={chainFacets}
+            currentPreset={currentSearchPreset}
             dietaryFilters={search.dietaryFilters}
             inStockOnly={search.filters.inStockOnly}
             labelFacets={labelFacets}
@@ -228,11 +244,13 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             <p className="mt-2 text-xs font-semibold text-violet-900">Active URL filters: {search.activeFilters.join(' · ')}</p>
           ) : null}
         </div>
+        <SavedSearchAction subscription={savedSearchSubscription} />
         <OriginFilter
           className="mt-5"
           counts={Object.fromEntries(originFacets.map((facet) => [facet.value, facet.count])) as Partial<Record<OriginFilterCode, number>>}
           selected={search.originFilters}
         />
+        <ProductSortSelect searchParams={{ ...resolvedSearchParams, brand: selectedBrand }} selectedSort={search.sort} />
         {resultCards.length === 0 ? (
           <div className="mt-5 rounded-3xl border border-amber-200 bg-amber-50 p-5">
             <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-800">No exact matches</p>
@@ -293,10 +311,16 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">Price range + stock</p>
             <p className="mt-3 text-2xl font-black text-slate-950">{formatSek(priceRange.min)} – {formatSek(priceRange.max)}</p>
             <p className="mt-2 text-xs font-bold text-slate-600">Comparable unit filters cover kr/kg, kr/l, and per-unit rows. {inStockOnly.label} keeps unpriced catalog rows out of instant results.</p>
+            <p className="mt-2 text-xs font-bold text-slate-600">
+              Variance badges: {(volatilityBadgeCounts.stable ?? 0).toLocaleString('sv-SE')} stable · {(volatilityBadgeCounts.volatile ?? 0).toLocaleString('sv-SE')} volatile · {(volatilityBadgeCounts['likely-promo'] ?? 0).toLocaleString('sv-SE')} likely promo.
+            </p>
           </div>
         </div>
+        <p className="mt-5 text-sm font-semibold text-violet-900">
+          Rendering {rangeStart.toLocaleString('sv-SE')}–{rangeEnd.toLocaleString('sv-SE')} of {resultCards.length.toLocaleString('sv-SE')} matching products through an accessible virtualized result list.
+        </p>
         {/* product.isAvailable === false is rendered inside VirtualizedProductGrid for measured virtual rows. */}
-        <VirtualizedProductGrid products={resultCards} />
+        <VirtualizedProductGrid products={resultCards} resultLabel={virtualizedResultLabel} />
         {resultCards.length > PRODUCTS_PER_PAGE ? (
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3 text-sm">
             <p className="font-black text-slate-700">

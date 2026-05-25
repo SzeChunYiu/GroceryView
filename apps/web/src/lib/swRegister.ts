@@ -5,7 +5,9 @@ import { useEffect } from 'react';
 let registrationStarted = false;
 const SHOPPING_LIST_ROUTE_CACHE_NAME = 'groceryview-shopping-list-route-v1';
 const OFFLINE_SAVED_LIST_STORAGE_KEY = 'groceryview:offline-saved-list:v1';
+const OFFLINE_SAVED_LIST_SYNC_QUEUE_KEY = 'groceryview:offline-saved-list-sync-queue:v1';
 const OFFLINE_SAVED_LIST_UPDATED_EVENT = 'groceryview:offline-saved-list-updated';
+const OFFLINE_SAVED_LIST_SYNCED_EVENT = 'groceryview:offline-saved-list-synced';
 const OFFLINE_SAVED_LIST_BASE_ROUTES = ['/list', '/favourites'];
 const FAVOURITES_STORAGE_KEY = 'groceryview:favourite-products';
 const FAVOURITES_UPDATED_EVENT = 'groceryview:favourite-products-updated';
@@ -59,6 +61,19 @@ async function warmOfflineShoppingListRoute() {
   }
 }
 
+function flushOfflineSavedListSyncQueue() {
+  if (!navigator.onLine) return;
+
+  try {
+    const queuedSnapshots = localStorage.getItem(OFFLINE_SAVED_LIST_SYNC_QUEUE_KEY);
+    if (!queuedSnapshots) return;
+    localStorage.removeItem(OFFLINE_SAVED_LIST_SYNC_QUEUE_KEY);
+    window.dispatchEvent(new CustomEvent(OFFLINE_SAVED_LIST_SYNCED_EVENT, { detail: JSON.parse(queuedSnapshots) }));
+  } catch {
+    // Local sync metadata is best-effort and must never block service worker registration.
+  }
+}
+
 export function registerOfflineItemPageServiceWorker() {
   if (registrationStarted) return;
   if (typeof window === 'undefined') return;
@@ -72,10 +87,17 @@ export function registerOfflineItemPageServiceWorker() {
   window.addEventListener(FAVOURITES_UPDATED_EVENT, () => {
     void warmOfflineShoppingListRoute();
   });
+  window.addEventListener('online', () => {
+    flushOfflineSavedListSyncQueue();
+    void warmOfflineShoppingListRoute();
+  });
 
   const register = () => {
     void navigator.serviceWorker.register('/sw.js', { scope: '/' })
-      .then(() => warmOfflineShoppingListRoute())
+      .then(() => {
+        flushOfflineSavedListSyncQueue();
+        return warmOfflineShoppingListRoute();
+      })
       .catch(() => {
         registrationStarted = false;
       });

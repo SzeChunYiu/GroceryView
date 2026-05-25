@@ -231,6 +231,7 @@ export function estimateTripCompletion(
 export const activeShoppingTripEstimates = activeShoppingLists.map((list) => estimateTripCompletion(list, list.routeMode));
 
 export type StoreLayoutChain = 'ica' | 'coop' | 'willys';
+export type StoreLayoutGroupOrder = 'store-layout' | 'reverse-layout';
 
 export type StoreLayoutDepartment = {
   id: string;
@@ -267,12 +268,17 @@ export function getStoreLayoutDepartment(itemName: string, chain: StoreLayoutCha
   return storeLayoutDepartments[chain].find((department) => department.keywords.some((keyword) => normalized.includes(keyword))) ?? storeLayoutDepartments[chain][storeLayoutDepartments[chain].length - 1];
 }
 
-export function sortItemsByStoreLayout<TItem extends { name: string }>(items: TItem[], chain: StoreLayoutChain = 'ica') {
+export function storeLayoutDepartmentsForOrder(chain: StoreLayoutChain = 'ica', groupOrder: StoreLayoutGroupOrder = 'store-layout') {
+  return groupOrder === 'reverse-layout' ? [...storeLayoutDepartments[chain]].reverse() : storeLayoutDepartments[chain];
+}
+
+export function sortItemsByStoreLayout<TItem extends { name: string }>(items: TItem[], chain: StoreLayoutChain = 'ica', groupOrder: StoreLayoutGroupOrder = 'store-layout') {
+  const departments = storeLayoutDepartmentsForOrder(chain, groupOrder);
   return [...items].sort((left, right) => {
     const leftDepartment = getStoreLayoutDepartment(left.name, chain);
     const rightDepartment = getStoreLayoutDepartment(right.name, chain);
-    const leftIndex = storeLayoutDepartments[chain].findIndex((department) => department.id === leftDepartment.id);
-    const rightIndex = storeLayoutDepartments[chain].findIndex((department) => department.id === rightDepartment.id);
+    const leftIndex = departments.findIndex((department) => department.id === leftDepartment.id);
+    const rightIndex = departments.findIndex((department) => department.id === rightDepartment.id);
     return leftIndex - rightIndex || left.name.localeCompare(right.name, 'sv-SE');
   });
 }

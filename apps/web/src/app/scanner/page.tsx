@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { OcrScanHistoryTimeline } from '@/components/ocr-scan-history-timeline';
+import { BarcodeScanner } from '@/components/barcode-scanner';
 import { ScannerUploadActions } from '@/components/scanner-upload-actions';
 import { barcodeMissFallbackProducts } from '@/lib/openfoodfacts-catalog';
 import { routeMetadata } from '@/lib/seo';
@@ -123,6 +124,14 @@ export default function ScannerPage() {
           <Link className="rounded-full border border-indigo-200 px-4 py-2 text-sm font-black text-indigo-900" href="/watchlist">Watchlist</Link>
         </div>
       </Card>
+      <Card className="mt-6 border-amber-200 bg-amber-50/70">
+        <p className="text-xs font-black uppercase tracking-[0.22em] text-amber-800">In-store barcode mode</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Camera EAN lookup resolves products before upload flows</h2>
+        <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-amber-950">
+          The scanner controls below can read EAN-8, EAN-13, UPC-A, and UPC-E frames in-browser, link exact catalogue matches to product detail pages, or prepare a missing-product submission draft when no match exists.
+        </p>
+      </Card>
+      <BarcodeScanner />
       <div id="scan" className="scroll-mt-24">
         <ScannerUploadActions fallbackProducts={barcodeMissFallbackProducts} />
       </div>

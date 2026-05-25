@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import {
+  affiliateDisclosureKind,
   affiliateDisclosureLabel,
   buildAffiliateOutboundUrl,
   trackAffiliateOutboundClick,
@@ -16,6 +17,7 @@ import type { ConfidenceLevel } from '@/lib/content-style';
 import { buildDealContext, type DealHistoryPoint } from '@/lib/deal-context';
 import { getPriceFreshness, type FreshnessLevel } from '@/lib/freshness';
 import { dealShareUrl } from '@/lib/seo';
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 
 export type SponsoredDealPlacement = {
   disclosure?: string;
@@ -47,6 +49,8 @@ type DealCardProps = {
   imageAlt?: string;
   imageUrl?: string | null;
   localityLabel?: string;
+  chainBadgeLabel?: string;
+  freshnessBadgeLabel?: string;
   dropPercentLabel?: string;
   unitPriceDropLabel?: string;
   evidenceLabel?: string;
@@ -55,6 +59,7 @@ type DealCardProps = {
   sourceLabel?: string;
   sponsoredPlacement?: SponsoredDealPlacement;
   dealEndsAt?: string;
+  imagePriority?: boolean;
   verificationLabel?: string;
 };
 
@@ -97,15 +102,19 @@ function OutboundAffiliateLink({
   children: ReactNode;
   metadata: AffiliateLinkMetadata;
 }>) {
-  const disclosureKind = metadata.sponsored === false ? 'outbound' : 'affiliate';
+  const disclosureKind = affiliateDisclosureKind(metadata);
   return (
     <div className="min-w-44 flex-1">
       <a
         className="inline-flex w-full items-center justify-center rounded-full bg-market-mint px-4 py-2 text-sm font-black text-market-ink transition hover:bg-emerald-300"
         data-affiliate-campaign={metadata.campaignId ?? metadata.surface}
+        data-affiliate-deal-id={metadata.dealId}
         data-affiliate-disclosure={disclosureKind}
         data-affiliate-placement={metadata.placement}
+        data-affiliate-product-id={metadata.productId}
         data-affiliate-retailer={metadata.retailerName}
+        data-affiliate-sponsored={String(disclosureKind === 'sponsored')}
+        data-affiliate-surface={metadata.surface}
         href={buildAffiliateOutboundUrl(metadata)}
         onClick={() => trackAffiliateOutboundClick(metadata)}
         rel="sponsored noopener noreferrer"
@@ -116,6 +125,44 @@ function OutboundAffiliateLink({
       <span className="mt-2 block rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold leading-5 text-amber-950" data-affiliate-disclosure={disclosureKind}>
         {affiliateDisclosureLabel(metadata)}
       </span>
+    </div>
+  );
+}
+
+function LazyDealImage({
+  alt,
+  priority = false,
+  src
+}: Readonly<{
+  alt: string;
+  priority?: boolean;
+  src: string;
+}>) {
+  const { isIntersecting, ref } = useIntersectionObserver<HTMLDivElement>({
+    freezeOnceVisible: true,
+    rootMargin: '240px'
+  });
+  const shouldLoad = priority || isIntersecting;
+
+  return (
+    <div
+      className="relative mb-4 aspect-[4/3] overflow-hidden rounded-2xl border border-market-ink/10 bg-gradient-to-br from-slate-100 to-emerald-50"
+      ref={ref}
+    >
+      {shouldLoad ? (
+        <Image
+          alt={alt}
+          className="object-cover"
+          fill
+          fetchPriority={priority ? 'high' : 'auto'}
+          loading={priority ? 'eager' : 'lazy'}
+          placeholder="empty"
+          sizes="(min-width: 1280px) 22vw, (min-width: 768px) 44vw, 92vw"
+          src={src}
+        />
+      ) : (
+        <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-slate-100 via-white to-slate-100" aria-hidden="true" />
+      )}
     </div>
   );
 }
@@ -141,6 +188,8 @@ export function DealCard({
   imageAlt,
   imageUrl,
   localityLabel,
+  chainBadgeLabel,
+  freshnessBadgeLabel,
   dropPercentLabel,
   unitPriceDropLabel,
   evidenceLabel,
@@ -149,6 +198,7 @@ export function DealCard({
   sourceLabel,
   sponsoredPlacement,
   dealEndsAt,
+  imagePriority = false,
   verificationLabel
 }: DealCardProps) {
   const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle');
@@ -157,6 +207,7 @@ export function DealCard({
     campaignId: affiliateCampaignId,
     dealId,
     destinationUrl: outboundDealUrl,
+    disclosureKind: sponsoredPlacement ? 'sponsored' : 'affiliate',
     placement: 'deal_card',
     productId,
     retailerName,
@@ -167,6 +218,7 @@ export function DealCard({
     campaignId: affiliateCampaignId,
     dealId,
     destinationUrl: outboundStoreUrl,
+    disclosureKind: 'outbound',
     placement: 'store_link',
     productId,
     retailerName,
@@ -182,7 +234,7 @@ export function DealCard({
   const sponsoredSurface = sponsoredPlacement?.surface ?? 'discovery_rail';
   const sponsoredPlacementId = sponsoredPlacement?.placementId ?? analyticsDealId;
   const separatedFromOrganicRankings = true;
-  const metaLabel = [rankLabel, categoryLabel, localityLabel].filter(Boolean).join(' · ');
+  const metaLabel = [rankLabel, categoryLabel, localityLabel, chainBadgeLabel, freshnessBadgeLabel].filter(Boolean).join(' · ');
   const priceFreshnessObservedAt = freshnessObservedAt ?? discountStartedAt ?? priceHistory?.at(-1)?.observedAt ?? null;
   const priceFreshness = getPriceFreshness(priceFreshnessObservedAt);
   const priceVerificationLabel = verificationLabel
@@ -239,21 +291,8 @@ export function DealCard({
           <p className="mt-1 text-amber-900">Provider: {sponsoredPlacement.provider} · Organic ranking separated: {String(separatedFromOrganicRankings)}</p>
         </div>
       ) : null}
+      {imageUrl ? <LazyDealImage alt={imageAlt ?? `${title} deal image`} priority={imagePriority} src={imageUrl} /> : null}
       <div className="flex items-start justify-between gap-3">
-        {imageUrl ? (
-          <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl bg-white p-2 ring-1 ring-market-ink/10">
-            <Image
-              alt={imageAlt ?? `${title} deal image`}
-              className="max-h-full max-w-full object-contain"
-              height={96}
-              loading="lazy"
-              placeholder="empty"
-              sizes="(min-width: 768px) 96px, 80px"
-              src={imageUrl}
-              width={96}
-            />
-          </div>
-        ) : null}
         <div>
           {replacementLabel ? (
             <p className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{replacementLabel}</p>

@@ -16,6 +16,26 @@ export type GrocerySearchExpansionTelemetry = {
   cacheRequests: number;
 };
 
+export type HeaderSuggestGroupKind = 'products' | 'brands' | 'categories' | 'stores';
+
+export type HeaderSuggestMatchRange = [number, number];
+
+export type HeaderSuggestItem = {
+  id: string;
+  group: HeaderSuggestGroupKind;
+  label: string;
+  href: string;
+  detail?: string;
+  score: number;
+  matchRanges: HeaderSuggestMatchRange[];
+};
+
+export type HeaderSuggestGroup = {
+  id: HeaderSuggestGroupKind;
+  label: string;
+  items: HeaderSuggestItem[];
+};
+
 type WeightedAlias = { value: string; weight: number };
 
 const groceryAliasEntries: Array<{ canonical: string; aliases: WeightedAlias[] }> = [
@@ -44,6 +64,54 @@ function normalizeAliasText(value: string): string {
     .replace(/[^a-z0-9]+/g, ' ')
     .trim()
     .replace(/\s+/g, ' ');
+}
+
+export function normalizeSuggestText(value: string): string {
+  return normalizeAliasText(value);
+}
+
+function mergeMatchedIndexes(indexes: number[]): HeaderSuggestMatchRange[] {
+  const sortedIndexes = [...new Set(indexes)].sort((left, right) => left - right);
+  const ranges: HeaderSuggestMatchRange[] = [];
+  for (const index of sortedIndexes) {
+    const lastRange = ranges[ranges.length - 1];
+    if (lastRange && lastRange[1] === index) {
+      lastRange[1] = index + 1;
+    } else {
+      ranges.push([index, index + 1]);
+    }
+  }
+  return ranges;
+}
+
+export function fuzzySuggestMatch(label: string, query: string): Pick<HeaderSuggestItem, 'matchRanges' | 'score'> | null {
+  const normalizedLabel = normalizeSuggestText(label);
+  const normalizedQuery = normalizeSuggestText(query);
+  if (!normalizedLabel || !normalizedQuery) return null;
+
+  const exactIndex = normalizedLabel.indexOf(normalizedQuery);
+  if (exactIndex >= 0) {
+    const startsWord = exactIndex === 0 || normalizedLabel[exactIndex - 1] === ' ';
+    return {
+      matchRanges: [[exactIndex, exactIndex + normalizedQuery.length]],
+      score: (startsWord ? 0 : 20) + exactIndex
+    };
+  }
+
+  let searchFrom = 0;
+  const matchedIndexes: number[] = [];
+  for (const character of normalizedQuery.replace(/\s/g, '')) {
+    const index = normalizedLabel.indexOf(character, searchFrom);
+    if (index < 0) return null;
+    matchedIndexes.push(index);
+    searchFrom = index + 1;
+  }
+
+  const span = matchedIndexes.length > 0 ? matchedIndexes[matchedIndexes.length - 1] - matchedIndexes[0] : 0;
+  return {
+    matchRanges: mergeMatchedIndexes(matchedIndexes),
+    score: 50 + span + normalizedLabel.length / 100
+  };
 }
 
 function addUnique(values: string[], value: string): void {
@@ -181,6 +249,34 @@ export function expandGrocerySearchQueryWithTelemetry(query: string, maxQueries 
 
 export function expandGrocerySearchQuery(query: string, maxQueries = 5): GrocerySearchExpansion {
   return expandGrocerySearchQueryWithTelemetry(query, maxQueries).expansion;
+}
+
+export type MisspelledQueryRecovery = {
+  query: string;
+  didYouMean: string[];
+  popularAlternatives: string[];
+};
+
+const popularRecoveryQueries = ['mjölk', 'kaffe', 'havregryn', 'ägg', 'yoghurt', 'pasta'];
+
+export function buildMisspelledQueryRecovery(query: string, maxSuggestions = 4): MisspelledQueryRecovery {
+  const normalizedQuery = normalizeAliasText(query);
+  const aliasCandidates = groceryAliasEntries.flatMap((entry) => [entry.canonical, ...entry.aliases.map((alias) => alias.value)]);
+  const didYouMean = aliasCandidates
+    .map((candidate) => ({ candidate, distance: editDistance(normalizeAliasText(candidate), normalizedQuery) }))
+    .filter((row) => normalizedQuery.length >= 3 && row.distance <= Math.max(2, Math.floor(normalizedQuery.length / 3)))
+    .sort((left, right) => left.distance - right.distance || left.candidate.localeCompare(right.candidate, 'sv'))
+    .map((row) => row.candidate)
+    .filter((candidate, index, values) => values.findIndex((value) => normalizeAliasText(value) === normalizeAliasText(candidate)) === index)
+    .slice(0, maxSuggestions);
+
+  const expansion = expandGrocerySearchQuery(query, maxSuggestions);
+  const popularAlternatives = [...expansion.expandedQueries, ...popularRecoveryQueries]
+    .filter((candidate) => normalizeAliasText(candidate) !== normalizedQuery)
+    .filter((candidate, index, values) => values.findIndex((value) => normalizeAliasText(value) === normalizeAliasText(candidate)) === index)
+    .slice(0, maxSuggestions);
+
+  return { query, didYouMean, popularAlternatives };
 }
 
 export type CategorySearchProduct = {
