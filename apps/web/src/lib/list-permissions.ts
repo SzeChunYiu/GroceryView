@@ -189,3 +189,43 @@ export function readPublicListShare(shareId: string): PublicListShare | null {
 export function publicListSharePath(shareId: string) {
   return `/lists/${encodeURIComponent(shareId)}`;
 }
+
+export type PublicListShareControl = {
+  expiresAt: string;
+  listId: string;
+  revokeLabel: string;
+  revokedAt: string | null;
+  shareId: string;
+  shareUrl: string;
+  status: 'active' | 'expired' | 'revoked';
+};
+
+export function createPublicListShareControl(input: {
+  expiresAt: string;
+  items: PublicListShareItem[];
+  listId: string;
+  revokedAt?: string | null;
+}): PublicListShareControl {
+  const shareId = createPublicListShareToken({ expiresAt: input.expiresAt, items: input.items, listId: input.listId });
+  const isExpired = Date.parse(input.expiresAt) <= Date.now();
+  const status = input.revokedAt ? 'revoked' : isExpired ? 'expired' : 'active';
+
+  return {
+    expiresAt: input.expiresAt,
+    listId: input.listId,
+    revokeLabel: status === 'revoked' ? 'Share revoked' : 'Revoke public link',
+    revokedAt: input.revokedAt ?? null,
+    shareId,
+    shareUrl: publicListSharePath(shareId),
+    status
+  };
+}
+
+export function revokePublicListShare(control: PublicListShareControl, revokedAt = new Date().toISOString()): PublicListShareControl {
+  return {
+    ...control,
+    revokeLabel: 'Share revoked',
+    revokedAt,
+    status: 'revoked'
+  };
+}

@@ -3,6 +3,7 @@ import { ActivityStream } from '@/components/activity-stream';
 import { HouseholdPlanActions } from '@/components/household-plan-actions';
 import { ListCard } from '@/components/list-card';
 import { buildSharedListActivityEvent } from '@/lib/activity-log';
+import { createPublicListShareControl } from '@/lib/list-permissions';
 import { DEFAULT_HOUSEHOLD_PRICE_PREFERENCES, HOUSEHOLD_PRICE_PREFERENCE_STORAGE_KEY, sortByHouseholdPricePreferences } from '@/lib/user-preferences';
 import { formatPct, formatSek, shareableHouseholdListContract, sourceCoverage, topChainSpreads } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
@@ -106,6 +107,33 @@ const householdActivityTimeline = [
   })
 ];
 
+const householdPublicShareItems = [
+  {
+    detail: "Read-only household planning preview with matched store context.",
+    id: "milk-preview",
+    importSource: "item-detail" as const,
+    matchedProductName: topChainSpreads[0]?.name,
+    matchedProductSlug: topChainSpreads[0]?.slug,
+    name: topChainSpreads[0]?.name ?? "Milk",
+    quantity: "2 st"
+  },
+  {
+    detail: "Public viewers can compare but cannot edit checkout state.",
+    id: "bread-preview",
+    importSource: "item-detail" as const,
+    matchedProductName: topChainSpreads[1]?.name,
+    matchedProductSlug: topChainSpreads[1]?.slug,
+    name: topChainSpreads[1]?.name ?? "Bread",
+    quantity: "1 loaf"
+  }
+];
+
+const householdPublicShareControl = createPublicListShareControl({
+  expiresAt: "2026-06-01T18:00:00.000Z",
+  items: householdPublicShareItems,
+  listId: "static-household-preview"
+});
+
 const householdListCommentPreview = [
   {
     id: 'milk-preview',
@@ -152,8 +180,20 @@ export default function FeaturePage() {
       </div>
 
       <div className="mt-6">
-        <ListCard currentRole="partner" items={householdListCommentPreview} />
+        <ListCard currentRole="partner" items={householdListCommentPreview} publicShareExpiresAt={householdPublicShareControl.expiresAt} publicShareHref={householdPublicShareControl.shareUrl} publicShareRevokedAt={householdPublicShareControl.revokedAt} />
       </div>
+
+      <Card className="mt-6 border-sky-200 bg-sky-50">
+        <Eyebrow>Public household list link</Eyebrow>
+        <h2 className="mt-2 text-2xl font-black tracking-tight">Read-only share link with expiry and revocation controls</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+          The public list URL expires on {new Date(householdPublicShareControl.expiresAt).toLocaleString("sv-SE")} and can be revoked by the household owner without requiring collaborators to create accounts. Current status: {householdPublicShareControl.status}.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <a className="rounded-full bg-sky-800 px-4 py-2 text-sm font-black text-white" href={householdPublicShareControl.shareUrl}>Open read-only link</a>
+          <button className="rounded-full border border-sky-300 bg-white px-4 py-2 text-sm font-black text-sky-900" type="button">{householdPublicShareControl.revokeLabel}</button>
+        </div>
+      </Card>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
         <Eyebrow>Friend invite onboarding</Eyebrow>

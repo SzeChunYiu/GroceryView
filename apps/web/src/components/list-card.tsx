@@ -26,7 +26,9 @@ type ListCardProps = {
   currentRole: FamilyRole;
   items: CommentableSharedListItem[];
   onConflictPrompt?: (prompt: ListConflictPrompt) => void;
+  publicShareExpiresAt?: string;
   publicShareHref?: string;
+  publicShareRevokedAt?: string | null;
   selectedChain?: StoreLayoutChain;
 };
 
@@ -82,7 +84,7 @@ export function PublicSharePreviewCard({
   );
 }
 
-export function ListCard({ currentRole, items, onConflictPrompt, publicShareHref, selectedChain = "ica" }: ListCardProps) {
+export function ListCard({ currentRole, items, onConflictPrompt, publicShareExpiresAt, publicShareHref, publicShareRevokedAt, selectedChain = "ica" }: ListCardProps) {
   const [commentsByItem, setCommentsByItem] = useState<Record<string, ListItemComment[]>>(() =>
     Object.fromEntries(items.map((item) => [item.id, item.comments ?? []])),
   );
@@ -145,7 +147,7 @@ export function ListCard({ currentRole, items, onConflictPrompt, publicShareHref
       </div>
       {publicShareHref ? (
         <p className="mb-3 rounded-xl bg-sky-50 px-3 py-2 text-sm font-bold text-sky-950">
-          Public viewers can open a tokenized read-only URL with item details, matched price badges, and cheapest-store comparison without account access or edit controls.
+          Public viewers can open a tokenized read-only URL with item details, matched price badges, and cheapest-store comparison without account access or edit controls. Expires {publicShareExpiresAt ? new Date(publicShareExpiresAt).toLocaleDateString("sv-SE") : "after the household-defined window"}; {publicShareRevokedAt ? `revoked ${new Date(publicShareRevokedAt).toLocaleDateString("sv-SE")}` : "revocation control is available to the owner"}.
         </p>
       ) : null}
 
