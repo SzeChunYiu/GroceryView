@@ -17,6 +17,16 @@ jobs:
         with:
           node-version: '22'
           cache: npm
+      - name: Restore build and link checker caches
+        uses: actions/cache@v4
+        with:
+          path: |
+            apps/web/.next/cache
+            .link-check-cache
+          key: ${{ runner.os }}-groceryview-ci-${{ hashFiles('package-lock.json', 'apps/web/package.json') }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-groceryview-ci-${{ hashFiles('package-lock.json', 'apps/web/package.json') }}-
+            ${{ runner.os }}-groceryview-ci-
       - name: Install dependencies
         id: install
         run: npm ci
@@ -28,6 +38,14 @@ jobs:
       - name: Build workspaces
         id: build
         run: npm run build
+      - name: Check route and sitemap links
+        id: link_checker
+        env:
+          LINK_CHECK_TIMEOUT_MS: '10000'
+          LINK_CHECK_MAX_MANIFEST_ROUTES: '2000'
+          LINK_CHECK_MAX_SITEMAP_LINKS: '5000'
+          LINK_CHECK_CACHE_DIR: .link-check-cache
+        run: node --experimental-strip-types scripts/checkLinks.ts apps/web/.next/routes-manifest.json https://grocery-web-mu.vercel.app/sitemap.xml
       - name: Next profile bundle budget
         id: profile_bundle
         run: npm run perf:bundle:profile -w @groceryview/web
