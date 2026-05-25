@@ -72,7 +72,9 @@ function field(row: Record<string, string>, names: readonly string[]) {
 }
 
 function numericValue(value: string) {
-  const parsed = Number(value.replace(/\s/g, '').replace(',', '.'));
+  const normalized = value.replace(/\s/g, '').replace(',', '.');
+  if (!normalized) return null;
+  const parsed = Number(normalized);
   return Number.isFinite(parsed) ? parsed : null;
 }
 
