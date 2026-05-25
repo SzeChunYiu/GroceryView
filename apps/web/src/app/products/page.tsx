@@ -8,7 +8,7 @@ import { ProductSortSelect } from '@/components/product-sort-select';
 import { ProductPriceCards } from '@/components/product-price-cards';
 import { NewArrivalsCarousel } from '@/components/TrendingCarousel';
 import { SavedSearchActions } from '@/components/saved-search-actions';
-import { VirtualizedProductGrid } from '@/components/LazyItemCard';
+import { ProductGrid } from '@/components/product-grid';
 import { apohemSource } from '@/lib/ingested/apohem';
 import { newProductArrivals } from '@/lib/new-arrivals';
 import { buildSavedSearchSubscription } from '@/lib/alert-scheduler';
@@ -360,8 +360,8 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
         <p className="mt-5 text-sm font-semibold text-violet-900">
           Rendering {rangeStart.toLocaleString('sv-SE')}–{rangeEnd.toLocaleString('sv-SE')} of {resultCards.length.toLocaleString('sv-SE')} matching products through an accessible virtualized result list.
         </p>
-        {/* product.isAvailable === false is rendered inside VirtualizedProductGrid for measured virtual rows. */}
-        <VirtualizedProductGrid products={virtualizedResultCards} resultLabel={virtualizedResultLabel} />
+        {/* product.isAvailable === false is rendered inside ProductGrid's VirtualizedProductGrid for measured virtual rows. */}
+        <ProductGrid products={virtualizedResultCards} resultLabel={virtualizedResultLabel} />
         {resultCards.length > PRODUCTS_PER_PAGE ? (
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3 text-sm">
             <p className="font-black text-slate-700">
