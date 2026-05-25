@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+import type { RoutePerformanceBudgetReport } from '@/lib/telemetry';
 import { AppNav } from './app-nav';
 import { BottomNav } from './bottom-nav';
 import {
@@ -94,6 +95,54 @@ export function TopSpreads({ limit = 6 }: Readonly<{ limit?: number }>) {
             <p className="rounded-full bg-amber-100 px-3 py-1 text-sm font-black text-amber-950">{formatPct(product.spreadPct)} spread</p>
           </Link>
         ))}
+      </div>
+    </Card>
+  );
+}
+
+export function RoutePerformanceBudgetPanel({ reports }: Readonly<{ reports: RoutePerformanceBudgetReport[] }>) {
+  const failingMetrics = reports.flatMap((report) => report.metrics.filter((metric) => metric.failing).map((metric) => ({ ...metric, route: report.route })));
+
+  return (
+    <Card className="border-violet-200 bg-violet-50">
+      <div data-internal-performance-page="route-budgets">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <Eyebrow>Internal performance</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Route performance budgets</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-violet-950">
+              Recent Lighthouse route snapshots are grouped here so performance regressions are visible outside CI logs. Failing metrics are called out before shoppers feel slower grocery searches.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-violet-950 shadow-sm">
+            {failingMetrics.length} failing metric{failingMetrics.length === 1 ? '' : 's'}
+          </p>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {reports.map((report) => (
+            <section className="rounded-2xl border border-violet-100 bg-white p-4 shadow-sm" key={report.route}>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="font-mono text-sm font-black text-slate-950">{report.route}</p>
+                  <p className="mt-1 text-xs font-bold text-slate-500">{report.measuredAt}</p>
+                </div>
+                <p className={report.status === 'fail' ? 'rounded-full bg-rose-100 px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-rose-950' : 'rounded-full bg-emerald-100 px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-emerald-950'}>
+                  {report.status}
+                </p>
+              </div>
+              <div className="mt-4 space-y-3">
+                {report.metrics.map((metric) => (
+                  <div className={metric.failing ? 'rounded-xl border border-rose-200 bg-rose-50 p-3' : 'rounded-xl bg-slate-50 p-3'} key={`${report.route}-${metric.metric}`}>
+                    <p className="font-mono text-xs font-black text-slate-950">{metric.metric}</p>
+                    <p className="mt-1 text-sm font-semibold text-slate-700">Budget {metric.budget} · observed {metric.observed}</p>
+                    <p className="mt-2 text-xs font-semibold leading-5 text-slate-600">{metric.detail}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-4 text-xs font-semibold text-slate-500">Source: {report.source}</p>
+            </section>
+          ))}
+        </div>
       </div>
     </Card>
   );

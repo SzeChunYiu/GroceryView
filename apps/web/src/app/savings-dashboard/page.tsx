@@ -1,11 +1,12 @@
 import Link from 'next/link';
 import { PiggyBank } from 'lucide-react';
 import { ConfidenceBadge } from '@/components/confidence-badge';
-import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { Card, Eyebrow, PageShell, RoutePerformanceBudgetPanel, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { elderlyFixedIncomeBudgetTracker, elderlyStaplesStabilityTracker, grocerySpendForecast, personalGroceryInflation, savingsDashboard, studentWeeklyBudgetTracker } from '@/lib/demo-data';
 import { ecoBasketScorecard } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
+import { recentRoutePerformanceBudgetReports } from '@/lib/telemetry';
 
 export function generateMetadata() {
   const metadata = routeMetadata({
@@ -95,6 +96,10 @@ export default function SavingsDashboardPage() {
             />
           </div>
         </Card>
+      </div>
+
+      <div className="mt-6">
+        <RoutePerformanceBudgetPanel reports={recentRoutePerformanceBudgetReports} />
       </div>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
