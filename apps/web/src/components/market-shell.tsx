@@ -9,7 +9,7 @@ import { buildSeasonalProduceDiscoveryCards } from '@/lib/deal-context';
 import { defaultLocale, localeReadiness, localeTranslationGuardrails, localizedPriceIntelligenceTerminology, localizedShellCopy, type SupportedLocale } from '@/lib/i18n';
 import { basketCostHeatmap } from '@/lib/map-basket-cost-heatmap';
 import { mapChainIndexScores } from '@/lib/map-chain-index';
-import { buildPersonalizedReorderRail } from '@/lib/personalization';
+import { buildPersonalizedRecommendationRail, buildPersonalizedReorderRail } from '@/lib/personalization';
 import {
   allStoreDailyRunnerReadiness,
   apiPerformanceReadiness,
@@ -66,6 +66,13 @@ const homepageMarketHeatmap = marketHeatmapTiles.slice(0, 6);
 const homepageChainIndexTrend = buildChainIndexTrendSeries().series.slice(0, 2);
 const homepageBasketCostHeatmap = basketCostHeatmap.rows.slice(0, 3);
 const homepagePersonalizedReorderRail = buildPersonalizedReorderRail(homepageAdaptiveProductCards);
+const homepagePersonalizedRecommendationRail = buildPersonalizedRecommendationRail(homepageAdaptiveProductCards, {
+  favoriteBrands: ['Garant', 'Änglamark', 'ICA'],
+  pantryGaps: ['milk', 'bread', 'coffee'],
+  recentCategoryInterest: ['mejeri-ost-agg', 'brod-bageri', 'kaffe'],
+  recentListActivity: ['breakfast', 'fruit', 'coffee'],
+  limit: 4
+});
 const homepagePharmacyOtcEvidence = pharmacyOtcEvidenceBoard.rows.slice(0, 3);
 const homepageCommodityMappingReview = {
   queue: commodityMappingReviewPlan.queue.slice(0, 2),
@@ -816,6 +823,7 @@ export function MarketShell({ locale = defaultLocale }: { locale?: SupportedLoca
             eyebrow="Product-card display"
             title="Homepage cards show pack price and jämförpris"
             intro="The homepage now uses the same adaptive total/per-unit card model as the product catalogue, with no hidden actual price."
+            recommendationItems={homepagePersonalizedRecommendationRail}
           />
         </div>
       </Card>
