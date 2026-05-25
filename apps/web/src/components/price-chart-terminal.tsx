@@ -154,7 +154,10 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
           <h2 className="mt-2 text-3xl font-black tracking-tight">{chart.title}</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">{chart.caveat}</p>
         </div>
-        <dl className="grid gap-2 rounded-2xl border border-white/10 bg-white/10 p-4 text-sm font-black text-emerald-100 sm:grid-cols-2">
+        <dl
+          aria-label="crosshair value readout"
+          className="grid gap-2 rounded-2xl border border-white/10 bg-white/10 p-4 text-sm font-black text-emerald-100 sm:grid-cols-2"
+        >
           <div>
             <dt className="text-[0.65rem] uppercase tracking-[0.18em] text-emerald-300">Source</dt>
             <dd>{readoutSourceLabel}</dd>
