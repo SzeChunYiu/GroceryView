@@ -501,6 +501,26 @@ export default function DataSourcesPage() {
         </div>
       </Card>
 
+      <Card className="mt-6 border-orange-200 bg-orange-50/70">
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-orange-800">Fuel source documentation</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Preem · station-local consumer evidence + separate business list prices</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Preem entries must stay scoped: consumer pump-price evidence is station-local, while business list prices are separate business evidence. GroceryView should not claim that Preem exposes chain-wide consumer pump prices.
+            </p>
+          </div>
+          <Link className="rounded-full bg-white px-4 py-2 text-sm font-black text-orange-900 shadow-sm" href="https://github.com/SzeChunYiu/GroceryView/blob/main/docs/connectors/preem-se.md">
+            Read docs/connectors/preem-se.md
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          <Metric label="Consumer scope" value="station-local" />
+          <Metric label="Business prices" value="separate list" />
+          <Metric label="Chain-wide pump feed" value="not claimed" />
+        </div>
+      </Card>
+
       <Card className="mt-6 border-sky-200 bg-sky-50/70">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
