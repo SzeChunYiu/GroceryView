@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import {
   applyPantryConsumptionEvents,
@@ -11,6 +12,13 @@ import {
 type PantryTrackerProps = {
   items: PantryStockItem[];
 };
+
+const expiryClasses = {
+  expired: 'bg-rose-100 text-rose-900',
+  'use-soon': 'bg-amber-100 text-amber-900',
+  planned: 'bg-sky-100 text-sky-900',
+  unknown: 'bg-slate-100 text-slate-700'
+} satisfies Record<PantryStockItem['expiryReminder']['urgency'], string>;
 
 const statusClasses: Record<PantryStockStatus, string> = {
   healthy: 'bg-emerald-100 text-emerald-900',
@@ -73,7 +81,10 @@ export function PantryTracker({ items }: PantryTrackerProps) {
                 <p className="mt-1 text-sm font-semibold text-slate-700">
                   Owned {item.ownedQuantity} {item.unit} · uses about {item.estimatedDailyUse} {item.unit}/day
                 </p>
-                <p className="mt-1 text-sm text-slate-600">{formatDays(item.depletionEstimateDays)}</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <p className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-slate-700">{formatDays(item.depletionEstimateDays)}</p>
+                  <p className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.14em] ${expiryClasses[item.expiryReminder.urgency]}`}>{item.expiryReminder.label}</p>
+                </div>
               </div>
               <p className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.18em] ${statusClasses[item.status]}`}>{item.status}</p>
             </div>
@@ -103,6 +114,14 @@ export function PantryTracker({ items }: PantryTrackerProps) {
                 Log use
               </button>
             </div>
+
+            {item.expiryReminder.urgency === 'expired' || item.expiryReminder.urgency === 'use-soon' ? (
+              <div className="mt-3 flex flex-wrap gap-2 rounded-2xl border border-amber-200 bg-amber-50 p-3">
+                <span className="text-sm font-black text-amber-950">Use-soon actions</span>
+                <Link className="rounded-full bg-white px-3 py-1 text-xs font-black text-emerald-900 hover:text-emerald-700" href={`/meal-planner?ingredient=${item.productId}`}>Find recipes</Link>
+                <Link className="rounded-full bg-white px-3 py-1 text-xs font-black text-emerald-900 hover:text-emerald-700" href={`/deals?replace=${item.productId}`}>Replacement deals</Link>
+              </div>
+            ) : null}
           </div>
         ))}
       </div>
