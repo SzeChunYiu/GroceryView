@@ -8,6 +8,7 @@ import {
   type TransactionalEmailFetch,
   type TransactionalEmailMessage
 } from '@groceryview/notifications';
+import { buildMyFlyerEmail, type MyFlyerEmailOffer } from '@groceryview/server/email/myFlyerEmail';
 
 const defaultMaxChangesPerUser = 10;
 const weeklyDigestDays = 7;
@@ -58,6 +59,45 @@ export type WeeklyDigestJobInput = {
   now?: string;
 };
 
+export type MyFlyerDigestSubscription = {
+  country: string;
+  userId: string;
+  recipientEmail: string;
+};
+
+export type MyFlyerDigestJobInput = {
+  baseUrl: string;
+  countries: string[];
+  emailClient: TransactionalEmailClient;
+  executor: QueryExecutor;
+  maxOffersPerUser?: number;
+  now?: string;
+};
+
+export type MyFlyerDigestJobSent = {
+  country: string;
+  userId: string;
+  recipientEmail: string;
+  messageId: string;
+  itemCount: number;
+};
+
+export type MyFlyerDigestJobSkipped = {
+  country: string;
+  userId: string;
+  recipientEmail: string;
+  reason: 'missing_recipient_email' | 'no_my_flyer_offers';
+};
+
+export type MyFlyerDigestJobResult = {
+  countries: string[];
+  since: string;
+  until: string;
+  subscriptionCount: number;
+  sent: MyFlyerDigestJobSent[];
+  skipped: MyFlyerDigestJobSkipped[];
+};
+
 export type WeeklyDigestJobSent = {
   userId: string;
   recipientEmail: string;
@@ -87,6 +127,10 @@ export type WeeklyDigestCliResult = WeeklyDigestJobResult & {
   status: 'sent' | 'no_recipients' | 'no_changes';
 };
 
+export type MyFlyerDigestCliResult = MyFlyerDigestJobResult & {
+  status: 'sent' | 'no_recipients' | 'no_offers';
+};
+
 type WeeklyDigestSubscriptionRow = {
   user_id: string;
   recipient_email: string;
@@ -108,6 +152,28 @@ type WeeklyWatchlistPriceChangeRow = {
   change_percent: string | number;
   currency: string;
   observed_at: string | Date;
+  confidence: string | number;
+};
+
+type MyFlyerDigestSubscriptionRow = {
+  country: string | null;
+  user_id: string;
+  recipient_email: string;
+};
+
+type MyFlyerEmailOfferRow = {
+  product_id: string;
+  product_name: string;
+  brand: string | null;
+  chain_name: string;
+  store_name: string | null;
+  offer_price: string | number;
+  regular_price: string | number | null;
+  unit_price: string | number | null;
+  currency: string;
+  valid_until: string | Date | null;
+  image_url: string | null;
+  source_url: string | null;
   confidence: string | number;
 };
 
@@ -204,6 +270,73 @@ export async function runWeeklyDigestJob(input: WeeklyDigestJobInput): Promise<W
   };
 }
 
+export async function runMyFlyerDigestJob(input: MyFlyerDigestJobInput): Promise<MyFlyerDigestJobResult> {
+  const now = input.now ?? new Date().toISOString();
+  const window = weeklyDigestWindow(now);
+  const countries = normalizeCountries(input.countries);
+  const maxOffersPerUser = normalizeLimit(input.maxOffersPerUser ?? defaultMaxChangesPerUser);
+  const subscriptions = await listMyFlyerDigestSubscriptions(input.executor, countries);
+  const sent: MyFlyerDigestJobSent[] = [];
+  const skipped: MyFlyerDigestJobSkipped[] = [];
+
+  for (const subscription of subscriptions) {
+    if (!subscription.recipientEmail.trim()) {
+      skipped.push({
+        country: subscription.country,
+        userId: subscription.userId,
+        recipientEmail: subscription.recipientEmail,
+        reason: 'missing_recipient_email'
+      });
+      continue;
+    }
+
+    const offers = await listMyFlyerEmailOffers(input.executor, {
+      country: subscription.country,
+      limit: maxOffersPerUser,
+      userId: subscription.userId,
+      window
+    });
+
+    if (offers.length === 0) {
+      skipped.push({
+        country: subscription.country,
+        userId: subscription.userId,
+        recipientEmail: subscription.recipientEmail,
+        reason: 'no_my_flyer_offers'
+      });
+      continue;
+    }
+
+    const message = buildMyFlyerEmail({
+      baseUrl: input.baseUrl,
+      country: subscription.country,
+      generatedAt: now,
+      offers,
+      recipientEmail: subscription.recipientEmail,
+      userId: subscription.userId,
+      weekStartsOn: window.since,
+      weekEndsOn: window.until
+    });
+    const messageId = await input.emailClient.send(message);
+    sent.push({
+      country: subscription.country,
+      userId: subscription.userId,
+      recipientEmail: subscription.recipientEmail,
+      messageId,
+      itemCount: offers.length
+    });
+  }
+
+  return {
+    countries,
+    since: window.since,
+    until: window.until,
+    subscriptionCount: subscriptions.length,
+    sent,
+    skipped
+  };
+}
+
 export function buildWeeklyDigestEmail(input: BuildWeeklyDigestEmailInput): TransactionalEmailMessage {
   const itemLines = input.items.flatMap((item, index) => {
     const location = [item.chainName, item.storeName].filter(Boolean).join(' · ');
@@ -258,6 +391,37 @@ async function listWeeklyDigestSubscriptions(executor: QueryExecutor): Promise<W
   );
 
   return rows.map((row) => ({
+    userId: row.user_id,
+    recipientEmail: row.recipient_email.trim()
+  }));
+}
+
+async function listMyFlyerDigestSubscriptions(
+  executor: QueryExecutor,
+  countries: string[]
+): Promise<MyFlyerDigestSubscription[]> {
+  const rows = await executor.query<MyFlyerDigestSubscriptionRow>(
+    `/* my_flyer_digest_subscriptions */
+     select distinct on (notification_subscriptions.user_id, lower(coalesce(user_preferences.notification_preferences ->> 'myFlyerCountry', 'se')))
+            lower(coalesce(user_preferences.notification_preferences ->> 'myFlyerCountry', 'se')) as country,
+            notification_subscriptions.user_id,
+            notification_subscriptions.recipient as recipient_email
+       from notification_subscriptions
+       join user_preferences on user_preferences.user_id = notification_subscriptions.user_id
+      where notification_subscriptions.active = true
+        and notification_subscriptions.channel = 'email'
+        and user_preferences.notification_preferences ->> 'myFlyerWeeklyEmail' = 'true'
+        and lower(coalesce(user_preferences.notification_preferences ->> 'myFlyerCountry', 'se')) = any($1::text[])
+        and nullif(btrim(notification_subscriptions.recipient), '') is not null
+      order by notification_subscriptions.user_id,
+               lower(coalesce(user_preferences.notification_preferences ->> 'myFlyerCountry', 'se')),
+               notification_subscriptions.updated_at desc,
+               notification_subscriptions.id`,
+    [countries]
+  );
+
+  return rows.map((row) => ({
+    country: normalizeCountry(row.country ?? 'se'),
     userId: row.user_id,
     recipientEmail: row.recipient_email.trim()
   }));
@@ -346,6 +510,71 @@ async function listWeeklyWatchlistPriceChanges(
   return rows.map(mapWeeklyWatchlistPriceChangeRow);
 }
 
+async function listMyFlyerEmailOffers(
+  executor: QueryExecutor,
+  input: { country: string; userId: string; window: WeeklyDigestWindow; limit: number }
+): Promise<MyFlyerEmailOffer[]> {
+  const rows = await executor.query<MyFlyerEmailOfferRow>(
+    `/* my_flyer_email_offers */
+     with watched_products as (
+       select product_id
+         from watchlist_items
+        where user_id = $1
+          and active = true
+     ), ranked_flyer_rows as (
+       select products.id::text as product_id,
+              products.canonical_name as product_name,
+              products.brand,
+              chains.name as chain_name,
+              stores.name as store_name,
+              observations.price as offer_price,
+              observations.regular_price,
+              observations.unit_price,
+              observations.currency,
+              coalesce(observations.valid_until, observations.promotion_ends_on::timestamptz) as valid_until,
+              products.image_url,
+              observations.provenance ->> 'sourceUrl' as source_url,
+              observations.confidence,
+              case when watched_products.product_id is not null then 1 else 0 end as watchlist_rank
+         from observations
+         join products on products.id = observations.product_id
+         join chains on chains.id = observations.chain_id
+         left join stores on stores.id = observations.store_id
+         left join watched_products on watched_products.product_id = products.id::text
+        where observations.domain = 'grocery'
+          and chains.country_code = upper($2)
+          and observations.price_type in ('promotion', 'member')
+          and observations.observed_at >= $3::timestamptz
+          and observations.observed_at < $4::timestamptz
+          and observations.price >= 0
+          and observations.price_type <> 'estimated'
+     )
+     select product_id,
+            product_name,
+            brand,
+            chain_name,
+            store_name,
+            offer_price,
+            regular_price,
+            unit_price,
+            currency,
+            valid_until,
+            image_url,
+            source_url,
+            confidence
+       from ranked_flyer_rows
+      order by watchlist_rank desc,
+               greatest(coalesce(regular_price - offer_price, 0), 0) desc,
+               confidence desc,
+               product_name,
+               chain_name
+      limit $5`,
+    [input.userId, input.country, input.window.since, input.window.until, input.limit]
+  );
+
+  return rows.map(mapMyFlyerEmailOfferRow);
+}
+
 function mapWeeklyWatchlistPriceChangeRow(row: WeeklyWatchlistPriceChangeRow): WeeklyWatchlistPriceChange {
   return {
     productId: row.product_id,
@@ -363,6 +592,24 @@ function mapWeeklyWatchlistPriceChangeRow(row: WeeklyWatchlistPriceChangeRow): W
     changePercent: numeric(row.change_percent),
     currency: row.currency,
     observedAt: row.observed_at instanceof Date ? row.observed_at.toISOString() : row.observed_at,
+    confidence: numeric(row.confidence)
+  };
+}
+
+function mapMyFlyerEmailOfferRow(row: MyFlyerEmailOfferRow): MyFlyerEmailOffer {
+  return {
+    productId: row.product_id,
+    productName: row.product_name,
+    brand: nullableString(row.brand),
+    chainName: row.chain_name,
+    storeName: nullableString(row.store_name),
+    offerPrice: numeric(row.offer_price),
+    regularPrice: nullableNumeric(row.regular_price),
+    unitPrice: nullableNumeric(row.unit_price),
+    currency: row.currency,
+    validUntil: row.valid_until instanceof Date ? row.valid_until.toISOString() : nullableString(row.valid_until),
+    imageUrl: nullableString(row.image_url),
+    sourceUrl: nullableString(row.source_url),
     confidence: numeric(row.confidence)
   };
 }
@@ -389,6 +636,36 @@ export async function runWeeklyDigestCli(env: WeeklyDigestEnv = process.env): Pr
     return {
       ...result,
       status: result.sent.length > 0 ? 'sent' : result.subscriptionCount === 0 ? 'no_recipients' : 'no_changes'
+    };
+  } finally {
+    await pool.end();
+  }
+}
+
+export async function runMyFlyerDigestCli(env: WeeklyDigestEnv = process.env): Promise<MyFlyerDigestCliResult> {
+  const databaseUrl = requiredEnv(env, 'DATABASE_URL');
+  const baseUrl = env.GROCERYVIEW_BASE_URL?.trim() || 'https://groceryview.se';
+  const now = env.WEEKLY_DIGEST_NOW?.trim() || new Date().toISOString();
+  const maxOffersPerUser = env.MY_FLYER_DIGEST_MAX_OFFERS_PER_USER
+    ? Number(env.MY_FLYER_DIGEST_MAX_OFFERS_PER_USER)
+    : defaultMaxChangesPerUser;
+  const countries = (env.MY_FLYER_DIGEST_COUNTRIES?.split(',') ?? ['se', 'no', 'dk', 'fi']).map((country) => country.trim());
+  const emailClient = createWeeklyDigestResendClientFromEnv(env);
+  const pgModule = await importPgModule();
+  const pool = new pgModule.Pool({ connectionString: databaseUrl });
+
+  try {
+    const result = await runMyFlyerDigestJob({
+      baseUrl,
+      countries,
+      emailClient,
+      executor: createPgQueryExecutor(pool),
+      maxOffersPerUser,
+      now
+    });
+    return {
+      ...result,
+      status: result.sent.length > 0 ? 'sent' : result.subscriptionCount === 0 ? 'no_recipients' : 'no_offers'
     };
   } finally {
     await pool.end();
@@ -447,8 +724,17 @@ function normalizeLimit(value: number): number {
   return Math.min(Math.max(Math.trunc(value), 1), 25);
 }
 
-function nullableString(value: string | null): string | undefined {
-  return value === null || value.trim() === '' ? undefined : value;
+function normalizeCountries(values: string[]): string[] {
+  const countries = values.map(normalizeCountry).filter(Boolean);
+  return [...new Set(countries.length > 0 ? countries : ['se'])];
+}
+
+function normalizeCountry(value: string): string {
+  return value.trim().toLowerCase().slice(0, 2);
+}
+
+function nullableString(value: string | null | undefined): string | undefined {
+  return value === null || value === undefined || value.trim() === '' ? undefined : value;
 }
 
 function numeric(value: string | number): number {
@@ -457,13 +743,18 @@ function numeric(value: string | number): number {
   return result;
 }
 
+function nullableNumeric(value: string | number | null): number | undefined {
+  if (value === null) return undefined;
+  return numeric(value);
+}
+
 function isMainModule(): boolean {
   const entrypoint = process.argv[1];
   return Boolean(entrypoint && import.meta.url === pathToFileURL(entrypoint).href);
 }
 
 if (isMainModule()) {
-  runWeeklyDigestCli()
+  runMyFlyerDigestCli()
     .then((result) => {
       console.log(JSON.stringify(result));
     })

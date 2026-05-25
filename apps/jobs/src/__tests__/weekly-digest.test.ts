@@ -5,6 +5,7 @@ import type { QueryExecutor } from '@groceryview/db';
 import {
   buildWeeklyDigestEmail,
   createWeeklyDigestResendClient,
+  runMyFlyerDigestJob,
   runWeeklyDigestJob,
   weeklyDigestWindow
 } from '../weekly-digest.js';
@@ -36,6 +37,28 @@ type PriceChangeRow = {
   confidence: string;
 };
 
+type MyFlyerSubscriptionRow = {
+  country: string;
+  user_id: string;
+  recipient_email: string;
+};
+
+type MyFlyerOfferRow = {
+  product_id: string;
+  product_name: string;
+  brand: string | null;
+  chain_name: string;
+  store_name: string | null;
+  offer_price: string;
+  regular_price: string | null;
+  unit_price: string | null;
+  currency: string;
+  valid_until: string | null;
+  image_url: string | null;
+  source_url: string | null;
+  confidence: string;
+};
+
 class WeeklyDigestExecutor implements QueryExecutor {
   readonly calls: ExecutorCall[] = [];
 
@@ -59,6 +82,32 @@ class WeeklyDigestExecutor implements QueryExecutor {
     }
 
     throw new Error(`Unexpected SQL in weekly digest test: ${sql}`);
+  }
+}
+
+class MyFlyerDigestExecutor implements QueryExecutor {
+  readonly calls: ExecutorCall[] = [];
+
+  constructor(
+    private readonly fixtures: {
+      subscriptions: MyFlyerSubscriptionRow[];
+      offersByUser: Record<string, MyFlyerOfferRow[]>;
+    }
+  ) {}
+
+  async query<T>(sql: string, params: unknown[] = []): Promise<T[]> {
+    this.calls.push({ sql, params });
+
+    if (sql.includes('my_flyer_digest_subscriptions')) {
+      return this.fixtures.subscriptions as T[];
+    }
+
+    if (sql.includes('my_flyer_email_offers')) {
+      const userId = String(params[0]);
+      return (this.fixtures.offersByUser[userId] ?? []) as T[];
+    }
+
+    throw new Error(`Unexpected SQL in MyFlyer digest test: ${sql}`);
   }
 }
 
@@ -218,12 +267,101 @@ describe('weekly digest job', () => {
   it('wires the weekly digest job into a scheduled GitHub Actions cron', () => {
     const workflow = readFileSync('../../.github/workflows/weekly-digest.yml', 'utf8');
 
-    assert.match(workflow, /cron: '15 6 \* \* 1'/);
+    assert.match(workflow, /cron: '0 6 \* \* 1'/);
     assert.match(workflow, /npm run build -w @groceryview\/jobs/);
     assert.match(workflow, /node apps\/jobs\/dist\/weekly-digest\.js/);
     assert.match(workflow, /RESEND_API_KEY/);
     assert.match(workflow, /WEEKLY_DIGEST_FROM_EMAIL/);
     assert.match(workflow, /DATABASE_URL/);
+    assert.match(workflow, /MY_FLYER_DIGEST_COUNTRIES/);
+  });
+
+  it('sends MyFlyer HTML only to explicit weekly email opt-ins by country', async () => {
+    const sentMessages: TransactionalEmailMessage[] = [];
+    const executor = new MyFlyerDigestExecutor({
+      subscriptions: [
+        { country: 'se', user_id: 'user-1', recipient_email: 'flyer@example.com' },
+        { country: 'no', user_id: 'user-2', recipient_email: 'empty@example.com' }
+      ],
+      offersByUser: {
+        'user-1': [
+          {
+            product_id: 'coffee',
+            product_name: 'Zoégas Coffee 450g',
+            brand: 'Zoégas',
+            chain_name: 'Willys',
+            store_name: 'Willys Odenplan',
+            offer_price: '49.90',
+            regular_price: '59.90',
+            unit_price: '110.89',
+            currency: 'SEK',
+            valid_until: '2026-05-25T21:59:59.000Z',
+            image_url: 'https://example.com/coffee.png',
+            source_url: 'https://example.com/source',
+            confidence: '0.96'
+          }
+        ]
+      }
+    });
+
+    const result = await runMyFlyerDigestJob({
+      baseUrl: 'https://groceryview.se',
+      countries: ['se', 'no'],
+      emailClient: {
+        send: async (message) => {
+          sentMessages.push(message);
+          return `resend-${sentMessages.length}`;
+        }
+      },
+      executor,
+      maxOffersPerUser: 8,
+      now: '2026-05-25T06:00:00.000Z'
+    });
+
+    assert.deepEqual(result.countries, ['se', 'no']);
+    assert.equal(result.subscriptionCount, 2);
+    assert.deepEqual(result.sent, [
+      {
+        country: 'se',
+        userId: 'user-1',
+        recipientEmail: 'flyer@example.com',
+        messageId: 'resend-1',
+        itemCount: 1
+      }
+    ]);
+    assert.deepEqual(result.skipped, [
+      {
+        country: 'no',
+        userId: 'user-2',
+        recipientEmail: 'empty@example.com',
+        reason: 'no_my_flyer_offers'
+      }
+    ]);
+
+    assert.equal(sentMessages[0]?.subject, 'Your GroceryView MyFlyer for 2026-05-18');
+    assert.match(sentMessages[0]?.text ?? '', /Open the flyer: https:\/\/groceryview\.se\/se\/my-flyer/);
+    assert.match(sentMessages[0]?.html ?? '', /Zoégas Coffee 450g/);
+    assert.match(sentMessages[0]?.html ?? '', /Open MyFlyer/);
+    assert.deepEqual(sentMessages[0]?.metadata, {
+      type: 'my_flyer_weekly_digest',
+      userId: 'user-1',
+      country: 'se',
+      itemCount: '1',
+      sendAt: '2026-05-25T06:00:00.000Z'
+    });
+
+    const subscriptionCall = executor.calls.find((call) => call.sql.includes('my_flyer_digest_subscriptions'));
+    assert.ok(subscriptionCall, 'expected explicit MyFlyer opt-in subscriptions query');
+    assert.match(subscriptionCall.sql, /notification_preferences ->> 'myFlyerWeeklyEmail' = 'true'/);
+    assert.match(subscriptionCall.sql, /notification_subscriptions\.channel = 'email'/);
+    assert.deepEqual(subscriptionCall.params, [['se', 'no']]);
+
+    const offerCall = executor.calls.find((call) => call.sql.includes('my_flyer_email_offers'));
+    assert.ok(offerCall, 'expected source-backed MyFlyer offer query');
+    assert.match(offerCall.sql, /observations\.price_type in \('promotion', 'member'\)/);
+    assert.match(offerCall.sql, /chains\.country_code = upper\(\$2\)/);
+    assert.match(offerCall.sql, /left join watched_products/);
+    assert.deepEqual(offerCall.params, ['user-1', 'se', '2026-05-18T06:00:00.000Z', '2026-05-25T06:00:00.000Z', 8]);
   });
 
   it('creates a Resend client for the weekly digest cron job', async () => {

@@ -274,7 +274,7 @@ Primary key: `(user_id, store_id)`.
 
 App repository budget and authenticated settings preferences.
 
-Key columns: `user_id`, `weekly_budget`, `monthly_budget`, `preferred_currency`, `notification_channels`, `updated_at`.
+Key columns: `user_id`, `weekly_budget`, `monthly_budget`, `preferred_currency`, `notification_channels`, `notification_preferences`, `updated_at`.
 
 ### `watchlist_items`
 

@@ -3,16 +3,24 @@ import { PostgresQueryExecutorService } from '../database/postgres-query-executo
 
 export const allowedPreferenceCurrencies = ['SEK', 'EUR', 'NOK', 'DKK'] as const;
 export const allowedNotificationChannels = ['push', 'email', 'telegram'] as const;
+export const allowedMyFlyerCountries = ['se', 'no', 'dk', 'fi'] as const;
+
+export type NotificationPreferencesPatch = {
+  myFlyerWeeklyEmail?: boolean;
+  myFlyerCountry?: (typeof allowedMyFlyerCountries)[number];
+};
 
 export type UserPreferencePatch = {
   currency?: (typeof allowedPreferenceCurrencies)[number];
   preferredStores?: string[];
   notificationChannels?: Array<(typeof allowedNotificationChannels)[number]>;
+  notificationPreferences?: NotificationPreferencesPatch;
 };
 
 type PreferenceRow = {
   preferred_currency: string;
   notification_channels: string[] | null;
+  notification_preferences: NotificationPreferencesPatch | null;
 };
 
 @Injectable()
@@ -34,15 +42,19 @@ export class SettingsService {
       [userId]
     );
 
-    if (patch.currency !== undefined || patch.notificationChannels !== undefined) {
+    if (patch.currency !== undefined || patch.notificationChannels !== undefined || patch.notificationPreferences !== undefined) {
       await this.executor.query(
-        `insert into user_preferences(user_id, weekly_budget, monthly_budget, preferred_currency, notification_channels)
-         values ($1, 0, 0, coalesce($2::text, 'SEK'), coalesce($3::text[], array[]::text[]))
+        `insert into user_preferences(user_id, weekly_budget, monthly_budget, preferred_currency, notification_channels, notification_preferences)
+         values ($1, 0, 0, coalesce($2::text, 'SEK'), coalesce($3::text[], array[]::text[]), coalesce($4::jsonb, '{}'::jsonb))
          on conflict (user_id) do update set
            preferred_currency = coalesce($2::text, user_preferences.preferred_currency),
            notification_channels = coalesce($3::text[], user_preferences.notification_channels),
+           notification_preferences = case
+             when $4::jsonb is null then user_preferences.notification_preferences
+             else user_preferences.notification_preferences || $4::jsonb
+           end,
            updated_at = now()`,
-        [userId, patch.currency ?? null, patch.notificationChannels ?? null]
+        [userId, patch.currency ?? null, patch.notificationChannels ?? null, patch.notificationPreferences ? JSON.stringify(patch.notificationPreferences) : null]
       );
     }
 
@@ -61,7 +73,7 @@ export class SettingsService {
 
   private async fetchPreferences(userId: string) {
     const preferenceRows = await this.executor.query<PreferenceRow>(
-      `select preferred_currency, notification_channels
+      `select preferred_currency, notification_channels, notification_preferences
        from user_preferences
        where user_id = $1`,
       [userId]
@@ -76,7 +88,8 @@ export class SettingsService {
       userId,
       currency: preference?.preferred_currency ?? 'SEK',
       preferredStores: storeRows.map((row) => row.store_id),
-      notificationChannels: preference?.notification_channels ?? []
+      notificationChannels: preference?.notification_channels ?? [],
+      notificationPreferences: preference?.notification_preferences ?? {}
     };
   }
 }

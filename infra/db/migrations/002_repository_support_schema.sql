@@ -21,6 +21,7 @@ create table if not exists user_preferences (
   monthly_budget numeric(12, 2) not null default 0 check (monthly_budget >= 0),
   preferred_currency text not null default 'SEK' check (preferred_currency in ('SEK', 'EUR', 'NOK', 'DKK')),
   notification_channels text[] not null default array[]::text[] check (notification_channels <@ array['push', 'email', 'telegram']::text[]),
+  notification_preferences jsonb not null default '{}'::jsonb,
   updated_at timestamptz not null default now()
 );
 

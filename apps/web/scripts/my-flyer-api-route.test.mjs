@@ -12,7 +12,7 @@ const ts = require('typescript');
 const scriptsDir = dirname(fileURLToPath(import.meta.url));
 const webRoot = resolve(scriptsDir, '..');
 const repoRoot = resolve(webRoot, '..', '..');
-const workspacePackages = ['api', 'core'];
+const workspacePackages = ['api', 'core', 'monetization'];
 
 function installRuntime() {
   const originalResolveFilename = Module._resolveFilename;
@@ -153,5 +153,20 @@ describe('my-flyer API payload', () => {
     assert.match(route, /limit: z\.coerce\.number\(\)\.int\(\)\.min\(1\)\.max\(50\)\.default\(12\)/);
     assert.match(route, /'Cache-Control': 'private, max-age=3600'/);
     assert.match(route, /'X-MyFlyer-Cache'/);
+  });
+
+  it('exposes the account opt-in checkbox contract for weekly MyFlyer email', () => {
+    const page = readFileSync(new URL('../src/app/account/email-prefs/page.tsx', import.meta.url), 'utf8');
+
+    assert.match(page, /name=\{myFlyerEmailPreference\.field\}/);
+    assert.match(page, /type="checkbox"/);
+    assert.match(page, /notification_preferences\.myFlyerWeeklyEmail/);
+    assert.match(page, /Monday 06:00 per selected country/);
+    assert.match(page, /\.github\/workflows\/weekly-digest\.yml/);
+    assert.match(page, /\/api\/settings/);
+    assert.match(page, /sessionStorage\.getItem\('groceryview:accessToken'\)/);
+    assert.match(page, /method: 'PATCH'/);
+    assert.match(page, /notificationPreferences/);
+    assert.match(page, /No anonymous email preference writes/);
   });
 });

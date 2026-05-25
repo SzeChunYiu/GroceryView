@@ -5,12 +5,13 @@
   "main": "dist/weekly-digest.js",
   "types": "dist/weekly-digest.d.ts",
   "scripts": {
-    "build": "npm run build -w @groceryview/db && npm run build -w @groceryview/notifications && tsc -p tsconfig.build.json",
-    "test": "npm run build -w @groceryview/db && npm run build -w @groceryview/notifications && tsc -p tsconfig.test.json && node --test dist-test/__tests__/*.test.js"
+    "build": "npm run build -w @groceryview/db && npm run build -w @groceryview/notifications && npm run build -w @groceryview/server && tsc -p tsconfig.build.json",
+    "test": "npm run build -w @groceryview/db && npm run build -w @groceryview/notifications && npm run build -w @groceryview/server && tsc -p tsconfig.test.json && node --test dist-test/__tests__/*.test.js"
   },
   "dependencies": {
     "@groceryview/db": "0.1.0",
     "@groceryview/notifications": "0.1.0",
+    "@groceryview/server": "0.1.0",
     "pg": "^8.21.0"
   }
 }

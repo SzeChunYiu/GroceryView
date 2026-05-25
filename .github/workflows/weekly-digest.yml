@@ -1,13 +1,13 @@
-name: Weekly digest email
+name: MyFlyer weekly email
 
 on:
   schedule:
-    - cron: '15 6 * * 1'
+    - cron: '0 6 * * 1'
   workflow_dispatch:
 
 jobs:
   send-weekly-digest:
-    name: Send weekly watchlist digest
+    name: Send MyFlyer weekly digest
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: production
@@ -50,4 +50,5 @@ jobs:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           WEEKLY_DIGEST_FROM_EMAIL: ${{ secrets.WEEKLY_DIGEST_FROM_EMAIL }}
           GROCERYVIEW_BASE_URL: ${{ vars.GROCERYVIEW_BASE_URL || 'https://groceryview.se' }}
+          MY_FLYER_DIGEST_COUNTRIES: ${{ vars.MY_FLYER_DIGEST_COUNTRIES || 'se,no,dk,fi' }}
         run: node apps/jobs/dist/weekly-digest.js

@@ -23,7 +23,7 @@ class RecordingPriceHistoryExecutor {
     favorite_stores_only: boolean;
     allowed_price_types: string[] | null;
   }> = [];
-  preferenceRows = new Map<string, { preferred_currency: string; notification_channels: string[] }>();
+  preferenceRows = new Map<string, { preferred_currency: string; notification_channels: string[]; notification_preferences: Record<string, unknown> }>();
   favoriteStoreRows = new Map<string, string[]>();
 
   isConfigured(): boolean {
@@ -35,16 +35,22 @@ class RecordingPriceHistoryExecutor {
     if (sql.includes('insert into app_users')) return [] as T[];
     if (sql.includes('insert into user_preferences')) {
       const userId = params[0] as string;
-      const existing = this.preferenceRows.get(userId) ?? { preferred_currency: 'SEK', notification_channels: [] };
+      const existing = this.preferenceRows.get(userId) ?? { preferred_currency: 'SEK', notification_channels: [], notification_preferences: {} };
+      const notificationPreferences = params[3] ? JSON.parse(String(params[3])) as Record<string, unknown> : null;
       this.preferenceRows.set(userId, {
         preferred_currency: (params[1] as string | null) ?? existing.preferred_currency,
-        notification_channels: (params[2] as string[] | null) ?? existing.notification_channels
+        notification_channels: (params[2] as string[] | null) ?? existing.notification_channels,
+        notification_preferences: notificationPreferences ? { ...existing.notification_preferences, ...notificationPreferences } : existing.notification_preferences
       });
       return [] as T[];
     }
     if (sql.includes('select preferred_currency, notification_channels')) {
       const row = this.preferenceRows.get(params[0] as string);
-      return (row ? [{ preferred_currency: row.preferred_currency, notification_channels: row.notification_channels }] : []) as T[];
+      return (row ? [{
+        preferred_currency: row.preferred_currency,
+        notification_channels: row.notification_channels,
+        notification_preferences: row.notification_preferences
+      }] : []) as T[];
     }
     if (sql.includes('delete from favorite_stores')) {
       this.favoriteStoreRows.set(params[0] as string, []);
@@ -749,7 +755,8 @@ describe('GroceryView API app', () => {
       userId: 'user-settings-1',
       currency: 'EUR',
       preferredStores: ['lidl-sveavagen', 'willys-odenplan'],
-      notificationChannels: ['push', 'email']
+      notificationChannels: ['push', 'email'],
+      notificationPreferences: {}
     });
     assert.ok(priceHistoryExecutor.calls.some((call) => call.sql.includes('insert into user_preferences') && call.params[0] === 'user-settings-1'));
     assert.deepEqual(
@@ -763,6 +770,24 @@ describe('GroceryView API app', () => {
       .patch('/api/settings')
       .set('authorization', `Bearer ${token}`)
       .send({ notificationChannels: ['sms'] })
+      .expect(400);
+
+    const myFlyerResponse = await request(app.getHttpServer())
+      .patch('/api/settings')
+      .set('authorization', `Bearer ${token}`)
+      .send({ notificationPreferences: { myFlyerWeeklyEmail: true, myFlyerCountry: 'se' } })
+      .expect(200);
+
+    assert.deepEqual(myFlyerResponse.body.notificationPreferences, {
+      myFlyerWeeklyEmail: true,
+      myFlyerCountry: 'se'
+    });
+    assert.ok(priceHistoryExecutor.calls.some((call) => call.sql.includes('notification_preferences = case') && call.params[3] === '{"myFlyerWeeklyEmail":true,"myFlyerCountry":"se"}'));
+
+    await request(app.getHttpServer())
+      .patch('/api/settings')
+      .set('authorization', `Bearer ${token}`)
+      .send({ notificationPreferences: { myFlyerWeeklyEmail: true, myFlyerCountry: 'us' } })
       .expect(400);
   });
 
@@ -781,12 +806,14 @@ describe('GroceryView API app', () => {
       userId: 'user-settings-read-1',
       currency: 'SEK',
       preferredStores: [],
-      notificationChannels: []
+      notificationChannels: [],
+      notificationPreferences: {}
     });
 
     priceHistoryExecutor.preferenceRows.set('user-settings-read-1', {
       preferred_currency: 'NOK',
-      notification_channels: ['email', 'telegram']
+      notification_channels: ['email', 'telegram'],
+      notification_preferences: { myFlyerWeeklyEmail: true, myFlyerCountry: 'no' }
     });
     priceHistoryExecutor.favoriteStoreRows.set('user-settings-read-1', ['willys-odenplan', 'lidl-sveavagen']);
 
@@ -799,7 +826,8 @@ describe('GroceryView API app', () => {
       userId: 'user-settings-read-1',
       currency: 'NOK',
       preferredStores: ['lidl-sveavagen', 'willys-odenplan'],
-      notificationChannels: ['email', 'telegram']
+      notificationChannels: ['email', 'telegram'],
+      notificationPreferences: { myFlyerWeeklyEmail: true, myFlyerCountry: 'no' }
     });
     assert.equal(priceHistoryExecutor.calls.some((call) => call.sql.includes('insert into user_preferences')), false);
 

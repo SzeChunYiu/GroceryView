@@ -1,11 +1,22 @@
 import { Body, Controller, Delete, Get, HttpCode, Patch, Req, ServiceUnavailableException, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { planAccountDeletion } from '@groceryview/core';
-import { IsArray, IsIn, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsBoolean, IsIn, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 import { AuthGuard, authenticatedUserId, type AuthenticatedRequest } from '../middleware/auth.js';
 import { settingsRoutes } from '../routes/settings.js';
 import { buildDemoUserDataExport } from './data-export.js';
-import { allowedNotificationChannels, allowedPreferenceCurrencies, SettingsService } from './settings.service.js';
+import { allowedMyFlyerCountries, allowedNotificationChannels, allowedPreferenceCurrencies, SettingsService } from './settings.service.js';
+
+class NotificationPreferencesPatchDto {
+  @IsOptional()
+  @IsBoolean()
+  myFlyerWeeklyEmail?: boolean;
+
+  @IsOptional()
+  @IsIn(allowedMyFlyerCountries)
+  myFlyerCountry?: (typeof allowedMyFlyerCountries)[number];
+}
 
 class SettingsPatchDto {
   @IsOptional()
@@ -21,6 +32,11 @@ class SettingsPatchDto {
   @IsArray()
   @IsIn(allowedNotificationChannels, { each: true })
   notificationChannels?: Array<(typeof allowedNotificationChannels)[number]>;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => NotificationPreferencesPatchDto)
+  notificationPreferences?: NotificationPreferencesPatchDto;
 }
 
 @ApiTags('settings')

@@ -4,6 +4,18 @@
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./email/myFlyerEmail": {
+      "types": "./dist/email/myFlyerEmail.d.ts",
+      "import": "./dist/email/myFlyerEmail.js",
+      "default": "./dist/email/myFlyerEmail.js"
+    }
+  },
   "scripts": {
     "build": "npm run build -w @groceryview/core && npm run build -w @groceryview/catalog && npm run build -w @groceryview/monetization && npm run build -w @groceryview/api && npm run build -w @groceryview/api-contracts && npm run build -w @groceryview/auth && npm run build -w @groceryview/notifications && npm run build -w @groceryview/db && npm run build -w @groceryview/scanning && tsc -p tsconfig.build.json",
     "test": "npm run build -w @groceryview/core && npm run build -w @groceryview/catalog && npm run build -w @groceryview/monetization && npm run build -w @groceryview/api && npm run build -w @groceryview/api-contracts && npm run build -w @groceryview/auth && npm run build -w @groceryview/notifications && npm run build -w @groceryview/db && npm run build -w @groceryview/scanning && tsc -p tsconfig.test.json && node --test dist-test/__tests__/*.test.js"

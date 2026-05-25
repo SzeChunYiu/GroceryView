@@ -4,6 +4,7 @@ export type TransactionalEmailMessage = {
   to: string;
   subject: string;
   text: string;
+  html?: string;
   metadata?: Record<string, string>;
 };
 
@@ -56,6 +57,7 @@ async function sendResendEmail(
     to: [message.to],
     subject: message.subject,
     text: message.text,
+    html: message.html,
     tags: metadataToTags(message.metadata)
   };
 
@@ -88,6 +90,7 @@ async function sendPostmarkEmail(
     To: message.to,
     Subject: message.subject,
     TextBody: message.text,
+    HtmlBody: message.html,
     Metadata: message.metadata ?? {}
   };
 

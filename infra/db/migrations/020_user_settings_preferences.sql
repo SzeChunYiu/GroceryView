@@ -2,7 +2,8 @@ alter table user_preferences
   alter column weekly_budget set default 0,
   alter column monthly_budget set default 0,
   add column if not exists preferred_currency text not null default 'SEK',
-  add column if not exists notification_channels text[] not null default array[]::text[];
+  add column if not exists notification_channels text[] not null default array[]::text[],
+  add column if not exists notification_preferences jsonb not null default '{}'::jsonb;
 
 do $$
 begin
