@@ -696,6 +696,35 @@ describe('summarizeStoreBasketCoverage', () => {
       fullCoverageStoreIds: ['willys-odenplan']
     });
   });
+
+  it('excludes mixed-country and mixed-currency rows from coverage totals', () => {
+    const summary = summarizeStoreBasketCoverage({
+      country: 'SE',
+      currency: 'SEK',
+      favoriteStoreIds: ['willys-odenplan', 'rema-oslo'],
+      items: [
+        {
+          productId: 'coffee',
+          quantity: 1,
+          prices: [
+            { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 49, country: 'SE', currency: 'SEK' },
+            { storeId: 'rema-oslo', storeName: 'Rema Oslo', price: 39, country: 'NO', currency: 'NOK' }
+          ]
+        }
+      ]
+    });
+
+    assert.deepEqual(summary.stores.map((store) => ({
+      storeId: store.storeId,
+      knownTotal: store.knownTotal,
+      availableProductIds: store.availableProductIds,
+      missingProductIds: store.missingProductIds,
+      coveragePercent: store.coveragePercent
+    })), [
+      { storeId: 'willys-odenplan', knownTotal: 49, availableProductIds: ['coffee'], missingProductIds: [], coveragePercent: 100 },
+      { storeId: 'rema-oslo', knownTotal: 0, availableProductIds: [], missingProductIds: ['coffee'], coveragePercent: 0 }
+    ]);
+  });
 });
 
 describe('summarizeLocalOfferBasket', () => {
