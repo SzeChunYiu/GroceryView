@@ -1,6 +1,8 @@
 'use client';
 
 import { FormEvent, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { routeForBarcodeResult } from '@/lib/openfoodfacts-catalog';
 
 type ScannerStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
 type BrowserSession = { accessToken: string; userId: string };
@@ -43,6 +45,7 @@ function newScanId(prefix: 'receipt' | 'barcode') {
 }
 
 export function ScannerUploadActions() {
+  const router = useRouter();
   const [barcode, setBarcode] = useState('0735000123456');
   const [byteLength, setByteLength] = useState('123456');
   const [contentType, setContentType] = useState('image/jpeg');
@@ -50,6 +53,7 @@ export function ScannerUploadActions() {
   const [message, setMessage] = useState('No anonymous scan uploads. Sign in first to request private upload tickets or process barcode scans.');
   const [cameraReady, setCameraReady] = useState(false);
   const [receiptHistory, setReceiptHistory] = useState<ReceiptPurchaseHistoryItem[]>([]);
+  const [barcodeRoute, setBarcodeRoute] = useState<ReturnType<typeof routeForBarcodeResult> | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
@@ -212,7 +216,20 @@ export function ScannerUploadActions() {
       headers: { 'content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
       body: JSON.stringify({ scanId, kind: 'barcode', payload: barcode })
     });
-    await handleResponse(response, `Barcode processed for ${scanId}; review work items are returned when matching needs human review.`);
+    if (!response.ok) {
+      setStatus('error');
+      setMessage('Scanner request was rejected by the production API.');
+      return;
+    }
+    const route = routeForBarcodeResult(barcode);
+    setBarcodeRoute(route);
+    setStatus('ready');
+    setMessage(
+      route.status === 'exact_product'
+        ? `Barcode processed for ${scanId}; opening exact product match ${route.label}.`
+        : `Barcode processed for ${scanId}; opening product search fallback for ${route.label}.`
+    );
+    router.push(route.href);
   }
 
   return (
@@ -278,6 +295,11 @@ export function ScannerUploadActions() {
         </form>
       </div>
       <p aria-live="polite" className="mt-4 rounded-2xl bg-indigo-50 p-3 text-sm font-bold text-indigo-950" data-status={status}>{message}</p>
+      {barcodeRoute ? (
+        <p className="mt-3 rounded-2xl bg-slate-50 p-3 text-sm font-bold text-slate-800">
+          Barcode route: {barcodeRoute.status === 'exact_product' ? 'exact product detail' : 'fallback product search'} · {barcodeRoute.href}
+        </p>
+      ) : null}
       {receiptHistory.length > 0 ? (
         <section className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4" aria-label="Receipt purchase history">
           <h3 className="text-sm font-black uppercase tracking-[0.18em] text-emerald-800">Receipt purchase history</h3>

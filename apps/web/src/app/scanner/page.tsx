@@ -110,6 +110,9 @@ export default function ScannerPage() {
         <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
           The mobile bottom navigation now promotes Scan, the current shopping list, nearby deals, and the watchlist so grocery trips can jump between receipt capture, aisle tasks, and price checks without opening menus.
         </p>
+        <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-indigo-900">
+          Signed-in barcode scans route to an exact product detail page when the OpenFoodFacts code is known, or to product search with the barcode prefilled when the match needs review.
+        </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <Link className="rounded-full bg-indigo-900 px-4 py-2 text-sm font-black text-white" href="#scan">Scan receipt</Link>
           <Link className="rounded-full border border-indigo-200 px-4 py-2 text-sm font-black text-indigo-900" href="/list">Current list</Link>
