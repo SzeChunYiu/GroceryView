@@ -24,7 +24,7 @@ export default function WatchlistPage() {
       <Eyebrow>Watchlist price alerts</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Tracked products with notification-ready alerts</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
-        This page calls buildWatchlistAlerts with verified chain price rows, then runs planNotifications so set-target push and email rows respect user preferences and quiet-hour rules. Predictive drop alerts also surface model-forecast savings windows before a current threshold is crossed.
+        This page calls buildWatchlistAlerts with verified chain price rows, then runs planNotifications so set-target push and email rows respect user preferences and quiet-hour rules. Predictive drop alerts also surface model-forecast savings windows — derived only from observed historical price rows, never speculative — before a current threshold is crossed.
       </p>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr_1fr]">
@@ -98,7 +98,7 @@ export default function WatchlistPage() {
               </div>
               <p className="mt-3 text-sm font-semibold leading-6 text-slate-700">{alert.message}</p>
               <div className="mt-3 grid gap-2 text-sm text-slate-700">
-                <p className="rounded-2xl bg-cyan-100 p-3 font-semibold">Forecast price: {formatSek(alert.trigger.predictedPrice)}</p>
+                <p className="rounded-2xl bg-cyan-100 p-3 font-semibold">Forecast price (from observed historical rows): {formatSek(alert.trigger.predictedPrice)}</p>
                 <p className="rounded-2xl bg-cyan-100 p-3 font-semibold">Savings window: {alert.trigger.predictedDate}</p>
                 <p className="rounded-2xl bg-white p-3 font-black text-cyan-950">Model confidence {Math.round(alert.trigger.modelConfidence * 100)}%</p>
               </div>
