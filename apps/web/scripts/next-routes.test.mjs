@@ -85,12 +85,15 @@ describe('verified-data UI', () => {
   it('surfaces latest_prices availability as an out-of-stock product card badge', async () => {
     const productCards = await read('src/components/product-price-cards.tsx');
     const productsPage = await read('src/app/products/page.tsx');
+    const lazyItemCard = await read('src/components/LazyItemCard.tsx');
     const verified = await read('src/lib/verified-data.ts');
 
     assert.match(productCards, /card\.isAvailable === false/);
     assert.match(productCards, /Out of stock/);
+    assert.match(productsPage, /VirtualizedProductGrid/);
     assert.match(productsPage, /product\.isAvailable === false/);
-    assert.match(productsPage, /Out of stock/);
+    assert.match(lazyItemCard, /product\.isAvailable === false/);
+    assert.match(lazyItemCard, /Out of stock/);
     assert.match(verified, /isAvailable/);
     assert.match(verified, /outOfStockLatestPriceCount/);
   });
@@ -3359,6 +3362,7 @@ ${seo}`;
     const worker = await read('public/sw.js');
     const registrar = await read('src/lib/swRegister.ts');
     const shoppingListPage = await read('src/app/list/page.tsx');
+    const listSharePreview = await read('src/components/list-share-preview.tsx');
 
     assert.match(manifest, /Open shopping list/);
     assert.match(manifest, /url: '\/list'/);
@@ -3370,10 +3374,11 @@ ${seo}`;
     assert.match(registrar, /OFFLINE_SAVED_LIST_BASE_ROUTES = \['\/list'/);
     assert.match(registrar, /cache\.add\(route\)/);
     assert.doesNotMatch(registrar, /console\./);
-    assert.match(shoppingListPage, /OFFLINE_SHOPPING_LIST_CACHE_KEY = 'groceryview:shopping-list:offline-cache:v1'/);
-    assert.match(shoppingListPage, /cheapestSourceForProductSlug/);
-    assert.match(shoppingListPage, /lastKnownPrices/);
-    assert.match(shoppingListPage, /window\.localStorage\.setItem\(OFFLINE_SHOPPING_LIST_CACHE_KEY/);
+    assert.match(shoppingListPage, /ListSharePreview/);
+    assert.match(listSharePreview, /OFFLINE_SHOPPING_LIST_CACHE_KEY = 'groceryview:shopping-list:offline-cache:v1'/);
+    assert.match(listSharePreview, /cheapestSourceForProductSlug/);
+    assert.match(listSharePreview, /lastKnownPrices/);
+    assert.match(listSharePreview, /window\.localStorage\.setItem\(OFFLINE_SHOPPING_LIST_CACHE_KEY/);
   });
 
 
