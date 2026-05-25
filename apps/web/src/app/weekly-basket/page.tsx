@@ -8,6 +8,7 @@ import { budgetStretchKronaOptimizer, expiryDealReports, familyBulkUnitPriceComp
 import { buildExpiringPromotionRail } from '@/lib/deal-context';
 import { buildBasketForecastSummary } from '@/lib/basket-forecast';
 import { weeklyRecurringBasketPlan } from '@/lib/recurring-basket';
+import { mergeMealPlanIngredientsForWeeklyBasket } from '@/lib/unit-normalizer';
 import { recurringBasketDigestContract, weeklyBasketChangeDigest } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -18,6 +19,15 @@ export function generateMetadata() {
 function formatSek(value: number) {
   return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);
 }
+
+
+const mergedMealPlanBasketRows = mergeMealPlanIngredientsForWeeklyBasket([
+  { mealTitle: 'Taco night', name: 'Tomatoes', quantity: 400, unit: 'g' },
+  { mealTitle: 'Pasta lunchboxes', name: 'Tomatoes', quantity: 0.6, unit: 'kg' },
+  { mealTitle: 'Pancake breakfast', name: 'Milk', quantity: 5, unit: 'dl' },
+  { mealTitle: 'Family stew', name: 'Milk', quantity: 500, unit: 'ml' },
+  { mealTitle: 'Freezer curry', name: 'Onion', quantity: 3, unit: 'st' }
+]);
 
 const weeklyBasketConfidence = {
   level: 'medium' as const,
@@ -67,6 +77,29 @@ export default function WeeklyBasketPage() {
       </p>
 
       <ExpiringPromotionRail items={expiringPromotions} snapshotLabel={`Snapshot ${promotionSnapshotAt.toISOString().slice(0, 10)}`} />
+
+      <Card className="mt-6 border-lime-200 bg-lime-50">
+        <div id="meal-plan-ingredient-basket" className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-lime-800">Meal-plan ingredient merge</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Consolidated weekly basket quantities</h2>
+            <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Meal planner ingredients are merged by normalized unit before shopping execution, preserving source meal titles while converting grams to kilograms and milliliters/deciliters to liters.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-lime-900">{mergedMealPlanBasketRows.length} merged rows</p>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          {mergedMealPlanBasketRows.map((ingredient) => (
+            <div className="rounded-2xl bg-white p-4 shadow-sm" key={`${ingredient.name}-${ingredient.unit}`}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-700">{ingredient.quantityLabel}</p>
+              <p className="mt-2 font-black text-slate-950">{ingredient.name}</p>
+              <p className="mt-1 text-sm font-semibold text-slate-600">Meals: {ingredient.mealTitles.join(', ')}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
+
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr_1fr]">
         <Card>
