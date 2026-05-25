@@ -1,7 +1,9 @@
+import Link from 'next/link';
 import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { PriceReportReviewActions } from '@/components/price-report-review-actions';
 import { routeMetadata } from '@/lib/seo';
 import { commodityMappingReviewPlan, crowdPriceSubmissionContract } from '@/lib/verified-data';
+import { communityModerationQueue } from '@/lib/reviews';
 
 export function generateMetadata() {
   return routeMetadata('/price-reports');
@@ -125,6 +127,20 @@ export default function FeaturePage() {
             ))}
           </ul>
           <p className="mt-3 text-sm font-bold text-amber-950">Next runtime step: {commodityMappingReviewPlan.nextRuntimeStep}</p>
+        </div>
+      </Card>
+      <Card className="mt-6 border-sky-200 bg-sky-50/80">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-sky-800">Moderation queue</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Flagged reviews, duplicates, and freshness votes</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              {communityModerationQueue.length} community review items are ready for admin triage before shopper-facing evidence changes.
+            </p>
+          </div>
+          <Link className="rounded-full bg-sky-800 px-5 py-3 text-center text-sm font-black text-white" href="/admin/reviews">
+            Open review queue
+          </Link>
         </div>
       </Card>
       <PriceReportReviewActions />
