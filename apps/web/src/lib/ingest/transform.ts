@@ -21,6 +21,33 @@ export type NormalizedIngestUnitFields = {
   readonly sourceUnitPriceUnit?: string | null;
 };
 
+export type IngestionPipelineRun = {
+  readonly chain: string;
+  readonly dataSource: string;
+  readonly failureCount: number;
+  readonly lastFinishedAt: string;
+  readonly latestStatus: 'succeeded' | 'warning' | 'failed';
+  readonly latencyMs: number;
+  readonly rowCount: number;
+  readonly sourceName: string;
+};
+
+export type IngestionPipelineMonitorRow = IngestionPipelineRun & {
+  readonly hasFailures: boolean;
+  readonly latencySeconds: number;
+};
+
+export function buildIngestionPipelineMonitorRows(runs: readonly IngestionPipelineRun[]): IngestionPipelineMonitorRow[] {
+  return runs.map((run) => ({
+    ...run,
+    failureCount: Math.max(0, Math.round(run.failureCount)),
+    hasFailures: run.failureCount > 0 || run.latestStatus === 'failed',
+    latencyMs: Math.max(0, Math.round(run.latencyMs)),
+    latencySeconds: Math.round((Math.max(0, run.latencyMs) / 1000) * 10) / 10,
+    rowCount: Math.max(0, Math.round(run.rowCount))
+  }));
+}
+
 export function transformIngestedUnitFields(fields: IngestUnitFields): NormalizedIngestUnitFields {
   const normalizedQuantity = normalizeQuantity(fields.quantity, fields.unit);
   const normalizedUnitPrice = normalizeUnitPrice(

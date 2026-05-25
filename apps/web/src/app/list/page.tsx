@@ -4,16 +4,26 @@ import { ActivityStream } from '@/components/activity-stream';
 import { ListCard } from '@/components/list-card';
 import { ListSharePreview } from '@/components/list-share-preview';
 import { buildSharedListActivityEvent } from '@/lib/activity-log';
-import { publicListSharePath } from '@/lib/list-permissions';
+import { createPublicListShareToken, publicListSharePath, type PublicListShareItem } from '@/lib/list-permissions';
 import { storeLayoutDepartments, type StoreLayoutChain } from '@/lib/trip-planner';
 import { metadataForShoppingListShare } from '@/lib/seo';
 
 const demoItems = [
   { id: 'bananas', name: 'Bananas', quantity: '1 bunch', ownerRole: 'guardian' as const },
-  { id: 'oat-milk', name: 'Oat milk', quantity: '2 cartons', ownerRole: 'partner' as const },
-  { id: 'pasta-sauce', name: 'Pasta sauce', quantity: '1 jar', ownerRole: 'teen' as const },
+  { id: 'oat-milk', name: 'Oat milk', quantity: '2 cartons', ownerRole: 'partner' as const, matchedProductSlug: 'havregryn-extra-fylliga-101758934-st' },
+  { id: 'pasta-sauce', name: 'Pasta sauce', quantity: '1 jar', ownerRole: 'teen' as const, matchedProductSlug: 'makaroner-pasta-101302991-st' },
   { id: 'sparkling-water', name: 'Sparkling water', quantity: '6-pack', ownerRole: 'guest' as const }
 ];
+
+const publicDemoShareItems: PublicListShareItem[] = demoItems.map((item) => ({
+  detail: `${item.ownerRole} item shared from the family grocery list`,
+  id: item.id,
+  importSource: 'item-detail',
+  matchedProductName: item.name,
+  matchedProductSlug: 'matchedProductSlug' in item ? item.matchedProductSlug : undefined,
+  name: item.name,
+  quantity: item.quantity
+}));
 
 type ListPageSearchParams = {
   chain?: string | string[];
@@ -72,22 +82,26 @@ export default async function ShoppingListPage({ searchParams }: { searchParams?
   const resolvedSearchParams = await (searchParams ?? Promise.resolve({}));
   const selectedChain = normalizeChain(resolvedSearchParams.chain);
   const shareToken = Array.isArray(resolvedSearchParams.share) ? resolvedSearchParams.share[0] : resolvedSearchParams.share;
+  const publicShareToken = shareToken ?? createPublicListShareToken({
+    expiresAt: '2026-06-30T23:59:59.000Z',
+    items: publicDemoShareItems,
+    listId: 'weekly-staples'
+  });
+  const publicShareHref = publicListSharePath(publicShareToken);
 
   return (
     <div className="space-y-6">
       <ListSharePreview />
-      {shareToken ? (
-        <section className="rounded-2xl border border-sky-200 bg-sky-50 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-sky-800">Public share page</p>
-          <h2 className="mt-1 text-xl font-bold text-slate-950">Open the read-only public list view</h2>
-          <p className="mt-2 text-sm text-sky-950">
+      <section className="rounded-2xl border border-sky-200 bg-sky-50 p-4">
+        <p className="text-xs font-semibold uppercase tracking-wide text-sky-800">Public share page</p>
+        <h2 className="mt-1 text-xl font-bold text-slate-950">Open the read-only public list view</h2>
+        <p className="mt-2 text-sm text-sky-950">
             This signed share can be reviewed on a public page with expiry status, cheapest-store summaries, and a copy-to-my-list action.
           </p>
-          <Link className="mt-3 inline-flex rounded-full bg-sky-800 px-4 py-2 text-sm font-black text-white" href={publicListSharePath(shareToken)}>
+        <Link className="mt-3 inline-flex rounded-full bg-sky-800 px-4 py-2 text-sm font-black text-white" href={publicShareHref}>
             View public list page
-          </Link>
-        </section>
-      ) : null}
+        </Link>
+      </section>
       <section className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
         <p className="text-xs font-semibold uppercase tracking-wide text-emerald-800">Smart store order</p>
         <h2 className="mt-1 text-xl font-bold text-slate-950">Reorder this list by chain layout</h2>
@@ -105,7 +119,7 @@ export default async function ShoppingListPage({ searchParams }: { searchParams?
         </p>
       </section>
       <ActivityStream initialEvents={sharedListActivityEvents} listId={demoListId} />
-      <ListCard currentRole="guardian" items={demoItems} selectedChain={selectedChain} />
+      <ListCard currentRole="guardian" items={demoItems} publicShareHref={publicShareHref} selectedChain={selectedChain} />
     </div>
   );
 }
