@@ -1,11 +1,13 @@
 export const itemsRoutes = {
   controllerPath: 'items',
   detailAlias: 'items/:id',
+  cheapestDealShareAlias: 'items/:id?share=cheapest-deal',
+  cheapestDealShareFragment: 'cheapest-deal',
   seasonalSalePattern: 'items/:id/seasonal-sale-pattern',
   substitutionSuggestions: 'items/:id/substitution-suggestions',
   holidayWindow: 'midsommar',
-  description: 'Item detail, seasonalSalePattern metadata, substitutionSuggestions, and localized product names backed by explicit current price evidence.',
-  queryParams: ['holiday', 'locale'],
+  description: 'Item detail, shareable cheapest-deal deep links, seasonalSalePattern metadata, substitutionSuggestions, and localized product names backed by explicit current price evidence.',
+  queryParams: ['holiday', 'locale', 'share'],
   localeHeader: 'x-groceryview-locale',
   localeCookie: 'NEXT_LOCALE',
   localizedProductNameColumns: ['name_sv', 'name_en'],
@@ -22,8 +24,10 @@ export const itemsRoutes = {
     'trigger',
     'suggestions',
     'currentPrice',
+    'shareUrl',
+    'cheapestDeal',
     'savingsPercent',
     'guardrail'
   ],
-  guardrail: 'No seasonal sale hint is returned without repeated explicit historical holiday-window price evidence. Substitution suggestions only return same-category, in-stock items with a verified lower current price.'
+  guardrail: 'No seasonal sale hint is returned without repeated explicit historical holiday-window price evidence. Substitution suggestions only return same-category, in-stock items with a verified lower current price. Cheapest-deal share URLs point to public item pages and only summarize explicit current or observed-low price evidence.'
 } as const;
