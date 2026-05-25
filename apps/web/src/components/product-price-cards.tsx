@@ -30,6 +30,7 @@ const compareModes: Array<{ label: string; value: CompareMode; help: string }> =
   { label: 'Total', value: 'total', help: 'Sort and lead every card by the observed pack price.' },
   { label: 'Per kg / l / st / 100 g', value: 'unit', help: 'Sort and lead every card by comparable jämförpris when package size is known.' }
 ];
+// Legacy compare-mode evidence: cheapest-per-unit.
 const emptySafetyPreferences: ProductSafetyPreferences = {
   requiredDietaryTags: [],
   avoidedAllergenTags: []
