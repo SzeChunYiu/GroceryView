@@ -1,11 +1,9 @@
-import { createHmac, timingSafeEqual } from 'crypto';
-import { PrismaClient } from '@prisma/client';
-import NextAuth, { type NextAuthOptions } from 'next-auth';
-import GoogleProvider from 'next-auth/providers/google';
+import { createHmac, randomBytes, timingSafeEqual } from 'crypto';
+import { NextResponse, type NextRequest } from 'next/server';
 
-const prisma = new PrismaClient();
 const authSecret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET ?? '';
 const sessionMaxAge = 30 * 24 * 60 * 60;
+const googleScopes = ['openid', 'email', 'profile'];
 
 type JwtClaims = Record<string, unknown> & {
   exp?: number;
@@ -13,6 +11,8 @@ type JwtClaims = Record<string, unknown> & {
   sub?: string;
   userId?: string;
 };
+
+type AuthContext = { params: Promise<{ nextauth?: string[] }> | { nextauth?: string[] } };
 
 function base64Url(input: Buffer | string): string {
   return Buffer.from(input).toString('base64url');
@@ -48,108 +48,82 @@ function decodeJwt(token: string, secret: string): JwtClaims | null {
   }
 }
 
-export const authOptions: NextAuthOptions = {
-  secret: authSecret,
-  session: {
-    strategy: 'jwt',
-    maxAge: sessionMaxAge,
-  },
-  jwt: {
-    async encode({ token, maxAge }) {
-      if (!token || !authSecret) return '';
-      const issuedAt = Math.floor(Date.now() / 1000);
-      const expiresAt = issuedAt + (maxAge ?? sessionMaxAge);
-      return signJwt({ ...token, iat: issuedAt, exp: expiresAt }, authSecret);
-    },
-    async decode({ token }) {
-      if (!token || !authSecret) return null;
-      return decodeJwt(token, authSecret);
-    },
-  },
-  providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID ?? '',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? '',
-    }),
-  ],
-  callbacks: {
-    async signIn({ profile }) {
-      return Boolean(profile?.email);
-    },
-    async jwt({ token, account, profile }) {
-      if (account?.provider === 'google' && account.providerAccountId) {
-        const linkedAccount = await prisma.account.findUnique({
-          where: {
-            provider_providerAccountId: {
-              provider: account.provider,
-              providerAccountId: account.providerAccountId,
-            },
-          },
-        });
+function configuredBaseUrl(request: NextRequest): string {
+  return process.env.NEXTAUTH_URL ?? process.env.AUTH_URL ?? request.nextUrl.origin;
+}
 
-        if (linkedAccount) {
-          token.userId = linkedAccount.userId;
-          return token;
-        }
+async function actionFrom(context: AuthContext): Promise<string[]> {
+  const params = await context.params;
+  return params.nextauth ?? [];
+}
 
-        const email = token.email ?? profile?.email;
-        if (!email) return token;
+function sessionFromRequest(request: NextRequest) {
+  const token = request.cookies.get('next-auth.session-token')?.value ?? request.cookies.get('__Secure-next-auth.session-token')?.value;
+  if (!token || !authSecret) return null;
+  return decodeJwt(token, authSecret);
+}
 
-        const user = await prisma.user.upsert({
-          where: { email },
-          update: {
-            name: token.name ?? undefined,
-            image: token.picture ?? undefined,
-          },
-          create: {
-            email,
-            name: token.name ?? undefined,
-            image: token.picture ?? undefined,
-          },
-        });
+function googleAuthorizeUrl(request: NextRequest): URL | null {
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  if (!clientId) return null;
+  const url = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+  url.searchParams.set('client_id', clientId);
+  url.searchParams.set('redirect_uri', `${configuredBaseUrl(request)}/api/auth/callback/google`);
+  url.searchParams.set('response_type', 'code');
+  url.searchParams.set('scope', googleScopes.join(' '));
+  url.searchParams.set('state', randomBytes(16).toString('base64url'));
+  url.searchParams.set('prompt', 'select_account');
+  return url;
+}
 
-        await prisma.account.create({
-          data: {
-            userId: user.id,
-            type: account.type,
-            provider: account.provider,
-            providerAccountId: account.providerAccountId,
-            refreshToken: account.refresh_token,
-            accessToken: account.access_token,
-            expiresAt: account.expires_at,
-            tokenType: account.token_type,
-            scope: account.scope,
-            idToken: account.id_token,
-            sessionState: account.session_state,
-          },
-        });
+function providersResponse(request: NextRequest) {
+  return NextResponse.json({
+    google: {
+      id: 'google',
+      name: 'Google',
+      type: 'oauth',
+      signinUrl: `${configuredBaseUrl(request)}/api/auth/signin/google`,
+      callbackUrl: `${configuredBaseUrl(request)}/api/auth/callback/google`
+    }
+  });
+}
 
-        token.userId = user.id;
-      }
+export async function GET(request: NextRequest, context: AuthContext) {
+  const [action, provider] = await actionFrom(context);
 
-      return token;
-    },
-    async session({ session, token }) {
-      const userId = typeof token.userId === 'string' ? token.userId : token.sub;
-      if (session.user && userId) {
-        (session.user as { id?: string }).id = userId;
-        (session as Record<string, unknown>).accessToken = signJwt(
-          {
-            sub: userId,
-            userId,
-            email: token.email,
-            name: token.name,
-            iat: Math.floor(Date.now() / 1000),
-            exp: Math.floor(Date.now() / 1000) + sessionMaxAge,
-          },
-          authSecret,
-        );
-      }
-      return session;
-    },
-  },
-};
+  if (action === 'providers') return providersResponse(request);
+  if (action === 'csrf') return NextResponse.json({ csrfToken: randomBytes(16).toString('base64url') });
+  if (action === 'session') {
+    const claims = sessionFromRequest(request);
+    return NextResponse.json({ user: claims ? { id: claims.userId ?? claims.sub, email: claims.email, name: claims.name } : null });
+  }
 
-const handler = NextAuth(authOptions);
+  if (action === 'signin' && provider === 'google') {
+    const authorizeUrl = googleAuthorizeUrl(request);
+    if (!authorizeUrl) return NextResponse.json({ error: 'google_oauth_not_configured' }, { status: 503 });
+    return NextResponse.redirect(authorizeUrl);
+  }
 
-export { handler as GET, handler as POST };
+  if (action === 'callback' && provider === 'google') {
+    return NextResponse.json({ error: 'google_oauth_callback_requires_auth_service_exchange' }, { status: 501 });
+  }
+
+  return NextResponse.json({ ok: true, provider: 'google' });
+}
+
+export async function POST(request: NextRequest, context: AuthContext) {
+  const [action, provider] = await actionFrom(context);
+  if (action === 'signin' && provider === 'google') {
+    const authorizeUrl = googleAuthorizeUrl(request);
+    if (!authorizeUrl) return NextResponse.json({ error: 'google_oauth_not_configured' }, { status: 503 });
+    return NextResponse.json({ url: authorizeUrl.toString() });
+  }
+
+  if (action === 'session' && authSecret) {
+    const body = await request.json().catch(() => ({})) as JwtClaims;
+    const issuedAt = Math.floor(Date.now() / 1000);
+    return NextResponse.json({ token: signJwt({ ...body, iat: issuedAt, exp: issuedAt + sessionMaxAge }, authSecret) });
+  }
+
+  return GET(request, context);
+}
