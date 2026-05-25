@@ -5,6 +5,7 @@ import { ListSharePreview } from '@/components/list-share-preview';
 import { createPublicListShareToken, publicListSharePath, type PublicListShareItem } from '@/lib/list-permissions';
 import { parseMealPlanShoppingListExport, type MealPlanShoppingListExport } from '@/lib/meal-budgets';
 import { generateRecurringListInstance, recurringListTemplates } from '@/lib/recurring-lists';
+import { reorderWarningsForMatchedProducts } from '@/lib/reorder-suggestions';
 import { storeLayoutDepartments, storeLayoutDepartmentsForOrder, type StoreLayoutChain, type StoreLayoutGroupOrder } from '@/lib/trip-planner';
 import { metadataForShoppingListShare } from '@/lib/seo';
 import { OFFLINE_LIST_EDIT_RECONCILIATION_STEPS, offlineListSyncStatusCopy } from '@/lib/offline-sync';
@@ -80,11 +81,13 @@ export default async function ShoppingListPage({ searchParams }: { searchParams?
   const mealPlanExport = mealPlanExportFromParam(resolvedSearchParams.mealPlan);
   const mealPlanItems = mealPlanExport?.items.map((item) => ({
     id: item.id,
+    matchedProductSlug: item.productId,
     name: item.name,
     ownerRole: 'guardian' as const,
     quantity: item.quantity
   })) ?? [];
   const listItems = [...mealPlanItems, ...demoItems.filter((item) => !mealPlanItems.some((mealItem) => mealItem.id === item.id))];
+  const reorderWarnings = reorderWarningsForMatchedProducts(listItems);
   const publicShareToken = shareToken ?? createPublicListShareToken({
     expiresAt: '2026-06-30T23:59:59.000Z',
     items: publicDemoShareItems,
@@ -146,6 +149,28 @@ export default async function ShoppingListPage({ searchParams }: { searchParams?
         </div>
       </section>
       <ListSharePreview />
+      {reorderWarnings.length > 0 ? (
+        <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4" aria-labelledby="reorder-warning-title">
+          <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">Verified reorder warnings</p>
+          <h2 id="reorder-warning-title" className="mt-1 text-xl font-bold text-slate-950">Review price changes before preparing a reorder</h2>
+          <ul className="mt-3 grid gap-3 md:grid-cols-2">
+            {reorderWarnings.map((warning) => (
+              <li className="rounded-xl border border-amber-200 bg-white px-3 py-2" key={warning.itemId}>
+                <p className="text-sm font-black text-amber-950">{warning.itemName}: {warning.label}</p>
+                <p className="mt-1 text-sm font-semibold text-slate-700">
+                  {warning.currentUnitPrice === null
+                    ? 'Current verified price missing'
+                    : `${formatSek(warning.currentUnitPrice)} latest verified price`}
+                  {warning.previousUnitPrice === null ? '' : ` · ${formatSek(warning.previousUnitPrice)} previous`}
+                </p>
+                <p className="mt-1 text-xs font-bold text-amber-900">
+                  {warning.recommendedAction} Confidence {(warning.confidence * 100).toFixed(0)}%.
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
       <section className="rounded-2xl border border-sky-200 bg-sky-50 p-4">
         <p className="text-xs font-semibold uppercase tracking-wide text-sky-800">Public share page</p>
         <h2 className="mt-1 text-xl font-bold text-slate-950">Open the read-only public list view</h2>
