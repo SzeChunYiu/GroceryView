@@ -105,6 +105,8 @@ import {
   findPharmacyEanMatches,
   parseApohemProducts,
   parseApotekHjartatProducts,
+  fetchLyfOgHeilsaProducts,
+  parseLyfOgHeilsaProducts,
   parseIcaReklambladOffers,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
@@ -116,6 +118,7 @@ import {
   GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL,
   GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL,
   GROCERYVIEW_DAILY_LOCALFOODNODES_SE_PRODUCTS_URL,
+  GROCERYVIEW_DAILY_LYF_OG_HEILSA_IS_PRODUCTS_URL,
   GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL,
   GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL,
   GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL,
@@ -7170,6 +7173,142 @@ describe('daily ingestion runner', () => {
       original_price_text: '18,89 kr',
       original_effective_date: '2026-05-22'
     });
+  });
+
+  it('parses Lyf og heilsa Gatsby page-data fixtures and fetches public IS pharmacy products', async () => {
+    const retrievedAt = '2026-05-24T10:15:00.000Z';
+    const sourceUrl = 'https://www.lyfogheilsa.is/page-data/gamla-apot/page-data.json';
+    const pageData = JSON.stringify({
+      result: {
+        data: {
+          prismicBrandPage: {
+            data: {
+              body: [{
+                items: [{
+                  productGroup: {
+                    productGroupId: '2076',
+                    title: 'GAMLA APÓTEKIÐ Sárakrem 50ml',
+                    fullPrice: 1699,
+                    discountPrice: 1299,
+                    discountPercent: 24,
+                    category: { slug: 'hudvorur' },
+                    images: [{ largeUrl: 'https://cdn.lyfogheilsa.is/sarakrem.jpg' }]
+                  }
+                }, {
+                  productGroup: {
+                    productGroupId: '3001',
+                    title: 'NOW D-Vítamín 100 töflur',
+                    fullPrice: '2.499',
+                    discountPrice: '2.499',
+                    discountPercent: 0,
+                    category: { slug: 'vitamin-og-baetiefni' },
+                    images: []
+                  }
+                }]
+              }]
+            }
+          }
+        }
+      }
+    });
+
+    const rows = parseLyfOgHeilsaProducts(pageData, sourceUrl, retrievedAt);
+    assert.equal(rows.length, 2);
+    assert.deepEqual(rows[0], {
+      chain: 'lyf-og-heilsa-is',
+      code: '2076',
+      name: 'GAMLA APÓTEKIÐ Sárakrem 50ml',
+      category: 'otc',
+      categorySlug: 'hudvorur',
+      price: 1299,
+      priceText: '1299 ISK',
+      originalPrice: 1699,
+      originalPriceText: '1699 ISK',
+      discountPercent: 24,
+      productUrl: 'https://www.lyfogheilsa.is/gamla-apot#product-2076',
+      imageUrl: 'https://cdn.lyfogheilsa.is/sarakrem.jpg',
+      sourceUrl,
+      retrievedAt
+    });
+    assert.equal(rows[1].category, 'supplement');
+
+    const requestedUrls: string[] = [];
+    const fetched = await fetchLyfOgHeilsaProducts({
+      sourcePaths: ['/page-data/gamla-apot/page-data.json'],
+      retrievedAt,
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return new Response(pageData, { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+    assert.deepEqual(requestedUrls, [sourceUrl]);
+    assert.equal(fetched.length, 2);
+    assert.equal(fetched[0].code, '2076');
+  });
+
+  it('materializes Lyf og heilsa public page-data products as IS pharmacy observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const endpointUrl = `${GROCERYVIEW_DAILY_LYF_OG_HEILSA_IS_PRODUCTS_URL}?sourcePaths=/page-data/gamla-apot/page-data.json`;
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-24T10:15:00.000Z',
+      connectors: [{
+        connectorId: 'lyf-og-heilsa-is-public-products',
+        chainId: 'lyf-og-heilsa-is',
+        domain: 'pharmacy',
+        sourceType: 'retailer_online_page',
+        endpointUrl,
+        parserVersion: 'lyf-og-heilsa-is-page-data-v1',
+        robotsTxtStatus: 'allow',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: false,
+        requireStoreScopedPrices: false,
+        stores: []
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return new Response(JSON.stringify({
+          result: {
+            data: {
+              prismicBrandPage: {
+                data: {
+                  body: [{
+                    items: [{
+                      productGroup: {
+                        productGroupId: '2076',
+                        title: 'GAMLA APÓTEKIÐ Sárakrem 50ml',
+                        fullPrice: 1699,
+                        discountPrice: 1299,
+                        discountPercent: 24,
+                        category: { slug: 'hudvorur' },
+                        images: [{ largeUrl: 'https://cdn.lyfogheilsa.is/sarakrem.jpg' }]
+                      }
+                    }]
+                  }]
+                }
+              }
+            }
+          }
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.deepEqual(requestedUrls, ['https://www.lyfogheilsa.is/page-data/gamla-apot/page-data.json']);
+    const chainInsert = executor.calls.find((call) => call.sql.includes('insert into chains'));
+    assert.deepEqual(chainInsert?.params, ['lyf-og-heilsa-is', 'lyf-og-heilsa-is', 'pharmacy']);
+    const product = firstBatchProduct(executor);
+    assert.equal(product.domain, 'pharmacy');
+    assert.equal(product.category_id, 'pharmacy-otc');
+    assert.equal(product.package_size, 50);
+    assert.equal(product.package_unit, 'ml');
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.domain, 'pharmacy');
+    assert.equal(observation.store_id, null);
+    assert.equal(observation.price, 1299);
+    assert.equal(observation.regular_price, 1699);
   });
 
   it('materializes public pharmacy products as domain=pharmacy observations without prescription rows', async () => {
