@@ -202,6 +202,10 @@ export const routeMetadataCatalog = {
     title: 'Household grocery planning gate | GroceryView',
     description: 'Household planning stays fail-closed until verified private profile and basket records are connected.'
   },
+  '/index': {
+    title: 'Personalized grocery index shortcuts | GroceryView',
+    description: 'Browse household-ranked grocery index shortcuts with verified category medians, OpenPrices row counts, and cross-chain spread context.'
+  },
   '/login': {
     title: 'Sign in to GroceryView',
     description: 'Authentication is withheld in the static build until a production auth provider can return a verified user session.',

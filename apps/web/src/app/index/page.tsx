@@ -1,9 +1,14 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { buildDemoHouseholdCategorySignals, defaultHouseholdId, getHouseholdCategoryScore, rankLandingShortcuts } from '@/lib/personalization';
+import { routeMetadata } from '@/lib/seo';
 import { categorySummaries, formatPct, formatSek } from '@/lib/verified-data';
 
 export const dynamic = 'force-dynamic';
+
+export function generateMetadata() {
+  return routeMetadata('/index');
+}
 
 type LandingShortcut = {
   categorySlug: string;
