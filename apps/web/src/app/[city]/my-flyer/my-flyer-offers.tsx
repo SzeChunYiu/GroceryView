@@ -106,12 +106,19 @@ export function MyFlyerOffers({ rows }: MyFlyerOffersProps) {
   }, []);
 
   const rankedRows = useMemo(() => rankRows(rows, selectedFilters), [rows, selectedFilters]);
+  const activeDietSummary = selectedFilters.length > 0
+    ? selectedFilters.map((filter) => dietLabels[filter]).join(', ')
+    : 'No diet filters applied';
 
   return (
     <>
       <div className="my-flyer-screen-only mb-6" data-print-hide>
         <DietFilterPicker selected={selectedFilters} onChange={setSelectedFilters} storageKey={DIET_FILTER_STORAGE_KEY} />
       </div>
+
+      <section className="my-flyer-diet-print-summary my-flyer-print-only mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-sm font-black text-emerald-950" aria-label="Active diet filters for printed flyer">
+        Diet filters: {activeDietSummary}
+      </section>
 
       <section className="my-flyer-print-grid grid gap-4 lg:grid-cols-2">
         {rankedRows.map(({ product, offer }) => {

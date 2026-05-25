@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import type { PublicSharePreview } from "../lib/social";
+import { getStoreLayoutDepartment, sortItemsByStoreLayout, type StoreLayoutChain } from "../lib/trip-planner";
 import {
   useList,
   type FamilyRole,
@@ -23,6 +25,7 @@ type ListCardProps = {
   currentRole: FamilyRole;
   items: CommentableSharedListItem[];
   onConflictPrompt?: (prompt: ListConflictPrompt) => void;
+  selectedChain?: StoreLayoutChain;
 };
 
 const roleLabels: Record<FamilyRole, string> = {
@@ -36,7 +39,48 @@ function formatCommentTime(createdAt: string) {
   return createdAt.replace("T", " ").slice(0, 16);
 }
 
-export function ListCard({ currentRole, items, onConflictPrompt }: ListCardProps) {
+export function PublicSharePreviewCard({
+  preview,
+}: Readonly<{ preview: PublicSharePreview }>) {
+  return (
+    <section
+      aria-labelledby="public-share-preview-title"
+      className="rounded-2xl border border-emerald-200 bg-white p-4 shadow-sm"
+    >
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.22em] text-emerald-800">
+            Public read-only preview
+          </p>
+          <h2
+            id="public-share-preview-title"
+            className="mt-1 text-base font-semibold text-slate-950"
+          >
+            Share-safe basket snapshot
+          </h2>
+          <p className="mt-1 text-sm text-slate-600">{preview.privacyNote}</p>
+        </div>
+        <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-800">
+          {preview.estimatedTotalLabel}
+        </span>
+      </div>
+
+      <ul className="mt-3 space-y-2">
+        {preview.items.map((item) => (
+          <li key={`${item.name}:${item.quantity}`} className="rounded-xl border border-slate-100 p-3">
+            <p className="font-medium text-slate-950">{item.name}</p>
+            <p className="text-sm text-slate-600">{item.quantity}</p>
+            <p className="mt-2 rounded-lg bg-slate-50 px-3 py-2 text-xs font-bold text-slate-700">
+              {item.estimateLabel} · {item.privacySafeStoreRange}
+            </p>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+export function ListCard({ currentRole, items, onConflictPrompt, selectedChain = "ica" }: ListCardProps) {
   const [commentsByItem, setCommentsByItem] = useState<Record<string, ListItemComment[]>>(() =>
     Object.fromEntries(items.map((item) => [item.id, item.comments ?? []])),
   );
@@ -45,6 +89,7 @@ export function ListCard({ currentRole, items, onConflictPrompt }: ListCardProps
     initialItems: items,
     onConflictPrompt,
   });
+  const storeOrderedItems = sortItemsByStoreLayout(listItems, selectedChain);
 
   function addComment(itemId: string, event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -82,7 +127,7 @@ export function ListCard({ currentRole, items, onConflictPrompt }: ListCardProps
             Shared shopping list
           </h2>
           <p className="text-sm text-slate-600">
-            Editing another role&apos;s item creates a checkout conflict prompt.
+            Editing another role&apos;s item creates a checkout conflict prompt. Items are ordered by the selected store layout.
           </p>
         </div>
         <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
@@ -91,11 +136,14 @@ export function ListCard({ currentRole, items, onConflictPrompt }: ListCardProps
       </div>
 
       <ul className="space-y-2">
-        {listItems.map((item) => {
+        {storeOrderedItems.map((item) => {
           const comments = commentsByItem[item.id] ?? [];
 
           return (
             <li key={item.id} className="rounded-xl border border-slate-100 p-3">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-emerald-700">
+                {getStoreLayoutDepartment(item.name, selectedChain).label}
+              </p>
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="font-medium text-slate-950">{item.name}</p>

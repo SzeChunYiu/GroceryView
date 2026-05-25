@@ -1,3 +1,5 @@
+import { cheapestSourceForProductSlug } from './shopping-list-prices';
+
 export type SocialFeedPost = Readonly<{
   author: string;
   body: string;
@@ -15,6 +17,7 @@ export type FriendPriceSighting = Readonly<{
   productName: string;
   productSlug: string;
   reporter: string;
+  sharedWithFriends: boolean;
   storeName: string;
 }>;
 
@@ -26,6 +29,25 @@ export type SocialComment = Readonly<{
   mentions: string[];
   parentId?: string;
   postId: string;
+}>;
+
+type PublicSharePreviewInputItem = Readonly<{
+  matchedProductSlug?: string;
+  name: string;
+  quantity?: string;
+}>;
+
+export type PublicSharePreviewItem = Readonly<{
+  estimateLabel: string;
+  name: string;
+  privacySafeStoreRange: string;
+  quantity: string;
+}>;
+
+export type PublicSharePreview = Readonly<{
+  estimatedTotalLabel: string;
+  items: PublicSharePreviewItem[];
+  privacyNote: string;
 }>;
 
 export const socialFeedPosts: SocialFeedPost[] = [
@@ -52,9 +74,10 @@ export const friendPriceSightings: FriendPriceSighting[] = [
     observedAt: '2026-05-24T08:42:00.000Z',
     postId: 'weekly-oats-swap',
     priceLabel: '21,90 kr',
-    productName: 'Store-brand oats 1 kg',
-    productSlug: 'havregryn',
+    productName: 'Havregryn',
+    productSlug: 'havregryn-100132321-st',
     reporter: 'Friend sighting',
+    sharedWithFriends: true,
     storeName: 'Hemkop Skanstull'
   },
   {
@@ -66,7 +89,20 @@ export const friendPriceSightings: FriendPriceSighting[] = [
     productName: 'Fresh basil pot',
     productSlug: 'basilika',
     reporter: 'Household sighting',
+    sharedWithFriends: true,
     storeName: 'Willys Stockholm'
+  },
+  {
+    confidence: 'high',
+    id: 'friend-sighting-fiberhavregryn-willys',
+    observedAt: '2026-05-24T11:20:00.000Z',
+    postId: 'weekly-oats-swap',
+    priceLabel: '20,90 kr',
+    productName: 'Fiberhavregryn',
+    productSlug: 'fiberhavregryn-7340083480638',
+    reporter: 'Friend sighting',
+    sharedWithFriends: true,
+    storeName: 'Willys Hornstull'
   }
 ];
 
@@ -89,8 +125,66 @@ export function listSocialComments(postId?: string) {
   return socialComments.filter((comment) => !postId || comment.postId === postId);
 }
 
+function recentFriendSightings(sightings: FriendPriceSighting[]) {
+  return [...sightings].sort((left, right) => right.observedAt.localeCompare(left.observedAt));
+}
+
 export function listFriendPriceSightings(postId?: string) {
-  return friendPriceSightings.filter((sighting) => !postId || sighting.postId === postId);
+  return recentFriendSightings(friendPriceSightings.filter((sighting) => sighting.sharedWithFriends && (!postId || sighting.postId === postId)));
+}
+
+export function listFriendPriceSightingsForProduct(productSlug: string) {
+  return recentFriendSightings(friendPriceSightings.filter((sighting) => sighting.sharedWithFriends && sighting.productSlug === productSlug));
+}
+
+function priceFromLabel(priceLabel: string) {
+  const normalized = priceLabel.replace(/\s/g, '').replace(',', '.').match(/\d+(\.\d+)?/);
+  return normalized ? Number(normalized[0]) : null;
+}
+
+function formatSekEstimate(value: number) {
+  return `${Math.round(value).toLocaleString('sv-SE')} kr`;
+}
+
+const publicPreviewFallbackSlugs: Record<string, string> = {
+  coffee: 'mellanrost-perfekt-med-mj-lk-bryggkaffe-101276230-st',
+  'fresh fruit': 'pple-royal-gala-klass-1-100144504-kg',
+  'frozen vegetables': 'babymor-tter-frysta-100655792-st',
+  'milk or fil': 'mj-lk-3-101205891-st',
+  oats: 'havregryn-100132394-st'
+};
+
+function publicPreviewSlugForItem(item: PublicSharePreviewInputItem) {
+  return item.matchedProductSlug || publicPreviewFallbackSlugs[item.name.trim().toLowerCase()];
+}
+
+export function createPublicListSharePreview(items: PublicSharePreviewInputItem[]): PublicSharePreview {
+  let matchedEstimateTotal = 0;
+
+  const previewItems = items.map((item) => {
+    const cheapestSource = cheapestSourceForProductSlug(publicPreviewSlugForItem(item));
+    const price = cheapestSource ? priceFromLabel(cheapestSource.priceLabel) : null;
+    if (price !== null) matchedEstimateTotal += price;
+
+    const rangeCeiling = price !== null && cheapestSource
+      ? price * (1 + Math.max(cheapestSource.spreadPercent, 0) / 100)
+      : null;
+
+    return {
+      estimateLabel: price !== null ? `Estimated from ${cheapestSource?.priceLabel}` : 'No verified estimate yet',
+      name: item.name,
+      privacySafeStoreRange: price !== null && rangeCeiling !== null && cheapestSource
+        ? `${cheapestSource.chainLabel} public shelf band ${formatSekEstimate(price)}–${formatSekEstimate(rangeCeiling)}`
+        : 'Store range hidden until a verified public price match exists',
+      quantity: item.quantity?.trim() || 'Quantity not shared'
+    };
+  });
+
+  return {
+    estimatedTotalLabel: matchedEstimateTotal > 0 ? `About ${formatSekEstimate(matchedEstimateTotal)} from matched items` : 'No matched-item total yet',
+    items: previewItems,
+    privacyNote: 'Public previews show item names, quantities, catalog estimates, and chain-level price bands only — never account, household, or exact store data.'
+  };
 }
 
 export function createSocialComment(input: Readonly<{ author: string; body: string; parentId?: string; postId: string }>) {

@@ -1,8 +1,9 @@
 import Link from 'next/link';
-import { ArrowDownRight, BadgeCheck, Clock3, MapPin, Search, TrendingUp } from 'lucide-react';
+import { ArrowDownRight, BadgeCheck, BarChart3, Clock3, ListPlus, MapPin, Search, TrendingUp } from 'lucide-react';
 import { buildPriceDropDiscoveryRail } from '@/lib/price-events';
-import { buildCityPriceDropTrends, type CityPriceDropTrend, type CitySearchTrendFeed } from '@/lib/trends';
+import { buildCityPriceDropTrends, type BrandLeaderboardTrendFeed, type CityPriceDropTrend, type CitySearchTrendFeed } from '@/lib/trends';
 import { categoryLabels, pricedProducts } from '@/lib/openprices-products';
+import type { CategoryTrendingShelf } from '@/lib/grocery-index-widget';
 
 function formatSek(value: number) {
   return new Intl.NumberFormat('sv-SE', {
@@ -161,6 +162,65 @@ export function TrendingSearchModule({ feed }: Readonly<{ feed: CitySearchTrendF
   );
 }
 
+export function BrandLeaderboardModule({ feed }: Readonly<{ feed: BrandLeaderboardTrendFeed }>) {
+  if (feed.cards.length === 0) return null;
+
+  return (
+    <section
+      className="mt-5 rounded-[1.75rem] border border-violet-200 bg-white p-5 shadow-sm"
+      aria-label={`${feed.city} trending brand leaderboard`}
+      data-brand-leaderboard-module
+    >
+      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.22em] text-violet-800">Brand momentum</p>
+          <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Trending grocery brands in {feed.city}</h2>
+        </div>
+        <p className="max-w-2xl text-sm font-semibold leading-6 text-slate-600">
+          Ranked by week-over-week search interest, latest price drops, and saved-list addition momentum from the verified product observation feed.
+        </p>
+      </div>
+      <div className="mt-5 grid gap-3 lg:grid-cols-5" data-brand-leaderboard-grid>
+        {feed.cards.map((brand) => (
+          <Link
+            className="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:-translate-y-0.5 hover:border-violet-700"
+            data-brand-leaderboard-rank={brand.rank}
+            href={`/products/${brand.featuredProductSlug}`}
+            key={brand.brand}
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-800">#{brand.rank} · {brand.categoryLabel}</p>
+                <h3 className="mt-2 line-clamp-2 text-lg font-black leading-6 text-slate-950">{brand.brand}</h3>
+              </div>
+              <span className="rounded-full bg-violet-100 p-2 text-violet-800" aria-label="Brand momentum score">
+                <BarChart3 aria-hidden="true" size={20} strokeWidth={3} />
+              </span>
+            </div>
+            <p className="mt-3 line-clamp-1 text-sm font-black text-slate-700">{brand.featuredProductName}</p>
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <div className="rounded-xl bg-white p-3">
+                <p className="text-xs font-bold text-slate-500">Search lift</p>
+                <p className="mt-1 text-lg font-black text-violet-800">{formatSignedPercent(brand.searchLiftPercent)}</p>
+              </div>
+              <div className="rounded-xl bg-white p-3">
+                <p className="text-xs font-bold text-slate-500">Drops</p>
+                <p className="mt-1 text-lg font-black text-emerald-800">{brand.priceDropCount}</p>
+              </div>
+            </div>
+            <p className="mt-3 flex items-center gap-2 text-sm font-black text-slate-700">
+              <ListPlus aria-hidden="true" size={16} />
+              {formatCount(brand.listAdditions)} list adds · score {brand.score.toFixed(1)}
+            </p>
+            <p className="mt-2 text-xs font-semibold leading-5 text-slate-500">{brand.evidenceLabel}</p>
+          </Link>
+        ))}
+      </div>
+      <p className="mt-4 text-xs font-bold leading-5 text-slate-500">Source: {feed.source}.</p>
+    </section>
+  );
+}
+
 export function TrendingPriceDropCards({ city = 'stockholm' }: Readonly<{ city?: string }>) {
   const feed = buildCityPriceDropTrends({ city, limit: 4 });
   if (feed.cards.length === 0) return null;
@@ -219,6 +279,57 @@ export function TrendingPriceDropCards({ city = 'stockholm' }: Readonly<{ city?:
               {card.confidenceDetail}; source {card.sourceLabel}.
             </p>
           </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ShelfColumn({ title, items }: Readonly<{ title: string; items: CategoryTrendingShelf['fastRising'] }>) {
+  if (items.length === 0) return null;
+
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-4">
+      <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{title}</p>
+      <div className="mt-3 space-y-3">
+        {items.map((item) => (
+          <Link className="block rounded-xl bg-slate-50 p-3 hover:bg-emerald-50" href={`/products/${item.slug}`} key={item.slug}>
+            <p className="font-black text-slate-950">{item.name}</p>
+            <p className="mt-1 text-sm font-semibold text-slate-600">{item.brand} · {formatSek(item.price)}</p>
+            <p className="mt-1 text-xs font-bold text-slate-500">{item.metric}</p>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function CategoryTrendingShelves({ shelves }: Readonly<{ shelves: CategoryTrendingShelf[] }>) {
+  if (shelves.length === 0) return null;
+
+  return (
+    <section className="mt-6 rounded-[1.75rem] border border-emerald-200 bg-emerald-50 p-5" aria-label="Trending category shelves">
+      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-800">Dynamic category shelves</p>
+          <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Fast-rising, newly discounted, and stable staples</h2>
+        </div>
+        <p className="max-w-2xl text-sm font-semibold leading-6 text-slate-700">
+          Shelves are derived from verified OpenPrices observation counts, latest price drops, and products repeatedly priced near their low.
+        </p>
+      </div>
+      <div className="mt-5 space-y-4">
+        {shelves.map((shelf) => (
+          <div className="rounded-[1.5rem] border border-emerald-100 bg-white/70 p-4" key={shelf.slug}>
+            <Link className="text-xl font-black text-slate-950 hover:text-emerald-800" href={`/categories/${shelf.slug}`}>
+              {shelf.label}
+            </Link>
+            <div className="mt-4 grid gap-3 lg:grid-cols-3">
+              <ShelfColumn title="Fast-rising searches" items={shelf.fastRising} />
+              <ShelfColumn title="Newly discounted items" items={shelf.newlyDiscounted} />
+              <ShelfColumn title="Stable low-price staples" items={shelf.stableLowPriceStaples} />
+            </div>
+          </div>
         ))}
       </div>
     </section>

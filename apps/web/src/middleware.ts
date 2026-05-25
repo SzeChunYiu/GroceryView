@@ -9,6 +9,7 @@ import {
   normalizeLocale,
   resolveLocaleFromAcceptLanguage
 } from './lib/i18n-routing';
+import { isPublicCatalogueLandingRoute, publicCatalogueCacheControl, publicCatalogueRevalidateSeconds } from './lib/seo';
 
 export function middleware(request: NextRequest) {
   const nextLocaleCookieName = localeCookieName; // NEXT_LOCALE
@@ -26,6 +27,12 @@ export function middleware(request: NextRequest) {
   response.headers.set('x-groceryview-locale-route', routeLocale ? localeRoutePrefix(routeLocale) : 'unrouted');
   if (blockedLocaleRoute && blockedLocaleRoutes.includes(blockedLocaleRoute)) {
     response.headers.set('x-groceryview-locale-blocked', localeRoutePrefix(blockedLocaleRoute));
+  }
+  if (isPublicCatalogueLandingRoute(request.nextUrl.pathname)) {
+    response.headers.set('Cache-Control', publicCatalogueCacheControl);
+    response.headers.set('CDN-Cache-Control', publicCatalogueCacheControl);
+    response.headers.set('Vercel-CDN-Cache-Control', publicCatalogueCacheControl);
+    response.headers.set('x-groceryview-revalidate-seconds', String(publicCatalogueRevalidateSeconds));
   }
   response.headers.set('vary', 'accept-language');
   return response;
