@@ -129,6 +129,7 @@ export * from './connectors/citygross-bulk.js';
 export * from './connectors/circle-k-se.js';
 export * from './connectors/coop.js';
 export * from './connectors/hemkop.js';
+export * from './connectors/hemkop-klubb-offers-se.js';
 export * from './connectors/ica.js';
 export * from './connectors/ica-bulk.js';
 export * from './connectors/ica-reklamblad.js';
