@@ -60,6 +60,8 @@ export type MiddleEasternNoChainStatus = {
   retailer_type: 'ethnic_middle_eastern';
   status: 'verified_multi_location_halal_international_market';
   qualifiesForChainConnector: true;
+  qualifiesForLocationConnector: true;
+  qualifiesForOnlinePriceConnector: false;
   minimumVerifiedStoreCount: number;
   evidence: Array<{
     kind: 'shopping_centre_press_release' | 'shopping_centre_store_page';
@@ -117,6 +119,8 @@ export const MIDDLE_EASTERN_NO_CHAIN_STATUS: MiddleEasternNoChainStatus = {
   retailer_type: 'ethnic_middle_eastern',
   status: 'verified_multi_location_halal_international_market',
   qualifiesForChainConnector: true,
+  qualifiesForLocationConnector: true,
+  qualifiesForOnlinePriceConnector: false,
   minimumVerifiedStoreCount: 3,
   evidence: [
     {
@@ -130,7 +134,7 @@ export const MIDDLE_EASTERN_NO_CHAIN_STATUS: MiddleEasternNoChainStatus = {
       sourceUrl: MIDDLE_EASTERN_NO_IMS_KILDEN_URL
     }
   ],
-  caveat: 'IMS is positioned by public sources as an international/halal grocery mini-chain rather than a pure Middle Eastern-only operator; this connector includes it because the assortment overlaps the ethnic_middle_eastern segment and no independent single-city shops are merged into an invented chain.'
+  caveat: 'IMS is positioned by public sources as an international/halal grocery mini-chain, not a pure Middle Eastern-only operator; this connector includes it because the assortment overlaps the ethnic_middle_eastern segment and no independent single-city shops are merged into an invented chain. Public sources do not expose item prices, so the connector emits null-price assortment coverage only.'
 };
 
 export async function fetchMiddleEasternNoAssortment(

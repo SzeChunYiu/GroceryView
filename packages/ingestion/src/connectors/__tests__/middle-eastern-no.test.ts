@@ -31,8 +31,11 @@ describe('Middle Eastern NO / IMS connector', () => {
     assert.equal(status.status, 'verified_multi_location_halal_international_market');
     assert.equal(status.minimumVerifiedStoreCount, 3);
     assert.equal(status.qualifiesForChainConnector, true);
+    assert.equal(status.qualifiesForLocationConnector, true);
+    assert.equal(status.qualifiesForOnlinePriceConnector, false);
     assert.equal(status.retailer_type, 'ethnic_middle_eastern');
     assert.match(status.caveat, /not.*pure Middle Eastern-only/i);
+    assert.match(status.caveat, /null-price assortment/i);
     assert.equal(status.evidence.some((entry) => entry.sourceUrl === MIDDLE_EASTERN_NO_IMS_CITYCON_URL), true);
     assert.equal(status.evidence.some((entry) => entry.sourceUrl === MIDDLE_EASTERN_NO_IMS_KILDEN_URL), true);
   });
