@@ -44,7 +44,7 @@ function newScanId(prefix: 'receipt' | 'barcode') {
   return `${prefix}-${Date.now()}`;
 }
 
-export function ScannerUploadActions({ fallbackProducts = [] }: Readonly<{ fallbackProducts?: BarcodeMissFallbackProduct[] }>) {
+export function ScannerUploadActions({ fallbackProducts = [], lookupSources = [] }: Readonly<{ fallbackProducts?: BarcodeMissFallbackProduct[]; lookupSources?: readonly string[] }>) {
   const [barcode, setBarcode] = useState('0735000123456');
   const [byteLength, setByteLength] = useState('123456');
   const [contentType, setContentType] = useState('image/jpeg');
@@ -259,6 +259,11 @@ export function ScannerUploadActions({ fallbackProducts = [] }: Readonly<{ fallb
       <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
         These controls use the sessionStorage token from the production session exchange. Receipt uploads first request a private upload ticket, while barcode scans go directly to provider-backed processing and return review work items when evidence is uncertain.
       </p>
+      {lookupSources.length > 0 ? (
+        <p className="mt-3 rounded-2xl bg-indigo-50 p-3 text-sm font-bold text-indigo-950">
+          Barcode lookup order: {lookupSources.join(' → ')}. If every source misses, manual product creation stays available.
+        </p>
+      ) : null}
       <div className="mt-4 grid gap-4 lg:grid-cols-2">
         <form className="rounded-2xl border border-slate-200 bg-slate-50 p-4" onSubmit={requestReceiptUploadTicket}>
           <label className="text-sm font-black text-slate-950" htmlFor="receipt-content-type">Receipt content type</label>

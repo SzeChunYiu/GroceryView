@@ -106,3 +106,9 @@ export const barcodeMissFallbackProducts: BarcodeMissFallbackProduct[] = [
     matchReason: 'Packaged staple with brand and quantity metadata for fallback product identification.'
   }
 ];
+
+export const barcodeLookupSourceOrder = [
+  'OpenFoodFacts barcode catalogue',
+  'OpenPrices product observations',
+  'GroceryView manual product queue'
+];

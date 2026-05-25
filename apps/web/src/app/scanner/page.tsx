@@ -3,7 +3,7 @@ import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/c
 import { OcrScanHistoryTimeline } from '@/components/ocr-scan-history-timeline';
 import { BarcodeScanner } from '@/components/barcode-scanner';
 import { ScannerUploadActions } from '@/components/scanner-upload-actions';
-import { barcodeMissFallbackProducts } from '@/lib/openfoodfacts-catalog';
+import { barcodeLookupSourceOrder, barcodeMissFallbackProducts } from '@/lib/openfoodfacts-catalog';
 import { routeMetadata } from '@/lib/seo';
 import { receiptFedAliasGrowthPlan } from '@/lib/verified-data';
 
@@ -126,7 +126,7 @@ export default function ScannerPage() {
       </Card>
       <BarcodeScanner />
       <div id="scan" className="scroll-mt-24">
-        <ScannerUploadActions fallbackProducts={barcodeMissFallbackProducts} />
+        <ScannerUploadActions fallbackProducts={barcodeMissFallbackProducts} lookupSources={barcodeLookupSourceOrder} />
       </div>
       <div id="scan-history" className="scroll-mt-24">
         <OcrScanHistoryTimeline />
