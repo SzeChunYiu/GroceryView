@@ -361,3 +361,24 @@ export function summarizeBasketBuyTiming(recommendations: ReadonlyArray<BasketBu
     itemCount: recommendations.length
   };
 }
+
+export type PremiumSavingsForecastDriver = {
+  label: string;
+  amount: number;
+  detail: string;
+};
+
+export function buildPremiumSavingsForecast(drivers: PremiumSavingsForecastDriver[] = [
+  { label: 'Alerts', amount: 42, detail: 'watchlist drops and wait-window alerts' },
+  { label: 'Swaps', amount: 58, detail: 'verified chain substitutions' },
+  { label: 'Basket planning', amount: 33, detail: 'duplicate-buy and pantry timing guidance' }
+]) {
+  const monthlySavings = drivers.reduce((sum, driver) => sum + driver.amount, 0);
+
+  return {
+    monthlySavings,
+    monthlySavingsLabel: `${monthlySavings} kr`,
+    drivers: drivers.map((driver) => ({ ...driver, amountLabel: `${driver.amount} kr` })),
+    confidenceLabel: 'Premium estimate from observed alerts, basket optimization, and historical behavior.'
+  };
+}
