@@ -132,6 +132,10 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
   const search = buildProductSearchView(resolvedSearchParams);
   const { categoryFacets, labelFacets, originFacets, chainFacets, priceRange, inStockOnly, resultCards } = search;
+  const drawerPriceRange = {
+    min: priceRange.min ?? 0,
+    max: priceRange.max ?? 0
+  };
   const requestedPage = toPageNumber(resolvedSearchParams.page);
   const selectedBrand = normalizeSelectedBrand(resolvedSearchParams.brand);
   const baseProductCards = selectedBrand
@@ -234,7 +238,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             maxPrice={search.filters.maxPrice ?? undefined}
             minConfidence={search.filters.minConfidence ?? undefined}
             minPrice={search.filters.minPrice ?? undefined}
-            priceRange={priceRange}
+            priceRange={drawerPriceRange}
             selectedBrand={selectedBrand}
             selectedCategories={search.filters.categories}
             selectedChains={search.filters.chains}
