@@ -135,3 +135,35 @@ export function rankLandingShortcuts<T extends LandingShortcutInput>(
     .sort((a, b) => b.score - a.score || a.index - b.index)
     .map(({ shortcut }) => shortcut);
 }
+
+export type BrandTolerance = 'favorite' | 'acceptable' | 'excluded';
+
+export type PreferredBrandControl = {
+  brand: string;
+  tolerance: BrandTolerance;
+  note: string;
+};
+
+export const demoPreferredBrandControls: PreferredBrandControl[] = [
+  { brand: 'Garant', tolerance: 'favorite', note: 'Prioritize for pantry staples and dairy swaps.' },
+  { brand: 'Änglamark', tolerance: 'favorite', note: 'Prefer when organic substitutes are available.' },
+  { brand: 'ICA Basic', tolerance: 'acceptable', note: 'Show when savings are meaningful and ratings stay strong.' },
+  { brand: 'Unknown private label', tolerance: 'excluded', note: 'Hide from automatic substitutions until reviewed.' },
+];
+
+export function groupPreferredBrandControls(controls: readonly PreferredBrandControl[] = demoPreferredBrandControls) {
+  return {
+    favorite: controls.filter((control) => control.tolerance === 'favorite'),
+    acceptable: controls.filter((control) => control.tolerance === 'acceptable'),
+    excluded: controls.filter((control) => control.tolerance === 'excluded'),
+  };
+}
+
+export function scoreBrandTolerance(brand: string | null | undefined, controls: readonly PreferredBrandControl[] = demoPreferredBrandControls) {
+  const normalizedBrand = (brand ?? '').trim().toLocaleLowerCase('sv-SE');
+  const match = controls.find((control) => control.brand.trim().toLocaleLowerCase('sv-SE') === normalizedBrand);
+  if (!match) return { tolerance: 'acceptable' as BrandTolerance, score: 0 };
+  if (match.tolerance === 'favorite') return { tolerance: match.tolerance, score: 30 };
+  if (match.tolerance === 'excluded') return { tolerance: match.tolerance, score: -100 };
+  return { tolerance: match.tolerance, score: 5 };
+}

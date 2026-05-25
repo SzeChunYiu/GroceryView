@@ -4,13 +4,27 @@ import { useState } from 'react';
 
 type PriceAlertDialogProps = {
   productName?: string;
+  activeAlertCount?: number;
+  freeAlertLimit?: number;
+  premiumFeaturesEnabled?: boolean;
 };
 
-export function PriceAlertDialog({ productName = 'this product' }: PriceAlertDialogProps) {
+export function PriceAlertDialog({
+  productName = 'this product',
+  activeAlertCount = 0,
+  freeAlertLimit = 3,
+  premiumFeaturesEnabled = false
+}: PriceAlertDialogProps) {
+  const freeLimitReached = !premiumFeaturesEnabled && activeAlertCount >= freeAlertLimit;
   const [targetPrice, setTargetPrice] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   const validateTargetPrice = () => {
+    if (freeLimitReached) {
+      setError(`Free accounts can keep up to ${freeAlertLimit} active price alerts. Upgrade to premium for unlimited alerts and faster deal monitoring.`);
+      return false;
+    }
+
     const parsed = Number(targetPrice.replace(',', '.'));
     if (!targetPrice.trim()) {
       setError('Enter a target price before saving this price alert.');
@@ -33,6 +47,9 @@ export function PriceAlertDialog({ productName = 'this product' }: PriceAlertDia
       }}
     >
       <h2 className="text-xl font-black text-slate-950">Create a price alert for {productName}</h2>
+      <p className="mt-3 rounded-2xl bg-amber-50 p-3 text-sm font-bold text-amber-900">
+        Free accounts include {freeAlertLimit} active price alerts. Premium unlocks unlimited alerts, priority checks, and earlier deal notifications.
+      </p>
       <label className="mt-4 block text-sm font-bold text-slate-700" htmlFor="price-alert-target">
         Target price
       </label>
@@ -50,7 +67,7 @@ export function PriceAlertDialog({ productName = 'this product' }: PriceAlertDia
           {error}
         </p>
       ) : null}
-      <button className="mt-4 rounded-2xl bg-emerald-700 px-4 py-2 text-sm font-black text-white" type="submit">
+      <button className="mt-4 rounded-2xl bg-emerald-700 px-4 py-2 text-sm font-black text-white disabled:cursor-not-allowed disabled:bg-slate-400" disabled={freeLimitReached} type="submit">
         Save alert
       </button>
     </form>

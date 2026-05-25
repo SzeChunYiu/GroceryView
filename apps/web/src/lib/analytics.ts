@@ -22,6 +22,26 @@ export type RecentProductSearch = {
   searchedAt: string;
 };
 
+export type ProductSearchPerformanceTelemetry = {
+  cacheHit: boolean;
+  cacheHitRate: number;
+  latencyMs: number;
+  observedAt: string;
+  query: string;
+  resultCount: number;
+  source: string;
+  timedOut: boolean;
+  timeoutRate: number;
+};
+
+export type ProductSearchPerformanceSummary = {
+  averageLatencyMs: number;
+  averageResultCount: number;
+  cacheHitRate: number;
+  sampleSize: number;
+  timeoutRate: number;
+};
+
 type FunnelDeviceSegment = 'desktop' | 'mobile' | 'tablet' | 'unknown';
 type FunnelAccountSegment = 'guest' | 'account' | 'unknown';
 
@@ -31,9 +51,50 @@ export const recentProductSearchesStorageKey = 'groceryview:recent-product-searc
 const maxBatchSize = 20;
 const flushDelayMs = 1200;
 const maxRecentSearches = 10;
+const maxProductSearchTelemetrySamples = 100;
 
 let pendingImpressions: ItemCardImpression[] = [];
 let flushTimer: ReturnType<typeof setTimeout> | null = null;
+const recentProductSearchPerformanceTelemetry: ProductSearchPerformanceTelemetry[] = [];
+
+function rate(count: number, total: number) {
+  return total === 0 ? 0 : count / total;
+}
+
+export function summarizeProductSearchPerformanceTelemetry(): ProductSearchPerformanceSummary {
+  const sampleSize = recentProductSearchPerformanceTelemetry.length;
+  const totalLatencyMs = recentProductSearchPerformanceTelemetry.reduce((sum, event) => sum + event.latencyMs, 0);
+  const totalResultCount = recentProductSearchPerformanceTelemetry.reduce((sum, event) => sum + event.resultCount, 0);
+
+  return {
+    averageLatencyMs: sampleSize === 0 ? 0 : Math.round(totalLatencyMs / sampleSize),
+    averageResultCount: sampleSize === 0 ? 0 : Number((totalResultCount / sampleSize).toFixed(2)),
+    cacheHitRate: rate(recentProductSearchPerformanceTelemetry.filter((event) => event.cacheHit).length, sampleSize),
+    sampleSize,
+    timeoutRate: rate(recentProductSearchPerformanceTelemetry.filter((event) => event.timedOut).length, sampleSize)
+  };
+}
+
+export function recordProductSearchPerformanceTelemetry(
+  event: Omit<ProductSearchPerformanceTelemetry, 'cacheHitRate' | 'observedAt' | 'timeoutRate'>
+) {
+  const telemetry: ProductSearchPerformanceTelemetry = {
+    ...event,
+    cacheHitRate: 0,
+    observedAt: new Date().toISOString(),
+    timeoutRate: 0
+  };
+
+  recentProductSearchPerformanceTelemetry.push(telemetry);
+  if (recentProductSearchPerformanceTelemetry.length > maxProductSearchTelemetrySamples) {
+    recentProductSearchPerformanceTelemetry.shift();
+  }
+
+  const summary = summarizeProductSearchPerformanceTelemetry();
+  telemetry.cacheHitRate = summary.cacheHitRate;
+  telemetry.timeoutRate = summary.timeoutRate;
+  return telemetry;
+}
 
 function clearFlushTimer() {
   if (flushTimer) {
