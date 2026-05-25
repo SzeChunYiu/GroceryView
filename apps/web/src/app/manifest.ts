@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: 'GroceryView',
     description: 'Install GroceryView for mobile-first Swedish grocery price checks, saved lists, favourites, cached product details, and offline store trips.',
     id: '/',
-    start_url: '/',
+    start_url: '/?utm_source=pwa',
     scope: '/',
     display: 'standalone',
     orientation: 'portrait',
