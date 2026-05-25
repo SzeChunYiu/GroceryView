@@ -2,9 +2,8 @@ import { createPgQueryExecutor, searchProductsByText, type ProductSearchResult }
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { recordProductSearchPerformanceTelemetry, type ProductSearchPerformanceTelemetry } from '@/lib/analytics';
-import { fuzzyProductSearchQueries, rankFuzzyProductResults } from '@/lib/search-fuzzy';
 import { searchExplanationBadgesForProduct } from '@/lib/search-filters';
-import { buildMisspelledQueryRecovery, expandGrocerySearchQueryWithTelemetry, type GrocerySearchExpansion, type GrocerySearchExpansionTelemetry } from '@/lib/search-suggest';
+import { expandGrocerySearchQueryWithTelemetry, type GrocerySearchExpansion, type GrocerySearchExpansionTelemetry } from '@/lib/search-suggest';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -65,7 +64,18 @@ function withSearchExplanationBadges(query: string, results: ProductSearchResult
   }));
 }
 
-const productSearchTelemetrySource = 'postgres.products_tsvector_alias_synonym_fuzzy_rank';
+const productSearchTelemetrySource = 'postgres.products_tsvector_alias_synonym_expansion';
+
+function mergeSearchResults(batches: ProductSearchResult[][]): ProductSearchResult[] {
+  const byId = new Map<string, ProductSearchResult>();
+  for (const results of batches) {
+    for (const result of results) {
+      const existing = byId.get(result.id);
+      if (!existing || result.searchRank > existing.searchRank) byId.set(result.id, result);
+    }
+  }
+  return [...byId.values()].sort((left, right) => right.searchRank - left.searchRank || left.name.localeCompare(right.name, 'sv')).slice(0, 8);
+}
 
 function isTimeoutError(error: unknown) {
   if (!(error instanceof Error)) return false;
@@ -114,7 +124,6 @@ function responsePayload(
     matchedAliases: expansion.matchedAliases,
     matchedFuzzyAliases: expansion.matchedFuzzyAliases,
     matchedSynonyms: expansion.matchedSynonyms,
-    queryRecovery: buildMisspelledQueryRecovery(query),
     results,
     performanceTelemetry: {
       cacheHit: telemetry.cacheHit,
@@ -167,9 +176,8 @@ export async function GET(request: Request) {
 
   try {
     const executor = await executorForDatabaseUrl(databaseUrl);
-    const searchQueries = fuzzyProductSearchQueries(query, expansion);
-    const batches = await Promise.all(searchQueries.map((expandedQuery) => searchProductsByText(executor, expandedQuery, { limit: 8 })));
-    const results = rankFuzzyProductResults(query, batches, expansion);
+    const batches = await Promise.all(expansion.expandedQueries.map((expandedQuery) => searchProductsByText(executor, expandedQuery, { limit: 8 })));
+    const results = mergeSearchResults(batches);
     const telemetry = buildPerformanceTelemetry(query, results.length, startedAt, expansionTelemetry);
     logPerformanceTelemetry(telemetry);
     return NextResponse.json(responsePayload(query, withSearchExplanationBadges(query, results, expansion), expansion, telemetry));
