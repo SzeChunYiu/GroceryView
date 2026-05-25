@@ -7216,7 +7216,6 @@ describe('daily ingestion runner', () => {
       'okq8',
       'OKQ8',
       GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL,
-  GROCERYVIEW_DAILY_OB_IS_FUEL_PRICES_URL,
       'okq8-fuel-prices-v1'
     ]);
     const fuelSourceLink = executor.calls.find((call) => call.sql.includes('insert into fuel_price_source_observations'));
