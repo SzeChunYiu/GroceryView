@@ -69,9 +69,14 @@ export default function AdminSourceHealthPage() {
               <Eyebrow>Ingestion sources</Eyebrow>
               <h2 className="mt-2 text-2xl font-black tracking-tight">Freshness, row deltas, failures, and stale thresholds</h2>
             </div>
-            <Link className="rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white" href="/data-sources">
-              View source provenance
-            </Link>
+            <div className="flex flex-wrap gap-2">
+              <Link className="rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white" href="/admin/slo-error-budgets">
+                View SLO budgets
+              </Link>
+              <Link className="rounded-full border border-slate-300 px-5 py-3 text-sm font-black text-slate-800" href="/data-sources">
+                View source provenance
+              </Link>
+            </div>
           </div>
           <SourceHealthDashboardTable sources={sourceHealthDashboardRows} />
         </Card>
