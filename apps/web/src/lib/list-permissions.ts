@@ -28,6 +28,7 @@ export type PublicListShare = {
   isExpired: boolean;
   items: PublicListShareItem[];
   listId: string;
+  updatedAt: string;
 };
 
 export const listShareRoles: Record<ListShareRole, { label: string; description: string; capabilities: string[] }> = {
@@ -80,6 +81,29 @@ export const accountListSharePermissions: ListSharePermission[] = [
 
 export function resolveListShareRole(role: string | null | undefined): ListShareRole {
   return role === 'edit' || role === 'comment' ? role : 'view';
+}
+
+export function canListShareRoleCommentOnItems(role: ListShareRole) {
+  return role === 'comment' || role === 'edit';
+}
+
+export type ListItemCommentIntent = 'substitution' | 'quantity' | 'store_note';
+
+export function buildListItemCommentDraft(input: {
+  body: string;
+  itemId: string;
+  role: ListShareRole;
+  intent?: ListItemCommentIntent;
+}) {
+  const body = input.body.trim().slice(0, 160);
+
+  return {
+    body,
+    canComment: body.length > 0 && canListShareRoleCommentOnItems(input.role),
+    itemId: input.itemId,
+    intent: input.intent ?? 'store_note',
+    role: input.role
+  } as const;
 }
 
 export function createListSharePermission(input: {
@@ -164,6 +188,7 @@ function decodeSharePayload(shareId: string) {
       expiresAt?: unknown;
       items?: unknown;
       listId?: unknown;
+      updatedAt?: unknown;
     };
   } catch {
     return null;
@@ -182,12 +207,13 @@ export function readPublicListShare(shareId: string): PublicListShare | null {
     expiresAt,
     isExpired: Number.isFinite(expiresAtMs) && expiresAtMs <= Date.now(),
     items: Array.isArray(payload.items) ? normalizePublicListShareItems(payload.items) : [],
-    listId: safeString(payload.listId, 'shared-shopping-list')
+    listId: safeString(payload.listId, 'shared-shopping-list'),
+    updatedAt: safeString(payload.updatedAt, safeString(payload.createdAt, new Date(0).toISOString()))
   };
 }
 
 export function publicListSharePath(shareId: string) {
-  return `/lists/${encodeURIComponent(shareId)}`;
+  return `/list/shared/${encodeURIComponent(shareId)}`;
 }
 
 export type PublicListShareControl = {
