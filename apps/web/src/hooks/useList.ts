@@ -22,7 +22,7 @@ export type ProductListItemInput = Omit<ShoppingListItem, 'checked' | 'id' | 'im
 };
 
 type PersistedCustomListItemInput = BulkImportedListItemInput | (Omit<ShoppingListItem, 'checked'> & {
-  importSource: 'item-detail';
+  importSource: 'item-detail' | 'pantry-suggestion';
 });
 
 export type ShareLinkState = {
@@ -177,7 +177,7 @@ function listStateFromStorage(value: string | null): Required<PersistedListState
       ? maybeImportedItems.filter((item): item is PersistedCustomListItemInput => (
         item !== null
         && typeof item === 'object'
-        && (item.importSource === 'bulk-clipboard' || item.importSource === 'item-detail')
+        && (item.importSource === 'bulk-clipboard' || item.importSource === 'item-detail' || item.importSource === 'pantry-suggestion')
         && typeof item.id === 'string'
         && typeof item.name === 'string'
         && typeof item.quantity === 'string'

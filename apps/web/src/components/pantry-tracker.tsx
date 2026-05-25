@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   applyPantryConsumptionEvents,
   type PantryConsumptionEvent,
@@ -26,6 +26,8 @@ const statusClasses: Record<PantryStockStatus, string> = {
   depleted: 'bg-rose-100 text-rose-900'
 };
 
+const PANTRY_TRACKER_SUGGESTION_ACTIONS_KEY = 'groceryview:pantry-tracker-suggestion-actions:v1';
+
 function formatDays(days: number | null) {
   if (days === null) return 'No depletion estimate';
   if (days === 0) return 'Depleted';
@@ -46,7 +48,24 @@ function makeEvent(productId: string, quantity: number, source: PantryConsumptio
 export function PantryTracker({ items }: PantryTrackerProps) {
   const [events, setEvents] = useState<PantryConsumptionEvent[]>([]);
   const [manualQuantities, setManualQuantities] = useState<Record<string, string>>({});
+  const [acceptedSuggestions, setAcceptedSuggestions] = useState<string[]>([]);
+  const [dismissedSuggestions, setDismissedSuggestions] = useState<string[]>([]);
   const stock = useMemo(() => applyPantryConsumptionEvents(items, events), [events, items]);
+
+  useEffect(() => {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(PANTRY_TRACKER_SUGGESTION_ACTIONS_KEY) ?? '{}') as { accepted?: unknown; dismissed?: unknown };
+      setAcceptedSuggestions(Array.isArray(parsed.accepted) ? parsed.accepted.filter((id): id is string => typeof id === 'string') : []);
+      setDismissedSuggestions(Array.isArray(parsed.dismissed) ? parsed.dismissed.filter((id): id is string => typeof id === 'string') : []);
+    } catch {
+      setAcceptedSuggestions([]);
+      setDismissedSuggestions([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(PANTRY_TRACKER_SUGGESTION_ACTIONS_KEY, JSON.stringify({ accepted: acceptedSuggestions, dismissed: dismissedSuggestions }));
+  }, [acceptedSuggestions, dismissedSuggestions]);
 
   function recordTripCompletion(item: PantryStockItem) {
     setEvents((current) => [...current, makeEvent(item.productId, item.estimatedDailyUse, 'trip')]);
@@ -58,6 +77,14 @@ export function PantryTracker({ items }: PantryTrackerProps) {
 
     setEvents((current) => [...current, makeEvent(productId, quantity, 'manual')]);
     setManualQuantities((current) => ({ ...current, [productId]: '' }));
+  }
+
+  function acceptSuggestion(productId: string) {
+    setAcceptedSuggestions((current) => [...new Set([...current, productId])]);
+  }
+
+  function dismissSuggestion(productId: string) {
+    setDismissedSuggestions((current) => [...new Set([...current, productId])]);
   }
 
   return (
@@ -73,7 +100,7 @@ export function PantryTracker({ items }: PantryTrackerProps) {
       </div>
 
       <div className="mt-4 space-y-3">
-        {stock.map((item) => (
+        {stock.filter((item) => !dismissedSuggestions.includes(item.productId)).map((item) => (
           <div className="rounded-2xl bg-slate-50 p-4" key={item.productId}>
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
@@ -127,6 +154,14 @@ export function PantryTracker({ items }: PantryTrackerProps) {
                   Find recipes
                 </Link>
                 <Link className="rounded-full bg-white px-3 py-1 text-xs font-black text-emerald-900 hover:text-emerald-700" href={`/deals?replace=${item.productId}`}>Replacement deals</Link>
+                <Link
+                  className="rounded-full bg-emerald-800 px-3 py-1 text-xs font-black text-white hover:bg-emerald-900"
+                  href={`/list?add=${encodeURIComponent(item.productId)}`}
+                  onClick={() => acceptSuggestion(item.productId)}
+                >
+                  {acceptedSuggestions.includes(item.productId) ? 'Added to list' : 'Add to list'}
+                </Link>
+                <button className="rounded-full bg-white px-3 py-1 text-xs font-black text-slate-700 hover:text-rose-800" onClick={() => dismissSuggestion(item.productId)} type="button">Dismiss</button>
               </div>
             ) : null}
           </div>

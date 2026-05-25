@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { AppNav } from '@/components/app-nav';
 import { BottomNav } from '@/components/bottom-nav';
@@ -47,12 +47,21 @@ const initialPantryItems: PantryInventoryItem[] = [
   { id: 'frozen-veg', name: 'Frozen vegetables', aisle: 'Freezer', quantity: '1 bag', expiresAt: null, recipeHref: '/meal-planner?ingredient=frozen-veg', replacementHref: '/deals?replace=frozen-veg', status: 'stocked' }
 ];
 
+const PANTRY_SUGGESTION_ACTIONS_KEY = 'groceryview:pantry-suggestion-actions:v1';
+
+type PersistedSuggestionActions = {
+  added: string[];
+  dismissed: string[];
+};
+
 function Card({ children, className = '' }: Readonly<{ children: ReactNode; className?: string }>) {
   return <section className={`rounded-[1.75rem] border border-slate-200 bg-white/88 p-5 shadow-sm ${className}`}>{children}</section>;
 }
 
 export default function PantryInventoryPage() {
   const [items, setItems] = useState(initialPantryItems);
+  const [suggestionActions, setSuggestionActions] = useState<PersistedSuggestionActions>({ added: [], dismissed: [] });
+  const [hasLoadedSuggestionActions, setHasLoadedSuggestionActions] = useState(false);
   const itemsWithExpiry = useMemo(() => items.map((item) => ({
     ...item,
     expiryReminder: buildExpiryReminder({ expiresAt: item.expiresAt })
@@ -62,11 +71,38 @@ export default function PantryInventoryPage() {
     return counts;
   }, { stocked: 0, consumed: 0, low: 0, replenished: 0 }), [items]);
   const useSoonCount = itemsWithExpiry.filter((item) => item.expiryReminder.urgency === 'expired' || item.expiryReminder.urgency === 'use-soon').length;
+  const activeSuggestions = itemsWithExpiry.filter((item) => !suggestionActions.dismissed.includes(item.id));
+
+  useEffect(() => {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(PANTRY_SUGGESTION_ACTIONS_KEY) ?? '{}') as Partial<PersistedSuggestionActions>;
+      setSuggestionActions({
+        added: Array.isArray(parsed.added) ? parsed.added.filter((id): id is string => typeof id === 'string') : [],
+        dismissed: Array.isArray(parsed.dismissed) ? parsed.dismissed.filter((id): id is string => typeof id === 'string') : []
+      });
+    } catch {
+      setSuggestionActions({ added: [], dismissed: [] });
+    } finally {
+      setHasLoadedSuggestionActions(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!hasLoadedSuggestionActions) return;
+    localStorage.setItem(PANTRY_SUGGESTION_ACTIONS_KEY, JSON.stringify(suggestionActions));
+  }, [hasLoadedSuggestionActions, suggestionActions]);
 
   function markItem(itemId: string, status: PantryStatus) {
     setItems((currentItems) => currentItems.map((item) => (
       item.id === itemId ? { ...item, status } : item
     )));
+  }
+
+  function recordSuggestionAction(itemId: string, action: 'added' | 'dismissed') {
+    setSuggestionActions((current) => ({
+      added: action === 'added' ? [...new Set([...current.added, itemId])] : current.added,
+      dismissed: action === 'dismissed' ? [...new Set([...current.dismissed, itemId])] : current.dismissed.filter((id) => id !== itemId)
+    }));
   }
 
   return (
@@ -108,7 +144,7 @@ export default function PantryInventoryPage() {
           </div>
 
           <div className="mt-5 space-y-3">
-            {itemsWithExpiry.map((item) => (
+            {activeSuggestions.map((item) => (
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4" key={item.id}>
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                   <div>
@@ -131,6 +167,20 @@ export default function PantryInventoryPage() {
                   </span>
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
+                  <Link
+                    className="rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white transition hover:bg-emerald-900"
+                    href={`/list?add=${encodeURIComponent(item.id)}`}
+                    onClick={() => recordSuggestionAction(item.id, 'added')}
+                  >
+                    {suggestionActions.added.includes(item.id) ? 'Added to list' : 'Add suggestion to list'}
+                  </Link>
+                  <button
+                    className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-black text-slate-700 transition hover:border-rose-700 hover:text-rose-900"
+                    onClick={() => recordSuggestionAction(item.id, 'dismissed')}
+                    type="button"
+                  >
+                    Dismiss suggestion
+                  </button>
                   {(['consumed', 'low', 'replenished'] as PantryStatus[]).map((status) => (
                     <button
                       aria-pressed={item.status === status}
