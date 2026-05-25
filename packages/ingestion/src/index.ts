@@ -1905,7 +1905,7 @@ function icaProductToDailyItem(row: IcaProduct): RetailerConnectorParsedProduct 
     price,
     regularPrice: row.promoPrice !== null && row.price !== null && row.price > row.promoPrice ? row.price : undefined,
     promoText: row.promotionDescription || undefined,
-    memberOnly: false,
+    memberOnly: row.is_member_price === true,
     observedAt: row.retrievedAt,
     originCountry: normalizeRetailerOriginCountry(row.countryOfOrigin),
     sourceUrl: row.sourceUrl,

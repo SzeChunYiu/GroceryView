@@ -2906,6 +2906,65 @@ describe('fetchIcaProducts', () => {
     ]);
   });
 
+  it('codifies source-backed ICA format, member, multi-buy, and counter channel quirks', async () => {
+    const fetchImpl: typeof fetch = async () => Response.json({
+      productGroups: [{
+        type: 'ON_OFFER',
+        decoratedProducts: [{
+          productId: 'ica-member-multibuy',
+          retailerProductId: '2142371',
+          name: 'Ätmogen Avokado 3-pack Klass 1 ICA',
+          brand: 'ICA',
+          packSizeDescription: '330g',
+          price: { amount: 40.6, currency: 'SEK' },
+          unitPrice: { price: { amount: 123.03, currency: 'SEK' }, unit: 'fop.price.per.kg' },
+          promotions: [{ description: '2 för 35 kr -- Stammispris' }]
+        }, {
+          productId: 'ica-counter-cheese',
+          retailerProductId: 'counter-cheese',
+          name: 'Herrgård, Präst, Grevé',
+          brand: 'Arla',
+          packSizeDescription: 'ca 700 g',
+          price: { amount: 79, currency: 'SEK' },
+          unitPrice: { price: { amount: 79, currency: 'SEK' }, unit: 'fop.price.per.kg' },
+          promotions: [{ description: '79 kr/kg' }]
+        }]
+      }]
+    });
+
+    const rows = await fetchIcaProducts({
+      fetchImpl,
+      storeName: 'ICA Kvantum Åstorp',
+      retrievedAt: '2026-05-25T12:00:00.000Z',
+      maxRows: 2
+    });
+
+    assert.deepEqual(rows.map((row) => ({
+      code: row.code,
+      format: row.format,
+      channel: row.channel,
+      is_member_price: row.is_member_price,
+      multi_buy: row.multi_buy
+    })), [{
+      code: '2142371',
+      format: 'kvantum',
+      channel: 'packaged',
+      is_member_price: true,
+      multi_buy: {
+        quantity: 2,
+        price: 35,
+        currency: 'SEK',
+        sourceText: '2 för 35 kr -- Stammispris'
+      }
+    }, {
+      code: 'counter-cheese',
+      format: 'kvantum',
+      channel: 'counter',
+      is_member_price: undefined,
+      multi_buy: undefined
+    }]);
+  });
+
   it('deduplicates repeated ICA store products', async () => {
     const product = {
       productId: 'product-1',
