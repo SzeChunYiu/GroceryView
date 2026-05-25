@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ListCard, type MealPlanListImportSummary } from '@/components/list-card';
 import { ListSharePreview } from '@/components/list-share-preview';
+import { PrintButton } from '@/components/PrintButton';
+import { buildShoppingListPdfDocument, printPriceSummary, type ShoppingListPdfItem } from '@/lib/exportListPdf';
 import { createPublicListShareToken, publicListSharePath, type PublicListShareItem } from '@/lib/list-permissions';
 import { parseMealPlanShoppingListExport, type MealPlanShoppingListExport } from '@/lib/meal-budgets';
 import { generateRecurringListInstance, recurringListTemplates } from '@/lib/recurring-lists';
@@ -15,6 +17,25 @@ const demoItems = [
   { id: 'pasta-sauce', name: 'Pasta sauce', quantity: '1 jar', ownerRole: 'teen' as const, matchedProductSlug: 'makaroner-pasta-101302991-st' },
   { id: 'sparkling-water', name: 'Sparkling water', quantity: '6-pack', ownerRole: 'guest' as const }
 ];
+
+const demoPerStorePrices: Record<string, ShoppingListPdfItem['perStorePrices']> = {
+  bananas: [
+    { storeName: 'ICA nearby store', priceLabel: '24.90 kr/kg' },
+    { storeName: 'Willys nearby store', priceLabel: '22.90 kr/kg' }
+  ],
+  'oat-milk': [
+    { storeName: 'ICA nearby store', priceLabel: '22.50 kr' },
+    { storeName: 'Willys nearby store', priceLabel: '20.90 kr' }
+  ],
+  'pasta-sauce': [
+    { storeName: 'ICA nearby store', priceLabel: '31.90 kr' },
+    { storeName: 'Coop nearby store', priceLabel: '29.90 kr' }
+  ],
+  'sparkling-water': [
+    { storeName: 'Willys nearby store', priceLabel: '36.90 kr' },
+    { storeName: 'Coop nearby store', priceLabel: '39.90 kr' }
+  ]
+};
 
 const publicDemoShareItems: PublicListShareItem[] = demoItems.map((item) => ({
   detail: `${item.ownerRole} item shared from the family grocery list`,
@@ -67,6 +88,15 @@ function mealPlanImportSummary(exportPayload: MealPlanShoppingListExport): MealP
   };
 }
 
+function pdfItemsForList(items: Array<{ id: string; name: string; quantity: string }>): ShoppingListPdfItem[] {
+  return items.map((item) => ({
+    id: item.id,
+    name: item.name,
+    perStorePrices: demoPerStorePrices[item.id] ?? [],
+    quantity: item.quantity
+  }));
+}
+
 export async function generateMetadata({ searchParams }: { searchParams?: Promise<ListPageSearchParams> }): Promise<Metadata> {
   const resolvedSearchParams = await (searchParams ?? Promise.resolve({}));
   return metadataForShoppingListShare(resolvedSearchParams.share);
@@ -97,6 +127,11 @@ export default async function ShoppingListPage({ searchParams }: { searchParams?
     template,
     instance: generateRecurringListInstance(template, new Date('2026-05-25T00:00:00.000Z'))
   }));
+  const pdfDocument = buildShoppingListPdfDocument({
+    generatedAt: '2026-05-25T00:00:00.000Z',
+    items: pdfItemsForList(listItems),
+    listName: 'Weekly staples'
+  });
 
   return (
     <div className="space-y-6">
@@ -178,6 +213,39 @@ export default async function ShoppingListPage({ searchParams }: { searchParams?
         <p className="mt-3 text-sm text-emerald-950">
           Approximate route: {storeLayoutDepartmentsForOrder(selectedChain, groupOrder).map((department) => department.label).join(' → ')}.
         </p>
+      </section>
+      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm" aria-labelledby="list-pdf-export-title">
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">PDF export</p>
+            <h2 className="mt-1 text-xl font-bold text-slate-950" id="list-pdf-export-title">Print or save this list as PDF</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              {pdfDocument.subtitle} Browser print controls can save the formatted list as {pdfDocument.fileName}.
+            </p>
+          </div>
+          <PrintButton fileName={pdfDocument.fileName} label="Save as PDF" />
+        </div>
+        <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200 print:border-slate-400" data-shopping-list-pdf-export>
+          <table className="min-w-full text-left text-sm">
+            <caption className="sr-only">{pdfDocument.title} PDF export with quantities and per-store prices</caption>
+            <thead className="bg-slate-950 text-white print:bg-white print:text-slate-950">
+              <tr>
+                <th className="px-3 py-2">Item</th>
+                <th className="px-3 py-2">Quantity</th>
+                <th className="px-3 py-2">Per-store prices</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pdfDocument.items.map((item) => (
+                <tr className="border-t border-slate-200" key={item.id}>
+                  <td className="px-3 py-3 font-bold text-slate-950">{item.name}</td>
+                  <td className="px-3 py-3 text-slate-700">{item.quantity}</td>
+                  <td className="px-3 py-3 text-slate-700">{printPriceSummary(item)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </section>
       <ListCard
         currentRole="guardian"
