@@ -15,6 +15,7 @@ import {
   type SavedSearchEntry
 } from '@/lib/personalization';
 import type { SearchExplanationBadge } from '@/lib/search-filters';
+import { fuzzySuggestMatch } from '@/lib/search-suggest';
 
 type ProductSearchResult = {
   id: string;
@@ -28,8 +29,16 @@ type ProductSearchResult = {
 
 type ProductSearchResponse = {
   query: string;
+  fuzzyCorrections?: string[];
+  matchedFuzzyAliases?: string[];
+  misspelledRecovery?: MisspelledQueryRecovery;
   results: ProductSearchResult[];
   error?: string;
+};
+
+type MisspelledQueryRecovery = {
+  didYouMean: string[];
+  popularAlternatives: string[];
 };
 
 type HeaderSearchFacetChip = {
@@ -129,6 +138,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
   const [results, setResults] = useState<ProductSearchResult[]>([]);
   const [facetChips, setFacetChips] = useState<HeaderSearchFacetChip[]>([]);
   const [suggestGroups, setSuggestGroups] = useState<HeaderSuggestGroup[]>([]);
+  const [fuzzyCorrections, setFuzzyCorrections] = useState<string[]>([]);
   const [recentSearches, setRecentSearches] = useState<RecentSearchHistoryEntry[]>([]);
   const [savedSearches, setSavedSearches] = useState<SavedSearchEntry[]>([]);
   const [activeOptionIndex, setActiveOptionIndex] = useState(-1);
@@ -213,6 +223,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
       setResults([]);
       setFacetChips([]);
       setSuggestGroups([]);
+      setFuzzyCorrections([]);
       setActiveOptionIndex(-1);
       setStatus('idle');
       return;
@@ -252,7 +263,13 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
         if (!response.ok || payload.error) throw new Error(payload.error ?? 'product_search_failed');
         if (controller.signal.aborted) return;
         const nextResults = payload.results ?? [];
+        const nextCorrections = [
+          ...(payload.fuzzyCorrections ?? []),
+          ...(payload.matchedFuzzyAliases ?? []),
+          ...(payload.misspelledRecovery?.didYouMean ?? [])
+        ].filter((candidate, index, values) => values.findIndex((value) => value.toLocaleLowerCase('sv-SE') === candidate.toLocaleLowerCase('sv-SE')) === index);
         setResults(nextResults);
+        setFuzzyCorrections(nextCorrections.slice(0, 4));
         setStatus(nextResults.length > 0 ? 'ready' : 'empty');
         if (nextResults.length > 0) setRecentSearches(rememberRecentSearchHistory(trimmedQuery, nextResults.length));
         trackSearchToSavingsFunnelStep('landing_search');
@@ -262,6 +279,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
         setResults([]);
         setFacetChips([]);
         setSuggestGroups([]);
+        setFuzzyCorrections([]);
         setStatus('error');
       }
     }, 300);
@@ -447,6 +465,16 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
           {status === 'loading' ? (
             <p className="px-4 py-3 text-sm font-bold text-slate-600">Searching verified products…</p>
           ) : null}
+          {fuzzyCorrections.length > 0 ? (
+            <div className="border-t border-amber-100 bg-amber-50 px-4 py-3">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-800">Typo-tolerant matches</p>
+              <p className="mt-1 text-sm font-semibold text-amber-950">
+                Ranking close grocery spellings ahead for {fuzzyCorrections.map((term) => (
+                  <span className="ml-1 rounded-full bg-white px-2 py-0.5 text-xs font-black" key={term}>{term}</span>
+                ))}
+              </p>
+            </div>
+          ) : null}
           {suggestGroups.length > 0 ? (
             <div className="max-h-96 overflow-y-auto border-t border-slate-100">
               {suggestGroups.map((group) => (
@@ -527,6 +555,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
             <div className="max-h-96 divide-y divide-slate-100 overflow-y-auto">
               {results.map((result) => {
                 const index = nextOptionIndex();
+                const resultMatch = fuzzySuggestMatch(result.name, trimmedQuery);
                 return (
                   <Link
                     className="block px-4 py-3 transition hover:bg-emerald-50 focus:bg-emerald-50 focus:outline-none"
@@ -537,7 +566,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
                     onKeyDown={(event) => handleOptionKeyDown(event, index)}
                     role="option"
                   >
-                    <span className="block text-sm font-black text-slate-950">{result.name}</span>
+                    <span className="block text-sm font-black text-slate-950"><HighlightedMatch label={result.name} ranges={resultMatch?.matchRanges} /></span>
                     <span className="mt-1 block text-xs font-semibold text-slate-600">{result.brand ?? 'Brand not reported'} · PostgreSQL product search</span>
                     {result.searchExplanationBadges && result.searchExplanationBadges.length > 0 ? (
                       <span className="mt-2 flex flex-wrap gap-1.5" data-search-explanation-badges>

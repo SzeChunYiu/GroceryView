@@ -262,6 +262,12 @@ export function buildMisspelledQueryRecovery(query: string, maxSuggestions = 4):
   return { query, didYouMean, popularAlternatives };
 }
 
+export function fuzzyCorrectionLabels(expansion: GrocerySearchExpansion, recovery: MisspelledQueryRecovery) {
+  return [...expansion.matchedFuzzyAliases, ...recovery.didYouMean]
+    .filter((candidate, index, values) => values.findIndex((value) => normalizeAliasText(value) === normalizeAliasText(candidate)) === index)
+    .slice(0, 4);
+}
+
 export type CategorySearchProduct = {
   name: string;
   brand?: string | null;

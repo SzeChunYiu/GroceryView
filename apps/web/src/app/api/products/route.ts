@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { recordProductSearchPerformanceTelemetry, type ProductSearchPerformanceTelemetry } from '@/lib/analytics';
 import { fuzzyProductSearchQueries, rankFuzzyProductResults } from '@/lib/search-fuzzy';
 import { searchExplanationBadgesForProduct } from '@/lib/search-filters';
-import { expandGrocerySearchQueryWithTelemetry, type GrocerySearchExpansion, type GrocerySearchExpansionTelemetry } from '@/lib/search-suggest';
+import { buildMisspelledQueryRecovery, expandGrocerySearchQueryWithTelemetry, fuzzyCorrectionLabels, type GrocerySearchExpansion, type GrocerySearchExpansionTelemetry } from '@/lib/search-suggest';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -108,12 +108,15 @@ function responsePayload(
   telemetry: ProductSearchPerformanceTelemetry,
   error?: string
 ) {
+  const misspelledRecovery = buildMisspelledQueryRecovery(query);
   return {
     query,
     expandedQueries: expansion.expandedQueries,
     matchedAliases: expansion.matchedAliases,
     matchedFuzzyAliases: expansion.matchedFuzzyAliases,
     matchedSynonyms: expansion.matchedSynonyms,
+    fuzzyCorrections: fuzzyCorrectionLabels(expansion, misspelledRecovery),
+    misspelledRecovery,
     results,
     performanceTelemetry: {
       cacheHit: telemetry.cacheHit,
