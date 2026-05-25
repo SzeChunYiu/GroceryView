@@ -2,9 +2,20 @@ import type { Metadata } from 'next';
 
 export const siteUrl = 'https://grocery-web-mu.vercel.app';
 export const siteName = 'GroceryView';
+export const publicCatalogueRevalidateSeconds = 900;
+export const publicCatalogueStaleWhileRevalidateSeconds = 3600;
+export const publicCatalogueCacheControl = `public, s-maxage=${publicCatalogueRevalidateSeconds}, stale-while-revalidate=${publicCatalogueStaleWhileRevalidateSeconds}`;
 
 const defaultDescription = 'Verified Swedish grocery price intelligence with product tickers, chain comparisons, store coverage, and confidence-labelled savings signals.';
 const localeNegotiatedCurrentRouteCaveat = 'Locale-negotiated current route hreflang alternates share the canonical URL until native route translations exist beyond /sv and /en.';
+
+type PublicCatalogueCacheSurface = 'category' | 'product' | 'products-index' | 'store' | 'stores-index';
+
+type PublicCatalogueCacheMetadata = {
+  surface: PublicCatalogueCacheSurface;
+  cacheControl?: string;
+  revalidateSeconds?: number;
+};
 
 type RouteMetadataConfig = {
   path: string;
@@ -15,6 +26,7 @@ type RouteMetadataConfig = {
   noIndexFollow?: boolean;
   imagePath?: string;
   imageAlt?: string;
+  edgeCache?: PublicCatalogueCacheMetadata;
 };
 
 type ProductSeoInput = {
@@ -100,7 +112,8 @@ export const routeMetadataCatalog = {
   },
   '/categories': {
     title: 'Verified grocery category coverage | GroceryView',
-    description: 'Explore category quality, category deal leaders, OpenPrices depth, and verified dietary aisle coverage across Swedish grocery rows.'
+    description: 'Explore category quality, category deal leaders, OpenPrices depth, and verified dietary aisle coverage across Swedish grocery rows.',
+    edgeCache: { surface: 'category' }
   },
   '/chain-coverage': {
     title: 'Willys and Hemkop category coverage | GroceryView',
@@ -216,7 +229,8 @@ export const routeMetadataCatalog = {
   },
   '/products': {
     title: 'Verified Swedish grocery product catalogue | GroceryView',
-    description: 'Browse verified product tickers with prices, unit-price cards, OpenFoodFacts metadata, image-first browsing, and deal signals.'
+    description: 'Browse verified product tickers with prices, unit-price cards, OpenFoodFacts metadata, image-first browsing, and deal signals.',
+    edgeCache: { surface: 'products-index' }
   },
   '/savings-dashboard': {
     title: 'Personal grocery inflation dashboard | GroceryView',
@@ -249,7 +263,8 @@ export const routeMetadataCatalog = {
   },
   '/stores': {
     title: 'Sweden grocery store directory | GroceryView',
-    description: 'Browse verified Swedish grocery store locations, brands, formats, and source coverage from OpenStreetMap.'
+    description: 'Browse verified Swedish grocery store locations, brands, formats, and source coverage from OpenStreetMap.',
+    edgeCache: { surface: 'stores-index' }
   },
   '/unit-price-alerts': {
     title: 'Unit-price spread alerts | GroceryView',
@@ -310,6 +325,15 @@ function truncateDescription(description: string) {
   return description.length > 180 ? `${description.slice(0, 177)}...` : description;
 }
 
+function publicCatalogueCacheOther(edgeCache: PublicCatalogueCacheMetadata | undefined) {
+  if (!edgeCache) return {};
+  return {
+    'x-groceryview-cache-control': edgeCache.cacheControl ?? publicCatalogueCacheControl,
+    'x-groceryview-revalidate-seconds': String(edgeCache.revalidateSeconds ?? publicCatalogueRevalidateSeconds),
+    'x-groceryview-cache-surface': edgeCache.surface
+  };
+}
+
 export function routeMetadata(route: keyof typeof routeMetadataCatalog | RouteMetadataConfig): Metadata {
   const config = typeof route === 'string' ? { path: route, ...routeMetadataCatalog[route] } : route;
   const alternatePath = config.canonicalPath ?? config.path;
@@ -341,7 +365,8 @@ export function routeMetadata(route: keyof typeof routeMetadataCatalog | RouteMe
     // locale-negotiated alternates stay bound to the current route path.
     alternates: { canonical: canonical, languages: languageAlternateUrls(config.path) },
     other: {
-      'x-groceryview-hreflang-boundary': localeNegotiatedCurrentRouteCaveat
+      'x-groceryview-hreflang-boundary': localeNegotiatedCurrentRouteCaveat,
+      ...publicCatalogueCacheOther(config.edgeCache)
     },
     openGraph: {
       title,
@@ -456,7 +481,8 @@ export function metadataForProduct(product: ProductSeoInput): Metadata {
     title: `${product.name} price ticker | GroceryView`,
     description: `Compare ${product.name}${brand ? ` from ${brand}` : ''} across Swedish grocery data with deal score, unit price, smart swaps, and confidence labels.${priceCopy}`,
     imagePath: `/products/${product.slug}/opengraph-image`,
-    imageAlt: `${product.name} verified GroceryView price image`
+    imageAlt: `${product.name} verified GroceryView price image`,
+    edgeCache: { surface: 'product' }
   });
 }
 
@@ -464,7 +490,8 @@ export function metadataForCategory(category: { slug: string; label: string }): 
   return routeMetadata({
     path: `/categories/${category.slug}`,
     title: `${category.label} grocery deals and price coverage | GroceryView`,
-    description: `Browse verified ${category.label} grocery rows with category deal leaders, chain spreads, OpenPrices observations, and source freshness.`
+    description: `Browse verified ${category.label} grocery rows with category deal leaders, chain spreads, OpenPrices observations, and source freshness.`,
+    edgeCache: { surface: 'category' }
   });
 }
 
@@ -473,6 +500,7 @@ export function metadataForStore(store: StoreSeoInput): Metadata {
   return routeMetadata({
     path: `/stores/${store.slug}`,
     title: `${store.name} store record | GroceryView`,
-    description: `Verified OpenStreetMap grocery store record for ${store.name}, ${store.brand}${place}. Prices are not inferred from store location.`
+    description: `Verified OpenStreetMap grocery store record for ${store.name}, ${store.brand}${place}. Prices are not inferred from store location.`,
+    edgeCache: { surface: 'store' }
   });
 }
