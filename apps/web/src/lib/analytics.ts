@@ -338,3 +338,83 @@ export function trackDealShare(event: Omit<DealShareEvent, 'observedAt' | 'refer
     method: 'POST'
   }).catch(() => undefined);
 }
+
+export type AffiliateLinkMetadata = {
+  placement: 'deal_card' | 'store_link' | 'source_link';
+  surface: string;
+  retailerName: string;
+  destinationUrl: string;
+  productId?: string;
+  dealId?: string;
+  campaignId?: string;
+  sponsored?: boolean;
+};
+
+export type AffiliateOutboundClickEvent = AffiliateLinkMetadata & {
+  disclosureLabel: string;
+  observedAt: string;
+};
+
+const affiliateOutboundEndpoint = '/api/analytics/affiliate-outbound-clicks';
+const groceryViewAffiliateSource = 'groceryview';
+
+export function affiliateDisclosureLabel(metadata: Pick<AffiliateLinkMetadata, 'retailerName' | 'sponsored'>) {
+  const prefix = metadata.sponsored === false ? 'Outbound store link' : 'Affiliate link';
+  return `${prefix}: GroceryView may earn a commission from ${metadata.retailerName}; deal ranking and savings math stay independent.`;
+}
+
+export function buildAffiliateOutboundUrl(metadata: AffiliateLinkMetadata) {
+  try {
+    const url = new URL(metadata.destinationUrl);
+    url.searchParams.set('utm_source', groceryViewAffiliateSource);
+    url.searchParams.set('utm_medium', metadata.sponsored === false ? 'outbound_store' : 'affiliate');
+    url.searchParams.set('utm_campaign', metadata.campaignId ?? metadata.surface);
+    url.searchParams.set('gv_affiliate_disclosure', metadata.sponsored === false ? 'outbound' : 'affiliate');
+    if (metadata.productId) url.searchParams.set('gv_product_id', metadata.productId);
+    if (metadata.dealId) url.searchParams.set('gv_deal_id', metadata.dealId);
+    return url.toString();
+  } catch {
+    return metadata.destinationUrl;
+  }
+}
+
+function sendAffiliateOutboundClick(event: AffiliateOutboundClickEvent) {
+  if (typeof window === 'undefined') return;
+
+  const payload = JSON.stringify({ event });
+  window.dispatchEvent(new CustomEvent('groceryview:affiliate-outbound-click', { detail: event }));
+  if (navigator.sendBeacon) {
+    const sent = navigator.sendBeacon(affiliateOutboundEndpoint, new Blob([payload], { type: 'application/json' }));
+    if (sent) return;
+  }
+
+  void fetch(affiliateOutboundEndpoint, {
+    body: payload,
+    headers: { 'content-type': 'application/json' },
+    keepalive: true,
+    method: 'POST'
+  }).catch(() => undefined);
+}
+
+export function trackAffiliateOutboundClick(metadata: AffiliateLinkMetadata) {
+  sendAffiliateOutboundClick({
+    ...metadata,
+    disclosureLabel: affiliateDisclosureLabel(metadata),
+    observedAt: new Date().toISOString()
+  });
+}
+
+export function affiliateOutboundClickScript(metadata: AffiliateLinkMetadata) {
+  const payload = JSON.stringify({
+    ...metadata,
+    disclosureLabel: affiliateDisclosureLabel(metadata)
+  }).replace(/</g, '\\u003c');
+
+  return `(() => {
+    const event = { ...${payload}, observedAt: new Date().toISOString() };
+    window.dispatchEvent(new CustomEvent('groceryview:affiliate-outbound-click', { detail: event }));
+    const body = JSON.stringify({ event });
+    if (navigator.sendBeacon && navigator.sendBeacon('${affiliateOutboundEndpoint}', new Blob([body], { type: 'application/json' }))) return;
+    fetch('${affiliateOutboundEndpoint}', { body, headers: { 'content-type': 'application/json' }, keepalive: true, method: 'POST' }).catch(() => undefined);
+  })();`;
+}
