@@ -13,6 +13,8 @@ type ReplacementDeal = {
   categorySlug: string;
   currentPrice: number;
   dealId: string;
+  imageAlt?: string;
+  imageUrl?: string | null;
   originalPrice?: number;
   productName: string;
   productSlug: string;
@@ -52,6 +54,8 @@ const spreadDeals: ReplacementDeal[] = topChainSpreads.map((product) => ({
   categorySlug: product.category,
   currentPrice: product.lowestPrice,
   dealId: `spread-${product.slug}`,
+  imageAlt: `${product.name} product image`,
+  imageUrl: product.image,
   originalPrice: product.highestPrice > product.lowestPrice ? product.highestPrice : undefined,
   productName: product.name,
   productSlug: product.slug,
@@ -176,6 +180,9 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
             currentPrice={deal.currentPrice}
             dealEndsAt={flyerDealEndsAt(index)}
             dealId={deal.dealId}
+            imageAlt={deal.imageAlt}
+            imagePriority={index < 2}
+            imageUrl={deal.imageUrl}
             key={deal.dealId}
             originalPrice={deal.originalPrice}
             replacementLabel={replacementFilter ? `Replacement for ${replacementFilter.label}` : undefined}

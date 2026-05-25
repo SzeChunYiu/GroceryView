@@ -12,6 +12,7 @@ import {
 } from '@/lib/analytics';
 import { buildDealContext, type DealHistoryPoint } from '@/lib/deal-context';
 import { dealShareUrl } from '@/lib/seo';
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 
 export type SponsoredDealPlacement = {
   disclosure?: string;
@@ -48,6 +49,9 @@ type DealCardProps = {
   sourceLabel?: string;
   sponsoredPlacement?: SponsoredDealPlacement;
   dealEndsAt?: string;
+  imageUrl?: string | null;
+  imageAlt?: string;
+  imagePriority?: boolean;
 };
 
 function formatPrice(value: number, locale: string, currency: string) {
@@ -106,6 +110,42 @@ function OutboundAffiliateLink({
   );
 }
 
+function LazyDealImage({
+  alt,
+  priority = false,
+  src
+}: Readonly<{
+  alt: string;
+  priority?: boolean;
+  src: string;
+}>) {
+  const { isIntersecting, ref } = useIntersectionObserver<HTMLDivElement>({
+    freezeOnceVisible: true,
+    rootMargin: '240px'
+  });
+  const shouldLoad = priority || isIntersecting;
+
+  return (
+    <div
+      className="relative mb-4 aspect-[4/3] overflow-hidden rounded-2xl border border-market-ink/10 bg-gradient-to-br from-slate-100 to-emerald-50"
+      ref={ref}
+    >
+      {shouldLoad ? (
+        <img
+          alt={alt}
+          className="h-full w-full object-cover"
+          decoding="async"
+          fetchPriority={priority ? 'high' : 'auto'}
+          loading={priority ? 'eager' : 'lazy'}
+          src={src}
+        />
+      ) : (
+        <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-slate-100 via-white to-slate-100" aria-hidden="true" />
+      )}
+    </div>
+  );
+}
+
 export function DealCard({
   title,
   currentPrice,
@@ -131,7 +171,10 @@ export function DealCard({
   replacementLabel,
   sourceLabel,
   sponsoredPlacement,
-  dealEndsAt
+  dealEndsAt,
+  imageUrl,
+  imageAlt,
+  imagePriority = false
 }: DealCardProps) {
   const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle');
   const context = buildDealContext({ currentPrice, discountStartedAt, priceHistory, currency, locale });
@@ -217,6 +260,7 @@ export function DealCard({
           <p className="mt-1 text-amber-900">Provider: {sponsoredPlacement.provider} · Organic ranking separated: {String(separatedFromOrganicRankings)}</p>
         </div>
       ) : null}
+      {imageUrl ? <LazyDealImage alt={imageAlt ?? `${title} deal image`} priority={imagePriority} src={imageUrl} /> : null}
       <div className="flex items-start justify-between gap-3">
         <div>
           {replacementLabel ? (
