@@ -31,7 +31,7 @@ test('global navigation mounts the debounced product search bar', async () => {
   const appNav = await read('src/components/app-nav.tsx');
 
   assert.match(appNav, /import \{ SearchBar \} from '\.\/SearchBar'/);
-  assert.match(appNav, /<SearchBar \/>/);
+  assert.match(appNav, /<SearchBar surface="app-nav" \/>/);
 });
 
 test('web product search API is backed by PostgreSQL full-text search', async () => {
