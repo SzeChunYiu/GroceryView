@@ -4,6 +4,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo, useState, useTransition } from 'react';
 import { compareBasketStrategies, summarizeStoreBasketCoverage } from '@groceryview/core';
+import { buildSmartBasketSubstituteSuggestions } from '@/lib/recurring-basket';
+import { suggestCheaperBasketAlternatives, summarizeWeeklyBudgetProgress } from '@/lib/meal-budgets';
 
 export type BasketCalculatorPriceRow = {
   chainId: string;
@@ -28,6 +30,7 @@ export type BasketCalculatorProduct = {
 type BasketCalculatorProps = {
   products: BasketCalculatorProduct[];
   sourceLabel: string;
+  weeklyBudgetSek: number;
 };
 
 function formatSek(value: number | null | undefined) {
@@ -40,8 +43,13 @@ function initialBasketIds(products: BasketCalculatorProduct[]) {
   return new Set(products.slice(0, 4).map((product) => product.id));
 }
 
-export function BasketCalculator({ products, sourceLabel }: Readonly<BasketCalculatorProps>) {
+function cheapestProductPrice(product: BasketCalculatorProduct) {
+  return product.prices.reduce((lowest, price) => Math.min(lowest, price.price), Number.POSITIVE_INFINITY);
+}
+
+export function BasketCalculator({ products, sourceLabel, weeklyBudgetSek }: Readonly<BasketCalculatorProps>) {
   const [selectedProductIds, setSelectedProductIds] = useState(() => initialBasketIds(products));
+  const [weeklyBudget, setWeeklyBudget] = useState(weeklyBudgetSek);
   const [, startBasketUpdateTransition] = useTransition();
 
   const selectedProducts = useMemo(
@@ -73,6 +81,24 @@ export function BasketCalculator({ products, sourceLabel }: Readonly<BasketCalcu
 
   const comparison = useMemo(() => compareBasketStrategies(basketInput), [basketInput]);
   const coverage = useMemo(() => summarizeStoreBasketCoverage(basketInput), [basketInput]);
+  const weeklyBudgetProgress = useMemo(() => summarizeWeeklyBudgetProgress({
+    plannedTotal: comparison.cheapestByProduct.total,
+    weeklyBudget
+  }), [comparison.cheapestByProduct.total, weeklyBudget]);
+  const budgetAlternatives = useMemo(() => suggestCheaperBasketAlternatives(
+    selectedProducts.map((product) => ({
+      id: product.id,
+      name: product.name,
+      category: product.categoryLabel,
+      currentPrice: cheapestProductPrice(product)
+    })),
+    products.map((product) => ({
+      id: product.id,
+      name: product.name,
+      category: product.categoryLabel,
+      currentPrice: cheapestProductPrice(product)
+    }))
+  ).slice(0, 3), [products, selectedProducts]);
 
   const chainTotals = useMemo(() => chains.map((chain) => {
     const singleStoreOption = comparison.singleStoreOptions.find((option) => option.storeId === chain.id);
@@ -96,6 +122,22 @@ export function BasketCalculator({ products, sourceLabel }: Readonly<BasketCalcu
     ...assignment,
     product: selectedProducts.find((product) => product.id === assignment.productId)
   }));
+
+  const smartSubstitutes = useMemo(() => buildSmartBasketSubstituteSuggestions({
+    catalog: products.map((product) => ({
+      productId: product.id,
+      productName: product.name,
+      categoryLabel: product.categoryLabel,
+      prices: product.prices.map((price) => ({ chainName: price.chainName, price: price.price }))
+    })),
+    items: selectedProducts.map((product) => ({
+      productId: product.id,
+      productName: product.name,
+      categoryLabel: product.categoryLabel,
+      prices: product.prices.map((price) => ({ chainName: price.chainName, price: price.price }))
+    })),
+    unavailableChainNames: chains.map((chain) => chain.name)
+  }), [chains, products, selectedProducts]);
 
   function toggleProduct(productId: string) {
     startBasketUpdateTransition(() => {
@@ -185,6 +227,56 @@ export function BasketCalculator({ products, sourceLabel }: Readonly<BasketCalcu
           </p>
         </div>
 
+        <div className="rounded-[1.75rem] border border-amber-200 bg-amber-50 p-5 shadow-sm">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-amber-800">Weekly budget progress</p>
+              <h3 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Planned split basket vs. weekly budget</h3>
+            </div>
+            <label className="text-sm font-black text-amber-950">
+              Budget
+              <input
+                className="mt-1 block w-32 rounded-xl border border-amber-300 bg-white px-3 py-2 text-right font-black text-slate-950"
+                min="0"
+                onChange={(event) => setWeeklyBudget(Number(event.target.value))}
+                step="25"
+                type="number"
+                value={weeklyBudget}
+              />
+            </label>
+          </div>
+          <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-amber-800">Planned total</p>
+              <p className="mt-1 text-4xl font-black text-slate-950">{formatSek(weeklyBudgetProgress.plannedTotal)}</p>
+            </div>
+            <p className={`rounded-full px-3 py-1 text-sm font-black ${weeklyBudgetProgress.status === 'over' ? 'bg-rose-100 text-rose-900' : weeklyBudgetProgress.status === 'near' ? 'bg-amber-100 text-amber-950' : 'bg-emerald-100 text-emerald-950'}`}>
+              {weeklyBudgetProgress.status === 'over' ? `${formatSek(Math.abs(weeklyBudgetProgress.remaining))} over` : `${formatSek(weeklyBudgetProgress.remaining)} left`}
+            </p>
+          </div>
+          <div className="mt-4 h-3 overflow-hidden rounded-full bg-white">
+            <div
+              className={`h-full rounded-full ${weeklyBudgetProgress.status === 'over' ? 'bg-rose-600' : weeklyBudgetProgress.status === 'near' ? 'bg-amber-500' : 'bg-emerald-600'}`}
+              style={{ width: `${Math.min(100, weeklyBudgetProgress.percentUsed)}%` }}
+            />
+          </div>
+          <p className="mt-3 text-sm font-semibold leading-6 text-amber-950">{weeklyBudgetProgress.warning}</p>
+          <div className="mt-4 space-y-2">
+            {budgetAlternatives.length > 0 ? budgetAlternatives.map((alternative) => (
+              <Link
+                className="block rounded-2xl bg-white/80 p-3 text-sm hover:bg-white"
+                href={`/products/${alternative.alternativeProductId}`}
+                key={`${alternative.productId}-${alternative.alternativeProductId}`}
+              >
+                <span className="block font-black text-slate-950">Swap {alternative.productName} for {alternative.alternativeName}</span>
+                <span className="mt-1 block font-semibold text-amber-950">Save about {formatSek(alternative.estimatedSavings)} on this category line.</span>
+              </Link>
+            )) : (
+              <p className="rounded-2xl bg-white/80 p-3 text-sm font-semibold text-amber-950">No cheaper same-category alternatives found in the current basket catalogue.</p>
+            )}
+          </div>
+        </div>
+
         <div className="rounded-[1.75rem] border border-slate-200 bg-white/90 p-5 shadow-sm">
           <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-500">Cheapest split basket</p>
           <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
@@ -211,6 +303,28 @@ export function BasketCalculator({ products, sourceLabel }: Readonly<BasketCalcu
               </Link>
             )) : (
               <p className="rounded-2xl bg-slate-50 p-3 text-sm font-semibold text-slate-600">Select at least one product to calculate the split basket.</p>
+            )}
+          </div>
+        </div>
+
+        <div className="rounded-[1.75rem] border border-violet-200 bg-violet-50 p-5 shadow-sm">
+          <p className="text-xs font-black uppercase tracking-[0.22em] text-violet-800">Smart substitute suggestions</p>
+          <h3 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Actionable swaps</h3>
+          <p className="mt-2 text-sm font-semibold leading-6 text-violet-950">
+            Cheaper equivalent products and chain-available substitutes are suggested without rewriting the basket automatically.
+          </p>
+          <div className="mt-4 space-y-2">
+            {smartSubstitutes.length > 0 ? smartSubstitutes.map((suggestion) => (
+              <div className="rounded-2xl bg-white/80 p-3 text-sm" key={`${suggestion.productId}-${suggestion.substituteProductId}-${suggestion.reason}`}>
+                <p className="font-black text-slate-950">{suggestion.substituteProductName}</p>
+                <p className="mt-1 font-semibold text-slate-600">
+                  Replace {suggestion.productName} at {suggestion.chainName}. {suggestion.reason === 'high_unit_price'
+                    ? `Estimated unit saving ${suggestion.savingsLabel}.`
+                    : 'This chain has the substitute when the selected item is unavailable.'}
+                </p>
+              </div>
+            )) : (
+              <p className="rounded-2xl bg-white/80 p-3 text-sm font-semibold text-slate-600">No cheaper equivalent or chain-available substitute found for the selected basket.</p>
             )}
           </div>
         </div>
