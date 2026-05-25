@@ -2,6 +2,11 @@ export type FuelGradeId = 'fuel-95-e10' | 'fuel-98' | 'fuel-diesel' | 'fuel-hvo1
 
 export type FuelPriceSourceKind = 'operator_public_price_page' | 'crowd_station_report';
 
+export const OKQ8_FUEL_STATION_PRICE_SCOPE = 'national_business_station_price' as const;
+export const OKQ8_FUEL_STORE_ID = 'okq8-se-national-business-station' as const;
+export const OKQ8_FUEL_REGION = 'se-national' as const;
+export const OKQ8_FUEL_FORMAT = 'okq8_tanka_st1_biogas_station_network' as const;
+
 export type FuelPriceObservation = {
   domain: 'fuel';
   productId: FuelGradeId;
@@ -11,6 +16,17 @@ export type FuelPriceObservation = {
   operatorName: 'OKQ8';
   sourceKind: FuelPriceSourceKind;
   sourceUrl: string;
+  channel: 'store';
+  customer_segment: 'business';
+  price_scope: typeof OKQ8_FUEL_STATION_PRICE_SCOPE;
+  store_id: typeof OKQ8_FUEL_STORE_ID;
+  region: typeof OKQ8_FUEL_REGION;
+  format: typeof OKQ8_FUEL_FORMAT;
+  is_member_price: false;
+  is_subscription_price: false;
+  is_coupon_price: false;
+  is_clearance: false;
+  multi_buy: null;
   observedAt: string;
   capturedAt: string;
   effectiveFrom: string;
@@ -118,6 +134,17 @@ export function parseOkq8FuelPricePage(input: {
       operatorName: 'OKQ8',
       sourceKind: 'operator_public_price_page',
       sourceUrl,
+      channel: 'store',
+      customer_segment: 'business',
+      price_scope: OKQ8_FUEL_STATION_PRICE_SCOPE,
+      store_id: OKQ8_FUEL_STORE_ID,
+      region: OKQ8_FUEL_REGION,
+      format: OKQ8_FUEL_FORMAT,
+      is_member_price: false,
+      is_subscription_price: false,
+      is_coupon_price: false,
+      is_clearance: false,
+      multi_buy: null,
       observedAt: isoDateAtStartOfDay(effectiveFrom),
       capturedAt: input.capturedAt,
       effectiveFrom,

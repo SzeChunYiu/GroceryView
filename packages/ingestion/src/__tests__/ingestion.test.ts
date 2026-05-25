@@ -601,6 +601,31 @@ describe('OKQ8 fuel price connector', () => {
     ]);
     assert.equal(rows[0]?.sourceKind, 'operator_public_price_page');
     assert.equal(rows[0]?.provenance.originalPriceText, '18,89 kr');
+    assert.deepEqual({
+      channel: rows[0]?.channel,
+      customer_segment: rows[0]?.customer_segment,
+      price_scope: rows[0]?.price_scope,
+      store_id: rows[0]?.store_id,
+      region: rows[0]?.region,
+      format: rows[0]?.format,
+      is_member_price: rows[0]?.is_member_price,
+      is_subscription_price: rows[0]?.is_subscription_price,
+      is_coupon_price: rows[0]?.is_coupon_price,
+      is_clearance: rows[0]?.is_clearance,
+      multi_buy: rows[0]?.multi_buy
+    }, {
+      channel: 'store',
+      customer_segment: 'business',
+      price_scope: 'national_business_station_price',
+      store_id: 'okq8-se-national-business-station',
+      region: 'se-national',
+      format: 'okq8_tanka_st1_biogas_station_network',
+      is_member_price: false,
+      is_subscription_price: false,
+      is_coupon_price: false,
+      is_clearance: false,
+      multi_buy: null
+    });
   });
 
   it('fetches and rejects blocked fuel source responses', async () => {
