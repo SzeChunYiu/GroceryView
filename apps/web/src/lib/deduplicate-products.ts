@@ -16,6 +16,13 @@ export type DuplicateCandidate = {
   preview: ProductRecord
 }
 
+export type DuplicateReviewAction = "merge" | "ignore" | "confidence"
+
+export type DuplicateReviewRow = DuplicateCandidate & {
+  confidenceLabel: "High" | "Medium" | "Needs review"
+  recommendedAction: DuplicateReviewAction
+}
+
 const stopWords = new Set(["and", "the", "a", "an", "of", "for"])
 
 function normalize(value?: string | null) {
@@ -124,4 +131,29 @@ export function findDuplicateProducts(products: ProductRecord[], threshold = 0.5
   }
 
   return candidates.sort((left, right) => right.confidence - left.confidence)
+}
+
+export function getDuplicateReviewAction(candidate: DuplicateCandidate): DuplicateReviewAction {
+  if (candidate.confidence >= 0.85) {
+    return "merge"
+  }
+
+  if (candidate.confidence < 0.65) {
+    return "ignore"
+  }
+
+  return "confidence"
+}
+
+export function buildDuplicateReviewRows(products: ProductRecord[], threshold = 0.55): DuplicateReviewRow[] {
+  return findDuplicateProducts(products, threshold).map((candidate) => ({
+    ...candidate,
+    confidenceLabel:
+      candidate.confidence >= 0.85
+        ? "High"
+        : candidate.confidence >= 0.7
+          ? "Medium"
+          : "Needs review",
+    recommendedAction: getDuplicateReviewAction(candidate),
+  }))
 }
