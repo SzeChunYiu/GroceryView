@@ -1,4 +1,4 @@
-import { isTypoTolerantTokenMatch } from './search-fuzzy';
+import { fuzzyEditDistance, isTypoTolerantTokenMatch } from './search-fuzzy';
 import { semanticSynonymsForQuery } from './search-synonyms';
 
 export type GrocerySearchExpansion = {
@@ -140,6 +140,20 @@ function fuzzyAliasMatch(queryTokens: Set<string>, normalizedAlias: string) {
   return aliasTokens.every((aliasToken) => queryTokenList.some((queryToken) => fuzzyTokenMatch(queryToken, aliasToken)));
 }
 
+export function phoneticGroceryKey(value: string) {
+  return normalizeAliasText(value)
+    .replace(/sch|skj|stj|sj/g, '7')
+    .replace(/tj|kj|ch/g, '6')
+    .replace(/ph/g, 'f')
+    .replace(/ck/g, 'k')
+    .replace(/[cq]/g, 'k')
+    .replace(/[vw]/g, 'v')
+    .replace(/z/g, 's')
+    .replace(/[aeiouy]+/g, 'a')
+    .replace(/(.)\1+/g, '$1')
+    .replace(/\s+/g, '');
+}
+
 const expansionCache = new Map<string, GrocerySearchExpansion>();
 let expansionCacheRequests = 0;
 let expansionCacheHits = 0;
@@ -183,6 +197,10 @@ function buildGrocerySearchExpansion(query: string, maxQueries: number): Grocery
         addUnique(matchedAliases, alias.value);
         addWeightedQuery(expandedQueries, queryWeights, entry.canonical, alias.weight);
         for (const canonicalToken of normalizeAliasText(entry.canonical).split(' ')) addWeightedQuery(expandedQueries, queryWeights, canonicalToken, alias.weight * 0.85);
+      } else if (normalizedQuery.length >= 3 && phoneticGroceryKey(normalizedQuery) === phoneticGroceryKey(normalizedAlias)) {
+        addUnique(matchedFuzzyAliases, alias.value);
+        addWeightedQuery(expandedQueries, queryWeights, entry.canonical, alias.weight * 0.8);
+        for (const canonicalToken of normalizeAliasText(entry.canonical).split(' ')) addWeightedQuery(expandedQueries, queryWeights, canonicalToken, alias.weight * 0.7);
       } else if (fuzzyAliasMatch(tokens, normalizedAlias)) {
         addUnique(matchedFuzzyAliases, alias.value);
         addWeightedQuery(expandedQueries, queryWeights, entry.canonical, alias.weight * 0.75);
@@ -242,11 +260,29 @@ export type MisspelledQueryRecovery = {
 
 const popularRecoveryQueries = ['mjölk', 'kaffe', 'havregryn', 'ägg', 'yoghurt', 'pasta'];
 
+export function phoneticRankedQueryHints(query: string, maxSuggestions = 4) {
+  const normalizedQuery = normalizeAliasText(query);
+  const queryKey = phoneticGroceryKey(normalizedQuery);
+  if (normalizedQuery.length < 3 || !queryKey) return [];
+
+  const aliasCandidates = groceryAliasEntries.flatMap((entry) => [entry.canonical, ...entry.aliases.map((alias) => alias.value)]);
+  return aliasCandidates
+    .map((candidate) => {
+      const candidateKey = phoneticGroceryKey(candidate);
+      return { candidate, distance: fuzzyEditDistance(candidateKey, queryKey), exact: candidateKey === queryKey };
+    })
+    .filter((row) => row.exact || row.distance <= 1)
+    .sort((left, right) => Number(right.exact) - Number(left.exact) || left.distance - right.distance || left.candidate.localeCompare(right.candidate, 'sv'))
+    .map((row) => row.candidate)
+    .filter((candidate, index, values) => values.findIndex((value) => normalizeAliasText(value) === normalizeAliasText(candidate)) === index)
+    .slice(0, maxSuggestions);
+}
+
 export function buildMisspelledQueryRecovery(query: string, maxSuggestions = 4): MisspelledQueryRecovery {
   const normalizedQuery = normalizeAliasText(query);
   const aliasCandidates = groceryAliasEntries.flatMap((entry) => [entry.canonical, ...entry.aliases.map((alias) => alias.value)]);
   const didYouMean = aliasCandidates
-    .map((candidate) => ({ candidate, distance: editDistance(normalizeAliasText(candidate), normalizedQuery) }))
+    .map((candidate) => ({ candidate, distance: fuzzyEditDistance(normalizeAliasText(candidate), normalizedQuery) }))
     .filter((row) => normalizedQuery.length >= 3 && row.distance <= Math.max(2, Math.floor(normalizedQuery.length / 3)))
     .sort((left, right) => left.distance - right.distance || left.candidate.localeCompare(right.candidate, 'sv'))
     .map((row) => row.candidate)
@@ -254,7 +290,7 @@ export function buildMisspelledQueryRecovery(query: string, maxSuggestions = 4):
     .slice(0, maxSuggestions);
 
   const expansion = expandGrocerySearchQuery(query, maxSuggestions);
-  const popularAlternatives = [...expansion.expandedQueries, ...popularRecoveryQueries]
+  const popularAlternatives = [...expansion.expandedQueries, ...phoneticRankedQueryHints(query, maxSuggestions), ...popularRecoveryQueries]
     .filter((candidate) => normalizeAliasText(candidate) !== normalizedQuery)
     .filter((candidate, index, values) => values.findIndex((value) => normalizeAliasText(value) === normalizeAliasText(candidate)) === index)
     .slice(0, maxSuggestions);
