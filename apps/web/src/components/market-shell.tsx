@@ -9,6 +9,7 @@ import { buildSeasonalProduceDiscoveryCards } from '@/lib/deal-context';
 import { defaultLocale, localeReadiness, localeTranslationGuardrails, localizedPriceIntelligenceTerminology, localizedShellCopy, type SupportedLocale } from '@/lib/i18n';
 import { basketCostHeatmap } from '@/lib/map-basket-cost-heatmap';
 import { mapChainIndexScores } from '@/lib/map-chain-index';
+import { buildPersonalizedReorderRail } from '@/lib/personalization';
 import {
   allStoreDailyRunnerReadiness,
   apiPerformanceReadiness,
@@ -64,6 +65,7 @@ const homepageSourceCoverageNames = sourceCoverage.map((source) => source.name);
 const homepageMarketHeatmap = marketHeatmapTiles.slice(0, 6);
 const homepageChainIndexTrend = buildChainIndexTrendSeries().series.slice(0, 2);
 const homepageBasketCostHeatmap = basketCostHeatmap.rows.slice(0, 3);
+const homepagePersonalizedReorderRail = buildPersonalizedReorderRail(homepageAdaptiveProductCards);
 const homepagePharmacyOtcEvidence = pharmacyOtcEvidenceBoard.rows.slice(0, 3);
 const homepageCommodityMappingReview = {
   queue: commodityMappingReviewPlan.queue.slice(0, 2),
@@ -97,6 +99,11 @@ const homepageWebPerformanceBudgetGate = {
   routes: webPerformanceBudgetGate.terminalRoutes.slice(0, 4),
   assertions: webPerformanceBudgetGate.assertions.slice(0, 4),
   guardrails: webPerformanceBudgetGate.guardrails.slice(0, 2)
+};
+const homepageBundleSizeBudgetCheck = {
+  command: 'npm run perf:bundle:budget -w @groceryview/web',
+  routes: ['/', '/products', '/compare', '/scanner'],
+  clientComponents: ['market-shell.tsx ≤100KB', 'SearchBar.tsx ≤45KB', 'TrendingCarousel.tsx ≤50KB']
 };
 const homepageSeasonalDiscoveryCards = buildSeasonalProduceDiscoveryCards({
   deals: categoryDealLeaders,
@@ -196,7 +203,7 @@ export function MarketShell({ locale = defaultLocale }: { locale?: SupportedLoca
 
       <div className="mt-6"><MetricGrid /></div>
 
-      <TrendingCarousel items={homepageTrendingPriceChanges} />
+      <TrendingCarousel items={homepageTrendingPriceChanges} reorderItems={homepagePersonalizedReorderRail} />
 
       <TrendingPriceDropCards city="stockholm" />
 
@@ -405,6 +412,14 @@ export function MarketShell({ locale = defaultLocale }: { locale?: SupportedLoca
           </p>
           <p className="rounded-2xl bg-white/80 p-3 text-sm font-bold leading-6 text-violet-950">
             {homepageWebPerformanceBudgetGate.guardrails.join(' ')}
+          </p>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-[1fr_1fr]">
+          <p className="rounded-2xl bg-white/80 p-3 text-sm font-bold leading-6 text-violet-950">
+            Bundle budget check: {homepageBundleSizeBudgetCheck.command}; routes {homepageBundleSizeBudgetCheck.routes.join(' · ')}
+          </p>
+          <p className="rounded-2xl bg-white/80 p-3 text-sm font-bold leading-6 text-violet-950">
+            Heavy client component caps: {homepageBundleSizeBudgetCheck.clientComponents.join(' · ')}
           </p>
         </div>
       </Card>

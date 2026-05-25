@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceFreshnessStatusBadge, SourceManagementActionsPanel } from '@/components/data-ui';
-import { DataGrid, dataGridActionClass } from '@/components/data-grid';
+import { DataGrid, DataGridProductCell, dataGridActionClass } from '@/components/data-grid';
 import { axfoodProducts } from '@/lib/axfood-products';
-import { buildDuplicateReviewRows, type ProductRecord } from '@/lib/deduplicate-products';
+import { buildDuplicateMergeQueue, type ProductRecord } from '@/lib/deduplicate-products';
 import { buildUnitNormalizationQaReport } from '@/lib/normalization';
 import { pricedProducts } from '@/lib/openprices-products';
+import { dbSiteAxfoodProducts, dbSiteSnapshotGeneratedAt } from '@/lib/generated/db-site-products';
 import {
   allStoreDailyRunnerReadiness,
   apiPerformanceReadiness,
@@ -24,7 +25,15 @@ import {
   timescaleDbEvaluation
 } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
-import { partnerOnboardingIntake, sourceFreshnessSlaDashboard, sourceFreshnessSlaSummary, sourceManagementActions, sourceManagementSummary } from '@/lib/source-health';
+import {
+  ingestionPipelineMonitorRows,
+  ingestionPipelineMonitorSummary,
+  partnerOnboardingIntake,
+  sourceFreshnessSlaDashboard,
+  sourceFreshnessSlaSummary,
+  sourceManagementActions,
+  sourceManagementSummary
+} from '@/lib/source-health';
 
 const unitNormalizationQaReport = buildUnitNormalizationQaReport([
   ...axfoodProducts.map((product) => ({
@@ -41,13 +50,24 @@ const unitNormalizationQaReport = buildUnitNormalizationQaReport([
   }))
 ]);
 
+function axfoodSourceUrl(product: (typeof axfoodProducts)[number]) {
+  return Object.values(product.chains).find((chain) => chain.url)?.url || `/products/${product.slug}`;
+}
+
+const duplicateReviewSourceProducts = dbSiteAxfoodProducts.length > 0 ? dbSiteAxfoodProducts : axfoodProducts;
+
 const duplicateReviewProducts: ProductRecord[] = [
-  ...axfoodProducts.slice(0, 120).map((product) => ({
+  ...duplicateReviewSourceProducts.slice(0, 120).map((product) => ({
     id: `axfood:${product.code}`,
     name: product.name,
     brand: product.brand,
     category: product.category,
+    imageUrl: product.image,
+    sourceUrl: axfoodSourceUrl(product),
     size: product.subline,
+    unit: product.subline,
+    ean: product.code,
+    unitLabel: product.subline,
     upc: product.code
   })),
   ...pricedProducts.slice(0, 120).map((product) => ({
@@ -55,12 +75,17 @@ const duplicateReviewProducts: ProductRecord[] = [
     name: product.name,
     brand: product.brands,
     category: product.category,
+    imageUrl: product.image,
+    sourceUrl: `https://world.openfoodfacts.org/product/${product.code}`,
     size: product.quantity,
+    unit: product.quantity,
+    ean: product.code,
+    unitLabel: product.quantity || 'OpenPrices unit not reported',
     upc: product.code
   }))
 ];
 
-const duplicateReviewRows = buildDuplicateReviewRows(duplicateReviewProducts, 0.45).slice(0, 8);
+const duplicateMergeQueue = buildDuplicateMergeQueue(duplicateReviewProducts, 0.45).slice(0, 8);
 
 const duplicateReviewActionLabels = {
   merge: 'Merge',
@@ -88,6 +113,60 @@ export default function DataSourcesPage() {
         <Metric label="Source groups" value={sourceCoverage.length.toLocaleString('sv-SE')} />
         <Metric label="Brand ledgers" value={storeBrandLedger.length.toLocaleString('sv-SE')} />
       </div>
+
+      <Card className="mt-6 border-rose-200 bg-rose-50/70">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-rose-800">Admin ingestion monitor</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Latest pipeline status before prices go stale</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Operators can compare latest ingest status, transformed row counts, run failures, and transform latency for every source before stale or broken feeds reach shoppers.
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white p-3 text-sm font-black text-rose-950 shadow-sm">
+            <p>monitored {ingestionPipelineMonitorSummary.monitoredAt}</p>
+            <p>{ingestionPipelineMonitorSummary.totalFailures.toLocaleString('sv-SE')} failures in latest runs</p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          <Metric label="Pipelines" value={ingestionPipelineMonitorSummary.sourceCount.toLocaleString('sv-SE')} />
+          <Metric label="Rows transformed" value={ingestionPipelineMonitorSummary.totalRows.toLocaleString('sv-SE')} />
+          <Metric label="Failed sources" value={ingestionPipelineMonitorSummary.failedSourceCount.toLocaleString('sv-SE')} />
+        </div>
+        <div className="mt-5 overflow-x-auto rounded-2xl border border-rose-100 bg-white">
+          <table className="min-w-full text-left text-sm">
+            <thead className="bg-rose-50 text-xs font-black uppercase tracking-[0.16em] text-rose-900">
+              <tr>
+                <th className="px-4 py-3">Source</th>
+                <th className="px-4 py-3">Latest status</th>
+                <th className="px-4 py-3">Rows</th>
+                <th className="px-4 py-3">Failures</th>
+                <th className="px-4 py-3">Latency</th>
+                <th className="px-4 py-3">Last finished</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-rose-100 font-semibold text-slate-700">
+              {ingestionPipelineMonitorRows.map((source) => (
+                <tr key={source.sourceName}>
+                  <td className="px-4 py-3">
+                    <p className="font-black text-slate-950">{source.chain}</p>
+                    <p className="text-xs text-slate-500">{source.dataSource}</p>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className={`rounded-full px-3 py-1 text-xs font-black uppercase ${source.latestStatus === 'succeeded' ? 'bg-emerald-50 text-emerald-800' : source.latestStatus === 'warning' ? 'bg-amber-50 text-amber-800' : 'bg-red-50 text-red-800'}`}>
+                      {source.latestStatus}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">{source.rowCount.toLocaleString('sv-SE')}</td>
+                  <td className="px-4 py-3">{source.failureCount.toLocaleString('sv-SE')}</td>
+                  <td className="px-4 py-3">{source.latencySeconds.toLocaleString('sv-SE')}s</td>
+                  <td className="px-4 py-3">{source.lastFinishedAt}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
 
       <Card className="mt-6 border-cyan-200 bg-cyan-50/70">
         <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
@@ -170,47 +249,65 @@ export default function DataSourcesPage() {
             </p>
           </div>
           <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-sky-900 shadow-sm">
-            {duplicateReviewRows.length.toLocaleString('sv-SE')} clusters queued
+            {duplicateMergeQueue.length.toLocaleString('sv-SE')} clusters queued
           </p>
         </div>
         <DataGrid className="mt-5 overflow-x-auto bg-white" dense>
           <table>
             <thead>
               <tr className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">
-                <th>Source record</th>
-                <th>Possible duplicate</th>
+                <th>Merge cluster</th>
+                <th>Canonical record</th>
                 <th>Confidence</th>
-                <th>Signals</th>
+                <th>Merge note</th>
                 <th>Review actions</th>
               </tr>
             </thead>
             <tbody className="text-sm font-semibold text-slate-700">
-              {duplicateReviewRows.map((candidate) => (
-                <tr key={candidate.id}>
-                  <td>
-                    <p className="font-black text-slate-950">{candidate.source.name}</p>
-                    <p className="text-xs text-slate-500">{candidate.source.brand || 'Unknown brand'} · {candidate.source.size || 'size missing'}</p>
-                  </td>
-                  <td>
-                    <p className="font-black text-slate-950">{candidate.match.name}</p>
-                    <p className="text-xs text-slate-500">{candidate.match.brand || 'Unknown brand'} · {candidate.match.size || 'size missing'}</p>
-                  </td>
-                  <td>
-                    <p className="font-black text-sky-900">{Math.round(candidate.confidence * 100)}%</p>
-                    <p className="text-xs text-slate-500">{candidate.confidenceLabel}</p>
-                  </td>
-                  <td>{candidate.signals.join(', ') || 'similar names'}</td>
-                  <td>
-                    <div className="flex flex-wrap gap-2">
-                      <button className={`${dataGridActionClass} bg-emerald-50 text-emerald-800`} type="button">Merge</button>
-                      <button className={`${dataGridActionClass} bg-white`} type="button">Ignore</button>
-                      <button className={`${dataGridActionClass} bg-amber-50 text-amber-800`} type="button">
-                        {duplicateReviewActionLabels[candidate.recommendedAction]}
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {duplicateMergeQueue.map((group) => {
+                const topCandidate = group.candidates[0];
+                const clusterLead = topCandidate?.source ?? group.canonicalProduct;
+
+                return (
+                  <tr key={group.id}>
+                    <td>
+                      <DataGridProductCell
+                        brand={clusterLead.brand}
+                        imageUrl={clusterLead.imageUrl}
+                        name={group.products.map((product) => product.name).join(' + ')}
+                        sourceUrl={clusterLead.sourceUrl}
+                        unitLabel={`${group.products.length} records · ${group.signals.join(', ') || 'similar names'}`}
+                      />
+                    </td>
+                    <td>
+                      <DataGridProductCell
+                        brand={group.canonicalProduct.brand}
+                        imageUrl={group.canonicalProduct.imageUrl}
+                        name={group.canonicalProduct.name}
+                        sourceUrl={group.canonicalProduct.sourceUrl}
+                        unitLabel={group.canonicalProduct.unitLabel || group.canonicalProduct.size}
+                      />
+                    </td>
+                    <td>
+                      <p className="font-black text-sky-900">{Math.round((topCandidate?.confidence ?? 0) * 100)}%</p>
+                      <p className="text-xs text-slate-500">{topCandidate?.confidenceLabel ?? 'Needs review'}</p>
+                    </td>
+                    <td>
+                      <p>{group.mergeNote}</p>
+                      <p className="mt-1 text-xs text-slate-500">Snapshot: {dbSiteSnapshotGeneratedAt ?? 'static fallback'}</p>
+                    </td>
+                    <td>
+                      <div className="flex flex-wrap gap-2">
+                        <button className={`${dataGridActionClass} bg-emerald-50 text-emerald-800`} type="button">Merge into canonical</button>
+                        <button className={`${dataGridActionClass} bg-white`} type="button">Ignore</button>
+                        <button className={`${dataGridActionClass} bg-amber-50 text-amber-800`} type="button">
+                          {duplicateReviewActionLabels[group.recommendedAction]}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </DataGrid>

@@ -6,7 +6,10 @@ export type ProductRecord = {
   name: string
   brand?: string | null
   category?: string | null
+  imageUrl?: string | null
+  sourceUrl?: string | null
   size?: string | null
+  unitLabel?: string | null
   unit?: string | null
   ean?: string | null
   upc?: string | null
@@ -36,6 +39,11 @@ export type DuplicateReviewGroup = {
   candidates: DuplicateReviewRow[]
   signals: string[]
   recommendedAction: DuplicateReviewAction
+}
+
+export type DuplicateMergeQueueItem = DuplicateReviewGroup & {
+  canonicalProduct: ProductRecord
+  mergeNote: string
 }
 
 const stopWords = new Set(["and", "the", "a", "an", "of", "for"])
@@ -291,4 +299,42 @@ export function findSubstitutionSavings(
     .filter((suggestion): suggestion is SubstitutionSavingsSuggestion => Boolean(suggestion))
     .sort((left, right) => right.savings - left.savings)
     .slice(0, 3)
+}
+
+function canonicalScore(product: ProductRecord) {
+  return [product.ean, product.upc].filter(Boolean).length * 3
+    + [product.brand, product.category, product.size, product.unit].filter(Boolean).length
+}
+
+export function chooseCanonicalProduct(products: ProductRecord[]): ProductRecord {
+  const sorted = [...products].sort((left, right) => {
+    const scoreDelta = canonicalScore(right) - canonicalScore(left)
+    if (scoreDelta !== 0) return scoreDelta
+    return left.id.localeCompare(right.id)
+  })
+
+  const canonicalProduct = sorted[0]
+  if (!canonicalProduct) throw new Error("Duplicate merge groups require at least one product")
+  return canonicalProduct
+}
+
+function mergeNoteForGroup(group: DuplicateReviewGroup, canonicalProduct: ProductRecord) {
+  const mergedIds = group.products
+    .filter((product) => product.id !== canonicalProduct.id)
+    .map((product) => product.id)
+    .join(", ")
+  const signals = group.signals.length > 0 ? group.signals.join(", ") : "similar product text"
+
+  return `Keep ${canonicalProduct.id} as canonical; attach ${mergedIds || "no secondary records"} as aliases so continuous price history is preserved. Signals: ${signals}.`
+}
+
+export function buildDuplicateMergeQueue(products: ProductRecord[], threshold = 0.55): DuplicateMergeQueueItem[] {
+  return buildDuplicateReviewGroups(products, threshold).map((group) => {
+    const canonicalProduct = chooseCanonicalProduct(group.products)
+    return {
+      ...group,
+      canonicalProduct,
+      mergeNote: mergeNoteForGroup(group, canonicalProduct)
+    }
+  })
 }

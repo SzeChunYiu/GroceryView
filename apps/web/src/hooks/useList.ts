@@ -1,12 +1,13 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { parseMealPlanShoppingListExport } from '@/lib/meal-budgets';
 
 export type ShoppingListItem = {
   checked: boolean;
   detail: string;
   id: string;
-  importSource?: 'starter' | 'bulk-clipboard' | 'item-detail';
+  importSource?: 'starter' | 'bulk-clipboard' | 'item-detail' | 'meal-plan';
   matchedProductName?: string;
   matchedProductSlug?: string;
   name: string;
@@ -21,7 +22,11 @@ export type ProductListItemInput = Omit<ShoppingListItem, 'checked' | 'id' | 'im
   productId: string;
 };
 
-type PersistedCustomListItemInput = BulkImportedListItemInput | (Omit<ShoppingListItem, 'checked'> & {
+export type MealPlanListItemInput = Omit<ShoppingListItem, 'checked'> & {
+  importSource: 'meal-plan';
+};
+
+type PersistedCustomListItemInput = BulkImportedListItemInput | MealPlanListItemInput | (Omit<ShoppingListItem, 'checked'> & {
   importSource: 'item-detail';
 });
 
@@ -48,15 +53,26 @@ type SignedSharePayload = {
 export type OfflineSavedListSnapshot = {
   checkedCount: number;
   items: ShoppingListItem[];
+  lastSeenPriceEstimates: Record<string, OfflineSavedListPriceEstimate>;
   remainingCount: number;
   routes: string[];
   savedAt: string;
+  syncStatus: 'synced' | 'pending';
   totalCount: number;
+};
+
+export type OfflineSavedListPriceEstimate = {
+  itemId: string;
+  label: string;
+  matchedProductSlug?: string;
+  observedAt: string;
 };
 
 export const LIST_STORAGE_KEY = 'groceryview:shopping-list:checked:v1';
 export const OFFLINE_SAVED_LIST_STORAGE_KEY = 'groceryview:offline-saved-list:v1';
+export const OFFLINE_SAVED_LIST_SYNC_QUEUE_KEY = 'groceryview:offline-saved-list-sync-queue:v1';
 export const OFFLINE_SAVED_LIST_UPDATED_EVENT = 'groceryview:offline-saved-list-updated';
+export const OFFLINE_SAVED_LIST_SYNCED_EVENT = 'groceryview:offline-saved-list-synced';
 const OFFLINE_SAVED_LIST_ROUTE_CACHE_NAME = 'groceryview-shopping-list-route-v1';
 const OFFLINE_SAVED_LIST_BASE_ROUTES = ['/list', '/favourites'];
 const OFFLINE_SAVED_LIST_MAX_ROUTES = 16;
@@ -177,7 +193,7 @@ function listStateFromStorage(value: string | null): Required<PersistedListState
       ? maybeImportedItems.filter((item): item is PersistedCustomListItemInput => (
         item !== null
         && typeof item === 'object'
-        && (item.importSource === 'bulk-clipboard' || item.importSource === 'item-detail')
+        && (item.importSource === 'bulk-clipboard' || item.importSource === 'item-detail' || item.importSource === 'meal-plan')
         && typeof item.id === 'string'
         && typeof item.name === 'string'
         && typeof item.quantity === 'string'
@@ -189,6 +205,21 @@ function listStateFromStorage(value: string | null): Required<PersistedListState
   } catch {
     return empty;
   }
+}
+
+function mealPlanItemsFromSearchParam(value: string): MealPlanListItemInput[] {
+  const mealPlanExport = parseMealPlanShoppingListExport(value);
+  if (!mealPlanExport) return [];
+
+  return mealPlanExport.items.map((item) => ({
+    detail: item.detail,
+    id: item.id,
+    importSource: 'meal-plan',
+    matchedProductName: item.name,
+    matchedProductSlug: item.productId,
+    name: item.name,
+    quantity: item.quantity
+  }));
 }
 
 function withCheckedState(checkedById: Record<string, boolean>, importedItems: PersistedCustomListItemInput[] = []): ShoppingListItem[] {
@@ -246,7 +277,7 @@ async function verifyShareToken(token: string): Promise<ShareLinkState> {
     ? payload.items.filter((item): item is PersistedCustomListItemInput => (
       item !== null
       && typeof item === 'object'
-      && (item.importSource === 'bulk-clipboard' || item.importSource === 'item-detail')
+      && (item.importSource === 'bulk-clipboard' || item.importSource === 'item-detail' || item.importSource === 'meal-plan')
       && typeof item.id === 'string'
       && typeof item.name === 'string'
       && typeof item.quantity === 'string'
@@ -270,6 +301,7 @@ function persistCheckedState(items: ShoppingListItem[]) {
     const importedItems = items
       .filter((item) => item.importSource === 'bulk-clipboard')
       .concat(items.filter((item) => item.importSource === 'item-detail'))
+      .concat(items.filter((item) => item.importSource === 'meal-plan'))
       .map((item) => ({
         detail: item.detail,
         id: item.id,
@@ -304,19 +336,62 @@ export function offlineSavedListRoutesForItems(items: ShoppingListItem[]) {
   return [...routes].slice(0, OFFLINE_SAVED_LIST_MAX_ROUTES);
 }
 
+function lastSeenPriceEstimatesForItems(items: ShoppingListItem[], observedAt: string): Record<string, OfflineSavedListPriceEstimate> {
+  return Object.fromEntries(items.map((item) => [
+    item.id,
+    {
+      itemId: item.id,
+      label: item.matchedProductName
+        ? `Last seen estimate cached for ${item.matchedProductName}`
+        : 'No verified price estimate cached for this custom item yet',
+      matchedProductSlug: item.matchedProductSlug,
+      observedAt
+    }
+  ]));
+}
+
+function enqueueOfflineSavedListSync(snapshot: OfflineSavedListSnapshot) {
+  if (navigator.onLine) return;
+
+  try {
+    const parsed = JSON.parse(localStorage.getItem(OFFLINE_SAVED_LIST_SYNC_QUEUE_KEY) || '[]') as OfflineSavedListSnapshot[] | null;
+    const queue = Array.isArray(parsed) ? parsed : [];
+    localStorage.setItem(OFFLINE_SAVED_LIST_SYNC_QUEUE_KEY, JSON.stringify([...queue.slice(-4), snapshot]));
+  } catch {
+    // Sync queue is best-effort; the latest snapshot remains in localStorage.
+  }
+}
+
+function flushOfflineSavedListSyncQueue() {
+  if (!navigator.onLine) return;
+
+  try {
+    const rawQueue = localStorage.getItem(OFFLINE_SAVED_LIST_SYNC_QUEUE_KEY);
+    if (!rawQueue) return;
+    localStorage.removeItem(OFFLINE_SAVED_LIST_SYNC_QUEUE_KEY);
+    window.dispatchEvent(new CustomEvent(OFFLINE_SAVED_LIST_SYNCED_EVENT, { detail: JSON.parse(rawQueue) }));
+  } catch {
+    // Leave the UI usable even if sync metadata is malformed.
+  }
+}
+
 function persistOfflineSavedListSnapshot(items: ShoppingListItem[]) {
   const checkedCount = items.filter((item) => item.checked).length;
+  const savedAt = new Date().toISOString();
   const snapshot: OfflineSavedListSnapshot = {
     checkedCount,
     items,
+    lastSeenPriceEstimates: lastSeenPriceEstimatesForItems(items, savedAt),
     remainingCount: items.length - checkedCount,
     routes: offlineSavedListRoutesForItems(items),
-    savedAt: new Date().toISOString(),
+    savedAt,
+    syncStatus: navigator.onLine ? 'synced' : 'pending',
     totalCount: items.length
   };
 
   try {
     localStorage.setItem(OFFLINE_SAVED_LIST_STORAGE_KEY, JSON.stringify(snapshot));
+    enqueueOfflineSavedListSync(snapshot);
     window.dispatchEvent(new CustomEvent(OFFLINE_SAVED_LIST_UPDATED_EVENT, { detail: snapshot }));
   } catch {
     // Offline snapshots are a progressive enhancement; checked-item persistence remains authoritative.
@@ -345,7 +420,8 @@ export function useList() {
     async function loadBrowserState() {
       try {
         const { checkedById, importedItems } = listStateFromStorage(localStorage.getItem(LIST_STORAGE_KEY));
-        const token = new URLSearchParams(window.location.search).get('share');
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('share');
         if (token) {
           const verifiedShare = await verifyShareToken(token);
           if (!cancelled) setShareLink(verifiedShare);
@@ -355,7 +431,8 @@ export function useList() {
             return;
           }
         }
-        if (!cancelled) setItems(withCheckedState(checkedById, importedItems));
+        const mealPlanItems = mealPlanItemsFromSearchParam(params.get('mealPlan') ?? '');
+        if (!cancelled) setItems(withCheckedState(checkedById, [...importedItems, ...mealPlanItems]));
       } finally {
         if (!cancelled) setHasLoadedBrowserState(true);
       }
@@ -373,7 +450,14 @@ export function useList() {
     persistCheckedState(items);
     persistOfflineSavedListSnapshot(items);
     void warmOfflineSavedListCompanions(items);
+    flushOfflineSavedListSyncQueue();
   }, [hasLoadedBrowserState, items, shareLink?.isValid]);
+
+  useEffect(() => {
+    if (!hasLoadedBrowserState) return undefined;
+    window.addEventListener('online', flushOfflineSavedListSyncQueue);
+    return () => window.removeEventListener('online', flushOfflineSavedListSyncQueue);
+  }, [hasLoadedBrowserState]);
 
   const toggleItemChecked = useCallback((itemId: string) => {
     setItems((currentItems) => currentItems.map((item) => (
