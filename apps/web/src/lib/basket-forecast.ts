@@ -79,7 +79,7 @@ export function buildBasketForecastSummary(input: BasketComparisonInput, snapsho
         forecastTotal,
         delta: roundMoney(forecastTotal - currentTotal),
         volatilitySignal: volatilityLabel(averageVolatility),
-        flyerSignal: row.flyerLines > 0 ? `${row.flyerLines} flyer/member line${row.flyerLines === 1 ? '' : 's'} pulling forecast down` : 'No flyer signal; volatility nudges forecast up',
+        flyerSignal: row.flyerLines > 0 ? `${row.flyerLines} observed flyer/member line${row.flyerLines === 1 ? '' : 's'} pulling forecast down` : 'No observed flyer signal; historical volatility nudges forecast up',
         pricedLineCount: row.pricedLineCount,
         missingLineCount: input.items.length - row.pricedLineCount
       } satisfies BasketForecastChain;
@@ -92,6 +92,6 @@ export function buildBasketForecastSummary(input: BasketComparisonInput, snapsho
     forecastWindowLabel: 'Next weekly basket',
     chains,
     bestChain: chains[0] ?? null,
-    guardrail: 'Forecast uses only visible favorite-store prices, cross-store volatility, and explicit member/promotion price rows; missing lines are counted, not estimated.'
+    guardrail: 'Forecast uses only observed favorite-store source rows, historical cross-store volatility, and explicit member/promotion price rows; missing lines are counted, not estimated.'
   };
 }

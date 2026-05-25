@@ -4,6 +4,7 @@ import type { TrendingProductPriceChange } from '@groceryview/db';
 import { buildBrandLeaderboardTrends, buildCitySearchTrends } from '@/lib/trends';
 import { BrandLeaderboardModule, TrendingSearchModule } from '@/app/page-sections/trending';
 import type { PersonalizedReorderItem } from '@/lib/personalization';
+import type { TrendingCategory } from '@/lib/trending-categories';
 
 function formatMoney(value: number, currency: string) {
   return new Intl.NumberFormat('sv-SE', {
@@ -49,6 +50,44 @@ function PersonalizedReorderRail({ items }: Readonly<{ items: PersonalizedReorde
             <p className="mt-3 text-xs font-bold leading-5 text-slate-600">{item.packageLabel} · {item.sourceLabel}</p>
             <p className="mt-3 rounded-xl bg-slate-950 p-3 text-xs font-black leading-5 text-white">{item.signalSummary}</p>
             <p className="mt-2 text-xs font-semibold text-emerald-900">{item.lastActionLabel}</p>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+export function TrendingCategoryCarousel({ items }: Readonly<{ items: TrendingCategory[] }>) {
+  if (items.length === 0) return null;
+
+  return (
+    <section className="mt-6 rounded-[1.75rem] border border-violet-200 bg-white/90 p-5 shadow-sm" aria-label="Trending categories">
+      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.24em] text-violet-800">Trending categories</p>
+          <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Aisles moving by price, saves, and seasonality</h2>
+        </div>
+        <p className="max-w-2xl text-sm font-semibold leading-6 text-slate-600">
+          Ranked from recent observed product movement, verified category deal leaders, seasonal best-buy rows, and catalogue coverage. Missing signals stay visible instead of being inferred.
+        </p>
+      </div>
+      <div className="mt-5 flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory" data-trending-category-carousel>
+        {items.map((item) => (
+          <Link
+            className="min-w-[18rem] max-w-[18rem] snap-start rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:-translate-y-0.5 hover:border-violet-700"
+            data-trending-category-rank={item.rank}
+            href={item.href}
+            key={item.slug}
+          >
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-800">#{item.rank} · category discovery</p>
+            <h3 className="mt-2 text-xl font-black tracking-tight text-slate-950">{item.categoryLabel}</h3>
+            <p className="mt-3 rounded-xl bg-white p-3 text-sm font-black text-violet-950">{item.evidenceLabel}</p>
+            <div className="mt-3 grid gap-2 text-sm font-semibold leading-5 text-slate-700">
+              <p className="rounded-xl bg-white p-3">{item.priceMovementLabel}</p>
+              <p className="rounded-xl bg-white p-3">{item.shopperSavesLabel}</p>
+              <p className="rounded-xl bg-white p-3">{item.seasonalDemandLabel}</p>
+            </div>
+            {item.topProductLabel ? <p className="mt-3 text-xs font-bold text-slate-500">Top mover: {item.topProductLabel}</p> : null}
           </Link>
         ))}
       </div>

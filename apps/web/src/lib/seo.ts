@@ -170,6 +170,10 @@ export const routeMetadataCatalog = {
     title: 'Verified grocery deal radar | GroceryView',
     description: 'Find expiry deals, single-portion deals, lunchbox deals, and trusted deal opportunities from visible source-backed rows.'
   },
+  '/discover': {
+    title: 'Trending grocery category discovery | GroceryView',
+    description: 'Discover verified grocery categories ranked by observed price movement, shopper-savings signals, and historical seasonal demand.'
+  },
   '/expiry-deals': {
     title: 'Near-expiry grocery deal radar | GroceryView',
     description: 'Surface near-expiry markdowns from timestamped product rows with verification, stale evidence, and confidence labels.'
