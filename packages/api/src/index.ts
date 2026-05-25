@@ -2844,6 +2844,7 @@ export function buildRealCategoryPriceIndices(rows: RealPriceIndexRow[]): Catego
         weight: 1
       }))
     });
+    if (index.value === null || index.movementPercent === null) return [];
 
     return [{
       id: index.id,
@@ -2941,6 +2942,8 @@ function buildCategoryPriceIndices(): CategoryPriceIndexSummary {
       currentDate: indexCurrentDate(categoryProducts),
       components
     });
+    if (index.value === null || index.movementPercent === null) return [];
+
     return [{
       id: index.id,
       category,

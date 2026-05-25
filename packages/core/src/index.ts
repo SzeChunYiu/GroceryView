@@ -1867,8 +1867,8 @@ export type FixedBasketIndex = {
   currency: FixedBasketIndexCurrency;
   baseDate: string;
   currentDate: string;
-  value: number;
-  movementPercent: number;
+  value: number | null;
+  movementPercent: number | null;
   confidence: 'low' | 'medium' | 'high';
   components: IndexComponent[];
 };
@@ -1877,7 +1877,18 @@ export function calculateFixedBasketIndex(input: FixedBasketIndexInput): FixedBa
   const expectedCurrency = fixedBasketIndexCurrencyByCountry[input.country];
   const countryComponents = input.components.filter((component) => component.country === input.country);
   if (countryComponents.length === 0) {
-    throw new Error(`At least one ${input.country} component is required to calculate an index.`);
+    return {
+      id: input.id,
+      label: input.label,
+      country: input.country,
+      currency: expectedCurrency,
+      baseDate: input.baseDate,
+      currentDate: input.currentDate,
+      value: null,
+      movementPercent: null,
+      confidence: 'low',
+      components: []
+    };
   }
 
   const currencyMismatch = countryComponents.find((component) => component.currency !== expectedCurrency);
@@ -2397,6 +2408,7 @@ export function calculateBrandTierIndices(observations: BrandTierPriceObservatio
         weight: 1
       }))
     }))
+    .filter((index): index is FixedBasketIndex & { value: number; movementPercent: number } => index.value !== null && index.movementPercent !== null)
     .map((index) => ({
       brandTier: index.id.replace('-index', '') as BrandTier,
       label: index.label,
