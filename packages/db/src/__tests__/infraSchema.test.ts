@@ -451,4 +451,114 @@ describe('produce classes canonical schema', () => {
       assert.match(source, /produce_classes_segment_depth_idx/);
     }
   });
+
+  it('seeds an initial hierarchical produce taxonomy for vegetables, fruits, herbs, and mushrooms', () => {
+    const seed = readFileSync(join(repoRoot, 'packages/server/seeds/produceClasses.sql'), 'utf8').toLowerCase();
+    const rows = [...seed.matchAll(/\('([^']+)',\s*(null|'[^']+'),\s*'produce',\s*'[^']+',\s*(\d+),\s*(\d+)\)/g)].map(
+      ([, id, parentId, depth, sortOrder]) => ({
+        id,
+        parentId: parentId === 'null' ? null : parentId.slice(1, -1),
+        depth: Number(depth),
+        sortOrder: Number(sortOrder)
+      })
+    );
+    const rowById = new Map(rows.map((row) => [row.id, row]));
+    const topLevelClasses = [
+      'vegetable-root',
+      'vegetable-leaf',
+      'vegetable-fruit',
+      'vegetable-cruciferous',
+      'vegetable-bulb',
+      'vegetable-allium',
+      'fruit-pome',
+      'fruit-stone',
+      'fruit-berry',
+      'fruit-citrus',
+      'fruit-tropical',
+      'herb-leaf',
+      'herb-root',
+      'mushroom'
+    ];
+
+    assert.match(seed, /insert into produce_classes \(id, parent_id, segment, label, depth, sort_order\) values/);
+    assert.match(seed, /on conflict \(id\) do update set/);
+    assert.ok(rows.length >= 80, `expected at least 80 produce classes, got ${rows.length}`);
+    assert.equal(rowById.size, rows.length, 'produce class IDs must be unique');
+
+    for (const id of topLevelClasses) {
+      const row = rowById.get(id);
+      assert.ok(row, `${id} missing from produce class seed`);
+      assert.equal(row.parentId, null, `${id} must be top-level`);
+      assert.equal(row.depth, 0, `${id} must have depth 0`);
+    }
+
+    for (const row of rows) {
+      if (row.parentId === null) {
+        continue;
+      }
+      const parent = rowById.get(row.parentId);
+      assert.ok(parent, `${row.id} parent ${row.parentId} missing`);
+      assert.equal(row.depth, parent.depth + 1, `${row.id} depth must follow parent`);
+    }
+
+    for (const id of [
+      'apples',
+      'apple-granny-smith',
+      'apple-pink-lady',
+      'apple-royal-gala',
+      'tomatoes',
+      'tomato-cherry',
+      'tomato-vine',
+      'tomato-plum',
+      'tomato-beef',
+      'tomato-round',
+      'potatoes',
+      'potato-floury',
+      'potato-king-edward',
+      'potato-bintje',
+      'potato-waxy',
+      'potato-cara',
+      'potato-mandel',
+      'potato-charlotte',
+      'potato-new',
+      'citrus',
+      'herbs',
+      'mushrooms',
+      'leafy-vegetables'
+    ]) {
+      assert.ok(rowById.has(id), `${id} missing from produce class seed`);
+    }
+  });
+
+  it('documents produce taxonomy boundaries next to the seed', () => {
+    const produceDocsDir = join(repoRoot, 'docs/product-classes/produce');
+    const docs = ['README.md', 'apples.md', 'potatoes.md', 'tomato-varieties.md', 'citrus.md', 'mushrooms.md'];
+    const combinedDocs = docs.map((file) => readFileSync(join(produceDocsDir, file), 'utf8').toLowerCase()).join('\n');
+
+    for (const id of [
+      'vegetable-root',
+      'vegetable-leaf',
+      'vegetable-fruit',
+      'vegetable-cruciferous',
+      'vegetable-bulb',
+      'vegetable-allium',
+      'fruit-pome',
+      'fruit-stone',
+      'fruit-berry',
+      'fruit-citrus',
+      'fruit-tropical',
+      'herb-leaf',
+      'herb-root',
+      'mushroom',
+      'apple-granny-smith',
+      'apple-pink-lady',
+      'apple-royal-gala',
+      'tomato',
+      'potato-floury',
+      'potato-waxy',
+      'potato-new'
+    ]) {
+      assert.match(combinedDocs, new RegExp(`\\b${id}\\b`), `${id} missing from produce docs`);
+    }
+  });
 });
