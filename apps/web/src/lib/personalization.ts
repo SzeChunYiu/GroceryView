@@ -197,6 +197,20 @@ type RecommendationProductInput = {
   totalPriceLabel?: string;
 };
 
+export type BasketIdeaExplanationInput = {
+  productId: string;
+  name?: string;
+  storeName?: string;
+  unitPrice?: number;
+  dietaryTags?: readonly string[];
+};
+
+export type BasketIdeaExplanationOptions = {
+  cheapestStoreName?: string;
+  dietaryPreferences?: readonly string[];
+  frequentlyBoughtTogetherIds?: readonly string[];
+};
+
 export type PersonalizedRecommendation = RecommendationProductInput & {
   score: number;
   reason: string;
@@ -224,6 +238,31 @@ const demoReorderSignals: ReorderProductSignal[] = [
   { productSlug: 'banana', watchedCount: 8, favoriteSaves: 1, repeatPurchases: 2, lastActionLabel: 'watched for price drops' },
   { productSlug: 'coffee', watchedCount: 4, favoriteSaves: 2, repeatPurchases: 2, lastActionLabel: 'favorite pantry refill' },
 ];
+
+export function basketIdeaRecommendationExplanations(
+  item: BasketIdeaExplanationInput,
+  options: BasketIdeaExplanationOptions = {}
+) {
+  const reasons: string[] = [];
+  const dietaryPreferences = new Set((options.dietaryPreferences ?? []).map((tag) => tag.toLocaleLowerCase('sv-SE')));
+  const itemDietaryTags = item.dietaryTags?.map((tag) => tag.toLocaleLowerCase('sv-SE')) ?? [];
+
+  if (item.storeName && item.storeName === options.cheapestStoreName) {
+    reasons.push(`Cheaper substitute at ${item.storeName} for this basket`);
+  } else if (typeof item.unitPrice === 'number' && Number.isFinite(item.unitPrice)) {
+    reasons.push(`Cheaper substitute candidate from verified unit price ${item.unitPrice.toFixed(2)} SEK`);
+  }
+
+  if (options.frequentlyBoughtTogetherIds?.includes(item.productId)) {
+    reasons.push('Frequently bought together with other student staples');
+  }
+
+  if (itemDietaryTags.some((tag) => dietaryPreferences.has(tag))) {
+    reasons.push('Matches dietary preference filters');
+  }
+
+  return (reasons.length > 0 ? reasons : ['Recommended from verified basket coverage']).slice(0, 3);
+}
 
 function reorderSignalScore(signal: Pick<ReorderProductSignal, 'favoriteSaves' | 'repeatPurchases' | 'watchedCount'>) {
   return (
