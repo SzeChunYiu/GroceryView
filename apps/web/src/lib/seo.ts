@@ -46,6 +46,18 @@ type DealSeoInput = {
   imagePath?: string;
 };
 
+type ShoppingListShareItem = {
+  matchedProductName?: string;
+  matchedProductSlug?: string;
+  name?: string;
+  quantity?: string;
+};
+
+type ShoppingListSharePayload = {
+  items?: ShoppingListShareItem[];
+  listId?: string;
+};
+
 export const routeMetadataCatalog = {
   '/': {
     title: 'GroceryView verified grocery snapshot',
@@ -363,6 +375,75 @@ export function metadataForDeal(deal: DealSeoInput): Metadata {
     description: `Share this verified GroceryView grocery deal for ${deal.title} at ${currentPrice}${savingsCopy}. Referral parameters preserve deal attribution from shared links.`,
     imagePath: deal.imagePath ?? `/deals/${encodeURIComponent(deal.slug ?? deal.id ?? deal.title)}/opengraph-image`,
     imageAlt: `${deal.title} GroceryView deal preview`
+  });
+}
+
+function firstParamValue(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function decodeBase64UrlJson(value: string) {
+  const normalized = value.replace(/-/g, '+').replace(/_/g, '/');
+  const decoded = atob(normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '='));
+
+  try {
+    return decodeURIComponent(Array.from(decoded, (character) => `%${character.charCodeAt(0).toString(16).padStart(2, '0')}`).join(''));
+  } catch {
+    return decoded;
+  }
+}
+
+function sharePayloadFromToken(token: string | undefined): ShoppingListSharePayload | null {
+  const [encodedPayload, signature, extra] = token?.split('.') ?? [];
+  if (!encodedPayload || !signature || extra !== undefined) return null;
+
+  try {
+    const parsed = JSON.parse(decodeBase64UrlJson(encodedPayload)) as ShoppingListSharePayload;
+    return parsed && typeof parsed === 'object' ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function normalizedShareItems(payload: ShoppingListSharePayload | null) {
+  return Array.isArray(payload?.items)
+    ? payload.items.filter((item): item is ShoppingListShareItem => item !== null && typeof item === 'object' && typeof item.name === 'string' && item.name.trim().length > 0).slice(0, 50)
+    : [];
+}
+
+function shoppingListShareTitle(items: readonly ShoppingListShareItem[]) {
+  if (items.length === 0) return 'Shared GroceryView shopping list';
+  const leadingNames = items.slice(0, 2).map((item) => item.name).filter(Boolean).join(' + ');
+  const remaining = items.length > 2 ? ` + ${items.length - 2} more` : '';
+  return `${leadingNames}${remaining} shopping list | GroceryView`;
+}
+
+function shoppingListShareDescription(items: readonly ShoppingListShareItem[]) {
+  if (items.length === 0) return 'Open a read-only GroceryView shopping list with item context and grocery planning details.';
+  const names = items.slice(0, 4).map((item) => item.name).filter(Boolean).join(', ');
+  const suffix = items.length > 4 ? `, and ${items.length - 4} more` : '';
+  return `Open this read-only GroceryView list with ${items.length} item${items.length === 1 ? '' : 's'}: ${names}${suffix}.`;
+}
+
+function shoppingListShareImagePath(items: readonly ShoppingListShareItem[]) {
+  const matchedItem = items.find((item) => typeof item.matchedProductSlug === 'string' && item.matchedProductSlug.trim().length > 0);
+  return matchedItem?.matchedProductSlug ? `/products/${encodeURIComponent(matchedItem.matchedProductSlug)}/opengraph-image` : undefined;
+}
+
+export function metadataForShoppingListShare(share: string | string[] | undefined): Metadata {
+  const token = firstParamValue(share);
+  const items = normalizedShareItems(sharePayloadFromToken(token));
+
+  if (!token || items.length === 0) return routeMetadata('/list');
+
+  return routeMetadata({
+    path: `/list?share=${encodeURIComponent(token)}`,
+    canonicalPath: '/list',
+    title: shoppingListShareTitle(items),
+    description: shoppingListShareDescription(items),
+    imagePath: shoppingListShareImagePath(items),
+    imageAlt: `${items[0]?.name ?? 'GroceryView'} shopping list item preview`,
+    noIndex: true
   });
 }
 
