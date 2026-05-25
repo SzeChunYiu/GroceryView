@@ -1,4 +1,10 @@
-export type PremiumEntitlementFeature = 'premium_ocr_history' | 'advanced_forecasts' | 'unlimited_alerts' | 'exports';
+export type PremiumEntitlementFeature =
+  | 'advanced_alerts'
+  | 'saved_views'
+  | 'export_api'
+  | 'household_sharing'
+  | 'pro_terminal_tools'
+  | 'premium_ocr_history';
 
 export type AccountEntitlement = {
   tier: 'free' | 'premium';
@@ -11,36 +17,57 @@ export type PremiumEntitlementGate = {
   freeLimit: string;
   premiumAccess: string;
   enforcementReason: string;
+  status: 'available' | 'coming_soon';
 };
 
 export const premiumEntitlementCatalog: PremiumEntitlementGate[] = [
+  {
+    feature: 'advanced_alerts',
+    label: 'Advanced alerts',
+    freeLimit: 'Basic price alerts remain available with confidence and source details visible.',
+    premiumAccess: 'Best-time, volatility-tuned, stock, and larger watchlist alert rules.',
+    enforcementReason: 'advanced_alerts_require_active_subscription',
+    status: 'available',
+  },
+  {
+    feature: 'saved_views',
+    label: 'Saved views',
+    freeLimit: 'Save up to three product filter views per signed-in account.',
+    premiumAccess: 'Unlimited saved product views, alert presets, and dashboard shortcuts.',
+    enforcementReason: 'saved_views_require_active_subscription',
+    status: 'available',
+  },
+  {
+    feature: 'export_api',
+    label: 'Export and API',
+    freeLimit: 'Public pages, source coverage, confidence, privacy, and legal information stay free.',
+    premiumAccess: 'CSV exports, account-owned receipt exports, and API-oriented data pulls.',
+    enforcementReason: 'export_api_requires_active_subscription',
+    status: 'available',
+  },
+  {
+    feature: 'household_sharing',
+    label: 'Household sharing',
+    freeLimit: 'Single-account lists and core basket tools remain available.',
+    premiumAccess: 'Shared household lists, roles, and collaborative basket history.',
+    enforcementReason: 'household_sharing_requires_active_subscription',
+    status: 'coming_soon',
+  },
+  {
+    feature: 'pro_terminal_tools',
+    label: 'Pro terminal tools',
+    freeLimit: 'Core price comparison and source freshness pages stay public.',
+    premiumAccess: 'Dense terminal-style analysis, exports, and saved operator workspaces.',
+    enforcementReason: 'pro_terminal_tools_require_active_subscription',
+    status: 'coming_soon',
+  },
   {
     feature: 'premium_ocr_history',
     label: 'Premium OCR history',
     freeLimit: 'Process a current scan without storing historical OCR corrections.',
     premiumAccess: 'Save scan history, retailer aliases, and corrected receipt rows.',
     enforcementReason: 'premium_ocr_history_requires_active_subscription',
-  },
-  {
-    feature: 'advanced_forecasts',
-    label: 'Advanced forecasts',
-    freeLimit: 'Show the public savings explanation without account-specific forecasts.',
-    premiumAccess: 'Unlock account-specific monthly savings and basket forecast drivers.',
-    enforcementReason: 'advanced_forecasts_require_premium_entitlement',
-  },
-  {
-    feature: 'unlimited_alerts',
-    label: 'Unlimited alerts',
-    freeLimit: 'Limit active price and stock alerts to the free account cap.',
-    premiumAccess: 'Allow unlimited watched products, best-time alerts, and deal monitoring.',
-    enforcementReason: 'unlimited_alerts_require_premium_entitlement',
-  },
-  {
-    feature: 'exports',
-    label: 'Exports',
-    freeLimit: 'Keep CSV and receipt exports locked behind account checkout.',
-    premiumAccess: 'Export corrected receipts, basket history, and forecast summaries.',
-    enforcementReason: 'exports_require_premium_entitlement',
+    status: 'available',
   },
 ];
 
@@ -67,4 +94,23 @@ export function resolvePremiumEntitlementGates(entitlement: AccountEntitlement |
     ...gate,
     allowed: resolvePremiumEntitlementGate(gate.feature, entitlement).allowed,
   }));
+}
+
+export function entitlementFromHeaders(headers: Headers): AccountEntitlement | null {
+  const tier = headers.get('x-groceryview-entitlement-tier')?.trim().toLowerCase();
+  const status = headers.get('x-groceryview-entitlement-status')?.trim().toLowerCase();
+  if (tier !== 'premium' && tier !== 'free') return null;
+  if (status !== 'active' && status !== 'trialing' && status !== 'past_due' && status !== 'canceled') return null;
+  return { tier, status };
+}
+
+export function premiumRequiredResponse(feature: PremiumEntitlementFeature, entitlement: AccountEntitlement | null | undefined) {
+  const gate = resolvePremiumEntitlementGate(feature, entitlement);
+  return {
+    error: 'premium_entitlement_required',
+    feature,
+    allowed: gate.allowed,
+    enforcementReason: gate.enforcementReason,
+    freeTrustSurfaces: ['legal', 'privacy', 'source_confidence', 'freshness', 'core_price_comparison']
+  };
 }

@@ -7,7 +7,6 @@ import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/componen
 import { DietaryProfileOnboarding } from '@/components/diet-filter-picker';
 import { listShareRoles, accountListSharePermissions } from '@/lib/list-permissions';
 import { dietaryPreferenceOnboardingContract, demoPreferredBrandControls, groupPreferredBrandControls, savedSearchesStorageKey } from '@/lib/personalization';
-import { buildPremiumSavingsForecast } from '@/lib/price-intelligence';
 import { routeMetadata } from '@/lib/seo';
 import { accountSavedShoppingContract, formatSek, savedBasketAutoReorderPlanner } from '@/lib/verified-data';
 import { planAccountDeletion } from '@groceryview/core';
@@ -160,7 +159,6 @@ const notificationSubscriptionScript = `(() => {
   refreshState();
 })();`;
 
-const premiumSavingsForecast = buildPremiumSavingsForecast();
 const accountDeletionPlan = planAccountDeletion('signed-in-user');
 const accountDeletionConfirmations = [
   'Confirm the active session belongs to the account owner.',
@@ -640,7 +638,7 @@ export default function AccountPage() {
 
       <AccountMutationActions />
       <p className="mt-6 rounded-2xl bg-violet-50 p-4 text-sm font-bold text-violet-950">
-        Premium forecast preview: {premiumSavingsForecast.monthlySavingsLabel} estimated monthly savings before checkout. Review the <a className="underline decoration-2 underline-offset-4" href="/pricing#premium-ocr-history">Premium OCR history plan</a> before opening checkout.
+        Premium packaging is visible before checkout with active and coming-soon flags. Review the <a className="underline decoration-2 underline-offset-4" href="/pricing#premium">Premium plan</a> before opening checkout.
       </p>
       <AccountBillingActions />
       <AdDisclosureActions />

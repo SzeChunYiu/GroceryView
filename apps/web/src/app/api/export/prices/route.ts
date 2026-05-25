@@ -4,6 +4,7 @@ import {
   type PriceObservationHistoryRecord
 } from '@groceryview/db';
 import { NextResponse } from 'next/server';
+import { entitlementFromHeaders, hasActivePremiumEntitlement, premiumRequiredResponse } from '@/lib/entitlements';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -114,6 +115,11 @@ function priceHistoryCsv(rows: PriceObservationHistoryRecord[]) {
 }
 
 export async function GET(request: Request) {
+  const entitlement = entitlementFromHeaders(request.headers);
+  if (!hasActivePremiumEntitlement(entitlement)) {
+    return NextResponse.json(premiumRequiredResponse('export_api', entitlement), { status: 402 });
+  }
+
   const { searchParams } = new URL(request.url);
   const productId = searchParams.get('product_id');
 
