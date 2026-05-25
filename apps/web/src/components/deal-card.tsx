@@ -1,4 +1,6 @@
+import type { ReactNode } from 'react';
 import { buildDealContext, type DealHistoryPoint } from '@/lib/deal-context';
+import { affiliateDisclosureLabel, buildAffiliateOutboundUrl, type AffiliateLinkMetadata } from '@/lib/analytics';
 
 type DealCardProps = {
   title: string;
@@ -8,10 +10,67 @@ type DealCardProps = {
   priceHistory?: DealHistoryPoint[];
   currency?: string;
   locale?: string;
+  retailerName?: string;
+  productId?: string;
+  dealId?: string;
+  outboundDealUrl?: string;
+  outboundStoreUrl?: string;
+  affiliateCampaignId?: string;
 };
 
 function formatPrice(value: number, locale: string, currency: string) {
   return new Intl.NumberFormat(locale, { currency, style: 'currency' }).format(value);
+}
+
+function outboundMetadata({
+  campaignId,
+  dealId,
+  destinationUrl,
+  placement,
+  productId,
+  retailerName,
+  sponsored,
+  surface
+}: AffiliateLinkMetadata & { campaignId?: string }) {
+  return {
+    campaignId,
+    dealId,
+    destinationUrl,
+    placement,
+    productId,
+    retailerName,
+    sponsored,
+    surface
+  } satisfies AffiliateLinkMetadata;
+}
+
+function OutboundAffiliateLink({
+  children,
+  metadata
+}: Readonly<{
+  children: ReactNode;
+  metadata: AffiliateLinkMetadata;
+}>) {
+  const disclosureKind = metadata.sponsored === false ? 'outbound' : 'affiliate';
+  return (
+    <div className="min-w-44 flex-1">
+      <a
+        className="inline-flex w-full items-center justify-center rounded-full bg-market-mint px-4 py-2 text-sm font-black text-market-ink transition hover:bg-emerald-300"
+        data-affiliate-campaign={metadata.campaignId ?? metadata.surface}
+        data-affiliate-disclosure={disclosureKind}
+        data-affiliate-placement={metadata.placement}
+        data-affiliate-retailer={metadata.retailerName}
+        href={buildAffiliateOutboundUrl(metadata)}
+        rel="sponsored noopener noreferrer"
+        target="_blank"
+      >
+        {children}
+      </a>
+      <span className="mt-2 block rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold leading-5 text-amber-950" data-affiliate-disclosure={disclosureKind}>
+        {affiliateDisclosureLabel(metadata)}
+      </span>
+    </div>
+  );
 }
 
 export function DealCard({
@@ -21,9 +80,35 @@ export function DealCard({
   discountStartedAt,
   priceHistory,
   currency = 'SEK',
-  locale = 'sv-SE'
+  locale = 'sv-SE',
+  retailerName = 'the retailer',
+  productId,
+  dealId,
+  outboundDealUrl,
+  outboundStoreUrl,
+  affiliateCampaignId
 }: DealCardProps) {
   const context = buildDealContext({ currentPrice, discountStartedAt, priceHistory, currency, locale });
+  const dealLinkMetadata = outboundDealUrl ? outboundMetadata({
+    campaignId: affiliateCampaignId,
+    dealId,
+    destinationUrl: outboundDealUrl,
+    placement: 'deal_card',
+    productId,
+    retailerName,
+    sponsored: true,
+    surface: 'deal-card-primary'
+  }) : null;
+  const storeLinkMetadata = outboundStoreUrl ? outboundMetadata({
+    campaignId: affiliateCampaignId,
+    dealId,
+    destinationUrl: outboundStoreUrl,
+    placement: 'store_link',
+    productId,
+    retailerName,
+    sponsored: false,
+    surface: 'deal-card-store'
+  }) : null;
 
   return (
     <article className="rounded-2xl border border-market-ink/10 bg-white p-4 shadow-sm">
@@ -54,6 +139,13 @@ export function DealCard({
           </span>
         ) : null}
       </div>
+
+      {dealLinkMetadata || storeLinkMetadata ? (
+        <div className="mt-4 flex flex-wrap gap-3" aria-label="Outbound store and deal links with affiliate disclosure">
+          {dealLinkMetadata ? <OutboundAffiliateLink metadata={dealLinkMetadata}>Open deal at {retailerName}</OutboundAffiliateLink> : null}
+          {storeLinkMetadata ? <OutboundAffiliateLink metadata={storeLinkMetadata}>Visit {retailerName} store</OutboundAffiliateLink> : null}
+        </div>
+      ) : null}
     </article>
   );
 }
