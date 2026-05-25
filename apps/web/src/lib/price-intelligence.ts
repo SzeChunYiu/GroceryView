@@ -115,6 +115,14 @@ export type BestTimeToBuyAlertRecommendation = {
   rationale: string;
 };
 
+export type BestTimeToBuyForecastPanel = {
+  headline: string;
+  guidance: string;
+  confidenceLabel: string;
+  expectedMovementLabel: string;
+  recommendationCount: number;
+};
+
 export type SeasonalDiscoveryRow = {
   slug: string;
   productName: string;
@@ -444,6 +452,23 @@ export function buildBestTimeToBuyAlert(input: BestTimeToBuyAlertInput): BestTim
       : decision === 'wait_for_flyer'
         ? `Historical volatility score ${volatility.score} plus the upcoming flyer window makes waiting more useful than buying at the current observed price.`
         : `Current price is close to historical observations and no strong flyer signal is available, so keep the watchlist alert active.`
+  };
+}
+
+export function buildBestTimeToBuyForecastPanel(recommendations: ReadonlyArray<BestTimeToBuyAlertRecommendation>): BestTimeToBuyForecastPanel {
+  const buyNow = recommendations.filter((recommendation) => recommendation.decision === 'buy_now').length;
+  const wait = recommendations.filter((recommendation) => recommendation.decision === 'wait_for_flyer').length;
+  const watch = recommendations.length - buyNow - wait;
+  const leadRecommendation = [...recommendations].sort((left, right) => right.volatilityScore - left.volatilityScore)[0];
+
+  return {
+    headline: wait > buyNow ? 'Waiting may beat today’s shelf price' : buyNow > 0 ? 'Several observed prices look buyable now' : 'Keep watching volatile items',
+    guidance: `Decision mix: ${buyNow} buy now · ${wait} wait for flyer · ${watch} keep watching.`,
+    confidenceLabel: leadRecommendation?.confidenceLabel ?? 'limited timing evidence',
+    expectedMovementLabel: leadRecommendation
+      ? `${leadRecommendation.productName}: ${leadRecommendation.flyerWindowLabel}; observed range ${leadRecommendation.observedRangeLabel}.`
+      : 'No item has enough observed movement to summarize yet.',
+    recommendationCount: recommendations.length
   };
 }
 
