@@ -1,6 +1,7 @@
 'use client';
 
 import { type FormEvent, useMemo, useState } from 'react';
+import { defaultPushNotificationPreferences, type PushNotificationPreferenceKey, type PushNotificationPreferences } from '@/lib/alert-scheduler';
 
 type NotificationInboxStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
 type BestTimeRuleStatus = 'idle' | 'blocked' | 'saving' | 'saved' | 'error';
@@ -50,11 +51,54 @@ const BEST_TIME_CATEGORIES = [
   { id: 'fresh_produce', label: 'Fresh produce' }
 ] as const;
 
+const PUSH_NOTIFICATION_PREFERENCES: { key: PushNotificationPreferenceKey; label: string; description: string }[] = [
+  { key: 'priceDrops', label: 'Price drops', description: 'Push when a watched item or saved search gets a verified lower price.' },
+  { key: 'stockChanges', label: 'Stock changes', description: 'Push when unavailable basket staples return to stock.' },
+  { key: 'listCollaboration', label: 'List collaboration', description: 'Push when household members add, claim, or complete shared list items.' },
+  { key: 'budgetWarnings', label: 'Budget warnings', description: 'Push before baskets or recurring shops cross a weekly budget limit.' }
+];
+
 function readSession(): BrowserSession {
   if (typeof window === 'undefined') return { accessToken: '', userId: '' };
   const accessToken = sessionStorage.getItem('groceryview:accessToken') || '';
   const userId = sessionStorage.getItem('groceryview:userId') || '';
   return { accessToken, userId };
+}
+
+export function PushNotificationPreferenceControls() {
+  const [preferences, setPreferences] = useState<PushNotificationPreferences>(defaultPushNotificationPreferences);
+  const enabledCount = Object.values(preferences).filter(Boolean).length;
+
+  return (
+    <section className="mt-4 rounded-3xl border border-indigo-200 bg-white/85 p-5" aria-label="Push notification preference controls">
+      <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.2em] text-indigo-800">Push notification preferences</p>
+          <h3 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Choose which high-value mobile alerts can interrupt you</h3>
+          <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+            Granular toggles keep price drops, stock changes, list collaboration, and budget warnings independently controllable before notification delivery.
+          </p>
+        </div>
+        <p className="rounded-full bg-indigo-100 px-4 py-2 text-sm font-black text-indigo-900">{enabledCount}/4 enabled</p>
+      </div>
+      <div className="mt-4 grid gap-3 md:grid-cols-2">
+        {PUSH_NOTIFICATION_PREFERENCES.map((preference) => (
+          <label className="flex items-start gap-3 rounded-2xl border border-indigo-100 bg-indigo-50/70 p-4" key={preference.key}>
+            <input
+              checked={preferences[preference.key]}
+              className="mt-1 h-5 w-5 accent-indigo-700"
+              onChange={(event) => setPreferences((current) => ({ ...current, [preference.key]: event.target.checked }))}
+              type="checkbox"
+            />
+            <span>
+              <span className="block text-sm font-black text-slate-950">{preference.label}</span>
+              <span className="mt-1 block text-sm font-semibold leading-6 text-slate-700">{preference.description}</span>
+            </span>
+          </label>
+        ))}
+      </div>
+    </section>
+  );
 }
 
 export function NotificationInboxActions() {

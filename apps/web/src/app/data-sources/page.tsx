@@ -24,7 +24,15 @@ import {
   timescaleDbEvaluation
 } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
-import { partnerOnboardingIntake, sourceFreshnessSlaDashboard, sourceFreshnessSlaSummary, sourceManagementActions, sourceManagementSummary } from '@/lib/source-health';
+import {
+  ingestionPipelineMonitorRows,
+  ingestionPipelineMonitorSummary,
+  partnerOnboardingIntake,
+  sourceFreshnessSlaDashboard,
+  sourceFreshnessSlaSummary,
+  sourceManagementActions,
+  sourceManagementSummary
+} from '@/lib/source-health';
 
 const unitNormalizationQaReport = buildUnitNormalizationQaReport([
   ...axfoodProducts.map((product) => ({
@@ -102,6 +110,60 @@ export default function DataSourcesPage() {
         <Metric label="Source groups" value={sourceCoverage.length.toLocaleString('sv-SE')} />
         <Metric label="Brand ledgers" value={storeBrandLedger.length.toLocaleString('sv-SE')} />
       </div>
+
+      <Card className="mt-6 border-rose-200 bg-rose-50/70">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-rose-800">Admin ingestion monitor</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Latest pipeline status before prices go stale</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Operators can compare latest ingest status, transformed row counts, run failures, and transform latency for every source before stale or broken feeds reach shoppers.
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white p-3 text-sm font-black text-rose-950 shadow-sm">
+            <p>monitored {ingestionPipelineMonitorSummary.monitoredAt}</p>
+            <p>{ingestionPipelineMonitorSummary.totalFailures.toLocaleString('sv-SE')} failures in latest runs</p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          <Metric label="Pipelines" value={ingestionPipelineMonitorSummary.sourceCount.toLocaleString('sv-SE')} />
+          <Metric label="Rows transformed" value={ingestionPipelineMonitorSummary.totalRows.toLocaleString('sv-SE')} />
+          <Metric label="Failed sources" value={ingestionPipelineMonitorSummary.failedSourceCount.toLocaleString('sv-SE')} />
+        </div>
+        <div className="mt-5 overflow-x-auto rounded-2xl border border-rose-100 bg-white">
+          <table className="min-w-full text-left text-sm">
+            <thead className="bg-rose-50 text-xs font-black uppercase tracking-[0.16em] text-rose-900">
+              <tr>
+                <th className="px-4 py-3">Source</th>
+                <th className="px-4 py-3">Latest status</th>
+                <th className="px-4 py-3">Rows</th>
+                <th className="px-4 py-3">Failures</th>
+                <th className="px-4 py-3">Latency</th>
+                <th className="px-4 py-3">Last finished</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-rose-100 font-semibold text-slate-700">
+              {ingestionPipelineMonitorRows.map((source) => (
+                <tr key={source.sourceName}>
+                  <td className="px-4 py-3">
+                    <p className="font-black text-slate-950">{source.chain}</p>
+                    <p className="text-xs text-slate-500">{source.dataSource}</p>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className={`rounded-full px-3 py-1 text-xs font-black uppercase ${source.latestStatus === 'succeeded' ? 'bg-emerald-50 text-emerald-800' : source.latestStatus === 'warning' ? 'bg-amber-50 text-amber-800' : 'bg-red-50 text-red-800'}`}>
+                      {source.latestStatus}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">{source.rowCount.toLocaleString('sv-SE')}</td>
+                  <td className="px-4 py-3">{source.failureCount.toLocaleString('sv-SE')}</td>
+                  <td className="px-4 py-3">{source.latencySeconds.toLocaleString('sv-SE')}s</td>
+                  <td className="px-4 py-3">{source.lastFinishedAt}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
 
       <Card className="mt-6 border-cyan-200 bg-cyan-50/70">
         <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">

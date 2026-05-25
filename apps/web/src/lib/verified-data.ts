@@ -23,6 +23,7 @@ import {
 } from './generated/db-site-ingested-overrides';
 import { dbSiteHomepageTrendingPriceChanges } from './generated/db-site-trending-price-changes';
 import { categoryLabels, pricedProducts } from './openprices-products';
+import { classifyRecentPriceVariance } from './price-intelligence';
 import { allergenRiskBadgesForText } from './search-filters';
 import { osmStores } from './osm-stores';
 import {
@@ -673,6 +674,7 @@ function booleanSearchValue(value: SearchParamValue): boolean {
 function productSearchResultCards(searchResult: typeof rawFacetedProductSearch) {
   return searchResult.products.map((product) => {
     const cheapest = product.currentPrices[0] ?? null;
+    const volatilityBadge = classifyRecentPriceVariance(product.currentPrices);
     return {
       slug: product.slug,
       name: product.canonicalName,
@@ -688,6 +690,7 @@ function productSearchResultCards(searchResult: typeof rawFacetedProductSearch) 
       }) : unknownUnitPriceLabel,
       isAvailable: product.isAvailable,
       chainLabel: cheapest ? `${cheapest.chainName} · ${cheapest.priceType}` : 'Awaiting latest_prices row',
+      volatilityBadge,
       sourceTables: searchResult.evidence.sourceTables,
       allergenRiskBadges: allergenRiskBadgesForText([
         product.canonicalName,
@@ -2036,6 +2039,17 @@ export type AdaptiveProductCard = {
   packageLabel: string;
   sourceLabel: string;
   confidenceLabel: string;
+  confidenceLevel: 'high' | 'medium' | 'low';
+  confidenceDrilldown: {
+    sourceCount: number;
+    observationAgeLabel: string;
+    normalizationQuality: string;
+    reviewStatus: string;
+    rows: Array<{
+      label: string;
+      value: string;
+    }>;
+  };
   totalSortPrice: number;
   unitSortPrice: number | null;
   defaultCompareMode: 'total' | 'unit';
@@ -2141,6 +2155,20 @@ function sevenDaySparklinePoints(product: (typeof productUniverse)[number]): Ada
     }));
 }
 
+function observationAgeLabel(observedAt: string, asOf = '2026-05-25') {
+  const observedTime = Date.parse(observedAt.includes('T') ? observedAt : `${observedAt}T00:00:00.000Z`);
+  const asOfTime = Date.parse(`${asOf}T00:00:00.000Z`);
+  if (!Number.isFinite(observedTime) || !Number.isFinite(asOfTime)) return 'Observation age not reported';
+  const ageDays = Math.max(0, Math.round((asOfTime - observedTime) / (24 * 60 * 60 * 1000)));
+  return ageDays === 0 ? 'Observed today' : `Observed ${ageDays} day${ageDays === 1 ? '' : 's'} before ${asOf}`;
+}
+
+function confidenceLevelForEvidence(sourceCount: number, hasNormalizedUnit: boolean): AdaptiveProductCard['confidenceLevel'] {
+  if (sourceCount >= 8 && hasNormalizedUnit) return 'high';
+  if (sourceCount >= 2 || hasNormalizedUnit) return 'medium';
+  return 'low';
+}
+
 export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((product) => {
   const isChainProduct = 'lowestPrice' in product;
   const totalPrice = isChainProduct ? product.lowestPrice : product.priceMedian;
@@ -2158,6 +2186,32 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
   const sparklinePoints = sevenDaySparklinePoints(product);
   const priceDrop = priceDropFromThirtyDayHistory(product);
   const safetyProfile = safetyProfileForProduct(product);
+  const sourceCount = isChainProduct
+    ? Object.values(product.chains).filter((row) => typeof row.price === 'number' && Number.isFinite(row.price) && row.price > 0).length
+    : product.observationCount;
+  const latestObservedAt = isChainProduct ? '2026-05-21' : product.lastObservedAt;
+  const observationAge = observationAgeLabel(latestObservedAt);
+  const normalizationQuality = normalizedUnit
+    ? `Package parsed as ${normalizedUnit.packageLabel}; comparable ${normalizedUnit.unitLabel} retained.`
+    : 'Package quantity missing or unparsable; comparable unit price is withheld.';
+  const reviewStatus = isChainProduct
+    ? 'Retailer catalog row accepted from Axfood source data; no community-review flag is attached.'
+    : openFoodFactsSafetyByCode.has(product.code)
+      ? 'OpenFoodFacts metadata linked for source review context.'
+      : 'OpenPrices observation has no linked OpenFoodFacts review metadata yet.';
+  const confidenceLevel = confidenceLevelForEvidence(sourceCount, Boolean(normalizedUnit));
+  const confidenceDrilldown = {
+    sourceCount,
+    observationAgeLabel: observationAge,
+    normalizationQuality,
+    reviewStatus,
+    rows: [
+      { label: 'Source count', value: `${sourceCount.toLocaleString('sv-SE')} ${isChainProduct ? 'chain price row(s)' : 'OpenPrices observation(s)'}` },
+      { label: 'Observation age', value: observationAge },
+      { label: 'Normalization quality', value: normalizationQuality },
+      { label: 'Review status', value: reviewStatus }
+    ]
+  };
 
   return {
     slug: product.slug,
@@ -2175,6 +2229,8 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
     packageLabel: normalizedUnit?.packageLabel || packageText || 'Package size not reported',
     sourceLabel: isChainProduct ? `${product.lowestChain} lowest · ${formatPct(product.spreadPct)} spread` : `OpenPrices · ${product.observationCount.toLocaleString('sv-SE')} observations`,
     confidenceLabel: normalizedUnit ? `Derived from observed price + package size (${normalizedUnit.unitLabel})` : 'No synthetic unit prices: package quantity missing',
+    confidenceLevel,
+    confidenceDrilldown,
     totalSortPrice: totalPrice,
     unitSortPrice: normalizedUnit?.unitSortPrice ?? null,
     defaultCompareMode: productKind === 'commodity' ? 'unit' : 'total',

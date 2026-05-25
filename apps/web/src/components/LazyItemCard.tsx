@@ -2,12 +2,15 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { trackItemCardImpression } from '@/lib/analytics';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
+import { PriceBadge } from './price-badge';
+import type { RecentPriceVarianceBadge } from '@/lib/price-intelligence';
 import { dataGridVirtualStatusClass } from '@/components/data-grid';
 
 export type LazyItemCardProps = {
+  ariaLabel?: string;
   children: ReactNode;
   className: string;
   compareMode: string;
@@ -17,9 +20,11 @@ export type LazyItemCardProps = {
   linkRef?: (node: HTMLAnchorElement | null) => void;
   listId: string;
   listIndex: number;
+  positionInSet?: number;
+  setSize?: number;
 };
 
-export function LazyItemCard({ children, className, compareMode, href, itemId, itemName, linkRef, listId, listIndex }: Readonly<LazyItemCardProps>) {
+export function LazyItemCard({ ariaLabel, children, className, compareMode, href, itemId, itemName, linkRef, listId, listIndex, positionInSet, setSize }: Readonly<LazyItemCardProps>) {
   const hasTrackedImpression = useRef(false);
   const { isIntersecting, ref } = useIntersectionObserver<HTMLAnchorElement>({ freezeOnceVisible: true, rootMargin: '120px 0px', threshold: 0.4 });
   const combinedRef = useCallback((node: HTMLAnchorElement | null) => {
@@ -33,7 +38,20 @@ export function LazyItemCard({ children, className, compareMode, href, itemId, i
     trackItemCardImpression({ compareMode, itemId, itemName, listId, listIndex });
   }, [compareMode, isIntersecting, itemId, itemName, listId, listIndex]);
 
-  return <Link className={className} data-analytics-item-id={itemId} data-analytics-list-id={listId} href={href} ref={combinedRef}>{children}</Link>;
+  return (
+    <Link
+      aria-label={ariaLabel}
+      aria-posinset={positionInSet}
+      aria-setsize={setSize}
+      className={className}
+      data-analytics-item-id={itemId}
+      data-analytics-list-id={listId}
+      href={href}
+      ref={combinedRef}
+    >
+      {children}
+    </Link>
+  );
 }
 
 type VirtualizedProduct = {
@@ -48,12 +66,14 @@ type VirtualizedProduct = {
   slug: string;
   sourceTables: string[];
   unitPriceLabel: string;
+  volatilityBadge?: RecentPriceVarianceBadge | null;
 };
 
 const ESTIMATED_ROW_HEIGHT = 236;
 const GRID_GAP = 12;
 
-export function VirtualizedProductGrid({ products }: Readonly<{ products: VirtualizedProduct[] }>) {
+export function VirtualizedProductGrid({ products, resultLabel = 'Virtualized product results' }: Readonly<{ products: VirtualizedProduct[]; resultLabel?: string }>) {
+  const statusId = useId();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const productRefs = useRef<Map<number, HTMLAnchorElement>>(new Map());
   const measuredRows = useRef<Map<number, number>>(new Map());
@@ -142,16 +162,21 @@ export function VirtualizedProductGrid({ products }: Readonly<{ products: Virtua
 
   return (
     <>
-      <p className={dataGridVirtualStatusClass}>Use Tab or arrow keys to move through {products.length.toLocaleString('sv-SE')} virtualized product cards.</p>
-      <div aria-label="Virtualized product results" className="relative mt-5 focus:outline-none" onKeyDown={onGridKeyDown} ref={containerRef} role="list" style={{ height: totalHeight }} tabIndex={0}>
+      <p className={dataGridVirtualStatusClass} id={statusId}>
+        Use Tab or arrow keys to move through {products.length.toLocaleString('sv-SE')} virtualized product cards. Screen readers receive the full result count and each rendered card announces its position.
+      </p>
+      <div aria-describedby={statusId} aria-label={resultLabel} className="relative mt-5 focus:outline-none" onKeyDown={onGridKeyDown} ref={containerRef} role="list" style={{ height: totalHeight }} tabIndex={0}>
       {renderedRows.map(({ offset, rowIndex }) => (
-        <div className="absolute left-0 grid w-full gap-3 md:grid-cols-2 xl:grid-cols-3" key={rowIndex} ref={measureRow(rowIndex)} style={{ transform: `translateY(${offset}px)` }}>
-          {products.slice(rowIndex * columns, rowIndex * columns + columns).map((product, productOffset) => (
-            <LazyItemCard className="group rounded-2xl border border-violet-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-violet-700 focus:outline-none focus:ring-4 focus:ring-violet-300" compareMode="products-grid" href={`/products/${product.slug}`} itemId={product.slug} itemName={product.name} key={product.slug} linkRef={(node) => {
+        <div className="absolute left-0 grid w-full gap-3 md:grid-cols-2 xl:grid-cols-3" key={rowIndex} ref={measureRow(rowIndex)} role="presentation" style={{ transform: `translateY(${offset}px)` }}>
+          {products.slice(rowIndex * columns, rowIndex * columns + columns).map((product, productOffset) => {
+            const productIndex = rowIndex * columns + productOffset;
+            return (
+            <div aria-posinset={productIndex + 1} aria-setsize={products.length} key={product.slug} role="listitem">
+            <LazyItemCard ariaLabel={`${product.name}, ${product.cheapestPriceLabel}, ${product.chainLabel}`} className="block h-full group rounded-2xl border border-violet-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-violet-700 focus:outline-none focus:ring-4 focus:ring-violet-300" compareMode="products-grid" href={`/products/${product.slug}`} itemId={product.slug} itemName={product.name} linkRef={(node) => {
               const index = rowIndex * columns + productOffset;
               if (node) productRefs.current.set(index, node);
               else productRefs.current.delete(index);
-            }} listId="products-grid" listIndex={rowIndex * columns + productOffset}>
+            }} listId="products-grid" listIndex={productIndex}>
               <div className="flex gap-3">
                 {product.imageUrl ? <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-white p-2 ring-1 ring-violet-100"><Image alt={`${product.name} product image`} className="max-h-full max-w-full object-contain transition group-hover:scale-105" height={80} loading="lazy" placeholder="empty" sizes="80px" src={product.imageUrl} width={80} /></div> : null}
                 <div>
@@ -165,12 +190,17 @@ export function VirtualizedProductGrid({ products }: Readonly<{ products: Virtua
                 </div>
               </div>
               <div className="mt-4 grid gap-2 text-xs font-black text-slate-700">
-                <p>{product.cheapestPriceLabel} · {product.unitPriceLabel}</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <PriceBadge className="px-2 py-0.5 text-xs" price={product.cheapestPriceLabel} varianceBadge={product.volatilityBadge} />
+                  <span>{product.unitPriceLabel}</span>
+                </div>
                 <p>{product.chainLabel}</p>
                 <p className="text-violet-800">sourceTables: {product.sourceTables.join(' · ')}</p>
               </div>
             </LazyItemCard>
-          ))}
+            </div>
+            );
+          })}
         </div>
       ))}
       </div>
