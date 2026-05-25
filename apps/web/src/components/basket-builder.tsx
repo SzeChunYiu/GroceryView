@@ -23,10 +23,12 @@ import {
   type BasketChainPrice,
   type BasketStackOffer,
 } from "@/lib/deal-context";
+import { buildSmartBasketSubstituteSuggestions, type BasketSubstituteProduct } from "@/lib/recurring-basket";
 
 export type BasketBuilderProduct = {
   id: string;
   name: string;
+  categoryLabel?: string;
   chainPrices?: BasketChainPrice[];
   dealStackOffers?: BasketStackOffer[];
   dietaryTags?: readonly string[];
@@ -82,6 +84,23 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
     offers: basketProducts.flatMap((product) => product.dealStackOffers ?? []),
   });
   const bestChainStack = chainStacks[0];
+  const substituteProducts: BasketSubstituteProduct[] = products.map((product) => ({
+    productId: product.id,
+    productName: product.name,
+    categoryLabel: product.categoryLabel,
+    prices: (product.chainPrices ?? []).map((price) => ({ chainName: price.chain, price: price.price }))
+  }));
+  const substituteChainNames = Array.from(new Set(substituteProducts.flatMap((product) => product.prices.map((price) => price.chainName))));
+  const smartSubstitutes = buildSmartBasketSubstituteSuggestions({
+    catalog: substituteProducts,
+    items: basketProducts.map((product) => ({
+      productId: product.id,
+      productName: product.name,
+      categoryLabel: product.categoryLabel,
+      prices: (product.chainPrices ?? []).map((price) => ({ chainName: price.chain, price: price.price }))
+    })),
+    unavailableChainNames: substituteChainNames
+  });
 
   function add(product: T) {
     setBasketProducts((current) => addBasketBuilderProduct(current, product));
@@ -141,6 +160,22 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
           <li key={product.id}>{product.name}</li>
         ))}
       </ul>
+
+      {smartSubstitutes.length > 0 ? (
+        <section aria-label="Smart substitute suggestions">
+          <h3>Smart substitute suggestions</h3>
+          <ul>
+            {smartSubstitutes.map((suggestion) => (
+              <li key={`${suggestion.productId}-${suggestion.substituteProductId}-${suggestion.reason}`}>
+                Swap {suggestion.productName} for {suggestion.substituteProductName} at {suggestion.chainName}
+                {suggestion.reason === 'high_unit_price'
+                  ? ` to save ${suggestion.savingsLabel}`
+                  : ' because the selected chain is missing the current item'}.
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       {bestChainStack ? (
         <section aria-label="Cheapest coupon stack by chain">

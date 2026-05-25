@@ -1,5 +1,28 @@
 import { matchPurchaseHistoryRowToProduct, type PurchaseHistoryProductMatch } from './normalization';
 
+export type BasketSubstitutePrice = {
+  chainName: string;
+  price: number;
+};
+
+export type BasketSubstituteProduct = {
+  productId: string;
+  productName: string;
+  categoryLabel?: string;
+  prices: BasketSubstitutePrice[];
+};
+
+export type BasketSubstituteSuggestion = {
+  productId: string;
+  productName: string;
+  substituteProductId: string;
+  substituteProductName: string;
+  chainName: string;
+  reason: 'high_unit_price' | 'unavailable_chain';
+  savings: number;
+  savingsLabel: string;
+};
+
 export type RecurringBasketLine = {
   productId: string;
   productName: string;
@@ -53,6 +76,109 @@ export type PurchaseHistoryImportPreview = {
   }>;
   totalSpend: number;
 };
+
+function normalizedSuggestionTokens(value: string) {
+  return new Set(
+    value
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLocaleLowerCase('sv-SE')
+      .split(/[^a-z0-9]+/i)
+      .filter((token) => token.length >= 3)
+  );
+}
+
+function equivalentBasketProducts(product: BasketSubstituteProduct, candidate: BasketSubstituteProduct) {
+  if (product.productId === candidate.productId) return false;
+  if (product.categoryLabel && candidate.categoryLabel && product.categoryLabel === candidate.categoryLabel) return true;
+
+  const productTokens = normalizedSuggestionTokens(product.productName);
+  const candidateTokens = normalizedSuggestionTokens(candidate.productName);
+  return [...productTokens].some((token) => candidateTokens.has(token));
+}
+
+function cheapestSubstitutePrice(product: BasketSubstituteProduct, chainName?: string) {
+  const prices = chainName ? product.prices.filter((price) => price.chainName === chainName) : product.prices;
+  const validPrices = prices.filter((price) => Number.isFinite(price.price) && price.price > 0);
+  return validPrices.sort((left, right) => left.price - right.price)[0];
+}
+
+function formatSubstituteSavings(value: number, locale = 'sv-SE', currency = 'SEK') {
+  return new Intl.NumberFormat(locale, { currency, maximumFractionDigits: 2, style: 'currency' }).format(value);
+}
+
+export function buildSmartBasketSubstituteSuggestions({
+  catalog,
+  items,
+  locale = 'sv-SE',
+  currency = 'SEK',
+  unavailableChainNames = []
+}: {
+  catalog: readonly BasketSubstituteProduct[];
+  items: readonly BasketSubstituteProduct[];
+  locale?: string;
+  currency?: string;
+  unavailableChainNames?: readonly string[];
+}): BasketSubstituteSuggestion[] {
+  const suggestions: BasketSubstituteSuggestion[] = [];
+
+  for (const item of items) {
+    const itemCheapest = cheapestSubstitutePrice(item);
+    const equivalents = catalog.filter((candidate) => equivalentBasketProducts(item, candidate));
+
+    if (itemCheapest) {
+      const cheaperCandidate = equivalents
+        .map((candidate) => ({ candidate, price: cheapestSubstitutePrice(candidate) }))
+        .filter((row): row is { candidate: BasketSubstituteProduct; price: BasketSubstitutePrice } => Boolean(row.price))
+        .filter((row) => itemCheapest.price - row.price.price >= Math.max(1, itemCheapest.price * 0.08))
+        .sort((left, right) => left.price.price - right.price.price)[0];
+
+      if (cheaperCandidate) {
+        const savings = itemCheapest.price - cheaperCandidate.price.price;
+        suggestions.push({
+          productId: item.productId,
+          productName: item.productName,
+          substituteProductId: cheaperCandidate.candidate.productId,
+          substituteProductName: cheaperCandidate.candidate.productName,
+          chainName: cheaperCandidate.price.chainName,
+          reason: 'high_unit_price',
+          savings,
+          savingsLabel: formatSubstituteSavings(savings, locale, currency)
+        });
+      }
+    }
+
+    for (const chainName of unavailableChainNames) {
+      if (item.prices.some((price) => price.chainName === chainName)) continue;
+      const availableCandidate = equivalents
+        .map((candidate) => ({ candidate, price: cheapestSubstitutePrice(candidate, chainName) }))
+        .filter((row): row is { candidate: BasketSubstituteProduct; price: BasketSubstitutePrice } => Boolean(row.price))
+        .sort((left, right) => left.price.price - right.price.price)[0];
+
+      if (availableCandidate) {
+        suggestions.push({
+          productId: item.productId,
+          productName: item.productName,
+          substituteProductId: availableCandidate.candidate.productId,
+          substituteProductName: availableCandidate.candidate.productName,
+          chainName,
+          reason: 'unavailable_chain',
+          savings: 0,
+          savingsLabel: formatSubstituteSavings(0, locale, currency)
+        });
+        break;
+      }
+    }
+  }
+
+  const seen = new Set<string>();
+  return suggestions.filter((suggestion) => {
+    const key = `${suggestion.productId}:${suggestion.substituteProductId}:${suggestion.reason}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).slice(0, 4);
+}
 
 const nextWeeklyWindow: RecurringBasketWindow = { startsOn: '2026-05-25', endsOn: '2026-05-31', label: 'Week 22 grocery window' };
 const followingWeeklyWindow: RecurringBasketWindow = { startsOn: '2026-06-01', endsOn: '2026-06-07', label: 'Week 23 grocery window' };
