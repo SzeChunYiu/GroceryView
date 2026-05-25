@@ -55,7 +55,18 @@ type ScreenerRow = {
 const sortOptions = SCREENER_SORT_OPTIONS;
 
 export function generateMetadata() {
-  return routeMetadata('/screener');
+  const metadata = routeMetadata('/screener');
+  const openGraph = metadata.openGraph;
+
+  return {
+    ...metadata,
+    twitter: {
+      card: 'summary_large_image',
+      title: openGraph?.title ?? metadata.title,
+      description: openGraph?.description ?? metadata.description,
+      images: openGraph?.images
+    }
+  };
 }
 
 function paramValue(value: string | string[] | undefined) {
