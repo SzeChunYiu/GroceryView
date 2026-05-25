@@ -1,6 +1,9 @@
+'use client';
+
 import { confidenceCopy, type ConfidenceLevel } from '@/lib/content-style';
 import { confidenceStateToken } from '@/lib/color-vision-palette';
 import { getPriceFreshness } from '@/lib/freshness';
+import { groceryTranslator, type SupportedLocale } from '@/lib/i18n';
 
 type ConfidenceBadgeProps = {
   level: ConfidenceLevel;
@@ -12,6 +15,10 @@ type ConfidenceBadgeProps = {
     value: string;
   }>;
   verificationLabel?: string;
+  locale?: SupportedLocale;
+  emptyData?: boolean;
+  actionLabel?: string;
+  onAction?: () => void;
 };
 
 const levelClasses: Record<ConfidenceBadgeProps["level"], string> = {
@@ -20,17 +27,18 @@ const levelClasses: Record<ConfidenceBadgeProps["level"], string> = {
   low: "border-amber-200 bg-amber-50 text-amber-900",
 };
 
-export function ConfidenceBadge({ level, label, observedAt, sampleSize, details, verificationLabel }: ConfidenceBadgeProps) {
+export function ConfidenceBadge({ level, label, observedAt, sampleSize, details, verificationLabel, locale, emptyData = false, actionLabel = 'Review confidence data', onAction }: ConfidenceBadgeProps) {
+  const t = groceryTranslator(locale);
   const displayLabel = label ?? confidenceCopy(level, sampleSize);
   const token = confidenceStateToken(level);
-  const sampleCopy = sampleSize !== undefined ? `Sample size ${sampleSize}.` : '';
+  const sampleCopy = sampleSize !== undefined ? t('confidence-badge.sampleSize', { sampleSize }) : '';
   const freshness = observedAt !== undefined ? getPriceFreshness(observedAt) : null;
   const verificationCopy = verificationLabel?.trim();
   const detailCopy = [
     sampleCopy,
-    freshness ? `Freshness ${freshness.label}. ${freshness.refreshHint}` : '',
-    verificationCopy ? `Verification ${verificationCopy}.` : '',
-    `${token.meaning}. Indicator ${token.indicator}.`
+    freshness ? t('confidence-badge.freshness', { label: freshness.label, refreshHint: freshness.refreshHint }) : '',
+    verificationCopy ? t('confidence-badge.verification', { verificationLabel: verificationCopy }) : '',
+    t('confidence-badge.indicator', { meaning: token.meaning, indicator: token.indicator })
   ].filter(Boolean).join(' ');
   const badge = (
     <span
@@ -46,20 +54,35 @@ export function ConfidenceBadge({ level, label, observedAt, sampleSize, details,
       {verificationCopy ? <span className="normal-case tracking-normal">{verificationCopy}</span> : null}
     </span>
   );
+  const action = onAction ? (
+    <button
+      type="button"
+      className="ml-2 rounded-lg border border-slate-300 px-3 py-1 text-xs font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+      disabled={emptyData}
+      onClick={onAction}
+    >
+      {actionLabel}
+    </button>
+  ) : null;
 
-  if (!details?.length) return badge;
+  if (!details?.length && !action) return badge;
 
   return (
     <div className="inline-block rounded-xl border border-slate-200 bg-white p-2 text-left shadow-sm">
-      {badge}
-      <dl className="mt-2 grid gap-2 text-xs normal-case tracking-normal text-slate-700">
-        {details.map((detail) => (
-          <div key={detail.label}>
-            <dt className="font-black text-slate-950">{detail.label}</dt>
-            <dd>{detail.value}</dd>
-          </div>
-        ))}
-      </dl>
+      <div className="flex flex-wrap items-center gap-2">
+        {badge}
+        {action}
+      </div>
+      {details?.length ? (
+        <dl className="mt-2 grid gap-2 text-xs normal-case tracking-normal text-slate-700">
+          {details.map((detail) => (
+            <div key={detail.label}>
+              <dt className="font-black text-slate-950">{detail.label}</dt>
+              <dd>{detail.value}</dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
     </div>
   );
 }

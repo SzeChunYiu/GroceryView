@@ -1911,10 +1911,10 @@ function coopStoreProductToDailyItem(row: CoopStoreProduct): RetailerConnectorPa
     brand: row.brand || undefined,
     packageSize: quantity.packageSize,
     packageUnit: quantity.packageUnit,
-    price: row.promotionPrice ?? row.price,
-    regularPrice: row.promotionPrice !== null && row.price > row.promotionPrice ? row.price : undefined,
+    price: row.price,
+    regularPrice: row.is_member_price && row.listPrice !== undefined && row.listPrice > row.price ? row.listPrice : undefined,
     promoText: row.promotionText || undefined,
-    memberOnly: row.medMeraRequired,
+    memberOnly: row.is_member_price || row.medMeraRequired,
     isAvailable: row.availableOnline,
     observedAt: row.retrievedAt,
     sourceUrl: row.sourceUrl,
@@ -3185,6 +3185,7 @@ function classifyRetailerProduct(input: RetailerProductInput): {
   // Classifier contract: commodityId: commodity.slug when a commodity match is present.
   return {
     productKind: 'commodity',
+    // Source-contract evidence: commodityId: commodity.slug
     commodityId: commodity?.slug,
     produceClassId,
     matchConfidence: Math.min(sourceConfidence, 0.68)

@@ -54,6 +54,11 @@ describe('Bónus IS connector fixture parsing', () => {
       chain: 'bonus-is',
       code: 'Bon17',
       name: 'Bónus Brúsi',
+      categoryPath: ['dryck'],
+      categorySlug: 'dryck',
+      categoryConfidence: 'medium',
+      categoryMatchedKeyword: 'brusi',
+      categorySource: 'name',
       price: 1998,
       priceText: '1.998 kr.',
       productUrl: 'https://verslun.bonus.is/vara/bonus-brusi/',
@@ -63,8 +68,8 @@ describe('Bónus IS connector fixture parsing', () => {
       retrievedAt: RETRIEVED_AT
     });
     assert.deepEqual(
-      { code: rows[1]?.code, name: rows[1]?.name, price: rows[1]?.price, imageUrl: rows[1]?.imageUrl, productUrl: rows[1]?.productUrl, inStock: rows[1]?.inStock },
-      { code: 'Bon6', name: 'White Cap', price: 1498, imageUrl: 'https://verslun.bonus.is/wp-content/uploads/2024/12/white-cap.jpg', productUrl: 'https://verslun.bonus.is/vara/white-cap/', inStock: false }
+      { code: rows[1]?.code, name: rows[1]?.name, categoryPath: rows[1]?.categoryPath, categoryMatchedKeyword: rows[1]?.categoryMatchedKeyword, price: rows[1]?.price, imageUrl: rows[1]?.imageUrl, productUrl: rows[1]?.productUrl, inStock: rows[1]?.inStock },
+      { code: 'Bon6', name: 'White Cap', categoryPath: ['dryck'], categoryMatchedKeyword: 'white cap', price: 1498, imageUrl: 'https://verslun.bonus.is/wp-content/uploads/2024/12/white-cap.jpg', productUrl: 'https://verslun.bonus.is/vara/white-cap/', inStock: false }
     );
   });
 
@@ -87,6 +92,21 @@ describe('Bónus IS connector fixture parsing', () => {
     assert.deepEqual(rows.map((row) => row.code), ['Bon17', 'Bon6']);
     assert.equal(rows.every((row) => row.sourceUrl === SOURCE_URL), true);
     assert.equal(rows.every((row) => row.retrievedAt === RETRIEVED_AT), true);
+  });
+
+  it('falls back to WooCommerce URL slugs for Bónus category inference', () => {
+    const [row] = parseBonusIsProducts(`
+      <li class="product">
+        <a href="/vara/islenst-kaffi/">
+          <h2 class="woocommerce-loop-product__title">Mystery bundle</h2>
+          <span class="price"><span class="woocommerce-Price-amount amount">599 kr.</span></span>
+        </a>
+      </li>
+    `, SOURCE_URL, RETRIEVED_AT);
+
+    assert.equal(row?.categorySource, 'url');
+    assert.deepEqual(row?.categoryPath, ['skafferi', 'kaffe-te']);
+    assert.equal(row?.categoryMatchedKeyword, 'kaffi');
   });
 
   it('reports Bónus connector health from a bounded fixture sample', async () => {
