@@ -3265,14 +3265,33 @@ const elderlyStaplesHistoryInputs = [
   }
 ] as const;
 
+const elderlyStaplesMinimumObservedPoints = 4;
+
+function stapleVolatilityPercent(points: readonly { price: number }[]) {
+  const prices = points.map((point) => point.price);
+  const average = prices.reduce((sum, price) => sum + price, 0) / Math.max(1, prices.length);
+  if (average === 0) return 0;
+  return Math.round(((Math.max(...prices) - Math.min(...prices)) / average) * 1000) / 10;
+}
+
 export const elderlyStaplesStabilityTracker = {
   persona: 'Elderly / seniors',
   title: 'Staples price stability',
-  rows: elderlyStaplesHistoryInputs.map((item) => ({
-    ...item,
-    history: summarizePriceHistory([...item.points]),
-    stabilityBand: item.stabilityBand
-  })),
+  minimumObservedPoints: elderlyStaplesMinimumObservedPoints,
+  rows: elderlyStaplesHistoryInputs.map((item) => {
+    const history = summarizePriceHistory([...item.points]);
+    const insufficientHistoryWarning = history.observedCount < elderlyStaplesMinimumObservedPoints
+      ? `Only ${history.observedCount} observed price points; wait for ${elderlyStaplesMinimumObservedPoints - history.observedCount} more before relying on this staple for fixed-income planning.`
+      : null;
+
+    return {
+      ...item,
+      history,
+      insufficientHistoryWarning,
+      stabilityBand: item.stabilityBand,
+      volatilityPercent: stapleVolatilityPercent(item.points)
+    };
+  }),
   coverage: {
     confidence: 'medium',
     caveat: 'Staples stability uses observed price-history points only; unobserved store weeks stay out of the band instead of being estimated.'
