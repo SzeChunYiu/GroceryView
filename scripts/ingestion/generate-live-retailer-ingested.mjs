@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, rm, writeFile } from 'node:fs/promises';
 import {
   DEFAULT_COOP_PRODUCT_QUERIES,
   DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES,
@@ -458,6 +458,11 @@ async function writeCoop(products, weeklyDiscounts) {
 }
 
 async function writeWillys(products, weeklyDiscounts) {
+  const weeklyDiscountChunkExport = await writeChunkedGeneratedArray({
+    directoryName: 'willys-weekly-discounts',
+    exportPrefix: 'willysWeeklyDiscounts',
+    rows: weeklyDiscounts
+  });
   const productSourceUrls = unique(products.map((row) => row.sourceUrl));
   const weeklySourceUrls = unique(weeklyDiscounts.map((row) => row.sourceUrl));
   const weeklyStoreIds = unique(weeklyDiscounts.map((row) => row.storeId));
@@ -542,12 +547,17 @@ async function writeWillys(products, weeklyDiscounts) {
       sourceUrls: weeklySourceUrls
     })} as const;`,
     '',
-    `export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = ${literal(weeklyDiscounts)};`,
+    weeklyDiscountChunkExport('willysWeeklyDiscounts', 'WillysIngestedWeeklyDiscount'),
     ''
   ]);
 }
 
 async function writeHemkop(products, weeklyDiscounts) {
+  const weeklyDiscountChunkExport = await writeChunkedGeneratedArray({
+    directoryName: 'hemkop-weekly-discounts',
+    exportPrefix: 'hemkopWeeklyDiscounts',
+    rows: weeklyDiscounts
+  });
   const productSourceUrls = unique(products.map((row) => row.sourceUrl));
   const weeklySourceUrls = unique(weeklyDiscounts.map((row) => row.sourceUrl));
   const weeklyStoreIds = unique(weeklyDiscounts.map((row) => row.storeId));
@@ -632,7 +642,7 @@ async function writeHemkop(products, weeklyDiscounts) {
       sourceUrls: weeklySourceUrls
     })} as const;`,
     '',
-    `export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = ${literal(weeklyDiscounts)};`,
+    weeklyDiscountChunkExport('hemkopWeeklyDiscounts', 'HemkopIngestedWeeklyDiscount'),
     ''
   ]);
 }
@@ -1370,6 +1380,36 @@ async function writeIcaReklamblad(rows) {
     ''
   ]);
 }
+
+async function writeChunkedGeneratedArray({ directoryName, exportPrefix, rows, chunkSize = 8000 }) {
+  const directoryUrl = new URL(`${directoryName}/`, INGESTED_DIR);
+  await rm(directoryUrl, { recursive: true, force: true });
+  await mkdir(directoryUrl, { recursive: true });
+
+  const chunkNames = [];
+  for (let index = 0; index < rows.length; index += chunkSize) {
+    const chunkIndex = Math.floor(index / chunkSize);
+    const paddedIndex = String(chunkIndex).padStart(3, '0');
+    const chunkName = `${exportPrefix}Chunk${paddedIndex}`;
+    const chunkRows = rows.slice(index, index + chunkSize);
+    chunkNames.push(chunkName);
+    await writeFile(new URL(`chunk-${paddedIndex}.ts`, directoryUrl), `${[
+      `// AUTO-GENERATED chunk for ${exportPrefix}.`,
+      `// Rows ${index + 1}-${index + chunkRows.length} of ${rows.length}.`,
+      `export const ${chunkName} = ${literal(chunkRows)} as const;`,
+      ''
+    ].join('\n')}`);
+  }
+
+  return (exportName, typeName) => [
+    ...chunkNames.map((chunkName, index) => `import { ${chunkName} } from './${directoryName}/chunk-${String(index).padStart(3, '0')}';`),
+    '',
+    `export const ${exportName}: ${typeName}[] = [`,
+    ...chunkNames.map((chunkName) => `  ...${chunkName},`),
+    `] as ${typeName}[];`
+  ].join('\n');
+}
+
 
 async function writeGeneratedFile(fileName, lines) {
   while (lines.at(-1) === '') lines.pop();
