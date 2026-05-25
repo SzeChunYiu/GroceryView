@@ -1,6 +1,10 @@
 #!/usr/bin/env node
 import process from 'node:process';
 
+import {
+  isSupabaseManagementAccessTokenShape,
+  supabaseManagementTokenRequirement
+} from './check-production-secrets.mjs';
 import { checkSupabaseProjectHealth } from './check-supabase-project-health.mjs';
 
 const SUPABASE_MANAGEMENT_API_BASE_URL = 'https://api.supabase.com/v1';
@@ -79,6 +83,44 @@ function buildRecommendedActions(health, queryDiagnostic) {
   return actions;
 }
 
+function buildInvalidTokenPacket(projectRef, options = {}) {
+  return {
+    status: 'blocked',
+    generatedAt: options.generatedAt ?? new Date().toISOString(),
+    projectRef,
+    evidence: {
+      secretValidation: {
+        status: 'blocked',
+        invalidSecrets: ['SUPABASE_ACCESS_TOKEN'],
+        requirement: supabaseManagementTokenRequirement
+      },
+      health: {
+        status: 'skipped',
+        blocker: 'db_recovery_secret_invalid_format'
+      },
+      managementSqlProbe: {
+        status: 'skipped',
+        blocker: 'db_recovery_secret_invalid_format'
+      },
+      recentDailyReadinessRun: options.githubRunId ? { runId: options.githubRunId } : undefined
+    },
+    blockers: ['db_recovery_secret_invalid_format'],
+    recommendedActions: [
+      {
+        id: 'replace-supabase-management-token',
+        owner: 'operator',
+        action: `Replace SUPABASE_ACCESS_TOKEN with a Supabase Management API personal access token that satisfies: ${supabaseManagementTokenRequirement}`
+      },
+      {
+        id: 'replacement-db-cutover',
+        owner: 'operator_after_approval',
+        action: 'If provider recovery cannot proceed promptly, configure REPLACEMENT_DATABASE_URL or CANDIDATE_DATABASE_URL with a distinct writable replacement DB and run the Production DB cutover validation workflow before updating DATABASE_URL.'
+      }
+    ],
+    completionGate: 'Do not run production migrations or all-store daily ingestion against the production DATABASE_URL until SUPABASE_ACCESS_TOKEN is valid and this packet status is ready, or until a replacement DB passes the Production DB cutover validation workflow and DATABASE_URL is updated to that validated target.'
+  };
+}
+
 async function runManagementSqlDiagnostic(env, options = {}) {
   const token = env.SUPABASE_ACCESS_TOKEN?.trim();
   const projectRef = env.SUPABASE_PROJECT_REF?.trim();
@@ -102,6 +144,9 @@ export async function createProductionDbRecoveryPacket(env = process.env, option
   const projectRef = env.SUPABASE_PROJECT_REF?.trim();
   if (!token) throw new Error('SUPABASE_ACCESS_TOKEN is required.');
   if (!projectRef) throw new Error('SUPABASE_PROJECT_REF is required.');
+  if (!isSupabaseManagementAccessTokenShape(token)) {
+    return buildInvalidTokenPacket(projectRef, { ...options, githubRunId: env.GITHUB_RUN_ID });
+  }
 
   const health = await checkSupabaseProjectHealth(
     { ...env, SUPABASE_HEALTH_SERVICES: env.SUPABASE_HEALTH_SERVICES ?? 'db,db_postgres_user,pooler,rest' },

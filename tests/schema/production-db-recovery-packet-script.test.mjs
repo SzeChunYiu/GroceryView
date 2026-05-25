@@ -84,6 +84,38 @@ describe('production DB recovery packet script', () => {
     assert.deepEqual(packet.recommendedActions.map((action) => action.id), ['rerun-daily-ingestion-readiness']);
   });
 
+  it('fails closed before Supabase API calls when the management token is not an sbp_ token', async () => {
+    const calls = [];
+    const packet = await createProductionDbRecoveryPacket(
+      {
+        SUPABASE_ACCESS_TOKEN: 'go-k_keychain_session_value',
+        SUPABASE_PROJECT_REF: 'dgsoqwanrkqgdichtgzl',
+        GITHUB_RUN_ID: '26354345680'
+      },
+      {
+        generatedAt: '2026-05-25T08:30:00.000Z',
+        fetchImpl: async (url) => {
+          calls.push(String(url));
+          return jsonResponse({ message: 'unexpected call' });
+        }
+      }
+    );
+
+    assert.equal(packet.status, 'blocked');
+    assert.deepEqual(packet.blockers, ['db_recovery_secret_invalid_format']);
+    assert.equal(packet.evidence.health.status, 'skipped');
+    assert.equal(packet.evidence.managementSqlProbe.status, 'skipped');
+    assert.deepEqual(packet.evidence.secretValidation.invalidSecrets, ['SUPABASE_ACCESS_TOKEN']);
+    assert.match(packet.evidence.secretValidation.requirement, /sbp_/);
+    assert.deepEqual(packet.recommendedActions.map((action) => action.id), [
+      'replace-supabase-management-token',
+      'replacement-db-cutover'
+    ]);
+    assert.equal(packet.evidence.recentDailyReadinessRun.runId, '26354345680');
+    assert.equal(calls.length, 0);
+    assert.equal(JSON.stringify(packet).includes('go-k_keychain_session_value'), false);
+  });
+
   it('requires explicit Supabase management credentials and project ref', async () => {
     await assert.rejects(() => createProductionDbRecoveryPacket({ SUPABASE_PROJECT_REF: 'ref' }), /SUPABASE_ACCESS_TOKEN is required/);
     await assert.rejects(() => createProductionDbRecoveryPacket({ SUPABASE_ACCESS_TOKEN: 'sbp_secret' }), /SUPABASE_PROJECT_REF is required/);
