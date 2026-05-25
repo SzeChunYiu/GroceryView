@@ -10,19 +10,19 @@ async function read(path) {
 
 test('search bar persists and renders the last ten successful product searches', async () => {
   const searchBar = await read('src/components/SearchBar.tsx');
-  const analytics = await read('src/lib/analytics.ts');
   const appNav = await read('src/components/app-nav.tsx');
+  const personalization = await read('src/lib/personalization.ts');
 
-  assert.match(analytics, /recentProductSearchesStorageKey/);
-  assert.match(analytics, /readRecentProductSearches/);
-  assert.match(analytics, /rememberRecentProductSearch/);
-  assert.match(analytics, /maxRecentSearches = 10/);
-  assert.match(analytics, /resultCount <= 0/);
+  assert.match(personalization, /recentSearchHistoryStorageKey/);
+  assert.match(personalization, /readRecentSearchHistory/);
+  assert.match(personalization, /rememberRecentSearchHistory/);
+  assert.match(personalization, /maxRecentSearchHistory = 10/);
+  assert.match(personalization, /resultCount <= 0/);
 
-  assert.match(searchBar, /RecentProductSearch/);
+  assert.match(searchBar, /RecentSearchHistoryEntry/);
   assert.match(searchBar, /data-recent-product-searches/);
   assert.match(searchBar, /shouldShowRecentSearches/);
-  assert.match(searchBar, /rememberRecentProductSearch\(trimmedQuery, nextResults\.length\)/);
+  assert.match(searchBar, /rememberRecentSearchHistory\(trimmedQuery, nextResults\.length\)/);
   assert.match(searchBar, /Recent searches/);
   assert.match(searchBar, /onFocus/);
 
