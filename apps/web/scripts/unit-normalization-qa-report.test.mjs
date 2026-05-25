@@ -21,6 +21,7 @@ test('data sources page surfaces unit normalization QA report', async () => {
 
   assert.match(normalization, /buildUnitNormalizationQaReport/);
   assert.match(normalization, /unitNormalizationQaIssuesForProduct/);
+  assert.match(normalization, /packageEvidenceFromText/);
   assert.match(normalization, /No parseable package unit/);
   assert.match(normalization, /outside the expected grocery package range/);
   assert.match(normalization, /Normalized unit-price conversion/);
@@ -31,4 +32,17 @@ test('data sources page surfaces unit normalization QA report', async () => {
   assert.match(dataSources, /Suspicious pack sizes/);
   assert.match(dataSources, /Inconsistent conversions/);
   assert.match(dataSources, /synthetic kr\/kg, kr\/l, or kr\/st values/);
+});
+
+test('unit normalization audit keeps parser, mismatch, and bucket regressions covered', async () => {
+  const normalization = await read('src/lib/normalization.ts');
+
+  assert.match(normalization, /packageUnitPattern = 'kg\|g\|l\|ml\|st\|pc\|pcs\|piece\|pieces\|each'/);
+  assert.match(normalization, /packCount \* packAmount/);
+  assert.match(normalization, /ratio < 0\.5 \|\| ratio > 2/);
+  assert.match(normalization, /differs sharply from reported unit price/);
+  assert.match(normalization, /UnitNormalizationOutlierBucket = 'kg' \| 'l' \| 'piece'/);
+  assert.match(normalization, /packageOutlierBucket/);
+  assert.match(normalization, /suspiciousPackSizeBuckets/);
+  assert.match(normalization, /Record<UnitNormalizationOutlierBucket, number> = \{ kg: 0, l: 0, piece: 0 \}/);
 });
