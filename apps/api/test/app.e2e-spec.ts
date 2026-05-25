@@ -25,6 +25,7 @@ class RecordingPriceHistoryExecutor {
   }> = [];
   preferenceRows = new Map<string, { preferred_currency: string; notification_channels: string[] }>();
   favoriteStoreRows = new Map<string, string[]>();
+  stockUpRows: StockUpListTestRow[] = [];
 
   isConfigured(): boolean {
     return this.configured;
@@ -60,6 +61,70 @@ class RecordingPriceHistoryExecutor {
     }
     if (sql.includes('select store_id from favorite_stores')) {
       return [...(this.favoriteStoreRows.get(params[0] as string) ?? [])].sort().map((store_id) => ({ store_id })) as T[];
+    }
+    if (sql.includes('insert into multi_week_stock_up_rows')) {
+      const row: StockUpListTestRow = {
+        user_id: params[0] as string,
+        row_id: params[1] as string,
+        product_id: params[2] as string,
+        product_name: params[3] as string,
+        store_id: params[4] as string | null,
+        store_name: params[5] as string,
+        planning_weeks: params[6] as number,
+        weekly_need_units: params[7] as number,
+        package_units: params[8] as number,
+        comparable_unit: params[9] as string,
+        current_unit_price: params[10] as number,
+        historical_low_unit_price: params[11] as number,
+        typical_unit_price: params[12] as number,
+        confidence: params[13] as StockUpListTestRow['confidence'],
+        history_window_start: params[14] as string,
+        history_window_end: params[15] as string,
+        storage_limit_weeks: params[16] as number | null,
+        no_forecast_reason: params[17] as string,
+        review_trigger: params[18] as string,
+        updated_at: '2026-05-25T08:00:00.000Z'
+      };
+      const existingIndex = this.stockUpRows.findIndex((candidate) => candidate.user_id === row.user_id && candidate.row_id === row.row_id);
+      if (existingIndex === -1) {
+        this.stockUpRows.push(row);
+      } else {
+        this.stockUpRows[existingIndex] = row;
+      }
+      return [] as T[];
+    }
+    if (sql.includes('update multi_week_stock_up_rows set')) {
+      const row = this.stockUpRows.find((candidate) => candidate.user_id === params[0] && candidate.row_id === params[1]);
+      if (!row) return [] as T[];
+      const patch = {
+        product_id: params[2] as string | null,
+        product_name: params[3] as string | null,
+        store_id: params[4] as string | null,
+        store_name: params[5] as string | null,
+        planning_weeks: params[6] as number | null,
+        weekly_need_units: params[7] as number | null,
+        package_units: params[8] as number | null,
+        comparable_unit: params[9] as string | null,
+        current_unit_price: params[10] as number | null,
+        historical_low_unit_price: params[11] as number | null,
+        typical_unit_price: params[12] as number | null,
+        confidence: params[13] as StockUpListTestRow['confidence'] | null,
+        history_window_start: params[14] as string | null,
+        history_window_end: params[15] as string | null,
+        storage_limit_weeks: params[16] as number | null,
+        no_forecast_reason: params[17] as string | null,
+        review_trigger: params[18] as string | null
+      };
+      for (const [key, value] of Object.entries(patch)) {
+        if (value !== null) (row as Record<string, unknown>)[key] = value;
+      }
+      row.updated_at = '2026-05-25T08:10:00.000Z';
+      return [row] as T[];
+    }
+    if (sql.includes('from multi_week_stock_up_rows')) {
+      return this.stockUpRows
+        .filter((row) => row.user_id === params[0])
+        .sort((left, right) => right.updated_at.localeCompare(left.updated_at) || left.row_id.localeCompare(right.row_id)) as T[];
     }
     if (sql.includes('latest_prices.observation_id') && sql.includes(' as product_name')) {
       if (params[0] === 'missing-product') return [] as T[];
@@ -578,6 +643,29 @@ class UnconfiguredPostgresExecutor {
   }
 }
 
+type StockUpListTestRow = {
+  row_id: string;
+  user_id: string;
+  product_id: string;
+  product_name: string;
+  store_id: string | null;
+  store_name: string;
+  planning_weeks: number;
+  weekly_need_units: number;
+  package_units: number;
+  comparable_unit: string;
+  current_unit_price: number;
+  historical_low_unit_price: number;
+  typical_unit_price: number;
+  confidence: 'high' | 'medium' | 'low';
+  history_window_start: string;
+  history_window_end: string;
+  storage_limit_weeks: number | null;
+  no_forecast_reason: string;
+  review_trigger: string;
+  updated_at: string;
+};
+
 describe('GroceryView API app', () => {
   let app: INestApplication;
   let priceHistoryExecutor: RecordingPriceHistoryExecutor;
@@ -650,10 +738,10 @@ describe('GroceryView API app', () => {
   });
 
   it('serves health and OpenAPI docs', async () => {
-    await request(app.getHttpServer())
-      .get('/health')
-      .expect(200)
-      .expect({ status: 'ok', service: 'api' });
+    const health = await request(app.getHttpServer()).get('/health').expect(200);
+    assert.equal(health.body.status, 'ok');
+    assert.equal(health.body.database.ok, true);
+    assert.equal(health.body.version, '0.1.0');
 
     const docs = await request(app.getHttpServer()).get('/api-json').expect(200);
     assert.equal(docs.body.info.title, 'GroceryView API');
@@ -728,6 +816,10 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/users/demo/basket/import-review']);
     assert.ok(docs.body.paths['/users/demo/basket/import-review/{reviewItemId}/decisions']);
     assert.ok(docs.body.paths['/users/demo/basket/stores/{storeId}/quote']);
+    assert.ok(docs.body.paths['/users/{userId}/basket/stock-up-list']);
+    assert.ok(docs.body.paths['/users/{userId}/basket/stock-up-list/rows']);
+    assert.ok(docs.body.paths['/users/{userId}/basket/stock-up-list/rows/{rowId}']);
+    assert.deepEqual(docs.body.paths['/users/{userId}/basket/stock-up-list'].get.security, [{ bearer: [] }]);
   });
 
   it('saves authenticated user settings preferences through PATCH /api/settings', async () => {
@@ -810,6 +902,67 @@ describe('GroceryView API app', () => {
       .expect(503);
   });
 
+  it('persists signed-in multi-week stock-up rows with observed historical price guardrails', async () => {
+    process.env.AUTH_SECRET = 'test-auth-secret';
+    const token = await createSessionToken({ userId: 'stock-user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'test-auth-secret');
+    const otherToken = await createSessionToken({ userId: 'stock-user-2', expiresAt: '2099-01-01T00:00:00.000Z' }, 'test-auth-secret');
+
+    await request(app.getHttpServer()).get('/users/stock-user-1/basket/stock-up-list').expect(401);
+    await request(app.getHttpServer())
+      .get('/users/stock-user-1/basket/stock-up-list')
+      .set('authorization', `Bearer ${otherToken}`)
+      .expect(403);
+
+    const created = await request(app.getHttpServer())
+      .post('/users/stock-user-1/basket/stock-up-list/rows')
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        rowId: 'coffee-stock-up',
+        productId: 'coffee',
+        productName: 'Zoégas Coffee 450g',
+        storeName: 'Willys Odenplan',
+        planningWeeks: 4,
+        weeklyNeedUnits: 1,
+        packageUnits: 0.45,
+        comparableUnit: 'kg',
+        currentUnitPrice: 110.89,
+        historicalLowUnitPrice: 99.9,
+        typicalUnitPrice: 133.11,
+        confidence: 'high',
+        historyWindowStart: '2026-04-01T00:00:00.000Z',
+        historyWindowEnd: '2026-05-21T00:00:00.000Z',
+        noForecastReason: 'Historical low and typical prices are observed facts only; no future shelf price is predicted.',
+        reviewTrigger: 'Re-check observed prices before restocking.'
+      })
+      .expect(201);
+
+    assert.equal(created.body.userId, 'stock-user-1');
+    assert.equal(created.body.itemCount, 1);
+    assert.equal(created.body.rows[0].rowId, 'coffee-stock-up');
+    assert.equal(created.body.rows[0].historicalLowUnitPrice, 99.9);
+    assert.equal(created.body.rows[0].confidence, 'high');
+    assert.equal(created.body.evidence.noForecast, true);
+    assert.deepEqual(created.body.evidence.sourceTables, ['multi_week_stock_up_rows', 'app_users']);
+    assert.ok(created.body.guardrails.some((guardrail: string) => /no future price forecast/i.test(guardrail)));
+
+    const updated = await request(app.getHttpServer())
+      .patch('/users/stock-user-1/basket/stock-up-list/rows/coffee-stock-up')
+      .set('authorization', `Bearer ${token}`)
+      .send({ planningWeeks: 6, confidence: 'medium', reviewTrigger: 'Review when the verified historical window changes.' })
+      .expect(200);
+
+    assert.equal(updated.body.rows[0].planningWeeks, 6);
+    assert.equal(updated.body.rows[0].confidence, 'medium');
+    assert.equal(updated.body.rows[0].currentUnitPrice, 110.89);
+    assert.match(updated.body.rows[0].reviewTrigger, /verified historical window/);
+
+    priceHistoryExecutor.configured = false;
+    await request(app.getHttpServer())
+      .get('/users/stock-user-1/basket/stock-up-list')
+      .set('authorization', `Bearer ${token}`)
+      .expect(503);
+  });
+
   it('serves products, stores, prices, watchlists, baskets, and alerts', async () => {
     const market = await request(app.getHttpServer()).get('/market/overview').expect(200);
     assert.equal(market.body.city, 'Stockholm');
@@ -853,7 +1006,8 @@ describe('GroceryView API app', () => {
       'favorite_stores',
       'watchlist',
       'receipts',
-      'households'
+      'households',
+      'friend_shared_deal_signals'
     ]);
 
     const settingsDeletion = await request(app.getHttpServer()).delete('/users/demo/settings/account').send({ confirmation: 'DELETE ACCOUNT' }).expect(200);

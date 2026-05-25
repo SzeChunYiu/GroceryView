@@ -868,16 +868,22 @@ describe('verified-data UI', () => {
   it('surfaces a multi-week stock-up list with forecast claims blocked', async () => {
     const demo = await read('src/lib/demo-data.ts');
     const source = await read('src/app/weekly-basket/page.tsx');
+    const actions = await read('src/components/stock-up-list-actions.tsx');
 
     assert.match(demo, /export const multiWeekStockUpList = /);
     assert.match(demo, /observedHistoryWindow/);
     assert.match(demo, /noForecastReason/);
     assert.match(demo, /reviewTrigger/);
     assert.match(source, /multiWeekStockUpList/);
+    assert.match(source, /StockUpListActions/);
     assert.match(source, /Multi-week stock-up list/);
     assert.match(source, /planningWeeks/);
     assert.match(source, /No price forecast/);
     assert.match(source, /observedHistoryWindow/);
+    assert.match(actions, /groceryview:accessToken/);
+    assert.match(actions, /basket\/stock-up-list\/rows/);
+    assert.match(actions, /No stock-up row is saved anonymously or to local storage/);
+    assert.match(actions, /Historical low and typical prices remain labelled as observed facts, not forecasts/);
     assert.doesNotMatch(source, /future price prediction|forecasted price/i);
   });
 

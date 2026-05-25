@@ -129,6 +129,51 @@ export const basketSchema = z.object({
   items: z.array(basketItemSchema)
 });
 
+export const multiWeekStockUpConfidenceSchema = z.enum(['high', 'medium', 'low']);
+
+export const multiWeekStockUpRowSchema = z.object({
+  rowId: idSchema,
+  userId: idSchema,
+  productId: idSchema,
+  productName: idSchema,
+  storeId: idSchema.optional(),
+  storeName: idSchema,
+  planningWeeks: z.number().int().positive().max(26),
+  weeklyNeedUnits: z.number().positive(),
+  packageUnits: z.number().positive(),
+  comparableUnit: idSchema,
+  currentUnitPrice: z.number().nonnegative(),
+  historicalLowUnitPrice: z.number().nonnegative(),
+  typicalUnitPrice: z.number().nonnegative(),
+  confidence: multiWeekStockUpConfidenceSchema,
+  historyWindowStart: isoDateTimeSchema,
+  historyWindowEnd: isoDateTimeSchema,
+  storageLimitWeeks: z.number().int().positive().max(26).optional(),
+  noForecastReason: idSchema,
+  reviewTrigger: idSchema,
+  updatedAt: isoDateTimeSchema
+});
+
+export const multiWeekStockUpCreateRowSchema = multiWeekStockUpRowSchema
+  .omit({ rowId: true, userId: true, updatedAt: true })
+  .extend({ rowId: idSchema.optional() });
+
+export const multiWeekStockUpUpdateRowSchema = multiWeekStockUpCreateRowSchema.partial().refine((patch) => Object.keys(patch).length > 0, {
+  message: 'At least one stock-up row field is required.'
+});
+
+export const multiWeekStockUpListResponseSchema = z.object({
+  userId: idSchema,
+  itemCount: z.number().int().nonnegative(),
+  rows: z.array(multiWeekStockUpRowSchema),
+  guardrails: z.array(idSchema),
+  evidence: z.object({
+    sourceTables: z.array(idSchema),
+    noForecast: z.literal(true),
+    historicalPriceFields: z.array(idSchema)
+  })
+});
+
 export const alertSchema = z.object({
   id: idSchema,
   userId: idSchema,
@@ -206,6 +251,10 @@ export const apiContractSchemas = {
   fuelPriceObservation: fuelPriceObservationSchema,
   fuelPriceSource: fuelPriceSourceSchema,
   fuelPricesResponse: fuelPricesResponseSchema,
+  multiWeekStockUpCreateRow: multiWeekStockUpCreateRowSchema,
+  multiWeekStockUpListResponse: multiWeekStockUpListResponseSchema,
+  multiWeekStockUpRow: multiWeekStockUpRowSchema,
+  multiWeekStockUpUpdateRow: multiWeekStockUpUpdateRowSchema,
   priceObservation: priceObservationSchema,
   product: productSchema,
   notificationInboxResponse: notificationInboxResponseSchema,
@@ -226,6 +275,11 @@ export type FuelPriceObservationDto = z.infer<typeof fuelPriceObservationSchema>
 export type FuelPriceSourceDto = z.infer<typeof fuelPriceSourceSchema>;
 export type FuelPricesResponseDto = z.infer<typeof fuelPricesResponseSchema>;
 export type LatestPriceDto = z.infer<typeof latestPriceSchema>;
+export type MultiWeekStockUpConfidence = z.infer<typeof multiWeekStockUpConfidenceSchema>;
+export type MultiWeekStockUpCreateRowDto = z.infer<typeof multiWeekStockUpCreateRowSchema>;
+export type MultiWeekStockUpListResponseDto = z.infer<typeof multiWeekStockUpListResponseSchema>;
+export type MultiWeekStockUpRowDto = z.infer<typeof multiWeekStockUpRowSchema>;
+export type MultiWeekStockUpUpdateRowDto = z.infer<typeof multiWeekStockUpUpdateRowSchema>;
 export type NotificationInboxQueueItemDto = z.infer<typeof notificationInboxQueueItemSchema>;
 export type NotificationInboxResponseDto = z.infer<typeof notificationInboxResponseSchema>;
 export type NotificationInboxSummaryDto = z.infer<typeof notificationInboxSummarySchema>;
@@ -301,6 +355,82 @@ export const apiContractOpenApiComponents = {
         }
       }
     ]
+  },
+  MultiWeekStockUpRow: {
+    type: 'object',
+    required: [
+      'rowId',
+      'userId',
+      'productId',
+      'productName',
+      'storeName',
+      'planningWeeks',
+      'weeklyNeedUnits',
+      'packageUnits',
+      'comparableUnit',
+      'currentUnitPrice',
+      'historicalLowUnitPrice',
+      'typicalUnitPrice',
+      'confidence',
+      'historyWindowStart',
+      'historyWindowEnd',
+      'noForecastReason',
+      'reviewTrigger',
+      'updatedAt'
+    ],
+    properties: {
+      rowId: { type: 'string' },
+      userId: { type: 'string' },
+      productId: { type: 'string' },
+      productName: { type: 'string' },
+      storeId: { type: 'string' },
+      storeName: { type: 'string' },
+      planningWeeks: { type: 'integer', minimum: 1, maximum: 26 },
+      weeklyNeedUnits: { type: 'number', minimum: 0 },
+      packageUnits: { type: 'number', minimum: 0 },
+      comparableUnit: { type: 'string' },
+      currentUnitPrice: { type: 'number', minimum: 0 },
+      historicalLowUnitPrice: { type: 'number', minimum: 0 },
+      typicalUnitPrice: { type: 'number', minimum: 0 },
+      confidence: { type: 'string', enum: multiWeekStockUpConfidenceSchema.options },
+      historyWindowStart: { type: 'string', format: 'date-time' },
+      historyWindowEnd: { type: 'string', format: 'date-time' },
+      storageLimitWeeks: { type: 'integer', minimum: 1, maximum: 26 },
+      noForecastReason: { type: 'string' },
+      reviewTrigger: { type: 'string' },
+      updatedAt: { type: 'string', format: 'date-time' }
+    }
+  },
+  MultiWeekStockUpListResponse: {
+    type: 'object',
+    required: ['userId', 'itemCount', 'rows', 'guardrails', 'evidence'],
+    properties: {
+      userId: { type: 'string' },
+      itemCount: { type: 'integer', minimum: 0 },
+      rows: {
+        type: 'array',
+        items: { $ref: '#/components/schemas/MultiWeekStockUpRow' }
+      },
+      guardrails: {
+        type: 'array',
+        items: { type: 'string' }
+      },
+      evidence: {
+        type: 'object',
+        required: ['sourceTables', 'noForecast', 'historicalPriceFields'],
+        properties: {
+          sourceTables: {
+            type: 'array',
+            items: { type: 'string' }
+          },
+          noForecast: { type: 'boolean', enum: [true] },
+          historicalPriceFields: {
+            type: 'array',
+            items: { type: 'string' }
+          }
+        }
+      }
+    }
   },
   NotificationInboxQueueItem: {
     type: 'object',
