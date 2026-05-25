@@ -21,6 +21,14 @@
     "persisted": "Språkvalet sparas lokalt och i NEXT_LOCALE-kakan.",
     "guardrail": "Arabiska och somaliska öppnas först efter granskade översättningar."
   },
+  "empty-state": {
+    "eyebrow": "Fail-closed UI",
+    "title": "Inga verifierade poster för funktionen än",
+    "body": "Den här sidan undviker medvetet exempelpersoner, falska kvitton, uppskattade kuponger och platshållarrader för arbetsflöden. Den visar bara det som de nuvarande genererade datamodulerna kan stödja.",
+    "verifiedSurface": "Verifierad yta",
+    "gateBeforeLaunch": "Spärr före lansering",
+    "nextVerifiedStep": "Nästa verifierade steg"
+  },
   "confidence-badge": {
     "sampleSize": "Urvalsstorlek {sampleSize}.",
     "freshness": "Aktualitet {label}. {refreshHint}",

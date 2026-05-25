@@ -14,6 +14,7 @@ import {
 } from '@/lib/verified-data';
 import type { PrivateFeatureRoute } from '@/lib/verified-data';
 import { freshnessCopy, sourceLimitationCopy } from '@/lib/content-style';
+import { groceryTranslator } from '@/lib/i18n';
 import type { SourceHealthDashboardRow, SourceManagementAction } from '@/lib/source-health';
 
 export function PageShell({ children }: Readonly<{ children: ReactNode }>) {
@@ -369,28 +370,29 @@ export function RoutePerformanceBudgetPanel({ reports }: Readonly<{ reports: Rou
 
 export function NoVerifiedData({
   route,
-  title = 'No verified records for this feature yet'
+  title
 }: Readonly<{ route?: PrivateFeatureRoute; title?: string }>) {
+  const t = groceryTranslator();
   const routeCopy = route ? privateFeatureCopy[route] : null;
   return (
     <Card className="border-amber-200 bg-amber-50">
-      <Eyebrow>Fail-closed UI</Eyebrow>
-      <h2 className="mt-2 text-2xl font-black tracking-tight text-amber-950">{title}</h2>
+      <Eyebrow>{t('empty-state.eyebrow')}</Eyebrow>
+      <h2 className="mt-2 text-2xl font-black tracking-tight text-amber-950">{title ?? t('empty-state.title')}</h2>
       <p className="mt-3 max-w-3xl text-sm leading-6 text-amber-950">
-        This page intentionally avoids sample people, fake receipts, estimated coupons, and placeholder workflow rows. It shows only what the current generated data modules can support.
+        {t('empty-state.body')}
       </p>
       {routeCopy ? (
         <div className="mt-4 grid gap-3 lg:grid-cols-3">
           <div className="rounded-2xl bg-white/70 p-4">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">Verified surface</p>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">{t('empty-state.verifiedSurface')}</p>
             <p className="mt-2 text-sm leading-6 text-amber-950">{routeCopy.verifiedSurface}</p>
           </div>
           <div className="rounded-2xl bg-white/70 p-4">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">Gate before launch</p>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">{t('empty-state.gateBeforeLaunch')}</p>
             <p className="mt-2 text-sm leading-6 text-amber-950">{routeCopy.gatedBy}</p>
           </div>
           <div className="rounded-2xl bg-white/70 p-4">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">Next verified step</p>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">{t('empty-state.nextVerifiedStep')}</p>
             <p className="mt-2 text-sm leading-6 text-amber-950">{routeCopy.nextStep}</p>
           </div>
         </div>

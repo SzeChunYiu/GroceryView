@@ -21,6 +21,14 @@
     "persisted": "The language preference is stored locally and in the NEXT_LOCALE cookie.",
     "guardrail": "Arabic and Somali stay blocked until reviewed translations are available."
   },
+  "empty-state": {
+    "eyebrow": "Fail-closed UI",
+    "title": "No verified records for this feature yet",
+    "body": "This page intentionally avoids sample people, fake receipts, estimated coupons, and placeholder workflow rows. It shows only what the current generated data modules can support.",
+    "verifiedSurface": "Verified surface",
+    "gateBeforeLaunch": "Gate before launch",
+    "nextVerifiedStep": "Next verified step"
+  },
   "confidence-badge": {
     "sampleSize": "Sample size {sampleSize}.",
     "freshness": "Freshness {label}. {refreshHint}",
