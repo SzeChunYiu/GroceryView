@@ -50,15 +50,22 @@ export default function PricingPage() {
       </p>
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         {plans.map((plan) => (
-          <Card className={plan.id === 'premium-ocr' ? 'border-indigo-200 bg-indigo-50/80' : 'bg-white'} key={plan.id}>
-            <p className="text-xs font-black uppercase tracking-[0.22em] text-indigo-800">{plan.id === 'premium-ocr' ? 'Upgrade reason' : 'Included'}</p>
-            <h2 className="mt-2 text-2xl font-black text-slate-950">{plan.name}</h2>
-            <p className="mt-2 text-4xl font-black text-emerald-800">{plan.price}</p>
-            <p className="mt-3 text-sm font-semibold leading-6 text-slate-700">{plan.summary}</p>
-            <ul className="mt-4 space-y-2 text-sm font-semibold leading-6 text-slate-700">
-              {plan.features.map((feature) => <li key={feature}>• {feature}</li>)}
-            </ul>
-          </Card>
+          <div className="scroll-mt-24" id={plan.id === 'premium-ocr' ? 'premium-ocr-history' : undefined} key={plan.id}>
+            <Card className={plan.id === 'premium-ocr' ? 'h-full border-indigo-200 bg-indigo-50/80 ring-2 ring-indigo-300' : 'h-full bg-white'}>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-indigo-800">{plan.id === 'premium-ocr' ? 'Upgrade reason' : 'Included'}</p>
+              <h2 className="mt-2 text-2xl font-black text-slate-950">{plan.name}</h2>
+              <p className="mt-2 text-4xl font-black text-emerald-800">{plan.price}</p>
+              <p className="mt-3 text-sm font-semibold leading-6 text-slate-700">{plan.summary}</p>
+              <ul className="mt-4 space-y-2 text-sm font-semibold leading-6 text-slate-700">
+                {plan.features.map((feature) => <li key={feature}>• {feature}</li>)}
+              </ul>
+              {plan.id === 'premium-ocr' ? (
+                <Link className="mt-4 inline-flex rounded-full bg-indigo-900 px-4 py-2 text-sm font-black text-white" href="/account">
+                  Continue to account checkout
+                </Link>
+              ) : null}
+            </Card>
+          </div>
         ))}
       </div>
       <Card className="mt-6 border-emerald-200 bg-emerald-50/70">

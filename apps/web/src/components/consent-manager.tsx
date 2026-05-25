@@ -158,6 +158,18 @@ export function ConsentManager() {
             <Link className="underline decoration-emerald-300 underline-offset-4" href="/cookies">
               Read cookie details
             </Link>
+            <Link className="underline decoration-emerald-300 underline-offset-4" href="/sv/privacy">
+              Integritetspolicy
+            </Link>
+            <Link className="underline decoration-emerald-300 underline-offset-4" href="/en/privacy">
+              Privacy policy
+            </Link>
+            <Link className="underline decoration-emerald-300 underline-offset-4" href="/sv/cookies">
+              Cookiepolicy
+            </Link>
+            <Link className="underline decoration-emerald-300 underline-offset-4" href="/en/cookies">
+              Cookie policy
+            </Link>
           </div>
         </div>
         <div className="flex flex-wrap gap-2 lg:justify-end">
