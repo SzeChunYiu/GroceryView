@@ -23,6 +23,7 @@ const appFiles = [
   'src/app/store-coverage/page.tsx',
   'src/app/openprices-depth/page.tsx',
   'src/app/pricing/page.tsx',
+  'src/app/[country]/complaint-helper/page.tsx',
   'src/app/settings/page.tsx',
   'src/app/admin/moderation/page.tsx',
   'src/components/market-shell.tsx',
@@ -4243,5 +4244,19 @@ ${seo}`;
     assert.match(fixtures, /consoleErrorCapture/);
     assert.match(fixtures, /gotoApp/);
     assert.match(fixtures, /setViewportSize/);
+  });
+
+  it('ships a country consumer complaint helper with authority templates from observed prices', async () => {
+    const helper = await read('src/app/[country]/complaint-helper/page.tsx');
+
+    assert.match(helper, /Konsumentverket/);
+    assert.match(helper, /Forbrukerrådet/);
+    assert.match(helper, /Neytendastofa/);
+    assert.match(helper, /topChainSpreads/);
+    assert.match(helper, /Här är beläggen för att butiken tog/);
+    assert.match(helper, /Receipt required/);
+    assert.match(helper, /no synthetic charge amounts/i);
+    assert.match(helper, /not legal advice/i);
+    assert.match(helper, /complaintTemplate/);
   });
 });
