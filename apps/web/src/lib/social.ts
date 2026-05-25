@@ -9,13 +9,16 @@ export type SocialFeedPost = Readonly<{
 }>;
 
 export type FriendPriceSighting = Readonly<{
+  action: 'reported' | 'saved';
   confidence: 'high' | 'medium' | 'low';
   id: string;
+  note?: string;
   observedAt: string;
   postId: string;
   priceLabel: string;
   productName: string;
   productSlug: string;
+  relationship: 'friend' | 'household';
   reporter: string;
   sharedWithFriends: boolean;
   storeName: string;
@@ -69,38 +72,47 @@ export const socialFeedPosts: SocialFeedPost[] = [
 
 export const friendPriceSightings: FriendPriceSighting[] = [
   {
+    action: 'reported',
     confidence: 'medium',
     id: 'friend-sighting-oats-hemkop',
+    note: 'Friend reported the shelf tag before the official feed refreshed.',
     observedAt: '2026-05-24T08:42:00.000Z',
     postId: 'weekly-oats-swap',
     priceLabel: '21,90 kr',
     productName: 'Havregryn',
     productSlug: 'havregryn-100132321-st',
+    relationship: 'friend',
     reporter: 'Friend sighting',
     sharedWithFriends: true,
     storeName: 'Hemkop Skanstull'
   },
   {
+    action: 'reported',
     confidence: 'low',
     id: 'friend-sighting-basil-willys',
+    note: 'Household member flagged local stock while shopping.',
     observedAt: '2026-05-24T10:12:00.000Z',
     postId: 'basil-stock-note',
     priceLabel: '18,90 kr',
     productName: 'Fresh basil pot',
     productSlug: 'basilika',
+    relationship: 'household',
     reporter: 'Household sighting',
     sharedWithFriends: true,
     storeName: 'Willys Stockholm'
   },
   {
+    action: 'saved',
     confidence: 'high',
     id: 'friend-sighting-fiberhavregryn-willys',
+    note: 'Saved by a household member as a cheaper local option.',
     observedAt: '2026-05-24T11:20:00.000Z',
     postId: 'weekly-oats-swap',
     priceLabel: '20,90 kr',
     productName: 'Fiberhavregryn',
     productSlug: 'fiberhavregryn-7340083480638',
-    reporter: 'Friend sighting',
+    relationship: 'household',
+    reporter: 'Household save',
     sharedWithFriends: true,
     storeName: 'Willys Hornstull'
   }
@@ -135,6 +147,11 @@ export function listFriendPriceSightings(postId?: string) {
 
 export function listFriendPriceSightingsForProduct(productSlug: string) {
   return recentFriendSightings(friendPriceSightings.filter((sighting) => sighting.sharedWithFriends && sighting.productSlug === productSlug));
+}
+
+export function friendPriceSightingSummary(sighting: FriendPriceSighting) {
+  const relationship = sighting.relationship === 'household' ? 'household member' : 'friend';
+  return `${sighting.reporter} ${sighting.action} by ${relationship}`;
 }
 
 function priceFromLabel(priceLabel: string) {
