@@ -164,6 +164,7 @@ export * from './connectors/lidl-bulk.js';
 export * from './connectors/willys-bulk.js';
 export * from './connectors/apohem.js';
 export * from './connectors/bonus-is.js';
+export * from './connectors/biltema-se.js';
 export * from './connectors/atlantsolia-is.js';
 export * from './connectors/apotek-gardabaer-is.js';
 export * from './connectors/apoteket-se.js';
