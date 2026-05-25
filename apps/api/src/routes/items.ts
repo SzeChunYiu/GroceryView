@@ -31,6 +31,9 @@ export const itemsRoutes = {
     'trigger',
     'suggestions',
     'currentPrice',
+    'priceComparison',
+    'priceComparison.stores',
+    'priceComparison.cheapestStore',
     'savingsPercent',
     'guardrail'
   ],
