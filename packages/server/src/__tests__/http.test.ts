@@ -19,6 +19,48 @@ function signStripeWebhookBody(body: string, secret: string, timestamp: number):
 }
 
 describe('createHttpHandler', () => {
+  it('persists MyFlyer preferences for anonymous cookie sessions and authenticated users', async () => {
+    const saved = new Map<string, Record<string, unknown>>();
+    const repository = {
+      async getPreferences(owner: { userId?: string; sessionId?: string }) {
+        return saved.get(owner.userId ? `user:${owner.userId}` : `session:${owner.sessionId}`) ?? null;
+      },
+      async upsertPreferences(owner: { userId?: string; sessionId?: string }, preferences: Record<string, unknown>) {
+        saved.set(owner.userId ? `user:${owner.userId}` : `session:${owner.sessionId}`, preferences);
+        return preferences;
+      }
+    };
+    const handle = createHttpHandler(undefined, {
+      authSecret: 'myflyer-secret',
+      myFlyerPreferencesRepository: repository
+    });
+
+    const anonymousWrite = await handle(new Request('http://localhost/api/myflyer/preferences', {
+      method: 'POST',
+      body: JSON.stringify({ preferences: { chains: ['willys'], categories: ['coffee'] } })
+    }));
+    assert.equal(anonymousWrite.status, 200);
+    const setCookie = anonymousWrite.headers.get('set-cookie') ?? '';
+    assert.match(setCookie, /session_id=anon_/);
+    const anonymousBody = await json(anonymousWrite) as { owner: { sessionId: string }; preferences: Record<string, unknown> };
+    assert.deepEqual(anonymousBody.preferences, { chains: ['willys'], categories: ['coffee'] });
+
+    const anonymousRead = await json(await handle(new Request('http://localhost/api/myflyer/preferences', {
+      headers: { cookie: setCookie.split(';')[0]! }
+    }))) as { owner: { sessionId: string }; preferences: Record<string, unknown> };
+    assert.equal(anonymousRead.owner.sessionId, anonymousBody.owner.sessionId);
+    assert.deepEqual(anonymousRead.preferences, { chains: ['willys'], categories: ['coffee'] });
+
+    const token = await createSessionToken({ userId: 'user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'myflyer-secret');
+    const authenticatedWrite = await json(await handle(new Request('http://localhost/api/myflyer/preferences', {
+      method: 'PUT',
+      headers: { authorization: `Bearer ${token}` },
+      body: JSON.stringify({ chains: ['ica'], maxDistanceKm: 4 })
+    }))) as { owner: { userId: string }; preferences: Record<string, unknown> };
+    assert.equal(authenticatedWrite.owner.userId, 'user-1');
+    assert.deepEqual(authenticatedWrite.preferences, { chains: ['ica'], maxDistanceKm: 4 });
+  });
+
   it('serves runtime health without leaking configured secret values', async () => {
     const previousDatabaseUrl = process.env.DATABASE_URL;
     const previousPublicWebUrl = process.env.PUBLIC_WEB_URL;

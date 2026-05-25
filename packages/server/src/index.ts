@@ -1,5 +1,5 @@
 import { Buffer } from 'node:buffer';
-import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
+import { createHash, createHmac, randomUUID, timingSafeEqual } from 'node:crypto';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
@@ -126,6 +126,10 @@ export type AuthOptions = {
     upsertBudget(userId: string, budget: BudgetRecord): Promise<void>;
     getBudget(userId: string): Promise<BudgetRecord | null>;
   };
+  myFlyerPreferencesRepository?: {
+    getPreferences(owner: MyFlyerPreferenceOwner): Promise<JsonRecord | null>;
+    upsertPreferences(owner: MyFlyerPreferenceOwner, preferences: JsonRecord): Promise<JsonRecord>;
+  };
   accountDeletionRepository?: {
     deleteUserAccount(userId: string): Promise<void>;
   };
@@ -220,6 +224,8 @@ export type RuntimePersistenceRepository = {
   upsertSubscriptionEntitlement(entitlement: BillingSubscriptionEntitlementMutation): Promise<void>;
   upsertBudget(userId: string, budget: BudgetRecord): Promise<void>;
   getBudget(userId: string): Promise<BudgetRecord | null>;
+  getMyFlyerPreferences?(owner: MyFlyerPreferenceOwner): Promise<JsonRecord | null>;
+  upsertMyFlyerPreferences?(owner: MyFlyerPreferenceOwner, preferences: JsonRecord): Promise<JsonRecord>;
   deleteUserAccount?(userId: string): Promise<void>;
   getHumanReviewer(reviewerId: string): Promise<HumanReviewOperator | null>;
   listOpenHumanReviewAssignments(): Promise<HumanReviewAssignment[]>;
@@ -297,6 +303,8 @@ export type StoreFlyerOffersProviderQuery = {
 };
 
 type JsonRecord = Record<string, unknown>;
+
+type MyFlyerPreferenceOwner = { userId: string; sessionId?: never } | { sessionId: string; userId?: never };
 
 const require = createRequire(import.meta.url);
 const jsonHeaders = { 'content-type': 'application/json; charset=utf-8' };
@@ -1992,6 +2000,24 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
     return null;
   };
 
+  const myFlyerOwnerForRequest = async (request: Request): Promise<{ owner: MyFlyerPreferenceOwner; setCookie?: string } | Response> => {
+    if (authOptions.authSecret) {
+      const token = parseBearerToken(request.headers.get('authorization'));
+      if (token) {
+        const session = await verifySessionToken(token, authOptions.authSecret, authOptions.now);
+        return { owner: { userId: session.userId } };
+      }
+    }
+    const cookie = request.headers.get('cookie') ?? '';
+    const sessionId = cookie.match(/(?:^|;\s*)session_id=([^;]+)/)?.[1];
+    if (sessionId) return { owner: { sessionId: decodeURIComponent(sessionId) } };
+    const createdSessionId = `anon_${randomUUID()}`;
+    return {
+      owner: { sessionId: createdSessionId },
+      setCookie: `session_id=${encodeURIComponent(createdSessionId)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=31536000`
+    };
+  };
+
   const requireOcrScanHistoryPremium = async (userId: string): Promise<Response | null> => {
     const now = (authOptions.now ?? new Date()).toISOString();
     const entitlement = authOptions.subscriptionEntitlementRepository
@@ -2118,6 +2144,29 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
             accessToken,
             expiresAt
           });
+        }
+      }
+
+      if (path === '/api/myflyer/preferences') {
+        const repository = authOptions.myFlyerPreferencesRepository;
+        if (!repository) return errorResponse(503, 'MyFlyer preferences repository is not configured.');
+        const ownerResult = await myFlyerOwnerForRequest(request);
+        if (ownerResult instanceof Response) return ownerResult;
+        if (method === 'GET') {
+          const preferences = await repository.getPreferences(ownerResult.owner);
+          return jsonResponse(
+            { owner: ownerResult.owner, preferences: preferences ?? {} },
+            ownerResult.setCookie ? { headers: { 'Set-Cookie': ownerResult.setCookie } } : {}
+          );
+        }
+        if (method === 'PUT' || method === 'POST') {
+          const body = await readJson(request);
+          const preferences = parseJsonObject(JSON.stringify(body.preferences ?? body));
+          const saved = await repository.upsertPreferences(ownerResult.owner, preferences);
+          return jsonResponse(
+            { owner: ownerResult.owner, preferences: saved },
+            ownerResult.setCookie ? { headers: { 'Set-Cookie': ownerResult.setCookie } } : {}
+          );
         }
       }
 
@@ -3945,6 +3994,14 @@ export function buildRepositoryBackedAuthOptions(
       upsertBudget: (userId, budget) => repository.upsertBudget(userId, budget),
       getBudget: (userId) => repository.getBudget(userId)
     },
+    ...(repository.getMyFlyerPreferences && repository.upsertMyFlyerPreferences
+      ? {
+          myFlyerPreferencesRepository: {
+            getPreferences: (owner) => repository.getMyFlyerPreferences!(owner),
+            upsertPreferences: (owner, preferences) => repository.upsertMyFlyerPreferences!(owner, preferences)
+          }
+        }
+      : {}),
     ...(repository.deleteUserAccount
       ? {
           accountDeletionRepository: {
