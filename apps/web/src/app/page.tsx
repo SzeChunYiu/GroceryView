@@ -1,4 +1,4 @@
-import { PriceDropDiscoveryRail } from '@/app/page-sections/trending';
+import { PriceDropDiscoveryRail, RecommendedDealsRail } from '@/app/page-sections/trending';
 import { PersonalizedRecommendationRail } from '@/components/locale-home-page';
 import { MarketShell } from '@/components/market-shell';
 import { PwaInstall } from '@/components/pwa-install';
@@ -12,6 +12,7 @@ export default function HomePage() {
   return (
     <>
       <PriceDropDiscoveryRail />
+      <RecommendedDealsRail />
       <PersonalizedRecommendationRail />
       <MarketShell />
       <PwaInstall />

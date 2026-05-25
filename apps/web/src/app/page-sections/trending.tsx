@@ -1,6 +1,7 @@
 import Link from 'next/link';
-import { ArrowDownRight, BadgeCheck, BarChart3, Clock3, ListPlus, MapPin, Search, TrendingUp } from 'lucide-react';
+import { ArrowDownRight, BadgeCheck, BarChart3, Clock3, Heart, ListChecks, ListPlus, MapPin, Search, TrendingUp } from 'lucide-react';
 import { buildPriceDropDiscoveryRail } from '@/lib/price-events';
+import { recommendedDealsFeed, type RecommendedDealSignal } from '@/lib/feed-recommendations';
 import { buildCityPriceDropTrends, type BrandLeaderboardTrendFeed, type CityPriceDropTrend, type CitySearchTrendFeed } from '@/lib/trends';
 import { categoryLabels, pricedProducts } from '@/lib/openprices-products';
 import type { CategoryTrendingShelf } from '@/lib/grocery-index-widget';
@@ -38,6 +39,69 @@ const discoveryRailItems = buildPriceDropDiscoveryRail(pricedProducts.map((produ
   category: categoryLabels[product.category] ?? product.category,
   observations: product.observations
 })), 6);
+
+const recommendationSignalLabels: Record<RecommendedDealSignal, string> = {
+  favorite: 'Favorite',
+  watchlist: 'Watchlist',
+  household: 'Household',
+  local_price_drop: 'Local drop'
+};
+
+export function RecommendedDealsRail() {
+  if (recommendedDealsFeed.length === 0) return null;
+
+  return (
+    <section className="mx-auto mt-4 max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Personalized recommended deals" data-recommended-deals-rail>
+      <div className="rounded-[1.75rem] border border-sky-200 bg-white p-4 shadow-sm md:p-5">
+        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-sky-800">Recommended deals</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Personalized savings before search</h2>
+          </div>
+          <p className="max-w-2xl text-sm font-semibold leading-6 text-slate-600">
+            Ranked from favorite brands, watchlist targets, household preference settings, and verified local price drops.
+          </p>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4" data-recommended-deals-grid>
+          {recommendedDealsFeed.map((deal) => (
+            <Link
+              className="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:-translate-y-0.5 hover:border-sky-700"
+              data-recommended-deal-card={deal.rank}
+              href={deal.href}
+              key={deal.productSlug}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-sky-800">#{deal.rank} · score {deal.score}</p>
+                  <h3 className="mt-2 line-clamp-2 text-lg font-black leading-6 text-slate-950">{deal.productName}</h3>
+                  <p className="mt-1 line-clamp-1 text-sm font-semibold text-slate-600">{deal.brand} · {deal.category}</p>
+                </div>
+                <span className="rounded-full bg-sky-100 p-2 text-sky-800" aria-label="Personalized recommended deal">
+                  <Heart aria-hidden="true" size={20} strokeWidth={3} />
+                </span>
+              </div>
+              <div className="mt-4 rounded-xl bg-white p-3">
+                <p className="text-xs font-bold text-slate-500">Personalized signal</p>
+                <p className="mt-1 text-lg font-black text-slate-950">{deal.priceLabel}</p>
+                <p className="mt-1 text-sm font-black text-sky-800">{deal.savingsLabel}</p>
+              </div>
+              <p className="mt-3 text-sm font-bold leading-5 text-slate-700">{deal.reason}</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {deal.signalBadges.map((signal) => (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-xs font-black text-slate-700" key={signal}>
+                    <ListChecks aria-hidden="true" size={14} />
+                    {recommendationSignalLabels[signal]}
+                  </span>
+                ))}
+              </div>
+              <p className="mt-3 line-clamp-2 text-xs font-semibold leading-5 text-slate-500">{deal.evidenceLabel}</p>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export function PriceDropDiscoveryRail() {
   if (discoveryRailItems.length === 0) return null;
