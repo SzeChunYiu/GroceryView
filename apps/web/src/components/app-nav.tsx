@@ -20,6 +20,7 @@ import {
   Tags,
   Moon,
   Sun,
+  TrendingUp,
   Utensils
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
@@ -51,6 +52,7 @@ const navContractLabels = [
       { href: '/', label: 'Overview' },
       { href: '/chain-index', label: 'Chain index' },
       { href: '/categories', label: 'Categories' },
+      { href: '/movers', label: 'Movers' },
       { href: '/heatmap', label: 'Heatmap' },
       { href: '/screener', label: 'Screener' }
     ]
@@ -85,6 +87,7 @@ function buildNavGroups(t: AppNavTranslator): NavGroup[] {
         { href: '/chain-index', label: t('app-nav.items.chainIndex'), icon: Database },
         { href: '/analytics/funnel', label: t('app-nav.items.funnel'), icon: BarChart3 },
         { href: '/categories', label: t('app-nav.items.categories'), icon: Tags },
+        { href: '/movers', label: 'Movers', icon: TrendingUp },
         { href: '/heatmap', label: t('app-nav.items.heatmap'), icon: Flame },
         { href: '/screener', label: 'Screener', icon: Search }
       ]

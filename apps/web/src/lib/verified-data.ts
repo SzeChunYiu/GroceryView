@@ -3502,34 +3502,75 @@ export const freshnessLagSummary = {
   claimBoundary: 'Freshness lag is computed from dated OpenPrices observations plus the dated Axfood chain snapshot; classes without a dated observation stay stale until the next source refresh.'
 };
 
-export const priceDropMoversBoard = pricedProducts
-  .flatMap((product) => {
-    const historyPoints = dailyObservedPricePoints(product);
-    if (historyPoints.length < 2) return [];
+function openPricesMoverRows(direction: 'drop' | 'rise') {
+  return pricedProducts
+    .flatMap((product) => {
+      const historyPoints = dailyObservedPricePoints(product);
+      if (historyPoints.length < 2) return [];
 
-    const summary = summarizePriceHistory(historyPoints);
-    const previousPrice = summary.previousPrice ?? summary.latestPrice;
-    return [{
-      productSlug: product.slug,
-      productName: product.name,
-      imageUrl: product.image || null,
-      categoryLabel: labelFromSlug(product.category),
-      latestPrice: summary.latestPrice,
-      previousPrice,
-      changeFromPrevious: summary.changeFromPrevious,
-      changePercent: previousPrice > 0 ? (summary.changeFromPrevious / previousPrice) * 100 : 0,
-      lowestPrice: summary.lowestPrice,
-      highestPrice: summary.highestPrice,
-      isNewLow: summary.isNewLow,
-      observedCount: summary.observedCount,
-      rawObservationCount: product.observationCount,
-      latestObservedAt: summary.latestObservedAt,
-      legalCopy: 'observed low only'
-    }];
-  })
-  .filter((mover) => mover.changeFromPrevious < 0)
-  .sort((a, b) => a.changeFromPrevious - b.changeFromPrevious || b.observedCount - a.observedCount || a.productName.localeCompare(b.productName, 'sv'))
-  .slice(0, 8);
+      const summary = summarizePriceHistory(historyPoints);
+      const previousPrice = summary.previousPrice ?? summary.latestPrice;
+      const unitPrice = normalizeComparableUnitPrice(summary.latestPrice, product.quantity);
+      const changePercent = previousPrice > 0 ? (summary.changeFromPrevious / previousPrice) * 100 : 0;
+      return [{
+        productSlug: product.slug,
+        productName: product.name,
+        imageUrl: product.image || null,
+        categorySlug: product.category,
+        categoryLabel: labelFromSlug(product.category),
+        chainId: 'openprices',
+        chainLabel: 'OpenPrices',
+        latestPrice: summary.latestPrice,
+        previousPrice,
+        changeFromPrevious: summary.changeFromPrevious,
+        changePercent,
+        lowestPrice: summary.lowestPrice,
+        highestPrice: summary.highestPrice,
+        isNewLow: summary.isNewLow,
+        observedCount: summary.observedCount,
+        rawObservationCount: product.observationCount,
+        latestObservedAt: summary.latestObservedAt,
+        unitPrice: unitPrice?.unitPrice ?? null,
+        unitLabel: unitPrice?.unitLabel ?? null,
+        packageLabel: (unitPrice?.packageLabel ?? product.quantity) || 'Package not reported',
+        direction,
+        legalCopy: 'observed low only'
+      }];
+    })
+    .filter((mover) => direction === 'drop' ? mover.changeFromPrevious < 0 : mover.changeFromPrevious > 0)
+    .sort((a, b) => (
+      direction === 'drop'
+        ? a.changeFromPrevious - b.changeFromPrevious
+        : b.changeFromPrevious - a.changeFromPrevious
+    ) || b.observedCount - a.observedCount || a.productName.localeCompare(b.productName, 'sv'))
+    .slice(0, 12);
+}
+
+export const priceDropMoversBoard = openPricesMoverRows('drop').slice(0, 8);
+
+export const priceRiseMoversBoard = openPricesMoverRows('rise').slice(0, 8);
+
+export const weeklyPriceMoversBoard = [
+  ...priceDropMoversBoard,
+  ...priceRiseMoversBoard
+]
+  .sort((a, b) => Math.abs(b.changePercent) - Math.abs(a.changePercent) || b.observedCount - a.observedCount || a.productName.localeCompare(b.productName, 'sv'))
+  .map((mover, index) => ({
+    ...mover,
+    rank: index + 1,
+    evidenceLabel: `${mover.observedCount} dated points · ${mover.rawObservationCount.toLocaleString('sv-SE')} raw observations · latest ${mover.latestObservedAt.slice(0, 10)}`
+  }));
+
+export const marketMoverFilterOptions = {
+  chains: [
+    { value: 'openprices', label: 'OpenPrices', detail: 'Dated community and public observation history' }
+  ],
+  categories: [...new Map(weeklyPriceMoversBoard.map((mover) => [mover.categorySlug, {
+    value: mover.categorySlug,
+    label: mover.categoryLabel
+  }])).values()].sort((a, b) => a.label.localeCompare(b.label, 'sv')),
+  coverage: [2, 4, 6, 8]
+} as const;
 
 export const categoryDealLeaderCandidates = matchedChainProducts.map((product) => {
   const sourceConfidence = clamp(product.inChains.length / 2, 0, 1);
