@@ -16,6 +16,8 @@ export function useHaptic() {
 
   return {
     impact: () => vibrate([10, 18, 10]),
+    isSupported: canVibrate,
+    scannerShortcut: () => vibrate([18, 28, 18, 28, 24]),
     selection: () => vibrate(12),
     success: () => vibrate([16, 24, 16]),
     vibrate,
