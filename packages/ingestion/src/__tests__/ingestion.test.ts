@@ -60,6 +60,7 @@ import {
   fetchOkq8FuelPrices,
   fetchOpenFoodFactsRetailerEnrichments,
   fetchBrandedSwedishFuelStations,
+  fetchApoteketSeProducts,
   fetchOverpassFuelStations,
   fetchOverpassGroceryStores,
   fetchSevenElevenSeConvenienceProducts,
@@ -103,6 +104,7 @@ import {
   fetchWillysWeeklyDiscounts,
   fetchWillysWeeklyDiscountsForAllStores,
   findPharmacyEanMatches,
+  parseApoteketSeProducts,
   parseApohemProducts,
   parseApotekHjartatProducts,
   parseIcaReklambladOffers,
@@ -119,6 +121,7 @@ import {
   GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL,
   GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL,
   GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL,
+  GROCERYVIEW_DAILY_APOTEKET_SE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL,
@@ -7244,6 +7247,64 @@ describe('daily ingestion runner', () => {
     assert.equal(observation.regular_price, 59);
   });
 
+  it('dispatches Apoteket SE public product rows through the daily native connector', async () => {
+    const executor = new DailyIngestionExecutor();
+    const sourceUrl = 'https://www.apoteket.se/sok/?q=vitamin';
+    const endpointUrl = `${GROCERYVIEW_DAILY_APOTEKET_SE_PRODUCTS_URL}?sourceUrls=${encodeURIComponent(sourceUrl)}`;
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-23T08:40:34.000Z',
+      connectors: [{
+        connectorId: 'apoteket-se-public-products',
+        chainId: 'apoteket',
+        domain: 'pharmacy',
+        sourceType: 'retailer_online_page',
+        endpointUrl,
+        parserVersion: 'apoteket-se-public-products-v1',
+        robotsTxtStatus: 'allow',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: false,
+        requireStoreScopedPrices: false,
+        stores: []
+      }],
+      fetchImpl: async (url) => {
+        assert.equal(String(url), sourceUrl);
+        return new Response(`
+          <script type="application/json">{
+            "products": [
+              {
+                "productName": "Apoteket D-vitamin 100 tabletter",
+                "price": { "amount": "79,90", "currency": "SEK" },
+                "packageSize": "100 tabletter",
+                "url": "/produkt/apoteket-d-vitamin-100-tabletter/",
+                "isPrescriptionProduct": false
+              },
+              {
+                "productName": "Receptbelagd vara",
+                "price": { "amount": 199, "currency": "SEK" },
+                "packageSize": "10 tabletter",
+                "isPrescriptionProduct": true
+              }
+            ]
+          }</script>
+        `, { status: 200, headers: { 'content-type': 'text/html' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    const product = firstBatchProduct(executor);
+    assert.equal(product.domain, 'pharmacy');
+    assert.equal(product.category_id, 'pharmacy-public');
+    assert.equal(product.package_size, 100);
+    assert.equal(product.package_unit, 'piece');
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.chain_id, 'chain-db-1');
+    assert.equal(observation.domain, 'pharmacy');
+    assert.equal(observation.store_id, null);
+    assert.equal(observation.price, 79.9);
+  });
+
   it('parses Apohem and Apotek Hjartat page fixtures with public EAN provenance only', () => {
     const retrievedAt = '2026-05-23T08:40:34.000Z';
     const apohemSourceUrl = 'https://www.apohem.se/receptfritt';
@@ -7358,6 +7419,59 @@ describe('daily ingestion runner', () => {
       apohemSourceUrl,
       apotekHjartatSourceUrl
     ]);
+  });
+
+  it('parses Apoteket SE fixtures into public pharmacy price-list rows', async () => {
+    const sourceUrl = 'https://www.apoteket.se/sok/?q=vitamin';
+    const observedAt = '2026-05-23T08:40:34.000Z';
+    const html = `
+      <script>self.__next_f.push([1, "payload:{\\"products\\":[{\\"name\\":\\"Apoteket C-vitamin 20 brustabletter\\",\\"price\\":{\\"amount\\":\\"42,50\\",\\"currency\\":\\"SEK\\"},\\"unit\\":\\"20 tabletter\\",\\"href\\":\\"/produkt/c-vitamin/\\"},{\\"name\\":\\"Rx only\\",\\"price\\":99,\\"requiresPrescription\\":true}]}"])</script>
+      <script type="application/json">{
+        "items": [{
+          "product_name": "Apoteket Tandkräm Fluor 125 ml",
+          "price_sek": 29.9,
+          "unit": "125 ml",
+          "source_url": "https://www.apoteket.se/produkt/tandkram/"
+        }]
+      }</script>
+    `;
+
+    const rows = parseApoteketSeProducts(html, sourceUrl, observedAt);
+
+    assert.deepEqual(rows, [
+      {
+        country: 'SE',
+        currency: 'SEK',
+        chain: 'apoteket',
+        product_name: 'Apoteket C-vitamin 20 brustabletter',
+        price_sek: 42.5,
+        unit: '20 tabletter',
+        observed_at: observedAt,
+        source_url: 'https://www.apoteket.se/produkt/c-vitamin/'
+      },
+      {
+        country: 'SE',
+        currency: 'SEK',
+        chain: 'apoteket',
+        product_name: 'Apoteket Tandkräm Fluor 125 ml',
+        price_sek: 29.9,
+        unit: '125 ml',
+        observed_at: observedAt,
+        source_url: 'https://www.apoteket.se/produkt/tandkram/'
+      }
+    ]);
+
+    const requestedUrls: string[] = [];
+    const fetched = await fetchApoteketSeProducts({
+      sourceUrls: [sourceUrl],
+      observedAt,
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return new Response(html, { status: 200, headers: { 'content-type': 'text/html' } });
+      }
+    });
+    assert.deepEqual(requestedUrls, [sourceUrl]);
+    assert.equal(fetched.length, 2);
   });
 
   it('materializes native Lidl all-store public offer prices into daily database observations', async () => {
