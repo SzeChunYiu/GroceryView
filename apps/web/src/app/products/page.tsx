@@ -6,7 +6,7 @@ import { PriceReportReviewActions } from '@/components/price-report-review-actio
 import { OriginFilter, type OriginFilterCode } from '@/components/origin-filter';
 import { ProductSortSelect } from '@/components/product-sort-select';
 import { ProductPriceCards } from '@/components/product-price-cards';
-import { SavedSearchAction } from '@/components/saved-search-action';
+import { SavedSearchActions } from '@/components/saved-search-actions';
 import { VirtualizedProductGrid } from '@/components/LazyItemCard';
 import { apohemSource } from '@/lib/ingested/apohem';
 import { buildSavedSearchSubscription } from '@/lib/alert-scheduler';
@@ -244,7 +244,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             <p className="mt-2 text-xs font-semibold text-violet-900">Active URL filters: {search.activeFilters.join(' · ')}</p>
           ) : null}
         </div>
-        <SavedSearchAction subscription={savedSearchSubscription} />
+        <SavedSearchActions resultCount={resultCards.length} subscription={savedSearchSubscription} />
         <OriginFilter
           className="mt-5"
           counts={Object.fromEntries(originFacets.map((facet) => [facet.value, facet.count])) as Partial<Record<OriginFilterCode, number>>}
