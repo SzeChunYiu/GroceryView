@@ -14,6 +14,7 @@ import {
   type RecentSearchHistoryEntry,
   type SavedSearchEntry
 } from '@/lib/personalization';
+import { buildNoResultCorrectionWorkflow } from '@/lib/search-alias-review';
 import type { SearchExplanationBadge } from '@/lib/search-filters';
 
 type ProductSearchResult = {
@@ -138,6 +139,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
   const voiceRecognitionRef = useRef<GrocerySpeechRecognition | null>(null);
   const trimmedQuery = useMemo(() => query.trim(), [query]);
   const emptyFallback = useMemo(() => zeroResultFallbacks(trimmedQuery), [trimmedQuery]);
+  const noResultWorkflow = useMemo(() => buildNoResultCorrectionWorkflow(trimmedQuery), [trimmedQuery]);
   const shouldShowRecentSearches = isFocused && trimmedQuery.length === 0 && (recentSearches.length > 0 || savedSearches.length > 0);
   const shouldShowDropdown = (status !== 'idle' && trimmedQuery.length >= MIN_QUERY_LENGTH) || shouldShowRecentSearches;
   const optionCount = useMemo(() => {
@@ -507,6 +509,11 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
               <p className="text-sm font-bold text-slate-700">No products matched “{trimmedQuery}”.</p>
               <p className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-slate-500">Try related searches</p>
               <div className="mt-2 flex flex-wrap gap-2">
+                {noResultWorkflow.suggestedCorrections.map((search) => (
+                  <Link className="rounded-full bg-amber-50 px-3 py-1 text-xs font-black text-amber-950" href={`/products?q=${encodeURIComponent(search)}`} key={`correction-${search}`}>
+                    Correct spelling: {search}
+                  </Link>
+                ))}
                 {emptyFallback.searches.map((search) => (
                   <Link className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-900" href={`/products?q=${encodeURIComponent(search)}`} key={search}>
                     {search}
@@ -521,6 +528,9 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
                   </Link>
                 ))}
               </div>
+              <Link className="mt-3 inline-flex rounded-full bg-sky-50 px-3 py-1.5 text-xs font-black text-sky-950" href={noResultWorkflow.aliasSubmissionHref}>
+                Submit “{trimmedQuery}” as an alias candidate
+              </Link>
             </div>
           ) : null}
           {status === 'ready' && suggestGroups.length === 0 ? (
