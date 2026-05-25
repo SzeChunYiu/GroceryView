@@ -452,6 +452,6 @@ export function buildBasketStoreComparison(
     sourceLabel: comparison.sourceLabel,
     summary: bestStore && itemCount > 0
       ? `${bestStore.storeName} is cheapest at ${bestStore.totalText}; ${closestStore?.storeName ?? 'the nearest matched store'} is closest at ${closestStore?.distanceText ?? 'distance not reported'}; ${bestStockedStore?.storeName ?? 'the best-stocked matched store'} has ${bestStockedStore?.coverageLabel ?? 'stock coverage not reported'}. Missing rows stay visible and substitutions point to the cheapest observed chain row.`
-      : 'Add product ids to compare full basket totals across nearby stores.'
+      : 'Add product ids to compare full basket totals across selected chains.'
   };
 }

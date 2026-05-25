@@ -1,10 +1,14 @@
 import Link from 'next/link';
 import { ArrowDownRight, ArrowUpRight, History } from 'lucide-react';
 import type { TrendingProductPriceChange } from '@groceryview/db';
-import { buildBrandLeaderboardTrends, buildCitySearchTrends } from '@/lib/trends';
+import { buildBrandLeaderboardTrends, buildCitySearchTrends, buildCityTrendingItems, type CityTrendingItemFeed } from '@/lib/trends';
 import { BrandLeaderboardModule, TrendingSearchModule } from '@/app/page-sections/trending';
 import type { PersonalizedReorderItem } from '@/lib/personalization';
 import type { NewProductArrival } from '@/lib/new-arrivals';
+
+type PersonalizedTrendingProductPriceChange = TrendingProductPriceChange & {
+  personalizationReason?: string;
+};
 
 function formatMoney(value: number, currency: string) {
   return new Intl.NumberFormat('sv-SE', {
@@ -98,17 +102,50 @@ export function NewArrivalsCarousel({ items }: Readonly<{ items: NewProductArriv
   );
 }
 
+function CityTrendingItemsRail({ feed }: Readonly<{ feed: CityTrendingItemFeed }>) {
+  if (feed.cards.length === 0) return null;
+
+  return (
+    <section className="mt-6 rounded-[1.75rem] border border-orange-200 bg-orange-50 p-5 shadow-sm" aria-label={`${feed.city} trending grocery items`}>
+      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.24em] text-orange-800">Trending in {feed.city}</p>
+          <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Local products shoppers are acting on</h2>
+        </div>
+        <p className="max-w-2xl text-sm font-semibold leading-6 text-orange-950">Ranked from recent local views, list adds, and observed price movement signals.</p>
+      </div>
+      <div className="mt-5 flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory" data-city-trending-items={feed.city}>
+        {feed.cards.map((item) => (
+          <Link className="min-w-[16rem] max-w-[16rem] snap-start rounded-2xl border border-orange-200 bg-white p-4 transition hover:-translate-y-0.5 hover:border-orange-700" href={item.resultHref} key={item.productSlug}>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-orange-800">#{item.rank} · {item.categoryLabel}</p>
+            <h3 className="mt-2 line-clamp-2 text-lg font-black leading-6 text-slate-950">{item.productName}</h3>
+            <p className="mt-1 line-clamp-1 text-sm font-semibold text-slate-600">{item.brand}</p>
+            <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs font-black">
+              <p className="rounded-xl bg-orange-50 p-2 text-orange-950">{item.recentViews}<span className="block font-semibold">views</span></p>
+              <p className="rounded-xl bg-emerald-50 p-2 text-emerald-950">{item.listAdds}<span className="block font-semibold">adds</span></p>
+              <p className="rounded-xl bg-slate-50 p-2 text-slate-950">{item.priceMovementLabel}<span className="block font-semibold">price</span></p>
+            </div>
+            <p className="mt-3 text-xs font-bold leading-5 text-slate-600">{item.evidenceLabel}</p>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export function TrendingCarousel({ items, reorderItems = [] }: Readonly<{
-  items: TrendingProductPriceChange[];
+  items: PersonalizedTrendingProductPriceChange[];
   reorderItems?: PersonalizedReorderItem[];
 }>) {
   const searchFeed = buildCitySearchTrends({ city: 'stockholm', limit: 6 });
   const brandFeed = buildBrandLeaderboardTrends({ city: 'stockholm', limit: 5 });
+  const cityItemFeed = buildCityTrendingItems({ city: 'stockholm', limit: 6 });
 
   if (items.length === 0) {
     return (
       <>
         <PersonalizedReorderRail items={reorderItems} />
+        <CityTrendingItemsRail feed={cityItemFeed} />
         <BrandLeaderboardModule feed={brandFeed} />
         <TrendingSearchModule feed={searchFeed} />
       </>
@@ -118,6 +155,7 @@ export function TrendingCarousel({ items, reorderItems = [] }: Readonly<{
   return (
     <>
       <PersonalizedReorderRail items={reorderItems} />
+      <CityTrendingItemsRail feed={cityItemFeed} />
       <section className="mt-6 rounded-[1.75rem] border border-cyan-200 bg-white/90 p-5 shadow-sm" aria-label="Trending products">
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
@@ -165,6 +203,11 @@ export function TrendingCarousel({ items, reorderItems = [] }: Readonly<{
                   <History aria-hidden="true" size={16} />
                   {item.changeCount} changes · {item.observationCount} observations
                 </p>
+                {item.personalizationReason ? (
+                  <p className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-cyan-800">
+                    Ranked for you: {item.personalizationReason}
+                  </p>
+                ) : null}
                 <p className="mt-2 text-xs font-semibold leading-5 text-slate-500">
                   {formatPercent(item.changePercent)} from {formatMoney(item.previousPrice, item.currency)} · latest {item.latestObservedAt.slice(0, 10)}
                 </p>

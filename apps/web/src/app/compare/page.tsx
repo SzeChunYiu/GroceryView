@@ -169,7 +169,7 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
           basketStores={basketStoreComparison.stores}
           items={[]}
         />
-        <p className="mt-3 text-sm font-semibold leading-6 text-slate-600">{basketStoreComparison.summary}</p>
+        <p className="mt-3 text-sm font-semibold leading-6 text-slate-600">Side-by-side chain totals include missing item counts and substitutions. {basketStoreComparison.summary}</p>
         <div className="mt-3 grid gap-3 md:grid-cols-3">
           <Card className="border-emerald-200 bg-emerald-50">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Cheapest basket</p>
