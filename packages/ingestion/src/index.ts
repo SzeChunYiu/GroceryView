@@ -179,6 +179,7 @@ export * from './connectors/willys-bulk.js';
 export * from './connectors/apohem.js';
 export * from './connectors/bonus-is.js';
 export * from './connectors/iceland-flyer-is.js';
+export * from './connectors/hagkaup-is.js';
 export * from './connectors/atlantsolia-is.js';
 export * from './connectors/apotek-gardabaer-is.js';
 export * from './connectors/apoteket-se.js';
