@@ -9,6 +9,7 @@ import { FavouriteProductToggle } from './favourite-product-toggle';
 import { readStoredSafetyPreferences, SAFETY_PREFERENCES_CHANGED_EVENT, type ProductSafetyPreferences } from './cert-filter';
 import { buildPriceHistorySparklinePath } from '@/lib/price-events';
 import { volatilityBadgeMethodology } from '@/lib/price-intelligence';
+import { productImageCdnUrl } from '@/lib/imageCdn';
 import type { SearchExplanationBadge } from '@/lib/search-filters';
 import { listFriendPriceSightingsForProduct } from '@/lib/social';
 import { substitutionPlansForUnavailableProducts } from '@/lib/substitutions';
@@ -364,7 +365,7 @@ export function ProductPriceCards({
                   loading={productCardImagePolicy.loading}
                   placeholder={productCardImagePolicy.placeholder}
                   sizes={productCardImagePolicy.sizes}
-                  src={card.imageUrl}
+                  src={productImageCdnUrl(card.imageUrl, { width: 144 })}
                   width={144}
                 />
               </div>
