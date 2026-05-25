@@ -5,6 +5,8 @@ import { useState } from 'react';
 type DisclosureStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
 type BrowserSession = { accessToken: string; userId: string };
 type AdPlacementSlot = {
+  disclosure?: string;
+  id?: string;
   surface?: string;
   provider?: string;
   label?: string;
@@ -21,6 +23,17 @@ type AdDisclosureReport = {
   affectsDealScore?: false;
   guardrails?: string[];
 };
+
+const defaultSponsoredPlacementSlots: AdPlacementSlot[] = [
+  {
+    disclosure: 'Paid grocery partner placement shown in a clearly separated discovery rail slot.',
+    id: 'sponsored-discovery-rail',
+    label: 'Sponsored',
+    organicRankingSeparated: true,
+    provider: 'GroceryView Ads',
+    surface: 'discovery_rail'
+  }
+];
 
 function readSession(): BrowserSession {
   const accessToken = sessionStorage.getItem('groceryview:accessToken') || '';
@@ -67,6 +80,7 @@ export function AdDisclosureActions() {
 
   const excludedSurfaces = disclosure?.excludedSurfaces ?? disclosure?.placementPlan?.excludedSurfaces ?? [];
   const slots = disclosure?.placementPlan?.slots ?? [];
+  const sponsoredSlotPreview = slots.length ? slots : defaultSponsoredPlacementSlots;
   const guardrails = disclosure?.guardrails ?? ['Sponsored placements cannot change Deal Score, basket totals, or store ordering.'];
 
   return (
@@ -108,6 +122,27 @@ export function AdDisclosureActions() {
           ))}
         </ul>
       ) : null}
+
+      <div className="mt-4 rounded-3xl border border-amber-200 bg-amber-50 p-4" aria-label="Sponsored discovery rail slot preview">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-800">Sponsored discovery slots</p>
+        <p className="mt-2 text-sm font-semibold leading-6 text-amber-950">
+          These labeled components can appear in discovery rails, but they remain outside organic deal rankings and cannot affect Deal Score.
+        </p>
+        <ul className="mt-3 grid gap-3 lg:grid-cols-2">
+          {sponsoredSlotPreview.slice(0, 4).map((slot, index) => (
+            <li className="rounded-2xl border border-amber-300 bg-white p-4 text-sm" key={slot.id ?? `${slot.surface ?? 'surface'}-${index}`}>
+              <p className="font-black uppercase tracking-[0.18em] text-amber-800">{slot.label ?? 'Sponsored'}</p>
+              <p className="mt-2 font-black text-slate-950">{slot.surface ?? 'discovery_rail'} · {slot.provider ?? 'provider'}</p>
+              <p className="mt-1 font-semibold leading-6 text-slate-700">
+                {slot.disclosure ?? 'Paid placement shown in a separate sponsored slot.'}
+              </p>
+              <p className="mt-2 rounded-full bg-amber-100 px-3 py-1 text-xs font-black text-amber-900">
+                organicRankingSeparated: {String(slot.organicRankingSeparated ?? true)}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </div>
 
       <ul className="mt-4 list-disc space-y-1 rounded-2xl bg-sky-50 p-4 pl-8 text-sm font-bold text-sky-950">
         {guardrails.map((guardrail) => <li key={guardrail}>{guardrail}</li>)}
