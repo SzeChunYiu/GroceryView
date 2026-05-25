@@ -3,8 +3,9 @@ import ProductPage, {
   generateMetadata as generateProductMetadata,
   generateStaticParams
 } from '../../products/[slug]/page';
+import { BackInStockBanner } from '@/components/BackInStockBanner';
 import { ItemDetailListShortcut } from '@/components/item-detail-list-shortcut';
-import { findProduct } from '@/lib/verified-data';
+import { chainPriceRows, findProduct } from '@/lib/verified-data';
 
 export { generateStaticParams };
 
@@ -27,6 +28,39 @@ function productQuantity(product: NonNullable<ReturnType<typeof findProduct>>) {
   return 'lowestPrice' in product ? product.subline : product.quantity;
 }
 
+function chainName(chain: string) {
+  if (chain === 'willys') return 'Willys';
+  if (chain === 'hemkop') return 'Hemköp';
+  return chain.replaceAll('-', ' ');
+}
+
+function backInStockAvailabilityForProduct(product: NonNullable<ReturnType<typeof findProduct>> | undefined) {
+  if (!product || !('lowestPrice' in product)) return null;
+
+  const backInStockRow = chainPriceRows(product)
+    .map((row) => row as typeof row & {
+      observedAt?: string;
+      previousOutOfStockAt?: string;
+      storeName?: string;
+    })
+    .find((row) => row.isAvailable !== false && typeof row.previousOutOfStockAt === 'string' && row.previousOutOfStockAt.trim().length > 0);
+
+  if (!backInStockRow) return null;
+
+  const displayChainName = chainName(backInStockRow.chain);
+  const previousOutOfStockAt = backInStockRow.previousOutOfStockAt;
+  if (!previousOutOfStockAt) return null;
+
+  return {
+    chainName: displayChainName,
+    currency: 'SEK',
+    currentObservedAt: backInStockRow.observedAt ?? '2026-05-21T00:00:00.000Z',
+    previousOutOfStockAt,
+    price: backInStockRow.price,
+    storeName: backInStockRow.storeName ?? `${displayChainName} online catalog`
+  };
+}
+
 export default async function ItemPage({ params }: Readonly<{ params: Promise<{ id: string }> }>) {
   const { id } = await params;
   const product = findProduct(id);
@@ -34,6 +68,7 @@ export default async function ItemPage({ params }: Readonly<{ params: Promise<{ 
 
   return (
     <>
+      <BackInStockBanner availability={backInStockAvailabilityForProduct(product)} />
       {renderedProductPage}
       <ItemDetailListShortcut
         productId={id}
