@@ -215,10 +215,40 @@ export const DEFAULT_MATHEM_SEARCH_QUERIES = [
   'stad',
   'rengoring',
   'hund',
-  'katt'
+  'katt',
+  'proteinbar',
+  'energibar',
+  'smoothie',
+  'fruktdryck',
+  'farskpotatis',
+  'kryddmix',
+  'tacokrydda',
+  'pannkakor',
+  'vafflor',
+  'ostbage',
+  'jordnotssmor',
+  'nutella',
+  'barbecue',
+  'hamburgerbrod',
+  'korvbrod',
+  'vegokorv',
+  'sojafars',
+  'tempeh',
+  'kimchi',
+  'surkal',
+  'matlagningsgradde',
+  'vispgradde',
+  'grekisk yoghurt',
+  'granola',
+  'havrekuddar',
+  'risnudlar',
+  'glasnudlar',
+  'ramen',
+  'sojasas',
+  'sesamolja'
 ] as const;
-export const DEFAULT_MATHEM_SEARCH_PAGES = [1, 2, 3] as const;
-export const DEFAULT_MATHEM_MAX_ROWS = 11000;
+export const DEFAULT_MATHEM_SEARCH_PAGES = [1, 2, 3, 4, 5] as const;
+export const DEFAULT_MATHEM_MAX_ROWS = 18000;
 const MATHEM_REQUEST_TIMEOUT_MS = 45_000;
 
 export type FetchMathemProductsOptions = {

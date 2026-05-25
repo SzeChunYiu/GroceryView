@@ -13,6 +13,7 @@ import {
   DEFAULT_LIDL_OFFER_PATHS,
   DEFAULT_MATHEM_SEARCH_PAGES,
   DEFAULT_MATHEM_SEARCH_QUERIES,
+  DEFAULT_MATHEM_MAX_ROWS,
   DEFAULT_MATPRISKOLLEN_REGIONS,
   DEFAULT_MATPRISKOLLEN_STORE_LIMIT,
   DEFAULT_MATPRISKOLLEN_OFFER_LIMIT_PER_STORE,
@@ -159,7 +160,7 @@ if (shouldRun('mathem')) {
   const mathemProducts = await fetchMathemProducts({
     queries: MATHEM_QUERIES,
     pages: MATHEM_PAGES,
-    maxRows: 9000,
+    maxRows: DEFAULT_MATHEM_MAX_ROWS,
     retrievedAt
   });
   await writeMathem(mathemProducts);
@@ -194,6 +195,7 @@ if (shouldRun('openfoodfacts')) {
   const openFoodFactsProducts = await fetchOpenFoodFactsSwedenCatalog({
     maxPages: DEFAULT_OPENFOODFACTS_SWEDEN_CATALOG_MAX_PAGES,
     pageSize: 100,
+    skipFailedPages: true,
     retrievedAt,
     onPage: (event) => pageEvents.push(event)
   });
@@ -233,7 +235,7 @@ if (shouldRun('apohem')) {
   const pharmacyProducts = await fetchPharmacyProducts({
     sourcePaths: APOHEM_SOURCE_PATHS,
     apotekHjartatUrls: APOTEK_HJARTAT_SEARCH_URLS,
-    maxRows: 2000,
+    maxRows: 3500,
     retrievedAt
   });
   await writeApohem(pharmacyProducts);
@@ -276,6 +278,8 @@ async function writeCityGross(rows) {
   const storeIds = unique(rows.map((row) => row.storeId));
   await writeGeneratedFile('citygross.ts', [
     '// AUTO-GENERATED from City Gross public store catalog and Loop54 product API.',
+    `// sourceUrl: ${sourceUrls[0] ?? 'https://www.citygross.se/api/v1/Loop54/products?Q={query}&skip={skip}&take={take}&siteId={siteId}'}`,
+    `// retrievedAt: ${retrievedAt}`,
     `// Store source URL: https://www.citygross.se/api/v1/PageData/stores`,
     `// Product source URL pattern: https://www.citygross.se/api/v1/Loop54/products?Q={query}&skip={skip}&take={take}&siteId={siteId}`,
     `// Product source URLs: ${sourceUrls.join('; ')}`,
@@ -329,6 +333,8 @@ async function writeCoop(products, weeklyDiscounts) {
     : '';
   await writeGeneratedFile('coop.ts', [
     '// AUTO-GENERATED from Coop public personalization search API.',
+    `// sourceUrl: ${productSourceUrls[0] ?? weeklySourceUrls[0] ?? 'https://external.api.coop.se/personalization/search/products?store={storeId}&device=desktop&direct=true&api-version=v1'}`,
+    `// retrievedAt: ${retrievedAt}`,
     `// Product source URL pattern: https://external.api.coop.se/personalization/search/products?store={storeId}&device=desktop&direct=true&api-version=v1`,
     `// Product source URLs: ${productSourceUrls.join(' | ')}`,
     `// Product queries: ${COOP_QUERIES.join(', ')}`,
@@ -423,6 +429,8 @@ async function writeWillys(products, weeklyDiscounts) {
   const weeklyStoreIds = unique(weeklyDiscounts.map((row) => row.storeId));
   await writeGeneratedFile('willys.ts', [
     '// AUTO-GENERATED from public Willys search JSON and public Axfood campaign JSON.',
+    `// sourceUrl: ${productSourceUrls[0] ?? weeklySourceUrls[0] ?? 'https://www.willys.se/search?q={query}'}`,
+    `// retrievedAt: ${retrievedAt}`,
     `// Product source URL pattern: https://www.willys.se/search?q={query}`,
     `// Product source URLs: ${productSourceUrls.join('; ')}`,
     `// Product retrieved: ${retrievedAt}`,
@@ -511,6 +519,8 @@ async function writeHemkop(products, weeklyDiscounts) {
   const weeklyStoreIds = unique(weeklyDiscounts.map((row) => row.storeId));
   await writeGeneratedFile('hemkop.ts', [
     '// AUTO-GENERATED from public Hemkop search JSON and public Axfood campaign JSON.',
+    `// sourceUrl: ${productSourceUrls[0] ?? weeklySourceUrls[0] ?? 'https://www.hemkop.se/search?q={query}&page={page}&size=100'}`,
+    `// retrievedAt: ${retrievedAt}`,
     `// Product source URL pattern: https://www.hemkop.se/search?q={query}&page={page}&size=100`,
     `// Product source URLs: ${productSourceUrls.join('; ')}`,
     `// Product retrieved: ${retrievedAt}`,
@@ -598,6 +608,8 @@ async function writeLidl(rows) {
   const storeIds = unique(rows.map((row) => row.storeId));
   await writeGeneratedFile('lidl.ts', [
     '// AUTO-GENERATED from Lidl public store pages and public offer pages.',
+    `// sourceUrl: ${sourceUrls[0] ?? 'https://www.lidl.se/s/sv-SE/butiker/'}`,
+    `// retrievedAt: ${retrievedAt}`,
     `// Store source URL: https://www.lidl.se/s/sv-SE/butiker/`,
     `// Offer source URLs: ${sourceUrls.join('; ')}`,
     `// Retrieved: ${retrievedAt}`,
@@ -646,6 +658,8 @@ async function writeMathem(rows) {
   const sourceUrls = unique(rows.map((row) => row.sourceUrl));
   await writeGeneratedFile('mathem.ts', [
     '// AUTO-GENERATED from public Mathem search page __NEXT_DATA__.',
+    `// sourceUrl: ${sourceUrls[0] ?? 'https://www.mathem.se/se/search/products/?q={query}'}`,
+    `// retrievedAt: ${retrievedAt}`,
     `// Source URL pattern: https://www.mathem.se/se/search/products/?q={query}`,
     `// Source URLs: ${sourceUrls.join('; ')}`,
     `// Retrieved: ${retrievedAt}`,
@@ -687,6 +701,8 @@ async function writeMatspar(rows) {
   const sourceUrls = unique(rows.map((row) => row.sourceUrl));
   await writeGeneratedFile('matspar.ts', [
     '// AUTO-GENERATED from Matspar public search pages with embedded __PAGEDATA__.',
+    `// sourceUrl: ${sourceUrls[0] ?? 'https://www.matspar.se/kategori?q={query}&page={page}'}`,
+    `// retrievedAt: ${retrievedAt}`,
     `// Source URL pattern: https://www.matspar.se/kategori?q={query}&page={page}`,
     `// Source URLs: ${sourceUrls.join('; ')}`,
     `// Retrieved: ${retrievedAt}`,
@@ -728,6 +744,8 @@ async function writeMatpriskollen(rows) {
   const stores = unique(rows.map((row) => row.storeKey));
   await writeGeneratedFile('matpriskollen.ts', [
     '// AUTO-GENERATED from Matpriskollen public stores and offers API.',
+    `// sourceUrl: ${sourceUrls[0] ?? 'https://matpriskollen.se/api/v1/stores/{storeKey}/offers?lat={lat}&lon={lon}&limit={limit}'}`,
+    `// retrievedAt: ${retrievedAt}`,
     ' // Store source URL pattern: https://matpriskollen.se/api/v1/stores?lat={lat}&lon={lon}&limit={limit}'.trim(),
     ' // Offer source URL pattern: https://matpriskollen.se/api/v1/stores/{storeKey}/offers?lat={lat}&lon={lon}&limit={limit}'.trim(),
     `// Offer source URLs: ${sourceUrls.join('; ')}`,
@@ -819,6 +837,8 @@ async function writeOpenFoodFacts(rows, pageEvents) {
 
   await writeGeneratedFile('openfoodfacts.ts', [
     '// AUTO-GENERATED from OpenFoodFacts Sweden public product search API metadata.',
+    `// sourceUrl: ${sourceUrls[0] ?? buildOpenFoodFactsSwedenSearchUrl(1, 100)}`,
+    `// retrievedAt: ${retrievedAt}`,
     ...sourceUrls.map((sourceUrl) => `// Source URL: ${sourceUrl}`),
     `// Retrieved: ${retrievedAt}`,
     `// Row count: ${rows.length} real normalized Sweden API product metadata rows from ${pageSummaries.reduce((total, page) => total + page.fetchedProductCount, 0)} fetched products across ${pageSummaries.length} pages.`,
@@ -912,6 +932,8 @@ async function writeApohem(rows) {
     }));
   await writeGeneratedFile('apohem.ts', [
     '// AUTO-GENERATED from public Apohem SSR pages and Apotek Hjärtat search HTML.',
+    `// sourceUrl: ${sourceUrls[0] ?? 'https://www.apohem.se/sok?q={query}'}`,
+    `// retrievedAt: ${retrievedAt}`,
     `// Source URLs: ${sourceUrls.join(', ')}`,
     `// Retrieved: ${retrievedAt}`,
     `// Row count: ${rows.length} real OTC, supplement, and beauty pharmacy rows; all include EAN and exclude prescription products.`,
@@ -1109,6 +1131,8 @@ async function writeIcaReklamblad(rows) {
   const stores = unique(rows.map((row) => row.storeName).filter(Boolean));
   await writeGeneratedFile('ica-reklamblad.ts', [
     '// AUTO-GENERATED from ICA public weekly offers with e-magin flyer provenance.',
+    `// sourceUrl: ${sourceUrls[0] ?? 'https://www.ica.se/erbjudanden/{store}/'}`,
+    `// retrievedAt: ${retrievedAt}`,
     `// Source URLs: ${sourceUrls.join(', ')}`,
     `// Flyer URLs: ${flyerUrls.join(', ')}`,
     `// Flyer PDF API URLs: ${flyerPdfUrls.join(', ')}`,
