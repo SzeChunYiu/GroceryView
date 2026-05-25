@@ -136,6 +136,10 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
     min: priceRange.min ?? 0,
     max: priceRange.max ?? 0
   };
+  const virtualizedResultCards = resultCards.map((card) => ({
+    ...card,
+    isAvailable: card.isAvailable ?? undefined
+  }));
   const requestedPage = toPageNumber(resolvedSearchParams.page);
   const selectedBrand = normalizeSelectedBrand(resolvedSearchParams.brand);
   const baseProductCards = selectedBrand
@@ -317,7 +321,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           </div>
           <div className="rounded-2xl border border-violet-100 bg-white p-4 shadow-sm">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">Price range + stock</p>
-            <p className="mt-3 text-2xl font-black text-slate-950">{formatSek(priceRange.min)} – {formatSek(priceRange.max)}</p>
+            <p className="mt-3 text-2xl font-black text-slate-950">{formatSek(drawerPriceRange.min)} – {formatSek(drawerPriceRange.max)}</p>
             <p className="mt-2 text-xs font-bold text-slate-600">Comparable unit filters cover kr/kg, kr/l, and per-unit rows. {inStockOnly.label} keeps unpriced catalog rows out of instant results.</p>
             <p className="mt-2 text-xs font-bold text-slate-600">
               Variance badges: {(volatilityBadgeCounts.stable ?? 0).toLocaleString('sv-SE')} stable · {(volatilityBadgeCounts.volatile ?? 0).toLocaleString('sv-SE')} volatile · {(volatilityBadgeCounts['likely-promo'] ?? 0).toLocaleString('sv-SE')} likely promo.
@@ -328,7 +332,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           Rendering {rangeStart.toLocaleString('sv-SE')}–{rangeEnd.toLocaleString('sv-SE')} of {resultCards.length.toLocaleString('sv-SE')} matching products through an accessible virtualized result list.
         </p>
         {/* product.isAvailable === false is rendered inside VirtualizedProductGrid for measured virtual rows. */}
-        <VirtualizedProductGrid products={resultCards} resultLabel={virtualizedResultLabel} />
+        <VirtualizedProductGrid products={virtualizedResultCards} resultLabel={virtualizedResultLabel} />
         {resultCards.length > PRODUCTS_PER_PAGE ? (
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3 text-sm">
             <p className="font-black text-slate-700">
