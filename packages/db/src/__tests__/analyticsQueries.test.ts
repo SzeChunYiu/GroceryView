@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import {
   buildTrendingItemsQuery,
+  insertSearchTelemetryEvents,
   mapTrendingItemRow,
   queryTrendingItemsReport
 } from '../queries/analytics.js';
@@ -68,5 +69,52 @@ describe('analytics queries', () => {
     assert.equal(report.windowEnd, '2026-05-25T00:00:00.000Z');
     assert.equal(report.items[0].eventCount, 10);
     assert.deepEqual(calls[0].params, ['2026-05-18T00:00:00.000Z', '2026-05-25T00:00:00.000Z', 50]);
+  });
+
+  it('persists accepted search telemetry events into analytics_events metadata', async () => {
+    const calls: Array<{ sql: string; params?: unknown[] }> = [];
+    const persisted = await insertSearchTelemetryEvents({
+      async query<T>(sql: string, params?: unknown[]): Promise<T[]> {
+        calls.push({ sql, params });
+        return [] as T[];
+      }
+    }, [
+      {
+        eventName: 'search_suggestion_clicked',
+        occurredAt: '2026-05-25T12:00:00.000Z',
+        query: 'mjolk',
+        anonymousId: 'anon-1',
+        payload: { resultId: 'milk-1', resultRank: 1 }
+      },
+      {
+        eventName: 'search_suggestions_dismissed',
+        occurredAt: '2026-05-25T12:01:00.000Z',
+        query: 'kaffe',
+        payload: { reason: 'escape' }
+      },
+      {
+        eventName: 'search_first_result_time',
+        occurredAt: '2026-05-25T12:02:00.000Z',
+        query: 'banan',
+        payload: { elapsedMs: 84, resultCount: 8 }
+      },
+      {
+        eventName: 'search_stream_event',
+        occurredAt: '2026-05-25T12:03:00.000Z',
+        query: 'pasta',
+        payload: { streamEvent: 'first_chunk', elapsedMs: 34 }
+      }
+    ]);
+
+    assert.equal(persisted, 4);
+    assert.match(calls[0]?.sql ?? '', /insert into analytics_events/i);
+    assert.match(calls[0]?.sql ?? '', /anonymous_id/i);
+    assert.match(calls[0]?.sql ?? '', /metadata/i);
+    assert.deepEqual(calls[0]?.params?.slice(0, 4), [
+      'search_suggestion_clicked',
+      'anon-1',
+      { resultId: 'milk-1', resultRank: 1, query: 'mjolk' },
+      '2026-05-25T12:00:00.000Z'
+    ]);
   });
 });
