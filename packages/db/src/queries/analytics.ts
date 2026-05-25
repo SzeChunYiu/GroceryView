@@ -37,6 +37,20 @@ export type TrendingItemsQueryExecutor = {
   query<T>(sql: string, params?: unknown[]): Promise<T[]>;
 };
 
+export type SearchTelemetryEventName =
+  | 'search_suggestion_clicked'
+  | 'search_suggestions_dismissed'
+  | 'search_first_result_time'
+  | 'search_stream_event';
+
+export type PersistedSearchTelemetryEvent = {
+  eventName: SearchTelemetryEventName;
+  occurredAt: string;
+  query: string;
+  anonymousId?: string;
+  payload: Record<string, unknown>;
+};
+
 function iso(value: string | Date): string {
   return value instanceof Date ? value.toISOString() : value;
 }
@@ -93,4 +107,30 @@ export async function queryTrendingItemsReport(
     windowEnd,
     windowStart
   };
+}
+
+export async function insertSearchTelemetryEvents(
+  executor: TrendingItemsQueryExecutor,
+  events: readonly PersistedSearchTelemetryEvent[]
+): Promise<number> {
+  if (events.length === 0) return 0;
+  const params: unknown[] = [];
+  const tuples = events.map((event) => {
+    params.push(event.eventName, event.anonymousId ?? null, {
+      ...event.payload,
+      query: event.query
+    }, event.occurredAt);
+    const offset = params.length - 3;
+    return `($${offset}::text, $${offset + 1}::text, $${offset + 2}::jsonb, $${offset + 3}::timestamptz)`;
+  });
+  await executor.query(
+    `insert into analytics_events (
+      event_name,
+      anonymous_id,
+      metadata,
+      occurred_at
+    ) values ${tuples.join(', ')}`,
+    params
+  );
+  return events.length;
 }
