@@ -58,6 +58,31 @@ const historyWindowDefinitions = [
 ] as const;
 const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const;
 
+type RetailerTypeBadge = 'grocery' | 'pharmacy' | 'variety' | 'cosmetics' | 'fuel-convenience' | 'household' | 'online marketplace';
+
+const retailerTypePatterns: Array<{ match: RegExp; type: RetailerTypeBadge }> = [
+  { match: /apotek|pharmacy|kronans|hjärtat|hjartat|lloyds|docmorris/i, type: 'pharmacy' },
+  { match: /normal|clas ohlson|dollarstore|rusta|öob|oob|lagerhaus/i, type: 'variety' },
+  { match: /kicks|lyko|sephora|rituals|cocopanda/i, type: 'cosmetics' },
+  { match: /circle k|okq8|preem|st1|ingo|pressbyrån|pressbyran|7-eleven|convenience/i, type: 'fuel-convenience' },
+  { match: /ikea|jula|bauhaus|hornbach/i, type: 'household' },
+  { match: /amazon|marketplace|online/i, type: 'online marketplace' }
+];
+
+function retailerTypeForChain(chain: string): RetailerTypeBadge {
+  return retailerTypePatterns.find((pattern) => pattern.match.test(chain))?.type ?? 'grocery';
+}
+
+function retailerTypeTone(type: RetailerTypeBadge) {
+  if (type === 'pharmacy') return 'bg-sky-100 text-sky-900';
+  if (type === 'variety') return 'bg-violet-100 text-violet-900';
+  if (type === 'cosmetics') return 'bg-pink-100 text-pink-900';
+  if (type === 'fuel-convenience') return 'bg-amber-100 text-amber-900';
+  if (type === 'household') return 'bg-orange-100 text-orange-900';
+  if (type === 'online marketplace') return 'bg-indigo-100 text-indigo-900';
+  return 'bg-emerald-100 text-emerald-900';
+}
+
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
@@ -91,7 +116,9 @@ function crossChainQuoteRowsFor(product: (typeof axfoodProducts)[number]) {
     ...row,
     basketMedianPrice,
     deltaVsMedian: basketMedianPrice && basketMedianPrice > 0 ? ((row.price - basketMedianPrice) / basketMedianPrice) * 100 : null,
-    isCheapest: cheapestPrice !== null && row.price === cheapestPrice
+    effectiveUnitPrice: row.price,
+    isCheapest: cheapestPrice !== null && row.price === cheapestPrice,
+    retailerType: retailerTypeForChain(row.chain)
   }));
 }
 
@@ -1361,9 +1388,9 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-800">Cross-chain quote table</p>
-              <h2 className="mt-2 text-2xl font-black text-slate-950">Current prices by chain</h2>
+              <h2 className="mt-2 text-2xl font-black text-slate-950">Current prices by retailer type</h2>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
-                Uses the real chainPriceRows / matchedChainProducts snapshot for this matched item. Delta compares each current quote with the median of the displayed chain basket; unavailable or missing prices are not fabricated.
+                Uses the real chainPriceRows / matchedChainProducts snapshot for this matched item across grocery, variety, cosmetics, pharmacy, and fuel-convenience retailers when those chains sell the SKU. Rows are sorted by effective unit price; unavailable or missing prices are not fabricated.
               </p>
             </div>
             <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-emerald-900 shadow-sm">
@@ -1375,8 +1402,9 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
               <thead className="bg-emerald-900 text-white">
                 <tr>
                   <th className="px-4 py-3 font-black">Chain</th>
+                  <th className="px-4 py-3 font-black">Retailer type</th>
                   <th className="px-4 py-3 font-black">Current price</th>
-                  <th className="px-4 py-3 font-black">Unit price</th>
+                  <th className="px-4 py-3 font-black">Effective unit price</th>
                   <th className="px-4 py-3 font-black">Vs basket median</th>
                   <th className="px-4 py-3 font-black">Confidence</th>
                 </tr>
@@ -1388,8 +1416,13 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
                       {row.chain}
                       {row.isCheapest ? <span className="ml-2 rounded-full bg-emerald-800 px-2 py-1 text-xs text-white">cheapest</span> : null}
                     </td>
+                    <td className="px-4 py-3">
+                      <span className={`rounded-full px-2 py-1 text-xs font-black uppercase tracking-[0.12em] ${retailerTypeTone(row.retailerType)}`}>
+                        {row.retailerType}
+                      </span>
+                    </td>
                     <td className="px-4 py-3 font-black text-emerald-900">{formatSek(row.price)}</td>
-                    <td className="px-4 py-3 font-semibold text-slate-700">{row.priceText} · {row.priceUnit}</td>
+                    <td className="px-4 py-3 font-semibold text-slate-700">{formatSek(row.effectiveUnitPrice)} · {row.priceUnit}</td>
                     <td className={`px-4 py-3 font-black ${row.deltaVsMedian && row.deltaVsMedian > 0 ? 'text-rose-800' : 'text-emerald-800'}`}>
                       {formatSignedPct(row.deltaVsMedian)}
                     </td>
