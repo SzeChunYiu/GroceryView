@@ -11,6 +11,7 @@ const ts = require('typescript');
 const root = new URL('../', import.meta.url);
 const rootPath = fileURLToPath(root);
 const moduleCache = new Map();
+const relativeToRoot = (absolutePath) => normalize(absolutePath.slice(rootPath.length));
 
 const read = (relative) => new Promise((resolve, reject) => {
   readFile(new URL(relative, root), 'utf8', (error, data) => (error ? reject(error) : resolve(data)));
@@ -79,8 +80,8 @@ function loadTsModule(relative, mocks = {}) {
       return new Proxy({}, { get: () => Icon });
     }
     if (specifier.startsWith('@/') || specifier.startsWith('.')) {
-      const resolved = resolveLocalModule(normalize(absolute.slice(rootPath.length + 1)), specifier);
-      return loadTsModule(normalize(resolved.slice(rootPath.length + 1)), mocks);
+      const resolved = resolveLocalModule(relativeToRoot(absolute), specifier);
+      return loadTsModule(relativeToRoot(resolved), mocks);
     }
     return require(specifier);
   };

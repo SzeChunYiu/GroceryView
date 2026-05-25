@@ -102,6 +102,7 @@ function buildNavGroups(t: AppNavTranslator): NavGroup[] {
 
 const installBannerDismissedKey = "groceryview:install-banner-dismissed";
 const themePreferenceStorageKey = 'groceryview:theme-preference';
+const defaultNavTagline = 'Verified grocery intelligence';
 
 function readPersistedLocale(): SupportedLocale {
   const localStorageLocale = normalizeLocale(window.localStorage.getItem(localeStorageKey));
@@ -281,7 +282,7 @@ export function AppNav() {
           <span className="grid h-11 w-11 place-items-center rounded-2xl bg-emerald-800 text-lg font-black text-white shadow-sm">GV</span>
           <span>
             <span className="block text-lg font-black tracking-tight text-slate-950 dark:text-slate-50">GroceryView</span>
-            <span className="block text-xs font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">{t('app-nav.tagline')}</span>
+            <span className="block text-xs font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">{t('app-nav.tagline') || defaultNavTagline}</span>
           </span>
         </Link>
         <div className="flex flex-1 flex-col gap-3 lg:items-end">
