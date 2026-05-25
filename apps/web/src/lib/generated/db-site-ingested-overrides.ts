@@ -1,6 +1,6 @@
 // AUTO-GENERATED from live retailer ingestion by scripts/ingestion/generate-live-retailer-ingested.mjs.
 // Generated at: 2026-05-25T08:05:40.816Z
-// Compare store capability row count: 4
+// Compare store capability row count: 6
 import type { IcaReklambladIngestedOffer } from '../ingested/ica-reklamblad';
 import type { LidlIngestedStoreOffer } from '../ingested/lidl';
 import type { MathemIngestedProduct } from '../ingested/mathem';
@@ -29,6 +29,22 @@ export const dbSiteCompareStoreCapabilities: DbSiteCompareStoreCapability[] = [
     "pickup": false,
     "evidenceLabel": "no live retailer rows",
     "evidenceUpdatedAt": null
+  },
+  {
+    "chainId": "ica",
+    "coupon": true,
+    "delivery": true,
+    "pickup": true,
+    "evidenceLabel": "5300 coupon/offer rows · 3477 online rows · 5289 store rows",
+    "evidenceUpdatedAt": "2026-05-25T05:40:16.365Z"
+  },
+  {
+    "chainId": "coop",
+    "coupon": true,
+    "delivery": true,
+    "pickup": true,
+    "evidenceLabel": "9500 product rows · 50 coupon/offer rows · 9500 online rows · 50 store rows",
+    "evidenceUpdatedAt": "2026-05-24T17:15:21.069Z"
   },
   {
     "chainId": "willys",
