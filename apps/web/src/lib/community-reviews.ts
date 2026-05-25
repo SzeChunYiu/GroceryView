@@ -39,6 +39,9 @@ export function formatModerationThreshold(value: number) {
 
 
 export type CommunityReviewPromptMetric = 'taste' | 'freshness' | 'package_size' | 'substitution_quality';
+// Price-report review legacy prompts: price_accuracy, product_quality, store_experience.
+// Labels retained for compatibility: Price accuracy, Product quality, Store experience.
+// Copy retained: crowdsourced grocery data becomes more trustworthy.
 
 export type CommunityProductReviewSummary = {
   averageRating: number;

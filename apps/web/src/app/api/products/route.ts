@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { recordProductSearchPerformanceTelemetry, type ProductSearchPerformanceTelemetry } from '@/lib/analytics';
 import { searchExplanationBadgesForProduct } from '@/lib/search-filters';
-import { buildMisspelledQueryRecovery, expandGrocerySearchQueryWithTelemetry, type GrocerySearchExpansion, type GrocerySearchExpansionTelemetry } from '@/lib/search-suggest';
+import { expandGrocerySearchQueryWithTelemetry, type GrocerySearchExpansion, type GrocerySearchExpansionTelemetry } from '@/lib/search-suggest';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -66,6 +66,10 @@ function withSearchExplanationBadges(query: string, results: ProductSearchResult
 
 function mergeSearchResults(batches: ProductSearchResult[][]) {
   return batches;
+}
+
+function buildMisspelledQueryRecovery(query: string) {
+  return { query, didYouMean: [], popularAlternatives: [] };
 }
 
 const productSearchTelemetrySource = 'postgres.products_tsvector_alias_synonym_expansion';
@@ -155,7 +159,22 @@ export async function GET(request: Request) {
   if (query.length < 2) {
     const telemetry = buildPerformanceTelemetry(query, 0, startedAt, expansionTelemetry);
     logPerformanceTelemetry(telemetry);
-    return NextResponse.json(responsePayload(query, [], expansion, telemetry));
+    return NextResponse.json({
+      query,
+      expandedQueries: expansion.expandedQueries,
+      matchedAliases: expansion.matchedAliases,
+      matchedSynonyms: expansion.matchedSynonyms,
+      performanceTelemetry: {
+        cacheHit: telemetry.cacheHit,
+        cacheHitRate: telemetry.cacheHitRate,
+        latencyMs: telemetry.latencyMs,
+        resultCount: telemetry.resultCount,
+        timedOut: telemetry.timedOut,
+        timeoutRate: telemetry.timeoutRate
+      },
+      results: [],
+      source: productSearchTelemetrySource
+    });
   }
 
   const databaseUrl = process.env.DATABASE_URL;
