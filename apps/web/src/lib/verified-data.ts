@@ -22,7 +22,7 @@ import {
   dbSiteMatpriskollenSource
 } from './generated/db-site-ingested-overrides';
 import { dbSiteHomepageTrendingPriceChanges } from './generated/db-site-trending-price-changes';
-import { categoryLabels, pricedProducts } from './openprices-products';
+import { categoryLabels, parseVerifiedProductQuantity, pricedProducts } from './openprices-products';
 import { classifyRecentPriceVariance } from './price-intelligence';
 import { allergenRiskBadgesForText, searchExplanationBadgesForProduct, type SearchExplanationBadge } from './search-filters';
 import { osmStores } from './osm-stores';
@@ -219,36 +219,7 @@ function median(values: number[]) {
   return sorted.length % 2 === 0 ? (sorted[middle - 1] + sorted[middle]) / 2 : sorted[middle];
 }
 
-function unitAmountFromPackage(packageText: string): { amount: number; unit: 'kg' | 'l' | 'st'; packageLabel: string } | null {
-  const normalized = packageText.replace(',', '.').toLowerCase();
-  const multiplied = normalized.match(/(\d+)\s*x\s*(\d+(?:\.\d+)?)\s*(kg|g|l|ml|cl|st)\b/);
-  if (multiplied) {
-    const count = Number(multiplied[1]);
-    const each = Number(multiplied[2]);
-    const unit = multiplied[3];
-    if (Number.isFinite(count) && Number.isFinite(each) && count > 0 && each > 0) {
-      if (unit === 'kg') return { amount: count * each, unit: 'kg', packageLabel: multiplied[0] };
-      if (unit === 'g') return { amount: (count * each) / 1000, unit: 'kg', packageLabel: multiplied[0] };
-      if (unit === 'l') return { amount: count * each, unit: 'l', packageLabel: multiplied[0] };
-      if (unit === 'cl') return { amount: (count * each) / 100, unit: 'l', packageLabel: multiplied[0] };
-      if (unit === 'ml') return { amount: (count * each) / 1000, unit: 'l', packageLabel: multiplied[0] };
-      return { amount: count * each, unit: 'st', packageLabel: multiplied[0] };
-    }
-  }
-
-  const matches = [...normalized.matchAll(/(\d+(?:\.\d+)?)\s*(kg|g|l|ml|cl|st)\b/g)];
-  const match = matches.at(-1);
-  if (!match) return null;
-  const value = Number(match[1]);
-  const unit = match[2];
-  if (!Number.isFinite(value) || value <= 0) return null;
-  if (unit === 'kg') return { amount: value, unit: 'kg', packageLabel: match[0] };
-  if (unit === 'g') return { amount: value / 1000, unit: 'kg', packageLabel: match[0] };
-  if (unit === 'l') return { amount: value, unit: 'l', packageLabel: match[0] };
-  if (unit === 'cl') return { amount: value / 100, unit: 'l', packageLabel: match[0] };
-  if (unit === 'ml') return { amount: value / 1000, unit: 'l', packageLabel: match[0] };
-  return { amount: value, unit: 'st', packageLabel: match[0] };
-}
+const unitAmountFromPackage = parseVerifiedProductQuantity;
 
 export function normalizeComparableUnitPrice(totalPrice: number, packageText: string) {
   const packageAmount = unitAmountFromPackage(packageText);
