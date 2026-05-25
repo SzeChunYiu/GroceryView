@@ -190,7 +190,20 @@ export const DEFAULT_COOP_PRODUCT_QUERIES = [
   'yoghurt',
   'banan',
   'ris',
-  'fisk'
+  'fisk',
+  'ost',
+  'bröd',
+  'frukt',
+  'grönsaker',
+  'glass',
+  'ägg',
+  'juice',
+  'flingor',
+  'köttfärs',
+  'potatis',
+  'tomat',
+  'choklad',
+  'blöjor'
 ] as const;
 
 const COOP_REQUEST_TIMEOUT_MS = 20_000;
@@ -400,14 +413,11 @@ export const DEFAULT_COOP_WEEKLY_DISCOUNT_STORE_IDS = [
   '184900',
   '123200',
   '136000',
+  '136049',
+  '136050',
   '236464',
   '133900',
   '016195',
-  '246549',
-  '246550',
-  '245030',
-  '085130',
-  '085320',
 ] as const;
 export const DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES = [
   'Färsk laxfilé Harbour',
@@ -1148,7 +1158,7 @@ export async function fetchCoopProductsForAllStores(
 export async function fetchCoopWeeklyDiscounts(
   options: FetchCoopWeeklyDiscountsOptions = {}
 ): Promise<CoopWeeklyDiscount[]> {
-  const fetchImpl = options.fetchImpl ?? fetch;
+  const fetchImpl = withCoopRequestTimeout(options.fetchImpl ?? fetch);
   const storeIds = options.storeIds ?? (options.storeId ? [options.storeId] : DEFAULT_COOP_WEEKLY_DISCOUNT_STORE_IDS);
   const maxRows = options.maxRows ?? storeIds.length * (options.productQueries?.length ?? DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES.length);
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
@@ -1616,7 +1626,7 @@ function stableCoopDrKey(value: string): string {
 export async function fetchCoopWeeklyDiscountsForAllStores(
   options: FetchCoopAllStoreWeeklyDiscountsOptions = {}
 ): Promise<CoopWeeklyDiscount[]> {
-  const fetchImpl = options.fetchImpl ?? fetch;
+  const fetchImpl = withCoopRequestTimeout(options.fetchImpl ?? fetch);
   const serviceAccess = options.subscriptionKey && options.storeApiSubscriptionKey
     ? {
         personalizationApiUrl: options.personalizationApiUrl ?? COOP_PERSONALIZATION_API_URL,

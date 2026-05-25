@@ -5558,10 +5558,22 @@ class DailyIngestionExecutor implements QueryExecutor {
     if (sql.includes('insert into stores')) return [{ id: `store-db-${++this.sequence}` }] as T[];
     if (sql.includes('jsonb_to_recordset') && sql.includes('insert into products')) {
       const products = JSON.parse(String(params[0])) as Array<{ slug: string; barcode?: string | null }>;
-      return products.map((product) => ({
-        slug: product.slug,
-        id: product.barcode ? `product-db-ean-${product.barcode}` : `product-db-${product.slug}`
-      })) as T[];
+      const existingSlugByBarcode = new Map([
+        ['7310130003547', 'ean-7310130003547'],
+        ['7310130000000', 'ean-7310130000000']
+      ]);
+      const batchSlugByBarcode = new Map<string, string>();
+      for (const product of products) {
+        if (!product.barcode) continue;
+        const current = batchSlugByBarcode.get(product.barcode);
+        if (current === undefined || product.slug < current) batchSlugByBarcode.set(product.barcode, product.slug);
+      }
+      return products.map((product) => {
+        const targetSlug = product.barcode
+          ? existingSlugByBarcode.get(product.barcode) ?? batchSlugByBarcode.get(product.barcode) ?? product.slug
+          : product.slug;
+        return { slug: product.slug, id: `product-db-${targetSlug}` };
+      }) as T[];
     }
     if (sql.includes('insert into products')) return [{ id: `product-db-${++this.sequence}` }] as T[];
     if (sql.includes('jsonb_to_recordset') && sql.includes('insert into aliases')) return [] as T[];
@@ -6331,8 +6343,8 @@ describe('daily ingestion runner', () => {
     assert.ok(aliasInsert, 'daily ingestion should batch upsert aliases');
     const aliases = JSON.parse(String(aliasInsert.params[0])) as Array<{ product_id: string }>;
     assert.deepEqual(aliases.map((alias) => alias.product_id), [
-      'product-db-ean-ean-case-001',
-      'product-db-ean-ean-case-001'
+      'product-db-willys-barcode-case-1',
+      'product-db-willys-barcode-case-1'
     ]);
   });
 

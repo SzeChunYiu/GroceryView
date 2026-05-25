@@ -3,9 +3,8 @@ import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { buildChainPriceObservations, buildMatchedBasketChainPriceObservations } from '@/lib/chain-index-data';
 import { coopSource } from '@/lib/ingested/coop';
-import { hemkopSource } from '@/lib/ingested/hemkop';
+import { hemkopSourceSummary, willysSourceSummary } from '@/lib/ingested/axfood-weekly-summary';
 import { matpriskollenSource } from '@/lib/ingested/matpriskollen';
-import { willysSource } from '@/lib/ingested/willys';
 import { routeMetadata } from '@/lib/seo';
 
 type ConfidenceLevel = 'high' | 'medium' | 'low';
@@ -33,14 +32,14 @@ const activeSources = [
   },
   {
     name: 'Willys product search',
-    retrievedAt: willysSource.retrievedAt,
-    rows: willysSource.rowCount,
+    retrievedAt: willysSourceSummary.retrievedAt,
+    rows: willysSourceSummary.rowCount,
     role: 'base unit-price universe'
   },
   {
     name: 'Hemkop product search',
-    retrievedAt: hemkopSource.retrievedAt,
-    rows: hemkopSource.rowCount,
+    retrievedAt: hemkopSourceSummary.retrievedAt,
+    rows: hemkopSourceSummary.rowCount,
     role: 'base unit-price universe'
   },
   {

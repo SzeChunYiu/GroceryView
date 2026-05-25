@@ -114,6 +114,7 @@ export * from './connectors/seven-eleven-se.js';
 export * from './connectors/st1-fuel.js';
 export * from './connectors/willys.js';
 export * from './store-enumerator.js';
+export * from './store-enumerator.js';
 export * from './unit-price.js';
 
 export type SourceType =

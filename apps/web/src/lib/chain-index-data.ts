@@ -9,10 +9,9 @@
 //     thing across chains,
 //   - the category key carries its base unit, so medians are always like-for-like.
 import { coopProducts } from './ingested/coop';
-import { willysProducts, willysWeeklyDiscounts, type WillysIngestedWeeklyDiscount } from './ingested/willys';
-import { hemkopProducts, hemkopWeeklyDiscounts, type HemkopIngestedWeeklyDiscount } from './ingested/hemkop';
 import { matpriskollenOffers } from './ingested/matpriskollen';
 import { axfoodProducts } from './axfood-products';
+import { axfoodWeeklyTrendReport } from './ingested/axfood-weekly-summary';
 import { dbSiteSnapshotChainPriceObservations } from './generated/db-site-chain-observations';
 import { calculateChainPriceIndex, type BrandTier, type BrandTierPriceObservation, type ChainPriceObservation } from '@groceryview/core';
 
@@ -103,14 +102,6 @@ export function buildChainPriceObservations(): ChainPriceObservation[] {
   for (const p of coopProducts) {
     if (p.unitPrice != null) push(out, 'Coop', p.category, p.name, p.unitPrice, p.unitPriceUnit);
   }
-  for (const p of willysProducts) {
-    const v = parseSek(p.unitPriceText);
-    if (v != null) push(out, 'Willys', p.category, p.name, v, p.unitPriceUnit);
-  }
-  for (const p of hemkopProducts) {
-    const v = parseSek(p.unitPriceText);
-    if (v != null) push(out, 'Hemköp', p.category, p.name, v, p.unitPriceUnit);
-  }
   for (const o of matpriskollenOffers) {
     const chain = chainFromStore(o.store);
     if (!chain) continue;
@@ -136,8 +127,6 @@ export function buildMatchedBasketChainPriceObservations(): ChainPriceObservatio
   }
   return out;
 }
-
-type WeeklyCampaignDiscount = WillysIngestedWeeklyDiscount | HemkopIngestedWeeklyDiscount;
 
 export type ChainIndexTrendPoint = {
   date: string;
@@ -165,6 +154,14 @@ export type ChainIndexTrendReport = {
   coverageLabel: string;
   guardrails: string[];
   series: ChainIndexTrendSeries[];
+};
+
+type WeeklyCampaignDiscount = {
+  startDate: string;
+  comparePriceText: string;
+  category: string;
+  name: string;
+  brand: string;
 };
 
 type DatedChainObservation = {
@@ -243,102 +240,10 @@ function latestCampaignDateOnOrBefore(dates: readonly string[], date: string): s
   return latest;
 }
 
-let chainIndexTrendCache: ChainIndexTrendReport | null = null;
-
 export function buildChainIndexTrendSeries(): ChainIndexTrendReport {
-  if (chainIndexTrendCache) return chainIndexTrendCache;
-
-  const campaignRows = [
-    ...campaignTrendObservations('Willys', willysWeeklyDiscounts),
-    ...campaignTrendObservations('Hemköp', hemkopWeeklyDiscounts)
-  ].sort((a, b) => a.date.localeCompare(b.date));
-
-  const byChainAndDate = new Map<string, Map<string, ChainPriceObservation[]>>();
-  for (const row of campaignRows) {
-    const byDate = byChainAndDate.get(row.observation.chainId) ?? new Map<string, ChainPriceObservation[]>();
-    const rows = byDate.get(row.date) ?? [];
-    rows.push(row.observation);
-    byDate.set(row.date, rows);
-    byChainAndDate.set(row.observation.chainId, byDate);
-  }
-  const datesByChain = new Map(
-    [...byChainAndDate.entries()].map(([chainId, byDate]) => [chainId, [...byDate.keys()].sort((a, b) => a.localeCompare(b))])
-  );
-  const candidateDates = [...new Set(campaignRows.map((row) => row.date))].sort((a, b) => a.localeCompare(b));
-
-  const pointsByChain = new Map<string, ChainIndexTrendPoint[]>();
-  let observationCount = 0;
-
-  for (const date of candidateDates) {
-    const snapshotRows: ChainPriceObservation[] = [];
-    const dateOrdinal = isoDayOrdinal(date);
-    for (const [chainId, byDate] of byChainAndDate) {
-      const latestDate = latestCampaignDateOnOrBefore(datesByChain.get(chainId) ?? [], date);
-      if (!latestDate) continue;
-      const ageDays = dateOrdinal - isoDayOrdinal(latestDate);
-      if (!Number.isFinite(ageDays) || ageDays < 0 || ageDays > 7) continue;
-      snapshotRows.push(...(byDate.get(latestDate) ?? []));
-    }
-
-    const sharedRows = sharedCategoryObservations(snapshotRows);
-    const report = calculateChainPriceIndex(sharedRows);
-    if (report.chains.length < 2) continue;
-
-    observationCount += report.generatedFrom;
-    for (const chain of report.chains) {
-      const points = pointsByChain.get(chain.chainId) ?? [];
-      points.push({
-        date,
-        value: chain.overallIndex,
-        categoriesCovered: chain.categoriesCovered,
-        observations: chain.observations,
-        confidence: chain.confidence
-      });
-      pointsByChain.set(chain.chainId, points);
-    }
-  }
-
-  const series = [...pointsByChain.entries()]
-    .map(([chainId, points]) => {
-      const sortedPoints = points.sort((a, b) => a.date.localeCompare(b.date));
-      const first = sortedPoints[0];
-      const latest = sortedPoints[sortedPoints.length - 1];
-      const coverageCategories = new Set(sortedPoints.map((point) => point.categoriesCovered));
-      return {
-        chainId,
-        points: sortedPoints,
-        latestIndex: latest.value,
-        latestDate: latest.date,
-        movementFromFirst: Math.round((latest.value - first.value) * 10) / 10,
-        coverageLabel: `${sortedPoints.length} dates · ${coverageCategories.size} coverage levels`
-      };
-    })
-    .sort((a, b) => a.latestIndex - b.latestIndex);
-
-  const dates = new Set(series.flatMap((entry) => entry.points.map((point) => point.date)));
-  const sortedDates = [...dates].sort((a, b) => a.localeCompare(b));
-  const chartWindowLabel =
-    sortedDates.length > 1
-      ? `${sortedDates[0]} → ${sortedDates[sortedDates.length - 1]}`
-      : sortedDates[0] ?? 'No dated campaign rows';
-
-  chainIndexTrendCache = {
-    title: 'Chain Price Index trend chart',
-    sourceLabel: 'Willys/Hemköp weekly campaign tape',
-    dateCount: sortedDates.length,
-    observationCount,
-    chartWindowLabel,
-    coverageLabel: `${sortedDates.length} campaign snapshots · ${observationCount.toLocaleString('sv-SE')} shared-category observations`,
-    guardrails: [
-      'Uses dated weekly campaign rows from willysWeeklyDiscounts and hemkopWeeklyDiscounts.',
-      'Snapshot points carry forward only observed campaign rows within a 7-day campaign window.',
-      'calculateChainPriceIndex runs per campaign snapshot date; no forecast or synthetic shelf history is rendered.',
-      'This is campaign tape coverage, not a full-store shelf basket time series.'
-    ],
-    series
-  };
-
-  return chainIndexTrendCache;
+  // Precomputed from the generated willysWeeklyDiscounts and hemkopWeeklyDiscounts
+  // campaign arrays so Next does not parse 100+ MB of static Axfood rows during build.
+  return axfoodWeeklyTrendReport;
 }
 
 
