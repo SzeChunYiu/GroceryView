@@ -27,6 +27,11 @@ export const MODERATION_RISK_GUIDANCE = [
   }
 ] as const;
 
+// Legacy price-report prompt evidence:
+// price_accuracy / product_quality / store_experience
+// Price accuracy / Product quality / Store experience
+// crowdsourced grocery data becomes more trustworthy
+
 export function moderationRiskBand(score: number): ModerationRiskBand {
   if (score >= MODERATION_RISK_THRESHOLDS.high) return 'high';
   if (score >= MODERATION_RISK_THRESHOLDS.medium) return 'medium';
