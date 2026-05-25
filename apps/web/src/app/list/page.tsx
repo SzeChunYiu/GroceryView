@@ -5,6 +5,7 @@ import { ListSharePreview } from '@/components/list-share-preview';
 import { publicListSharePath } from '@/lib/list-permissions';
 import { storeLayoutDepartments, type StoreLayoutChain } from '@/lib/trip-planner';
 import { metadataForShoppingListShare } from '@/lib/seo';
+import { summarizeWeeklyBudgetProgress } from '@/lib/meal-budgets';
 
 const demoItems = [
   { id: 'bananas', name: 'Bananas', quantity: '1 bunch', ownerRole: 'guardian' as const },
@@ -19,6 +20,7 @@ type ListPageSearchParams = {
 };
 
 const storeChains = Object.keys(storeLayoutDepartments) as StoreLayoutChain[];
+const demoBudgetProgress = summarizeWeeklyBudgetProgress({ plannedTotal: 386, weeklyBudget: 450 });
 
 function normalizeChain(chain: string | string[] | undefined): StoreLayoutChain {
   const requested = Array.isArray(chain) ? chain[0] : chain;
@@ -50,6 +52,11 @@ export default async function ShoppingListPage({ searchParams }: { searchParams?
           </Link>
         </section>
       ) : null}
+      <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
+        <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">Household budget</p>
+        <h2 className="mt-1 text-xl font-bold text-slate-950">Demo list: {demoBudgetProgress.percentUsed.toFixed(0)}% of weekly budget used</h2>
+        <p className="mt-2 text-sm font-semibold text-amber-950">{demoBudgetProgress.warning} New item warnings appear before adding rows that would exceed the limit.</p>
+      </section>
       <section className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
         <p className="text-xs font-semibold uppercase tracking-wide text-emerald-800">Smart store order</p>
         <h2 className="mt-1 text-xl font-bold text-slate-950">Reorder this list by chain layout</h2>

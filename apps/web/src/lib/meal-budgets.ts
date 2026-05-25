@@ -164,3 +164,9 @@ export function suggestBudgetAlternativesFromMealPlans(mealPlans: MealBudgetPlan
     .filter((alternative): alternative is BudgetAlternative => Boolean(alternative))
     .sort((left, right) => right.estimatedSavings - left.estimatedSavings);
 }
+
+export function budgetWarningForNewItem(currentTotal: number, itemPrice: number, weeklyBudget: number): string | null {
+  const projectedTotal = currentTotal + Math.max(0, Number.isFinite(itemPrice) ? itemPrice : 0);
+  if (weeklyBudget <= 0 || projectedTotal <= weeklyBudget) return null;
+  return `Adding this item would put the basket ${(projectedTotal - weeklyBudget).toLocaleString('sv-SE', { maximumFractionDigits: 2 })} kr over budget.`;
+}

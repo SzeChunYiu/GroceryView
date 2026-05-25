@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useMemo, useState, useTransition } from 'react';
 import { compareBasketStrategies, summarizeStoreBasketCoverage } from '@groceryview/core';
 import { buildSmartBasketSubstituteSuggestions } from '@/lib/recurring-basket';
-import { suggestCheaperBasketAlternatives, summarizeWeeklyBudgetProgress } from '@/lib/meal-budgets';
+import { budgetWarningForNewItem, suggestCheaperBasketAlternatives, summarizeWeeklyBudgetProgress } from '@/lib/meal-budgets';
 
 export type BasketCalculatorPriceRow = {
   chainId: string;
@@ -171,6 +171,7 @@ export function BasketCalculator({ products, sourceLabel, weeklyBudgetSek }: Rea
         <div className="mt-5 space-y-3">
           {products.map((product) => {
             const checked = selectedProductIds.has(product.id);
+            const budgetWarning = checked ? null : budgetWarningForNewItem(comparison.cheapestByProduct.total, cheapestProductPrice(product), weeklyBudget);
             return (
               <label
                 className={`flex cursor-pointer gap-3 rounded-2xl border p-3 transition ${checked ? 'border-emerald-700 bg-emerald-50' : 'border-slate-200 bg-white hover:border-emerald-400'}`}
@@ -207,6 +208,7 @@ export function BasketCalculator({ products, sourceLabel, weeklyBudgetSek }: Rea
                     ))}
                   </span>
                 </span>
+                {budgetWarning ? <span className="rounded-xl bg-rose-50 px-3 py-2 text-xs font-black text-rose-900">{budgetWarning}</span> : null}
               </label>
             );
           })}
