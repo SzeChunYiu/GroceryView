@@ -1,7 +1,14 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { useMemo, useState } from 'react';
-import { trackAffiliateOutboundClick, trackDealShare } from '@/lib/analytics';
+import {
+  affiliateDisclosureLabel,
+  buildAffiliateOutboundUrl,
+  trackAffiliateOutboundClick,
+  type AffiliateLinkMetadata,
+  trackDealShare
+} from '@/lib/analytics';
 import { buildDealContext, type DealHistoryPoint } from '@/lib/deal-context';
 import { dealShareUrl } from '@/lib/seo';
 
@@ -13,14 +20,69 @@ type DealCardProps = {
   priceHistory?: DealHistoryPoint[];
   currency?: string;
   locale?: string;
-  dealId?: string;
-  sharePath?: string;
   retailerName?: string;
-  retailerUrl?: string;
+  productId?: string;
+  dealId?: string;
+  outboundDealUrl?: string;
+  outboundStoreUrl?: string;
+  affiliateCampaignId?: string;
+  sharePath?: string;
 };
 
 function formatPrice(value: number, locale: string, currency: string) {
   return new Intl.NumberFormat(locale, { currency, style: 'currency' }).format(value);
+}
+
+function outboundMetadata({
+  campaignId,
+  dealId,
+  destinationUrl,
+  placement,
+  productId,
+  retailerName,
+  sponsored,
+  surface
+}: AffiliateLinkMetadata) {
+  return {
+    campaignId,
+    dealId,
+    destinationUrl,
+    placement,
+    productId,
+    retailerName,
+    sponsored,
+    surface
+  } satisfies AffiliateLinkMetadata;
+}
+
+function OutboundAffiliateLink({
+  children,
+  metadata
+}: Readonly<{
+  children: ReactNode;
+  metadata: AffiliateLinkMetadata;
+}>) {
+  const disclosureKind = metadata.sponsored === false ? 'outbound' : 'affiliate';
+  return (
+    <div className="min-w-44 flex-1">
+      <a
+        className="inline-flex w-full items-center justify-center rounded-full bg-market-mint px-4 py-2 text-sm font-black text-market-ink transition hover:bg-emerald-300"
+        data-affiliate-campaign={metadata.campaignId ?? metadata.surface}
+        data-affiliate-disclosure={disclosureKind}
+        data-affiliate-placement={metadata.placement}
+        data-affiliate-retailer={metadata.retailerName}
+        href={buildAffiliateOutboundUrl(metadata)}
+        onClick={() => trackAffiliateOutboundClick(metadata)}
+        rel="sponsored noopener noreferrer"
+        target="_blank"
+      >
+        {children}
+      </a>
+      <span className="mt-2 block rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold leading-5 text-amber-950" data-affiliate-disclosure={disclosureKind}>
+        {affiliateDisclosureLabel(metadata)}
+      </span>
+    </div>
+  );
 }
 
 export function DealCard({
@@ -31,31 +93,40 @@ export function DealCard({
   priceHistory,
   currency = 'SEK',
   locale = 'sv-SE',
+  retailerName = 'the retailer',
+  productId,
   dealId,
-  sharePath,
-  retailerName = 'retailer',
-  retailerUrl
+  outboundDealUrl,
+  outboundStoreUrl,
+  affiliateCampaignId,
+  sharePath
 }: DealCardProps) {
   const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle');
   const context = buildDealContext({ currentPrice, discountStartedAt, priceHistory, currency, locale });
+  const dealLinkMetadata = outboundDealUrl ? outboundMetadata({
+    campaignId: affiliateCampaignId,
+    dealId,
+    destinationUrl: outboundDealUrl,
+    placement: 'deal_card',
+    productId,
+    retailerName,
+    sponsored: true,
+    surface: 'deal-card-primary'
+  }) : null;
+  const storeLinkMetadata = outboundStoreUrl ? outboundMetadata({
+    campaignId: affiliateCampaignId,
+    dealId,
+    destinationUrl: outboundStoreUrl,
+    placement: 'store_link',
+    productId,
+    retailerName,
+    sponsored: false,
+    surface: 'deal-card-store'
+  }) : null;
   const shareUrl = useMemo(() => dealShareUrl({ dealId, path: sharePath, title }), [dealId, sharePath, title]);
   const encodedShareUrl = encodeURIComponent(shareUrl);
   const encodedShareText = encodeURIComponent(`${title} is ${formatPrice(currentPrice, locale, currency)} on GroceryView`);
   const analyticsDealId = dealId ?? sharePath ?? title;
-  const affiliateCampaign = 'groceryview-deal-card';
-  const affiliateUrl = useMemo(() => {
-    if (!retailerUrl) return null;
-    try {
-      const url = new URL(retailerUrl);
-      url.searchParams.set('utm_source', 'groceryview');
-      url.searchParams.set('utm_medium', 'affiliate');
-      url.searchParams.set('utm_campaign', affiliateCampaign);
-      url.searchParams.set('gv_deal_id', analyticsDealId);
-      return url.toString();
-    } catch {
-      return retailerUrl;
-    }
-  }, [analyticsDealId, retailerUrl]);
 
   async function copyShareLink() {
     trackDealShare({ dealId: analyticsDealId, shareUrl, channel: 'copy_link' });
@@ -71,11 +142,6 @@ export function DealCard({
 
   function trackNativeShare() {
     trackDealShare({ dealId: analyticsDealId, shareUrl, channel: 'web_share' });
-  }
-
-  function trackRetailerClick() {
-    if (!affiliateUrl) return;
-    trackAffiliateOutboundClick({ campaign: affiliateCampaign, dealId: analyticsDealId, href: affiliateUrl, retailerName });
   }
 
   return (
@@ -108,6 +174,13 @@ export function DealCard({
         ) : null}
       </div>
 
+      {dealLinkMetadata || storeLinkMetadata ? (
+        <div className="mt-4 flex flex-wrap gap-3" aria-label="Outbound store and deal links with affiliate disclosure">
+          {dealLinkMetadata ? <OutboundAffiliateLink metadata={dealLinkMetadata}>Open deal at {retailerName}</OutboundAffiliateLink> : null}
+          {storeLinkMetadata ? <OutboundAffiliateLink metadata={storeLinkMetadata}>Visit {retailerName} store</OutboundAffiliateLink> : null}
+        </div>
+      ) : null}
+
       <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-market-ink/10 pt-4" aria-label="Share this deal">
         <button
           type="button"
@@ -123,23 +196,7 @@ export function DealCard({
         >
           Share deal
         </a>
-        {affiliateUrl ? (
-          <a
-            className="rounded-full border border-amber-300 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-950 transition hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-market-mint"
-            href={affiliateUrl}
-            onClick={trackRetailerClick}
-            rel="nofollow sponsored noopener noreferrer"
-            target="_blank"
-          >
-            View at {retailerName} <span className="sr-only">(sponsored affiliate link)</span>
-          </a>
-        ) : null}
       </div>
-      {affiliateUrl ? (
-        <p className="mt-3 text-xs font-semibold leading-5 text-market-ink/70">
-          Affiliate disclosure: GroceryView may earn a commission from this retailer link. Click analytics are sent only after analytics consent.
-        </p>
-      ) : null}
     </article>
   );
 }
