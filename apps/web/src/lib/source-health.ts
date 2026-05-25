@@ -59,3 +59,42 @@ export function getDuplicateConflictAlerts(
     })
     .filter((alert): alert is SourceDuplicateConflictAlert => alert !== null);
 }
+
+export type PartnerOnboardingIntake = {
+  intakeEmail: string;
+  expectedResponseWindow: string;
+  requiredContactFields: string[];
+  coverageAreaFields: string[];
+  samplePriceFileRequirements: string[];
+  acceptedFileTypes: string[];
+  routingSteps: string[];
+};
+
+export const partnerOnboardingIntake: PartnerOnboardingIntake = {
+  intakeEmail: "partners@groceryview.se",
+  expectedResponseWindow: "2 business days",
+  requiredContactFields: [
+    "Retailer or store group name",
+    "Primary feed contact name, role, email, and phone",
+    "Technical contact for catalog, promotion, and inventory exports",
+    "Preferred launch window and any embargo constraints",
+  ],
+  coverageAreaFields: [
+    "Countries, regions, cities, or delivery zones covered by the feed",
+    "Store formats included, such as supermarket, convenience, dark store, or online delivery",
+    "Store identifiers that can be shared with shoppers and store identifiers that must stay internal",
+    "Refresh cadence for prices, promotions, and availability",
+  ],
+  samplePriceFileRequirements: [
+    "At least 50 representative rows with current price, currency, package size, and product identifiers",
+    "Promotion examples with valid-from and valid-through dates when available",
+    "A field dictionary for product IDs, store IDs, VAT, unit prices, and stock status",
+    "A note describing whether the sample is synthetic, redacted, or production data",
+  ],
+  acceptedFileTypes: ["CSV", "XLSX", "JSON", "Parquet", "OpenAPI link"],
+  routingSteps: [
+    "Source health review confirms contact ownership and coverage boundaries.",
+    "Data operations checks sample files for required price, unit, and freshness fields.",
+    "A partner-specific import plan is created before any shopper-facing claim goes live.",
+  ],
+};
