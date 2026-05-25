@@ -19,7 +19,29 @@ function formatSek(value: number) {
   return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);
 }
 
-export default function WatchlistPage() {
+type RecipeBasketSearchParams = {
+  recipeBasket?: string | string[];
+};
+
+function firstSearchValue(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] ?? '' : value ?? '';
+}
+
+function parseRecipeWatchlist(value: string) {
+  try {
+    const parsed = JSON.parse(value) as { source?: string; items?: Array<{ productId?: string; name?: string; price?: number | null }> };
+    if (parsed.source !== 'recipe-importer' || !Array.isArray(parsed.items)) return null;
+    return parsed.items.filter((item) => typeof item.name === 'string').slice(0, 20);
+  } catch {
+    return null;
+  }
+}
+
+export default async function WatchlistPage({
+  searchParams
+}: Readonly<{ searchParams?: Promise<RecipeBasketSearchParams> }>) {
+  const resolvedSearchParams = await Promise.resolve(searchParams ?? {});
+  const recipeWatchlistItems = parseRecipeWatchlist(firstSearchValue(resolvedSearchParams.recipeBasket));
   const { watchlistAlerts, plannedNotifications, watchedProducts, eligiblePriceRows, coverageConfidence } = watchlistAlertBoard;
   const bestTimeAlertSetups = watchlistAlertBoard.inputs.products.slice(0, 3).map((product, index) => {
     const currentPrice = product.bestPrice ?? product.prices?.[0]?.price ?? 0;
@@ -58,6 +80,19 @@ export default function WatchlistPage() {
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
         This page calls buildWatchlistAlerts with verified chain price rows, then runs planNotifications so set-target push and email rows respect user preferences and quiet-hour rules. Historical wait-window alerts also surface patterns derived from observed source rows before a current threshold is crossed; no forecast is shown without dated observation evidence.
       </p>
+      {recipeWatchlistItems ? (
+        <Card className="mt-6 border-lime-200 bg-lime-50">
+          <h2 className="text-2xl font-black text-lime-950">Recipe basket watchlist draft</h2>
+          <p className="mt-2 text-sm font-semibold text-lime-900">These mapped recipe products are ready to track; only rows with importer product IDs can become price alerts.</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {recipeWatchlistItems.map((item) => (
+              <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-lime-950" key={`${item.productId ?? item.name}`}>
+                {item.name}{typeof item.price === 'number' ? ` · ${formatSek(item.price)}` : ''}
+              </span>
+            ))}
+          </div>
+        </Card>
+      ) : null}
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr_1fr]">
         <Card>
