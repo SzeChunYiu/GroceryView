@@ -2871,7 +2871,7 @@ ${seo}`;
     assert.match(singularProductRoute, /generateProductMetadata/);
     assert.match(singularProductRoute, /params\.then\(\(\{ id \}\) => \(\{ slug: id \}\)\)/);
 
-    assert.match(canonicalProductRoute, /<img/);
+    assert.match(canonicalProductRoute, /<Image/);
     assert.match(canonicalProductRoute, /src=\{product\.image/);
     assert.match(canonicalProductRoute, /alt=\{product\.name\}/);
     assert.match(canonicalProductRoute, /Primary price evidence/);

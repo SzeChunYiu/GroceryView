@@ -129,6 +129,8 @@ async function writeCityGross(rows) {
   const storeIds = unique(rows.map((row) => row.storeId));
   await writeGeneratedFile('citygross.ts', [
     '// AUTO-GENERATED from City Gross public store catalog and Loop54 product API.',
+    `// sourceUrl: ${sourceUrls[0] ?? 'https://www.citygross.se/api/v1/Loop54/products?Q={query}&skip={skip}&take={take}&siteId={siteId}'}`,
+    `// retrievedAt: ${retrievedAt}`,
     `// Store source URL: https://www.citygross.se/api/v1/PageData/stores`,
     `// Product source URL pattern: https://www.citygross.se/api/v1/Loop54/products?Q={query}&skip={skip}&take={take}&siteId={siteId}`,
     `// Product source URLs: ${sourceUrls.join('; ')}`,
@@ -350,6 +352,8 @@ async function writeLidl(rows) {
   const storeIds = unique(rows.map((row) => row.storeId));
   await writeGeneratedFile('lidl.ts', [
     '// AUTO-GENERATED from Lidl public store pages and public offer pages.',
+    `// sourceUrl: ${sourceUrls[0] ?? 'https://www.lidl.se/s/sv-SE/butiker/'}`,
+    `// retrievedAt: ${retrievedAt}`,
     `// Store source URL: https://www.lidl.se/s/sv-SE/butiker/`,
     `// Offer source URLs: ${sourceUrls.join('; ')}`,
     `// Retrieved: ${retrievedAt}`,

@@ -121,8 +121,8 @@ export const CITY_GROSS_GROCERY_SUPER_CATEGORIES = [
 export const DEFAULT_CITY_GROSS_PRODUCT_QUERIES = [
   ''
 ] as const;
-export const DEFAULT_CITY_GROSS_LIVE_PRODUCT_MAX_STORES = 60;
-export const DEFAULT_CITY_GROSS_LIVE_PRODUCT_MAX_ROWS_PER_STORE = 1000;
+export const DEFAULT_CITY_GROSS_LIVE_PRODUCT_MAX_STORES = 70;
+export const DEFAULT_CITY_GROSS_LIVE_PRODUCT_MAX_ROWS_PER_STORE = 1200;
 
 export type FetchCityGrossStoresOptions = {
   fetchImpl?: typeof fetch;

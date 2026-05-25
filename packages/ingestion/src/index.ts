@@ -102,6 +102,7 @@ export * from './connectors/ica.js';
 export * from './connectors/ica-bulk.js';
 export * from './connectors/ica-reklamblad.js';
 export * from './connectors/lidl.js';
+export * from './connectors/seven-eleven-no.js';
 export * from './connectors/mathem.js';
 export * from './connectors/matpriskollen.js';
 export * from './connectors/matspar.js';
@@ -112,6 +113,7 @@ export * from './connectors/okq8-fuel.js';
 export * from './connectors/seven-eleven-se.js';
 export * from './connectors/st1-fuel.js';
 export * from './connectors/willys.js';
+export * from './store-enumerator.js';
 export * from './store-enumerator.js';
 export * from './unit-price.js';
 

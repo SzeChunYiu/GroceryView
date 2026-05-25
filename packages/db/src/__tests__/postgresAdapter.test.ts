@@ -1220,6 +1220,57 @@ describe('createPostgresCatalogReader', () => {
     assert.deepEqual(executor.calls[0]!.params, ['kaffe', ['Pantry', 'Coffee'], 25, 0]);
   });
 
+  it('keeps catalog rows with null and empty barcodes distinct when search input is blank', async () => {
+    const executor = new RecordingQueryExecutor();
+    executor.productRows = [
+      {
+        id: 'null-barcode-1',
+        slug: 'loose-apple-red',
+        canonical_name: 'Loose Apple Red',
+        brand: null,
+        brand_owner: null,
+        private_label_owner: null,
+        barcode: null,
+        category_path: ['Produce'],
+        package_size: '1.000',
+        package_unit: 'kg',
+        comparable_unit: 'kg',
+        nutrition: null,
+        image_url: null,
+        created_at: '2026-05-21T03:17:00.000Z',
+        updated_at: '2026-05-21T03:17:00.000Z'
+      },
+      {
+        id: 'empty-barcode-2',
+        slug: 'loose-apple-green',
+        canonical_name: 'Loose Apple Green',
+        brand: null,
+        brand_owner: null,
+        private_label_owner: null,
+        barcode: '',
+        category_path: ['Produce'],
+        package_size: '1.000',
+        package_unit: 'kg',
+        comparable_unit: 'kg',
+        nutrition: null,
+        image_url: null,
+        created_at: '2026-05-21T03:17:00.000Z',
+        updated_at: '2026-05-21T03:17:00.000Z'
+      }
+    ];
+    const reader = createPostgresCatalogReader(executor);
+
+    const rows = await reader.listProducts({ search: '   ', limit: 10 });
+
+    assert.deepEqual(rows.map((row) => [row.productId, row.slug, row.barcode]), [
+      ['null-barcode-1', 'loose-apple-red', null],
+      ['empty-barcode-2', 'loose-apple-green', '']
+    ]);
+    assert.match(executor.calls[0]!.sql, /nullif\(trim\(\$1::text\), ''\) as term/);
+    assert.deepEqual(executor.calls[0]!.params, ['   ', null, 10, 0]);
+  });
+
+
   it('supports page-based offsets for product listings', async () => {
     const executor = new RecordingQueryExecutor();
     const reader = createPostgresCatalogReader(executor);
