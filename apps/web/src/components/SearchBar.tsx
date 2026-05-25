@@ -3,7 +3,13 @@
 import Link from 'next/link';
 import { Search } from 'lucide-react';
 import { useEffect, useId, useMemo, useState } from 'react';
-import { readRecentProductSearches, rememberRecentProductSearch, trackSearchToSavingsFunnelStep, type RecentProductSearch } from '@/lib/analytics';
+import { trackSearchToSavingsFunnelStep } from '@/lib/analytics';
+import {
+  clearRecentSearchHistory,
+  readRecentSearchHistory,
+  rememberRecentSearchHistory,
+  type RecentSearchHistoryEntry
+} from '@/lib/personalization';
 
 type ProductSearchResult = {
   id: string;
@@ -57,7 +63,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<ProductSearchResult[]>([]);
   const [facetChips, setFacetChips] = useState<HeaderSearchFacetChip[]>([]);
-  const [recentSearches, setRecentSearches] = useState<RecentProductSearch[]>([]);
+  const [recentSearches, setRecentSearches] = useState<RecentSearchHistoryEntry[]>([]);
   const [isFocused, setIsFocused] = useState(false);
   const [status, setStatus] = useState<SearchStatus>('idle');
   const trimmedQuery = useMemo(() => query.trim(), [query]);
@@ -66,7 +72,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
   const shouldShowDropdown = (status !== 'idle' && trimmedQuery.length >= MIN_QUERY_LENGTH) || shouldShowRecentSearches;
 
   useEffect(() => {
-    setRecentSearches(readRecentProductSearches());
+    setRecentSearches(readRecentSearchHistory());
   }, []);
 
   useEffect(() => {
@@ -106,7 +112,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
         const nextResults = payload.results ?? [];
         setResults(nextResults);
         setStatus(nextResults.length > 0 ? 'ready' : 'empty');
-        if (nextResults.length > 0) setRecentSearches(rememberRecentProductSearch(trimmedQuery, nextResults.length));
+        if (nextResults.length > 0) setRecentSearches(rememberRecentSearchHistory(trimmedQuery, nextResults.length));
         trackSearchToSavingsFunnelStep('landing_search');
       } catch (error) {
         if (controller.signal.aborted) return;
@@ -139,7 +145,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
           onBlur={() => window.setTimeout(() => setIsFocused(false), 120)}
           onChange={(event) => setQuery(event.target.value)}
           onFocus={() => {
-            setRecentSearches(readRecentProductSearches());
+            setRecentSearches(readRecentSearchHistory());
             setIsFocused(true);
           }}
           placeholder="Search product or brand"
@@ -157,7 +163,17 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
         >
           {shouldShowRecentSearches ? (
             <div className="px-4 py-3" data-recent-product-searches>
-              <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">Recent searches</p>
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">Recent searches</p>
+                <button
+                  className="text-xs font-black text-slate-500 underline decoration-slate-300 underline-offset-4 hover:text-rose-700"
+                  onClick={() => setRecentSearches(clearRecentSearchHistory())}
+                  onMouseDown={(event) => event.preventDefault()}
+                  type="button"
+                >
+                  Clear all
+                </button>
+              </div>
               <div className="mt-2 grid gap-2">
                 {recentSearches.map((search) => (
                   <Link
@@ -236,5 +252,45 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
         </div>
       ) : null}
     </div>
+  );
+}
+
+export function RecentSearchReplayPills() {
+  const [recentSearches, setRecentSearches] = useState<RecentSearchHistoryEntry[]>([]);
+
+  useEffect(() => {
+    setRecentSearches(readRecentSearchHistory());
+  }, []);
+
+  if (recentSearches.length === 0) return null;
+
+  return (
+    <section className="mx-auto mb-4 w-full max-w-5xl rounded-3xl border border-emerald-100 bg-white p-4 shadow-sm" data-search-history-replay>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">Recent searches</p>
+          <p className="mt-1 text-sm font-semibold text-slate-600">Replay successful grocery searches saved on this device.</p>
+        </div>
+        <button
+          className="rounded-full border border-slate-200 px-3 py-1.5 text-xs font-black text-slate-700 hover:border-rose-200 hover:text-rose-700"
+          onClick={() => setRecentSearches(clearRecentSearchHistory())}
+          type="button"
+        >
+          Clear all
+        </button>
+      </div>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {recentSearches.map((search) => (
+          <Link
+            className="rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-black text-emerald-950 hover:bg-emerald-100"
+            href={search.href}
+            key={`${search.query}-${search.searchedAt}`}
+          >
+            {search.query}
+            <span className="ml-2 text-xs font-semibold text-emerald-800">{search.resultCount}</span>
+          </Link>
+        ))}
+      </div>
+    </section>
   );
 }

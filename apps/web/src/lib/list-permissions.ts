@@ -1,4 +1,4 @@
-export type ListShareRole = 'view' | 'edit';
+export type ListShareRole = 'view' | 'comment' | 'edit';
 
 export type ListSharePermission = {
   id: string;
@@ -16,10 +16,15 @@ export const listShareRoles: Record<ListShareRole, { label: string; description:
     description: 'Can open the shared list and compare prices without changing household planning data.',
     capabilities: ['Read list items', 'Compare store totals', 'Export a shopping copy'],
   },
+  comment: {
+    label: 'Can comment',
+    description: 'Can leave timestamped notes on individual list items without changing quantities or checkout state.',
+    capabilities: ['Read list items', 'Add item comments', 'Review comment history'],
+  },
   edit: {
     label: 'Can edit',
-    description: 'Can add, remove, and check off list items for active household collaboration.',
-    capabilities: ['Read list items', 'Update quantities', 'Check off purchased items'],
+    description: 'Can add, remove, check off list items, and leave timestamped comments for active household collaboration.',
+    capabilities: ['Read list items', 'Update quantities', 'Check off purchased items', 'Add item comments'],
   },
 };
 
@@ -42,10 +47,19 @@ export const accountListSharePermissions: ListSharePermission[] = [
     role: 'view',
     grantedAt: '2026-05-22T16:45:00.000Z',
   },
+  {
+    id: 'share-neighbor-comment',
+    listId: 'weekly-staples',
+    listName: 'Weekly staples',
+    collaboratorName: 'Sam Neighbor',
+    collaboratorEmail: 'sam@example.com',
+    role: 'comment',
+    grantedAt: '2026-05-23T09:20:00.000Z',
+  },
 ];
 
 export function resolveListShareRole(role: string | null | undefined): ListShareRole {
-  return role === 'edit' ? 'edit' : 'view';
+  return role === 'edit' || role === 'comment' ? role : 'view';
 }
 
 export function createListSharePermission(input: {
