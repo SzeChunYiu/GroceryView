@@ -57,7 +57,7 @@ type OverpassResponse = {
 
 export const OVERPASS_INTERPRETER_URL = 'https://overpass-api.de/api/interpreter';
 
-export const SWEDISH_GROCERY_SHOP_VALUES = ['supermarket', 'convenience', 'grocery', 'greengrocer'] as const;
+export const SWEDISH_GROCERY_SHOP_VALUES = ['supermarket', 'convenience', 'grocery', 'deli', 'greengrocer', 'butcher', 'bakery'] as const;
 
 const SWEDISH_GROCERY_SHOP_REGEX = `^(${SWEDISH_GROCERY_SHOP_VALUES.join('|')})$`;
 
