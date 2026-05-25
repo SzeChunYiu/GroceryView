@@ -1,6 +1,6 @@
 import { buildFacetedProductSearch, type RealCatalogSearchPriceRow } from '@groceryview/api';
 import { COMMODITIES, STAPLE_BASKET, SUPPORTED_PRICE_DOMAINS, type Commodity, type ComparableUnit } from '@groceryview/catalog';
-import { buildPriceChartSeries, buildWatchlistAlerts, calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, suggestFriendSharedDeals, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type MultiWeekStockUpHistoryPoint, type PriceChartObservation, type ProductMatchInput, type WatchlistItem, type WatchlistPriceType, type WatchlistProductSnapshot } from '@groceryview/core';
+import { buildPriceChartSeries, buildWatchlistAlerts, calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planFuelCrowdPriceSubmission, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, suggestFriendSharedDeals, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type MultiWeekStockUpHistoryPoint, type PriceChartObservation, type ProductMatchInput, type WatchlistItem, type WatchlistPriceType, type WatchlistProductSnapshot } from '@groceryview/core';
 import { planReceiptAliasGrowth } from '@groceryview/scanning';
 import { calculateCarbonScore, type ProductCarbonScore } from '../../../../packages/core/src/lib/carbonScore';
 import { axfoodProducts } from './axfood-products';
@@ -1228,6 +1228,27 @@ export const fuelStationSourceCoverage = {
     'The connector reads OSM station location and grade availability tags only.',
     'Fuel pages must not render pump prices until connector or trusted crowd rows write domain=fuel observations.',
     'Fuel grade matching stays separate from grocery EAN and commodity matching.'
+  ]
+};
+
+export const fuelCrowdSubmissionPolicy = {
+  title: 'Trusted crowd fuel submission gate',
+  driver: planFuelCrowdPriceSubmission.name,
+  sourceKind: 'crowd_station_report',
+  trustTable: 'community_reporter_trust',
+  sourceTable: 'fuel_price_sources',
+  observationLinkTable: 'fuel_price_source_observations',
+  maxFreshnessHours: 6,
+  maxOutlierPercent: 20,
+  requiredFields: ['station_id', 'fuel_grade_id', 'price_per_litre', 'observed_at', 'submitted_at', 'reporter_id', 'evidence_type'],
+  acceptedEvidenceTypes: ['pump_photo', 'receipt', 'station_sign'],
+  abuseControls: planCommunityReportAbuseControls({ reporters: [] }),
+  publicDisplayGates: [
+    'Crowd rows must be fresh within 6 hours of submission.',
+    'Reporter must pass community_reporter_trust burst, pending, and rejection controls.',
+    'Pump photo, receipt, or station-sign evidence is required before review.',
+    'Rows more than 20% away from same-grade operator references require manual review.',
+    'No crowd fuel row is public until verification links it to a domain=fuel observation.'
   ]
 };
 
