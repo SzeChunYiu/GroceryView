@@ -10,11 +10,14 @@ import { buildCategorySeasonalDiscoveryModules } from '@/lib/price-intelligence'
 import { categoryDealLeaderCandidates, categorySummaries, dataFreshnessBadges, formatPct, formatSek, seasonalProduceCalendar } from '@/lib/verified-data';
 import { metadataForCategory } from '@/lib/seo';
 
-export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
+type CategorySearchParams = Readonly<{ q?: string; sort?: string; page?: string }>;
+
+export async function generateMetadata({ params, searchParams }: Readonly<{ params: Promise<{ slug: string }>; searchParams?: Promise<CategorySearchParams> }>) {
   const { slug } = await params;
+  const resolvedSearchParams = await searchParams;
   const label = categoryLabels[slug];
   if (!label) notFound();
-  return metadataForCategory({ slug, label });
+  return metadataForCategory({ slug, label }, resolvedSearchParams);
 }
 
 export function generateStaticParams() { return categorySummaries.map((category) => ({ slug: category.slug })); }
@@ -25,8 +28,6 @@ function categoryDealLeadersFor(slug: string) {
     minimumSourceConfidence: 0.6
   });
 }
-
-type CategorySearchParams = Readonly<{ q?: string; sort?: string; page?: string }>;
 
 function searchValue(value: string | undefined) { return value?.trim() ?? ''; }
 function pageValue(value: string | undefined) { const parsed = Number(value); return Number.isInteger(parsed) && parsed > 0 ? parsed : 1; }
