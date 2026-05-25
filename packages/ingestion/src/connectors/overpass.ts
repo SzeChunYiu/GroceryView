@@ -1,8 +1,11 @@
 type OsmType = 'node' | 'way' | 'relation';
 
+export type OverpassCountryCode = 'SE' | 'NO' | 'IS';
+
 export type OverpassGroceryStore = {
   osmType: OsmType;
   osmId: number;
+  country: OverpassCountryCode;
   name: string;
   brand: string;
   shop: string;
@@ -61,6 +64,12 @@ export const SWEDISH_GROCERY_SHOP_VALUES = ['supermarket', 'convenience', 'groce
 
 const SWEDISH_GROCERY_SHOP_REGEX = `^(${SWEDISH_GROCERY_SHOP_VALUES.join('|')})$`;
 
+export const OVERPASS_COUNTRY_AREA_NAMES: Record<OverpassCountryCode, string> = {
+  SE: 'Sverige',
+  NO: 'Norge',
+  IS: 'Ísland'
+};
+
 export const STOCKHOLM_GROCERY_OVERPASS_QUERY = `[out:json][timeout:25];
 area["ISO3166-2"="SE-AB"][admin_level=4]->.searchArea;
 (
@@ -70,14 +79,18 @@ area["ISO3166-2"="SE-AB"][admin_level=4]->.searchArea;
 );
 out center tags 120;`;
 
-export const SWEDEN_GROCERY_OVERPASS_QUERY = `[out:json][timeout:180];
-area["ISO3166-1"="SE"][admin_level=2]->.searchArea;
+export function buildCountryGroceryOverpassQuery(country: OverpassCountryCode): string {
+  return `[out:json][timeout:180];
+area["ISO3166-1"="${country}"]["name"="${OVERPASS_COUNTRY_AREA_NAMES[country]}"][admin_level=2]->.searchArea;
 (
   node["shop"~"${SWEDISH_GROCERY_SHOP_REGEX}"](area.searchArea);
   way["shop"~"${SWEDISH_GROCERY_SHOP_REGEX}"](area.searchArea);
   relation["shop"~"${SWEDISH_GROCERY_SHOP_REGEX}"](area.searchArea);
 );
 out center tags;`;
+}
+
+export const SWEDEN_GROCERY_OVERPASS_QUERY = buildCountryGroceryOverpassQuery('SE');
 
 export const STOCKHOLM_FUEL_OVERPASS_QUERY = `[out:json][timeout:25];
 area["ISO3166-2"="SE-AB"][admin_level=4]->.searchArea;
@@ -140,6 +153,7 @@ out center tags;`;
 }
 
 export type FetchOverpassGroceryStoresOptions = {
+  country?: OverpassCountryCode;
   fetchImpl?: typeof fetch;
   query?: string;
   retrievedAt?: string;
@@ -147,7 +161,8 @@ export type FetchOverpassGroceryStoresOptions = {
 
 export async function fetchOverpassGroceryStores(options: FetchOverpassGroceryStoresOptions = {}): Promise<OverpassGroceryStore[]> {
   const fetchImpl = options.fetchImpl ?? fetch;
-  const query = options.query ?? STOCKHOLM_GROCERY_OVERPASS_QUERY;
+  const country = options.country ?? 'SE';
+  const query = options.query ?? buildCountryGroceryOverpassQuery(country);
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const body = new URLSearchParams({ data: query });
   const response = await fetchImpl(OVERPASS_INTERPRETER_URL, {
@@ -165,16 +180,24 @@ export async function fetchOverpassGroceryStores(options: FetchOverpassGrocerySt
   }
 
   const payload = await response.json() as OverpassResponse;
-  return parseOverpassGroceryStores(payload, retrievedAt);
+  return parseOverpassGroceryStores(payload, retrievedAt, country);
 }
 
-export function parseOverpassGroceryStores(payload: OverpassResponse, retrievedAt: string): OverpassGroceryStore[] {
+export function parseOverpassGroceryStores(
+  payload: OverpassResponse,
+  retrievedAt: string,
+  country: OverpassCountryCode = 'SE'
+): OverpassGroceryStore[] {
   return (payload.elements ?? [])
-    .map((element) => normalizeOverpassElement(element, retrievedAt))
+    .map((element) => normalizeOverpassElement(element, retrievedAt, country))
     .filter((store): store is OverpassGroceryStore => store !== null);
 }
 
-export function normalizeOverpassElement(element: OverpassElement, retrievedAt: string): OverpassGroceryStore | null {
+export function normalizeOverpassElement(
+  element: OverpassElement,
+  retrievedAt: string,
+  country: OverpassCountryCode = 'SE'
+): OverpassGroceryStore | null {
   const osmType = asOsmType(element.type);
   const osmId = typeof element.id === 'number' ? element.id : null;
   const tags = element.tags ?? {};
@@ -190,6 +213,7 @@ export function normalizeOverpassElement(element: OverpassElement, retrievedAt: 
   return {
     osmType,
     osmId,
+    country,
     name,
     brand: text(tags.brand) || text(tags.operator) || name,
     shop,

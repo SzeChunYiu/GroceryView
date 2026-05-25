@@ -45,6 +45,7 @@ import {
   BRANDED_FUEL_STATIONS_OVERPASS_URL,
   BRANDED_SWEDISH_FUEL_STATION_CHAINS,
   confidenceForSource,
+  buildCountryGroceryOverpassQuery,
   buildSwedishCountyFuelOverpassQuery,
   buildSwedishCountyGroceryOverpassQuery,
   buildWillysCategoryUrl,
@@ -526,6 +527,7 @@ describe('store enumerator full branch source parsers', () => {
     const osmBranches = parseOsmChainStores([{
       osmType: 'node',
       osmId: 29898149,
+      country: 'SE',
       name: 'ICA nära Karlaplan',
       brand: 'ICA Nära',
       shop: 'supermarket',
@@ -543,6 +545,7 @@ describe('store enumerator full branch source parsers', () => {
     }], retrievedAt);
 
     assert.equal(osmBranches[0].chainId, 'ica');
+    assert.equal(osmBranches[0].countryCode, 'SE');
     assert.equal(osmBranches[0].sourceIds[0], 'osm_overpass_sweden');
     assert.equal(storeEnumeratorSourceCitations.length, STORE_ENUMERATOR_CHAIN_IDS.length + 1);
 
@@ -2060,9 +2063,14 @@ describe('fetchCoopWeeklyDiscounts', () => {
 describe('fetchOverpassGroceryStores', () => {
   it('ships a Sweden-wide query for the nationwide OSM store refresh', () => {
     assert.match(SWEDEN_GROCERY_OVERPASS_QUERY, /ISO3166-1"="SE/);
+    assert.match(SWEDEN_GROCERY_OVERPASS_QUERY, /name"="Sverige/);
     assert.match(SWEDEN_GROCERY_OVERPASS_QUERY, /admin_level=2/);
     assert.match(SWEDEN_GROCERY_OVERPASS_QUERY, /shop"~"\^\(supermarket\|convenience\|grocery\|greengrocer\)\$/);
     assert.doesNotMatch(SWEDEN_GROCERY_OVERPASS_QUERY, /ISO3166-2"="SE-AB/);
+    assert.match(buildCountryGroceryOverpassQuery('NO'), /ISO3166-1"="NO/);
+    assert.match(buildCountryGroceryOverpassQuery('NO'), /name"="Norge/);
+    assert.match(buildCountryGroceryOverpassQuery('IS'), /ISO3166-1"="IS/);
+    assert.match(buildCountryGroceryOverpassQuery('IS'), /name"="Ísland/);
     assert.match(STOCKHOLM_GROCERY_OVERPASS_QUERY, /ISO3166-2"="SE-AB/);
     assert.equal(SWEDISH_COUNTY_ISO3166_2_CODES.length, 21);
     assert.match(buildSwedishCountyGroceryOverpassQuery('SE-M'), /ISO3166-2"="SE-M/);
@@ -2094,14 +2102,17 @@ describe('fetchOverpassGroceryStores', () => {
     };
 
     const rows = await fetchOverpassGroceryStores({
+      country: 'NO',
       fetchImpl,
       retrievedAt: '2026-05-20T23:45:00.000Z'
     });
 
     assert.match(requestedBodies[0], /shop/);
+    assert.match(new URLSearchParams(requestedBodies[0]).get('data') ?? '', /ISO3166-1"="NO/);
     assert.deepEqual(rows, [{
       osmType: 'node',
       osmId: 29898149,
+      country: 'NO',
       name: 'ICA nära Karlaplan',
       brand: 'ICA Nära',
       shop: 'supermarket',
@@ -2126,10 +2137,11 @@ describe('fetchOverpassGroceryStores', () => {
         { type: 'node', id: 2, tags: { shop: 'supermarket', name: 'Missing coordinates' } },
         { type: 'node', id: 3, lat: 59, lon: 18, tags: { shop: 'supermarket' } }
       ]
-    }, '2026-05-20T23:45:00.000Z');
+    }, '2026-05-20T23:45:00.000Z', 'IS');
 
     assert.equal(rows.length, 1);
     assert.equal(rows[0].name, 'Valid');
+    assert.equal(rows[0].country, 'IS');
   });
 });
 

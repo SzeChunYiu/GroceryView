@@ -507,7 +507,7 @@ export function parseOsmChainStores(rows: OverpassGroceryStore[], retrievedAt: s
         address,
         city: row.city,
         postalCode: row.postcode,
-        countryCode: 'SE',
+        countryCode: row.country,
         latitude: row.latitude,
         longitude: row.longitude,
         phone: row.phone,
@@ -830,6 +830,7 @@ export function normalizeOsmSupermarket(element: unknown, capturedAt: string): E
   const chainId = classifyOsmChain({
     osmType: 'node',
     osmId: 0,
+    country: 'SE',
     name,
     brand,
     shop: text(tags.shop) || text(tags.amenity),
