@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { DataGrid } from '@/components/data-grid';
 import {
   allStoreDailyRunnerReadiness,
   apiPerformanceReadiness,
@@ -7,6 +8,7 @@ import {
   commodityIngestionClassifierEvidence,
   commodityMappingReviewPlan,
   formatPct,
+  formatSek,
   icaStorePromotionEvidence,
   multiVerticalDomainFoundation,
   publicApiDirectory,
@@ -16,7 +18,8 @@ import {
   sourceReadinessMatrix,
   sourceRouteMap,
   storeBrandLedger,
-  timescaleDbEvaluation
+  timescaleDbEvaluation,
+  unitNormalizationAuditReport
 } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -40,6 +43,72 @@ export default function DataSourcesPage() {
         <Metric label="Source groups" value={sourceCoverage.length.toLocaleString('sv-SE')} />
         <Metric label="Brand ledgers" value={storeBrandLedger.length.toLocaleString('sv-SE')} />
       </div>
+
+      <Card className="mt-6 border-rose-200 bg-rose-50/70">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-rose-800">Unit normalization audit</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Suspicious units, package sizes, and unit-price outliers</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+              The audit scans Axfood chain rows, OpenPrices observations, and Mathem public search rows with the same package parser used for shopper unit-price comparisons. Rows below are data-quality candidates, not hidden product claims.
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white p-4 text-right shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-800">Flagged rows</p>
+            <p className="mt-2 text-3xl font-black text-rose-950">{unitNormalizationAuditReport.issueCount.toLocaleString('sv-SE')}</p>
+            <p className="mt-1 text-sm font-semibold text-slate-700">{unitNormalizationAuditReport.criticalCount.toLocaleString('sv-SE')} critical · {unitNormalizationAuditReport.warningCount.toLocaleString('sv-SE')} warning-only</p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-4">
+          <Metric label="Rows scanned" value={unitNormalizationAuditReport.rowCount.toLocaleString('sv-SE')} />
+          <Metric label="Package parses" value={unitNormalizationAuditReport.parsedPackageCount.toLocaleString('sv-SE')} />
+          <Metric label="Missing package text" value={unitNormalizationAuditReport.issueTypeCounts['missing-package-size'].toLocaleString('sv-SE')} />
+          <Metric label="Unit outliers" value={unitNormalizationAuditReport.issueTypeCounts['unit-price-outlier'].toLocaleString('sv-SE')} />
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {unitNormalizationAuditReport.unitCoverage.map((unit) => (
+            <section className="rounded-2xl border border-rose-100 bg-white p-4 shadow-sm" key={unit.unit}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-800">kr/{unit.unit}</p>
+              <p className="mt-2 text-2xl font-black text-slate-950">{unit.rows.toLocaleString('sv-SE')} rows</p>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">Median {formatSek(unit.medianUnitPrice)} · {unit.issueRows.toLocaleString('sv-SE')} flagged rows</p>
+            </section>
+          ))}
+        </div>
+        <DataGrid className="mt-5 bg-white" density="compact" scrollX>
+          <table>
+            <caption className="sr-only">Products with suspicious unit normalization evidence</caption>
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Source</th>
+                <th>Package text</th>
+                <th>Unit price</th>
+                <th>Audit issue</th>
+              </tr>
+            </thead>
+            <tbody>
+              {unitNormalizationAuditReport.issueRows.slice(0, 10).map((row) => (
+                <tr key={row.id}>
+                  <td className="min-w-52 font-black text-slate-950">{row.name}</td>
+                  <td className="min-w-48 font-semibold text-slate-700">{row.source}</td>
+                  <td className="min-w-40 font-mono text-xs font-bold text-slate-700">{row.packageText || 'Not reported'}</td>
+                  <td className="whitespace-nowrap font-semibold text-slate-700">
+                    {row.auditUnitPrice ? `${formatSek(row.auditUnitPrice)}/${row.auditUnit}` : 'Not available'}
+                  </td>
+                  <td className="min-w-72 text-sm font-semibold leading-6 text-rose-950">
+                    {row.issues.map((issue) => issue.message).join(' ')}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </DataGrid>
+        <ul className="mt-4 grid gap-2 text-sm font-semibold leading-6 text-rose-950 md:grid-cols-3">
+          {unitNormalizationAuditReport.guardrails.map((guardrail) => (
+            <li className="rounded-2xl bg-white p-3" key={guardrail}>• {guardrail}</li>
+          ))}
+        </ul>
+      </Card>
 
       <Card className="mt-6 border-lime-200 bg-lime-50/70">
         <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">

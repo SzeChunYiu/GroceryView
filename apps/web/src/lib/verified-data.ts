@@ -24,6 +24,7 @@ import {
 import { categoryLabels, pricedProducts } from './openprices-products';
 import { allergenRiskBadgesForText } from './search-filters';
 import { osmStores } from './osm-stores';
+import { auditUnitNormalization, type NormalizedUnitPrice, type UnitNormalizationAuditInput } from './normalization';
 import {
   currencyFromObservation,
   defaultLocale,
@@ -258,6 +259,67 @@ export const matchedChainProducts = axfoodProducts.filter((product) => product.i
 export const topChainSpreads = [...matchedChainProducts].sort((a, b) => b.spreadPct - a.spreadPct).slice(0, 18);
 export const freshestOpenPrices = [...pricedProducts].sort((a, b) => b.lastObservedAt.localeCompare(a.lastObservedAt)).slice(0, 18);
 export const productUniverse = [...topChainSpreads, ...freshestOpenPrices].slice(0, 36);
+
+
+function comparableUnitFromPriceUnit(value: string | undefined): NormalizedUnitPrice['comparableUnit'] | null {
+  const normalized = (value ?? '').toLowerCase();
+  if (/kr\s*\/\s*kg|sek\s*\/\s*kg/.test(normalized)) return 'kg';
+  if (/kr\s*\/\s*l\b|sek\s*\/\s*l\b/.test(normalized)) return 'l';
+  if (/kr\s*\/\s*(st|piece|pcs)\b|sek\s*\/\s*(st|piece|pcs)\b/.test(normalized)) return 'piece';
+  return null;
+}
+
+function finitePositive(value: number | null | undefined) {
+  return typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : null;
+}
+
+const axfoodUnitAuditRows: UnitNormalizationAuditInput[] = axfoodProducts.flatMap((product) => {
+  const lowestChainPrice = product.chains[product.lowestChain];
+  if (!lowestChainPrice) return [];
+  const comparableUnit = comparableUnitFromPriceUnit(lowestChainPrice.priceUnit);
+  const isPackagePrice = comparableUnit === 'piece' || comparableUnit === null;
+  return [{
+    id: `axfood-${product.code}`,
+    name: product.name,
+    brand: product.brand,
+    source: 'Axfood chain price snapshot',
+    category: product.category,
+    packageText: product.subline,
+    totalPrice: isPackagePrice ? product.lowestPrice : null,
+    observedUnitPrice: !isPackagePrice ? product.lowestPrice : null,
+    observedComparableUnit: comparableUnit === 'piece' ? null : comparableUnit,
+    href: `/products/${product.slug}`
+  }];
+});
+
+const openPricesUnitAuditRows: UnitNormalizationAuditInput[] = pricedProducts.map((product) => ({
+  id: `openprices-${product.code}`,
+  name: product.name,
+  brand: product.brands || 'Brand not reported',
+  source: 'OpenPrices SEK observations',
+  category: product.category,
+  packageText: product.quantity,
+  totalPrice: product.priceMedian,
+  href: `/products/${product.slug}`
+}));
+
+const mathemUnitAuditRows: UnitNormalizationAuditInput[] = mathemProducts.map((product) => ({
+  id: `mathem-${product.code}`,
+  name: product.name,
+  brand: product.brand || 'Brand not reported',
+  source: 'Mathem public search rows',
+  packageText: product.packageText,
+  totalPrice: product.price,
+  observedUnitPrice: finitePositive(product.unitPrice),
+  observedComparableUnit: comparableUnitFromPriceUnit(product.unitPriceUnit || product.unitPriceText),
+  href: product.productUrl
+}));
+
+export const unitNormalizationAuditReport = auditUnitNormalization([
+  ...axfoodUnitAuditRows,
+  ...openPricesUnitAuditRows,
+  ...mathemUnitAuditRows
+]);
 
 export const MAX_ITEM_COMPARISON_ITEMS = 4;
 
