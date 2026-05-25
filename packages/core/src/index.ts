@@ -1,3 +1,4 @@
+export * from './lib/extractors/fatPercent.js';
 export * from './lib/rankers/nearby.js';
 export type DealScoreInput = {
   currentCityPercentile: number;
