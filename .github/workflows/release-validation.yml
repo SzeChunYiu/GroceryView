@@ -1,8 +1,7 @@
-# GroceryView release gate. The required PR check ("Validate release-safe candidate")
-# runs only fast, blocking checks (install + build + typecheck + secret scan) so PR
-# throughput is high. The full ~19-workspace test suite runs POST-MERGE on main
-# (job "Full test suite") — non-blocking for PRs, surfaces regressions on main without
-# cascade-blocking the pipeline. No untrusted event input referenced in any run step.
+# GroceryView release gate. PR check ("Validate release-safe candidate") is intentionally
+# LIGHT for high PR/merge throughput: typecheck + secret-scan only (~30-60s). The heavy
+# build + full ~19-workspace test run POST-MERGE on main (job "Full build + test"),
+# non-blocking — caught/fixed in bulk rather than gating every PR.
 name: Release validation
 
 on:
@@ -20,7 +19,29 @@ jobs:
   validate:
     name: Validate release-safe candidate
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Secret scan (no committed credentials)
+        run: |
+          if git grep -nE "(SUPABASE_SERVICE_ROLE|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----)" \
+              -- ':!*.example' ':!**/*.md' ':!.github/**' ':!**/package-lock.json'; then
+            echo "::error::potential committed secret"; exit 1
+          fi
+
+  fullcheck:
+    name: Full build + test (post-merge)
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -31,27 +52,5 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
-      - name: Typecheck
-        run: npm run typecheck
-      - name: Secret scan (no committed credentials)
-        run: |
-          if git grep -nE "(SUPABASE_SERVICE_ROLE|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----)" \
-              -- ':!*.example' ':!**/*.md' ':!.github/**' ':!**/package-lock.json'; then
-            echo "::error::potential committed secret"; exit 1
-          fi
-
-  fulltest:
-    name: Full test suite (post-merge)
-    if: github.event_name == 'push'
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 22
-          cache: npm
-      - name: Install
-        run: npm ci
       - name: Test
         run: npm test
