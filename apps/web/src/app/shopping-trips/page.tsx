@@ -1,7 +1,8 @@
+import { BudgetEnvelopePanel } from '@/components/budget-envelope-panel';
 import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { basketTripCostContract, budgetCheapestStoreRoutingPlanner, deliveryVsInStoreComparison, elderlyNearestDeliveryPlanner, formatSek, fulfillmentSlotsContract } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
-import { activeShoppingTripEstimates } from '@/lib/trip-planner';
+import { activeBudgetEnvelopePlans, activeShoppingTripEstimates } from '@/lib/trip-planner';
 
 export function generateMetadata() {
   return routeMetadata('/shopping-trips');
@@ -69,6 +70,7 @@ export default function FeaturePage() {
           ))}
         </div>
       </Card>
+      <BudgetEnvelopePanel plans={activeBudgetEnvelopePlans} />
       <Card className="mt-6 border-sky-200 bg-sky-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-800">Travel-cost optimizer</p>
         <h2 className="mt-2 text-2xl font-black tracking-tight">Basket + trip cost optimizer: {basketTripCostContract.title}</h2>
