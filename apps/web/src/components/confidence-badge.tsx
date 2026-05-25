@@ -34,6 +34,7 @@ type ConfidenceBadgeProps = {
     value: string;
   }>;
   verificationLabel?: string;
+  countryCode?: string;
   locale?: SupportedLocale;
   emptyData?: boolean;
   actionLabel?: string;
@@ -46,14 +47,20 @@ const levelClasses: Record<ConfidenceBadgeProps["level"], string> = {
   low: "border-amber-200 bg-amber-50 text-amber-900",
 };
 
-export function ConfidenceBadge({ level, label, observedAt, sampleSize, details, verificationLabel, locale, emptyData = false, actionLabel = 'Review confidence data', onAction }: ConfidenceBadgeProps) {
+function countryCodeFromDetails(details: ConfidenceBadgeProps['details']) {
+  return details?.find((detail) => /country/i.test(detail.label))?.value.trim();
+}
+
+export function ConfidenceBadge({ level, label, observedAt, sampleSize, details, verificationLabel, countryCode, locale, emptyData = false, actionLabel = 'Review confidence data', onAction }: ConfidenceBadgeProps) {
   const t = groceryTranslator(locale);
   const displayLabel = label ?? confidenceCopy(level, sampleSize);
   const token = confidenceStateToken(level);
   const sampleCopy = sampleSize !== undefined ? t('confidence-badge.sampleSize', { sampleSize }) : '';
   const freshness = observedAt !== undefined ? getPriceFreshness(observedAt) : null;
   const verificationCopy = verificationLabel?.trim();
+  const countryCopy = (countryCode ?? countryCodeFromDetails(details))?.toUpperCase();
   const detailCopy = [
+    countryCopy ? `Country ${countryCopy}.` : '',
     sampleCopy,
     freshness ? t('confidence-badge.freshness', { label: freshness.label, refreshHint: freshness.refreshHint }) : '',
     verificationCopy ? t('confidence-badge.verification', { verificationLabel: verificationCopy }) : '',

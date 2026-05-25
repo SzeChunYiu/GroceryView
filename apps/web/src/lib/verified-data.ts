@@ -2392,9 +2392,23 @@ function observationAgeLabel(observedAt: string, asOf = '2026-05-25') {
   return ageDays === 0 ? 'Observed today' : `Observed ${ageDays} day${ageDays === 1 ? '' : 's'} before ${asOf}`;
 }
 
-function confidenceLevelForEvidence(sourceCount: number, hasNormalizedUnit: boolean): AdaptiveProductCard['confidenceLevel'] {
-  if (sourceCount >= 8 && hasNormalizedUnit) return 'high';
-  if (sourceCount >= 2 || hasNormalizedUnit) return 'medium';
+export type CountryCoverageCode = 'SE' | 'NO' | 'IS';
+
+const countryCoverageThresholds: Record<CountryCoverageCode, { high: number; medium: number }> = {
+  SE: { high: 8, medium: 2 },
+  NO: { high: Number.POSITIVE_INFINITY, medium: Number.POSITIVE_INFINITY },
+  IS: { high: Number.POSITIVE_INFINITY, medium: Number.POSITIVE_INFINITY }
+};
+
+export function confidenceLevelForCountryCoverage(
+  countryCode: CountryCoverageCode,
+  sourceCount: number,
+  hasNormalizedUnit: boolean
+): AdaptiveProductCard['confidenceLevel'] {
+  const thresholds = countryCoverageThresholds[countryCode];
+  if (sourceCount >= thresholds.high && hasNormalizedUnit) return 'high';
+  if (countryCode === 'SE' && (sourceCount >= thresholds.medium || hasNormalizedUnit)) return 'medium';
+  if (sourceCount >= thresholds.medium && hasNormalizedUnit) return 'medium';
   return 'low';
 }
 
@@ -2432,6 +2446,7 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
   const sourceCount = isChainProduct
     ? Object.values(product.chains).filter((row) => typeof row.price === 'number' && Number.isFinite(row.price) && row.price > 0).length
     : product.observationCount;
+  const coverageCountry: CountryCoverageCode = 'SE';
   const latestObservedAt = isChainProduct ? '2026-05-21' : product.lastObservedAt;
   const observationAge = observationAgeLabel(latestObservedAt);
   const normalizationQuality = normalizedUnit
@@ -2442,13 +2457,14 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
     : openFoodFactsSafetyByCode.has(product.code)
       ? 'OpenFoodFacts metadata linked for source review context.'
       : 'OpenPrices observation has no linked OpenFoodFacts review metadata yet.';
-  const confidenceLevel = confidenceLevelForEvidence(sourceCount, Boolean(normalizedUnit));
+  const confidenceLevel = confidenceLevelForCountryCoverage(coverageCountry, sourceCount, Boolean(normalizedUnit));
   const confidenceDrilldown = {
     sourceCount,
     observationAgeLabel: observationAge,
     normalizationQuality,
     reviewStatus,
     rows: [
+      { label: 'Country', value: coverageCountry },
       { label: 'Source count', value: `${sourceCount.toLocaleString('sv-SE')} ${isChainProduct ? 'chain price row(s)' : 'OpenPrices observation(s)'}` },
       { label: 'Observation age', value: observationAge },
       { label: 'Normalization quality', value: normalizationQuality },
