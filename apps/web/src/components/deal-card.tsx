@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import type { ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import {
@@ -40,6 +41,8 @@ type DealCardProps = {
   productHref?: string;
   rankLabel?: string;
   categoryLabel?: string;
+  imageAlt?: string;
+  imageUrl?: string | null;
   localityLabel?: string;
   dropPercentLabel?: string;
   unitPriceDropLabel?: string;
@@ -124,6 +127,8 @@ export function DealCard({
   productHref,
   rankLabel,
   categoryLabel,
+  imageAlt,
+  imageUrl,
   localityLabel,
   dropPercentLabel,
   unitPriceDropLabel,
@@ -218,6 +223,20 @@ export function DealCard({
         </div>
       ) : null}
       <div className="flex items-start justify-between gap-3">
+        {imageUrl ? (
+          <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl bg-white p-2 ring-1 ring-market-ink/10">
+            <Image
+              alt={imageAlt ?? `${title} deal image`}
+              className="max-h-full max-w-full object-contain"
+              height={96}
+              loading="lazy"
+              placeholder="empty"
+              sizes="(min-width: 768px) 96px, 80px"
+              src={imageUrl}
+              width={96}
+            />
+          </div>
+        ) : null}
         <div>
           {replacementLabel ? (
             <p className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{replacementLabel}</p>
