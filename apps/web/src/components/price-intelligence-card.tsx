@@ -10,6 +10,8 @@ export interface PriceIntelligenceScoreCard {
   forecastRangeLabel?: string;
   forecastConfidenceLabel?: string;
   forecastTrendLabel?: string;
+  seasonalContextLabel?: string;
+  holidayLabel?: string;
   detail: string;
 }
 
@@ -18,6 +20,33 @@ export interface PriceIntelligenceCardProps {
   emptyState?: string;
   summary?: string;
   title?: string;
+}
+
+export interface BestTimeForecastPanelProps {
+  confidenceLabel: string;
+  expectedMovementLabel: string;
+  guidance: string;
+  headline: string;
+  recommendationCount: number;
+}
+
+export function BestTimeForecastPanel({ confidenceLabel, expectedMovementLabel, guidance, headline, recommendationCount }: BestTimeForecastPanelProps) {
+  return (
+    <section className="mt-6 rounded-[2rem] border border-sky-200 bg-sky-50/90 p-5 shadow-sm">
+      <p className="text-xs font-black uppercase tracking-[0.22em] text-sky-800">Best time to buy forecast</p>
+      <div className="mt-2 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+        <div>
+          <h2 className="text-2xl font-black text-slate-950">{headline}</h2>
+          <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">{guidance}</p>
+        </div>
+        <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-sky-900">{recommendationCount} scored items</p>
+      </div>
+      <div className="mt-4 grid gap-3 md:grid-cols-2">
+        <p className="rounded-2xl bg-white/85 p-4 text-sm font-bold text-slate-700">Confidence: {confidenceLabel}</p>
+        <p className="rounded-2xl bg-white/85 p-4 text-sm font-bold text-slate-700">{expectedMovementLabel}</p>
+      </div>
+    </section>
+  );
 }
 
 export function PriceIntelligenceCard({
@@ -63,6 +92,13 @@ export function PriceIntelligenceCard({
                   <p className="mt-1 text-sm font-black">{card.forecastRangeLabel}</p>
                   <p className="mt-1 text-sky-800">{card.forecastConfidenceLabel ?? 'forecast confidence unavailable'}</p>
                   {card.forecastTrendLabel ? <p className="mt-1 text-sky-800">{card.forecastTrendLabel}</p> : null}
+                </div>
+              ) : null}
+              {card.seasonalContextLabel ? (
+                <div className="mt-3 rounded-xl border border-amber-100 bg-amber-50 p-3 text-xs font-bold text-amber-950">
+                  <p className="uppercase tracking-[0.14em] text-amber-700">seasonal deal context</p>
+                  <p className="mt-1 text-sm font-black">{card.seasonalContextLabel}</p>
+                  {card.holidayLabel ? <p className="mt-1 text-amber-800">{card.holidayLabel}</p> : null}
                 </div>
               ) : null}
               <p className="mt-3 text-xs font-semibold leading-5 text-slate-500">{card.detail}</p>

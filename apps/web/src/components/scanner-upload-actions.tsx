@@ -1,7 +1,7 @@
 'use client';
 
-import Link from 'next/link';
 import { FormEvent, useRef, useState } from 'react';
+import { resolveBarcodeLookup, type BarcodeLookupResult } from '@/lib/barcode-lookup';
 import type { BarcodeMissFallbackProduct } from '@/lib/openfoodfacts-catalog';
 
 type ScannerStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
@@ -24,9 +24,6 @@ type ReceiptPurchaseHistoryItem = {
   totalAmount?: number;
 };
 
-type BarcodeLookupProduct = { href: string; name: string; brand: string; quantity: string; source: string };
-type BarcodeLookupResponse = { status: 'matched' | 'miss'; product: BarcodeLookupProduct | null };
-
 type ScanProcessResponse = {
   result?: {
     status: string;
@@ -37,6 +34,12 @@ type ScanProcessResponse = {
   };
   purchaseHistory?: ReceiptPurchaseHistoryItem[];
 };
+
+type BarcodeDetectorShape = {
+  detect(source: HTMLVideoElement): Promise<Array<{ rawValue?: string }>>;
+};
+
+type BarcodeDetectorConstructor = new (options?: { formats?: string[] }) => BarcodeDetectorShape;
 
 function readSession(): BrowserSession {
   const accessToken = sessionStorage.getItem('groceryview:accessToken') || '';
@@ -50,6 +53,7 @@ function newScanId(prefix: 'receipt' | 'barcode') {
 
 export function ScannerUploadActions({ fallbackProducts = [] }: Readonly<{ fallbackProducts?: BarcodeMissFallbackProduct[] }>) {
   const [barcode, setBarcode] = useState('0735000123456');
+  const [lookupResult, setLookupResult] = useState<BarcodeLookupResult | null>(() => resolveBarcodeLookup('0735000123456', fallbackProducts));
   const [byteLength, setByteLength] = useState('123456');
   const [contentType, setContentType] = useState('image/jpeg');
   const [status, setStatus] = useState<ScannerStatus>('idle');
@@ -58,11 +62,16 @@ export function ScannerUploadActions({ fallbackProducts = [] }: Readonly<{ fallb
   const [barcodeFallbackActive, setBarcodeFallbackActive] = useState(false);
   const [manualProductName, setManualProductName] = useState('');
   const [manualStoreHint, setManualStoreHint] = useState('');
-  const [barcodeMatch, setBarcodeMatch] = useState<BarcodeLookupProduct | null>(null);
   const [receiptHistory, setReceiptHistory] = useState<ReceiptPurchaseHistoryItem[]>([]);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const normalizedBarcode = barcode.replace(/\D/g, '');
+
+  function updateBarcode(value: string) {
+    setBarcode(value);
+    setBarcodeFallbackActive(false);
+    setLookupResult(resolveBarcodeLookup(value, fallbackProducts));
+  }
 
   function requireSession(): BrowserSession | null {
     const session = readSession();
@@ -201,6 +210,58 @@ export function ScannerUploadActions({ fallbackProducts = [] }: Readonly<{ fallb
     }
   }
 
+  async function startBarcodeCamera() {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setStatus('error');
+      setMessage('Barcode camera is not available in this browser. Use manual EAN entry instead.');
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } } });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+      setCameraReady(true);
+      setStatus('ready');
+      setMessage('Barcode camera is ready. Detection happens in-browser; no frame is uploaded for EAN lookup.');
+    } catch {
+      setStatus('error');
+      setMessage('Camera permission was denied or unavailable. Use manual EAN entry instead.');
+    }
+  }
+
+  async function detectBarcodeFromCamera() {
+    const detectorConstructor = (window as typeof window & { BarcodeDetector?: BarcodeDetectorConstructor }).BarcodeDetector;
+    if (!detectorConstructor) {
+      setStatus('error');
+      setMessage('This browser does not expose BarcodeDetector. Use manual EAN entry or submit a missing-product draft.');
+      return;
+    }
+    if (!videoRef.current || videoRef.current.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
+      setStatus('error');
+      setMessage('Start the barcode camera and wait for the preview before detecting an EAN.');
+      return;
+    }
+
+    const detector = new detectorConstructor({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e'] });
+    const [detected] = await detector.detect(videoRef.current);
+    const rawValue = detected?.rawValue;
+    if (!rawValue) {
+      setStatus('error');
+      setMessage('No EAN barcode was detected in the current camera frame.');
+      return;
+    }
+
+    updateBarcode(rawValue);
+    const result = resolveBarcodeLookup(rawValue, fallbackProducts);
+    setStatus(result?.status === 'matched' ? 'ready' : 'error');
+    setBarcodeFallbackActive(result?.status === 'missing');
+    setMessage(result?.status === 'matched'
+      ? `EAN ${result.barcode} resolved in-browser to ${result.productName}. Open the product detail link below.`
+      : `EAN ${rawValue.replace(/\D/g, '')} was detected but no product matched. Review the missing-product draft below.`);
+  }
+
   function stopReceiptCamera() {
     streamRef.current?.getTracks().forEach((track) => track.stop());
     streamRef.current = null;
@@ -209,37 +270,13 @@ export function ScannerUploadActions({ fallbackProducts = [] }: Readonly<{ fallb
     }
     setCameraReady(false);
     setStatus('idle');
-    setMessage('Receipt camera stopped. No anonymous scan uploads were sent.');
-  }
-
-  async function lookupCatalogBarcode() {
-    if (normalizedBarcode.length < 8) {
-      setBarcodeMatch(null);
-      setStatus('error');
-      setMessage('Enter at least 8 barcode digits before looking up a catalogue product.');
-      return null;
-    }
-    const response = await fetch(`/api/barcode?ean=${encodeURIComponent(normalizedBarcode)}`);
-    if (!response.ok) {
-      setBarcodeMatch(null);
-      setBarcodeFallbackActive(true);
-      setStatus('error');
-      setMessage(`No local catalogue product matched barcode ${normalizedBarcode}.`);
-      return null;
-    }
-    const body = (await response.json()) as BarcodeLookupResponse;
-    setBarcodeMatch(body.product);
-    setBarcodeFallbackActive(false);
-    setStatus('ready');
-    setMessage(body.product ? `Barcode ${normalizedBarcode} matched ${body.product.name}; open the product detail link below.` : `No local catalogue product matched barcode ${normalizedBarcode}.`);
-    return body.product;
+    setMessage('Camera stopped. No anonymous scan uploads were sent.');
   }
 
   async function processBarcode(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const session = requireSession();
     if (!session) return;
-    const catalogMatch = await lookupCatalogBarcode();
     const { accessToken, userId } = session;
     const scanId = newScanId('barcode');
     const response = await fetch(`/api/scans/process?userId=${encodeURIComponent(userId)}`, {
@@ -265,9 +302,7 @@ export function ScannerUploadActions({ fallbackProducts = [] }: Readonly<{ fallb
 
     setBarcodeFallbackActive(false);
     setStatus('ready');
-    setMessage(catalogMatch
-      ? `Barcode processed for ${scanId} and matched ${catalogMatch.name}; open the product detail link below.`
-      : `Barcode processed for ${scanId}; review work items are returned when matching needs human review.`);
+    setMessage(`Barcode processed for ${scanId}; review work items are returned when matching needs human review.`);
   }
 
   function reportMissingProduct() {
@@ -340,24 +375,40 @@ export function ScannerUploadActions({ fallbackProducts = [] }: Readonly<{ fallb
             className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-950"
             id="barcode-payload"
             onChange={(event) => {
-              setBarcode(event.target.value);
-              setBarcodeFallbackActive(false);
-              setBarcodeMatch(null);
+              updateBarcode(event.target.value);
             }}
             value={barcode}
           />
           <div className="mt-3 flex flex-wrap gap-2">
             <button className="rounded-full bg-slate-950 px-4 py-2 text-sm font-black text-white" disabled={!barcode.trim()} type="submit">Process barcode scan</button>
-            <button className="rounded-full border border-indigo-300 px-4 py-2 text-sm font-black text-indigo-900" disabled={!barcode.trim()} onClick={lookupCatalogBarcode} type="button">Lookup catalogue link</button>
+            <button className="rounded-full bg-indigo-800 px-4 py-2 text-sm font-black text-white" onClick={startBarcodeCamera} type="button">Start barcode camera</button>
+            <button className="rounded-full bg-emerald-700 px-4 py-2 text-sm font-black text-white" disabled={!cameraReady} onClick={detectBarcodeFromCamera} type="button">Detect EAN from camera</button>
           </div>
-          {barcodeMatch ? (
-            <div className="mt-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-sm font-bold text-emerald-950">
-              Matched {barcodeMatch.name} · {barcodeMatch.brand} · {barcodeMatch.quantity}
-              <Link className="ml-2 underline" href={barcodeMatch.href}>Open product detail</Link>
-            </div>
-          ) : null}
         </form>
       </div>
+      {lookupResult ? (
+        <section className={`mt-4 rounded-2xl border p-4 ${lookupResult.status === 'matched' ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50'}`} aria-label="In-browser barcode lookup result">
+          {lookupResult.status === 'matched' ? (
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h3 className="text-sm font-black uppercase tracking-[0.18em] text-emerald-800">EAN resolved in-browser</h3>
+                <p className="mt-2 text-sm font-semibold leading-6 text-emerald-950">
+                  {lookupResult.barcode} matched {lookupResult.productName} · {lookupResult.brandLabel} · {lookupResult.quantityLabel}.
+                </p>
+              </div>
+              <a className="rounded-full bg-emerald-900 px-4 py-2 text-sm font-black text-white" href={lookupResult.productHref}>Open product detail</a>
+            </div>
+          ) : (
+            <div>
+              <h3 className="text-sm font-black uppercase tracking-[0.18em] text-amber-800">Missing-product submission draft</h3>
+              <p className="mt-2 text-sm font-semibold leading-6 text-amber-950">{lookupResult.draft.title}</p>
+              <ul className="mt-3 space-y-1 text-sm font-semibold text-amber-950">
+                {lookupResult.draft.evidence.map((item) => <li key={item}>• {item}</li>)}
+              </ul>
+            </div>
+          )}
+        </section>
+      ) : null}
       {barcodeFallbackActive ? (
         <section className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4" aria-label="Barcode lookup fallback">
           <div className="flex flex-wrap items-start justify-between gap-3">

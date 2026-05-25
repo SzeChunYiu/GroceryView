@@ -2,6 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 
 type NotificationPermissionState = 'default' | 'denied' | 'granted' | 'unsupported';
 
+type PushNotificationPreferenceKey = 'priceDrops' | 'bestTimeBuys' | 'pantryExpiry' | 'weeklyBasketDigests';
+
+type PushNotificationPreferences = Record<PushNotificationPreferenceKey, boolean>;
+
+const defaultPushNotificationPreferences: PushNotificationPreferences = {
+  priceDrops: true,
+  bestTimeBuys: true,
+  pantryExpiry: true,
+  weeklyBasketDigests: true
+};
+
 type NotificationSubscription = {
   endpoint: string;
   expirationTime?: number | null;
@@ -16,6 +27,7 @@ type StoredNotificationSubscription = {
   channels: string[];
   deliveryEnabled: boolean;
   permission: NotificationPermissionState;
+  preferences: PushNotificationPreferences;
   subscription: NotificationSubscription | null;
   tokenId: string | null;
   updatedAt: string;
@@ -42,6 +54,18 @@ function normalizeChannels(value: unknown) {
 
 function normalizePermission(value: unknown): NotificationPermissionState | null {
   return value === 'default' || value === 'denied' || value === 'granted' || value === 'unsupported' ? value : null;
+}
+
+function normalizePreferences(value: unknown): PushNotificationPreferences {
+  if (!value || typeof value !== 'object') return defaultPushNotificationPreferences;
+  const input = value as Partial<Record<PushNotificationPreferenceKey, unknown>>;
+
+  return {
+    priceDrops: typeof input.priceDrops === 'boolean' ? input.priceDrops : defaultPushNotificationPreferences.priceDrops,
+    bestTimeBuys: typeof input.bestTimeBuys === 'boolean' ? input.bestTimeBuys : defaultPushNotificationPreferences.bestTimeBuys,
+    pantryExpiry: typeof input.pantryExpiry === 'boolean' ? input.pantryExpiry : defaultPushNotificationPreferences.pantryExpiry,
+    weeklyBasketDigests: typeof input.weeklyBasketDigests === 'boolean' ? input.weeklyBasketDigests : defaultPushNotificationPreferences.weeklyBasketDigests
+  };
 }
 
 function normalizeSubscription(value: unknown): NotificationSubscription | null {
@@ -82,8 +106,16 @@ export async function POST(request: NextRequest) {
   const accountId = cleanString(body.accountId);
   const permission = normalizePermission(body.permission);
   const subscription = normalizeSubscription(body.subscription);
-  const channels = normalizeChannels(body.channels);
-  const deliveryEnabled = Boolean(body.deliveryEnabled && permission === 'granted' && subscription);
+  const hasPreferencePayload = Boolean(body.preferences && typeof body.preferences === 'object');
+  const preferences = normalizePreferences(body.preferences);
+  const requestedChannels = normalizeChannels(body.channels);
+  const enabledPreferenceKeys = Object.entries(preferences).filter(([, enabled]) => enabled).map(([key]) => key);
+  const channels = requestedChannels.length > 0
+    ? hasPreferencePayload
+      ? requestedChannels.filter((channel) => enabledPreferenceKeys.includes(channel))
+      : requestedChannels
+    : enabledPreferenceKeys;
+  const deliveryEnabled = Boolean(body.deliveryEnabled && permission === 'granted' && subscription && channels.length > 0);
 
   if (!accountId) {
     return NextResponse.json({ error: 'accountId is required to save push notification consent.' }, { status: 400 });
@@ -99,6 +131,7 @@ export async function POST(request: NextRequest) {
     channels,
     deliveryEnabled,
     permission,
+    preferences,
     subscription,
     tokenId,
     updatedAt: new Date().toISOString(),
@@ -112,6 +145,7 @@ export async function POST(request: NextRequest) {
     channels,
     deliveryEnabled,
     permission,
+    preferences,
     status: 'saved',
     tokenId,
     updatedAt: record.updatedAt

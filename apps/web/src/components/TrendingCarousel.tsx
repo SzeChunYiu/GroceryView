@@ -1,9 +1,15 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowDownRight, ArrowUpRight, History } from 'lucide-react';
 import type { TrendingProductPriceChange } from '@groceryview/db';
 import { buildBrandLeaderboardTrends, buildCitySearchTrends, buildCityTrendingItems, type CityTrendingItemFeed } from '@/lib/trends';
 import { BrandLeaderboardModule, TrendingSearchModule } from '@/app/page-sections/trending';
 import type { PersonalizedReorderItem } from '@/lib/personalization';
+import type { NewProductArrival } from '@/lib/new-arrivals';
+
+type PersonalizedTrendingProductPriceChange = TrendingProductPriceChange & {
+  personalizationReason?: string;
+};
 
 function formatMoney(value: number, currency: string) {
   return new Intl.NumberFormat('sv-SE', {
@@ -15,6 +21,36 @@ function formatMoney(value: number, currency: string) {
 
 function formatPercent(value: number) {
   return `${value > 0 ? '+' : ''}${new Intl.NumberFormat('sv-SE', { maximumFractionDigits: 1 }).format(value)}%`;
+}
+
+type CarouselImageCandidate = {
+  imageAlt?: string | null;
+  imageUrl?: string | null;
+};
+
+const carouselImagePolicy = {
+  loading: 'lazy',
+  placeholder: 'empty',
+  sizes: '(min-width: 1024px) 15rem, 70vw'
+} as const;
+
+function CarouselProductImage({ fallbackAlt, item }: Readonly<{ fallbackAlt: string; item: CarouselImageCandidate }>) {
+  if (!item.imageUrl) return null;
+
+  return (
+    <div className="mb-3 flex aspect-[4/3] items-center justify-center rounded-2xl bg-white p-3 ring-1 ring-slate-200">
+      <Image
+        alt={item.imageAlt ?? fallbackAlt}
+        className="max-h-full max-w-full object-contain"
+        height={144}
+        loading={carouselImagePolicy.loading}
+        placeholder={carouselImagePolicy.placeholder}
+        sizes={carouselImagePolicy.sizes}
+        src={item.imageUrl}
+        width={192}
+      />
+    </div>
+  );
 }
 
 function PersonalizedReorderRail({ items }: Readonly<{ items: PersonalizedReorderItem[] }>) {
@@ -39,6 +75,7 @@ function PersonalizedReorderRail({ items }: Readonly<{ items: PersonalizedReorde
             href={`/products/${item.slug}`}
             key={item.slug}
           >
+            <CarouselProductImage fallbackAlt={`${item.name} product image`} item={item as CarouselImageCandidate} />
             <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{item.reorderReason}</p>
             <h3 className="mt-2 line-clamp-2 text-lg font-black leading-6 text-slate-950">{item.name}</h3>
             <p className="mt-1 line-clamp-1 text-sm font-semibold text-slate-600">{item.brand}</p>
@@ -56,6 +93,46 @@ function PersonalizedReorderRail({ items }: Readonly<{ items: PersonalizedReorde
   );
 }
 
+export function NewArrivalsCarousel({ items }: Readonly<{ items: NewProductArrival[] }>) {
+  if (items.length === 0) return null;
+
+  return (
+    <section className="mt-8 rounded-[1.75rem] border border-emerald-200 bg-emerald-50/70 p-5 shadow-sm" aria-label="New product arrivals">
+      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.24em] text-emerald-800">New arrivals</p>
+          <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Recently ingested products</h2>
+        </div>
+        <p className="max-w-2xl text-sm font-semibold leading-6 text-emerald-950">
+          Built from verified Axfood latest_prices rows and fresh OpenPrices observations so catalogue growth can be reviewed without synthetic products.
+        </p>
+      </div>
+      <div className="mt-5 flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory" data-new-arrivals-carousel>
+        {items.map((item) => (
+          <Link
+            className="min-w-[17rem] max-w-[17rem] snap-start rounded-2xl border border-emerald-100 bg-white p-4 transition hover:-translate-y-0.5 hover:border-emerald-700"
+            href={`/products/${item.slug}`}
+            key={`${item.slug}-${item.observedAt}`}
+          >
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{item.freshnessLabel}</p>
+            <h3 className="mt-2 line-clamp-2 text-lg font-black leading-6 text-slate-950">{item.name}</h3>
+            <p className="mt-1 line-clamp-1 text-sm font-semibold text-slate-600">{item.brand}</p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {item.badges.map((badge) => (
+                <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-900" key={badge}>{badge}</span>
+              ))}
+            </div>
+            <div className="mt-4 rounded-xl bg-slate-50 p-3 text-xs font-bold leading-5 text-slate-600">
+              <p className="text-slate-950">{item.sourceLabel}</p>
+              <p>{item.chainLabel} · {item.categoryLabel}</p>
+              <p>Observed {item.observedAt.slice(0, 10)}</p>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 function CityTrendingItemsRail({ feed }: Readonly<{ feed: CityTrendingItemFeed }>) {
   if (feed.cards.length === 0) return null;
@@ -89,7 +166,7 @@ function CityTrendingItemsRail({ feed }: Readonly<{ feed: CityTrendingItemFeed }
 }
 
 export function TrendingCarousel({ items, reorderItems = [] }: Readonly<{
-  items: TrendingProductPriceChange[];
+  items: PersonalizedTrendingProductPriceChange[];
   reorderItems?: PersonalizedReorderItem[];
 }>) {
   const searchFeed = buildCitySearchTrends({ city: 'stockholm', limit: 6 });
@@ -132,6 +209,7 @@ export function TrendingCarousel({ items, reorderItems = [] }: Readonly<{
                 href={`/products/${item.productSlug}`}
                 key={item.productSlug}
               >
+                <CarouselProductImage fallbackAlt={`${item.productName} product image`} item={item as CarouselImageCandidate} />
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">#{item.rank} · {item.categoryLabel ?? 'Grocery'}</p>
@@ -158,6 +236,11 @@ export function TrendingCarousel({ items, reorderItems = [] }: Readonly<{
                   <History aria-hidden="true" size={16} />
                   {item.changeCount} changes · {item.observationCount} observations
                 </p>
+                {item.personalizationReason ? (
+                  <p className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-cyan-800">
+                    Ranked for you: {item.personalizationReason}
+                  </p>
+                ) : null}
                 <p className="mt-2 text-xs font-semibold leading-5 text-slate-500">
                   {formatPercent(item.changePercent)} from {formatMoney(item.previousPrice, item.currency)} · latest {item.latestObservedAt.slice(0, 10)}
                 </p>

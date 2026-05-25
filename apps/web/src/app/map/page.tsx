@@ -7,7 +7,7 @@ import { basketCostHeatmap } from '@/lib/map-basket-cost-heatmap';
 import { buildStoreInventoryConfidence } from '@/lib/osm-stores';
 import { formatPct, storePricePercentileRanks, storeUniverse } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
-import { buildStoreDistanceCompare } from '@/lib/store-distance';
+import { buildNearbyDealRecommendations, buildStoreDistanceCompare } from '@/lib/store-distance';
 
 export function generateMetadata() {
   return routeMetadata('/map');
@@ -24,7 +24,13 @@ const routeAwareNearestStorePlan = buildStoreDistanceCompare(
   'walk'
 );
 const topRouteAwareStores = routeAwareNearestStorePlan.rows.slice(0, 4);
-const topRouteAwareStoreInventory = topRouteAwareStores.map((store) => {
+const nearbyDealRecommendations = buildNearbyDealRecommendations();
+const routeSavingsBenchmarkSek = Math.max(...topRouteAwareStores.map((store) => store.basketTotalSek));
+const topRouteSavingsHints = topRouteAwareStores.map((store) => ({
+  ...store,
+  expectedBasketSavingsSek: Number((routeSavingsBenchmarkSek - store.basketTotalSek).toFixed(2))
+}));
+const topRouteAwareStoreInventory = topRouteSavingsHints.map((store) => {
   const osmStore = osmStoreForRouteStore(store);
   return osmStore ? buildStoreInventoryConfidence(osmStore) : null;
 });
@@ -177,7 +183,46 @@ export default function MapPage() {
           </div>
         </div>
         <div className="h-[620px] overflow-hidden border-t border-white/10 bg-slate-900">
-          <StoreMap routeRecommendations={topRouteAwareStores.slice(0, 3)} />
+          <StoreMap nearbyDealRecommendations={nearbyDealRecommendations} routeRecommendations={topRouteSavingsHints.slice(0, 3)} />
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-fuchsia-200 bg-fuchsia-50">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto]">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-fuchsia-800">Nearby deal recommendations</p>
+            <h2 className="mt-2 text-3xl font-black text-fuchsia-950">High-savings products near visible Coop map stores</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-fuchsia-900">
+              The map requests browser geolocation only after shopper consent. Until then, Stockholm map-center distance ranks current flyer savings against visible Coop markers.
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white/80 p-4 text-right">
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-fuchsia-800">Savings candidates</p>
+            <p className="mt-2 text-2xl font-black text-fuchsia-950">{nearbyDealRecommendations.length}</p>
+            <p className="mt-2 text-sm font-semibold text-fuchsia-900">sorted by distance + SEK saved</p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {nearbyDealRecommendations.map((deal) => (
+            <div className="rounded-2xl border border-fuchsia-100 bg-white p-4 shadow-sm" data-nearby-deal-recommendation={deal.storeSlug} key={deal.id}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-fuchsia-800">{deal.chainName} · {deal.areaLabel}</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{deal.dealName}</h3>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{deal.packageText || deal.sourceStoreName}</p>
+              <dl className="mt-4 grid grid-cols-2 gap-2 text-sm">
+                <div className="rounded-xl bg-fuchsia-50 p-3">
+                  <dt className="text-xs font-black uppercase tracking-[0.12em] text-fuchsia-700">Save</dt>
+                  <dd className="mt-1 font-black text-fuchsia-950">{deal.savingsSek.toFixed(2)} SEK</dd>
+                </div>
+                <div className="rounded-xl bg-slate-50 p-3">
+                  <dt className="text-xs font-black uppercase tracking-[0.12em] text-slate-500">Nearby</dt>
+                  <dd className="mt-1 font-black text-slate-950">{(deal.distanceMeters / 1000).toFixed(1)} km</dd>
+                </div>
+              </dl>
+              <p className="mt-3 rounded-xl bg-slate-50 p-3 text-xs font-bold leading-5 text-slate-700">
+                {deal.offerMechanicText || `${deal.offerPrice.toFixed(2)} SEK`} · {deal.medMeraRequired ? 'MedMera required' : 'No member flag'}
+              </p>
+            </div>
+          ))}
         </div>
       </Card>
 
@@ -198,7 +243,7 @@ export default function MapPage() {
           </div>
         </div>
         <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          {topRouteAwareStores.map((store, index) => {
+          {topRouteSavingsHints.map((store, index) => {
             const inventory = topRouteAwareStoreInventory[index];
             return (
             <div className="rounded-2xl border border-cyan-100 bg-white p-4 shadow-sm" data-route-aware-nearest-store={store.id} key={store.id}>
@@ -214,6 +259,7 @@ export default function MapPage() {
                 <div className="rounded-xl bg-cyan-50 p-3">
                   <dt className="text-xs font-black uppercase tracking-[0.12em] text-cyan-700">Basket</dt>
                   <dd className="mt-1 font-black text-cyan-950">{store.basketTotalSek.toFixed(2)} SEK</dd>
+                  <dd className="mt-1 text-xs font-bold text-cyan-800">Saves {store.expectedBasketSavingsSek.toFixed(2)} SEK vs highest visible basket</dd>
                 </div>
                 <div className="rounded-xl bg-slate-50 p-3">
                   <dt className="text-xs font-black uppercase tracking-[0.12em] text-slate-500">Trip</dt>
@@ -235,12 +281,13 @@ export default function MapPage() {
             );
           })}
         </div>
-        {topRouteAwareStores[0] ? (
+        {topRouteSavingsHints[0] ? (
           <StoreDistanceCard
             fallbackLabel="Use the route-aware list above while location is unavailable, then verify stock before leaving."
             inventoryConfidence={topRouteAwareStoreInventory[0] ?? undefined}
-            routeHints={topRouteAwareStores[0].routeEstimates}
-            storeName={topRouteAwareStores[0].storeName}
+            expectedBasketSavingsSek={topRouteSavingsHints[0].expectedBasketSavingsSek}
+            routeHints={topRouteSavingsHints[0].routeEstimates}
+            storeName={topRouteSavingsHints[0].storeName}
           />
         ) : null}
       </Card>
