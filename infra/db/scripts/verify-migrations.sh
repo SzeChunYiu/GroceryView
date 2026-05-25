@@ -65,6 +65,7 @@ REQUIRED_TABLES=(
   latest_prices
   price_daily
   price_weekly
+  retention_runs
   users
   watchlists
   baskets

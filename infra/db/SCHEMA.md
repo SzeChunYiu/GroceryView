@@ -39,6 +39,14 @@ Migration 013 builds the first time-series partition lane without breaking exist
 
 The same monthly range partition and retention by partition drop pattern can be reused for long-term raw payload retention in `raw_records` if retailer capture volume grows faster than normalized observations.
 
+## Retention Tiering
+
+Migration 027 adds the first operator-run retention policy. The default hot window keeps immutable observations for 400 days and raw payload rows for 90 days. Operators run `npm run ops:run-db-retention` as a dry-run first; destructive execution requires `-- --execute` or `GROCERYVIEW_DB_RETENTION_DRY_RUN=0`.
+
+Observation retention is gated by three checks: the row must be older than the hot window, it must not be referenced by `latest_prices`, and its id must be present in both `price_daily.source_observation_ids` and `price_weekly.source_observation_ids`. This preserves current public charts and latest-price reads before old raw facts are deleted. The partition lane can still use `drop_observations_partitions_before(cutoff_month)` after archive and rollup validation when the canonical writer moves to partition-only retention.
+
+Raw payload retention is shorter but stricter: `raw_records` rows are deleted only when no `observations` or `observations_v2` row references them and `raw_records.provenance` includes an object-storage/archive URI (`archiveUri`, `objectStorageUri`, `payloadArchiveUri`, or `archive_url`). Every dry-run or executed run writes a `retention_runs` audit row with candidate and deleted counts.
+
 ## Deal Score Boundary
 
 The schema stores store location in `stores.position` for map and trip-planning features. Distance or travel time must not be stored as an input to default Deal Score ranking. Deal Score should use price history, discount depth, confidence, and provenance; distance can be applied later as an explicit user-side filter or trip-planning sort.
@@ -110,6 +118,8 @@ Raw payloads captured during ingestion before normalization.
 Key columns: `source_run_id`, `record_type`, `external_ref`, `observed_at`, `payload`, `payload_hash`, `provenance`.
 
 Indexes: `raw_records_payload_gin_idx`.
+
+Retention: payload rows can be TTL-pruned after archive handoff only when no normalized observation table references them. Archive location must be recorded in `provenance` before `run_observation_retention()` can delete the row.
 
 ### `retailer_source_policies`
 
@@ -190,6 +200,14 @@ Derived weekly rollup over immutable `observations` for long-range market charts
 Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `price_type`, `currency`, `week_start`, `min_price`, `max_price`, `avg_price`, `last_price`, unit-price equivalents, `first_observed_at`, `last_observed_at`, `observation_count`, `source_observation_ids`, `provenance`.
 
 Indexes: `price_weekly_product_chain_week_idx`, `price_weekly_store_week_idx`, and `price_weekly_domain_week_idx`.
+
+### `retention_runs`
+
+Audit log for dry-run and executed storage-retention jobs.
+
+Key columns: `run_kind`, `dry_run`, `observations_cutoff`, `raw_records_cutoff`, candidate/deleted counts for observations and raw records, `policy`, and `provenance`.
+
+Policy: `run_observation_retention(retain_observations_days, retain_raw_records_days, dry_run)` defaults to dry-run behavior through the ops script. It only deletes old observations after latest-price and daily/weekly rollup coverage checks pass, and only deletes raw records with archive/object-storage provenance after normalized references are gone.
 
 ### `users`
 
