@@ -451,6 +451,21 @@ class RecordingQueryExecutor implements QueryExecutor {
       observed_store_price_types: ['2102:shelf']
     }
   ];
+  friendSharedDealSignalRows: unknown[] = [
+    {
+      signal_id: 'friend-share-1',
+      user_id: 'user-1',
+      product_id: 'coffee',
+      shared_by_user_id: 'friend-1',
+      shared_by_display_name: 'Ada',
+      relationship: 'friend',
+      shared_at: '2026-05-20T10:30:00.000Z',
+      source_confidence: '0.8700',
+      opted_in: true,
+      deal_score: 82,
+      created_at: '2026-05-20T10:31:00.000Z'
+    }
+  ];
 
   async query<T>(sql: string, params: unknown[] = []) {
     this.calls.push({ sql, params });
@@ -476,6 +491,7 @@ class RecordingQueryExecutor implements QueryExecutor {
     if (sql.includes('from subscription_entitlements')) return this.subscriptionEntitlementRows as T[];
     if (sql.includes('from watchlist_items')) return this.watchlistRows as T[];
     if (sql.includes('from basket_import_review_items')) return this.basketImportReviewRows as T[];
+    if (sql.includes('from friend_shared_deal_signals')) return this.friendSharedDealSignalRows as T[];
     if (sql.includes('update basket_import_review_items')) {
       return [{
         ...this.basketImportReviewRows[0] as Record<string, unknown>,
@@ -686,6 +702,56 @@ describe('createPostgresRepository', () => {
     assert.equal(resolved.resolvedAt, '2026-05-22T09:36:00.000Z');
     const updateCall = executor.calls.find((call) => call.sql.includes('update basket_import_review_items'));
     assert.deepEqual(updateCall?.params, ['user-1', 'review-1', 'dismissed', '2026-05-22T09:36:00.000Z', null, null]);
+  });
+
+  it('persists friend-shared deal signals for account-scoped suggestion inputs', async () => {
+    const executor = new RecordingQueryExecutor();
+    const repo = createPostgresRepository(executor);
+
+    await repo.upsertFriendSharedDealSignal({
+      signalId: 'friend-share-1',
+      userId: 'user-1',
+      productId: 'coffee',
+      sharedByUserId: 'friend-1',
+      sharedByDisplayName: 'Ada',
+      relationship: 'friend',
+      sharedAt: '2026-05-20T10:30:00.000Z',
+      sourceConfidence: 0.87,
+      optedIn: true,
+      dealScore: 82,
+      createdAt: '2026-05-20T10:31:00.000Z'
+    });
+
+    const insertCall = executor.calls.find((call) => call.sql.includes('insert into friend_shared_deal_signals'));
+    assert.match(insertCall?.sql ?? '', /on conflict \(signal_id\) do update/);
+    assert.deepEqual(insertCall?.params, [
+      'friend-share-1',
+      'user-1',
+      'coffee',
+      'friend-1',
+      'Ada',
+      'friend',
+      '2026-05-20T10:30:00.000Z',
+      0.87,
+      true,
+      82,
+      '2026-05-20T10:31:00.000Z'
+    ]);
+    assert.deepEqual(await repo.listFriendSharedDealSignals('user-1'), [
+      {
+        signalId: 'friend-share-1',
+        userId: 'user-1',
+        productId: 'coffee',
+        sharedByUserId: 'friend-1',
+        sharedByDisplayName: 'Ada',
+        relationship: 'friend',
+        sharedAt: '2026-05-20T10:30:00.000Z',
+        sourceConfidence: 0.87,
+        optedIn: true,
+        dealScore: 82,
+        createdAt: '2026-05-20T10:31:00.000Z'
+      }
+    ]);
   });
 
   it('persists and reads subscription entitlements with parameterized billing identifiers', async () => {

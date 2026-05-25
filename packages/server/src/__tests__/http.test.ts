@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { createHmac } from 'node:crypto';
 import { createGroceryViewApi, type BasketImportReviewItem } from '@groceryview/api';
 import { createSessionToken } from '@groceryview/auth';
+import type { FriendSharedDealSignalRecord } from '@groceryview/db';
 import { createHttpHandler } from '../index.js';
 
 async function json(response: Response) {
@@ -1494,6 +1495,65 @@ describe('createHttpHandler', () => {
       })
     }));
     assert.equal(crossUser.status, 400);
+  });
+
+  it('persists friend share signals through the repository-backed deals endpoint', async () => {
+    const signals: FriendSharedDealSignalRecord[] = [];
+    const handle = createHttpHandler(undefined, {
+      now: new Date('2026-05-20T12:00:00.000Z'),
+      friendSharedDealSignalRepository: {
+        async upsertFriendSharedDealSignal(signal) {
+          signals.push(signal);
+        },
+        async listFriendSharedDealSignals(userId) {
+          return signals.filter((signal) => signal.userId === userId);
+        }
+      }
+    });
+
+    const saved = await handle(new Request('http://localhost/api/deals/friend-share-signals?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({
+        signalId: 'friend-share-1',
+        productId: 'coffee',
+        sharedByUserId: 'friend-1',
+        sharedByDisplayName: 'Ada',
+        relationship: 'friend',
+        sharedAt: '2026-05-20T10:30:00.000Z',
+        sourceConfidence: 0.87,
+        optedIn: true,
+        dealScore: 82
+      })
+    }));
+    assert.equal(saved.status, 202);
+    const savedBody = await json(saved) as { persisted: boolean; signal: { createdAt: string; userId: string } };
+    assert.equal(savedBody.persisted, true);
+    assert.equal(savedBody.signal.userId, 'user-1');
+    assert.equal(savedBody.signal.createdAt, '2026-05-20T12:00:00.000Z');
+
+    const listed = await json(await handle(new Request('http://localhost/api/deals/friend-share-signals?userId=user-1'))) as {
+      signals: Array<Record<string, unknown>>;
+    };
+    assert.deepEqual(listed.signals, [
+      {
+        signalId: 'friend-share-1',
+        userId: 'user-1',
+        productId: 'coffee',
+        sharedByUserId: 'friend-1',
+        sharedByDisplayName: 'Ada',
+        relationship: 'friend',
+        sharedAt: '2026-05-20T10:30:00.000Z',
+        sourceConfidence: 0.87,
+        optedIn: true,
+        dealScore: 82,
+        createdAt: '2026-05-20T12:00:00.000Z'
+      }
+    ]);
+
+    const exported = await json(await handle(new Request('http://localhost/api/privacy/export?userId=user-1'))) as {
+      sections: Array<{ name: string; records: Array<Record<string, unknown>> }>;
+    };
+    assert.deepEqual(exported.sections.find((section) => section.name === 'friend_shared_deal_signals')?.records, listed.signals);
   });
 
   it('deletes signed-in settings account data after explicit confirmation', async () => {

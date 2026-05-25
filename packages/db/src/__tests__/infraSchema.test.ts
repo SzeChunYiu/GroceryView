@@ -18,13 +18,14 @@ const retailerSourcePoliciesMigration = readFileSync(join(repoRoot, 'infra/db/mi
 const basketImportReviewsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/010_basket_import_reviews.sql'), 'utf8').toLowerCase();
 const priceAlertsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/011_price_alerts.sql'), 'utf8').toLowerCase();
 const telegramNotificationsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/018_telegram_notifications.sql'), 'utf8').toLowerCase();
+const friendSharedDealSignalsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/025_friend_shared_deal_signals.sql'), 'utf8').toLowerCase();
 const migrationsDir = join(repoRoot, 'infra/db/migrations');
 const allMigrations = readdirSync(migrationsDir)
   .filter((entry) => entry.endsWith('.sql') && !entry.startsWith('._'))
   .sort()
   .map((entry) => readFileSync(join(migrationsDir, entry), 'utf8').toLowerCase())
   .join('\n');
-const repositoryMigrations = `${repositoryMigration}\n${entitlementMigration}\n${alertRulesMigration}\n${pantryInventoryMigration}\n${receiptUploadsMigration}\n${householdPlansMigration}\n${basketImportReviewsMigration}\n${telegramNotificationsMigration}`;
+const repositoryMigrations = `${repositoryMigration}\n${entitlementMigration}\n${alertRulesMigration}\n${pantryInventoryMigration}\n${receiptUploadsMigration}\n${householdPlansMigration}\n${basketImportReviewsMigration}\n${telegramNotificationsMigration}\n${friendSharedDealSignalsMigration}`;
 const sourcePolicyTables = ['retailer_source_policies'];
 const migrationVerifier = readFileSync(join(repoRoot, 'infra/db/scripts/verify-migrations.sh'), 'utf8').toLowerCase();
 const schemaDoc = readFileSync(join(repoRoot, 'infra/db/SCHEMA.md'), 'utf8').toLowerCase();
@@ -54,6 +55,7 @@ const repositoryTables = [
   'weekly_baskets',
   'basket_items',
   'basket_import_review_items',
+  'friend_shared_deal_signals',
   'human_review_assignments',
   'human_reviewers',
   'community_reporter_trust',
@@ -343,6 +345,10 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(repositoryTableDefinition('basket_import_review_items'), /review_item_id text not null/);
     assert.match(repositoryTableDefinition('basket_import_review_items'), /status text not null check \(status in \('open', 'accepted', 'dismissed'\)\)/);
     assert.match(repositoryTableDefinition('basket_import_review_items'), /primary key \(user_id, review_item_id\)/);
+    assert.match(repositoryTableDefinition('friend_shared_deal_signals'), /signal_id text primary key/);
+    assert.match(repositoryTableDefinition('friend_shared_deal_signals'), /user_id text not null references app_users\(id\) on delete cascade/);
+    assert.match(repositoryTableDefinition('friend_shared_deal_signals'), /relationship text not null check \(relationship in \('household', 'friend'\)\)/);
+    assert.match(repositoryTableDefinition('friend_shared_deal_signals'), /source_confidence numeric\(5, 4\) not null check \(source_confidence between 0 and 1\)/);
     assert.match(repositoryTableDefinition('pantry_items'), /user_id text not null references app_users\(id\) on delete cascade/);
     assert.match(repositoryTableDefinition('pantry_items'), /category text not null check/);
     assert.match(repositoryTableDefinition('pantry_items'), /quantity numeric\(12, 3\) not null check \(quantity >= 0\)/);
