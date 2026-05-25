@@ -2,6 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   applyHumanReviewDecision,
+  auditProductMatchPrecisionByCountryPair,
   authorizeHumanReviewAction,
   classifyProductMatch,
   compareCommodityUnitPrices,
@@ -43,6 +44,88 @@ describe('classifyProductMatch', () => {
     assert.equal(match.qualityRisk, 'high');
   });
 });
+
+describe('auditProductMatchPrecisionByCountryPair', () => {
+  it('reports precision per Nordic country pair from a deterministic 50-product audit sample', () => {
+    const samples = [
+      ...Array.from({ length: 6 }, (_, index) => auditSample(`se-no-milk-${index}`, 'SE', 'NO', 'milk', 1, 'l', true)),
+      ...Array.from({ length: 6 }, (_, index) => auditSample(`se-no-pasta-${index}`, 'SE', 'NO', 'pasta', 500, 'g', true)),
+      auditSample('se-no-false-sour-milk', 'SE', 'NO', 'milk', 1, 'l', false),
+      auditSample('se-no-false-rice', 'SE', 'NO', 'rice', 1000, 'g', false),
+      auditSample('se-no-mismatch-baby', 'SE', 'NO', 'baby_formula', 1, 'piece', false),
+      auditSample('se-no-mismatch-size', 'SE', 'NO', 'pasta', 500, 'g', false, { candidatePackageSize: 750 }),
+      ...Array.from({ length: 8 }, (_, index) => auditSample(`no-se-pasta-${index}`, 'NO', 'SE', 'pasta', 500, 'g', true)),
+      auditSample('no-se-false-fish', 'NO', 'SE', 'fish', 400, 'g', false),
+      auditSample('no-se-mismatch-category', 'NO', 'SE', 'rice', 1000, 'g', false, { candidateCategory: 'flour' }),
+      ...Array.from({ length: 6 }, (_, index) => auditSample(`se-is-butter-${index}`, 'SE', 'IS', 'butter', 500, 'g', true)),
+      ...Array.from({ length: 2 }, (_, index) => auditSample(`se-is-mismatch-size-${index}`, 'SE', 'IS', 'milk', 1, 'l', false, { candidatePackageSize: 1.5 })),
+      ...Array.from({ length: 6 }, (_, index) => auditSample(`is-se-rice-${index}`, 'IS', 'SE', 'rice', 1000, 'g', true)),
+      ...Array.from({ length: 4 }, (_, index) => auditSample(`no-is-coffee-${index}`, 'NO', 'IS', 'coffee', 250, 'g', true)),
+      auditSample('no-is-false-yogurt', 'NO', 'IS', 'yogurt', 1000, 'g', false),
+      ...Array.from({ length: 4 }, (_, index) => auditSample(`is-no-flour-${index}`, 'IS', 'NO', 'flour', 1000, 'g', true)),
+      auditSample('is-no-mismatch-category', 'IS', 'NO', 'coffee', 450, 'g', false, { candidateCategory: 'tea' })
+    ];
+    const report = auditProductMatchPrecisionByCountryPair({
+      sampleSize: 50,
+      seed: 'nordic-match-audit-2026-05',
+      minimumSamplesPerPair: 2,
+      minimumPrecision: 0.9,
+      samples
+    });
+
+    assert.equal(report.requestedSampleSize, 50);
+    assert.equal(report.auditedSampleCount, 50);
+    assert.deepEqual(report.precisionByCountryPair.map((row) => ({
+      countryPair: row.countryPair,
+      sampleCount: row.sampleCount,
+      predictedMatchCount: row.predictedMatchCount,
+      falsePositiveCount: row.falsePositiveCount,
+      precision: row.precision,
+      tuningRecommendation: row.tuningRecommendation
+    })), [
+      { countryPair: 'IS-NO', sampleCount: 5, predictedMatchCount: 4, falsePositiveCount: 0, precision: 1, tuningRecommendation: 'keep_threshold' },
+      { countryPair: 'IS-SE', sampleCount: 6, predictedMatchCount: 6, falsePositiveCount: 0, precision: 1, tuningRecommendation: 'keep_threshold' },
+      { countryPair: 'NO-IS', sampleCount: 5, predictedMatchCount: 5, falsePositiveCount: 1, precision: 0.8, tuningRecommendation: 'tighten_country_pair_review' },
+      { countryPair: 'NO-SE', sampleCount: 10, predictedMatchCount: 9, falsePositiveCount: 1, precision: 0.89, tuningRecommendation: 'tighten_country_pair_review' },
+      { countryPair: 'SE-IS', sampleCount: 8, predictedMatchCount: 6, falsePositiveCount: 0, precision: 1, tuningRecommendation: 'keep_threshold' },
+      { countryPair: 'SE-NO', sampleCount: 16, predictedMatchCount: 14, falsePositiveCount: 2, precision: 0.86, tuningRecommendation: 'tighten_country_pair_review' }
+    ]);
+  });
+});
+
+function auditSample(
+  id: string,
+  sourceCountry: 'SE' | 'NO' | 'IS',
+  candidateCountry: 'SE' | 'NO' | 'IS',
+  category: string,
+  packageSize: number,
+  packageUnit: string,
+  expectedMatch: boolean,
+  overrides: { candidateCategory?: string; candidatePackageSize?: number } = {}
+) {
+  return {
+    id,
+    expectedMatch,
+    source: {
+      id: `${id}:source`,
+      country: sourceCountry,
+      brand: 'Audit',
+      category,
+      packageSize,
+      packageUnit,
+      brandTier: 'national' as const
+    },
+    candidate: {
+      id: `${id}:candidate`,
+      country: candidateCountry,
+      brand: 'Audit',
+      category: overrides.candidateCategory ?? category,
+      packageSize: overrides.candidatePackageSize ?? packageSize,
+      packageUnit,
+      brandTier: 'national' as const
+    }
+  };
+}
 
 describe('recommendSmartSwaps', () => {
   it('recommends private-label swaps only when savings and user preference allow it', () => {

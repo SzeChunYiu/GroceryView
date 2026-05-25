@@ -2918,6 +2918,32 @@ export type ProductMatchResult = {
   reason: string;
 };
 
+export type ProductMatchAuditCountry = FixedBasketIndexCountry;
+
+export type ProductMatchAuditSample = {
+  id: string;
+  source: ProductMatchInput & { country: ProductMatchAuditCountry };
+  candidate: ProductMatchInput & { country: ProductMatchAuditCountry };
+  expectedMatch: boolean;
+};
+
+export type ProductMatchCountryPairPrecision = {
+  countryPair: `${ProductMatchAuditCountry}-${ProductMatchAuditCountry}`;
+  sampleCount: number;
+  predictedMatchCount: number;
+  expectedMatchCount: number;
+  truePositiveCount: number;
+  falsePositiveCount: number;
+  precision: number | null;
+  tuningRecommendation: 'needs_more_samples' | 'keep_threshold' | 'tighten_country_pair_review';
+};
+
+export type ProductMatchPrecisionAuditReport = {
+  requestedSampleSize: number;
+  auditedSampleCount: number;
+  precisionByCountryPair: ProductMatchCountryPairPrecision[];
+};
+
 const highConfidenceCategories = new Set(['pasta', 'rice', 'sugar', 'flour', 'milk']);
 const mediumConfidenceCategories = new Set(['coffee', 'butter', 'yogurt', 'toilet_paper']);
 const lowConfidenceCategories = new Set(['meat', 'fish', 'fruit', 'vegetables']);
@@ -2960,6 +2986,85 @@ export function classifyProductMatch(input: { source: ProductMatchInput; candida
   }
 
   return { mode: 'not_recommended', confidence: 'low', qualityRisk: 'high', reason: 'Package sizes are not comparable.' };
+}
+
+export function auditProductMatchPrecisionByCountryPair(input: {
+  samples: readonly ProductMatchAuditSample[];
+  sampleSize?: number;
+  seed?: string;
+  minimumSamplesPerPair?: number;
+  minimumPrecision?: number;
+}): ProductMatchPrecisionAuditReport {
+  const requestedSampleSize = Math.max(1, input.sampleSize ?? 50);
+  const seed = input.seed ?? 'product-match-country-pair-audit';
+  const minimumSamplesPerPair = Math.max(1, input.minimumSamplesPerPair ?? 5);
+  const minimumPrecision = input.minimumPrecision ?? 0.9;
+  const sampled = input.samples
+    .map((sample) => ({ sample, sortKey: stableAuditSortKey(`${seed}:${sample.id}`) }))
+    .sort((a, b) => a.sortKey - b.sortKey || a.sample.id.localeCompare(b.sample.id))
+    .slice(0, requestedSampleSize)
+    .map(({ sample }) => sample);
+  const groups = new Map<ProductMatchCountryPairPrecision['countryPair'], {
+    sampleCount: number;
+    predictedMatchCount: number;
+    expectedMatchCount: number;
+    truePositiveCount: number;
+    falsePositiveCount: number;
+  }>();
+
+  for (const sample of sampled) {
+    const countryPair = `${sample.source.country}-${sample.candidate.country}` as ProductMatchCountryPairPrecision['countryPair'];
+    const stats = groups.get(countryPair) ?? {
+      sampleCount: 0,
+      predictedMatchCount: 0,
+      expectedMatchCount: 0,
+      truePositiveCount: 0,
+      falsePositiveCount: 0
+    };
+    const result = classifyProductMatch({ source: sample.source, candidate: sample.candidate });
+    const predictedMatch = result.mode !== 'not_recommended';
+    stats.sampleCount += 1;
+    if (sample.expectedMatch) stats.expectedMatchCount += 1;
+    if (predictedMatch) {
+      stats.predictedMatchCount += 1;
+      if (sample.expectedMatch) {
+        stats.truePositiveCount += 1;
+      } else {
+        stats.falsePositiveCount += 1;
+      }
+    }
+    groups.set(countryPair, stats);
+  }
+
+  return {
+    requestedSampleSize,
+    auditedSampleCount: sampled.length,
+    precisionByCountryPair: [...groups.entries()]
+      .map(([countryPair, stats]) => {
+        const precision = stats.predictedMatchCount === 0 ? null : roundMoney(stats.truePositiveCount / stats.predictedMatchCount);
+        const tuningRecommendation = stats.sampleCount < minimumSamplesPerPair
+          ? 'needs_more_samples'
+          : precision !== null && precision < minimumPrecision
+            ? 'tighten_country_pair_review'
+            : 'keep_threshold';
+        return {
+          countryPair,
+          ...stats,
+          precision,
+          tuningRecommendation
+        };
+      })
+      .sort((a, b) => a.countryPair.localeCompare(b.countryPair))
+  };
+}
+
+function stableAuditSortKey(value: string): number {
+  let hash = 2166136261;
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
 }
 
 export type SmartSwapInput = {
