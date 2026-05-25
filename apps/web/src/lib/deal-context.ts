@@ -1,3 +1,5 @@
+import { getPriceFreshness, type FreshnessLevel } from './freshness';
+
 export type DealHistoryPoint = {
   price: number;
   observedAt?: string;
@@ -19,6 +21,22 @@ export type DealContext = {
   previousLowestPrice?: number;
   previousLowestLabel?: string;
   isNewLowestPrice: boolean;
+};
+
+export type DealFeedFilters = {
+  chain?: string;
+  dietary?: string;
+  freshness?: FreshnessLevel;
+  minDropPercent?: number;
+  minSavings?: number;
+};
+
+export type DealFeedFilterCandidate = {
+  chainLabel?: string;
+  currentPrice: number;
+  dietaryTags?: string[];
+  freshnessObservedAt?: string | number | Date | null;
+  originalPrice?: number;
 };
 
 export type SeasonalProduceMonthPoint = {
@@ -186,6 +204,46 @@ export function buildDealContext({
       previousLowestPrice === undefined ? undefined : `Previous low ${formatPrice(previousLowestPrice, locale, currency)}`,
     isNewLowestPrice: previousLowestPrice === undefined ? false : currentPrice <= previousLowestPrice
   };
+}
+
+export function dealAbsoluteSavings(deal: Pick<DealFeedFilterCandidate, 'currentPrice' | 'originalPrice'>) {
+  return typeof deal.originalPrice === 'number' && deal.originalPrice > deal.currentPrice
+    ? deal.originalPrice - deal.currentPrice
+    : 0;
+}
+
+export function dealDropPercent(deal: Pick<DealFeedFilterCandidate, 'currentPrice' | 'originalPrice'>) {
+  return typeof deal.originalPrice === 'number' && deal.originalPrice > 0
+    ? (dealAbsoluteSavings(deal) / deal.originalPrice) * 100
+    : 0;
+}
+
+export function filterDealFeed<TDeal extends DealFeedFilterCandidate>(
+  deals: TDeal[],
+  filters: DealFeedFilters,
+  now = new Date()
+): TDeal[] {
+  const chain = filters.chain?.trim().toLocaleLowerCase('sv-SE');
+  const dietary = filters.dietary?.trim().toLocaleLowerCase('sv-SE');
+
+  return deals.filter((deal) => {
+    if (typeof filters.minDropPercent === 'number' && dealDropPercent(deal) < filters.minDropPercent) return false;
+    if (typeof filters.minSavings === 'number' && dealAbsoluteSavings(deal) < filters.minSavings) return false;
+    if (chain && deal.chainLabel?.toLocaleLowerCase('sv-SE') !== chain) return false;
+    if (filters.freshness && getPriceFreshness(deal.freshnessObservedAt, now).level !== filters.freshness) return false;
+    if (dietary && !(deal.dietaryTags ?? []).some((tag) => tag.toLocaleLowerCase('sv-SE') === dietary)) return false;
+    return true;
+  });
+}
+
+export function dealFeedFilterLabels(filters: DealFeedFilters) {
+  return [
+    typeof filters.minDropPercent === 'number' ? `Drop ≥ ${filters.minDropPercent}%` : '',
+    typeof filters.minSavings === 'number' ? `Savings ≥ ${formatPrice(filters.minSavings, 'sv-SE', 'SEK')}` : '',
+    filters.chain ? `Chain: ${filters.chain}` : '',
+    filters.freshness ? `Freshness: ${filters.freshness}` : '',
+    filters.dietary ? `Diet: ${filters.dietary}` : ''
+  ].filter(Boolean);
 }
 
 function peakMonthsFor(row: SeasonalProduceInput) {

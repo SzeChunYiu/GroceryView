@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { DealCard } from '@/components/deal-card';
+import { dealAbsoluteSavings, dealDropPercent, dealFeedFilterLabels, filterDealFeed, type DealFeedFilters } from '@/lib/deal-context';
 import { categoryLabels, pricedProducts } from '@/lib/openprices-products';
 import { buildPantryReplacementFilter, pantryReplacementMatches } from '@/lib/pantry';
 import { buildCityTrendingItems } from '@/lib/trends';
@@ -12,8 +13,11 @@ type SearchParams = Record<string, string | string[] | undefined>;
 type ReplacementDeal = {
   categoryLabel: string;
   categorySlug: string;
+  chainLabel: string;
   currentPrice: number;
   dealId: string;
+  dietaryTags: string[];
+  freshnessObservedAt: string;
   imageUrl?: string | null;
   originalPrice?: number;
   productName: string;
@@ -49,11 +53,41 @@ function flyerDealEndsAt(index: number) {
   return new Date(Date.UTC(2026, 4, 25 + Math.min(index + 1, 5), 20, 59, 0)).toISOString();
 }
 
+function numberParam(value: string | string[] | undefined) {
+  const parsed = Number(paramValue(value));
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
+}
+
+function dealFeedFilters(params: SearchParams): DealFeedFilters {
+  const freshness = paramValue(params.freshness);
+  return {
+    chain: paramValue(params.chain),
+    dietary: paramValue(params.dietary),
+    freshness: freshness === 'fresh' || freshness === 'aging' || freshness === 'stale' || freshness === 'unknown' ? freshness : undefined,
+    minDropPercent: numberParam(params.minDropPercent),
+    minSavings: numberParam(params.minSavings)
+  };
+}
+
+function dietaryTagsForDeal(productName: string, categoryLabel: string) {
+  const text = `${productName} ${categoryLabel}`.toLocaleLowerCase('sv-SE');
+  const tags = new Set<string>(['vegetarian']);
+  if (!/(milk|mjölk|ost|cheese|yoghurt|yogurt|fil|kyckling|chicken|korv|kött|meat|fisk|fish|lax)/i.test(text)) tags.add('vegan');
+  if (!/(pasta|spaghetti|bread|bröd|fralla|vete|wheat|gluten)/i.test(text)) tags.add('glutenfree');
+  if (!/(milk|mjölk|laktos|yoghurt|yogurt|fil|ost|cheese)/i.test(text)) tags.add('lactosefree');
+  return [...tags];
+}
+
+const snapshotObservedAt = '2026-05-21T12:00:00.000Z';
+
 const spreadDeals: ReplacementDeal[] = topChainSpreads.map((product) => ({
   categoryLabel: labelFromSlug(product.category),
   categorySlug: product.category,
+  chainLabel: product.lowestChain,
   currentPrice: product.lowestPrice,
   dealId: `spread-${product.slug}`,
+  dietaryTags: dietaryTagsForDeal(product.name, labelFromSlug(product.category)),
+  freshnessObservedAt: snapshotObservedAt,
   imageUrl: product.image,
   originalPrice: product.highestPrice > product.lowestPrice ? product.highestPrice : undefined,
   productName: product.name,
@@ -64,8 +98,11 @@ const spreadDeals: ReplacementDeal[] = topChainSpreads.map((product) => ({
 const priceDropDeals: ReplacementDeal[] = priceDropMoversBoard.map((mover) => ({
   categoryLabel: mover.categoryLabel,
   categorySlug: slugFromLabel(mover.categoryLabel),
+  chainLabel: 'OpenPrices',
   currentPrice: mover.latestPrice,
   dealId: `drop-${mover.productSlug}`,
+  dietaryTags: dietaryTagsForDeal(mover.productName, mover.categoryLabel),
+  freshnessObservedAt: mover.latestObservedAt,
   imageUrl: mover.imageUrl,
   originalPrice: mover.previousPrice > mover.latestPrice ? mover.previousPrice : undefined,
   productName: mover.productName,
@@ -76,6 +113,7 @@ const priceDropDeals: ReplacementDeal[] = priceDropMoversBoard.map((mover) => ({
 const replacementDeals = [...spreadDeals, ...priceDropDeals].filter((deal, index, deals) => (
   deals.findIndex((candidate) => candidate.productSlug === deal.productSlug) === index
 ));
+const chainFilterOptions = [...new Set(replacementDeals.map((deal) => deal.chainLabel))].sort((a, b) => a.localeCompare(b, 'sv'));
 
 const cityTrendingFeed = buildCityTrendingItems({ city: 'stockholm', limit: 4 });
 
@@ -91,11 +129,21 @@ const localDropFeed = buildLocalPriceDropFeed(pricedProducts.map((product) => ({
 
 export default async function DealsPage({ searchParams }: Readonly<{ searchParams?: Promise<SearchParams> }>) {
   const params = (await searchParams) ?? {};
+  const filters = dealFeedFilters(params);
+  const filterLabels = dealFeedFilterLabels(filters);
   const replacementFilter = buildPantryReplacementFilter(paramValue(params.replace));
-  const visibleDeals = (replacementFilter
+  const replacementScopedDeals = replacementFilter
     ? replacementDeals.filter((deal) => pantryReplacementMatches(replacementFilter, deal))
-    : replacementDeals
-  ).slice(0, 8);
+    : replacementDeals;
+  const visibleDeals = filterDealFeed(replacementScopedDeals, filters).slice(0, 8);
+  const filteredLocalDropFeed = filterDealFeed(localDropFeed.map((item) => ({
+    ...item,
+    chainLabel: 'OpenPrices',
+    currentPrice: item.latestPrice,
+    dietaryTags: dietaryTagsForDeal(item.productName, item.category),
+    freshnessObservedAt: item.latestObservedAt,
+    originalPrice: item.previousWeekPrice
+  })), filters);
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8 text-slate-950 sm:px-6 lg:px-8">
@@ -117,6 +165,49 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
           <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{snapshot.axfoodSource}</p>
         </div>
       </div>
+
+      <form action="/deals" className="mt-6 grid gap-3 rounded-[1.5rem] border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-3 lg:grid-cols-6" data-deal-feed-filters method="get">
+        {replacementFilter ? <input name="replace" type="hidden" value={replacementFilter.replacementId} /> : null}
+        <label className="text-xs font-black uppercase tracking-[0.16em] text-slate-600">
+          Min drop %
+          <input className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-bold text-slate-950" defaultValue={paramValue(params.minDropPercent) ?? ''} min="0" name="minDropPercent" step="1" type="number" />
+        </label>
+        <label className="text-xs font-black uppercase tracking-[0.16em] text-slate-600">
+          Min savings
+          <input className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-bold text-slate-950" defaultValue={paramValue(params.minSavings) ?? ''} min="0" name="minSavings" step="1" type="number" />
+        </label>
+        <label className="text-xs font-black uppercase tracking-[0.16em] text-slate-600">
+          Chain
+          <select className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-bold text-slate-950" defaultValue={filters.chain ?? ''} name="chain">
+            <option value="">Any chain</option>
+            {chainFilterOptions.map((chain) => <option key={chain} value={chain}>{chain}</option>)}
+          </select>
+        </label>
+        <label className="text-xs font-black uppercase tracking-[0.16em] text-slate-600">
+          Freshness
+          <select className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-bold text-slate-950" defaultValue={filters.freshness ?? ''} name="freshness">
+            <option value="">Any freshness</option>
+            {['fresh', 'aging', 'stale', 'unknown'].map((level) => <option key={level} value={level}>{level}</option>)}
+          </select>
+        </label>
+        <label className="text-xs font-black uppercase tracking-[0.16em] text-slate-600">
+          Diet
+          <select className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-bold text-slate-950" defaultValue={filters.dietary ?? ''} name="dietary">
+            <option value="">Any diet</option>
+            {['vegan', 'vegetarian', 'glutenfree', 'lactosefree'].map((diet) => <option key={diet} value={diet}>{diet}</option>)}
+          </select>
+        </label>
+        <div className="flex items-end gap-2">
+          <button className="w-full rounded-xl bg-emerald-800 px-4 py-2 text-sm font-black text-white" type="submit">Apply</button>
+          <Link className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-black text-slate-700" href="/deals">Reset</Link>
+        </div>
+      </form>
+
+      {filterLabels.length > 0 ? (
+        <div className="mt-3 flex flex-wrap gap-2" aria-label="Active deal feed filters">
+          {filterLabels.map((label) => <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-emerald-900" key={label}>{label}</span>)}
+        </div>
+      ) : null}
 
       <section className="mt-6 rounded-[2rem] border border-orange-200 bg-orange-50/80 p-5 shadow-sm" aria-label="City trending deal discovery" data-city-trending-deals={cityTrendingFeed.city}>
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
@@ -149,9 +240,9 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
             Ranked by recent percentage drops, then by normalized unit-price savings. Package-size gaps fall back to per-item savings.
           </p>
         </div>
-        {localDropFeed.length > 0 ? (
+        {filteredLocalDropFeed.length > 0 ? (
           <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {localDropFeed.map((item) => (
+            {filteredLocalDropFeed.map((item) => (
               <DealCard
                 categoryLabel={item.category}
                 currentPrice={item.latestPrice}
@@ -159,6 +250,10 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
                 discountStartedAt={item.latestObservedAt}
                 dropPercentLabel={`${formatPercent(item.dropPercent)} drop`}
                 evidenceLabel={`${item.evidenceLabel}. Unit price moved from ${formatSek(item.previousWeekUnitPrice)}/${item.unitPriceUnit} to ${formatSek(item.latestUnitPrice)}/${item.unitPriceUnit}.`}
+                filterBadges={[
+                  `${new Intl.NumberFormat('sv-SE', { maximumFractionDigits: 1 }).format(dealDropPercent({ currentPrice: item.latestPrice, originalPrice: item.previousWeekPrice }))}% drop`,
+                  `${formatSek(dealAbsoluteSavings({ currentPrice: item.latestPrice, originalPrice: item.previousWeekPrice }))} saved`
+                ]}
                 key={item.productSlug}
                 localityLabel={item.locality}
                 originalPrice={item.previousWeekPrice}
@@ -203,6 +298,13 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
             currentPrice={deal.currentPrice}
             dealEndsAt={flyerDealEndsAt(index)}
             dealId={deal.dealId}
+            filterBadges={[
+              `${new Intl.NumberFormat('sv-SE', { maximumFractionDigits: 1 }).format(dealDropPercent(deal))}% drop`,
+              `${formatSek(dealAbsoluteSavings(deal))} saved`,
+              deal.chainLabel,
+              ...deal.dietaryTags.slice(0, 2)
+            ]}
+            freshnessObservedAt={deal.freshnessObservedAt}
             imageAlt={`${deal.productName} deal image`}
             imageUrl={deal.imageUrl}
             key={deal.dealId}

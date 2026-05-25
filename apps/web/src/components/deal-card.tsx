@@ -51,6 +51,7 @@ type DealCardProps = {
   dropPercentLabel?: string;
   unitPriceDropLabel?: string;
   evidenceLabel?: string;
+  filterBadges?: string[];
   freshnessObservedAt?: string | number | Date | null;
   replacementLabel?: string;
   sourceLabel?: string;
@@ -149,6 +150,7 @@ export function DealCard({
   dropPercentLabel,
   unitPriceDropLabel,
   evidenceLabel,
+  filterBadges = [],
   freshnessObservedAt,
   replacementLabel,
   sourceLabel,
@@ -327,6 +329,11 @@ export function DealCard({
             {context.previousLowestLabel}
           </span>
         ) : null}
+        {filterBadges.map((badge) => (
+          <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-900" data-deal-filter-badge key={badge}>
+            {badge}
+          </span>
+        ))}
       </div>
 
       {evidenceLabel ? (
