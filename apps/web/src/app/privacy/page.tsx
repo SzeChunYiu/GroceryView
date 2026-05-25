@@ -100,6 +100,18 @@ export default function FeaturePage() {
             <li>No anonymous privacy requests are accepted; every data-subject workflow must be account-bound and auditable.</li>
           </ul>
         </Card>
+
+        <Card>
+          <h2 className="text-2xl font-black text-slate-950">Íslensk persónuverndaryfirlit (is-IS)</h2>
+          <p className="mt-3 text-sm leading-6 text-slate-700">
+            Fyrir Ísland meðhöndlar GroceryView reiknings-, körfu-, vöktunar-, heimilis- og kvittanagögn eingöngu til að veita verðupplýsingar, notendastýringar, tilkynningar og lögbundin persónuverndarferli.
+          </p>
+          <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-6 text-slate-700">
+            <li>Persónuvernd er íslenska eftirlitsstofnunin sem notendur geta leitað til vegna persónuverndarmála.</li>
+            <li>Icelandic processing is documented as EEA-aligned GDPR: aðgangur/export, leiðrétting, eyðing, andmæli og takmörkun vinnslu eru account-bound réttindi.</li>
+            <li>Engar nafnlausar beiðnir um persónugögn eru framkvæmdar; útflutningur og eyðing krefjast innskráningar og rekjanlegrar beiðni.</li>
+          </ul>
+        </Card>
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
