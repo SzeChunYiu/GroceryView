@@ -84,7 +84,7 @@ function buildNavGroups(t: AppNavTranslator): NavGroup[] {
         { href: '/analytics/funnel', label: t('app-nav.items.funnel'), icon: BarChart3 },
         { href: '/categories', label: t('app-nav.items.categories'), icon: Tags },
         { href: '/heatmap', label: t('app-nav.items.heatmap'), icon: Flame },
-        { href: '/screener', label: t('app-nav.items.screener'), icon: Search }
+        { href: '/screener', label: 'Screener', icon: Search }
       ]
     },
     {
