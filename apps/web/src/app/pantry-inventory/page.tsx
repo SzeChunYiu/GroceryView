@@ -5,7 +5,7 @@ import Link from 'next/link';
 import type { PantryDeal } from '@groceryview/core';
 import { AppNav } from '@/components/app-nav';
 import { BottomNav } from '@/components/bottom-nav';
-import { buildPantryDealEvidenceMap, buildExpiryReminder, type PantryExpiryUrgency } from '@/lib/pantry';
+import { buildPantryDealEvidenceMap, buildExpiryReminder, buildMarkdownSuggestion, type PantryExpiryUrgency } from '@/lib/pantry';
 
 type PantryStatus = 'stocked' | 'consumed' | 'low' | 'replenished';
 
@@ -67,11 +67,16 @@ export default function PantryInventoryPage() {
     currentPantryDeals,
     Object.fromEntries(items.map((item) => [item.id, item.replacementHref]))
   ), [items]);
-  const itemsWithExpiry = useMemo(() => items.map((item) => ({
-    ...item,
-    dealEvidence: dealEvidenceByProduct[item.id],
-    expiryReminder: buildExpiryReminder({ expiresAt: item.expiresAt })
-  })), [dealEvidenceByProduct, items]);
+  const itemsWithExpiry = useMemo(() => items.map((item) => {
+    const expiryReminder = buildExpiryReminder({ expiresAt: item.expiresAt });
+
+    return {
+      ...item,
+      dealEvidence: dealEvidenceByProduct[item.id],
+      expiryReminder,
+      markdownSuggestion: buildMarkdownSuggestion(expiryReminder)
+    };
+  }), [dealEvidenceByProduct, items]);
   const statusCounts = useMemo(() => items.reduce<Record<PantryStatus, number>>((counts, item) => {
     counts[item.status] += 1;
     return counts;
@@ -136,8 +141,16 @@ export default function PantryInventoryPage() {
                         <span className={`inline-flex rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.14em] ${expiryStyles[item.expiryReminder.urgency]}`}>
                           {item.expiryReminder.label}
                         </span>
+                        {item.markdownSuggestion.shouldPromote ? (
+                          <span className="inline-flex rounded-full bg-lime-100 px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-lime-900">
+                            {item.markdownSuggestion.label}
+                          </span>
+                        ) : null}
                         {item.expiryReminder.urgency === 'expired' || item.expiryReminder.urgency === 'use-soon' ? (
                           <>
+                            {item.markdownSuggestion.shouldPromote ? (
+                              <span className="inline-flex rounded-full bg-white px-3 py-1 text-xs font-black text-lime-900">{item.markdownSuggestion.detail}</span>
+                            ) : null}
                             <Link className="inline-flex rounded-full bg-white px-3 py-1 text-xs font-black text-emerald-900 transition hover:text-emerald-700" href={item.recipeHref}>Recipe ideas</Link>
                             <Link className="inline-flex rounded-full bg-white px-3 py-1 text-xs font-black text-emerald-900 transition hover:text-emerald-700" href={item.replacementHref}>Replacement deals</Link>
                           </>

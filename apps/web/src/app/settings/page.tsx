@@ -1,5 +1,6 @@
 import { buildPrivacyExport } from '@groceryview/core';
 import { BulkImportDialog } from '@/components/BulkImportDialog';
+import { PushNotificationPreferenceControls } from '@/components/notification-inbox-actions';
 import { SettingsDataExportActions } from '@/components/settings-data-export-actions';
 import { DietaryProfileOnboarding } from '@/components/diet-filter-picker';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
@@ -64,6 +65,15 @@ export default function SettingsPage() {
             </div>
           ))}
         </div>
+      </Card>
+
+            <Card className="mt-6 border-indigo-200 bg-indigo-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-indigo-800">Notification volume</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Granular push preferences</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+          Keep mobile alerts useful by independently enabling price drops, stock changes, list collaboration, and budget warning notifications.
+        </p>
+        <PushNotificationPreferenceControls />
       </Card>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
