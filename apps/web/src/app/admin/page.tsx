@@ -10,6 +10,7 @@ import {
   moderationStatusLabel
 } from '@/lib/reviews';
 import { routeMetadata } from '@/lib/seo';
+import { sourceHealthDashboardRows, sourceHealthDashboardSummary } from '@/lib/source-health';
 
 export function generateMetadata() {
   return routeMetadata({
@@ -24,11 +25,20 @@ function formatPercent(value: number) {
   return new Intl.NumberFormat('sv-SE', { maximumFractionDigits: 0, style: 'percent' }).format(value);
 }
 
+function formatDateTime(value: string) {
+  return new Intl.DateTimeFormat('sv-SE', {
+    dateStyle: 'short',
+    timeStyle: 'short',
+    timeZone: 'Europe/Stockholm'
+  }).format(new Date(value));
+}
+
 export default function AdminPage() {
   const flaggedReviews = communityModerationQueue.filter((item) => item.type === 'flagged_review').length;
   const priceReports = communityModerationQueue.filter((item) => item.type === 'price_report').length;
   const duplicateReports = communityModerationQueue.filter((item) => item.type === 'duplicate_product_report').length;
   const dashboard = buildPartnerStoreDashboardSummary();
+  const connectorRunRows = sourceHealthDashboardRows.slice(0, 6);
 
   return (
     <div className="min-h-screen bg-[#f5f1e8] text-slate-950">
@@ -66,6 +76,72 @@ export default function AdminPage() {
             value={dashboard.sharedCategoryCount.toLocaleString('sv-SE')}
           />
         </section>
+
+        <Card className="mt-6 border-sky-200 bg-sky-50/70">
+          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+            <div>
+              <Eyebrow>Connector health</Eyebrow>
+              <h2 className="mt-2 text-2xl font-black tracking-tight">connector_runs freshness snapshot</h2>
+              <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+                Static admin preview of the connector_runs table shape: last successful run, product rows per chain/source, and positive row deltas from the latest 24-hour ingest window.
+              </p>
+            </div>
+            <Link className="rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white" href="/admin/source-health">
+              Full source health
+            </Link>
+          </div>
+          <div className="mt-5 grid gap-3 md:grid-cols-4">
+            <AdminMetricCard
+              detail="Rows monitored across sourceHealthDashboardRows."
+              label="Connector rows"
+              value={sourceHealthDashboardSummary.totalRows.toLocaleString('sv-SE')}
+            />
+            <AdminMetricCard
+              detail="Sources with stale, warning, or failed status."
+              label="Attention needed"
+              value={(sourceHealthDashboardSummary.staleSourceCount + sourceHealthDashboardSummary.failingSourceCount).toLocaleString('sv-SE')}
+            />
+            <AdminMetricCard
+              detail="Net latest row movement from connector run samples."
+              label="24h row delta"
+              value={`${sourceHealthDashboardSummary.rowCountDelta >= 0 ? '+' : ''}${sourceHealthDashboardSummary.rowCountDelta.toLocaleString('sv-SE')}`}
+            />
+            <AdminMetricCard
+              detail={`Monitored ${formatDateTime(sourceHealthDashboardSummary.monitoredAt)}.`}
+              label="Connector sources"
+              value={sourceHealthDashboardSummary.sourceCount.toLocaleString('sv-SE')}
+            />
+          </div>
+          <div className="mt-5 overflow-hidden rounded-2xl border border-sky-100 bg-white">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-sky-50 text-xs font-black uppercase tracking-[0.14em] text-sky-900">
+                <tr>
+                  <th className="px-4 py-3">Connector</th>
+                  <th className="px-4 py-3">Last run</th>
+                  <th className="px-4 py-3">Product count</th>
+                  <th className="px-4 py-3">Price rows 24h</th>
+                  <th className="px-4 py-3">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200">
+                {connectorRunRows.map((source) => (
+                  <tr key={source.sourceName}>
+                    <td className="px-4 py-4 align-top">
+                      <p className="font-black text-slate-950">{source.sourceName}</p>
+                      <p className="mt-1 text-xs font-semibold text-slate-600">{source.chain} · {source.dataSource}</p>
+                    </td>
+                    <td className="px-4 py-4 align-top font-semibold text-slate-700">{formatDateTime(source.lastRefreshAt)}</td>
+                    <td className="px-4 py-4 align-top font-semibold text-slate-700">{source.rowCount.toLocaleString('sv-SE')}</td>
+                    <td className="px-4 py-4 align-top font-semibold text-slate-700">{Math.max(0, source.rowCountDelta).toLocaleString('sv-SE')}</td>
+                    <td className="px-4 py-4 align-top">
+                      <StatusBadge tone={source.failureState === 'healthy' ? 'success' : 'warning'}>{source.latestStatus}</StatusBadge>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
 
         <Card className="mt-6">
           <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
