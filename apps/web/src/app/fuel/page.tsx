@@ -5,7 +5,7 @@ import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTermin
 import { formatFuelPrice, fuelPriceSourceSchema, fuelPriceTargetAlerts, type VerifiedFuelPriceObservation, verifiedFuelPriceObservations, verifiedFuelPriceSource } from '@/lib/fuel-prices';
 import { fuelStations, fuelStationSource, type FuelStationChain } from '@/lib/ingested/fuel-stations';
 import { st1FuelPriceObservations, st1FuelPriceSource } from '@/lib/ingested/st1-fuel-prices';
-import { fuelStationSourceCoverage, multiVerticalDomainFoundation } from '@/lib/verified-data';
+import { fuelCrowdSubmissionPolicy, fuelStationSourceCoverage, multiVerticalDomainFoundation } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -377,6 +377,36 @@ export default async function FuelPage({ searchParams }: Readonly<{ searchParams
         <p className="mt-4 rounded-lg bg-slate-50 p-4 text-sm font-semibold leading-6 text-slate-700">
           {fuelPriceSourceSchema.gradeTable} + {fuelPriceSourceSchema.sourceObservationTable}: {fuelPriceSourceSchema.observationContract}.
         </p>
+      </Card>
+
+      <Card className="mt-6 border-amber-200 bg-amber-50">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-800">{fuelCrowdSubmissionPolicy.sourceKind}</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">{fuelCrowdSubmissionPolicy.title}</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              {fuelCrowdSubmissionPolicy.driver} reuses {fuelCrowdSubmissionPolicy.trustTable} before a station price can enter {fuelCrowdSubmissionPolicy.sourceTable}.
+            </p>
+          </div>
+          <div className="rounded-lg bg-white p-4 text-right shadow-sm">
+            <p className="text-4xl font-black text-amber-900">{fuelCrowdSubmissionPolicy.maxFreshnessHours}h</p>
+            <p className="text-sm font-bold uppercase tracking-[0.16em] text-slate-500">freshness gate</p>
+            <p className="mt-2 text-xs font-semibold text-slate-600">{fuelCrowdSubmissionPolicy.maxOutlierPercent}% outlier review</p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-2">
+          <div className="rounded-lg bg-white p-4 shadow-sm">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">Required fields</p>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{fuelCrowdSubmissionPolicy.requiredFields.join(', ')}</p>
+          </div>
+          <div className="rounded-lg bg-white p-4 shadow-sm">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">Evidence</p>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{fuelCrowdSubmissionPolicy.acceptedEvidenceTypes.join(', ')}</p>
+          </div>
+        </div>
+        <ul className="mt-4 list-disc space-y-2 pl-5 text-sm font-semibold leading-6 text-amber-950">
+          {fuelCrowdSubmissionPolicy.publicDisplayGates.map((gate) => <li key={gate}>{gate}</li>)}
+        </ul>
       </Card>
 
       <Card className="mt-6">
