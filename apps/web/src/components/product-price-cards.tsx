@@ -1,7 +1,9 @@
 'use client';
 
+import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
-import { LazyItemCard, ResponsiveProductImage } from './LazyItemCard';
+import { LazyItemCard } from './LazyItemCard';
+import { ResponsiveProductImage } from './LazyItemCard';
 import { FavouriteProductToggle } from './favourite-product-toggle';
 import { readStoredSafetyPreferences, SAFETY_PREFERENCES_CHANGED_EVENT, type ProductSafetyPreferences } from './cert-filter';
 import { volatilityBadgeMethodology } from '@/lib/price-intelligence';
@@ -16,6 +18,8 @@ const compareModes: Array<{ label: string; value: CompareMode; help: string }> =
   { label: 'Total', value: 'total', help: 'Sort and lead every card by the observed pack price.' },
   { label: 'Per kg / l / st / 100 g', value: 'unit', help: 'Sort and lead every card by comparable jämförpris when package size is known.' }
 ];
+const productPriceCardsImageComponent = Image;
+
 const emptySafetyPreferences: ProductSafetyPreferences = {
   requiredDietaryTags: [],
   avoidedAllergenTags: []
