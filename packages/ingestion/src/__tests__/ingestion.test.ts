@@ -120,6 +120,8 @@ import {
   locatorFixturesCanAffectDealScore,
   normaliseUnitPrice,
   normalizeUnitPrice,
+  extractDiaperDeclaredSize,
+  extractDiaperPackageCount,
   parseDiaperPackageClass,
   offerSelectorFixtures,
   offerSelectorFixturesCanEmitOfferFacts,
@@ -4601,6 +4603,17 @@ describe('normalizeUnitPrice', () => {
     assert.deepEqual(normaliseUnitPrice(49.9, '500g'), { unitPrice: 99.8, comparableUnit: 'kg' });
     assert.deepEqual(normaliseUnitPrice(22.5, '1.5L'), { unitPrice: 15, comparableUnit: 'l' });
     assert.deepEqual(normaliseUnitPrice(29.94, '6-pack'), { unitPrice: 4.99, comparableUnit: 'piece' });
+  });
+
+  it('exposes focused diaper count and declared-size extraction helpers', () => {
+    assert.equal(extractDiaperPackageCount('Strl 4 + 39p'), 39);
+    assert.equal(extractDiaperPackageCount('37 per frp'), 37);
+    assert.equal(extractDiaperPackageCount('Comfort2 3-6kg + 47p'), 47);
+    assert.equal(extractDiaperPackageCount('2x37p'), 74);
+    assert.equal(extractDiaperDeclaredSize('Strl 4 + 39p'), 4);
+    assert.equal(extractDiaperDeclaredSize('Comfort2 3-6kg + 47p'), 2);
+    assert.equal(extractDiaperDeclaredSize('37 per frp'), null);
+    assert.equal(extractDiaperDeclaredSize('2x37p'), null);
   });
 
   it('extracts diaper package counts and supported size classes from retailer text', () => {
