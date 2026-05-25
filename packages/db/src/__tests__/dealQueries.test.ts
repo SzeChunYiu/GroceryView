@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { buildRollingAverageDealsQuery, mapRollingAverageDealRow } from '../queries/deals.js';
+import {
+  buildRollingAverageDealReport,
+  buildRollingAverageDealsQuery,
+  mapRollingAverageDealRow,
+  queryRollingAverageDealReport
+} from '../queries/deals.js';
 
 describe('deal queries', () => {
   it('builds current deal query against 30-day rolling averages with an optional category filter', () => {
@@ -51,5 +56,73 @@ describe('deal queries', () => {
       currency: 'SEK',
       observedAt: '2026-05-24T09:00:00.000Z'
     });
+  });
+
+  it('builds the shared rolling-average deals report shape', () => {
+    const deals = [
+      mapRollingAverageDealRow({
+        product_id: 'product-coffee',
+        product_slug: 'coffee',
+        product_name: 'Zoegas Coffee 450g',
+        category_path: ['coffee'],
+        store_id: 'store-willys',
+        store_slug: 'willys-odenplan',
+        store_name: 'Willys Odenplan',
+        chain_id: 'chain-willys',
+        chain_slug: 'willys',
+        chain_name: 'Willys',
+        current_price: '49.90',
+        currency: 'SEK',
+        observed_at: '2026-05-24T09:00:00.000Z',
+        rolling_average_price: '64.90',
+        discount_percentage: '23.11'
+      })
+    ];
+
+    assert.deepEqual(buildRollingAverageDealReport('2026-05-24T12:00:00.000Z', deals, { category: ' coffee ' }), {
+      asOf: '2026-05-24T12:00:00.000Z',
+      filters: { category: 'coffee' },
+      dealCount: 1,
+      sortedBy: 'discount_percentage_desc',
+      windowDays: 30,
+      deals
+    });
+  });
+
+  it('queries rolling-average deals through the shared report builder', async () => {
+    const calls: Array<{ sql: string; params?: unknown[] }> = [];
+    const executor = {
+      async query<T>(sql: string, params?: unknown[]): Promise<T[]> {
+        calls.push({ sql, params });
+        return [{
+          product_id: 'product-coffee',
+          product_slug: 'coffee',
+          product_name: 'Zoegas Coffee 450g',
+          category_path: ['coffee'],
+          store_id: 'store-willys',
+          store_slug: 'willys-odenplan',
+          store_name: 'Willys Odenplan',
+          chain_id: 'chain-willys',
+          chain_slug: 'willys',
+          chain_name: 'Willys',
+          current_price: '49.90',
+          currency: 'SEK',
+          observed_at: '2026-05-24T09:00:00.000Z',
+          rolling_average_price: '64.90',
+          discount_percentage: '23.11'
+        }] as T[];
+      }
+    };
+
+    const report = await queryRollingAverageDealReport(executor, {
+      asOf: '2026-05-24T12:00:00.000Z',
+      category: ' coffee '
+    });
+
+    assert.deepEqual(calls[0].params, ['2026-05-24T12:00:00.000Z', 'coffee']);
+    assert.equal(report.asOf, '2026-05-24T12:00:00.000Z');
+    assert.deepEqual(report.filters, { category: 'coffee' });
+    assert.equal(report.dealCount, 1);
+    assert.equal(report.deals[0].productSlug, 'coffee');
   });
 });

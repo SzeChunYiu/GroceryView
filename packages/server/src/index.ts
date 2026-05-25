@@ -32,15 +32,13 @@ import {
   createPostgresCatalogReader,
   createPostgresRepository,
   createPostgresSourceRecordReader,
-  buildRollingAverageDealsQuery,
-  mapRollingAverageDealRow,
+  queryRollingAverageDealReport,
   buildUserAccountDeletionQueries,
   type BudgetRecord,
   type PgLikeClient,
   type PostgresIntegrationReadinessReport,
   type QueryExecutor,
-  type RollingAverageDeal,
-  type RollingAverageDealRow,
+  type RollingAverageDealReport,
   type SourceRunHealthCheckResult,
   type SourceRunHealthReport
 } from '@groceryview/db';
@@ -278,15 +276,6 @@ export type FlyerOffersProviderQuery = {
 
 export type DealsProviderQuery = {
   category?: string;
-};
-
-export type RollingAverageDealReport = {
-  asOf: string;
-  filters: { category?: string };
-  dealCount: number;
-  sortedBy: 'discount_percentage_desc';
-  windowDays: 30;
-  deals: RollingAverageDeal[];
 };
 
 export type StoreFlyerOffersProviderQuery = {
@@ -944,21 +933,7 @@ async function queryFlyerOffersFromPostgres(executor: QueryExecutor, query: Flye
 }
 
 async function queryDealsFromPostgres(executor: QueryExecutor, query: DealsProviderQuery): Promise<RollingAverageDealReport> {
-  const asOf = new Date().toISOString();
-  const dealQuery = buildRollingAverageDealsQuery(asOf, query.category);
-  const rows = await executor.query<RollingAverageDealRow>(dealQuery.sql, dealQuery.values);
-  const deals = rows.map(mapRollingAverageDealRow);
-
-  return {
-    asOf,
-    filters: {
-      ...(query.category?.trim() ? { category: query.category.trim() } : {})
-    },
-    dealCount: deals.length,
-    sortedBy: 'discount_percentage_desc',
-    windowDays: 30,
-    deals
-  };
+  return queryRollingAverageDealReport(executor, query);
 }
 
 async function queryStoreFlyerOffersFromPostgres(
