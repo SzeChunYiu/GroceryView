@@ -160,7 +160,7 @@ function indexTone(value: number) {
   return 'text-slate-950';
 }
 
-function confidenceLabel(level: 'high' | 'medium' | 'low') {
+function confidenceLabel(level: 'high' | 'medium' | 'low' | 'unknown') {
   return `${level} confidence`;
 }
 

@@ -1,4 +1,5 @@
 export * from './lib/rankers/nearby.js';
+import { countryCoverageConfidence, normalizeCoverageCountryCode, type CountryCoverageConfidence } from './lib/verified-data.js';
 export type DealScoreInput = {
   currentCityPercentile: number;
   knownPromoHistoryPercentile: number;
@@ -5032,6 +5033,7 @@ export type ChainPriceObservation = {
   chainId: string;
   category: string;
   unitPrice: number; // SEK per comparable unit (kg / l / pcs)
+  countryCode?: string;
 };
 
 export type ChainCategoryIndex = {
@@ -5039,7 +5041,7 @@ export type ChainCategoryIndex = {
   index: number; // 100 = market median for the category
   observations: number;
   marketReference: number; // market median unit price for the category
-  confidence: 'high' | 'medium' | 'low';
+  confidence: CountryCoverageConfidence;
   estimated: boolean; // true when coverage is below the confident threshold
 };
 
@@ -5048,7 +5050,8 @@ export type ChainPriceIndex = {
   overallIndex: number; // 100 = market-median basket
   observations: number;
   categoriesCovered: number;
-  confidence: 'high' | 'medium' | 'low';
+  confidence: CountryCoverageConfidence;
+  countryCode: string;
   byCategory: ChainCategoryIndex[];
 };
 
@@ -5109,6 +5112,7 @@ export function calculateChainPriceIndex(observations: ChainPriceObservation[]):
 
   const chains: ChainPriceIndex[] = [];
   for (const [chainId, rows] of byChain) {
+    const countryCode = normalizeCoverageCountryCode(rows.find((row) => row.countryCode)?.countryCode);
     const chainByCategory = new Map<string, number[]>();
     for (const r of rows) {
       const arr = chainByCategory.get(r.category) ?? [];
@@ -5131,7 +5135,7 @@ export function calculateChainPriceIndex(observations: ChainPriceObservation[]):
         index: roundMoney(adjustedRatio * 100),
         observations: n,
         marketReference: roundMoney(reference),
-        confidence: n >= 12 ? 'high' : n >= CHAIN_INDEX_MIN_CONFIDENT ? 'medium' : 'low',
+        confidence: countryCoverageConfidence({ countryCode, observations: n, scope: 'category' }),
         estimated: n < CHAIN_INDEX_MIN_CONFIDENT
       });
       ratios.push(adjustedRatio);
@@ -5143,12 +5147,12 @@ export function calculateChainPriceIndex(observations: ChainPriceObservation[]):
 
     const overall = roundMoney(weightedGeometricMean(ratios, weights) * 100) || 100;
     const totalObs = rows.length;
-    const confidence =
-      totalObs >= 30 && byCategory.length >= 4
-        ? 'high'
-        : totalObs >= 10 && byCategory.length >= 2
-          ? 'medium'
-          : 'low';
+    const confidence = countryCoverageConfidence({
+      countryCode,
+      observations: totalObs,
+      categoriesCovered: byCategory.length,
+      scope: 'chain'
+    });
 
     chains.push({
       chainId,
@@ -5156,6 +5160,7 @@ export function calculateChainPriceIndex(observations: ChainPriceObservation[]):
       observations: totalObs,
       categoriesCovered: byCategory.length,
       confidence,
+      countryCode,
       byCategory
     });
   }
