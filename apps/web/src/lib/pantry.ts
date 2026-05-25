@@ -1,3 +1,5 @@
+import type { PantryItemRecord } from '@groceryview/db';
+
 export type PantryStockStatus = 'healthy' | 'low' | 'depleted';
 
 export type PantryExpiryUrgency = 'expired' | 'use-soon' | 'planned' | 'unknown';
@@ -28,7 +30,7 @@ export type PantryConsumptionEvent = {
   occurredAt: string;
 };
 
-type PantryStatusRow = {
+export type PantryStatusRow = {
   productId: string;
   name: string;
   unit: string;
@@ -54,10 +56,10 @@ export function estimateDepletionDays(ownedQuantity: number, estimatedDailyUse: 
 }
 
 export function buildExpiryReminder(row: Pick<PantryStatusRow, 'daysUntilExpiry' | 'expiresAt'>): PantryExpiryReminder {
-  const daysUntilExpiry = typeof row.daysUntilExpiry === 'number'
-    ? Math.ceil(row.daysUntilExpiry)
-    : row.expiresAt
-      ? Math.ceil((new Date(row.expiresAt).getTime() - Date.now()) / 86_400_000)
+  const daysUntilExpiry = row.expiresAt
+    ? Math.ceil((new Date(row.expiresAt).getTime() - Date.now()) / 86_400_000)
+    : typeof row.daysUntilExpiry === 'number'
+      ? Math.ceil(row.daysUntilExpiry)
       : null;
 
   if (daysUntilExpiry === null || !Number.isFinite(daysUntilExpiry)) {
@@ -74,6 +76,17 @@ function getStockStatus(ownedQuantity: number, minimumQuantity: number): PantryS
   if (ownedQuantity <= 0) return 'depleted';
   if (ownedQuantity <= minimumQuantity) return 'low';
   return 'healthy';
+}
+
+export function pantryStatusRowsFromAccountInventory(items: PantryItemRecord[]): PantryStatusRow[] {
+  return items.map((item) => ({
+    productId: item.productId,
+    name: item.name,
+    unit: item.unit,
+    remainingQuantity: item.quantity,
+    minimumQuantity: item.minimumQuantity,
+    expiresAt: item.expiresOn ?? null
+  }));
 }
 
 export function buildPantryStockItems(rows: PantryStatusRow[]): PantryStockItem[] {
