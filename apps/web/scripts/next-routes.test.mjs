@@ -1429,6 +1429,19 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('wires compare page requested products through the compare snapshots endpoint', async () => {
+    const source = await read('src/app/compare/page.tsx');
+    const helper = await read('src/lib/compare-price-snapshots.ts');
+
+    assert.match(source, /fetchComparePriceSnapshots/);
+    assert.match(source, /endpointSnapshotMatrix/);
+    assert.match(source, /\/api\/compare\?itemIds=\.\.\./);
+    assert.match(source, /compareSnapshots\.missingItemIds/);
+    assert.match(helper, /itemIds=/);
+    assert.match(helper, /contractStoreRowsFromPayload/);
+    assert.match(helper, /stores/);
+  });
+
   it('surfaces student recipes built from deals using real core meal output', async () => {
     const source = await read('src/app/meal-planner/page.tsx');
     assert.match(source, /studentDealRecipes/);

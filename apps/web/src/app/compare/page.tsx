@@ -7,6 +7,7 @@ import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTermin
 import { StoreComparisonTable } from '@/components/StoreComparisonTable';
 import { StorePriceMatrix } from '@/components/store-price-matrix';
 import { COMPARE_CHAIN_ORDER, buildBasketStoreComparison, buildChainComparisonTable, parseCompareChainsParam } from '@/lib/chain-compare';
+import { fetchComparePriceSnapshots, type ComparePriceSnapshotStoreRow } from '@/lib/compare-price-snapshots';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, commodityComparisons, compareOverlayChart, formatPct, formatSek, matchedChainProducts, privateLabelDupeFinder } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
@@ -120,12 +121,46 @@ function compareHref(productsParam: string | string[] | undefined, selectedChain
   return `/compare${query ? `?${query}` : ''}`;
 }
 
+function endpointSnapshotMatrix(snapshotRows: ComparePriceSnapshotStoreRow[], requestedItemIds: string[]) {
+  const storeIds = [...new Set(snapshotRows.map((row) => row.storeName))].sort((left, right) => left.localeCompare(right, 'sv-SE'));
+  const rowsByItemStore = new Map(snapshotRows.map((row) => [`${row.itemId}:${row.storeName}`, row]));
+
+  return {
+    chains: storeIds.map((storeId) => ({ id: storeId, label: storeId })),
+    products: requestedItemIds.map((itemId) => {
+      const firstRow = snapshotRows.find((row) => row.itemId === itemId);
+      return {
+        brand: null,
+        packageLabel: 'Endpoint price snapshot',
+        productName: firstRow?.itemName ?? itemId,
+        productSlug: itemId,
+        cells: storeIds.map((storeId) => {
+          const row = rowsByItemStore.get(`${itemId}:${storeId}`);
+          return {
+            chainId: storeId,
+            freshnessObservedAt: row?.observedAt || null,
+            priceText: row?.priceLabel ?? 'Missing from store snapshot',
+            productName: row?.itemName ?? itemId,
+            productSlug: itemId,
+            status: row?.price === null || !row ? 'missing' : 'priced',
+            unitLabel: row?.unitLabel ?? 'No item snapshot row',
+            verificationLabel: row?.confidence ? `Endpoint confidence: ${row.confidence}` : 'Endpoint snapshot row'
+          };
+        })
+      };
+    })
+  };
+}
+
 export default async function ComparePage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
   const productsParam = resolvedSearchParams.products;
+  const compareSnapshots = await fetchComparePriceSnapshots(productsParam, { endpoint: '/api/compare' });
+  const hasEndpointRequestedItems = compareSnapshots.itemIds.length > 0;
+  const endpointMatrix = endpointSnapshotMatrix(compareSnapshots.storeRows, compareSnapshots.itemIds);
   const overlayMode = firstSearchValue(resolvedSearchParams.overlayMode) === 'index' ? 'index' as const : 'price' as const;
   const overlayChartModel = overlayTerminalModel(overlayMode);
-  const comparison = buildChainComparisonTable(productsParam);
+  const comparison = buildChainComparisonTable(hasEndpointRequestedItems ? undefined : productsParam);
   const selectedChainIds = parseCompareChainsParam(resolvedSearchParams.chains);
   const basketStoreComparison = buildBasketStoreComparison(productsParam, resolvedSearchParams.chains);
   const cheapestBasketStore = basketStoreComparison.stores.find((store) => store.highlightLabels.includes('Cheapest'));
@@ -195,13 +230,30 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
           </div>
         </div>
         <div className="mt-5 grid gap-4">
-          {comparison.products.length === 0 ? (
+          {hasEndpointRequestedItems ? (
+            <div className="rounded-3xl border border-emerald-100 bg-white p-5 shadow-sm">
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-800">GET /api/compare?itemIds=...</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">Endpoint-backed store snapshots</h3>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+                Requested item ids are fetched from the compare endpoint and rendered as storeId to item snapshot rows. Missing item ids stay visible instead of falling back to name inference.
+              </p>
+              {compareSnapshots.endpointUnavailable ? (
+                <p className="mt-3 rounded-2xl bg-amber-50 p-3 text-sm font-bold text-amber-950">The compare endpoint is unavailable, so requested item ids are held in the missing state.</p>
+              ) : null}
+              {endpointMatrix.products.length > 0 && endpointMatrix.chains.length > 0 ? (
+                <div className="mt-4">
+                  <StorePriceMatrix chains={endpointMatrix.chains} products={endpointMatrix.products} sourceGeneratedAt={comparison.generatedAt} sourceLabel="/api/compare item snapshot rows" />
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+          {!hasEndpointRequestedItems && comparison.products.length === 0 ? (
             <p className="rounded-3xl border border-emerald-100 bg-white p-5 text-sm font-semibold text-slate-600 shadow-sm">
               Add ?products=product-slug-1,product-slug-2 to render DB-backed comparison rows. Missing product ids: {comparison.missingProductIds.join(', ') || 'none yet'}.
             </p>
           ) : null}
-          <StorePriceMatrix chains={COMPARE_CHAIN_ORDER} products={comparison.products} sourceGeneratedAt={comparison.generatedAt} sourceLabel={comparison.sourceLabel} />
-          {rowSections.map((section) => (
+          {!hasEndpointRequestedItems ? <StorePriceMatrix chains={COMPARE_CHAIN_ORDER} products={comparison.products} sourceGeneratedAt={comparison.generatedAt} sourceLabel={comparison.sourceLabel} /> : null}
+          {!hasEndpointRequestedItems ? rowSections.map((section) => (
             <div className="overflow-hidden rounded-3xl border border-emerald-100 bg-white shadow-sm" key={section.id}>
               <div className="border-b border-emerald-100 bg-emerald-50 px-4 py-3">
                 <h3 className="text-sm font-black text-emerald-950">{section.title}</h3>
@@ -256,11 +308,11 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
                 <p className="px-4 py-5 text-sm font-semibold text-slate-500">No requested rows used this match type.</p>
               )}
             </div>
-          ))}
+          )) : null}
         </div>
-        {comparison.missingProductIds.length > 0 ? (
+        {(hasEndpointRequestedItems ? compareSnapshots.missingItemIds : comparison.missingProductIds).length > 0 ? (
           <p className="mt-3 rounded-2xl bg-amber-50 p-3 text-sm font-bold text-amber-950">
-            Missing product ids: {comparison.missingProductIds.join(', ')}. The compare route does not infer products from names.
+            Missing product ids: {(hasEndpointRequestedItems ? compareSnapshots.missingItemIds : comparison.missingProductIds).join(', ')}. The compare route does not infer products from names.
           </p>
         ) : null}
         <p className="mt-3 text-xs font-semibold text-slate-500">
