@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Search } from 'lucide-react';
-import { useEffect, useId, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState, type KeyboardEvent } from 'react';
 import { readRecentProductSearches, rememberRecentProductSearch, trackSearchToSavingsFunnelStep, type RecentProductSearch } from '@/lib/analytics';
 
 type ProductSearchResult = {
@@ -16,11 +16,19 @@ type ProductSearchResult = {
 
 type ProductSearchResponse = {
   query: string;
+  resultCount?: number;
   results: ProductSearchResult[];
   error?: string;
 };
 
 type SearchStatus = 'idle' | 'loading' | 'ready' | 'empty' | 'error';
+type SearchSuggestionOption = {
+  description: string;
+  href: string;
+  id: string;
+  label: string;
+  type: 'recent' | 'product' | 'fallback-search' | 'fallback-category';
+};
 
 const MIN_QUERY_LENGTH = 2;
 const ZERO_RESULT_FALLBACKS = [
@@ -43,15 +51,67 @@ function zeroResultFallbacks(query: string) {
 export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: string }>) {
   const inputId = useId();
   const listboxId = useId();
+  const statusId = useId();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<ProductSearchResult[]>([]);
   const [recentSearches, setRecentSearches] = useState<RecentProductSearch[]>([]);
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
+  const [isDropdownDismissed, setIsDropdownDismissed] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [status, setStatus] = useState<SearchStatus>('idle');
   const trimmedQuery = useMemo(() => query.trim(), [query]);
   const emptyFallback = useMemo(() => zeroResultFallbacks(trimmedQuery), [trimmedQuery]);
   const shouldShowRecentSearches = isFocused && trimmedQuery.length === 0 && recentSearches.length > 0;
-  const shouldShowDropdown = (status !== 'idle' && trimmedQuery.length >= MIN_QUERY_LENGTH) || shouldShowRecentSearches;
+  const suggestionOptions = useMemo<SearchSuggestionOption[]>(() => {
+    if (shouldShowRecentSearches) {
+      return recentSearches.map((search, index) => ({
+        description: `${search.resultCount} verified result${search.resultCount === 1 ? '' : 's'}`,
+        href: search.href,
+        id: `${listboxId}-recent-${index}`,
+        label: search.query,
+        type: 'recent'
+      }));
+    }
+
+    if (status === 'ready') {
+      return results.map((result) => ({
+        description: `${result.brand ?? 'Brand not reported'} · PostgreSQL product search`,
+        href: `/products/${result.slug}`,
+        id: `${listboxId}-product-${result.id}`,
+        label: result.name,
+        type: 'product'
+      }));
+    }
+
+    if (status === 'empty') {
+      return [
+        ...emptyFallback.searches.map((search, index) => ({
+          description: 'Related search',
+          href: `/products?q=${encodeURIComponent(search)}`,
+          id: `${listboxId}-fallback-search-${index}`,
+          label: search,
+          type: 'fallback-search' as const
+        })),
+        ...emptyFallback.categories.map((category, index) => ({
+          description: 'Browse category',
+          href: `/products?category=${encodeURIComponent(category)}`,
+          id: `${listboxId}-fallback-category-${index}`,
+          label: category,
+          type: 'fallback-category' as const
+        }))
+      ];
+    }
+
+    return [];
+  }, [emptyFallback.categories, emptyFallback.searches, listboxId, recentSearches, results, shouldShowRecentSearches, status]);
+  const shouldShowDropdown = !isDropdownDismissed && ((status !== 'idle' && trimmedQuery.length >= MIN_QUERY_LENGTH) || shouldShowRecentSearches);
+  const activeSuggestion = activeSuggestionIndex >= 0 ? suggestionOptions[activeSuggestionIndex] ?? null : null;
+  const activeDescendant = shouldShowDropdown ? activeSuggestion?.id : undefined;
+  const statusMessage = activeSuggestion
+    ? `${activeSuggestion.label}, ${activeSuggestion.description}`
+    : shouldShowDropdown
+      ? `${suggestionOptions.length} search suggestion${suggestionOptions.length === 1 ? '' : 's'} available.`
+      : 'Search suggestions collapsed.';
 
   useEffect(() => {
     setRecentSearches(readRecentProductSearches());
@@ -61,6 +121,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
     if (trimmedQuery.length < MIN_QUERY_LENGTH) {
       setResults([]);
       setStatus('idle');
+      setActiveSuggestionIndex(-1);
       return;
     }
 
@@ -94,6 +155,42 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
     };
   }, [trimmedQuery]);
 
+  useEffect(() => {
+    setActiveSuggestionIndex((currentIndex) => (
+      currentIndex >= suggestionOptions.length ? suggestionOptions.length - 1 : currentIndex
+    ));
+  }, [suggestionOptions.length]);
+
+  function navigateToSuggestion(option: SearchSuggestionOption) {
+    window.location.assign(option.href);
+  }
+
+  function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key === 'Escape') {
+      if (shouldShowDropdown) {
+        event.preventDefault();
+        setActiveSuggestionIndex(-1);
+        setIsDropdownDismissed(true);
+      }
+      return;
+    }
+
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      if (!shouldShowDropdown || suggestionOptions.length === 0) return;
+      event.preventDefault();
+      setActiveSuggestionIndex((currentIndex) => {
+        if (event.key === 'ArrowDown') return currentIndex < suggestionOptions.length - 1 ? currentIndex + 1 : 0;
+        return currentIndex > 0 ? currentIndex - 1 : suggestionOptions.length - 1;
+      });
+      return;
+    }
+
+    if (event.key === 'Enter' && shouldShowDropdown && activeSuggestion) {
+      event.preventDefault();
+      navigateToSuggestion(activeSuggestion);
+    }
+  }
+
   return (
     <div className="relative w-full max-w-xl lg:w-[min(36vw,28rem)]" data-search-surface={surface}>
       <label className="sr-only" htmlFor={inputId}>Search products by name or brand</label>
@@ -101,24 +198,33 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
         <Search className="h-4 w-4 text-slate-500" aria-hidden="true" />
         <input
           aria-autocomplete="list"
+          aria-activedescendant={activeDescendant}
           aria-controls={listboxId}
+          aria-describedby={statusId}
           aria-expanded={shouldShowDropdown}
           aria-label="Search products"
           autoComplete="off"
           className="min-w-0 flex-1 bg-transparent text-sm font-semibold text-slate-950 outline-none placeholder:text-slate-500"
           id={inputId}
           onBlur={() => window.setTimeout(() => setIsFocused(false), 120)}
-          onChange={(event) => setQuery(event.target.value)}
+          onChange={(event) => {
+            setQuery(event.target.value);
+            setActiveSuggestionIndex(-1);
+            setIsDropdownDismissed(false);
+          }}
           onFocus={() => {
             setRecentSearches(readRecentProductSearches());
             setIsFocused(true);
+            setIsDropdownDismissed(false);
           }}
+          onKeyDown={handleKeyDown}
           placeholder="Search product or brand"
           role="combobox"
           type="search"
           value={query}
         />
       </div>
+      <p className="sr-only" id={statusId} aria-live="polite">{statusMessage}</p>
 
       {shouldShowDropdown ? (
         <div
@@ -132,9 +238,12 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
               <div className="mt-2 grid gap-2">
                 {recentSearches.map((search) => (
                   <Link
-                    className="rounded-2xl bg-slate-50 px-3 py-2 text-sm font-black text-slate-800 transition hover:bg-emerald-50 hover:text-emerald-900"
+                    aria-selected={activeDescendant === `${listboxId}-recent-${recentSearches.indexOf(search)}`}
+                    className={`rounded-2xl px-3 py-2 text-sm font-black transition ${activeDescendant === `${listboxId}-recent-${recentSearches.indexOf(search)}` ? 'bg-emerald-50 text-emerald-900' : 'bg-slate-50 text-slate-800 hover:bg-emerald-50 hover:text-emerald-900'}`}
                     href={search.href}
+                    id={`${listboxId}-recent-${recentSearches.indexOf(search)}`}
                     key={`${search.query}-${search.searchedAt}`}
+                    onMouseEnter={() => setActiveSuggestionIndex(recentSearches.indexOf(search))}
                     role="option"
                   >
                     {search.query}
@@ -156,7 +265,15 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
               <p className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-slate-500">Try related searches</p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {emptyFallback.searches.map((search) => (
-                  <Link className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-900" href={`/products?q=${encodeURIComponent(search)}`} key={search}>
+                  <Link
+                    aria-selected={activeDescendant === `${listboxId}-fallback-search-${emptyFallback.searches.indexOf(search)}`}
+                    className={`rounded-full px-3 py-1 text-xs font-black ${activeDescendant === `${listboxId}-fallback-search-${emptyFallback.searches.indexOf(search)}` ? 'bg-emerald-800 text-white' : 'bg-emerald-50 text-emerald-900'}`}
+                    href={`/products?q=${encodeURIComponent(search)}`}
+                    id={`${listboxId}-fallback-search-${emptyFallback.searches.indexOf(search)}`}
+                    key={search}
+                    onMouseEnter={() => setActiveSuggestionIndex(emptyFallback.searches.indexOf(search))}
+                    role="option"
+                  >
                     {search}
                   </Link>
                 ))}
@@ -164,7 +281,15 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
               <p className="mt-3 text-xs font-black uppercase tracking-[0.16em] text-slate-500">Browse categories</p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {emptyFallback.categories.map((category) => (
-                  <Link className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-800" href={`/products?category=${encodeURIComponent(category)}`} key={category}>
+                  <Link
+                    aria-selected={activeDescendant === `${listboxId}-fallback-category-${emptyFallback.categories.indexOf(category)}`}
+                    className={`rounded-full px-3 py-1 text-xs font-black ${activeDescendant === `${listboxId}-fallback-category-${emptyFallback.categories.indexOf(category)}` ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-800'}`}
+                    href={`/products?category=${encodeURIComponent(category)}`}
+                    id={`${listboxId}-fallback-category-${emptyFallback.categories.indexOf(category)}`}
+                    key={category}
+                    onMouseEnter={() => setActiveSuggestionIndex(emptyFallback.searches.length + emptyFallback.categories.indexOf(category))}
+                    role="option"
+                  >
                     {category}
                   </Link>
                 ))}
@@ -175,9 +300,12 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
             <div className="max-h-96 divide-y divide-slate-100 overflow-y-auto">
               {results.map((result) => (
                 <Link
-                  className="block px-4 py-3 transition hover:bg-emerald-50 focus:bg-emerald-50 focus:outline-none"
+                  aria-selected={activeDescendant === `${listboxId}-product-${result.id}`}
+                  className={`block px-4 py-3 transition focus:bg-emerald-50 focus:outline-none ${activeDescendant === `${listboxId}-product-${result.id}` ? 'bg-emerald-50' : 'hover:bg-emerald-50'}`}
                   href={`/products/${result.slug}`}
+                  id={`${listboxId}-product-${result.id}`}
                   key={result.id}
+                  onMouseEnter={() => setActiveSuggestionIndex(results.findIndex((candidate) => candidate.id === result.id))}
                   role="option"
                 >
                   <span className="block text-sm font-black text-slate-950">{result.name}</span>

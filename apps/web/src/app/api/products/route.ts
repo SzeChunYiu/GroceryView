@@ -65,6 +65,7 @@ function responsePayload(query: string, results: ProductSearchResult[], expansio
     expandedQueries: expansion.expandedQueries,
     matchedAliases: expansion.matchedAliases,
     matchedSynonyms: expansion.matchedSynonyms,
+    resultCount: results.length,
     results,
     source: 'postgres.products_tsvector_alias_synonym_expansion',
     ...(error ? { error } : {})

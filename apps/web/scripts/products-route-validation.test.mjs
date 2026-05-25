@@ -40,6 +40,7 @@ test('products route validation accepts q-only searches and rejects unexpected q
     expandedQueries: ['a'],
     matchedAliases: [],
     matchedSynonyms: [],
+    resultCount: 0,
     results: [],
     source: 'postgres.products_tsvector_alias_synonym_expansion'
   });

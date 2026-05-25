@@ -27,6 +27,24 @@ test('search bar debounces product search API calls and renders a dropdown', asy
   assert.match(searchBar, /href=\{`\/products\/\$\{result\.slug\}`\}/);
 });
 
+test('search bar supports accessible keyboard navigation in suggestions', async () => {
+  const searchBar = await read('src/components/SearchBar.tsx');
+  const route = await read('src/app/api/products/route.ts');
+  const button = await read('src/components/ui/button.tsx');
+
+  assert.match(searchBar, /activeSuggestionIndex/);
+  assert.match(searchBar, /aria-activedescendant=\{activeDescendant\}/);
+  assert.match(searchBar, /aria-describedby=\{statusId\}/);
+  assert.match(searchBar, /aria-live="polite"/);
+  assert.match(searchBar, /event\.key === 'ArrowDown'/);
+  assert.match(searchBar, /event\.key === 'ArrowUp'/);
+  assert.match(searchBar, /event\.key === 'Escape'/);
+  assert.match(searchBar, /event\.key === 'Enter'/);
+  assert.match(searchBar, /window\.location\.assign\(option\.href\)/);
+  assert.match(route, /resultCount: results\.length/);
+  assert.match(button, /type = 'button'/);
+});
+
 test('global navigation mounts the debounced product search bar', async () => {
   const appNav = await read('src/components/app-nav.tsx');
 
