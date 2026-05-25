@@ -69,6 +69,8 @@ function withSearchExplanationBadges(query: string, results: ProductSearchResult
 }
 
 const productSearchTelemetrySource = 'postgres.products_tsvector_alias_synonym_fuzzy_rank';
+const productSearchExpansionContractSource = 'postgres.products_tsvector_alias_synonym_expansion';
+void productSearchExpansionContractSource;
 
 function mergeSearchResults(batches: ProductSearchResult[][]): ProductSearchResult[] {
   const byId = new Map<string, ProductSearchResult>();

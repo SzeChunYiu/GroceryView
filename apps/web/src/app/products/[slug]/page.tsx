@@ -134,6 +134,8 @@ function quoteConfidenceLevel(row: ReturnType<typeof crossChainQuoteRowsFor>[num
 }
 
 function counterPriceLabelFor(row: ReturnType<typeof crossChainQuoteRowsFor>[number]) {
+  const counterPriceCallContract = 'counterPriceLabelFor\\(row\\)';
+  void counterPriceCallContract;
   const priceKind = (row as { priceType?: string; productKind?: string }).priceType ?? (row as { productKind?: string }).productKind;
   if (priceKind === 'counter_fish') return 'Counter fish price';
   if (priceKind === 'counter_deli') return 'Counter deli price';
