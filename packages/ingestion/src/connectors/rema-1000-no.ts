@@ -2,6 +2,8 @@ export type Rema1000NoProduct = {
   country: 'NO';
   currency: 'NOK';
   chain: 'rema-1000-no';
+  storeId: null;
+  storeName: null;
   code: string;
   name: string;
   brand: string;
@@ -15,6 +17,17 @@ export type Rema1000NoProduct = {
   imageUrl: string;
   sourceUrl: string;
   retrievedAt: string;
+  sourceFreshness: {
+    retrievedAt: string;
+    sourceUrl: string;
+    parserVersion: string;
+    sourceKind: 'public_search_fixture';
+  };
+  provenance: {
+    source: 'rema_no_search';
+    parserVersion: string;
+    accessPolicy: 'public_read_only_search';
+  };
 };
 
 export type FetchRema1000NoProductsOptions = {
@@ -27,6 +40,20 @@ export type FetchRema1000NoProductsOptions = {
 
 export const REMA_1000_NO_BASE_URL = 'https://www.rema.no';
 export const REMA_1000_NO_SEARCH_PATH = '/search';
+export const REMA_1000_NO_PARSER_VERSION = 'rema-1000-no-search-v2';
+export const REMA_1000_NO_ACCESS_POLICY = {
+  source: 'rema_no_search',
+  officialBaseUrl: REMA_1000_NO_BASE_URL,
+  checkedAt: '2026-05-25',
+  robotsTxtUrl: 'https://www.rema.no/robots.txt',
+  allowedSurface: '/search?search={query}',
+  blockedSurfaces: ['/search.php?search=', '/oppskrifter/?search=', '/butikker/?q='],
+  constraints: [
+    'Use public read-only REMA 1000 pages only; do not use authenticated REMA app traffic or personalized offers.',
+    'Keep crawls query-bounded and attach sourceUrl plus retrievedAt to every normalized row.',
+    'Treat rows as national/catalog search evidence unless a future allowed store-scoped source is documented.'
+  ]
+} as const;
 
 export function buildRema1000NoSearchUrl(query: string, baseUrl = REMA_1000_NO_BASE_URL): string {
   const url = new URL(REMA_1000_NO_SEARCH_PATH, baseUrl);
@@ -68,6 +95,9 @@ export function parseRema1000NoProducts(
   retrievedAt: string,
   baseUrl = REMA_1000_NO_BASE_URL
 ): Rema1000NoProduct[] {
+  if (typeof payload === 'string' && /captcha|access denied|cloudflare|logg inn/i.test(payload)) {
+    throw new Error('REMA 1000 Norway search source returned a blocked/login page.');
+  }
   const json = typeof payload === 'string' ? extractJsonPayload(payload) : payload;
   const rows: Rema1000NoProduct[] = [];
   const seen = new Set<string>();
@@ -103,6 +133,8 @@ export function normalizeRema1000NoProduct(
     country: 'NO',
     currency: 'NOK',
     chain: 'rema-1000-no',
+    storeId: null,
+    storeName: null,
     code,
     name,
     brand: firstText(candidate, ['brand', 'brandName', 'brand_name', 'manufacturer']) || firstText(brandRecord, ['name', 'title']),
@@ -115,7 +147,18 @@ export function normalizeRema1000NoProduct(
     productUrl: productPath ? absoluteUrl(productPath, baseUrl) : '',
     imageUrl: imagePath ? absoluteUrl(imagePath, baseUrl) : '',
     sourceUrl,
-    retrievedAt
+    retrievedAt,
+    sourceFreshness: {
+      retrievedAt,
+      sourceUrl,
+      parserVersion: REMA_1000_NO_PARSER_VERSION,
+      sourceKind: 'public_search_fixture'
+    },
+    provenance: {
+      source: 'rema_no_search',
+      parserVersion: REMA_1000_NO_PARSER_VERSION,
+      accessPolicy: 'public_read_only_search'
+    }
   };
 }
 
