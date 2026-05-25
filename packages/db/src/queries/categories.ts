@@ -1,3 +1,5 @@
+import { ACTIVE_PRODUCTS_PREDICATE } from './items.js';
+
 export type CategoryTreeQuery = {
   sql: string;
   values: [];
@@ -29,6 +31,7 @@ export function buildCategoryTreeQuery(): CategoryTreeQuery {
               from products
               cross join lateral generate_subscripts(products.category_path, 1) as category_depth(depth)
              where coalesce(array_length(products.category_path, 1), 0) > 0
+               and ${ACTIVE_PRODUCTS_PREDICATE}
           ),
           normalized as (
             select depth,
