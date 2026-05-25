@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceFreshnessStatusBadge, SourceManagementActionsPanel } from '@/components/data-ui';
-import { DataGrid, DataGridProductCell, dataGridActionClass } from '@/components/data-grid';
+import { DataGrid, DataGridProductCell, UnitAuditFilterTable, dataGridActionClass, type UnitAuditIssueRow } from '@/components/data-grid';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { buildDuplicateMergeQueue, type ProductRecord } from '@/lib/deduplicate-products';
-import { buildUnitNormalizationQaReport } from '@/lib/normalization';
+import { buildUnitNormalizationQaReport, unitNormalizationQaIssuesForProduct } from '@/lib/normalization';
 import { pricedProducts } from '@/lib/openprices-products';
 import { dbSiteAxfoodProducts, dbSiteSnapshotGeneratedAt } from '@/lib/generated/db-site-products';
 import {
@@ -22,7 +22,9 @@ import {
   sourceReadinessMatrix,
   sourceRouteMap,
   storeBrandLedger,
-  timescaleDbEvaluation
+  timescaleDbEvaluation,
+  unitNormalizationAuditFilterOptions,
+  unitNormalizationMathemAuditInputs
 } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 import {
@@ -35,20 +37,43 @@ import {
   sourceManagementSummary
 } from '@/lib/source-health';
 
-const unitNormalizationQaReport = buildUnitNormalizationQaReport([
+const unitNormalizationQaInputs = [
   ...axfoodProducts.map((product) => ({
     productId: product.slug,
     productName: product.name,
     packageText: product.subline,
-    price: product.lowestPrice
+    price: product.lowestPrice,
+    source: 'Axfood'
   })),
   ...pricedProducts.map((product) => ({
     productId: product.slug,
     productName: product.name,
     packageText: product.quantity,
-    price: product.priceMedian
+    price: product.priceMedian,
+    source: 'OpenPrices'
+  })),
+  ...unitNormalizationMathemAuditInputs
+];
+
+const unitNormalizationQaReport = buildUnitNormalizationQaReport(unitNormalizationQaInputs);
+
+const unitNormalizationQaIssueLabels = Object.fromEntries(
+  unitNormalizationAuditFilterOptions.issueTypes.map((option) => [option.value, option.label])
+);
+
+const unitNormalizationQaRows: UnitAuditIssueRow[] = unitNormalizationQaInputs.flatMap((product) => (
+  unitNormalizationQaIssuesForProduct(product).map((issue) => ({
+    id: `${product.source}-${issue.kind}-${issue.productId}`,
+    source: product.source,
+    kind: issue.kind,
+    kindLabel: unitNormalizationQaIssueLabels[issue.kind] ?? issue.kind,
+    severity: issue.severity,
+    productName: issue.productName,
+    productId: issue.productId,
+    packageText: issue.packageText,
+    detail: issue.detail
   }))
-]);
+));
 
 function axfoodSourceUrl(product: (typeof axfoodProducts)[number]) {
   return Object.values(product.chains).find((chain) => chain.url)?.url || `/products/${product.slug}`;
@@ -457,16 +482,12 @@ export default function DataSourcesPage() {
           <Metric label="Suspicious pack sizes" value={unitNormalizationQaReport.suspiciousPackSizeCount.toLocaleString('sv-SE')} />
           <Metric label="Inconsistent conversions" value={unitNormalizationQaReport.inconsistentUnitPriceCount.toLocaleString('sv-SE')} />
         </div>
-        <div className="mt-5 grid gap-3 lg:grid-cols-2">
-          {unitNormalizationQaReport.issues.slice(0, 6).map((issue) => (
-            <section className="rounded-2xl border border-amber-100 bg-white p-4 shadow-sm" key={`${issue.kind}-${issue.productId}`}>
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-800">{issue.kind} · {issue.severity}</p>
-              <h3 className="mt-2 text-lg font-black text-slate-950">{issue.productName}</h3>
-              <p className="mt-1 text-sm font-semibold text-slate-600">{issue.productId} · {issue.packageText}</p>
-              <p className="mt-3 text-sm font-semibold leading-6 text-slate-700">{issue.detail}</p>
-            </section>
-          ))}
-        </div>
+        <UnitAuditFilterTable
+          issueTypeOptions={unitNormalizationAuditFilterOptions.issueTypes}
+          rows={unitNormalizationQaRows}
+          severityOptions={unitNormalizationAuditFilterOptions.severities}
+          sourceOptions={unitNormalizationAuditFilterOptions.sources}
+        />
         <ul className="mt-4 grid gap-2 text-sm font-semibold leading-6 text-amber-950 md:grid-cols-3">
           {unitNormalizationQaReport.guardrails.map((guardrail) => (
             <li className="rounded-2xl bg-white p-3" key={guardrail}>• {guardrail}</li>
