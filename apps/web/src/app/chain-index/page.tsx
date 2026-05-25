@@ -63,6 +63,9 @@ export default function ChainIndexPage() {
       <Eyebrow>Chain index</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Willys/Hemköp matched-product index</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">The index is computed only from products with the same Axfood code in both chain catalogues. It does not mix unmatched SKUs or branch-location data.</p>
+      <Link className="mt-4 inline-flex rounded-full bg-white px-4 py-2 text-sm font-black text-emerald-900 shadow-sm" href="/methodology-changelog">
+        View data and methodology changelog
+      </Link>
       <div className="mt-6 grid gap-4 md:grid-cols-3">
         <Card><p className="text-sm font-black text-slate-600">Matched products</p><p className="mt-2 text-4xl font-black text-emerald-800">{matchedChainProducts.length}</p></Card>
         <Card><p className="text-sm font-black text-slate-600">Average spread</p><p className="mt-2 text-4xl font-black text-emerald-800">{formatPct(averageSpread)}</p></Card>
