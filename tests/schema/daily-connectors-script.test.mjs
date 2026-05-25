@@ -31,7 +31,9 @@ describe('daily connectors export script', () => {
       'matspar',
       'pharmacy',
       'apoteket',
-      'okq8'
+      'preem',
+      'okq8',
+      'ob-is'
     ]);
     assert.deepEqual(connectors.map((connector) => connector.connectorId), [
       'ica-store-promotions-default-stores',
@@ -47,7 +49,9 @@ describe('daily connectors export script', () => {
       'matspar-public-search',
       'pharmacy-public-products',
       'apoteket-se-public-products',
-      'okq8-fuel-prices'
+      'preem-se-business-list-prices',
+      'okq8-fuel-prices',
+      'ob-is-fuel-prices'
     ]);
     assert.equal(
       connectors
