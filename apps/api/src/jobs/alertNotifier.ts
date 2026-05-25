@@ -1,10 +1,11 @@
 import type { WatchlistAlert } from '@groceryview/core';
-import type { TransactionalEmailClient, TransactionalEmailMessage } from '../lib/email.js';
+import { buildEmailUnsubscribeUrl, type TransactionalEmailClient, type TransactionalEmailMessage } from '../lib/email.js';
 
 export type TriggeredPriceAlertEmailNotification = {
   recipientEmail: string;
   alert: WatchlistAlert;
   itemUrl?: string;
+  userId?: string;
 };
 
 export type NotifyTriggeredPriceAlertsInput = {
@@ -12,6 +13,7 @@ export type NotifyTriggeredPriceAlertsInput = {
   emailClient: TransactionalEmailClient;
   notifications: TriggeredPriceAlertEmailNotification[];
   now: string;
+  unsubscribeTokenSecret?: string;
 };
 
 export type TriggeredPriceAlertEmailSent = {
@@ -56,7 +58,7 @@ export async function notifyTriggeredPriceAlerts(
       continue;
     }
 
-    const message = buildTriggeredPriceAlertEmail(notification, input.baseUrl, input.now);
+    const message = buildTriggeredPriceAlertEmail(notification, input.baseUrl, input.now, input.unsubscribeTokenSecret);
     const messageId = await input.emailClient.send(message);
     sent.push({
       recipientEmail: notification.recipientEmail,
@@ -130,12 +132,18 @@ function numericTriggerField(trigger: Record<string, unknown>, names: string[]):
 export function buildTriggeredPriceAlertEmail(
   notification: TriggeredPriceAlertEmailNotification,
   baseUrl: string,
-  now: string
+  now: string,
+  unsubscribeTokenSecret?: string
 ): TransactionalEmailMessage {
   const { alert } = notification;
   const itemUrl = notification.itemUrl ?? buildProductUrl(baseUrl, alert.productId);
   const storeSuffix = alert.trigger.storeName ? ` at ${alert.trigger.storeName}` : '';
   const threshold = typeof alert.trigger.threshold === 'number' ? alert.trigger.threshold : undefined;
+  const unsubscribeUrl = buildEmailUnsubscribeUrl(baseUrl, {
+    recipientEmail: notification.recipientEmail,
+    secret: unsubscribeTokenSecret,
+    userId: notification.userId ?? notification.recipientEmail
+  });
 
   const lines = [
     alert.message,
@@ -144,7 +152,9 @@ export function buildTriggeredPriceAlertEmail(
     threshold === undefined ? undefined : `Alert threshold: ${formatSek(threshold)}`,
     `Open item: ${itemUrl}`,
     '',
-    `Sent at: ${now}`
+    `Sent at: ${now}`,
+    '',
+    `Unsubscribe from GroceryView email alerts: ${unsubscribeUrl}`
   ].filter((line): line is string => typeof line === 'string');
 
   return {
@@ -154,7 +164,8 @@ export function buildTriggeredPriceAlertEmail(
     metadata: {
       type: alert.type,
       productId: alert.productId,
-      sendAt: now
+      sendAt: now,
+      unsubscribeUrl
     }
   };
 }

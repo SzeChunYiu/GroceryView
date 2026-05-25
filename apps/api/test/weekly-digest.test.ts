@@ -32,7 +32,9 @@ describe('weekly cheapest digest email job', () => {
     assert.match(message.text, /searched or listed/);
     assert.match(message.text, /Zoégas Bryggkaffe — SEK 39\.90 at Willys Odenplan/);
     assert.match(message.text, /https:\/\/groceryview\.se\/product\/zoegas-coffee/);
+    assert.match(message.text, /Unsubscribe from GroceryView email alerts: https:\/\/groceryview\.se\/api\/unsubscribe\?token=/);
     assert.equal(message.metadata?.type, 'weekly_cheapest_digest');
+    assert.match(message.metadata?.unsubscribeUrl ?? '', /^https:\/\/groceryview\.se\/api\/unsubscribe\?token=/);
   });
 
   it('sends at most the ten personalized deal rows returned by the database query', async () => {
@@ -82,5 +84,6 @@ describe('weekly cheapest digest email job', () => {
     });
     assert.equal(sentMessages.length, 1);
     assert.match(sentMessages[0]?.text ?? '', /Based on: search/);
+    assert.match(sentMessages[0]?.text ?? '', /\/api\/unsubscribe\?token=/);
   });
 });

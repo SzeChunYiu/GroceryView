@@ -2,9 +2,10 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import type { WatchlistAlert } from '@groceryview/core';
 import { notifyTriggeredPriceAlerts } from '../src/jobs/alertNotifier.js';
-import { createTransactionalEmailClient } from '../src/lib/email.js';
+import { buildEmailUnsubscribeToken, createTransactionalEmailClient, verifyEmailUnsubscribeToken } from '../src/lib/email.js';
 import type { TransactionalEmailMessage } from '../src/lib/email.js';
 import { alertsRoutes } from '../src/routes/alerts.js';
+import { handleEmailUnsubscribeToken, unsubscribeRoutes } from '../src/routes/unsubscribe.js';
 
 const targetPriceAlert: WatchlistAlert = {
   productId: 'coffee-450g',
@@ -53,6 +54,8 @@ describe('transactional price alert email notifier', () => {
     assert.match(sentMessages[0]?.text ?? '', /https:\/\/groceryview\.se\/product\/coffee-450g/);
     assert.match(sentMessages[0]?.text ?? '', /49\.90 SEK at Willys/);
     assert.match(sentMessages[0]?.text ?? '', /threshold: 55\.00 SEK/);
+    assert.match(sentMessages[0]?.text ?? '', /Unsubscribe from GroceryView email alerts: https:\/\/groceryview\.se\/api\/unsubscribe\?token=/);
+    assert.match(sentMessages[0]?.metadata?.unsubscribeUrl ?? '', /^https:\/\/groceryview\.se\/api\/unsubscribe\?token=/);
     assert.equal(alertsRoutes.priceAlertEmailNotifierJob, 'jobs/alerts/price-email-notifier');
   });
 
@@ -151,5 +154,43 @@ describe('transactional price alert email notifier', () => {
     assert.equal((calls[1]?.init.headers as Record<string, string>)['x-postmark-server-token'], 'postmark-token');
     assert.doesNotMatch(String(calls[0]?.init.body), /resend-key/);
     assert.doesNotMatch(String(calls[1]?.init.body), /postmark-token/);
+  });
+
+  it('verifies one-click unsubscribe tokens and disables email alerts without login', async () => {
+    const secret = 'test-unsubscribe-secret';
+    const token = buildEmailUnsubscribeToken({
+      email: 'SHOPPER@example.com',
+      secret,
+      userId: 'user-1'
+    });
+    const claims = verifyEmailUnsubscribeToken(token, secret);
+    const mutations: Array<typeof claims> = [];
+
+    assert.deepEqual(claims, {
+      action: 'disable_email_alerts',
+      channel: 'email',
+      email: 'shopper@example.com',
+      userId: 'user-1',
+      version: 1
+    });
+    assert.equal(verifyEmailUnsubscribeToken(`${token}x`, secret), null);
+
+    const result = await handleEmailUnsubscribeToken({
+      token,
+      secret,
+      disableEmailAlerts: async (verifiedClaims) => {
+        mutations.push(verifiedClaims);
+      }
+    });
+
+    assert.deepEqual(result, {
+      ok: true,
+      emailAlertsEnabled: false,
+      recipientEmail: 'shopper@example.com',
+      userId: 'user-1'
+    });
+    assert.deepEqual(mutations, [claims]);
+    assert.equal(unsubscribeRoutes.oneClickEmailAlerts, 'api/unsubscribe');
+    assert.equal(unsubscribeRoutes.tokenQueryParam, 'token');
   });
 });

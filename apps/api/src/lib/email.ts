@@ -7,7 +7,18 @@ export {
   type TransactionalEmailProvider
 } from '@groceryview/notifications';
 
+import { createHmac, timingSafeEqual } from 'node:crypto';
 import type { TransactionalEmailMessage } from '@groceryview/notifications';
+
+const DEFAULT_UNSUBSCRIBE_TOKEN_SECRET = 'groceryview-local-unsubscribe-token-secret';
+
+export type EmailUnsubscribeTokenClaims = {
+  action: 'disable_email_alerts';
+  channel: 'email';
+  email: string;
+  userId: string;
+  version: 1;
+};
 
 export type CheapestThisWeekDigestDeal = {
   productId: string;
@@ -31,6 +42,7 @@ export type CheapestThisWeekDigestEmailInput = {
   weekStart: string;
   weekEnd: string;
   generatedAt: string;
+  unsubscribeTokenSecret?: string;
 };
 
 export function buildCheapestThisWeekDigestEmail(input: CheapestThisWeekDigestEmailInput): TransactionalEmailMessage {
@@ -50,7 +62,13 @@ export function buildCheapestThisWeekDigestEmail(input: CheapestThisWeekDigestEm
     '',
     `Digest window: ${input.weekStart} to ${input.weekEnd}`,
     `Generated at: ${input.generatedAt}`,
-    'You are receiving this because email digests are enabled in your GroceryView notification preferences.'
+    'You are receiving this because email digests are enabled in your GroceryView notification preferences.',
+    '',
+    `Unsubscribe from GroceryView email alerts: ${buildEmailUnsubscribeUrl(input.baseUrl, {
+      recipientEmail: input.recipientEmail,
+      userId: input.userId,
+      secret: input.unsubscribeTokenSecret
+    })}`
   ];
 
   return {
@@ -60,9 +78,73 @@ export function buildCheapestThisWeekDigestEmail(input: CheapestThisWeekDigestEm
     metadata: {
       type: 'weekly_cheapest_digest',
       userId: input.userId,
-      sendAt: input.generatedAt
+      sendAt: input.generatedAt,
+      unsubscribeUrl: buildEmailUnsubscribeUrl(input.baseUrl, {
+        recipientEmail: input.recipientEmail,
+        userId: input.userId,
+        secret: input.unsubscribeTokenSecret
+      })
     }
   };
+}
+
+export function buildEmailUnsubscribeUrl(
+  baseUrl: string,
+  input: { recipientEmail: string; secret?: string; userId: string }
+): string {
+  const token = buildEmailUnsubscribeToken({
+    email: input.recipientEmail,
+    secret: input.secret,
+    userId: input.userId
+  });
+  return `${baseUrl.replace(/\/+$/, '')}/api/unsubscribe?token=${encodeURIComponent(token)}`;
+}
+
+export function buildEmailUnsubscribeToken(
+  input: { email: string; secret?: string; userId: string }
+): string {
+  const claims: EmailUnsubscribeTokenClaims = {
+    action: 'disable_email_alerts',
+    channel: 'email',
+    email: input.email.trim().toLowerCase(),
+    userId: input.userId,
+    version: 1
+  };
+  const payload = base64UrlEncode(JSON.stringify(claims));
+  const signature = signPayload(payload, resolveUnsubscribeSecret(input.secret));
+  return `${payload}.${signature}`;
+}
+
+export function verifyEmailUnsubscribeToken(token: string, secret?: string): EmailUnsubscribeTokenClaims | null {
+  const [payload, signature, ...extra] = token.split('.');
+  if (!payload || !signature || extra.length > 0) return null;
+  const expected = signPayload(payload, resolveUnsubscribeSecret(secret));
+  if (!constantTimeEqual(signature, expected)) return null;
+
+  try {
+    const claims = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as Partial<EmailUnsubscribeTokenClaims>;
+    if (
+      claims.version !== 1 ||
+      claims.action !== 'disable_email_alerts' ||
+      claims.channel !== 'email' ||
+      typeof claims.email !== 'string' ||
+      !claims.email.includes('@') ||
+      typeof claims.userId !== 'string' ||
+      claims.userId.length === 0
+    ) {
+      return null;
+    }
+
+    return {
+      action: claims.action,
+      channel: claims.channel,
+      email: claims.email,
+      userId: claims.userId,
+      version: claims.version
+    };
+  } catch {
+    return null;
+  }
 }
 
 function buildProductUrl(baseUrl: string, productSlug: string): string {
@@ -75,4 +157,22 @@ function formatDigestProductName(deal: CheapestThisWeekDigestDeal): string {
 
 function formatMoney(currency: string, value: number): string {
   return `${currency} ${value.toFixed(2)}`;
+}
+
+function resolveUnsubscribeSecret(secret?: string): string {
+  return secret && secret.length > 0 ? secret : DEFAULT_UNSUBSCRIBE_TOKEN_SECRET;
+}
+
+function signPayload(payload: string, secret: string): string {
+  return createHmac('sha256', secret).update(payload).digest('base64url');
+}
+
+function base64UrlEncode(value: string): string {
+  return Buffer.from(value, 'utf8').toString('base64url');
+}
+
+function constantTimeEqual(actual: string, expected: string): boolean {
+  const actualBuffer = Buffer.from(actual);
+  const expectedBuffer = Buffer.from(expected);
+  return actualBuffer.length === expectedBuffer.length && timingSafeEqual(actualBuffer, expectedBuffer);
 }
