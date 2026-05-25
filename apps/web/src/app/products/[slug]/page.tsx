@@ -22,6 +22,7 @@ import { PriceIntelligenceCard, type PriceIntelligenceScoreCard } from '@/compon
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
+import { buildShortTermPriceForecast } from '@/lib/price-intelligence';
 import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { normalizeUnitPriceForPackageText, packageEvidenceFromText } from '@/lib/normalization';
@@ -1150,6 +1151,23 @@ function priceChartTerminalFor(product: NonNullable<ReturnType<typeof findProduc
       } : {})
     };
   });
+  const shortTermForecast = buildShortTermPriceForecast({
+    observations: observations.map((observation) => ({
+      observedAt: observation.observedAt,
+      price: observation.price
+    })),
+    horizonDays: 14
+  });
+  const forecastTerminalModel = {
+    available: shortTermForecast.available,
+    title: 'Short-term price forecast band',
+    horizonLabel: shortTermForecast.available ? `next ${shortTermForecast.horizonDays} days` : 'forecast withheld',
+    summary: shortTermForecast.available && shortTermForecast.points.length > 0
+      ? `${shortTermForecast.trendLabel}; projected band ${formatTrendValue(shortTermForecast.points.at(-1)!.lowerBound)}–${formatTrendValue(shortTermForecast.points.at(-1)!.upperBound)}.`
+      : shortTermForecast.summary,
+    caveat: shortTermForecast.caveat,
+    points: shortTermForecast.points
+  };
 
   const windows = timeframeWindows.map((window): PriceChartTerminalWindow => {
     const result = buildPriceChartSeries({
@@ -1173,7 +1191,8 @@ function priceChartTerminalFor(product: NonNullable<ReturnType<typeof findProduc
       latestObservedAt: latestPoint?.time,
       lowValueLabel: values.length ? formatTrendValue(Math.min(...values)) : 'Not reported',
       highValueLabel: values.length ? formatTrendValue(Math.max(...values)) : 'Not reported',
-      series: result.series
+      series: result.series,
+      forecast: forecastTerminalModel
     };
   });
 
@@ -1183,8 +1202,8 @@ function priceChartTerminalFor(product: NonNullable<ReturnType<typeof findProduc
     sourceLabel: comparableUnit ? `buildPriceChartSeries · OpenPrices community observations · normalized unit price per ${comparableUnit}` : 'buildPriceChartSeries · OpenPrices community observations',
     confidenceLabel: `${formatPct(sourceConfidence * 100)} chart confidence`,
     caveat: comparableUnit
-      ? `Every plotted point comes from dated OpenPrices observations normalized by package size (${packageText}) to a unit price per ${comparableUnit}; missing shelf, flyer, and member prices are disclosed instead of inferred.`
-      : 'Every plotted point comes from dated OpenPrices observations; missing shelf, flyer, and member prices are disclosed instead of inferred.',
+      ? `Every plotted point comes from dated OpenPrices observations normalized by package size (${packageText}) to a unit price per ${comparableUnit}; missing shelf, flyer, and member prices are disclosed instead of inferred. The forecast band uses only recent observed price-event trends.`
+      : 'Every plotted point comes from dated OpenPrices observations; missing shelf, flyer, and member prices are disclosed instead of inferred. The forecast band uses only recent observed price-event trends.',
     defaultWindow: windows.find((window) => window.label === '1Y' && window.pointCount > 0)?.label ?? 'ALL',
     windows
   };

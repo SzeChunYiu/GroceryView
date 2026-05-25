@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { affiliateDisclosureLabel, buildAffiliateOutboundUrl, type AffiliateLinkMetadata } from '@/lib/analytics';
 
 type DisclosureStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
 type BrowserSession = { accessToken: string; userId: string };
@@ -34,6 +35,19 @@ const defaultSponsoredPlacementSlots: AdPlacementSlot[] = [
     surface: 'discovery_rail'
   }
 ];
+
+export function AffiliateDisclosureNotice({ metadata }: Readonly<{ metadata: AffiliateLinkMetadata }>) {
+  const label = affiliateDisclosureLabel(metadata);
+  return (
+    <span className="mt-2 block rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold leading-5 text-amber-950" data-affiliate-disclosure={metadata.sponsored === false ? 'outbound' : 'affiliate'}>
+      {label}
+    </span>
+  );
+}
+
+export function affiliateTrackedHref(metadata: AffiliateLinkMetadata) {
+  return buildAffiliateOutboundUrl(metadata);
+}
 
 function readSession(): BrowserSession {
   const accessToken = sessionStorage.getItem('groceryview:accessToken') || '';
@@ -92,6 +106,13 @@ export function AdDisclosureActions() {
       </p>
       <div className="mt-4 flex flex-wrap gap-2">
         <button className="rounded-full bg-sky-700 px-4 py-2 text-sm font-black text-white" onClick={loadAdDisclosure} type="button">Load signed-in ad disclosure</button>
+      </div>
+
+      <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+        <p className="text-sm font-black text-amber-950">Outbound link disclosure contract</p>
+        <p className="mt-2 text-sm font-semibold leading-6 text-amber-950">
+          Store and deal links must carry affiliate metadata, open with sponsored/noopener rel attributes, and show a nearby disclosure that commissions never affect Deal Score, basket totals, or ranking.
+        </p>
       </div>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-3">

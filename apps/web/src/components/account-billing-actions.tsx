@@ -162,7 +162,7 @@ export function AccountBillingActions() {
           <div>
             <p className="text-sm font-black text-violet-950">Premium savings forecast</p>
             <p className="mt-2 text-sm font-semibold leading-6 text-violet-950">
-              Forecasted monthly savings stay premium-only and combine alerts, swaps, and basket-planning signals after subscription access is loaded.
+              Forecasted monthly savings stay premium-only and combine observed alerts, historical swaps, and basket-planning source rows after subscription access is loaded.
             </p>
           </div>
           <p className="rounded-full bg-white px-3 py-1 text-sm font-black text-violet-800">{forecastUnlocked ? 'Unlocked' : 'Locked'}</p>
