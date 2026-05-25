@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { FuelDetourCalc } from '@/components/fuel-detour-calc';
-import { formatFuelPrice, fuelPriceSourceSchema, fuelPriceTargetAlerts, verifiedFuelPriceObservations, verifiedFuelPriceSource } from '@/lib/fuel-prices';
+import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalSeries } from '@/components/price-chart-terminal';
+import { formatFuelPrice, fuelPriceSourceSchema, fuelPriceTargetAlerts, type VerifiedFuelPriceObservation, verifiedFuelPriceObservations, verifiedFuelPriceSource } from '@/lib/fuel-prices';
 import { fuelStations, fuelStationSource, type FuelStationChain } from '@/lib/ingested/fuel-stations';
+import { st1FuelPriceObservations, st1FuelPriceSource } from '@/lib/ingested/st1-fuel-prices';
 import { fuelStationSourceCoverage, multiVerticalDomainFoundation } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -46,10 +48,150 @@ function stationAddress(station: (typeof fuelStations)[number]) {
   return [station.street, station.houseNumber, station.postcode, station.city].filter(Boolean).join(', ');
 }
 
-export default function FuelPage() {
+type FuelGrade = VerifiedFuelPriceObservation['grade'];
+type FuelTerminalRow = {
+  id: string;
+  grade: FuelGrade;
+  label: string;
+  operatorId: 'okq8' | 'st1';
+  operatorName: 'OKQ8' | 'St1';
+  pricePerLitre: number;
+  observedAt: string;
+  effectiveFrom: string;
+  confidence: number;
+  sourceUrl: string;
+  sourceLabel: string;
+};
+
+const currentLocation = { latitude: 59.3293, longitude: 18.0686, label: 'Stockholm' };
+const gradeOptions: Array<{ value: FuelGrade; label: string }> = [
+  { value: '95', label: '95 E10' },
+  { value: '98', label: '98' },
+  { value: 'diesel', label: 'Diesel' },
+  { value: 'hvo100', label: 'HVO100' },
+  { value: 'e85', label: 'E85' }
+];
+
+const fuelTerminalRows: FuelTerminalRow[] = [
+  ...verifiedFuelPriceObservations.map((row) => ({
+    id: row.id,
+    grade: row.grade,
+    label: row.label,
+    operatorId: 'okq8' as const,
+    operatorName: 'OKQ8' as const,
+    pricePerLitre: row.pricePerLitre,
+    observedAt: row.observedAt,
+    effectiveFrom: row.effectiveFrom,
+    confidence: row.confidence,
+    sourceUrl: row.sourceUrl,
+    sourceLabel: verifiedFuelPriceSource.name
+  })),
+  ...st1FuelPriceObservations.map((row) => ({
+    id: row.id,
+    grade: row.grade.toLowerCase() as FuelGrade,
+    label: row.label,
+    operatorId: 'st1' as const,
+    operatorName: 'St1' as const,
+    pricePerLitre: row.pricePerLitre,
+    observedAt: row.observedAt,
+    effectiveFrom: row.validFrom.slice(0, 10),
+    confidence: row.confidence,
+    sourceUrl: row.sourceUrl,
+    sourceLabel: st1FuelPriceSource.source
+  }))
+];
+
+function selectedFuelGrade(value: string | string[] | undefined): FuelGrade {
+  const candidate = Array.isArray(value) ? value[0] : value;
+  return gradeOptions.some((option) => option.value === candidate) ? candidate as FuelGrade : '95';
+}
+
+function distanceKm(
+  left: { latitude: number; longitude: number },
+  right: { latitude: number; longitude: number }
+) {
+  const earthRadiusKm = 6371;
+  const latDelta = ((right.latitude - left.latitude) * Math.PI) / 180;
+  const lonDelta = ((right.longitude - left.longitude) * Math.PI) / 180;
+  const leftLat = (left.latitude * Math.PI) / 180;
+  const rightLat = (right.latitude * Math.PI) / 180;
+  const haversine = Math.sin(latDelta / 2) ** 2 + Math.cos(leftLat) * Math.cos(rightLat) * Math.sin(lonDelta / 2) ** 2;
+  return 2 * earthRadiusKm * Math.asin(Math.sqrt(haversine));
+}
+
+function formatKm(value: number) {
+  return `${value.toLocaleString('sv-SE', { maximumFractionDigits: 1 })} km`;
+}
+
+function fuelTerminalChartFor(rows: FuelTerminalRow[], gradeLabel: string): PriceChartTerminalModel {
+  const series: PriceChartTerminalSeries[] = ['okq8', 'st1'].flatMap((operatorId): PriceChartTerminalSeries[] => {
+    const operatorRows = rows
+      .filter((row) => row.operatorId === operatorId)
+      .sort((left, right) => left.observedAt.localeCompare(right.observedAt));
+    if (operatorRows.length === 0) return [];
+    const operatorName = operatorRows[0]!.operatorName;
+
+    return [{
+      id: `fuel-${operatorId}-${gradeLabel}`,
+      storeName: operatorName,
+      sourceType: 'operator_public_price_page',
+      lineStyle: operatorId === 'okq8' ? 'solid' : 'dashed',
+      points: operatorRows.map((row) => ({
+        time: row.observedAt.slice(0, 10),
+        value: row.pricePerLitre,
+        confidence: row.confidence,
+        provenanceLabel: row.sourceLabel
+      })),
+      markers: operatorRows.map((row) => ({
+        time: row.observedAt.slice(0, 10),
+        text: formatFuelPrice(row.pricePerLitre),
+        color: operatorId === 'okq8' ? '#0b65c6' : '#f3c300',
+        provenanceLabel: row.sourceLabel
+      }))
+    }];
+  });
+  const prices = rows.map((row) => row.pricePerLitre);
+  const latest = [...rows].sort((left, right) => right.observedAt.localeCompare(left.observedAt))[0];
+
+  return {
+    available: series.length > 0,
+    title: `${gradeLabel} fuel price terminal`,
+    sourceLabel: 'domain=fuel operator price history',
+    confidenceLabel: 'Operator page confidence; no station pump inference',
+    caveat: 'History points are sourced from public operator price pages. Station dots are locations only unless station-level prices are explicitly observed.',
+    defaultWindow: 'ALL',
+    windows: [{
+      label: 'ALL',
+      rangeLabel: 'all verified fuel rows',
+      windowStart: rows.map((row) => row.observedAt).sort()[0],
+      windowEnd: latest?.observedAt,
+      pointCount: rows.length,
+      markerCount: rows.length,
+      latestValueLabel: latest ? formatFuelPrice(latest.pricePerLitre) : 'Not reported',
+      latestObservedAt: latest?.observedAt,
+      lowValueLabel: prices.length ? formatFuelPrice(Math.min(...prices)) : 'Not reported',
+      highValueLabel: prices.length ? formatFuelPrice(Math.max(...prices)) : 'Not reported',
+      series
+    }]
+  };
+}
+
+export default async function FuelPage({ searchParams }: Readonly<{ searchParams?: Promise<{ grade?: string | string[] }> }>) {
+  const query = searchParams ? await searchParams : {};
+  const selectedGrade = selectedFuelGrade(query.grade);
+  const selectedGradeLabel = gradeOptions.find((option) => option.value === selectedGrade)!.label;
+  const selectedGradeRows = fuelTerminalRows.filter((row) => row.grade === selectedGrade);
+  const cheapestSelectedGrade = [...selectedGradeRows].sort((a, b) => a.pricePerLitre - b.pricePerLitre || a.operatorName.localeCompare(b.operatorName, 'sv-SE'))[0]!;
+  const selectedOperatorStations = fuelStations
+    .filter((station) => station.chain === cheapestSelectedGrade.operatorName)
+    .map((station) => ({ ...station, distanceKm: distanceKm(currentLocation, station) }))
+    .sort((left, right) => left.distanceKm - right.distanceKm)
+    .slice(0, 5);
+  const nearestSelectedStation = selectedOperatorStations[0];
+  const fuelTerminalChart = fuelTerminalChartFor(selectedGradeRows, selectedGradeLabel);
   const domain = multiVerticalDomainFoundation.find((candidate) => candidate.slug === 'fuel')!;
-  const lowest = [...verifiedFuelPriceObservations].sort((a, b) => a.pricePerLitre - b.pricePerLitre)[0]!;
-  const freshestDate = verifiedFuelPriceObservations
+  const lowest = [...fuelTerminalRows].sort((a, b) => a.pricePerLitre - b.pricePerLitre)[0]!;
+  const freshestDate = fuelTerminalRows
     .map((row) => row.effectiveFrom)
     .sort()
     .at(-1)!;
@@ -65,10 +207,33 @@ export default function FuelPage() {
         GroceryView now renders fuel only from domain=fuel observations with price per litre and source provenance. The first operator source is OKQ8&apos;s public fuel price page; crowd reports remain schema-ready but empty.
       </p>
 
+      <Card className="mt-6 border-slate-200 bg-slate-50">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Grade selector</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">{selectedGradeLabel} terminal view</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Selected grade uses {selectedGradeRows.length} verified operator rows and highlights the cheapest operator-backed station candidates near {currentLocation.label}.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {gradeOptions.map((option) => (
+              <Link
+                className={option.value === selectedGrade ? 'rounded-full bg-slate-950 px-4 py-2 text-sm font-black text-white' : 'rounded-full bg-white px-4 py-2 text-sm font-black text-slate-700 shadow-sm'}
+                href={`/fuel?grade=${option.value}`}
+                key={option.value}
+              >
+                {option.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </Card>
+
       <div className="mt-6 grid gap-4 md:grid-cols-3">
         <Card>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Observed rows</p>
-          <p className="mt-2 text-5xl font-black text-slate-950">{verifiedFuelPriceObservations.length}</p>
+          <p className="mt-2 text-5xl font-black text-slate-950">{fuelTerminalRows.length}</p>
           <p className="mt-3 text-sm font-semibold text-slate-700">All rows are domain=fuel and unit=litre.</p>
         </Card>
         <Card>
@@ -86,6 +251,36 @@ export default function FuelPage() {
       <div className="mt-6">
         <FuelDetourCalc currentFuelPrice={lowest.pricePerLitre} />
       </div>
+
+      <div className="mt-6">
+        <PriceChartTerminal chart={fuelTerminalChart} />
+      </div>
+
+      <Card className="mt-6 border-sky-200 bg-sky-50">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <Eyebrow>Cheapest station near me</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">
+              {nearestSelectedStation ? `${nearestSelectedStation.name} is the nearest ${cheapestSelectedGrade.operatorName} candidate` : `No ${cheapestSelectedGrade.operatorName} station candidates found`}
+            </h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              {selectedGradeLabel} cheapest operator row: {formatFuelPrice(cheapestSelectedGrade.pricePerLitre)} from {cheapestSelectedGrade.sourceLabel}. Station distance uses OSM coordinates near {currentLocation.label}; the operator row is not claimed as a station-specific pump price.
+            </p>
+          </div>
+          <p className="rounded-2xl bg-white p-4 text-center text-sm font-black text-sky-950 shadow-sm">
+            {nearestSelectedStation ? formatKm(nearestSelectedStation.distanceKm) : 'No distance'}
+          </p>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-5">
+          {selectedOperatorStations.map((station) => (
+            <div className="rounded-2xl border border-sky-100 bg-white p-4 shadow-sm" key={`${station.osmType}-${station.osmId}-nearby`}>
+              <p className="text-sm font-black text-slate-950">{station.name}</p>
+              <p className="mt-2 text-xs font-bold text-slate-600">{stationAddress(station) || 'Address not tagged'}</p>
+              <p className="mt-3 text-lg font-black text-sky-900">{formatKm(station.distanceKm)}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
         <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
@@ -153,13 +348,13 @@ export default function FuelPage() {
               </tr>
             </thead>
             <tbody>
-              {verifiedFuelPriceObservations.map((row) => (
+              {fuelTerminalRows.map((row) => (
                 <tr className="border-t border-slate-200" key={row.id}>
                   <td className="px-4 py-3 font-black text-slate-950">{row.label}</td>
                   <td className="px-4 py-3 font-semibold text-slate-700">{row.operatorName}</td>
                   <td className="px-4 py-3 font-black text-emerald-800">{formatFuelPrice(row.pricePerLitre)}</td>
                   <td className="px-4 py-3 font-semibold text-slate-700">{row.effectiveFrom}</td>
-                  <td className="px-4 py-3 font-semibold text-slate-700">{row.sourceType.replaceAll('_', ' ')}</td>
+                  <td className="px-4 py-3 font-semibold text-slate-700">{row.sourceLabel}</td>
                 </tr>
               ))}
             </tbody>
@@ -253,7 +448,7 @@ export default function FuelPage() {
             {fuelStations.map((station) => (
               <span
                 aria-label={`${station.name}, ${station.chain}`}
-                className="absolute z-10 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white shadow-sm"
+                className={station.chain === cheapestSelectedGrade.operatorName ? 'absolute z-20 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow-lg shadow-sky-900/30' : 'absolute z-10 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white shadow-sm'}
                 key={`${station.osmType}-${station.osmId}`}
                 style={{
                   ...fuelStationPosition(station.latitude, station.longitude),
