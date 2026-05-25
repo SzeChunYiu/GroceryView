@@ -9,11 +9,46 @@ type GeolocationErrorState = {
   message: string;
 };
 
-type GeolocationPositionState = {
+export type GeolocationPositionState = {
   latitude: number;
   longitude: number;
   accuracy: number;
 };
+
+export type TripPlannerOrigin = {
+  latitude: number;
+  longitude: number;
+  accuracyMeters: number;
+  label: string;
+  consented: boolean;
+};
+
+type GeolocationRequestOptions = {
+  enableHighAccuracy?: boolean;
+  maximumAgeMs?: number;
+  timeoutMs?: number;
+};
+
+const defaultRequestOptions = {
+  enableHighAccuracy: true,
+  maximumAgeMs: 60_000,
+  timeoutMs: 10_000
+};
+const emptyRequestOptions: GeolocationRequestOptions = {};
+
+export function buildTripPlannerOrigin(position: GeolocationPositionState | null): TripPlannerOrigin | null {
+  if (!position) {
+    return null;
+  }
+
+  return {
+    latitude: position.latitude,
+    longitude: position.longitude,
+    accuracyMeters: Math.ceil(position.accuracy),
+    label: `Current location within ${Math.ceil(position.accuracy)} m`,
+    consented: true
+  };
+}
 
 function mapPositionError(error: GeolocationPositionError): GeolocationErrorState {
   if (error.code === error.PERMISSION_DENIED) {
@@ -45,11 +80,15 @@ function buildRetryGuidance(kind: GeolocationErrorKind, attempts: number) {
   return `${repeatedPrefix}Retry in a moment, or use city search while location services recover.`;
 }
 
-export function useGeolocation() {
+export function useGeolocation(options: GeolocationRequestOptions = emptyRequestOptions) {
   const [attempts, setAttempts] = useState(0);
   const [error, setError] = useState<GeolocationErrorState | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [position, setPosition] = useState<GeolocationPositionState | null>(null);
+  const requestOptions = useMemo(
+    () => ({ ...defaultRequestOptions, ...options }),
+    [options.enableHighAccuracy, options.maximumAgeMs, options.timeoutMs]
+  );
 
   const requestLocation = useCallback(() => {
     setAttempts((currentAttempts) => currentAttempts + 1);
@@ -75,11 +114,16 @@ export function useGeolocation() {
         setIsLoading(false);
         setError(mapPositionError(nextError));
       },
-      { enableHighAccuracy: true, maximumAge: 60_000, timeout: 10_000 }
+      {
+        enableHighAccuracy: requestOptions.enableHighAccuracy,
+        maximumAge: requestOptions.maximumAgeMs,
+        timeout: requestOptions.timeoutMs
+      }
     );
-  }, []);
+  }, [requestOptions]);
 
   const retryGuidance = useMemo(() => (error ? buildRetryGuidance(error.kind, attempts) : null), [attempts, error]);
+  const tripPlannerOrigin = useMemo(() => buildTripPlannerOrigin(position), [position]);
 
-  return { attempts, error, isLoading, position, requestLocation, retryGuidance };
+  return { attempts, error, isLoading, position, requestLocation, retryGuidance, tripPlannerOrigin };
 }

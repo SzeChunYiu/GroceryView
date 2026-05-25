@@ -2,7 +2,7 @@ import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/c
 import { defaultStoreRouteChecklist, osmStores } from '@/lib/osm-stores';
 import { basketTripCostContract, budgetCheapestStoreRoutingPlanner, deliveryVsInStoreComparison, elderlyNearestDeliveryPlanner, formatSek, fulfillmentSlotsContract } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
-import { activeShoppingTripEstimates } from '@/lib/trip-planner';
+import { activeShoppingTripEstimates, routeAwareSplitTripPlanner } from '@/lib/trip-planner';
 
 export function generateMetadata() {
   return routeMetadata('/shopping-trips');
@@ -126,6 +126,79 @@ export default function FeaturePage() {
               </section>
             );
           })}
+        </div>
+      </Card>
+      <Card className="mt-6 border-lime-200 bg-lime-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-lime-800">Route-aware split planner</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight">{routeAwareSplitTripPlanner.recommendedPlan.label}</h2>
+        <p className="mt-3 text-sm leading-6 text-slate-700">
+          GroceryView compares the best single-store run with an ordered split-store route, then recommends the split only when shelf savings still clear the travel and time-cost threshold. This static demo uses {routeAwareSplitTripPlanner.origin.label}; signed-in shoppers can replace it with a consented browser location from the geolocation hook.
+        </p>
+        <div className="mt-4 grid gap-4 lg:grid-cols-4">
+          <div className="rounded-2xl bg-white p-4">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-800">Recommended total</p>
+            <p className="mt-2 text-3xl font-black text-slate-950">{formatSek(routeAwareSplitTripPlanner.recommendedPlan.effectiveTotalSek)}</p>
+            <p className="mt-2 text-sm font-semibold text-slate-700">{routeAwareSplitTripPlanner.recommendedPlan.explanation}</p>
+          </div>
+          <div className="rounded-2xl bg-white p-4">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-800">Best single store</p>
+            <p className="mt-2 font-black text-slate-950">{routeAwareSplitTripPlanner.bestSingleStorePlan.stores[0]?.storeName}</p>
+            <p className="mt-2 text-sm font-semibold text-slate-700">{formatSek(routeAwareSplitTripPlanner.bestSingleStorePlan.effectiveTotalSek)} effective total</p>
+          </div>
+          <div className="rounded-2xl bg-white p-4">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-800">Split-store route</p>
+            <p className="mt-2 font-black text-slate-950">{routeAwareSplitTripPlanner.splitStorePlan.stores.map((stop) => stop.chain).join(' -> ')}</p>
+            <p className="mt-2 text-sm font-semibold text-slate-700">{routeAwareSplitTripPlanner.splitStorePlan.travelDistanceKm} km, {routeAwareSplitTripPlanner.splitStorePlan.travelMinutes} min travel</p>
+          </div>
+          <div className="rounded-2xl bg-white p-4">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-800">Savings gate</p>
+            <p className="mt-2 font-black text-slate-950">{formatSek(routeAwareSplitTripPlanner.splitStorePlan.netSavingsSek)} net savings</p>
+            <p className="mt-2 text-sm font-semibold text-slate-700">Requires at least {formatSek(routeAwareSplitTripPlanner.minimumNetSavingsSek)} after travel and time costs.</p>
+          </div>
+        </div>
+        <div className="mt-4 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="overflow-hidden rounded-2xl bg-white">
+            <div className="grid grid-cols-[0.9fr_1.1fr_0.7fr_0.6fr] gap-3 bg-lime-100 px-4 py-3 text-xs font-black uppercase tracking-[0.16em] text-lime-900">
+              <span>Stop</span>
+              <span>Items</span>
+              <span>Basket</span>
+              <span>Pick time</span>
+            </div>
+            <div className="divide-y divide-lime-100">
+              {routeAwareSplitTripPlanner.splitStorePlan.stores.map((stop, index) => (
+                <div className="grid grid-cols-[0.9fr_1.1fr_0.7fr_0.6fr] gap-3 px-4 py-3 text-sm" key={stop.storeId}>
+                  <div>
+                    <p className="font-black text-slate-950">{index + 1}. {stop.storeName}</p>
+                    <p className="mt-1 text-xs font-semibold text-slate-600">{stop.chain}</p>
+                  </div>
+                  <p className="font-semibold text-slate-700">{stop.items.join(', ')}</p>
+                  <p className="font-black text-slate-950">{formatSek(stop.basketTotalSek)}</p>
+                  <p className="font-semibold text-slate-700">{stop.pickupMinutes} min</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-2xl bg-white p-4">
+            <p className="font-black text-slate-950">Route legs</p>
+            <dl className="mt-3 space-y-3 text-sm">
+              {routeAwareSplitTripPlanner.splitStorePlan.routeLegs.map((leg) => (
+                <div className="border-b border-lime-100 pb-3 last:border-b-0 last:pb-0" key={`${leg.from}-${leg.to}`}>
+                  <dt className="font-black text-slate-950">{leg.from} -> {leg.to}</dt>
+                  <dd className="mt-1 font-semibold text-slate-700">{leg.distanceKm} km · {leg.travelMinutes} min</dd>
+                </div>
+              ))}
+            </dl>
+            <div className="mt-4 grid grid-cols-2 gap-3 border-t border-lime-100 pt-4 text-sm">
+              <div>
+                <p className="font-semibold text-slate-600">travel cost</p>
+                <p className="font-black text-slate-950">{formatSek(routeAwareSplitTripPlanner.splitStorePlan.travelCostSek)}</p>
+              </div>
+              <div>
+                <p className="font-semibold text-slate-600">time cost</p>
+                <p className="font-black text-slate-950">{formatSek(routeAwareSplitTripPlanner.splitStorePlan.timeCostSek)}</p>
+              </div>
+            </div>
+          </div>
         </div>
       </Card>
       <Card className="mt-6 border-sky-200 bg-sky-50">
