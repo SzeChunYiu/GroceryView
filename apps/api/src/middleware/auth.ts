@@ -6,6 +6,7 @@ export type AuthenticatedRequest = {
     authorization?: string;
   };
   user?: SessionPayload;
+  authToken?: string;
 };
 
 @Injectable()
@@ -18,6 +19,7 @@ export class AuthGuard implements CanActivate {
 
     try {
       request.user = await verifySessionToken(token, authSecret);
+      request.authToken = token;
       return true;
     } catch {
       throw new UnauthorizedException('Authentication required.');
@@ -33,4 +35,9 @@ export function authenticatedUserId(request: AuthenticatedRequest): string {
 export function authenticatedUserEmail(request: AuthenticatedRequest): string | undefined {
   if (!request.user?.userId) throw new UnauthorizedException('Authentication required.');
   return request.user.email;
+}
+
+export function authenticatedSession(request: AuthenticatedRequest): SessionPayload {
+  if (!request.user?.userId) throw new UnauthorizedException('Authentication required.');
+  return request.user;
 }

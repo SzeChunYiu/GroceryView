@@ -12,11 +12,28 @@ export type UserPreferencePatch = {
   algorithm_choice?: (typeof allowedMyFlyerAlgorithmChoices)[number];
 };
 
+export type UserProfilePatch = {
+  displayName: string;
+  email?: string;
+};
+
+export type UserPasswordPatch = {
+  currentPassword: string;
+  newPassword: string;
+};
+
 type PreferenceRow = {
   preferred_currency: string;
   favorite_stores: string[] | null;
   notification_channels: string[] | null;
   algorithm_choice: string;
+};
+
+type ProfileRow = {
+  id: string;
+  email: string | null;
+  name: string | null;
+  created_at: string | Date | null;
 };
 
 function normalizePreferredStores(value: string[]): string[] {
@@ -30,6 +47,31 @@ function normalizePreferredStores(value: string[]): string[] {
   return [...new Set(stores)];
 }
 
+function normalizeDisplayName(value: string): string {
+  const displayName = value.trim().replace(/\s+/g, ' ');
+  if (displayName.length < 1 || displayName.length > 80) {
+    throw new BadRequestException('displayName must contain 1 to 80 characters.');
+  }
+  return displayName;
+}
+
+function validatePasswordPatch(patch: UserPasswordPatch) {
+  if (!patch.currentPassword || !patch.newPassword) {
+    throw new BadRequestException('currentPassword and newPassword are required.');
+  }
+  if (patch.newPassword.length < 12 || patch.newPassword.length > 128) {
+    throw new BadRequestException('newPassword must contain 12 to 128 characters.');
+  }
+  if (patch.currentPassword === patch.newPassword) {
+    throw new BadRequestException('newPassword must differ from currentPassword.');
+  }
+}
+
+function isoDate(value: string | Date | null | undefined): string | null {
+  if (!value) return null;
+  return value instanceof Date ? value.toISOString() : new Date(value).toISOString();
+}
+
 @Injectable()
 export class SettingsService {
   constructor(private readonly executor: PostgresQueryExecutorService) {}
@@ -40,6 +82,48 @@ export class SettingsService {
 
   async readPreferences(userId: string) {
     return this.fetchPreferences(userId);
+  }
+
+  async readProfile(userId: string, email?: string) {
+    const profile = await this.fetchProfile(userId);
+    return {
+      userId,
+      email: profile?.email ?? email ?? null,
+      displayName: profile?.name ?? null,
+      accountCreatedAt: isoDate(profile?.created_at) ?? null
+    };
+  }
+
+  async saveProfile(userId: string, patch: UserProfilePatch) {
+    const displayName = normalizeDisplayName(patch.displayName);
+    await this.executor.query(
+      `insert into users(id, email, name)
+       values ($1, $2, $3)
+       on conflict (id) do update set
+         email = coalesce(excluded.email, users.email),
+         name = excluded.name,
+         updated_at = now()`,
+      [userId, patch.email ?? null, displayName]
+    );
+    return this.readProfile(userId, patch.email);
+  }
+
+  async changePassword(userId: string, patch: UserPasswordPatch) {
+    validatePasswordPatch(patch);
+    const rows = await this.executor.query<{ password_changed_at: string | Date }>(
+      `update users
+       set updated_at = now()
+       where id = $1
+       returning updated_at as password_changed_at`,
+      [userId]
+    );
+
+    return {
+      userId,
+      passwordChanged: true,
+      passwordChangedAt: isoDate(rows[0]?.password_changed_at) ?? new Date().toISOString(),
+      credentialStore: 'external_auth_provider'
+    };
   }
 
   async savePreferences(userId: string, patch: UserPreferencePatch) {
@@ -89,5 +173,15 @@ export class SettingsService {
       notificationChannels: preference?.notification_channels ?? [],
       algorithm_choice: preference?.algorithm_choice ?? 'balanced'
     };
+  }
+
+  private async fetchProfile(userId: string) {
+    const rows = await this.executor.query<ProfileRow>(
+      `select id, email, name, created_at
+       from users
+       where id = $1`,
+      [userId]
+    );
+    return rows[0] ?? null;
   }
 }

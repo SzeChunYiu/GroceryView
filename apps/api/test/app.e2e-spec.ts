@@ -24,6 +24,7 @@ class RecordingPriceHistoryExecutor {
     allowed_price_types: string[] | null;
   }> = [];
   preferenceRows = new Map<string, { preferred_currency: string; favorite_stores: string[]; notification_channels: string[]; algorithm_choice: string }>();
+  profileRows = new Map<string, { id: string; email: string | null; name: string | null; created_at: string; updated_at: string }>();
   stockUpRows: StockUpListTestRow[] = [];
 
   isConfigured(): boolean {
@@ -52,6 +53,35 @@ class RecordingPriceHistoryExecutor {
         notification_channels: row.notification_channels,
         algorithm_choice: row.algorithm_choice
       }] : []) as T[];
+    }
+    if (sql.includes('select id, email, name, created_at') && sql.includes('from users')) {
+      const row = this.profileRows.get(params[0] as string);
+      return (row ? [{
+        id: row.id,
+        email: row.email,
+        name: row.name,
+        created_at: row.created_at
+      }] : []) as T[];
+    }
+    if (sql.includes('insert into users')) {
+      const userId = params[0] as string;
+      const existing = this.profileRows.get(userId);
+      this.profileRows.set(userId, {
+        id: userId,
+        email: (params[1] as string | null) ?? existing?.email ?? null,
+        name: params[2] as string,
+        created_at: existing?.created_at ?? '2026-05-25T12:00:00.000Z',
+        updated_at: '2026-05-25T12:05:00.000Z'
+      });
+      return [] as T[];
+    }
+    if (sql.includes('update users') && sql.includes('password_changed_at')) {
+      const userId = params[0] as string;
+      const existing = this.profileRows.get(userId);
+      if (existing) {
+        existing.updated_at = '2026-05-25T12:10:00.000Z';
+      }
+      return [{ password_changed_at: '2026-05-25T12:10:00.000Z' }] as T[];
     }
     if (sql.includes('insert into multi_week_stock_up_rows')) {
       const row: StockUpListTestRow = {
@@ -766,8 +796,13 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/users/demo/settings/account']);
     assert.ok(docs.body.paths['/users/demo/settings/data-export']);
     assert.ok(docs.body.paths['/api/settings']);
+    assert.ok(docs.body.paths['/api/settings/profile']);
+    assert.ok(docs.body.paths['/api/settings/profile/password']);
     assert.deepEqual(docs.body.paths['/api/settings'].get.security, [{ bearer: [] }]);
     assert.deepEqual(docs.body.paths['/api/settings'].patch.security, [{ bearer: [] }]);
+    assert.deepEqual(docs.body.paths['/api/settings/profile'].get.security, [{ bearer: [] }]);
+    assert.deepEqual(docs.body.paths['/api/settings/profile'].patch.security, [{ bearer: [] }]);
+    assert.deepEqual(docs.body.paths['/api/settings/profile/password'].patch.security, [{ bearer: [] }]);
     assert.ok(docs.body.paths['/products']);
     assert.ok(docs.body.paths['/products/{productId}/cheapest-now']);
     assert.ok(docs.body.paths['/products/{id}/terminal']);
@@ -903,6 +938,76 @@ describe('GroceryView API app', () => {
       .expect(503);
   });
 
+  it('reads and updates authenticated profile metadata through /api/settings/profile', async () => {
+    process.env.AUTH_SECRET = 'test-auth-secret';
+    const token = await createSessionToken({ userId: 'profile-user-1', email: 'profile@example.com', expiresAt: '2099-01-01T00:00:00.000Z' }, 'test-auth-secret');
+
+    await request(app.getHttpServer()).get('/api/settings/profile').expect(401);
+
+    const emptyResponse = await request(app.getHttpServer())
+      .get('/api/settings/profile')
+      .set('authorization', `Bearer ${token}`)
+      .expect(200);
+
+    assert.deepEqual(emptyResponse.body, {
+      userId: 'profile-user-1',
+      email: 'profile@example.com',
+      displayName: null,
+      accountCreatedAt: null
+    });
+
+    const updated = await request(app.getHttpServer())
+      .patch('/api/settings/profile')
+      .set('authorization', `Bearer ${token}`)
+      .send({ displayName: '  Ada   Shopper  ' })
+      .expect(200);
+
+    assert.deepEqual(updated.body, {
+      userId: 'profile-user-1',
+      email: 'profile@example.com',
+      displayName: 'Ada Shopper',
+      accountCreatedAt: '2026-05-25T12:00:00.000Z'
+    });
+    assert.ok(priceHistoryExecutor.calls.some((call) => call.sql.includes('insert into users') && call.params[0] === 'profile-user-1'));
+
+    await request(app.getHttpServer())
+      .patch('/api/settings/profile')
+      .set('authorization', `Bearer ${token}`)
+      .send({ displayName: '' })
+      .expect(400);
+  });
+
+  it('validates authenticated password changes without returning submitted secrets', async () => {
+    process.env.AUTH_SECRET = 'test-auth-secret';
+    const token = await createSessionToken({ userId: 'profile-password-user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'test-auth-secret');
+
+    await request(app.getHttpServer())
+      .patch('/api/settings/profile/password')
+      .send({ currentPassword: 'current-password', newPassword: 'new-password-value' })
+      .expect(401);
+
+    await request(app.getHttpServer())
+      .patch('/api/settings/profile/password')
+      .set('authorization', `Bearer ${token}`)
+      .send({ currentPassword: 'current-password', newPassword: 'short' })
+      .expect(400);
+
+    const response = await request(app.getHttpServer())
+      .patch('/api/settings/profile/password')
+      .set('authorization', `Bearer ${token}`)
+      .send({ currentPassword: 'current-password', newPassword: 'new-password-value' })
+      .expect(200);
+
+    assert.deepEqual(response.body, {
+      userId: 'profile-password-user-1',
+      passwordChanged: true,
+      passwordChangedAt: '2026-05-25T12:10:00.000Z',
+      credentialStore: 'external_auth_provider'
+    });
+    assert.equal(JSON.stringify(response.body).includes('current-password'), false);
+    assert.equal(JSON.stringify(response.body).includes('new-password-value'), false);
+  });
+
   it('persists signed-in multi-week stock-up rows with observed historical price guardrails', async () => {
     process.env.AUTH_SECRET = 'test-auth-secret';
     const token = await createSessionToken({ userId: 'stock-user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'test-auth-secret');
@@ -943,7 +1048,15 @@ describe('GroceryView API app', () => {
     assert.equal(created.body.rows[0].historicalLowUnitPrice, 99.9);
     assert.equal(created.body.rows[0].confidence, 'high');
     assert.equal(created.body.evidence.noForecast, true);
-    assert.deepEqual(created.body.evidence.sourceTables, ['multi_week_stock_up_rows', 'app_users']);
+    assert.deepEqual(created.body.evidence.sourceTables, [
+      'multi_week_stock_up_rows',
+      'weekly_baskets',
+      'basket_items',
+      'products',
+      'latest_prices',
+      'observations',
+      'app_users'
+    ]);
     assert.ok(created.body.guardrails.some((guardrail: string) => /no future price forecast/i.test(guardrail)));
 
     const updated = await request(app.getHttpServer())

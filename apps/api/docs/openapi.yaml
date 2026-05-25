@@ -37,6 +37,14 @@
         "properties": {},
         "type": "object"
       },
+      "PasswordPatchDto": {
+        "properties": {},
+        "type": "object"
+      },
+      "ProfilePatchDto": {
+        "properties": {},
+        "type": "object"
+      },
       "SettingsPatchDto": {
         "properties": {},
         "type": "object"
@@ -81,6 +89,29 @@
         },
         "tags": [
           "root"
+        ]
+      }
+    },
+    "/admin/coverage": {
+      "get": {
+        "operationId": "AdminController_coverage",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-groceryview-role",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Admin"
         ]
       }
     },
@@ -248,6 +279,81 @@
         "responses": {
           "200": {
             "description": "Save authenticated user preferences for currency, preferred stores, notification channels, and MyFlyer algorithm_choice"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/settings/profile": {
+      "get": {
+        "operationId": "AuthenticatedSettingsController_readProfile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Read authenticated user profile metadata including display name, email, and account creation date"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "settings"
+        ]
+      },
+      "patch": {
+        "operationId": "AuthenticatedSettingsController_updateProfile",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfilePatchDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Update authenticated user profile display name"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/settings/profile/password": {
+      "patch": {
+        "operationId": "AuthenticatedSettingsController_updatePassword",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordPatchDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Change authenticated user password without returning or logging secrets"
           }
         },
         "security": [
@@ -593,10 +699,19 @@
     "/market/overview": {
       "get": {
         "operationId": "MarketController_overview",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "market",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Stockholm grocery market overview"
+            "description": "Country-scoped grocery market overview"
           }
         },
         "tags": [

@@ -19,6 +19,7 @@ const appFiles = [
   'src/app/coverage/page.tsx',
   'src/app/map/page.tsx',
   'src/app/my-flyer/page.tsx',
+  'src/app/profile/page.tsx',
   'src/app/data-sources/page.tsx',
   'src/app/store-coverage/page.tsx',
   'src/app/openprices-depth/page.tsx',
@@ -79,6 +80,21 @@ describe('verified-data UI', () => {
     assert.match(route, /Delivery surfaces/);
     assert.match(route, /email, push, print, PDF, and share/);
     assert.doesNotMatch(route, /useState|useEffect/);
+  });
+
+  it('ships a signed-in profile page for display name, password, and creation date controls', async () => {
+    const profile = await read('src/app/profile/page.tsx');
+
+    assert.match(profile, /\/api\/settings\/profile/);
+    assert.match(profile, /\/api\/settings\/profile\/password/);
+    assert.match(profile, /sessionStorage\.getItem\('groceryview:accessToken'/);
+    assert.match(profile, /Save display name/);
+    assert.match(profile, /Change password/);
+    assert.match(profile, /formatAccountDate/);
+    assert.match(profile, /accountCreatedAt/);
+    assert.match(profile, /No anonymous profile reads or account changes/);
+    assert.doesNotMatch(profile, /console\./);
+    assert.doesNotMatch(profile, /demo-data|sample-data|mock session/i);
   });
 
   it('renders the consent banner visible in the first HTML pass to avoid homepage CLS', async () => {
