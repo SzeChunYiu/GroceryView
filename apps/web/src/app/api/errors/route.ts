@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { operatorErrorLog, safeErrorMessage } from '@/lib/safe-errors';
 
 const MAX_MESSAGE_LENGTH = 500;
 const MAX_STACK_LENGTH = 4_000;
@@ -30,8 +31,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'error_message_required' }, { status: 400 });
   }
 
+  const safe = safeErrorMessage(new Error(message));
   console.error('Client global error reported', {
     message,
+    safe,
+    operator: operatorErrorLog(new Error(message)),
     route: route || 'unknown',
     hasStack: stack.length > 0
   });
