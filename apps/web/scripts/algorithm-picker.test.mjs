@@ -16,6 +16,8 @@ test('AlgorithmPicker persists MyFlyer ranker choices to user preferences', asyn
   assert.match(source, /export function readStoredAlgorithmChoice/);
   assert.match(source, /export function writeStoredAlgorithmChoice/);
   assert.match(source, /export async function persistAlgorithmChoiceToUserPreferences/);
+  assert.match(source, /allowedAlgorithms\?: readonly AlgorithmChoice\[\]/);
+  assert.match(source, /const visibleOptions = useMemo/);
   assert.match(source, /algorithm_choice: normalizedSelected/);
   assert.match(source, /updated_at: new Date\(\)\.toISOString\(\)/);
   assert.match(source, /storage\.setItem\(storageKey, JSON\.stringify\(nextPreferences\)\)/);
