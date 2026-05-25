@@ -1,5 +1,6 @@
 import { createTranslator } from 'next-intl';
 import enMessages from '../../messages/en.json';
+import nbMessages from '../../messages/nb.json';
 import svMessages from '../../messages/sv.json';
 import {
   defaultLocale as routingDefaultLocale,
@@ -40,12 +41,14 @@ export const defaultLocale = 'sv' as SupportedLocale;
 
 const messagesByLocale: Record<SupportedLocale, GroceryMessages> = {
   sv: svMessages,
-  en: enMessages
+  en: enMessages,
+  nb: nbMessages
 };
 
 export const languageAccessOptions: LocaleOption[] = [
   { code: 'sv', label: 'Swedish', nativeLabel: 'Svenska', htmlLang: 'sv-SE', dir: 'ltr', currency: 'SEK', status: 'native_reviewed' },
   { code: 'en', label: 'English', nativeLabel: 'English', htmlLang: 'en-SE', dir: 'ltr', currency: 'SEK', status: 'native_reviewed' },
+  { code: 'nb', label: 'Norwegian Bokmål', nativeLabel: 'Norsk bokmål', htmlLang: 'nb-NO', dir: 'ltr', currency: 'SEK', status: 'native_reviewed' },
   { code: 'ar', label: 'Arabic', nativeLabel: 'العربية', htmlLang: 'ar-SE', dir: 'rtl', currency: 'SEK', status: 'blocked_native_review_required' },
   { code: 'so', label: 'Somali', nativeLabel: 'Soomaali', htmlLang: 'so-SE', dir: 'ltr', currency: 'SEK', status: 'blocked_native_review_required' }
 ];
@@ -58,6 +61,10 @@ export const languageAccessMessages: Record<SupportedLocale, { title: string; he
   en: {
     title: 'Language',
     helper: 'Prices, product names, and source evidence stay unchanged in Swedish kronor.'
+  },
+  nb: {
+    title: 'Språk',
+    helper: 'Priser, produktnavn og kildebevis vises uendret i svenske kroner.'
   }
 };
 
@@ -197,12 +204,12 @@ export const localizedShellCopy = supportedLocales.map((locale) => {
       persisted: t('language.persisted'),
       guardrail: t('language.guardrail')
     },
-    evidence: 'next-intl createTranslator messages with native-reviewed sv/en copy'
+    evidence: 'next-intl createTranslator messages with native-reviewed sv/en/nb copy'
   };
 });
 
 export const localeTranslationGuardrails = [
-  'Swedish and English shell copy is reviewed and stored in messages/{locale}.json.',
+  'Swedish, English, and Norwegian Bokmål shell copy is reviewed and stored in messages/{locale}.json.',
   'Prices, product names, source labels, and retailer evidence remain unchanged across languages.',
   'Arabic and Somali remain blocked until native-quality translations are reviewed; no MT copy is shipped.'
 ];

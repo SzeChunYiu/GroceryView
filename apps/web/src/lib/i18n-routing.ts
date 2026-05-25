@@ -1,6 +1,6 @@
-export const supportedLocales = ['sv', 'en'] as const;
+export const supportedLocales = ['sv', 'en', 'nb'] as const;
 export type SupportedLocale = (typeof supportedLocales)[number];
-export const routedLocales = ['sv', 'en'] as const;
+export const routedLocales = ['sv', 'en', 'nb'] as const;
 export const blockedLocaleRoutes = ['ar', 'so'] as const;
 export type BlockedLocaleRoute = (typeof blockedLocaleRoutes)[number];
 export type LocaleRoute = SupportedLocale | BlockedLocaleRoute;
@@ -19,6 +19,12 @@ export const localeReadiness = [
   {
     locale: 'en',
     label: 'English',
+    status: 'native_reviewed',
+    routeMode: 'current-route preference'
+  },
+  {
+    locale: 'nb',
+    label: 'Norsk bokmål',
     status: 'native_reviewed',
     routeMode: 'current-route preference'
   },

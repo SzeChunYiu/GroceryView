@@ -1,0 +1,24 @@
+{
+  "nav": {
+    "overview": "Oversikt",
+    "products": "Produkter",
+    "compare": "Sammenlign",
+    "mealCost": "Måltidskostnad",
+    "savings": "Sparing",
+    "chain": "Kjeder",
+    "stores": "Butikker",
+    "openPrices": "OpenPrices",
+    "map": "Kart",
+    "categories": "Kategorier"
+  },
+  "home": {
+    "eyebrow": "Svensk dagligvarepristerminal",
+    "headline": "Verifiserte dagligvarepriser med tydelige kilder.",
+    "body": "GroceryView viser bare prisrader med verifisert kilde. Mangler dokumentasjon, merkes det som en sperre i stedet for å fylles ut."
+  },
+  "language": {
+    "label": "Språk",
+    "persisted": "Språkvalget lagres lokalt og i NEXT_LOCALE-informasjonskapselen.",
+    "guardrail": "Arabisk og somali åpnes først etter gjennomgåtte oversettelser."
+  }
+}

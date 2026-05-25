@@ -3135,18 +3135,19 @@ ${seo}`;
     assert.match(store, /findStore/);
   });
 
-  it('ships metadataBase and hreflang alternates for the supported locale pair', async () => {
+  it('ships metadataBase and hreflang alternates for the supported locale set', async () => {
     const seo = await read('src/lib/seo.ts');
     const localeHome = await read('src/components/locale-home-page.tsx');
     const routing = await read('src/lib/i18n-routing.ts');
     const layout = await read('src/app/layout.tsx');
 
-    assert.match(routing, /supportedLocales = \['sv', 'en'\]/);
+    assert.match(routing, /supportedLocales = \['sv', 'en', 'nb'\]/);
     assert.match(layout, /metadataBase: new URL\(siteUrl\)/);
     assert.match(seo, /metadataBase: new URL\(siteUrl\)/);
     assert.match(seo, /languageAlternateUrls/);
     assert.match(seo, /'sv-SE'/);
     assert.match(seo, /'en-SE'/);
+    assert.match(seo, /'nb-NO'/);
     assert.match(seo, /'x-default'/);
     assert.match(seo, /alternates: \{[\s\S]*canonical:[\s\S]*languages: languageAlternateUrls\(config\.path\)/);
     assert.match(seo, /locale-negotiated current route/i);
@@ -3154,6 +3155,7 @@ ${seo}`;
     assert.match(localeHome, /languageHomeAlternates/);
     assert.match(localeHome, /\/sv/);
     assert.match(localeHome, /\/en/);
+    assert.match(localeHome, /\/nb/);
     assert.doesNotMatch(seo, /NoVerifiedData/);
   });
 
@@ -3820,6 +3822,7 @@ ${seo}`;
     const marketShell = await read('src/components/market-shell.tsx');
     const svMessages = await read('messages/sv.json');
     const enMessages = await read('messages/en.json');
+    const nbMessages = await read('messages/nb.json');
 
     assert.match(packageJson, /"next-intl"/);
     assert.match(i18n, /createTranslator/);
@@ -3838,6 +3841,7 @@ ${seo}`;
     assert.match(marketShell, /localizedShellCopy/);
     assert.match(svMessages, /"overview": "Översikt"/);
     assert.match(enMessages, /"overview": "Overview"/);
+    assert.match(nbMessages, /"overview": "Oversikt"/);
     assert.doesNotMatch(svMessages, /machine translated/i);
     assert.match(i18n, /Arabic and Somali remain blocked until native-quality translations are reviewed/);
   });
@@ -3849,10 +3853,11 @@ ${seo}`;
     const localeHome = await read('src/components/locale-home-page.tsx');
     const svRoute = await read('src/app/sv/page.tsx');
     const enRoute = await read('src/app/en/page.tsx');
+    const nbRoute = await read('src/app/nb/page.tsx');
     const arRoute = await read('src/app/ar/page.tsx');
     const soRoute = await read('src/app/so/page.tsx');
 
-    assert.match(routing, /routedLocales = \['sv', 'en'\]/);
+    assert.match(routing, /routedLocales = \['sv', 'en', 'nb'\]/);
     assert.match(routing, /blockedLocaleRoutes = \['ar', 'so'\]/);
     assert.match(routing, /localeRoutePrefix/);
     assert.match(middleware, /x-groceryview-locale-route/);
@@ -3864,10 +3869,12 @@ ${seo}`;
     assert.match(localeHome, /languages/);
     assert.match(localeHome, /\/sv/);
     assert.match(localeHome, /\/en/);
+    assert.match(localeHome, /\/nb/);
     assert.match(localeHome, /Native-quality translation review required/);
     assert.match(localeHome, /No machine-translated prices/);
     assert.match(svRoute, /locale=\"sv\"/);
     assert.match(enRoute, /locale=\"en\"/);
+    assert.match(nbRoute, /locale=\"nb\"/);
     assert.match(arRoute, /BlockedLocalePage/);
     assert.match(soRoute, /BlockedLocalePage/);
   });

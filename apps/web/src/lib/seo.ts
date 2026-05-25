@@ -4,7 +4,7 @@ export const siteUrl = 'https://grocery-web-mu.vercel.app';
 export const siteName = 'GroceryView';
 
 const defaultDescription = 'Verified Swedish grocery price intelligence with product tickers, chain comparisons, store coverage, and confidence-labelled savings signals.';
-const localeNegotiatedCurrentRouteCaveat = 'Locale-negotiated current route hreflang alternates share the canonical URL until native route translations exist beyond /sv and /en.';
+const localeNegotiatedCurrentRouteCaveat = 'Locale-negotiated current route hreflang alternates share the canonical URL until native route translations exist beyond /sv, /en, and /nb.';
 
 type RouteMetadataConfig = {
   path: string;
@@ -241,6 +241,7 @@ export function languageAlternateUrls(path: string) {
     return {
       'sv-SE': absoluteUrl('/sv'),
       'en-SE': absoluteUrl('/en'),
+      'nb-NO': absoluteUrl('/nb'),
       'x-default': absoluteUrl('/')
     };
   }
@@ -248,6 +249,7 @@ export function languageAlternateUrls(path: string) {
   return {
     'sv-SE': absoluteUrl(path),
     'en-SE': absoluteUrl(path),
+    'nb-NO': absoluteUrl(path),
     'x-default': absoluteUrl(path)
   };
 }

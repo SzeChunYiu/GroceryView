@@ -7,6 +7,7 @@ import { siteUrl } from '@/lib/seo';
 const languageHomeAlternates = {
   'sv-SE': '/sv',
   'en-SE': '/en',
+  'nb-NO': '/nb',
   'x-default': '/'
 };
 
@@ -69,7 +70,7 @@ export function BlockedLocalePage({ locale }: { locale: BlockedLocaleRoute }) {
         <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-800">{option.label} · {option.nativeLabel}</p>
         <h1 className="mt-3 text-4xl font-black tracking-tight text-slate-950">Native-quality translation review required</h1>
         <p className="mt-4 max-w-3xl text-base font-semibold leading-7 text-slate-700">
-          GroceryView only routes Swedish and English public copy today. Arabic and Somali remain visible as expansion routes, but they stay blocked until native reviewers approve every navigation, policy, and source-evidence string.
+          GroceryView routes Swedish, English, and Norwegian Bokmål public copy today. Arabic and Somali remain visible as expansion routes, but they stay blocked until native reviewers approve every navigation, policy, and source-evidence string.
         </p>
         <div className="mt-5 grid gap-3 md:grid-cols-3">
           {[

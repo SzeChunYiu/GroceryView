@@ -93,7 +93,7 @@ export function LanguagePreferenceSwitcher() {
       <p className="mt-2 max-w-2xl text-xs font-semibold leading-5 text-slate-600">
         {copy.helper} No prices or product names are machine-translated; SEK amounts, store names, and source evidence remain exactly as verified.
       </p>
-      <p className="sr-only">Language options include Swedish, English, Arabic, and Somali.</p>
+      <p className="sr-only">Language options include Swedish, English, Norwegian Bokmål, Arabic, and Somali.</p>
       <p className="sr-only">Current locale {selectedOption.htmlLang}, direction {selectedOption.dir}, currency {selectedOption.currency}.</p>
       <p className="sr-only">Blocked options: {languageAccessOptions.filter((option) => option.status !== 'native_reviewed').map((option) => option.label).join(', ')}.</p>
     </section>
