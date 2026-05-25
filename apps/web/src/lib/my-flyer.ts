@@ -88,14 +88,17 @@ function endOfIsoWeek(asOf: Date) {
   return date;
 }
 
+function comparableQuantity(offer: FlyerOffer) {
+  if (!offer.packageQuantity || offer.packageQuantity <= 0 || !offer.packageUnit) return null;
+  if (offer.packageUnit === 'g' || offer.packageUnit === 'ml') return offer.packageQuantity / 1000;
+  return offer.packageQuantity;
+}
+
 function unitPriceFor(offer: FlyerOffer) {
-  const unitHints: Record<string, number> = {
-    coffee: 0.45,
-    milk: 1,
-    'private-label-milk': 1,
-    butter: 0.5
-  };
-  const packageAmount = unitHints[offer.productId];
+  if (typeof offer.effectiveUnitPrice === 'number' && Number.isFinite(offer.effectiveUnitPrice) && offer.effectiveUnitPrice > 0) {
+    return round(offer.effectiveUnitPrice);
+  }
+  const packageAmount = comparableQuantity(offer);
   if (!packageAmount || packageAmount <= 0) return null;
   return round(offer.offerPrice / packageAmount);
 }
@@ -174,7 +177,11 @@ export function buildMyFlyerPayload(query: MyFlyerQuery, asOf = new Date()): MyF
 
   const report = api.getFlyerOffers({ asOf: generatedAt });
   const asOfMs = asOf.getTime();
-  const rows = report.offers
+  const sourceOffers = query.algorithm === 'best_unit_price'
+    ? report.offers.filter((offer) => unitPriceFor(offer) !== null)
+    : report.offers;
+
+  const rows = sourceOffers
     .map((offer) => scoreOffer(offer, query, asOfMs))
     .sort((left, right) =>
       right.personalizedScore - left.personalizedScore ||
@@ -200,7 +207,10 @@ export function buildMyFlyerPayload(query: MyFlyerQuery, asOf = new Date()): MyF
     cache: { key: cacheKey, ttlSeconds },
     source: {
       offerCount: report.offerCount,
-      guardrails: report.guardrails
+      guardrails: [
+        ...report.guardrails,
+        'Best unit price ranking excludes flyer rows that lack package quantity, package unit, or effective unit-price evidence.'
+      ]
     },
     rows
   };

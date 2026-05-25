@@ -1035,6 +1035,10 @@ export type FlyerOffer = {
   savings: number;
   discountPercent: number;
   currency: 'SEK';
+  packageQuantity: number | null;
+  packageUnit: string | null;
+  effectiveUnitPrice: number | null;
+  effectiveUnitPriceUnit: string | null;
   priceType: FlyerOfferPriceType;
   validFrom: string;
   validThrough: string;
@@ -1068,6 +1072,10 @@ export type FlyerOfferObservationInput = {
   productSlug: string;
   productName: string;
   categoryPath: string[];
+  packageSize?: number | null;
+  packageUnit?: string | null;
+  unitPrice?: number | null;
+  comparableUnit?: string | null;
   chainId: string;
   chainSlug: string;
   chainName: string;
@@ -4165,12 +4173,55 @@ function storeDealSummaryFor(storeId: string): StoreDealSummaryReport {
   };
 }
 
+
+function parsePackageEvidenceFromProductName(name: string): { packageQuantity: number | null; packageUnit: string | null } {
+  const match = name.match(/(?:^|\s)(\d+(?:[,.]\d+)?)\s*(kg|g|l|ml|st|pcs|pack)\b/i);
+  if (!match) return { packageQuantity: null, packageUnit: null };
+  const quantity = Number.parseFloat(match[1]!.replace(',', '.'));
+  if (!Number.isFinite(quantity) || quantity <= 0) return { packageQuantity: null, packageUnit: null };
+  const unit = match[2]!.toLocaleLowerCase('sv-SE');
+  return { packageQuantity: roundPrice(quantity), packageUnit: unit === 'pcs' ? 'st' : unit };
+}
+
+function parseEffectiveUnitPriceLabel(value: string): { effectiveUnitPrice: number | null; effectiveUnitPriceUnit: string | null } {
+  const match = value.match(/(\d+(?:[,.]\d+)?)\s*SEK\s*\/\s*([a-zA-Z]+)/i);
+  if (!match) return { effectiveUnitPrice: null, effectiveUnitPriceUnit: null };
+  const unitPrice = Number.parseFloat(match[1]!.replace(',', '.'));
+  if (!Number.isFinite(unitPrice) || unitPrice <= 0) return { effectiveUnitPrice: null, effectiveUnitPriceUnit: null };
+  return { effectiveUnitPrice: roundPrice(unitPrice), effectiveUnitPriceUnit: match[2]!.toLocaleLowerCase('sv-SE') };
+}
+
+function comparableUnitFromPackageUnit(packageUnit: string | null): string | null {
+  if (!packageUnit) return null;
+  if (packageUnit === 'kg' || packageUnit === 'g') return 'kg';
+  if (packageUnit === 'l' || packageUnit === 'ml') return 'l';
+  if (packageUnit === 'st' || packageUnit === 'pack') return packageUnit;
+  return null;
+}
+
+function comparableQuantity(packageQuantity: number | null, packageUnit: string | null): number | null {
+  if (!packageQuantity || packageQuantity <= 0 || !packageUnit) return null;
+  if (packageUnit === 'g') return packageQuantity / 1000;
+  if (packageUnit === 'ml') return packageQuantity / 1000;
+  return packageQuantity;
+}
+
+function unitPriceFromPackageEvidence(price: number, packageQuantity: number | null, packageUnit: string | null): number | null {
+  const quantity = comparableQuantity(packageQuantity, packageUnit);
+  if (!quantity || quantity <= 0) return null;
+  return roundPrice(price / quantity);
+}
+
 function flyerOfferFromRow(row: (typeof flyerOfferRows)[number]): FlyerOffer {
   const product = products.find((candidate) => candidate.id === row.productId);
   const store = stores.find((candidate) => candidate.id === row.storeId);
   if (!product) throw new Error(`Unknown productId: ${row.productId}`);
   if (!store) throw new Error(`Unknown storeId: ${row.storeId}`);
   const savings = roundPrice(row.regularPrice - row.offerPrice);
+  const packageEvidence = parsePackageEvidenceFromProductName(product.name);
+  const unitPriceEvidence = parseEffectiveUnitPriceLabel(product.unitPrice);
+  const fallbackEffectiveUnitPrice = unitPriceFromPackageEvidence(row.offerPrice, packageEvidence.packageQuantity, packageEvidence.packageUnit);
+  const fallbackEffectiveUnitPriceUnit = comparableUnitFromPackageUnit(packageEvidence.packageUnit);
   return {
     offerId: row.offerId,
     flyerId: row.flyerId,
@@ -4186,6 +4237,10 @@ function flyerOfferFromRow(row: (typeof flyerOfferRows)[number]): FlyerOffer {
     savings,
     discountPercent: row.regularPrice > 0 ? roundPercent((savings / row.regularPrice) * 100) : 0,
     currency: 'SEK',
+    packageQuantity: packageEvidence.packageQuantity,
+    packageUnit: packageEvidence.packageUnit,
+    effectiveUnitPrice: fallbackEffectiveUnitPrice ?? unitPriceEvidence.effectiveUnitPrice,
+    effectiveUnitPriceUnit: fallbackEffectiveUnitPriceUnit ?? unitPriceEvidence.effectiveUnitPriceUnit,
     priceType: row.priceType,
     validFrom: row.validFrom,
     validThrough: row.validThrough,
@@ -4202,6 +4257,12 @@ function flyerOfferFromRow(row: (typeof flyerOfferRows)[number]): FlyerOffer {
 function flyerOfferFromObservation(row: FlyerOfferObservationInput): FlyerOffer {
   const savings = roundPrice(row.regularPrice - row.price);
   const discountPercent = row.regularPrice > 0 ? roundPercent((savings / row.regularPrice) * 100) : 0;
+  const packageQuantity = typeof row.packageSize === 'number' && Number.isFinite(row.packageSize) && row.packageSize > 0 ? roundPrice(row.packageSize) : null;
+  const packageUnit = row.packageUnit?.trim().toLocaleLowerCase('sv-SE') || null;
+  const effectiveUnitPrice = typeof row.unitPrice === 'number' && Number.isFinite(row.unitPrice) && row.unitPrice > 0
+    ? roundPrice(row.unitPrice)
+    : unitPriceFromPackageEvidence(row.price, packageQuantity, packageUnit);
+  const effectiveUnitPriceUnit = (row.comparableUnit?.trim().toLocaleLowerCase('sv-SE') || comparableUnitFromPackageUnit(packageUnit));
   const dealScore = calculateDealScore({
     currentCityPercentile: Math.max(0, 100 - discountPercent * 3),
     knownPromoHistoryPercentile: Math.max(0, 100 - discountPercent * 2),
@@ -4224,6 +4285,10 @@ function flyerOfferFromObservation(row: FlyerOfferObservationInput): FlyerOffer 
     savings,
     discountPercent,
     currency: row.currency,
+    packageQuantity,
+    packageUnit,
+    effectiveUnitPrice,
+    effectiveUnitPriceUnit,
     priceType: row.memberRequired || row.priceType === 'member' ? 'member_flyer' : 'flyer',
     validFrom: row.validFrom ?? row.promotionStartsOn ?? row.observedAt,
     validThrough: row.validUntil ?? row.promotionEndsOn ?? row.observedAt,

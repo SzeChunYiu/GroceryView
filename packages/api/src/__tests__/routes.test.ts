@@ -1027,9 +1027,20 @@ describe('createGroceryViewApi', () => {
       topOfferId: 'flyer-willys-odenplan-coffee-2026w21',
       topDealScore: 82
     }]);
-    assert.deepEqual(report.offers.map((offer) => [offer.offerId, offer.storeId, offer.productId, offer.savings, offer.discountPercent, offer.sourceRunId]), [
-      ['flyer-willys-odenplan-coffee-2026w21', 'willys-odenplan', 'coffee', 15, 23.1, 'source-run-willys-flyer-2026-05-19'],
-      ['flyer-willys-odenplan-private-label-milk-2026w21', 'willys-odenplan', 'private-label-milk', 7, 35.2, 'source-run-willys-flyer-2026-05-19']
+    assert.deepEqual(report.offers.map((offer) => [
+      offer.offerId,
+      offer.storeId,
+      offer.productId,
+      offer.savings,
+      offer.discountPercent,
+      offer.sourceRunId,
+      offer.packageQuantity,
+      offer.packageUnit,
+      offer.effectiveUnitPrice,
+      offer.effectiveUnitPriceUnit
+    ]), [
+      ['flyer-willys-odenplan-coffee-2026w21', 'willys-odenplan', 'coffee', 15, 23.1, 'source-run-willys-flyer-2026-05-19', 450, 'g', 110.89, 'kg'],
+      ['flyer-willys-odenplan-private-label-milk-2026w21', 'willys-odenplan', 'private-label-milk', 7, 35.2, 'source-run-willys-flyer-2026-05-19', 1, 'l', 12.9, 'l']
     ]);
     assert.match(report.guardrails[0], /validity window/i);
 
@@ -1063,6 +1074,10 @@ describe('createGroceryViewApi', () => {
         productSlug: 'coffee',
         productName: 'Zoégas Coffee 450g',
         categoryPath: ['coffee'],
+        packageSize: 450,
+        packageUnit: 'g',
+        unitPrice: 110.89,
+        comparableUnit: 'kg',
         chainId: 'chain-willys',
         chainSlug: 'willys',
         chainName: 'Willys',
@@ -1078,6 +1093,10 @@ describe('createGroceryViewApi', () => {
     assert.equal(report.offers[0]?.sourceRunId, 'run-weekly-leaflet');
     assert.equal(report.offers[0]?.savings, 15);
     assert.equal(report.offers[0]?.sourceUrl, 'https://example.test/flyer');
+    assert.equal(report.offers[0]?.packageQuantity, 450);
+    assert.equal(report.offers[0]?.packageUnit, 'g');
+    assert.equal(report.offers[0]?.effectiveUnitPrice, 110.89);
+    assert.equal(report.offers[0]?.effectiveUnitPriceUnit, 'kg');
   });
 
   it('serves pantry replenishment plans with live deal and basket duplicate context', () => {
