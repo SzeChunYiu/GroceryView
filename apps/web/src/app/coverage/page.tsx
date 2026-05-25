@@ -80,6 +80,9 @@ export default function CoveragePage() {
               <p className="mt-2 text-3xl font-black text-emerald-800">{row.chainCount.toLocaleString('sv-SE')}</p>
               <p className="text-sm font-semibold text-slate-700">{row.status}</p>
               <p className="mt-3 text-sm leading-6 text-slate-600">{row.coverageLabel}</p>
+              <p className="mt-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                Freshness: {row.freshnessLabel}
+              </p>
               {row.chainSlugs.length > 0 ? (
                 <p className="mt-2 text-xs font-black uppercase tracking-[0.18em] text-slate-500">{row.chainSlugs.join(' / ')}</p>
               ) : null}
