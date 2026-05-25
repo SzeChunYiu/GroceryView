@@ -7,6 +7,7 @@ export type SocialFeedPost = Readonly<{
 }>;
 
 export type FriendPriceSighting = Readonly<{
+  chainSlug: string;
   confidence: 'high' | 'medium' | 'low';
   id: string;
   observedAt: string;
@@ -48,6 +49,7 @@ export const socialFeedPosts: SocialFeedPost[] = [
 
 export const friendPriceSightings: FriendPriceSighting[] = [
   {
+    chainSlug: 'hemkop',
     confidence: 'medium',
     id: 'friend-sighting-oats-hemkop',
     observedAt: '2026-05-24T08:42:00.000Z',
@@ -60,6 +62,7 @@ export const friendPriceSightings: FriendPriceSighting[] = [
     storeName: 'Hemkop Skanstull'
   },
   {
+    chainSlug: 'willys',
     confidence: 'low',
     id: 'friend-sighting-basil-willys',
     observedAt: '2026-05-24T10:12:00.000Z',
@@ -72,6 +75,7 @@ export const friendPriceSightings: FriendPriceSighting[] = [
     storeName: 'Willys Stockholm'
   },
   {
+    chainSlug: 'willys',
     confidence: 'high',
     id: 'friend-sighting-fiberhavregryn-willys',
     observedAt: '2026-05-24T11:20:00.000Z',
@@ -114,6 +118,13 @@ export function listFriendPriceSightings(postId?: string) {
 
 export function listFriendPriceSightingsForProduct(productSlug: string) {
   return recentFriendSightings(friendPriceSightings.filter((sighting) => sighting.sharedWithFriends && sighting.productSlug === productSlug));
+}
+
+export function listFriendPriceSightingsForProductChains(productSlug: string, chainSlugs: readonly string[]) {
+  const allowedChains = new Set(chainSlugs.map((chain) => chain.toLowerCase()));
+  return recentFriendSightings(friendPriceSightings.filter((sighting) =>
+    sighting.sharedWithFriends && sighting.productSlug === productSlug && allowedChains.has(sighting.chainSlug)
+  ));
 }
 
 export function createSocialComment(input: Readonly<{ author: string; body: string; parentId?: string; postId: string }>) {
