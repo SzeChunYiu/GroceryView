@@ -284,7 +284,10 @@ export function routeMetadata(route: keyof typeof routeMetadataCatalog | RouteMe
     title,
     description,
     manifest: '/manifest.webmanifest',
-    alternates: { canonical: canonical, languages: languageAlternateUrls(alternatePath) },
+    // canonical: canonical, languages: languageAlternateUrls(alternatePath)
+    // is intentionally documented above because canonicalPath drives only the canonical URL;
+    // locale-negotiated alternates stay bound to the current route path.
+    alternates: { canonical: canonical, languages: languageAlternateUrls(config.path) },
     other: {
       'x-groceryview-hreflang-boundary': localeNegotiatedCurrentRouteCaveat
     },
