@@ -49,12 +49,16 @@ async function executorForDatabaseUrl(databaseUrl: string) {
   return createPgQueryExecutor(cachedPool);
 }
 
-function mergeSearchResults(batches: ProductSearchResult[][]): ProductSearchResult[] {
+function mergeSearchResults(expansion: GrocerySearchExpansion, batches: ProductSearchResult[][]): ProductSearchResult[] {
   const byId = new Map<string, ProductSearchResult>();
-  for (const results of batches) {
+  const rankedQueries = expansion.rankedQueries ?? [];
+  for (const [index, results] of batches.entries()) {
+    const expandedQuery = expansion.expandedQueries[index];
+    const expansionBoost = rankedQueries.find((rankedQuery) => rankedQuery.query === expandedQuery)?.score ?? 0.6;
     for (const result of results) {
       const existing = byId.get(result.id);
-      if (!existing || result.searchRank > existing.searchRank) byId.set(result.id, result);
+      const rankedResult = { ...result, searchRank: result.searchRank + expansionBoost };
+      if (!existing || rankedResult.searchRank > existing.searchRank) byId.set(result.id, rankedResult);
     }
   }
   return [...byId.values()].sort((a, b) => b.searchRank - a.searchRank || a.name.localeCompare(b.name)).slice(0, 8);
@@ -161,7 +165,7 @@ export async function GET(request: Request) {
   try {
     const executor = await executorForDatabaseUrl(databaseUrl);
     const batches = await Promise.all(expansion.expandedQueries.map((expandedQuery) => searchProductsByText(executor, expandedQuery, { limit: 8 })));
-    const results = mergeSearchResults(batches);
+    const results = mergeSearchResults(expansion, batches);
     const telemetry = buildPerformanceTelemetry(query, results.length, startedAt, expansionTelemetry);
     logPerformanceTelemetry(telemetry);
     return NextResponse.json(responsePayload(query, results, expansion, telemetry));
