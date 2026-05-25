@@ -1,6 +1,7 @@
 import { ValidationPipe, type INestApplication } from '@nestjs/common';
 import { setupOpenApi } from './openapi.js';
 import { loadApiConfig } from './config.js';
+import { createJwtAuthMiddleware } from './middleware/auth.js';
 import { createRequestLoggingMiddleware, type RequestLoggingConfig } from './middleware/logger.js';
 
 export type ConfigureAppOptions = {
@@ -24,6 +25,7 @@ export function configureApp(app: INestApplication, options: ConfigureAppOptions
       callback(null, allowedOrigins.has(origin));
     }
   });
+  app.use(createJwtAuthMiddleware());
   app.useGlobalPipes(
     new ValidationPipe({
       forbidNonWhitelisted: true,
