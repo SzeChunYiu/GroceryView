@@ -10,7 +10,7 @@ type FamilyPackComparisonPanelProps = {
 
 function verdictTone(comparison: FamilyPackComparison) {
   if (comparison.verdict === 'bulk_cheaper') return 'bg-emerald-100 text-emerald-950';
-  return 'bg-amber-100 text-amber-950';
+  return 'bg-rose-100 text-rose-950';
 }
 
 export function FamilyPackComparisonPanel({ comparisons, emptyDetail, intro, title }: Readonly<FamilyPackComparisonPanelProps>) {
@@ -61,6 +61,11 @@ export function FamilyPackComparisonPanel({ comparisons, emptyDetail, intro, tit
                 <p className="rounded-xl bg-white p-3 font-black text-slate-950">{comparison.unitPriceDeltaLabel}</p>
                 <p className="rounded-xl bg-white p-3 font-black text-slate-950">{comparison.totalSpendDeltaLabel}</p>
               </div>
+              {comparison.largerPackWarningLabel ? (
+                <p className="mt-3 rounded-2xl border border-rose-200 bg-rose-50 p-3 text-sm font-black leading-6 text-rose-950">
+                  {comparison.largerPackWarningLabel}
+                </p>
+              ) : null}
               <p className="mt-3 rounded-2xl bg-amber-50 p-3 text-sm font-bold leading-6 text-amber-950">{comparison.storageDetail}</p>
               <p className="mt-3 text-xs font-semibold leading-5 text-slate-500">
                 {comparison.confidenceLabel} {comparison.sourceLabel}
