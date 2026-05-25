@@ -242,7 +242,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           />
         </form>
         <div className="mt-4">
-          <p className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-violet-800">Saved filter chips</p>
+          <p className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-violet-800">Removable filter chips</p>
           <ActiveFilterChips chips={activeFilterChips} />
           {search.activeFilters.length > 0 ? (
             <p className="mt-2 text-xs font-semibold text-violet-900">Active URL filters: {search.activeFilters.join(' · ')}</p>
