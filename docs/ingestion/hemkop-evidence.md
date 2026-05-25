@@ -206,6 +206,7 @@ Sample rows:
 - Current flyer rows for 25/05-2026-31/05-2026: 13535 rows across 205 stores
 - Web wire: apps/web/src/lib/ingested/hemkop.ts
 - Connector: packages/ingestion/src/connectors/hemkop.ts
+- Verification: `node scripts/ingestion/verify-ingested-provenance.mjs` reported rowCount 55355, 0 missing sourceUrl, 0 missing retrievedAt, and 0 duplicate provenance/content keys for `hemkopWeeklyDiscounts`.
 
 Sample current-week rows:
 1. 2500310779 | 4798 | Krossade tomater | 5 kr/st | 25/05-2026-31/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100

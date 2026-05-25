@@ -268,6 +268,7 @@ Sample rows:
 - Current flyer rows for 25/05-2026-31/05-2026: 15843 rows across 242 stores
 - Web wire: apps/web/src/lib/ingested/willys.ts
 - Connector: packages/ingestion/src/connectors/willys.ts
+- Verification: `node scripts/ingestion/verify-ingested-provenance.mjs` reported rowCount 46365, 0 missing sourceUrl, 0 missing retrievedAt, and 0 duplicate provenance/content keys for `willysWeeklyDiscounts`.
 
 Sample current-week rows:
 1. 2500299274 | 2149 | Bregott | 37,80/st | 25/05-2026-31/05-2026 | https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100
