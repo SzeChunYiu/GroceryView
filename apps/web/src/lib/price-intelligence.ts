@@ -104,7 +104,9 @@ export type BestTimeToBuyAlertRecommendation = {
   productName: string;
   decision: BestTimeToBuyDecision;
   decisionLabel: string;
+  buyWindowLabel: string;
   confidenceLabel: string;
+  priceSignalLabel: string;
   currentPrice: number;
   currentStoreName: string;
   volatilityScore: number;
@@ -433,13 +435,21 @@ export function buildBestTimeToBuyAlert(input: BestTimeToBuyAlertInput): BestTim
   const flyerWindowLabel = flyer
     ? `${flyer.window.storeName} ${flyer.window.categoryLabel} window starts in ${flyer.days} day${flyer.days === 1 ? '' : 's'}`
     : 'No upcoming flyer window inside 21 days';
+  const buyWindowLabel = decision === 'buy_now'
+    ? `Suggested buy window: today at ${input.currentStoreName}`
+    : decision === 'wait_for_flyer' && flyer
+      ? `Suggested buy window: ${flyer.window.startsAt.slice(0, 10)} to ${flyer.window.endsAt.slice(0, 10)}`
+      : 'Suggested buy window: keep watching this week';
+  const priceSignalLabel = `Signals: current price is ${currentVsAveragePct.toFixed(1)}% versus the observed average, volatility score ${volatility.score}, ${flyer ? `${expectedDiscountPct}% flyer discount expected` : 'no near-term flyer signal'}.`;
 
   return {
     productId: input.productId,
     productName: input.productName,
     decision,
     decisionLabel,
+    buyWindowLabel,
     confidenceLabel: bestTimeConfidenceLabel(volatility.observationCount, Boolean(flyer)),
+    priceSignalLabel,
     currentPrice: input.currentPrice,
     currentStoreName: input.currentStoreName,
     volatilityScore: volatility.score,
