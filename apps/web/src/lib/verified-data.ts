@@ -34,6 +34,7 @@ import {
   supportedCurrencies,
   unknownUnitPriceLabel
 } from './i18n';
+import { explainPriceAnomaly } from './normalization';
 
 const icaReklambladOffers = dbSiteIcaReklambladOffers.length > 0 ? dbSiteIcaReklambladOffers : staticIcaReklambladOffers;
 const icaReklambladSource = dbSiteIcaReklambladOffers.length > 0 ? dbSiteIcaReklambladSource : staticIcaReklambladSource;
@@ -1567,6 +1568,66 @@ export const crowdPriceSubmissionContract = {
   ],
   reviewWritebacks: ['accept_community_report', 'dismiss_community_report'],
   nextRuntimeStep: 'Wire the protected runtime endpoint to persist community_report raw_records and enqueue human_review_assignments.'
+};
+
+const priceAnomalyReviewRows = [
+  {
+    id: 'price-anomaly-unit-coffee',
+    productName: 'Zoegas Coffee 450g',
+    storeName: 'Willys Odenplan',
+    previousPrice: 59.9,
+    reportedPrice: 149.8,
+    previousUnit: 'kg',
+    reportedUnit: 'piece',
+    previousObservedAt: '2026-05-21T08:00:00.000Z',
+    reportedObservedAt: '2026-05-22T08:10:00.000Z',
+    sourceLabel: 'community shelf report',
+    promotionText: null,
+    status: 'review' as const
+  },
+  {
+    id: 'price-anomaly-stale-salmon',
+    productName: 'Salmon fillet 500g',
+    storeName: 'Hemköp Hornstull',
+    previousPrice: 89,
+    reportedPrice: 69,
+    previousUnit: 'kg',
+    reportedUnit: 'kg',
+    previousObservedAt: '2026-04-25T09:15:00.000Z',
+    reportedObservedAt: '2026-05-22T12:00:00.000Z',
+    sourceLabel: 'receipt queue',
+    promotionText: null,
+    status: 'review' as const
+  },
+  {
+    id: 'price-anomaly-promo-juice',
+    productName: 'Bravo Apelsinjuice 1l',
+    storeName: 'ICA Skanstull',
+    previousPrice: 34.9,
+    reportedPrice: 20,
+    previousUnit: 'l',
+    reportedUnit: 'l',
+    previousObservedAt: '2026-05-21T10:00:00.000Z',
+    reportedObservedAt: '2026-05-22T10:00:00.000Z',
+    sourceLabel: 'ICA store-scoped promotions',
+    promotionText: '2 för 40 kr Stammispris',
+    status: 'review' as const
+  }
+];
+
+export const priceAnomalyReviewPlan = {
+  title: 'Price anomaly explanations',
+  subtitle: 'Likely causes for suspicious price changes before reviewer writeback.',
+  rows: priceAnomalyReviewRows.map((row) => ({
+    ...row,
+    causes: explainPriceAnomaly(row)
+  })),
+  reviewChecklist: [
+    'Confirm unit-price normalization before accepting kg, liter, or piece comparisons.',
+    'Refresh stale source rows when the comparison crosses the freshness window.',
+    'Inspect multibuy, member price, deposit, and limit text before treating promotion rows as ordinary shelf prices.'
+  ],
+  guardrail: 'Explanations are reviewer hints only; they do not auto-approve or reject price reports.'
 };
 
 const tomatoCommodity = COMMODITIES.find((commodity) => commodity.slug === 'tomato') ?? COMMODITIES[0]!;

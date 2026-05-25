@@ -10,6 +10,7 @@ import {
   type CommunityReviewVote
 } from '@/lib/reviews';
 import { COMMUNITY_REVIEW_PROMPT_COPY, COMMUNITY_REVIEW_PROMPTS } from '@/lib/community-reviews';
+import { priceAnomalyReviewPlan } from '@/lib/verified-data';
 
 type ReviewStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
 type BrowserSession = { accessToken: string; userId: string };
@@ -137,6 +138,42 @@ export function PriceReportReviewActions() {
         <button className="rounded-full border border-amber-300 px-4 py-2 text-sm font-black text-amber-900" disabled={!assignmentId.trim()} onClick={() => decideReview('needs_more_info')} type="button">Request more info</button>
       </div>
 
+      <div className="mt-6 rounded-3xl border border-orange-200 bg-orange-50/80 p-4" aria-label="Price anomaly explanations">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-orange-800">Anomaly triage</p>
+        <h3 className="mt-2 text-xl font-black tracking-tight text-slate-950">{priceAnomalyReviewPlan.title}</h3>
+        <p className="mt-2 text-sm leading-6 text-slate-700">{priceAnomalyReviewPlan.subtitle}</p>
+        <div className="mt-4 grid gap-3 lg:grid-cols-3">
+          {priceAnomalyReviewPlan.rows.map((row) => (
+            <article className="rounded-2xl border border-orange-100 bg-white p-4 text-sm shadow-sm" key={row.id}>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="font-black text-slate-950">{row.productName}</p>
+                  <p className="mt-1 font-semibold text-slate-700">{row.storeName}</p>
+                </div>
+                <p className="rounded-full bg-orange-100 px-3 py-1 text-xs font-black text-orange-900">{row.status}</p>
+              </div>
+              <p className="mt-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">
+                {row.previousPrice} SEK {'->'} {row.reportedPrice} SEK
+              </p>
+              <div className="mt-3 space-y-2">
+                {row.causes.map((cause) => (
+                  <div className="rounded-2xl bg-orange-50 p-3" key={`${row.id}-${cause.kind}`}>
+                    <p className="text-xs font-black uppercase tracking-[0.14em] text-orange-800">{cause.label}</p>
+                    <p className="mt-2 font-semibold leading-6 text-slate-800">{cause.reviewerHint}</p>
+                    <p className="mt-1 text-xs font-bold text-slate-500">{cause.evidence}</p>
+                  </div>
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
+        <ul className="mt-4 grid gap-2 text-sm font-semibold leading-6 text-orange-950 lg:grid-cols-3">
+          {priceAnomalyReviewPlan.reviewChecklist.map((item) => (
+            <li className="rounded-2xl bg-white p-3" key={item}>{item}</li>
+          ))}
+        </ul>
+        <p className="mt-3 rounded-2xl bg-white p-3 text-sm font-bold text-orange-950">{priceAnomalyReviewPlan.guardrail}</p>
+      </div>
 
       <div className="mt-6 rounded-3xl border border-violet-200 bg-violet-50/80 p-4" aria-label="Community review prompts">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-violet-800">Community validation prompts</p>
