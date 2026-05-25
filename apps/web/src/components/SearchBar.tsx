@@ -283,8 +283,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
   function optionA11y(index: number) {
     return {
       'aria-selected': activeOptionIndex === index,
-      'data-active-option': activeOptionIndex === index ? 'true' : undefined,
-      id: `${listboxId}-option-${index}`
+      'data-active-option': activeOptionIndex === index ? 'true' : undefined
     };
   }
 
@@ -299,19 +298,25 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
     });
   }
 
+  function optionDomId(index: number) {
+    return `${listboxId}-option-${index}`;
+  }
+
+  function optionActiveClass(index: number, activeClass: string) {
+    return activeOptionIndex === index ? activeClass : '';
+  }
+
   function handleSearchKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key === 'Enter' && activeOptionIndex >= 0) {
-      const option = document.querySelector<HTMLAnchorElement>(`[data-search-option-index="${activeOptionIndex}"]`);
-      if (option) {
-        event.preventDefault();
-        option.click();
-      }
-      return;
-    }
-    if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp' && event.key !== 'Escape') return;
+    if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp' && event.key !== 'Escape' && event.key !== 'Enter') return;
     if (event.key === 'Escape') {
+      event.preventDefault();
       setIsFocused(false);
       setActiveOptionIndex(-1);
+      return;
+    }
+    if (event.key === 'Enter' && activeOptionIndex >= 0) {
+      event.preventDefault();
+      document.getElementById(optionDomId(activeOptionIndex))?.click();
       return;
     }
     if (!shouldShowDropdown || optionCount === 0) return;
@@ -417,9 +422,10 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
                   const index = nextOptionIndex();
                   return (
                     <Link
-                      className="rounded-2xl bg-violet-50 px-3 py-2 text-sm font-black text-violet-950 transition hover:bg-violet-100 focus:bg-violet-100 focus:outline-none data-[active-option=true]:bg-violet-100 data-[active-option=true]:ring-2 data-[active-option=true]:ring-violet-300"
+                      className={`rounded-2xl bg-violet-50 px-3 py-2 text-sm font-black text-violet-950 transition hover:bg-violet-100 focus:bg-violet-100 focus:outline-none ${optionActiveClass(index, 'ring-2 ring-violet-500')}`}
                       data-search-option-index={index}
                       href={search.href}
+                      id={optionDomId(index)}
                       key={`saved-${search.query}-${search.pinnedAt}`}
                       onFocus={() => setActiveOptionIndex(index)}
                       onKeyDown={(event) => handleOptionKeyDown(event, index)}
@@ -436,9 +442,10 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
                   return (
                     <div className="flex items-center gap-2 rounded-2xl bg-slate-50 px-3 py-2" key={`${search.query}-${search.searchedAt}`}>
                       <Link
-                        className="flex-1 rounded-xl px-2 py-1 text-sm font-black text-slate-800 transition hover:text-emerald-900 focus:outline-none data-[active-option=true]:bg-emerald-50 data-[active-option=true]:text-emerald-950 data-[active-option=true]:ring-2 data-[active-option=true]:ring-emerald-200"
+                        className={`flex-1 text-sm font-black text-slate-800 transition hover:text-emerald-900 focus:outline-none ${optionActiveClass(index, 'rounded-xl bg-emerald-50 px-2 py-1 text-emerald-950')}`}
                         data-search-option-index={index}
                         href={search.href}
+                        id={optionDomId(index)}
                         onFocus={() => setActiveOptionIndex(index)}
                         onKeyDown={(event) => handleOptionKeyDown(event, index)}
                         role="option"
@@ -477,9 +484,10 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
                       const index = nextOptionIndex();
                       return (
                         <Link
-                          className="rounded-2xl px-3 py-2 text-sm font-black text-slate-900 transition hover:bg-emerald-50 focus:bg-emerald-50 focus:outline-none data-[active-option=true]:bg-emerald-50 data-[active-option=true]:ring-2 data-[active-option=true]:ring-emerald-200"
+                          className={`rounded-2xl px-3 py-2 text-sm font-black text-slate-900 transition hover:bg-emerald-50 focus:bg-emerald-50 focus:outline-none ${optionActiveClass(index, 'bg-emerald-50 ring-2 ring-emerald-500')}`}
                           data-search-option-index={index}
                           href={item.href}
+                          id={optionDomId(index)}
                           key={item.id}
                           onFocus={() => setActiveOptionIndex(index)}
                           onKeyDown={(event) => handleOptionKeyDown(event, index)}
@@ -504,9 +512,10 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
                   const index = nextOptionIndex();
                   return (
                     <Link
-                      className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-900 transition hover:bg-emerald-100 focus:bg-emerald-100 focus:outline-none data-[active-option=true]:bg-emerald-100 data-[active-option=true]:ring-2 data-[active-option=true]:ring-emerald-300"
+                      className={`rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-900 transition hover:bg-emerald-100 focus:bg-emerald-100 focus:outline-none ${optionActiveClass(index, 'ring-2 ring-emerald-500')}`}
                       data-search-option-index={index}
                       href={facet.href}
+                      id={optionDomId(index)}
                       key={`${facet.kind}-${facet.href}`}
                       onFocus={() => setActiveOptionIndex(index)}
                       onKeyDown={(event) => handleOptionKeyDown(event, index)}
@@ -551,9 +560,10 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
                 const index = nextOptionIndex();
                 return (
                   <Link
-                    className="block px-4 py-3 transition hover:bg-emerald-50 focus:bg-emerald-50 focus:outline-none data-[active-option=true]:bg-emerald-50 data-[active-option=true]:ring-2 data-[active-option=true]:ring-inset data-[active-option=true]:ring-emerald-200"
+                    className={`block px-4 py-3 transition hover:bg-emerald-50 focus:bg-emerald-50 focus:outline-none ${optionActiveClass(index, 'bg-emerald-50 ring-inset ring-2 ring-emerald-500')}`}
                     data-search-option-index={index}
                     href={`/products/${result.slug}`}
+                    id={optionDomId(index)}
                     key={result.id}
                     onFocus={() => setActiveOptionIndex(index)}
                     onKeyDown={(event) => handleOptionKeyDown(event, index)}
