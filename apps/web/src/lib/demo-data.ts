@@ -3984,8 +3984,8 @@ export const pantryReplenishmentInput: {
   pantry: [
     { productId: 'eldorado-basmati-rice-1kg', name: 'Eldorado Basmati Rice 1kg', category: 'pantry', quantity: 0.5, unit: 'kg', minimumQuantity: 1, targetQuantity: 2, lastPurchasedAt: '2026-05-09T12:00:00.000Z' },
     { productId: 'barilla-spaghetti-1kg', name: 'Barilla Spaghetti 1kg', category: 'pantry', quantity: 1, unit: 'pack', minimumQuantity: 2, targetQuantity: 4, lastPurchasedAt: '2026-05-08T12:00:00.000Z' },
-    { productId: 'felix-ketchup-1kg', name: 'Felix Tomatketchup 1kg', category: 'pantry', quantity: 1, unit: 'each', minimumQuantity: 1, targetQuantity: 2, expiresAt: '2026-05-22T12:00:00.000Z', lastPurchasedAt: '2026-04-28T12:00:00.000Z' },
-    { productId: 'zeta-kikartor-380g', name: 'Zeta Kikärtor 380g', category: 'pantry', quantity: 3, unit: 'each', minimumQuantity: 1, targetQuantity: 4, expiresAt: '2026-06-18T12:00:00.000Z', lastPurchasedAt: '2026-05-15T12:00:00.000Z' }
+    { productId: 'felix-ketchup-1kg', name: 'Felix Tomatketchup 1kg', category: 'pantry', quantity: 1, unit: 'each', minimumQuantity: 1, targetQuantity: 2, expiresAt: '2026-06-12T12:00:00.000Z', lastPurchasedAt: '2026-04-28T12:00:00.000Z' },
+    { productId: 'zeta-kikartor-380g', name: 'Zeta Kikärtor 380g', category: 'pantry', quantity: 3, unit: 'each', minimumQuantity: 1, targetQuantity: 4, expiresAt: '2026-05-23T12:00:00.000Z', lastPurchasedAt: '2026-05-15T12:00:00.000Z' }
   ],
   usage: [
     { productId: 'eldorado-basmati-rice-1kg', quantityUsed: 0.5, usedAt: '2026-05-20T18:30:00.000Z' },

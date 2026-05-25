@@ -1,6 +1,12 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import {
+  DIETARY_PROFILE_STORAGE_KEY,
+  loadDietaryProfilePreferences,
+  saveDietaryProfilePreferences,
+  type DietaryProfilePreferences
+} from '@/lib/user-preferences';
 
 export const DIET_FILTER_STORAGE_KEY = 'groceryview:my-flyer:diet-filters';
 
@@ -68,6 +74,128 @@ export function writeStoredDietFilters(selected: readonly DietFilterValue[], sto
     new CustomEvent('groceryview:diet-filters-changed', {
       detail: { selected: normalizeDietFilters(selected), storageKey }
     })
+  );
+}
+
+const ALLERGY_OPTIONS = ['Milk', 'Eggs', 'Peanuts', 'Tree nuts', 'Gluten', 'Soy'] as const;
+
+function parseAvoidedIngredients(value: string) {
+  return value.split(',').map((ingredient) => ingredient.trim()).filter(Boolean);
+}
+
+function toCsv(values: readonly string[]) {
+  return values.join(', ');
+}
+
+export function DietaryProfileOnboarding({ className = '' }: Readonly<{ className?: string }>) {
+  const [profile, setProfile] = useState<DietaryProfilePreferences>(() => loadDietaryProfilePreferences());
+  const [avoidedInput, setAvoidedInput] = useState('');
+  const [savedMessage, setSavedMessage] = useState('');
+
+  useEffect(() => {
+    const storedProfile = loadDietaryProfilePreferences();
+    setProfile(storedProfile);
+    setAvoidedInput(toCsv(storedProfile.avoidedIngredients));
+  }, []);
+
+  function setProfileList(key: 'allergies' | 'diets', value: string) {
+    setProfile((currentProfile) => {
+      const currentValues = currentProfile[key];
+      const nextValues = currentValues.includes(value)
+        ? currentValues.filter((currentValue) => currentValue !== value)
+        : [...currentValues, value];
+
+      return { ...currentProfile, [key]: nextValues };
+    });
+  }
+
+  function saveProfile() {
+    const nextProfile = {
+      ...profile,
+      avoidedIngredients: parseAvoidedIngredients(avoidedInput),
+      onboardingCompleted: true
+    };
+
+    saveDietaryProfilePreferences(nextProfile);
+    setProfile(loadDietaryProfilePreferences());
+    setSavedMessage('Dietary profile saved for onboarding and settings personalization.');
+  }
+
+  return (
+    <section className={`rounded-3xl border border-emerald-100 bg-white p-4 shadow-sm ${className}`} aria-labelledby="dietary-profile-heading">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p id="dietary-profile-heading" className="text-sm font-black uppercase tracking-[0.18em] text-emerald-800">
+            Dietary profile onboarding
+          </p>
+          <p className="mt-1 text-sm text-slate-600">Save allergies, diets, and avoided ingredients for account setup and settings edits.</p>
+        </div>
+        <p className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-emerald-800">
+          {profile.onboardingCompleted ? 'Saved profile' : 'Setup step'}
+        </p>
+      </div>
+
+      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">Allergies</p>
+          <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="Allergy preferences">
+            {ALLERGY_OPTIONS.map((allergy) => {
+              const active = profile.allergies.includes(allergy);
+              return (
+                <button
+                  aria-pressed={active}
+                  className={`rounded-full border px-3 py-2 text-sm font-black ${active ? 'border-rose-700 bg-rose-700 text-white' : 'border-slate-200 bg-slate-50 text-slate-700'}`}
+                  key={allergy}
+                  onClick={() => setProfileList('allergies', allergy)}
+                  type="button"
+                >
+                  {allergy}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">Diets</p>
+          <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="Diet preferences">
+            {DIET_FILTER_OPTIONS.filter((option) => option.value !== 'organic').map((option) => {
+              const active = profile.diets.includes(option.value);
+              return (
+                <button
+                  aria-pressed={active}
+                  className={`rounded-full border px-3 py-2 text-sm font-black ${active ? 'border-emerald-800 bg-emerald-800 text-white' : 'border-slate-200 bg-slate-50 text-slate-700'}`}
+                  key={option.value}
+                  onClick={() => setProfileList('diets', option.value)}
+                  type="button"
+                >
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <label className="mt-4 block text-sm font-black text-slate-700" htmlFor="avoided-ingredients">
+        Avoided ingredients
+      </label>
+      <input
+        className="mt-2 w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm"
+        id="avoided-ingredients"
+        onChange={(event) => setAvoidedInput(event.target.value)}
+        placeholder="e.g. palm oil, aspartame, coriander"
+        value={avoidedInput}
+      />
+
+      <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-xs font-semibold text-slate-500">Stored under {DIETARY_PROFILE_STORAGE_KEY} for durable personalization.</p>
+        <button className="rounded-full bg-emerald-700 px-4 py-2 text-sm font-black text-white" onClick={saveProfile} type="button">
+          Save dietary profile
+        </button>
+      </div>
+      {savedMessage ? <p className="mt-3 text-sm font-bold text-emerald-800" role="status">{savedMessage}</p> : null}
+    </section>
   );
 }
 
