@@ -124,6 +124,7 @@ import {
   GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL,
   GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL,
+  GROCERYVIEW_DAILY_LIDL_BULK_PRODUCTS_URL,
   GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL,
   GROCERYVIEW_DAILY_LOCALFOODNODES_SE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_LYF_OG_HEILSA_IS_PRODUCTS_URL,
@@ -8266,6 +8267,56 @@ describe('daily ingestion runner', () => {
     ]);
     const observation = firstBatchObservation(executor);
     assert.equal(observation.store_id, 'store-db-2');
+    assert.equal(observation.price, 14.9);
+  });
+
+  it('materializes native Lidl bulk public offers into chain-level daily database observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const gridData = {
+      title: 'Grekisk vattenmelon',
+      regions: [1],
+      productId: 11029834,
+      canonicalUrl: '/p/grekisk-vattenmelon/p11029834',
+      packaging: { text: '1 kg' },
+      regionsPrices: {
+        1: {
+          currentPrice: {
+            price: 14.9,
+            basePrice: { text: '/kg' },
+            currencyCode: 'SEK',
+            discount: { discountText: 'Superpris' }
+          }
+        }
+      }
+    };
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-25T18:12:00.000Z',
+      connectors: [{
+        connectorId: 'lidl-products-bulk',
+        chainId: 'lidl',
+        sourceType: 'retailer_online_page',
+        endpointUrl: `${GROCERYVIEW_DAILY_LIDL_BULK_PRODUCTS_URL}?paths=/c/veckans-frukt-groent/a10094676&minRows=1&maxRows=1`,
+        parserVersion: 'lidl-bulk-native-v1',
+        robotsTxtStatus: 'allow',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        requireStoreScopedPrices: false
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return new Response(`<div data-grid-data="${JSON.stringify(gridData).replaceAll('"', '&quot;')}"></div>`, { status: 200 });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.deepEqual(requestedUrls, [
+      buildLidlOfferPageUrl('/c/veckans-frukt-groent/a10094676')
+    ]);
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.store_id, null);
     assert.equal(observation.price, 14.9);
   });
 
