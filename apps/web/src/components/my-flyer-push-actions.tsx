@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { readStoredAlgorithmChoice, USER_PREFERENCES_STORAGE_KEY, type AlgorithmChoice } from '@/components/algorithm-picker';
 
 import {
   buildMyFlyerRefreshUrl,
@@ -19,8 +20,14 @@ type MyFlyerPushActionsProps = Readonly<{
 }>;
 
 type ActionState = 'idle' | 'blocked' | 'loading' | 'saved' | 'error';
+type MyFlyerRequestAlgorithm = Exclude<AlgorithmChoice, 'balanced'>;
 
 const myFlyerReadyChannels = ['my-flyer-ready'];
+const myFlyerRequestAlgorithms = new Set<string>(['watchlist_first', 'best_savings', 'best_unit_price']);
+
+function requestAlgorithmForChoice(choice: AlgorithmChoice): MyFlyerRequestAlgorithm {
+  return myFlyerRequestAlgorithms.has(choice) ? choice as MyFlyerRequestAlgorithm : 'watchlist_first';
+}
 
 export function MyFlyerPushActions({
   city,
@@ -29,9 +36,21 @@ export function MyFlyerPushActions({
   limit,
   vapidPublicKey = ''
 }: MyFlyerPushActionsProps) {
-  const [algorithm, setAlgorithm] = useState(defaultAlgorithm);
+  const [algorithm, setAlgorithm] = useState<MyFlyerRequestAlgorithm>(() => requestAlgorithmForChoice(defaultAlgorithm as AlgorithmChoice));
   const [state, setState] = useState<ActionState>('idle');
   const [message, setMessage] = useState('Sign in to refresh your account-bound MyFlyer and enable ready alerts.');
+
+  useEffect(() => {
+    setAlgorithm(requestAlgorithmForChoice(readStoredAlgorithmChoice()));
+
+    function handlePreferenceChange(event: Event) {
+      if (!(event instanceof CustomEvent) || event.detail?.storageKey !== USER_PREFERENCES_STORAGE_KEY) return;
+      setAlgorithm(requestAlgorithmForChoice(event.detail.algorithm_choice));
+    }
+
+    window.addEventListener('groceryview:user-preferences-changed', handlePreferenceChange);
+    return () => window.removeEventListener('groceryview:user-preferences-changed', handlePreferenceChange);
+  }, []);
 
   function requireSignedInSession() {
     const session = readBrowserAccountSession();
@@ -116,17 +135,9 @@ export function MyFlyerPushActions({
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <label className="text-sm font-black text-slate-950" htmlFor="my-flyer-algorithm">Ranking</label>
-        <select
-          className="rounded-full border border-indigo-200 bg-white px-4 py-2 text-sm font-black text-slate-950"
-          id="my-flyer-algorithm"
-          onChange={(event) => setAlgorithm(event.target.value)}
-          value={algorithm}
-        >
-          <option value="watchlist_first">Watchlist first</option>
-          <option value="best_savings">Best savings</option>
-          <option value="best_unit_price">Best unit price</option>
-        </select>
+        <p className="rounded-full border border-indigo-200 bg-white px-4 py-2 text-sm font-black text-slate-950">
+          API ranking: {algorithm.replace(/_/g, ' ')}
+        </p>
         <button className="rounded-full bg-indigo-900 px-4 py-2 text-sm font-black text-white" onClick={refreshMyFlyer} type="button">
           Refresh signed-in MyFlyer
         </button>

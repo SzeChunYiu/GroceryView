@@ -103,6 +103,12 @@ function unitPriceFor(offer: FlyerOffer) {
   return round(offer.offerPrice / packageAmount);
 }
 
+function unitEconomicsEvidence(offer: FlyerOffer, unitPrice: number | null) {
+  if (unitPrice === null) return 'missing package or effective unit-price evidence';
+  if (offer.packageQuantity && offer.packageUnit) return `${offer.packageQuantity}${offer.packageUnit} package evidence`;
+  return `${unitPrice} SEK/${offer.effectiveUnitPriceUnit ?? 'unit'} effective unit price evidence`;
+}
+
 function expiryScoreFor(offer: FlyerOffer, asOfMs: number) {
   const validThroughMs = Date.parse(offer.validThrough);
   if (!Number.isFinite(validThroughMs)) return 0;
@@ -128,6 +134,7 @@ function scoreOffer(offer: FlyerOffer, query: MyFlyerQuery, asOfMs: number): Omi
   const explanation = [
     `${query.algorithm} ranker`,
     `${round(savings)} SEK savings`,
+    unitEconomicsEvidence(offer, unitPrice),
     profile.favoriteStores.has(offer.storeId) ? 'favorite store boost' : 'all-store eligible',
     watchlist > 0 ? 'watchlist or category match' : 'general weekly promotion',
     offer.priceType === 'member_flyer' ? 'member flyer label retained' : 'public flyer price'

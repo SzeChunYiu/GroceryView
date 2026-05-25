@@ -21,6 +21,25 @@ export type DealContext = {
   isNewLowestPrice: boolean;
 };
 
+export type DealExplanationFactor = {
+  label: string;
+  detail: string;
+};
+
+export type DealExplanationPanel = {
+  summary: string;
+  factors: DealExplanationFactor[];
+};
+
+export type DealExplanationInput = {
+  chainSpreadLabel?: string;
+  confidenceLabel?: string;
+  evidenceLabel?: string;
+  freshnessLabel?: string;
+  rankLabel?: string;
+  unitPriceBaselineLabel?: string;
+};
+
 export type SeasonalProduceMonthPoint = {
   monthIndex?: number;
   monthLabel: string;
@@ -72,6 +91,22 @@ export type ExpiringPromotionRailItem = ExpiringPromotionInput & {
   hoursRemaining: number;
   originalPriceLabel: string;
   urgencyLabel: string;
+};
+
+export type ExpiringDealUrgencyInput = {
+  category?: string;
+  hoursUntilExpiry: number;
+  markdownPercent: number;
+  productName: string;
+  radarScore?: number;
+  storeName?: string;
+  verificationCount?: number;
+};
+
+export type ExpiringDealUrgencyRank = {
+  urgencyRank: number;
+  urgencyScore: number;
+  urgencySummary: string;
 };
 
 export type SeasonalProduceDiscoveryCard = {
@@ -188,6 +223,31 @@ export function buildDealContext({
   };
 }
 
+export function buildDealExplanationPanel({
+  chainSpreadLabel,
+  confidenceLabel,
+  evidenceLabel,
+  freshnessLabel,
+  rankLabel,
+  unitPriceBaselineLabel
+}: DealExplanationInput): DealExplanationPanel {
+  const factors: DealExplanationFactor[] = [
+    rankLabel ? { label: 'Ranking signal', detail: rankLabel } : null,
+    unitPriceBaselineLabel ? { label: 'Unit-price baseline', detail: unitPriceBaselineLabel } : null,
+    chainSpreadLabel ? { label: 'Chain spread', detail: chainSpreadLabel } : null,
+    freshnessLabel ? { label: 'Freshness', detail: freshnessLabel } : null,
+    confidenceLabel ? { label: 'Confidence', detail: confidenceLabel } : null,
+    evidenceLabel ? { label: 'Evidence', detail: evidenceLabel } : null
+  ].filter((factor): factor is DealExplanationFactor => factor !== null);
+
+  return {
+    summary: factors.length > 0
+      ? `Why ranked: ${factors.slice(0, 3).map((factor) => factor.label.toLocaleLowerCase('sv-SE')).join(', ')}`
+      : 'Why ranked: price and availability signals',
+    factors: factors.length > 0 ? factors : [{ label: 'Deal ranking', detail: 'Ranked from the current observed price and available retailer evidence.' }]
+  };
+}
+
 function peakMonthsFor(row: SeasonalProduceInput) {
   if (typeof row.bestBuyMonthIndex !== 'number') return [row.bestBuyMonth];
   const idx = row.bestBuyMonthIndex;
@@ -217,6 +277,47 @@ function normalizedTokens(value: string | undefined) {
       .split(/[^a-z0-9]+/i)
       .filter((token) => token.length >= 3)
   );
+}
+
+function scoreUserRelevance(item: ExpiringDealUrgencyInput, preferredCategories: Set<string>, preferredTerms: Set<string>) {
+  const categoryScore = item.category && preferredCategories.has(item.category.toLowerCase()) ? 10 : 0;
+  const itemTokens = normalizedTokens(`${item.productName} ${item.storeName ?? ''}`);
+  const termScore = [...preferredTerms].some((term) => itemTokens.has(term)) ? 8 : 0;
+  return categoryScore + termScore;
+}
+
+export function rankExpiringDealsByUrgency<T extends ExpiringDealUrgencyInput>(
+  items: T[],
+  options: {
+    preferredCategories?: string[];
+    preferredTerms?: string[];
+  } = {}
+): Array<T & ExpiringDealUrgencyRank> {
+  const preferredCategories = new Set((options.preferredCategories ?? []).map((category) => category.toLowerCase()));
+  const preferredTerms = new Set((options.preferredTerms ?? []).flatMap((term) => [...normalizedTokens(term)]));
+
+  return items
+    .map((item) => {
+      const hoursScore = Math.max(0, Math.min(45, ((48 - item.hoursUntilExpiry) / 48) * 45));
+      const discountScore = Math.max(0, Math.min(30, (item.markdownPercent / 50) * 30));
+      const relevanceScore = scoreUserRelevance(item, preferredCategories, preferredTerms);
+      const evidenceScore = Math.min(10, (item.verificationCount ?? 0) * 4);
+      const urgencyScore = Math.round(hoursScore + discountScore + relevanceScore + evidenceScore + Math.min(item.radarScore ?? 0, 100) / 10);
+
+      return {
+        ...item,
+        urgencyRank: 0,
+        urgencyScore,
+        urgencySummary: `${Math.round(hoursScore)} time · ${Math.round(discountScore)} discount · ${Math.round(relevanceScore)} relevance`
+      };
+    })
+    .sort((left, right) => (
+      right.urgencyScore - left.urgencyScore
+      || left.hoursUntilExpiry - right.hoursUntilExpiry
+      || right.markdownPercent - left.markdownPercent
+      || left.productName.localeCompare(right.productName)
+    ))
+    .map((item, index) => ({ ...item, urgencyRank: index + 1 }));
 }
 
 function isLinkedSeasonalDeal(row: SeasonalProduceInput, deal: SeasonalDealInput) {
