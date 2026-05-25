@@ -35,6 +35,19 @@ export type AlertExplanationTimelineStep = {
   kind: 'source_price' | 'threshold' | 'prediction';
 };
 
+export type PriceAlertPushType = 'target_price' | 'predictive_drop' | 'best_time_to_buy';
+
+export type PriceAlertPushPreferences = {
+  enabledAlertTypes: PriceAlertPushType[];
+  preferredStoreIds: string[];
+  quietHours: {
+    startHour: number;
+    endHour: number;
+    timezone: string;
+  };
+  updatedAt: string;
+};
+
 type PredictiveDropAlertOptions = {
   now?: Date;
   daysAhead?: number;
@@ -45,6 +58,31 @@ type PredictiveDropAlertOptions = {
 const DEFAULT_DAYS_AHEAD = 14;
 const DEFAULT_MINIMUM_SAVINGS_PERCENT = 8;
 const DEFAULT_MINIMUM_CONFIDENCE = 0.6;
+
+export const priceAlertPushTypeLabels: Record<PriceAlertPushType, string> = {
+  best_time_to_buy: 'Best time to buy',
+  predictive_drop: 'Predicted price drops',
+  target_price: 'Target price reached'
+};
+
+export const defaultPriceAlertPushPreferences: PriceAlertPushPreferences = {
+  enabledAlertTypes: ['target_price', 'predictive_drop'],
+  preferredStoreIds: ['willys-odenplan', 'lidl-folkungagatan'],
+  quietHours: { startHour: 21, endHour: 7, timezone: 'Europe/Stockholm' },
+  updatedAt: '2026-05-25T00:00:00.000Z'
+};
+
+export function summarizePriceAlertPushPreferences(preferences: PriceAlertPushPreferences = defaultPriceAlertPushPreferences) {
+  return {
+    alertTypes: preferences.enabledAlertTypes.map((type) => priceAlertPushTypeLabels[type]),
+    preferredStoreCount: preferences.preferredStoreIds.length,
+    quietHoursLabel: `${String(preferences.quietHours.startHour).padStart(2, '0')}:00–${String(preferences.quietHours.endHour).padStart(2, '0')}:00 ${preferences.quietHours.timezone}`
+  };
+}
+
+export function isPriceAlertPushAllowed(alertType: PriceAlertPushType, storeId: string, preferences: PriceAlertPushPreferences = defaultPriceAlertPushPreferences) {
+  return preferences.enabledAlertTypes.includes(alertType) && preferences.preferredStoreIds.includes(storeId);
+}
 
 function daysUntil(date: Date, now: Date) {
   return Math.ceil((date.getTime() - now.getTime()) / 86_400_000);

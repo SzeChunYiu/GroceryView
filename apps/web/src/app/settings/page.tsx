@@ -3,6 +3,7 @@ import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { SettingsDataExportActions } from '@/components/settings-data-export-actions';
 import { DietaryProfileOnboarding } from '@/components/diet-filter-picker';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { defaultPriceAlertPushPreferences, priceAlertPushTypeLabels, summarizePriceAlertPushPreferences } from '@/lib/alert-scheduler';
 import { groupPreferredBrandControls } from '@/lib/personalization';
 import { routeMetadata } from '@/lib/seo';
 
@@ -32,6 +33,7 @@ const dataExportContract = buildPrivacyExport(
 
 export default function SettingsPage() {
   const brandControls = groupPreferredBrandControls();
+  const pushSummary = summarizePriceAlertPushPreferences(defaultPriceAlertPushPreferences);
 
   return (
     <PageShell>
@@ -77,6 +79,35 @@ export default function SettingsPage() {
               </ul>
             </div>
           ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-indigo-200 bg-indigo-50">
+        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-indigo-800">Push price-alert preferences</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Per-alert opt-ins, quiet hours, and preferred stores</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+              Push notifications stay opt-in by alert type and are scoped to preferred stores before any price-alert delivery is planned.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-indigo-900">{pushSummary.preferredStoreCount} stores</p>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          <div className="rounded-2xl bg-white/85 p-4">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-indigo-700">Enabled alert types</p>
+            <ul className="mt-3 space-y-2 text-sm font-semibold text-slate-700">
+              {defaultPriceAlertPushPreferences.enabledAlertTypes.map((type) => <li key={type}>{priceAlertPushTypeLabels[type]}</li>)}
+            </ul>
+          </div>
+          <div className="rounded-2xl bg-white/85 p-4">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-indigo-700">Quiet hours</p>
+            <p className="mt-3 text-sm font-semibold text-slate-700">{pushSummary.quietHoursLabel}</p>
+          </div>
+          <div className="rounded-2xl bg-white/85 p-4">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-indigo-700">Preferred store ids</p>
+            <p className="mt-3 text-sm font-semibold text-slate-700">{defaultPriceAlertPushPreferences.preferredStoreIds.join(', ')}</p>
+          </div>
         </div>
       </Card>
 

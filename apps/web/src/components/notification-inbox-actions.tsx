@@ -1,6 +1,7 @@
 'use client';
 
 import { type FormEvent, useMemo, useState } from 'react';
+import { defaultPriceAlertPushPreferences, priceAlertPushTypeLabels, summarizePriceAlertPushPreferences, type PriceAlertPushType } from '@/lib/alert-scheduler';
 
 type NotificationInboxStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
 type BestTimeRuleStatus = 'idle' | 'blocked' | 'saving' | 'saved' | 'error';
@@ -50,6 +51,8 @@ const BEST_TIME_CATEGORIES = [
   { id: 'fresh_produce', label: 'Fresh produce' }
 ] as const;
 
+const PRICE_ALERT_PUSH_TYPES = Object.keys(priceAlertPushTypeLabels) as PriceAlertPushType[];
+
 function readSession(): BrowserSession {
   if (typeof window === 'undefined') return { accessToken: '', userId: '' };
   const accessToken = sessionStorage.getItem('groceryview:accessToken') || '';
@@ -67,6 +70,10 @@ export function NotificationInboxActions() {
   const [categoryId, setCategoryId] = useState<string>(BEST_TIME_CATEGORIES[0].id);
   const [channel, setChannel] = useState<AlertChannel>('push');
   const [minimumConfidence, setMinimumConfidence] = useState('0.70');
+  const [enabledPushTypes, setEnabledPushTypes] = useState<PriceAlertPushType[]>(defaultPriceAlertPushPreferences.enabledAlertTypes);
+  const [quietStartHour, setQuietStartHour] = useState(String(defaultPriceAlertPushPreferences.quietHours.startHour));
+  const [quietEndHour, setQuietEndHour] = useState(String(defaultPriceAlertPushPreferences.quietHours.endHour));
+  const [preferredStoreIds, setPreferredStoreIds] = useState<string[]>(defaultPriceAlertPushPreferences.preferredStoreIds);
   const contractPreview = useMemo<BestTimeToBuyRuleRequest>(() => ({
     userId: readSession().userId || 'signed-in-user-id',
     storeId,
@@ -75,6 +82,25 @@ export function NotificationInboxActions() {
     alertType: 'best_time_to_buy',
     minimumConfidence: Number(minimumConfidence)
   }), [categoryId, channel, minimumConfidence, storeId]);
+  const pushPreferencePreview = useMemo(() => ({
+    enabledAlertTypes: enabledPushTypes,
+    preferredStoreIds,
+    quietHours: {
+      startHour: Number(quietStartHour),
+      endHour: Number(quietEndHour),
+      timezone: defaultPriceAlertPushPreferences.quietHours.timezone
+    },
+    updatedAt: defaultPriceAlertPushPreferences.updatedAt
+  }), [enabledPushTypes, preferredStoreIds, quietEndHour, quietStartHour]);
+  const pushPreferenceSummary = summarizePriceAlertPushPreferences(pushPreferencePreview);
+
+  function togglePushType(type: PriceAlertPushType) {
+    setEnabledPushTypes((current) => current.includes(type) ? current.filter((item) => item !== type) : [...current, type]);
+  }
+
+  function togglePreferredStore(storeIdOption: string) {
+    setPreferredStoreIds((current) => current.includes(storeIdOption) ? current.filter((item) => item !== storeIdOption) : [...current, storeIdOption]);
+  }
 
   async function loadInbox() {
     const { accessToken, userId } = readSession();
@@ -153,6 +179,52 @@ export function NotificationInboxActions() {
       </p>
       <button className="mt-4 rounded-full bg-cyan-800 px-4 py-2 text-sm font-black text-white" onClick={loadInbox} type="button">Load notification inbox</button>
       <p className="mt-4 rounded-2xl bg-white p-3 text-sm font-bold text-cyan-950" data-status={status}>{message}</p>
+
+      <div className="mt-5 rounded-3xl border border-indigo-200 bg-white p-4" aria-label="Push notification preference controls">
+        <p className="text-xs font-black uppercase tracking-[0.2em] text-indigo-800">Push notification preferences</p>
+        <h3 className="mt-2 text-xl font-black tracking-tight text-slate-950">Opt into alert types, quiet hours, and stores</h3>
+        <div className="mt-4 grid gap-4 lg:grid-cols-3">
+          <fieldset className="rounded-2xl border border-slate-200 p-3">
+            <legend className="px-1 text-sm font-black">Alert types</legend>
+            <div className="mt-2 space-y-2">
+              {PRICE_ALERT_PUSH_TYPES.map((type) => (
+                <label className="flex items-center gap-2 text-sm font-bold text-slate-700" key={type}>
+                  <input checked={enabledPushTypes.includes(type)} onChange={() => togglePushType(type)} type="checkbox" />
+                  {priceAlertPushTypeLabels[type]}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <div className="rounded-2xl border border-slate-200 p-3">
+            <p className="text-sm font-black">Quiet hours</p>
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              <label className="text-xs font-bold text-slate-600" htmlFor="push-quiet-start">
+                Start
+                <input className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2" id="push-quiet-start" max="23" min="0" onChange={(event) => setQuietStartHour(event.target.value)} type="number" value={quietStartHour} />
+              </label>
+              <label className="text-xs font-bold text-slate-600" htmlFor="push-quiet-end">
+                End
+                <input className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2" id="push-quiet-end" max="23" min="0" onChange={(event) => setQuietEndHour(event.target.value)} type="number" value={quietEndHour} />
+              </label>
+            </div>
+            <p className="mt-2 text-xs font-bold text-indigo-900">{pushPreferenceSummary.quietHoursLabel}</p>
+          </div>
+          <fieldset className="rounded-2xl border border-slate-200 p-3">
+            <legend className="px-1 text-sm font-black">Preferred stores</legend>
+            <div className="mt-2 space-y-2">
+              {BEST_TIME_STORES.map((store) => (
+                <label className="flex items-center gap-2 text-sm font-bold text-slate-700" key={store.id}>
+                  <input checked={preferredStoreIds.includes(store.id)} onChange={() => togglePreferredStore(store.id)} type="checkbox" />
+                  {store.label}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        </div>
+        <p className="mt-3 rounded-2xl bg-indigo-50 p-3 text-sm font-bold text-indigo-950">
+          Push enabled for {pushPreferenceSummary.alertTypes.join(', ') || 'no alert types'} at {pushPreferenceSummary.preferredStoreCount} preferred store{pushPreferenceSummary.preferredStoreCount === 1 ? '' : 's'}.
+        </p>
+      </div>
 
       {report ? (
         <div className="mt-4 grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
