@@ -151,6 +151,7 @@ export * from './connectors/mast-recalls-is.js';
 export * from './connectors/mathem.js';
 export * from './connectors/matpriskollen.js';
 export * from './connectors/matspar.js';
+export * from './connectors/meny-flyer-no.js';
 export * from './connectors/meny-no.js';
 export * from './connectors/normal-se.js';
 export {
