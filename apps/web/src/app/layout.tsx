@@ -41,6 +41,14 @@ export const metadata: Metadata = {
     statusBarStyle: 'default',
     title: 'GroceryView'
   },
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/pwa-icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/pwa-icon-512.png', sizes: '512x512', type: 'image/png' }
+    ],
+    apple: [{ url: '/pwa-icon-192.png', sizes: '192x192', type: 'image/png' }]
+  },
   other: {
     'mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-capable': 'yes',
