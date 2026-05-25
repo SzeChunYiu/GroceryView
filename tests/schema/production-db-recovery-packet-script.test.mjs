@@ -84,6 +84,34 @@ describe('production DB recovery packet script', () => {
     assert.deepEqual(packet.recommendedActions.map((action) => action.id), ['rerun-daily-ingestion-readiness']);
   });
 
+  it('recommends replacing an invalid Supabase management token before provider recovery', async () => {
+    const packet = await createProductionDbRecoveryPacket(
+      { SUPABASE_ACCESS_TOKEN: 'not-a-supabase-pat', SUPABASE_PROJECT_REF: 'dgsoqwanrkqgdichtgzl' },
+      {
+        generatedAt: '2026-05-25T08:35:00.000Z',
+        fetchImpl: async () => jsonResponse({ message: 'JWT could not be decoded' }, 401)
+      }
+    );
+
+    assert.equal(packet.status, 'blocked');
+    assert.match(packet.evidence.health.error, /JWT could not be decoded/);
+    assert.equal(packet.evidence.managementSqlProbe.httpStatus, 401);
+    assert.ok(packet.blockers.includes('supabase_management_token_invalid'));
+    assert.deepEqual(packet.recommendedActions.map((action) => action.id), [
+      'replace-invalid-supabase-management-token',
+      'replacement-db-cutover'
+    ]);
+    assert.match(
+      packet.recommendedActions.find((action) => action.id === 'replace-invalid-supabase-management-token').action,
+      /SUPABASE_ACCESS_TOKEN/
+    );
+    assert.match(
+      packet.recommendedActions.find((action) => action.id === 'replace-invalid-supabase-management-token').action,
+      /sbp_/
+    );
+    assert.equal(JSON.stringify(packet).includes('not-a-supabase-pat'), false);
+  });
+
   it('requires explicit Supabase management credentials and project ref', async () => {
     await assert.rejects(() => createProductionDbRecoveryPacket({ SUPABASE_PROJECT_REF: 'ref' }), /SUPABASE_ACCESS_TOKEN is required/);
     await assert.rejects(() => createProductionDbRecoveryPacket({ SUPABASE_ACCESS_TOKEN: 'sbp_secret' }), /SUPABASE_PROJECT_REF is required/);

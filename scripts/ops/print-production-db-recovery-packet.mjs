@@ -50,9 +50,31 @@ function hasDatabaseNotAcceptingConnections(health) {
   return joined.includes('database system is not accepting connections') || joined.includes('57p03');
 }
 
+function hasInvalidSupabaseManagementToken(health, queryDiagnostic) {
+  const joined = JSON.stringify([health, queryDiagnostic]).toLowerCase();
+  return (
+    joined.includes('jwt could not be decoded') ||
+    joined.includes('invalid jwt') ||
+    joined.includes('invalid token') ||
+    joined.includes('unauthorized') ||
+    queryDiagnostic.httpStatus === 401
+  );
+}
+
 function buildRecommendedActions(health, queryDiagnostic) {
   const actions = [];
-  if (hasDatabaseNotAcceptingConnections(health)) {
+  if (hasInvalidSupabaseManagementToken(health, queryDiagnostic)) {
+    actions.push({
+      id: 'replace-invalid-supabase-management-token',
+      owner: 'operator',
+      action: 'Replace SUPABASE_ACCESS_TOKEN with a valid Supabase Management API personal access token beginning with sbp_, then rerun Daily ingestion readiness to regenerate the production DB recovery packet.'
+    });
+    actions.push({
+      id: 'replacement-db-cutover',
+      owner: 'operator_after_approval',
+      action: 'If recovery credentials cannot be restored promptly, create or select a replacement Supabase project, store its connection string as REPLACEMENT_DATABASE_URL or CANDIDATE_DATABASE_URL, run the Production DB cutover validation workflow to prove write connectivity, migrations, all-store ingestion, and DB-backed snapshot evidence, then update DATABASE_URL and rerun Daily ingestion readiness on main.'
+    });
+  } else if (hasDatabaseNotAcceptingConnections(health)) {
     actions.push({
       id: 'supabase-platform-recovery',
       owner: 'supabase_support_or_dashboard_operator',
@@ -121,7 +143,8 @@ export async function createProductionDbRecoveryPacket(env = process.env, option
 
   const blockers = [
     ...(health.blockers ?? []),
-    ...(queryDiagnostic.status === 'ready' ? [] : ['supabase_management_sql_unavailable'])
+    ...(queryDiagnostic.status === 'ready' ? [] : ['supabase_management_sql_unavailable']),
+    ...(hasInvalidSupabaseManagementToken(health, queryDiagnostic) ? ['supabase_management_token_invalid'] : [])
   ];
 
   return {
