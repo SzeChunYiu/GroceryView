@@ -27,6 +27,13 @@ export type IcaProduct = {
   promoUnitPriceUnit: string;
   promotionDescription: string;
   soldByWeight?: boolean;
+  channel: 'online';
+  format: IcaFormat;
+  is_member_price: boolean;
+  is_coupon_price: boolean;
+  is_subscription_price: boolean;
+  is_clearance: boolean;
+  multi_buy: string;
   storeAccountId: string;
   storeName: string;
   regionId: string;
@@ -1872,6 +1879,13 @@ export function parseIcaStorePromotions(payload: unknown, options: ParseIcaStore
         promoUnitPriceUnit: promoUnitPrice.unit,
         promotionDescription: text(promotion?.description),
         ...(soldByWeight ? { soldByWeight: true } : {}),
+        channel: 'online',
+        format: icaFormat,
+        is_member_price: /stammis|medlemspris|medlem/i.test(text(promotion?.description)),
+        is_coupon_price: /kupong|rabattkod|coupon/i.test(text(promotion?.description)),
+        is_subscription_price: false,
+        is_clearance: /kort datum|svinn|utförsäljning|sista chansen/i.test(text(promotion?.description)),
+        multi_buy: multiBuyPromotion(text(promotion?.description)),
         storeAccountId: options.storeAccountId,
         storeName: options.storeName,
         regionId: options.regionId,
@@ -1904,6 +1918,10 @@ function hasIcaCounterPriceEvidence(input: {
   if (!ICA_COUNTER_CATEGORY_PATTERN.test(categoryOrName) && !ICA_COUNTER_NAME_PATTERN.test(categoryOrName)) return false;
   const unit = `${input.unitPriceUnit ?? ''} ${input.promoUnitPriceUnit ?? ''}`;
   return /(?:^|[.\s])per\.kg\b|(?:^|\s)(?:kg|kr\s*\/\s*kg)(?:\s|$)/i.test(unit);
+}
+
+function multiBuyPromotion(value: string): string {
+  return /(\d+\s*(st|för)\s*|\d+\s*%\s*vid köp av\s*\d+|3\s*för\s*2|2\s*för)/i.test(value) ? value : '';
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
