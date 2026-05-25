@@ -12,7 +12,7 @@ export const grocerySearchSynonymGroups: GrocerySearchSynonymGroup[] = [
   },
   {
     canonical: 'diapers',
-    terms: ['diapers', 'nappies', 'blöjor', 'blojor', 'baby pants', 'toddler pants', 'pampers', 'libero'],
+    terms: ['diapers', 'diaper', 'nappies', 'nappy', 'blöjor', 'blöja', 'blojor', 'bloja', 'baby pants', 'toddler pants', 'pampers', 'libero'],
     intent: 'product'
   },
   {
@@ -72,4 +72,10 @@ export function semanticSynonymsForQuery(query: string): Array<{ canonical: stri
       intent: group.intent
     }];
   });
+}
+
+export function synonymExpansionWeight(intent: GrocerySearchSynonymGroup['intent']): number {
+  if (intent === 'product') return 0.92;
+  if (intent === 'category') return 0.86;
+  return 0.8;
 }

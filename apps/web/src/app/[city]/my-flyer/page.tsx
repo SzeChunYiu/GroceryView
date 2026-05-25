@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
+import { AlgorithmPicker } from '@/components/algorithm-picker';
 import { MyFlyerPushActions } from '@/components/my-flyer-push-actions';
 import { axfoodProducts } from '@/lib/axfood-products';
+import { MyFlyerPreferences } from './my-flyer-preferences';
 import { MyFlyerOffers } from './my-flyer-offers';
 import './print-import.css';
 
@@ -92,6 +94,8 @@ export default async function MyFlyerPage({ params }: MyFlyerPageProps) {
           </div>
         </section>
 
+        <MyFlyerPreferences defaultCountry="se" defaultAlgorithm="watchlist_first" />
+
         <MyFlyerPushActions
           city={city}
           country="se"
@@ -99,6 +103,13 @@ export default async function MyFlyerPage({ params }: MyFlyerPageProps) {
           limit={flyerProducts.length}
           vapidPublicKey={notificationVapidPublicKey}
         />
+
+        <div className="my-flyer-screen-only mb-6" data-print-hide>
+          <AlgorithmPicker
+            allowedAlgorithms={['watchlist_first', 'best_savings', 'best_unit_price']}
+            defaultSelected="watchlist_first"
+          />
+        </div>
 
         <div aria-label="Sponsored placement" className="my-flyer-ad mb-6 rounded-3xl border border-dashed border-orange-300 bg-orange-50 p-4 text-sm font-bold text-orange-800" data-ad data-print-hide>
           Screen-only promo rail hidden by the MyFlyer print stylesheet.
