@@ -4,6 +4,7 @@ import { RecentSearchReplayPills } from '@/components/SearchBar';
 import { SaveSearchSubscriptionButton } from '@/components/saved-search-subscriptions';
 import { buildSavedSearchSubscription } from '@/lib/alert-scheduler';
 import { routeMetadata } from '@/lib/seo';
+import { buildNoResultCorrectionWorkflow } from '@/lib/search-alias-review';
 import { authenticatedSavedSearchShortcuts } from '@/lib/saved-searches';
 import { buildMisspelledQueryRecovery } from '@/lib/search-suggest';
 import { phoneticSearchBadgesForQuery } from '@/lib/search-filters';
@@ -21,6 +22,7 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
   const query = Array.isArray(resolvedSearchParams.q) ? resolvedSearchParams.q[0] ?? '' : resolvedSearchParams.q ?? '';
   const searchView = buildProductSearchView(resolvedSearchParams);
   const recovery = searchView.resultCards.length === 0 ? buildMisspelledQueryRecovery(query) : null;
+  const noResultWorkflow = recovery ? buildNoResultCorrectionWorkflow(query) : null;
   const phoneticBadges = query.trim() ? phoneticSearchBadgesForQuery(query) : [];
 
   return (
@@ -53,6 +55,30 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
         </section>
       ) : null}
       {recovery ? <SearchRecoveryPanel didYouMean={recovery.didYouMean} popularAlternatives={recovery.popularAlternatives} query={recovery.query} /> : null}
+      {noResultWorkflow && noResultWorkflow.query ? (
+        <section className="mx-auto mb-4 w-full max-w-5xl rounded-3xl border border-sky-100 bg-white p-4 shadow-sm" data-no-result-correction-workflow>
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-sky-800">Help improve search</p>
+          <h2 className="mt-1 text-lg font-black text-slate-950">Turn “{noResultWorkflow.query}” into a data-quality signal</h2>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {noResultWorkflow.suggestedCorrections.map((correction) => (
+              <a className="rounded-full bg-emerald-50 px-3 py-2 text-xs font-black text-emerald-950" href={`/search?q=${encodeURIComponent(correction)}`} key={correction}>
+                Try spelling: {correction}
+              </a>
+            ))}
+            <a className="rounded-full bg-sky-50 px-3 py-2 text-xs font-black text-sky-950" href={noResultWorkflow.aliasSubmissionHref}>
+              Submit as alias candidate
+            </a>
+          </div>
+          <p className="mt-3 text-xs font-black uppercase tracking-[0.16em] text-slate-500">Nearby categories</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {noResultWorkflow.categoryShortcuts.map((category) => (
+              <a className="rounded-full bg-slate-100 px-3 py-2 text-xs font-black text-slate-800" href={category.href} key={category.href}>
+                {category.label}
+              </a>
+            ))}
+          </div>
+        </section>
+      ) : null}
       <section aria-label="Search results with virtualized product rendering">
         <ProductsPage searchParams={Promise.resolve(resolvedSearchParams)} />
       </section>
