@@ -4,7 +4,7 @@ import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { PantryTracker } from '@/components/pantry-tracker';
 import { pantryReplenishmentInput, pantryReplenishmentPlan } from '@/lib/demo-data';
-import { buildPantryStockItems } from '@/lib/pantry';
+import { buildPantryDealEvidenceMap, buildPantryStockItems } from '@/lib/pantry';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -32,6 +32,10 @@ export default function PantryPlannerPage() {
   const alreadyInBasketCount = replenishment.filter((item) => item.alreadyInBasket).length;
   const dealBackedRestocks = replenishment.filter((item) => item.bestDeal).length;
   const stockItems = buildPantryStockItems(plan.statuses);
+  const pantryDealEvidence = buildPantryDealEvidenceMap(
+    pantryReplenishmentInput.deals,
+    Object.fromEntries(stockItems.map((item) => [item.productId, `/deals?replace=${encodeURIComponent(item.productId)}`]))
+  );
 
   return (
     <PageShell>
@@ -101,7 +105,7 @@ export default function PantryPlannerPage() {
         </Card>
 
         <Card>
-          <PantryTracker items={stockItems} />
+          <PantryTracker dealEvidence={pantryDealEvidence} items={stockItems} />
         </Card>
 
         <Card>

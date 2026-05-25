@@ -28,7 +28,7 @@ const alertProductSummaries: AlertProductSummary[] = matchedChainProducts.slice(
       lowestChain: product.lowestChain,
       targetPriceText: formatSek(product.lowestPrice),
       lastObservedAt: lastObservedAt ? new Date(lastObservedAt).toISOString() : undefined,
-      predictionSource: `Prediction inputs withheld unless a forecast alert exists; current explanation uses ${product.inChains.join(' + ')} verified chain rows.`
+      predictionSource: `Prediction inputs withheld unless a forecast alert exists; current explanation uses ${product.inChains.join(' + ')} observed source rows.`
     })
   };
 });

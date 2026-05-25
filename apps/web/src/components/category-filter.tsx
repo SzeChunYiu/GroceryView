@@ -94,3 +94,35 @@ export function CategoryFilter({
     </section>
   );
 }
+
+export type CategoryScopedSuggestion = {
+  query: string;
+  categorySlug: string;
+  reason: string;
+  count: number;
+};
+
+export function CategorySuggestionList({
+  suggestions,
+  label = 'Category search suggestions'
+}: Readonly<{ suggestions: CategoryScopedSuggestion[]; label?: string }>) {
+  if (suggestions.length === 0) return null;
+
+  return (
+    <div className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4">
+      <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{label}</p>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {suggestions.map((suggestion) => (
+          <a
+            className="rounded-full border border-emerald-200 bg-white px-3 py-2 text-sm font-black text-emerald-900 hover:border-emerald-700"
+            href={`/search?q=${encodeURIComponent(suggestion.query)}&category=${encodeURIComponent(suggestion.categorySlug)}`}
+            key={`${suggestion.categorySlug}-${suggestion.query}-${suggestion.reason}`}
+          >
+            {suggestion.query}
+            <span className="ml-2 text-xs font-semibold text-slate-500">{suggestion.reason.replace('-', ' ')} · {suggestion.count}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
