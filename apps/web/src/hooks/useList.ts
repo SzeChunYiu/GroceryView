@@ -175,7 +175,7 @@ function listStateFromStorage(value: string | null): Required<PersistedListState
   }
 }
 
-function withCheckedState(checkedById: Record<string, boolean>, importedItems: BulkImportedListItemInput[] = []): ShoppingListItem[] {
+function withCheckedState(checkedById: Record<string, boolean>, importedItems: PersistedCustomListItemInput[] = []): ShoppingListItem[] {
   const uniqueItems = new Map<string, Omit<ShoppingListItem, 'checked'>>();
   for (const item of baseListItems) uniqueItems.set(item.id, item);
   for (const item of importedItems) uniqueItems.set(item.id, item);
