@@ -23,7 +23,48 @@ export type DietaryPreferenceOnboardingContract = {
 
 export const defaultHouseholdId = 'stockholm-family-demo';
 export const recentSearchHistoryStorageKey = 'groceryview:recent-product-searches';
+export const brandPreferenceStorageKey = 'groceryview:brand-preferences:v1';
+export const disabledPersonalizationSignalsStorageKey = 'groceryview:personalization-disabled-signals:v1';
 const maxRecentSearchHistory = 10;
+
+export type PersonalizationTransparencySignal = {
+  id: string;
+  label: string;
+  source: string;
+  recommendationUse: string;
+  clearAction: string;
+};
+
+export const personalizationTransparencySignals: PersonalizationTransparencySignal[] = [
+  {
+    id: 'purchase_history',
+    label: 'Purchase and list history',
+    source: 'Signed-in basket imports, shopping-list activity, and receipt purchase rows.',
+    recommendationUse: 'Ranks recurring basket items, budget forecasts, and category shortcuts.',
+    clearAction: 'Clear imported history and recent list signals.'
+  },
+  {
+    id: 'recent_searches',
+    label: 'Recent searches',
+    source: 'Browser-local product searches stored on this device.',
+    recommendationUse: 'Keeps matching products and categories higher in search and discovery.',
+    clearAction: 'Clear recent search history on this device.'
+  },
+  {
+    id: 'brand_controls',
+    label: 'Brand substitution controls',
+    source: 'Favorite, acceptable, and excluded brand choices saved from settings.',
+    recommendationUse: 'Boosts favorites, allows fallback brands, and suppresses excluded substitutions.',
+    clearAction: 'Reset brand controls.'
+  },
+  {
+    id: 'dietary_profile',
+    label: 'Dietary profile',
+    source: 'Explicit allergies, diets, avoided ingredients, and certification preferences.',
+    recommendationUse: 'Filters unsafe matches and annotates product recommendations with label evidence.',
+    clearAction: 'Disable dietary signals until profile sync is re-enabled.'
+  }
+];
 
 export type RecentSearchHistoryEntry = {
   query: string;
