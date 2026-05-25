@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 
 type BarcodeScannerDetector = {
   detect(input: CanvasImageSource): Promise<Array<{ rawValue?: string }>>;
@@ -51,6 +51,31 @@ export function BarcodeScanner() {
   const normalizedEan = normalizeEan(ean);
   const productHref = useMemo(() => resolvedProduct?.href ?? productLookupHref(normalizedEan), [normalizedEan, resolvedProduct]);
 
+  const resolveBarcodeLookup = useCallback(async (value: string) => {
+    const lookupEan = normalizeEan(value);
+    if (lookupEan.length < 8) {
+      setResolvedProduct(null);
+      setStatus('Enter at least 8 barcode digits to resolve a product match.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/barcode?ean=${encodeURIComponent(lookupEan)}`);
+      if (!response.ok) {
+        setResolvedProduct(null);
+        setStatus(`No catalogue product matched EAN ${lookupEan}. Open search fallback or report the missing barcode.`);
+        return;
+      }
+
+      const body = (await response.json()) as BarcodeLookupResponse;
+      setResolvedProduct(body.product);
+      setStatus(body.product ? `Matched ${body.product.name} from ${body.product.source}.` : `No catalogue product matched EAN ${lookupEan}.`);
+    } catch {
+      setResolvedProduct(null);
+      setStatus('Barcode lookup is temporarily unavailable. Open search fallback or try again.');
+    }
+  }, []);
+
   useEffect(() => {
     return () => {
       streamRef.current?.getTracks().forEach((track) => track.stop());
@@ -77,27 +102,7 @@ export function BarcodeScanner() {
       }
     }, 700);
     return () => window.clearInterval(timer);
-  }, [isScanning]);
-
-  async function resolveBarcodeLookup(value: string) {
-    const lookupEan = normalizeEan(value);
-    if (lookupEan.length < 8) {
-      setResolvedProduct(null);
-      setStatus('Enter at least 8 barcode digits to resolve a product match.');
-      return;
-    }
-
-    const response = await fetch(`/api/barcode?ean=${encodeURIComponent(lookupEan)}`);
-    if (!response.ok) {
-      setResolvedProduct(null);
-      setStatus(`No catalogue product matched EAN ${lookupEan}. Open search fallback or report the missing barcode.`);
-      return;
-    }
-
-    const body = (await response.json()) as BarcodeLookupResponse;
-    setResolvedProduct(body.product);
-    setStatus(body.product ? `Matched ${body.product.name} from ${body.product.source}.` : `No catalogue product matched EAN ${lookupEan}.`);
-  }
+  }, [isScanning, resolveBarcodeLookup]);
 
   async function startCamera() {
     const browserWindow = window as BrowserWithBarcodeDetector;
