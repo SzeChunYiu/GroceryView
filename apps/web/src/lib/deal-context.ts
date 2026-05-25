@@ -21,6 +21,25 @@ export type DealContext = {
   isNewLowestPrice: boolean;
 };
 
+export type DealExplanationFactor = {
+  label: string;
+  detail: string;
+};
+
+export type DealExplanationPanel = {
+  summary: string;
+  factors: DealExplanationFactor[];
+};
+
+export type DealExplanationInput = {
+  chainSpreadLabel?: string;
+  confidenceLabel?: string;
+  evidenceLabel?: string;
+  freshnessLabel?: string;
+  rankLabel?: string;
+  unitPriceBaselineLabel?: string;
+};
+
 export type SeasonalProduceMonthPoint = {
   monthIndex?: number;
   monthLabel: string;
@@ -185,6 +204,31 @@ export function buildDealContext({
     previousLowestLabel:
       previousLowestPrice === undefined ? undefined : `Previous low ${formatPrice(previousLowestPrice, locale, currency)}`,
     isNewLowestPrice: previousLowestPrice === undefined ? false : currentPrice <= previousLowestPrice
+  };
+}
+
+export function buildDealExplanationPanel({
+  chainSpreadLabel,
+  confidenceLabel,
+  evidenceLabel,
+  freshnessLabel,
+  rankLabel,
+  unitPriceBaselineLabel
+}: DealExplanationInput): DealExplanationPanel {
+  const factors: DealExplanationFactor[] = [
+    rankLabel ? { label: 'Ranking signal', detail: rankLabel } : null,
+    unitPriceBaselineLabel ? { label: 'Unit-price baseline', detail: unitPriceBaselineLabel } : null,
+    chainSpreadLabel ? { label: 'Chain spread', detail: chainSpreadLabel } : null,
+    freshnessLabel ? { label: 'Freshness', detail: freshnessLabel } : null,
+    confidenceLabel ? { label: 'Confidence', detail: confidenceLabel } : null,
+    evidenceLabel ? { label: 'Evidence', detail: evidenceLabel } : null
+  ].filter((factor): factor is DealExplanationFactor => factor !== null);
+
+  return {
+    summary: factors.length > 0
+      ? `Why ranked: ${factors.slice(0, 3).map((factor) => factor.label.toLocaleLowerCase('sv-SE')).join(', ')}`
+      : 'Why ranked: price and availability signals',
+    factors: factors.length > 0 ? factors : [{ label: 'Deal ranking', detail: 'Ranked from the current observed price and available retailer evidence.' }]
   };
 }
 

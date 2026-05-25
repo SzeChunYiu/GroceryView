@@ -100,6 +100,7 @@ export type BasketStoreComparisonStore = {
 
 export type BasketStoreComparison = {
   requestedIds: string[];
+  selectedChainIds: CompareChainId[];
   itemCount: number;
   stores: BasketStoreComparisonStore[];
   sourceLabel: string;
@@ -132,6 +133,18 @@ export function parseCompareProductsParam(input: string | string[] | null | unde
       return true;
     })
     .slice(0, 6);
+}
+
+export function parseCompareChainsParam(input: string | string[] | null | undefined): CompareChainId[] {
+  const chainParam = Array.isArray(input) ? input.join(',') : (input ?? '');
+  const knownChains = new Set(COMPARE_CHAIN_ORDER.map((chain) => chain.id));
+  const selected = chainParam.split(',')
+    .map(normalizeCompareId)
+    .filter((value): value is CompareChainId => knownChains.has(value as CompareChainId));
+
+  return selected.length > 0
+    ? COMPARE_CHAIN_ORDER.map((chain) => chain.id).filter((chainId) => selected.includes(chainId))
+    : COMPARE_CHAIN_ORDER.map((chain) => chain.id);
 }
 
 export function buildCompareNoChainResetUrl(searchParams: CompareResetSearchParams = {}): string {
@@ -325,12 +338,15 @@ function formatBasketSek(value: number): string {
 
 export function buildBasketStoreComparison(
   productsParam: string | string[] | null | undefined,
+  chainsParam: string | string[] | null | undefined = null,
   products: readonly AxfoodProduct[] = axfoodProducts
 ): BasketStoreComparison {
   const comparison = buildChainComparisonTable(productsParam, products);
+  const selectedChainIds = parseCompareChainsParam(chainsParam);
+  const selectedChainSet = new Set(selectedChainIds);
   const rows = new Map<CompareChainId, Omit<BasketStoreComparisonStore, 'rankLabel' | 'totalText' | 'distanceText' | 'stockLabel' | 'highlightLabels' | 'substitutionCount' | 'coverageLabel'>>();
 
-  for (const chain of COMPARE_CHAIN_ORDER) {
+  for (const chain of COMPARE_CHAIN_ORDER.filter((candidate) => selectedChainSet.has(candidate.id))) {
     const context = nearbyChainStoreContext[chain.id];
     rows.set(chain.id, {
       storeId: chain.id,
@@ -354,11 +370,13 @@ export function buildBasketStoreComparison(
 
   for (const product of comparison.products) {
     const pricedCells = product.cells
+      .filter((cell) => selectedChainSet.has(cell.chainId))
       .filter((cell) => cell.status === 'priced' && cell.price !== null)
       .sort((left, right) => (left.price ?? Number.POSITIVE_INFINITY) - (right.price ?? Number.POSITIVE_INFINITY));
     const cheapestCell = pricedCells[0];
 
     for (const cell of product.cells) {
+      if (!selectedChainSet.has(cell.chainId)) continue;
       const store = rows.get(cell.chainId);
       if (!store) continue;
 
@@ -447,6 +465,7 @@ export function buildBasketStoreComparison(
 
   return {
     requestedIds: comparison.requestedIds,
+    selectedChainIds,
     itemCount,
     stores,
     sourceLabel: comparison.sourceLabel,
