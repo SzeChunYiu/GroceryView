@@ -43,6 +43,15 @@ function formatPercent(value: number) {
   return `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`;
 }
 
+const premiumSavingsForecast = {
+  totalMonthly: 133,
+  drivers: [
+    { label: 'Alerts', amount: 42, detail: 'price-drop and wait-window alerts across watched staples' },
+    { label: 'Swaps', amount: 58, detail: 'verified same-basket store swaps for eligible rows' },
+    { label: 'Basket planning', amount: 33, detail: 'pantry top-up timing and duplicate-buy prevention' }
+  ],
+  guardrail: 'Premium-only forecast uses signed-in watchpoints and saved basket rows; public dashboards keep the detailed plan locked.'
+};
 
 function SavingsEmptyState() {
   return (
@@ -138,6 +147,36 @@ export default function SavingsDashboardPage() {
         {grocerySpendForecast.warnings.length > 0 ? (
           <p className="mt-4 rounded-2xl bg-amber-50 p-4 text-sm font-bold text-amber-950">{grocerySpendForecast.warnings.join(' ')}</p>
         ) : null}
+      </Card>
+
+      <Card className="mt-6 border-violet-200 bg-violet-50">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-violet-800">Premium savings forecast</p>
+            <h2 className="mt-2 text-2xl font-black">Projected monthly savings from alerts, swaps, and basket planning</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Upgrade-ready households can preview how premium combines their alert queue, store-switch opportunities, and planned baskets into one monthly savings forecast.
+            </p>
+          </div>
+          <div className="rounded-3xl bg-white px-5 py-4 text-center shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Forecast</p>
+            <p className="mt-1 text-4xl font-black text-violet-800">{formatSek(premiumSavingsForecast.totalMonthly)}</p>
+            <p className="text-xs font-bold text-slate-600">next month</p>
+          </div>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          {premiumSavingsForecast.drivers.map((driver) => (
+            <div className="rounded-2xl bg-white p-4" key={driver.label}>
+              <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">{driver.label}</p>
+              <p className="mt-2 text-3xl font-black text-violet-800">{formatSek(driver.amount)}</p>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{driver.detail}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white p-4">
+          <p className="text-sm font-bold text-violet-950">{premiumSavingsForecast.guardrail}</p>
+          <Link className="rounded-full bg-violet-700 px-4 py-2 text-sm font-black text-white" href="/pricing">See premium plan</Link>
+        </div>
       </Card>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
