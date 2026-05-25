@@ -33,6 +33,12 @@ export type SocialComment = Readonly<{
   postId: string;
 }>;
 
+export type FriendPriceActivityCard = FriendPriceSighting & Readonly<{
+  activityLabel: string;
+  locationContext: string;
+  savingsLabel: string;
+}>;
+
 type PublicSharePreviewInputItem = Readonly<{
   matchedProductSlug?: string;
   name: string;
@@ -153,6 +159,15 @@ export function listSharedFriendPriceSightings(filters: Readonly<{ postId?: stri
     && (!filters.postId || sighting.postId === filters.postId)
     && (!filters.productSlug || sighting.productSlug === filters.productSlug)
   ));
+}
+
+export function listFriendPriceActivityCards(postId?: string): FriendPriceActivityCard[] {
+  return listFriendPriceSightings(postId).map((sighting) => ({
+    ...sighting,
+    activityLabel: sighting.confidence === 'high' ? 'Recently found low' : 'Friend-reported price',
+    locationContext: `${sighting.storeName} · opt-in store context`,
+    savingsLabel: `Friend saw ${sighting.productName} at ${sighting.priceLabel}`
+  }));
 }
 
 export function listFriendPriceSightingsForProductChains(productSlug: string, chainSlugs: readonly string[]) {

@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ConfidenceBadge } from '@/components/confidence-badge';
-import { listFriendPriceSightings, socialFeedPosts } from '@/lib/social';
+import { friendPriceActivityPrivacyContext } from '@/lib/privacy-request-actions';
+import { listFriendPriceActivityCards, socialFeedPosts } from '@/lib/social';
 import type { FormEvent } from 'react';
 import type { SocialComment } from '@/lib/social';
 
@@ -20,9 +21,9 @@ export function SocialFeed() {
   const [replyToByPost, setReplyToByPost] = useState<Record<string, SocialComment | undefined>>({});
   const [status, setStatus] = useState('Comments support replies and @mentions.');
   const commentsByPost = useMemo(() => groupComments(comments), [comments]);
-  const friendSightingsByPost = useMemo(() => {
-    return socialFeedPosts.reduce<Record<string, ReturnType<typeof listFriendPriceSightings>>>((groups, post) => {
-      groups[post.id] = listFriendPriceSightings(post.id);
+  const friendActivityByPost = useMemo(() => {
+    return socialFeedPosts.reduce<Record<string, ReturnType<typeof listFriendPriceActivityCards>>>((groups, post) => {
+      groups[post.id] = listFriendPriceActivityCards(post.id);
       return groups;
     }, {});
   }, []);
@@ -65,7 +66,7 @@ export function SocialFeed() {
       <p aria-live="polite" className="rounded-2xl bg-emerald-50 p-3 text-sm font-bold text-emerald-950" role="status">{status}</p>
       {socialFeedPosts.map((post) => {
         const postComments = commentsByPost[post.id] ?? [];
-        const friendSightings = friendSightingsByPost[post.id] ?? [];
+        const friendActivityCards = friendActivityByPost[post.id] ?? [];
         const replyTarget = replyToByPost[post.id];
 
         return (
@@ -74,21 +75,25 @@ export function SocialFeed() {
             <h2 className="mt-2 text-2xl font-black text-slate-950">{post.title}</h2>
             <p className="mt-2 text-sm leading-6 text-slate-700">{post.body}</p>
 
-            {friendSightings.length > 0 ? (
+            {friendActivityCards.length > 0 ? (
               <div className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
-                <h3 className="text-sm font-black text-emerald-950">Opt-in friend price sightings</h3>
+                <h3 className="text-sm font-black text-emerald-950">Opt-in friend price activity</h3>
+                <p className="mt-1 text-xs font-bold text-emerald-900">{friendPriceActivityPrivacyContext.consentLabel}</p>
                 <div className="mt-3 grid gap-3 md:grid-cols-2">
-                  {friendSightings.map((sighting) => (
+                  {friendActivityCards.map((sighting) => (
                     <Link
                       className="rounded-2xl bg-white p-3 text-sm shadow-sm hover:ring-2 hover:ring-emerald-300"
                       href={`/products/${sighting.productSlug}`}
                       key={sighting.id}
                     >
+                      <p className="text-xs font-black uppercase tracking-[0.14em] text-emerald-800">{sighting.activityLabel}</p>
                       <p className="font-black text-slate-950">{sighting.productName}</p>
-                      <p className="mt-1 font-semibold text-slate-700">{sighting.priceLabel} · {sighting.storeName}</p>
+                      <p className="mt-1 font-semibold text-slate-700">{sighting.savingsLabel}</p>
+                      <p className="mt-1 text-xs font-bold text-slate-600">{sighting.locationContext}</p>
                       <p className="mt-1 text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
-                        {sighting.reporter} · shared with friends · {new Date(sighting.observedAt).toLocaleString('sv-SE')}
+                        {friendPriceActivityPrivacyContext.anonymizationLabel} · {new Date(sighting.observedAt).toLocaleString('sv-SE')}
                       </p>
+                      <p className="mt-2 text-xs font-semibold text-slate-500">{friendPriceActivityPrivacyContext.locationContextLabel}</p>
                       <div className="mt-3">
                         <ConfidenceBadge level={sighting.confidence} label={`${sighting.confidence} sighting confidence`} />
                       </div>
