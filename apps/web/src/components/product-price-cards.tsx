@@ -1,8 +1,7 @@
 'use client';
 
-import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
-import { LazyItemCard } from './LazyItemCard';
+import { LazyItemCard, ResponsiveProductImage } from './LazyItemCard';
 import { FavouriteProductToggle } from './favourite-product-toggle';
 import { readStoredSafetyPreferences, SAFETY_PREFERENCES_CHANGED_EVENT, type ProductSafetyPreferences } from './cert-filter';
 import { volatilityBadgeMethodology } from '@/lib/price-intelligence';
@@ -251,9 +250,8 @@ export function ProductPriceCards({
             >
             {card.imageUrl && card.imageAlt ? (
               <div className="mb-4 flex aspect-[4/3] items-center justify-center rounded-2xl border border-white bg-white p-3 shadow-sm">
-                <Image
+                <ResponsiveProductImage
                   alt={card.imageAlt}
-                  className="max-h-full max-w-full object-contain"
                   height={144}
                   sizes="(min-width: 1280px) 16vw, (min-width: 768px) 33vw, 80vw"
                   src={card.imageUrl}

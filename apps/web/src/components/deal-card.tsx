@@ -1,5 +1,6 @@
 'use client';
 
+import { ResponsiveProductImage } from './LazyItemCard';
 import type { ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import {
@@ -48,6 +49,8 @@ type DealCardProps = {
   sourceLabel?: string;
   sponsoredPlacement?: SponsoredDealPlacement;
   dealEndsAt?: string;
+  imageAlt?: string;
+  imageUrl?: string;
 };
 
 function formatPrice(value: number, locale: string, currency: string) {
@@ -131,7 +134,9 @@ export function DealCard({
   replacementLabel,
   sourceLabel,
   sponsoredPlacement,
-  dealEndsAt
+  dealEndsAt,
+  imageAlt,
+  imageUrl
 }: DealCardProps) {
   const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle');
   const context = buildDealContext({ currentPrice, discountStartedAt, priceHistory, currency, locale });
@@ -215,6 +220,11 @@ export function DealCard({
           <p className="font-black uppercase tracking-[0.18em] text-amber-800">{sponsoredLabel}</p>
           <p className="mt-1">{sponsoredPlacement.disclosure ?? 'Paid placement shown in a separate sponsored slot. It does not affect organic deal rankings.'}</p>
           <p className="mt-1 text-amber-900">Provider: {sponsoredPlacement.provider} · Organic ranking separated: {String(separatedFromOrganicRankings)}</p>
+        </div>
+      ) : null}
+      {imageUrl ? (
+        <div className="mb-3 flex aspect-[4/3] items-center justify-center rounded-2xl border border-slate-100 bg-white p-3">
+          <ResponsiveProductImage alt={imageAlt ?? `${title} deal image`} height={180} sizes="(min-width: 1024px) 24vw, 90vw" src={imageUrl} width={240} />
         </div>
       ) : null}
       <div className="flex items-start justify-between gap-3">

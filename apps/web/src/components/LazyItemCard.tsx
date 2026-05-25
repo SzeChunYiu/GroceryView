@@ -114,7 +114,7 @@ export function VirtualizedProductGrid({ products }: Readonly<{ products: Virtua
           {products.slice(rowIndex * columns, rowIndex * columns + columns).map((product, productOffset) => (
             <LazyItemCard className="group rounded-2xl border border-violet-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-violet-700" compareMode="products-grid" href={`/products/${product.slug}`} itemId={product.slug} itemName={product.name} key={product.slug} listId="products-grid" listIndex={rowIndex * columns + productOffset}>
               <div className="flex gap-3">
-                {product.imageUrl ? <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-white p-2 ring-1 ring-violet-100"><Image alt={`${product.name} product image`} className="max-h-full max-w-full object-contain transition group-hover:scale-105" height={80} sizes="80px" src={product.imageUrl} width={80} /></div> : null}
+                {product.imageUrl ? <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-white p-2 ring-1 ring-violet-100"><ResponsiveProductImage alt={`${product.name} product image`} className="max-h-full max-w-full object-contain transition group-hover:scale-105" height={80} sizes="(min-width: 1280px) 7vw, (min-width: 768px) 10vw, 80px" src={product.imageUrl} width={80} /></div> : null}
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">{product.brand}</p>
@@ -135,5 +135,45 @@ export function VirtualizedProductGrid({ products }: Readonly<{ products: Virtua
         </div>
       ))}
     </div>
+  );
+}
+
+export function ResponsiveProductImage({
+  alt,
+  className = 'max-h-full max-w-full object-contain',
+  height,
+  sizes,
+  src,
+  width
+}: Readonly<{
+  alt: string;
+  className?: string;
+  height: number;
+  sizes: string;
+  src?: string | null;
+  width: number;
+}>) {
+  const [failed, setFailed] = useState(false);
+
+  if (!src || failed) {
+    return (
+      <div className="flex h-full w-full items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 p-3 text-center text-xs font-black text-slate-500">
+        Image unavailable
+      </div>
+    );
+  }
+
+  return (
+    <Image
+      alt={alt}
+      className={className}
+      height={height}
+      loading="lazy"
+      onError={() => setFailed(true)}
+      placeholder="empty"
+      sizes={sizes}
+      src={src}
+      width={width}
+    />
   );
 }
