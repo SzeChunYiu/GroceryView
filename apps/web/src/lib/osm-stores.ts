@@ -22,7 +22,7 @@ export type StoreInventoryConfidence = {
   stale: boolean;
 };
 
-export function osmStoreOpeningHoursLabel(store: OsmStore): string {
+export function osmStoreOpeningHoursLabel(store: Pick<OsmStore, 'openingHours' | 'opening_hours'>): string {
   return store.openingHours || store.opening_hours || 'Hours not reported by OSM';
 }
 
