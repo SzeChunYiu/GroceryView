@@ -3,6 +3,19 @@
 import { useEffect } from 'react';
 
 let registrationStarted = false;
+const SHOPPING_LIST_ROUTE_CACHE_NAME = 'groceryview-shopping-list-route-v1';
+
+async function warmOfflineShoppingListRoute() {
+  if (!('caches' in window)) return;
+  if (!navigator.onLine) return;
+
+  try {
+    const cache = await caches.open(SHOPPING_LIST_ROUTE_CACHE_NAME);
+    await cache.add('/list');
+  } catch {
+    // Offline route warming is opportunistic; registration should remain silent.
+  }
+}
 
 export function registerOfflineItemPageServiceWorker() {
   if (registrationStarted) return;
@@ -12,9 +25,11 @@ export function registerOfflineItemPageServiceWorker() {
 
   registrationStarted = true;
   const register = () => {
-    void navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch((error: unknown) => {
-      console.warn('GroceryView offline item-page service worker registration failed', error);
-    });
+    void navigator.serviceWorker.register('/sw.js', { scope: '/' })
+      .then(() => warmOfflineShoppingListRoute())
+      .catch(() => {
+        registrationStarted = false;
+      });
   };
 
   if (document.readyState === 'complete') {
