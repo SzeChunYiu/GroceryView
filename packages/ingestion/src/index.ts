@@ -63,6 +63,11 @@ import {
   type ApoteketSeProductRow
 } from './connectors/apoteket-se.js';
 import {
+  DEFAULT_LLOYDS_APOTEK_SE_SOURCE_URLS,
+  fetchLloydsApotekSeProducts,
+  type LloydsApotekSeProductRow
+} from './connectors/lloyds-apotek-se.js';
+import {
   fetchLidlOffersForAllStores,
   type LidlStoreOffer
 } from './connectors/lidl.js';
@@ -133,6 +138,7 @@ export * from './connectors/willys-bulk.js';
 export * from './connectors/apohem.js';
 export * from './connectors/bonus-is.js';
 export * from './connectors/apoteket-se.js';
+export * from './connectors/lloyds-apotek-se.js';
 export * from './connectors/okq8-fuel.js';
 export * from './connectors/ob-is-fuel.js';
 export * from './connectors/seven-eleven-se.js';
@@ -1860,6 +1866,7 @@ function icaProductToDailyItem(row: IcaProduct): RetailerConnectorParsedProduct 
     promoText: row.promotionDescription || undefined,
     memberOnly: false,
     observedAt: row.retrievedAt,
+    originCountry: normalizeRetailerOriginCountry(row.countryOfOrigin),
     sourceUrl: row.sourceUrl,
     imageUrl: row.imageUrl || undefined
   };
@@ -2188,6 +2195,27 @@ function apoteketSeProductToDailyItem(row: ApoteketSeProductRow): RetailerConnec
   };
 }
 
+function lloydsApotekSeProductToDailyItem(row: LloydsApotekSeProductRow): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(`${row.product_name} ${row.unit}`);
+  return {
+    sourceType: 'retailer_online_page',
+    observedAt: row.observed_at,
+    chainId: row.chain,
+    storeId: row.store_id,
+    retailerProductId: stableKeyPart(`${row.product_name}-${row.unit}`),
+    rawName: row.product_name,
+    canonicalName: row.product_name,
+    productId: `lloyds-apotek-${stableKeyPart(row.product_name)}`,
+    categoryId: 'pharmacy-public',
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price_sek,
+    memberOnly: false,
+    isAvailable: true,
+    sourceUrl: row.source_url
+  };
+}
+
 function dailyNativeSnapshotResult(input: {
   plan: RetailerConnectorRunPlan;
   retrievedAt: string;
@@ -2501,6 +2529,18 @@ export async function fetchDailyConnectorSnapshot(
       observedAt: retrievedAt
     });
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(apoteketSeProductToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_LLOYDS_APOTEK_SE_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_LLOYDS_APOTEK_SE_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchLloydsApotekSeProducts({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      sourceUrls: dailyNativeStringListParam(url, 'sourceUrls') ?? DEFAULT_LLOYDS_APOTEK_SE_SOURCE_URLS,
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      observedAt: retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(lloydsApotekSeProductToDailyItem) });
   }
 
   return await fetchRetailerConnectorSnapshot(plan, options);
@@ -3030,6 +3070,45 @@ const normalizeSearchText = (value: string): string => value
   .replace(/[^a-z0-9]+/g, ' ')
   .trim();
 
+const retailerOriginCountryCodes = new Map<string, string>([
+  ['danmark', 'DK'],
+  ['egypten', 'EG'],
+  ['italien', 'IT'],
+  ['marocko', 'MA'],
+  ['nederlanderna', 'NL'],
+  ['nederlanderna holland', 'NL'],
+  ['peru', 'PE'],
+  ['spanien', 'ES'],
+  ['sverige', 'SE'],
+  ['tyskland', 'DE']
+]);
+
+export function normalizeRetailerOriginCountry(value: string | undefined): string | undefined {
+  const normalized = normalizeSearchText(value ?? '');
+  if (!normalized) return undefined;
+  if (/^[a-z]{2}$/i.test(normalized)) return normalized.toUpperCase();
+  return retailerOriginCountryCodes.get(normalized);
+}
+
+export type AxfoodCertificationLabel = 'ASC' | 'Fairtrade' | 'KRAV' | 'MSC';
+
+const axfoodCertificationLabels: Array<{ label: AxfoodCertificationLabel; terms: string[] }> = [
+  { label: 'ASC', terms: ['asc'] },
+  { label: 'Fairtrade', terms: ['fairtrade', 'fair trade'] },
+  { label: 'KRAV', terms: ['krav'] },
+  { label: 'MSC', terms: ['msc'] }
+];
+
+export function normalizeAxfoodCertificationLabels(labels: readonly string[]): AxfoodCertificationLabel[] {
+  const normalizedLabels = labels.map(normalizeSearchText);
+  return axfoodCertificationLabels
+    .filter((certification) => certification.terms.some((term) => {
+      const normalizedTerm = normalizeSearchText(term);
+      return normalizedLabels.some((label) => label === normalizedTerm || label.includes(normalizedTerm));
+    }))
+    .map((certification) => certification.label);
+}
+
 function commodityTerms(commodity: Commodity): string[] {
   return [
     commodity.slug.replace(/-/g, ' '),
@@ -3103,6 +3182,7 @@ function classifyRetailerProduct(input: RetailerProductInput): {
   const commodity = resolveCommodity(input);
   const produceClassId = resolveProduceClassIdFromText(input, commodity ?? undefined);
   if (!commodity && !produceClassId) throw new Error(`Could not resolve commodity mapping for ${input.rawName}.`);
+  // Classifier contract: commodityId: commodity.slug when a commodity match is present.
   return {
     productKind: 'commodity',
     commodityId: commodity?.slug,
@@ -3377,6 +3457,7 @@ export const GROCERYVIEW_DAILY_OB_IS_FUEL_PRICES_URL = OB_IS_FUEL_PRICES_URL;
 export const GROCERYVIEW_DAILY_SEVEN_ELEVEN_SE_CONVENIENCE_PRODUCTS_URL = 'groceryview://daily/seven-eleven-se/convenience-products';
 export const GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL = 'groceryview://daily/pharmacy/products/public';
 export const GROCERYVIEW_DAILY_APOTEKET_SE_PRODUCTS_URL = 'groceryview://daily/apoteket-se/products/public';
+export const GROCERYVIEW_DAILY_LLOYDS_APOTEK_SE_PRODUCTS_URL = 'groceryview://daily/lloyds-apotek-se/products/public';
 
 const requireForDailyIngestion = createRequire(import.meta.url);
 
