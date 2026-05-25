@@ -59,6 +59,7 @@ export const OFFLINE_SAVED_LIST_STORAGE_KEY = 'groceryview:offline-saved-list:v1
 export const OFFLINE_SAVED_LIST_UPDATED_EVENT = 'groceryview:offline-saved-list-updated';
 const OFFLINE_SAVED_LIST_ROUTE_CACHE_NAME = 'groceryview-shopping-list-route-v1';
 const OFFLINE_SAVED_LIST_BASE_ROUTES = ['/list', '/favourites'];
+const OFFLINE_SAVED_LIST_MAX_ROUTES = 16;
 const LIST_SHARE_PUBLIC_SECRET = process.env.NEXT_PUBLIC_LIST_SHARE_SECRET || 'local-list-share-development-secret';
 
 export const BUDGET_HISTORY_STORAGE_KEY = 'groceryview:shopping-list:budget-history:v1';
@@ -300,7 +301,7 @@ export function offlineSavedListRoutesForItems(items: ShoppingListItem[]) {
     if (route) routes.add(route);
   }
 
-  return [...routes].slice(0, 12);
+  return [...routes].slice(0, OFFLINE_SAVED_LIST_MAX_ROUTES);
 }
 
 function persistOfflineSavedListSnapshot(items: ShoppingListItem[]) {
