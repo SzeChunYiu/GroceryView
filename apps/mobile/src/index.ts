@@ -59,11 +59,22 @@ export function buildMobileShell(): { tabs: MobileTab[]; todayModules: TodayModu
   };
 }
 
+export type MobileFriendSharedDeal = {
+  productId: string;
+  ticker: string;
+  name: string;
+  storeName: string;
+  bestPrice: number | null;
+  dealScore: number;
+  sharedByCount: number;
+};
+
 export type MobileViewModel = {
   userId: string;
   today: {
     marketCity: string;
     topDeals: Array<{ ticker: string; dealScore: number; bestPrice: number | null }>;
+    friendSharedDeals: MobileFriendSharedDeal[];
   };
   stores: {
     favoriteStores: Array<{ id: string; name: string }>;
@@ -77,6 +88,41 @@ export type MobileViewModel = {
 };
 
 type MobileApi = ReturnType<typeof createGroceryViewApi>;
+
+type FriendSharedDealCandidate = {
+  productId?: string;
+  id?: string;
+  ticker: string;
+  name?: string;
+  productName?: string;
+  storeName?: string;
+  bestPrice?: number | null;
+  price?: number | null;
+  dealScore: number;
+  verified?: boolean;
+  sharedByCount?: number;
+};
+
+type FriendSharedDealsApi = MobileApi & {
+  suggestFriendSharedDeals?: (userId: string) => FriendSharedDealCandidate[];
+};
+
+function getMobileFriendSharedDeals(userId: string, api: MobileApi): MobileFriendSharedDeal[] {
+  const suggestFriendSharedDeals = (api as FriendSharedDealsApi).suggestFriendSharedDeals;
+  if (!suggestFriendSharedDeals) return [];
+
+  return suggestFriendSharedDeals(userId)
+    .filter((deal) => deal.verified !== false)
+    .map((deal) => ({
+      productId: deal.productId ?? deal.id ?? deal.ticker,
+      ticker: deal.ticker,
+      name: deal.productName ?? deal.name ?? deal.ticker,
+      storeName: deal.storeName ?? 'Shared store',
+      bestPrice: deal.bestPrice ?? deal.price ?? null,
+      dealScore: deal.dealScore,
+      sharedByCount: deal.sharedByCount ?? 1
+    }));
+}
 
 export type MobilePriceTerminalSummary = {
   quote: {
@@ -311,11 +357,19 @@ export async function loadMobileProductTerminal(input: MobileProductTerminalLoad
 
 export function createMobileViewModel(userId: string, api: MobileApi = createGroceryViewApi()): MobileViewModel {
   const market = api.getMarketOverview();
+  const friendSharedDeals = getMobileFriendSharedDeals(userId, api);
+  const friendSharedTickers = new Set(friendSharedDeals.map((deal) => deal.ticker));
   return {
     userId,
     today: {
       marketCity: market.city,
-      topDeals: market.topDeals.map((deal) => ({ ticker: deal.ticker, dealScore: deal.dealScore, bestPrice: deal.bestPrice }))
+      topDeals: [
+        ...friendSharedDeals.map((deal) => ({ ticker: deal.ticker, dealScore: deal.dealScore, bestPrice: deal.bestPrice })),
+        ...market.topDeals
+          .filter((deal) => !friendSharedTickers.has(deal.ticker))
+          .map((deal) => ({ ticker: deal.ticker, dealScore: deal.dealScore, bestPrice: deal.bestPrice }))
+      ],
+      friendSharedDeals
     },
     stores: {
       favoriteStores: api.getFavoriteStores(userId).map((store) => ({ id: store.id, name: store.name }))
@@ -1439,6 +1493,19 @@ export function composeMobileTodayScreen(
           label: deal.ticker,
           value: `${deal.bestPrice?.toFixed(2) ?? 'n/a'} SEK, score ${deal.dealScore}`
         }))
+      },
+      {
+        type: 'section',
+        key: 'friend-shared-deals',
+        title: 'Friend-shared deals',
+        children: viewModel.today.friendSharedDeals.length > 0
+          ? viewModel.today.friendSharedDeals.map((deal) => ({
+              type: 'row',
+              key: `friend-shared-deal:${deal.productId}`,
+              label: deal.name,
+              value: `${deal.bestPrice?.toFixed(2) ?? 'n/a'} SEK at ${deal.storeName}, ${deal.sharedByCount} opted-in signal${deal.sharedByCount === 1 ? '' : 's'}, score ${deal.dealScore}`
+            }))
+          : [{ type: 'empty', key: 'no-friend-shared-deals', message: 'Opt in to household or friend sharing to see verified deal signals here.', action: 'search_product' }]
       },
       {
         type: 'section',

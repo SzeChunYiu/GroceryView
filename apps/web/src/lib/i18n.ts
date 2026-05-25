@@ -20,6 +20,7 @@ import {
   unknownUnitPriceLabel,
   unitPriceDisplayUnits
 } from './unit-price-formatting.js';
+import { priceIntelligenceTerminologyForLocale, type PriceIntelligenceTerminology } from './content-style';
 
 type GroceryMessages = typeof svMessages;
 export type LanguageAccessLocale = SupportedLocale | 'ar' | 'so';
@@ -206,3 +207,7 @@ export const localeTranslationGuardrails = [
   'Prices, product names, source labels, and retailer evidence remain unchanged across languages.',
   'Arabic and Somali remain blocked until native-quality translations are reviewed; no MT copy is shipped.'
 ];
+
+export function localizedPriceIntelligenceTerminology(locale: LanguageAccessLocale | null | undefined): PriceIntelligenceTerminology {
+  return priceIntelligenceTerminologyForLocale(locale ?? defaultLocale);
+}
