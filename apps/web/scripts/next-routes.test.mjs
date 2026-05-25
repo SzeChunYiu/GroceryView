@@ -22,6 +22,7 @@ const appFiles = [
   'src/app/data-sources/page.tsx',
   'src/app/store-coverage/page.tsx',
   'src/app/openprices-depth/page.tsx',
+  'src/app/pricing/page.tsx',
   'src/app/settings/page.tsx',
   'src/app/admin/moderation/page.tsx',
   'src/components/market-shell.tsx',

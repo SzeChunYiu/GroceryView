@@ -1,4 +1,5 @@
 import { buildPrivacyExport } from '@groceryview/core';
+import Link from 'next/link';
 import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { ChainSelector } from '@/components/chain-selector';
 import { PushNotificationPreferenceControls } from '@/components/notification-inbox-actions';
@@ -73,6 +74,20 @@ export default function SettingsPage() {
       </p>
 
       <SettingsDataExportActions />
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Legal policies</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Privacy and cookie policy links</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+          Review how account data, receipts, analytics, ads, retention, deletion, processors, and consent categories are handled in Swedish or English.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-3 text-sm font-black text-emerald-900">
+          <Link className="rounded-full bg-white px-4 py-2 shadow-sm underline decoration-emerald-300 underline-offset-4" href="/sv/privacy">Integritetspolicy</Link>
+          <Link className="rounded-full bg-white px-4 py-2 shadow-sm underline decoration-emerald-300 underline-offset-4" href="/en/privacy">Privacy policy</Link>
+          <Link className="rounded-full bg-white px-4 py-2 shadow-sm underline decoration-emerald-300 underline-offset-4" href="/sv/cookies">Cookiepolicy</Link>
+          <Link className="rounded-full bg-white px-4 py-2 shadow-sm underline decoration-emerald-300 underline-offset-4" href="/en/cookies">Cookie policy</Link>
+        </div>
+      </Card>
 
       <Card className="mt-6 border-violet-200 bg-violet-50">
         <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
