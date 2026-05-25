@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { CheckableListItem } from '@/components/CheckableListItem';
 import { AppNav } from '@/components/app-nav';
 import { BottomNav } from '@/components/bottom-nav';
@@ -10,7 +10,9 @@ import { PrintButton } from '@/components/PrintButton';
 import { useList } from '@/hooks/useList';
 
 export default function ShoppingListPage() {
-  const { addImportedItems, checkedCount, items, remainingCount, resetCheckedState, toggleItemChecked, totalCount } = useList();
+  const { addImportedItems, checkedCount, items, remainingCount, resetCheckedState, shareLink, toggleItemChecked, totalCount } = useList();
+  const [generatedShareUrl, setGeneratedShareUrl] = useState('');
+  const [shareStatus, setShareStatus] = useState('Create a read-only shopping list link after your basket is ready.');
   const progress = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
   const refreshLatestPrices = useCallback(async () => {
     const productUrls = items
@@ -20,6 +22,25 @@ export default function ShoppingListPage() {
     const refreshUrls = productUrls.length > 0 ? productUrls : [window.location.pathname];
 
     await Promise.all(refreshUrls.map((url) => fetch(url, { cache: 'no-store' })));
+  }, [items]);
+
+  const createShareLink = useCallback(async () => {
+    setShareStatus('Creating read-only share link…');
+    const response = await fetch('/api/list/share', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        listId: 'local-shopping-list',
+        items: items.map(({ checked: _checked, ...item }) => item)
+      })
+    });
+    if (!response.ok) {
+      setShareStatus('Could not create share link. Try again when the list API is reachable.');
+      return;
+    }
+    const payload = await response.json() as { shareUrl?: string };
+    setGeneratedShareUrl(payload.shareUrl ?? '');
+    setShareStatus(payload.shareUrl ? 'Read-only share link ready.' : 'Share API returned no link.');
   }, [items]);
 
   return (
@@ -42,9 +63,31 @@ export default function ShoppingListPage() {
             </div>
           </div>
 
+          {shareLink ? (
+            <div className={`mt-5 rounded-2xl border p-4 text-sm font-black ${shareLink.isValid ? 'border-emerald-200 bg-emerald-50 text-emerald-950' : 'border-red-200 bg-red-50 text-red-950'}`} role="status">
+              {shareLink.isValid ? 'Read-only shared list link verified.' : shareLink.error}
+            </div>
+          ) : null}
+
           <div className="mt-5 flex flex-wrap items-center gap-3" data-print-hidden="true">
             <PrintButton />
+            <button
+              className="inline-flex items-center justify-center rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-black text-emerald-900 transition hover:border-emerald-700"
+              onClick={createShareLink}
+              type="button"
+            >
+              Create share link
+            </button>
             <p className="text-sm font-semibold text-slate-600">Print view uses A4 spacing and hides navigation, import controls, and mobile chrome.</p>
+          </div>
+          <div className="mt-3 rounded-2xl bg-white/80 p-4 text-sm font-semibold text-slate-700" data-print-hidden="true" role="status">
+            <p>{shareStatus}</p>
+            {generatedShareUrl ? (
+              <label className="mt-2 block">
+                <span className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Share via link</span>
+                <input aria-label="Share link" className="mt-1 w-full rounded-xl border border-emerald-200 px-3 py-2 text-sm font-bold text-slate-800" readOnly value={generatedShareUrl} />
+              </label>
+            ) : null}
           </div>
 
           <div data-print-hidden="true"><BulkImportDialog onImportItems={addImportedItems} /></div>

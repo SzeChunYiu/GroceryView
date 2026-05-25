@@ -30,6 +30,7 @@ export type ShareLinkState = {
   expiresAt: string | null;
   isExpired: boolean;
   isValid: boolean;
+  sharedItems: PersistedCustomListItemInput[];
   token: string;
 };
 
@@ -40,6 +41,7 @@ type PersistedListState = {
 
 type SignedSharePayload = {
   expiresAt?: string | null;
+  items?: PersistedCustomListItemInput[];
   listId?: string;
 };
 
@@ -213,12 +215,12 @@ async function hmacSignature(encodedPayload: string) {
 async function verifyShareToken(token: string): Promise<ShareLinkState> {
   const [encodedPayload, signature, extra] = token.split('.');
   if (!encodedPayload || !signature || extra !== undefined) {
-    return { token, expiresAt: null, isExpired: false, isValid: false, error: 'Invalid read-only list link signature.' };
+    return { token, expiresAt: null, isExpired: false, isValid: false, sharedItems: [], error: 'Invalid read-only list link signature.' };
   }
 
   const expectedSignature = await hmacSignature(encodedPayload);
   if (signature !== expectedSignature) {
-    return { token, expiresAt: null, isExpired: false, isValid: false, error: 'Invalid read-only list link signature.' };
+    return { token, expiresAt: null, isExpired: false, isValid: false, sharedItems: [], error: 'Invalid read-only list link signature.' };
   }
 
   const payload = JSON.parse(decodeBase64Url(encodedPayload)) as SignedSharePayload;
@@ -226,11 +228,24 @@ async function verifyShareToken(token: string): Promise<ShareLinkState> {
   const expiresAtMs = expiresAt ? Date.parse(expiresAt) : Number.POSITIVE_INFINITY;
   const isExpired = Number.isFinite(expiresAtMs) && expiresAtMs <= Date.now();
 
+  const sharedItems = Array.isArray(payload.items)
+    ? payload.items.filter((item): item is PersistedCustomListItemInput => (
+      item !== null
+      && typeof item === 'object'
+      && (item.importSource === 'bulk-clipboard' || item.importSource === 'item-detail')
+      && typeof item.id === 'string'
+      && typeof item.name === 'string'
+      && typeof item.quantity === 'string'
+      && typeof item.detail === 'string'
+    ))
+    : [];
+
   return {
     token,
     expiresAt,
     isExpired,
     isValid: !isExpired,
+    sharedItems,
     error: isExpired ? 'This read-only shopping list link has expired.' : null
   };
 }
@@ -276,6 +291,10 @@ export function useList() {
           const verifiedShare = await verifyShareToken(token);
           if (!cancelled) setShareLink(verifiedShare);
           if (!verifiedShare.isValid) return;
+          if (verifiedShare.sharedItems.length > 0) {
+            if (!cancelled) setItems(withCheckedState({}, verifiedShare.sharedItems));
+            return;
+          }
         }
         if (!cancelled) setItems(withCheckedState(checkedById, importedItems));
       } finally {
