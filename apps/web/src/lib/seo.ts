@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { hreflangAlternateUrls } from '../i18n';
 
 export const siteUrl = 'https://grocery-web-mu.vercel.app';
 export const siteName = 'GroceryView';
@@ -351,19 +352,7 @@ function absoluteUrl(path: string) {
 }
 
 export function languageAlternateUrls(path: string) {
-  if (path === '/' || path === '') {
-    return {
-      'sv-SE': absoluteUrl('/sv'),
-      'en-SE': absoluteUrl('/en'),
-      'x-default': absoluteUrl('/')
-    };
-  }
-
-  return {
-    'sv-SE': absoluteUrl(path),
-    'en-SE': absoluteUrl(path),
-    'x-default': absoluteUrl(path)
-  };
+  return hreflangAlternateUrls(path);
 }
 
 function truncateDescription(description: string) {

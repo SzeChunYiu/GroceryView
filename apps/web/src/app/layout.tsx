@@ -3,6 +3,7 @@ import { PwaInstall } from '@/components/pwa-install';
 import { ConsentManager } from '@/components/consent-manager';
 import { SkipLink } from '@/components/SkipLink';
 import { EngagementReporter } from '@/lib/engagement';
+import { hreflangAlternateUrls } from '@/i18n';
 import { ServiceWorkerRegistrar } from '@/lib/swRegister';
 import { Providers } from './providers';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -35,6 +36,10 @@ export const metadata: Metadata = {
   title: 'GroceryView',
   description: 'Sweden grocery price intelligence for products, stores, and weekly baskets.',
   manifest: '/manifest.webmanifest',
+  alternates: {
+    canonical: siteUrl,
+    languages: hreflangAlternateUrls('/')
+  },
   applicationName: 'GroceryView',
   appleWebApp: {
     capable: true,
