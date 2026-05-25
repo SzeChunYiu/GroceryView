@@ -354,6 +354,15 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
         >
           <Mic className={voiceStatus === 'listening' ? 'h-4 w-4 animate-pulse text-emerald-700' : 'h-4 w-4'} aria-hidden="true" />
         </button>
+        <Link
+          aria-label="Scan a barcode with the camera"
+          className="rounded-full px-2 py-1 text-xs font-black text-slate-600 transition hover:bg-sky-50 hover:text-sky-800"
+          href="/scanner?handoff=search-bar#barcode-scan"
+          onMouseDown={(event) => event.preventDefault()}
+          title="Scan barcode"
+        >
+          Scan
+        </Link>
       </div>
       {voiceStatus === 'unsupported' || voiceStatus === 'error' ? (
         <p className="mt-2 px-4 text-xs font-bold text-amber-800" role="status">
