@@ -220,3 +220,49 @@ export function StoreComparisonTable({
     </section>
   );
 }
+
+export type CoverageGapSummaryItem = {
+  slug: string;
+  label: string;
+  chainId: string;
+  observedProducts: number;
+  targetProducts: number;
+  gapProducts: number;
+  coveragePct: number;
+  trendDirection: 'up' | 'flat' | 'down';
+  actionLabel: string;
+};
+
+export function CoverageGapSummary({ gaps }: Readonly<{ gaps: CoverageGapSummaryItem[] }>) {
+  if (gaps.length === 0) return null;
+
+  return (
+    <div className="overflow-hidden rounded-[1.5rem] border border-amber-200 bg-white">
+      <table className="min-w-full border-collapse text-left text-sm">
+        <caption className="sr-only">Catalog coverage gaps by chain and category</caption>
+        <thead className="bg-amber-950 text-white">
+          <tr>
+            <th className="px-4 py-3 font-black">Chain</th>
+            <th className="px-4 py-3 font-black">Category</th>
+            <th className="px-4 py-3 font-black">Coverage</th>
+            <th className="px-4 py-3 font-black">Trend</th>
+            <th className="px-4 py-3 font-black">Target gap</th>
+          </tr>
+        </thead>
+        <tbody>
+          {gaps.map((gap) => (
+            <tr className="border-t border-amber-100 align-top" key={`${gap.chainId}-${gap.slug}`}>
+              <th className="px-4 py-4 font-black capitalize text-slate-950">{gap.chainId}</th>
+              <td className="px-4 py-4 font-semibold text-slate-700">{gap.label}</td>
+              <td className="px-4 py-4 font-semibold text-slate-700">
+                {gap.observedProducts}/{gap.targetProducts} rows · {Math.round(gap.coveragePct * 100)}%
+              </td>
+              <td className="px-4 py-4 font-black text-amber-900">{gap.trendDirection}</td>
+              <td className="px-4 py-4 font-semibold text-slate-700">{gap.actionLabel}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
