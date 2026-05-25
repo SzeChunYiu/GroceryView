@@ -1,3 +1,66 @@
+export type PwaInstallAnalyticsAction =
+  | 'prompt_impression'
+  | 'banner_dismissed'
+  | 'install_prompt_accepted'
+  | 'install_prompt_dismissed'
+  | 'app_installed'
+  | 'standalone_launch';
+
+export type PwaInstallAnalyticsEvent = {
+  action: PwaInstallAnalyticsAction;
+  platform: 'android' | 'desktop' | 'ios';
+  canInstall: boolean;
+  source: 'beforeinstallprompt' | 'install_banner' | 'appinstalled' | 'standalone_display';
+  observedAt: string;
+  launchSource?: string;
+};
+
+const consentPolicyVersion = '2026-05-22-consent-v1';
+const consentStorageKey = 'groceryview:consent:state';
+
+type ConsentCategories = Record<'necessary' | 'analytics' | 'ads' | 'personalisation', boolean>;
+
+type ConsentSnapshot = {
+  policyVersion?: string;
+  categories?: Partial<ConsentCategories>;
+};
+
+function analyticsConsentGranted() {
+  if (typeof window === 'undefined') return false;
+
+  const runtimeConsent = (window as Window & { groceryviewConsent?: ConsentSnapshot }).groceryviewConsent;
+  if (runtimeConsent?.policyVersion === consentPolicyVersion) {
+    return runtimeConsent.categories?.analytics === true;
+  }
+
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(consentStorageKey) || 'null') as ConsentSnapshot | null;
+    return stored?.policyVersion === consentPolicyVersion && stored.categories?.analytics === true;
+  } catch {
+    return false;
+  }
+}
+
+function publishConsentAwareAnalyticsEvent(eventName: string, payload: Record<string, unknown>) {
+  if (typeof window === 'undefined' || !analyticsConsentGranted()) return;
+
+  window.dispatchEvent(new CustomEvent(eventName, { detail: payload }));
+  const analyticsWindow = window as Window & {
+    dataLayer?: unknown[];
+    gtag?: (...args: unknown[]) => void;
+  };
+  analyticsWindow.dataLayer = analyticsWindow.dataLayer || [];
+  analyticsWindow.dataLayer.push({ event: eventName, ...payload });
+  analyticsWindow.gtag?.('event', eventName, payload);
+}
+
+export function trackPwaInstallAnalytics(event: Omit<PwaInstallAnalyticsEvent, 'observedAt'>) {
+  publishConsentAwareAnalyticsEvent('groceryview_pwa_install', {
+    ...event,
+    observedAt: new Date().toISOString()
+  });
+}
+
 export type ItemCardImpression = {
   itemId: string;
   itemName: string;
@@ -332,6 +395,41 @@ export function trackDealShare(event: Omit<DealShareEvent, 'observedAt' | 'refer
   }
 
   void fetch(dealShareEndpoint, {
+    body: payload,
+    headers: { 'content-type': 'application/json' },
+    keepalive: true,
+    method: 'POST'
+  }).catch(() => undefined);
+}
+
+export type SponsoredPlacementImpression = {
+  label: string;
+  observedAt: string;
+  placementId: string;
+  provider: string;
+  separatedFromOrganicRankings: boolean;
+  surface: string;
+};
+
+const sponsoredPlacementImpressionEndpoint = '/api/analytics/sponsored-placement-impressions';
+
+export function trackSponsoredPlacementImpression(event: Omit<SponsoredPlacementImpression, 'observedAt'>) {
+  if (typeof window === 'undefined') return;
+
+  const payloadEvent: SponsoredPlacementImpression = {
+    ...event,
+    observedAt: new Date().toISOString()
+  };
+
+  window.dispatchEvent(new CustomEvent('groceryview:sponsored-placement-impression', { detail: payloadEvent }));
+  const payload = JSON.stringify({ event: payloadEvent });
+
+  if (navigator.sendBeacon) {
+    const sent = navigator.sendBeacon(sponsoredPlacementImpressionEndpoint, new Blob([payload], { type: 'application/json' }));
+    if (sent) return;
+  }
+
+  void fetch(sponsoredPlacementImpressionEndpoint, {
     body: payload,
     headers: { 'content-type': 'application/json' },
     keepalive: true,

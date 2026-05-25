@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export type UseIntersectionObserverOptions = IntersectionObserverInit & {
   freezeOnceVisible?: boolean;
@@ -13,11 +13,12 @@ export function useIntersectionObserver<TElement extends Element>({
   threshold = 0
 }: UseIntersectionObserverOptions = {}) {
   const targetRef = useRef<TElement | null>(null);
+  const [targetNode, setTargetNode] = useState<TElement | null>(null);
   const [entry, setEntry] = useState<IntersectionObserverEntry | null>(null);
   const frozen = freezeOnceVisible && entry?.isIntersecting;
 
   useEffect(() => {
-    const target = targetRef.current;
+    const target = targetNode;
     if (!target || frozen || typeof IntersectionObserver === 'undefined') return undefined;
 
     const observer = new IntersectionObserver(([nextEntry]) => {
@@ -26,7 +27,12 @@ export function useIntersectionObserver<TElement extends Element>({
 
     observer.observe(target);
     return () => observer.disconnect();
-  }, [frozen, root, rootMargin, threshold]);
+  }, [frozen, root, rootMargin, targetNode, threshold]);
 
-  return { entry, isIntersecting: Boolean(entry?.isIntersecting), ref: targetRef };
+  const ref = useCallback((node: TElement | null) => {
+    targetRef.current = node;
+    setTargetNode(node);
+  }, []);
+
+  return { entry, isIntersecting: Boolean(entry?.isIntersecting), ref };
 }
