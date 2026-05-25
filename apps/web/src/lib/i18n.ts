@@ -19,7 +19,7 @@ import {
   normalizeUnitPriceDisplayUnit,
   unknownUnitPriceLabel,
   unitPriceDisplayUnits
-} from './unit-price-formatting.js';
+} from './unit-price-formatting.cjs';
 import { priceIntelligenceTerminologyForLocale, type PriceIntelligenceTerminology } from './content-style';
 
 type GroceryMessages = typeof svMessages;
