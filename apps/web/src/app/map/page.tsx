@@ -25,7 +25,12 @@ const routeAwareNearestStorePlan = buildStoreDistanceCompare(
 );
 const topRouteAwareStores = routeAwareNearestStorePlan.rows.slice(0, 4);
 const nearbyDealRecommendations = buildNearbyDealRecommendations();
-const topRouteAwareStoreInventory = topRouteAwareStores.map((store) => {
+const routeSavingsBenchmarkSek = Math.max(...topRouteAwareStores.map((store) => store.basketTotalSek));
+const topRouteSavingsHints = topRouteAwareStores.map((store) => ({
+  ...store,
+  expectedBasketSavingsSek: Number((routeSavingsBenchmarkSek - store.basketTotalSek).toFixed(2))
+}));
+const topRouteAwareStoreInventory = topRouteSavingsHints.map((store) => {
   const osmStore = osmStoreForRouteStore(store);
   return osmStore ? buildStoreInventoryConfidence(osmStore) : null;
 });
@@ -178,7 +183,7 @@ export default function MapPage() {
           </div>
         </div>
         <div className="h-[620px] overflow-hidden border-t border-white/10 bg-slate-900">
-          <StoreMap nearbyDealRecommendations={nearbyDealRecommendations} routeRecommendations={topRouteAwareStores.slice(0, 3)} />
+          <StoreMap nearbyDealRecommendations={nearbyDealRecommendations} routeRecommendations={topRouteSavingsHints.slice(0, 3)} />
         </div>
       </Card>
 
@@ -238,7 +243,7 @@ export default function MapPage() {
           </div>
         </div>
         <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          {topRouteAwareStores.map((store, index) => {
+          {topRouteSavingsHints.map((store, index) => {
             const inventory = topRouteAwareStoreInventory[index];
             return (
             <div className="rounded-2xl border border-cyan-100 bg-white p-4 shadow-sm" data-route-aware-nearest-store={store.id} key={store.id}>
@@ -254,6 +259,7 @@ export default function MapPage() {
                 <div className="rounded-xl bg-cyan-50 p-3">
                   <dt className="text-xs font-black uppercase tracking-[0.12em] text-cyan-700">Basket</dt>
                   <dd className="mt-1 font-black text-cyan-950">{store.basketTotalSek.toFixed(2)} SEK</dd>
+                  <dd className="mt-1 text-xs font-bold text-cyan-800">Saves {store.expectedBasketSavingsSek.toFixed(2)} SEK vs highest visible basket</dd>
                 </div>
                 <div className="rounded-xl bg-slate-50 p-3">
                   <dt className="text-xs font-black uppercase tracking-[0.12em] text-slate-500">Trip</dt>
@@ -275,12 +281,13 @@ export default function MapPage() {
             );
           })}
         </div>
-        {topRouteAwareStores[0] ? (
+        {topRouteSavingsHints[0] ? (
           <StoreDistanceCard
             fallbackLabel="Use the route-aware list above while location is unavailable, then verify stock before leaving."
             inventoryConfidence={topRouteAwareStoreInventory[0] ?? undefined}
-            routeHints={topRouteAwareStores[0].routeEstimates}
-            storeName={topRouteAwareStores[0].storeName}
+            expectedBasketSavingsSek={topRouteSavingsHints[0].expectedBasketSavingsSek}
+            routeHints={topRouteSavingsHints[0].routeEstimates}
+            storeName={topRouteSavingsHints[0].storeName}
           />
         ) : null}
       </Card>

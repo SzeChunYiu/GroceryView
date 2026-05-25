@@ -164,10 +164,12 @@ function districtHeatCollection(): GeoJSON.FeatureCollection<GeoJSON.Point> {
   };
 }
 
+type RouteSavingsMapRow = StoreDistanceRow & { expectedBasketSavingsSek?: number };
+
 export function StoreMap({
   nearbyDealRecommendations = [],
   routeRecommendations = []
-}: Readonly<{ nearbyDealRecommendations?: NearbyDealRecommendation[]; routeRecommendations?: StoreDistanceRow[] }>) {
+}: Readonly<{ nearbyDealRecommendations?: NearbyDealRecommendation[]; routeRecommendations?: RouteSavingsMapRow[] }>) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const [storeCount, setStoreCount] = useState(0);
@@ -473,7 +475,7 @@ export function StoreMap({
                       <span className="font-black text-cyan-800">{store.routeScore.toFixed(0)}</span>
                     </div>
                     <p className="mt-1 font-semibold text-slate-600">
-                      {store.totalMinutes} min · {store.basketTotalSek.toFixed(2)} SEK basket · {store.openingStatusLabel}
+                      {store.totalMinutes} min · {store.basketTotalSek.toFixed(2)} SEK basket · {store.openingStatusLabel} · saves {(store.expectedBasketSavingsSek ?? 0).toFixed(2)} SEK
                     </p>
                   </div>
                 ))}

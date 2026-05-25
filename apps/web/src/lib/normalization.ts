@@ -1,3 +1,4 @@
+import { auditIngestedUnitFields, type IngestUnitFields, type UnitNormalizationAuditConfidence } from './ingest/transform';
 import { unitNormalizationQaSeverity, type UnitNormalizationQaIssueKind, type UnitNormalizationQaSeverity } from './unit-normalizer';
 
 export type PackageEvidence = {
@@ -398,4 +399,50 @@ export function buildUnitNormalizationQaReport(products: UnitNormalizationQaProd
       'Inconsistent unit-price conversions require source review before cheapest-per-unit badges are trusted.'
     ]
   };
+}
+
+export type UnitNormalizationAuditInput = IngestUnitFields & {
+  sourceName: string;
+  productId: string;
+  productName: string;
+};
+
+export type UnitNormalizationAuditRow = {
+  sourceName: string;
+  confidence: UnitNormalizationAuditConfidence;
+  totalProductCount: number;
+  affectedProductCount: number;
+  unresolvedConversionCount: number;
+  examples: string[];
+};
+
+export function buildUnitNormalizationAuditRows(inputs: UnitNormalizationAuditInput[]): UnitNormalizationAuditRow[] {
+  const groups = new Map<string, UnitNormalizationAuditInput[]>();
+  for (const input of inputs) {
+    groups.set(input.sourceName, [...(groups.get(input.sourceName) ?? []), input]);
+  }
+
+  return [...groups.entries()].map(([sourceName, rows]) => {
+    const unresolved = rows
+      .map((row) => ({ row, audit: auditIngestedUnitFields(row) }))
+      .filter(({ audit }) => audit.unresolvedReasons.length > 0);
+    const affectedProducts = new Set(unresolved.map(({ row }) => row.productId));
+    const unresolvedConversionCount = unresolved.reduce((count, { audit }) => count + audit.unresolvedReasons.length, 0);
+    const lowConfidenceCount = unresolved.filter(({ audit }) => audit.confidence === 'low').length;
+    const unresolvedShare = rows.length === 0 ? 0 : affectedProducts.size / rows.length;
+    const confidence: UnitNormalizationAuditConfidence = unresolvedConversionCount === 0
+      ? 'high'
+      : lowConfidenceCount === 0 && unresolvedShare <= 0.02
+        ? 'medium'
+        : 'low';
+
+    return {
+      sourceName,
+      confidence,
+      totalProductCount: rows.length,
+      affectedProductCount: affectedProducts.size,
+      unresolvedConversionCount,
+      examples: unresolved.slice(0, 3).map(({ row, audit }) => `${row.productName}: ${audit.unresolvedReasons.join('; ')}`)
+    };
+  }).sort((a, b) => b.unresolvedConversionCount - a.unresolvedConversionCount || a.sourceName.localeCompare(b.sourceName));
 }
