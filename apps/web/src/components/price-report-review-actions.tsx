@@ -15,6 +15,7 @@ import { COMMUNITY_REVIEW_PROMPT_COPY } from '@/lib/community-reviews';
 import { ReviewPromptForm } from '@/components/review-prompt-form';
 import { sourceDiscrepancyReviewContract } from '@/lib/verified-data';
 
+// COMMUNITY_REVIEW_PROMPTS render through ReviewPromptForm with aria-label={`${prompt.label} rating`}.
 type ReviewStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
 type BrowserSession = { accessToken: string; userId: string };
 type ReviewDecision = 'approve' | 'hide' | 'escalate';
