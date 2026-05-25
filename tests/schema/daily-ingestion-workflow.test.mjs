@@ -217,6 +217,8 @@ describe('daily ingestion workflow', () => {
       'after-ingestion DB IO hotspots must be captured before later readiness exports can obscure the ingestion delta'
     );
     assert.match(workflow, /\/tmp\/daily-db-io-hotspots-after\.json/);
+    assert.match(workflow, /daily_db_io_hotspots_after_skipped_after_ingestion_not_succeeded/);
+    assert.match(workflow, /ingestionStatus/);
     assert.match(workflow, /daily_db_io_hotspots_after_database_url_config_missing/);
     assert.match(workflow, /db_io_hotspots_after_status=\$\?/);
     assert.match(workflow, /daily_db_io_hotspots_after_diagnostic_missing/);
