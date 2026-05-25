@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ChainFilterInput } from './chain-filter-input';
+import { ActiveFilterChips } from '@/components/FilterPanel';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { PriceReportReviewActions } from '@/components/price-report-review-actions';
 import { OriginFilter, type OriginFilterCode } from '@/components/origin-filter';
@@ -12,6 +13,7 @@ import { adaptiveProductCards, buildProductSearchView, facetedProductSearch, for
 import { dbSiteNewArrivalChains, dbSiteNewArrivalProducts } from '@/lib/generated/db-site-products';
 import { routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
+import { buildRemovableSearchFilterChips } from '@/lib/search-filters';
 
 const PRODUCTS_PER_PAGE = 50;
 
@@ -198,6 +200,13 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const arrivalsQuery = firstParam(resolvedSearchParams.arrivalsQ).trim();
   const arrivalsSort = firstParam(resolvedSearchParams.arrivalsSort).trim() || 'newest';
   const arrivalsPage = toPageNumber(resolvedSearchParams.arrivalsPage);
+  const activeFilterChips = buildRemovableSearchFilterChips(resolvedSearchParams, {
+    basePath: '/products',
+    labels: {
+      chain: Object.fromEntries(search.chainFacets.map((facet) => [facet.value, facet.label])),
+      dietary: Object.fromEntries(search.dietaryFilters.map((filter) => [filter.value, filter.label]))
+    }
+  });
 
   function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'origin' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence', string>>) {
     const params = new URLSearchParams();
@@ -325,12 +334,12 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             <button className="rounded-full bg-violet-800 px-4 py-3 text-sm font-black text-white" type="submit">Apply filters</button>
           </div>
         </form>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {search.activeFilters.length > 0 ? search.activeFilters.map((filter) => (
-            <span className="rounded-full bg-violet-900 px-3 py-1 text-xs font-black text-white" key={filter}>{filter}</span>
-          )) : (
-            <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-violet-900 shadow-sm">No active URL filters</span>
-          )}
+        <div className="mt-4">
+          <p className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-violet-800">Saved filter chips</p>
+          <ActiveFilterChips chips={activeFilterChips} />
+          {search.activeFilters.length > 0 ? (
+            <p className="mt-2 text-xs font-semibold text-violet-900">Active URL filters: {search.activeFilters.join(' · ')}</p>
+          ) : null}
         </div>
         <OriginFilter
           className="mt-5"

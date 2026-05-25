@@ -30,6 +30,8 @@ type ItemGridProps = Readonly<{
   paginationLabel?: string;
 }>;
 
+const MAX_GRID_WINDOW_SIZE = 24;
+
 const sortOptions = [
   { value: 'name', label: 'Name A-Z' },
   { value: 'newest', label: 'Newest first' },
@@ -66,11 +68,12 @@ function pageHref(basePath: string, query: string, sort: string, page: number, q
 }
 
 export function ItemGrid({ rows, basePath, query, sort, page, pageSize = 12, queryParam = 'q', sortParam = 'sort', pageParam = 'page', paginationLabel = 'Category pagination' }: ItemGridProps) {
+  const windowedPageSize = Math.min(pageSize, MAX_GRID_WINDOW_SIZE);
   const normalizedPage = Number.isInteger(page) && page > 0 ? page : 1;
   const ranked = sortedRows(filteredRows(rows, query), sort);
-  const totalPages = Math.max(1, Math.ceil(ranked.length / pageSize));
+  const totalPages = Math.max(1, Math.ceil(ranked.length / windowedPageSize));
   const currentPage = Math.min(normalizedPage, totalPages);
-  const visibleRows = ranked.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const visibleRows = ranked.slice((currentPage - 1) * windowedPageSize, currentPage * windowedPageSize);
 
   return (
     <section className="mt-6 rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
