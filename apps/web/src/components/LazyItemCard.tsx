@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { trackItemCardImpression } from '@/lib/analytics';
+import { rememberRecentlyViewedProduct, type RecentlyViewedProductInput } from '@/lib/personalization';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { dataGridVirtualStatusClass } from '@/components/data-grid';
 
@@ -17,9 +18,10 @@ export type LazyItemCardProps = {
   linkRef?: (node: HTMLAnchorElement | null) => void;
   listId: string;
   listIndex: number;
+  recentlyViewedProduct?: RecentlyViewedProductInput;
 };
 
-export function LazyItemCard({ children, className, compareMode, href, itemId, itemName, linkRef, listId, listIndex }: Readonly<LazyItemCardProps>) {
+export function LazyItemCard({ children, className, compareMode, href, itemId, itemName, linkRef, listId, listIndex, recentlyViewedProduct }: Readonly<LazyItemCardProps>) {
   const hasTrackedImpression = useRef(false);
   const { isIntersecting, ref } = useIntersectionObserver<HTMLAnchorElement>({ freezeOnceVisible: true, rootMargin: '120px 0px', threshold: 0.4 });
   const combinedRef = useCallback((node: HTMLAnchorElement | null) => {
@@ -33,7 +35,11 @@ export function LazyItemCard({ children, className, compareMode, href, itemId, i
     trackItemCardImpression({ compareMode, itemId, itemName, listId, listIndex });
   }, [compareMode, isIntersecting, itemId, itemName, listId, listIndex]);
 
-  return <Link className={className} data-analytics-item-id={itemId} data-analytics-list-id={listId} href={href} ref={combinedRef}>{children}</Link>;
+  function rememberView() {
+    if (recentlyViewedProduct) rememberRecentlyViewedProduct({ ...recentlyViewedProduct, href });
+  }
+
+  return <Link className={className} data-analytics-item-id={itemId} data-analytics-list-id={listId} data-recently-viewed-product={recentlyViewedProduct ? itemId : undefined} href={href} onClick={rememberView} ref={combinedRef}>{children}</Link>;
 }
 
 type VirtualizedProduct = {
@@ -151,7 +157,14 @@ export function VirtualizedProductGrid({ products }: Readonly<{ products: Virtua
               const index = rowIndex * columns + productOffset;
               if (node) productRefs.current.set(index, node);
               else productRefs.current.delete(index);
-            }} listId="products-grid" listIndex={rowIndex * columns + productOffset}>
+            }} listId="products-grid" listIndex={rowIndex * columns + productOffset} recentlyViewedProduct={{
+              slug: product.slug,
+              name: product.name,
+              brand: product.brand,
+              imageUrl: product.imageUrl,
+              priceLabel: product.cheapestPriceLabel,
+              sourceLabel: product.sourceTables.join(' + ')
+            }}>
               <div className="flex gap-3">
                 {product.imageUrl ? <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-white p-2 ring-1 ring-violet-100"><Image alt={`${product.name} product image`} className="max-h-full max-w-full object-contain transition group-hover:scale-105" height={80} loading="lazy" placeholder="empty" sizes="80px" src={product.imageUrl} width={80} /></div> : null}
                 <div>

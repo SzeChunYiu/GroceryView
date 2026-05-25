@@ -23,9 +23,12 @@ export type DietaryPreferenceOnboardingContract = {
 
 export const defaultHouseholdId = 'stockholm-family-demo';
 export const recentSearchHistoryStorageKey = 'groceryview:recent-product-searches';
+export const recentlyViewedProductsStorageKey = 'groceryview:recently-viewed-products:v1';
+export const recentlyViewedProductsChangedEvent = 'groceryview:recently-viewed-products-changed';
 export const brandPreferenceStorageKey = 'groceryview:brand-preferences:v1';
 export const disabledPersonalizationSignalsStorageKey = 'groceryview:personalization-disabled-signals:v1';
 const maxRecentSearchHistory = 10;
+const maxRecentlyViewedProducts = 12;
 
 export type PersonalizationTransparencySignal = {
   id: string;
@@ -73,6 +76,21 @@ export type RecentSearchHistoryEntry = {
   searchedAt: string;
 };
 
+export type RecentlyViewedProductEntry = {
+  slug: string;
+  name: string;
+  href: string;
+  viewedAt: string;
+  brand?: string;
+  imageUrl?: string | null;
+  priceLabel?: string;
+  sourceLabel?: string;
+};
+
+export type RecentlyViewedProductInput = Omit<RecentlyViewedProductEntry, 'href' | 'viewedAt'> & {
+  href?: string;
+};
+
 export const householdCategorySignals: HouseholdCategorySignal[] = [
   { householdId: defaultHouseholdId, categorySlug: 'mejeri-ost-agg', clicks: 18, conversions: 7 },
   { householdId: defaultHouseholdId, categorySlug: 'frukt-gront', clicks: 16, conversions: 6 },
@@ -118,6 +136,65 @@ export function rememberRecentSearchHistory(query: string, resultCount: number, 
 export function clearRecentSearchHistory() {
   if (typeof window === 'undefined') return [];
   window.localStorage.removeItem(recentSearchHistoryStorageKey);
+  return [];
+}
+
+function validRecentlyViewedProduct(entry: Partial<RecentlyViewedProductEntry> | null | undefined): entry is RecentlyViewedProductEntry {
+  return Boolean(
+    entry
+    && typeof entry.slug === 'string'
+    && entry.slug.trim()
+    && typeof entry.name === 'string'
+    && entry.name.trim()
+    && typeof entry.href === 'string'
+    && entry.href.startsWith('/products/')
+  );
+}
+
+export function readRecentlyViewedProducts(): RecentlyViewedProductEntry[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(recentlyViewedProductsStorageKey) || '[]') as Array<Partial<RecentlyViewedProductEntry>>;
+    return Array.isArray(parsed)
+      ? parsed
+        .filter(validRecentlyViewedProduct)
+        .slice(0, maxRecentlyViewedProducts)
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+export function rememberRecentlyViewedProduct(product: RecentlyViewedProductInput) {
+  if (typeof window === 'undefined') return [];
+  const slug = product.slug.trim();
+  const name = product.name.trim();
+  if (!slug || !name) return readRecentlyViewedProducts();
+
+  const entry: RecentlyViewedProductEntry = {
+    slug,
+    name,
+    href: product.href?.startsWith('/products/') ? product.href : `/products/${encodeURIComponent(slug)}`,
+    viewedAt: new Date().toISOString(),
+    ...(product.brand ? { brand: product.brand } : {}),
+    ...(product.imageUrl ? { imageUrl: product.imageUrl } : {}),
+    ...(product.priceLabel ? { priceLabel: product.priceLabel } : {}),
+    ...(product.sourceLabel ? { sourceLabel: product.sourceLabel } : {})
+  };
+  const next = [
+    entry,
+    ...readRecentlyViewedProducts().filter((item) => item.slug.toLocaleLowerCase('sv-SE') !== slug.toLocaleLowerCase('sv-SE'))
+  ].slice(0, maxRecentlyViewedProducts);
+
+  window.localStorage.setItem(recentlyViewedProductsStorageKey, JSON.stringify(next));
+  window.dispatchEvent(new CustomEvent(recentlyViewedProductsChangedEvent, { detail: next }));
+  return next;
+}
+
+export function clearRecentlyViewedProducts() {
+  if (typeof window === 'undefined') return [];
+  window.localStorage.removeItem(recentlyViewedProductsStorageKey);
+  window.dispatchEvent(new CustomEvent(recentlyViewedProductsChangedEvent, { detail: [] }));
   return [];
 }
 

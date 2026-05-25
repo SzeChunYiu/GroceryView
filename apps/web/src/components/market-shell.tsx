@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Card, Eyebrow, MetricGrid, PageShell, SourceCoverage, TopSpreads } from './data-ui';
 import { FunnelStepBeacon } from './funnel-step-beacon';
 import { ProductPriceCards } from './product-price-cards';
+import { RecentlyViewedProductsCarousel } from './recently-viewed-products-carousel';
 import { TrendingCarousel } from './TrendingCarousel';
 import { TrendingPriceDropCards } from '@/app/page-sections/trending';
 import { buildChainIndexTrendSeries } from '@/lib/chain-index-data';
@@ -181,6 +182,8 @@ export function MarketShell({ locale = defaultLocale }: { locale?: SupportedLoca
           </div>
         </Card>
       </section>
+
+      <RecentlyViewedProductsCarousel className="mt-6" />
 
       <Card className="mt-6 border-cyan-200 bg-cyan-50">
         <Eyebrow>{locale.toUpperCase()} price intelligence terminology</Eyebrow>

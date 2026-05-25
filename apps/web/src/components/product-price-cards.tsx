@@ -270,6 +270,14 @@ export function ProductPriceCards({
               itemName={card.name}
               listId="adaptive-product-cards"
               listIndex={index}
+              recentlyViewedProduct={{
+                slug: card.slug,
+                name: card.name,
+                brand: card.brand,
+                imageUrl: card.imageUrl,
+                priceLabel: primaryLabel(card, compareMode),
+                sourceLabel: card.sourceLabel
+              }}
             >
             {card.imageUrl && card.imageAlt ? (
               <div className="mb-4 flex aspect-[4/3] items-center justify-center rounded-2xl border border-white bg-white p-3 shadow-sm">
