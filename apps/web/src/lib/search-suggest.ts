@@ -129,3 +129,53 @@ export function expandGrocerySearchQueryWithTelemetry(query: string, maxQueries 
 export function expandGrocerySearchQuery(query: string, maxQueries = 5): GrocerySearchExpansion {
   return expandGrocerySearchQueryWithTelemetry(query, maxQueries).expansion;
 }
+
+export type CategorySearchProduct = {
+  name: string;
+  brand?: string | null;
+  category?: string | null;
+};
+
+export type CategorySearchSuggestion = {
+  query: string;
+  categorySlug: string;
+  reason: 'popular-brand' | 'product-match' | 'expanded-query';
+  count: number;
+};
+
+export function buildCategoryScopedSearchSuggestions(
+  categorySlug: string,
+  products: CategorySearchProduct[],
+  seedQuery = '',
+  maxSuggestions = 6
+): CategorySearchSuggestion[] {
+  const scopedProducts = products.filter((product) => normalizeAliasText(product.category ?? '') === normalizeAliasText(categorySlug));
+  const suggestions: CategorySearchSuggestion[] = [];
+
+  for (const product of scopedProducts) {
+    if (product.brand) {
+      const existing = suggestions.find((suggestion) => normalizeAliasText(suggestion.query) === normalizeAliasText(product.brand ?? ''));
+      if (existing) existing.count += 1;
+      else suggestions.push({ query: product.brand, categorySlug, reason: 'popular-brand', count: 1 });
+    }
+  }
+
+  for (const product of scopedProducts.slice(0, 12)) {
+    const firstWords = product.name.split(/\s+/).slice(0, 3).join(' ');
+    if (firstWords && !suggestions.some((suggestion) => normalizeAliasText(suggestion.query) === normalizeAliasText(firstWords))) {
+      suggestions.push({ query: firstWords, categorySlug, reason: 'product-match', count: 1 });
+    }
+  }
+
+  if (seedQuery.trim()) {
+    for (const query of expandGrocerySearchQuery(seedQuery, 4).expandedQueries) {
+      if (!suggestions.some((suggestion) => normalizeAliasText(suggestion.query) === normalizeAliasText(query))) {
+        suggestions.push({ query, categorySlug, reason: 'expanded-query', count: 1 });
+      }
+    }
+  }
+
+  return suggestions
+    .sort((left, right) => right.count - left.count || left.query.localeCompare(right.query))
+    .slice(0, maxSuggestions);
+}
