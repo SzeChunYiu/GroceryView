@@ -9,6 +9,7 @@ import { categoryLabels, pricedProducts } from '@/lib/openprices-products';
 import { buildCategorySeasonalDiscoveryModules } from '@/lib/price-intelligence';
 import { categoryDealLeaderCandidates, categorySummaries, dataFreshnessBadges, formatPct, formatSek, seasonalProduceCalendar } from '@/lib/verified-data';
 import { metadataForCategory } from '@/lib/seo';
+import { seoLandingProducts } from '@/lib/seo-landing-pages';
 
 type CategorySearchParams = Readonly<{ q?: string; sort?: string; page?: string }>;
 
@@ -75,6 +76,7 @@ export default async function CategoryPage({ params, searchParams }: Readonly<{ 
     categorySlug: slug,
     seasonalRows: seasonalProduceCalendar.produceSeasonalityRows
   });
+  const categorySeoLandings = seoLandingProducts.filter((product) => product.categorySlug === slug).slice(0, 4);
 
   return (
     <PageShell>
@@ -186,6 +188,33 @@ export default async function CategoryPage({ params, searchParams }: Readonly<{ 
           ))}
         </div>
       </Card>
+      {categorySeoLandings.length > 0 ? (
+        <Card className="mt-6 border-indigo-200 bg-indigo-50/70">
+          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+            <div>
+              <Eyebrow>Price comparison landing pages</Eyebrow>
+              <h2 className="mt-2 text-2xl font-black tracking-tight">Crawlable pages backed by this category coverage</h2>
+            </div>
+            <p className="max-w-xl text-sm font-semibold leading-6 text-indigo-950">
+              Links appear only for products with verified matched chain rows; city variants keep local availability caveats visible.
+            </p>
+          </div>
+          <div className="mt-5 grid gap-3 md:grid-cols-2">
+            {categorySeoLandings.map((product) => (
+              <div className="rounded-2xl bg-white p-4 shadow-sm" key={product.slug}>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-indigo-700">{product.evidenceLabel}</p>
+                <h3 className="mt-2 text-lg font-black text-slate-950">{product.name}</h3>
+                <p className="mt-2 text-sm font-semibold text-slate-700">{product.cheapestPriceLabel} lowest · {product.spreadPctLabel} spread</p>
+                <div className="mt-3 flex flex-wrap gap-2 text-xs font-black">
+                  <Link className="rounded-full bg-indigo-700 px-3 py-2 text-white" href={`/billigaste/${product.slug}`}>Billigaste</Link>
+                  <Link className="rounded-full bg-slate-950 px-3 py-2 text-white" href={`/prisjamforelse/${product.slug}`}>Prisjämförelse</Link>
+                  <Link className="rounded-full bg-white px-3 py-2 text-slate-700 ring-1 ring-slate-200" href={`/stockholm/prisjamforelse/${product.slug}`}>Stockholm comparison</Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      ) : null}
       <ItemGrid basePath={`/categories/${slug}`} page={page} query={query} rows={itemGridRows} sort={sort} />
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <Card><h2 className="text-2xl font-black">Chain spread rows</h2><div className="mt-4 space-y-3">{chainRows.slice(0, 24).map((product) => <Link className="block rounded-2xl border border-slate-200 p-4 hover:border-emerald-700" href={`/products/${product.slug}`} key={product.slug}><p className="font-black">{product.name}</p><p className="text-sm text-slate-600">{formatSek(product.lowestPrice)} · {formatPct(product.spreadPct)} spread</p></Link>)}</div></Card>

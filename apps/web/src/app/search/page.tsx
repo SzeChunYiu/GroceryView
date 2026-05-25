@@ -7,6 +7,7 @@ import { buildNoResultCorrectionWorkflow } from '@/lib/search-alias-review';
 import { authenticatedSavedSearchShortcuts } from '@/lib/saved-searches';
 import { buildMisspelledQueryRecovery } from '@/lib/search-suggest';
 import { phoneticSearchBadgesForQuery } from '@/lib/search-filters';
+import { seoLandingProducts } from '@/lib/seo-landing-pages';
 import { buildProductSearchView } from '@/lib/verified-data';
 
 type SearchPageParams = Record<string, string | string[] | undefined>;
@@ -53,6 +54,12 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
   const recovery = searchView.resultCards.length === 0 ? buildMisspelledQueryRecovery(query) : null;
   const noResultWorkflow = recovery ? buildNoResultCorrectionWorkflow(query) : null;
   const phoneticBadges = query.trim() ? phoneticSearchBadgesForQuery(query) : [];
+  const normalizedQuery = query.trim().toLocaleLowerCase('sv-SE');
+  const seoLandingMatches = normalizedQuery
+    ? seoLandingProducts
+      .filter((product) => `${product.name} ${product.brand} ${product.categoryLabel}`.toLocaleLowerCase('sv-SE').includes(normalizedQuery))
+      .slice(0, 3)
+    : seoLandingProducts.slice(0, 3);
 
   return (
     <>
@@ -84,6 +91,21 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
         </section>
       ) : null}
       {recovery ? <SearchRecoveryPanel didYouMean={recovery.didYouMean} popularAlternatives={recovery.popularAlternatives} query={recovery.query} /> : null}
+      {seoLandingMatches.length > 0 ? (
+        <section className="mx-auto mb-4 w-full max-w-5xl rounded-3xl border border-indigo-100 bg-indigo-50/80 p-4 shadow-sm" aria-label="Verified price comparison landing pages">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-indigo-800">Verified price pages</p>
+          <p className="mt-1 text-sm font-semibold leading-6 text-indigo-950">
+            Crawlable landing pages are linked only for products with matched chain-price coverage and explicit source caveats.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {seoLandingMatches.map((product) => (
+              <a className="rounded-full bg-white px-3 py-2 text-xs font-black text-indigo-950 shadow-sm" href={`/prisjamforelse/${product.slug}`} key={product.slug}>
+                {product.name} · {product.cheapestPriceLabel}
+              </a>
+            ))}
+          </div>
+        </section>
+      ) : null}
       {noResultWorkflow && noResultWorkflow.query ? (
         <section className="mx-auto mb-4 w-full max-w-5xl rounded-3xl border border-sky-100 bg-white p-4 shadow-sm" data-no-result-correction-workflow>
           <p className="text-xs font-black uppercase tracking-[0.16em] text-sky-800">Help improve search</p>
