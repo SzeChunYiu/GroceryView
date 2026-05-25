@@ -29,7 +29,7 @@ export async function POST(request: Request) {
   const events = Array.isArray(payload.events) ? payload.events : [];
   const productConversionEvents = Array.isArray(payload.productConversionEvents) ? payload.productConversionEvents : [];
   if ((events.length === 0 && productConversionEvents.length === 0) || events.length > 50 || productConversionEvents.length > 50) {
-    return NextResponse.json({ error: 'Expected 1-50 aggregate funnel or product conversion events.' }, { status: 400 });
+    return NextResponse.json({ error: 'Expected 1-50 aggregate funnel events or product conversion events.' }, { status: 400 });
   }
 
   const funnelResult = events.length > 0
