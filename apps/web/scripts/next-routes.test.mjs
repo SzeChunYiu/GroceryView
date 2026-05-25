@@ -186,9 +186,11 @@ describe('verified-data UI', () => {
     assert.match(household, /item_checked/);
     assert.match(household, /item_edited/);
     assert.match(household, /item_removed/);
-    assert.match(activityStream, /added, checked, edited, and removed events/);
+    assert.match(activityStream, /Collaborator additions, removals, price alert changes, and completed items/);
     assert.match(activityStream, /sortSharedListActivityEvents/);
-    assert.match(activityLog, /'item_added' \| 'item_checked' \| 'item_edited' \| 'item_removed'/);
+    assert.match(activityLog, /'item_added'/);
+    assert.match(activityLog, /'item_completed'/);
+    assert.match(activityLog, /'price_alert_changed'/);
     assert.match(activityLog, /publishSharedListItemChecked/);
     assert.match(activityLog, /publishSharedListItemEdited/);
   });
@@ -1761,7 +1763,8 @@ describe('verified-data UI', () => {
     assert.match(previewWorkflow, /pull_request:/);
     assert.match(previewWorkflow, /environment: 'Preview'/);
     assert.match(previewWorkflow, /core\.exportVariable\('LHCI_PREVIEW_URL'/);
-    assert.match(previewWorkflow, /npm run perf:lighthouse:preview -w @groceryview\/web/);
+    assert.match(previewWorkflow, /\.\/node_modules\/\.bin\/lhci autorun --config=\.lighthouserc\.json/);
+    assert.match(previewWorkflow, /--collect\.url=\$\{base\}\$\{route\}/);
     assert.match(verified, /export const webPerformanceBudgetGate/);
     assert.match(verified, /Core Web Vitals budget/);
     assert.match(verified, /≤ 0\.15 layout shift/);

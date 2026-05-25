@@ -2,7 +2,7 @@ import { AlertManagementPanel, type AlertProductSummary } from '@/components/Ale
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { SavedSearchSubscriptionsPanel } from '@/components/saved-search-subscriptions';
-import type { SavedSearchDealCandidate } from '@/lib/alert-scheduler';
+import { buildAlertExplanationTimeline, type SavedSearchDealCandidate } from '@/lib/alert-scheduler';
 import { FREE_PRICE_ALERT_LIMIT } from '@/app/api/alerts/store';
 import { formatSek, matchedChainProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
@@ -21,7 +21,15 @@ const alertProductSummaries: AlertProductSummary[] = matchedChainProducts.slice(
     currentPriceText: formatSek(product.lowestPrice),
     lastObservedAt: lastObservedAt ? new Date(lastObservedAt).toISOString() : undefined,
     lowestChain: product.lowestChain,
-    productHref: `/products/${product.slug}`
+    productHref: `/products/${product.slug}`,
+    explanationTimeline: buildAlertExplanationTimeline({
+      productName: product.name,
+      currentPriceText: formatSek(product.lowestPrice),
+      lowestChain: product.lowestChain,
+      targetPriceText: formatSek(product.lowestPrice),
+      lastObservedAt: lastObservedAt ? new Date(lastObservedAt).toISOString() : undefined,
+      predictionSource: `Prediction inputs withheld unless a forecast alert exists; current explanation uses ${product.inChains.join(' + ')} observed source rows.`
+    })
   };
 });
 
