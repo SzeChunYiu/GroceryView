@@ -107,6 +107,12 @@ export const barcodeMissFallbackProducts: BarcodeMissFallbackProduct[] = [
   }
 ];
 
+export const barcodeLookupSourceOrder = [
+  'OpenFoodFacts barcode catalogue',
+  'OpenPrices product observations',
+  'GroceryView manual product queue'
+];
+
 export type BarcodeLookupResult = {
   barcode: string;
   found: boolean;

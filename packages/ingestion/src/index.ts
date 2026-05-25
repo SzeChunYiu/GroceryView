@@ -83,6 +83,11 @@ import {
   type FuelPriceObservation
 } from './connectors/okq8-fuel.js';
 import {
+  fetchObIsFuelPrices,
+  OB_IS_FUEL_PRICES_URL,
+  type ObIsFuelPriceObservation
+} from './connectors/ob-is-fuel.js';
+import {
   fetchSevenElevenSeConvenienceProducts,
   type SevenElevenSeProduct
 } from './connectors/seven-eleven-se.js';
@@ -129,6 +134,7 @@ export * from './connectors/apohem.js';
 export * from './connectors/bonus-is.js';
 export * from './connectors/apoteket-se.js';
 export * from './connectors/okq8-fuel.js';
+export * from './connectors/ob-is-fuel.js';
 export * from './connectors/seven-eleven-se.js';
 export * from './connectors/st1-fuel.js';
 export * from './connectors/willys.js';
@@ -2063,6 +2069,33 @@ function okq8FuelPriceToDailyItem(row: FuelPriceObservation): RetailerConnectorP
   };
 }
 
+function obIsFuelPriceToDailyItem(row: ObIsFuelPriceObservation): RetailerConnectorParsedProduct {
+  return {
+    sourceType: 'retailer_online_page',
+    observedAt: row.observedAt,
+    chainId: row.chainId,
+    retailerProductId: row.productId,
+    rawName: row.gradeLabel,
+    canonicalName: row.gradeLabel,
+    productId: row.productId,
+    categoryId: 'fuel',
+    fuelGradeId: row.productId,
+    fuelSource: {
+      sourceKind: row.sourceKind,
+      fuelGradeId: row.productId,
+      originalPriceText: row.provenance.originalPriceText,
+      originalEffectiveDate: row.effectiveFrom
+    },
+    brand: row.operatorName,
+    packageSize: 1,
+    packageUnit: 'l',
+    price: row.pricePerLitre,
+    memberOnly: false,
+    validFrom: row.effectiveFrom,
+    sourceUrl: row.sourceUrl
+  };
+}
+
 function sevenElevenSeProductToDailyItem(row: SevenElevenSeProduct): RetailerConnectorParsedProduct {
   return {
     sourceType: 'retailer_online_page',
@@ -2409,6 +2442,16 @@ export async function fetchDailyConnectorSnapshot(
       sourceUrl: OKQ8_FUEL_PRICES_URL
     });
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(okq8FuelPriceToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_OB_IS_FUEL_PRICES_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_OB_IS_FUEL_PRICES_URL}?`)) {
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchObIsFuelPrices({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      capturedAt: retrievedAt,
+      sourceUrl: OB_IS_FUEL_PRICES_URL
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(obIsFuelPriceToDailyItem) });
   }
 
   if (sourceUrl === GROCERYVIEW_DAILY_SEVEN_ELEVEN_SE_CONVENIENCE_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_SEVEN_ELEVEN_SE_CONVENIENCE_PRODUCTS_URL}?`)) {
@@ -2883,6 +2926,7 @@ export type IngestedProduct = {
   categoryId: string;
   productKind: 'branded' | 'commodity';
   commodityId?: string;
+  produceClassId?: string;
   fuelGradeId?: FuelGradeId;
   variant?: string;
   isOrganic: boolean;
@@ -3002,6 +3046,36 @@ function categoryHintsMatch(input: RetailerProductInput, commodity: Commodity): 
     .some((hint) => hint.length > 0 && (category.includes(hint) || hint.includes(category)));
 }
 
+type ProduceClassRule = {
+  produceClassId: string;
+  commodityIds: string[];
+  terms: string[];
+};
+
+const produceClassRules: ProduceClassRule[] = [
+  { produceClassId: 'tomatoes', commodityIds: ['tomato'], terms: ['tomat', 'tomato'] },
+  { produceClassId: 'potatoes', commodityIds: ['potato'], terms: ['potatis', 'potato'] },
+  { produceClassId: 'apples', commodityIds: ['apple'], terms: ['apple', 'apples', 'applen', 'äpple', 'äpplen'] },
+  { produceClassId: 'citrus', commodityIds: ['orange', 'lemon', 'lime'], terms: ['citrus', 'apelsin', 'orange', 'citron', 'lemon', 'lime', 'grapefrukt', 'grape fruit', 'clementin', 'mandarin', 'satsuma'] },
+  { produceClassId: 'herbs', commodityIds: [], terms: ['ort', 'orter', 'örter', 'herb', 'herbs', 'basilika', 'persilja', 'koriander', 'dill', 'timjan', 'rosmarin', 'graslok', 'gräslök', 'mynta'] },
+  { produceClassId: 'mushrooms', commodityIds: ['mushroom'], terms: ['svamp', 'champinjon', 'champinjoner', 'mushroom', 'mushrooms', 'shiitake', 'shitake', 'skogschampinjon', 'ostronskivling', 'portabello', 'portobello', 'enoki'] },
+  { produceClassId: 'leafy-vegetables', commodityIds: ['iceberg-lettuce', 'spinach', 'white-cabbage'], terms: ['sallad', 'lettuce', 'isberg', 'spenat', 'spinach', 'ruccola', 'rucola', 'rocket', 'mangold', 'gronkal', 'grönkål', 'kale', 'vitkal', 'vitkål'] }
+];
+
+function isProduceCommodity(input: RetailerProductInput, commodity?: Commodity): boolean {
+  if (input.soldByWeight === true || input.productKind === 'commodity') return true;
+  return commodity?.categoryPath.some((path) => normalizeSearchText(path).includes('frukt gront')) ?? false;
+}
+
+function resolveProduceClassIdFromText(input: RetailerProductInput, commodity?: Commodity): string | undefined {
+  if (!isProduceCommodity(input, commodity)) return undefined;
+  const haystack = normalizeSearchText(`${input.rawName} ${input.canonicalName} ${input.categoryId} ${commodity?.slug ?? ''} ${commodity?.nameSv ?? ''} ${commodity?.nameEn ?? ''}`);
+  return produceClassRules.find((rule) =>
+    (commodity ? rule.commodityIds.includes(commodity.slug) : false) ||
+    rule.terms.some((term) => haystack.includes(normalizeSearchText(term)))
+  )?.produceClassId;
+}
+
 function resolveCommodity(input: RetailerProductInput): Commodity | null {
   if (input.commodityId) {
     const explicit = findCommodity(input.commodityId);
@@ -3019,6 +3093,7 @@ function resolveCommodity(input: RetailerProductInput): Commodity | null {
 function classifyRetailerProduct(input: RetailerProductInput): {
   productKind: 'branded' | 'commodity';
   commodityId?: string;
+  produceClassId?: string;
   matchConfidence: number;
 } {
   const sourceConfidence = confidenceForSource(input.sourceType);
@@ -3026,10 +3101,12 @@ function classifyRetailerProduct(input: RetailerProductInput): {
   if (!requiresCommodityResolution) return { productKind: 'branded', matchConfidence: sourceConfidence };
 
   const commodity = resolveCommodity(input);
-  if (!commodity) throw new Error(`Could not resolve commodity mapping for ${input.rawName}.`);
+  const produceClassId = resolveProduceClassIdFromText(input, commodity ?? undefined);
+  if (!commodity && !produceClassId) throw new Error(`Could not resolve commodity mapping for ${input.rawName}.`);
   return {
     productKind: 'commodity',
-    commodityId: commodity.slug,
+    commodityId: commodity?.slug,
+    produceClassId,
     matchConfidence: Math.min(sourceConfidence, 0.68)
   };
 }
@@ -3059,6 +3136,7 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
       categoryId: input.categoryId,
       productKind: classification.productKind,
       commodityId: classification.commodityId,
+      produceClassId: classification.produceClassId,
       fuelGradeId: input.fuelGradeId,
       variant: input.variant,
       isOrganic: input.isOrganic ?? (/\b(eko|ekologisk|organic)\b/i.test(input.rawName) || /\b(eko|ekologisk|organic)\b/i.test(input.canonicalName)),
@@ -3295,6 +3373,7 @@ export const GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL = 'groceryview://d
 export const GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL = 'groceryview://daily/mathem/products/public-search';
 export const GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL = 'groceryview://daily/matspar/products/public-search';
 export const GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL = OKQ8_FUEL_PRICES_URL;
+export const GROCERYVIEW_DAILY_OB_IS_FUEL_PRICES_URL = OB_IS_FUEL_PRICES_URL;
 export const GROCERYVIEW_DAILY_SEVEN_ELEVEN_SE_CONVENIENCE_PRODUCTS_URL = 'groceryview://daily/seven-eleven-se/convenience-products';
 export const GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL = 'groceryview://daily/pharmacy/products/public';
 export const GROCERYVIEW_DAILY_APOTEKET_SE_PRODUCTS_URL = 'groceryview://daily/apoteket-se/products/public';

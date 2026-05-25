@@ -127,6 +127,28 @@ export type CategoryInflationTrendFeed = {
   cards: CategoryInflationTrend[];
 };
 
+export type TrendingCategoryDiscovery = {
+  rank: number;
+  category: string;
+  categoryLabel: string;
+  momentumScore: number;
+  productCount: number;
+  observationCount: number;
+  representativeProductSlug: string;
+  representativeProductName: string;
+  representativeBrand: string;
+  latestObservedAt: string;
+  evidenceLabel: string;
+};
+
+export type TrendingDiscoveryFeed = {
+  city: string;
+  generatedAt: string;
+  source: string;
+  categories: TrendingCategoryDiscovery[];
+  products: CityTrendingItem[];
+};
+
 type BuildCityPriceDropTrendsOptions = {
   city?: string | null;
   limit?: number;
@@ -158,6 +180,14 @@ type BuildBrandLeaderboardTrendsOptions = {
 
 type BuildCategoryInflationTrendsOptions = {
   limit?: number;
+  products?: PricedProduct[];
+  generatedAt?: string;
+};
+
+type BuildTrendingDiscoveryFeedOptions = {
+  city?: string | null;
+  categoryLimit?: number;
+  productLimit?: number;
   products?: PricedProduct[];
   generatedAt?: string;
 };
@@ -204,6 +234,80 @@ function categoryMomentum(product: PricedProduct) {
   const recencyDays = Math.max(0, Math.round((Date.now() - Date.parse(product.lastObservedAt)) / 86_400_000));
   const recencyBoost = recencyDays <= 7 ? 1.2 : recencyDays <= 21 ? 1.1 : recencyDays <= 60 ? 1 : 0.86;
   return (product.observationCount * 1.7 + categoryDepth * 4 + priceSpread * 80) * recencyBoost;
+}
+
+export function buildTrendingDiscoveryFeed({
+  city,
+  categoryLimit = 6,
+  productLimit = 8,
+  products = pricedProducts,
+  generatedAt = new Date().toISOString()
+}: BuildTrendingDiscoveryFeedOptions = {}): TrendingDiscoveryFeed {
+  const cityName = normalizeCity(city);
+  const categoryDrafts = products.reduce((map, product) => {
+    const score = categoryMomentum(product);
+    const existing = map.get(product.category) ?? {
+      category: product.category,
+      categoryLabel: categoryLabels[product.category] ?? 'Grocery',
+      momentumScore: 0,
+      productCount: 0,
+      observationCount: 0,
+      representativeProductSlug: product.slug,
+      representativeProductName: product.name,
+      representativeBrand: product.brands || 'Brand not reported',
+      representativeScore: -1,
+      latestObservedAt: product.lastObservedAt
+    };
+
+    existing.momentumScore += score;
+    existing.productCount += 1;
+    existing.observationCount += product.observationCount;
+    if (score > existing.representativeScore) {
+      existing.representativeProductSlug = product.slug;
+      existing.representativeProductName = product.name;
+      existing.representativeBrand = product.brands || 'Brand not reported';
+      existing.representativeScore = score;
+    }
+    if (product.lastObservedAt > existing.latestObservedAt) existing.latestObservedAt = product.lastObservedAt;
+    map.set(product.category, existing);
+    return map;
+  }, new Map<string, {
+    category: string;
+    categoryLabel: string;
+    momentumScore: number;
+    productCount: number;
+    observationCount: number;
+    representativeProductSlug: string;
+    representativeProductName: string;
+    representativeBrand: string;
+    representativeScore: number;
+    latestObservedAt: string;
+  }>());
+
+  const categories = [...categoryDrafts.values()]
+    .sort((left, right) => right.momentumScore - left.momentumScore || right.observationCount - left.observationCount)
+    .slice(0, Math.max(1, Math.min(categoryLimit, 12)))
+    .map((category, index) => ({
+      category: category.category,
+      categoryLabel: category.categoryLabel,
+      productCount: category.productCount,
+      observationCount: category.observationCount,
+      representativeProductSlug: category.representativeProductSlug,
+      representativeProductName: category.representativeProductName,
+      representativeBrand: category.representativeBrand,
+      latestObservedAt: category.latestObservedAt,
+      rank: index + 1,
+      momentumScore: Number(category.momentumScore.toFixed(1)),
+      evidenceLabel: `${category.productCount} products · ${category.observationCount} dated observations · latest ${category.latestObservedAt}`
+    }));
+
+  return {
+    city: cityName,
+    generatedAt,
+    source: 'OpenPrices product observation momentum grouped by category plus city trending item signals',
+    categories,
+    products: buildCityTrendingItems({ city: cityName, limit: productLimit, products, generatedAt }).cards
+  };
 }
 
 function citySearchTrendHref({ city, category, query }: { city: string; category: string; query: string }) {
