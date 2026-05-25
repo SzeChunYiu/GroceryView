@@ -18,6 +18,33 @@ GroceryView ingestion layer pulls from (or could pull from). Each entry lists
 
 ---
 
+## Current Swedish grocery-chain fetchers
+
+This queue item narrows the canonical list to sources that have an actual fetcher under `packages/ingestion/src/connectors`. Pending ideas without a connector stay in later discovery sections, but they are not counted as data GroceryView reads today.
+
+| Chain/source | Fetcher(s) | Surface read | Confidence source type | Notes |
+|---|---|---|---|---|
+| Willys (Axfood) | `willys.ts`, `willys-bulk.ts` | public product search, store-scoped product pages, weekly discounts | `retailer_online_page` (0.85) or `flyer_campaign` (0.70) | Axfood-backed online catalog evidence; chain/store scope depends on payload. |
+| Hemköp (Axfood) | `hemkop.ts` | public product search, store pages, weekly discounts | `retailer_online_page` (0.85) or `flyer_campaign` (0.70) | Same Axfood family as Willys, with Hemköp URLs and source labels. |
+| ICA | `ica.ts`, `ica-bulk.ts`, `ica-reklamblad.ts` | ICA handla/store catalog probes and weekly flyer evidence | `official_api` (0.95) for API/catalog rows; `flyer_campaign` (0.70) for reklamblad | Store account/region IDs make ICA the main per-store grocery-price path. |
+| Coop | `coop.ts` | public product/store/flyer surfaces | `retailer_online_page` (0.85) or `flyer_campaign` (0.70) | Regional/store hints are retained when present; no synthetic branch price is inferred. |
+| City Gross | `citygross.ts`, `citygross-bulk.ts` | public store and product catalog surfaces | `retailer_online_page` (0.85) | Grocery rows are accepted only with source URL, product name, and numeric SEK price evidence. |
+| Lidl Sweden | `lidl.ts`, `lidl-bulk.ts` | store locator and offer/product feeds | `retailer_online_page` (0.85) or `flyer_campaign` (0.70) | Offer rows are campaign evidence, not a standing shelf price unless payload says so. |
+| Mathem | `mathem.ts` | public online grocery search | `retailer_online_page` (0.85) | Online retailer/postcode surface; not branch-level evidence. |
+| Matspar | `matspar.ts` | public price-comparison search pages | `retailer_online_page` (0.85) | Aggregator evidence is kept as Matspar-sourced and never promoted to per-store truth. |
+| Matpriskollen | `matpriskollen.ts` | regional campaign/offer surfaces | `flyer_campaign` (0.70) | Useful for offer discovery and schema comparison; rows remain campaign-scoped. |
+| Local Food Nodes SE | `localfoodnodes-se.ts` | local producer/store marketplace listings | `retailer_online_page` (0.85) | Swedish grocery-adjacent marketplace; source provenance is required per row. |
+| Swedish convenience/specialty grocery | `seven-eleven-se.ts`, `direkten-se.ts`, `polski-sklep-se.ts`, `goodstore-se.ts` | public store/product/offer pages depending on connector | `retailer_online_page` (0.85) | Included because fetchers exist and they sell grocery/convenience goods; they should not be mixed into full-supermarket coverage metrics without chain class labels. |
+| OpenFoodFacts retailer enrichment | `openfoodfacts.ts` | product metadata with retailer candidates for Willys/Hemköp/Coop/ICA/City Gross/Mathem/Matspar | `estimated` (0.25) unless confirmed by a retailer fetcher | Metadata helps matching, but current price confidence comes from the retailer or receipt source, not OFF alone. |
+
+Pharmacy (`apoteket-se`, `apohem`, `lloyds-apotek-se`), fuel (`st1-fuel`, `okq8-fuel`, `preem-se`), Norway/Iceland connectors, and benchmark feeds are intentionally excluded from this Swedish grocery-chain list even though they have fetchers.
+
+### Confidence computation
+
+`packages/ingestion/src/index.ts` owns the base confidence mapping via `confidenceForSource(sourceType)`: official APIs score `0.95`, retailer online pages `0.85`, receipt scans `0.80`, shelf photos `0.75`, flyer campaigns `0.70`, manual user reports `0.50`, and estimates `0.25`. Connectors choose the source type that matches the evidence they fetched; downstream transforms preserve the score on price observations and add confidence reasons when identifiers, hours, special opening times, or product matching are incomplete. A connector must not increase confidence because a value looks plausible: unverified metadata stays `estimated`, campaign rows stay `flyer_campaign`, and per-branch confidence is only allowed when the fetched payload is explicitly scoped to a store, receipt, or shelf observation.
+
+---
+
 ## 1. Stores (where shops physically are)
 
 ### 1.1 OpenStreetMap — Overpass API ✅ shipped (PR #528; widened nationwide in this round)
