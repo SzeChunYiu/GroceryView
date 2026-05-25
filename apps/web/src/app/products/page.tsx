@@ -4,13 +4,14 @@ import { ChainFilterInput } from './chain-filter-input';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { PriceReportReviewActions } from '@/components/price-report-review-actions';
 import { OriginFilter, type OriginFilterCode } from '@/components/origin-filter';
+import { LazyItemCard } from '@/components/LazyItemCard';
 import { ProductPriceCards } from '@/components/product-price-cards';
 import { apohemSource } from '@/lib/ingested/apohem';
 import { adaptiveProductCards, buildProductSearchView, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
 
-const PRODUCTS_PER_PAGE = 50;
+const PRODUCTS_PER_PAGE = 24;
 
 export function generateMetadata() {
   return routeMetadata('/products');
@@ -305,8 +306,8 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           </div>
         </div>
         <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {pagedResultCards.map((product) => (
-            <Link className="group rounded-2xl border border-violet-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-violet-700" href={`/products/${product.slug}`} key={product.slug}>
+          {pagedResultCards.map((product, index) => (
+            <LazyItemCard className="group rounded-2xl border border-violet-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-violet-700" compareMode="products-grid" href={"/products/" + product.slug} itemId={product.slug} itemName={product.name} key={product.slug} listId="products-page" listIndex={pageStart + index}>
               <div className="flex gap-3">
                 {product.imageUrl ? (
                   <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-white p-2 ring-1 ring-violet-100">
@@ -332,7 +333,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
                 <p>{product.chainLabel}</p>
                 <p className="text-violet-800">sourceTables: {product.sourceTables.join(' · ')}</p>
               </div>
-            </Link>
+            </LazyItemCard>
           ))}
         </div>
         {resultCards.length > PRODUCTS_PER_PAGE ? (

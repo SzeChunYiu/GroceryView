@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useRef, type CSSProperties, type ReactNode } from 'react';
 import { trackItemCardImpression } from '@/lib/analytics';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 
@@ -14,6 +14,7 @@ export type LazyItemCardProps = {
   itemName: string;
   listId: string;
   listIndex: number;
+  style?: CSSProperties;
 };
 
 export function LazyItemCard({
@@ -24,7 +25,8 @@ export function LazyItemCard({
   itemId,
   itemName,
   listId,
-  listIndex
+  listIndex,
+  style
 }: Readonly<LazyItemCardProps>) {
   const hasTrackedImpression = useRef(false);
   const { isIntersecting, ref } = useIntersectionObserver<HTMLAnchorElement>({
@@ -46,6 +48,7 @@ export function LazyItemCard({
       data-analytics-list-id={listId}
       href={href}
       ref={ref}
+      style={{ contentVisibility: 'auto', containIntrinsicSize: '320px', ...style }}
     >
       {children}
     </Link>
