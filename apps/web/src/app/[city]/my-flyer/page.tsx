@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { axfoodProducts } from '@/lib/axfood-products';
+import { MyFlyerOffers } from './my-flyer-offers';
 import './print-import.css';
 
 type MyFlyerPageProps = Readonly<{ params: Promise<{ city: string }> }>;
@@ -93,29 +94,7 @@ export default async function MyFlyerPage({ params }: MyFlyerPageProps) {
           Screen-only promo rail hidden by the MyFlyer print stylesheet.
         </div>
 
-        <section className="my-flyer-print-grid grid gap-4 lg:grid-cols-2">
-          {flyerProducts.map(({ product, offer }) => (
-            <article className="my-flyer-product-card rounded-[1.5rem] border border-stone-300 bg-white p-4 shadow-sm" key={product.code}>
-              <div className="my-flyer-product-media rounded-2xl bg-stone-50 p-4">
-                <img alt="" className="my-flyer-product-image mx-auto h-36 w-full object-contain" src={product.image ?? ''} />
-              </div>
-              <div className="my-flyer-product-content pt-4">
-                <p className="my-flyer-product-brand text-xs font-black uppercase tracking-[0.18em] text-orange-700">{product.brand}</p>
-                <h2 className="my-flyer-product-name mt-1 text-2xl font-black tracking-[-0.04em] text-slate-950">{product.name}</h2>
-                <p className="my-flyer-product-subline mt-1 text-sm font-semibold text-slate-600">{product.subline}</p>
-                <div className="my-flyer-product-price-row mt-4 flex items-end justify-between gap-3">
-                  <div>
-                    <p className="my-flyer-product-store text-xs font-black uppercase tracking-[0.16em] text-slate-500">{offer.chain}</p>
-                    <p className="my-flyer-product-price text-4xl font-black tracking-[-0.06em] text-slate-950">{offer.priceText}</p>
-                    <p className="my-flyer-product-unit text-xs font-bold uppercase tracking-[0.14em] text-slate-500">{offer.unit}</p>
-                  </div>
-                  {offer.savings ? <p className="my-flyer-product-saving rounded-full bg-lime-200 px-3 py-1 text-sm font-black">Save {offer.savings.toFixed(0)} kr</p> : null}
-                </div>
-                <p className="my-flyer-product-source mt-3 text-xs font-semibold text-slate-500">Observed Axfood catalogue data · {product.code}</p>
-              </div>
-            </article>
-          ))}
-        </section>
+        <MyFlyerOffers rows={flyerProducts} />
 
         <p className="my-flyer-print-note mt-6 text-sm font-semibold text-slate-600">
           Print mode hides navigation and advertising elements, keeps source identifiers visible, and expands product images inside each deal card for easier shelf matching.
