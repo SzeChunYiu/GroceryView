@@ -240,7 +240,7 @@ export type MisspelledQueryRecovery = {
   popularAlternatives: string[];
 };
 
-const popularRecoveryQueries = ['mjölk', 'kaffe', 'havregryn', 'ägg', 'yoghurt', 'pasta'];
+const popularRecoveryQueries = ['mjölk', 'kaffe', 'havregryn', 'ägg', 'yoghurt', 'pasta', 'äpple'];
 
 export function buildMisspelledQueryRecovery(query: string, maxSuggestions = 4): MisspelledQueryRecovery {
   const normalizedQuery = normalizeAliasText(query);
