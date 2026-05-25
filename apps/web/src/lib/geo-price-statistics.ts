@@ -1,4 +1,9 @@
 import { formatSek } from '@/lib/verified-data';
+import {
+  geoPriceBranchObservations,
+  geoPriceBranchObservationSourceLabels,
+  type IngestedBranchPriceObservation
+} from './ingested/branch-observations';
 
 export type GeoPriceStatisticsScope = 'city' | 'district' | 'kommun';
 
@@ -9,6 +14,9 @@ export type GeoProductStatisticsRow = {
   medianPrice: number;
   lowPrice: number;
   highPrice: number;
+  retailerCount?: number;
+  storeCount?: number;
+  sourceLabels?: string[];
 };
 
 export type GeoAreaSummary = {
@@ -20,7 +28,7 @@ export type GeoAreaSummary = {
 
 const MIN_PRODUCT_COVERAGE = 3;
 
-export const geoAreaSummaries: GeoAreaSummary[] = [
+const staticGeoAreaSummaries: GeoAreaSummary[] = [
   {
     scope: 'city',
     slug: 'stockholm',
@@ -60,6 +68,107 @@ function normalizeProductKey(value: string) {
     .trim();
 }
 
+function slugifyArea(value: string) {
+  return normalizeProductKey(value).replace(/\s+/g, '-');
+}
+
+function normalizeBranchIdentifier(sourceKey: string, storeId: string, storeName: string) {
+  const explicitStoreId = storeId.trim();
+  if (explicitStoreId.length > 0) return `${sourceKey}:${explicitStoreId.toLowerCase()}`;
+  return `${sourceKey}:store-name:${slugifyArea(storeName)}`;
+}
+
+function normalizeObservationProductKey(code: string, name: string) {
+  const explicitCode = code.trim();
+  if (explicitCode.length > 0) return explicitCode.toLowerCase();
+  return `name:${normalizeProductKey(name)}`;
+}
+
+function isVisiblePrice(value: number) {
+  return Number.isFinite(value) && value > 0;
+}
+
+function median(values: number[]) {
+  const sorted = [...values].sort((left, right) => left - right);
+  const middle = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 0 ? (sorted[middle - 1]! + sorted[middle]!) / 2 : sorted[middle]!;
+}
+
+function roundSek(value: number) {
+  return Math.round(value * 100) / 100;
+}
+
+function dedupeBranchProductObservations(observations: IngestedBranchPriceObservation[]) {
+  return [...observations.reduce((ledger, observation) => {
+    const branchId = normalizeBranchIdentifier(observation.sourceKey, observation.storeId, observation.storeName);
+    const productKey = normalizeObservationProductKey(observation.productKey, observation.productName);
+    const dedupeKey = `${observation.sourceKey}:${branchId}:${productKey}`;
+    if (!ledger.has(dedupeKey)) ledger.set(dedupeKey, { ...observation, storeId: branchId, productKey });
+    return ledger;
+  }, new Map<string, IngestedBranchPriceObservation>()).values()];
+}
+
+function buildBranchPriceObservations(): IngestedBranchPriceObservation[] {
+  return dedupeBranchProductObservations(
+    geoPriceBranchObservations.filter((observation) => isVisiblePrice(observation.price) && observation.city.trim().length > 0)
+  );
+}
+
+function generatedGeoAreaSummaries(): GeoAreaSummary[] {
+  const grouped = new Map<string, IngestedBranchPriceObservation[]>();
+
+  for (const observation of buildBranchPriceObservations()) {
+    const citySlug = slugifyArea(observation.city);
+    const productKey = normalizeObservationProductKey(observation.productKey, observation.productName);
+    const groupKey = `city:${citySlug}:${productKey}`;
+    grouped.set(groupKey, [...(grouped.get(groupKey) ?? []), observation]);
+  }
+
+  const areaRows = new Map<string, GeoProductStatisticsRow[]>();
+  for (const rows of grouped.values()) {
+    const first = rows[0]!;
+    const prices = rows.map((row) => row.price);
+    const citySlug = slugifyArea(first.city);
+    const sourceLabels = [...new Set(rows.map((row) => row.sourceLabel))].sort((left, right) => left.localeCompare(right, 'sv'));
+    const retailerCount = new Set(rows.map((row) => row.retailer)).size;
+    const storeCount = new Set(rows.map((row) => row.storeId)).size;
+    const productRow = {
+      productName: first.productName,
+      observationCount: rows.length,
+      medianPrice: roundSek(median(prices)),
+      lowPrice: roundSek(Math.min(...prices)),
+      highPrice: roundSek(Math.max(...prices)),
+      retailerCount,
+      storeCount,
+      sourceLabels
+    };
+
+    areaRows.set(citySlug, [...(areaRows.get(citySlug) ?? []), productRow]);
+  }
+
+  return [...areaRows.entries()]
+    .map(([slug, productRows]) => ({
+      scope: 'city' as const,
+      slug,
+      name: slug.split('-').map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(' '),
+      productRows: productRows
+        .filter((row) => row.observationCount >= MIN_PRODUCT_COVERAGE)
+        .sort((left, right) => right.observationCount - left.observationCount || left.productName.localeCompare(right.productName, 'sv'))
+        .slice(0, 60)
+    }))
+    .filter((area) => area.productRows.length > 0)
+    .sort((left, right) => left.name.localeCompare(right.name, 'sv'));
+}
+
+export const geoPriceStatisticsSourceLabels = [
+  ...geoPriceBranchObservationSourceLabels
+];
+
+export const geoAreaSummaries: GeoAreaSummary[] = [
+  ...staticGeoAreaSummaries,
+  ...generatedGeoAreaSummaries()
+];
+
 export function localPriceStatisticsForProduct(product: { slug: string; name: string }) {
   const productNameKey = normalizeProductKey(product.name);
   const rows = geoAreaSummaries.flatMap((area) =>
@@ -74,6 +183,10 @@ export function localPriceStatisticsForProduct(product: { slug: string; name: st
           href: `/price-statistics/${area.scope}/${area.slug}`,
           observationCount: row.observationCount,
           isWithheld,
+          sourceLabel: row.sourceLabels?.join(' · ') ?? 'Curated local statistics snapshot',
+          storeCoverageLabel: row.storeCount && row.retailerCount
+            ? `${row.storeCount} normalized branch identifiers across ${row.retailerCount} retailer${row.retailerCount === 1 ? '' : 's'}`
+            : 'Curated area row',
           coverageLabel: isWithheld
             ? `Withheld: ${row.observationCount}/${MIN_PRODUCT_COVERAGE} local observations`
             : `${row.observationCount} local observations`,

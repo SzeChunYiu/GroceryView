@@ -1557,6 +1557,8 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-teal-800">{row.scope} · {row.areaName}</p>
                 <p className="mt-2 text-2xl font-black text-slate-950">{row.medianPriceLabel}</p>
                 <p className="mt-2 text-sm font-semibold text-slate-600">Range {row.rangeLabel}</p>
+                <p className="mt-2 text-xs font-semibold leading-5 text-slate-600">{row.sourceLabel}</p>
+                <p className="mt-1 text-xs font-semibold leading-5 text-slate-500">{row.storeCoverageLabel}</p>
                 <p className={row.isWithheld ? 'mt-3 rounded-xl bg-amber-50 p-3 text-xs font-black uppercase tracking-[0.14em] text-amber-950' : 'mt-3 rounded-xl bg-teal-50 p-3 text-xs font-black uppercase tracking-[0.14em] text-teal-950'}>
                   {row.coverageLabel}
                 </p>

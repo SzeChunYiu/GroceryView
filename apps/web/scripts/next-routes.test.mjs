@@ -2388,6 +2388,28 @@ ${seo}`;
     assert.doesNotMatch(route, /NoVerifiedData/);
   });
 
+  it('builds local price statistics from multi-retailer branch observation feeds', async () => {
+    const stats = await read('src/lib/geo-price-statistics.ts');
+    const generated = await read('src/lib/ingested/branch-observations.ts');
+    const productRoute = await read('src/app/products/[slug]/page.tsx');
+
+    assert.match(generated, /AUTO-GENERATED from sampled public branch observation feeds/);
+    assert.match(generated, /Lidl public branch offers/);
+    assert.match(generated, /Willys weekly discount branch rows/);
+    assert.match(generated, /Hemkop weekly discount branch rows/);
+    assert.match(generated, /Coop online-price store rows/);
+    assert.match(generated, /Coop weekly flyer branch rows/);
+    assert.match(stats, /geoPriceBranchObservations/);
+    assert.match(stats, /normalizeBranchIdentifier/);
+    assert.match(stats, /dedupeBranchProductObservations/);
+    assert.match(stats, /sourceLabels/);
+    assert.match(stats, /storeCount/);
+    assert.match(stats, /retailerCount/);
+    assert.match(stats, /MIN_PRODUCT_COVERAGE/);
+    assert.match(productRoute, /row\.sourceLabel/);
+    assert.match(productRoute, /row\.storeCoverageLabel/);
+  });
+
   it('surfaces a fail-closed store price-percentile rank gate on store pages', async () => {
     const route = await read('src/app/stores/[slug]/page.tsx');
 
