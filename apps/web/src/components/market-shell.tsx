@@ -98,6 +98,11 @@ const homepageWebPerformanceBudgetGate = {
   assertions: webPerformanceBudgetGate.assertions.slice(0, 4),
   guardrails: webPerformanceBudgetGate.guardrails.slice(0, 2)
 };
+const homepageBundleSizeBudgetCheck = {
+  command: 'npm run perf:bundle:budget -w @groceryview/web',
+  routes: ['/', '/products', '/compare', '/scanner'],
+  clientComponents: ['market-shell.tsx ≤100KB', 'SearchBar.tsx ≤45KB', 'TrendingCarousel.tsx ≤50KB']
+};
 const homepageSeasonalDiscoveryCards = buildSeasonalProduceDiscoveryCards({
   deals: categoryDealLeaders,
   limit: 3,
@@ -405,6 +410,14 @@ export function MarketShell({ locale = defaultLocale }: { locale?: SupportedLoca
           </p>
           <p className="rounded-2xl bg-white/80 p-3 text-sm font-bold leading-6 text-violet-950">
             {homepageWebPerformanceBudgetGate.guardrails.join(' ')}
+          </p>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-[1fr_1fr]">
+          <p className="rounded-2xl bg-white/80 p-3 text-sm font-bold leading-6 text-violet-950">
+            Bundle budget check: {homepageBundleSizeBudgetCheck.command}; routes {homepageBundleSizeBudgetCheck.routes.join(' · ')}
+          </p>
+          <p className="rounded-2xl bg-white/80 p-3 text-sm font-bold leading-6 text-violet-950">
+            Heavy client component caps: {homepageBundleSizeBudgetCheck.clientComponents.join(' · ')}
           </p>
         </div>
       </Card>
