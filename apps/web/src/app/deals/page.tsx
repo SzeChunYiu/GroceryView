@@ -67,6 +67,7 @@ const priceDropDeals: ReplacementDeal[] = priceDropMoversBoard.map((mover) => ({
   categorySlug: slugFromLabel(mover.categoryLabel),
   currentPrice: mover.latestPrice,
   dealId: `drop-${mover.productSlug}`,
+  imageUrl: mover.imageUrl,
   originalPrice: mover.previousPrice > mover.latestPrice ? mover.previousPrice : undefined,
   productName: mover.productName,
   productSlug: mover.productSlug,
@@ -180,7 +181,7 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
             currentPrice={deal.currentPrice}
             dealEndsAt={flyerDealEndsAt(index)}
             dealId={deal.dealId}
-            imageAlt={deal.imageAlt}
+            imageAlt={deal.imageAlt ?? `${deal.productName} deal image`}
             imagePriority={index < 2}
             imageUrl={deal.imageUrl}
             key={deal.dealId}

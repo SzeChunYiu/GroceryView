@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { Card, Eyebrow, PageShell, SourceFreshnessStatusBadge } from '@/components/data-ui';
-import { DataGrid, dataGridActionClass } from '@/components/data-grid';
+import { Card, Eyebrow, PageShell, SourceFreshnessStatusBadge, SourceManagementActionsPanel } from '@/components/data-ui';
+import { DataGrid, DataGridProductCell, dataGridActionClass } from '@/components/data-grid';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { buildDuplicateReviewRows, type ProductRecord } from '@/lib/deduplicate-products';
 import { buildUnitNormalizationQaReport } from '@/lib/normalization';
@@ -24,7 +24,7 @@ import {
   timescaleDbEvaluation
 } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
-import { partnerOnboardingIntake, sourceFreshnessSlaDashboard, sourceFreshnessSlaSummary } from '@/lib/source-health';
+import { partnerOnboardingIntake, sourceFreshnessSlaDashboard, sourceFreshnessSlaSummary, sourceManagementActions, sourceManagementSummary } from '@/lib/source-health';
 
 const unitNormalizationQaReport = buildUnitNormalizationQaReport([
   ...axfoodProducts.map((product) => ({
@@ -41,13 +41,22 @@ const unitNormalizationQaReport = buildUnitNormalizationQaReport([
   }))
 ]);
 
+function axfoodSourceUrl(product: (typeof axfoodProducts)[number]) {
+  return Object.values(product.chains).find((chain) => chain.url)?.url || `/products/${product.slug}`;
+}
+
 const duplicateReviewProducts: ProductRecord[] = [
   ...axfoodProducts.slice(0, 120).map((product) => ({
     id: `axfood:${product.code}`,
     name: product.name,
     brand: product.brand,
     category: product.category,
+    imageUrl: product.image,
+    sourceUrl: axfoodSourceUrl(product),
     size: product.subline,
+    unit: product.subline,
+    ean: product.code,
+    unitLabel: product.subline,
     upc: product.code
   })),
   ...pricedProducts.slice(0, 120).map((product) => ({
@@ -55,7 +64,12 @@ const duplicateReviewProducts: ProductRecord[] = [
     name: product.name,
     brand: product.brands,
     category: product.category,
+    imageUrl: product.image,
+    sourceUrl: `https://world.openfoodfacts.org/product/${product.code}`,
     size: product.quantity,
+    unit: product.quantity,
+    ean: product.code,
+    unitLabel: product.quantity || 'OpenPrices unit not reported',
     upc: product.code
   }))
 ];
@@ -142,6 +156,24 @@ export default function DataSourcesPage() {
         </div>
       </Card>
 
+      <Card className="mt-6 border-slate-200 bg-slate-50/80">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-slate-700">Source management</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Pause, resume, annotate, and route ownership</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Retailer connector operations now expose safe controls with owner labels and runbook links so incidents and planned maintenance do not rely on ad-hoc spreadsheet notes.
+            </p>
+          </div>
+          <div className="grid gap-2 rounded-2xl bg-white p-3 text-sm font-black text-slate-700 shadow-sm">
+            <p>{sourceManagementSummary.actionCount.toLocaleString('sv-SE')} managed sources</p>
+            <p>{sourceManagementSummary.pausedCount.toLocaleString('sv-SE')} paused</p>
+            <p>{sourceManagementSummary.ownerCount.toLocaleString('sv-SE')} owners</p>
+          </div>
+        </div>
+        <SourceManagementActionsPanel actions={sourceManagementActions} />
+      </Card>
+
       <Card className="mt-6 border-sky-200 bg-sky-50/70">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div>
@@ -170,12 +202,22 @@ export default function DataSourcesPage() {
               {duplicateReviewRows.map((candidate) => (
                 <tr key={candidate.id}>
                   <td>
-                    <p className="font-black text-slate-950">{candidate.source.name}</p>
-                    <p className="text-xs text-slate-500">{candidate.source.brand || 'Unknown brand'} · {candidate.source.size || 'size missing'}</p>
+                    <DataGridProductCell
+                      brand={candidate.source.brand}
+                      imageUrl={candidate.source.imageUrl}
+                      name={candidate.source.name}
+                      sourceUrl={candidate.source.sourceUrl}
+                      unitLabel={candidate.source.unitLabel || candidate.source.size}
+                    />
                   </td>
                   <td>
-                    <p className="font-black text-slate-950">{candidate.match.name}</p>
-                    <p className="text-xs text-slate-500">{candidate.match.brand || 'Unknown brand'} · {candidate.match.size || 'size missing'}</p>
+                    <DataGridProductCell
+                      brand={candidate.match.brand}
+                      imageUrl={candidate.match.imageUrl}
+                      name={candidate.match.name}
+                      sourceUrl={candidate.match.sourceUrl}
+                      unitLabel={candidate.match.unitLabel || candidate.match.size}
+                    />
                   </td>
                   <td>
                     <p className="font-black text-sky-900">{Math.round(candidate.confidence * 100)}%</p>

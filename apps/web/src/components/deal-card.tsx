@@ -1,7 +1,9 @@
 'use client';
 
+import Image from 'next/image';
 import type { ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
+import { ConfidenceBadge } from '@/components/confidence-badge';
 import {
   affiliateDisclosureLabel,
   buildAffiliateOutboundUrl,
@@ -10,7 +12,9 @@ import {
   trackDealShare,
   trackSponsoredPlacementImpression
 } from '@/lib/analytics';
+import type { ConfidenceLevel } from '@/lib/content-style';
 import { buildDealContext, type DealHistoryPoint } from '@/lib/deal-context';
+import { getPriceFreshness, type FreshnessLevel } from '@/lib/freshness';
 import { dealShareUrl } from '@/lib/seo';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 
@@ -41,21 +45,29 @@ type DealCardProps = {
   productHref?: string;
   rankLabel?: string;
   categoryLabel?: string;
+  imageAlt?: string;
+  imageUrl?: string | null;
   localityLabel?: string;
   dropPercentLabel?: string;
   unitPriceDropLabel?: string;
   evidenceLabel?: string;
+  freshnessObservedAt?: string | number | Date | null;
   replacementLabel?: string;
   sourceLabel?: string;
   sponsoredPlacement?: SponsoredDealPlacement;
   dealEndsAt?: string;
-  imageUrl?: string | null;
-  imageAlt?: string;
   imagePriority?: boolean;
+  verificationLabel?: string;
 };
 
 function formatPrice(value: number, locale: string, currency: string) {
   return new Intl.NumberFormat(locale, { currency, style: 'currency' }).format(value);
+}
+
+function freshnessConfidenceLevel(level: FreshnessLevel): ConfidenceLevel {
+  if (level === 'fresh') return 'high';
+  if (level === 'aging') return 'medium';
+  return 'low';
 }
 
 function outboundMetadata({
@@ -131,12 +143,14 @@ function LazyDealImage({
       ref={ref}
     >
       {shouldLoad ? (
-        <img
+        <Image
           alt={alt}
-          className="h-full w-full object-cover"
-          decoding="async"
+          className="object-cover"
+          fill
           fetchPriority={priority ? 'high' : 'auto'}
           loading={priority ? 'eager' : 'lazy'}
+          placeholder="empty"
+          sizes="(min-width: 1280px) 22vw, (min-width: 768px) 44vw, 92vw"
           src={src}
         />
       ) : (
@@ -164,17 +178,19 @@ export function DealCard({
   productHref,
   rankLabel,
   categoryLabel,
+  imageAlt,
+  imageUrl,
   localityLabel,
   dropPercentLabel,
   unitPriceDropLabel,
   evidenceLabel,
+  freshnessObservedAt,
   replacementLabel,
   sourceLabel,
   sponsoredPlacement,
   dealEndsAt,
-  imageUrl,
-  imageAlt,
-  imagePriority = false
+  imagePriority = false,
+  verificationLabel
 }: DealCardProps) {
   const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle');
   const context = buildDealContext({ currentPrice, discountStartedAt, priceHistory, currency, locale });
@@ -208,6 +224,10 @@ export function DealCard({
   const sponsoredPlacementId = sponsoredPlacement?.placementId ?? analyticsDealId;
   const separatedFromOrganicRankings = true;
   const metaLabel = [rankLabel, categoryLabel, localityLabel].filter(Boolean).join(' · ');
+  const priceFreshnessObservedAt = freshnessObservedAt ?? discountStartedAt ?? priceHistory?.at(-1)?.observedAt ?? null;
+  const priceFreshness = getPriceFreshness(priceFreshnessObservedAt);
+  const priceVerificationLabel = verificationLabel
+    ?? (sourceLabel ? `Source: ${sourceLabel}` : retailerName !== 'the retailer' ? `Source: ${retailerName}` : 'Source evidence pending');
   const countdownLabel = useMemo(() => {
     if (!dealEndsAt) return null;
     const endsAt = new Date(dealEndsAt).getTime();
@@ -277,6 +297,15 @@ export function DealCard({
             ) : title}
           </h3>
           <p className="mt-2 text-2xl font-bold text-market-ink">{formatPrice(currentPrice, locale, currency)}</p>
+          <div className="mt-2">
+            <ConfidenceBadge
+              label="Price freshness"
+              level={freshnessConfidenceLevel(priceFreshness.level)}
+              observedAt={priceFreshnessObservedAt}
+              sampleSize={priceHistory ? priceHistory.length + 1 : undefined}
+              verificationLabel={priceVerificationLabel}
+            />
+          </div>
           {originalPrice ? (
             <p className="text-sm text-market-ink/60">
               Was <span className="line-through">{formatPrice(originalPrice, locale, currency)}</span>

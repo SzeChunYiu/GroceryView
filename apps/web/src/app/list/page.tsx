@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { ListCard } from '@/components/list-card';
 import { ListSharePreview } from '@/components/list-share-preview';
+import { publicListSharePath } from '@/lib/list-permissions';
 import { storeLayoutDepartments, type StoreLayoutChain } from '@/lib/trip-planner';
 import { metadataForShoppingListShare } from '@/lib/seo';
 
@@ -31,10 +33,23 @@ export async function generateMetadata({ searchParams }: { searchParams?: Promis
 export default async function ShoppingListPage({ searchParams }: { searchParams?: Promise<ListPageSearchParams> }) {
   const resolvedSearchParams = await (searchParams ?? Promise.resolve({}));
   const selectedChain = normalizeChain(resolvedSearchParams.chain);
+  const shareToken = Array.isArray(resolvedSearchParams.share) ? resolvedSearchParams.share[0] : resolvedSearchParams.share;
 
   return (
     <div className="space-y-6">
       <ListSharePreview />
+      {shareToken ? (
+        <section className="rounded-2xl border border-sky-200 bg-sky-50 p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-sky-800">Public share page</p>
+          <h2 className="mt-1 text-xl font-bold text-slate-950">Open the read-only public list view</h2>
+          <p className="mt-2 text-sm text-sky-950">
+            This signed share can be reviewed on a public page with expiry status, cheapest-store summaries, and a copy-to-my-list action.
+          </p>
+          <Link className="mt-3 inline-flex rounded-full bg-sky-800 px-4 py-2 text-sm font-black text-white" href={publicListSharePath(shareToken)}>
+            View public list page
+          </Link>
+        </section>
+      ) : null}
       <section className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
         <p className="text-xs font-semibold uppercase tracking-wide text-emerald-800">Smart store order</p>
         <h2 className="mt-1 text-xl font-bold text-slate-950">Reorder this list by chain layout</h2>

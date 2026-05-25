@@ -3178,6 +3178,7 @@ export const priceDropMoversBoard = pricedProducts
     return [{
       productSlug: product.slug,
       productName: product.name,
+      imageUrl: product.image || null,
       categoryLabel: labelFromSlug(product.category),
       latestPrice: summary.latestPrice,
       previousPrice,
@@ -4554,3 +4555,21 @@ export function chainPriceRows(product: (typeof axfoodProducts)[number]) {
 
   return rows.filter((row): row is (typeof rows)[number] & { price: number } => typeof row.price === 'number' && Number.isFinite(row.price));
 }
+
+export const sourceDiscrepancyReportOptions = [
+  { id: 'wrong_price', label: 'Wrong price', reviewerHint: 'Compare shopper evidence with the latest raw price row before approving.' },
+  { id: 'wrong_unit', label: 'Wrong unit', reviewerHint: 'Check package text, normalized unit, and unit-price conversion.' },
+  { id: 'missing_image', label: 'Missing image', reviewerHint: 'Confirm the source image URL is absent or broken before requesting a refresh.' },
+  { id: 'unavailable_product', label: 'Unavailable product', reviewerHint: 'Verify store availability or stale catalogue rows before hiding the item.' }
+] as const;
+
+export const sourceDiscrepancyReviewContract = {
+  protectedEndpoint: '/api/source-discrepancies',
+  subjectType: 'source_discrepancy_report',
+  queue: 'human_review_assignments',
+  guardrails: [
+    'Reports are attached to productId and storeId so reviewers can trace the exact product row.',
+    'Wrong price, wrong unit, missing image, and unavailable product reports enter human review before verified data changes.',
+    'Approvals create source QA follow-up instead of directly mutating source prices.'
+  ]
+};

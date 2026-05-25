@@ -12,11 +12,12 @@ import {
   type CommunityReviewVote
 } from '@/lib/reviews';
 import { COMMUNITY_REVIEW_PROMPT_COPY, COMMUNITY_REVIEW_PROMPTS } from '@/lib/community-reviews';
+import { sourceDiscrepancyReviewContract } from '@/lib/verified-data';
 
 type ReviewStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
 type BrowserSession = { accessToken: string; userId: string };
 type ReviewDecision = 'approve' | 'reject' | 'needs_more_info';
-type Assignment = { id: string; reviewId?: string; subjectType?: 'product_match' | 'community_report' | 'commodity_mapping' | 'price_report' | 'duplicate_product_report'; subjectId?: string; priority?: string; reason?: string; assigneeId?: string; dueAt?: string; status?: string };
+type Assignment = { id: string; reviewId?: string; subjectType?: 'product_match' | 'community_report' | 'commodity_mapping' | 'price_report' | 'duplicate_product_report' | 'source_discrepancy_report'; subjectId?: string; priority?: string; reason?: string; assigneeId?: string; dueAt?: string; status?: string };
 type AssignmentResponse = { assignments?: Assignment[]; sla?: { status?: string; overdueAssignments?: number; breachedReviewIds?: string[] } };
 
 function readSession(): BrowserSession {
@@ -80,7 +81,7 @@ export function PriceReportReviewActions() {
       return;
     }
     setStatus('ready');
-    setMessage(`${decision} decision accepted with reviewedByHuman: true writeback. needs_more_info leaves assignment status in_progress; community_report and price_report approvals map to accept_community_report and rejections map to dismiss_community_report; duplicate_product_report decisions route to catalog merge review; commodity_mapping approvals map to approve_commodity_mapping and rejections map to reject_commodity_mapping.`);
+    setMessage(`${decision} decision accepted with reviewedByHuman: true writeback. needs_more_info leaves assignment status in_progress; community_report and price_report approvals map to accept_community_report and rejections map to dismiss_community_report; duplicate_product_report decisions route to catalog merge review; source_discrepancy_report decisions create source QA follow-up; commodity_mapping approvals map to approve_commodity_mapping and rejections map to reject_commodity_mapping.`);
   }
 
   async function voteCommunityReview(reviewId: string, vote: CommunityReviewVote) {
@@ -148,7 +149,20 @@ export function PriceReportReviewActions() {
       </div>
 
 
-      <div className="mt-6 rounded-3xl border border-violet-200 bg-violet-50/80 p-4" aria-label="Community review prompts">
+      <div className="mt-6 rounded-3xl border border-amber-200 bg-amber-50/80 p-4" aria-label="Source discrepancy review contract">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-800">Source discrepancy reports</p>
+        <h3 className="mt-2 text-xl font-black tracking-tight text-slate-950">Wrong price, wrong unit, missing image, and unavailable product queue</h3>
+        <p className="mt-2 text-sm leading-6 text-slate-700">
+          Product-row reports post to {sourceDiscrepancyReviewContract.protectedEndpoint} and enter {sourceDiscrepancyReviewContract.queue} as {sourceDiscrepancyReviewContract.subjectType}.
+        </p>
+        <ul className="mt-3 grid gap-2 lg:grid-cols-3">
+          {sourceDiscrepancyReviewContract.guardrails.map((guardrail) => (
+            <li className="rounded-2xl bg-white p-3 text-sm font-bold text-amber-950" key={guardrail}>• {guardrail}</li>
+          ))}
+        </ul>
+      </div>
+
+
         <p className="text-sm font-black uppercase tracking-[0.2em] text-violet-800">Community validation prompts</p>
         <h3 className="mt-2 text-xl font-black tracking-tight text-slate-950">{COMMUNITY_REVIEW_PROMPT_COPY.title}</h3>
         <p className="mt-2 text-sm leading-6 text-slate-700">{COMMUNITY_REVIEW_PROMPT_COPY.intro}</p>
