@@ -18,6 +18,8 @@ type ProductCardWithSearchExplanations = AdaptiveProductCard & {
 };
 
 const storageKey = 'groceryview:product-card-compare-mode';
+const compareModeChangedEvent = 'groceryview:product-card-compare-mode-changed';
+const accountCompareModeEndpoint = '/api/account/price-compare-mode';
 const productCardImagePolicy = {
   loading: 'lazy',
   placeholder: 'empty',
@@ -32,6 +34,30 @@ const emptySafetyPreferences: ProductSafetyPreferences = {
   requiredDietaryTags: [],
   avoidedAllergenTags: []
 };
+
+function isCompareMode(value: string | null): value is CompareMode {
+  return value === 'adaptive' || value === 'total' || value === 'unit';
+}
+
+function signedInAccountContext() {
+  const accessToken = window.sessionStorage.getItem('groceryview:accessToken');
+  const userId = window.sessionStorage.getItem('groceryview:userId');
+  return accessToken && userId ? { accessToken, userId } : null;
+}
+
+async function persistSignedInCompareMode(compareMode: CompareMode) {
+  const account = signedInAccountContext();
+  if (!account) return;
+
+  await fetch(accountCompareModeEndpoint, {
+    method: 'PATCH',
+    headers: {
+      authorization: `Bearer ${account.accessToken}`,
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({ compareMode, userId: account.userId })
+  }).catch(() => undefined);
+}
 
 function resolvedMode(card: AdaptiveProductCard, compareMode: CompareMode): 'total' | 'unit' {
   if (compareMode === 'adaptive') return card.defaultCompareMode;
@@ -211,20 +237,44 @@ export function ProductPriceCards({
 
   useEffect(() => {
     const stored = window.localStorage.getItem(storageKey);
-    if (stored === 'adaptive' || stored === 'total' || stored === 'unit') {
+    if (isCompareMode(stored)) {
       setCompareMode(stored);
     }
     setSafetyPreferences(readStoredSafetyPreferences());
+
+    const account = signedInAccountContext();
+    if (account) {
+      fetch(`${accountCompareModeEndpoint}?userId=${encodeURIComponent(account.userId)}`, {
+        headers: { authorization: `Bearer ${account.accessToken}` }
+      })
+        .then((response) => response.ok ? response.json() as Promise<{ compareMode?: string }> : null)
+        .then((payload) => {
+          if (isCompareMode(payload?.compareMode ?? null)) {
+            window.localStorage.setItem(storageKey, payload.compareMode);
+            setCompareMode(payload.compareMode);
+          }
+        })
+        .catch(() => undefined);
+    }
 
     function refreshSafetyPreferences() {
       setSafetyPreferences(readStoredSafetyPreferences());
     }
 
+    function refreshCompareMode() {
+      const nextMode = window.localStorage.getItem(storageKey);
+      if (isCompareMode(nextMode)) setCompareMode(nextMode);
+    }
+
     window.addEventListener(SAFETY_PREFERENCES_CHANGED_EVENT, refreshSafetyPreferences);
     window.addEventListener('storage', refreshSafetyPreferences);
+    window.addEventListener('storage', refreshCompareMode);
+    window.addEventListener(compareModeChangedEvent, refreshCompareMode);
     return () => {
       window.removeEventListener(SAFETY_PREFERENCES_CHANGED_EVENT, refreshSafetyPreferences);
       window.removeEventListener('storage', refreshSafetyPreferences);
+      window.removeEventListener('storage', refreshCompareMode);
+      window.removeEventListener(compareModeChangedEvent, refreshCompareMode);
     };
   }, []);
 
@@ -236,6 +286,8 @@ export function ProductPriceCards({
   function chooseMode(value: CompareMode) {
     setCompareMode(value);
     window.localStorage.setItem(storageKey, value);
+    window.dispatchEvent(new CustomEvent(compareModeChangedEvent, { detail: { compareMode: value } }));
+    void persistSignedInCompareMode(value);
   }
 
   return (
