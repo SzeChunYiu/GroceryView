@@ -10,7 +10,7 @@ export function Breadcrumb({ items }: Readonly<{ items: readonly BreadcrumbItem[
   if (items.length === 0) return null;
 
   return (
-    <nav aria-label="Breadcrumb trail" className="mt-4 text-sm font-bold text-slate-600">
+    <nav aria-label="Breadcrumb" className="mt-4 text-sm font-bold text-slate-600">
       <ol className="flex flex-wrap items-center gap-2" role="list">
         {items.map((item, index) => {
           const current = index === items.length - 1;

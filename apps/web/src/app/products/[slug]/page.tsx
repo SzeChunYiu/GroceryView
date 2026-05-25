@@ -30,6 +30,7 @@ import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { normalizeUnitPriceForPackageText, packageEvidenceFromText } from '@/lib/normalization';
 import { metadataForProduct } from '@/lib/seo';
 import { listFriendPriceSightingsForProduct, listFriendPriceSightingsForProductChains } from '@/lib/social';
+import { localPriceStatisticsForProduct } from '@/lib/geo-price-statistics';
 
 export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
   const { slug } = await params;
@@ -130,6 +131,13 @@ function crossChainQuoteRowsFor(product: (typeof axfoodProducts)[number]) {
 function quoteConfidenceLevel(row: ReturnType<typeof crossChainQuoteRowsFor>[number], rowCount: number) {
   if (row.isAvailable === false) return 'low';
   return rowCount >= 2 ? 'high' : 'medium';
+}
+
+function counterPriceLabelFor(row: ReturnType<typeof crossChainQuoteRowsFor>[number]) {
+  const priceKind = (row as { priceType?: string; productKind?: string }).priceType ?? (row as { productKind?: string }).productKind;
+  if (priceKind === 'counter_fish') return 'Counter fish price';
+  if (priceKind === 'counter_deli') return 'Counter deli price';
+  return 'Shelf price';
 }
 
 function quantileFor(values: number[], quantile: number) {
@@ -1335,6 +1343,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const intraChainBranchSpread = intraChainBranchSpreadFor(product);
   const priceChartTerminal = priceChartTerminalFor(product);
   const commodityComparison = commodityComparisonForProduct(product.slug);
+  const localPriceStatistics = localPriceStatisticsForProduct({ slug: product.slug, name: product.name });
   const freshnessBadge = dataFreshnessBadges.find((badge) => badge.sourceKind === (isChain ? 'axfood' : 'openprices')) ?? dataFreshnessBadges[0]!;
   const productJsonLd = productJsonLdFor(product);
   const breadcrumbJsonLd = breadcrumbJsonLdFor(product);
@@ -1421,7 +1430,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
                       {row.isCheapest ? <span className="ml-2 rounded-full bg-emerald-800 px-2 py-1 text-xs text-white">cheapest</span> : null}
                     </td>
                     <td className="px-4 py-3 font-black text-emerald-900">{formatSek(row.price)}</td>
-                    <td className="px-4 py-3 font-semibold text-slate-700">{row.priceText} · {row.priceUnit}</td>
+                    <td className="px-4 py-3 font-semibold text-slate-700">{row.priceText} · {row.priceUnit}<span className="ml-2 rounded-full bg-slate-100 px-2 py-1 text-xs font-black text-slate-600">{counterPriceLabelFor(row)}</span></td>
                     <td className={`px-4 py-3 font-black ${row.deltaVsMedian && row.deltaVsMedian > 0 ? 'text-rose-800' : 'text-emerald-800'}`}>
                       {formatSignedPct(row.deltaVsMedian)}
                     </td>
@@ -1458,6 +1467,39 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
         </div>
       </Card>
       <FriendPriceSightings sightings={friendPriceSightings} />
+      <Card className="mt-6 border-teal-200 bg-teal-50/70">
+        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-teal-800">Product-level local stats</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Local price statistics links</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Finds matching GeoAreaSummary.productRows by product slug or normalized name and links to the city, district, or kommun statistics pages. Rows below the local coverage threshold keep prices withheld.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-teal-900 shadow-sm">
+            {localPriceStatistics.available ? `${localPriceStatistics.rows.length} area${localPriceStatistics.rows.length === 1 ? '' : 's'}` : 'No local match'}
+          </p>
+        </div>
+        {localPriceStatistics.available ? (
+          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {localPriceStatistics.rows.map((row) => (
+              <Link className="rounded-2xl border border-teal-100 bg-white p-4 shadow-sm transition hover:border-teal-700" href={row.href} key={`${row.scope}-${row.areaSlug}`}>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-teal-800">{row.scope} · {row.areaName}</p>
+                <p className="mt-2 text-2xl font-black text-slate-950">{row.medianPriceLabel}</p>
+                <p className="mt-2 text-sm font-semibold text-slate-600">Range {row.rangeLabel}</p>
+                <p className={row.isWithheld ? 'mt-3 rounded-xl bg-amber-50 p-3 text-xs font-black uppercase tracking-[0.14em] text-amber-950' : 'mt-3 rounded-xl bg-teal-50 p-3 text-xs font-black uppercase tracking-[0.14em] text-teal-950'}>
+                  {row.coverageLabel}
+                </p>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-5 rounded-2xl bg-white/85 p-4 text-sm font-bold text-slate-700">{localPriceStatistics.summary}</p>
+        )}
+        <p className="mt-4 text-xs font-semibold leading-5 text-slate-600">
+          {localPriceStatistics.summary} Minimum product coverage is {localPriceStatistics.minimumCoverage} observations per local area.
+        </p>
+      </Card>
       {commodityComparison ? (
         <Card className="mt-6 border-lime-200 bg-lime-50/70">
           <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-start">
