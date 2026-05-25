@@ -29,7 +29,7 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
       <section className="mx-auto mb-4 w-full max-w-5xl rounded-3xl border border-emerald-100 bg-emerald-50/80 p-4 shadow-sm" data-voice-search-help>
         <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">Mobile voice search</p>
         <p className="mt-1 text-sm font-semibold leading-6 text-emerald-950">
-          Tap the microphone in the header search bar on supported mobile browsers to dictate grocery terms like "lactosefri mjölk" or "havregryn". Voice entries submit into the same verified product results as typed searches.
+          Tap the microphone in the header search bar on supported mobile browsers to dictate grocery terms like "lactosefri mjölk" or "havregryn". Voice entries submit into the same verified product results as typed searches, then the saved-search action can subscribe to those filters for alerts.
         </p>
       </section>
       <section className="mx-auto mb-4 w-full max-w-5xl rounded-3xl border border-violet-100 bg-violet-50/80 p-4 shadow-sm" aria-label="Saved search shortcuts">
