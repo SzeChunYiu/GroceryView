@@ -16,6 +16,8 @@ type ProductCardWithSearchExplanations = AdaptiveProductCard & {
 };
 
 const storageKey = 'groceryview:product-card-compare-mode';
+const groceryImageBlurDataUrl = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 160 120%22%3E%3Crect width=%22160%22 height=%22120%22 fill=%22%23ecfdf5%22/%3E%3Ccircle cx=%2280%22 cy=%2260%22 r=%2232%22 fill=%22%23bbf7d0%22/%3E%3C/svg%3E';
+const catalogueProductImageSizes = '(min-width: 1280px) 16vw, (min-width: 768px) 33vw, 80vw';
 const compareModes: Array<{ label: string; value: CompareMode; help: string }> = [
   { label: 'Adaptive', value: 'adaptive', help: 'Commodity cards lead with unit price; branded cards lead with total price.' },
   { label: 'Total', value: 'total', help: 'Sort and lead every card by the observed pack price.' },
@@ -278,8 +280,9 @@ export function ProductPriceCards({
                   className="max-h-full max-w-full object-contain"
                   height={144}
                   loading="lazy"
-                  placeholder="empty"
-                  sizes="(min-width: 1280px) 16vw, (min-width: 768px) 33vw, 80vw"
+                  placeholder="blur"
+                  blurDataURL={groceryImageBlurDataUrl}
+                  sizes={catalogueProductImageSizes}
                   src={card.imageUrl}
                   width={144}
                 />

@@ -1,9 +1,18 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowDownRight, ArrowUpRight, History } from 'lucide-react';
 import type { TrendingProductPriceChange } from '@groceryview/db';
 import { buildBrandLeaderboardTrends, buildCitySearchTrends } from '@/lib/trends';
 import { BrandLeaderboardModule, TrendingSearchModule } from '@/app/page-sections/trending';
 import type { PersonalizedReorderItem } from '@/lib/personalization';
+
+const groceryImageBlurDataUrl = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 160 120%22%3E%3Crect width=%22160%22 height=%22120%22 fill=%22%23ecfeff%22/%3E%3Ccircle cx=%2280%22 cy=%2260%22 r=%2232%22 fill=%22%23a5f3fc%22/%3E%3C/svg%3E';
+const carouselProductImageSizes = '(min-width: 768px) 96px, 80px';
+
+type TrendingCarouselProduct = TrendingProductPriceChange & {
+  imageAlt?: string | null;
+  imageUrl?: string | null;
+};
 
 function formatMoney(value: number, currency: string) {
   return new Intl.NumberFormat('sv-SE', {
@@ -57,7 +66,7 @@ function PersonalizedReorderRail({ items }: Readonly<{ items: PersonalizedReorde
 }
 
 export function TrendingCarousel({ items, reorderItems = [] }: Readonly<{
-  items: TrendingProductPriceChange[];
+  items: TrendingCarouselProduct[];
   reorderItems?: PersonalizedReorderItem[];
 }>) {
   const searchFeed = buildCitySearchTrends({ city: 'stockholm', limit: 6 });
@@ -98,12 +107,29 @@ export function TrendingCarousel({ items, reorderItems = [] }: Readonly<{
                 key={item.productSlug}
               >
                 <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">#{item.rank} · {item.categoryLabel ?? 'Grocery'}</p>
-                    <h3 className="mt-2 line-clamp-2 text-lg font-black leading-6 text-slate-950">{item.productName}</h3>
-                    <p className="mt-1 line-clamp-1 text-sm font-semibold text-slate-600">{item.brand ?? 'Brand not reported'}</p>
+                  <div className="flex min-w-0 gap-3">
+                    {item.imageUrl ? (
+                      <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-white p-2 ring-1 ring-cyan-100">
+                        <Image
+                          alt={item.imageAlt ?? `${item.productName} product image`}
+                          blurDataURL={groceryImageBlurDataUrl}
+                          className="max-h-full max-w-full object-contain"
+                          height={80}
+                          loading="lazy"
+                          placeholder="blur"
+                          sizes={carouselProductImageSizes}
+                          src={item.imageUrl}
+                          width={80}
+                        />
+                      </div>
+                    ) : null}
+                    <div className="min-w-0">
+                      <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">#{item.rank} · {item.categoryLabel ?? 'Grocery'}</p>
+                      <h3 className="mt-2 line-clamp-2 text-lg font-black leading-6 text-slate-950">{item.productName}</h3>
+                      <p className="mt-1 line-clamp-1 text-sm font-semibold text-slate-600">{item.brand ?? 'Brand not reported'}</p>
+                    </div>
                   </div>
-                  <span className={`rounded-full p-2 ${isDrop ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`} aria-label={isDrop ? 'Price drop' : 'Price increase'}>
+                  <span className={`shrink-0 rounded-full p-2 ${isDrop ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`} aria-label={isDrop ? 'Price drop' : 'Price increase'}>
                     <TrendIcon aria-hidden="true" size={20} strokeWidth={3} />
                   </span>
                 </div>

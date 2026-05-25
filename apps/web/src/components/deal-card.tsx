@@ -59,6 +59,9 @@ type DealCardProps = {
   verificationLabel?: string;
 };
 
+const groceryImageBlurDataUrl = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 160 120%22%3E%3Crect width=%22160%22 height=%22120%22 fill=%22%23ecfdf5%22/%3E%3Ccircle cx=%2280%22 cy=%2260%22 r=%2232%22 fill=%22%23bbf7d0%22/%3E%3C/svg%3E';
+const dealProductImageSizes = '(min-width: 768px) 96px, 80px';
+
 function formatPrice(value: number, locale: string, currency: string) {
   return new Intl.NumberFormat(locale, { currency, style: 'currency' }).format(value);
 }
@@ -254,8 +257,9 @@ export function DealCard({
               className="max-h-full max-w-full object-contain"
               height={96}
               loading="lazy"
-              placeholder="empty"
-              sizes="(min-width: 768px) 96px, 80px"
+              placeholder="blur"
+              blurDataURL={groceryImageBlurDataUrl}
+              sizes={dealProductImageSizes}
               src={imageUrl}
               width={96}
             />
