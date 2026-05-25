@@ -13,8 +13,28 @@ import { accountSavedShoppingContract, formatSek, savedBasketAutoReorderPlanner 
 import { planAccountDeletion } from '@groceryview/core';
 
 const notificationSubscriptionEndpoint = '/api/notifications/subscription';
+const alertPreferencesEndpoint = '/api/alerts/preferences';
 const notificationVapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? '';
 const notificationChannelPreferences = ['price-drop-alerts', 'basket-reminders'];
+const adaptiveAlertPreferences = {
+  accountId: 'signed-in-user',
+  cadenceOptions: [
+    { value: 'immediate', label: 'Immediate', detail: 'Direct alerts with per-product dedupe.' },
+    { value: 'daily_digest', label: 'Daily digest', detail: 'One planning bundle for noisy price movement.' },
+    { value: 'weekly_digest', label: 'Weekly digest', detail: 'Aligned with flyer and basket planning cadence.' },
+    { value: 'paused', label: 'Paused', detail: 'Keep the profile but suppress delivery.' }
+  ],
+  channels: [
+    { value: 'email', label: 'Email' },
+    { value: 'push', label: 'Push' },
+    { value: 'in_app_digest', label: 'In-app digest' }
+  ],
+  sensitivityOptions: [
+    { value: 'low', label: 'Low', detail: 'Only high-confidence drops and restock signals.' },
+    { value: 'standard', label: 'Standard', detail: 'Balanced thresholds for weekly grocery planning.' },
+    { value: 'high', label: 'High', detail: 'More responsive alerts for active watchlists.' }
+  ]
+};
 const notificationSubscriptionScript = `(() => {
   const root = document.querySelector('[data-push-preferences]');
   if (!root) return;
@@ -496,6 +516,61 @@ export default function AccountPage() {
             </ol>
           </div>
         </div>
+      </Card>
+
+      <Card className="mt-6 border-cyan-200 bg-cyan-50">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <Eyebrow>Adaptive alert preferences</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Cadence, channel, and sensitivity profile</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+              Signed-in shoppers can store a delivery profile at <code className="rounded bg-white/80 px-1 py-0.5 text-cyan-900">{alertPreferencesEndpoint}</code>. The profile lets alert jobs cap daily interruptions, route delivery through selected channels, and raise confidence thresholds when the shopper chooses a quieter sensitivity.
+            </p>
+          </div>
+          <ConfidenceBadge level="high" label="Over-notification guardrails" sampleSize={adaptiveAlertPreferences.cadenceOptions.length + adaptiveAlertPreferences.channels.length + adaptiveAlertPreferences.sensitivityOptions.length} />
+        </div>
+        <form action={alertPreferencesEndpoint} className="mt-5 grid gap-4 lg:grid-cols-[1fr_0.8fr_0.8fr]" method="post">
+          <input name="accountId" type="hidden" value={adaptiveAlertPreferences.accountId} />
+          <fieldset className="rounded-lg border border-cyan-100 bg-white p-4">
+            <legend className="text-sm font-black text-slate-950">Cadence</legend>
+            <div className="mt-3 grid gap-2">
+              {adaptiveAlertPreferences.cadenceOptions.map((option) => (
+                <label className="rounded-lg bg-cyan-50 p-3 text-sm font-semibold text-slate-700" key={option.value}>
+                  <input className="mr-2" defaultChecked={option.value === 'daily_digest'} name="cadence" type="radio" value={option.value} />
+                  <span className="font-black text-slate-950">{option.label}</span>
+                  <span className="mt-1 block">{option.detail}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <fieldset className="rounded-lg border border-cyan-100 bg-white p-4">
+            <legend className="text-sm font-black text-slate-950">Channels</legend>
+            <div className="mt-3 grid gap-2">
+              {adaptiveAlertPreferences.channels.map((channel) => (
+                <label className="rounded-lg bg-cyan-50 p-3 text-sm font-black text-slate-800" key={channel.value}>
+                  <input className="mr-2" defaultChecked={channel.value !== 'push'} name="channels" type="checkbox" value={channel.value} />
+                  {channel.label}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <fieldset className="rounded-lg border border-cyan-100 bg-white p-4">
+            <legend className="text-sm font-black text-slate-950">Sensitivity</legend>
+            <div className="mt-3 grid gap-2">
+              {adaptiveAlertPreferences.sensitivityOptions.map((option) => (
+                <label className="rounded-lg bg-cyan-50 p-3 text-sm font-semibold text-slate-700" key={option.value}>
+                  <input className="mr-2" defaultChecked={option.value === 'standard'} name="sensitivity" type="radio" value={option.value} />
+                  <span className="font-black text-slate-950">{option.label}</span>
+                  <span className="mt-1 block">{option.detail}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <div className="lg:col-span-3">
+            <button className="rounded-full bg-cyan-950 px-5 py-2.5 text-sm font-black text-white shadow-sm" type="submit">Save alert profile</button>
+            <p className="mt-3 text-xs font-bold text-cyan-950">The API returns the persisted profile with derived maxDailyAlerts and minimumConfidence guardrails.</p>
+          </div>
+        </form>
       </Card>
 
       <Card

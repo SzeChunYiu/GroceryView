@@ -585,6 +585,26 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(account, /@\/lib\/demo-data/);
   });
 
+  it('stores adaptive alert preferences with cadence, channel, and sensitivity guardrails', async () => {
+    const account = await read('src/app/account/page.tsx');
+    const route = await read('src/app/api/alerts/preferences/route.ts');
+
+    assert.match(account, /Adaptive alert preferences/);
+    assert.match(account, /\/api\/alerts\/preferences/);
+    assert.match(account, /name="cadence"/);
+    assert.match(account, /daily_digest/);
+    assert.match(account, /weekly_digest/);
+    assert.match(account, /name="channels"/);
+    assert.match(account, /in_app_digest/);
+    assert.match(account, /name="sensitivity"/);
+    assert.match(account, /Save alert profile/);
+    assert.match(route, /groceryViewAlertPreferencesProfiles/);
+    assert.match(route, /maxDailyAlerts/);
+    assert.match(route, /minimumConfidence/);
+    assert.match(route, /cadence must be immediate, daily_digest, weekly_digest, or paused/);
+    assert.match(route, /At least one delivery channel is required unless alerts are paused/);
+  });
+
 
   it('ships signed-in ad disclosure controls without anonymous sponsored-ranking state', async () => {
     const account = await read('src/app/account/page.tsx');
