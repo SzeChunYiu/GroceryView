@@ -141,6 +141,7 @@ export * from './connectors/apoteket-se.js';
 export * from './connectors/lloyds-apotek-se.js';
 export * from './connectors/okq8-fuel.js';
 export * from './connectors/ob-is-fuel.js';
+export * from './connectors/skeljungur-is.js';
 export * from './connectors/seven-eleven-se.js';
 export * from './connectors/st1-fuel.js';
 export * from './connectors/willys.js';
