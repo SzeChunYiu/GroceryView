@@ -28,6 +28,8 @@ import {
   buildLidlOfferPageUrl,
   buildLidlStoreDetailPayloadUrl,
   buildLidlStoresUrl,
+  buildLocalFoodNodesNodesUrl,
+  buildLocalFoodNodesProductsUrl,
   buildSevenElevenNoStoresUrl,
   buildMatpriskollenStoreOffersUrl,
   buildMatpriskollenStoresUrl,
@@ -90,6 +92,7 @@ import {
   fetchLidlOffers,
   fetchLidlOffersForAllStores,
   fetchLidlStores,
+  fetchLocalFoodNodesProductsForAllNodes,
   fetchSevenElevenNoStores,
   fetchMathemProducts,
   fetchMatpriskollenOffers,
@@ -112,6 +115,7 @@ import {
   GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL,
   GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL,
   GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL,
+  GROCERYVIEW_DAILY_LOCALFOODNODES_SE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL,
   GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL,
   GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL,
@@ -7551,6 +7555,137 @@ describe('daily ingestion runner', () => {
     assert.equal(result.status, 'blocked');
     assert.deepEqual(result.blockers, ['willys:missing_configured_store_observations:willys-skanstull']);
     assert.equal(executor.calls.length, 0);
+  });
+
+  it('fetches LocalFoodNodes SE products across nodes with all-store runner semantics', async () => {
+    const requestedUrls: string[] = [];
+    const retrievedAt = '2026-05-25T09:00:00.000Z';
+    const fetchImpl: typeof fetch = async (url) => {
+      const requestUrl = String(url);
+      requestedUrls.push(requestUrl);
+      if (requestUrl === buildLocalFoodNodesNodesUrl()) {
+        return Response.json({
+          nodes: [{
+            id: 'se-gothenburg-node',
+            name: 'Göteborg REKO-ring',
+            city: 'Göteborg',
+            country: 'SE',
+            url: '/nodes/se-gothenburg-node'
+          }]
+        });
+      }
+      if (requestUrl === buildLocalFoodNodesProductsUrl({ nodeId: 'se-gothenburg-node' })) {
+        return Response.json({
+          products: [{
+            id: 'lfn-carrot-1kg',
+            name: 'Morötter 1 kg',
+            producer: { name: 'Björkbacka gård' },
+            category: 'Grönsaker',
+            unit: '1 kg',
+            price: 35,
+            currency: 'SEK',
+            available: true,
+            url: '/products/lfn-carrot-1kg',
+            images: [{ url: '/images/carrot.jpg' }]
+          }]
+        });
+      }
+      return new Response('not found', { status: 404 });
+    };
+
+    const rows = await fetchLocalFoodNodesProductsForAllNodes({
+      fetchImpl,
+      maxNodes: 1,
+      maxRowsPerNode: 1,
+      retrievedAt
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildLocalFoodNodesNodesUrl(),
+      buildLocalFoodNodesProductsUrl({ nodeId: 'se-gothenburg-node' })
+    ]);
+    assert.equal(rows.length, 1);
+    const row = rows[0];
+    assert.ok(row);
+    assert.deepEqual(row, {
+      country: 'SE',
+      currency: 'SEK',
+      chain: 'localfoodnodes',
+      code: 'lfn-carrot-1kg',
+      name: 'Morötter 1 kg',
+      brand: 'Björkbacka gård',
+      category: 'Grönsaker',
+      packageText: '1 kg',
+      price: 35,
+      priceText: '35 SEK',
+      unitPrice: null,
+      unitPriceUnit: '1 kg',
+      storeId: 'se-gothenburg-node',
+      storeName: 'Göteborg REKO-ring',
+      nodeId: 'se-gothenburg-node',
+      nodeName: 'Göteborg REKO-ring',
+      producer: 'Björkbacka gård',
+      available: true,
+      productUrl: 'https://localfoodnodes.com/products/lfn-carrot-1kg',
+      imageUrl: 'https://localfoodnodes.com/images/carrot.jpg',
+      sourceUrl: 'https://localfoodnodes.com/api/nodes/se-gothenburg-node/products',
+      retrievedAt
+    });
+  });
+
+  it('materializes native LocalFoodNodes SE products into daily database observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-25T09:00:00.000Z',
+      connectors: [{
+        connectorId: 'localfoodnodes-se-products',
+        chainId: 'localfoodnodes',
+        sourceType: 'official_api',
+        endpointUrl: `${GROCERYVIEW_DAILY_LOCALFOODNODES_SE_PRODUCTS_URL}?maxNodes=1&maxRowsPerNode=1`,
+        parserVersion: 'native-localfoodnodes-se-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{
+          storeId: 'se-gothenburg-node',
+          name: 'Göteborg REKO-ring',
+          address: 'Göteborg',
+          city: 'Göteborg'
+        }]
+      }],
+      fetchImpl: async (url) => {
+        const requestUrl = String(url);
+        if (requestUrl === buildLocalFoodNodesNodesUrl()) {
+          return Response.json({
+            nodes: [{ id: 'se-gothenburg-node', name: 'Göteborg REKO-ring', city: 'Göteborg', country: 'SE' }]
+          });
+        }
+        if (requestUrl === buildLocalFoodNodesProductsUrl({ nodeId: 'se-gothenburg-node' })) {
+          return Response.json({
+            products: [{
+              id: 'lfn-potato-2kg',
+              name: 'Potatis 2 kg',
+              producer: { name: 'Västkustens gård' },
+              category: 'Rotfrukter',
+              unit: '2 kg',
+              price: '49 SEK',
+              currency: 'SEK',
+              available: true,
+              url: '/products/lfn-potato-2kg'
+            }]
+          });
+        }
+        return new Response('not found', { status: 404 });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.equal(result.rejectedCount, 0);
+    const observationInsert = executor.calls.find((call) => call.sql.includes('insert into observations'));
+    assert.ok(observationInsert, 'LocalFoodNodes connector should persist observations');
+    assert.match(JSON.stringify(observationInsert.params), /lfn-potato-2kg/);
   });
 
   it('marks the source run failed when daily observation persistence aborts after run creation', async () => {
