@@ -57,9 +57,14 @@ export default async function MyFlyerPage({ params }: MyFlyerPageProps) {
           <a className="text-sm font-black uppercase tracking-[0.2em] text-orange-700" href="/">
             GroceryView
           </a>
-          <button className="rounded-full bg-slate-950 px-5 py-2 text-sm font-black uppercase tracking-[0.14em] text-white" type="button">
-            Print flyer
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <a className="rounded-full border border-slate-300 bg-white px-5 py-2 text-sm font-black uppercase tracking-[0.14em] text-slate-800" href={`/${country}/my-flyer/setup`}>
+              Setup MyFlyer
+            </a>
+            <button className="rounded-full bg-slate-950 px-5 py-2 text-sm font-black uppercase tracking-[0.14em] text-white" type="button">
+              Print flyer
+            </button>
+          </div>
         </div>
 
         <header className="my-flyer-print-header grid gap-6 border-b-4 border-slate-950 pb-6 lg:grid-cols-[1fr_auto]">

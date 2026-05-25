@@ -402,6 +402,34 @@ describe('verified-data UI', () => {
     assert.match(api, /diet_filters/);
   });
 
+  it('provides skippable first-time MyFlyer setup that fills user_preferences', async () => {
+    const page = await read('src/app/[country]/my-flyer/setup/page.tsx');
+    const wizard = await read('src/app/[country]/my-flyer/setup/setup-wizard.tsx');
+    const flyer = await read('src/app/[country]/my-flyer/page.tsx');
+
+    assert.match(page, /MyFlyerSetupWizard/);
+    assert.match(page, /routeCountry=\{country \|\| 'se'\}/);
+    assert.match(wizard, /Step 1/);
+    assert.match(wizard, /Pick country/);
+    assert.match(wizard, /Step 2/);
+    assert.match(wizard, /FavoriteStorePicker/);
+    assert.match(wizard, /Step 3/);
+    assert.match(wizard, /Pick algorithm/);
+    assert.match(wizard, /routeCountryAliases/);
+    assert.match(wizard, /USER_PREFERENCES_STORAGE_KEY/);
+    assert.match(wizard, /window\.localStorage\.setItem\(USER_PREFERENCES_STORAGE_KEY/);
+    assert.match(wizard, /country: selectedCountry/);
+    assert.match(wizard, /favorite_stores: selectedFavoriteStores/);
+    assert.match(wizard, /algorithm_choice: normalizeAlgorithmChoice\(selectedAlgorithm\)/);
+    assert.match(wizard, /my_flyer_onboarding_completed: true/);
+    assert.match(wizard, /my_flyer_onboarding_skipped/);
+    assert.match(wizard, /groceryview:user-preferences-changed/);
+    assert.match(wizard, /fetch\('\/api\/my-flyer'/);
+    assert.match(wizard, /Skip setup/);
+    assert.match(wizard, /Skip step/);
+    assert.match(flyer, /href=\{`\/\$\{country\}\/my-flyer\/setup`\}/);
+  });
+
   it('maps purchase history CSV imports into settings personalization and budget seeds', async () => {
     const settings = await read('src/app/settings/page.tsx');
     const bulkImport = await read('src/components/BulkImportDialog.tsx');
