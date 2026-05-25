@@ -1,4 +1,5 @@
 import { buildPrivacyExport } from '@groceryview/core';
+import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { SettingsDataExportActions } from '@/components/settings-data-export-actions';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { routeMetadata } from '@/lib/seo';
@@ -37,6 +38,15 @@ export default function SettingsPage() {
       </p>
 
       <SettingsDataExportActions />
+
+      <Card className="mt-6 border-sky-200 bg-sky-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-800">Cold-start personalization</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Import purchase history for recommendations and budgets</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+          CSV imports map past grocery rows into recurring basket candidates, recommendation seeds, and budget history. Expected columns are <code className="rounded bg-white/80 px-1 py-0.5 text-sky-900">date</code>, <code className="rounded bg-white/80 px-1 py-0.5 text-sky-900">product</code>, <code className="rounded bg-white/80 px-1 py-0.5 text-sky-900">store</code>, <code className="rounded bg-white/80 px-1 py-0.5 text-sky-900">quantity</code>, and <code className="rounded bg-white/80 px-1 py-0.5 text-sky-900">total</code>.
+        </p>
+        <BulkImportDialog importMode="purchase-history" />
+      </Card>
 
       <Card className="mt-6 border-amber-200 bg-amber-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-900">Form error announcements</p>
