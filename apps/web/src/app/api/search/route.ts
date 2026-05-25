@@ -11,6 +11,8 @@ const publicApiReadHeaders = {
   'Cache-Control': publicApiReadCacheControl
 };
 
+const barcodePattern = /^\d{8,14}$/;
+
 type PgPoolLike = {
   query(text: string, values: unknown[]): Promise<{ rows: unknown[] }>;
   end(): Promise<void>;
@@ -59,6 +61,17 @@ async function weightedSearchBatch(executor: Awaited<ReturnType<typeof executorF
   }));
 }
 
+function barcodeResponsePayload(ean: string, results: ProductSearchResult[], error?: string) {
+  return {
+    query: ean,
+    ean,
+    results,
+    rankingMode: 'exact_barcode',
+    source: 'postgres.products_barcode_exact',
+    ...(error ? { error } : {})
+  };
+}
+
 function responsePayload(query: string, expansion: GrocerySearchExpansion, results: ProductSearchResult[], error?: string, cacheStatus?: 'hit' | 'miss' | 'stored') {
   return {
     query,
@@ -73,6 +86,44 @@ function responsePayload(query: string, expansion: GrocerySearchExpansion, resul
     ...(cacheStatus ? { cacheStatus } : {}),
     ...(error ? { error } : {})
   };
+}
+
+async function searchProductsByBarcode(executor: Awaited<ReturnType<typeof executorForDatabaseUrl>>, ean: string): Promise<ProductSearchResult[]> {
+  const rows = await executor.query(
+    `select products.id::text as id,
+            products.slug,
+            products.canonical_name as name,
+            products.brand,
+            products.image_url,
+            1 as search_rank
+       from products
+      where products.domain = 'grocery'
+        and products.deleted_at is null
+        and products.barcode = $1
+      order by products.canonical_name asc
+      limit 8`,
+    [ean]
+  );
+
+  return rows.map((row) => {
+    const result = row as {
+      id: string;
+      slug: string;
+      name: string;
+      brand: string | null;
+      image_url: string | null;
+      search_rank: string | number | null;
+    };
+    const rank = Number(result.search_rank ?? 0);
+    return {
+      id: result.id,
+      slug: result.slug,
+      name: result.name,
+      brand: result.brand,
+      imageUrl: result.image_url,
+      searchRank: Number.isFinite(rank) ? rank : 0
+    };
+  });
 }
 
 async function expandedSearchResults(executor: Awaited<ReturnType<typeof executorForDatabaseUrl>>, expansion: GrocerySearchExpansion) {
@@ -90,6 +141,34 @@ async function prefetchSearchQuery(executor: Awaited<ReturnType<typeof executorF
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
+  if (searchParams.has('ean')) {
+    const ean = (searchParams.get('ean') ?? '').trim();
+    if (!ean) {
+      return NextResponse.json(barcodeResponsePayload('', [], 'missing_ean'), { status: 400 });
+    }
+    if (!barcodePattern.test(ean)) {
+      return NextResponse.json(barcodeResponsePayload(ean, [], 'invalid_ean'), { status: 400 });
+    }
+
+    const databaseUrl = process.env.DATABASE_URL;
+    if (!databaseUrl) {
+      return NextResponse.json(
+        barcodeResponsePayload(ean, [], 'product_search_database_unconfigured'),
+        { status: 503 }
+      );
+    }
+
+    try {
+      const executor = await executorForDatabaseUrl(databaseUrl);
+      return NextResponse.json(barcodeResponsePayload(ean, await searchProductsByBarcode(executor, ean)), { headers: publicApiReadHeaders });
+    } catch {
+      return NextResponse.json(
+        barcodeResponsePayload(ean, [], 'product_search_query_failed'),
+        { status: 500 }
+      );
+    }
+  }
+
   const query = (searchParams.get('q') ?? '').trim();
   const expansion = expandGrocerySearchQuery(query);
   const cacheKey = searchCacheKey(query, expansion.expandedQueries);
@@ -117,8 +196,7 @@ export async function GET(request: Request) {
     const payload = responsePayload(query, expansion, await expandedSearchResults(executor, expansion), undefined, 'miss');
     writeSearchCache(cacheKey, { ...payload, cacheStatus: 'stored' });
     return NextResponse.json(payload, { headers: publicApiReadHeaders });
-  } catch (error) {
-    console.error('Product search query failed', error instanceof Error ? { name: error.name } : { name: 'unknown' });
+  } catch {
     return NextResponse.json(
       responsePayload(query, expansion, [], 'product_search_query_failed'),
       { status: 500 }
