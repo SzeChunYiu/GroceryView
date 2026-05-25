@@ -33,6 +33,7 @@
     "ops:db-recovery-packet": "node scripts/ops/print-production-db-recovery-packet.mjs",
     "ops:postgres-restore-drill": "node scripts/ops/run-postgres-restore-drill.mjs",
     "ops:validate-db-cutover": "node scripts/ops/validate-db-cutover.mjs",
+    "ops:run-db-retention": "node scripts/ops/run-db-retention.mjs",
     "db:check-retailer-seeds": "npm run test:retailer-seeds -w @groceryview/db && node --test tests/schema/stockholm-seed.test.mjs",
     "db:seed:categories": "npm run build -w @groceryview/db && node packages/db/dist/seed/categories.js",
     "ops:check-bonus-is-connector": "npm run build -w @groceryview/ingestion && node scripts/ops/check-bonus-is-connector.mjs"

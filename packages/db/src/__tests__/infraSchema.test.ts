@@ -274,6 +274,20 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(schemaDoc, /retention.*partition drop/);
   });
 
+  it('adds audited dry-run retention tiering for observations and raw records', () => {
+    assert.match(allMigrations, /create table if not exists retention_runs\b/);
+    assert.match(allMigrations, /create or replace function run_observation_retention\(/);
+    assert.match(allMigrations, /dry_run boolean default true/);
+    assert.match(allMigrations, /latest_prices latest[\s\S]*latest\.observation_id = observation\.id/);
+    assert.match(allMigrations, /price_daily daily[\s\S]*daily\.source_observation_ids @> array\[observation\.id\]/);
+    assert.match(allMigrations, /price_weekly weekly[\s\S]*weekly\.source_observation_ids @> array\[observation\.id\]/);
+    assert.match(allMigrations, /raw_record\.provenance \? 'archiveuri'/);
+    assert.match(migrationVerifier, /\bretention_runs\b/);
+    assert.match(schemaDoc, /### `retention_runs`/);
+    assert.match(schemaDoc, /ops:run-db-retention/);
+    assert.match(schemaDoc, /archiveuri/);
+  });
+
   it('preserves provenance on source-derived tables', () => {
     for (const table of provenanceTables) {
       assert.match(tableDefinition(table), /\bprovenance\b/, `${table}.provenance missing`);
