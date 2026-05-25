@@ -17,6 +17,7 @@ export type FriendPriceSighting = Readonly<{
   productName: string;
   productSlug: string;
   reporter: string;
+  sharedWithFriends: boolean;
   storeName: string;
 }>;
 
@@ -73,9 +74,10 @@ export const friendPriceSightings: FriendPriceSighting[] = [
     observedAt: '2026-05-24T08:42:00.000Z',
     postId: 'weekly-oats-swap',
     priceLabel: '21,90 kr',
-    productName: 'Store-brand oats 1 kg',
-    productSlug: 'havregryn',
+    productName: 'Havregryn',
+    productSlug: 'havregryn-100132321-st',
     reporter: 'Friend sighting',
+    sharedWithFriends: true,
     storeName: 'Hemkop Skanstull'
   },
   {
@@ -87,7 +89,20 @@ export const friendPriceSightings: FriendPriceSighting[] = [
     productName: 'Fresh basil pot',
     productSlug: 'basilika',
     reporter: 'Household sighting',
+    sharedWithFriends: true,
     storeName: 'Willys Stockholm'
+  },
+  {
+    confidence: 'high',
+    id: 'friend-sighting-fiberhavregryn-willys',
+    observedAt: '2026-05-24T11:20:00.000Z',
+    postId: 'weekly-oats-swap',
+    priceLabel: '20,90 kr',
+    productName: 'Fiberhavregryn',
+    productSlug: 'fiberhavregryn-7340083480638',
+    reporter: 'Friend sighting',
+    sharedWithFriends: true,
+    storeName: 'Willys Hornstull'
   }
 ];
 
@@ -110,8 +125,16 @@ export function listSocialComments(postId?: string) {
   return socialComments.filter((comment) => !postId || comment.postId === postId);
 }
 
+function recentFriendSightings(sightings: FriendPriceSighting[]) {
+  return [...sightings].sort((left, right) => right.observedAt.localeCompare(left.observedAt));
+}
+
 export function listFriendPriceSightings(postId?: string) {
-  return friendPriceSightings.filter((sighting) => !postId || sighting.postId === postId);
+  return recentFriendSightings(friendPriceSightings.filter((sighting) => sighting.sharedWithFriends && (!postId || sighting.postId === postId)));
+}
+
+export function listFriendPriceSightingsForProduct(productSlug: string) {
+  return recentFriendSightings(friendPriceSightings.filter((sighting) => sighting.sharedWithFriends && sighting.productSlug === productSlug));
 }
 
 function priceFromLabel(priceLabel: string) {

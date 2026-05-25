@@ -31,6 +31,15 @@ describe('forecastGrocerySpend', () => {
     assert.equal(forecast.predictedSpend, 1131.12);
     assert.equal(forecast.trendPercent, 6.4);
     assert.equal(forecast.confidence, 'high');
+    assert.deepEqual(forecast.confidenceDrivers, {
+      observedMonths: 4,
+      receiptCount: 8,
+      highThresholdMonths: 4,
+      highThresholdReceipts: 8,
+      mediumThresholdMonths: 2,
+      mediumThresholdReceipts: 3
+    });
+    assert.deepEqual(forecast.skippedRows, []);
     assert.deepEqual(forecast.warnings, []);
   });
 
@@ -51,6 +60,8 @@ describe('forecastGrocerySpend', () => {
     assert.equal(forecast.baselineMonthlySpend, 250);
     assert.equal(forecast.confidence, 'low');
     assert.deepEqual(forecast.monthSummaries, [{ month: '2026-05', spend: 250, receiptCount: 1 }]);
+    assert.deepEqual(forecast.skippedRows.map((row) => row.reason), ['invalid-date', 'invalid-total-spend', 'future-purchase']);
+    assert.equal(forecast.skippedRows.some((row) => row.detail.includes('future')), true);
     assert.equal(forecast.warnings.some((warning) => warning.includes('bad-date')), true);
     assert.equal(forecast.warnings.some((warning) => warning.includes('negative')), true);
     assert.equal(forecast.warnings.some((warning) => warning.includes('less than two calendar months')), true);
