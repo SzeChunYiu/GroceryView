@@ -128,6 +128,7 @@ export * from './connectors/mathem.js';
 export * from './connectors/matpriskollen.js';
 export * from './connectors/matspar.js';
 export * from './connectors/meny-no.js';
+export * from './connectors/n1-is.js';
 export * from './connectors/lidl-bulk.js';
 export * from './connectors/willys-bulk.js';
 export * from './connectors/apohem.js';
