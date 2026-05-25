@@ -1,15 +1,36 @@
-import { BadRequestException, Controller, Get, NotFoundException, Param, Query, ServiceUnavailableException } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
+import { BadRequestException, Body, Controller, Get, HttpCode, NotFoundException, Param, Post, Query, ServiceUnavailableException } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { IsInt, IsString, Matches, Max, Min } from 'class-validator';
 import { allStores, groceryApi } from '../demo-data.js';
 import { DealsService } from '../deals/deals.service.js';
+import { PostgresQueryExecutorService } from '../database/postgres-query-executor.service.js';
 import { NearestStoresService } from './nearest-stores.service.js';
+
+class StoreRatingDto {
+  @IsString()
+  @Matches(/^[A-Za-z0-9:_./@-]{3,160}$/)
+  userId!: string;
+
+  @IsInt()
+  @Min(1)
+  @Max(5)
+  rating!: number;
+}
+
+type StoreRatingAggregateRow = {
+  averageRating: number | string | null;
+  ratingCount: number | string;
+  userRating?: number | string | null;
+};
 
 @ApiTags('stores')
 @Controller('stores')
 export class StoresController {
   constructor(
     private readonly dealsService: DealsService,
-    private readonly nearestStoresService: NearestStoresService
+    private readonly nearestStoresService: NearestStoresService,
+    private readonly postgres: PostgresQueryExecutorService
   ) {}
 
   @Get()
@@ -96,12 +117,64 @@ export class StoresController {
     return { ...groceryApi.getStoreCategoryCoverage(id), demo: true };
   }
 
+  @Get(':id/rating')
+  @ApiOkResponse({ description: 'Average user rating for one store' })
+  async rating(@Param('id') id: string, @Query('userId') userId?: string) {
+    if (!this.postgres.isConfigured()) {
+      throw new ServiceUnavailableException('DATABASE_URL is required for store ratings.');
+    }
+    return this.storeRatingSummary(id, userId);
+  }
+
+  @Post(':id/rating')
+  @HttpCode(200)
+  @ApiOkResponse({ description: 'Create or update a user rating for one store' })
+  async rate(@Param('id') id: string, @Body() body: StoreRatingDto) {
+    if (!this.postgres.isConfigured()) {
+      throw new ServiceUnavailableException('DATABASE_URL is required for store ratings.');
+    }
+    await this.postgres.query(
+      `
+        insert into store_ratings (id, user_id, store_id, rating, created_at, updated_at)
+        values ($1, $2, $3, $4, current_timestamp, current_timestamp)
+        on conflict (user_id, store_id)
+        do update set rating = excluded.rating, updated_at = current_timestamp
+      `,
+      [randomUUID(), body.userId, id, body.rating]
+    );
+    return this.storeRatingSummary(id, body.userId);
+  }
+
   @Get(':id')
   @ApiOkResponse({ description: 'Store detail with opening hours and assortment overview' })
   detail(@Param('id') id: string) {
     const detail = groceryApi.getStoreDetail(id);
     if (!detail) throw new NotFoundException('Store not found');
     return { ...detail, demo: true };
+  }
+
+  private async storeRatingSummary(storeId: string, userId?: string) {
+    const rows = await this.postgres.query<StoreRatingAggregateRow>(
+      `
+        select
+          avg(rating)::float as "averageRating",
+          count(*)::int as "ratingCount",
+          max(case when user_id = $2 then rating else null end)::int as "userRating"
+        from store_ratings
+        where store_id = $1
+      `,
+      [storeId, userId ?? null]
+    );
+    const row = rows[0] ?? { averageRating: null, ratingCount: 0, userRating: null };
+    const averageRating = row.averageRating === null ? null : Number(row.averageRating);
+    const userRating = row.userRating === null || row.userRating === undefined ? null : Number(row.userRating);
+
+    return {
+      storeId,
+      averageRating: averageRating === null || Number.isNaN(averageRating) ? null : Math.round(averageRating * 10) / 10,
+      ratingCount: Number(row.ratingCount) || 0,
+      userRating: userRating === null || Number.isNaN(userRating) ? null : userRating
+    };
   }
 }
 

@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { StoreMap } from '@/components/StoreMap';
+import { StoreRatingPanel } from '@/components/StoreRatingPanel';
 import { osmStores } from '@/lib/osm-stores';
 import {
   adaptiveProductCards,
@@ -164,6 +165,7 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
   const { slug } = await params;
   const store = findStore(slug);
   if (!store) notFound();
+  const storeRatingApiBaseUrl = process.env.NEXT_PUBLIC_GROCERYVIEW_API_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3001';
   const pricePercentileRank = storePricePercentileRankFor(store);
   const openingHoursLabel = storeOpeningHoursLabel(store);
   const assortmentOverview = storeAssortmentOverviewForStore(store);
@@ -182,6 +184,9 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
       <p className="mt-3 text-lg text-slate-700">
         {store.brand} · {store.format}
       </p>
+      <div className="mt-6">
+        <StoreRatingPanel apiBaseUrl={storeRatingApiBaseUrl} storeId={store.slug} storeName={store.name} />
+      </div>
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <Card>
           <h2 className="text-2xl font-black">Location fields</h2>
