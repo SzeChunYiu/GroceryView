@@ -5165,3 +5165,5 @@ export function calculateChainPriceIndex(observations: ChainPriceObservation[]):
   return { chains, categories, marketReferenceByCategory, generatedFrom: usable.length };
 }
 export * from './lib/extractors/loosePacked.js';
+export type { FatPercentExtraction } from './lib/extractors/fatPercent.js';
+export { extractFatPercent } from './lib/extractors/fatPercent.js';
