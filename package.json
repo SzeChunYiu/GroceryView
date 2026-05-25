@@ -21,6 +21,7 @@
     "ops:check-daily-db-connectivity": "node scripts/ops/check-daily-db-connectivity.mjs",
     "ops:db-io-hotspots": "node scripts/ops/check-daily-db-connectivity.mjs --pg-stat-statements-io",
     "ops:compare-db-io-hotspots": "node scripts/ops/compare-db-io-hotspots.mjs",
+    "ops:check-hot-query-plans": "node scripts/ops/check-hot-query-plans.mjs --fixtures tests/fixtures/hot-query-plans.json",
     "ops:daily-connectors": "npm run build -w @groceryview/ingestion && node scripts/ops/print-daily-connectors.mjs",
     "ops:daily-connector-stores": "npm run build -w @groceryview/ingestion && node scripts/ops/print-daily-connector-stores.mjs",
     "ops:norway-readiness": "npm run build -w @groceryview/ops && node scripts/ops/print-norway-coverage-readiness.mjs",
