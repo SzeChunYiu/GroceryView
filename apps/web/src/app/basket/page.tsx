@@ -73,6 +73,8 @@ const sourceLabel = dbSiteSnapshotGeneratedAt
   ? `postgres.latest_prices/observations site snapshot generated ${dbSiteSnapshotGeneratedAt}`
   : 'postgres.latest_prices/observations DB-shaped generated module; local builds fall back to the bundled verified Axfood snapshot';
 
+const weeklyBasketBudgetSek = 600;
+
 export default function BasketPage() {
   const pricedRows = basketProducts.reduce((sum, product) => sum + product.prices.length, 0);
   const averageSpread = matchedChainProducts.length
@@ -119,7 +121,7 @@ export default function BasketPage() {
 
       <BasketBuyTiming recommendations={basketBuyTimingRecommendations} />
 
-      <BasketCalculator products={basketProducts} sourceLabel={sourceLabel} />
+      <BasketCalculator products={basketProducts} sourceLabel={sourceLabel} weeklyBudgetSek={weeklyBasketBudgetSek} />
 
       <div className="mt-6">
         <SourceCoverage />
