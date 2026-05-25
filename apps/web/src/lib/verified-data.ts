@@ -4619,6 +4619,37 @@ export const sourceDiscrepancyReportOptions = [
   { id: 'unavailable_product', label: 'Unavailable product', reviewerHint: 'Verify store availability or stale catalogue rows before hiding the item.' }
 ] as const;
 
+export const storeProductStockFreshnessExamples = [
+  {
+    productId: 'demo-live-stock',
+    storeId: 'willys',
+    availability: 'live',
+    observedAt: '2026-05-25T08:00:00.000Z',
+    source: 'retailer store feed'
+  },
+  {
+    productId: 'demo-stale-stock',
+    storeId: 'hemkop',
+    availability: 'stale',
+    observedAt: '2026-05-12T08:00:00.000Z',
+    source: 'retailer store feed'
+  },
+  {
+    productId: 'demo-inferred-stock',
+    storeId: 'willys',
+    availability: 'inferred',
+    observedAt: null,
+    source: 'priced row without stock field'
+  },
+  {
+    productId: 'demo-unavailable-stock',
+    storeId: 'hemkop',
+    availability: 'unavailable',
+    observedAt: '2026-05-25T08:00:00.000Z',
+    source: 'retailer store feed'
+  }
+] as const;
+
 export const sourceDiscrepancyReviewContract = {
   protectedEndpoint: '/api/source-discrepancies',
   subjectType: 'source_discrepancy_report',

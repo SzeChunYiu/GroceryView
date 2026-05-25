@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import type { PublicSharePreview } from "../lib/social";
-import { getStoreLayoutDepartment, sortItemsByStoreLayout, type StoreLayoutChain } from "../lib/trip-planner";
+import { getStoreLayoutDepartment, sortItemsByStoreLayout, type StoreLayoutChain, type StoreLayoutGroupOrder } from "../lib/trip-planner";
 import {
   useList,
   type FamilyRole,
@@ -24,6 +24,7 @@ export type CommentableSharedListItem = SharedListItem & {
 
 type ListCardProps = {
   currentRole: FamilyRole;
+  groupOrder?: StoreLayoutGroupOrder;
   items: CommentableSharedListItem[];
   onConflictPrompt?: (prompt: ListConflictPrompt) => void;
   publicShareHref?: string;
@@ -62,9 +63,17 @@ export function PublicSharePreviewCard({
           </h2>
           <p className="mt-1 text-sm text-slate-600">{preview.privacyNote}</p>
         </div>
-        <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-800">
-          {preview.estimatedTotalLabel}
-        </span>
+        <div className="grid gap-2 text-xs font-black text-slate-700 sm:min-w-60">
+          <span className="rounded-full bg-emerald-50 px-3 py-1 text-emerald-800">
+            {preview.estimatedTotalLabel}
+          </span>
+          <span className="rounded-full bg-sky-50 px-3 py-1 text-sky-800">
+            {preview.cheapestChainLabel}
+          </span>
+          <span className="rounded-full bg-slate-50 px-3 py-1 text-slate-700">
+            {preview.lastUpdatedLabel}
+          </span>
+        </div>
       </div>
 
       <ul className="mt-3 space-y-2">
@@ -82,7 +91,7 @@ export function PublicSharePreviewCard({
   );
 }
 
-export function ListCard({ currentRole, items, onConflictPrompt, publicShareHref, selectedChain = "ica" }: ListCardProps) {
+export function ListCard({ currentRole, groupOrder = "store-layout", items, onConflictPrompt, publicShareHref, selectedChain = "ica" }: ListCardProps) {
   const [commentsByItem, setCommentsByItem] = useState<Record<string, ListItemComment[]>>(() =>
     Object.fromEntries(items.map((item) => [item.id, item.comments ?? []])),
   );
@@ -91,7 +100,7 @@ export function ListCard({ currentRole, items, onConflictPrompt, publicShareHref
     initialItems: items,
     onConflictPrompt,
   });
-  const storeOrderedItems = sortItemsByStoreLayout(listItems, selectedChain);
+  const storeOrderedItems = sortItemsByStoreLayout(listItems, selectedChain, groupOrder);
 
   function addComment(itemId: string, event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

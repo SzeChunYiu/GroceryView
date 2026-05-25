@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { buildCityPriceDropTrends } from '@/lib/trends';
+import { rankTrendingDealsForHousehold } from '@/lib/personalization';
 
 export const dynamic = 'force-static';
 
@@ -29,11 +30,23 @@ export function GET(request: Request) {
     category: normalizeFilterSlug(searchParams.get('category')),
     chain: normalizeFilterSlug(searchParams.get('chain'))
   };
+  const csv = (name: string) => (searchParams.get(name) ?? '').split(',').map((value) => value.trim()).filter(Boolean);
   const feed = buildCityPriceDropTrends({ city, limit: filters.category || filters.chain ? 12 : limit });
-  const cards = feed.cards
-    .filter((card) => cardMatchesFilter(card, filters))
-    .slice(0, limit)
-    .map((card, index) => ({ ...card, rank: index + 1 }));
+  const filteredCards = feed.cards.filter((card) => cardMatchesFilter(card, filters));
+  const cards = rankTrendingDealsForHousehold(filteredCards, {
+    householdId: searchParams.get('householdId') ?? undefined,
+    favoriteBrands: csv('favoriteBrands'),
+    dietaryFilters: csv('dietary'),
+    nearbyChains: csv('nearbyChains'),
+    clickedProductSlugs: csv('clicked'),
+  }).slice(0, limit).map((card, index) => ({ ...card, rank: index + 1 }));
 
-  return NextResponse.json({ ...feed, filters, cards });
+  return NextResponse.json({
+    ...feed,
+    filters,
+    cards,
+    personalization: {
+      signals: ['favoriteBrands', 'dietary', 'nearbyChains', 'clicked', 'household category history'],
+    },
+  });
 }
