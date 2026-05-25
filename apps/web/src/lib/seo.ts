@@ -152,6 +152,10 @@ export const routeMetadataCatalog = {
     title: 'Compare grocery items side by side | GroceryView',
     description: 'Compare up to four verified grocery items by nutrition labels, store price evidence, and observed trend charts.'
   },
+  '/contact': {
+    title: 'Contact GroceryView',
+    description: 'Send source corrections, accessibility issues, partner notes, and product feedback to the GroceryView team.'
+  },
   '/coverage': {
     title: 'Freshness lag coverage by class | GroceryView',
     description: 'Inspect per-class freshness lag, stale observation share, latest observed dates, and source boundaries for grocery ingestion cadence tuning.'
