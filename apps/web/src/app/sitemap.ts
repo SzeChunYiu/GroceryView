@@ -120,6 +120,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     entry('/search', 0.9, 'daily'),
     entry('/compare', 0.9, 'daily'),
     entry('/compare-items', 0.88, 'daily'),
+    entry('/cultural-aisles', 0.82, 'weekly'),
     entry('/coverage', 0.66, 'daily'),
     entry('/deals', 0.9, 'daily'),
     entry('/screener', 0.9, 'daily'),

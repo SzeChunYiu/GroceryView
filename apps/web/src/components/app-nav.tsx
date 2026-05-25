@@ -7,6 +7,7 @@ import {
   ChevronDown,
   Database,
   Flame,
+  Globe2,
   Heart,
   ScanLine,
   Map,
@@ -98,6 +99,7 @@ function buildNavGroups(t: AppNavTranslator): NavGroup[] {
       items: [
         { href: '/products', label: t('app-nav.items.browse'), icon: PackageSearch },
         { href: '/new-arrivals', label: t('app-nav.items.newArrivals'), icon: PackageSearch },
+        { href: '/cultural-aisles', label: 'Cultural aisles', icon: Globe2 },
         { href: '/compare', label: t('app-nav.items.compare'), icon: Tags }
       ]
     },
