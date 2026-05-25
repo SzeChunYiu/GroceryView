@@ -1,8 +1,8 @@
-# GroceryView release gate. The required PR check ("Validate release-safe candidate")
-# runs only fast, blocking checks (install + build + typecheck + secret scan) so PR
-# throughput is high. The full ~19-workspace test suite runs POST-MERGE on main
-# (job "Full test suite") — non-blocking for PRs, surfaces regressions on main without
-# cascade-blocking the pipeline. No untrusted event input referenced in any run step.
+# GroceryView release gate — optimized for high PR throughput + always-green main.
+#  - pull_request: LIGHT check (typecheck + secret-scan, node_modules cached) → fast PR iteration.
+#  - merge_group: FULL build + test, batched by the merge queue → main stays green, build amortized
+#    over batches instead of run per-PR.
+#  - push(main): full build + test as a post-merge safety net.
 name: Release validation
 
 on:
@@ -10,6 +10,7 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  merge_group:
   workflow_dispatch:
 
 concurrency:
@@ -19,39 +20,58 @@ concurrency:
 jobs:
   validate:
     name: Validate release-safe candidate
+    if: github.event_name != 'merge_group'
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
+        with: { node-version: 22, cache: npm }
+      - name: Cache node_modules
+        id: nm
+        uses: actions/cache@v4
         with:
-          node-version: 22
-          cache: npm
+          path: |
+            node_modules
+            apps/*/node_modules
+            packages/*/node_modules
+          key: nm-${{ runner.os }}-node22-${{ hashFiles('package-lock.json') }}
       - name: Install
+        if: steps.nm.outputs.cache-hit != 'true'
         run: npm ci
-      - name: Build
-        run: npm run build
       - name: Typecheck
         run: npm run typecheck
-      - name: Secret scan (no committed credentials)
+      - name: Secret scan
         run: |
           if git grep -nE "(SUPABASE_SERVICE_ROLE|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----)" \
               -- ':!*.example' ':!**/*.md' ':!.github/**' ':!**/package-lock.json'; then
             echo "::error::potential committed secret"; exit 1
           fi
 
-  fulltest:
-    name: Full test suite (post-merge)
-    if: github.event_name == 'push'
+  merge-gate:
+    name: Merge queue full check
+    if: github.event_name == 'merge_group' || github.event_name == 'push'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
+        with: { node-version: 22, cache: npm }
+      - name: Cache node_modules
+        id: nm
+        uses: actions/cache@v4
         with:
-          node-version: 22
-          cache: npm
+          path: |
+            node_modules
+            apps/*/node_modules
+            packages/*/node_modules
+          key: nm-${{ runner.os }}-node22-${{ hashFiles('package-lock.json') }}
       - name: Install
+        if: steps.nm.outputs.cache-hit != 'true'
         run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Build
+        run: npm run build
       - name: Test
         run: npm test

@@ -5,6 +5,7 @@ import { ProductPriceCards } from './product-price-cards';
 import { TrendingCarousel } from './TrendingCarousel';
 import { TrendingPriceDropCards } from '@/app/page-sections/trending';
 import { buildChainIndexTrendSeries } from '@/lib/chain-index-data';
+import { buildSeasonalProduceDiscoveryCards } from '@/lib/deal-context';
 import { defaultLocale, localeReadiness, localeTranslationGuardrails, localizedPriceIntelligenceTerminology, localizedShellCopy, type SupportedLocale } from '@/lib/i18n';
 import { basketCostHeatmap } from '@/lib/map-basket-cost-heatmap';
 import { mapChainIndexScores } from '@/lib/map-chain-index';
@@ -97,6 +98,11 @@ const homepageWebPerformanceBudgetGate = {
   assertions: webPerformanceBudgetGate.assertions.slice(0, 4),
   guardrails: webPerformanceBudgetGate.guardrails.slice(0, 2)
 };
+const homepageSeasonalDiscoveryCards = buildSeasonalProduceDiscoveryCards({
+  deals: categoryDealLeaders,
+  limit: 3,
+  rows: seasonalProduceCalendar.topBestBuys
+});
 const elderlyAccessibilityMode = {
   persona: 'Elderly / seniors',
   title: 'Large-text high-contrast mode',
@@ -644,12 +650,18 @@ export function MarketShell({ locale = defaultLocale }: { locale?: SupportedLoca
           </Link>
         </div>
         <div className="mt-5 grid gap-3 md:grid-cols-3">
-          {seasonalProduceCalendar.topBestBuys.slice(0, 3).map((row) => (
+          {homepageSeasonalDiscoveryCards.map((row) => (
             <Link className="rounded-2xl border border-emerald-200 bg-white p-4 shadow-sm hover:border-emerald-700" data-product-slug={row.slug} href={`/products/${row.slug}`} key={row.slug}>
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Best time to buy · {row.bestBuyMonth}</p>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Peak months · {row.peakMonths.join(' / ')}</p>
               <h3 className="mt-2 text-lg font-black text-slate-950">{row.productName}</h3>
-              <p className="mt-2 text-sm font-semibold text-slate-700">{row.historicalMonthlyAverageLabel} historicalMonthlyAverage · {row.savingsVsTypicalLabel}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">{row.typicalPriceRangeLabel}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">Best month {row.bestBuyMonth} · {row.historicalMonthlyAverageLabel} · {row.savingsVsTypicalLabel}</p>
               <p className="mt-2 text-xs font-bold uppercase tracking-[0.14em] text-slate-500">{row.confidenceLabel}</p>
+              <p className="mt-3 rounded-xl bg-emerald-50 p-3 text-xs font-bold text-emerald-950">
+                {row.linkedCurrentDeals.length > 0
+                  ? `${row.linkedCurrentDeals.length} linked current deal${row.linkedCurrentDeals.length === 1 ? '' : 's'}`
+                  : 'No linked current deal right now'}
+              </p>
             </Link>
           ))}
         </div>

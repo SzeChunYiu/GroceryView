@@ -1,5 +1,7 @@
 import Link from 'next/link';
 
+import { communityReviewSummaryForProduct } from '@/lib/community-reviews';
+
 export type ItemGridRow = Readonly<{
   id: string;
   name: string;
@@ -82,18 +84,29 @@ export function ItemGrid({ rows, basePath, query, sort, page, pageSize = 12 }: I
       </div>
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {visibleRows.map((row) => (
-          <Link className="group rounded-3xl border border-slate-200 bg-slate-50 p-4 transition hover:-translate-y-0.5 hover:border-emerald-700 hover:bg-white" href={row.href} key={row.id}>
-            {row.image ? <img alt="" className="mb-4 aspect-square w-full rounded-2xl bg-white object-contain p-3" loading="lazy" src={row.image} /> : null}
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{row.source}</p>
-            <h3 className="mt-2 text-lg font-black text-slate-950 group-hover:text-emerald-800">{row.name}</h3>
-            <p className="mt-1 text-sm font-semibold text-slate-600">{row.brand}</p>
-            <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
-              <p className="rounded-2xl bg-white p-3 font-black text-emerald-800">{row.priceLabel}</p>
-              <p className="rounded-2xl bg-white p-3 font-bold text-slate-600">{row.observationLabel}</p>
-            </div>
-          </Link>
-        ))}
+        {visibleRows.map((row) => {
+          const reviewSummary = communityReviewSummaryForProduct(row.name);
+
+          return (
+            <Link className="group rounded-3xl border border-slate-200 bg-slate-50 p-4 transition hover:-translate-y-0.5 hover:border-emerald-700 hover:bg-white" href={row.href} key={row.id}>
+              {row.image ? <img alt="" className="mb-4 aspect-square w-full rounded-2xl bg-white object-contain p-3" loading="lazy" src={row.image} /> : null}
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{row.source}</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950 group-hover:text-emerald-800">{row.name}</h3>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{row.brand}</p>
+              <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
+                <p className="rounded-2xl bg-white p-3 font-black text-emerald-800">{row.priceLabel}</p>
+                <p className="rounded-2xl bg-white p-3 font-bold text-slate-600">{row.observationLabel}</p>
+              </div>
+              {reviewSummary ? (
+                <div className="mt-3 rounded-2xl bg-white p-3 text-xs font-bold text-slate-700">
+                  <p className="text-sm font-black text-slate-950">{reviewSummary.averageRatingLabel}</p>
+                  <p className="mt-1">{reviewSummary.reviewCount} community reviews</p>
+                  <p className="mt-1">{reviewSummary.topFreshnessComplaint}</p>
+                </div>
+              ) : null}
+            </Link>
+          );
+        })}
       </div>
 
       {visibleRows.length === 0 ? <p className="mt-5 rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-5 text-sm font-bold text-slate-500">No items match this filter.</p> : null}

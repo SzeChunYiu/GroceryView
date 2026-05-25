@@ -2,24 +2,24 @@ import type { ChainIndexTrendReport } from '../chain-index-data';
 
 export const willysSourceSummary = {
   source: 'willys.se public search JSON',
-  retrievedAt: '2026-05-24T22:11:12.471Z',
-  rowCount: 11278,
+  retrievedAt: '2026-05-25T08:05:40.816Z',
+  rowCount: 11200,
   sourceUrlPattern: 'https://www.willys.se/search?q={query}',
-  sourceUrlCount: 133
+  sourceUrlCount: 132
 };
 
 export const hemkopSourceSummary = {
   source: 'hemkop.se public search JSON',
-  retrievedAt: '2026-05-24T22:59:19.059Z',
-  rowCount: 11799,
+  retrievedAt: '2026-05-25T08:05:40.816Z',
+  rowCount: 11802,
   sourceUrlPattern: 'https://www.hemkop.se/search?q={query}&page={page}&size=100',
-  sourceUrlCount: 140
+  sourceUrlCount: 139
 };
 
 export const willysWeeklyDiscountSourceSummary = {
   source: 'willys.se public Axfood campaign JSON',
-  retrievedAt: '2026-05-24T22:11:12.471Z',
-  rowCount: 46365,
+  retrievedAt: '2026-05-25T08:05:40.816Z',
+  rowCount: 46905,
   storeSourceUrl: 'https://www.willys.se/axfood/rest/store',
   sourceUrlPattern: 'https://www.willys.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100',
   storeCount: 254,
@@ -28,8 +28,8 @@ export const willysWeeklyDiscountSourceSummary = {
 
 export const hemkopWeeklyDiscountSourceSummary = {
   source: 'hemkop.se public Axfood campaign JSON',
-  retrievedAt: '2026-05-24T22:59:19.059Z',
-  rowCount: 55355,
+  retrievedAt: '2026-05-25T08:05:40.816Z',
+  rowCount: 54842,
   storeSourceUrl: 'https://www.hemkop.se/axfood/rest/store',
   sourceUrlPattern: 'https://www.hemkop.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100',
   storeCount: 205,

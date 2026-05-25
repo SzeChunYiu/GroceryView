@@ -1,3 +1,5 @@
+import { unitNormalizationQaSeverity, type UnitNormalizationQaIssueKind, type UnitNormalizationQaSeverity } from './unit-normalizer';
+
 export type PackageEvidence = {
   packageSize: number;
   packageUnit: 'g' | 'ml' | 'piece';
@@ -32,6 +34,32 @@ export type RecipeProductMatch = ParsedRecipeIngredient & {
   storeLabel: string;
   sourceLabel: string;
   matchScore: number;
+};
+
+export type UnitNormalizationQaProductInput = {
+  productId: string;
+  productName: string;
+  packageText: string | null | undefined;
+  price: number | null | undefined;
+  reportedUnitPrice?: number | null;
+};
+
+export type UnitNormalizationQaIssue = {
+  kind: UnitNormalizationQaIssueKind;
+  severity: UnitNormalizationQaSeverity;
+  productId: string;
+  productName: string;
+  packageText: string;
+  detail: string;
+};
+
+export type UnitNormalizationQaReport = {
+  issueCount: number;
+  missingUnitCount: number;
+  suspiciousPackSizeCount: number;
+  inconsistentUnitPriceCount: number;
+  issues: UnitNormalizationQaIssue[];
+  guardrails: string[];
 };
 
 const recipeQuantityPattern = /^((?:\d+(?:[.,/]\d+)?|\d+\s+\d+\/\d+)\s*(?:kg|g|l|dl|ml|msk|tsk|st|pcs?|cups?|tbsp|tsp)?\s+)/i;
@@ -189,4 +217,65 @@ export function suggestRecipeProductMatches(
       matchScore: bestScore
     };
   });
+}
+
+function qaIssue(
+  kind: UnitNormalizationQaIssueKind,
+  product: UnitNormalizationQaProductInput,
+  detail: string
+): UnitNormalizationQaIssue {
+  return {
+    kind,
+    severity: unitNormalizationQaSeverity(kind),
+    productId: product.productId,
+    productName: product.productName,
+    packageText: product.packageText || 'Package text missing',
+    detail
+  };
+}
+
+export function unitNormalizationQaIssuesForProduct(product: UnitNormalizationQaProductInput): UnitNormalizationQaIssue[] {
+  const packageText = product.packageText?.trim() ?? '';
+  const evidence = packageText ? packageEvidenceFromText(packageText) : null;
+  if (!evidence) {
+    return [qaIssue('missing_unit', product, 'No parseable package unit was found, so comparable unit price must stay withheld.')];
+  }
+
+  const normalized = typeof product.price === 'number' ? normalizeUnitPrice(product.price, evidence) : null;
+  const issues: UnitNormalizationQaIssue[] = [];
+  const suspiciousPackSize =
+    (evidence.packageUnit === 'g' && (evidence.packageSize < 5 || evidence.packageSize > 10000))
+    || (evidence.packageUnit === 'ml' && (evidence.packageSize < 5 || evidence.packageSize > 10000))
+    || (evidence.packageUnit === 'piece' && (evidence.packageSize < 1 || evidence.packageSize > 100));
+
+  if (suspiciousPackSize) {
+    issues.push(qaIssue('suspicious_pack_size', product, `Parsed ${evidence.packageSize} ${evidence.packageUnit}, which is outside the expected grocery package range.`));
+  }
+
+  if (!normalized || normalized.value <= 0 || normalized.value > 10000) {
+    issues.push(qaIssue('inconsistent_unit_price', product, 'Normalized unit-price conversion is missing, non-positive, or implausibly high.'));
+  } else if (typeof product.reportedUnitPrice === 'number' && product.reportedUnitPrice > 0) {
+    const ratio = normalized.value / product.reportedUnitPrice;
+    if (ratio < 0.5 || ratio > 2) {
+      issues.push(qaIssue('inconsistent_unit_price', product, `Normalized value ${normalized.value.toFixed(2)} differs sharply from reported unit price ${product.reportedUnitPrice.toFixed(2)}.`));
+    }
+  }
+
+  return issues;
+}
+
+export function buildUnitNormalizationQaReport(products: UnitNormalizationQaProductInput[]): UnitNormalizationQaReport {
+  const issues = products.flatMap(unitNormalizationQaIssuesForProduct);
+  return {
+    issueCount: issues.length,
+    missingUnitCount: issues.filter((issue) => issue.kind === 'missing_unit').length,
+    suspiciousPackSizeCount: issues.filter((issue) => issue.kind === 'suspicious_pack_size').length,
+    inconsistentUnitPriceCount: issues.filter((issue) => issue.kind === 'inconsistent_unit_price').length,
+    issues: issues.slice(0, 12),
+    guardrails: [
+      'Products with missing units must not receive synthetic comparable prices.',
+      'Suspicious pack sizes stay visible for ingestion QA before basket comparison uses them.',
+      'Inconsistent unit-price conversions require source review before cheapest-per-unit badges are trusted.'
+    ]
+  };
 }

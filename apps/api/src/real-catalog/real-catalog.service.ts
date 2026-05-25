@@ -7,6 +7,7 @@ import {
   type RealCatalogPriceType,
   type RealCatalogSearchPriceRow
 } from '@groceryview/api';
+import { buildProductSuggestQuery, mapProductSuggestionRow } from '@groceryview/db';
 import { PostgresQueryExecutorService } from '../database/postgres-query-executor.service.js';
 import { localizedProductNameSql, type ProductNameLocale } from '../product-name-locale.js';
 
@@ -48,6 +49,15 @@ type PendingSearchAliasSqlRow = {
   product_id: string | null;
   reviewed_at: string | Date | null;
   created_at: string | Date | null;
+};
+
+type ProductSuggestionSqlRow = {
+  id: string;
+  slug: string;
+  name: string;
+  brand: string | null;
+  image_url: string | null;
+  match_rank: string | number | null;
 };
 
 const allowedPriceTypes = new Set<RealCatalogPriceType>(['shelf', 'online', 'member', 'promotion', 'receipt', 'community', 'estimated']);
@@ -211,6 +221,25 @@ export class RealCatalogService {
       sourceRef: facetedSearchNoResultSourceRef,
       aliases: rows.map((row) => this.mapPendingSearchAlias(row)),
       evidence: { pendingCount: rows.length, sourceTables: ['aliases'] }
+    };
+  }
+
+  async suggestProducts(query: { q?: string; limit?: string }) {
+    const q = query.q?.trim() ?? '';
+    if (!q) throw new BadRequestException('q query parameter is required.');
+    const limit = Math.min(limitQuery(query.limit), 8);
+    this.requireDatabase();
+    const suggestQuery = buildProductSuggestQuery(q, { limit });
+    if (!suggestQuery) return { query: q, suggestions: [], source: 'postgres.products_trgm_prefix' };
+    const rows = await this.database.query<ProductSuggestionSqlRow>(suggestQuery.sql, suggestQuery.values);
+    return {
+      query: q,
+      suggestions: rows.map(mapProductSuggestionRow),
+      source: 'postgres.products_trgm_prefix',
+      evidence: {
+        sourceTables: ['products'],
+        indexHint: 'products_search_suggest_trgm_idx'
+      }
     };
   }
 

@@ -14,6 +14,19 @@ export type NormalizedUnit = UnitAlias & {
   readonly alias: string;
 };
 
+export type UnitNormalizationQaIssueKind =
+  | "missing_unit"
+  | "suspicious_pack_size"
+  | "inconsistent_unit_price";
+
+export type UnitNormalizationQaSeverity = "warning" | "review" | "blocker";
+
+export function unitNormalizationQaSeverity(kind: UnitNormalizationQaIssueKind): UnitNormalizationQaSeverity {
+  if (kind === "missing_unit") return "blocker";
+  if (kind === "inconsistent_unit_price") return "review";
+  return "warning";
+}
+
 const MASS_KG: UnitAlias = {
   canonicalUnit: "kg",
   kind: "mass",
@@ -204,4 +217,5 @@ export const unitNormalizer = Object.freeze({
   normalizeQuantity,
   normalizeUnitPrice,
   areCompatibleUnits,
+  unitNormalizationQaSeverity,
 });

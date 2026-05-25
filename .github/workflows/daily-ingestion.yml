@@ -770,6 +770,26 @@ jobs:
           METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
         run: |
           set -euo pipefail
+          if [ -s /tmp/daily-db-connectivity.json ]; then
+            postgres_readiness_skip_status=0
+            node <<'NODE' >/tmp/postgres-readiness.json || postgres_readiness_skip_status=$?
+          const connectivity = require('/tmp/daily-db-connectivity.json');
+          if (connectivity.status === 'ready') process.exit(2);
+          console.log(JSON.stringify({
+            status: 'skipped',
+            blocker: 'postgres_readiness_skipped_after_db_connectivity_not_ready',
+            connectivityStatus: connectivity.status ?? 'unknown',
+            connectivityBlockers: connectivity.blockers ?? []
+          }, null, 2));
+          NODE
+            if [ "${postgres_readiness_skip_status}" -eq 0 ]; then
+              cat /tmp/postgres-readiness.json
+              exit 0
+            fi
+            if [ "${postgres_readiness_skip_status}" -ne 2 ]; then
+              exit "${postgres_readiness_skip_status}"
+            fi
+          fi
           postgres_readiness_status=0
           if [ -z "${GROCERYVIEW_SERVER_URL:-}" ] || [ -z "${METRICS_TOKEN:-}" ]; then
             node <<'NODE' >/tmp/postgres-readiness.json
@@ -838,6 +858,26 @@ jobs:
           METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
         run: |
           set -euo pipefail
+          if [ -s /tmp/daily-db-connectivity.json ]; then
+            source_run_readiness_skip_status=0
+            node <<'NODE' >/tmp/source-run-readiness.json || source_run_readiness_skip_status=$?
+          const connectivity = require('/tmp/daily-db-connectivity.json');
+          if (connectivity.status === 'ready') process.exit(2);
+          console.log(JSON.stringify({
+            status: 'skipped',
+            blocker: 'source_run_readiness_skipped_after_db_connectivity_not_ready',
+            connectivityStatus: connectivity.status ?? 'unknown',
+            connectivityBlockers: connectivity.blockers ?? []
+          }, null, 2));
+          NODE
+            if [ "${source_run_readiness_skip_status}" -eq 0 ]; then
+              cat /tmp/source-run-readiness.json
+              exit 0
+            fi
+            if [ "${source_run_readiness_skip_status}" -ne 2 ]; then
+              exit "${source_run_readiness_skip_status}"
+            fi
+          fi
           source_run_readiness_status=0
           if [ -z "${GROCERYVIEW_SERVER_URL:-}" ] || [ -z "${METRICS_TOKEN:-}" ]; then
             node <<'NODE' >/tmp/source-run-readiness.json
@@ -905,6 +945,26 @@ jobs:
           METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
         run: |
           set -euo pipefail
+          if [ -s /tmp/daily-db-connectivity.json ]; then
+            catalog_coverage_readiness_skip_status=0
+            node <<'NODE' >/tmp/catalog-coverage-readiness.json || catalog_coverage_readiness_skip_status=$?
+          const connectivity = require('/tmp/daily-db-connectivity.json');
+          if (connectivity.status === 'ready') process.exit(2);
+          console.log(JSON.stringify({
+            status: 'skipped',
+            blocker: 'catalog_coverage_readiness_skipped_after_db_connectivity_not_ready',
+            connectivityStatus: connectivity.status ?? 'unknown',
+            connectivityBlockers: connectivity.blockers ?? []
+          }, null, 2));
+          NODE
+            if [ "${catalog_coverage_readiness_skip_status}" -eq 0 ]; then
+              cat /tmp/catalog-coverage-readiness.json
+              exit 0
+            fi
+            if [ "${catalog_coverage_readiness_skip_status}" -ne 2 ]; then
+              exit "${catalog_coverage_readiness_skip_status}"
+            fi
+          fi
           catalog_coverage_readiness_status=0
           if [ -z "${GROCERYVIEW_SERVER_URL:-}" ] || [ -z "${METRICS_TOKEN:-}" ]; then
             node <<'NODE' >/tmp/catalog-coverage-readiness.json

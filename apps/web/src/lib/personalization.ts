@@ -5,6 +5,22 @@ export type HouseholdCategorySignal = {
   conversions: number;
 };
 
+export type DietaryPreferenceOption = {
+  value: string;
+  label: string;
+  helper: string;
+};
+
+export type DietaryPreferenceOnboardingContract = {
+  endpoint: '/api/account/dietary-preferences';
+  fields: Array<'dietaryRestrictions' | 'avoidedIngredients' | 'certificationPreferences'>;
+  dietaryRestrictions: DietaryPreferenceOption[];
+  avoidedIngredients: DietaryPreferenceOption[];
+  certificationPreferences: DietaryPreferenceOption[];
+  personalizationSurfaces: string[];
+  guardrails: string[];
+};
+
 export const defaultHouseholdId = 'stockholm-family-demo';
 
 export const householdCategorySignals: HouseholdCategorySignal[] = [
@@ -15,6 +31,40 @@ export const householdCategorySignals: HouseholdCategorySignal[] = [
   { householdId: 'new-arrival-demo', categorySlug: 'skafferi', clicks: 14, conversions: 6 },
   { householdId: 'new-arrival-demo', categorySlug: 'frys', clicks: 9, conversions: 3 },
 ];
+
+export const dietaryPreferenceOnboardingContract: DietaryPreferenceOnboardingContract = {
+  endpoint: '/api/account/dietary-preferences',
+  fields: ['dietaryRestrictions', 'avoidedIngredients', 'certificationPreferences'],
+  dietaryRestrictions: [
+    { value: 'vegetarian', label: 'Vegetarian', helper: 'Prefer meat-free recipes, swaps, and basket ideas.' },
+    { value: 'vegan', label: 'Vegan', helper: 'Require plant-based alternatives before recommendations are ranked.' },
+    { value: 'gluten_free', label: 'Gluten-free', helper: 'Keep products without verified gluten-free evidence out of default matches.' },
+    { value: 'lactose_free', label: 'Lactose-free', helper: 'Prefer dairy rows with explicit lactose-free evidence.' }
+  ],
+  avoidedIngredients: [
+    { value: 'peanuts', label: 'Peanuts', helper: 'Warn before products with peanut allergen evidence are recommended.' },
+    { value: 'tree_nuts', label: 'Tree nuts', helper: 'Treat nut evidence as a default exclusion for search and baskets.' },
+    { value: 'shellfish', label: 'Shellfish', helper: 'Exclude shellfish evidence from meal and substitution suggestions.' },
+    { value: 'pork', label: 'Pork', helper: 'Avoid pork ingredients for religious or lifestyle preferences.' }
+  ],
+  certificationPreferences: [
+    { value: 'halal', label: 'Halal', helper: 'Prefer explicit halal certification or store-confirmation steps.' },
+    { value: 'kosher', label: 'Kosher', helper: 'Prefer package-label evidence before surfacing product matches.' },
+    { value: 'organic', label: 'Organic', helper: 'Promote verified organic labels when price and stock evidence are available.' },
+    { value: 'keyhole', label: 'Keyhole', helper: 'Prefer verified Nordic Keyhole labels for health-oriented filters.' }
+  ],
+  personalizationSurfaces: [
+    'search filters',
+    'recommendation ranking',
+    'price alerts',
+    'weekly basket warnings'
+  ],
+  guardrails: [
+    'Preferences are saved only for a signed-in account.',
+    'Health, religious, and lifestyle needs are never inferred from browsing or purchase history.',
+    'Certification preferences require verified product label evidence or an explicit store-confirmation step.'
+  ]
+};
 
 type CategoryRankInput = {
   slug: string;

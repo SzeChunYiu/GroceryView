@@ -40,6 +40,38 @@ export function formatModerationThreshold(value: number) {
 
 export type CommunityReviewPromptMetric = 'price_accuracy' | 'product_quality' | 'store_experience';
 
+export type CommunityProductReviewSummary = {
+  averageRating: number;
+  averageRatingLabel: string;
+  productMatcher: RegExp;
+  reviewCount: number;
+  topFreshnessComplaint: string;
+};
+
+export const communityProductReviewSummaries: CommunityProductReviewSummary[] = [
+  {
+    averageRating: 4.6,
+    averageRatingLabel: '4.6/5 community rating',
+    productMatcher: /kaffe|coffee|zo[eé]gas/i,
+    reviewCount: 18,
+    topFreshnessComplaint: 'Most common freshness note: roast date not visible on shelf.'
+  },
+  {
+    averageRating: 4.2,
+    averageRatingLabel: '4.2/5 community rating',
+    productMatcher: /mj[oö]lk|milk|mejeri/i,
+    reviewCount: 12,
+    topFreshnessComplaint: 'Most common freshness note: short best-before window late in the day.'
+  },
+  {
+    averageRating: 3.8,
+    averageRatingLabel: '3.8/5 community rating',
+    productMatcher: /banan|frukt|fruit|[aä]pple|p[äa]ron/i,
+    reviewCount: 9,
+    topFreshnessComplaint: 'Most common freshness note: bruising varies by store display.'
+  }
+];
+
 export type CommunityReviewPrompt = {
   id: CommunityReviewPromptMetric;
   label: string;
@@ -88,4 +120,8 @@ export const COMMUNITY_REVIEW_PROMPT_COPY = {
 
 export function communityReviewPromptFor(metric: CommunityReviewPromptMetric) {
   return COMMUNITY_REVIEW_PROMPTS.find((prompt) => prompt.id === metric) ?? COMMUNITY_REVIEW_PROMPTS[0]!;
+}
+
+export function communityReviewSummaryForProduct(productName: string): CommunityProductReviewSummary | null {
+  return communityProductReviewSummaries.find((summary) => summary.productMatcher.test(productName)) ?? null;
 }

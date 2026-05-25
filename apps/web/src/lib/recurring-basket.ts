@@ -28,6 +28,26 @@ export type RecurringBasketPlan = {
   guardrails: string[];
 };
 
+export type PurchaseHistoryImportRow = {
+  purchasedAt: string;
+  productName: string;
+  storeName: string;
+  quantity: number;
+  totalSpend: number;
+};
+
+export type PurchaseHistoryImportPreview = {
+  rows: PurchaseHistoryImportRow[];
+  recurringCandidates: Array<{
+    productName: string;
+    purchaseCount: number;
+    totalSpend: number;
+    recommendationSeed: string;
+    budgetSeedLabel: string;
+  }>;
+  totalSpend: number;
+};
+
 const nextWeeklyWindow: RecurringBasketWindow = { startsOn: '2026-05-25', endsOn: '2026-05-31', label: 'Week 22 grocery window' };
 const followingWeeklyWindow: RecurringBasketWindow = { startsOn: '2026-06-01', endsOn: '2026-06-07', label: 'Week 23 grocery window' };
 const twoWeeksAheadWindow: RecurringBasketWindow = { startsOn: '2026-06-08', endsOn: '2026-06-14', label: 'Week 24 grocery window' };
@@ -67,5 +87,82 @@ export function createRecurringBasketDuplicate(plan: RecurringBasketPlan, target
       productName: line.productName,
       quantity: line.templateQuantity
     }))
+  };
+}
+
+function parseCsvLine(line: string) {
+  const cells: string[] = [];
+  let current = '';
+  let quoted = false;
+
+  for (const character of line) {
+    if (character === '"') {
+      quoted = !quoted;
+    } else if (character === ',' && !quoted) {
+      cells.push(current.trim());
+      current = '';
+    } else {
+      current += character;
+    }
+  }
+
+  cells.push(current.trim());
+  return cells.map((cell) => cell.replace(/^"|"$/g, '').trim());
+}
+
+export function parsePurchaseHistoryCsv(csv: string): PurchaseHistoryImportRow[] {
+  const [headerLine, ...lines] = csv.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  if (!headerLine) return [];
+
+  const headers = parseCsvLine(headerLine).map((header) => header.toLocaleLowerCase('sv-SE'));
+  const indexFor = (...names: string[]) => names.map((name) => headers.indexOf(name)).find((index) => index >= 0) ?? -1;
+  const dateIndex = indexFor('date', 'purchased_at', 'purchasedat');
+  const productIndex = indexFor('product', 'product_name', 'productname', 'item');
+  const storeIndex = indexFor('store', 'store_name', 'storename', 'chain');
+  const quantityIndex = indexFor('quantity', 'qty', 'count');
+  const totalIndex = indexFor('total', 'total_spend', 'totalspend', 'amount');
+
+  return lines
+    .map((line) => {
+      const cells = parseCsvLine(line);
+      const productName = cells[productIndex]?.trim();
+      if (!productName) return null;
+      const quantity = Number(cells[quantityIndex] ?? 1);
+      const totalSpend = Number((cells[totalIndex] ?? 0).replace(/[^0-9.]/g, ''));
+      return {
+        purchasedAt: cells[dateIndex] || 'date not provided',
+        productName,
+        storeName: cells[storeIndex] || 'store not provided',
+        quantity: Number.isFinite(quantity) && quantity > 0 ? quantity : 1,
+        totalSpend: Number.isFinite(totalSpend) && totalSpend >= 0 ? totalSpend : 0
+      };
+    })
+    .filter((row): row is PurchaseHistoryImportRow => row !== null);
+}
+
+export function buildPurchaseHistoryImportPreview(rows: readonly PurchaseHistoryImportRow[]): PurchaseHistoryImportPreview {
+  const grouped = new Map<string, PurchaseHistoryImportRow[]>();
+  for (const row of rows) {
+    grouped.set(row.productName, [...(grouped.get(row.productName) ?? []), row]);
+  }
+
+  const recurringCandidates = Array.from(grouped.entries())
+    .map(([productName, productRows]) => {
+      const totalSpend = productRows.reduce((sum, row) => sum + row.totalSpend, 0);
+      return {
+        productName,
+        purchaseCount: productRows.length,
+        totalSpend,
+        recommendationSeed: `${productRows.length} historical purchase${productRows.length === 1 ? '' : 's'} for recommendation ranking`,
+        budgetSeedLabel: `${totalSpend.toFixed(2)} SEK imported budget history`
+      };
+    })
+    .sort((a, b) => b.purchaseCount - a.purchaseCount || b.totalSpend - a.totalSpend || a.productName.localeCompare(b.productName, 'sv'))
+    .slice(0, 6);
+
+  return {
+    rows: [...rows],
+    recurringCandidates,
+    totalSpend: rows.reduce((sum, row) => sum + row.totalSpend, 0)
   };
 }

@@ -2,7 +2,10 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   buildProductSearchQuery,
+  buildProductSuggestQuery,
   mapProductSearchRow,
+  mapProductSuggestionRow,
+  suggestProductsByPrefix,
   searchProductsByText
 } from '../queries/productSearch.js';
 
@@ -50,6 +53,50 @@ describe('PostgreSQL product search query', () => {
       brand: 'Zoégas',
       imageUrl: 'https://example.test/coffee.png',
       searchRank: 0.42
+    });
+  });
+
+  it('builds a bounded pg_trgm prefix suggestion query over product names', () => {
+    const query = buildProductSuggestQuery(' mjö ', { limit: 50 });
+
+    assert.ok(query);
+    assert.deepEqual(query.values, ['mjö', 8]);
+    assert.match(query.sql, /products\.canonical_name ilike query\.raw_prefix \|\| '%'/);
+    assert.match(query.sql, /coalesce\(products\.name_sv, ''\) ilike query\.raw_prefix \|\| '%'/);
+    assert.match(query.sql, /lower\(unaccent\(products\.canonical_name\)\) like query\.query_prefix \|\| '%'/);
+    assert.match(query.sql, /lower\(unaccent\(coalesce\(products\.name_sv, ''\)\)\) like query\.query_prefix \|\| '%'/);
+    assert.match(query.sql, /similarity\(lower\(unaccent\(coalesce\(products\.canonical_name, ''\).*query\.query_prefix\)/s);
+    assert.match(query.sql, /products\.domain = 'grocery'/);
+    assert.match(query.sql, /limit \$2/);
+  });
+
+  it('maps and executes prefix suggestions without querying blank input', async () => {
+    assert.equal(buildProductSuggestQuery(''), null);
+
+    let calls = 0;
+    const blank = await suggestProductsByPrefix({
+      async query() {
+        calls += 1;
+        return [];
+      }
+    }, '');
+    assert.equal(calls, 0);
+    assert.deepEqual(blank, []);
+
+    assert.deepEqual(mapProductSuggestionRow({
+      id: 'product-1',
+      slug: 'standardmjolk-1l',
+      name: 'Standardmjölk 1 l',
+      brand: 'Arla',
+      image_url: null,
+      match_rank: '1'
+    }), {
+      id: 'product-1',
+      slug: 'standardmjolk-1l',
+      name: 'Standardmjölk 1 l',
+      brand: 'Arla',
+      imageUrl: null,
+      matchRank: 1
     });
   });
 });
