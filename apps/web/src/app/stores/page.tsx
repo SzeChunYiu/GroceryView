@@ -42,8 +42,8 @@ export function generateMetadata() {
   return routeMetadata('/stores');
 }
 
-export default async function StoresIndexPage({ searchParams }: { searchParams?: Promise<SearchParams> | SearchParams } = {}) {
-  const resolvedSearchParams = searchParams ? await searchParams : {};
+export default async function StoresIndexPage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
+  const resolvedSearchParams = await (searchParams ?? Promise.resolve({}));
   const hoursFilter = resolveHoursFilter(resolvedSearchParams);
   const filteredStores = storeUniverse.filter((store) => matchesHoursFilter(store, hoursFilter));
   const brandCounts = [...storeUniverse.reduce((map, store) => map.set(store.brand, (map.get(store.brand) ?? 0) + 1), new Map<string, number>())]

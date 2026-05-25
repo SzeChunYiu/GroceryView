@@ -160,8 +160,8 @@ function buildRegionalPriceStatisticsGate() {
   };
 }
 
-export default async function MapPage({ searchParams }: { searchParams?: Promise<SearchParams> | SearchParams } = {}) {
-  const resolvedSearchParams = searchParams ? await searchParams : {};
+export default async function MapPage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
+  const resolvedSearchParams = await (searchParams ?? Promise.resolve({}));
   const hoursFilter = resolveHoursFilter(resolvedSearchParams);
   const filteredStores = storeUniverse.filter((store) => matchesHoursFilter(store, hoursFilter));
   const visibleStores = filteredStores.slice(0, 80);
