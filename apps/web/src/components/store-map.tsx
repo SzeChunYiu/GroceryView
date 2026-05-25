@@ -6,6 +6,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import { osmStores, type OsmStore } from '@/lib/osm-stores';
 import { cheapestMapChain, mapChainIndexScores } from '@/lib/map-chain-index';
 import { trackStoreDirectionsClick } from '@/lib/analytics';
+import type { StoreDistanceRow } from '@/lib/store-distance';
 
 // Free, no-API-key vector tiles (© OpenMapTiles / OpenFreeMap, data © OSM).
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/bright';
@@ -162,7 +163,7 @@ function districtHeatCollection(): GeoJSON.FeatureCollection<GeoJSON.Point> {
   };
 }
 
-export function StoreMap() {
+export function StoreMap({ routeRecommendations = [] }: Readonly<{ routeRecommendations?: StoreDistanceRow[] }>) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const [storeCount, setStoreCount] = useState(0);
@@ -405,6 +406,13 @@ export function StoreMap() {
           <div>{cheapestMapChain ? `${cheapestMapChain.chainId} · index ${cheapestMapChain.overallIndex.toFixed(1)}` : 'Awaiting index coverage'}</div>
           <div className="mt-1">Green &lt; 96 · amber 96-103 · red &gt; 103</div>
         </div>
+        {routeRecommendations.length > 0 ? (
+          <div className="mt-2 border-t border-market-ink/10 pt-2 text-market-ink/70" data-route-aware-map-legend="true">
+            <div className="font-bold uppercase tracking-wide text-market-ink/55">Route-aware nearest</div>
+            <div>{routeRecommendations[0]?.storeName} · {routeRecommendations[0]?.totalMinutes} min</div>
+            <div className="mt-1">Rank combines distance, basket total, and opening status.</div>
+          </div>
+        ) : null}
       </div>
 
       <div className="absolute bottom-3 right-3 top-3 flex w-[min(22rem,calc(100%-1.5rem))] flex-col rounded-2xl border border-white/70 bg-white/95 p-3 text-slate-950 shadow-2xl backdrop-blur">
@@ -416,6 +424,24 @@ export function StoreMap() {
           </p>
         </div>
         <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
+          {routeRecommendations.length > 0 ? (
+            <div className="rounded-2xl border border-cyan-100 bg-cyan-50 p-3" data-route-aware-nearest-panel="true">
+              <p className="text-[11px] font-black uppercase tracking-[0.16em] text-cyan-800">Route-aware nearest stores</p>
+              <div className="mt-2 space-y-2">
+                {routeRecommendations.slice(0, 3).map((store, index) => (
+                  <div className="rounded-xl bg-white/80 p-2 text-xs" key={store.id}>
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="font-black text-slate-950">#{index + 1} {store.storeName}</p>
+                      <span className="font-black text-cyan-800">{store.routeScore.toFixed(0)}</span>
+                    </div>
+                    <p className="mt-1 font-semibold text-slate-600">
+                      {store.totalMinutes} min · {store.basketTotalSek.toFixed(2)} SEK basket · {store.openingStatusLabel}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
           {syncedMapListStores.map((store) => {
             const selected = selectedStoreSlug === store.slug;
             const score = chainIndexScore(store.brand || '');

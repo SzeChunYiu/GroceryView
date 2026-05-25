@@ -5,6 +5,7 @@ import { buildChainPriceObservations } from '@/lib/chain-index-data';
 import { basketCostHeatmap } from '@/lib/map-basket-cost-heatmap';
 import { formatPct, storePricePercentileRanks, storeUniverse } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
+import { buildStoreDistanceCompare } from '@/lib/store-distance';
 
 export function generateMetadata() {
   return routeMetadata('/map');
@@ -16,6 +17,11 @@ const cheapestChainNearMe = chainIndexSummary.chains[0];
 const cheapestBranchNearMe = storePricePercentileRanks[0] ?? null;
 const districtHeatOverlay = buildDistrictHeatOverlay();
 const regionalPriceStatisticsGate = buildRegionalPriceStatisticsGate();
+const routeAwareNearestStorePlan = buildStoreDistanceCompare(
+  'makaroner-pasta-101302991-st,havregryn-extra-fylliga-101758934-st,svensk-honung-101550069-st',
+  'walk'
+);
+const topRouteAwareStores = routeAwareNearestStorePlan.rows.slice(0, 4);
 
 function normaliseBrand(brand: string) {
   const lower = brand.toLowerCase();
@@ -150,7 +156,51 @@ export default function MapPage() {
           </div>
         </div>
         <div className="h-[620px] overflow-hidden border-t border-white/10 bg-slate-900">
-          <StoreMap />
+          <StoreMap routeRecommendations={topRouteAwareStores.slice(0, 3)} />
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-cyan-200 bg-cyan-50">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto]">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-cyan-800">Route-aware nearest stores</p>
+            <h2 className="mt-2 text-3xl font-black text-cyan-950">Nearest recommendations with basket cost and opening status</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-cyan-900">
+              {routeAwareNearestStorePlan.summary} The static map uses a sample basket and Stockholm map-center routing;
+              a signed-in shopper must consent before private location or list data can replace these defaults.
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white/80 p-4 text-right">
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-cyan-800">Rank inputs</p>
+            <p className="mt-2 text-2xl font-black text-cyan-950">{routeAwareNearestStorePlan.routeRankInputs.length} signals</p>
+            <p className="mt-2 text-sm font-semibold text-cyan-900">{routeAwareNearestStorePlan.mode} route · no private GPS by default</p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {topRouteAwareStores.map((store, index) => (
+            <div className="rounded-2xl border border-cyan-100 bg-white p-4 shadow-sm" data-route-aware-nearest-store={store.id} key={store.id}>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">#{index + 1} · {store.chainName}</p>
+                  <h3 className="mt-2 text-lg font-black text-slate-950">{store.storeName}</h3>
+                  <p className="mt-1 text-sm font-semibold text-slate-600">{store.areaLabel} · {(store.distanceMeters / 1000).toFixed(1)} km</p>
+                </div>
+                <span className="rounded-full bg-cyan-100 px-3 py-2 text-sm font-black text-cyan-950">{store.routeScore.toFixed(0)}</span>
+              </div>
+              <dl className="mt-4 grid grid-cols-2 gap-2 text-sm">
+                <div className="rounded-xl bg-cyan-50 p-3">
+                  <dt className="text-xs font-black uppercase tracking-[0.12em] text-cyan-700">Basket</dt>
+                  <dd className="mt-1 font-black text-cyan-950">{store.basketTotalSek.toFixed(2)} SEK</dd>
+                </div>
+                <div className="rounded-xl bg-slate-50 p-3">
+                  <dt className="text-xs font-black uppercase tracking-[0.12em] text-slate-500">Trip</dt>
+                  <dd className="mt-1 font-black text-slate-950">{store.totalMinutes} min · {store.travelCostSek.toFixed(1)} SEK</dd>
+                </div>
+              </dl>
+              <p className="mt-3 rounded-xl bg-slate-50 p-3 text-xs font-bold leading-5 text-slate-700">{store.openingStatusLabel}</p>
+              <p className="mt-3 text-xs font-semibold leading-5 text-slate-500">{store.recommendationLabel}</p>
+            </div>
+          ))}
         </div>
       </Card>
 
