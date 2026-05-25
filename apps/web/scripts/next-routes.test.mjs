@@ -100,15 +100,22 @@ describe('verified-data UI', () => {
     const productsPage = await read('src/app/products/page.tsx');
     const lazyItemCard = await read('src/components/LazyItemCard.tsx');
     const verified = await read('src/lib/verified-data.ts');
+    const substitutions = await read('src/lib/substitutions.ts');
+    const storePage = await read('src/app/stores/[slug]/page.tsx');
 
     assert.match(productCards, /card\.isAvailable === false/);
     assert.match(productCards, /Out of stock/);
+    assert.match(productCards, /substitutionPlansForUnavailableProducts/);
+    assert.match(productCards, /data-store-substitution-suggestions/);
     assert.match(productsPage, /VirtualizedProductGrid/);
     assert.match(productsPage, /product\.isAvailable === false/);
     assert.match(lazyItemCard, /product\.isAvailable === false/);
     assert.match(lazyItemCard, /Out of stock/);
     assert.match(verified, /isAvailable/);
     assert.match(verified, /outOfStockLatestPriceCount/);
+    assert.match(substitutions, /substitutionSuggestionsForUnavailableProduct/);
+    assert.match(substitutions, /nutritionImpactLabel/);
+    assert.match(storePage, /Selected-store substitutions/);
   });
 
   it('makes unavailable private features fail closed instead of showing fabricated rows', async () => {

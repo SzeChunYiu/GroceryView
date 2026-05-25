@@ -11,6 +11,7 @@ import { buildPriceHistorySparklinePath } from '@/lib/price-events';
 import { volatilityBadgeMethodology } from '@/lib/price-intelligence';
 import type { SearchExplanationBadge } from '@/lib/search-filters';
 import { listFriendPriceSightingsForProduct } from '@/lib/social';
+import { substitutionPlansForUnavailableProducts } from '@/lib/substitutions';
 import type { AdaptiveProductCard } from '@/lib/verified-data';
 
 type CompareMode = 'adaptive' | 'total' | 'unit';
@@ -284,6 +285,9 @@ export function ProductPriceCards({
     const delta = sortValue(left, compareMode) - sortValue(right, compareMode);
     return delta === 0 ? left.name.localeCompare(right.name, 'sv') : delta;
   }), [cards, compareMode]);
+  const substitutionPlanBySlug = useMemo(() => new Map(
+    substitutionPlansForUnavailableProducts(cards).map((plan) => [plan.unavailableProduct.slug, plan])
+  ), [cards]);
 
   function chooseMode(value: CompareMode) {
     setCompareMode(value);
@@ -400,6 +404,24 @@ export function ProductPriceCards({
             ) : null}
             <SearchExplanationBadges badges={(card as ProductCardWithSearchExplanations).searchExplanationBadges} />
             <p className="mt-3 text-sm leading-6 text-slate-600">{card.sourceLabel}</p>
+            {card.isAvailable === false ? (
+              <div className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 p-3" data-store-substitution-suggestions>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-900">Substitution suggestions</p>
+                {(substitutionPlanBySlug.get(card.slug)?.suggestions.length ?? 0) > 0 ? (
+                  <ul className="mt-2 space-y-2">
+                    {substitutionPlanBySlug.get(card.slug)?.suggestions.map((suggestion) => (
+                      <li className="rounded-xl bg-white p-2 text-xs font-semibold text-slate-700" key={suggestion.slug}>
+                        <p className="font-black text-slate-950">{suggestion.name} · {suggestion.totalPriceLabel}</p>
+                        <p className="mt-1">{suggestion.reason}</p>
+                        <p className="mt-1 text-amber-950">{suggestion.nutritionImpactLabel}</p>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-2 text-xs font-bold text-amber-950">No verified available alternative clears the category, brand, and nutrition-evidence checks.</p>
+                )}
+              </div>
+            ) : null}
             <FriendPriceSightingsPanel card={card} />
             <SafetyWarningBanner card={card} preferences={safetyPreferences} />
             <PriceHistorySparkline card={card} />
