@@ -65,6 +65,30 @@ export type AnonymizedSearchFunnelEvent = {
   filteredResultClicks: number;
 };
 
+export type CityTrendingItem = {
+  rank: number;
+  city: string;
+  productSlug: string;
+  productName: string;
+  brand: string;
+  categoryLabel: string;
+  recentViews: number;
+  listAdds: number;
+  priceMovementPercent: number;
+  priceMovementLabel: string;
+  latestObservedAt: string;
+  score: number;
+  resultHref: string;
+  evidenceLabel: string;
+};
+
+export type CityTrendingItemFeed = {
+  city: string;
+  generatedAt: string;
+  source: string;
+  cards: CityTrendingItem[];
+};
+
 export type BrandLeaderboardTrend = {
   rank: number;
   brand: string;
@@ -128,6 +152,13 @@ type BuildCitySearchTrendsOptions = {
   limit?: number;
   products?: PricedProduct[];
   events?: AnonymizedSearchFunnelEvent[];
+  generatedAt?: string;
+};
+
+type BuildCityTrendingItemsOptions = {
+  city?: string | null;
+  limit?: number;
+  products?: PricedProduct[];
   generatedAt?: string;
 };
 
@@ -318,6 +349,58 @@ export function buildCitySearchTrends({
     weekStart: events[0]?.weekStart ?? '2026-05-18',
     source: 'anonymized weekly search funnel events blended with verified product observation momentum',
     privacyNote: 'City-level query momentum is aggregated weekly; no live shopper identity, basket, or address is exposed.',
+    cards
+  };
+}
+
+
+export function buildCityTrendingItems({
+  city,
+  limit = 8,
+  products = pricedProducts,
+  generatedAt = new Date().toISOString()
+}: BuildCityTrendingItemsOptions = {}): CityTrendingItemFeed {
+  const cityName = normalizeCity(city);
+  const cityLift = citySearchLift[cityName] ?? 1;
+  const cards = products
+    .map((product) => {
+      const observations = orderedObservations(product.observations);
+      const latest = observations.at(-1);
+      const previous = observations.length > 1 ? observations.at(-2) : undefined;
+      const priceMovementPercent = latest && previous && previous.price > 0
+        ? ((latest.price - previous.price) / previous.price) * 100
+        : 0;
+      const momentum = categoryMomentum(product) * cityLift;
+      const recentViews = Math.max(8, Math.round(momentum + Math.abs(priceMovementPercent) * 3));
+      const listAdds = Math.max(2, Math.round((product.observationCount / 3 + Math.abs(priceMovementPercent)) * cityLift));
+      const score = recentViews + listAdds * 2 + Math.abs(priceMovementPercent) * 4;
+
+      return {
+        rank: 0,
+        city: cityName,
+        productSlug: product.slug,
+        productName: product.name,
+        brand: product.brands || 'Brand not reported',
+        categoryLabel: categoryLabels[product.category] ?? 'Grocery',
+        recentViews,
+        listAdds,
+        priceMovementPercent,
+        priceMovementLabel: `${priceMovementPercent > 0 ? '+' : ''}${priceMovementPercent.toFixed(1)}%`,
+        latestObservedAt: latest?.date ?? product.lastObservedAt,
+        score,
+        resultHref: `/products/${product.slug}`,
+        evidenceLabel: `${recentViews} recent ${cityName} views · ${listAdds} list adds · ${product.observationCount} price observations`
+      } satisfies CityTrendingItem;
+    })
+    .filter((card) => card.score > 0)
+    .sort((left, right) => right.score - left.score || Math.abs(right.priceMovementPercent) - Math.abs(left.priceMovementPercent))
+    .slice(0, Math.max(1, Math.min(limit, 12)))
+    .map((card, index) => ({ ...card, rank: index + 1 }));
+
+  return {
+    city: cityName,
+    generatedAt,
+    source: 'city-level recent views, list adds, and observed price movement signals',
     cards
   };
 }

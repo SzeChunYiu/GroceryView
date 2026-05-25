@@ -255,7 +255,7 @@ export function ScannerUploadActions({ fallbackProducts = [] }: Readonly<{ fallb
   return (
     <section className="mt-6 rounded-3xl border border-indigo-200 bg-white p-5 shadow-sm" aria-label="Scanner upload controls">
       <p className="text-sm font-black uppercase tracking-[0.2em] text-indigo-800">Signed-in scan actions</p>
-      <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Receipt upload tickets and barcode processing</h2>
+      <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Receipt upload tickets and manual barcode processing</h2>
       <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
         These controls use the sessionStorage token from the production session exchange. Receipt uploads first request a private upload ticket, while barcode scans go directly to provider-backed processing and return review work items when evidence is uncertain.
       </p>
