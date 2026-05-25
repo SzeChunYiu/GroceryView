@@ -1,16 +1,17 @@
 'use client';
 
 import Link from 'next/link';
-import { Search } from 'lucide-react';
+import { Mic, Search } from 'lucide-react';
 import type { KeyboardEvent, ReactNode } from 'react';
-import { useEffect, useId, useMemo, useState } from 'react';
-import { trackSearchToSavingsFunnelStep } from '@/lib/analytics';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { trackSearchToSavingsFunnelStep, trackVoiceSearchInput } from '@/lib/analytics';
 import {
   clearRecentSearchHistory,
   readRecentSearchHistory,
   rememberRecentSearchHistory,
   type RecentSearchHistoryEntry
 } from '@/lib/personalization';
+import type { SearchExplanationBadge } from '@/lib/search-filters';
 
 type ProductSearchResult = {
   id: string;
@@ -19,6 +20,7 @@ type ProductSearchResult = {
   brand: string | null;
   imageUrl: string | null;
   searchRank: number;
+  searchExplanationBadges?: SearchExplanationBadge[];
 };
 
 type ProductSearchResponse = {
@@ -55,6 +57,34 @@ type HeaderSuggestResponse = {
 };
 
 type SearchStatus = 'idle' | 'loading' | 'ready' | 'empty' | 'error';
+type VoiceSearchStatus = 'idle' | 'listening' | 'unsupported' | 'error';
+
+type GrocerySpeechRecognitionEvent = {
+  results: {
+    [index: number]: {
+      [index: number]: { transcript: string };
+    };
+  };
+};
+
+type GrocerySpeechRecognition = {
+  abort: () => void;
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  maxAlternatives: number;
+  onend: (() => void) | null;
+  onerror: (() => void) | null;
+  onresult: ((event: GrocerySpeechRecognitionEvent) => void) | null;
+  onstart: (() => void) | null;
+  start: () => void;
+};
+
+type GrocerySpeechRecognitionConstructor = new () => GrocerySpeechRecognition;
+type VoiceSearchWindow = Window & {
+  SpeechRecognition?: GrocerySpeechRecognitionConstructor;
+  webkitSpeechRecognition?: GrocerySpeechRecognitionConstructor;
+};
 
 const MIN_QUERY_LENGTH = 2;
 const ZERO_RESULT_FALLBACKS = [
@@ -100,6 +130,8 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
   const [activeOptionIndex, setActiveOptionIndex] = useState(-1);
   const [isFocused, setIsFocused] = useState(false);
   const [status, setStatus] = useState<SearchStatus>('idle');
+  const [voiceStatus, setVoiceStatus] = useState<VoiceSearchStatus>('idle');
+  const voiceRecognitionRef = useRef<GrocerySpeechRecognition | null>(null);
   const trimmedQuery = useMemo(() => query.trim(), [query]);
   const emptyFallback = useMemo(() => zeroResultFallbacks(trimmedQuery), [trimmedQuery]);
   const shouldShowRecentSearches = isFocused && trimmedQuery.length === 0 && recentSearches.length > 0;
@@ -114,6 +146,62 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
   useEffect(() => {
     setRecentSearches(readRecentSearchHistory());
   }, []);
+
+  useEffect(() => () => {
+    voiceRecognitionRef.current?.abort();
+    voiceRecognitionRef.current = null;
+  }, []);
+
+  function submitVoiceQuery(nextQuery: string) {
+    const trimmedVoiceQuery = nextQuery.trim();
+    if (!trimmedVoiceQuery) return;
+    setQuery(trimmedVoiceQuery);
+    setIsFocused(true);
+    trackVoiceSearchInput({ query: trimmedVoiceQuery, status: 'submitted', surface });
+    window.setTimeout(() => {
+      window.location.assign(`/products?q=${encodeURIComponent(trimmedVoiceQuery)}`);
+    }, 250);
+  }
+
+  function startVoiceSearch() {
+    const voiceWindow = window as VoiceSearchWindow;
+    const Recognition = voiceWindow.SpeechRecognition ?? voiceWindow.webkitSpeechRecognition;
+    if (!Recognition) {
+      setVoiceStatus('unsupported');
+      trackVoiceSearchInput({ status: 'unsupported', surface });
+      return;
+    }
+
+    voiceRecognitionRef.current?.abort();
+    const recognition = new Recognition();
+    voiceRecognitionRef.current = recognition;
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = navigator.language || 'sv-SE';
+    recognition.maxAlternatives = 1;
+    recognition.onstart = () => {
+      setVoiceStatus('listening');
+      trackVoiceSearchInput({ status: 'started', surface });
+    };
+    recognition.onresult = (event) => {
+      submitVoiceQuery(event.results[0]?.[0]?.transcript ?? '');
+    };
+    recognition.onerror = () => {
+      setVoiceStatus('error');
+      trackVoiceSearchInput({ status: 'error', surface });
+    };
+    recognition.onend = () => {
+      setVoiceStatus((current) => current === 'listening' ? 'idle' : current);
+      voiceRecognitionRef.current = null;
+    };
+
+    try {
+      recognition.start();
+    } catch {
+      setVoiceStatus('error');
+      trackVoiceSearchInput({ status: 'error', surface });
+    }
+  }
 
   useEffect(() => {
     if (trimmedQuery.length < MIN_QUERY_LENGTH) {
@@ -249,7 +337,23 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
           type="search"
           value={query}
         />
+        <button
+          aria-label={voiceStatus === 'listening' ? 'Listening for grocery search' : 'Search by voice'}
+          className="rounded-full p-2 text-slate-500 transition hover:bg-emerald-50 hover:text-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
+          disabled={voiceStatus === 'listening'}
+          onClick={startVoiceSearch}
+          onMouseDown={(event) => event.preventDefault()}
+          title={voiceStatus === 'unsupported' ? 'Voice search is not supported in this browser' : 'Search by voice'}
+          type="button"
+        >
+          <Mic className={voiceStatus === 'listening' ? 'h-4 w-4 animate-pulse text-emerald-700' : 'h-4 w-4'} aria-hidden="true" />
+        </button>
       </div>
+      {voiceStatus === 'unsupported' || voiceStatus === 'error' ? (
+        <p className="mt-2 px-4 text-xs font-bold text-amber-800" role="status">
+          {voiceStatus === 'unsupported' ? 'Voice search is not supported in this browser yet.' : 'Voice search could not start. Try typing your grocery search.'}
+        </p>
+      ) : null}
 
       {shouldShowDropdown ? (
         <div
@@ -386,6 +490,19 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
                   >
                     <span className="block text-sm font-black text-slate-950">{result.name}</span>
                     <span className="mt-1 block text-xs font-semibold text-slate-600">{result.brand ?? 'Brand not reported'} · PostgreSQL product search</span>
+                    {result.searchExplanationBadges && result.searchExplanationBadges.length > 0 ? (
+                      <span className="mt-2 flex flex-wrap gap-1.5" data-search-explanation-badges>
+                        {result.searchExplanationBadges.slice(0, 3).map((badge) => (
+                          <span
+                            className="rounded-full bg-indigo-50 px-2 py-0.5 text-[0.65rem] font-black uppercase tracking-[0.12em] text-indigo-900"
+                            key={`${result.id}-${badge.kind}-${badge.label}`}
+                            title={`Matched: ${badge.matchedTerms.join(', ')}`}
+                          >
+                            {badge.label}
+                          </span>
+                        ))}
+                      </span>
+                    ) : null}
                   </Link>
                 );
               })}

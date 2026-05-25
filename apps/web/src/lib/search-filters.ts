@@ -10,6 +10,12 @@ export type SearchSynonymBadge = {
   matchedTerms: string[];
 };
 
+export type SearchExplanationBadge = {
+  kind: 'name' | 'brand' | 'category' | 'barcode' | 'synonym';
+  label: string;
+  matchedTerms: string[];
+};
+
 export type HeaderSearchFacetChip = {
   kind: 'category' | 'chain' | 'diet' | 'price-range';
   label: string;
@@ -51,6 +57,39 @@ function normalizedSearchText(parts: Array<string | null | undefined>) {
 
 function hasTerm(text: string, term: string) {
   return text.includes(term.toLocaleLowerCase('sv-SE'));
+}
+
+function normalizedExplanationText(value: string | null | undefined) {
+  return (value ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase('sv-SE')
+    .replace(/[^a-z0-9åäö]+/g, ' ')
+    .trim()
+    .replace(/\s+/g, ' ');
+}
+
+function searchTerms(query: string) {
+  const normalized = normalizedExplanationText(query);
+  return normalized.split(' ').filter((term) => term.length > 1);
+}
+
+function matchesSearchText(value: string | null | undefined, query: string) {
+  const normalizedValue = normalizedExplanationText(value);
+  const normalizedQuery = normalizedExplanationText(query);
+  if (!normalizedValue || !normalizedQuery) return false;
+  if (normalizedValue.includes(normalizedQuery)) return true;
+  const terms = searchTerms(query);
+  return terms.length > 0 && terms.some((term) => normalizedValue.includes(term));
+}
+
+function pushUniqueBadge(badges: SearchExplanationBadge[], badge: SearchExplanationBadge) {
+  if (!badges.some((existing) => existing.kind === badge.kind && existing.label === badge.label)) {
+    badges.push({
+      ...badge,
+      matchedTerms: [...new Set(badge.matchedTerms.filter(Boolean))]
+    });
+  }
 }
 
 export function allergenRiskBadgesForText(parts: Array<string | null | undefined>): AllergenRiskBadge[] {
@@ -148,7 +187,7 @@ export type RemovableSearchFilterChip = {
   href: string;
 };
 
-type SearchFilterChipKey = 'category' | 'chain' | 'dietary' | 'minPrice' | 'maxPrice';
+type SearchFilterChipKey = 'brand' | 'category' | 'chain' | 'dietary' | 'inStockOnly' | 'label' | 'minConfidence' | 'minPrice' | 'maxPrice';
 
 type SearchFilterChipOptions = {
   basePath?: string;
@@ -157,7 +196,7 @@ type SearchFilterChipOptions = {
 
 type SearchFilterParams = Record<string, SearchFilterParamValue>;
 
-const multiValueChipKeys = new Set<SearchFilterChipKey>(['category', 'chain', 'dietary']);
+const multiValueChipKeys = new Set<SearchFilterChipKey>(['category', 'chain', 'dietary', 'label']);
 
 function searchParamValues(value: SearchFilterParamValue): string[] {
   const rawValues = Array.isArray(value) ? value : value ? [value] : [];
@@ -218,11 +257,27 @@ export function buildRemovableSearchFilterChips(searchParams: SearchFilterParams
     });
   }
 
+  for (const brand of searchParamValues(searchParams.brand)) {
+    chips.push({
+      id: `brand:${brand}`,
+      label: `Brand: ${displayChipValue(brand, options.labels?.brand)}`,
+      href: chipRemovalHref(searchParams, 'brand', brand, basePath)
+    });
+  }
+
   for (const dietary of searchParamValues(searchParams.dietary)) {
     chips.push({
       id: `dietary:${dietary}`,
       label: `Dietary: ${displayChipValue(dietary, options.labels?.dietary)}`,
       href: chipRemovalHref(searchParams, 'dietary', dietary, basePath)
+    });
+  }
+
+  for (const label of searchParamValues(searchParams.label)) {
+    chips.push({
+      id: `label:${label}`,
+      label: `Certification: ${displayChipValue(label, options.labels?.label)}`,
+      href: chipRemovalHref(searchParams, 'label', label, basePath)
     });
   }
 
@@ -244,5 +299,71 @@ export function buildRemovableSearchFilterChips(searchParams: SearchFilterParams
     });
   }
 
+  const minConfidence = searchParamValues(searchParams.minConfidence)[0];
+  if (minConfidence) {
+    chips.push({
+      id: `minConfidence:${minConfidence}`,
+      label: `Min confidence: ${minConfidence}`,
+      href: chipRemovalHref(searchParams, 'minConfidence', minConfidence, basePath)
+    });
+  }
+
+  const inStockOnly = searchParamValues(searchParams.inStockOnly)[0];
+  if (inStockOnly === 'true' || inStockOnly === '1' || inStockOnly === 'on') {
+    chips.push({
+      id: 'inStockOnly:true',
+      label: 'Availability: in stock only',
+      href: chipRemovalHref(searchParams, 'inStockOnly', inStockOnly, basePath)
+    });
+  }
+
   return chips;
+}
+
+export function searchExplanationBadgesForProduct({
+  barcode,
+  brand,
+  category,
+  matchedSynonyms = [],
+  name,
+  query
+}: {
+  barcode?: string | null;
+  brand?: string | null;
+  category?: string | null;
+  matchedSynonyms?: string[];
+  name: string;
+  query: string;
+}): SearchExplanationBadge[] {
+  const badges: SearchExplanationBadge[] = [];
+  const trimmedQuery = query.trim();
+  if (!trimmedQuery) return badges;
+
+  if (matchesSearchText(brand, trimmedQuery)) {
+    pushUniqueBadge(badges, { kind: 'brand', label: 'brand match', matchedTerms: [trimmedQuery] });
+  }
+
+  if (matchesSearchText(category, trimmedQuery)) {
+    pushUniqueBadge(badges, { kind: 'category', label: 'category match', matchedTerms: [trimmedQuery] });
+  }
+
+  const queryDigits = trimmedQuery.replace(/\D/g, '');
+  const barcodeDigits = (barcode ?? '').replace(/\D/g, '');
+  if (queryDigits.length >= 4 && barcodeDigits.includes(queryDigits)) {
+    pushUniqueBadge(badges, { kind: 'barcode', label: 'barcode match', matchedTerms: [queryDigits] });
+  }
+
+  if (matchedSynonyms.length > 0) {
+    pushUniqueBadge(badges, { kind: 'synonym', label: 'synonym match', matchedTerms: matchedSynonyms });
+  }
+
+  if (matchesSearchText(name, trimmedQuery)) {
+    pushUniqueBadge(badges, { kind: 'name', label: 'name match', matchedTerms: [trimmedQuery] });
+  }
+
+  if (badges.length === 0) {
+    pushUniqueBadge(badges, { kind: 'name', label: 'ranked text match', matchedTerms: searchTerms(trimmedQuery).slice(0, 3) });
+  }
+
+  return badges;
 }

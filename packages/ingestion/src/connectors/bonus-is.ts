@@ -20,11 +20,64 @@ export type FetchBonusIsProductsOptions = {
   retrievedAt?: string;
 };
 
+export type BonusIsConnectorHealth = {
+  chain: BonusIsChain;
+  checkedAt: string;
+  sourceUrls: readonly string[];
+  requestedMaxRows: number;
+  rowCount: number;
+  nonEmptyFields: {
+    name: number;
+    price: number;
+    productUrl: number;
+    imageUrl: number;
+  };
+  ok: boolean;
+  error?: string;
+};
+
 export const BONUS_IS_STORE_BASE_URL = 'https://verslun.bonus.is';
 export const DEFAULT_BONUS_IS_PRODUCT_URLS = [
   `${BONUS_IS_STORE_BASE_URL}/`,
   `${BONUS_IS_STORE_BASE_URL}/en/`
 ] as const;
+
+export async function checkBonusIsConnectorHealth(options: FetchBonusIsProductsOptions = {}): Promise<BonusIsConnectorHealth> {
+  const requestedMaxRows = options.maxRows ?? 5;
+  const sourceUrls = options.sourceUrls ?? DEFAULT_BONUS_IS_PRODUCT_URLS;
+  const checkedAt = options.retrievedAt ?? new Date().toISOString();
+
+  try {
+    const rows = await fetchBonusIsProducts({ ...options, sourceUrls, maxRows: requestedMaxRows, retrievedAt: checkedAt });
+    const nonEmptyFields = countNonEmptyBonusIsFields(rows);
+    const allRowsHaveRequiredFields = rows.length > 0
+      && nonEmptyFields.name === rows.length
+      && nonEmptyFields.price === rows.length
+      && nonEmptyFields.productUrl === rows.length
+      && nonEmptyFields.imageUrl === rows.length;
+
+    return {
+      chain: 'bonus-is',
+      checkedAt,
+      sourceUrls,
+      requestedMaxRows,
+      rowCount: rows.length,
+      nonEmptyFields,
+      ok: allRowsHaveRequiredFields
+    };
+  } catch (error) {
+    return {
+      chain: 'bonus-is',
+      checkedAt,
+      sourceUrls,
+      requestedMaxRows,
+      rowCount: 0,
+      nonEmptyFields: { name: 0, price: 0, productUrl: 0, imageUrl: 0 },
+      ok: false,
+      error: error instanceof Error ? error.message : String(error)
+    };
+  }
+}
 
 export async function fetchBonusIsProducts(options: FetchBonusIsProductsOptions = {}): Promise<BonusIsProduct[]> {
   const fetchImpl = options.fetchImpl ?? fetch;
@@ -75,6 +128,15 @@ export function normalizeBonusIsProduct(block: string, sourceUrl: string, retrie
     inStock: !outOfStock,
     sourceUrl,
     retrievedAt
+  };
+}
+
+function countNonEmptyBonusIsFields(rows: readonly BonusIsProduct[]): BonusIsConnectorHealth['nonEmptyFields'] {
+  return {
+    name: rows.filter((row) => row.name.trim().length > 0).length,
+    price: rows.filter((row) => Number.isFinite(row.price)).length,
+    productUrl: rows.filter((row) => row.productUrl.trim().length > 0).length,
+    imageUrl: rows.filter((row) => row.imageUrl.trim().length > 0).length
   };
 }
 

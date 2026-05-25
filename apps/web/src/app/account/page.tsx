@@ -4,8 +4,10 @@ import { AdDisclosureActions } from '@/components/ad-disclosure-actions';
 import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { DietaryProfileOnboarding } from '@/components/diet-filter-picker';
 import { listShareRoles, accountListSharePermissions } from '@/lib/list-permissions';
-import { dietaryPreferenceOnboardingContract } from '@/lib/personalization';
+import { dietaryPreferenceOnboardingContract, demoPreferredBrandControls, groupPreferredBrandControls } from '@/lib/personalization';
+import { buildPremiumSavingsForecast } from '@/lib/price-intelligence';
 import { routeMetadata } from '@/lib/seo';
 import { accountSavedShoppingContract, formatSek, savedBasketAutoReorderPlanner } from '@/lib/verified-data';
 import { planAccountDeletion } from '@groceryview/core';
@@ -137,6 +139,7 @@ const notificationSubscriptionScript = `(() => {
   refreshState();
 })();`;
 
+const premiumSavingsForecast = buildPremiumSavingsForecast();
 const accountDeletionPlan = planAccountDeletion('signed-in-user');
 const accountDeletionConfirmations = [
   'Confirm the active session belongs to the account owner.',
@@ -149,6 +152,7 @@ const bestTimeToBuyAlertRules = [
   { label: 'Discount stores + pantry', stores: ['Willys', 'Lidl'], categories: ['Pantry', 'Frozen'], confidence: 0.78 },
   { label: 'Weekend produce watch', stores: ['Coop', 'Hemköp'], categories: ['Produce'], confidence: 0.74 }
 ];
+const preferredBrandControlGroups = groupPreferredBrandControls();
 
 export function generateMetadata() {
   return routeMetadata('/account');
@@ -271,6 +275,57 @@ export default function AccountPage() {
             </div>
             <p className="mt-3 text-xs font-bold uppercase tracking-[0.16em] text-lime-900">
               Used by {dietaryPreferenceOnboardingContract.personalizationSurfaces.join(', ')}
+            </p>
+          </div>
+        </div>
+        <DietaryProfileOnboarding className="mt-4 border-lime-100" />
+      </Card>
+
+      <Card className="mt-6 border-fuchsia-200 bg-fuchsia-50">
+        <div className="grid gap-5 lg:grid-cols-[0.85fr_1fr] lg:items-start">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-fuchsia-800">Brand personalization</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Preferred and avoided brands stay explicit</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-700">
+              Account settings now expose brand controls used by search ranking, recommendation rails, and substitution scoring. Favorite brands get a positive ranking signal while avoided brands are pushed down instead of being inferred from browsing history.
+            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <p className="rounded-2xl bg-white p-4 shadow-sm">
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">Preferred</span>
+                <span className="mt-1 block text-3xl font-black text-fuchsia-900">{preferredBrandControlGroups.favorite.length}</span>
+              </p>
+              <p className="rounded-2xl bg-white p-4 shadow-sm">
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">Allowed</span>
+                <span className="mt-1 block text-3xl font-black text-slate-950">{preferredBrandControlGroups.acceptable.length}</span>
+              </p>
+              <p className="rounded-2xl bg-white p-4 shadow-sm">
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">Avoided</span>
+                <span className="mt-1 block text-3xl font-black text-rose-900">{preferredBrandControlGroups.excluded.length}</span>
+              </p>
+            </div>
+          </div>
+          <div className="rounded-[1.5rem] border border-fuchsia-100 bg-white p-4 shadow-sm">
+            <p className="text-sm font-black text-slate-950">Choose brand treatment</p>
+            <div className="mt-3 grid gap-2 text-sm font-semibold text-slate-700">
+              {demoPreferredBrandControls.map((control) => (
+                <label className="flex items-start gap-3 rounded-2xl bg-fuchsia-50 p-3" key={control.brand}>
+                  <input
+                    aria-label={`${control.brand} ${control.tolerance}`}
+                    checked={control.tolerance !== 'acceptable'}
+                    className="mt-1 h-4 w-4 accent-fuchsia-700"
+                    readOnly
+                    type="checkbox"
+                  />
+                  <span>
+                    <span className="block font-black text-slate-950">{control.brand}</span>
+                    <span className="mt-1 block text-xs font-black uppercase tracking-[0.14em] text-fuchsia-900">{control.tolerance}</span>
+                    <span className="mt-1 block text-xs leading-5 text-slate-600">{control.note}</span>
+                  </span>
+                </label>
+              ))}
+            </div>
+            <p className="mt-3 rounded-2xl bg-white p-3 text-xs font-bold leading-5 text-fuchsia-950">
+              Stored preferences remain account-owned and are applied before automatic product substitutions can be suggested.
             </p>
           </div>
         </div>
@@ -440,6 +495,7 @@ export default function AccountPage() {
       </Card>
 
       <AccountMutationActions />
+      <p className="mt-6 rounded-2xl bg-violet-50 p-4 text-sm font-bold text-violet-950">Premium forecast preview: {premiumSavingsForecast.monthlySavingsLabel} estimated monthly savings before checkout.</p>
       <AccountBillingActions />
       <AdDisclosureActions />
 
