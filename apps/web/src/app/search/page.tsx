@@ -1,8 +1,11 @@
 import ProductsPage from '../products/page';
+import { SearchRecoveryPanel } from '@/components/data-ui';
 import { RecentSearchReplayPills } from '@/components/SearchBar';
 import { SaveSearchSubscriptionButton } from '@/components/saved-search-subscriptions';
 import { buildSavedSearchSubscription } from '@/lib/alert-scheduler';
 import { routeMetadata } from '@/lib/seo';
+import { buildMisspelledQueryRecovery } from '@/lib/search-suggest';
+import { buildProductSearchView } from '@/lib/verified-data';
 
 export function generateMetadata() {
   return routeMetadata('/search');
@@ -13,6 +16,9 @@ type SearchPageParams = Record<string, string | string[] | undefined>;
 export default async function SearchPage({ searchParams }: { searchParams?: Promise<SearchPageParams> }) {
   const resolvedSearchParams = await (searchParams ?? Promise.resolve({}));
   const subscription = buildSavedSearchSubscription({ searchParams: resolvedSearchParams, path: '/search' });
+  const query = Array.isArray(resolvedSearchParams.q) ? resolvedSearchParams.q[0] ?? '' : resolvedSearchParams.q ?? '';
+  const searchView = buildProductSearchView(resolvedSearchParams);
+  const recovery = searchView.resultCards.length === 0 ? buildMisspelledQueryRecovery(query) : null;
 
   return (
     <>
@@ -24,7 +30,10 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
         </p>
       </section>
       <RecentSearchReplayPills />
-      <ProductsPage searchParams={Promise.resolve(resolvedSearchParams)} />
+      {recovery ? <SearchRecoveryPanel didYouMean={recovery.didYouMean} popularAlternatives={recovery.popularAlternatives} query={recovery.query} /> : null}
+      <section aria-label="Search results with virtualized product rendering">
+        <ProductsPage searchParams={Promise.resolve(resolvedSearchParams)} />
+      </section>
     </>
   );
 }

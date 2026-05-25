@@ -1,5 +1,6 @@
 export type ObservedPricePoint = {
   price: number;
+  observedAt?: string;
 };
 
 export type VolatilityBadgeMethodology = {
@@ -8,6 +9,17 @@ export type VolatilityBadgeMethodology = {
   rangeLabel: string;
   summary: string;
   forecastBoundary: string;
+};
+
+export type RecentPriceVarianceStatus = 'stable' | 'volatile' | 'likely-promo';
+
+export type RecentPriceVarianceBadge = {
+  status: RecentPriceVarianceStatus;
+  label: string;
+  shortLabel: string;
+  score: number;
+  observationCount: number;
+  summary: string;
 };
 
 export type BasketBuyTimingAction = 'buy_now' | 'watch' | 'substitute';
@@ -101,6 +113,14 @@ export type BestTimeToBuyAlertRecommendation = {
   upcomingFlyerWindow: FlyerWindow | null;
   flyerWindowLabel: string;
   rationale: string;
+};
+
+export type BestTimeToBuyForecastPanel = {
+  headline: string;
+  guidance: string;
+  confidenceLabel: string;
+  expectedMovementLabel: string;
+  recommendationCount: number;
 };
 
 export type SeasonalDiscoveryRow = {
@@ -319,6 +339,60 @@ export function volatilityBadgeMethodology(points: ReadonlyArray<ObservedPricePo
   };
 }
 
+export function classifyRecentPriceVariance(points: ReadonlyArray<ObservedPricePoint>): RecentPriceVarianceBadge | null {
+  const recent = [...points]
+    .map((point, index) => ({
+      price: point.price,
+      observedTime: point.observedAt ? Date.parse(point.observedAt) : index
+    }))
+    .filter((point) => Number.isFinite(point.price) && point.price > 0 && Number.isFinite(point.observedTime))
+    .sort((left, right) => left.observedTime - right.observedTime)
+    .slice(-8);
+
+  if (recent.length < 2) return null;
+
+  const prices = recent.map((point) => point.price);
+  const low = Math.min(...prices);
+  const high = Math.max(...prices);
+  const average = prices.reduce((sum, price) => sum + price, 0) / prices.length;
+  const latest = prices.at(-1) ?? average;
+  const spreadPercent = average > 0 ? ((high - low) / average) * 100 : 0;
+  const volatilityPercent = average > 0 ? (standardDeviation(prices) / average) * 100 : 0;
+  const score = Math.round(clamp(Math.max(spreadPercent, volatilityPercent * 2), 0, 100));
+  const isLikelyPromo = recent.length >= 3 && score >= 12 && latest <= average * 0.92 && latest <= low * 1.03;
+
+  if (isLikelyPromo) {
+    return {
+      status: 'likely-promo',
+      label: 'Likely promo',
+      shortLabel: 'promo',
+      score,
+      observationCount: recent.length,
+      summary: `Latest observed price is near the recent low after a ${score}% recent variance swing.`
+    };
+  }
+
+  if (score >= 18) {
+    return {
+      status: 'volatile',
+      label: 'Volatile price',
+      shortLabel: 'volatile',
+      score,
+      observationCount: recent.length,
+      summary: `Recent observed prices moved across a ${score}% variance band.`
+    };
+  }
+
+  return {
+    status: 'stable',
+    label: 'Stable price',
+    shortLabel: 'stable',
+    score,
+    observationCount: recent.length,
+    summary: `Recent observed prices stayed within a ${score}% variance band.`
+  };
+}
+
 function averagePrice(points: ReadonlyArray<PriceForecastObservation>) {
   const prices = points.map((point) => point.price).filter((price) => Number.isFinite(price) && price > 0);
   return prices.length > 0 ? prices.reduce((sum, price) => sum + price, 0) / prices.length : null;
@@ -378,6 +452,23 @@ export function buildBestTimeToBuyAlert(input: BestTimeToBuyAlertInput): BestTim
       : decision === 'wait_for_flyer'
         ? `Historical volatility score ${volatility.score} plus the upcoming flyer window makes waiting more useful than buying at the current observed price.`
         : `Current price is close to historical observations and no strong flyer signal is available, so keep the watchlist alert active.`
+  };
+}
+
+export function buildBestTimeToBuyForecastPanel(recommendations: ReadonlyArray<BestTimeToBuyAlertRecommendation>): BestTimeToBuyForecastPanel {
+  const buyNow = recommendations.filter((recommendation) => recommendation.decision === 'buy_now').length;
+  const wait = recommendations.filter((recommendation) => recommendation.decision === 'wait_for_flyer').length;
+  const watch = recommendations.length - buyNow - wait;
+  const leadRecommendation = [...recommendations].sort((left, right) => right.volatilityScore - left.volatilityScore)[0];
+
+  return {
+    headline: wait > buyNow ? 'Waiting may beat today’s shelf price' : buyNow > 0 ? 'Several observed prices look buyable now' : 'Keep watching volatile items',
+    guidance: `Decision mix: ${buyNow} buy now · ${wait} wait for flyer · ${watch} keep watching.`,
+    confidenceLabel: leadRecommendation?.confidenceLabel ?? 'limited timing evidence',
+    expectedMovementLabel: leadRecommendation
+      ? `${leadRecommendation.productName}: ${leadRecommendation.flyerWindowLabel}; observed range ${leadRecommendation.observedRangeLabel}.`
+      : 'No item has enough observed movement to summarize yet.',
+    recommendationCount: recommendations.length
   };
 }
 
