@@ -1,5 +1,6 @@
 "use client";
 
+import { getStoreLayoutDepartment, sortItemsByStoreLayout, type StoreLayoutChain } from "../lib/trip-planner";
 import {
   useList,
   type FamilyRole,
@@ -11,6 +12,7 @@ type ListCardProps = {
   currentRole: FamilyRole;
   items: SharedListItem[];
   onConflictPrompt?: (prompt: ListConflictPrompt) => void;
+  selectedChain?: StoreLayoutChain;
 };
 
 const roleLabels: Record<FamilyRole, string> = {
@@ -20,12 +22,13 @@ const roleLabels: Record<FamilyRole, string> = {
   guest: "Guest",
 };
 
-export function ListCard({ currentRole, items, onConflictPrompt }: ListCardProps) {
+export function ListCard({ currentRole, items, onConflictPrompt, selectedChain = "ica" }: ListCardProps) {
   const { conflictPrompts, items: listItems, updateItem } = useList({
     currentRole,
     initialItems: items,
     onConflictPrompt,
   });
+  const storeOrderedItems = sortItemsByStoreLayout(listItems, selectedChain);
 
   return (
     <section
@@ -38,7 +41,7 @@ export function ListCard({ currentRole, items, onConflictPrompt }: ListCardProps
             Shared shopping list
           </h2>
           <p className="text-sm text-slate-600">
-            Editing another role&apos;s item creates a checkout conflict prompt.
+            Editing another role&apos;s item creates a checkout conflict prompt. Items are ordered by the selected store layout.
           </p>
         </div>
         <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
@@ -47,8 +50,9 @@ export function ListCard({ currentRole, items, onConflictPrompt }: ListCardProps
       </div>
 
       <ul className="space-y-2">
-        {listItems.map((item) => (
+        {storeOrderedItems.map((item) => (
           <li key={item.id} className="rounded-xl border border-slate-100 p-3">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-emerald-700">{getStoreLayoutDepartment(item.name, selectedChain).label}</p>
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="font-medium text-slate-950">{item.name}</p>
