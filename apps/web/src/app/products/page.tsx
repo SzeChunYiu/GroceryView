@@ -5,8 +5,10 @@ import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { PriceReportReviewActions } from '@/components/price-report-review-actions';
 import { OriginFilter, type OriginFilterCode } from '@/components/origin-filter';
 import { ProductPriceCards } from '@/components/product-price-cards';
+import { NewArrivalsCarousel } from '@/components/TrendingCarousel';
 import { VirtualizedProductGrid } from '@/components/LazyItemCard';
 import { apohemSource } from '@/lib/ingested/apohem';
+import { newProductArrivals } from '@/lib/new-arrivals';
 import { adaptiveProductCards, buildProductSearchView, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
 import { publicCatalogueRevalidateSeconds, routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
@@ -170,6 +172,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
       <Eyebrow>Products</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Verified product catalogue</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">Products are shown only when present in the Axfood chain snapshot or OpenPrices SEK observations. No synthetic prices or filler products are rendered.</p>
+      <NewArrivalsCarousel items={newProductArrivals} />
       <Card className="mt-8 border-indigo-200 bg-indigo-50/70">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div>
