@@ -29,6 +29,42 @@ export type PredictiveDropAlert = {
   };
 };
 
+export type PushNotificationPreferenceId = 'price_drops' | 'pantry_expiry' | 'budget_warnings' | 'household_updates';
+
+export type PushNotificationPreferenceOption = {
+  id: PushNotificationPreferenceId;
+  label: string;
+  description: string;
+  defaultEnabled: boolean;
+};
+
+export const pushNotificationPreferenceOptions: PushNotificationPreferenceOption[] = [
+  {
+    id: 'price_drops',
+    label: 'Price drops',
+    description: 'Notify when watched products or saved searches cross a price-drop threshold.',
+    defaultEnabled: true
+  },
+  {
+    id: 'pantry_expiry',
+    label: 'Pantry expiry',
+    description: 'Notify before pantry items expire or need use-soon recipe planning.',
+    defaultEnabled: false
+  },
+  {
+    id: 'budget_warnings',
+    label: 'Budget warnings',
+    description: 'Notify when a basket or trip plan risks exceeding the weekly budget.',
+    defaultEnabled: true
+  },
+  {
+    id: 'household_updates',
+    label: 'Household updates',
+    description: 'Notify when shared list items, comments, or household planning changes need attention.',
+    defaultEnabled: false
+  }
+];
+
 type PredictiveDropAlertOptions = {
   now?: Date;
   daysAhead?: number;

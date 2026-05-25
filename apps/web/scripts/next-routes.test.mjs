@@ -311,6 +311,24 @@ describe('verified-data UI', () => {
     assert.match(server, /\/api\/settings\/account/);
   });
 
+  it('surfaces granular push notification preferences in settings', async () => {
+    const settings = await read('src/app/settings/page.tsx');
+    const actions = await read('src/components/notification-inbox-actions.tsx');
+    const scheduler = await read('src/lib/alert-scheduler.ts');
+
+    assert.match(settings, /NotificationInboxActions/);
+    assert.match(actions, /Push preference center/);
+    assert.match(actions, /savePushPreferences/);
+    assert.match(actions, /\/api\/notifications\/subscription/);
+    assert.match(actions, /selectedPreferences/);
+    assert.match(actions, /pushNotificationPreferenceOptions/);
+    assert.match(scheduler, /PushNotificationPreferenceId/);
+    assert.match(scheduler, /price_drops/);
+    assert.match(scheduler, /pantry_expiry/);
+    assert.match(scheduler, /budget_warnings/);
+    assert.match(scheduler, /household_updates/);
+  });
+
 
 
   it('surfaces the bookmarklet import/export contract and static asset on the basket ideas route', async () => {

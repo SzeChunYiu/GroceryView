@@ -1,6 +1,7 @@
 'use client';
 
 import { type FormEvent, useMemo, useState } from 'react';
+import { pushNotificationPreferenceOptions, type PushNotificationPreferenceId } from '@/lib/alert-scheduler';
 
 type NotificationInboxStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
 type BestTimeRuleStatus = 'idle' | 'blocked' | 'saving' | 'saved' | 'error';
@@ -35,6 +36,7 @@ type BestTimeToBuyRuleRequest = {
   alertType: 'best_time_to_buy';
   minimumConfidence: number;
 };
+type PreferenceStatus = 'idle' | 'blocked' | 'saving' | 'saved' | 'error';
 
 const BEST_TIME_STORES = [
   { id: 'willys-odenplan', label: 'Willys Odenplan' },
@@ -67,6 +69,11 @@ export function NotificationInboxActions() {
   const [categoryId, setCategoryId] = useState<string>(BEST_TIME_CATEGORIES[0].id);
   const [channel, setChannel] = useState<AlertChannel>('push');
   const [minimumConfidence, setMinimumConfidence] = useState('0.70');
+  const [preferenceStatus, setPreferenceStatus] = useState<PreferenceStatus>('idle');
+  const [preferenceMessage, setPreferenceMessage] = useState('Choose notification categories before saving account-bound push preferences.');
+  const [selectedPreferences, setSelectedPreferences] = useState<PushNotificationPreferenceId[]>(() => (
+    pushNotificationPreferenceOptions.filter((option) => option.defaultEnabled).map((option) => option.id)
+  ));
   const contractPreview = useMemo<BestTimeToBuyRuleRequest>(() => ({
     userId: readSession().userId || 'signed-in-user-id',
     storeId,
@@ -75,6 +82,46 @@ export function NotificationInboxActions() {
     alertType: 'best_time_to_buy',
     minimumConfidence: Number(minimumConfidence)
   }), [categoryId, channel, minimumConfidence, storeId]);
+
+  function togglePreference(id: PushNotificationPreferenceId) {
+    setSelectedPreferences((current) => (
+      current.includes(id) ? current.filter((value) => value !== id) : [...current, id]
+    ));
+  }
+
+  async function savePushPreferences() {
+    const { accessToken, userId } = readSession();
+    if (!accessToken || !userId) {
+      setPreferenceStatus('blocked');
+      setPreferenceMessage('Sign in first. Push notification preferences are account-bound and are not saved anonymously.');
+      return;
+    }
+
+    setPreferenceStatus('saving');
+    const response = await fetch('/api/notifications/subscription', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        accountId: userId,
+        channels: selectedPreferences,
+        deliveryEnabled: false,
+        permission: 'unsupported',
+        subscription: null
+      })
+    });
+
+    if (!response.ok) {
+      setPreferenceStatus('error');
+      setPreferenceMessage('The notification subscription API rejected the push preference update.');
+      return;
+    }
+
+    setPreferenceStatus('saved');
+    setPreferenceMessage(`Saved push preferences for ${selectedPreferences.length} category channel(s): ${selectedPreferences.join(', ')}.`);
+  }
 
   async function loadInbox() {
     const { accessToken, userId } = readSession();
@@ -153,6 +200,36 @@ export function NotificationInboxActions() {
       </p>
       <button className="mt-4 rounded-full bg-cyan-800 px-4 py-2 text-sm font-black text-white" onClick={loadInbox} type="button">Load notification inbox</button>
       <p className="mt-4 rounded-2xl bg-white p-3 text-sm font-bold text-cyan-950" data-status={status}>{message}</p>
+
+      <div className="mt-5 rounded-3xl border border-cyan-100 bg-white p-4 shadow-sm" aria-label="Push notification preference center">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-800">Push preference center</p>
+            <h3 className="mt-2 text-xl font-black text-slate-950">Choose price, pantry, budget, and household alerts separately</h3>
+            <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-slate-700">
+              Preferences are saved through the account notification subscription endpoint before browser delivery is enabled.
+            </p>
+          </div>
+          <button className="rounded-full bg-cyan-800 px-4 py-2 text-sm font-black text-white" onClick={savePushPreferences} type="button">Save push preferences</button>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          {pushNotificationPreferenceOptions.map((option) => (
+            <label className="flex gap-3 rounded-2xl bg-cyan-50 p-3 text-sm font-semibold text-slate-700" key={option.id}>
+              <input
+                checked={selectedPreferences.includes(option.id)}
+                className="mt-1 h-4 w-4 accent-cyan-800"
+                onChange={() => togglePreference(option.id)}
+                type="checkbox"
+              />
+              <span>
+                <span className="block font-black text-slate-950">{option.label}</span>
+                <span className="mt-1 block">{option.description}</span>
+              </span>
+            </label>
+          ))}
+        </div>
+        <p className="mt-3 rounded-2xl bg-cyan-50 p-3 text-sm font-bold text-cyan-950" data-status={preferenceStatus}>{preferenceMessage}</p>
+      </div>
 
       {report ? (
         <div className="mt-4 grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
