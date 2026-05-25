@@ -118,6 +118,32 @@ export const watchlistSchema = z.object({
   favoriteStoresOnly: z.boolean().default(false)
 });
 
+export const dealShareRelationshipSchema = z.enum(['household', 'friend']);
+
+export const friendSharedDealSignalSchema = z.object({
+  signalId: idSchema,
+  userId: idSchema,
+  productId: idSchema,
+  sharedByUserId: idSchema,
+  sharedByDisplayName: idSchema,
+  relationship: dealShareRelationshipSchema,
+  sharedAt: isoDateTimeSchema,
+  sourceConfidence: z.number().min(0).max(1),
+  optedIn: z.literal(true),
+  dealScore: z.number().int().min(0).max(100).optional(),
+  createdAt: isoDateTimeSchema
+});
+
+export const friendSharedDealSignalCreateSchema = friendSharedDealSignalSchema
+  .omit({ userId: true, createdAt: true })
+  .extend({ createdAt: isoDateTimeSchema.optional() });
+
+export const friendSharedDealSignalListResponseSchema = z.object({
+  userId: idSchema,
+  signals: z.array(friendSharedDealSignalSchema),
+  guardrails: z.array(idSchema)
+});
+
 export const basketItemSchema = z.object({
   productId: idSchema,
   quantity: z.number().positive()
@@ -247,6 +273,9 @@ export const apiContractSchemas = {
   basket: basketSchema,
   basketItem: basketItemSchema,
   compareResponse: compareResponseSchema,
+  friendSharedDealSignal: friendSharedDealSignalSchema,
+  friendSharedDealSignalCreate: friendSharedDealSignalCreateSchema,
+  friendSharedDealSignalListResponse: friendSharedDealSignalListResponseSchema,
   latestPrice: latestPriceSchema,
   fuelPriceObservation: fuelPriceObservationSchema,
   fuelPriceSource: fuelPriceSourceSchema,
@@ -292,6 +321,9 @@ export type ProvenanceDto = z.infer<typeof provenanceSchema>;
 export type SourceType = z.infer<typeof sourceTypeSchema>;
 export type StoreDto = z.infer<typeof storeSchema>;
 export type WatchlistDto = z.infer<typeof watchlistSchema>;
+export type FriendSharedDealSignalDto = z.infer<typeof friendSharedDealSignalSchema>;
+export type FriendSharedDealSignalCreateDto = z.infer<typeof friendSharedDealSignalCreateSchema>;
+export type FriendSharedDealSignalListResponseDto = z.infer<typeof friendSharedDealSignalListResponseSchema>;
 
 export const apiContractOpenApiComponents = {
   PriceObservation: {
@@ -486,6 +518,38 @@ export const apiContractOpenApiComponents = {
         items: { $ref: '#/components/schemas/NotificationInboxQueueItem' }
       },
       quietHoursWindow: { type: 'string' },
+      guardrails: {
+        type: 'array',
+        items: { type: 'string' }
+      }
+    }
+  },
+  FriendSharedDealSignal: {
+    type: 'object',
+    required: ['signalId', 'userId', 'productId', 'sharedByUserId', 'sharedByDisplayName', 'relationship', 'sharedAt', 'sourceConfidence', 'optedIn', 'createdAt'],
+    properties: {
+      signalId: { type: 'string' },
+      userId: { type: 'string' },
+      productId: { type: 'string' },
+      sharedByUserId: { type: 'string' },
+      sharedByDisplayName: { type: 'string' },
+      relationship: { type: 'string', enum: dealShareRelationshipSchema.options },
+      sharedAt: { type: 'string', format: 'date-time' },
+      sourceConfidence: { type: 'number', minimum: 0, maximum: 1 },
+      optedIn: { type: 'boolean', enum: [true] },
+      dealScore: { type: 'integer', minimum: 0, maximum: 100 },
+      createdAt: { type: 'string', format: 'date-time' }
+    }
+  },
+  FriendSharedDealSignalListResponse: {
+    type: 'object',
+    required: ['userId', 'signals', 'guardrails'],
+    properties: {
+      userId: { type: 'string' },
+      signals: {
+        type: 'array',
+        items: { $ref: '#/components/schemas/FriendSharedDealSignal' }
+      },
       guardrails: {
         type: 'array',
         items: { type: 'string' }

@@ -798,6 +798,7 @@ function friendSharedDealSignalFromBody(userId: string, body: JsonRecord, now: D
   if (dealScore !== undefined && (!Number.isFinite(dealScore) || dealScore < 0 || dealScore > 100)) {
     throw new Error('dealScore must be between 0 and 100.');
   }
+  if (body.optedIn !== true) throw new Error('Only opted-in friend share signals can be persisted.');
 
   return {
     signalId: requiredString(body.signalId, 'signalId'),
@@ -808,7 +809,7 @@ function friendSharedDealSignalFromBody(userId: string, body: JsonRecord, now: D
     relationship: requiredDealShareRelationship(body.relationship),
     sharedAt: requiredIsoTimestamp(body.sharedAt, 'sharedAt'),
     sourceConfidence,
-    optedIn: optionalBoolean(body.optedIn, 'optedIn') ?? true,
+    optedIn: true,
     ...(dealScore === undefined ? {} : { dealScore }),
     createdAt: optionalIsoTimestamp(body.createdAt, 'createdAt') ?? now.toISOString()
   };
@@ -2070,10 +2071,13 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
     const preferences = budgetSummary.weeklyBudget > 0 || budgetSummary.monthlyBudget > 0
       ? [{ weeklyBudget: budgetSummary.weeklyBudget, monthlyBudget: budgetSummary.monthlyBudget }]
       : [];
-    const apiWithFriendSignals = api as typeof api & { getFriendSharedDealSignals?: (userId: string) => unknown[] };
+    const apiWithFriendSignals = api as typeof api & { getFriendSharedDealSignals?: (userId: string) => unknown[] | { signals?: unknown[] } };
+    const apiFriendSignals = apiWithFriendSignals.getFriendSharedDealSignals?.(user);
     const friendSharedDealSignals = authOptions.friendSharedDealSignalRepository
       ? await authOptions.friendSharedDealSignalRepository.listFriendSharedDealSignals(user)
-      : apiWithFriendSignals.getFriendSharedDealSignals?.(user) ?? [];
+      : Array.isArray(apiFriendSignals)
+        ? apiFriendSignals
+        : apiFriendSignals?.signals ?? [];
 
     return buildPrivacyExport(
       {
@@ -2325,7 +2329,15 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         const repository = authOptions.friendSharedDealSignalRepository;
         if (!repository) return errorResponse(503, 'Friend share signal repository is not configured.');
         if (method === 'GET') {
-          return jsonResponse({ userId: user, signals: await repository.listFriendSharedDealSignals(user) });
+          return jsonResponse({
+            userId: user,
+            signals: await repository.listFriendSharedDealSignals(user),
+            guardrails: [
+              'Only opted-in household or friend signals are persisted.',
+              'Anonymous shares are rejected before they can feed suggestFriendSharedDeals.',
+              'Signals remain user-scoped for privacy export and deletion workflows.'
+            ]
+          });
         }
         if (method === 'POST') {
           const body = await readJson(request);
@@ -3463,7 +3475,10 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/deals/discounts': { get: publicOperation('Get active weekly discounts by branch, chain, category, or product with source evidence.') },
       '/api/deals/flyer-offers': { get: publicOperation('Get active weekly flyer offers by branch, chain, category, or product with source evidence.') },
       '/api/deals/friend-share-signals': {
-        get: protectedOperation('List opted-in household and friend deal share signals for the signed-in account.'),
+        get: operationWithJsonResponse(
+          protectedOperation('List opted-in household and friend deal share signals for the signed-in account.'),
+          'FriendSharedDealSignalListResponse'
+        ),
         post: protectedOperation('Persist an opted-in household or friend deal share signal for future deal suggestions.')
       },
       '/api/retailers': { get: publicOperation('List supported retailers with logo and website metadata.') },

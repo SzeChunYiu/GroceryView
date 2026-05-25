@@ -1533,7 +1533,9 @@ describe('createHttpHandler', () => {
 
     const listed = await json(await handle(new Request('http://localhost/api/deals/friend-share-signals?userId=user-1'))) as {
       signals: Array<Record<string, unknown>>;
+      guardrails: string[];
     };
+    assert.match(listed.guardrails.join('\n'), /Only opted-in/);
     assert.deepEqual(listed.signals, [
       {
         signalId: 'friend-share-1',
@@ -1554,6 +1556,22 @@ describe('createHttpHandler', () => {
       sections: Array<{ name: string; records: Array<Record<string, unknown>> }>;
     };
     assert.deepEqual(exported.sections.find((section) => section.name === 'friend_shared_deal_signals')?.records, listed.signals);
+
+    const nonConsented = await handle(new Request('http://localhost/api/deals/friend-share-signals?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({
+        signalId: 'friend-share-private',
+        productId: 'coffee',
+        sharedByUserId: 'friend-1',
+        sharedByDisplayName: 'Ada',
+        relationship: 'friend',
+        sharedAt: '2026-05-20T10:30:00.000Z',
+        sourceConfidence: 0.87,
+        optedIn: false
+      })
+    }));
+    assert.equal(nonConsented.status, 400);
+    assert.equal((await handle(new Request('http://localhost/api/deals/friend-share-signals', { method: 'POST', body: '{}' }))).status, 400);
   });
 
   it('deletes signed-in settings account data after explicit confirmation', async () => {
