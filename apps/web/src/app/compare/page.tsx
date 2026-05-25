@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { BasketComparisonPrint } from '@/components/basket-comparison-print';
 import { ChainSelector } from '@/components/chain-selector';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { FamilyPackComparisonPanel } from '@/components/family-pack-comparison';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
 import { SavedViewActions } from '@/components/saved-view-actions';
@@ -9,6 +10,7 @@ import { StoreComparisonTable } from '@/components/StoreComparisonTable';
 import { StorePriceMatrix } from '@/components/store-price-matrix';
 import { COMPARE_CHAIN_ORDER, buildBasketStoreComparison, buildChainComparisonTable, parseCompareCapabilityFilters, parseCompareChainsParam, type CompareChainCapabilityFilter } from '@/lib/chain-compare';
 import { fetchComparePriceSnapshots, type ComparePriceSnapshotStoreRow } from '@/lib/compare-price-snapshots';
+import { topFamilyPackComparisons } from '@/lib/family-pack';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, commodityComparisons, compareOverlayChart, formatPct, formatSek, matchedChainProducts, privateLabelDupeFinder } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
@@ -211,6 +213,7 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
   const packagedRows = comparison.products.filter((product) => product.matchType === 'packaged_barcode');
   const commodityRows = comparison.products.filter((product) => product.matchType === 'commodity_alias');
   const sampleProductsHref = '/compare?products=makaroner-pasta-101302991-st,havregryn-extra-fylliga-101758934-st';
+  const familyPackComparisons = topFamilyPackComparisons(matchedChainProducts, labelFromSlug);
   const chainSelectorOptions = COMPARE_CHAIN_ORDER.map((chain) => ({
     href: compareHref(
       productsParam,
@@ -653,6 +656,14 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
           ))}
         </div>
       </Card>
+      <div className="mt-6">
+        <FamilyPackComparisonPanel
+          comparisons={familyPackComparisons}
+          emptyDetail="No same-category larger-pack comparisons have parseable unit evidence in the current matched-chain catalogue."
+          intro="Ranks family-pack candidates from matched chain rows by normalized unit price, total spend delta, and storage suitability so larger packs do not look cheaper unless the unit data proves it."
+          title="Family-pack unit-price comparison"
+        />
+      </div>
       <Card className="mt-6 border-sky-200 bg-sky-50/70">
         <div className="grid gap-5 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
           <div>

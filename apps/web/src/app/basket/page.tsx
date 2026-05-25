@@ -1,8 +1,10 @@
 import { BasketCalculator, type BasketCalculatorProduct } from '@/components/basket-calculator';
 import { BasketBuyTiming } from '@/components/basket-buy-timing';
 import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
+import { FamilyPackComparisonPanel } from '@/components/family-pack-comparison';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { dbSiteSnapshotGeneratedAt } from '@/lib/generated/db-site-products';
+import { topFamilyPackComparisons } from '@/lib/family-pack';
 import { assessBasketBuyTiming } from '@/lib/price-intelligence';
 import { routeMetadata } from '@/lib/seo';
 import { chainPriceRows, formatPct, formatSek, labelFromSlug, matchedChainProducts, topChainSpreads } from '@/lib/verified-data';
@@ -74,6 +76,7 @@ const sourceLabel = dbSiteSnapshotGeneratedAt
   : 'postgres.latest_prices/observations DB-shaped generated module; local builds fall back to the bundled verified Axfood snapshot';
 
 const weeklyBasketBudgetSek = 600;
+const weeklyBasketFamilyPackComparisons = topFamilyPackComparisons(topChainSpreads.slice(0, 24), labelFromSlug, 4);
 
 export default function BasketPage() {
   const pricedRows = basketProducts.reduce((sum, product) => sum + product.prices.length, 0);
@@ -120,6 +123,15 @@ export default function BasketPage() {
       </div>
 
       <BasketBuyTiming recommendations={basketBuyTimingRecommendations} />
+
+      <div className="mt-6">
+        <FamilyPackComparisonPanel
+          comparisons={weeklyBasketFamilyPackComparisons}
+          emptyDetail="No larger same-category basket candidate has parseable pack-size evidence in the current weekly basket catalogue."
+          intro="Uses the same verified weekly basket candidates to show when a larger pack lowers normalized unit price and when it only raises the checkout total."
+          title="Weekly basket family-pack checks"
+        />
+      </div>
 
       <BasketCalculator products={basketProducts} sourceLabel={sourceLabel} weeklyBudgetSek={weeklyBasketBudgetSek} />
 
