@@ -3,6 +3,7 @@ import { describe, it } from 'node:test';
 import {
   fetchApoteketSeProducts,
   normalizeApoteketCandidate,
+  normalizeApoteketCandidateRows,
   parseApoteketSeProducts,
   type ApoteketSeProductRow
 } from '../apoteket-se.js';
@@ -157,6 +158,50 @@ describe('Apoteket.se connector fixture parsing', () => {
       null
     );
     assert.equal(normalizeApoteketCandidate({ name: 'Saknar pris' }, SOURCE_URL, OBSERVED_AT), null);
+  });
+
+  it('emits Apoteket-specific channel, member, coupon, and multi-buy pricing quirks', () => {
+    const rows = normalizeApoteketCandidateRows(
+      {
+        productName: 'Apoteket Aloe Vera Gel 200 ml',
+        currentPrice: 59,
+        storePrice: 89,
+        packageSize: '200 ml',
+        productUrl: '/produkt/254012',
+        campaignLabel: 'Webbpris 25% vid köp av 2 online',
+        memberPriceLabel: 'Apoteket+ medlemspris med kod MEDLEM',
+        isMemberPrice: true,
+        requiresCoupon: true
+      },
+      SOURCE_URL,
+      OBSERVED_AT
+    );
+
+    assert.deepEqual(
+      rows.map((row) => ({
+        channel: row.channel,
+        price: row.price_sek,
+        member: row.is_member_price,
+        coupon: row.is_coupon_price,
+        multiBuy: row.multi_buy
+      })),
+      [
+        {
+          channel: 'online',
+          price: 59,
+          member: true,
+          coupon: true,
+          multiBuy: 'Webbpris 25% vid köp av 2 online'
+        },
+        {
+          channel: 'store',
+          price: 89,
+          member: true,
+          coupon: undefined,
+          multiBuy: undefined
+        }
+      ]
+    );
   });
 
   it('mocks HTTP with the fixture, de-duplicates rows, passes crawler headers, and honors maxRows', async () => {
