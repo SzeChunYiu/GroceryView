@@ -4,6 +4,10 @@ import type { TrendingProductPriceChange } from '@groceryview/db';
 import { buildBrandLeaderboardTrends, buildCitySearchTrends } from '@/lib/trends';
 import { BrandLeaderboardModule, TrendingSearchModule } from '@/app/page-sections/trending';
 
+type PersonalizedTrendingProductPriceChange = TrendingProductPriceChange & {
+  personalizationReason?: string;
+};
+
 function formatMoney(value: number, currency: string) {
   return new Intl.NumberFormat('sv-SE', {
     style: 'currency',
@@ -16,7 +20,7 @@ function formatPercent(value: number) {
   return `${value > 0 ? '+' : ''}${new Intl.NumberFormat('sv-SE', { maximumFractionDigits: 1 }).format(value)}%`;
 }
 
-export function TrendingCarousel({ items }: Readonly<{ items: TrendingProductPriceChange[] }>) {
+export function TrendingCarousel({ items }: Readonly<{ items: PersonalizedTrendingProductPriceChange[] }>) {
   const searchFeed = buildCitySearchTrends({ city: 'stockholm', limit: 6 });
   const brandFeed = buildBrandLeaderboardTrends({ city: 'stockholm', limit: 5 });
 
@@ -78,6 +82,11 @@ export function TrendingCarousel({ items }: Readonly<{ items: TrendingProductPri
                   <History aria-hidden="true" size={16} />
                   {item.changeCount} changes · {item.observationCount} observations
                 </p>
+                {item.personalizationReason ? (
+                  <p className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-cyan-800">
+                    Ranked for you: {item.personalizationReason}
+                  </p>
+                ) : null}
                 <p className="mt-2 text-xs font-semibold leading-5 text-slate-500">
                   {formatPercent(item.changePercent)} from {formatMoney(item.previousPrice, item.currency)} · latest {item.latestObservedAt.slice(0, 10)}
                 </p>
