@@ -3505,6 +3505,18 @@ ${seo}`;
     assert.match(productRoute, /metadataForProduct/);
   });
 
+  it('reuses product OpenGraph metadata for Twitter cards', async () => {
+    const productRoute = await read('src/app/products/[slug]/page.tsx');
+
+    assert.match(productRoute, /const openGraph = \{/);
+    assert.match(productRoute, /openGraph,/);
+    assert.match(productRoute, /twitter:\s*\{/);
+    assert.match(productRoute, /card:\s*'summary_large_image'/);
+    assert.match(productRoute, /title:\s*openGraph\.title/);
+    assert.match(productRoute, /description:\s*openGraph\.description/);
+    assert.match(productRoute, /images:\s*openGraph\.images/);
+  });
+
   it('ships programmatic SEO landing pages from verified price spreads', async () => {
     const landingData = await read('src/lib/seo-landing-pages.ts');
     const landingComponent = await read('src/components/seo-landing-page.tsx');

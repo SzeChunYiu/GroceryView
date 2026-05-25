@@ -48,25 +48,26 @@ export async function generateMetadata({ params }: Readonly<{ params: Promise<{ 
     height: 630,
     alt: `${product.name} · ${categoryLabel}`
   };
+  const openGraph = {
+    title,
+    description,
+    url: `${siteUrl}/products/${product.slug}`,
+    siteName: 'GroceryView',
+    locale: 'sv_SE',
+    type: 'website',
+    images: [image]
+  } as const;
 
   return {
     ...metadata,
     title,
     description,
-    openGraph: {
-      title,
-      description,
-      url: `${siteUrl}/products/${product.slug}`,
-      siteName: 'GroceryView',
-      locale: 'sv_SE',
-      type: 'website',
-      images: [image]
-    },
+    openGraph,
     twitter: {
       card: 'summary_large_image',
-      title,
-      description,
-      images: [{ url: image.url, alt: image.alt }]
+      title: openGraph.title,
+      description: openGraph.description,
+      images: openGraph.images
     }
   };
 }
