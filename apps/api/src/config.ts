@@ -1,5 +1,6 @@
 import { type RequestLoggingConfig } from './middleware/logger.js';
 import { loadDatabaseConfig, type ApiDatabaseConfig } from './lib/db.js';
+import { DEFAULT_ICA_MAXI_SCRAPE_CRON } from './jobs/scheduler.js';
 
 export type ApiCorsConfig = {
   allowedOrigins: string[];
@@ -75,6 +76,7 @@ function loadScrapeSchedulerConfig(env: NodeJS.ProcessEnv): ScrapeSchedulerConfi
     enabled: parseBooleanFlag(env.SCRAPER_SCHEDULER_ENABLED, true),
     retailers: [
       { id: 'ica', cadence: 'daily', cron: env.SCRAPER_CRON_ICA?.trim() || '15 2 * * *' },
+      { id: 'ica-maxi', cadence: 'daily', cron: env.SCRAPER_CRON_ICA_MAXI?.trim() || DEFAULT_ICA_MAXI_SCRAPE_CRON },
       { id: 'willys', cadence: 'daily', cron: env.SCRAPER_CRON_WILLYS?.trim() || '30 2 * * *' },
       { id: 'coop', cadence: 'daily', cron: env.SCRAPER_CRON_COOP?.trim() || '45 2 * * *' },
       { id: 'hemkop', cadence: 'daily', cron: env.SCRAPER_CRON_HEMKOP?.trim() || '0 3 * * *' },

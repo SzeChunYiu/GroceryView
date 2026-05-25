@@ -8,6 +8,9 @@ export type ScheduledCronJob = CronJob & {
   nextRunAt: Date;
 };
 
+export const ICA_MAXI_SCRAPE_JOB_NAME = 'scrape:ica-maxi';
+export const DEFAULT_ICA_MAXI_SCRAPE_CRON = '20 2 * * *';
+
 type Timer = ReturnType<typeof setTimeout>;
 
 const MAX_LOOKAHEAD_MINUTES = 366 * 24 * 60;
