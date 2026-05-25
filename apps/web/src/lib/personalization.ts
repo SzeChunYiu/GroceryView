@@ -403,15 +403,21 @@ export function buildPersonalizedRecommendationRail<T extends RecommendationProd
     householdId?: string;
     favoriteBrands?: readonly string[];
     avoidedBrands?: readonly string[];
+    pantryGaps?: readonly string[];
+    recentCategoryInterest?: readonly string[];
     recentListActivity?: readonly string[];
     limit?: number;
   } = {},
 ): PersonalizedRecommendation[] {
   const favoriteBrands = new Set((options.favoriteBrands ?? ['Garant', 'Änglamark', 'Kaffe']).map((brand) => brand.toLocaleLowerCase('sv-SE')));
   const avoidedBrands = new Set((options.avoidedBrands ?? ['Unknown private label']).map((brand) => brand.toLocaleLowerCase('sv-SE')));
+  const pantryGapWords = (options.pantryGaps ?? ['milk', 'bread', 'coffee', 'fruit'])
+    .flatMap((item) => item.toLocaleLowerCase('sv-SE').split(/\s+/))
+    .filter((word) => word.length > 2);
   const recentWords = (options.recentListActivity ?? ['milk', 'bread', 'coffee', 'fruit'])
     .flatMap((item) => item.toLocaleLowerCase('sv-SE').split(/\s+/))
     .filter((word) => word.length > 2);
+  const recentCategoryInterest = options.recentCategoryInterest ?? ['mejeri-ost-agg', 'brod-bageri', 'kaffe'];
 
   return products
     .map((product, index) => {
@@ -419,14 +425,20 @@ export function buildPersonalizedRecommendationRail<T extends RecommendationProd
       const favoriteHit = product.brand ? favoriteBrands.has(product.brand.toLocaleLowerCase('sv-SE')) : false;
       const avoidedHit = product.brand ? avoidedBrands.has(product.brand.toLocaleLowerCase('sv-SE')) : false;
       const listHits = recentWords.filter((word) => haystack.includes(word)).length;
+      const pantryGapHits = pantryGapWords.filter((word) => haystack.includes(word)).length;
+      const categoryInterestHit = recentCategoryInterest.some((category) => product.slug.includes(category) || haystack.includes(category.replace(/-/g, ' ')));
       const historyScore = getHouseholdCategoryScore(product.slug.split('-').slice(0, 2).join('-'), options.householdId ?? defaultHouseholdId);
-      const score = historyScore + listHits * 18 + (favoriteHit ? 24 : 0) - (avoidedHit ? 120 : 0) + Math.max(0, 8 - index);
+      const score = historyScore + listHits * 18 + pantryGapHits * 20 + (categoryInterestHit ? 12 : 0) + (favoriteHit ? 24 : 0) - (avoidedHit ? 120 : 0) + Math.max(0, 8 - index);
       const reason = avoidedHit
         ? `Avoided brand control lowers ${product.brand} for recommendations and substitutions`
         : favoriteHit
         ? `Favorite brand signal for ${product.brand}`
+        : pantryGapHits > 0
+          ? `${pantryGapHits} pantry gap signal${pantryGapHits === 1 ? '' : 's'} matched`
         : listHits > 0
           ? `${listHits} recent list signal${listHits === 1 ? '' : 's'} matched`
+          : categoryInterestHit
+            ? 'Recent category interest keeps this rail relevant'
           : 'Household favorites, watchlist, dietary preferences, and recent searches keep this in the discovery mix';
       return { ...product, score, reason };
     })
