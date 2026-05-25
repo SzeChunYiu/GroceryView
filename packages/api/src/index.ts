@@ -1342,6 +1342,7 @@ export type RealCatalogSearchPriceRow = {
   canonicalName: string;
   brand?: string;
   categoryPath: string[];
+  originCountry?: string;
   labels?: string[];
   packageSize?: number;
   packageUnit?: string;
@@ -1367,6 +1368,7 @@ export type FacetedProductSearchFilters = {
   query?: string;
   categories?: string[];
   labels?: string[];
+  originCountries?: string[];
   brands?: string[];
   chains?: string[];
   stores?: string[];
@@ -1383,12 +1385,12 @@ export const facetedProductSearchEndpoint = {
   controllerPath: 'products',
   actionPath: 'search/faceted',
   path: '/products/search/faceted',
-  queryParams: ['q', 'category', 'brand', 'label', 'chain', 'store', 'priceType', 'minPrice', 'maxPrice', 'inStockOnly', 'minConfidence', 'limit']
+  queryParams: ['q', 'category', 'brand', 'label', 'origin', 'chain', 'store', 'priceType', 'minPrice', 'maxPrice', 'inStockOnly', 'minConfidence', 'limit']
 } as const;
 
 export type FacetedProductSearchResult = {
   query: string;
-  filters: Required<Pick<FacetedProductSearchFilters, 'categories' | 'labels' | 'brands' | 'chains' | 'stores' | 'priceTypes'>> & {
+  filters: Required<Pick<FacetedProductSearchFilters, 'categories' | 'labels' | 'originCountries' | 'brands' | 'chains' | 'stores' | 'priceTypes'>> & {
     minPrice: number | null;
     maxPrice: number | null;
     inStockOnly: boolean;
@@ -1403,6 +1405,7 @@ export type FacetedProductSearchResult = {
     brand: string | null;
     categoryPath: string[];
     labels: string[];
+    originCountry: string | null;
     packageSize: number | null;
     packageUnit: string | null;
     comparableUnit: string;
@@ -1430,6 +1433,7 @@ export type FacetedProductSearchResult = {
   facets: {
     categories: Array<{ value: string; count: number }>;
     labels: Array<{ value: string; count: number }>;
+    origins: Array<{ value: string; count: number }>;
     brands: Array<{ value: string; count: number }>;
     chains: Array<{ value: string; label: string; count: number }>;
     stores: Array<{ value: string; label: string; count: number }>;
@@ -1541,7 +1545,8 @@ function rowSearchHaystack(row: RealCatalogSearchPriceRow): string {
     row.canonicalName,
     row.brand ?? '',
     ...row.categoryPath,
-    ...(row.labels ?? [])
+    ...(row.labels ?? []),
+    row.originCountry ?? ''
   ].join(' ').toLocaleLowerCase('sv-SE');
 }
 
@@ -1554,6 +1559,7 @@ export function buildFacetedProductSearch(input: {
   const query = filters.query?.trim().toLocaleLowerCase('sv-SE') ?? '';
   const categoryFilters = normalizedFilterSet(filters.categories);
   const labelFilters = normalizedFilterSet(filters.labels);
+  const originCountryFilters = normalizedFilterSet(filters.originCountries);
   const brandFilters = normalizedFilterSet(filters.brands);
   const chainFilters = normalizedFilterSet(filters.chains);
   const storeFilters = normalizedFilterSet(filters.stores);
@@ -1565,6 +1571,7 @@ export function buildFacetedProductSearch(input: {
   const productMap = new Map<string, FacetedProductSearchResult['products'][number]>();
   const categoryFacet = new Map<string, number>();
   const labelFacet = new Map<string, number>();
+  const originFacet = new Map<string, number>();
   const brandFacet = new Map<string, number>();
   const chainFacet = new Map<string, { label: string; count: number }>();
   const storeFacet = new Map<string, { label: string; count: number }>();
@@ -1581,6 +1588,7 @@ export function buildFacetedProductSearch(input: {
     if (query && !rowSearchHaystack(row).includes(query)) continue;
     if (categoryFilters.size > 0 && !rowCategories.some((category) => categoryFilters.has(category))) continue;
     if (labelFilters.size > 0 && ![...labelFilters].every((label) => rowLabels.includes(label))) continue;
+    if (originCountryFilters.size > 0 && (!row.originCountry || !originCountryFilters.has(row.originCountry.toLocaleLowerCase('sv-SE')))) continue;
     if (brandFilters.size > 0 && (!row.brand || !brandFilters.has(row.brand.toLocaleLowerCase('sv-SE')))) continue;
     if (chainFilters.size > 0 && (!row.chainSlug || !chainFilters.has(row.chainSlug.toLocaleLowerCase('sv-SE')))) continue;
     if (storeFilters.size > 0 && (!row.storeSlug || !storeFilters.has(row.storeSlug.toLocaleLowerCase('sv-SE')))) continue;
@@ -1600,6 +1608,7 @@ export function buildFacetedProductSearch(input: {
         brand: row.brand ?? null,
         categoryPath: [...row.categoryPath],
         labels: normalizedList(row.labels),
+        originCountry: row.originCountry ?? null,
         packageSize: row.packageSize ?? null,
         packageUnit: row.packageUnit ?? null,
         comparableUnit: row.comparableUnit,
@@ -1612,6 +1621,7 @@ export function buildFacetedProductSearch(input: {
       productMap.set(row.productId, product);
       for (const category of row.categoryPath) increment(categoryFacet, category);
       for (const label of row.labels ?? []) increment(labelFacet, label);
+      if (row.originCountry) increment(originFacet, row.originCountry);
       if (row.brand) increment(brandFacet, row.brand);
     }
 
@@ -1680,6 +1690,7 @@ export function buildFacetedProductSearch(input: {
     filters: {
       categories: normalizedList(filters.categories),
       labels: normalizedList(filters.labels),
+      originCountries: normalizedList(filters.originCountries),
       brands: normalizedList(filters.brands),
       chains: normalizedList(filters.chains),
       stores: normalizedList(filters.stores),
@@ -1695,6 +1706,7 @@ export function buildFacetedProductSearch(input: {
     facets: {
       categories: sortedFacet(categoryFacet),
       labels: sortedFacet(labelFacet),
+      origins: sortedFacet(originFacet),
       brands: sortedFacet(brandFacet),
       chains: [...chainFacet.entries()]
         .map(([value, facet]) => ({ value, label: facet.label, count: facet.count }))

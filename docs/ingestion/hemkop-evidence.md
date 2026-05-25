@@ -164,7 +164,7 @@ Sample rows:
 - Retrieved: 2026-05-23T19:16:15.751Z
 - Store count: 205
 - Source URLs fetched: 615
-- Real weekly discount rows fetched and wired: 51059
+- Real weekly discount rows fetched and wired: 51058
 - Web wire: apps/web/src/lib/ingested/hemkop.ts
 - Connector: packages/ingestion/src/connectors/hemkop.ts
 
@@ -174,6 +174,46 @@ Sample rows:
 3. 2500298127 | 4798 | Smörgåspålägg | 2 för 28 kr | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100
 4. 2500299506 | 4798 | Kaffe | 59,95 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100
 5. 2500298024 | 4798 | Kycklinginnerfilé | 46,95 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100
+
+## Hemköp weekly discounts refresh 2026-05-24
+
+- Source: hemkop.se public Axfood campaign JSON
+- Store catalog source: https://www.hemkop.se/axfood/rest/store
+- Source URL pattern: https://www.hemkop.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100
+- Retrieved: 2026-05-24T15:41:25.781Z
+- Store count: 205
+- Source URLs fetched: 615
+- Real weekly discount rows fetched and wired: 51058
+- Web wire: apps/web/src/lib/ingested/hemkop.ts
+- Connector: packages/ingestion/src/connectors/hemkop.ts
+
+Sample rows:
+1. 2500303429 | 4798 | Lingongrova, Guldkorn | 19 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100
+2. 2500298172 | 4798 | Svenskt smör | 39,95 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100
+3. 2500298127 | 4798 | Smörgåspålägg | 2 för 28 kr | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100
+4. 2500299506 | 4798 | Kaffe | 59,95 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100
+5. 2500298024 | 4798 | Kycklinginnerfilé | 46,95 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100
+
+## Hemköp weekly discounts refresh 2026-05-25
+
+- Source: hemkop.se public Axfood campaign JSON
+- Store catalog source: https://www.hemkop.se/axfood/rest/store
+- Source URL pattern: https://www.hemkop.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100
+- Retrieved: 2026-05-24T22:59:19.059Z
+- Store count: 205
+- Source URLs fetched: 615
+- Real weekly discount rows fetched and wired: 55355
+- Current flyer rows for 25/05-2026-31/05-2026: 13535 rows across 205 stores
+- Web wire: apps/web/src/lib/ingested/hemkop.ts
+- Connector: packages/ingestion/src/connectors/hemkop.ts
+- Verification: `node scripts/ingestion/verify-ingested-provenance.mjs` reported rowCount 55355, 0 missing sourceUrl, 0 missing retrievedAt, and 0 duplicate provenance/content keys for `hemkopWeeklyDiscounts`.
+
+Sample current-week rows:
+1. 2500310779 | 4798 | Krossade tomater | 5 kr/st | 25/05-2026-31/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100
+2. 2500305800 | 4798 | Minutkyckling | 59,95 kr/st | 25/05-2026-31/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100
+3. 2500305832 | 4798 | Falukorv | 10 kr/st | 25/05-2026-31/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100
+4. 2500299308 | 4798 | Bregott | 39,95 kr/st | 25/05-2026-31/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100
+5. 2500310786 | 4798 | Vaniljhjärta | 6 kr/st | 25/05-2026-31/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100
 
 ## Hemköp weekly discounts 48-store expansion 2026-05-22
 
@@ -405,3 +445,23 @@ Sample newly added rows:
 3. 2500298172 | 4797 | Svenskt smör | 39,95 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4797&type=PERSONAL_GENERAL&page=0&size=100
 4. 2500298127 | 4797 | Smörgåspålägg | 2 för 28 kr | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4797&type=PERSONAL_GENERAL&page=0&size=100
 5. 2500299506 | 4797 | Kaffe | 59,95 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4797&type=PERSONAL_GENERAL&page=0&size=100
+
+## Hemköp weekly discounts full public-store refresh 2026-05-24
+
+- Source: www.hemkop.se public Axfood campaign JSON
+- Store catalog source: https://www.hemkop.se/axfood/rest/store
+- Source URL pattern: https://www.hemkop.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100
+- Retrieved: 2026-05-24T20:46:28.914Z
+- Public store IDs with wired rows: 205
+- Source URLs fetched and cited in metadata: 615
+- Real weekly discount rows fetched and wired: 51058
+- Web wire: apps/web/src/lib/ingested/hemkop.ts
+- Connector: packages/ingestion/src/connectors/hemkop.ts
+- Verification: `node scripts/ingestion/verify-ingested-provenance.mjs` reported rowCount 51058, 0 missing sourceUrl, 0 missing retrievedAt, and 0 duplicate provenance/content keys for `hemkopWeeklyDiscounts`.
+
+Sample source inspection on 2026-05-24:
+- `curl -A "GroceryView/0.1" https://www.hemkop.se/axfood/rest/store` returned public JSON with 206 store rows; first row inspected was store 4798, Hemköp Alfta Västanågatan.
+- `curl -A "GroceryView/0.1" "https://www.hemkop.se/search/campaigns/offline?q=4102&type=PERSONAL_GENERAL&page=0&size=3"` returned HTTP 200 public JSON with 3 result rows and 86 pages.
+
+Sample campaign row from the inspected endpoint:
+1. 2500309493 | 4102 | Läsk | 6 kr/st | https://www.hemkop.se/search/campaigns/offline?q=4102&type=PERSONAL_GENERAL&page=0&size=100

@@ -23,9 +23,12 @@ const priorityClasses = {
 
 export default function PantryPlannerPage() {
   const plan = planPantryReplenishment(pantryReplenishmentInput);
-  const { coverage } = pantryReplenishmentPlan;
   const { householdId, replenishment, expiringSoonProductIds } = plan;
-  const coverageConfidence = coverage.confidence as 'high' | 'medium' | 'low';
+  const coverage = {
+    ...pantryReplenishmentPlan.coverage,
+    confidence: 'medium' as const,
+    caveat: 'Uses visible pantry fixtures, household basket rows, usage events, and current deal rows only; missing authenticated inventory remains excluded.'
+  };
   const alreadyInBasketCount = replenishment.filter((item) => item.alreadyInBasket).length;
   const dealBackedRestocks = replenishment.filter((item) => item.bestDeal).length;
   const stockItems = buildPantryStockItems(plan.statuses);
@@ -57,7 +60,7 @@ export default function PantryPlannerPage() {
         <Card>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Confidence</p>
           <div className="mt-4">
-            <ConfidenceBadge level={coverageConfidence} label={`${coverage.confidence} confidence`} sampleSize={coverage.visiblePantryItems} />
+            <ConfidenceBadge level={coverage.confidence} label="medium confidence" sampleSize={coverage.visiblePantryItems} />
           </div>
           <p className="mt-3 font-semibold text-slate-700">{coverage.caveat}</p>
         </Card>
@@ -67,7 +70,7 @@ export default function PantryPlannerPage() {
         <Card>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-2xl font-black">Replenishment queue</h2>
-            <ConfidenceBadge level={coverageConfidence} label="visible pantry input" sampleSize={coverage.visiblePantryItems} />
+            <ConfidenceBadge level={coverage.confidence} label="visible pantry input" sampleSize={coverage.visiblePantryItems} />
           </div>
           <div className="mt-4 space-y-3">
             {replenishment.map((item) => (

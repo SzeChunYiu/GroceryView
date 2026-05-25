@@ -28,6 +28,7 @@ import {
   buildLidlOfferPageUrl,
   buildLidlStoreDetailPayloadUrl,
   buildLidlStoresUrl,
+  buildSevenElevenNoStoresUrl,
   buildMatpriskollenStoreOffersUrl,
   buildMatpriskollenStoresUrl,
   buildMathemSearchUrl,
@@ -35,6 +36,7 @@ import {
   buildOpenFoodFactsProductUrl,
   buildOpenFoodFactsSwedenSearchUrl,
   buildOpenPricesConnectorUrl,
+  buildSevenElevenSeBusinessOrdersUrl,
   fetchSt1FuelPrices,
   cacheKeyForScbPxWebQueryFixture,
   cellCountForScbPxWebQueryFixture,
@@ -58,6 +60,7 @@ import {
   fetchBrandedSwedishFuelStations,
   fetchOverpassFuelStations,
   fetchOverpassGroceryStores,
+  fetchSevenElevenSeConvenienceProducts,
   fetchRetailerConnectorSnapshot,
   fetchCityGrossBulkProducts,
   fetchCityGrossProducts,
@@ -87,6 +90,7 @@ import {
   fetchLidlOffers,
   fetchLidlOffersForAllStores,
   fetchLidlStores,
+  fetchSevenElevenNoStores,
   fetchMathemProducts,
   fetchMatpriskollenOffers,
   fetchMatsparProducts,
@@ -120,6 +124,8 @@ import {
   locatorFixturesCanAffectDealScore,
   normaliseUnitPrice,
   normalizeUnitPrice,
+  extractDiaperDeclaredSize,
+  extractDiaperPackageCount,
   parseDiaperPackageClass,
   offerSelectorFixtures,
   offerSelectorFixturesCanEmitOfferFacts,
@@ -128,10 +134,12 @@ import {
   parseIcaStoreList,
   parseLidlStoreDirectoryLinks,
   parseLidlStorePayload,
+  parseSevenElevenNoStores,
   parseOsmChainStores,
   parseOpenPricesSnapshot,
   parseOkq8FuelPricePage,
   parseBrandedSwedishFuelStations,
+  parseSevenElevenSeConvenienceProducts,
   parseCoopDrPdfTextOffers,
   parseRetailerProductJsonSnapshot,
   persistOpenFoodFactsProductMetadata,
@@ -146,6 +154,8 @@ import {
   OVERPASS_INTERPRETER_URL,
   STOCKHOLM_FUEL_OVERPASS_QUERY,
   STOCKHOLM_GROCERY_OVERPASS_QUERY,
+  findSevenElevenSeAssortmentPdfUrl,
+  SEVEN_ELEVEN_SE_ASSORTMENT_PDF_URL,
   STORE_ENUMERATOR_OVERPASS_URL,
   SWEDEN_BRANDED_FUEL_STATIONS_OVERPASS_QUERY,
   SWEDEN_FUEL_OVERPASS_QUERY,
@@ -730,7 +740,20 @@ describe('fetchOpenFoodFactsProducts', () => {
       quantity: '1 l',
       categories: ['en:beverages', 'en:dairy-substitutes'],
       labels: ['en:vegan'],
+      allergens: [],
+      traces: [],
+      additives: [],
+      countries: [],
+      stores: [],
+      origins: [],
+      manufacturingPlaces: [],
+      packaging: [],
+      ingredientsText: '',
+      servingSize: '',
       nutriscoreGrade: 'd',
+      novaGroup: null,
+      ecoscoreGrade: 'unknown',
+      dataQualityTags: [],
       nutritionPer100g: {
         energyKj: 180,
         energyKcal: 43,
@@ -3255,6 +3278,18 @@ describe('fetchCityGrossProducts', () => {
       unitPrice: 136.96,
       unitPriceUnit: 'KGM',
       priceText: '31.50 SEK',
+      hasPromotion: false,
+      hasDiscount: true,
+      isMembersOnlyPrice: false,
+      isLongTimeDiscount: false,
+      isCurrentWeekDiscount: false,
+      promotionPrice: null,
+      promotionUnitPrice: null,
+      promotionUnitPriceUnit: '',
+      promotionMinQuantity: null,
+      promotionFrom: '',
+      promotionTo: '',
+      superCategory: '',
       productUrl: 'https://www.citygross.se/matvaror/skafferiet/del-monte-pear-halves-in-juice-p100001971_ST',
       imageUrl: 'https://www.citygross.se/images/24000124962_C1N1.jpg',
       sourceUrl: buildCityGrossProductsUrl({ siteId: '21', query: 'kaffe', take: 1, skip: 0 }),
@@ -4603,6 +4638,17 @@ describe('normalizeUnitPrice', () => {
     assert.deepEqual(normaliseUnitPrice(29.94, '6-pack'), { unitPrice: 4.99, comparableUnit: 'piece' });
   });
 
+  it('exposes focused diaper count and declared-size extraction helpers', () => {
+    assert.equal(extractDiaperPackageCount('Strl 4 + 39p'), 39);
+    assert.equal(extractDiaperPackageCount('37 per frp'), 37);
+    assert.equal(extractDiaperPackageCount('Comfort2 3-6kg + 47p'), 47);
+    assert.equal(extractDiaperPackageCount('2x37p'), 74);
+    assert.equal(extractDiaperDeclaredSize('Strl 4 + 39p'), 4);
+    assert.equal(extractDiaperDeclaredSize('Comfort2 3-6kg + 47p'), 2);
+    assert.equal(extractDiaperDeclaredSize('37 per frp'), null);
+    assert.equal(extractDiaperDeclaredSize('2x37p'), null);
+  });
+
   it('extracts diaper package counts and supported size classes from retailer text', () => {
     assert.deepEqual(parseDiaperPackageClass('Strl 4 + 39p'), {
       diaperCount: 39,
@@ -5512,10 +5558,22 @@ class DailyIngestionExecutor implements QueryExecutor {
     if (sql.includes('insert into stores')) return [{ id: `store-db-${++this.sequence}` }] as T[];
     if (sql.includes('jsonb_to_recordset') && sql.includes('insert into products')) {
       const products = JSON.parse(String(params[0])) as Array<{ slug: string; barcode?: string | null }>;
-      return products.map((product) => ({
-        slug: product.slug,
-        id: product.barcode ? `product-db-ean-${product.barcode}` : `product-db-${product.slug}`
-      })) as T[];
+      const existingSlugByBarcode = new Map([
+        ['7310130003547', 'ean-7310130003547'],
+        ['7310130000000', 'ean-7310130000000']
+      ]);
+      const batchSlugByBarcode = new Map<string, string>();
+      for (const product of products) {
+        if (!product.barcode) continue;
+        const current = batchSlugByBarcode.get(product.barcode);
+        if (current === undefined || product.slug < current) batchSlugByBarcode.set(product.barcode, product.slug);
+      }
+      return products.map((product) => {
+        const targetSlug = product.barcode
+          ? existingSlugByBarcode.get(product.barcode) ?? batchSlugByBarcode.get(product.barcode) ?? product.slug
+          : product.slug;
+        return { slug: product.slug, id: `product-db-${targetSlug}` };
+      }) as T[];
     }
     if (sql.includes('insert into products')) return [{ id: `product-db-${++this.sequence}` }] as T[];
     if (sql.includes('jsonb_to_recordset') && sql.includes('insert into aliases')) return [] as T[];
@@ -6285,10 +6343,79 @@ describe('daily ingestion runner', () => {
     assert.ok(aliasInsert, 'daily ingestion should batch upsert aliases');
     const aliases = JSON.parse(String(aliasInsert.params[0])) as Array<{ product_id: string }>;
     assert.deepEqual(aliases.map((alias) => alias.product_id), [
-      'product-db-ean-ean-case-001',
-      'product-db-ean-ean-case-001'
+      'product-db-willys-barcode-case-1',
+      'product-db-willys-barcode-case-1'
     ]);
   });
+
+  it('keeps daily products with null and empty barcodes on separate slug upsert paths', async () => {
+    const executor = new DailyIngestionExecutor();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-21T03:17:00.000Z',
+      connectors: [
+        {
+          connectorId: 'willys-normalized-json',
+          chainId: 'willys',
+          sourceType: 'official_api',
+          endpointUrl: 'https://sources.example.test/willys/products.json',
+          parserVersion: 'normalized-json-v1',
+          robotsTxtStatus: 'not_applicable',
+          legalReviewStatus: 'approved',
+          hasDataAgreement: true,
+          stores: [{ storeId: '2110', name: 'Willys Kungsbacka Hede', address: 'Tölöleden 3', city: 'Kungsbacka' }]
+        }
+      ],
+      fetchImpl: async () => new Response(JSON.stringify({
+        items: [
+          {
+            storeId: '2110',
+            retailerProductId: 'wil-null-barcode-1',
+            rawName: 'Loose Apple Red',
+            canonicalName: 'Loose Apple Red',
+            productId: 'willys-loose-apple-red',
+            categoryId: 'produce',
+            barcode: null,
+            packageSize: 1,
+            packageUnit: 'kg',
+            price: 24.9
+          },
+          {
+            storeId: '2110',
+            retailerProductId: 'wil-empty-barcode-2',
+            rawName: 'Loose Apple Green',
+            canonicalName: 'Loose Apple Green',
+            productId: 'willys-loose-apple-green',
+            categoryId: 'produce',
+            barcode: '   ',
+            packageSize: 1,
+            packageUnit: 'kg',
+            price: 22.9
+          }
+        ]
+      }), { status: 200, headers: { 'content-type': 'application/json' } })
+    });
+
+    assert.equal(result.acceptedCount, 2);
+    const productInsert = executor.calls.find((call) => call.sql.includes('jsonb_to_recordset') && call.sql.includes('insert into products'));
+    assert.ok(productInsert, 'daily ingestion should batch upsert null-barcode products');
+    assert.match(productInsert.sql, /where barcode is not null/);
+    assert.match(productInsert.sql, /left join products existing on existing\.barcode = input\.barcode and input\.barcode is not null/);
+    const products = JSON.parse(String(productInsert.params[0])) as Array<{ slug: string; barcode: string | null }>;
+    assert.deepEqual(products.map((product) => [product.slug, product.barcode]), [
+      ['willys-loose-apple-red', null],
+      ['willys-loose-apple-green', null]
+    ]);
+
+    const aliasInsert = executor.calls.find((call) => call.sql.includes('jsonb_to_recordset') && call.sql.includes('insert into aliases'));
+    assert.ok(aliasInsert, 'daily ingestion should batch upsert aliases for both null-barcode rows');
+    const aliases = JSON.parse(String(aliasInsert.params[0])) as Array<{ product_id: string }>;
+    assert.deepEqual(aliases.map((alias) => alias.product_id), [
+      'product-db-willys-loose-apple-red',
+      'product-db-willys-loose-apple-green'
+    ]);
+  });
+
 
   it('upserts every configured daily store before writing partial store-scoped observations', async () => {
     const executor = new DailyIngestionExecutor();
@@ -7505,4 +7632,117 @@ describe('daily ingestion runner', () => {
     assert.deepEqual(result.blockers, ['ica:robots_txt_allow_required', 'ica:legal_review_approval_required']);
     assert.equal(executor.calls.length, 0);
   });
+
+
+  it('parses and fetches 7-Eleven Sweden convenience assortment SKUs from the B2B PDF', async () => {
+    const retrievedAt = '2026-05-24T12:00:00.000Z';
+    const sourceUrl = buildSevenElevenSeBusinessOrdersUrl();
+    const pageHtml = `<a href="${SEVEN_ELEVEN_SE_ASSORTMENT_PDF_URL}">Meny företagsbeställning</a>`;
+    const pdfText = `
+      Ingredienser: Croissant, ost, skinka.
+      CROISSANTFRALLA OST & SKINKA 34-39:-
+      Ingredienser: 83,3% Äppeljuice 10% Mixad Ananas.
+      JUICE SPENAT ÄPPLE ANANAS CITRON RÅSAFT 32-37:- + pant
+      PANE LUNGO, PESTO MED MOZZARELLA, PARMESANKRÄM
+      & RUCCOLA 85-95:- LAKTO-VEGETARISK
+      CHIAPUDDING 34-39:-SURDEGSFRALLA RÅG ÄGG & KAVIAR 34-39:-
+    `;
+
+    assert.equal(findSevenElevenSeAssortmentPdfUrl(pageHtml, sourceUrl), SEVEN_ELEVEN_SE_ASSORTMENT_PDF_URL);
+
+    const parsed = parseSevenElevenSeConvenienceProducts(pdfText, {
+      sourceUrl,
+      pdfUrl: SEVEN_ELEVEN_SE_ASSORTMENT_PDF_URL,
+      retrievedAt,
+      rawSnapshotRef: 'raw://seven-eleven-se-assortment/test'
+    });
+
+    assert.equal(parsed.length, 5);
+    assert.deepEqual(parsed[0], {
+      productId: 'seven-eleven-se-croissantfralla-ost-skinka',
+      chainId: 'seven_eleven_se',
+      chainName: '7-Eleven Sweden',
+      name: 'CROISSANTFRALLA OST & SKINKA',
+      category: 'breakfast',
+      priceMin: 34,
+      priceMax: 39,
+      priceText: '34-39:-',
+      currency: 'SEK',
+      depositIncluded: false,
+      dietaryTags: [],
+      sourceUrl,
+      pdfUrl: SEVEN_ELEVEN_SE_ASSORTMENT_PDF_URL,
+      retrievedAt,
+      provenance: {
+        source: 'seven_eleven_se_b2b_assortment_pdf',
+        parserVersion: 'seven-eleven-se-b2b-assortment-v1',
+        rawSnapshotRef: 'raw://seven-eleven-se-assortment/test'
+      }
+    });
+    assert.equal(parsed[1].category, 'drink');
+    assert.equal(parsed[1].depositIncluded, true);
+    assert.equal(parsed[2].name, 'PANE LUNGO, PESTO MED MOZZARELLA, PARMESANKRÄM & RUCCOLA');
+    assert.deepEqual(parsed[2].dietaryTags, ['lacto_vegetarian', 'vegetarian']);
+    assert.equal(parsed[4].name, 'SURDEGSFRALLA RÅG ÄGG & KAVIAR');
+
+    const requestedUrls: string[] = [];
+    const fetched = await fetchSevenElevenSeConvenienceProducts({
+      retrievedAt,
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        if (String(url) === sourceUrl) {
+          return new Response(pageHtml, { status: 200, headers: { 'content-type': 'text/html' } });
+        }
+        return new Response(new Uint8Array([1, 2, 3]), { status: 200, headers: { 'content-type': 'application/pdf' } });
+      },
+      pdfTextExtractor: async () => pdfText
+    });
+
+    assert.deepEqual(requestedUrls, [sourceUrl, SEVEN_ELEVEN_SE_ASSORTMENT_PDF_URL]);
+    assert.equal(fetched.length, 5);
+  });
+
+
+  it('parses and fetches 7-Eleven Norway store directory rows', async () => {
+    const retrievedAt = '2026-05-24T12:00:00.000Z';
+    const html = `
+      <ol id="Maps-1133-list">
+        <li data-lat="69.648515" data-lng="18.955042" data-title="7-Eleven Domkirkeplassen" data-storeid="7153" data-department="7">
+          <header><h3 class="name">7-Eleven Domkirkeplassen</h3></header>
+          <div class="adr"><div class="street-address">Storgata 61</div><div class="postal"><span class="locality">TROMSØ</span></div></div>
+        </li>
+        <li data-lat="59.932893" data-lng="10.860874" data-title="Alfaset" data-storeid="7547" data-department="77">
+          <header><h3 class="name">Alfaset</h3></header>
+          <div class="adr"><div class="street-address">Nedre Kallbakvei 98</div><div class="postal"><span class="locality">OSLO</span></div></div>
+        </li>
+      </ol>`;
+
+    const rows = parseSevenElevenNoStores(html, buildSevenElevenNoStoresUrl(), retrievedAt);
+    assert.equal(rows.length, 2);
+    assert.deepEqual(rows[0], {
+      storeId: '7153',
+      name: '7-Eleven Domkirkeplassen',
+      chain: '7-eleven',
+      department: '7',
+      address: 'Storgata 61',
+      city: 'TROMSØ',
+      latitude: 69.648515,
+      longitude: 18.955042,
+      sourceUrl: buildSevenElevenNoStoresUrl(),
+      retrievedAt
+    });
+    assert.equal(rows[1].chain, 'uno-x-7-eleven');
+
+    const requestedUrls: string[] = [];
+    const fetched = await fetchSevenElevenNoStores({
+      retrievedAt,
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return new Response(html, { status: 200, headers: { 'content-type': 'text/html' } });
+      }
+    });
+    assert.deepEqual(requestedUrls, [buildSevenElevenNoStoresUrl()]);
+    assert.equal(fetched.length, 2);
+  });
+
 });

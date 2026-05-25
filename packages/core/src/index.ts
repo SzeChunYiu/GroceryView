@@ -1,4 +1,6 @@
 export * from './lib/rankers/nearby.js';
+export * from './lib/rankers/premium.js';
+export * from './lib/rankers/myBasket.js';
 export type DealScoreInput = {
   currentCityPercentile: number;
   knownPromoHistoryPercentile: number;
@@ -5165,3 +5167,5 @@ export function calculateChainPriceIndex(observations: ChainPriceObservation[]):
   return { chains, categories, marketReferenceByCategory, generatedFrom: usable.length };
 }
 export * from './lib/extractors/loosePacked.js';
+
+export * from './lib/loyaltyROI.js';

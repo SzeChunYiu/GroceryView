@@ -11,3 +11,13 @@ export function validateNoUnexpectedQueryParameters(
     throw new BadRequestException(`Unexpected query parameter for ${routeName}: ${unexpected.join(', ')}`);
   }
 }
+
+export function optionalSingleQueryParameter(
+  query: Record<string, unknown>,
+  parameterName: string
+): string | undefined {
+  const value = query[parameterName];
+  if (value === undefined || value === null || value === '') return undefined;
+  if (typeof value === 'string') return value;
+  throw new BadRequestException(`${parameterName} must be a single query parameter`);
+}

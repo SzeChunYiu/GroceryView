@@ -186,29 +186,70 @@ export const DEFAULT_MATHEM_SEARCH_QUERIES = [
   'kikartor',
   'kidneybonor',
   'kokosmjolk',
-  'bakpulver',
-  'vaniljsocker',
-  'kanel',
-  'oregano',
-  'basilika',
-  'curry',
-  'paprikapulver',
-  'soja',
-  'teriyaki',
-  'sesam',
-  'bulgur',
-  'risotto',
-  'polenta',
-  'ströbröd',
-  'sirap',
-  'agavesirap',
-  'jordnötssmör',
-  'mandelmjöl',
-  'chia',
-  'pumpakärnor'
+  'glutenfri',
+  'laktosfri',
+  'ekologisk',
+  'vegansk',
+  'vegetarisk',
+  'fardigmat',
+  'fryst',
+  'matolja',
+  'bakning',
+  'frukost',
+  'mejeri',
+  'tacos',
+  'asiatiskt',
+  'indiskt',
+  'grill',
+  'hamburgare',
+  'blandfars',
+  'flaskfile',
+  'kycklingfile',
+  'kaviar',
+  'juicekoncentrat',
+  'snabbkaffe',
+  'kaffefilter',
+  'valling',
+  'barn',
+  'apotek',
+  'stad',
+  'rengoring',
+  'hund',
+  'katt',
+  'proteinbar',
+  'energibar',
+  'smoothie',
+  'fruktdryck',
+  'farskpotatis',
+  'kryddmix',
+  'tacokrydda',
+  'pannkakor',
+  'vafflor',
+  'ostbage',
+  'jordnotssmor',
+  'nutella',
+  'barbecue',
+  'hamburgerbrod',
+  'korvbrod',
+  'vegokorv',
+  'sojafars',
+  'tempeh',
+  'kimchi',
+  'surkal',
+  'matlagningsgradde',
+  'vispgradde',
+  'grekisk yoghurt',
+  'granola',
+  'havrekuddar',
+  'risnudlar',
+  'glasnudlar',
+  'ramen',
+  'sojasas',
+  'sesamolja'
 ] as const;
-export const DEFAULT_MATHEM_SEARCH_PAGES = [1, 2, 3] as const;
-export const DEFAULT_MATHEM_MAX_ROWS = 9000;
+export const DEFAULT_MATHEM_SEARCH_PAGES = [1, 2, 3, 4, 5] as const;
+export const DEFAULT_MATHEM_MAX_ROWS = 18000;
+const MATHEM_REQUEST_TIMEOUT_MS = 45_000;
 
 export type FetchMathemProductsOptions = {
   fetchImpl?: typeof fetch;
@@ -226,7 +267,7 @@ export function buildMathemSearchUrl(query: string, page = 1): string {
 }
 
 export async function fetchMathemProducts(options: FetchMathemProductsOptions = {}): Promise<MathemProduct[]> {
-  const fetchImpl = options.fetchImpl ?? fetch;
+  const fetchImpl = withMathemRequestTimeout(options.fetchImpl ?? fetch);
   const queries = options.queries ?? DEFAULT_MATHEM_SEARCH_QUERIES;
   const pages = options.pages ?? DEFAULT_MATHEM_SEARCH_PAGES;
   const maxRows = options.maxRows ?? DEFAULT_MATHEM_MAX_ROWS;
@@ -263,6 +304,15 @@ export async function fetchMathemProducts(options: FetchMathemProductsOptions = 
   }
 
   return rows;
+}
+
+function withMathemRequestTimeout(fetchImpl: typeof fetch): typeof fetch {
+  return async (input, init = {}) => {
+    const timeoutSignal = typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal
+      ? AbortSignal.timeout(MATHEM_REQUEST_TIMEOUT_MS)
+      : undefined;
+    return fetchImpl(input, timeoutSignal ? { ...init, signal: init.signal ?? timeoutSignal } : init);
+  };
 }
 
 export function parseMathemSearchProducts(html: string): MathemSearchProduct[] {

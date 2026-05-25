@@ -12,6 +12,10 @@
 
 ## Source URLs
 
+- Source URL (1004281 ICA Supermarket Vagnhärad, retrieved 2026-05-24T12:21:51.000Z, rows 7): https://handlaprivatkund.ica.se/stores/1004281/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=7&maxPageSize=7
+
+- Source URL (1003829 ICA Kvantum Tranås, retrieved 2026-05-24T01:37:18.571Z, rows 25): https://handlaprivatkund.ica.se/stores/1003829/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=25&maxPageSize=25
+
 - Source URL (1003822 ICA Supermarket Toria, retrieved 2026-05-24T00:56:17.000Z, rows 145): https://handlaprivatkund.ica.se/stores/1003822/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=145&maxPageSize=145
 
 - Source URL (1004070 ICA Kvantum Tomelilla, retrieved 2026-05-23T13:26:35.000Z, rows 10): https://handlaprivatkund.ica.se/stores/1004070/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=10&maxPageSize=10

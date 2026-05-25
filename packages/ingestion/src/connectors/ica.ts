@@ -1534,6 +1534,11 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     regionId: DEFAULT_ICA_REGION_ID
   },
   {
+    storeAccountId: '1003829',
+    storeName: 'ICA Kvantum Tranås',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
     storeAccountId: '1003911',
     storeName: 'ICA Nära Kilafors',
     regionId: DEFAULT_ICA_REGION_ID
@@ -1651,6 +1656,11 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
   {
     storeAccountId: '1004070',
     storeName: 'ICA Kvantum Tomelilla',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004281',
+    storeName: 'ICA Supermarket Vagnhärad',
     regionId: DEFAULT_ICA_REGION_ID
   },
   {

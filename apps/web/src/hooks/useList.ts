@@ -6,7 +6,7 @@ export type ShoppingListItem = {
   checked: boolean;
   detail: string;
   id: string;
-  importSource?: 'starter' | 'bulk-clipboard';
+  importSource?: 'starter' | 'bulk-clipboard' | 'item-detail';
   matchedProductName?: string;
   matchedProductSlug?: string;
   name: string;
@@ -16,6 +16,14 @@ export type ShoppingListItem = {
 export type BulkImportedListItemInput = Omit<ShoppingListItem, 'checked'> & {
   importSource: 'bulk-clipboard';
 };
+
+export type ProductListItemInput = Omit<ShoppingListItem, 'checked' | 'id' | 'importSource' | 'matchedProductName' | 'matchedProductSlug'> & {
+  productId: string;
+};
+
+type PersistedCustomListItemInput = BulkImportedListItemInput | (Omit<ShoppingListItem, 'checked'> & {
+  importSource: 'item-detail';
+});
 
 export type ShareLinkState = {
   error: string | null;
@@ -27,7 +35,7 @@ export type ShareLinkState = {
 
 type PersistedListState = {
   checkedById?: Record<string, boolean>;
-  importedItems?: BulkImportedListItemInput[];
+  importedItems?: PersistedCustomListItemInput[];
 };
 
 type SignedSharePayload = {
@@ -150,10 +158,10 @@ function listStateFromStorage(value: string | null): Required<PersistedListState
       : {};
 
     const importedItems = Array.isArray(maybeImportedItems)
-      ? maybeImportedItems.filter((item): item is BulkImportedListItemInput => (
+      ? maybeImportedItems.filter((item): item is PersistedCustomListItemInput => (
         item !== null
         && typeof item === 'object'
-        && item.importSource === 'bulk-clipboard'
+        && (item.importSource === 'bulk-clipboard' || item.importSource === 'item-detail')
         && typeof item.id === 'string'
         && typeof item.name === 'string'
         && typeof item.quantity === 'string'
@@ -167,7 +175,7 @@ function listStateFromStorage(value: string | null): Required<PersistedListState
   }
 }
 
-function withCheckedState(checkedById: Record<string, boolean>, importedItems: BulkImportedListItemInput[] = []): ShoppingListItem[] {
+function withCheckedState(checkedById: Record<string, boolean>, importedItems: PersistedCustomListItemInput[] = []): ShoppingListItem[] {
   const uniqueItems = new Map<string, Omit<ShoppingListItem, 'checked'>>();
   for (const item of baseListItems) uniqueItems.set(item.id, item);
   for (const item of importedItems) uniqueItems.set(item.id, item);
@@ -232,10 +240,11 @@ function persistCheckedState(items: ShoppingListItem[]) {
     const checkedById = Object.fromEntries(items.map((item) => [item.id, item.checked]));
     const importedItems = items
       .filter((item) => item.importSource === 'bulk-clipboard')
+      .concat(items.filter((item) => item.importSource === 'item-detail'))
       .map((item) => ({
         detail: item.detail,
         id: item.id,
-        importSource: 'bulk-clipboard' as const,
+        importSource: item.importSource,
         matchedProductName: item.matchedProductName,
         matchedProductSlug: item.matchedProductSlug,
         name: item.name,
@@ -245,6 +254,10 @@ function persistCheckedState(items: ShoppingListItem[]) {
   } catch {
     // Keep the check-off UI usable even when a browser blocks localStorage.
   }
+}
+
+function productListItemId(productId: string): string {
+  return `product:${productId.trim().toLowerCase()}`;
 }
 
 export function useList() {
@@ -303,6 +316,27 @@ export function useList() {
     });
   }, []);
 
+  const addProductItem = useCallback((input: ProductListItemInput) => {
+    const item: PersistedCustomListItemInput = {
+      detail: input.detail,
+      id: productListItemId(input.productId),
+      importSource: 'item-detail',
+      matchedProductName: input.name,
+      matchedProductSlug: input.productId,
+      name: input.name,
+      quantity: input.quantity
+    };
+    const alreadyOnList = items.some((currentItem) => currentItem.id === item.id);
+    if (!alreadyOnList) {
+      setItems((currentItems) => (
+        currentItems.some((currentItem) => currentItem.id === item.id)
+          ? currentItems
+          : [...currentItems, { ...item, checked: false }]
+      ));
+    }
+    return { added: !alreadyOnList, item };
+  }, [items]);
+
   const checkedCount = useMemo(() => items.filter((item) => item.checked).length, [items]);
   const totalCount = items.length;
   const remainingCount = totalCount - checkedCount;
@@ -327,8 +361,10 @@ export function useList() {
   }, [budgetSnapshot, hasLoadedBrowserState]);
 
   return {
+    addProductItem,
     addImportedItems,
     checkedCount,
+    hasLoadedBrowserState,
     items,
     remainingCount,
     resetCheckedState,
