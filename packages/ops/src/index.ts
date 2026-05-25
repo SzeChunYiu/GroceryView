@@ -177,6 +177,266 @@ export function buildNorwayCoverageReadinessReport(
   };
 }
 
+export type IcelandCoverageReadinessStage = 'preview' | 'reykjavik' | 'production';
+
+export type IcelandCoverageThresholds = {
+  chains: number;
+  reykjavikStores: number;
+  nationalRegions: number;
+  stores: number;
+  products: number;
+  stapleProducts: number;
+  categories: number;
+  sourceCount: number;
+  sourceTypeCount: number;
+  livePriceObservations: number;
+  maxFreshnessDays: number;
+};
+
+export const icelandCoverageThresholds: Record<IcelandCoverageReadinessStage, IcelandCoverageThresholds> = {
+  preview: {
+    chains: 4,
+    reykjavikStores: 0,
+    nationalRegions: 0,
+    stores: 0,
+    products: 0,
+    stapleProducts: 80,
+    categories: 6,
+    sourceCount: 0,
+    sourceTypeCount: 0,
+    livePriceObservations: 0,
+    maxFreshnessDays: 999_999
+  },
+  reykjavik: {
+    chains: 3,
+    reykjavikStores: 12,
+    nationalRegions: 1,
+    stores: 12,
+    products: 500,
+    stapleProducts: 80,
+    categories: 8,
+    sourceCount: 2,
+    sourceTypeCount: 2,
+    livePriceObservations: 500,
+    maxFreshnessDays: 7
+  },
+  production: {
+    chains: 4,
+    reykjavikStores: 20,
+    nationalRegions: 5,
+    stores: 60,
+    products: 1500,
+    stapleProducts: 80,
+    categories: 12,
+    sourceCount: 3,
+    sourceTypeCount: 2,
+    livePriceObservations: 1500,
+    maxFreshnessDays: 3
+  }
+};
+
+export type IcelandCoverageSourceType =
+  | 'official_api'
+  | 'public_storefront'
+  | 'flyer_campaign'
+  | 'operator_public_page'
+  | 'manual_taxonomy';
+
+export type IcelandCoverageSource = {
+  sourceId: string;
+  sourceType: IcelandCoverageSourceType;
+  latestObservedAt?: string | null;
+  livePriceObservationCount?: number;
+};
+
+export type IcelandCoverageReadinessInput = {
+  chains: string[];
+  cities: string[];
+  nationalRegions: string[];
+  storeCount: number;
+  reykjavikStoreCount: number;
+  productCount: number;
+  stapleProductCount: number;
+  categories: string[];
+  sources: IcelandCoverageSource[];
+  latestObservedAt?: string | null;
+  starterBasketItemCount?: number;
+  generatedAt?: string;
+};
+
+export type IcelandCoverageReadinessGate = {
+  name: keyof IcelandCoverageThresholds;
+  current: number;
+  previewRequired: number;
+  reykjavikRequired: number;
+  productionRequired: number;
+  previewPass: boolean;
+  reykjavikPass: boolean;
+  productionPass: boolean;
+};
+
+export type IcelandCoverageReadinessReport = {
+  market: 'IS';
+  currency: 'ISK';
+  status: 'blocked' | 'preview' | 'reykjavik_ready' | 'production_ready';
+  publicClaimsAllowed: boolean;
+  reykjavikClaimsAllowed: boolean;
+  nationalClaimsAllowed: boolean;
+  previewReady: boolean;
+  reykjavikReady: boolean;
+  productionReady: boolean;
+  starterBasketOnly: boolean;
+  metrics: {
+    chainCount: number;
+    cityCount: number;
+    nationalRegionCount: number;
+    storeCount: number;
+    reykjavikStoreCount: number;
+    productCount: number;
+    stapleProductCount: number;
+    categoryCount: number;
+    sourceCount: number;
+    sourceTypeCount: number;
+    livePriceObservationCount: number;
+    freshnessDays: number | null;
+  };
+  gates: IcelandCoverageReadinessGate[];
+  blockers: string[];
+  guardrails: string[];
+  summary: string;
+};
+
+export const emptyIcelandCoverageReadinessInput: IcelandCoverageReadinessInput = {
+  chains: [],
+  cities: [],
+  nationalRegions: [],
+  storeCount: 0,
+  reykjavikStoreCount: 0,
+  productCount: 0,
+  stapleProductCount: 0,
+  categories: [],
+  sources: [],
+  latestObservedAt: null,
+  starterBasketItemCount: 0
+};
+
+function newestIsoDate(values: Array<string | null | undefined>): string | null {
+  const timestamps = values
+    .map((value) => value ? Date.parse(value) : Number.NaN)
+    .filter((value) => Number.isFinite(value));
+  if (timestamps.length === 0) return null;
+  return new Date(Math.max(...timestamps)).toISOString();
+}
+
+export function buildIcelandCoverageReadinessReport(
+  input: IcelandCoverageReadinessInput,
+  options: { asOf?: string } = {}
+): IcelandCoverageReadinessReport {
+  const chains = uniqueNonEmpty(input.chains);
+  const cities = uniqueNonEmpty(input.cities);
+  const nationalRegions = uniqueNonEmpty(input.nationalRegions);
+  const categories = uniqueNonEmpty(input.categories);
+  const sources = input.sources.filter((source) => source.sourceId.trim());
+  const sourceIds = uniqueNonEmpty(sources.map((source) => source.sourceId));
+  const sourceTypes = uniqueNonEmpty(sources.map((source) => source.sourceType));
+  const livePriceObservationCount = Math.max(
+    0,
+    sources.reduce((total, source) => total + Math.max(0, source.livePriceObservationCount ?? 0), 0)
+  );
+  const asOf = options.asOf ?? input.generatedAt ?? new Date().toISOString();
+  const latestObservedAt = newestIsoDate([input.latestObservedAt, ...sources.map((source) => source.latestObservedAt)]);
+  const freshnessDays = daysSince(latestObservedAt, asOf);
+  const starterBasketItemCount = Math.max(0, input.starterBasketItemCount ?? 0);
+  const stapleProductCount = Math.max(input.stapleProductCount, starterBasketItemCount);
+  const starterBasketOnly = starterBasketItemCount > 0 && livePriceObservationCount === 0;
+  const metrics = {
+    chainCount: chains.length,
+    cityCount: cities.length,
+    nationalRegionCount: nationalRegions.length,
+    storeCount: Math.max(0, input.storeCount),
+    reykjavikStoreCount: Math.max(0, input.reykjavikStoreCount),
+    productCount: Math.max(0, input.productCount),
+    stapleProductCount,
+    categoryCount: categories.length,
+    sourceCount: sourceIds.length,
+    sourceTypeCount: sourceTypes.length,
+    livePriceObservationCount,
+    freshnessDays
+  };
+
+  const currentByGate: Record<keyof IcelandCoverageThresholds, number> = {
+    chains: metrics.chainCount,
+    reykjavikStores: metrics.reykjavikStoreCount,
+    nationalRegions: metrics.nationalRegionCount,
+    stores: metrics.storeCount,
+    products: metrics.productCount,
+    stapleProducts: metrics.stapleProductCount,
+    categories: metrics.categoryCount,
+    sourceCount: metrics.sourceCount,
+    sourceTypeCount: metrics.sourceTypeCount,
+    livePriceObservations: metrics.livePriceObservationCount,
+    maxFreshnessDays: freshnessScore(metrics.freshnessDays)
+  };
+
+  const gates = (Object.keys(icelandCoverageThresholds.preview) as Array<keyof IcelandCoverageThresholds>).map((name) => {
+    const current = currentByGate[name];
+    const previewRequired = icelandCoverageThresholds.preview[name];
+    const reykjavikRequired = icelandCoverageThresholds.reykjavik[name];
+    const productionRequired = icelandCoverageThresholds.production[name];
+    const isFreshnessGate = name === 'maxFreshnessDays';
+    return {
+      name,
+      current,
+      previewRequired,
+      reykjavikRequired,
+      productionRequired,
+      previewPass: isFreshnessGate ? current <= previewRequired : current >= previewRequired,
+      reykjavikPass: isFreshnessGate ? current <= reykjavikRequired : current >= reykjavikRequired,
+      productionPass: isFreshnessGate ? current <= productionRequired : current >= productionRequired
+    };
+  });
+
+  const previewReady = gates.every((gate) => gate.previewPass);
+  const reykjavikReady = !starterBasketOnly && gates.every((gate) => gate.reykjavikPass);
+  const productionReady = !starterBasketOnly && gates.every((gate) => gate.productionPass);
+  const blockers = gates
+    .filter((gate) => !gate.productionPass)
+    .map((gate) => `iceland_${gate.name}_below_production_minimum:${gate.current}/${gate.productionRequired}`);
+  if (!previewReady) blockers.unshift('iceland_market_not_preview_ready');
+  if (!reykjavikReady) blockers.unshift('iceland_market_not_reykjavik_ready');
+  if (starterBasketOnly) blockers.push('iceland_starter_basket_only');
+  if (metrics.livePriceObservationCount === 0) blockers.push('iceland_live_price_evidence_missing');
+  if (metrics.freshnessDays === null) blockers.push('iceland_freshness_evidence_missing');
+
+  return {
+    market: 'IS',
+    currency: 'ISK',
+    status: productionReady ? 'production_ready' : reykjavikReady ? 'reykjavik_ready' : previewReady ? 'preview' : 'blocked',
+    publicClaimsAllowed: productionReady,
+    reykjavikClaimsAllowed: reykjavikReady,
+    nationalClaimsAllowed: productionReady,
+    previewReady,
+    reykjavikReady,
+    productionReady,
+    starterBasketOnly,
+    metrics,
+    gates,
+    blockers,
+    guardrails: [
+      'Iceland national price claims stay disabled until production readiness passes.',
+      'Reykjavik readiness requires live ISK price observations, store coverage, freshness, and at least two source types.',
+      'Starter-basket taxonomy is preview-only and never authorizes cheapest-chain claims by itself.'
+    ],
+    summary: productionReady
+      ? 'Iceland coverage meets production launch thresholds.'
+      : reykjavikReady
+        ? 'Iceland coverage is Reykjavik-ready but still blocked for national production claims.'
+        : previewReady
+          ? 'Iceland coverage is preview-only; live Reykjavik price and source-mix evidence is still missing.'
+          : 'Iceland coverage is blocked until preview, Reykjavik, and production minimums pass.'
+  };
+}
+
 export type LocalSmokeEnvOverride = {
   name: string;
   defaultValue: string;
