@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { pricedProducts } from '@/lib/openprices-products';
+import { buildShortTermPriceForecast } from '@/lib/price-intelligence';
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
@@ -40,6 +41,13 @@ function scoreBuyingWindow(product: (typeof pricedProducts)[number]) {
   const median = medianFor(values) ?? latest.price;
   const trendSlopePercent = baseline.price > 0 ? ((latest.price - baseline.price) / baseline.price) * 100 : 0;
   const volatilityPercent = volatilityPercentFor(values);
+  const forecast = buildShortTermPriceForecast({
+    horizonDays: 7,
+    observations: points.map((point) => ({
+      observedAt: `${point.date}T00:00:00.000Z`,
+      price: point.price
+    }))
+  });
   const belowMedianPercent = median > 0 ? ((median - latest.price) / median) * 100 : 0;
   const score = Math.round(clamp(58 + belowMedianPercent * 2 - Math.max(trendSlopePercent, 0) * 1.2 - volatilityPercent * 0.9, 0, 100));
   const actionLabel = score >= 75 ? 'Buy now' : score >= 55 ? 'Watch closely' : 'Wait';
@@ -54,6 +62,16 @@ function scoreBuyingWindow(product: (typeof pricedProducts)[number]) {
     windowLabel,
     trendSlopePercent,
     volatilityPercent,
+    forecast: {
+      available: forecast.available,
+      confidenceLabel: forecast.confidenceLabel,
+      horizonDays: forecast.horizonDays,
+      rangeLabel: forecast.rangeLabel,
+      trendLabel: forecast.trendLabel
+    },
+    forecastConfidenceLabel: forecast.confidenceLabel,
+    forecastRangeLabel: forecast.rangeLabel,
+    forecastTrendLabel: forecast.trendLabel,
     latestObservedAt: latest.date,
     observationCount: points.length
   };
