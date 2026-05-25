@@ -4206,4 +4206,21 @@ ${seo}`;
     assert.match(review, /status: 'rejected'/);
     assert.match(review, /rejectionReason: reason/);
   });
+
+  it('configures Playwright browsers, reporters, failure artifacts, and base fixtures', async () => {
+    const config = await read('playwright.config.ts');
+    const fixtures = await read('e2e/fixtures/base.ts');
+
+    assert.match(config, /name: 'chromium'/);
+    assert.match(config, /name: 'firefox'/);
+    assert.match(config, /name: 'webkit'/);
+    assert.match(config, /\['junit', \{ outputFile: '\.\/e2e\/test-results\/junit\.xml' \}\]/);
+    assert.match(config, /\['html', \{ outputFolder: '\.\/e2e\/playwright-report', open: 'never' \}\]/);
+    assert.match(config, /screenshot: 'only-on-failure'/);
+    assert.match(config, /trace: 'retain-on-failure'/);
+    assert.match(fixtures, /test = base\.extend/);
+    assert.match(fixtures, /consoleErrorCapture/);
+    assert.match(fixtures, /gotoApp/);
+    assert.match(fixtures, /setViewportSize/);
+  });
 });
