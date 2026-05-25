@@ -4129,7 +4129,7 @@ async function persistDailyConnectorOutput(input: {
       [
         'operator_public_price_page',
         normalizeDailySlug(config.chainId),
-        config.chainId.toUpperCase(),
+        config.chainId === 'ob-is' ? 'OB' : config.chainId.toUpperCase(),
         config.endpointUrl,
         config.parserVersion,
         config.requestedAt ?? result.plan.provenance.capturedAt,
