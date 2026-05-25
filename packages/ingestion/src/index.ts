@@ -1866,6 +1866,7 @@ function icaProductToDailyItem(row: IcaProduct): RetailerConnectorParsedProduct 
     promoText: row.promotionDescription || undefined,
     memberOnly: false,
     observedAt: row.retrievedAt,
+    originCountry: normalizeRetailerOriginCountry(row.countryOfOrigin),
     sourceUrl: row.sourceUrl,
     imageUrl: row.imageUrl || undefined
   };
@@ -3068,6 +3069,45 @@ const normalizeSearchText = (value: string): string => value
   .replace(/\p{Diacritic}/gu, '')
   .replace(/[^a-z0-9]+/g, ' ')
   .trim();
+
+const retailerOriginCountryCodes = new Map<string, string>([
+  ['danmark', 'DK'],
+  ['egypten', 'EG'],
+  ['italien', 'IT'],
+  ['marocko', 'MA'],
+  ['nederlanderna', 'NL'],
+  ['nederlanderna holland', 'NL'],
+  ['peru', 'PE'],
+  ['spanien', 'ES'],
+  ['sverige', 'SE'],
+  ['tyskland', 'DE']
+]);
+
+export function normalizeRetailerOriginCountry(value: string | undefined): string | undefined {
+  const normalized = normalizeSearchText(value ?? '');
+  if (!normalized) return undefined;
+  if (/^[a-z]{2}$/i.test(normalized)) return normalized.toUpperCase();
+  return retailerOriginCountryCodes.get(normalized);
+}
+
+export type AxfoodCertificationLabel = 'ASC' | 'Fairtrade' | 'KRAV' | 'MSC';
+
+const axfoodCertificationLabels: Array<{ label: AxfoodCertificationLabel; terms: string[] }> = [
+  { label: 'ASC', terms: ['asc'] },
+  { label: 'Fairtrade', terms: ['fairtrade', 'fair trade'] },
+  { label: 'KRAV', terms: ['krav'] },
+  { label: 'MSC', terms: ['msc'] }
+];
+
+export function normalizeAxfoodCertificationLabels(labels: readonly string[]): AxfoodCertificationLabel[] {
+  const normalizedLabels = labels.map(normalizeSearchText);
+  return axfoodCertificationLabels
+    .filter((certification) => certification.terms.some((term) => {
+      const normalizedTerm = normalizeSearchText(term);
+      return normalizedLabels.some((label) => label === normalizedTerm || label.includes(normalizedTerm));
+    }))
+    .map((certification) => certification.label);
+}
 
 function commodityTerms(commodity: Commodity): string[] {
   return [
