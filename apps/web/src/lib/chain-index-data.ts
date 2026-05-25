@@ -15,6 +15,16 @@ import { axfoodWeeklyTrendReport } from './ingested/axfood-weekly-summary';
 import { dbSiteSnapshotChainPriceObservations } from './generated/db-site-chain-observations';
 import { calculateChainPriceIndex, type BrandTier, type BrandTierPriceObservation, type ChainPriceObservation } from '@groceryview/core';
 
+export const householdCategoryExposureWeights: Record<string, { monthlySpend: number; sharePercent: number }> = {
+  'Dairy & eggs': { monthlySpend: 420, sharePercent: 18 },
+  'Bread & bakery': { monthlySpend: 260, sharePercent: 11 },
+  'Fruit & veg': { monthlySpend: 510, sharePercent: 22 },
+  'Pantry & dry': { monthlySpend: 360, sharePercent: 15 },
+  Beverages: { monthlySpend: 210, sharePercent: 9 },
+  Frozen: { monthlySpend: 190, sharePercent: 8 },
+  Household: { monthlySpend: 170, sharePercent: 7 }
+};
+
 // ── unit canonicalisation ────────────────────────────────────────────────────
 type Canon = { factor: number; base: 'kg' | 'l' | 'st' };
 const UNIT_CANON: Record<string, Canon> = {
