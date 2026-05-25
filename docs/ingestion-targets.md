@@ -14,6 +14,7 @@ Pick the highest unblocked P0/P1. Apply A1→A12 from the playbook. As soon as a
 | **P1** | MatPiraten | ⏳ pending | unknown | matpiraten.se HTML scrape; small but real per-product prices. |
 | **P1** | Hemglass | ⏳ pending | per-postcode (delivery) | hemglass.se Next.js? Full frozen-food catalog probable. |
 | **P1** | Apohem | ⏳ pending | online-only | apohem.se REST API; pharmacy + select grocery. |
+| **P1** | Apotek 1 NO | 🧪 verified | chain-wide public search | Documented public `apotek1.no/sok?searchTerm=` evidence and conservative robots posture; pharmacy connector not ingested yet and must stay out of grocery basket totals. |
 | **P1** | City Gross | 🟡 partial | unknown | citygross.se/sok HTML __NEXT_DATA__ inspection. |
 | **P1** | Lidl Sverige | ⏳ pending | chain-wide | Weekly flyer PDF at lidl.se/c/erbjudanden; web anti-bot — try mobile app. |
 | **P2** | Tempo | ❌ blocked | n/a | Static Sitevision site, no API; rely on weekly flyer PDFs. |
