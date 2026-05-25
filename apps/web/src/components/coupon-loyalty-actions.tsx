@@ -7,6 +7,7 @@ type BrowserSession = { accessToken: string; userId: string };
 type LoyaltyOffer = { productId?: string; chain?: string; savings?: number; status?: string; actionRequired?: boolean; requirement?: string };
 type LoyaltyOfferResponse = { totalEligibleSavings?: number; requiresActionCount?: number; offers?: LoyaltyOffer[]; guardrails?: string[] };
 type SubscriptionAccessResponse = { enforcementReasons?: string[]; accountActions?: string[]; entitlement?: { tier?: string; status?: string; plan?: string } | null };
+const priceMatrixModes = ['regular', 'member', 'coupon', 'stacked'] as const;
 
 function readSession(): BrowserSession {
   const accessToken = sessionStorage.getItem('groceryview:accessToken') || '';
@@ -61,6 +62,7 @@ export function CouponLoyaltyActions() {
       <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Account-bound coupon and loyalty offers</h2>
       <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
         These controls call the protected loyalty and subscription endpoints with the sessionStorage bearer token. Public pages can describe coupon readiness, but actual savings stay tied to the signed-in account, membership state, and required clip actions.
+        The price matrix can compare regular, member, coupon, and stacked modes, but non-regular modes remain account-required until this response confirms eligibility.
       </p>
       <div className="mt-4 flex flex-wrap gap-2">
         <button className="rounded-full bg-amber-700 px-4 py-2 text-sm font-black text-white" onClick={loadCouponOffers} type="button">Load signed-in coupon offers</button>
@@ -82,6 +84,17 @@ export function CouponLoyaltyActions() {
           <p className="mt-2 text-sm font-bold text-slate-700">{subscriptionAccess?.enforcementReasons?.join(', ') ?? 'missing_subscription_entitlement until signed in'}</p>
           <p className="mt-2 text-sm leading-6 text-slate-600">needs_membership offers remain blocked until subscription or loyalty entitlement is confirmed.</p>
         </div>
+      </div>
+      <div className="mt-4 rounded-2xl border border-amber-100 bg-amber-50 p-4">
+        <p className="text-sm font-black text-slate-950">Price matrix comparison modes</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {priceMatrixModes.map((mode) => (
+            <span className="rounded-full bg-white px-3 py-1.5 text-xs font-black text-amber-950" key={mode}>{mode}</span>
+          ))}
+        </div>
+        <p className="mt-3 text-sm font-semibold leading-6 text-amber-950">
+          Member, coupon, and stacked prices must come from account-bound loyalty offers; no anonymous coupon or membership savings are counted in the matrix.
+        </p>
       </div>
 
       {loyalty?.offers?.length ? (
