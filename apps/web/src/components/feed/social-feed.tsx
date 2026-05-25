@@ -76,7 +76,7 @@ export function SocialFeed() {
 
             {friendSightings.length > 0 ? (
               <div className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
-                <h3 className="text-sm font-black text-emerald-950">Opt-in friend price sightings</h3>
+                <h3 className="text-sm font-black text-emerald-950">Friend price sightings</h3>
                 <div className="mt-3 grid gap-3 md:grid-cols-2">
                   {friendSightings.map((sighting) => (
                     <Link

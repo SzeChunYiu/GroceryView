@@ -5,7 +5,11 @@ import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { listShareRoles, accountListSharePermissions } from '@/lib/list-permissions';
-import { dietaryPreferenceOnboardingContract } from '@/lib/personalization';
+import {
+  buildPurchaseHistoryPersonalizationSeed,
+  dietaryPreferenceOnboardingContract,
+  parsePurchaseHistoryCsv
+} from '@/lib/personalization';
 import { routeMetadata } from '@/lib/seo';
 import { accountSavedShoppingContract, formatSek, savedBasketAutoReorderPlanner } from '@/lib/verified-data';
 import { planAccountDeletion } from '@groceryview/core';
@@ -149,6 +153,11 @@ const bestTimeToBuyAlertRules = [
   { label: 'Discount stores + pantry', stores: ['Willys', 'Lidl'], categories: ['Pantry', 'Frozen'], confidence: 0.78 },
   { label: 'Weekend produce watch', stores: ['Coop', 'Hemköp'], categories: ['Produce'], confidence: 0.74 }
 ];
+const purchaseHistorySeedPreview = buildPurchaseHistoryPersonalizationSeed(parsePurchaseHistoryCsv(`date,product,store,quantity,total
+2026-05-02,Garant Pasta,Willys,2,37.80
+2026-05-09,Garant Pasta,Willys,1,18.90
+2026-05-14,Änglamark Bananas,Coop,1,24.50
+2026-05-20,ICA Basic Tomatoes,ICA,2,31.80`));
 
 export function generateMetadata() {
   return routeMetadata('/account');
@@ -205,8 +214,31 @@ export default function AccountPage() {
         <Eyebrow>Purchase history import</Eyebrow>
         <h2 className="mt-2 text-2xl font-black tracking-tight">Seed recommendations from receipt CSVs</h2>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
-          Paste loyalty or receipt exports with date, product, store, quantity, and total columns. GroceryView maps rows to known products, summarizes historical spend, and identifies recurring purchases before saving account recommendations.
+          Paste loyalty or receipt exports with date, product, store, quantity, and total columns. GroceryView maps rows to known products, summarizes historical spend, and identifies recurring purchases before saving account staples, favorites, and brand preferences.
         </p>
+        <div className="mt-4 grid gap-3 md:grid-cols-4">
+          <p className="rounded-2xl bg-white p-4 text-sm font-bold text-slate-700 shadow-sm">
+            <span className="block text-xs font-black uppercase tracking-[0.18em] text-sky-800">Staple seeds</span>
+            <span className="mt-1 block text-2xl font-black text-slate-950">{purchaseHistorySeedPreview.stapleSeeds.length}</span>
+          </p>
+          <p className="rounded-2xl bg-white p-4 text-sm font-bold text-slate-700 shadow-sm">
+            <span className="block text-xs font-black uppercase tracking-[0.18em] text-sky-800">Favorite seeds</span>
+            <span className="mt-1 block text-2xl font-black text-slate-950">{purchaseHistorySeedPreview.favoriteProductSeeds.length}</span>
+          </p>
+          <p className="rounded-2xl bg-white p-4 text-sm font-bold text-slate-700 shadow-sm">
+            <span className="block text-xs font-black uppercase tracking-[0.18em] text-sky-800">Brand preference seeds</span>
+            <span className="mt-1 block text-2xl font-black text-slate-950">{purchaseHistorySeedPreview.brandPreferenceSeeds.length}</span>
+          </p>
+          <p className="rounded-2xl bg-white p-4 text-sm font-bold text-slate-700 shadow-sm">
+            <span className="block text-xs font-black uppercase tracking-[0.18em] text-sky-800">Budget seeds</span>
+            <span className="mt-1 block text-2xl font-black text-slate-950">{purchaseHistorySeedPreview.budgetSeeds.length}</span>
+          </p>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          {purchaseHistorySeedPreview.guardrails.map((guardrail) => (
+            <p className="rounded-2xl bg-white/85 p-3 text-sm font-semibold leading-6 text-slate-700" key={guardrail}>{guardrail}</p>
+          ))}
+        </div>
         <BulkImportDialog importMode="purchase-history" />
       </Card>
 

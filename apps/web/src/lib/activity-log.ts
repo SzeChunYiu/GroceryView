@@ -6,6 +6,8 @@ export type SharedListActivityKind =
   | 'item_removed'
   | 'price_alert_changed';
 
+// Legacy activity audit covers: 'item_added' | 'item_checked' | 'item_edited' | 'item_removed'
+
 export type SharedListActor = {
   id: string;
   name: string;

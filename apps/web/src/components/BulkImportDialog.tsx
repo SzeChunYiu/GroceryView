@@ -3,7 +3,11 @@
 import { useMemo, useState } from 'react';
 import { useHaptic } from '@/hooks/useHaptic';
 import type { BulkImportedListItemInput } from '@/hooks/useList';
-import { buildPurchaseHistoryImportPreview, parsePurchaseHistoryCsv } from '@/lib/recurring-basket';
+import {
+  buildPurchaseHistoryImportPreview,
+  buildPurchaseHistoryPersonalizationSeed,
+  parsePurchaseHistoryCsv
+} from '@/lib/personalization';
 
 type BulkImportDialogProps = {
   importMode?: 'shopping-list' | 'purchase-history';
@@ -124,6 +128,7 @@ export function BulkImportDialog({ importMode = 'shopping-list', onImportItems }
   const importItems = useMemo(() => lines.map(itemForLine), [lines]);
   const purchaseHistoryRows = useMemo(() => parsePurchaseHistoryCsv(plainText), [plainText]);
   const purchaseHistoryPreview = useMemo(() => buildPurchaseHistoryImportPreview(purchaseHistoryRows), [purchaseHistoryRows]);
+  const personalizationSeed = useMemo(() => buildPurchaseHistoryPersonalizationSeed(purchaseHistoryRows), [purchaseHistoryRows]);
   const matchedCount = importItems.filter((item) => item.matchedProductSlug).length;
   const unmatchedLines = useMemo(() => (
     lines.filter((line) => matchBulkImportLineToCatalog(line) === null)
@@ -144,7 +149,7 @@ export function BulkImportDialog({ importMode = 'shopping-list', onImportItems }
     if (isPurchaseHistory) {
       if (purchaseHistoryRows.length === 0) return;
       success();
-      setLastImportSummary(`Mapped ${purchaseHistoryRows.length} purchase row(s), ${purchaseHistoryPreview.recurringCandidates.length} recurring seed candidate(s), ${purchaseHistoryPreview.totalSpend.toFixed(2)} SEK total spend.`);
+      setLastImportSummary(`Mapped ${purchaseHistoryRows.length} purchase row(s), ${personalizationSeed.stapleSeeds.length} staple seed(s), ${personalizationSeed.favoriteProductSeeds.length} favorite seed(s), ${personalizationSeed.brandPreferenceSeeds.length} brand preference seed(s), ${purchaseHistoryPreview.totalSpend.toFixed(2)} SEK total spend.`);
       setPlainText('');
       return;
     }
@@ -164,7 +169,7 @@ export function BulkImportDialog({ importMode = 'shopping-list', onImportItems }
           <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950" id="bulk-import-title">{isPurchaseHistory ? 'Map past grocery purchases from CSV' : 'Paste a shopping list'}</h2>
           <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
             {isPurchaseHistory
-              ? 'Paste CSV with date, product, store, quantity, and total columns. GroceryView maps purchase rows into recommendation seeds and budget history before saving.'
+              ? 'Paste CSV with date, product, store, quantity, and total columns. GroceryView maps purchase rows into staples, favorites, brand preference seeds, and budget history before saving.'
               : 'Paste plain text with one item per line. GroceryView matches each line against a product catalog subset and keeps unmatched lines as editable list rows.'}
           </p>
         </div>
@@ -192,7 +197,7 @@ export function BulkImportDialog({ importMode = 'shopping-list', onImportItems }
           <p className="font-black text-slate-950">{clipboardStatus}</p>
           <p className="mt-1">
             {isPurchaseHistory
-              ? `${purchaseHistoryRows.length} mapped purchase row(s) · ${purchaseHistoryPreview.recurringCandidates.length} recurring seed candidate(s) · ${purchaseHistoryPreview.totalSpend.toFixed(2)} SEK budget seed.`
+              ? `${purchaseHistoryRows.length} mapped purchase row(s) · ${personalizationSeed.stapleSeeds.length} staple seed(s) · ${personalizationSeed.favoriteProductSeeds.length} favorite seed(s) · ${personalizationSeed.brandPreferenceSeeds.length} brand preference seed(s) · ${purchaseHistoryPreview.totalSpend.toFixed(2)} SEK budget seed.`
               : `${lines.length} parsed line(s) · ${matchedCount} catalog match(es) · ${unmatchedLines.length} unmatched line(s).`}
           </p>
           {!isPurchaseHistory && unmatchedLines.length > 0 ? (
@@ -211,7 +216,7 @@ export function BulkImportDialog({ importMode = 'shopping-list', onImportItems }
       </div>
 
       {isPurchaseHistory && purchaseHistoryPreview.recurringCandidates.length > 0 ? (
-        <div className="mt-4 grid gap-2 md:grid-cols-2">
+        <div className="mt-4 grid gap-2 md:grid-cols-2" data-purchase-history-personalization-seeds="true">
           {purchaseHistoryPreview.recurringCandidates.map((candidate) => (
             <div className="rounded-2xl border border-sky-100 bg-white p-3 text-sm font-semibold text-slate-700" key={candidate.productName}>
               <p className="font-black text-slate-950">{candidate.productName}</p>
@@ -220,6 +225,42 @@ export function BulkImportDialog({ importMode = 'shopping-list', onImportItems }
               <p className="mt-1 text-xs font-bold text-slate-500">{candidate.budgetSeedLabel}</p>
             </div>
           ))}
+        </div>
+      ) : null}
+
+      {isPurchaseHistory && purchaseHistoryRows.length > 0 ? (
+        <div className="mt-4 grid gap-3 lg:grid-cols-3">
+          <div className="rounded-2xl border border-emerald-100 bg-white p-3 text-sm font-semibold text-slate-700">
+            <p className="font-black text-slate-950">Staples seeded from purchases</p>
+            <ul className="mt-2 space-y-2">
+              {personalizationSeed.stapleSeeds.slice(0, 4).map((seed) => (
+                <li key={seed.productId ?? seed.productName}>
+                  {seed.productName} · {seed.purchaseCount} purchase(s)
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="rounded-2xl border border-cyan-100 bg-white p-3 text-sm font-semibold text-slate-700">
+            <p className="font-black text-slate-950">Favorite product seeds</p>
+            <ul className="mt-2 space-y-2">
+              {personalizationSeed.favoriteProductSeeds.slice(0, 4).map((seed) => (
+                <li key={seed.productId ?? seed.productName}>
+                  {seed.productName} · score {seed.score}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="rounded-2xl border border-violet-100 bg-white p-3 text-sm font-semibold text-slate-700">
+            <p className="font-black text-slate-950">Brand preference seeds</p>
+            <ul className="mt-2 space-y-2">
+              {personalizationSeed.brandPreferenceSeeds.map((seed) => (
+                <li key={seed.brand}>
+                  {seed.brand} · {seed.tolerance}
+                </li>
+              ))}
+              {personalizationSeed.brandPreferenceSeeds.length === 0 ? <li>No brand preference seed yet.</li> : null}
+            </ul>
+          </div>
         </div>
       ) : null}
 
