@@ -1889,7 +1889,7 @@ export type PriceChartSourceType = 'shelf' | 'online' | 'flyer' | 'member' | 're
 
 export type PriceChartLineStyle = 'solid' | 'dashed' | 'dotted';
 
-export type PriceChartMarkerType = 'promotion' | 'member' | 'new_low' | 'receipt_confirmed' | 'source_warning';
+export type PriceChartMarkerType = 'promotion' | 'member' | 'new_low' | 'price_change' | 'receipt_confirmed' | 'source_warning';
 
 export type PriceChartObservation = PriceHistoryPoint & {
   storeId: string;
@@ -2207,6 +2207,7 @@ function markerText(type: PriceChartMarkerType): string {
   if (type === 'promotion') return 'Promo';
   if (type === 'member') return 'Member';
   if (type === 'new_low') return 'New low';
+  if (type === 'price_change') return 'Move';
   if (type === 'receipt_confirmed') return 'Receipt';
   return 'Source';
 }
@@ -2215,6 +2216,7 @@ function markerColor(type: PriceChartMarkerType): string {
   if (type === 'promotion') return '#2563eb';
   if (type === 'member') return '#7c3aed';
   if (type === 'new_low') return '#0f766e';
+  if (type === 'price_change') return '#e11d48';
   if (type === 'receipt_confirmed') return '#16a34a';
   return '#b45309';
 }
@@ -2222,6 +2224,7 @@ function markerColor(type: PriceChartMarkerType): string {
 function markerPriority(type: PriceChartMarkerType): number {
   if (type === 'source_warning') return 0;
   if (type === 'new_low') return 1;
+  if (type === 'price_change') return 2;
   if (type === 'promotion' || type === 'member') return 2;
   return 3;
 }
