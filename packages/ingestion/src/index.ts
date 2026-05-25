@@ -68,6 +68,7 @@ import {
   type FuelPriceSourceKind,
   type FuelPriceObservation
 } from './connectors/okq8-fuel.js';
+import { fetchObIsFuelPrices, OB_IS_FUEL_PRICES_URL, type ObIsFuelPriceObservation } from './connectors/ob-is-fuel.js';
 import {
   fetchSevenElevenSeConvenienceProducts,
   type SevenElevenSeProduct
@@ -110,6 +111,7 @@ export * from './connectors/lidl-bulk.js';
 export * from './connectors/willys-bulk.js';
 export * from './connectors/apohem.js';
 export * from './connectors/okq8-fuel.js';
+export * from './connectors/ob-is-fuel.js';
 export * from './connectors/seven-eleven-se.js';
 export * from './connectors/st1-fuel.js';
 export * from './connectors/willys.js';
@@ -1980,7 +1982,9 @@ function mathemProductToDailyItem(row: MathemProduct): RetailerConnectorParsedPr
   };
 }
 
-function okq8FuelPriceToDailyItem(row: FuelPriceObservation): RetailerConnectorParsedProduct {
+type DailyFuelPriceObservation = FuelPriceObservation | ObIsFuelPriceObservation;
+
+function fuelPriceToDailyItem(row: DailyFuelPriceObservation): RetailerConnectorParsedProduct {
   return {
     sourceType: 'retailer_online_page',
     observedAt: row.observedAt,
@@ -2292,7 +2296,17 @@ export async function fetchDailyConnectorSnapshot(
       capturedAt: retrievedAt,
       sourceUrl: OKQ8_FUEL_PRICES_URL
     });
-    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(okq8FuelPriceToDailyItem) });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(fuelPriceToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_OB_IS_FUEL_PRICES_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_OB_IS_FUEL_PRICES_URL}?`)) {
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchObIsFuelPrices({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      capturedAt: retrievedAt,
+      sourceUrl: OB_IS_FUEL_PRICES_URL
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(fuelPriceToDailyItem) });
   }
 
   if (sourceUrl === GROCERYVIEW_DAILY_SEVEN_ELEVEN_SE_CONVENIENCE_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_SEVEN_ELEVEN_SE_CONVENIENCE_PRODUCTS_URL}?`)) {
@@ -3153,6 +3167,7 @@ export const GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL = 'groceryview://d
 export const GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL = 'groceryview://daily/mathem/products/public-search';
 export const GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL = 'groceryview://daily/matspar/products/public-search';
 export const GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL = OKQ8_FUEL_PRICES_URL;
+export const GROCERYVIEW_DAILY_OB_IS_FUEL_PRICES_URL = OB_IS_FUEL_PRICES_URL;
 export const GROCERYVIEW_DAILY_SEVEN_ELEVEN_SE_CONVENIENCE_PRODUCTS_URL = 'groceryview://daily/seven-eleven-se/convenience-products';
 export const GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL = 'groceryview://daily/pharmacy/products/public';
 

@@ -134,6 +134,19 @@ const CONNECTOR_TEMPLATES = [
     stores: []
   },
   {
+    connectorId: 'ob-is-fuel-prices',
+    chainId: 'ob-is',
+    domain: 'fuel',
+    sourceType: 'retailer_online_page',
+    endpointUrl: 'https://www.ob.is/eldsneytisverd/',
+    parserVersion: 'ob-is-fuel-prices-v1',
+    robotsTxtStatus: 'allow',
+    legalReviewStatus: 'approved',
+    hasDataAgreement: false,
+    requireStoreScopedPrices: false,
+    stores: []
+  },
+  {
     connectorId: 'okq8-fuel-prices',
     chainId: 'okq8',
     domain: 'fuel',
