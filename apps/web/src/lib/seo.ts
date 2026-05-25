@@ -63,6 +63,8 @@ type StoreSeoInput = {
   district?: string;
 };
 
+export type CanonicalFilterSearchParams = Readonly<Record<string, string | string[] | undefined>>;
+
 type DealSeoInput = {
   id?: string;
   slug?: string;
@@ -357,6 +359,13 @@ function publicCatalogueCacheOther(edgeCache: PublicCatalogueCacheMetadata | und
   };
 }
 
+export function hasAppliedCanonicalFilters(searchParams: CanonicalFilterSearchParams | undefined) {
+  return Object.values(searchParams ?? {}).some((value) => {
+    if (Array.isArray(value)) return value.some((entry) => entry.trim().length > 0);
+    return typeof value === 'string' && value.trim().length > 0;
+  });
+}
+
 export function routeMetadata(route: keyof typeof routeMetadataCatalog | RouteMetadataConfig): Metadata {
   const config = typeof route === 'string' ? { path: route, ...routeMetadataCatalog[route] } : route;
   const alternatePath = config.canonicalPath ?? config.path;
@@ -509,12 +518,22 @@ export function metadataForProduct(product: ProductSeoInput): Metadata {
   });
 }
 
-export function metadataForCategory(category: { slug: string; label: string }): Metadata {
+export function metadataForCategory(category: { slug: string; label: string }, searchParams?: CanonicalFilterSearchParams): Metadata {
+  const categoryPath = `/categories/${category.slug}`;
   return routeMetadata({
-    path: `/categories/${category.slug}`,
+    path: categoryPath,
+    canonicalPath: hasAppliedCanonicalFilters(searchParams) ? categoryPath : undefined,
     title: `${category.label} grocery deals and price coverage | GroceryView`,
     description: `Browse verified ${category.label} grocery rows with category deal leaders, chain spreads, OpenPrices observations, and source freshness.`,
     edgeCache: { surface: 'category' }
+  });
+}
+
+export function metadataForSearch(searchParams?: CanonicalFilterSearchParams): Metadata {
+  return routeMetadata({
+    path: '/search',
+    canonicalPath: hasAppliedCanonicalFilters(searchParams) ? '/search' : undefined,
+    ...routeMetadataCatalog['/search']
   });
 }
 
