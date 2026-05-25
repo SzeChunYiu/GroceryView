@@ -7,6 +7,10 @@ export type ScannerHistoryRow = {
   itemCount?: number;
   storeName?: string;
   totalSek?: number;
+  productSlug?: string;
+  compareHref?: string;
+  listHref?: string;
+  reportHref?: string;
 };
 
 type ScannerHistoryPayload = {
@@ -19,6 +23,10 @@ function stringField(value: unknown, fallback: string) {
   return typeof value === 'string' && value.trim().length > 0 ? value : fallback;
 }
 
+function optionalStringField(value: unknown) {
+  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : undefined;
+}
+
 function numberField(value: unknown) {
   return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
 }
@@ -28,6 +36,8 @@ function normalizeRow(row: unknown, index: number): ScannerHistoryRow {
   const createdAt = stringField(value.createdAt ?? value.created_at ?? value.scannedAt, 'Timestamp redacted');
   const kind = stringField(value.kind ?? value.scanKind, 'receipt');
   const status = stringField(value.status, 'processed');
+  const productSlug = optionalStringField(value.productSlug ?? value.product_slug ?? value.slug);
+  const productParam = productSlug ? encodeURIComponent(productSlug) : undefined;
 
   return {
     id: stringField(value.id ?? value.scanId, `scan-${index}`),
@@ -38,6 +48,10 @@ function normalizeRow(row: unknown, index: number): ScannerHistoryRow {
     itemCount: numberField(value.itemCount ?? value.item_count),
     storeName: stringField(value.storeName ?? value.store_name, 'Store redacted'),
     totalSek: numberField(value.totalSek ?? value.total_sek ?? value.total),
+    productSlug,
+    compareHref: optionalStringField(value.compareHref ?? value.compare_href) ?? (productParam ? `/compare?product=${productParam}` : undefined),
+    listHref: optionalStringField(value.listHref ?? value.list_href) ?? (productParam ? `/list?add=${productParam}` : undefined),
+    reportHref: optionalStringField(value.reportHref ?? value.report_href) ?? (productParam ? `/price-reports?product=${productParam}` : undefined),
   };
 }
 

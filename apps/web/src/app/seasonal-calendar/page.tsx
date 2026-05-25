@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { buildSeasonalProduceDiscoveryCards } from '@/lib/deal-context';
+import { buildCategorySeasonalDiscoveryModules } from '@/lib/price-intelligence';
 import { categoryDealLeaders, localSeasonalPicks, seasonalProduceCalendar } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -12,6 +13,10 @@ export default function SeasonalCalendarPage() {
   const seasonalDiscoveryCards = buildSeasonalProduceDiscoveryCards({
     deals: categoryDealLeaders,
     rows: seasonalProduceCalendar.topBestBuys
+  });
+  const produceCategoryModules = buildCategorySeasonalDiscoveryModules({
+    categorySlug: 'produce',
+    seasonalRows: seasonalProduceCalendar.produceSeasonalityRows
   });
 
   return (
@@ -64,6 +69,30 @@ export default function SeasonalCalendarPage() {
                 <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Typical {row.typicalMonthlyAverageLabel} · {row.savingsVsTypicalLabel}</p>
                 <p className="rounded-2xl bg-slate-50 p-3 font-semibold">{row.observationCount} observations · {row.observedMonthCount} months</p>
               </div>
+            </Link>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-fuchsia-200 bg-fuchsia-50">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-fuchsia-800">Category-page module preview</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Reusable seasonal discovery blocks for category pages</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              {produceCategoryModules.guardrail}
+            </p>
+          </div>
+          <Link className="rounded-full bg-fuchsia-700 px-5 py-3 text-sm font-black text-white" href="/categories/produce">
+            Open produce category
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {produceCategoryModules.historicBestBuyWindows.map((row) => (
+            <Link className="rounded-2xl border border-fuchsia-200 bg-white p-4 shadow-sm hover:border-fuchsia-700" href={`/products/${row.slug}`} key={`category-module-${row.slug}`}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-fuchsia-800">{row.bestBuyMonth} historic window</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{row.productName}</h3>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{row.savingsVsTypicalLabel} · {row.confidenceLabel}</p>
             </Link>
           ))}
         </div>

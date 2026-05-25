@@ -7,6 +7,9 @@ export interface PriceIntelligenceScoreCard {
   windowLabel: string;
   trendSlopeLabel: string;
   volatilityLabel: string;
+  forecastRangeLabel?: string;
+  forecastConfidenceLabel?: string;
+  forecastTrendLabel?: string;
   detail: string;
 }
 
@@ -54,6 +57,14 @@ export function PriceIntelligenceCard({
                 <p className="rounded-xl bg-emerald-50 p-3">trend slope: {card.trendSlopeLabel}</p>
                 <p className="rounded-xl bg-slate-50 p-3">volatility: {card.volatilityLabel}</p>
               </div>
+              {card.forecastRangeLabel ? (
+                <div className="mt-3 rounded-xl border border-sky-100 bg-sky-50 p-3 text-xs font-bold text-sky-950">
+                  <p className="uppercase tracking-[0.14em] text-sky-700">7-day forecast range</p>
+                  <p className="mt-1 text-sm font-black">{card.forecastRangeLabel}</p>
+                  <p className="mt-1 text-sky-800">{card.forecastConfidenceLabel ?? 'forecast confidence unavailable'}</p>
+                  {card.forecastTrendLabel ? <p className="mt-1 text-sky-800">{card.forecastTrendLabel}</p> : null}
+                </div>
+              ) : null}
               <p className="mt-3 text-xs font-semibold leading-5 text-slate-500">{card.detail}</p>
             </article>
           ))}
