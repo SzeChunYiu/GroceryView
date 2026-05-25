@@ -1,18 +1,21 @@
 import { ImageResponse } from 'next/og';
 import { notFound } from 'next/navigation';
-import { findProduct, productUniverse } from '@/lib/verified-data';
+import { findProduct } from '@/lib/verified-data';
 import { itemOpenGraphModel, itemOpenGraphSize } from '@/lib/og';
 
 export const alt = 'GroceryView item price social image';
 export const size = itemOpenGraphSize;
 export const contentType = 'image/png';
 
+export const dynamicParams = true;
 export function generateStaticParams() {
-  return productUniverse.map((product) => ({ id: product.slug }));
+  // Render item OG images on-demand (not at build), so one bad item cannot fail the whole build.
+  return [];
 }
 
 export default async function Image({ params }: Readonly<{ params: Promise<{ id: string }> }>) {
   const { id } = await params;
+  try {
   const product = findProduct(id);
   if (!product) notFound();
 
@@ -97,4 +100,14 @@ export default async function Image({ params }: Readonly<{ params: Promise<{ id:
     ),
     size
   );
+  } catch {
+    return new ImageResponse(
+      (
+        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#ecfdf5', color: '#047857', fontSize: 72, fontWeight: 900, fontFamily: 'Arial, sans-serif' }}>
+          GroceryView
+        </div>
+      ),
+      size
+    );
+  }
 }
