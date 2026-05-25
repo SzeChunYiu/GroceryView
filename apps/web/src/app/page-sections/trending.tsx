@@ -3,6 +3,7 @@ import { ArrowDownRight, BadgeCheck, BarChart3, Clock3, ListPlus, MapPin, Search
 import { buildPriceDropDiscoveryRail, buildTrendingItemDetailCards } from '@/lib/price-events';
 import { buildCityPriceDropTrends, type BrandLeaderboardTrendFeed, type CityPriceDropTrend, type CitySearchTrendFeed } from '@/lib/trends';
 import { categoryLabels, pricedProducts } from '@/lib/openprices-products';
+import { rankPersonalizedPriceDrops } from '@/lib/personalization';
 import type { CategoryTrendingShelf } from '@/lib/grocery-index-widget';
 
 function formatSek(value: number) {
@@ -41,6 +42,20 @@ const priceEventProducts = pricedProducts.map((product) => ({
 
 const discoveryRailItems = buildPriceDropDiscoveryRail(priceEventProducts, 6);
 const trendingItemDetailCards = buildTrendingItemDetailCards(priceEventProducts, 4, 'Stockholm');
+const personalizedPriceDropItems = rankPersonalizedPriceDrops(
+  discoveryRailItems.map((item) => ({
+    ...item,
+    chainName: item.locality,
+    chainSlug: item.locality.toLocaleLowerCase('sv-SE'),
+    productSlug: item.productSlug,
+    productName: item.productName
+  })),
+  {
+    favoriteBrands: ['Garant', 'Änglamark', 'Zoégas'],
+    nearbyChains: ['ica', 'coop', 'willys'],
+    clickedProductSlugs: ['coffee', 'milk', 'banana']
+  }
+).slice(0, 4);
 
 function PriceDropDiscoveryEmptyState() {
   return (
@@ -123,6 +138,36 @@ export function PriceDropDiscoveryRail() {
               </div>
               <p className="mt-3 text-sm font-black text-emerald-800">Save {formatSek(item.dropAmount)} vs {formatSek(item.previousWeekPrice)}</p>
               <p className="mt-2 text-xs font-semibold leading-5 text-slate-500">{item.evidenceLabel}</p>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function PersonalizedPriceDropFeed() {
+  if (personalizedPriceDropItems.length === 0) return null;
+
+  return (
+    <section className="mx-auto mt-4 max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Personalized price-drop feed" data-personalized-price-drop-feed>
+      <div className="rounded-[1.75rem] border border-violet-200 bg-violet-50 p-5 shadow-sm">
+        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-violet-800">For your next basket</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Personalized price drops from favorites, lists, and nearby stores</h2>
+          </div>
+          <p className="max-w-2xl text-sm font-semibold leading-6 text-slate-700">
+            Ranked with saved favorites, household list signals, preferred stores, and verified week-over-week price movement.
+          </p>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-4">
+          {personalizedPriceDropItems.map((item) => (
+            <Link className="rounded-2xl border border-violet-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-violet-700" href={`/products/${item.productSlug}`} key={item.productSlug}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-800">#{item.rank} · {item.personalizationReason}</p>
+              <h3 className="mt-2 line-clamp-2 text-lg font-black text-slate-950">{item.productName}</h3>
+              <p className="mt-2 text-sm font-semibold text-slate-600">{item.brand} · {item.locality}</p>
+              <p className="mt-3 text-sm font-black text-emerald-800">Save {formatSek(item.dropAmount)} ({formatPercent(item.dropPercent * 100)})</p>
             </Link>
           ))}
         </div>
