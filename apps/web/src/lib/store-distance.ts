@@ -1,7 +1,14 @@
-export type StoreTravelMode = 'walk' | 'drive';
+export type StoreTravelMode = 'walk' | 'drive' | 'transit';
 export type StoreOpeningStatus = 'open_now' | 'closing_soon' | 'closed' | 'unknown';
 
 type ProductParam = string | string[] | undefined;
+
+export type StoreRouteEstimate = {
+  mode: StoreTravelMode;
+  label: string;
+  minutes: number;
+  distanceLabel: string;
+};
 
 export type StoreDistanceRow = {
   id: string;
@@ -11,6 +18,8 @@ export type StoreDistanceRow = {
   distanceMeters: number;
   walkMinutes: number;
   driveMinutes: number;
+  transitMinutes: number;
+  routeEstimates: StoreRouteEstimate[];
   pickupMinutes: number;
   totalMinutes: number;
   basketTotalSek: number;
@@ -34,6 +43,7 @@ const storeRouteSeeds = [
     distanceMeters: 450,
     walkMinutes: 6,
     driveMinutes: 4,
+    transitMinutes: 7,
     basketBaseSek: 338.9,
     basketPerProductSek: 1.2,
     openingStatus: 'open_now',
@@ -47,6 +57,7 @@ const storeRouteSeeds = [
     distanceMeters: 850,
     walkMinutes: 11,
     driveMinutes: 5,
+    transitMinutes: 8,
     basketBaseSek: 319.4,
     basketPerProductSek: 0.9,
     openingStatus: 'closing_soon',
@@ -60,6 +71,7 @@ const storeRouteSeeds = [
     distanceMeters: 1200,
     walkMinutes: 16,
     driveMinutes: 7,
+    transitMinutes: 10,
     basketBaseSek: 329.8,
     basketPerProductSek: 1.5,
     openingStatus: 'open_now',
@@ -73,6 +85,7 @@ const storeRouteSeeds = [
     distanceMeters: 1500,
     walkMinutes: 20,
     driveMinutes: 8,
+    transitMinutes: 12,
     basketBaseSek: 314.5,
     basketPerProductSek: 1.1,
     openingStatus: 'closed',
@@ -92,7 +105,9 @@ function parseSelectedProducts(products: ProductParam) {
 }
 
 export function normalizeStoreTravelMode(mode: ProductParam): StoreTravelMode {
-  return firstParam(mode) === 'drive' ? 'drive' : 'walk';
+  const value = firstParam(mode);
+  if (value === 'drive' || value === 'transit') return value;
+  return 'walk';
 }
 
 function openingPenaltyMinutes(status: StoreOpeningStatus): number {
@@ -104,7 +119,23 @@ function openingPenaltyMinutes(status: StoreOpeningStatus): number {
 
 function travelCostSek(distanceMeters: number, routeMinutes: number, mode: StoreTravelMode): number {
   if (mode === 'drive') return Number(((distanceMeters / 1000) * 3.8 + routeMinutes * 0.9).toFixed(1));
+  if (mode === 'transit') return Number((routeMinutes * 0.35 + 26).toFixed(1));
   return Number((routeMinutes * 0.55).toFixed(1));
+}
+
+function routeMinutesFor(store: Pick<StoreDistanceRow, 'driveMinutes' | 'transitMinutes' | 'walkMinutes'>, mode: StoreTravelMode) {
+  if (mode === 'drive') return store.driveMinutes;
+  if (mode === 'transit') return store.transitMinutes;
+  return store.walkMinutes;
+}
+
+function routeEstimatesFor(store: Pick<StoreDistanceRow, 'distanceMeters' | 'driveMinutes' | 'transitMinutes' | 'walkMinutes'>): StoreRouteEstimate[] {
+  const distanceLabel = `${(store.distanceMeters / 1000).toFixed(1)} km`;
+  return [
+    { mode: 'walk', label: 'Walk', minutes: store.walkMinutes, distanceLabel },
+    { mode: 'drive', label: 'Drive', minutes: store.driveMinutes, distanceLabel },
+    { mode: 'transit', label: 'Transit', minutes: store.transitMinutes, distanceLabel }
+  ];
 }
 
 function routeRecommendationLabel(row: Pick<StoreDistanceRow, 'openingStatus' | 'routeAwareTotalSek' | 'totalMinutes'>): string {
@@ -122,16 +153,18 @@ export function buildStoreDistanceCompare(products: ProductParam, mode: ProductP
 
   const rows: StoreDistanceRow[] = storeRouteSeeds
     .map((store) => {
-      const routeMinutes = travelMode === 'drive' ? store.driveMinutes : store.walkMinutes;
+      const routeMinutes = routeMinutesFor(store, travelMode);
       const openingPenalty = openingPenaltyMinutes(store.openingStatus);
       const basketTotalSek = Number((store.basketBaseSek + pricedProductCount * store.basketPerProductSek).toFixed(2));
       const tripCostSek = travelCostSek(store.distanceMeters, routeMinutes, travelMode);
+      const routeEstimates = routeEstimatesFor(store);
       const routeAwareTotalSek = Number((basketTotalSek + tripCostSek).toFixed(2));
       const totalMinutes = routeMinutes + pickupMinutes + openingPenalty;
       const routeScore = Number((routeAwareTotalSek + totalMinutes * 1.35 + openingPenalty * 1.8).toFixed(2));
       const row = {
         ...store,
         pickupMinutes,
+        routeEstimates,
         totalMinutes,
         basketTotalSek,
         travelCostSek: tripCostSek,
@@ -142,6 +175,7 @@ export function buildStoreDistanceCompare(products: ProductParam, mode: ProductP
         recommendationLabel: '',
         routeRankInputs: [
           `${travelMode} route ${routeMinutes} min`,
+          `walk ${store.walkMinutes} min · drive ${store.driveMinutes} min · transit ${store.transitMinutes} min`,
           `basket ${basketTotalSek.toFixed(2)} SEK`,
           store.openingStatusLabel
         ]
@@ -158,7 +192,7 @@ export function buildStoreDistanceCompare(products: ProductParam, mode: ProductP
     mode: travelMode,
     selectedProductIds,
     rows,
-    routeRankInputs: ['distance / route minutes', 'known basket total', 'opening status penalty'],
+    routeRankInputs: ['walking / driving / transit route minutes', 'known basket total', 'opening status penalty'],
     summary: `${rows[0]?.storeName ?? 'No store'} is best by route-aware ${travelMode} score after combining distance, basket cost, and opening status.`
   };
 }
