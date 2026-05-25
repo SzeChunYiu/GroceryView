@@ -1,5 +1,28 @@
 import { matchPurchaseHistoryRowToProduct, type PurchaseHistoryProductMatch } from './normalization';
 
+export type BasketSubstitutePrice = {
+  chainName: string;
+  price: number;
+};
+
+export type BasketSubstituteProduct = {
+  productId: string;
+  productName: string;
+  categoryLabel?: string;
+  prices: BasketSubstitutePrice[];
+};
+
+export type BasketSubstituteSuggestion = {
+  productId: string;
+  productName: string;
+  substituteProductId: string;
+  substituteProductName: string;
+  chainName: string;
+  reason: 'high_unit_price' | 'unavailable_chain';
+  savings: number;
+  savingsLabel: string;
+};
+
 export type RecurringBasketLine = {
   productId: string;
   productName: string;
@@ -20,6 +43,7 @@ export type RecurringBasketDuplicate = {
 };
 
 export type RecurringBasketPlan = {
+  forecastSnapshotAt: string;
   id: string;
   templateName: string;
   cadence: 'weekly';
@@ -53,6 +77,119 @@ export type PurchaseHistoryImportPreview = {
   totalSpend: number;
 };
 
+export type PastPurchaseShortcut = {
+  productId: string;
+  productName: string;
+  categoryLabel: string;
+  purchaseCount: number;
+  suggestedQuantity: number;
+  lastPurchasedAt: string;
+  shortcutLabel: string;
+};
+
+function normalizedSuggestionTokens(value: string) {
+  return new Set(
+    value
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLocaleLowerCase('sv-SE')
+      .split(/[^a-z0-9]+/i)
+      .filter((token) => token.length >= 3)
+  );
+}
+
+function equivalentBasketProducts(product: BasketSubstituteProduct, candidate: BasketSubstituteProduct) {
+  if (product.productId === candidate.productId) return false;
+  if (product.categoryLabel && candidate.categoryLabel && product.categoryLabel === candidate.categoryLabel) return true;
+
+  const productTokens = normalizedSuggestionTokens(product.productName);
+  const candidateTokens = normalizedSuggestionTokens(candidate.productName);
+  return [...productTokens].some((token) => candidateTokens.has(token));
+}
+
+function cheapestSubstitutePrice(product: BasketSubstituteProduct, chainName?: string) {
+  const prices = chainName ? product.prices.filter((price) => price.chainName === chainName) : product.prices;
+  const validPrices = prices.filter((price) => Number.isFinite(price.price) && price.price > 0);
+  return validPrices.sort((left, right) => left.price - right.price)[0];
+}
+
+function formatSubstituteSavings(value: number, locale = 'sv-SE', currency = 'SEK') {
+  return new Intl.NumberFormat(locale, { currency, maximumFractionDigits: 2, style: 'currency' }).format(value);
+}
+
+export function buildSmartBasketSubstituteSuggestions({
+  catalog,
+  items,
+  locale = 'sv-SE',
+  currency = 'SEK',
+  unavailableChainNames = []
+}: {
+  catalog: readonly BasketSubstituteProduct[];
+  items: readonly BasketSubstituteProduct[];
+  locale?: string;
+  currency?: string;
+  unavailableChainNames?: readonly string[];
+}): BasketSubstituteSuggestion[] {
+  const suggestions: BasketSubstituteSuggestion[] = [];
+
+  for (const item of items) {
+    const itemCheapest = cheapestSubstitutePrice(item);
+    const equivalents = catalog.filter((candidate) => equivalentBasketProducts(item, candidate));
+
+    if (itemCheapest) {
+      const cheaperCandidate = equivalents
+        .map((candidate) => ({ candidate, price: cheapestSubstitutePrice(candidate) }))
+        .filter((row): row is { candidate: BasketSubstituteProduct; price: BasketSubstitutePrice } => Boolean(row.price))
+        .filter((row) => itemCheapest.price - row.price.price >= Math.max(1, itemCheapest.price * 0.08))
+        .sort((left, right) => left.price.price - right.price.price)[0];
+
+      if (cheaperCandidate) {
+        const savings = itemCheapest.price - cheaperCandidate.price.price;
+        suggestions.push({
+          productId: item.productId,
+          productName: item.productName,
+          substituteProductId: cheaperCandidate.candidate.productId,
+          substituteProductName: cheaperCandidate.candidate.productName,
+          chainName: cheaperCandidate.price.chainName,
+          reason: 'high_unit_price',
+          savings,
+          savingsLabel: formatSubstituteSavings(savings, locale, currency)
+        });
+      }
+    }
+
+    for (const chainName of unavailableChainNames) {
+      if (item.prices.some((price) => price.chainName === chainName)) continue;
+      const availableCandidate = equivalents
+        .map((candidate) => ({ candidate, price: cheapestSubstitutePrice(candidate, chainName) }))
+        .filter((row): row is { candidate: BasketSubstituteProduct; price: BasketSubstitutePrice } => Boolean(row.price))
+        .sort((left, right) => left.price.price - right.price.price)[0];
+
+      if (availableCandidate) {
+        suggestions.push({
+          productId: item.productId,
+          productName: item.productName,
+          substituteProductId: availableCandidate.candidate.productId,
+          substituteProductName: availableCandidate.candidate.productName,
+          chainName,
+          reason: 'unavailable_chain',
+          savings: 0,
+          savingsLabel: formatSubstituteSavings(0, locale, currency)
+        });
+        break;
+      }
+    }
+  }
+
+  const seen = new Set<string>();
+  return suggestions.filter((suggestion) => {
+    const key = `${suggestion.productId}:${suggestion.substituteProductId}:${suggestion.reason}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).slice(0, 4);
+}
+
 const nextWeeklyWindow: RecurringBasketWindow = { startsOn: '2026-05-25', endsOn: '2026-05-31', label: 'Week 22 grocery window' };
 const followingWeeklyWindow: RecurringBasketWindow = { startsOn: '2026-06-01', endsOn: '2026-06-07', label: 'Week 23 grocery window' };
 const twoWeeksAheadWindow: RecurringBasketWindow = { startsOn: '2026-06-08', endsOn: '2026-06-14', label: 'Week 24 grocery window' };
@@ -66,6 +203,7 @@ const purchaseHistoryCatalog = [
 
 export const weeklyRecurringBasketPlan: RecurringBasketPlan = {
   id: 'weekly-family-basics',
+  forecastSnapshotAt: '2026-05-25T00:00:00.000Z',
   templateName: 'Weekly family basics',
   cadence: 'weekly',
   reusableTemplateId: 'template-family-basics-v1',
@@ -181,3 +319,39 @@ export function buildPurchaseHistoryImportPreview(rows: readonly PurchaseHistory
     totalSpend: rows.reduce((sum, row) => sum + row.totalSpend, 0)
   };
 }
+
+export function buildPastPurchaseShortcuts(rows: readonly PurchaseHistoryImportRow[]): PastPurchaseShortcut[] {
+  const rowsByProduct = new Map<string, PurchaseHistoryImportRow[]>();
+  for (const row of rows) {
+    const productId = row.productMatch?.productId ?? row.productName.toLocaleLowerCase('sv-SE').replace(/[^a-z0-9]+/g, '-');
+    rowsByProduct.set(productId, [...(rowsByProduct.get(productId) ?? []), row]);
+  }
+
+  return [...rowsByProduct.entries()]
+    .map(([productId, productRows]) => {
+      const sortedRows = [...productRows].sort((left, right) => right.purchasedAt.localeCompare(left.purchasedAt));
+      const latest = sortedRows[0]!;
+      const suggestedQuantity = Math.max(1, Math.round(productRows.reduce((sum, row) => sum + row.quantity, 0) / productRows.length));
+      return {
+        productId,
+        productName: latest.productMatch?.productName ?? latest.productName,
+        categoryLabel: latest.productMatch ? 'Recurring staple' : 'Purchase history',
+        purchaseCount: productRows.length,
+        suggestedQuantity,
+        lastPurchasedAt: latest.purchasedAt,
+        shortcutLabel: `${productRows.length} past purchase${productRows.length === 1 ? '' : 's'} · add ${suggestedQuantity}`
+      };
+    })
+    .sort((left, right) => right.purchaseCount - left.purchaseCount || left.productName.localeCompare(right.productName, 'sv'))
+    .slice(0, 5);
+}
+
+export const homePastPurchaseShortcuts = buildPastPurchaseShortcuts(parsePurchaseHistoryCsv(`date,product,store,quantity,total
+2026-05-18,Milk 1L,Willys,4,58
+2026-05-11,Milk 1L,Willys,4,58
+2026-05-18,Eggs 12-pack,Hemköp,1,39
+2026-05-04,Eggs 12-pack,Hemköp,1,39
+2026-05-18,Sourdough bread,Willys,2,64
+2026-05-11,Sourdough bread,Willys,2,64
+2026-05-18,Havregryn Extra Fylliga,Willys,1,25
+2026-05-11,Kaffe,Willys,1,49`));

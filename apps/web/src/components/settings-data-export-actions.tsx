@@ -1,10 +1,15 @@
 'use client';
 
 import { useState } from 'react';
+import {
+  brandPreferenceStorageKey,
+  clearRecentSearchHistory,
+  disabledPersonalizationSignalsStorageKey,
+  personalizationTransparencySignals
+} from '@/lib/personalization';
 
 type ExportStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
 type BrowserSession = { accessToken: string; userId: string };
-const brandPreferenceStorageKey = 'groceryview:brand-preferences:v1';
 
 function readSession(): BrowserSession {
   const accessToken = sessionStorage.getItem('groceryview:accessToken') || '';
@@ -16,6 +21,7 @@ export function SettingsDataExportActions() {
   const [status, setStatus] = useState<ExportStatus>('idle');
   const [message, setMessage] = useState('No anonymous data exports. No anonymous account deletion. Sign in first to manage account-owned JSON records.');
   const [brandMessage, setBrandMessage] = useState('Brand controls are stored locally until account preference sync is connected.');
+  const [personalizationMessage, setPersonalizationMessage] = useState('Personalization history and signal category controls are ready.');
 
   function requireSession(): BrowserSession | null {
     const session = readSession();
@@ -100,6 +106,29 @@ export function SettingsDataExportActions() {
     setBrandMessage('Saved favorite, acceptable, and excluded brand controls for recommendations on this device.');
   }
 
+  function clearPersonalizationHistory() {
+    clearRecentSearchHistory();
+    localStorage.removeItem(brandPreferenceStorageKey);
+    localStorage.removeItem(disabledPersonalizationSignalsStorageKey);
+    setBrandMessage('Brand controls reset on this device.');
+    setPersonalizationMessage('Cleared local recent searches, brand controls, and disabled signal categories for this device.');
+  }
+
+  function disablePersonalizationSignal(signalId: string) {
+    let disabledIds: string[] = [];
+    try {
+      const parsed = JSON.parse(localStorage.getItem(disabledPersonalizationSignalsStorageKey) || '[]');
+      disabledIds = Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === 'string') : [];
+    } catch {
+      disabledIds = [];
+    }
+    const disabled = new Set(disabledIds);
+    disabled.add(signalId);
+    localStorage.setItem(disabledPersonalizationSignalsStorageKey, JSON.stringify([...disabled]));
+    const label = personalizationTransparencySignals.find((signal) => signal.id === signalId)?.label ?? signalId;
+    setPersonalizationMessage(`Disabled ${label} for recommendation ranking on this device.`);
+  }
+
   return (
     <section className="mt-6 rounded-3xl border border-emerald-200 bg-white p-5 shadow-sm" aria-label="Settings data export controls">
       <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Signed-in settings action</p>
@@ -116,8 +145,21 @@ export function SettingsDataExportActions() {
       <button className="ml-2 mt-4 rounded-full border border-cyan-300 px-4 py-2 text-sm font-black text-cyan-800" onClick={saveBrandPreferences} type="button">
         Save brand controls
       </button>
+      <button className="ml-2 mt-4 rounded-full border border-violet-300 px-4 py-2 text-sm font-black text-violet-800" onClick={clearPersonalizationHistory} type="button">
+        Clear personalization history
+      </button>
       <p className="mt-4 rounded-2xl bg-emerald-50 p-3 text-sm font-bold text-emerald-950" data-status={status}>{message}</p>
       <p className="mt-3 rounded-2xl bg-cyan-50 p-3 text-sm font-bold text-cyan-950">{brandMessage}</p>
+      <div className="mt-3 rounded-2xl bg-violet-50 p-3">
+        <p className="text-sm font-bold text-violet-950">{personalizationMessage}</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {personalizationTransparencySignals.map((signal) => (
+            <button className="rounded-full border border-violet-200 bg-white px-3 py-2 text-xs font-black text-violet-800" key={signal.id} onClick={() => disablePersonalizationSignal(signal.id)} type="button">
+              Disable {signal.label}
+            </button>
+          ))}
+        </div>
+      </div>
     </section>
   );
 }

@@ -10,6 +10,18 @@ export type OsmStore = {
   openingHours?: string; opening_hours?: string; holidayHours?: string; holiday_hours?: string;
 };
 
+export type StoreInventoryConfidenceLevel = 'high' | 'medium' | 'low';
+
+export type StoreInventoryConfidence = {
+  detail: string;
+  label: string;
+  lastSeenAt: string;
+  lastSeenLabel: string;
+  level: StoreInventoryConfidenceLevel;
+  sourceLabel: string;
+  stale: boolean;
+};
+
 export function osmStoreOpeningHoursLabel(store: OsmStore): string {
   return store.openingHours || store.opening_hours || 'Hours not reported by OSM';
 }
@@ -43,6 +55,31 @@ export type StoreRouteChecklist = {
   stopOrder: string[];
   items: StoreRouteChecklistItem[];
 };
+
+function daysSinceRetrieved(retrievedDate: string, now: Date) {
+  const retrievedTime = Date.parse(`${retrievedDate}T12:00:00.000Z`);
+  if (Number.isNaN(retrievedTime)) return Number.POSITIVE_INFINITY;
+  return Math.max(0, Math.floor((now.getTime() - retrievedTime) / 86_400_000));
+}
+
+export function buildStoreInventoryConfidence(store: Pick<OsmStore, 'format' | 'retrievedDate' | 'shop' | 'source'>, now = new Date()): StoreInventoryConfidence {
+  const ageDays = daysSinceRetrieved(store.retrievedDate, now);
+  const level: StoreInventoryConfidenceLevel = ageDays <= 2 ? 'high' : ageDays <= 7 ? 'medium' : 'low';
+
+  return {
+    detail: level === 'high'
+      ? `Fresh ${store.format} source row; stock is still not guaranteed until checkout.`
+      : level === 'medium'
+        ? `Recently seen ${store.shop} row; verify availability before making a special trip.`
+        : `Stale ${store.shop} row; treat availability as uncertain and confirm before leaving.`,
+    label: level === 'high' ? 'High stock confidence' : level === 'medium' ? 'Medium stock confidence' : 'Low stock confidence',
+    lastSeenAt: `${store.retrievedDate}T12:00:00.000Z`,
+    lastSeenLabel: ageDays === Number.POSITIVE_INFINITY ? 'Last seen unknown' : `Last seen ${store.retrievedDate} (${ageDays} day${ageDays === 1 ? '' : 's'} ago)`,
+    level,
+    sourceLabel: store.source === 'osm' ? 'OSM store feed' : 'Store feed',
+    stale: level === 'low'
+  };
+}
 
 export const osmStores: OsmStore[] = [
   {

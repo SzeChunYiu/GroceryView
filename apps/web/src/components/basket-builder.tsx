@@ -23,13 +23,19 @@ import {
   type BasketChainPrice,
   type BasketStackOffer,
 } from "@/lib/deal-context";
+import { buildSmartBasketSubstituteSuggestions, type BasketSubstituteProduct } from "@/lib/recurring-basket";
 
 export type BasketBuilderProduct = {
   id: string;
   name: string;
+  categoryLabel?: string;
   chainPrices?: BasketChainPrice[];
   dealStackOffers?: BasketStackOffer[];
   dietaryTags?: readonly string[];
+  lastPurchasedAt?: string;
+  purchaseCount?: number;
+  shortcutLabel?: string;
+  suggestedQuantity?: number;
 };
 
 export function addBasketBuilderProduct<T extends BasketBuilderProduct>(
@@ -45,12 +51,14 @@ export function addBasketBuilderProduct<T extends BasketBuilderProduct>(
 
 export type BasketBuilderProps<T extends BasketBuilderProduct> = {
   products: readonly T[];
+  pastPurchaseShortcuts?: readonly T[];
   selectedDietaryFilters?: readonly string[];
   onSelectedDietaryFiltersChange?: (filters: string[]) => void;
 };
 
 export function BasketBuilder<T extends BasketBuilderProduct>({
   products,
+  pastPurchaseShortcuts = [],
   selectedDietaryFilters,
   onSelectedDietaryFiltersChange,
 }: BasketBuilderProps<T>) {
@@ -82,6 +90,23 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
     offers: basketProducts.flatMap((product) => product.dealStackOffers ?? []),
   });
   const bestChainStack = chainStacks[0];
+  const substituteProducts: BasketSubstituteProduct[] = products.map((product) => ({
+    productId: product.id,
+    productName: product.name,
+    categoryLabel: product.categoryLabel,
+    prices: (product.chainPrices ?? []).map((price) => ({ chainName: price.chain, price: price.price }))
+  }));
+  const substituteChainNames = Array.from(new Set(substituteProducts.flatMap((product) => product.prices.map((price) => price.chainName))));
+  const smartSubstitutes = buildSmartBasketSubstituteSuggestions({
+    catalog: substituteProducts,
+    items: basketProducts.map((product) => ({
+      productId: product.id,
+      productName: product.name,
+      categoryLabel: product.categoryLabel,
+      prices: (product.chainPrices ?? []).map((price) => ({ chainName: price.chain, price: price.price }))
+    })),
+    unavailableChainNames: substituteChainNames
+  });
 
   function add(product: T) {
     setBasketProducts((current) => addBasketBuilderProduct(current, product));
@@ -101,6 +126,21 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
 
   return (
     <section aria-label="Basket builder">
+      {pastPurchaseShortcuts.length > 0 ? (
+        <section aria-label="Past purchase shortcuts">
+          <h3>Past purchase shortcuts</h3>
+          <p>Frequently purchased staples can be added with one tap before you build the rest of the basket.</p>
+          <div>
+            {pastPurchaseShortcuts.map((product) => (
+              <button key={`shortcut-${product.id}`} type="button" onClick={() => add(product)}>
+                Add {product.name}
+                {product.shortcutLabel ? ` · ${product.shortcutLabel}` : ''}
+              </button>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
       {availableDietaryTags.length > 0 ? (
         <fieldset aria-label="Dietary filters">
           <legend>Dietary filters</legend>
@@ -141,6 +181,22 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
           <li key={product.id}>{product.name}</li>
         ))}
       </ul>
+
+      {smartSubstitutes.length > 0 ? (
+        <section aria-label="Smart substitute suggestions">
+          <h3>Smart substitute suggestions</h3>
+          <ul>
+            {smartSubstitutes.map((suggestion) => (
+              <li key={`${suggestion.productId}-${suggestion.substituteProductId}-${suggestion.reason}`}>
+                Swap {suggestion.productName} for {suggestion.substituteProductName} at {suggestion.chainName}
+                {suggestion.reason === 'high_unit_price'
+                  ? ` to save ${suggestion.savingsLabel}`
+                  : ' because the selected chain is missing the current item'}.
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       {bestChainStack ? (
         <section aria-label="Cheapest coupon stack by chain">
