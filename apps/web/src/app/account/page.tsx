@@ -413,6 +413,48 @@ export default function AccountPage() {
             </div>
           ))}
         </div>
+        <form action="/api/alerts/best-time" className="mt-4 grid gap-3 rounded-2xl border border-amber-100 bg-white p-4 shadow-sm lg:grid-cols-[1fr_1fr_auto]" method="post">
+          <input name="accountId" type="hidden" value="signed-in-user" />
+          <label className="text-sm font-black text-slate-800" htmlFor="best-time-target-stores">
+            Target stores
+            <input
+              className="mt-1 block w-full rounded-xl border border-amber-200 px-3 py-2 text-sm font-semibold text-slate-900"
+              defaultValue="Willys, Lidl"
+              id="best-time-target-stores"
+              name="targetStores"
+              required
+            />
+          </label>
+          <label className="text-sm font-black text-slate-800" htmlFor="best-time-categories">
+            Watched categories
+            <input
+              className="mt-1 block w-full rounded-xl border border-amber-200 px-3 py-2 text-sm font-semibold text-slate-900"
+              defaultValue="Pantry, Frozen"
+              id="best-time-categories"
+              name="categories"
+              required
+            />
+          </label>
+          <label className="text-sm font-black text-slate-800" htmlFor="best-time-confidence-threshold">
+            Confidence threshold
+            <input
+              className="mt-1 block w-full rounded-xl border border-amber-200 px-3 py-2 text-sm font-semibold text-slate-900"
+              defaultValue="0.78"
+              id="best-time-confidence-threshold"
+              max="0.99"
+              min="0.5"
+              name="confidenceThreshold"
+              step="0.01"
+              type="number"
+            />
+          </label>
+          <button className="rounded-full bg-amber-900 px-5 py-3 text-sm font-black text-white lg:col-start-3" type="submit">
+            Save best-time rule
+          </button>
+          <p className="text-xs font-bold leading-5 text-amber-950 lg:col-span-2">
+            The API accepts comma-separated stores and categories from this form, or JSON with product price history when clients want an immediate buy-now/wait recommendation preview.
+          </p>
+        </form>
       </Card>
 
       <Card className="mt-6 border-rose-200 bg-rose-50">
@@ -503,7 +545,9 @@ export default function AccountPage() {
       </Card>
 
       <AccountMutationActions />
-      <p className="mt-6 rounded-2xl bg-violet-50 p-4 text-sm font-bold text-violet-950">Premium forecast preview: {premiumSavingsForecast.monthlySavingsLabel} estimated monthly savings before checkout.</p>
+      <p className="mt-6 rounded-2xl bg-violet-50 p-4 text-sm font-bold text-violet-950">
+        Premium forecast preview: {premiumSavingsForecast.monthlySavingsLabel} estimated monthly savings before checkout. Review the <a className="underline decoration-2 underline-offset-4" href="/pricing#premium-ocr-history">Premium OCR history plan</a> before opening checkout.
+      </p>
       <AccountBillingActions />
       <AdDisclosureActions />
 

@@ -63,6 +63,8 @@ type StoreSeoInput = {
   district?: string;
 };
 
+export type CanonicalFilterSearchParams = Readonly<Record<string, string | string[] | undefined>>;
+
 type DealSeoInput = {
   id?: string;
   slug?: string;
@@ -161,6 +163,14 @@ export const routeMetadataCatalog = {
   '/cookies': {
     title: 'Cookie policy and consent settings | GroceryView',
     description: 'Read GroceryView cookie categories, IAB TCF v2.2 consent signals, Google Consent Mode v2 defaults, and non-personalised ad guardrails.'
+  },
+  '/en/cookies': {
+    title: 'Cookie policy | GroceryView',
+    description: 'Read the English GroceryView cookie policy for necessary cookies, optional analytics, ads, personalisation, consent proof, and retention.'
+  },
+  '/en/privacy': {
+    title: 'Privacy policy | GroceryView',
+    description: 'Read the English GroceryView privacy policy for account data, receipts, analytics, ads, retention, deletion, and processors.'
   },
   '/data-sources': {
     title: 'GroceryView source coverage and claim ledger',
@@ -264,6 +274,14 @@ export const routeMetadataCatalog = {
     description: 'Download signed-in account data exports for lists, alerts, preferences, analytics events, and other private GDPR sections.',
     noIndex: true
   },
+  '/sv/cookies': {
+    title: 'Cookiepolicy | GroceryView',
+    description: 'Läs GroceryViews svenska cookiepolicy för nödvändiga cookies, frivillig analys, annonser, personalisering, samtyckesbevis och lagring.'
+  },
+  '/sv/privacy': {
+    title: 'Integritetspolicy | GroceryView',
+    description: 'Läs GroceryViews svenska integritetspolicy för kontodata, kvitton, analys, annonser, lagring, radering och personuppgiftsbiträden.'
+  },
   '/seasonal-calendar': {
     title: 'Seasonal produce price calendar | GroceryView',
     description: 'Find the best time to buy produce from historical monthly averages, with no forecasted prices and eco planning guardrails.'
@@ -355,6 +373,13 @@ function publicCatalogueCacheOther(edgeCache: PublicCatalogueCacheMetadata | und
     'x-groceryview-revalidate-seconds': String(revalidateSeconds),
     'x-groceryview-cache-surface': surface
   };
+}
+
+export function hasAppliedCanonicalFilters(searchParams: CanonicalFilterSearchParams | undefined) {
+  return Object.values(searchParams ?? {}).some((value) => {
+    if (Array.isArray(value)) return value.some((entry) => entry.trim().length > 0);
+    return typeof value === 'string' && value.trim().length > 0;
+  });
 }
 
 export function routeMetadata(route: keyof typeof routeMetadataCatalog | RouteMetadataConfig): Metadata {
@@ -509,12 +534,22 @@ export function metadataForProduct(product: ProductSeoInput): Metadata {
   });
 }
 
-export function metadataForCategory(category: { slug: string; label: string }): Metadata {
+export function metadataForCategory(category: { slug: string; label: string }, searchParams?: CanonicalFilterSearchParams): Metadata {
+  const categoryPath = `/categories/${category.slug}`;
   return routeMetadata({
-    path: `/categories/${category.slug}`,
+    path: categoryPath,
+    canonicalPath: hasAppliedCanonicalFilters(searchParams) ? categoryPath : undefined,
     title: `${category.label} grocery deals and price coverage | GroceryView`,
     description: `Browse verified ${category.label} grocery rows with category deal leaders, chain spreads, OpenPrices observations, and source freshness.`,
     edgeCache: { surface: 'category' }
+  });
+}
+
+export function metadataForSearch(searchParams?: CanonicalFilterSearchParams): Metadata {
+  return routeMetadata({
+    path: '/search',
+    canonicalPath: hasAppliedCanonicalFilters(searchParams) ? '/search' : undefined,
+    ...routeMetadataCatalog['/search']
   });
 }
 

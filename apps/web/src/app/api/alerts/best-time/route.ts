@@ -3,6 +3,7 @@ import { buildBestTimeAlertExplanationTimeline } from '@/lib/alert-scheduler';
 import { buildBestTimeToBuyAlert, type FlyerWindow, type PriceForecastObservation } from '@/lib/price-intelligence';
 
 type BestTimeAlertPayload = {
+  accountId?: unknown;
   categories?: unknown;
   confidenceThreshold?: unknown;
   currentPrice?: unknown;
@@ -15,6 +16,9 @@ type BestTimeAlertPayload = {
 };
 
 function stringList(value: unknown) {
+  if (typeof value === 'string') {
+    return value.split(',').map((item) => item.trim()).filter(Boolean);
+  }
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string' && item.trim().length > 0).map((item) => item.trim()) : [];
 }
 
@@ -77,48 +81,75 @@ function parseFlyerWindows(value: unknown): FlyerWindow[] {
     .filter((entry): entry is FlyerWindow => entry !== null);
 }
 
+async function readBestTimeAlertPayload(request: Request): Promise<BestTimeAlertPayload> {
+  const contentType = request.headers.get('content-type') ?? '';
+  if (contentType.includes('application/x-www-form-urlencoded') || contentType.includes('multipart/form-data')) {
+    return Object.fromEntries(await request.formData()) as BestTimeAlertPayload;
+  }
+  return (await request.json().catch(() => ({}))) as BestTimeAlertPayload;
+}
+
+function hasRecommendationInputs(body: BestTimeAlertPayload) {
+  return body.productId !== undefined
+    || body.productName !== undefined
+    || body.currentPrice !== undefined
+    || body.currentStoreName !== undefined
+    || body.priceHistory !== undefined
+    || body.upcomingFlyerWindows !== undefined;
+}
+
 export async function POST(request: Request) {
   try {
-    const body = (await request.json().catch(() => ({}))) as BestTimeAlertPayload;
+    const body = await readBestTimeAlertPayload(request);
     const targetStores = stringList(body.targetStores);
     const categories = stringList(body.categories);
     const confidenceThreshold = parseConfidenceThreshold(body.confidenceThreshold);
-    const recommendation = buildBestTimeToBuyAlert({
-      productId: requiredString(body.productId, 'productId'),
-      productName: requiredString(body.productName, 'productName'),
-      currentPrice: requiredPositiveNumber(body.currentPrice, 'currentPrice'),
-      currentStoreName: requiredString(body.currentStoreName, 'currentStoreName'),
-      priceHistory: parsePriceHistory(body.priceHistory),
-      upcomingFlyerWindows: parseFlyerWindows(body.upcomingFlyerWindows)
-    });
-    const explanationTimeline = buildBestTimeAlertExplanationTimeline({
-      productName: recommendation.productName,
-      categoryLabel: categories.join(', '),
-      decisionLabel: recommendation.decisionLabel,
-      flyerWindowLabel: recommendation.upcomingFlyerWindow ? recommendation.flyerWindowLabel : undefined,
-      observedPriceCount: recommendation.observedPriceCount,
-      observedRangeLabel: recommendation.observedRangeLabel,
-      volatilityScore: recommendation.volatilityScore
-    });
 
     if (targetStores.length === 0 || categories.length === 0) {
       return NextResponse.json({ error: 'targetStores and categories are required to create a best-time-to-buy alert rule.' }, { status: 400 });
     }
 
+    const recommendation = hasRecommendationInputs(body)
+      ? buildBestTimeToBuyAlert({
+        productId: requiredString(body.productId, 'productId'),
+        productName: requiredString(body.productName, 'productName'),
+        currentPrice: requiredPositiveNumber(body.currentPrice, 'currentPrice'),
+        currentStoreName: requiredString(body.currentStoreName, 'currentStoreName'),
+        priceHistory: parsePriceHistory(body.priceHistory),
+        upcomingFlyerWindows: parseFlyerWindows(body.upcomingFlyerWindows)
+      })
+      : null;
+    const explanationTimeline = recommendation
+      ? buildBestTimeAlertExplanationTimeline({
+        productName: recommendation.productName,
+        categoryLabel: categories.join(', '),
+        decisionLabel: recommendation.decisionLabel,
+        flyerWindowLabel: recommendation.upcomingFlyerWindow ? recommendation.flyerWindowLabel : undefined,
+        observedPriceCount: recommendation.observedPriceCount,
+        observedRangeLabel: recommendation.observedRangeLabel,
+        volatilityScore: recommendation.volatilityScore
+      })
+      : buildBestTimeAlertExplanationTimeline({
+        productName: 'Watched category rule',
+        categoryLabel: categories.join(', '),
+        seasonalityLabel: `Rule applies only to ${categories.join(', ')} at ${targetStores.join(', ')} when confidence clears ${(confidenceThreshold * 100).toFixed(0)}%.`,
+        volatilityScore: null
+      });
+
     return NextResponse.json(
       {
         rule: {
           id: `best-time-${targetStores.join('-').toLowerCase()}-${categories.join('-').toLowerCase()}`.replace(/[^a-z0-9-]/g, '-'),
+          accountId: typeof body.accountId === 'string' && body.accountId.trim() ? body.accountId.trim() : 'signed-in-user',
           targetStores,
           categories,
           confidenceThreshold,
           notifyWhen: 'buy-now-or-wait-decision',
-          status: 'active'
+          status: 'active',
+          createdAt: new Date().toISOString()
         },
-        recommendation: {
-          ...recommendation,
-          explanationTimeline
-        }
+        recommendation: recommendation ? { ...recommendation, explanationTimeline } : null,
+        explanationTimeline
       },
       { status: 201 }
     );
@@ -132,7 +163,9 @@ export async function POST(request: Request) {
 
 export function GET() {
   return NextResponse.json({
+    formAction: '/api/alerts/best-time',
     requiredInputs: ['productId', 'productName', 'currentPrice', 'currentStoreName', 'priceHistory', 'upcomingFlyerWindows', 'targetStores', 'categories', 'confidenceThreshold'],
+    ruleInputs: ['accountId', 'targetStores', 'categories', 'confidenceThreshold'],
     confidenceThreshold: { min: 0.5, max: 0.99, default: 0.75 },
     notifyWhen: 'buy-now-or-wait-decision',
     decisionInputs: ['seasonality', 'historical volatility', 'current price vs historical average', 'upcoming flyer windows'],
