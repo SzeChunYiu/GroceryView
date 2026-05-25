@@ -6,6 +6,7 @@ import { ExpiringPromotionRail } from '@/components/expiring-promotion-rail';
 import { StockUpListActions } from '@/components/stock-up-list-actions';
 import { budgetStretchKronaOptimizer, expiryDealReports, familyBulkUnitPriceComparison, loyaltyAdjustedBasketComparison, mealPrepBulkBuyOptimizer, multiWeekStockUpList, oneTapBasketOptimizer, savedBasketAutoReorderPlan, weeklyBasket, weeklyBasketOptimizerInput } from '@/lib/demo-data';
 import { buildExpiringPromotionRail } from '@/lib/deal-context';
+import { buildBasketForecastSummary } from '@/lib/basket-forecast';
 import { weeklyRecurringBasketPlan } from '@/lib/recurring-basket';
 import { mergeMealPlanIngredientsForWeeklyBasket } from '@/lib/unit-normalizer';
 import { recurringBasketDigestContract, weeklyBasketChangeDigest } from '@/lib/verified-data';
@@ -65,6 +66,7 @@ export default function WeeklyBasketPage() {
   }
 
   const bestSingleStore = comparison.bestSingleStore;
+  const basketForecast = buildBasketForecastSummary(weeklyBasketOptimizerInput, weeklyRecurringBasketPlan.forecastSnapshotAt);
 
   return (
     <PageShell>
@@ -118,6 +120,37 @@ export default function WeeklyBasketPage() {
           <p className="mt-3 font-semibold text-slate-700">{weeklyBasketConfidence.caveat}</p>
         </Card>
       </div>
+
+      <Card className="mt-6 border-indigo-200 bg-indigo-50/70">
+        <div className="grid gap-5 lg:grid-cols-[0.8fr_1fr]">
+          <div>
+            <Eyebrow>Basket forecast</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Next-week cost by chain</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+              {basketForecast.forecastWindowLabel} estimates combine current basket totals with observed cross-store volatility and flyer/member price signals.
+            </p>
+            <p className="mt-3 rounded-2xl bg-white p-3 text-sm font-bold text-indigo-950">
+              Best forecast: {basketForecast.bestChain ? `${basketForecast.bestChain.storeName} at ${formatSek(basketForecast.bestChain.forecastTotal)}` : 'No priced chain forecast'}
+            </p>
+          </div>
+          <div className="grid gap-3">
+            {basketForecast.chains.map((chain) => (
+              <div className="rounded-2xl bg-white p-4 shadow-sm" key={chain.storeId}>
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="font-black text-slate-950">{chain.storeName}</p>
+                    <p className="mt-1 text-xs font-bold uppercase tracking-[0.14em] text-indigo-700">{chain.volatilitySignal} volatility · {chain.pricedLineCount} priced lines</p>
+                  </div>
+                  <p className="text-2xl font-black text-indigo-900">{formatSek(chain.forecastTotal)}</p>
+                </div>
+                <p className="mt-2 text-sm font-semibold text-slate-700">Current {formatSek(chain.currentTotal)} · forecast delta {formatSek(chain.delta)} · {chain.flyerSignal}</p>
+                {chain.missingLineCount > 0 ? <p className="mt-1 text-xs font-black text-amber-800">{chain.missingLineCount} missing basket line{chain.missingLineCount === 1 ? '' : 's'} excluded</p> : null}
+              </div>
+            ))}
+            <p className="text-xs font-bold leading-5 text-indigo-950">{basketForecast.guardrail}</p>
+          </div>
+        </div>
+      </Card>
 
       <Card className="mt-6 border-emerald-200 bg-white">
         <div className="grid gap-5 lg:grid-cols-[0.85fr_1fr] lg:items-start">
