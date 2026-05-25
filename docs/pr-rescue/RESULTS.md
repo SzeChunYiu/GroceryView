@@ -1,1 +1,3 @@
 - PR #1575: decision=rescued; outcome=added completion log entry; attribution=ticket-cn070-p11.
+- PR #3474: decision=rescued; outcome=merged worker triage-queue goal prompt update; attribution=ticket-cn006-p16.
+- PR #3477: decision=rescued; outcome=merged Lighthouse and performance-budget rescue notes; attribution=ticket-cn006-p3.
