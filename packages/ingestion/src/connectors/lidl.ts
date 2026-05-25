@@ -98,8 +98,8 @@ export const DEFAULT_LIDL_OFFER_PATHS = [
   '/c/varma-haelsningar-fran-grekland/a10095526',
   '/c/veckans-blommor/a10095391'
 ] as const;
-export const DEFAULT_LIDL_LIVE_MAX_STORES = 85;
-export const DEFAULT_LIDL_LIVE_OFFER_MAX_ROWS = 400;
+export const DEFAULT_LIDL_LIVE_MAX_STORES = 100;
+export const DEFAULT_LIDL_LIVE_OFFER_MAX_ROWS = 500;
 
 export type FetchLidlStoresOptions = AllStoreTaskRunnerControls & {
   fetchImpl?: typeof fetch;
