@@ -80,6 +80,23 @@ export type UnitNormalizationQaReport = {
   guardrails: string[];
 };
 
+export type DuplicateProductMatchInput = {
+  name: string;
+  brand?: string | null;
+  size?: string | null;
+  unit?: string | null;
+  ean?: string | null;
+  upc?: string | null;
+};
+
+export type DuplicateProductMatchKey = {
+  ean: string;
+  normalizedName: string;
+  normalizedBrand: string;
+  normalizedSize: string;
+  normalizedUnit: string;
+};
+
 const recipeQuantityPattern = /^((?:\d+(?:[.,/]\d+)?|\d+\s+\d+\/\d+)\s*(?:kg|g|l|dl|ml|msk|tsk|st|pcs?|cups?|tbsp|tsp)?\s+)/i;
 const recipeStopWords = new Set([
   'and',
@@ -147,6 +164,41 @@ export function normalizeUnitPrice(price: number, packageEvidence: PackageEviden
 
 export function normalizeUnitPriceForPackageText(price: number, packageText: string): NormalizedUnitPrice | null {
   return normalizeUnitPrice(price, packageEvidenceFromText(packageText));
+}
+
+export function normalizeDuplicateProductText(value?: string | null) {
+  return (value ?? '')
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9åäöæø]+/gi, ' ')
+    .trim()
+    .replace(/\s+/g, ' ');
+}
+
+function normalizedDuplicatePackage(size?: string | null, unit?: string | null) {
+  const packageEvidence = size ? packageEvidenceFromText(size) : null;
+  if (packageEvidence) {
+    return {
+      normalizedSize: String(packageEvidence.packageSize),
+      normalizedUnit: packageEvidence.packageUnit
+    };
+  }
+  return {
+    normalizedSize: normalizeDuplicateProductText(size),
+    normalizedUnit: normalizeDuplicateProductText(unit)
+  };
+}
+
+export function duplicateProductMatchKey(input: DuplicateProductMatchInput): DuplicateProductMatchKey {
+  const normalizedPackage = normalizedDuplicatePackage(input.size, input.unit);
+  return {
+    ean: (input.ean ?? input.upc ?? '').replace(/\D/g, ''),
+    normalizedName: normalizeDuplicateProductText(input.name),
+    normalizedBrand: normalizeDuplicateProductText(input.brand),
+    ...normalizedPackage
+  };
 }
 
 function wordsFromText(text: string) {

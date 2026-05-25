@@ -2,6 +2,7 @@ import type { ComponentPropsWithoutRef } from 'react';
 
 export const dataGridRowStripingClass = '[&_tbody_tr:nth-child(even)]:bg-slate-50 [&_[role=row]:nth-child(even)]:bg-slate-50';
 export const dataGridActionClass = 'rounded-full border border-slate-300 px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-slate-700';
+export const dataGridVirtualStatusClass = 'rounded-2xl border border-violet-100 bg-white px-4 py-3 text-sm font-black text-slate-700 shadow-sm';
 
 type DataGridProps = ComponentPropsWithoutRef<'div'> & {
   striped?: boolean;
