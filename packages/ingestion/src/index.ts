@@ -114,6 +114,7 @@ export * from './connectors/openfoodfacts.js';
 export * from './connectors/all-store-runner.js';
 export * from './connectors/overpass.js';
 export * from './connectors/fuel-stations.js';
+export * from './connectors/hagstofa-cpi-is.js';
 export * from './jobs/is-poi-audit.js';
 export * from './jobs/no-poi-audit.js';
 export * from './connectors/citygross.js';
