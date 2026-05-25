@@ -1,4 +1,4 @@
-import { PriceDropDiscoveryRail } from '@/app/page-sections/trending';
+import { PersonalizedPriceDropFeed, PriceDropDiscoveryRail } from '@/app/page-sections/trending';
 import { BasketBuilder, type BasketBuilderProduct } from '@/components/basket-builder';
 import { PersonalizedRecommendations } from '@/components/personalized-recommendations';
 import { MarketShell } from '@/components/market-shell';
@@ -24,6 +24,7 @@ export default function HomePage() {
   return (
     <>
       <PriceDropDiscoveryRail />
+      <PersonalizedPriceDropFeed />
       <PersonalizedRecommendations />
       <section className="mx-auto my-6 w-full max-w-6xl rounded-3xl border border-emerald-100 bg-emerald-50/70 p-5">
         <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-800">Returning shopper shortcuts</p>
