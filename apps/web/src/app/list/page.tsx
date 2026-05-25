@@ -4,6 +4,7 @@ import { ListCard, type MealPlanListImportSummary } from '@/components/list-card
 import { ListSharePreview } from '@/components/list-share-preview';
 import { createPublicListShareToken, publicListSharePath, type PublicListShareItem } from '@/lib/list-permissions';
 import { parseMealPlanShoppingListExport, type MealPlanShoppingListExport } from '@/lib/meal-budgets';
+import { generateRecurringListInstance, recurringListTemplates } from '@/lib/recurring-lists';
 import { storeLayoutDepartments, storeLayoutDepartmentsForOrder, type StoreLayoutChain, type StoreLayoutGroupOrder } from '@/lib/trip-planner';
 import { metadataForShoppingListShare } from '@/lib/seo';
 import { OFFLINE_LIST_EDIT_RECONCILIATION_STEPS, offlineListSyncStatusCopy } from '@/lib/offline-sync';
@@ -92,6 +93,10 @@ export default async function ShoppingListPage({ searchParams }: { searchParams?
   const publicShareHref = publicListSharePath(publicShareToken);
   const pendingOfflineCopy = offlineListSyncStatusCopy({ isOnline: false, pendingEdits: 2 });
   const syncedOfflineCopy = offlineListSyncStatusCopy({ isOnline: true, pendingEdits: 0, lastSyncedAt: 'after background sync' });
+  const recurringTemplatePreviews = recurringListTemplates.map((template) => ({
+    template,
+    instance: generateRecurringListInstance(template, new Date('2026-05-25T00:00:00.000Z'))
+  }));
 
   return (
     <div className="space-y-6">
@@ -113,6 +118,32 @@ export default async function ShoppingListPage({ searchParams }: { searchParams?
             <li key={step} className="rounded-xl bg-white/70 px-3 py-2">{step}</li>
           ))}
         </ul>
+      </section>
+      <section className="rounded-2xl border border-violet-200 bg-violet-50 p-4" aria-labelledby="recurring-list-templates-title">
+        <p className="text-xs font-semibold uppercase tracking-wide text-violet-800">Recurring list templates</p>
+        <h2 id="recurring-list-templates-title" className="mt-1 text-xl font-bold text-slate-950">Generate weekly or biweekly list instances with one click</h2>
+        <p className="mt-2 text-sm text-violet-950">
+          Saved templates keep habitual shopping lists out of manual setup. The API route accepts a templateId and returns the next dated list instance.
+        </p>
+        <div className="mt-3 grid gap-3 md:grid-cols-2">
+          {recurringTemplatePreviews.map(({ template, instance }) => (
+            <div className="rounded-xl border border-violet-200 bg-white p-3" key={template.id}>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <p className="text-sm font-black text-violet-950">{template.title}</p>
+                  <p className="mt-1 text-sm text-slate-700">{template.frequency} · next {instance.shoppingDate} · {instance.itemCount} items</p>
+                </div>
+                <form action="/api/list/templates" method="post">
+                  <input name="templateId" type="hidden" value={template.id} />
+                  <button className="rounded-full bg-violet-700 px-4 py-2 text-sm font-black text-white" type="submit">Generate</button>
+                </form>
+              </div>
+              <p className="mt-2 text-xs font-semibold text-slate-600">
+                {template.items.map((item) => `${item.name} (${item.quantity})`).join(' · ')}
+              </p>
+            </div>
+          ))}
+        </div>
       </section>
       <ListSharePreview />
       <section className="rounded-2xl border border-sky-200 bg-sky-50 p-4">
