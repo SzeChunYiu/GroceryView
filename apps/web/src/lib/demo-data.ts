@@ -2215,6 +2215,40 @@ export const studentBasicsInput: BasketComparisonInput = {
         { storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', price: 25.9 },
         { storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', price: 22.9 }
       ]
+    },
+    {
+      productId: 'arla-mellanmjolk-1l',
+      quantity: 1,
+      prices: [
+        { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 15.9 },
+        { storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', price: 17.5 },
+        { storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', price: 16.9 }
+      ]
+    },
+    {
+      productId: 'friggs-agg-10-pack',
+      quantity: 1,
+      prices: [
+        { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 34.9 },
+        { storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', price: 38.9 }
+      ]
+    },
+    {
+      productId: 'zoegas-kaffe-450g',
+      quantity: 1,
+      prices: [
+        { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 49.9 },
+        { storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', price: 54.9 }
+      ]
+    },
+    {
+      productId: 'svenska-applen-1kg',
+      quantity: 1,
+      prices: [
+        { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 29.9 },
+        { storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', price: 32.9 },
+        { storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', price: 31.9 }
+      ]
     }
   ]
 };
@@ -2224,7 +2258,11 @@ const studentBasicsNames: Record<string, string> = {
   'eldorado-basmati-rice-1kg': 'Eldorado Basmati Rice 1kg',
   'barilla-spaghetti-1kg': 'Barilla Spaghetti 1kg',
   'pagen-lingongrova-500g': 'Pågen Lingongrova 500g',
-  'bravo-apelsinjuice-1l': 'Bravo Apelsinjuice 1L'
+  'bravo-apelsinjuice-1l': 'Bravo Apelsinjuice 1L',
+  'arla-mellanmjolk-1l': 'Arla Mellanmjölk 1L',
+  'friggs-agg-10-pack': 'Friggs Ägg 10-pack',
+  'zoegas-kaffe-450g': 'Zoégas Kaffe 450g',
+  'svenska-applen-1kg': 'Svenska äpplen 1kg'
 };
 
 const studentBasicsComparison = compareBasketStrategies(studentBasicsInput);
@@ -2241,7 +2279,7 @@ export const studentBasicsBoard = {
   })),
   confidence: {
     level: 'medium',
-    caveat: 'Uses visible staple prices across favorite Stockholm stores; missing product-store rows reduce coverage and are not estimated.'
+    caveat: 'Uses visible staple prices for milk, pasta, rice, eggs, coffee, oats, and produce across favorite Stockholm stores; missing product-store rows reduce coverage and are not estimated.'
   }
 };
 
