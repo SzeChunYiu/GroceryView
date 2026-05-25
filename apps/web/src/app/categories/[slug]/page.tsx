@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { summarizeCategoryDealLeaders } from '@groceryview/core';
-import { CategoryBreadcrumb } from '@/components/Breadcrumb';
+import { CategoryBreadcrumb } from '@/components/Breadcrumbs';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { ItemGrid, type ItemGridRow } from '@/components/ItemGrid';
 import { axfoodProducts } from '@/lib/axfood-products';
