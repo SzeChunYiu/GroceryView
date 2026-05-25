@@ -3,6 +3,7 @@ import { ActivityStream } from '@/components/activity-stream';
 import { HouseholdPlanActions } from '@/components/household-plan-actions';
 import { ListCard } from '@/components/list-card';
 import { buildSharedListActivityEvent } from '@/lib/activity-log';
+import { canListShareRoleCommentOnItems, listShareRoles } from '@/lib/list-permissions';
 import { DEFAULT_HOUSEHOLD_PRICE_PREFERENCES, HOUSEHOLD_PRICE_PREFERENCE_STORAGE_KEY, sortByHouseholdPricePreferences } from '@/lib/user-preferences';
 import { formatPct, formatSek, shareableHouseholdListContract, sourceCoverage, topChainSpreads } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
@@ -137,6 +138,8 @@ const householdListCommentPreview = [
   }
 ];
 
+const householdCommentPermission = canListShareRoleCommentOnItems('comment') ? listShareRoles.comment : listShareRoles.view;
+
 export default function FeaturePage() {
   const route = 'household';
   const householdPricePreferences = DEFAULT_HOUSEHOLD_PRICE_PREFERENCES;
@@ -154,6 +157,14 @@ export default function FeaturePage() {
       <div className="mt-6">
         <ListCard currentRole="partner" items={householdListCommentPreview} />
       </div>
+
+      <Card className="mt-6 border-sky-200 bg-sky-50">
+        <Eyebrow>List item comment threads</Eyebrow>
+        <h2 className="mt-2 text-2xl font-black tracking-tight">Notes stay attached to the item that needs a decision</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+          {householdCommentPermission.label} collaborators can add substitution, quantity, and store notes without changing checkout state; editors keep the same thread when they later update or check off the item.
+        </p>
+      </Card>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
         <Eyebrow>Friend invite onboarding</Eyebrow>

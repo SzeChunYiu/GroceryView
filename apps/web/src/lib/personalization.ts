@@ -13,10 +13,11 @@ export type DietaryPreferenceOption = {
 
 export type DietaryPreferenceOnboardingContract = {
   endpoint: '/api/account/dietary-preferences';
-  fields: Array<'dietaryRestrictions' | 'avoidedIngredients' | 'certificationPreferences'>;
+  fields: Array<'dietaryRestrictions' | 'avoidedIngredients' | 'certificationPreferences' | 'nutritionPriorities'>;
   dietaryRestrictions: DietaryPreferenceOption[];
   avoidedIngredients: DietaryPreferenceOption[];
   certificationPreferences: DietaryPreferenceOption[];
+  nutritionPriorities: DietaryPreferenceOption[];
   personalizationSurfaces: string[];
   guardrails: string[];
 };
@@ -151,7 +152,7 @@ export function pinSavedSearch(entry: RecentSearchHistoryEntry): SavedSearchEntr
 
 export const dietaryPreferenceOnboardingContract: DietaryPreferenceOnboardingContract = {
   endpoint: '/api/account/dietary-preferences',
-  fields: ['dietaryRestrictions', 'avoidedIngredients', 'certificationPreferences'],
+  fields: ['dietaryRestrictions', 'avoidedIngredients', 'certificationPreferences', 'nutritionPriorities'],
   dietaryRestrictions: [
     { value: 'vegetarian', label: 'Vegetarian', helper: 'Prefer meat-free recipes, swaps, and basket ideas.' },
     { value: 'vegan', label: 'Vegan', helper: 'Require plant-based alternatives before recommendations are ranked.' },
@@ -169,6 +170,12 @@ export const dietaryPreferenceOnboardingContract: DietaryPreferenceOnboardingCon
     { value: 'kosher', label: 'Kosher', helper: 'Prefer package-label evidence before surfacing product matches.' },
     { value: 'organic', label: 'Organic', helper: 'Promote verified organic labels when price and stock evidence are available.' },
     { value: 'keyhole', label: 'Keyhole', helper: 'Prefer verified Nordic Keyhole labels for health-oriented filters.' }
+  ],
+  nutritionPriorities: [
+    { value: 'lower_sugar', label: 'Lower sugar', helper: 'Rank verified lower-sugar options higher when label data is present.' },
+    { value: 'higher_protein', label: 'Higher protein', helper: 'Prioritize stronger protein-per-krona matches for meals and swaps.' },
+    { value: 'higher_fiber', label: 'Higher fiber', helper: 'Prefer products with fiber evidence for weekly basket suggestions.' },
+    { value: 'lower_salt', label: 'Lower salt', helper: 'Down-rank high-salt substitutions unless explicitly selected.' }
   ],
   personalizationSurfaces: [
     'search filters',
