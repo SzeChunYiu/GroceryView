@@ -1384,10 +1384,12 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
-  it('redirects the legacy deals route to the verified deal screener', async () => {
+  it('surfaces replacement deal radar filters on the deals route', async () => {
     const route = await read('src/app/deals/page.tsx');
 
-    assert.match(route, /redirect\('\/screener'\)/);
+    assert.match(route, /buildPantryReplacementFilter/);
+    assert.match(route, /pantryReplacementMatches/);
+    assert.match(route, /Replacement deals for/);
     assert.match(route, /generateMetadata/);
     assert.match(route, /routeMetadata\('\/deals'\)/);
   });
