@@ -22,6 +22,7 @@ export { formatPriceChartTerminalReadout, priceChartTerminalLatestPoint } from '
  */
 type LineStyleName = 'solid' | 'dashed' | 'dotted';
 type ChartLoadStatus = 'idle' | 'loading' | 'ready' | 'failed';
+type PriceChartTerminalMetricId = 'price' | 'unitPrice';
 type LightweightChartsModule = typeof import('lightweight-charts');
 type LightweightChartsValues = Pick<LightweightChartsModule, 'ColorType' | 'LineSeries' | 'LineStyle' | 'createChart'>;
 
@@ -40,6 +41,10 @@ export type PriceChartTerminalSeries = {
   points: Array<{
     time: string;
     value: number;
+    priceValue?: number;
+    unitValue?: number;
+    priceValueLabel?: string;
+    unitValueLabel?: string;
     confidence: number;
     lowerBound?: number;
     upperBound?: number;
@@ -90,6 +95,14 @@ export type PriceChartTerminalModel = {
   confidenceLabel: string;
   caveat: string;
   defaultWindow: PriceChartTerminalWindow['label'];
+  defaultMetric?: PriceChartTerminalMetricId;
+  metrics?: Array<{
+    id: PriceChartTerminalMetricId;
+    label: string;
+    shortLabel: string;
+    axisLabel: string;
+    summaryLabel: string;
+  }>;
   windows: PriceChartTerminalWindow[];
 };
 
@@ -122,6 +135,18 @@ function volatilityBandForPoint(point: PriceChartTerminalSeries['points'][number
   };
 }
 
+function metricValueForPoint(point: PriceChartTerminalSeries['points'][number], metricId: PriceChartTerminalMetricId) {
+  if (metricId === 'unitPrice') return point.unitValue;
+  return point.priceValue ?? point.value;
+}
+
+function metricLabelForPoint(point: PriceChartTerminalSeries['points'][number], metricId: PriceChartTerminalMetricId) {
+  const explicitLabel = metricId === 'unitPrice' ? point.unitValueLabel : point.priceValueLabel;
+  if (explicitLabel) return explicitLabel;
+  const value = metricValueForPoint(point, metricId);
+  return typeof value === 'number' && Number.isFinite(value) ? value.toLocaleString('sv-SE') : 'Not reported';
+}
+
 function latestVolatilityBandLabel(series: PriceChartTerminalSeries) {
   const point = series.points.at(-1);
   if (!point) return 'no band';
@@ -131,6 +156,8 @@ function latestVolatilityBandLabel(series: PriceChartTerminalSeries) {
 
 export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTerminalModel }>) {
   const [activeWindowLabel, setActiveWindowLabel] = useState(chart.defaultWindow);
+  const [activeMetricId, setActiveMetricId] = useState<PriceChartTerminalMetricId>(chart.defaultMetric ?? chart.metrics?.[0]?.id ?? 'price');
+  const [hiddenSeriesIds, setHiddenSeriesIds] = useState<Set<string>>(() => new Set());
   const [chartLoadError, setChartLoadError] = useState<string | null>(null);
   const [chartLoadStatus, setChartLoadStatus] = useState<ChartLoadStatus>('idle');
   const chartRendererStatusId = useId();
@@ -140,6 +167,41 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
     () => chart.windows.find((window) => window.label === activeWindowLabel) ?? chart.windows[0],
     [activeWindowLabel, chart.windows]
   );
+  const metrics = useMemo(
+    () => chart.metrics?.length ? chart.metrics : [{
+      id: 'price' as const,
+      label: 'Shelf price',
+      shortLabel: 'Price',
+      axisLabel: 'SEK',
+      summaryLabel: 'Price'
+    }],
+    [chart.metrics]
+  );
+  const activeMetric = metrics.find((metric) => metric.id === activeMetricId) ?? metrics[0]!;
+  const showMetricSelector = (chart.metrics?.length ?? 0) > 1;
+  const activeSeries = useMemo(() => {
+    if (!activeWindow) return [];
+    const visibleSeries = activeWindow.series.filter((series) => !hiddenSeriesIds.has(series.id));
+    return visibleSeries.length > 0 ? visibleSeries : activeWindow.series;
+  }, [activeWindow, hiddenSeriesIds]);
+  const showStoreSelector = (activeWindow?.series.length ?? 0) > 1;
+  const activeMetricPoints = useMemo(() => activeSeries.flatMap((series) =>
+    series.points
+      .map((point) => ({ point, value: metricValueForPoint(point, activeMetric.id) }))
+      .filter((entry): entry is { point: PriceChartTerminalSeries['points'][number]; value: number } =>
+        typeof entry.value === 'number' && Number.isFinite(entry.value)
+      )
+  ), [activeMetric.id, activeSeries]);
+  const activeMetricSummary = useMemo(() => {
+    const latestPoint = [...activeMetricPoints].sort((a, b) => a.point.time.localeCompare(b.point.time)).at(-1);
+    const values = activeMetricPoints.map((entry) => entry.value);
+    return {
+      pointCount: activeMetricPoints.length,
+      lowValueLabel: values.length ? Math.min(...values).toLocaleString('sv-SE') : 'Not reported',
+      highValueLabel: values.length ? Math.max(...values).toLocaleString('sv-SE') : 'Not reported',
+      latestValueLabel: latestPoint ? metricLabelForPoint(latestPoint.point, activeMetric.id) : 'Not reported'
+    };
+  }, [activeMetric.id, activeMetricPoints]);
   const latestReadout = formatPriceChartTerminalReadout(activeWindow);
   const handleWindowKeyDown = (
     event: KeyboardEvent<HTMLButtonElement>,
@@ -149,10 +211,23 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
     event.preventDefault();
     setActiveWindowLabel(windowLabel);
   };
+  const toggleSeries = (seriesId: string) => {
+    setHiddenSeriesIds((current) => {
+      const next = new Set(current);
+      if (next.has(seriesId)) {
+        next.delete(seriesId);
+        return next;
+      }
+      const visibleCount = activeWindow?.series.filter((series) => !next.has(series.id)).length ?? 0;
+      if (visibleCount <= 1) return next;
+      next.add(seriesId);
+      return next;
+    });
+  };
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container || !chart.available || !activeWindow || activeWindow.series.length === 0) return;
+    if (!container || !chart.available || !activeWindow || activeSeries.length === 0 || activeMetricPoints.length === 0) return;
 
     let isDisposed = false;
     let removeChart: (() => void) | undefined;
@@ -184,8 +259,17 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
           }
         });
 
-        activeWindow.series.forEach((series, index) => {
+        activeSeries.forEach((series, index) => {
           const bandColor = bandColorFor(index);
+          const metricPoints = series.points
+            .map((point) => ({
+              time: point.time.slice(0, 10),
+              value: metricValueForPoint(point, activeMetric.id),
+              band: volatilityBandForPoint(point)
+            }))
+            .filter((point): point is { time: string; value: number; band: { lower: number; upper: number } } =>
+              typeof point.value === 'number' && Number.isFinite(point.value)
+            );
           const lowerBand = chartApi.addSeries(LineSeries, {
             color: bandColor,
             lineWidth: 1,
@@ -193,10 +277,7 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
             lastValueVisible: false,
             priceLineVisible: false
           });
-          lowerBand.setData(series.points.map((point) => ({
-            time: point.time.slice(0, 10),
-            value: volatilityBandForPoint(point).lower
-          })));
+          lowerBand.setData(metricPoints.map((point) => ({ time: point.time, value: activeMetric.id === 'unitPrice' ? point.value : point.band.lower })));
 
           const line = chartApi.addSeries(LineSeries, {
             color: chartColorFor(index),
@@ -205,10 +286,7 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
             lastValueVisible: true,
             priceLineVisible: true
           });
-          line.setData(series.points.map((point) => ({
-            time: point.time.slice(0, 10),
-            value: point.value
-          })));
+          line.setData(metricPoints.map((point) => ({ time: point.time, value: point.value })));
 
           const upperBand = chartApi.addSeries(LineSeries, {
             color: bandColor,
@@ -217,13 +295,10 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
             lastValueVisible: false,
             priceLineVisible: false
           });
-          upperBand.setData(series.points.map((point) => ({
-            time: point.time.slice(0, 10),
-            value: volatilityBandForPoint(point).upper
-          })));
+          upperBand.setData(metricPoints.map((point) => ({ time: point.time, value: activeMetric.id === 'unitPrice' ? point.value : point.band.upper })));
         });
 
-        if (activeWindow.forecast?.available && activeWindow.forecast.points.length > 0) {
+        if (activeMetric.id === 'price' && activeWindow.forecast?.available && activeWindow.forecast.points.length > 0) {
           const forecastBandColor = 'rgba(245, 158, 11, 0.42)';
           const latestHistoricalPoint = activeWindow.series
             .flatMap((series) => series.points)
@@ -291,7 +366,7 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
       isDisposed = true;
       removeChart?.();
     };
-  }, [activeWindow, chart.available]);
+  }, [activeMetric.id, activeMetricPoints.length, activeSeries, activeWindow, chart.available]);
 
   return (
     <section className="mt-6 rounded-[2rem] border border-slate-800 bg-slate-950 p-5 text-white shadow-xl md:p-6">
@@ -336,22 +411,73 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
           </button>
         ))}
       </div>
+      {showMetricSelector || showStoreSelector ? (
+        <div className="mt-4 grid gap-3 lg:grid-cols-[auto_1fr] lg:items-start">
+          {showMetricSelector ? (
+            <div className="flex flex-wrap gap-2" aria-label="Price chart metric selector" role="group">
+              {metrics.map((metric) => {
+                const metricHasPoints = activeWindow?.series.some((series) =>
+                  series.points.some((point) => typeof metricValueForPoint(point, metric.id) === 'number')
+                ) ?? false;
+                return (
+                  <button
+                    aria-pressed={metric.id === activeMetric.id}
+                    className={`rounded-full px-4 py-2 text-xs font-black uppercase tracking-[0.14em] motion-safe:transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 ${
+                      metric.id === activeMetric.id
+                        ? 'bg-white text-slate-950'
+                        : 'border border-white/15 bg-white/10 text-slate-200 hover:border-emerald-300 disabled:cursor-not-allowed disabled:opacity-45'
+                    }`}
+                    disabled={!metricHasPoints}
+                    key={metric.id}
+                    onClick={() => setActiveMetricId(metric.id)}
+                    type="button"
+                  >
+                    {metric.shortLabel}
+                  </button>
+                );
+              })}
+            </div>
+          ) : null}
+          {showStoreSelector ? (
+            <div className="flex flex-wrap gap-2" aria-label="Price chart store selector" role="group">
+              {activeWindow?.series.map((series) => {
+                const pressed = !hiddenSeriesIds.has(series.id);
+                return (
+                  <button
+                    aria-pressed={pressed}
+                    className={`rounded-full px-4 py-2 text-xs font-black motion-safe:transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 ${
+                      pressed
+                        ? 'bg-emerald-100 text-emerald-950'
+                        : 'border border-white/15 bg-white/10 text-slate-300 hover:border-emerald-300'
+                    }`}
+                    key={series.id}
+                    onClick={() => toggleSeries(series.id)}
+                    type="button"
+                  >
+                    {series.storeName}
+                  </button>
+                );
+              })}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
       <p id={chartRendererStatusId} aria-live="polite" className="sr-only" role="status">Chart renderer status: {chartLoadStatus}</p>
 
-      {chart.available && activeWindow && activeWindow.pointCount > 0 ? (
+      {chart.available && activeWindow && activeMetricSummary.pointCount > 0 ? (
         <>
           <div className="mt-5 grid gap-3 md:grid-cols-5">
             <p className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm font-bold text-slate-200">
               Window: <span className="text-white">{activeWindow.rangeLabel}</span>
             </p>
             <p className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm font-bold text-slate-200">
-              Latest: <span className="text-white">{activeWindow.latestValueLabel}</span>
+              {activeMetric.summaryLabel}: <span className="text-white">{activeMetricSummary.latestValueLabel}</span>
             </p>
             <p className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm font-bold text-slate-200">
-              Range: <span className="text-white">{activeWindow.lowValueLabel} → {activeWindow.highValueLabel}</span>
+              Range: <span className="text-white">{activeMetricSummary.lowValueLabel} → {activeMetricSummary.highValueLabel}</span>
             </p>
             <p className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm font-bold text-slate-200">
-              Points/markers: <span className="text-white">{activeWindow.pointCount}/{activeWindow.markerCount}</span>
+              Stores/points: <span className="text-white">{activeSeries.length}/{activeMetricSummary.pointCount}</span>
             </p>
             <p className="rounded-2xl border border-amber-300/30 bg-amber-300/10 p-4 text-sm font-bold text-amber-100">
               Forecast: <span className="text-white">{activeWindow.forecast?.available ? activeWindow.forecast.horizonLabel : 'withheld'}</span>
@@ -360,7 +486,7 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
           <div
             ref={containerRef}
             aria-describedby={chartRendererStatusId}
-            aria-label={`${chart.title} price history chart for ${activeWindow.rangeLabel}`}
+            aria-label={`${chart.title} ${activeMetric.axisLabel} history chart for ${activeWindow.rangeLabel}`}
             className="mt-5 h-[280px] overflow-hidden rounded-3xl border border-white/10 bg-white"
             role="img"
           />
@@ -382,7 +508,7 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
                 <p className="mt-2 text-xs font-semibold text-amber-100/80">{activeWindow.forecast.caveat}</p>
               </div>
             ) : null}
-            {activeWindow.series.map((series) => (
+            {activeSeries.map((series) => (
               <div className="rounded-2xl border border-white/10 bg-white/10 p-4" key={series.id}>
                 <p className="text-sm font-black text-white">{series.storeName} · {series.sourceType}</p>
                 <p className="mt-1 text-xs font-semibold text-slate-300">lineStyle {series.lineStyle} · {series.points.length} points · {series.markers.length} markers</p>

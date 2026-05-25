@@ -1130,7 +1130,8 @@ function priceChartTerminalFor(product: NonNullable<ReturnType<typeof findProduc
   const packageText = productPackageText(product);
   const sampleNormalizedPrice = normalizeUnitPriceForPackageText(product.priceMedian, packageText);
   const comparableUnit = sampleNormalizedPrice?.comparableUnit;
-  const formatTrendValue = (value: number) => comparableUnit ? formatComparableUnitPrice(value, comparableUnit) : formatSek(value);
+  const formatTrendValue = (value: number) => formatSek(value);
+  const formatUnitTrendValue = (value: number) => comparableUnit ? formatComparableUnitPrice(value, comparableUnit) : formatSek(value);
   const priceChangeLog = priceChangeEventLogFor(product);
   const priceChangeMarkersByDate = new Map(
     priceChangeLog.priceChangeEvents.map((event) => [event.observedAt, event])
@@ -1139,12 +1140,12 @@ function priceChartTerminalFor(product: NonNullable<ReturnType<typeof findProduc
     const priceChangeMarker = priceChangeMarkersByDate.get(observation.date);
     return {
       observedAt: `${observation.date}T00:00:00.000Z`,
-      price: normalizeUnitPriceForPackageText(observation.price, packageText)?.value ?? observation.price,
+      price: observation.price,
       storeId: 'openprices-community',
       storeName: 'OpenPrices community',
       sourceType: 'online' as const,
       confidence: sourceConfidence,
-      provenanceLabel: `${product.observationCount} OpenPrices observations · ${product.code}${comparableUnit ? ` · normalized to ${comparableUnit}` : ''}${priceChangeMarker ? ` · chartMarkerKey ${priceChangeMarker.chartMarkerKey}` : ''}`,
+      provenanceLabel: `${product.observationCount} OpenPrices observations · ${product.code}${comparableUnit ? ` · unit toggle normalized to ${comparableUnit}` : ''}${priceChangeMarker ? ` · chartMarkerKey ${priceChangeMarker.chartMarkerKey}` : ''}`,
       ...(priceChangeMarker ? {
         markerType: 'price_change' as const,
         markerLabel: priceChangeMarker.chartMarkerLabel
@@ -1187,24 +1188,53 @@ function priceChartTerminalFor(product: NonNullable<ReturnType<typeof findProduc
       windowEnd: result.windowEnd,
       pointCount: points.length,
       markerCount: result.series.reduce((total, series) => total + series.markers.length, 0),
-      latestValueLabel: latestPoint ? formatTrendValue(latestPoint.value) : 'Not reported',
+      latestValueLabel: latestPoint ? formatSek(latestPoint.value) : 'Not reported',
       latestObservedAt: latestPoint?.time,
-      lowValueLabel: values.length ? formatTrendValue(Math.min(...values)) : 'Not reported',
-      highValueLabel: values.length ? formatTrendValue(Math.max(...values)) : 'Not reported',
-      series: result.series,
+      lowValueLabel: values.length ? formatSek(Math.min(...values)) : 'Not reported',
+      highValueLabel: values.length ? formatSek(Math.max(...values)) : 'Not reported',
+      series: result.series.map((series) => ({
+        ...series,
+        points: series.points.map((point) => {
+          const unitPrice = normalizeUnitPriceForPackageText(point.value, packageText);
+          return {
+            ...point,
+            priceValue: point.value,
+            priceValueLabel: formatSek(point.value),
+            unitValue: unitPrice?.value,
+            unitValueLabel: unitPrice ? formatUnitTrendValue(unitPrice.value) : undefined
+          };
+        })
+      })),
       forecast: forecastTerminalModel
     };
   });
 
   return {
     available: windows.some((window) => window.pointCount > 0),
-    title: comparableUnit ? `Multi-timeframe OpenPrices tape · normalized per ${comparableUnit}` : 'Multi-timeframe OpenPrices tape',
-    sourceLabel: comparableUnit ? `buildPriceChartSeries · OpenPrices community observations · normalized unit price per ${comparableUnit}` : 'buildPriceChartSeries · OpenPrices community observations',
+    title: comparableUnit ? `Multi-timeframe OpenPrices tape · price and unit price` : 'Multi-timeframe OpenPrices tape',
+    sourceLabel: comparableUnit ? `buildPriceChartSeries · OpenPrices community observations · shelf SEK + normalized unit price per ${comparableUnit}` : 'buildPriceChartSeries · OpenPrices community observations',
     confidenceLabel: `${formatPct(sourceConfidence * 100)} chart confidence`,
     caveat: comparableUnit
-      ? `Every plotted point comes from dated OpenPrices observations normalized by package size (${packageText}) to a unit price per ${comparableUnit}; missing shelf, flyer, and member prices are disclosed instead of inferred. The forecast band uses only recent observed price-event trends.`
+      ? `Every plotted point comes from dated OpenPrices observations; shoppers can toggle shelf price and a normalized unit price per ${comparableUnit} from package evidence (${packageText}). Missing shelf, flyer, and member prices are disclosed instead of inferred. The forecast band uses only recent observed price-event trends.`
       : 'Every plotted point comes from dated OpenPrices observations; missing shelf, flyer, and member prices are disclosed instead of inferred. The forecast band uses only recent observed price-event trends.',
     defaultWindow: windows.find((window) => window.label === '1Y' && window.pointCount > 0)?.label ?? 'ALL',
+    defaultMetric: 'price',
+    metrics: [
+      {
+        id: 'price',
+        label: 'Shelf price',
+        shortLabel: 'Price',
+        axisLabel: 'SEK shelf price',
+        summaryLabel: 'Latest shelf price'
+      },
+      {
+        id: 'unitPrice',
+        label: comparableUnit ? `Unit price per ${comparableUnit}` : 'Unit price',
+        shortLabel: 'Unit',
+        axisLabel: comparableUnit ? `SEK per ${comparableUnit}` : 'SEK/unit',
+        summaryLabel: 'Latest unit price'
+      }
+    ],
     windows
   };
 }

@@ -73,7 +73,7 @@ describe('compare price snapshots helper', () => {
                 slug: 'milk',
                 name: 'Milk',
                 storePrices: [
-                  { storeName: 'Store A', price: 12.5, priceLabel: '12,50 kr', unitLabel: 'kr/l' },
+                  { storeName: 'Store A', price: 12.5, priceLabel: '12,50 kr', unitPrice: 12.5, unitPriceLabel: '12,50 kr/l', unitLabel: 'kr/l' },
                   { storeName: 'Store B', price: 11, priceLabel: '11,00 kr', unitLabel: 'kr/l' }
                 ]
               },
@@ -96,7 +96,7 @@ describe('compare price snapshots helper', () => {
     assert.deepEqual(result.itemIds, ['milk', 'bread', 'missing']);
     assert.deepEqual(result.missingItemIds, ['missing']);
     assert.deepEqual(result.storeRows, [
-      { itemId: 'milk', itemName: 'Milk', storeName: 'Store A', price: 12.5, priceLabel: '12,50 kr', unitLabel: 'kr/l' },
+      { itemId: 'milk', itemName: 'Milk', storeName: 'Store A', price: 12.5, priceLabel: '12,50 kr', unitPrice: 12.5, unitPriceLabel: '12,50 kr/l', unitLabel: 'kr/l' },
       { itemId: 'milk', itemName: 'Milk', storeName: 'Store B', price: 11, priceLabel: '11,00 kr', unitLabel: 'kr/l' },
       { itemId: 'bread', itemName: 'Bread', storeName: 'Store A', price: 25, priceLabel: '25,00 kr', unitLabel: 'kr/st' }
     ]);

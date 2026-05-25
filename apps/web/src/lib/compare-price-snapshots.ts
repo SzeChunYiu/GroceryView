@@ -8,6 +8,8 @@ export type ComparePriceSnapshotStoreRow = {
   storeName: string;
   price: number | null;
   priceLabel: string;
+  unitPrice?: number | null;
+  unitPriceLabel?: string;
   unitLabel: string;
 };
 
@@ -29,6 +31,8 @@ type StorePriceRowPayload = {
   storeName?: unknown;
   price?: unknown;
   priceLabel?: unknown;
+  unitPrice?: unknown;
+  unitPriceLabel?: unknown;
   unitLabel?: unknown;
 };
 
@@ -73,6 +77,20 @@ function numberOrNull(value: unknown) {
   return typeof value === 'number' && Number.isFinite(value) ? value : null;
 }
 
+function storeRowFromPayload(row: StorePriceRowPayload, itemId: string, itemName: string): ComparePriceSnapshotStoreRow {
+  const unitPrice = numberOrNull(row.unitPrice);
+  return {
+    itemId,
+    itemName,
+    storeName: stringOrFallback(row.storeName, 'Unknown store'),
+    price: numberOrNull(row.price),
+    priceLabel: stringOrFallback(row.priceLabel, 'Price unavailable'),
+    ...(row.unitPrice !== undefined ? { unitPrice } : {}),
+    ...(row.unitPriceLabel !== undefined ? { unitPriceLabel: stringOrFallback(row.unitPriceLabel, 'Unit price unavailable') } : {}),
+    unitLabel: stringOrFallback(row.unitLabel, 'Unit unavailable')
+  };
+}
+
 function fallbackResult(itemIds: string[]): ComparePriceSnapshotsResult {
   return {
     itemIds,
@@ -103,14 +121,7 @@ function directStoreRowsFromPayload(payload: unknown): ComparePriceSnapshotStore
     .filter((row): row is StorePriceRowPayload => row !== null && typeof row === 'object')
     .map((row) => {
       const itemId = stringOrFallback(row.itemId, 'unknown-item');
-      return {
-        itemId,
-        itemName: stringOrFallback(row.itemName, itemId),
-        storeName: stringOrFallback(row.storeName, 'Unknown store'),
-        price: numberOrNull(row.price),
-        priceLabel: stringOrFallback(row.priceLabel, 'Price unavailable'),
-        unitLabel: stringOrFallback(row.unitLabel, 'Unit unavailable')
-      };
+      return storeRowFromPayload(row, itemId, stringOrFallback(row.itemName, itemId));
     });
 }
 
@@ -122,14 +133,7 @@ function nestedStoreRowsFromPayload(payload: unknown): ComparePriceSnapshotStore
 
     return storePrices
       .filter((row): row is StorePriceRowPayload => row !== null && typeof row === 'object')
-      .map((row) => ({
-        itemId,
-        itemName,
-        storeName: stringOrFallback(row.storeName, 'Unknown store'),
-        price: numberOrNull(row.price),
-        priceLabel: stringOrFallback(row.priceLabel, 'Price unavailable'),
-        unitLabel: stringOrFallback(row.unitLabel, 'Unit unavailable')
-      }));
+      .map((row) => storeRowFromPayload(row, itemId, itemName));
   });
 }
 
