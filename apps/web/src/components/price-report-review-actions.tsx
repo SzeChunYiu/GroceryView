@@ -10,11 +10,12 @@ import {
   type CommunityReviewVote
 } from '@/lib/reviews';
 import { COMMUNITY_REVIEW_PROMPT_COPY, COMMUNITY_REVIEW_PROMPTS } from '@/lib/community-reviews';
+import { priceAnomalyReviewWorkflow } from '@/lib/price-events';
 
 type ReviewStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
 type BrowserSession = { accessToken: string; userId: string };
 type ReviewDecision = 'approve' | 'reject' | 'needs_more_info';
-type Assignment = { id: string; reviewId?: string; subjectType?: 'product_match' | 'community_report' | 'commodity_mapping'; subjectId?: string; priority?: string; reason?: string; assigneeId?: string; dueAt?: string; status?: string };
+type Assignment = { id: string; reviewId?: string; subjectType?: 'product_match' | 'community_report' | 'commodity_mapping' | 'price_anomaly'; subjectId?: string; priority?: string; reason?: string; assigneeId?: string; dueAt?: string; status?: string };
 type AssignmentResponse = { assignments?: Assignment[]; sla?: { status?: string; overdueAssignments?: number; breachedReviewIds?: string[] } };
 
 function readSession(): BrowserSession {
@@ -81,6 +82,32 @@ export function PriceReportReviewActions() {
     setMessage(`${decision} decision accepted with reviewedByHuman: true writeback. needs_more_info leaves assignment status in_progress; community_report approvals map to accept_community_report and rejections map to dismiss_community_report; commodity_mapping approvals map to approve_commodity_mapping and rejections map to reject_commodity_mapping.`);
   }
 
+  async function decidePriceAnomaly(priceAnomalyStatus: 'verified' | 'quarantined') {
+    const session = requireSession();
+    if (!session || !assignmentId.trim()) return;
+    const { accessToken, userId } = session;
+    const response = await fetch(`/api/human-review/assignments/${encodeURIComponent(assignmentId)}/decisions?userId=${encodeURIComponent(userId)}`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+      body: JSON.stringify({
+        decision: priceAnomalyStatus === 'verified' ? 'approve' : 'reject',
+        notes,
+        subjectType: priceAnomalyReviewWorkflow.subjectType,
+        priceAnomalyStatus,
+        canHighlightDeal: priceAnomalyStatus === 'verified'
+      })
+    });
+    if (!response.ok) {
+      setStatus('error');
+      setMessage('Price anomaly review decision was rejected by the production API.');
+      return;
+    }
+    setStatus('ready');
+    setMessage(priceAnomalyStatus === 'verified'
+      ? 'Price anomaly verified; deal highlighting can resume after human_price_anomaly_review writeback.'
+      : 'Price anomaly quarantined; deal highlighting remains blocked to prevent false savings claims.');
+  }
+
   async function voteCommunityReview(reviewId: string, vote: CommunityReviewVote) {
     setCommunityReviews((currentReviews) => applyCommunityReviewVote(currentReviews, reviewId, vote));
     const response = await fetch('/api/reviews/vote', {
@@ -137,6 +164,20 @@ export function PriceReportReviewActions() {
         <button className="rounded-full border border-amber-300 px-4 py-2 text-sm font-black text-amber-900" disabled={!assignmentId.trim()} onClick={() => decideReview('needs_more_info')} type="button">Request more info</button>
       </div>
 
+      <div className="mt-6 rounded-3xl border border-rose-200 bg-rose-50/80 p-4" aria-label="Price anomaly review workflow">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-rose-800">Price anomaly review</p>
+        <h3 className="mt-2 text-xl font-black tracking-tight text-slate-950">Verify or quarantine extreme price changes</h3>
+        <p className="mt-2 text-sm leading-6 text-slate-700">
+          Assignments with subjectType {priceAnomalyReviewWorkflow.subjectType} stay blocked from deal highlights until a reviewer confirms the shelf price or quarantines the event as a likely scraper error.
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button className="rounded-full border border-rose-300 bg-white px-4 py-2 text-sm font-black text-rose-900" disabled={!assignmentId.trim()} onClick={() => decidePriceAnomaly('verified')} type="button">Verify anomaly price</button>
+          <button className="rounded-full bg-rose-900 px-4 py-2 text-sm font-black text-white" disabled={!assignmentId.trim()} onClick={() => decidePriceAnomaly('quarantined')} type="button">Quarantine false savings</button>
+        </div>
+        <p className="mt-3 rounded-2xl bg-white p-3 text-sm font-bold text-rose-950">
+          {priceAnomalyReviewWorkflow.guardrails.join(' ')}
+        </p>
+      </div>
 
       <div className="mt-6 rounded-3xl border border-violet-200 bg-violet-50/80 p-4" aria-label="Community review prompts">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-violet-800">Community validation prompts</p>

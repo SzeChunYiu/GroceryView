@@ -19,6 +19,41 @@ export interface PriceDropReason {
   detail: string;
 }
 
+export type PriceAnomalyReviewStatus = 'clear' | 'queued_for_auto_verification' | 'queued_for_manual_review';
+export type PriceAnomalyReviewSeverity = 'normal' | 'watch' | 'block_deal_highlight';
+
+export type PriceAnomalyReviewInput = PriceDropReasonInput & {
+  productId: string;
+  observedAt?: string | null;
+  sourceConfidence?: number | null;
+};
+
+export type PriceAnomalyReviewDecision = {
+  status: PriceAnomalyReviewStatus;
+  severity: PriceAnomalyReviewSeverity;
+  dropPercent: number | null;
+  canHighlightDeal: boolean;
+  assignmentReason: string;
+  requiredWriteback: 'none' | 'automated_price_event_verified' | 'human_price_anomaly_review';
+};
+
+export const priceAnomalyReviewWorkflow = {
+  queueTable: 'human_review_assignments',
+  subjectType: 'price_anomaly',
+  reviewEndpoint: '/api/human-review/assignments',
+  autoVerificationEndpoint: '/api/price-events/anomaly-verification',
+  thresholds: {
+    autoVerificationDropPercent: 0.35,
+    manualReviewDropPercent: 0.6,
+    lowSourceConfidence: 0.55
+  },
+  guardrails: [
+    'Sudden extreme price changes are queued before deal badges or savings claims are highlighted.',
+    'Automated verification may clear a known campaign only when source confidence is high.',
+    'Manual review is required for unexplained large drops, low-confidence sources, or near-zero prices.'
+  ]
+} as const;
+
 function includesAny(value: string, needles: string[]) {
   return needles.some((needle) => value.includes(needle));
 }
@@ -83,4 +118,46 @@ export function getPriceDropReasons(input: PriceDropReasonInput): PriceDropReaso
   }
 
   return reasons;
+}
+
+export function getPriceAnomalyReviewDecision(input: PriceAnomalyReviewInput): PriceAnomalyReviewDecision {
+  const dropPercent = getPriceDropPercent(input);
+  const reasons = getPriceDropReasons(input);
+  const hasKnownReason = reasons.some((reason) => reason.kind !== 'unusual_drop');
+  const sourceConfidence = input.sourceConfidence ?? 1;
+  const nearZeroPrice = typeof input.currentPrice === 'number' && input.currentPrice <= 0.1;
+  const needsManualReview = nearZeroPrice
+    || sourceConfidence < priceAnomalyReviewWorkflow.thresholds.lowSourceConfidence
+    || (dropPercent !== null && dropPercent >= priceAnomalyReviewWorkflow.thresholds.manualReviewDropPercent && !hasKnownReason);
+
+  if (needsManualReview) {
+    return {
+      status: 'queued_for_manual_review',
+      severity: 'block_deal_highlight',
+      dropPercent,
+      canHighlightDeal: false,
+      assignmentReason: `Queue ${input.productId} as price_anomaly before highlighting savings; observed ${dropPercent === null ? 'unknown' : `${Math.round(dropPercent * 100)}%`} drop from ${input.source ?? 'unknown source'}.`,
+      requiredWriteback: 'human_price_anomaly_review'
+    };
+  }
+
+  if (dropPercent !== null && dropPercent >= priceAnomalyReviewWorkflow.thresholds.autoVerificationDropPercent) {
+    return {
+      status: 'queued_for_auto_verification',
+      severity: 'watch',
+      dropPercent,
+      canHighlightDeal: false,
+      assignmentReason: `Run automated anomaly verification for ${input.productId} before promoting the drop as a deal.`,
+      requiredWriteback: 'automated_price_event_verified'
+    };
+  }
+
+  return {
+    status: 'clear',
+    severity: 'normal',
+    dropPercent,
+    canHighlightDeal: true,
+    assignmentReason: 'Price event can be displayed without anomaly review because the drop is below queue thresholds.',
+    requiredWriteback: 'none'
+  };
 }

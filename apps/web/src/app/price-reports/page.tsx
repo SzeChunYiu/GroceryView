@@ -1,5 +1,6 @@
 import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { PriceReportReviewActions } from '@/components/price-report-review-actions';
+import { getPriceAnomalyReviewDecision, priceAnomalyReviewWorkflow } from '@/lib/price-events';
 import { routeMetadata } from '@/lib/seo';
 import { commodityMappingReviewPlan, crowdPriceSubmissionContract } from '@/lib/verified-data';
 
@@ -24,6 +25,15 @@ const titles: Record<string, string> = {
   'shopping-trips': 'Shopping trips',
   privacy: 'Privacy controls'
 };
+const anomalyReviewExample = getPriceAnomalyReviewDecision({
+  productId: 'reported-price-anomaly',
+  productName: 'Reported community price',
+  previousPrice: 49.9,
+  currentPrice: 9.9,
+  source: 'community price report',
+  sourceConfidence: 0.42,
+  observedAt: '2026-05-25T08:00:00.000Z'
+});
 
 export default function FeaturePage() {
   const route = 'price-reports';
@@ -125,6 +135,46 @@ export default function FeaturePage() {
             ))}
           </ul>
           <p className="mt-3 text-sm font-bold text-amber-950">Next runtime step: {commodityMappingReviewPlan.nextRuntimeStep}</p>
+        </div>
+      </Card>
+      <Card className="mt-6 border-rose-200 bg-rose-50/80">
+        <div className="grid gap-5 lg:grid-cols-[0.95fr_1.05fr]">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-rose-800">Price anomaly review</p>
+            <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">Extreme price changes wait for verification</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-700">
+              Sudden drops are queued as {priceAnomalyReviewWorkflow.subjectType} before GroceryView highlights them as deals, preventing scraper errors from becoming false savings claims.
+            </p>
+            <p className="mt-3 rounded-2xl bg-white/80 p-3 text-sm font-bold leading-6 text-rose-950">
+              Current example decision: {anomalyReviewExample.status} · canHighlightDeal {String(anomalyReviewExample.canHighlightDeal)} · requiredWriteback {anomalyReviewExample.requiredWriteback}.
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="rounded-2xl bg-white/80 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-rose-800">Auto queue</p>
+              <p className="mt-2 text-3xl font-black text-rose-950">{Math.round(priceAnomalyReviewWorkflow.thresholds.autoVerificationDropPercent * 100)}%</p>
+              <p className="mt-1 text-xs font-semibold text-slate-600">drop triggers automated verification</p>
+            </div>
+            <div className="rounded-2xl bg-white/80 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-rose-800">Manual queue</p>
+              <p className="mt-2 text-3xl font-black text-rose-950">{Math.round(priceAnomalyReviewWorkflow.thresholds.manualReviewDropPercent * 100)}%</p>
+              <p className="mt-1 text-xs font-semibold text-slate-600">unexplained drop blocks deal highlight</p>
+            </div>
+            <div className="rounded-2xl bg-white/80 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-rose-800">Confidence gate</p>
+              <p className="mt-2 text-3xl font-black text-rose-950">{Math.round(priceAnomalyReviewWorkflow.thresholds.lowSourceConfidence * 100)}%</p>
+              <p className="mt-1 text-xs font-semibold text-slate-600">below this requires manual review</p>
+            </div>
+          </div>
+        </div>
+        <div className="mt-5 rounded-2xl bg-white/80 p-4">
+          <p className="text-sm font-black text-slate-950">Review workflow guardrails</p>
+          <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-700">
+            {priceAnomalyReviewWorkflow.guardrails.map((guardrail) => (
+              <li key={guardrail}>• {guardrail}</li>
+            ))}
+          </ul>
+          <p className="mt-3 text-sm font-bold text-rose-950">{anomalyReviewExample.assignmentReason}</p>
         </div>
       </Card>
       <PriceReportReviewActions />
