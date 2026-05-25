@@ -180,6 +180,10 @@ export const routeMetadataCatalog = {
     title: 'Price report evidence gate | GroceryView',
     description: 'Crowd price reports are blocked from public claims until verified submissions, trust records, and moderation are wired.'
   },
+  '/pricing': {
+    title: 'GroceryView pricing and premium OCR tools',
+    description: 'Compare free public price intelligence with premium OCR scan history and advanced receipt correction tools.'
+  },
   '/privacy': {
     title: 'Privacy and data controls | GroceryView',
     description: 'Read GroceryView privacy guardrails, private data gates, and source boundaries for account and receipt information.'

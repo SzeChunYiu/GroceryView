@@ -208,6 +208,25 @@ describe('verified-data UI', () => {
 
 
 
+  it('surfaces premium OCR scan history on scanner and pricing routes', async () => {
+    const scanner = await read('src/app/scanner/page.tsx');
+    const pricing = await read('src/app/pricing/page.tsx');
+    const seo = await read('src/lib/seo.ts');
+    const sitemap = await read('src/app/sitemap.ts');
+
+    assert.match(scanner, /premiumOcrScanHistory/);
+    assert.match(scanner, /OCR scan history and advanced corrections/);
+    assert.match(scanner, /active premium entitlement/);
+    assert.match(scanner, /href="\/pricing"/);
+    assert.match(pricing, /Premium OCR history/);
+    assert.match(pricing, /Private OCR scan history timeline/);
+    assert.match(pricing, /Advanced line-item correction tools/);
+    assert.match(pricing, /No OCR scan history storage/);
+    assert.match(pricing, /routeMetadata\('\/pricing'\)/);
+    assert.match(seo, /'\/pricing'/);
+    assert.match(sitemap, /entry\('\/pricing'/);
+  });
+
   it('surfaces receipt-fed commodity alias growth without exposing private receipts', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const scanner = await read('src/app/scanner/page.tsx');
@@ -3022,6 +3041,7 @@ ${seo}`;
       'src/app/pantry-planner/page.tsx',
       'src/app/pharmacy/page.tsx',
       'src/app/price-reports/page.tsx',
+      'src/app/pricing/page.tsx',
       'src/app/privacy/page.tsx',
       'src/app/prisjamforelse/[slug]/page.tsx',
       'src/app/products/page.tsx',
