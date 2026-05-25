@@ -457,6 +457,7 @@ export type OfficialBaselineSource = {
 
 export type RetailerSourceAccessInput = {
   chainId: string;
+  domain?: DailyIngestionDomain;
   sourceType: Extract<SourceType, 'official_api' | 'retailer_online_page' | 'flyer_campaign'>;
   robotsTxtStatus: RobotsTxtStatus;
   legalReviewStatus: LegalReviewStatus;
@@ -1447,6 +1448,7 @@ export type RetailerConnectorRunPlan = {
   status: 'ready' | 'blocked' | 'duplicate';
   connectorId: string;
   chainId: string;
+  domain?: DailyIngestionDomain;
   sourceType: RetailerConnectorKind;
   runKey: string;
   sourceRunId: string;
