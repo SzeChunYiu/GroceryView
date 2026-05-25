@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
+import { publicCatalogueCacheControl, publicCatalogueRevalidateSeconds } from './cache-policy';
+
+export { publicCatalogueCacheControl, publicCatalogueRevalidateSeconds, publicCatalogueStaleWhileRevalidateSeconds } from './cache-policy';
 
 export const siteUrl = 'https://grocery-web-mu.vercel.app';
 export const siteName = 'GroceryView';
-export const publicCatalogueRevalidateSeconds = 300;
-export const publicCatalogueStaleWhileRevalidateSeconds = publicCatalogueRevalidateSeconds * 3;
-export const publicCatalogueCacheControl = `public, s-maxage=${publicCatalogueRevalidateSeconds}, stale-while-revalidate=${publicCatalogueStaleWhileRevalidateSeconds}`;
 
 const defaultDescription = 'Verified Swedish grocery price intelligence with product tickers, chain comparisons, store coverage, and confidence-labelled savings signals.';
 const localeNegotiatedCurrentRouteCaveat = 'Locale-negotiated current route hreflang alternates share the canonical URL until native route translations exist beyond /sv and /en.';

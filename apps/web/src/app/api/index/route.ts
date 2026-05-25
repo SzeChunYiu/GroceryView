@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server';
+import { publicApiReadCacheControl } from '@/lib/cache-policy';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+
+const publicApiReadHeaders = {
+  'Cache-Control': publicApiReadCacheControl
+};
 
 type CountryCode = 'SE' | 'NO' | 'IS';
 
@@ -182,7 +187,7 @@ export async function GET(request: Request) {
   const cacheKey = `index:${country}`;
   const cached = indexCache.get(cacheKey);
   if (cached && cached.expiresAt > Date.now()) {
-    return NextResponse.json({ ...cached.payload, cache: { key: cacheKey, status: 'hit' } });
+    return NextResponse.json({ ...cached.payload, cache: { key: cacheKey, status: 'hit' } }, { headers: publicApiReadHeaders });
   }
 
   const databaseUrl = process.env.DATABASE_URL;
@@ -193,7 +198,7 @@ export async function GET(request: Request) {
   try {
     const payload = await buildIndexPayload(await poolForDatabaseUrl(databaseUrl), country);
     indexCache.set(cacheKey, { expiresAt: Date.now() + cacheTtlMs, payload });
-    return NextResponse.json({ ...payload, cache: { key: cacheKey, status: 'stored' } });
+    return NextResponse.json({ ...payload, cache: { key: cacheKey, status: 'stored' } }, { headers: publicApiReadHeaders });
   } catch (error) {
     console.error('Country index API query failed', error instanceof Error ? { name: error.name } : { name: 'unknown' });
     return NextResponse.json({ error: 'index_query_failed', country }, { status: 500 });
