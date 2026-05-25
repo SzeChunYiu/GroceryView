@@ -10,6 +10,7 @@ export type PriceAlertInput = {
   userEmail: string;
   productId: string;
   targetPrice: number;
+  premiumFeaturesEnabled: boolean;
 };
 
 type PriceAlertRow = {
@@ -28,6 +29,8 @@ type PgPoolLike = {
 type PgModuleLike = {
   Pool: new (config: { connectionString: string; max: number }) => PgPoolLike;
 };
+
+export const FREE_PRICE_ALERT_LIMIT = Number(process.env.FREE_PRICE_ALERT_LIMIT ?? 3);
 
 const priceAlerts = new Map<string, PriceAlert>();
 let cachedDatabaseUrl: string | null = null;
@@ -61,7 +64,8 @@ function normalizeInput(input: unknown): PriceAlertInput {
   return {
     userEmail: normalizeEmail(candidate.userEmail),
     productId: candidate.productId.trim(),
-    targetPrice
+    targetPrice,
+    premiumFeaturesEnabled: candidate.premiumFeaturesEnabled === true
   };
 }
 
@@ -96,6 +100,12 @@ function databaseUrl() {
   return process.env.DATABASE_URL;
 }
 
+function assertWithinFreeAlertLimit(activeAlertCount: number, premiumFeaturesEnabled: boolean) {
+  if (!premiumFeaturesEnabled && activeAlertCount >= FREE_PRICE_ALERT_LIMIT) {
+    throw new Error(`Free accounts can keep up to ${FREE_PRICE_ALERT_LIMIT} active price alerts. Upgrade to premium for unlimited alerts and faster deal monitoring.`);
+  }
+}
+
 export async function listPriceAlerts(userEmail: string): Promise<PriceAlert[]> {
   const normalizedEmail = normalizeEmail(userEmail);
   const configuredDatabaseUrl = databaseUrl();
@@ -121,6 +131,14 @@ export async function createPriceAlert(input: unknown): Promise<PriceAlert> {
   const configuredDatabaseUrl = databaseUrl();
   if (configuredDatabaseUrl) {
     const pool = await poolForDatabaseUrl(configuredDatabaseUrl);
+    const existing = await pool.query(
+      `select count(*)::int as count
+       from price_alerts
+       where user_email = $1`,
+      [alertInput.userEmail]
+    );
+    assertWithinFreeAlertLimit(Number((existing.rows[0] as { count?: number } | undefined)?.count ?? 0), alertInput.premiumFeaturesEnabled);
+
     const result = await pool.query(
       `insert into price_alerts(user_email, product_id, target_price)
        values ($1, $2, $3)
@@ -132,9 +150,13 @@ export async function createPriceAlert(input: unknown): Promise<PriceAlert> {
     return priceAlertFromRow(row);
   }
 
+  assertWithinFreeAlertLimit([...priceAlerts.values()].filter((alert) => alert.userEmail === alertInput.userEmail).length, alertInput.premiumFeaturesEnabled);
+
   const alert: PriceAlert = {
     id: crypto.randomUUID(),
-    ...alertInput,
+    userEmail: alertInput.userEmail,
+    productId: alertInput.productId,
+    targetPrice: alertInput.targetPrice,
     createdAt: new Date().toISOString()
   };
   priceAlerts.set(alert.id, alert);

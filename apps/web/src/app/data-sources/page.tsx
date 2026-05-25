@@ -22,6 +22,7 @@ import {
   timescaleDbEvaluation
 } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
+import { partnerOnboardingIntake } from '@/lib/source-health';
 
 const unitNormalizationQaReport = buildUnitNormalizationQaReport([
   ...axfoodProducts.map((product) => ({
@@ -58,6 +59,26 @@ export default function DataSourcesPage() {
         <Metric label="Source groups" value={sourceCoverage.length.toLocaleString('sv-SE')} />
         <Metric label="Brand ledgers" value={storeBrandLedger.length.toLocaleString('sv-SE')} />
       </div>
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50/70">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-800">Partner intake</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Store partner self-service submission</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              New retailers can now submit feed contact details, coverage areas, and sample price files through a repeatable onboarding form before GroceryView expands source coverage.
+            </p>
+          </div>
+          <Link className="rounded-full bg-emerald-900 px-5 py-3 text-center text-sm font-black text-white shadow-sm" href="/partners/submit">
+            Submit a partner feed
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          <Metric label="Required contact fields" value={partnerOnboardingIntake.requiredContactFields.length.toLocaleString('sv-SE')} />
+          <Metric label="Coverage prompts" value={partnerOnboardingIntake.coverageAreaFields.length.toLocaleString('sv-SE')} />
+          <Metric label="Accepted sample formats" value={partnerOnboardingIntake.acceptedFileTypes.join(', ')} />
+        </div>
+      </Card>
 
       <Card className="mt-6 border-lime-200 bg-lime-50/70">
         <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
