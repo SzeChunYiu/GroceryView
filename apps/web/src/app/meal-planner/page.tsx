@@ -2,8 +2,9 @@ import Link from 'next/link';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { RecipeImporter } from '@/components/recipe-importer';
-import { dealBasedMealInputs, dealBasedMeals, familyMealPlannerFromDeals, freezerBatchCookPlanner, products, studentDealRecipes } from '@/lib/demo-data';
+import { dealBasedMealInputs, dealBasedMeals, familyMealPlannerFromDeals, freezerBatchCookPlanner, pantryReplenishmentInput, products, studentDealRecipes } from '@/lib/demo-data';
 import { extractIngredientsFromMealPlans, suggestBudgetAlternativesFromMealPlans } from '@/lib/meal-budgets';
+import { buildMealPlanGroceryExport } from '@/lib/pantry';
 import { dietarySubstitutionAssistantContract } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -71,6 +72,14 @@ const COPY = {
     dealScore: ' · deal score ',
     dot: ' · ',
   },
+  export: {
+    eyebrow: 'Meal plan grocery export',
+    title: 'Send selected recipes to the shopping list',
+    description:
+      'Choose recipes here, then export a consolidated list that merges duplicate ingredients and skips pantry items already above the restock threshold.',
+    button: 'Export selected recipes',
+    pantryExcluded: 'pantry exclusions ready',
+  },
 } as const;
 
 type MealPlannerSearchParams = {
@@ -124,6 +133,15 @@ const recipeProductCandidates = [
   }))
 ];
 
+function mealPlanExportPlans() {
+  return [
+    ...dealBasedMeals.suggestions.map((meal) => ({ ...meal, title: `Suggested: ${meal.title}` })),
+    ...studentDealRecipes.recipes.map((meal) => ({ ...meal, title: `Student: ${meal.title}` })),
+    ...familyMealPlannerFromDeals.meals.map((meal) => ({ ...meal, title: `Family: ${meal.title}` })),
+    ...freezerBatchCookPlanner.meals.map((meal) => ({ ...meal, title: `Freezer: ${meal.title}` }))
+  ];
+}
+
 export default async function MealPlannerPage({
   searchParams
 }: Readonly<{ searchParams?: Promise<MealPlannerSearchParams> }>) {
@@ -138,6 +156,12 @@ export default async function MealPlannerPage({
   ];
   const extractedMealIngredients = extractIngredientsFromMealPlans(mealBudgetPlans);
   const budgetAlternatives = suggestBudgetAlternativesFromMealPlans(mealBudgetPlans);
+  const exportPlans = mealPlanExportPlans();
+  const defaultExportTitles = exportPlans.slice(0, 2).map((meal) => meal.title);
+  const pantryExclusionIds = pantryReplenishmentInput.pantry
+    .filter((item) => item.quantity > item.minimumQuantity)
+    .map((item) => item.productId);
+  const defaultExport = buildMealPlanGroceryExport(exportPlans, defaultExportTitles, pantryExclusionIds);
   const selectedIngredient = dealBasedMealInputs.find((ingredient) => ingredient.productId === selectedIngredientId);
   const selectedIngredientMatchCount = selectedIngredientId.length > 0
     ? mealBudgetPlans.filter((meal) => mealUsesIngredient(meal, selectedIngredientId)).length
@@ -186,6 +210,30 @@ export default async function MealPlannerPage({
       </div>
 
       <RecipeImporter candidates={recipeProductCandidates} />
+
+      <Card className="mt-6 border-lime-200 bg-lime-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-lime-800">{COPY.export.eyebrow}</p>
+        <h2 className="mt-2 text-2xl font-black">{COPY.export.title}</h2>
+        <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">{COPY.export.description}</p>
+        <form action="/list" className="mt-4 space-y-3" method="get">
+          <div className="grid gap-3 md:grid-cols-2">
+            {exportPlans.map((meal, index) => (
+              <label className="rounded-2xl border border-lime-200 bg-white p-3 text-sm font-bold text-slate-800" key={meal.title}>
+                <input className="mr-2" defaultChecked={index < 2} name="mealPlan" type="checkbox" value={meal.title} />
+                {meal.title}
+              </label>
+            ))}
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <button className="rounded-full bg-lime-700 px-4 py-2 text-sm font-black text-white" type="submit">
+              {COPY.export.button}
+            </button>
+            <span className="text-sm font-bold text-lime-950">
+              {defaultExport.items.length} list items · {defaultExport.excludedPantryItems.length} {COPY.export.pantryExcluded}
+            </span>
+          </div>
+        </form>
+      </Card>
 
       {selectedIngredientId.length > 0 ? (
         <Card className="mt-6 border-amber-200 bg-amber-50">

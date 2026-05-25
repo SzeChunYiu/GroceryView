@@ -1,5 +1,6 @@
 import type { PantryItemRecord } from '@groceryview/db';
 import type { PantryDeal } from '@groceryview/core';
+import type { MealBudgetIngredient, MealBudgetPlan } from './meal-budgets';
 
 export type PantryStockStatus = 'healthy' | 'low' | 'depleted';
 
@@ -54,6 +55,29 @@ export type PantryDealEvidence = {
   price: number;
   dealScore: number | null;
   href: string;
+};
+
+export type MealPlanGroceryListItem = {
+  id: string;
+  name: string;
+  category: string;
+  quantity: string;
+  recipeCount: number;
+  mealTitles: string[];
+  source?: string;
+};
+
+export type MealPlanPantryExclusion = {
+  productId: string;
+  name: string;
+  mealTitles: string[];
+  reason: string;
+};
+
+export type MealPlanGroceryExport = {
+  selectedMealTitles: string[];
+  items: MealPlanGroceryListItem[];
+  excludedPantryItems: MealPlanPantryExclusion[];
 };
 
 const pantryReplacementFilters: Record<string, Omit<PantryReplacementFilter, 'replacementId'>> = {
@@ -247,4 +271,68 @@ export function buildPantryDealEvidenceMap(
       .map(([productId, href]) => [productId, buildPantryDealEvidence(deals, productId, href)] as const)
       .filter((entry): entry is readonly [string, PantryDealEvidence] => entry[1] !== null)
   );
+}
+
+function ingredientKey(ingredient: MealBudgetIngredient) {
+  return ingredient.productId ?? normalizeReplacementText(ingredient.name);
+}
+
+function quantityLabel(recipeCount: number) {
+  return `${recipeCount} recipe${recipeCount === 1 ? '' : 's'}`;
+}
+
+export function buildMealPlanGroceryExport(
+  mealPlans: readonly MealBudgetPlan[],
+  selectedMealTitles: readonly string[],
+  pantryProductIds: readonly string[] = []
+): MealPlanGroceryExport {
+  const selectedSet = new Set(selectedMealTitles);
+  const pantrySet = new Set(pantryProductIds);
+  const items = new Map<string, MealPlanGroceryListItem>();
+  const excludedPantryItems = new Map<string, MealPlanPantryExclusion>();
+
+  for (const meal of mealPlans) {
+    if (!selectedSet.has(meal.title)) continue;
+
+    for (const ingredient of meal.ingredients) {
+      if (!ingredient) continue;
+
+      const key = ingredientKey(ingredient);
+      if (ingredient.productId && pantrySet.has(ingredient.productId)) {
+        const excluded = excludedPantryItems.get(ingredient.productId) ?? {
+          productId: ingredient.productId,
+          name: ingredient.name,
+          mealTitles: [],
+          reason: 'Already covered by pantry inventory above the restock threshold.'
+        };
+
+        excluded.mealTitles.push(meal.title);
+        excludedPantryItems.set(ingredient.productId, excluded);
+        continue;
+      }
+
+      const current = items.get(key) ?? {
+        id: key,
+        name: ingredient.name,
+        category: ingredient.category,
+        quantity: '',
+        recipeCount: 0,
+        mealTitles: [],
+        source: ingredient.source
+      };
+
+      current.recipeCount += 1;
+      current.quantity = quantityLabel(current.recipeCount);
+      current.mealTitles.push(meal.title);
+      items.set(key, current);
+    }
+  }
+
+  return {
+    selectedMealTitles: selectedMealTitles.filter((title) => selectedSet.has(title)),
+    items: Array.from(items.values()).sort((left, right) => left.name.localeCompare(right.name)),
+    excludedPantryItems: Array.from(excludedPantryItems.values()).sort((left, right) =>
+      left.name.localeCompare(right.name)
+    )
+  };
 }
