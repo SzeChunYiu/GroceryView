@@ -1469,6 +1469,13 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
             <p className="text-sm font-black uppercase tracking-[0.18em] text-emerald-800">Deal Score</p>
             <p className="mt-2 text-5xl font-black text-emerald-950">{dealVerdict.score}</p>
             <p className="mt-1 text-lg font-black text-slate-950">{dealVerdict.band.label} · {dealVerdict.band.verdict}</p>
+            <div className="mt-3">
+              <ConfidenceBadge
+                level={dealVerdict.confidence >= 0.75 ? 'high' : dealVerdict.confidence >= 0.4 ? 'medium' : 'low'}
+                label={`${dealVerdict.band.verdict} confidence`}
+                verificationLabel={dealVerdict.evidence}
+              />
+            </div>
           </div>
         </div>
         <div className="mt-5 grid gap-3 md:grid-cols-3">
