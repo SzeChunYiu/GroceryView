@@ -8,6 +8,7 @@ import { generateRecurringListInstance, recurringListTemplates } from '@/lib/rec
 import { storeLayoutDepartments, storeLayoutDepartmentsForOrder, type StoreLayoutChain, type StoreLayoutGroupOrder } from '@/lib/trip-planner';
 import { metadataForShoppingListShare } from '@/lib/seo';
 import { OFFLINE_LIST_EDIT_RECONCILIATION_STEPS, offlineListSyncStatusCopy } from '@/lib/offline-sync';
+import { listPresenceParticipants, summarizeListPresence } from '@/lib/list-presence';
 
 const demoItems = [
   { id: 'bananas', name: 'Bananas', quantity: '1 bunch', ownerRole: 'guardian' as const },
@@ -97,9 +98,33 @@ export default async function ShoppingListPage({ searchParams }: { searchParams?
     template,
     instance: generateRecurringListInstance(template, new Date('2026-05-25T00:00:00.000Z'))
   }));
+  const presenceSummary = summarizeListPresence(listPresenceParticipants);
 
   return (
     <div className="space-y-6">
+      <section className="rounded-2xl border border-emerald-200 bg-white p-4 shadow-sm" aria-labelledby="list-presence-title">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-emerald-800">Live list presence</p>
+            <h2 id="list-presence-title" className="mt-1 text-xl font-bold text-slate-950">{presenceSummary.statusLabel}</h2>
+            <p className="mt-1 text-sm text-slate-600">
+              {presenceSummary.idleCount.toLocaleString('sv-SE')} idle collaborator{presenceSummary.idleCount === 1 ? '' : 's'} remain visible for handoff context.
+            </p>
+          </div>
+          <div className="flex -space-x-2" aria-label="Active household list collaborators">
+            {listPresenceParticipants.map((participant) => (
+              <span
+                aria-label={`${participant.displayName} ${participant.state}`}
+                className={`inline-flex size-10 items-center justify-center rounded-full border-2 border-white text-sm font-black ${participant.colorClassName}`}
+                key={participant.id}
+                title={`${participant.displayName} ${participant.state}`}
+              >
+                {participant.displayName.slice(0, 1)}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
       <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4" aria-labelledby="offline-sync-title">
         <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">Offline edit reconciliation</p>
         <h2 id="offline-sync-title" className="mt-1 text-xl font-bold text-slate-950">Pending edits stay visible until sync finishes</h2>
@@ -184,6 +209,7 @@ export default async function ShoppingListPage({ searchParams }: { searchParams?
         groupOrder={groupOrder}
         items={listItems}
         mealPlanImport={mealPlanExport ? mealPlanImportSummary(mealPlanExport) : undefined}
+        presenceParticipants={listPresenceParticipants}
         publicShareHref={publicShareHref}
         selectedChain={selectedChain}
       />
