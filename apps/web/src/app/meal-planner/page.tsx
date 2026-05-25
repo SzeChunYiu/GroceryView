@@ -3,7 +3,7 @@ import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { RecipeImporter } from '@/components/recipe-importer';
 import { dealBasedMealInputs, dealBasedMeals, familyMealPlannerFromDeals, freezerBatchCookPlanner, products, studentDealRecipes } from '@/lib/demo-data';
-import { extractIngredientsFromMealPlans, suggestBudgetAlternativesFromMealPlans } from '@/lib/meal-budgets';
+import { buildMealPlanShoppingListItems, extractIngredientsFromMealPlans, mealPlanShoppingListHref, suggestBudgetAlternativesFromMealPlans, type MealBudgetPlan } from '@/lib/meal-budgets';
 import { dietarySubstitutionAssistantContract } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -105,6 +105,37 @@ function mealCardClass(meal: MealWithIngredients, productId: string, defaultClas
   return mealUsesIngredient(meal, productId)
     ? `${defaultClasses} border-amber-400 bg-amber-50 shadow-sm`
     : defaultClasses;
+}
+
+function MealPlanShoppingListExport({ meal }: Readonly<{ meal: MealBudgetPlan }>) {
+  const exportItems = buildMealPlanShoppingListItems([meal]);
+  const categories = [...new Set(exportItems.map((item) => item.category))];
+
+  return (
+    <div className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50 p-4" data-meal-plan-shopping-list-export={meal.title}>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">Shopping-list export</p>
+          <p className="mt-1 text-sm font-semibold text-slate-700">
+            Converts this recipe into {exportItems.length} categorized item{exportItems.length === 1 ? '' : 's'} with quantities: {categories.join(', ')}.
+          </p>
+        </div>
+        <Link
+          className="inline-flex items-center justify-center rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white transition hover:bg-emerald-700"
+          href={mealPlanShoppingListHref([meal], meal.title)}
+        >
+          Add recipe to shopping list
+        </Link>
+      </div>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {exportItems.map((item) => (
+          <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-emerald-950 shadow-sm" key={item.id}>
+            {item.category}: {item.quantity} {item.name}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 const recipeProductCandidates = [
@@ -239,6 +270,7 @@ export default async function MealPlannerPage({
                   </Link>
                 ) : null)}
               </div>
+              <MealPlanShoppingListExport meal={meal} />
             </div>
           ))}
         </div>
@@ -295,6 +327,7 @@ export default async function MealPlannerPage({
                   </Link>
                 ) : null)}
               </div>
+              <MealPlanShoppingListExport meal={recipe} />
               <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm font-semibold text-slate-700">
                 {recipe.cookSteps.map((step) => <li key={step}>{step}</li>)}
               </ol>
@@ -336,6 +369,7 @@ export default async function MealPlannerPage({
                   </Link>
                 ) : null)}
               </div>
+              <MealPlanShoppingListExport meal={meal} />
             </div>
           ))}
         </div>
@@ -373,6 +407,7 @@ export default async function MealPlannerPage({
                   </Link>
                 ) : null)}
               </div>
+              <MealPlanShoppingListExport meal={meal} />
               <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm font-semibold text-slate-700">
                 {meal.batchCookSteps.map((step) => <li key={step}>{step}</li>)}
               </ol>

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceFreshnessStatusBadge, SourceManagementActionsPanel } from '@/components/data-ui';
-import { DataGrid, dataGridActionClass } from '@/components/data-grid';
+import { DataGrid, DataGridProductCell, dataGridActionClass } from '@/components/data-grid';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { buildDuplicateMergeQueue, type ProductRecord } from '@/lib/deduplicate-products';
 import { buildUnitNormalizationQaReport } from '@/lib/normalization';
@@ -42,6 +42,10 @@ const unitNormalizationQaReport = buildUnitNormalizationQaReport([
   }))
 ]);
 
+function axfoodSourceUrl(product: (typeof axfoodProducts)[number]) {
+  return Object.values(product.chains).find((chain) => chain.url)?.url || `/products/${product.slug}`;
+}
+
 const duplicateReviewSourceProducts = dbSiteAxfoodProducts.length > 0 ? dbSiteAxfoodProducts : axfoodProducts;
 
 const duplicateReviewProducts: ProductRecord[] = [
@@ -50,7 +54,12 @@ const duplicateReviewProducts: ProductRecord[] = [
     name: product.name,
     brand: product.brand,
     category: product.category,
+    imageUrl: product.image,
+    sourceUrl: axfoodSourceUrl(product),
     size: product.subline,
+    unit: product.subline,
+    ean: product.code,
+    unitLabel: product.subline,
     upc: product.code
   })),
   ...pricedProducts.slice(0, 120).map((product) => ({
@@ -58,7 +67,12 @@ const duplicateReviewProducts: ProductRecord[] = [
     name: product.name,
     brand: product.brands,
     category: product.category,
+    imageUrl: product.image,
+    sourceUrl: `https://world.openfoodfacts.org/product/${product.code}`,
     size: product.quantity,
+    unit: product.quantity,
+    ean: product.code,
+    unitLabel: product.quantity || 'OpenPrices unit not reported',
     upc: product.code
   }))
 ];
@@ -190,16 +204,27 @@ export default function DataSourcesPage() {
             <tbody className="text-sm font-semibold text-slate-700">
               {duplicateMergeQueue.map((group) => {
                 const topCandidate = group.candidates[0];
+                const clusterLead = topCandidate?.source ?? group.canonicalProduct;
 
                 return (
                   <tr key={group.id}>
                     <td>
-                      <p className="font-black text-slate-950">{group.products.map((product) => product.name).join(' + ')}</p>
-                      <p className="text-xs text-slate-500">{group.products.length} records · {group.signals.join(', ') || 'similar names'}</p>
+                      <DataGridProductCell
+                        brand={clusterLead.brand}
+                        imageUrl={clusterLead.imageUrl}
+                        name={group.products.map((product) => product.name).join(' + ')}
+                        sourceUrl={clusterLead.sourceUrl}
+                        unitLabel={`${group.products.length} records · ${group.signals.join(', ') || 'similar names'}`}
+                      />
                     </td>
                     <td>
-                      <p className="font-black text-slate-950">{group.canonicalProduct.name}</p>
-                      <p className="text-xs text-slate-500">{group.canonicalProduct.brand || 'Unknown brand'} · {group.canonicalProduct.size || 'size missing'}</p>
+                      <DataGridProductCell
+                        brand={group.canonicalProduct.brand}
+                        imageUrl={group.canonicalProduct.imageUrl}
+                        name={group.canonicalProduct.name}
+                        sourceUrl={group.canonicalProduct.sourceUrl}
+                        unitLabel={group.canonicalProduct.unitLabel || group.canonicalProduct.size}
+                      />
                     </td>
                     <td>
                       <p className="font-black text-sky-900">{Math.round((topCandidate?.confidence ?? 0) * 100)}%</p>

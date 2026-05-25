@@ -78,6 +78,12 @@ export function writeStoredDietFilters(selected: readonly DietFilterValue[], sto
 }
 
 const ALLERGY_OPTIONS = ['Milk', 'Eggs', 'Peanuts', 'Tree nuts', 'Gluten', 'Soy'] as const;
+const NUTRITION_PRIORITY_OPTIONS = [
+  { value: 'lower-sugar', label: 'Lower sugar' },
+  { value: 'higher-protein', label: 'Higher protein' },
+  { value: 'high-fiber', label: 'High fiber' },
+  { value: 'lower-salt', label: 'Lower salt' }
+] as const;
 
 function parseAvoidedIngredients(value: string) {
   return value.split(',').map((ingredient) => ingredient.trim()).filter(Boolean);
@@ -98,7 +104,7 @@ export function DietaryProfileOnboarding({ className = '' }: Readonly<{ classNam
     setAvoidedInput(toCsv(storedProfile.avoidedIngredients));
   }, []);
 
-  function setProfileList(key: 'allergies' | 'diets', value: string) {
+  function setProfileList(key: 'allergies' | 'diets' | 'nutritionPriorities', value: string) {
     setProfile((currentProfile) => {
       const currentValues = currentProfile[key];
       const nextValues = currentValues.includes(value)
@@ -167,6 +173,41 @@ export function DietaryProfileOnboarding({ className = '' }: Readonly<{ classNam
                   className={`rounded-full border px-3 py-2 text-sm font-black ${active ? 'border-emerald-800 bg-emerald-800 text-white' : 'border-slate-200 bg-slate-50 text-slate-700'}`}
                   key={option.value}
                   onClick={() => setProfileList('diets', option.value)}
+                  type="button"
+                >
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
+        <label className="block text-sm font-black text-slate-700" htmlFor="household-size">
+          Household size
+          <input
+            className="mt-2 w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm"
+            id="household-size"
+            max={12}
+            min={1}
+            onChange={(event) => setProfile((currentProfile) => ({ ...currentProfile, householdSize: Number(event.target.value) }))}
+            type="number"
+            value={profile.householdSize}
+          />
+        </label>
+
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">Default nutrition priorities</p>
+          <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="Default nutrition priorities">
+            {NUTRITION_PRIORITY_OPTIONS.map((option) => {
+              const active = profile.nutritionPriorities.includes(option.value);
+              return (
+                <button
+                  aria-pressed={active}
+                  className={`rounded-full border px-3 py-2 text-sm font-black ${active ? 'border-sky-800 bg-sky-800 text-white' : 'border-slate-200 bg-slate-50 text-slate-700'}`}
+                  key={option.value}
+                  onClick={() => setProfileList('nutritionPriorities', option.value)}
                   type="button"
                 >
                   {option.label}

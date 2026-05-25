@@ -6,7 +6,10 @@ export type ProductRecord = {
   name: string
   brand?: string | null
   category?: string | null
+  imageUrl?: string | null
+  sourceUrl?: string | null
   size?: string | null
+  unitLabel?: string | null
   unit?: string | null
   ean?: string | null
   upc?: string | null
