@@ -37,6 +37,208 @@
         "properties": {},
         "type": "object"
       },
+      "ProductDealSignalsDto": {
+        "properties": {
+          "currentCityPercentile": {
+            "example": 18,
+            "type": "number"
+          },
+          "discountDepthPercent": {
+            "example": 8,
+            "type": "number"
+          },
+          "equivalentUnitPricePercentile": {
+            "example": 35,
+            "type": "number"
+          },
+          "knownPromoHistoryPercentile": {
+            "example": 12,
+            "type": "number"
+          },
+          "sourceConfidence": {
+            "example": 0.86,
+            "type": "number"
+          }
+        },
+        "required": [
+          "currentCityPercentile",
+          "knownPromoHistoryPercentile",
+          "equivalentUnitPricePercentile",
+          "discountDepthPercent",
+          "sourceConfidence"
+        ],
+        "type": "object"
+      },
+      "ProductDetailDto": {
+        "properties": {
+          "availableChains": {
+            "example": [
+              "ica",
+              "willys",
+              "lidl"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "brandTier": {
+            "example": "national",
+            "type": "string"
+          },
+          "category": {
+            "example": "dairy",
+            "type": "string"
+          },
+          "currentPrices": {
+            "items": {
+              "$ref": "#/components/schemas/ProductPriceComparisonStoreDto"
+            },
+            "type": "array"
+          },
+          "dealScore": {
+            "example": 73,
+            "type": "number"
+          },
+          "dealSignals": {
+            "$ref": "#/components/schemas/ProductDealSignalsDto"
+          },
+          "demo": {
+            "example": true,
+            "type": "boolean"
+          },
+          "history": {
+            "items": {
+              "$ref": "#/components/schemas/ProductHistoryPointDto"
+            },
+            "type": "array"
+          },
+          "id": {
+            "example": "milk",
+            "type": "string"
+          },
+          "name": {
+            "example": "Arla Milk 1L",
+            "type": "string"
+          },
+          "priceComparison": {
+            "$ref": "#/components/schemas/ProductPriceComparisonDto"
+          },
+          "ticker": {
+            "example": "ARLA-MILK-1L",
+            "type": "string"
+          },
+          "unitPrice": {
+            "example": "14.90 SEK/l",
+            "type": "string"
+          },
+          "verdict": {
+            "example": "Buy",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "ticker",
+          "name",
+          "category",
+          "brandTier",
+          "availableChains",
+          "currentPrices",
+          "priceComparison",
+          "dealScore",
+          "verdict",
+          "unitPrice",
+          "history",
+          "dealSignals",
+          "demo"
+        ],
+        "type": "object"
+      },
+      "ProductHistoryPointDto": {
+        "properties": {
+          "date": {
+            "example": "2026-05-19",
+            "type": "string"
+          },
+          "price": {
+            "example": 14.9,
+            "type": "number"
+          },
+          "verified": {
+            "example": true,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "date",
+          "price",
+          "verified"
+        ],
+        "type": "object"
+      },
+      "ProductPriceComparisonDto": {
+        "properties": {
+          "cheapestStore": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ProductPriceComparisonStoreDto"
+              }
+            ],
+            "nullable": true,
+            "type": "object"
+          },
+          "stores": {
+            "items": {
+              "$ref": "#/components/schemas/ProductPriceComparisonStoreDto"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "stores",
+          "cheapestStore"
+        ],
+        "type": "object"
+      },
+      "ProductPriceComparisonStoreDto": {
+        "properties": {
+          "country": {
+            "example": "SE",
+            "type": "string"
+          },
+          "currency": {
+            "example": "SEK",
+            "type": "string"
+          },
+          "distanceKm": {
+            "example": 0.8,
+            "type": "number"
+          },
+          "price": {
+            "example": 13.9,
+            "type": "number"
+          },
+          "priceType": {
+            "example": "shelf",
+            "type": "string"
+          },
+          "storeId": {
+            "example": "lidl-sveavagen",
+            "type": "string"
+          },
+          "storeName": {
+            "example": "Lidl Sveavägen",
+            "type": "string"
+          }
+        },
+        "required": [
+          "storeId",
+          "storeName",
+          "price"
+        ],
+        "type": "object"
+      },
       "SettingsPatchDto": {
         "properties": {},
         "type": "object"
@@ -81,6 +283,29 @@
         },
         "tags": [
           "root"
+        ]
+      }
+    },
+    "/admin/coverage": {
+      "get": {
+        "operationId": "AdminController_coverage",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-groceryview-role",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Admin"
         ]
       }
     },
@@ -593,10 +818,19 @@
     "/market/overview": {
       "get": {
         "operationId": "MarketController_overview",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "market",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Stockholm grocery market overview"
+            "description": "Country-scoped grocery market overview"
           }
         },
         "tags": [
@@ -679,6 +913,13 @@
         ],
         "responses": {
           "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductDetailDto"
+                }
+              }
+            },
             "description": "Product detail data"
           }
         },

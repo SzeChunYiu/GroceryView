@@ -769,6 +769,14 @@ describe('GroceryView API app', () => {
     assert.deepEqual(docs.body.paths['/api/settings'].get.security, [{ bearer: [] }]);
     assert.deepEqual(docs.body.paths['/api/settings'].patch.security, [{ bearer: [] }]);
     assert.ok(docs.body.paths['/products']);
+    assert.equal(
+      docs.body.paths['/products/{id}'].get.responses['200'].content['application/json'].schema.$ref,
+      '#/components/schemas/ProductDetailDto'
+    );
+    assert.ok(docs.body.components.schemas.ProductDetailDto.properties.priceComparison);
+    assert.deepEqual(docs.body.components.schemas.ProductDetailDto.required.includes('priceComparison'), true);
+    assert.ok(docs.body.components.schemas.ProductPriceComparisonDto.properties.stores);
+    assert.ok(docs.body.components.schemas.ProductPriceComparisonDto.properties.cheapestStore);
     assert.ok(docs.body.paths['/products/{productId}/cheapest-now']);
     assert.ok(docs.body.paths['/products/{id}/terminal']);
     assert.ok(docs.body.paths['/products/{id}/spread']);
@@ -943,7 +951,7 @@ describe('GroceryView API app', () => {
     assert.equal(created.body.rows[0].historicalLowUnitPrice, 99.9);
     assert.equal(created.body.rows[0].confidence, 'high');
     assert.equal(created.body.evidence.noForecast, true);
-    assert.deepEqual(created.body.evidence.sourceTables, ['multi_week_stock_up_rows', 'app_users']);
+    assert.deepEqual(created.body.evidence.sourceTables, ['multi_week_stock_up_rows', 'weekly_baskets', 'basket_items', 'products', 'latest_prices', 'observations', 'app_users']);
     assert.ok(created.body.guardrails.some((guardrail: string) => /no future price forecast/i.test(guardrail)));
 
     const updated = await request(app.getHttpServer())
@@ -1079,6 +1087,10 @@ describe('GroceryView API app', () => {
     assert.equal(products.body[0].currentPrices[0].priceType, 'shelf');
     assert.equal(products.body[0].currentPrices[0].sourceType, 'demo_seed');
     assert.ok(products.body[0].currentPrices[0].provenance);
+
+    const product = await request(app.getHttpServer()).get('/products/milk').expect(200);
+    assert.deepEqual(product.body.priceComparison.stores.map((store: { storeId: string }) => store.storeId), ['lidl-sveavagen', 'willys-odenplan']);
+    assert.equal(product.body.priceComparison.cheapestStore.storeId, 'lidl-sveavagen');
 
     const retailers = await request(app.getHttpServer()).get('/retailers').expect(200);
     assert.deepEqual(retailers.body.map((retailer: { id: string; name: string; logo: string; websiteUrl: string }) => [
