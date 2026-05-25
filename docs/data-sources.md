@@ -92,6 +92,14 @@ GroceryView ingestion layer pulls from (or could pull from). Each entry lists
 - **Lands in:** `packages/ingestion/src/connectors/matspar.ts`, daily DB observations through `groceryview://daily/matspar/products/public-search`, and the generated web artifact `apps/web/src/lib/ingested/matspar.ts`.
 - **Matpriskollen:** still useful for schema comparison, but not yet part of the daily DB connector set.
 
+### 2.9 Apoteket.se public pharmacy catalog ✅ shipped foundation
+- **Connector detail:** [Apoteket.se connector notes](connectors/apoteket-se.md) document the public pharmacy source pages, extracted fields, quirks, edge cases, and last checked-in verification date.
+- **Endpoint patterns:** `https://www.apoteket.se/sok/?q={query}` and `https://www.apoteket.se/kategori/{categoryPath}/`.
+- **What it returns:** public non-prescription product names, SEK prices, package/unit text, and product URLs from embedded page payloads.
+- **Per-branch granularity:** ❌ no by default — online catalog evidence unless a payload supplies explicit `store_id`.
+- **Guardrail:** prescription-only rows, non-SEK prices, and rows without a product name or numeric price are dropped.
+- **Lands in:** `packages/ingestion/src/connectors/apoteket-se.ts` and daily `domain=pharmacy` observations through the pharmacy public-products dispatcher.
+
 ---
 
 ## 2F. Fuel prices
