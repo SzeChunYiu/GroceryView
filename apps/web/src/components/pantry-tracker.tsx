@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react';
 import {
   applyPantryConsumptionEvents,
   type PantryConsumptionEvent,
+  type PantryDepletionUrgency,
   type PantryStockItem,
   type PantryStockStatus
 } from '@/lib/pantry';
@@ -24,6 +25,13 @@ const statusClasses: Record<PantryStockStatus, string> = {
   healthy: 'bg-emerald-100 text-emerald-900',
   low: 'bg-amber-100 text-amber-900',
   depleted: 'bg-rose-100 text-rose-900'
+};
+
+const depletionClasses: Record<PantryDepletionUrgency, string> = {
+  'reorder-now': 'bg-rose-100 text-rose-900',
+  'reorder-soon': 'bg-amber-100 text-amber-900',
+  covered: 'bg-emerald-100 text-emerald-900',
+  unknown: 'bg-slate-100 text-slate-700'
 };
 
 function formatDays(days: number | null) {
@@ -66,7 +74,7 @@ export function PantryTracker({ items }: PantryTrackerProps) {
         <div>
           <h2 className="text-2xl font-black">Owned stock tracker</h2>
           <p className="mt-2 text-sm font-semibold text-slate-600">
-            Quantities decrement when a trip is completed or when the household logs manual consumption.
+            Quantities decrement when a trip is completed or when the household logs manual consumption; observed purchase dates and household size tune restock timing.
           </p>
         </div>
         <p className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black uppercase tracking-[0.18em] text-slate-700">{events.length} events</p>
@@ -83,8 +91,14 @@ export function PantryTracker({ items }: PantryTrackerProps) {
                 </p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   <p className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-slate-700">{formatDays(item.depletionEstimateDays)}</p>
+                  <p className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.14em] ${depletionClasses[item.depletionPrediction.urgency]}`}>
+                    {item.depletionPrediction.reminderLabel}
+                  </p>
                   <p className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.14em] ${expiryClasses[item.expiryReminder.urgency]}`}>{item.expiryReminder.label}</p>
                 </div>
+                <p className="mt-2 text-xs font-bold text-slate-600">
+                  Household {item.depletionPrediction.householdSize} · projected empty {item.depletionPrediction.expectedDepletedAt ?? 'unknown'}
+                </p>
               </div>
               <p className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.18em] ${statusClasses[item.status]}`}>{item.status}</p>
             </div>

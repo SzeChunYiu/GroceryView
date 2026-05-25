@@ -8,6 +8,18 @@ export type PantryExpiryReminder = {
   urgency: PantryExpiryUrgency;
 };
 
+export type PantryDepletionUrgency = 'reorder-now' | 'reorder-soon' | 'covered' | 'unknown';
+
+export type PantryDepletionPrediction = {
+  daysUntilDepleted: number | null;
+  expectedDepletedAt: string | null;
+  reminderDate: string | null;
+  reminderLabel: string;
+  urgency: PantryDepletionUrgency;
+  householdSize: number;
+  observedDailyUse: number;
+};
+
 export type PantryStockItem = {
   productId: string;
   name: string;
@@ -16,6 +28,7 @@ export type PantryStockItem = {
   minimumQuantity: number;
   estimatedDailyUse: number;
   depletionEstimateDays: number | null;
+  depletionPrediction: PantryDepletionPrediction;
   expiryReminder: PantryExpiryReminder;
   status: PantryStockStatus;
 };
@@ -34,6 +47,9 @@ type PantryStatusRow = {
   unit: string;
   remainingQuantity: number;
   minimumQuantity: number;
+  purchasedQuantity?: number | null;
+  purchasedAt?: string | null;
+  householdSize?: number | null;
   daysUntilExpiry?: number | null;
   expiresAt?: string | null;
 };
@@ -42,15 +58,84 @@ function roundQuantity(value: number) {
   return Math.round(Math.max(0, value) * 100) / 100;
 }
 
-function estimateDailyUse(row: PantryStatusRow) {
+function daysBetween(start: Date, end: Date) {
+  return Math.max(1, Math.ceil((end.getTime() - start.getTime()) / 86_400_000));
+}
+
+function normalizeHouseholdSize(value: number | null | undefined) {
+  return Math.max(1, Math.round(Number.isFinite(value) ? value ?? 1 : 1));
+}
+
+function estimateDailyUse(row: PantryStatusRow, asOf: Date) {
+  const purchasedAt = row.purchasedAt ? new Date(row.purchasedAt) : null;
+  const purchasedQuantity = typeof row.purchasedQuantity === 'number' ? row.purchasedQuantity : null;
+
+  if (purchasedAt && Number.isFinite(purchasedAt.getTime()) && purchasedQuantity !== null && purchasedQuantity > row.remainingQuantity) {
+    return roundQuantity((purchasedQuantity - row.remainingQuantity) / daysBetween(purchasedAt, asOf));
+  }
+
+  const householdSize = normalizeHouseholdSize(row.householdSize);
   const buffer = Math.max(row.remainingQuantity - row.minimumQuantity, row.minimumQuantity);
-  return roundQuantity(Math.max(buffer / 7, 0.25));
+  return roundQuantity(Math.max((buffer / 7) * Math.sqrt(householdSize), 0.25));
 }
 
 export function estimateDepletionDays(ownedQuantity: number, estimatedDailyUse: number) {
   if (ownedQuantity <= 0) return 0;
   if (estimatedDailyUse <= 0) return null;
   return Math.ceil(ownedQuantity / estimatedDailyUse);
+}
+
+function addDays(asOf: Date, days: number) {
+  const date = new Date(asOf);
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
+export function buildDepletionPrediction({
+  asOf = new Date(),
+  estimatedDailyUse,
+  ownedQuantity,
+  row
+}: {
+  asOf?: Date;
+  estimatedDailyUse: number;
+  ownedQuantity: number;
+  row: Pick<PantryStatusRow, 'householdSize'>;
+}): PantryDepletionPrediction {
+  const householdSize = normalizeHouseholdSize(row.householdSize);
+  const daysUntilDepleted = estimateDepletionDays(ownedQuantity, estimatedDailyUse);
+
+  if (daysUntilDepleted === null) {
+    return {
+      daysUntilDepleted: null,
+      expectedDepletedAt: null,
+      reminderDate: null,
+      reminderLabel: 'No observed depletion estimate yet',
+      urgency: 'unknown',
+      householdSize,
+      observedDailyUse: estimatedDailyUse
+    };
+  }
+
+  const reminderLeadDays = householdSize >= 4 ? 5 : householdSize >= 2 ? 3 : 2;
+  const reminderOffset = Math.max(0, daysUntilDepleted - reminderLeadDays);
+  const urgency: PantryDepletionUrgency = daysUntilDepleted <= reminderLeadDays
+    ? 'reorder-now'
+    : daysUntilDepleted <= reminderLeadDays + 4
+      ? 'reorder-soon'
+      : 'covered';
+
+  return {
+    daysUntilDepleted,
+    expectedDepletedAt: addDays(asOf, daysUntilDepleted),
+    reminderDate: addDays(asOf, reminderOffset),
+    reminderLabel: daysUntilDepleted === 0
+      ? 'Restock now'
+      : `Remind ${reminderLeadDays} days before depletion`,
+    urgency,
+    householdSize,
+    observedDailyUse: estimatedDailyUse
+  };
 }
 
 export function buildExpiryReminder(row: Pick<PantryStatusRow, 'daysUntilExpiry' | 'expiresAt'>): PantryExpiryReminder {
@@ -76,10 +161,10 @@ function getStockStatus(ownedQuantity: number, minimumQuantity: number): PantryS
   return 'healthy';
 }
 
-export function buildPantryStockItems(rows: PantryStatusRow[]): PantryStockItem[] {
+export function buildPantryStockItems(rows: PantryStatusRow[], asOf: Date = new Date()): PantryStockItem[] {
   return rows.map((row) => {
     const ownedQuantity = roundQuantity(row.remainingQuantity);
-    const estimatedDailyUse = estimateDailyUse(row);
+    const estimatedDailyUse = estimateDailyUse(row, asOf);
 
     return {
       productId: row.productId,
@@ -89,6 +174,7 @@ export function buildPantryStockItems(rows: PantryStatusRow[]): PantryStockItem[
       minimumQuantity: row.minimumQuantity,
       estimatedDailyUse,
       depletionEstimateDays: estimateDepletionDays(ownedQuantity, estimatedDailyUse),
+      depletionPrediction: buildDepletionPrediction({ asOf, estimatedDailyUse, ownedQuantity, row }),
       expiryReminder: buildExpiryReminder(row),
       status: getStockStatus(ownedQuantity, row.minimumQuantity)
     };
@@ -96,6 +182,8 @@ export function buildPantryStockItems(rows: PantryStatusRow[]): PantryStockItem[
 }
 
 export function applyPantryConsumptionEvents(items: PantryStockItem[], events: PantryConsumptionEvent[]) {
+  if (events.length === 0) return items;
+
   const consumedByProduct = events.reduce<Record<string, number>>((acc, event) => {
     acc[event.productId] = (acc[event.productId] ?? 0) + Math.max(0, event.quantity);
     return acc;
@@ -108,6 +196,11 @@ export function applyPantryConsumptionEvents(items: PantryStockItem[], events: P
       ...item,
       ownedQuantity,
       depletionEstimateDays: estimateDepletionDays(ownedQuantity, item.estimatedDailyUse),
+      depletionPrediction: buildDepletionPrediction({
+        estimatedDailyUse: item.estimatedDailyUse,
+        ownedQuantity,
+        row: { householdSize: item.depletionPrediction.householdSize }
+      }),
       status: getStockStatus(ownedQuantity, item.minimumQuantity)
     };
   });

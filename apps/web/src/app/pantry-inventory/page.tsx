@@ -4,7 +4,8 @@ import { useMemo, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { AppNav } from '@/components/app-nav';
 import { BottomNav } from '@/components/bottom-nav';
-import { buildExpiryReminder, type PantryExpiryUrgency } from '@/lib/pantry';
+import { PantryTracker } from '@/components/pantry-tracker';
+import { buildExpiryReminder, buildPantryStockItems, type PantryDepletionUrgency, type PantryExpiryUrgency } from '@/lib/pantry';
 
 type PantryStatus = 'stocked' | 'consumed' | 'low' | 'replenished';
 
@@ -13,6 +14,12 @@ type PantryInventoryItem = {
   id: string;
   name: string;
   quantity: string;
+  unit: string;
+  ownedQuantity: number;
+  purchasedQuantity: number;
+  purchasedAt: string;
+  minimumQuantity: number;
+  householdSize: number;
   daysUntilExpiry: number | null;
   recipeHref: string;
   replacementHref: string;
@@ -40,11 +47,18 @@ const expiryStyles: Record<PantryExpiryUrgency, string> = {
   unknown: 'bg-slate-100 text-slate-700'
 };
 
+const depletionStyles: Record<PantryDepletionUrgency, string> = {
+  'reorder-now': 'bg-rose-100 text-rose-900',
+  'reorder-soon': 'bg-amber-100 text-amber-900',
+  covered: 'bg-emerald-100 text-emerald-900',
+  unknown: 'bg-slate-100 text-slate-700'
+};
+
 const initialPantryItems: PantryInventoryItem[] = [
-  { id: 'coffee', name: 'Coffee', aisle: 'Breakfast', quantity: '1 package', daysUntilExpiry: 45, recipeHref: '/meal-planner?ingredient=coffee', replacementHref: '/deals?replace=coffee', status: 'stocked' },
-  { id: 'oats', name: 'Oats', aisle: 'Breakfast', quantity: '1 bag', daysUntilExpiry: 6, recipeHref: '/meal-planner?ingredient=oats', replacementHref: '/deals?replace=oats', status: 'low' },
-  { id: 'milk', name: 'Milk or fil', aisle: 'Dairy', quantity: '2 cartons', daysUntilExpiry: 2, recipeHref: '/meal-planner?ingredient=milk', replacementHref: '/deals?replace=milk', status: 'consumed' },
-  { id: 'frozen-veg', name: 'Frozen vegetables', aisle: 'Freezer', quantity: '1 bag', daysUntilExpiry: null, recipeHref: '/meal-planner?ingredient=frozen-veg', replacementHref: '/deals?replace=frozen-veg', status: 'stocked' }
+  { id: 'coffee', name: 'Coffee', aisle: 'Breakfast', quantity: '1 package', unit: 'package', ownedQuantity: 1, purchasedQuantity: 1.5, purchasedAt: '2026-05-04T08:00:00.000Z', minimumQuantity: 0.25, householdSize: 2, daysUntilExpiry: 45, recipeHref: '/meal-planner?ingredient=coffee', replacementHref: '/deals?replace=coffee', status: 'stocked' },
+  { id: 'oats', name: 'Oats', aisle: 'Breakfast', quantity: '1 bag', unit: 'bag', ownedQuantity: 0.35, purchasedQuantity: 1, purchasedAt: '2026-05-10T08:00:00.000Z', minimumQuantity: 0.25, householdSize: 3, daysUntilExpiry: 6, recipeHref: '/meal-planner?ingredient=oats', replacementHref: '/deals?replace=oats', status: 'low' },
+  { id: 'milk', name: 'Milk or fil', aisle: 'Dairy', quantity: '2 cartons', unit: 'carton', ownedQuantity: 0.4, purchasedQuantity: 2, purchasedAt: '2026-05-22T08:00:00.000Z', minimumQuantity: 1, householdSize: 4, daysUntilExpiry: 2, recipeHref: '/meal-planner?ingredient=milk', replacementHref: '/deals?replace=milk', status: 'consumed' },
+  { id: 'frozen-veg', name: 'Frozen vegetables', aisle: 'Freezer', quantity: '1 bag', unit: 'bag', ownedQuantity: 1, purchasedQuantity: 1.2, purchasedAt: '2026-04-28T08:00:00.000Z', minimumQuantity: 0.5, householdSize: 2, daysUntilExpiry: null, recipeHref: '/meal-planner?ingredient=frozen-veg', replacementHref: '/deals?replace=frozen-veg', status: 'stocked' }
 ];
 
 function Card({ children, className = '' }: Readonly<{ children: ReactNode; className?: string }>) {
@@ -57,11 +71,23 @@ export default function PantryInventoryPage() {
     ...item,
     expiryReminder: buildExpiryReminder({ daysUntilExpiry: item.daysUntilExpiry })
   })), [items]);
+  const pantryStockItems = useMemo(() => buildPantryStockItems(items.map((item) => ({
+    productId: item.id,
+    name: item.name,
+    unit: item.unit,
+    remainingQuantity: item.ownedQuantity,
+    minimumQuantity: item.minimumQuantity,
+    purchasedQuantity: item.purchasedQuantity,
+    purchasedAt: item.purchasedAt,
+    householdSize: item.householdSize,
+    daysUntilExpiry: item.daysUntilExpiry
+  })), new Date('2026-05-25T08:00:00.000Z')), [items]);
   const statusCounts = useMemo(() => items.reduce<Record<PantryStatus, number>>((counts, item) => {
     counts[item.status] += 1;
     return counts;
   }, { stocked: 0, consumed: 0, low: 0, replenished: 0 }), [items]);
   const useSoonCount = itemsWithExpiry.filter((item) => item.expiryReminder.urgency === 'expired' || item.expiryReminder.urgency === 'use-soon').length;
+  const reorderCount = pantryStockItems.filter((item) => item.depletionPrediction.urgency === 'reorder-now' || item.depletionPrediction.urgency === 'reorder-soon').length;
 
   function markItem(itemId: string, status: PantryStatus) {
     setItems((currentItems) => currentItems.map((item) => (
@@ -79,7 +105,7 @@ export default function PantryInventoryPage() {
           Mark pantry staples as consumed, low stock, or replenished after each shopping cycle while expiry reminders highlight food to use soon before buying replacements.
         </p>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-5">
+        <div className="mt-6 grid gap-4 md:grid-cols-6">
           {(Object.keys(statusLabels) as PantryStatus[]).map((status) => (
             <Card className="p-4" key={status}>
               <p className="text-sm font-black uppercase tracking-[0.18em] text-slate-500">{statusLabels[status]}</p>
@@ -90,7 +116,15 @@ export default function PantryInventoryPage() {
             <p className="text-sm font-black uppercase tracking-[0.18em] text-slate-500">Use soon</p>
             <p className="mt-2 text-4xl font-black text-amber-800">{useSoonCount}</p>
           </Card>
+          <Card className="p-4">
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-slate-500">Restock timing</p>
+            <p className="mt-2 text-4xl font-black text-rose-800">{reorderCount}</p>
+          </Card>
         </div>
+
+        <Card className="mt-6">
+          <PantryTracker items={pantryStockItems} />
+        </Card>
 
         <Card className="mt-6">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
@@ -112,6 +146,14 @@ export default function PantryInventoryPage() {
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4" key={item.id}>
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                   <div>
+                    {(() => {
+                      const stockItem = pantryStockItems.find((entry) => entry.productId === item.id);
+                      return stockItem ? (
+                        <span className={`mb-2 inline-flex rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.14em] ${depletionStyles[stockItem.depletionPrediction.urgency]}`}>
+                          {stockItem.depletionPrediction.daysUntilDepleted === null ? 'No observed restock timing' : `${stockItem.depletionPrediction.daysUntilDepleted} days to empty`}
+                        </span>
+                      ) : null;
+                    })()}
                     <p className="text-xl font-black text-slate-950">{item.name}</p>
                     <p className="mt-1 text-sm font-semibold text-slate-700">{item.quantity} · {item.aisle}</p>
                     <div className="mt-2 flex flex-wrap gap-2">
