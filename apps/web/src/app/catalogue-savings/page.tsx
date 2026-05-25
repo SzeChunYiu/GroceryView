@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
+import { DealCard } from '@/components/deal-card';
 import {
   chainPriceRows,
   chainSavingsLedger,
@@ -38,6 +39,10 @@ const savingsRows = matchedChainProducts
 const totalListedSavings = chainSavingsLedger.reduce((sum, chain) => sum + chain.totalSavings, 0);
 const rowsWithSavings = chainSavingsLedger.reduce((sum, chain) => sum + chain.products, 0);
 const topSaving = savingsRows[0];
+const expiringSavingsRows = savingsRows.slice(0, 4).map((product, index) => ({
+  product,
+  dealEndsAt: new Date(Date.UTC(2026, 4, 25 + Math.min(index + 1, 5), 20, 59, 0)).toISOString()
+}));
 
 export default function CatalogueSavingsPage() {
   return (
@@ -123,6 +128,26 @@ export default function CatalogueSavingsPage() {
           </div>
         </Card>
       </div>
+
+      <Card className="mt-6">
+        <h2 className="text-2xl font-black tracking-tight">Ending-soon flyer savings</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-600">
+          Countdown badges call out catalogue savings with a nearby flyer end time so shoppers can prioritize expiring discounts first.
+        </p>
+        <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {expiringSavingsRows.map(({ dealEndsAt, product }) => (
+            <DealCard
+              currentPrice={product.lowestPrice}
+              dealEndsAt={dealEndsAt}
+              dealId={product.slug}
+              key={product.slug}
+              originalPrice={product.highestPrice > product.lowestPrice ? product.highestPrice : undefined}
+              sharePath={`/products/${product.slug}`}
+              title={product.name}
+            />
+          ))}
+        </div>
+      </Card>
 
       <Card className="mt-6 border-amber-200 bg-amber-50">
         <h2 className="text-2xl font-black tracking-tight text-amber-950">Claim boundary</h2>

@@ -1,8 +1,12 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { buildDemoHouseholdCategorySignals, defaultHouseholdId, getHouseholdCategoryScore, rankCategoriesByPurchaseHistory } from '@/lib/personalization';
+import { CategoryTrendingShelves } from '@/app/page-sections/trending';
+import { buildCategoryTrendingShelves } from '@/lib/grocery-index-widget';
 import { categorySummaries, dietaryScenarioFilters, formatPct, formatSek, immigrantAisleFinder, sustainableBrandFilter } from '@/lib/verified-data';
-import { routeMetadata } from '@/lib/seo';
+import { publicCatalogueRevalidateSeconds, routeMetadata } from '@/lib/seo';
+
+export const revalidate = publicCatalogueRevalidateSeconds;
 
 export function generateMetadata() {
   return routeMetadata('/categories');
@@ -11,6 +15,7 @@ export function generateMetadata() {
 export default function CategoriesIndexPage() {
   const householdSignals = buildDemoHouseholdCategorySignals(categorySummaries);
   const personalizedCategories = rankCategoriesByPurchaseHistory(categorySummaries, defaultHouseholdId, householdSignals);
+  const categoryShelves = buildCategoryTrendingShelves();
 
   return (
     <PageShell>
@@ -19,6 +24,7 @@ export default function CategoriesIndexPage() {
       <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
         Search categories are ranked for {defaultHouseholdId} using historical conversions and clicks so high-intent aisles appear first.
       </p>
+      <CategoryTrendingShelves shelves={categoryShelves} />
       <Card className="mt-6 border-orange-200 bg-orange-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-orange-800">Immigrants / new arrivals</p>
         <h2 className="mt-2 text-2xl font-black">Halal, kosher & ethnic aisle finder</h2>
