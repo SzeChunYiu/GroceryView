@@ -42,8 +42,22 @@ const priceEventProducts = pricedProducts.map((product) => ({
 const discoveryRailItems = buildPriceDropDiscoveryRail(priceEventProducts, 6);
 const trendingItemDetailCards = buildTrendingItemDetailCards(priceEventProducts, 4, 'Stockholm');
 
+function PriceDropDiscoveryEmptyState() {
+  return (
+    <section className="mx-auto mt-4 max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Recommended deals unavailable" data-price-drop-discovery-empty-state>
+      <div className="rounded-[1.75rem] border border-dashed border-emerald-200 bg-white p-5 shadow-sm">
+        <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-800">Recommended deals</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">No verified recommended deals yet</h2>
+        <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-600">
+          Only dated price observations can populate this rail. GroceryView keeps the space empty until the feed has enough real week-over-week deal evidence to rank.
+        </p>
+      </div>
+    </section>
+  );
+}
+
 export function PriceDropDiscoveryRail() {
-  if (discoveryRailItems.length === 0) return null;
+  if (discoveryRailItems.length === 0) return <PriceDropDiscoveryEmptyState />;
 
   return (
     <section className="mx-auto mt-4 max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Week-over-week price-drop discovery" data-price-drop-discovery-rail>

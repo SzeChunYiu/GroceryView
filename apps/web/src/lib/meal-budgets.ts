@@ -57,6 +57,28 @@ export type WeeklyBudgetProgress = {
   warning: string;
 };
 
+export type WeeklyGroceryBudgetTrackerInput = {
+  plannedBasketCost: number;
+  actualCheckedItemsCost: number;
+  weeklyAllowance: number;
+  plannedItemCount?: number;
+  checkedItemCount?: number;
+};
+
+export type WeeklyGroceryBudgetTracker = {
+  plannedBasketCost: number;
+  actualCheckedItemsCost: number;
+  weeklyAllowance: number;
+  plannedItemCount: number | null;
+  checkedItemCount: number | null;
+  remainingWeeklyAllowance: number;
+  plannedRemainingAllowance: number;
+  checkedSpendPercent: number;
+  plannedSpendPercent: number;
+  status: WeeklyBudgetProgressStatus;
+  warning: string;
+};
+
 export type BasketBudgetItem = {
   id: string;
   name: string;
@@ -101,6 +123,50 @@ export function summarizeWeeklyBudgetProgress({ plannedTotal, weeklyBudget }: We
     weeklyBudget: safeWeeklyBudget,
     remaining,
     percentUsed,
+    status,
+    warning
+  };
+}
+
+export function summarizeWeeklyGroceryBudgetTracker({
+  plannedBasketCost,
+  actualCheckedItemsCost,
+  weeklyAllowance,
+  plannedItemCount,
+  checkedItemCount
+}: WeeklyGroceryBudgetTrackerInput): WeeklyGroceryBudgetTracker {
+  const safePlannedBasketCost = Math.max(0, Number.isFinite(plannedBasketCost) ? plannedBasketCost : 0);
+  const safeActualCheckedItemsCost = Math.max(0, Number.isFinite(actualCheckedItemsCost) ? actualCheckedItemsCost : 0);
+  const safeWeeklyAllowance = Math.max(0, Number.isFinite(weeklyAllowance) ? weeklyAllowance : 0);
+  const remainingWeeklyAllowance = safeWeeklyAllowance - safeActualCheckedItemsCost;
+  const plannedRemainingAllowance = safeWeeklyAllowance - safePlannedBasketCost;
+  const checkedSpendPercent = safeWeeklyAllowance > 0 ? (safeActualCheckedItemsCost / safeWeeklyAllowance) * 100 : 0;
+  const plannedSpendPercent = safeWeeklyAllowance > 0 ? (safePlannedBasketCost / safeWeeklyAllowance) * 100 : 0;
+  const status: WeeklyBudgetProgressStatus = safeActualCheckedItemsCost <= 0
+    ? 'empty'
+    : remainingWeeklyAllowance < 0
+      ? 'over'
+      : checkedSpendPercent >= 85 || plannedRemainingAllowance < 0
+        ? 'near'
+        : 'under';
+  const warning = status === 'over'
+    ? 'Checked grocery items are already over the weekly allowance.'
+    : status === 'near'
+      ? 'Checked items or the planned basket are close to the weekly allowance.'
+      : status === 'empty'
+        ? 'Check off grocery items to compare actual spend with the weekly allowance.'
+        : 'Checked grocery items are within the weekly allowance.';
+
+  return {
+    plannedBasketCost: safePlannedBasketCost,
+    actualCheckedItemsCost: safeActualCheckedItemsCost,
+    weeklyAllowance: safeWeeklyAllowance,
+    plannedItemCount: typeof plannedItemCount === 'number' && Number.isFinite(plannedItemCount) ? Math.max(0, plannedItemCount) : null,
+    checkedItemCount: typeof checkedItemCount === 'number' && Number.isFinite(checkedItemCount) ? Math.max(0, checkedItemCount) : null,
+    remainingWeeklyAllowance,
+    plannedRemainingAllowance,
+    checkedSpendPercent,
+    plannedSpendPercent,
     status,
     warning
   };
