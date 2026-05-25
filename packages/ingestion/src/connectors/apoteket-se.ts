@@ -8,6 +8,10 @@ export type ApoteketSeProductRow = {
   unit: string;
   observed_at: string;
   source_url: string;
+  channel?: 'online' | 'store';
+  is_member_price?: boolean;
+  is_coupon_price?: boolean;
+  multi_buy?: string;
 };
 
 type ApoteketSeCandidate = Record<string, unknown>;
@@ -58,12 +62,12 @@ export function parseApoteketSeProducts(html: string, sourceUrl: string, observe
 
   for (const root of extractApoteketJsonRoots(html)) {
     visit(root, (value) => {
-      const row = normalizeApoteketCandidate(value, sourceUrl, observedAt);
-      if (!row) return;
-      const key = `${row.store_id ?? ''}:${row.product_name.toLowerCase()}:${row.price_sek}:${row.unit}:${row.source_url}`;
-      if (seen.has(key)) return;
-      seen.add(key);
-      rows.push(row);
+      for (const row of normalizeApoteketCandidateRows(value, sourceUrl, observedAt)) {
+        const key = `${row.store_id ?? ''}:${row.product_name.toLowerCase()}:${row.price_sek}:${row.unit}:${row.source_url}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        rows.push(row);
+      }
     });
   }
 
@@ -71,13 +75,17 @@ export function parseApoteketSeProducts(html: string, sourceUrl: string, observe
 }
 
 export function normalizeApoteketCandidate(candidate: ApoteketSeCandidate, sourceUrl: string, observedAt: string): ApoteketSeProductRow | null {
-  if (isPrescriptionOnly(candidate)) return null;
+  return normalizeApoteketCandidateRows(candidate, sourceUrl, observedAt)[0] ?? null;
+}
+
+export function normalizeApoteketCandidateRows(candidate: ApoteketSeCandidate, sourceUrl: string, observedAt: string): ApoteketSeProductRow[] {
+  if (isPrescriptionOnly(candidate)) return [];
   const productName = firstText(candidate, ['product_name', 'productName', 'displayName', 'name', 'title']);
   const priceSek = firstNumber(candidate, ['price_sek', 'priceSek', 'currentPrice', 'salesPrice', 'salePrice', 'sellingPrice', 'price']);
-  if (!productName || priceSek === null) return null;
+  if (!productName || priceSek === null) return [];
 
   const currency = firstText(candidate, ['currency', 'currencyCode']) || nestedText(candidate, ['price', 'currency']) || 'SEK';
-  if (currency.toUpperCase() !== 'SEK') return null;
+  if (currency.toUpperCase() !== 'SEK') return [];
 
   const unit = firstText(candidate, ['unit', 'packageUnit', 'packageSize', 'packageText', 'quantity', 'size', 'netContent']) || unitFromName(productName);
   const row: ApoteketSeProductRow = {
@@ -90,9 +98,19 @@ export function normalizeApoteketCandidate(candidate: ApoteketSeCandidate, sourc
     observed_at: observedAt,
     source_url: absoluteUrl(firstText(candidate, ['source_url', 'sourceUrl', 'url', 'href', 'productUrl', 'canonicalUrl']), APOTEKET_SE_BASE_URL) || sourceUrl
   };
+  applyApoteketPricingFlags(row, candidate);
   const storeId = firstText(candidate, ['store_id', 'storeId']);
   if (storeId) row.store_id = storeId;
-  return row;
+  const rows = [row];
+  const storePrice = firstNumber(candidate, ['storePrice', 'store_price', 'butikspris', 'shopPrice', 'physicalStorePrice']);
+  if (storePrice !== null && roundMoney(storePrice) !== row.price_sek) {
+    const storeRow: ApoteketSeProductRow = { ...row, price_sek: roundMoney(storePrice), channel: 'store' };
+    delete storeRow.is_coupon_price;
+    delete storeRow.multi_buy;
+    rows.push(storeRow);
+    row.channel = row.channel ?? 'online';
+  }
+  return rows;
 }
 
 export function extractApoteketJsonRoots(html: string): unknown[] {
@@ -246,6 +264,34 @@ function isPrescriptionOnly(candidate: Record<string, unknown>): boolean {
   }
   const availability = firstText(candidate, ['availability', 'productType', 'type']).toLowerCase();
   return availability.includes('receptbel') || availability.includes('prescription');
+}
+
+function applyApoteketPricingFlags(row: ApoteketSeProductRow, candidate: Record<string, unknown>): void {
+  const label = firstText(candidate, [
+    'campaignLabel',
+    'promotionLabel',
+    'badgeText',
+    'priceLabel',
+    'offerText',
+    'discountText',
+    'name'
+  ]).toLowerCase();
+  const channel = firstText(candidate, ['channel', 'salesChannel', 'priceChannel']).toLowerCase();
+  if (channel === 'online' || label.includes('webbpris') || label.includes('online')) row.channel = 'online';
+  if (channel === 'store' || channel === 'butik' || label.includes('butikspris')) row.channel = 'store';
+
+  const memberText = `${label} ${firstText(candidate, ['memberPriceLabel', 'membershipLabel', 'customerClubLabel'])}`.toLowerCase();
+  if (candidate.isMemberPrice === true || candidate.memberPrice === true || /medlem|apoteket\+|kundklubb|seniorrabatt/.test(memberText)) {
+    row.is_member_price = true;
+  }
+  if (candidate.isCouponPrice === true || candidate.requiresCoupon === true || /kod|kupong|coupon|rabattkod/.test(memberText)) {
+    row.is_coupon_price = true;
+  }
+
+  const multiBuy = firstText(candidate, ['multi_buy', 'multiBuy', 'multibuy', 'promotionText', 'offerText', 'campaignLabel']);
+  if (/(\d+\s*(st|för)\s*|\d+\s*%\s*vid köp av\s*\d+|3\s*för\s*2|2\s*för)/i.test(multiBuy)) {
+    row.multi_buy = multiBuy;
+  }
 }
 
 function unitFromName(name: string): string {
