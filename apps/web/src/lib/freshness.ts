@@ -144,3 +144,21 @@ export function getStoreReliabilityScore({
     tone,
   };
 }
+
+export type StockConfidenceInput = {
+  observedAt?: string | number | Date | null;
+  recentObservationCount?: number;
+  isAvailable?: boolean | null;
+};
+
+export function getStockConfidence({ observedAt, recentObservationCount = 0, isAvailable }: StockConfidenceInput): { level: 'high' | 'medium' | 'low'; label: string; detail: string } {
+  const freshness = getPriceFreshness(observedAt);
+  const availabilityKnown = isAvailable !== null && isAvailable !== undefined;
+  if (isAvailable === false || freshness.isStale || recentObservationCount <= 0) {
+    return { level: 'low', label: 'Low stock confidence', detail: `${freshness.label}; ${recentObservationCount} recent observations; availability ${availabilityKnown ? 'known' : 'unknown'}.` };
+  }
+  if (freshness.level === 'fresh' && recentObservationCount >= 3 && isAvailable === true) {
+    return { level: 'high', label: 'High stock confidence', detail: `${freshness.label}; ${recentObservationCount} recent observations; marked available.` };
+  }
+  return { level: 'medium', label: 'Medium stock confidence', detail: `${freshness.label}; ${recentObservationCount} recent observations; availability ${availabilityKnown ? 'known' : 'unknown'}.` };
+}

@@ -2,7 +2,7 @@ import { confidenceCopy, type ConfidenceLevel } from '@/lib/content-style';
 import { confidenceStateToken } from '@/lib/color-vision-palette';
 import { getPriceFreshness } from '@/lib/freshness';
 
-type ConfidenceBadgeProps = {
+export type ConfidenceBadgeProps = {
   level: ConfidenceLevel;
   label?: string;
   observedAt?: string | number | Date | null;

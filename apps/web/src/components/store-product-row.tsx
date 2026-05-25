@@ -2,7 +2,9 @@
 
 import { useId, useState } from "react";
 
+import { ConfidenceBadge } from "@/components/confidence-badge";
 import { communityReviewSummaryForProduct } from "@/lib/community-reviews";
+import { getStockConfidence } from "@/lib/freshness";
 import { sourceDiscrepancyReportOptions } from "@/lib/verified-data";
 
 type FreshnessVote = "fresh" | "outdated";
@@ -15,6 +17,9 @@ export type StoreProductRowProps = {
   storeName?: string;
   priceLabel?: string;
   shelfLifeDays?: number;
+  observedAt?: string | number | Date | null;
+  recentObservationCount?: number;
+  isAvailable?: boolean | null;
   className?: string;
 };
 
@@ -27,6 +32,9 @@ export function StoreProductRow({
   storeName,
   priceLabel,
   shelfLifeDays,
+  observedAt,
+  recentObservationCount = 0,
+  isAvailable,
   className,
 }: StoreProductRowProps) {
   const noteId = useId();
@@ -37,6 +45,7 @@ export function StoreProductRow({
   const [discrepancyType, setDiscrepancyType] = useState<SourceDiscrepancyType>("wrong_price");
   const [discrepancyStatus, setDiscrepancyStatus] = useState<SubmitState>("idle");
   const reviewSummary = communityReviewSummaryForProduct(productName);
+  const stockConfidence = getStockConfidence({ observedAt, recentObservationCount, isAvailable });
 
   async function submitFreshness() {
     setStatus("saving");
@@ -99,6 +108,7 @@ export function StoreProductRow({
         <h3>{productName}</h3>
         {storeName ? <p>{storeName}</p> : null}
         {priceLabel ? <p>{priceLabel}</p> : null}
+        <ConfidenceBadge level={stockConfidence.level} label={stockConfidence.label} sampleSize={recentObservationCount} verificationLabel={stockConfidence.detail} />
       </div>
 
       {reviewSummary ? (
