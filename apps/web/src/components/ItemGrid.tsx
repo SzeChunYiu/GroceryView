@@ -12,6 +12,8 @@ export type ItemGridRow = Readonly<{
   priceLabel: string;
   category: string;
   observationLabel: string;
+  chainName?: string;
+  ingestedAt?: string;
   image?: string | null;
 }>;
 
@@ -22,10 +24,16 @@ type ItemGridProps = Readonly<{
   sort: string;
   page: number;
   pageSize?: number;
+  queryParam?: string;
+  sortParam?: string;
+  pageParam?: string;
+  paginationLabel?: string;
 }>;
 
 const sortOptions = [
   { value: 'name', label: 'Name A-Z' },
+  { value: 'newest', label: 'Newest first' },
+  { value: 'chain', label: 'Chain/source' },
   { value: 'price-asc', label: 'Price low-high' },
   { value: 'price-desc', label: 'Price high-low' },
   { value: 'source', label: 'Source' }
@@ -34,11 +42,13 @@ const sortOptions = [
 function filteredRows(rows: readonly ItemGridRow[], query: string) {
   const normalized = query.trim().toLowerCase();
   if (!normalized) return [...rows];
-  return rows.filter((row) => [row.name, row.brand, row.source].some((value) => value.toLowerCase().includes(normalized)));
+  return rows.filter((row) => [row.name, row.brand, row.source, row.chainName ?? '', row.observationLabel].some((value) => value.toLowerCase().includes(normalized)));
 }
 
 function sortedRows(rows: ItemGridRow[], sort: string) {
   return rows.sort((left, right) => {
+    if (sort === 'newest') return (right.ingestedAt ?? '').localeCompare(left.ingestedAt ?? '') || left.name.localeCompare(right.name, 'sv');
+    if (sort === 'chain') return (left.chainName ?? left.source).localeCompare(right.chainName ?? right.source, 'sv') || left.name.localeCompare(right.name, 'sv');
     if (sort === 'price-asc') return left.price - right.price || left.name.localeCompare(right.name, 'sv');
     if (sort === 'price-desc') return right.price - left.price || left.name.localeCompare(right.name, 'sv');
     if (sort === 'source') return left.source.localeCompare(right.source) || left.name.localeCompare(right.name, 'sv');
@@ -46,16 +56,16 @@ function sortedRows(rows: ItemGridRow[], sort: string) {
   });
 }
 
-function pageHref(basePath: string, query: string, sort: string, page: number) {
+function pageHref(basePath: string, query: string, sort: string, page: number, queryParam: string, sortParam: string, pageParam: string) {
   const params = new URLSearchParams();
-  if (query) params.set('q', query);
-  if (sort && sort !== 'name') params.set('sort', sort);
-  if (page > 1) params.set('page', String(page));
+  if (query) params.set(queryParam, query);
+  if (sort && sort !== 'name') params.set(sortParam, sort);
+  if (page > 1) params.set(pageParam, String(page));
   const suffix = params.toString();
   return suffix ? `${basePath}?${suffix}` : basePath;
 }
 
-export function ItemGrid({ rows, basePath, query, sort, page, pageSize = 12 }: ItemGridProps) {
+export function ItemGrid({ rows, basePath, query, sort, page, pageSize = 12, queryParam = 'q', sortParam = 'sort', pageParam = 'page', paginationLabel = 'Category pagination' }: ItemGridProps) {
   const normalizedPage = Number.isInteger(page) && page > 0 ? page : 1;
   const ranked = sortedRows(filteredRows(rows, query), sort);
   const totalPages = Math.max(1, Math.ceil(ranked.length / pageSize));
@@ -67,11 +77,11 @@ export function ItemGrid({ rows, basePath, query, sort, page, pageSize = 12 }: I
       <form className="grid gap-3 md:grid-cols-[1fr_220px_auto]" method="get">
         <label className="grid gap-2 text-sm font-black text-slate-700">
           Filter items
-          <input className="rounded-2xl border border-slate-200 px-4 py-3 font-semibold" defaultValue={query} name="q" placeholder="Search name, brand, or source" />
+          <input className="rounded-2xl border border-slate-200 px-4 py-3 font-semibold" defaultValue={query} name={queryParam} placeholder="Search name, brand, or source" />
         </label>
         <label className="grid gap-2 text-sm font-black text-slate-700">
           Sort
-          <select className="rounded-2xl border border-slate-200 px-4 py-3 font-semibold" defaultValue={sort} name="sort">
+          <select className="rounded-2xl border border-slate-200 px-4 py-3 font-semibold" defaultValue={sort} name={sortParam}>
             {sortOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
           </select>
         </label>
@@ -97,6 +107,11 @@ export function ItemGrid({ rows, basePath, query, sort, page, pageSize = 12 }: I
                 <p className="rounded-2xl bg-white p-3 font-black text-emerald-800">{row.priceLabel}</p>
                 <p className="rounded-2xl bg-white p-3 font-bold text-slate-600">{row.observationLabel}</p>
               </div>
+              {row.chainName || row.ingestedAt ? (
+                <p className="mt-3 rounded-2xl bg-white p-3 text-xs font-black text-slate-600">
+                  {row.chainName ?? row.source}{row.ingestedAt ? ` · ingested ${row.ingestedAt}` : ''}
+                </p>
+              ) : null}
               {reviewSummary ? (
                 <div className="mt-3 rounded-2xl bg-white p-3 text-xs font-bold text-slate-700">
                   <p className="text-sm font-black text-slate-950">{reviewSummary.averageRatingLabel}</p>
@@ -111,11 +126,11 @@ export function ItemGrid({ rows, basePath, query, sort, page, pageSize = 12 }: I
 
       {visibleRows.length === 0 ? <p className="mt-5 rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-5 text-sm font-bold text-slate-500">No items match this filter.</p> : null}
 
-      <nav className="mt-6 flex flex-wrap items-center justify-between gap-3" aria-label="Category pagination">
-        <Link className="rounded-full border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 aria-disabled:pointer-events-none aria-disabled:opacity-40" aria-disabled={currentPage <= 1} href={pageHref(basePath, query, sort, currentPage - 1)}>
+      <nav className="mt-6 flex flex-wrap items-center justify-between gap-3" aria-label={paginationLabel}>
+        <Link className="rounded-full border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 aria-disabled:pointer-events-none aria-disabled:opacity-40" aria-disabled={currentPage <= 1} href={pageHref(basePath, query, sort, currentPage - 1, queryParam, sortParam, pageParam)}>
           Previous
         </Link>
-        <Link className="rounded-full border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 aria-disabled:pointer-events-none aria-disabled:opacity-40" aria-disabled={currentPage >= totalPages} href={pageHref(basePath, query, sort, currentPage + 1)}>
+        <Link className="rounded-full border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 aria-disabled:pointer-events-none aria-disabled:opacity-40" aria-disabled={currentPage >= totalPages} href={pageHref(basePath, query, sort, currentPage + 1, queryParam, sortParam, pageParam)}>
           Next
         </Link>
       </nav>

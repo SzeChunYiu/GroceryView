@@ -6,8 +6,10 @@ import { PriceReportReviewActions } from '@/components/price-report-review-actio
 import { OriginFilter, type OriginFilterCode } from '@/components/origin-filter';
 import { ProductPriceCards } from '@/components/product-price-cards';
 import { VirtualizedProductGrid } from '@/components/LazyItemCard';
+import { ItemGrid, type ItemGridRow } from '@/components/ItemGrid';
 import { apohemSource } from '@/lib/ingested/apohem';
 import { adaptiveProductCards, buildProductSearchView, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
+import { dbSiteNewArrivalChains, dbSiteNewArrivalProducts } from '@/lib/generated/db-site-products';
 import { routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
 
@@ -30,10 +32,17 @@ type SearchParams = {
   minConfidence?: string | string[];
   brand?: string | string[];
   page?: string | string[];
+  arrivalsQ?: string | string[];
+  arrivalsSort?: string | string[];
+  arrivalsPage?: string | string[];
 };
 
+function firstParam(value: string | string[] | undefined): string {
+  return Array.isArray(value) ? value[0] ?? '' : value ?? '';
+}
+
 function toPageNumber(value: string | string[] | undefined): number {
-  const raw = Array.isArray(value) ? value[0] : value;
+  const raw = firstParam(value);
   const parsed = Number.parseInt(raw ?? '1', 10);
   if (!Number.isFinite(parsed) || !Number.isInteger(parsed) || parsed <= 0) return 1;
   return parsed;
@@ -96,6 +105,55 @@ function relatedSearchFallback(query: string) {
   )) ?? ZERO_RESULT_RELATED_SEARCHES[0];
 }
 
+
+function fallbackNewArrivalRows(): ItemGridRow[] {
+  const openPricesRows: ItemGridRow[] = freshestOpenPrices.slice(0, 6).map((product) => ({
+    brand: product.brands || 'Brand not reported',
+    category: product.category,
+    chainName: 'OpenPrices SEK observations',
+    href: `/products/${product.slug}`,
+    id: `new-openprices-${product.code}`,
+    image: product.image,
+    ingestedAt: product.lastObservedAt,
+    name: product.name,
+    observationLabel: `Observed ${product.lastObservedAt}`,
+    price: product.priceMedian,
+    priceLabel: formatSek(product.priceMedian),
+    source: 'OpenPrices'
+  }));
+
+  const axfoodRows: ItemGridRow[] = topChainSpreads.slice(0, 6).map((product) => ({
+    brand: product.brand || 'Brand not reported',
+    category: product.category,
+    chainName: product.inChains.join(' + '),
+    href: `/products/${product.slug}`,
+    id: `new-axfood-${product.code}`,
+    image: product.image,
+    ingestedAt: '2026-05-21',
+    name: product.name,
+    observationLabel: `${product.inChains.length} chain matches`,
+    price: product.lowestPrice,
+    priceLabel: formatSek(product.lowestPrice),
+    source: 'Axfood'
+  }));
+
+  return [...openPricesRows, ...axfoodRows].sort((left, right) => (right.ingestedAt ?? '').localeCompare(left.ingestedAt ?? ''));
+}
+
+function summarizeArrivalChains(rows: readonly ItemGridRow[]) {
+  const chainMap = new Map<string, { chainName: string; latestIngestedAt: string; productCount: number }>();
+  for (const row of rows) {
+    const chainName = row.chainName ?? row.source;
+    const current = chainMap.get(chainName);
+    chainMap.set(chainName, {
+      chainName,
+      latestIngestedAt: current?.latestIngestedAt && current.latestIngestedAt > (row.ingestedAt ?? '') ? current.latestIngestedAt : row.ingestedAt ?? 'Not reported',
+      productCount: (current?.productCount ?? 0) + 1
+    });
+  }
+  return [...chainMap.values()].sort((left, right) => right.latestIngestedAt.localeCompare(left.latestIngestedAt));
+}
+
 function zeroResultCategoryShortcuts(query: string, selectedCategory: string | string[] | undefined) {
   const normalizedQuery = query.toLocaleLowerCase('sv-SE');
   const activeCategory = (Array.isArray(selectedCategory) ? selectedCategory[0] : selectedCategory)?.toLocaleLowerCase('sv-SE') ?? '';
@@ -135,6 +193,11 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const defaultSearchCount = facetedProductSearch.resultCards.length;
   const zeroResultFallback = relatedSearchFallback(search.query);
   const zeroResultCategories = zeroResultCategoryShortcuts(search.query, resolvedSearchParams.category);
+  const newArrivalRows = dbSiteNewArrivalProducts.length > 0 ? dbSiteNewArrivalProducts : fallbackNewArrivalRows();
+  const newArrivalChains = dbSiteNewArrivalChains.length > 0 ? dbSiteNewArrivalChains : summarizeArrivalChains(newArrivalRows);
+  const arrivalsQuery = firstParam(resolvedSearchParams.arrivalsQ).trim();
+  const arrivalsSort = firstParam(resolvedSearchParams.arrivalsSort).trim() || 'newest';
+  const arrivalsPage = toPageNumber(resolvedSearchParams.arrivalsPage);
 
   function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'origin' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence', string>>) {
     const params = new URLSearchParams();
@@ -168,6 +231,38 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           </Link>
         </div>
       </Card>
+      <Card className="mt-8 border-emerald-200 bg-emerald-50/70">
+        <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-800">New arrivals</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Recently ingested products and chains</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Sort the newest DB-backed product arrivals by ingest date, chain/source, price, or name. Local fallback rows are derived from verified Axfood and OpenPrices snapshots only.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-emerald-950 shadow-sm">{newArrivalRows.length} recent rows · {newArrivalChains.length} chains/sources</p>
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2" aria-label="New arrival chain summary">
+          {newArrivalChains.map((chain) => (
+            <span className="rounded-full bg-white px-3 py-2 text-xs font-black text-emerald-900 shadow-sm" key={chain.chainName}>
+              {chain.chainName} · {chain.productCount} products · latest {chain.latestIngestedAt}
+            </span>
+          ))}
+        </div>
+        <ItemGrid
+          basePath="/products"
+          page={arrivalsPage}
+          pageParam="arrivalsPage"
+          pageSize={6}
+          paginationLabel="New arrivals pagination"
+          query={arrivalsQuery}
+          queryParam="arrivalsQ"
+          rows={newArrivalRows}
+          sort={arrivalsSort}
+          sortParam="arrivalsSort"
+        />
+      </Card>
+
       <Card className="mt-8 border-violet-200 bg-violet-50/70">
         <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
           <div>
