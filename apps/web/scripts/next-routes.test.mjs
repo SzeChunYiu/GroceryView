@@ -3212,7 +3212,7 @@ ${seo}`;
     assert.match(robots, /\/users/);
   });
 
-  it('drives dynamic product, category, and store sitemap URLs from DB catalog-shaped records', async () => {
+  it('drives dynamic product, item, category, and store sitemap URLs from DB catalog-shaped records', async () => {
     const sitemap = await read('src/app/sitemap.ts');
 
     assert.match(sitemap, /@groceryview\/db/);
@@ -3228,6 +3228,7 @@ ${seo}`;
     assert.match(sitemap, /lastModifiedFrom\(product\.updatedAt\)/);
     assert.match(sitemap, /lastModifiedFrom\(store\.updatedAt\)/);
     assert.match(sitemap, /\/products\/\$\{product\.slug\}/);
+    assert.match(sitemap, /\/items\/\$\{product\.slug\}/);
     assert.match(sitemap, /\/categories\/\$\{category\.slug\}/);
     assert.match(sitemap, /\/stores\/\$\{store\.slug\}/);
     assert.doesNotMatch(sitemap, /productUniverse/);
@@ -3248,6 +3249,7 @@ ${seo}`;
     const seo = await read('src/lib/seo.ts');
     const sitemap = await read('src/app/sitemap.ts');
     const itemsPage = await read('src/app/items/page.tsx');
+    const itemDetailPage = await read('src/app/items/[id]/page.tsx');
     const searchPage = await read('src/app/search/page.tsx');
 
     assert.match(seo, /'\/items'/);
@@ -3256,9 +3258,14 @@ ${seo}`;
     assert.match(seo, /Product search/);
     assert.match(sitemap, /entry\('\/items'/);
     assert.match(sitemap, /entry\('\/search'/);
+    assert.match(sitemap, /entry\(`\/items\/\$\{product\.slug\}`, 0\.8, 'daily', lastModifiedFrom\(product\.updatedAt\)\)/);
     assert.match(sitemap, /public entry points/i);
     assert.match(itemsPage, /routeMetadata\('\/items'\)/);
     assert.match(itemsPage, /ProductsPage/);
+    assert.match(itemDetailPage, /generateMetadata/);
+    assert.match(itemDetailPage, /canonical: `\/items\/\$\{id\}`/);
+    assert.match(itemDetailPage, /openGraph: metadata\.openGraph \? \{ \.\.\.metadata\.openGraph, url: `\/items\/\$\{id\}`/);
+    assert.match(itemDetailPage, /twitter: metadata\.twitter \? \{ \.\.\.metadata\.twitter, images: \[itemOgImage\] \}/);
     assert.match(searchPage, /routeMetadata\('\/search'\)/);
     assert.match(searchPage, /ProductsPage/);
   });

@@ -106,6 +106,7 @@ export function buildCatalogSitemapEntries(): MetadataRoute.Sitemap {
 
   return [
     ...products.map((product) => entry(`/products/${product.slug}`, 0.82, 'daily', lastModifiedFrom(product.updatedAt))),
+    ...products.map((product) => entry(`/items/${product.slug}`, 0.8, 'daily', lastModifiedFrom(product.updatedAt))),
     ...categories.map((category) => entry(`/categories/${category.slug}`, 0.74, 'daily')),
     ...stores.map((store) => entry(`/stores/${store.slug}`, 0.58, 'weekly', lastModifiedFrom(store.updatedAt)))
   ];
