@@ -16,6 +16,7 @@ import {
   rankNutritionPerKrona,
   planPantryReplenishment,
   planRecurringBasketDigest,
+  rankUnitPriceBeaters,
   reviewReceiptScan,
   scoreBand,
   searchProducts,
@@ -55,6 +56,7 @@ import {
   type RecurringBasketCadence,
   type RecurringBasketDigest,
   type ReceiptReview,
+  type RankedUnitPriceBeaterPromo,
   type HouseholdBasketItem,
   type HouseholdMember,
   type HouseholdSnapshot,
@@ -1104,6 +1106,8 @@ export type FlyerOfferReport = {
     productId?: string;
   };
   offerCount: number;
+  unitPriceBeaterCount: number;
+  unitPriceBeaters: RankedUnitPriceBeaterPromo[];
   stores: FlyerOfferStoreSummary[];
   offers: FlyerOffer[];
   guardrails: string[];
@@ -4348,6 +4352,39 @@ function buildFlyerOfferReportFromOffers(asOf: string, options: {
     right.totalOneEachSavings - left.totalOneEachSavings ||
     left.storeName.localeCompare(right.storeName)
   );
+  const unitPriceBeaters = rankUnitPriceBeaters({
+    promos: offers.flatMap((offer) => {
+      if (offer.effectiveUnitPriceUnit !== 'kg' || offer.effectiveUnitPrice === null) return [];
+      return [{
+        promoId: offer.offerId,
+        canonicalProductId: offer.productId,
+        productName: offer.productName,
+        effectiveKrPerKg: offer.effectiveUnitPrice,
+        storeId: offer.storeId,
+        storeName: offer.storeName,
+        currency: offer.currency,
+        startsAt: offer.validFrom,
+        endsAt: offer.validThrough,
+        active: true,
+        sourceConfidence: offer.confidence
+      }];
+    }),
+    priceHistory: products.flatMap((product) =>
+      product.history
+        .filter((point) => point.verified)
+        .map((point) => ({
+          canonicalProductId: product.id,
+          observedAt: `${point.date}T00:00:00.000Z`,
+          krPerKg: comparableUnitPrice(product, point.price),
+          sourceConfidence: product.dealSignals.sourceConfidence
+        }))
+    ),
+    asOf,
+    medianWindowDays: 30,
+    minimumBeatPercent: 2,
+    minimumSourceConfidence: 0.7,
+    topN: 8
+  });
 
   return {
     asOf,
@@ -4358,10 +4395,13 @@ function buildFlyerOfferReportFromOffers(asOf: string, options: {
       ...(options.productId ? { productId: options.productId } : {})
     },
     offerCount: offers.length,
+    unitPriceBeaterCount: unitPriceBeaters.length,
+    unitPriceBeaters,
     stores: storesSummary,
     offers,
     guardrails: [
       'Flyer offers are active only inside their captured validity window.',
+      'Unit-price beaters are ranked only when active promo kr/kg beats the canonical product 30-day median kr/kg history.',
       'Branch-level offers stay tied to a store, source run, and flyer URL before they can drive shopper action.',
       'Member flyer prices remain labeled and never overwrite public shelf price history.'
     ]

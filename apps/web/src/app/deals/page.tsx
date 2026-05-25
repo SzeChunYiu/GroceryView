@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { createGroceryViewApi } from '@groceryview/api';
 import { DealCard } from '@/components/deal-card';
 import { categoryLabels, pricedProducts } from '@/lib/openprices-products';
 import { buildNewProductArrivals } from '@/lib/freshness';
@@ -9,6 +10,7 @@ import { routeMetadata } from '@/lib/seo';
 import { formatPct, labelFromSlug, priceDropMoversBoard, snapshot, topChainSpreads } from '@/lib/verified-data';
 
 type SearchParams = Record<string, string | string[] | undefined>;
+const api = createGroceryViewApi();
 
 type ReplacementDeal = {
   categoryLabel: string;
@@ -106,9 +108,27 @@ const newProductArrivals = buildNewProductArrivals(pricedProducts.map((product) 
 export default async function DealsPage({ searchParams }: Readonly<{ searchParams?: Promise<SearchParams> }>) {
   const params = (await searchParams) ?? {};
   const replacementFilter = buildPantryReplacementFilter(paramValue(params.replace));
+  const unitPriceBeaterFilter = paramValue(params.unit) === 'beaters';
+  const flyerOfferReport = api.getFlyerOffers({ asOf: '2026-05-25T12:00:00.000Z' });
+  const flyerOffersById = new Map(flyerOfferReport.offers.map((offer) => [offer.offerId, offer]));
+  const unitPriceBeaterDeals: ReplacementDeal[] = flyerOfferReport.unitPriceBeaters.flatMap((beater) => {
+    const offer = flyerOffersById.get(beater.promoId);
+    if (!offer) return [];
+    return [{
+      categoryLabel: labelFromSlug(offer.category),
+      categorySlug: offer.category,
+      currentPrice: offer.offerPrice,
+      dealId: `unit-beater-${beater.promoId}`,
+      originalPrice: offer.regularPrice,
+      productName: offer.productName,
+      productSlug: offer.productId,
+      sourceLabel: `${beater.beatPercent.toFixed(1)}% below 30-day median kr/kg · ${beater.historyObservationCount} canonical observations · ${offer.storeName}`
+    }];
+  });
+  const dealPool = unitPriceBeaterFilter ? unitPriceBeaterDeals : replacementDeals;
   const visibleDeals = (replacementFilter
-    ? replacementDeals.filter((deal) => pantryReplacementMatches(replacementFilter, deal))
-    : replacementDeals
+    ? dealPool.filter((deal) => pantryReplacementMatches(replacementFilter, deal))
+    : dealPool
   ).slice(0, 8);
 
   return (
@@ -117,10 +137,12 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
       <div className="mt-3 grid gap-4 lg:grid-cols-[1fr_0.34fr] lg:items-end">
         <div>
           <h1 className="text-4xl font-black tracking-tight">
-            {replacementFilter ? `Replacement deals for ${replacementFilter.label}` : 'Verified grocery deals'}
+            {unitPriceBeaterFilter ? 'True unit-price beaters' : replacementFilter ? `Replacement deals for ${replacementFilter.label}` : 'Verified grocery deals'}
           </h1>
           <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
-            {replacementFilter
+            {unitPriceBeaterFilter
+              ? "Active MyFlyer promo rows are shown only when their canonical kr/kg price beats the product's observed 30-day median kr/kg history."
+              : replacementFilter
               ? 'Expiry and low-stock pantry links now narrow this surface to replacement matches from observed deal rows with ending-soon countdowns.'
               : 'Browse observed cross-chain spreads, recent price drops, local unit-price savings, and flyer countdown badges without synthetic discounts.'}
           </p>
@@ -131,6 +153,45 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
           <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{snapshot.axfoodSource}</p>
         </div>
       </div>
+
+      <section className="mt-6 rounded-[2rem] border border-indigo-200 bg-indigo-50/80 p-5 shadow-sm" aria-label="MyFlyer true unit-price beaters" data-unit-price-beater-deals>
+        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-indigo-800">MyFlyer · true unit-price beaters</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Promos beating 30-day canonical kr/kg history</h2>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Link className="rounded-full bg-white px-4 py-2 text-sm font-black text-indigo-900 shadow-sm" href="/deals?unit=beaters">
+              Show only beaters
+            </Link>
+            {unitPriceBeaterFilter ? <Link className="rounded-full bg-indigo-900 px-4 py-2 text-sm font-black text-white" href="/deals">Clear filter</Link> : null}
+          </div>
+        </div>
+        <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-indigo-950">
+          The API calls rankUnitPriceBeaters with active flyer/member promo rows and product history normalized to canonical kr/kg. Checkout and alert behavior is unchanged.
+        </p>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {flyerOfferReport.unitPriceBeaters.map((beater) => {
+            const offer = flyerOffersById.get(beater.promoId);
+            return (
+              <Link className="rounded-2xl border border-indigo-100 bg-white p-4 hover:border-indigo-700" href={`/products/${beater.canonicalProductId}`} key={beater.promoId}>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-indigo-800">#{beater.rank} · {offer?.priceType === 'member_flyer' ? 'member flyer' : 'flyer'}</p>
+                <h3 className="mt-2 text-lg font-black leading-6 text-slate-950">{beater.productName}</h3>
+                <p className="mt-3 text-2xl font-black text-indigo-900">{beater.beatPercent.toFixed(1)}% below median</p>
+                <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+                  {formatSek(beater.effectiveKrPerKg)}/kg promo vs {formatSek(beater.medianKrPerKg)}/kg 30-day median.
+                </p>
+                <p className="mt-2 rounded-xl bg-indigo-50 p-3 text-xs font-bold leading-5 text-indigo-950">{beater.explanation}</p>
+              </Link>
+            );
+          })}
+          {flyerOfferReport.unitPriceBeaters.length === 0 ? (
+            <p className="rounded-2xl border border-dashed border-indigo-200 bg-white p-4 text-sm font-semibold text-slate-700">
+              No active flyer row beats its canonical 30-day kr/kg median with enough source confidence.
+            </p>
+          ) : null}
+        </div>
+      </section>
 
       <section className="mt-6 rounded-[2rem] border border-orange-200 bg-orange-50/80 p-5 shadow-sm" aria-label="City trending deal discovery" data-city-trending-deals={cityTrendingFeed.city}>
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
