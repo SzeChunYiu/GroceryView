@@ -340,6 +340,264 @@ export const sourceManagementSummary = {
   ownerCount: new Set(sourceManagementActions.map((source) => source.owner)).size
 };
 
+export type SourceTermsDashboardRow = {
+  sourceId: string;
+  market: string;
+  chain: string;
+  accessMethod: string;
+  termsStatus: 'approved' | 'pending' | 'blocked' | 'unknown';
+  productionStatus: 'allowed' | 'blocked';
+  rateLimit: string;
+  credentials: string;
+  coverage: string;
+  owner: string;
+  checkedAt: string;
+};
+
+export const sourceTermsDashboard: SourceTermsDashboardRow[] = [
+  {
+    sourceId: 'se:ica:store-promotions-default-stores',
+    market: 'SE',
+    chain: 'ICA',
+    accessMethod: 'official_api',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Bounded daily store batch',
+    credentials: 'partner_agreement',
+    coverage: 'Default-store promotion endpoints with source-run provenance',
+    owner: 'Data Ops - ICA promotions',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'se:willys:products-all-stores',
+    market: 'SE',
+    chain: 'Willys',
+    accessMethod: 'official_api',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Bounded daily all-store batch',
+    credentials: 'partner_agreement',
+    coverage: 'Branch-scoped product price snapshots',
+    owner: 'Data Ops - Axfood',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'se:willys:weekly-all-stores',
+    market: 'SE',
+    chain: 'Willys weekly offers',
+    accessMethod: 'flyer_campaign',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Daily campaign refresh',
+    credentials: 'partner_agreement',
+    coverage: 'Weekly campaign offers by store',
+    owner: 'Data Ops - Axfood',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'se:coop:products-all-stores',
+    market: 'SE',
+    chain: 'Coop',
+    accessMethod: 'official_api',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Bounded daily all-store batch',
+    credentials: 'partner_agreement',
+    coverage: 'Stores that expose online product prices',
+    owner: 'Data Ops - Coop',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'se:coop:weekly-all-stores',
+    market: 'SE',
+    chain: 'Coop weekly offers',
+    accessMethod: 'flyer_campaign',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Daily campaign refresh',
+    credentials: 'partner_agreement',
+    coverage: 'Weekly campaign offers by store',
+    owner: 'Data Ops - Coop',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'se:hemkop:products-all-stores',
+    market: 'SE',
+    chain: 'Hemkop',
+    accessMethod: 'official_api',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Bounded daily all-store batch',
+    credentials: 'partner_agreement',
+    coverage: 'Branch-scoped product price snapshots',
+    owner: 'Data Ops - Axfood',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'se:hemkop:weekly-all-stores',
+    market: 'SE',
+    chain: 'Hemkop weekly offers',
+    accessMethod: 'flyer_campaign',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Daily campaign refresh',
+    credentials: 'partner_agreement',
+    coverage: 'Weekly campaign offers by store',
+    owner: 'Data Ops - Axfood',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'se:lidl:public-offers-all-stores',
+    market: 'SE',
+    chain: 'Lidl',
+    accessMethod: 'retailer_online_page',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Daily public-offer refresh',
+    credentials: 'none',
+    coverage: 'Public weekly offer pages linked to store evidence',
+    owner: 'Data Ops - Lidl public offers',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'se:city-gross:products-bulk',
+    market: 'SE',
+    chain: 'City Gross',
+    accessMethod: 'official_api',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Bulk minimum-row guard plus worker retry limits',
+    credentials: 'partner_agreement',
+    coverage: 'Bulk product and price snapshots',
+    owner: 'Data Ops - City Gross',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'se:mathem:public-search',
+    market: 'SE',
+    chain: 'Mathem',
+    accessMethod: 'retailer_online_page',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Small query set, daily refresh',
+    credentials: 'none',
+    coverage: 'Public search sample rows',
+    owner: 'Data Ops - public search',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'se:matspar:public-search',
+    market: 'SE',
+    chain: 'Matspar',
+    accessMethod: 'retailer_online_page',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Small query set, daily refresh',
+    credentials: 'none',
+    coverage: 'Public search sample rows',
+    owner: 'Data Ops - public search',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'se:pharmacy:public-products',
+    market: 'SE',
+    chain: 'Sweden pharmacy',
+    accessMethod: 'retailer_online_page',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Bounded public product paths',
+    credentials: 'none',
+    coverage: 'Public OTC pharmacy catalog evidence',
+    owner: 'Data Ops - pharmacy',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'se:apoteket:public-products',
+    market: 'SE',
+    chain: 'Apoteket',
+    accessMethod: 'retailer_online_page',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Bounded public product URLs',
+    credentials: 'none',
+    coverage: 'Public OTC product evidence',
+    owner: 'Data Ops - pharmacy',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'se:okq8:fuel-prices',
+    market: 'SE',
+    chain: 'OKQ8',
+    accessMethod: 'operator_public_page',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Daily operator-price page fetch',
+    credentials: 'none',
+    coverage: 'Public business fuel price page',
+    owner: 'Mobility price ops',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'se:preem:business-list-prices',
+    market: 'SE',
+    chain: 'Preem',
+    accessMethod: 'operator_public_page',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Daily operator-price page fetch',
+    credentials: 'none',
+    coverage: 'Public business fuel list prices',
+    owner: 'Mobility price ops',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'is:ob:fuel-prices',
+    market: 'IS',
+    chain: 'OB Iceland',
+    accessMethod: 'operator_public_page',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Daily operator-price page fetch',
+    credentials: 'none',
+    coverage: 'Public fuel price page',
+    owner: 'Mobility price ops',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'no:rema-1000:search-review',
+    market: 'NO',
+    chain: 'REMA 1000',
+    accessMethod: 'retailer_online_page',
+    termsStatus: 'pending',
+    productionStatus: 'blocked',
+    rateLimit: 'No production rate limit approved',
+    credentials: 'none',
+    coverage: 'Norway source review only',
+    owner: 'Data Ops - Norway readiness',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'is:starter-basket:manual-review',
+    market: 'IS',
+    chain: 'Iceland starter basket',
+    accessMethod: 'public_dataset',
+    termsStatus: 'unknown',
+    productionStatus: 'blocked',
+    rateLimit: 'No production ingestion allowed',
+    credentials: 'none',
+    coverage: 'Manual planning source, not a live price feed',
+    owner: 'Data Ops - Iceland readiness',
+    checkedAt: '2026-05-25'
+  }
+];
+
+export const sourceTermsSummary = {
+  sourceCount: sourceTermsDashboard.length,
+  approvedCount: sourceTermsDashboard.filter((source) => source.termsStatus === 'approved').length,
+  blockedCount: sourceTermsDashboard.filter((source) => source.productionStatus === 'blocked').length,
+  marketCount: new Set(sourceTermsDashboard.map((source) => source.market)).size
+};
+
 export type PartnerOnboardingIntake = {
   intakeEmail: string;
   expectedResponseWindow: string;
