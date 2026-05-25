@@ -9,6 +9,17 @@ export type IcelandStarterBasketItem = {
   priceStatus: 'awaiting_live_iceland_observation';
 };
 
+export type IcelandPersonaMode = {
+  id: 'tourist-road-trip' | 'resident-household';
+  label: string;
+  audience: string;
+  primaryRoute: string;
+  prioritySignals: string[];
+  caveats: string[];
+  callsToAction: string[];
+  dataStatus: 'preview_no_live_isk_prices';
+};
+
 const starterBasketGroups: Array<{
   category: IcelandStarterBasketCategory;
   benchmarkRole: IcelandStarterBasketItem['benchmarkRole'];
@@ -154,6 +165,45 @@ export const icelandStarterBasketChainTargets = [
   { chainId: 'hagkaup', label: 'Hagkaup', role: 'premium benchmark' }
 ] as const;
 
+export const icelandTouristResidentModes: IcelandPersonaMode[] = [
+  {
+    id: 'tourist-road-trip',
+    label: 'Tourist road-trip mode',
+    audience: 'Visitors buying a few cheap meals, snacks, and road-trip staples near Reykjavik before driving onward.',
+    primaryRoute: '/map?market=IS&mode=tourist-road-trip',
+    prioritySignals: [
+      'map-first discovery for Bonus, Kronan, Netto, and Hagkaup coverage targets',
+      'store price tier labels before basket history exists',
+      'opening-hours caveats for late arrivals, holidays, and rural next-stop planning',
+      'starter-basket shortcuts for breakfast, packed lunch, drinks, and hygiene basics'
+    ],
+    caveats: [
+      'No Iceland branch price, road-distance, or stock claim is published until live source observations pass readiness.',
+      'Opening hours must stay source-attributed or marked unknown; tourist mode cannot infer holiday hours.'
+    ],
+    callsToAction: ['Open map preview', 'Compare road-trip staples', 'Check source readiness'],
+    dataStatus: 'preview_no_live_isk_prices'
+  },
+  {
+    id: 'resident-household',
+    label: 'Resident household mode',
+    audience: 'Iceland households tracking repeat staples, local chains, alerts, and basket history over time.',
+    primaryRoute: '/weekly-basket?market=IS&mode=resident-household',
+    prioritySignals: [
+      'saved basket history once account-owned Iceland observations exist',
+      'price alerts for recurring staples and household hygiene items',
+      'local chain comparison for Bonus, Kronan, Netto, Hagkaup, and Samkaup-family coverage',
+      'confidence and freshness badges for every Iceland source row'
+    ],
+    caveats: [
+      'Resident mode must not reuse tourist assumptions for household staples, privacy, or alert cadence.',
+      'Basket history and alerts stay preview-only until signed-in account data and live Iceland prices are available.'
+    ],
+    callsToAction: ['Open resident basket preview', 'Plan staple alerts', 'Review local chain coverage'],
+    dataStatus: 'preview_no_live_isk_prices'
+  }
+];
+
 export function buildIcelandStarterBasketReadiness() {
   const categoryCounts = Object.fromEntries(
     starterBasketGroups.map((group) => [group.category, group.items.length])
@@ -173,3 +223,9 @@ export function buildIcelandStarterBasketReadiness() {
   };
 }
 
+export function buildIcelandTouristResidentModes() {
+  return icelandTouristResidentModes.map((mode) => ({
+    ...mode,
+    guardrail: `${mode.label} is a preview mode only; no live ISK prices, personal location, basket history, or alert delivery is claimed for Iceland yet.`
+  }));
+}

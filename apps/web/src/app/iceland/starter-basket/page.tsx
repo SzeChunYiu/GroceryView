@@ -1,5 +1,5 @@
 import { routeMetadata } from '@/lib/seo';
-import { buildIcelandStarterBasketReadiness, icelandStarterBasketItems } from '@/lib/iceland-starter-basket';
+import { buildIcelandStarterBasketReadiness, buildIcelandTouristResidentModes, icelandStarterBasketItems } from '@/lib/iceland-starter-basket';
 
 export const metadata = routeMetadata({
   path: '/iceland/starter-basket',
@@ -20,6 +20,7 @@ const categoryLabels = {
 
 export default function IcelandStarterBasketPage() {
   const readiness = buildIcelandStarterBasketReadiness();
+  const personaModes = buildIcelandTouristResidentModes();
   const groupedItems = Object.entries(readiness.categoryCounts).map(([category, count]) => ({
     category: category as keyof typeof categoryLabels,
     count,
@@ -39,6 +40,59 @@ export default function IcelandStarterBasketPage() {
           <p className="rounded-2xl bg-slate-100 p-4 text-sm font-black text-slate-800">Live ISK prices <span className="block text-3xl">{readiness.livePriceObservationCount}</span></p>
           <p className="rounded-2xl bg-slate-100 p-4 text-sm font-black text-slate-800">Scope <span className="block text-lg">{readiness.cityScope}</span></p>
           <p className="rounded-2xl bg-amber-100 p-4 text-sm font-black text-amber-950">Index status <span className="block text-lg">{readiness.chainIndexStatus.replaceAll('_', ' ')}</span></p>
+        </div>
+      </section>
+
+      <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm" data-iceland-tourist-resident-modes>
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto]">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-slate-500">Tourist and resident modes</p>
+            <h2 className="mt-2 text-3xl font-black tracking-tight">Separate Iceland workflows before live prices launch</h2>
+            <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-600">
+              Tourist mode is map-first for cheap road-trip groceries and opening-hours caveats. Resident mode is basket-history and alert-first for households tracking local chains. Both stay preview-only until Iceland source rows are live.
+            </p>
+          </div>
+          <p className="rounded-2xl bg-amber-100 p-4 text-sm font-black text-amber-950">
+            Data status
+            <span className="mt-1 block text-lg">preview no live ISK prices</span>
+          </p>
+        </div>
+        <div className="mt-5 grid gap-4 lg:grid-cols-2">
+          {personaModes.map((mode) => (
+            <article className="rounded-2xl border border-slate-200 bg-slate-50 p-5" data-iceland-persona-mode={mode.id} key={mode.id}>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">{mode.dataStatus.replaceAll('_', ' ')}</p>
+                  <h3 className="mt-2 text-2xl font-black text-slate-950">{mode.label}</h3>
+                </div>
+                <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase text-slate-700">{mode.primaryRoute}</span>
+              </div>
+              <p className="mt-3 text-sm font-semibold leading-6 text-slate-700">{mode.audience}</p>
+              <div className="mt-4 grid gap-3 md:grid-cols-2">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Priority signals</p>
+                  <ul className="mt-2 grid gap-2 text-sm font-semibold text-slate-700">
+                    {mode.prioritySignals.map((signal) => (
+                      <li className="rounded-xl bg-white px-3 py-2" key={signal}>{signal}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Guardrails</p>
+                  <ul className="mt-2 grid gap-2 text-sm font-semibold text-slate-700">
+                    {[mode.guardrail, ...mode.caveats].map((caveat) => (
+                      <li className="rounded-xl bg-white px-3 py-2" key={caveat}>{caveat}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {mode.callsToAction.map((action) => (
+                  <span className="rounded-full bg-slate-950 px-3 py-1 text-xs font-black text-white" key={action}>{action}</span>
+                ))}
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 
@@ -76,4 +130,3 @@ export default function IcelandStarterBasketPage() {
     </main>
   );
 }
-
