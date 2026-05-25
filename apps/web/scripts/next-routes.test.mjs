@@ -1175,6 +1175,18 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(compare, /NoVerifiedData/);
   });
 
+  it('renders distinct shelf and counter price labels on product pages', async () => {
+    const product = await read('src/app/products/[slug]/page.tsx');
+
+    assert.match(product, /function counterPriceLabelFor/);
+    assert.match(product, /priceKind === 'counter_fish'/);
+    assert.match(product, /Counter fish price/);
+    assert.match(product, /priceKind === 'counter_deli'/);
+    assert.match(product, /Counter deli price/);
+    assert.match(product, /Shelf price/);
+    assert.match(product, /counterPriceLabelFor\\(row\\)/);
+  });
+
 
 
 
