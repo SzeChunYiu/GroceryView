@@ -200,6 +200,28 @@ export function normalizeUnitPrice(
   };
 }
 
+export type ComparableUnitPrice = {
+  price: number;
+  unit: CanonicalUnit;
+  label: string;
+};
+
+export function getComparableUnitPrice(
+  price: number | null | undefined,
+  unit: string | null | undefined,
+): ComparableUnitPrice | null {
+  const normalized = normalizeUnitPrice(price, unit);
+
+  if (!normalized || normalized.price <= 0) {
+    return null;
+  }
+
+  return {
+    ...normalized,
+    label: `kr/${normalized.unit}`,
+  };
+}
+
 export function areCompatibleUnits(
   left: string | null | undefined,
   right: string | null | undefined,
@@ -241,6 +263,7 @@ export const unitNormalizer = Object.freeze({
   normalizeUnit,
   normalizeQuantity,
   normalizeUnitPrice,
+  getComparableUnitPrice,
   areCompatibleUnits,
   parsePackageSize,
   unitNormalizationQaSeverity,

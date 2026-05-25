@@ -17,6 +17,7 @@
 "use client";
 
 import { useState } from "react";
+import { rankSubstitutionsForBasket } from "../lib/substitution-ranker";
 
 import {
   buildBasketCouponStackOptimizer,
@@ -29,6 +30,10 @@ export type BasketBuilderProduct = {
   name: string;
   chainPrices?: BasketChainPrice[];
   dealStackOffers?: BasketStackOffer[];
+  category?: string | null;
+  unitPrice?: number | null;
+  unitPriceUnit?: string | null;
+  dietaryTags?: readonly string[] | null;
 };
 
 export function addBasketBuilderProduct<T extends BasketBuilderProduct>(
@@ -44,10 +49,12 @@ export function addBasketBuilderProduct<T extends BasketBuilderProduct>(
 
 export type BasketBuilderProps<T extends BasketBuilderProduct> = {
   products: readonly T[];
+  selectedDietaryFilters?: readonly string[];
 };
 
 export function BasketBuilder<T extends BasketBuilderProduct>({
   products,
+  selectedDietaryFilters = [],
 }: BasketBuilderProps<T>) {
   const [basketProducts, setBasketProducts] = useState<T[]>([]);
   const chainStacks = buildBasketCouponStackOptimizer({
@@ -55,6 +62,11 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
     offers: basketProducts.flatMap((product) => product.dealStackOffers ?? []),
   });
   const bestChainStack = chainStacks[0];
+  const substitutionSuggestions = rankSubstitutionsForBasket({
+    basketItems: basketProducts,
+    candidates: products,
+    selectedDietaryFilters,
+  });
 
   function add(product: T) {
     setBasketProducts((current) => addBasketBuilderProduct(current, product));
@@ -93,6 +105,34 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
             {chainStacks.map((stack) => (
               <li key={stack.chain}>
                 {stack.chain}: {stack.totalLabel} ({stack.savingsLabel} saved)
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {substitutionSuggestions.length > 0 ? (
+        <section aria-label="Substitution suggestions">
+          <h3>Suggested swaps</h3>
+          <ul aria-label="Substitution suggestions">
+            {substitutionSuggestions.map((suggestion) => (
+              <li key={suggestion.item.id}>
+                <span>{suggestion.item.name}</span>
+                <ul>
+                  {suggestion.substitutions.map((substitution) => (
+                    <li key={substitution.product.id}>
+                      <span>{substitution.product.name}</span>
+                      <span>
+                        {" "}
+                        saves{" "}
+                        {substitution.savingsPerUnit.toLocaleString("sv-SE", {
+                          maximumFractionDigits: 2,
+                        })}{" "}
+                        kr/{substitution.unit}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
               </li>
             ))}
           </ul>
