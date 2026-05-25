@@ -20,7 +20,7 @@ export function FormField({ id, label, children, error, hint }: FormFieldProps) 
       {children}
       {hint ? <p className="text-xs text-slate-500" id={hintId}>{hint}</p> : null}
       {error ? (
-        <p className="rounded-2xl bg-rose-50 p-3 text-sm font-bold text-rose-800" id={errorId} role="alert" aria-live="assertive">
+        <p className="rounded-2xl bg-rose-50 p-3 text-sm font-bold text-rose-800" id={errorId} role="alert" aria-atomic="true" aria-live="assertive">
           {error}
         </p>
       ) : null}
