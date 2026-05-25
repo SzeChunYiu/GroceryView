@@ -28,6 +28,7 @@ import {
   buildLidlOfferPageUrl,
   buildLidlStoreDetailPayloadUrl,
   buildLidlStoresUrl,
+  buildSevenElevenNoStoresUrl,
   buildMatpriskollenStoreOffersUrl,
   buildMatpriskollenStoresUrl,
   buildMathemSearchUrl,
@@ -89,6 +90,7 @@ import {
   fetchLidlOffers,
   fetchLidlOffersForAllStores,
   fetchLidlStores,
+  fetchSevenElevenNoStores,
   fetchMathemProducts,
   fetchMatpriskollenOffers,
   fetchMatsparProducts,
@@ -132,6 +134,7 @@ import {
   parseIcaStoreList,
   parseLidlStoreDirectoryLinks,
   parseLidlStorePayload,
+  parseSevenElevenNoStores,
   parseOsmChainStores,
   parseOpenPricesSnapshot,
   parseOkq8FuelPricePage,
@@ -7593,6 +7596,7 @@ describe('daily ingestion runner', () => {
     assert.equal(executor.calls.length, 0);
   });
 
+
   it('parses and fetches 7-Eleven Sweden convenience assortment SKUs from the B2B PDF', async () => {
     const retrievedAt = '2026-05-24T12:00:00.000Z';
     const sourceUrl = buildSevenElevenSeBusinessOrdersUrl();
@@ -7659,6 +7663,49 @@ describe('daily ingestion runner', () => {
 
     assert.deepEqual(requestedUrls, [sourceUrl, SEVEN_ELEVEN_SE_ASSORTMENT_PDF_URL]);
     assert.equal(fetched.length, 5);
+  });
+
+
+  it('parses and fetches 7-Eleven Norway store directory rows', async () => {
+    const retrievedAt = '2026-05-24T12:00:00.000Z';
+    const html = `
+      <ol id="Maps-1133-list">
+        <li data-lat="69.648515" data-lng="18.955042" data-title="7-Eleven Domkirkeplassen" data-storeid="7153" data-department="7">
+          <header><h3 class="name">7-Eleven Domkirkeplassen</h3></header>
+          <div class="adr"><div class="street-address">Storgata 61</div><div class="postal"><span class="locality">TROMSØ</span></div></div>
+        </li>
+        <li data-lat="59.932893" data-lng="10.860874" data-title="Alfaset" data-storeid="7547" data-department="77">
+          <header><h3 class="name">Alfaset</h3></header>
+          <div class="adr"><div class="street-address">Nedre Kallbakvei 98</div><div class="postal"><span class="locality">OSLO</span></div></div>
+        </li>
+      </ol>`;
+
+    const rows = parseSevenElevenNoStores(html, buildSevenElevenNoStoresUrl(), retrievedAt);
+    assert.equal(rows.length, 2);
+    assert.deepEqual(rows[0], {
+      storeId: '7153',
+      name: '7-Eleven Domkirkeplassen',
+      chain: '7-eleven',
+      department: '7',
+      address: 'Storgata 61',
+      city: 'TROMSØ',
+      latitude: 69.648515,
+      longitude: 18.955042,
+      sourceUrl: buildSevenElevenNoStoresUrl(),
+      retrievedAt
+    });
+    assert.equal(rows[1].chain, 'uno-x-7-eleven');
+
+    const requestedUrls: string[] = [];
+    const fetched = await fetchSevenElevenNoStores({
+      retrievedAt,
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return new Response(html, { status: 200, headers: { 'content-type': 'text/html' } });
+      }
+    });
+    assert.deepEqual(requestedUrls, [buildSevenElevenNoStoresUrl()]);
+    assert.equal(fetched.length, 2);
   });
 
 });
