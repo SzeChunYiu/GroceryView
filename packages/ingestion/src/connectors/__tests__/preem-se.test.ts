@@ -1,6 +1,13 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { fetchPreemSeBusinessListPrices, parsePreemSeBusinessListPrices, PREEM_SE_BUSINESS_LIST_URL } from '../preem-se.js';
+import {
+  fetchPreemSeBusinessListPrices,
+  fetchPreemSeMemberFuelDiscounts,
+  parsePreemSeBusinessListPrices,
+  parsePreemSeMemberFuelDiscounts,
+  PREEM_SE_BUSINESS_LIST_URL,
+  PREEM_SE_MEMBER_URL
+} from '../preem-se.js';
 
 const OBSERVED_AT = '2026-05-25T10:00:00.000Z';
 const FIXTURE = `<!doctype html><main>
@@ -18,6 +25,13 @@ Eldningsolja Eldningsolja E0504 Pris exkl. moms 13 384 kr/Nm3 Gäller fr.om 2026
 <h2>Listpriser Elfordonsladdning</h2>
 Laddningstyp Preem Pris inkl. moms 4,99 kr/kWh Gäller fr.om 2025-11-13
 </main>`;
+const MEMBER_FIXTURE = `<!doctype html><main>
+<h1>Preem Medlem</h1>
+25 öre/liter i drivmedelsrabatt på butikstationer med Preem Mastercard
+15 öre/liter i rabatt på butikstationer med Preem Privatkort eller ett anslutet betalkort
+10 öre/liter i rabatt på automatstationer
+Preempris på elfordonsladdning i appen
+</main>`;
 
 describe('Preem SE business list connector', () => {
   it('parses business-card, truck-card, and bulk fuel rows with source-backed units and dates', () => {
@@ -31,6 +45,14 @@ describe('Preem SE business list connector', () => {
       operatorName: 'Preem',
       customerSegment: 'business',
       listPriceKind: 'business_card',
+      channel: 'business_list',
+      priceScope: 'national_business_list',
+      discountBasis: 'pre_discount_list_price',
+      isMemberPrice: false,
+      isSubscriptionPrice: false,
+      isCouponPrice: false,
+      isClearance: false,
+      multiBuy: null,
       productName: 'Preem Evolution Diesel',
       price: 21.34,
       currency: 'SEK',
@@ -44,6 +66,54 @@ describe('Preem SE business list connector', () => {
     assert.equal(rows.find((row) => row.productName === 'ACP Diesel')?.listPriceKind, 'truck_card');
     assert.equal(rows.find((row) => row.productName === 'Preem Evolution Diesel' && row.listPriceKind === 'bulk')?.includesVat, false);
     assert.equal(rows.find((row) => row.unit === 'Nm3')?.price, 13384);
+  });
+
+  it('parses Preem Medlem per-liter fuel discounts as member-price rows', () => {
+    const rows = parsePreemSeMemberFuelDiscounts({ html: MEMBER_FIXTURE, observedAt: OBSERVED_AT });
+
+    assert.equal(rows.length, 3);
+    assert.deepEqual(rows.map((row) => ({
+      id: row.id,
+      channel: row.channel,
+      stationFormat: row.stationFormat,
+      requirement: row.requirement,
+      discountAmount: row.discountAmount,
+      discountUnit: row.discountUnit,
+      isMemberPrice: row.isMemberPrice,
+      isCouponPrice: row.isCouponPrice
+    })), [
+      {
+        id: 'preem-member-mastercard-staffed',
+        channel: 'member_discount',
+        stationFormat: 'staffed',
+        requirement: 'preem_mastercard',
+        discountAmount: 0.25,
+        discountUnit: 'SEK/l',
+        isMemberPrice: true,
+        isCouponPrice: false
+      },
+      {
+        id: 'preem-member-private-card-or-connected-card-staffed',
+        channel: 'member_discount',
+        stationFormat: 'staffed',
+        requirement: 'preem_privatkort_or_connected_payment_card',
+        discountAmount: 0.15,
+        discountUnit: 'SEK/l',
+        isMemberPrice: true,
+        isCouponPrice: false
+      },
+      {
+        id: 'preem-member-member-card-automatic',
+        channel: 'member_discount',
+        stationFormat: 'automatic',
+        requirement: 'preem_member_payment_card',
+        discountAmount: 0.1,
+        discountUnit: 'SEK/l',
+        isMemberPrice: true,
+        isCouponPrice: false
+      }
+    ]);
+    assert.equal(rows[0]?.sourceUrl, PREEM_SE_MEMBER_URL);
   });
 
   it('fails closed for consumer pump URLs and blocked pages', () => {
@@ -71,6 +141,24 @@ describe('Preem SE business list connector', () => {
     assert.equal(JSON.stringify(headers[0]).includes('preem-business-list-connector'), true);
     await assert.rejects(
       () => fetchPreemSeBusinessListPrices({ fetchImpl: async () => new Response('blocked', { status: 403 }) }),
+      /blocked with HTTP 403/
+    );
+  });
+
+  it('fetches member-discount rows with connector headers and blocked-response handling', async () => {
+    const headers: HeadersInit[] = [];
+    const rows = await fetchPreemSeMemberFuelDiscounts({
+      observedAt: OBSERVED_AT,
+      fetchImpl: async (_input, init) => {
+        headers.push(init?.headers ?? {});
+        return new Response(MEMBER_FIXTURE, { status: 200 });
+      }
+    });
+
+    assert.equal(rows.length, 3);
+    assert.equal(JSON.stringify(headers[0]).includes('preem-member-discount-connector'), true);
+    await assert.rejects(
+      () => fetchPreemSeMemberFuelDiscounts({ fetchImpl: async () => new Response('blocked', { status: 403 }) }),
       /blocked with HTTP 403/
     );
   });
