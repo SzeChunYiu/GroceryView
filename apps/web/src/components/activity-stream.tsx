@@ -18,13 +18,16 @@ const emptyActivityEvents: SharedListActivityEvent[] = [];
 function activityLabel(event: SharedListActivityEvent): string {
   if (event.kind === 'item_added') return 'added';
   if (event.kind === 'item_checked') return 'checked';
+  if (event.kind === 'item_completed') return 'completed';
   if (event.kind === 'item_edited') return 'edited';
+  if (event.kind === 'price_alert_changed') return 'updated alert for';
   return 'removed';
 }
 
 function activityTone(event: SharedListActivityEvent): string {
   if (event.kind === 'item_removed') return 'bg-rose-50 text-rose-800';
-  if (event.kind === 'item_checked') return 'bg-emerald-50 text-emerald-800';
+  if (event.kind === 'item_checked' || event.kind === 'item_completed') return 'bg-emerald-50 text-emerald-800';
+  if (event.kind === 'price_alert_changed') return 'bg-violet-50 text-violet-800';
   if (event.kind === 'item_edited') return 'bg-amber-50 text-amber-900';
   return 'bg-sky-50 text-sky-800';
 }
@@ -60,7 +63,7 @@ export function ActivityStream({ listId, initialEvents = emptyActivityEvents }: 
       <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Activity stream</p>
       <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Shared-list changes</h2>
       <p className="mt-2 text-sm leading-6 text-slate-600">
-        Collaborator added, checked, edited, and removed events include the actor and timestamp so asynchronous shopping-list edits stay transparent.
+        Collaborator additions, removals, price alert changes, and completed items include the actor and timestamp so asynchronous shopping-list edits stay transparent.
       </p>
 
       {events.length === 0 ? (
