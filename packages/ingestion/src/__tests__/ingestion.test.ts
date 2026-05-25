@@ -3245,6 +3245,15 @@ describe('fetchMathemProducts', () => {
       imageUrl: 'https://images.mathem.se/product.jpg',
       productUrl: 'https://www.mathem.se/se/products/6448-kungsornen-gammaldags-idealmakaroner/',
       available: true,
+      country: 'SE',
+      currency: 'SEK',
+      chain: 'mathem',
+      mathem_tier: 'spot',
+      channel: 'online',
+      is_coupon_price: false,
+      is_subscription_price: false,
+      is_clearance: false,
+      multi_buy: '',
       sourceUrl: buildMathemSearchUrl('makaroner'),
       retrievedAt: '2026-05-21T01:00:00.000Z'
     }]);
