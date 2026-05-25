@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 import type { RemovableSearchFilterChip } from '@/lib/search-filters';
 import type { SearchFilterPreset } from '@/lib/search-presets';
 
@@ -131,6 +131,15 @@ function SavedSearchPresetControls({ currentPreset }: Readonly<{ currentPreset: 
 }
 
 export function ActiveFilterChips({ chips }: ActiveFilterChipsProps) {
+  function handleChipKeyDown(event: KeyboardEvent<HTMLAnchorElement>, index: number) {
+    if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
+    event.preventDefault();
+    const nextIndex = event.key === 'ArrowRight'
+      ? (index + 1) % chips.length
+      : (index - 1 + chips.length) % chips.length;
+    document.querySelector<HTMLAnchorElement>(`[data-filter-chip-index="${nextIndex}"]`)?.focus();
+  }
+
   if (chips.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-violet-200 bg-white/80 px-4 py-3 text-sm font-bold text-violet-900">
@@ -140,9 +149,17 @@ export function ActiveFilterChips({ chips }: ActiveFilterChipsProps) {
   }
 
   return (
-    <div aria-label="Active removable search filters" className="flex flex-wrap gap-2">
-      {chips.map((chip) => (
-        <Link aria-label={`Remove ${chip.label}`} className="rounded-full bg-violet-900 px-3 py-2 text-xs font-black text-white shadow-sm transition hover:bg-violet-700" href={chip.href} key={chip.id}>
+    <div aria-label="Active removable search filters" className="flex flex-wrap gap-2" role="list">
+      {chips.map((chip, index) => (
+        <Link
+          aria-label={`Remove ${chip.label}`}
+          className="rounded-full bg-violet-900 px-3 py-2 text-xs font-black text-white shadow-sm transition hover:bg-violet-700"
+          data-filter-chip-index={index}
+          href={chip.href}
+          key={chip.id}
+          onKeyDown={(event) => handleChipKeyDown(event, index)}
+          role="listitem"
+        >
           {chip.label}
           <span aria-hidden="true" className="ml-2">×</span>
           <span className="sr-only">Remove {chip.label}</span>
@@ -174,13 +191,55 @@ export function AdvancedFilterDrawer({
   selectedChains = [],
   selectedLabels = []
 }: AdvancedFilterDrawerProps) {
+  const [isOpen, setIsOpen] = useState(activeChips.length > 0);
+  const drawerRef = useRef<HTMLDetailsElement>(null);
+  const openerRef = useRef<HTMLElement | null>(null);
   const selectedCategorySet = new Set(selectedCategories);
   const selectedChainSet = new Set(selectedChains);
   const selectedLabelSet = new Set(selectedLabels);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    function handleDocumentKeyDown(event: globalThis.KeyboardEvent) {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setIsOpen(false);
+        window.setTimeout(() => openerRef.current?.focus(), 0);
+      }
+      if (event.key === 'Tab') {
+        const focusable = Array.from(drawerRef.current?.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), summary') ?? [])
+          .filter((element) => element.offsetParent !== null);
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    }
+    document.addEventListener('keydown', handleDocumentKeyDown);
+    return () => document.removeEventListener('keydown', handleDocumentKeyDown);
+  }, [isOpen]);
+
   return (
-    <details className="rounded-3xl border border-violet-200 bg-violet-50/80 p-4 lg:col-span-full" open={activeChips.length > 0}>
-      <summary className="cursor-pointer text-sm font-black uppercase tracking-[0.18em] text-violet-800">
+    <details
+      className="rounded-3xl border border-violet-200 bg-violet-50/80 p-4 lg:col-span-full"
+      onToggle={(event) => setIsOpen(event.currentTarget.open)}
+      open={isOpen}
+      ref={drawerRef}
+    >
+      <summary
+        aria-expanded={isOpen}
+        className="cursor-pointer text-sm font-black uppercase tracking-[0.18em] text-violet-800"
+        onClick={(event) => {
+          if (!isOpen) openerRef.current = event.currentTarget;
+        }}
+        role="button"
+      >
         Advanced filter drawer
       </summary>
       <div className="mt-4 grid gap-4 xl:grid-cols-3">
