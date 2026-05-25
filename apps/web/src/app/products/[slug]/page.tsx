@@ -20,6 +20,7 @@ import { predictBestTimeToBuy, type BestTimeToBuyObservation } from '@groceryvie
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { BestTimeBadge } from '@/components/best-time-badge';
 import { ConfidenceBadge } from '@/components/confidence-badge';
+import { FamilyPackComparisonPanel } from '@/components/family-pack-comparison';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { FriendPriceSightings } from '@/components/friend-price-sightings';
 import { PriceIntelligenceCard, type PriceIntelligenceScoreCard } from '@/components/price-intelligence-card';
@@ -29,6 +30,7 @@ import { pricedProducts } from '@/lib/openprices-products';
 import { buildShortTermPriceForecast } from '@/lib/price-intelligence';
 import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug, matchedChainProducts } from '@/lib/verified-data';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
+import { familyPackComparisonsForProduct } from '@/lib/family-pack';
 import { normalizeUnitPriceForPackageText, packageEvidenceFromText } from '@/lib/normalization';
 import { metadataForProduct } from '@/lib/seo';
 import { listFriendPriceSightingsForProduct, listFriendPriceSightingsForProductChains } from '@/lib/social';
@@ -1464,6 +1466,9 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const priceChartTerminal = priceChartTerminalFor(product);
   const commodityComparison = commodityComparisonForProduct(product.slug);
   const localPriceStatistics = localPriceStatisticsForProduct({ slug: product.slug, name: product.name });
+  const familyPackComparisons = matchedChainProduct
+    ? familyPackComparisonsForProduct(matchedChainProduct, matchedChainProducts, labelFromSlug(matchedChainProduct.category))
+    : [];
   const freshnessBadge = dataFreshnessBadges.find((badge) => badge.sourceKind === (isChain ? 'axfood' : 'openprices')) ?? dataFreshnessBadges[0]!;
   const chainSourceAttribution = crossChainQuoteRows.length > 0
     ? chainSourceAttributionFor(crossChainQuoteRows, freshnessBadge.freshnessLabel)
@@ -1617,6 +1622,14 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
         </div>
       </Card>
       <FriendPriceSightings sightings={friendPriceSightings} />
+      <div className="mt-6">
+        <FamilyPackComparisonPanel
+          comparisons={familyPackComparisons}
+          emptyDetail="No larger or smaller same-category pack with parseable unit evidence is available for this product, so family-pack guidance stays withheld."
+          intro="Compares this product against larger and smaller same-category Axfood rows using parsed pack size, total price, and normalized unit price. Storage notes describe source category constraints only."
+          title="Family-pack and bulk comparison"
+        />
+      </div>
       <Card className="mt-6 border-teal-200 bg-teal-50/70">
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
