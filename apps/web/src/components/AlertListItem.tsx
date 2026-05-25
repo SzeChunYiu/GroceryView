@@ -2,6 +2,7 @@
 
 import { FormEvent, useMemo, useState } from 'react';
 import Link from 'next/link';
+import type { AlertExplanationTimelineStep } from '@/lib/alert-scheduler';
 
 export type ManagedPriceAlert = {
   id: string;
@@ -19,6 +20,7 @@ export type AlertProductSummary = {
   lastObservedAt?: string;
   lowestChain: string;
   productHref: string;
+  explanationTimeline: AlertExplanationTimelineStep[];
 };
 
 type AlertListItemProps = {
@@ -48,6 +50,16 @@ function priceFreshnessLabel(product: AlertProductSummary | undefined, staleAfte
 }
 
 export function AlertListItem({ alert, product, staleAfterHours, onDelete }: Readonly<AlertListItemProps>) {
+  const explanationTimeline: AlertExplanationTimelineStep[] = product ? [
+    product.explanationTimeline[0],
+    {
+      kind: 'threshold',
+      label: 'Threshold compared',
+      detail: `Alert target is ${formatTargetPrice(alert.targetPrice)}; current verified price is ${product.currentPriceText}.`
+    },
+    product.explanationTimeline[2]
+  ].filter((step): step is AlertExplanationTimelineStep => Boolean(step)) : [];
+
   return (
     <article className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm" data-alert-id={alert.id}>
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -72,6 +84,16 @@ export function AlertListItem({ alert, product, staleAfterHours, onDelete }: Rea
           Delete alert
         </button>
       </div>
+      {explanationTimeline.length ? (
+        <ol className="mt-4 grid gap-3 md:grid-cols-3" aria-label="Alert explanation timeline">
+          {explanationTimeline.map((step) => (
+            <li className="rounded-2xl bg-slate-50 p-3" key={`${alert.id}-${step.kind}`}>
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{step.label}</p>
+              <p className="mt-1 text-sm font-semibold text-slate-700">{step.detail}</p>
+            </li>
+          ))}
+        </ol>
+      ) : null}
     </article>
   );
 }
