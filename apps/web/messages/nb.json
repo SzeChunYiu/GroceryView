@@ -18,7 +18,7 @@
   },
   "language": {
     "label": "Språk",
-    "persisted": "Språkvalget lagres lokalt og i NEXT_LOCALE-informasjonskapselen.",
+    "persisted": "Det valgte språket lagres lokalt og i NEXT_LOCALE-informasjonskapselen.",
     "guardrail": "Arabisk og somali åpnes først etter gjennomgåtte oversettelser."
   }
 }
