@@ -6,7 +6,7 @@ import { NotificationInboxActions } from '@/components/notification-inbox-action
 import { WatchlistRow } from '@/components/watchlist-row';
 import { babyDiaperPriceTracker, budgetEssentialsPriceDropAlerts, dealHunterNewProductPriceDropAlerts, weeklyPersonalizedEmailDigest } from '@/lib/demo-data';
 import { samplePredictiveDropAlerts } from '@/lib/alert-scheduler';
-import { buildBestTimeToBuyAlert } from '@/lib/price-intelligence';
+import { buildBestTimeToBuyAlert, buildBestTimeToBuyForecastPanel } from '@/lib/price-intelligence';
 import { priceAlertThresholdPreferenceContract } from '@/lib/verified-data';
 import { confidenceForProduct, priceRowCount, priceDropReasonForAlert, priceDropReasonForProduct, priceSource, volatilityForProduct, watchlistAlertBoard, watchlistItemForAlert } from '@/lib/watchlist-data';
 import { routeMetadata } from '@/lib/seo';
@@ -46,6 +46,8 @@ export default function WatchlistPage() {
       ]
     });
   });
+  const bestTimePanel = buildBestTimeToBuyForecastPanel(bestTimeAlertSetups);
+  const bestTimeByProductId = new Map(bestTimeAlertSetups.map((setup) => [setup.productId, setup]));
 
   return (
     <PageShell>
@@ -103,6 +105,9 @@ export default function WatchlistPage() {
                   store={alert.trigger.storeName}
                   volatilityLabel={volatilityForProduct(alert.productId)?.label}
                   volatilityDetail={volatilityForProduct(alert.productId)?.detail}
+                  bestTimeWindowLabel={bestTimeByProductId.get(alert.productId)?.buyWindowLabel}
+                  bestTimeConfidenceLabel={bestTimeByProductId.get(alert.productId)?.confidenceLabel}
+                  bestTimeSignalLabel={bestTimeByProductId.get(alert.productId)?.priceSignalLabel}
                 />
               </div>
               <div className="mt-3 grid gap-2 text-sm text-slate-700 sm:grid-cols-4">
@@ -143,6 +148,17 @@ export default function WatchlistPage() {
               </div>
             </Link>
           ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-cyan-200 bg-cyan-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-cyan-800">Best-time explanation</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">{bestTimePanel.headline}</h2>
+        <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">{bestTimePanel.guidance}</p>
+        <div className="mt-4 grid gap-3 lg:grid-cols-3">
+          <p className="rounded-2xl bg-white p-4 text-sm font-black text-cyan-950">{bestTimePanel.confidenceLabel}</p>
+          <p className="rounded-2xl bg-white p-4 text-sm font-semibold text-slate-700">{bestTimePanel.expectedMovementLabel}</p>
+          <p className="rounded-2xl bg-white p-4 text-sm font-semibold text-slate-700">{bestTimePanel.recommendationCount} watchlist timing recommendations explain their window and price signals.</p>
         </div>
       </Card>
 
