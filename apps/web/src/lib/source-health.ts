@@ -12,6 +12,21 @@ export type SourceDuplicateConflictAlert = SourceDuplicateSample & {
   message: string;
 };
 
+export type ConnectorManagementStatus = "enabled" | "paused" | "watch";
+
+export type ConnectorManagementConfig = {
+  id: string;
+  name: string;
+  upstream: string;
+  metadataOwner: string;
+  escalationOwner: string;
+  enabledMarkets: string[];
+  freshnessThresholdHours: number;
+  status: ConnectorManagementStatus;
+  lastEditedAt: string;
+  changeReason: string;
+};
+
 export const duplicateConflictSamples: SourceDuplicateSample[] = [
   {
     source: "Axfood scraper",
@@ -35,6 +50,56 @@ export const duplicateConflictSamples: SourceDuplicateSample[] = [
     sampledAt: "2026-05-24T09:30:00.000Z",
   },
 ];
+
+export const connectorManagementConfigs: ConnectorManagementConfig[] = [
+  {
+    id: "axfood-weekly",
+    name: "Axfood weekly campaign connector",
+    upstream: "Willys/Hemköp campaign feeds",
+    metadataOwner: "ingestion-oncall@groceryview.example",
+    escalationOwner: "retailer-sources@groceryview.example",
+    enabledMarkets: ["SE"],
+    freshnessThresholdHours: 36,
+    status: "enabled",
+    lastEditedAt: "2026-05-25T08:30:00.000Z",
+    changeReason: "Weekly campaign rows are current and source URLs remain reachable.",
+  },
+  {
+    id: "ica-store-promotions",
+    name: "ICA store-scoped promotions",
+    upstream: "handla.ica.se store-scoped campaign data",
+    metadataOwner: "ica-ingestion@groceryview.example",
+    escalationOwner: "retailer-sources@groceryview.example",
+    enabledMarkets: ["SE"],
+    freshnessThresholdHours: 24,
+    status: "watch",
+    lastEditedAt: "2026-05-25T08:45:00.000Z",
+    changeReason: "Store-scoped coverage is live, but branch shelf-price claims remain blocked.",
+  },
+  {
+    id: "openfoodfacts",
+    name: "Open Food Facts enrichment",
+    upstream: "Open Food Facts public product API",
+    metadataOwner: "catalog-quality@groceryview.example",
+    escalationOwner: "community-data@groceryview.example",
+    enabledMarkets: ["SE", "NO", "DK", "FI"],
+    freshnessThresholdHours: 168,
+    status: "enabled",
+    lastEditedAt: "2026-05-25T09:00:00.000Z",
+    changeReason: "Nutrition and image enrichment can lag weekly without blocking price ingestion.",
+  },
+];
+
+export function connectorManagementSummary(configs: ConnectorManagementConfig[] = connectorManagementConfigs) {
+  return {
+    total: configs.length,
+    enabled: configs.filter((config) => config.status === "enabled").length,
+    watch: configs.filter((config) => config.status === "watch").length,
+    paused: configs.filter((config) => config.status === "paused").length,
+    markets: [...new Set(configs.flatMap((config) => config.enabledMarkets))].sort(),
+    shortestFreshnessThresholdHours: Math.min(...configs.map((config) => config.freshnessThresholdHours)),
+  };
+}
 
 export function getDuplicateConflictAlerts(
   samples: SourceDuplicateSample[] = duplicateConflictSamples,

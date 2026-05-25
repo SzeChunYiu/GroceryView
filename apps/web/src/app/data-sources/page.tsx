@@ -18,6 +18,7 @@ import {
   storeBrandLedger,
   timescaleDbEvaluation
 } from '@/lib/verified-data';
+import { connectorManagementSummary } from '@/lib/source-health';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -27,6 +28,8 @@ export function generateMetadata() {
 export const dynamic = 'force-static';
 
 export default function DataSourcesPage() {
+  const connectorSummary = connectorManagementSummary();
+
   return (
     <PageShell>
       <Eyebrow>Data sources</Eyebrow>
@@ -40,6 +43,28 @@ export default function DataSourcesPage() {
         <Metric label="Source groups" value={sourceCoverage.length.toLocaleString('sv-SE')} />
         <Metric label="Brand ledgers" value={storeBrandLedger.length.toLocaleString('sv-SE')} />
       </div>
+
+      <Card className="mt-6 border-slate-200 bg-slate-50">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-slate-600">Admin source management</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Connector metadata editor</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+              Routine source configuration now has an admin surface for metadata owners, freshness thresholds,
+              enabled markets, and escalation owners before connector changes require code edits.
+            </p>
+          </div>
+          <Link className="rounded-full bg-slate-950 px-4 py-2 text-sm font-black text-white" href="/admin/sources">
+            Open admin editor
+          </Link>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-4">
+          <Metric label="Managed connectors" value={connectorSummary.total.toLocaleString('sv-SE')} />
+          <Metric label="Enabled" value={connectorSummary.enabled.toLocaleString('sv-SE')} />
+          <Metric label="Watch" value={connectorSummary.watch.toLocaleString('sv-SE')} />
+          <Metric label="Markets" value={connectorSummary.markets.join(', ')} />
+        </div>
+      </Card>
 
       <Card className="mt-6 border-lime-200 bg-lime-50/70">
         <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">

@@ -3755,6 +3755,30 @@ ${seo}`;
     assert.doesNotMatch(route, /@\/components\/sample-data/);
   });
 
+  it('surfaces an admin source management editor for connector operations', async () => {
+    const sourceHealth = await read('src/lib/source-health.ts');
+    const adminSources = await read('src/app/admin/sources/page.tsx');
+    const dataSources = await read('src/app/data-sources/page.tsx');
+
+    assert.match(sourceHealth, /export type ConnectorManagementConfig/);
+    assert.match(sourceHealth, /connectorManagementConfigs/);
+    assert.match(sourceHealth, /freshnessThresholdHours/);
+    assert.match(sourceHealth, /enabledMarkets/);
+    assert.match(sourceHealth, /escalationOwner/);
+    assert.match(sourceHealth, /connectorManagementSummary/);
+
+    assert.match(adminSources, /Retailer connector editor/);
+    assert.match(adminSources, /Connector metadata owner/);
+    assert.match(adminSources, /Freshness threshold hours/);
+    assert.match(adminSources, /Enabled markets/);
+    assert.match(adminSources, /Escalation owner/);
+    assert.match(adminSources, /data-admin-source-connector/);
+
+    assert.match(dataSources, /connectorManagementSummary/);
+    assert.match(dataSources, /href="\/admin\/sources"/);
+    assert.match(dataSources, /Connector metadata editor/);
+  });
+
   it('surfaces the multi-vertical domain foundation without fabricating non-grocery prices', async () => {
     const catalogDomains = await read('../../packages/catalog/src/domains.ts');
     const catalogIndex = await read('../../packages/catalog/src/index.ts');
