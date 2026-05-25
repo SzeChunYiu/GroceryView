@@ -53,6 +53,27 @@ export type SeasonalDealInput = {
   storeName?: string;
 };
 
+export type ExpiringPromotionInput = {
+  currentPrice: number;
+  expiresAt: string;
+  id: string;
+  markdownPercent: number;
+  originalPrice: number;
+  productId: string;
+  productName: string;
+  reportedAt: string;
+  storeName: string;
+  verificationCount?: number;
+};
+
+export type ExpiringPromotionRailItem = ExpiringPromotionInput & {
+  currentPriceLabel: string;
+  evidenceLabel: string;
+  hoursRemaining: number;
+  originalPriceLabel: string;
+  urgencyLabel: string;
+};
+
 export type SeasonalProduceDiscoveryCard = {
   slug: string;
   productName: string;
@@ -149,6 +170,49 @@ function isLinkedSeasonalDeal(row: SeasonalProduceInput, deal: SeasonalDealInput
   const rowTokens = normalizedTokens(row.productName);
   const dealTokens = normalizedTokens(deal.productName);
   return [...rowTokens].some((token) => dealTokens.has(token));
+}
+
+export function buildExpiringPromotionRail({
+  basketProductIds,
+  limit = 4,
+  promotions,
+  windowHours = 36,
+  now = new Date()
+}: {
+  basketProductIds: readonly string[];
+  limit?: number;
+  now?: Date;
+  promotions: ExpiringPromotionInput[];
+  windowHours?: number;
+}): ExpiringPromotionRailItem[] {
+  const basketIds = new Set(basketProductIds);
+  const windowMs = windowHours * 60 * 60 * 1000;
+  const nowMs = now.getTime();
+
+  return promotions
+    .map((promotion) => {
+      const expiresMs = Date.parse(promotion.expiresAt);
+      return { expiresMs, promotion };
+    })
+    .filter(({ expiresMs, promotion }) => (
+      basketIds.has(promotion.productId)
+      && Number.isFinite(expiresMs)
+      && expiresMs > nowMs
+      && expiresMs - nowMs <= windowMs
+    ))
+    .sort((left, right) => left.expiresMs - right.expiresMs || right.promotion.markdownPercent - left.promotion.markdownPercent)
+    .slice(0, limit)
+    .map(({ expiresMs, promotion }) => {
+      const hoursRemaining = Math.max(1, Math.ceil((expiresMs - nowMs) / (60 * 60 * 1000)));
+      return {
+        ...promotion,
+        currentPriceLabel: formatPrice(promotion.currentPrice, 'sv-SE', 'SEK'),
+        evidenceLabel: `${promotion.verificationCount ?? 0} community checks · reported ${promotion.reportedAt.slice(0, 10)}`,
+        hoursRemaining,
+        originalPriceLabel: formatPrice(promotion.originalPrice, 'sv-SE', 'SEK'),
+        urgencyLabel: hoursRemaining <= 12 ? 'expires today' : `expires in ${hoursRemaining}h`
+      };
+    });
 }
 
 export function buildSeasonalProduceDiscoveryCards({
