@@ -136,6 +136,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const pageStart = (currentPage - 1) * PRODUCTS_PER_PAGE;
   const rangeStart = resultCards.length === 0 ? 0 : pageStart + 1;
   const rangeEnd = Math.min(pageStart + PRODUCTS_PER_PAGE, resultCards.length);
+  const virtualizedResultLabel = `Virtualized product results, ${resultCards.length.toLocaleString('sv-SE')} matches`;
   const defaultSearchCount = facetedProductSearch.resultCards.length;
   const zeroResultFallback = relatedSearchFallback(search.query);
   const zeroResultCategories = zeroResultCategoryShortcuts(search.query, resolvedSearchParams.category);
@@ -149,6 +150,11 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
     }
   });
   const friendPriceComparisonSightings = listFriendPriceSightings().slice(0, 3);
+  const volatilityBadgeCounts = resultCards.reduce<Record<string, number>>((counts, product) => {
+    const status = product.volatilityBadge?.status ?? 'insufficient';
+    counts[status] = (counts[status] ?? 0) + 1;
+    return counts;
+  }, {});
 
   function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'origin' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence', string>>) {
     const params = new URLSearchParams();
@@ -296,10 +302,16 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">Price range + stock</p>
             <p className="mt-3 text-2xl font-black text-slate-950">{formatSek(priceRange.min)} – {formatSek(priceRange.max)}</p>
             <p className="mt-2 text-xs font-bold text-slate-600">Comparable unit filters cover kr/kg, kr/l, and per-unit rows. {inStockOnly.label} keeps unpriced catalog rows out of instant results.</p>
+            <p className="mt-2 text-xs font-bold text-slate-600">
+              Variance badges: {(volatilityBadgeCounts.stable ?? 0).toLocaleString('sv-SE')} stable · {(volatilityBadgeCounts.volatile ?? 0).toLocaleString('sv-SE')} volatile · {(volatilityBadgeCounts['likely-promo'] ?? 0).toLocaleString('sv-SE')} likely promo.
+            </p>
           </div>
         </div>
+        <p className="mt-5 text-sm font-semibold text-violet-900">
+          Rendering {rangeStart.toLocaleString('sv-SE')}–{rangeEnd.toLocaleString('sv-SE')} of {resultCards.length.toLocaleString('sv-SE')} matching products through an accessible virtualized result list.
+        </p>
         {/* product.isAvailable === false is rendered inside VirtualizedProductGrid for measured virtual rows. */}
-        <VirtualizedProductGrid products={resultCards} />
+        <VirtualizedProductGrid products={resultCards} resultLabel={virtualizedResultLabel} />
         {resultCards.length > PRODUCTS_PER_PAGE ? (
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3 text-sm">
             <p className="font-black text-slate-700">
