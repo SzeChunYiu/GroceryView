@@ -53,8 +53,8 @@ function parsePriceHistory(value: unknown): PriceForecastObservation[] {
 function parseFlyerWindows(value: unknown): FlyerWindow[] {
   if (!Array.isArray(value)) return [];
   return value
-    .map((entry) => {
-      if (!entry || typeof entry !== 'object') return null;
+    .flatMap((entry) => {
+      if (!entry || typeof entry !== 'object') return [];
       const candidate = entry as Record<string, unknown>;
       const storeName = typeof candidate.storeName === 'string' ? candidate.storeName.trim() : '';
       const categoryLabel = typeof candidate.categoryLabel === 'string' ? candidate.categoryLabel.trim() : '';
@@ -63,17 +63,16 @@ function parseFlyerWindows(value: unknown): FlyerWindow[] {
       const expectedDiscountPct = candidate.expectedDiscountPct === undefined || candidate.expectedDiscountPct === null
         ? null
         : Number(candidate.expectedDiscountPct);
-      if (!storeName || !categoryLabel || !startsAt || !endsAt) return null;
+      if (!storeName || !categoryLabel || !startsAt || !endsAt) return [];
       const expectedDiscount = expectedDiscountPct === null || !Number.isFinite(expectedDiscountPct) ? null : expectedDiscountPct;
-      return {
+      return [{
         storeName,
         categoryLabel,
         startsAt,
         endsAt,
         expectedDiscountPct: expectedDiscount
-      };
-    })
-    .filter((entry): entry is FlyerWindow => entry !== null);
+      }];
+    });
 }
 
 export async function POST(request: Request) {

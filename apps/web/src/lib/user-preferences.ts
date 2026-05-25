@@ -56,7 +56,7 @@ function normalizedValue(value?: string | null) {
   return value?.trim().toLowerCase() ?? '';
 }
 
-function uniquePreferenceValues(values: (string | null | undefined)[]) {
+function uniquePreferenceValues(values: readonly (string | null | undefined)[]) {
   const seen = new Set<string>();
   const nextValues: string[] = [];
 

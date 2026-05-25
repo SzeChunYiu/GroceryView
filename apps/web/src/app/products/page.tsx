@@ -8,13 +8,13 @@ import { ProductPriceCards } from '@/components/product-price-cards';
 import { VirtualizedProductGrid } from '@/components/LazyItemCard';
 import { apohemSource } from '@/lib/ingested/apohem';
 import { adaptiveProductCards, buildProductSearchView, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
-import { publicCatalogueRevalidateSeconds, routeMetadata } from '@/lib/seo';
+import { routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
 import { buildRemovableSearchFilterChips } from '@/lib/search-filters';
 
 const PRODUCTS_PER_PAGE = 50;
 
-export const revalidate = publicCatalogueRevalidateSeconds;
+export const revalidate = 300;
 
 export function generateMetadata() {
   return routeMetadata('/products');
@@ -137,6 +137,11 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const defaultSearchCount = facetedProductSearch.resultCards.length;
   const zeroResultFallback = relatedSearchFallback(search.query);
   const zeroResultCategories = zeroResultCategoryShortcuts(search.query, resolvedSearchParams.category);
+  const drawerPriceRange = { min: priceRange.min ?? 0, max: priceRange.max ?? 0 };
+  const productGridCards = resultCards.map((card) => ({
+    ...card,
+    isAvailable: card.isAvailable ?? undefined
+  }));
   const activeFilterChips = buildRemovableSearchFilterChips(resolvedSearchParams, {
     basePath: '/products',
     labels: {
@@ -211,10 +216,10 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             dietaryFilters={search.dietaryFilters}
             inStockOnly={search.filters.inStockOnly}
             labelFacets={labelFacets}
-            maxPrice={search.filters.maxPrice}
-            minConfidence={search.filters.minConfidence}
-            minPrice={search.filters.minPrice}
-            priceRange={priceRange}
+            maxPrice={search.filters.maxPrice ?? undefined}
+            minConfidence={search.filters.minConfidence ?? undefined}
+            minPrice={search.filters.minPrice ?? undefined}
+            priceRange={drawerPriceRange}
             selectedBrand={selectedBrand}
             selectedCategories={search.filters.categories}
             selectedChains={search.filters.chains}
@@ -296,7 +301,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           </div>
         </div>
         {/* product.isAvailable === false is rendered inside VirtualizedProductGrid for measured virtual rows. */}
-        <VirtualizedProductGrid products={resultCards} />
+        <VirtualizedProductGrid products={productGridCards} />
         {resultCards.length > PRODUCTS_PER_PAGE ? (
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3 text-sm">
             <p className="font-black text-slate-700">

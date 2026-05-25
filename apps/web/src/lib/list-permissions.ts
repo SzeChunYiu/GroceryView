@@ -117,7 +117,7 @@ function safeString(value: unknown, fallback = '') {
 export function normalizePublicListShareItems(items: unknown[]): PublicListShareItem[] {
   return items
     .filter((item): item is Record<string, unknown> => item !== null && typeof item === 'object' && !Array.isArray(item))
-    .map((item, index) => ({
+    .map((item, index): PublicListShareItem => ({
       detail: safeString(item.detail, 'Shared grocery item'),
       id: safeString(item.id, `shared-item-${index + 1}`),
       importSource: item.importSource === 'item-detail' ? 'item-detail' : 'bulk-clipboard',

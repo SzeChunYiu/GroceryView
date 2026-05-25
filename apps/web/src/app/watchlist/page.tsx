@@ -100,7 +100,7 @@ export default function WatchlistPage() {
                 <WatchlistRow
                   name={alert.productName}
                   price={String(alert.trigger.value)}
-                  store={alert.trigger.storeName}
+                  store={alert.trigger.storeName ?? 'Store unavailable'}
                   volatilityLabel={volatilityForProduct(alert.productId)?.label}
                   volatilityDetail={volatilityForProduct(alert.productId)?.detail}
                 />

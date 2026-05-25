@@ -26,12 +26,12 @@ function normalizeChain(chain: string | string[] | undefined): StoreLayoutChain 
 }
 
 export async function generateMetadata({ searchParams }: { searchParams?: Promise<ListPageSearchParams> }): Promise<Metadata> {
-  const resolvedSearchParams = await (searchParams ?? Promise.resolve({}));
+  const resolvedSearchParams = await (searchParams ?? Promise.resolve({} as ListPageSearchParams));
   return metadataForShoppingListShare(resolvedSearchParams.share);
 }
 
 export default async function ShoppingListPage({ searchParams }: { searchParams?: Promise<ListPageSearchParams> }) {
-  const resolvedSearchParams = await (searchParams ?? Promise.resolve({}));
+  const resolvedSearchParams = await (searchParams ?? Promise.resolve({} as ListPageSearchParams));
   const selectedChain = normalizeChain(resolvedSearchParams.chain);
   const shareToken = Array.isArray(resolvedSearchParams.share) ? resolvedSearchParams.share[0] : resolvedSearchParams.share;
 
