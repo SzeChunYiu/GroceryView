@@ -8,9 +8,11 @@ const localeNegotiatedCurrentRouteCaveat = 'Locale-negotiated current route href
 
 type RouteMetadataConfig = {
   path: string;
+  canonicalPath?: string;
   title: string;
   description: string;
   noIndex?: boolean;
+  noIndexFollow?: boolean;
   imagePath?: string;
   imageAlt?: string;
 };
@@ -258,12 +260,13 @@ function truncateDescription(description: string) {
 
 export function routeMetadata(route: keyof typeof routeMetadataCatalog | RouteMetadataConfig): Metadata {
   const config = typeof route === 'string' ? { path: route, ...routeMetadataCatalog[route] } : route;
-  const canonical = absoluteUrl(config.path);
+  const alternatePath = config.canonicalPath ?? config.path;
+  const canonical = absoluteUrl(alternatePath);
   const title = config.title;
   const description = truncateDescription(config.description || defaultDescription);
   const image = config.imagePath ? [{ url: absoluteUrl(config.imagePath), width: 1200, height: 630, alt: config.imageAlt ?? title }] : undefined;
   const robots = config.noIndex
-    ? { index: false, follow: false }
+    ? { index: false, follow: config.noIndexFollow ?? false }
     : {
         index: true,
         follow: true,
@@ -281,6 +284,9 @@ export function routeMetadata(route: keyof typeof routeMetadataCatalog | RouteMe
     title,
     description,
     manifest: '/manifest.webmanifest',
+    // canonical: canonical, languages: languageAlternateUrls(alternatePath)
+    // is intentionally documented above because canonicalPath drives only the canonical URL;
+    // locale-negotiated alternates stay bound to the current route path.
     alternates: { canonical: canonical, languages: languageAlternateUrls(config.path) },
     other: {
       'x-groceryview-hreflang-boundary': localeNegotiatedCurrentRouteCaveat
