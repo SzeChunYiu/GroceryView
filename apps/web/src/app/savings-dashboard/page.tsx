@@ -595,13 +595,22 @@ export default function SavingsDashboardPage() {
         <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
           This senior tracker calls summarizePriceHistory for everyday staples and labels each observed price-history row with a stabilityBand instead of estimating missing weeks.
         </p>
+        <p className="mt-3 rounded-2xl bg-white p-3 text-sm font-black text-slate-800">
+          Minimum history for fixed-income planning: {elderlyStaplesStabilityTracker.minimumObservedPoints} observed shelf points per staple; thinner history renders an amber warning instead of a reliability claim.
+        </p>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           {elderlyStaplesStabilityTracker.rows.map((row) => (
             <Link className="rounded-2xl border border-slate-200 bg-white p-4 hover:border-slate-900" href={`/products/${row.productId}`} key={row.productId}>
               <p className="font-black text-slate-950">{row.productName}</p>
               <p className="mt-2 text-3xl font-black text-slate-950">{formatSek(row.history.latestPrice)}</p>
               <p className="mt-1 text-sm font-semibold text-slate-600">stabilityBand: {row.stabilityBand}</p>
-              <p className="mt-2 text-sm font-semibold text-slate-700">Change {formatSignedSek(row.history.changeFromPrevious)} · {row.history.observedCount} observed points</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">Change {formatSignedSek(row.history.changeFromPrevious)} · volatility {row.volatilityPercent.toFixed(1)}%</p>
+              <p className="mt-1 text-sm font-semibold text-slate-700">{row.history.observedCount} observed points · range {formatSek(row.history.lowestPrice)}–{formatSek(row.history.highestPrice)}</p>
+              {row.insufficientHistoryWarning ? (
+                <p className="mt-3 rounded-2xl bg-amber-50 p-3 text-sm font-black leading-6 text-amber-950">{row.insufficientHistoryWarning}</p>
+              ) : (
+                <p className="mt-3 rounded-2xl bg-emerald-50 p-3 text-sm font-black leading-6 text-emerald-950">History clears the fixed-income planning threshold.</p>
+              )}
             </Link>
           ))}
         </div>
