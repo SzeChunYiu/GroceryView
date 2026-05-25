@@ -5,7 +5,7 @@ import { NotificationInboxActions } from '@/components/notification-inbox-action
 import { babyDiaperPriceTracker, budgetEssentialsPriceDropAlerts, dealHunterNewProductPriceDropAlerts, weeklyPersonalizedEmailDigest } from '@/lib/demo-data';
 import { samplePredictiveDropAlerts } from '@/lib/alert-scheduler';
 import { priceAlertThresholdPreferenceContract } from '@/lib/verified-data';
-import { confidenceForProduct, priceRowCount, priceSource, watchlistAlertBoard, watchlistItemForAlert } from '@/lib/watchlist-data';
+import { confidenceForProduct, priceRowCount, priceDropReasonForAlert, priceDropReasonForProduct, priceSource, watchlistAlertBoard, watchlistItemForAlert } from '@/lib/watchlist-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -24,7 +24,7 @@ export default function WatchlistPage() {
       <Eyebrow>Watchlist price alerts</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Tracked products with notification-ready alerts</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
-        This page calls buildWatchlistAlerts with verified chain price rows, then runs planNotifications so set-target push and email rows respect user preferences and quiet-hour rules. Predictive drop alerts also surface model-forecast savings windows before a current threshold is crossed.
+        This page calls buildWatchlistAlerts with verified chain price rows, then runs planNotifications so set-target push and email rows respect user preferences and quiet-hour rules. Predictive drop alerts use historical source rows and observed price history before surfacing model-forecast savings windows.
       </p>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr_1fr]">
@@ -71,6 +71,9 @@ export default function WatchlistPage() {
                 <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Store: {alert.trigger.storeName}</p>
                 <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Value: {String(alert.trigger.value)}</p>
                 <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Target: {watchlistItemForAlert(alert.productId)?.targetPrice ? formatSek(watchlistItemForAlert(alert.productId)!.targetPrice!) : 'No target'}</p>
+                <p className="rounded-2xl bg-amber-50 p-3 font-semibold text-amber-950 sm:col-span-4">
+                  Reason: {priceDropReasonForAlert(alert).label} · {priceDropReasonForAlert(alert).detail}
+                </p>
               </div>
             </Link>
           ))}
@@ -178,7 +181,8 @@ export default function WatchlistPage() {
               {dealHunterNewProductPriceDropAlerts.priceDropAlerts.map((alert) => (
                 <Link className="block rounded-2xl bg-amber-50 p-3 text-sm font-semibold hover:bg-amber-100" href={`/products/${alert.productId}`} key={`${alert.productId}-${alert.type}`}>
                   <strong>{alert.productName}</strong><br />{alert.message}<br />
-                  <span className="text-slate-600">{alert.triggerMetric}: {String(alert.triggerValue)} · {alert.source}</span>
+                  <span className="text-slate-600">{alert.triggerMetric}: {String(alert.triggerValue)} · {alert.source}</span><br />
+                  <span className="text-amber-900">Reason: {priceDropReasonForProduct(alert.productId, alert.triggerMetric, alert.source).label} · {priceDropReasonForProduct(alert.productId, alert.triggerMetric, alert.source).detail}</span>
                 </Link>
               ))}
             </div>
