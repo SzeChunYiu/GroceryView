@@ -43,7 +43,9 @@ type PersistAlgorithmChoiceOptions = Readonly<{
 }>;
 
 type AlgorithmPickerProps = Readonly<{
+  allowedAlgorithms?: readonly AlgorithmChoice[];
   selected?: AlgorithmChoice;
+  defaultSelected?: AlgorithmChoice;
   onChange?: (selected: AlgorithmChoice) => void;
   storageKey?: string;
   preferencesEndpoint?: string;
@@ -73,6 +75,13 @@ function safeParsePreferences(rawValue: string | null): Partial<UserPreferencesR
   } catch {
     return {};
   }
+}
+
+function normalizeAllowedAlgorithmChoice(value: string | null | undefined, allowedAlgorithms?: readonly AlgorithmChoice[]) {
+  const normalized = normalizeAlgorithmChoice(value);
+  if (!allowedAlgorithms || allowedAlgorithms.length === 0 || allowedAlgorithms.includes(normalized)) return normalized;
+
+  return allowedAlgorithms[0];
 }
 
 export function normalizeAlgorithmChoice(value: string | null | undefined): AlgorithmChoice {
@@ -152,7 +161,9 @@ export async function persistAlgorithmChoiceToUserPreferences(
 }
 
 export function AlgorithmPicker({
+  allowedAlgorithms,
   selected,
+  defaultSelected = 'balanced',
   onChange,
   storageKey = USER_PREFERENCES_STORAGE_KEY,
   preferencesEndpoint,
@@ -160,13 +171,18 @@ export function AlgorithmPicker({
 }: AlgorithmPickerProps) {
   const isControlled = selected !== undefined;
   const [internalSelected, setInternalSelected] = useState<AlgorithmChoice>(() =>
-    normalizeAlgorithmChoice(selected)
+    normalizeAllowedAlgorithmChoice(selected ?? defaultSelected, allowedAlgorithms)
   );
   const [hasLoadedStoredSelection, setHasLoadedStoredSelection] = useState(isControlled);
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'local'>('idle');
+  const visibleOptions = useMemo(() => (
+    allowedAlgorithms && allowedAlgorithms.length > 0
+      ? ALGORITHM_OPTIONS.filter((option) => allowedAlgorithms.includes(option.value))
+      : ALGORITHM_OPTIONS
+  ), [allowedAlgorithms]);
   const currentSelected = useMemo(
-    () => normalizeAlgorithmChoice(isControlled ? selected : internalSelected),
-    [internalSelected, isControlled, selected]
+    () => normalizeAllowedAlgorithmChoice(isControlled ? selected : internalSelected, allowedAlgorithms),
+    [allowedAlgorithms, internalSelected, isControlled, selected]
   );
 
   useEffect(() => {
@@ -175,9 +191,9 @@ export function AlgorithmPicker({
       return;
     }
 
-    setInternalSelected(readStoredAlgorithmChoice(undefined, storageKey));
+    setInternalSelected(normalizeAllowedAlgorithmChoice(readStoredAlgorithmChoice(undefined, storageKey), allowedAlgorithms));
     setHasLoadedStoredSelection(true);
-  }, [isControlled, storageKey]);
+  }, [allowedAlgorithms, defaultSelected, isControlled, storageKey]);
 
   useEffect(() => {
     if (!hasLoadedStoredSelection) return;
@@ -199,7 +215,7 @@ export function AlgorithmPicker({
   }, [currentSelected, hasLoadedStoredSelection, preferencesEndpoint, storageKey]);
 
   function selectAlgorithm(nextSelected: AlgorithmChoice) {
-    const normalizedSelected = normalizeAlgorithmChoice(nextSelected);
+    const normalizedSelected = normalizeAllowedAlgorithmChoice(nextSelected, allowedAlgorithms);
 
     if (!isControlled) {
       setInternalSelected(normalizedSelected);
@@ -230,7 +246,7 @@ export function AlgorithmPicker({
       </div>
 
       <div className="mt-4 grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label="MyFlyer ranker">
-        {ALGORITHM_OPTIONS.map((option) => {
+        {visibleOptions.map((option) => {
           const active = currentSelected === option.value;
 
           return (

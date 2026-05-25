@@ -14,9 +14,10 @@ import {
   trackSponsoredPlacementImpression
 } from '@/lib/analytics';
 import type { ConfidenceLevel } from '@/lib/content-style';
-import { buildDealContext, type DealHistoryPoint } from '@/lib/deal-context';
+import { buildDealContext, buildDealExplanationPanel, type DealHistoryPoint } from '@/lib/deal-context';
 import { getPriceFreshness, type FreshnessLevel } from '@/lib/freshness';
 import { dealShareUrl } from '@/lib/seo';
+import { PriceDropReason } from '@/components/price-drop-reason';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 
 export type SponsoredDealPlacement = {
@@ -27,6 +28,12 @@ export type SponsoredDealPlacement = {
   separatedFromOrganicRankings?: boolean;
   surface?: string;
 };
+
+const dealCardImagePolicy = {
+  loading: 'lazy',
+  placeholder: 'empty',
+  sizes: '(min-width: 1280px) 22vw, (min-width: 768px) 44vw, 92vw'
+} as const;
 
 type DealCardProps = {
   title: string;
@@ -46,6 +53,7 @@ type DealCardProps = {
   productHref?: string;
   rankLabel?: string;
   categoryLabel?: string;
+  chainLabel?: string;
   imageAlt?: string;
   imageUrl?: string | null;
   localityLabel?: string;
@@ -59,6 +67,7 @@ type DealCardProps = {
   sourceLabel?: string;
   sponsoredPlacement?: SponsoredDealPlacement;
   dealEndsAt?: string;
+  urgencyRankLabel?: string;
   imagePriority?: boolean;
   verificationLabel?: string;
 };
@@ -155,9 +164,9 @@ function LazyDealImage({
           className="object-cover"
           fill
           fetchPriority={priority ? 'high' : 'auto'}
-          loading={priority ? 'eager' : 'lazy'}
-          placeholder="empty"
-          sizes="(min-width: 1280px) 22vw, (min-width: 768px) 44vw, 92vw"
+          loading={priority ? 'eager' : dealCardImagePolicy.loading}
+          placeholder={dealCardImagePolicy.placeholder}
+          sizes={dealCardImagePolicy.sizes}
           src={src}
         />
       ) : (
@@ -185,6 +194,7 @@ export function DealCard({
   productHref,
   rankLabel,
   categoryLabel,
+  chainLabel,
   imageAlt,
   imageUrl,
   localityLabel,
@@ -198,6 +208,7 @@ export function DealCard({
   sourceLabel,
   sponsoredPlacement,
   dealEndsAt,
+  urgencyRankLabel,
   imagePriority = false,
   verificationLabel
 }: DealCardProps) {
@@ -234,11 +245,19 @@ export function DealCard({
   const sponsoredSurface = sponsoredPlacement?.surface ?? 'discovery_rail';
   const sponsoredPlacementId = sponsoredPlacement?.placementId ?? analyticsDealId;
   const separatedFromOrganicRankings = true;
-  const metaLabel = [rankLabel, categoryLabel, localityLabel, chainBadgeLabel, freshnessBadgeLabel].filter(Boolean).join(' · ');
+  const metaLabel = [rankLabel, chainLabel, categoryLabel, localityLabel, chainBadgeLabel, freshnessBadgeLabel].filter(Boolean).join(' · ');
   const priceFreshnessObservedAt = freshnessObservedAt ?? discountStartedAt ?? priceHistory?.at(-1)?.observedAt ?? null;
   const priceFreshness = getPriceFreshness(priceFreshnessObservedAt);
   const priceVerificationLabel = verificationLabel
     ?? (sourceLabel ? `Source: ${sourceLabel}` : retailerName !== 'the retailer' ? `Source: ${retailerName}` : 'Source evidence pending');
+  const dealExplanation = buildDealExplanationPanel({
+    chainSpreadLabel: dropPercentLabel,
+    confidenceLabel: priceVerificationLabel,
+    evidenceLabel,
+    freshnessLabel: `${priceFreshness.label}. ${priceFreshness.refreshHint}`,
+    rankLabel,
+    unitPriceBaselineLabel: unitPriceDropLabel ?? (originalPrice ? `Baseline ${formatPrice(originalPrice, locale, currency)} before this deal` : undefined)
+  });
   const countdownLabel = useMemo(() => {
     if (!dealEndsAt) return null;
     const endsAt = new Date(dealEndsAt).getTime();
@@ -327,6 +346,9 @@ export function DealCard({
           {countdownLabel ? (
             <span className="rounded-full bg-rose-100 px-3 py-1 text-xs font-black text-rose-800">{countdownLabel}</span>
           ) : null}
+          {urgencyRankLabel ? (
+            <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-black text-orange-900">{urgencyRankLabel}</span>
+          ) : null}
           {context.isNewLowestPrice ? (
             <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">New low</span>
           ) : null}
@@ -365,6 +387,33 @@ export function DealCard({
         <p className="mt-3 rounded-2xl bg-slate-50 px-3 py-2 text-xs font-semibold leading-5 text-market-ink/70">
           {evidenceLabel}
         </p>
+      ) : null}
+
+      <details className="mt-3 rounded-2xl border border-emerald-100 bg-emerald-50 p-3 text-sm text-emerald-950">
+        <summary className="cursor-pointer text-xs font-black uppercase tracking-[0.18em] text-emerald-800">
+          {dealExplanation.summary}
+        </summary>
+        <dl className="mt-3 grid gap-2">
+          {dealExplanation.factors.map((factor) => (
+            <div className="rounded-xl bg-white/70 px-3 py-2" key={factor.label}>
+              <dt className="text-xs font-black uppercase tracking-[0.14em] text-emerald-900">{factor.label}</dt>
+              <dd className="mt-1 text-xs font-semibold leading-5 text-emerald-950">{factor.detail}</dd>
+            </div>
+          ))}
+        </dl>
+      </details>
+
+      {originalPrice ? (
+        <PriceDropReason
+          asDisclosure
+          className="mt-3"
+          currentPrice={currentPrice}
+          maxReasons={3}
+          previousPrice={originalPrice}
+          productName={title}
+          source={sourceLabel ?? retailerName}
+          summaryLabel="Price-drop clues"
+        />
       ) : null}
 
       {dealLinkMetadata || storeLinkMetadata ? (
