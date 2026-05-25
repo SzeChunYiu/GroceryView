@@ -39,4 +39,20 @@ describe('map nearest store route planning', () => {
     assert.match(storeDetailMap, /data-store-detail-route-aware-recommendation/);
     assert.match(storeDetailMap, /combines route time/);
   });
+
+  it('keeps the nearby stores map keyboard reachable and screen-reader announced', async () => {
+    const storeMap = await read('src/components/store-map.tsx');
+
+    assert.match(storeMap, /data-nearby-stores-accessibility="keyboard-map"/);
+    assert.match(storeMap, /tabIndex=\{0\}/);
+    assert.match(storeMap, /aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight \+ - Home"/);
+    assert.match(storeMap, /function handleMapKeyboard/);
+    assert.match(storeMap, /map\.panBy/);
+    assert.match(storeMap, /map\.zoomIn/);
+    assert.match(storeMap, /aria-live="polite"/);
+    assert.match(storeMap, /Location permission was not approved/);
+    assert.match(storeMap, /data-nearby-stores-accessibility="live-panel"/);
+    assert.match(storeMap, /aria-label=\{`Select \$\{candidate\.store\.name\}/);
+    assert.match(storeMap, /Show only stores reported open now/);
+  });
 });

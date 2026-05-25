@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import type { KeyboardEvent } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { osmStoreHolidayWarningLabel, osmStoreOpeningHoursLabel, osmStores, type OsmStore } from '@/lib/osm-stores';
@@ -177,8 +178,13 @@ export function StoreMap({
   const [selectedStoreSlug, setSelectedStoreSlug] = useState(syncedMapListStores[0]?.slug ?? '');
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [geoStatus, setGeoStatus] = useState('Using map-center distance until location is approved.');
+  const [mapA11yStatus, setMapA11yStatus] = useState('Nearby stores map ready. Use arrow keys to pan, plus or minus to zoom, and Home to return to Stockholm.');
   const [openNowOnly, setOpenNowOnly] = useState(false);
   const [preferredPickupMode, setPreferredPickupMode] = useState<PreferredPickupMode>('any');
+  const mapInstructionsId = useId();
+  const geoStatusId = useId();
+  const mapPanelHeadingId = useId();
+  const nearestStoresHeadingId = useId();
 
   const rankedNearbyDeals = useMemo(() => {
     if (!userLocation) return nearbyDealRecommendations;
@@ -198,11 +204,48 @@ export function StoreMap({
 
   function focusStore(store: OsmStore) {
     setSelectedStoreSlug(store.slug);
+    setMapA11yStatus(`Selected ${store.name}. ${storeLocationLabel(store)}. ${chainIndexLabel(store)}.`);
     mapRef.current?.easeTo({
       center: [store.lng, store.lat],
       zoom: 14,
       duration: 700,
     });
+  }
+
+  function handleMapKeyboard(event: KeyboardEvent<HTMLDivElement>) {
+    const map = mapRef.current;
+    if (!map) return;
+
+    const panDistance = 120;
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      map.panBy([0, -panDistance]);
+      setMapA11yStatus('Map panned north.');
+    } else if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      map.panBy([0, panDistance]);
+      setMapA11yStatus('Map panned south.');
+    } else if (event.key === 'ArrowLeft') {
+      event.preventDefault();
+      map.panBy([-panDistance, 0]);
+      setMapA11yStatus('Map panned west.');
+    } else if (event.key === 'ArrowRight') {
+      event.preventDefault();
+      map.panBy([panDistance, 0]);
+      setMapA11yStatus('Map panned east.');
+    } else if (event.key === '+' || event.key === '=') {
+      event.preventDefault();
+      map.zoomIn();
+      setMapA11yStatus('Map zoomed in.');
+    } else if (event.key === '-' || event.key === '_') {
+      event.preventDefault();
+      map.zoomOut();
+      setMapA11yStatus('Map zoomed out.');
+    } else if (event.key === 'Home') {
+      event.preventDefault();
+      map.easeTo({ center: STOCKHOLM, zoom: 9.5 });
+      setMapA11yStatus('Map returned to Stockholm overview.');
+    }
   }
 
   useEffect(() => {
@@ -215,8 +258,12 @@ export function StoreMap({
       (position) => {
         setUserLocation({ lat: position.coords.latitude, lng: position.coords.longitude });
         setGeoStatus('Sorted with your approved browser location.');
+        setMapA11yStatus('Location permission approved. Nearby stores and deals are sorted from your browser location.');
       },
-      () => setGeoStatus('Location was not approved; showing map-center deal distance.'),
+      () => {
+        setGeoStatus('Location was not approved; showing map-center deal distance.');
+        setMapA11yStatus('Location permission was not approved. Nearby stores remain sorted from the Stockholm map center.');
+      },
       { enableHighAccuracy: false, maximumAge: 300000, timeout: 5000 },
     );
   }, []);
@@ -427,7 +474,23 @@ export function StoreMap({
 
   return (
     <div className="relative h-full w-full">
-      <div ref={containerRef} className="h-full w-full" />
+      <p className="sr-only" id={mapInstructionsId}>
+        Interactive nearby stores map. Use arrow keys to pan, plus or minus to zoom, and Home to return to the Stockholm overview. Use the linked store list to select a store without using the pointer.
+      </p>
+      <p aria-live="polite" className="sr-only" id={geoStatusId}>
+        {geoStatus} {mapA11yStatus}
+      </p>
+      <div
+        aria-describedby={`${mapInstructionsId} ${geoStatusId}`}
+        aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight + - Home"
+        aria-label={`${storeCount.toLocaleString()} nearby grocery stores map. ${geoStatus}`}
+        className="h-full w-full focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-400"
+        data-nearby-stores-accessibility="keyboard-map"
+        onKeyDown={handleMapKeyboard}
+        ref={containerRef}
+        role="region"
+        tabIndex={0}
+      />
 
       {/* Chain legend */}
       <div className="pointer-events-none absolute left-3 top-3 rounded-lg border border-market-ink/10 bg-white/95 px-3 py-2 text-xs shadow-sm backdrop-blur">
@@ -467,24 +530,31 @@ export function StoreMap({
         ) : null}
       </div>
 
-      <div className="absolute bottom-3 right-3 top-3 flex w-[min(22rem,calc(100%-1.5rem))] flex-col rounded-2xl border border-white/70 bg-white/95 p-3 text-slate-950 shadow-2xl backdrop-blur">
+      <div
+        aria-describedby={geoStatusId}
+        aria-labelledby={mapPanelHeadingId}
+        className="absolute bottom-3 right-3 top-3 flex w-[min(22rem,calc(100%-1.5rem))] flex-col rounded-2xl border border-white/70 bg-white/95 p-3 text-slate-950 shadow-2xl backdrop-blur"
+        data-nearby-stores-accessibility="live-panel"
+        role="region"
+      >
         <div className="rounded-xl bg-slate-950 px-4 py-3 text-white">
           <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-200">Synced map + list</p>
-          <h3 className="mt-1 text-lg font-black">Linked store selection</h3>
+          <h3 className="mt-1 text-lg font-black" id={mapPanelHeadingId}>Linked store selection</h3>
           <p className="mt-1 text-xs font-semibold leading-5 text-slate-200">
             Click a list row to fly the map; click a marker to update the selected row.
           </p>
         </div>
         <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
-          <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-3" data-nearest-store-finder="true">
+          <div aria-labelledby={nearestStoresHeadingId} className="rounded-2xl border border-emerald-100 bg-emerald-50 p-3" data-nearest-store-finder="true" role="region">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-[11px] font-black uppercase tracking-[0.16em] text-emerald-800">Nearest-store finder</p>
+                <p className="text-[11px] font-black uppercase tracking-[0.16em] text-emerald-800" id={nearestStoresHeadingId}>Nearest-store finder</p>
                 <p className="mt-1 text-xs font-semibold leading-5 text-emerald-900">
                   Ranked by {userLocation ? 'approved browser location' : 'Stockholm map center'}, opening-window signal, and pickup preference.
                 </p>
               </div>
               <button
+                aria-label={`${openNowOnly ? 'Include all reported stores' : 'Show only stores reported open now'} in nearest-store results`}
                 aria-pressed={openNowOnly}
                 className={`rounded-full px-3 py-1 text-[11px] font-black ${openNowOnly ? 'bg-emerald-900 text-white' : 'bg-white text-emerald-900'}`}
                 onClick={() => setOpenNowOnly((current) => !current)}
@@ -500,6 +570,7 @@ export function StoreMap({
                 ['quick-trip', 'Quick top-up']
               ] as const).map(([mode, label]) => (
                 <button
+                  aria-label={`Rank nearest stores for ${label.toLowerCase()} pickup mode`}
                   aria-pressed={preferredPickupMode === mode}
                   className={`rounded-full px-3 py-1 text-[11px] font-black ${preferredPickupMode === mode ? 'bg-emerald-900 text-white' : 'bg-white text-emerald-900'}`}
                   key={mode}
@@ -510,9 +581,10 @@ export function StoreMap({
                 </button>
               ))}
             </div>
-            <div className="mt-2 space-y-2">
+            <div aria-live="polite" className="mt-2 space-y-2" role="list">
               {nearestStores.length > 0 ? nearestStores.map((candidate, index) => (
                 <button
+                  aria-label={`Select ${candidate.store.name}, ranked ${index + 1}, ${candidate.distanceLabel}, ${candidate.pickupModeLabel}, ${candidate.openingLabel}`}
                   className="w-full rounded-xl bg-white/85 p-2 text-left text-xs shadow-sm transition hover:bg-white"
                   key={candidate.store.slug}
                   onClick={() => focusStore(candidate.store)}
@@ -575,6 +647,7 @@ export function StoreMap({
             const score = chainIndexScore(store.brand || '');
             return (
               <button
+                aria-label={`Select ${store.name}. ${storeLocationLabel(store)}. ${chainIndexLabel(store)}. ${osmStoreOpeningHoursLabel(store)}.`}
                 aria-pressed={selected}
                 className={`w-full rounded-2xl border p-3 text-left transition ${
                   selected
