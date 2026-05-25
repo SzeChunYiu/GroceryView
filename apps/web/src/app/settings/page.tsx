@@ -3,7 +3,7 @@ import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { SettingsDataExportActions } from '@/components/settings-data-export-actions';
 import { DietaryProfileOnboarding } from '@/components/diet-filter-picker';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { groupPreferredBrandControls } from '@/lib/personalization';
+import { groupPreferredBrandControls, personalizationTransparencySignals } from '@/lib/personalization';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -42,6 +42,29 @@ export default function SettingsPage() {
       </p>
 
       <SettingsDataExportActions />
+
+      <Card className="mt-6 border-violet-200 bg-violet-50">
+        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-violet-800">Personalization transparency</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Recommendation signals and reset controls</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+              GroceryView recommendations use only explicit account, list, search, brand, and dietary signals. Use the controls above to clear local history or disable an entire signal category.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-violet-900">{personalizationTransparencySignals.length} signal categories</p>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2">
+          {personalizationTransparencySignals.map((signal) => (
+            <div className="rounded-2xl border border-violet-100 bg-white/85 p-4" key={signal.id}>
+              <p className="text-sm font-black text-slate-950">{signal.label}</p>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">Source: {signal.source}</p>
+              <p className="mt-2 text-sm font-semibold leading-6 text-violet-900">Use: {signal.recommendationUse}</p>
+              <p className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-violet-700">{signal.clearAction}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Personalization setup</p>

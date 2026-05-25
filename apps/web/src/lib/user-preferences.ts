@@ -3,6 +3,8 @@ export type DietaryProfilePreferences = {
   allergies: string[];
   diets: string[];
   avoidedIngredients: string[];
+  householdSize: number;
+  nutritionPriorities: string[];
   onboardingCompleted: boolean;
   updatedAt: string;
 };
@@ -14,6 +16,8 @@ export const DEFAULT_DIETARY_PROFILE_PREFERENCES: DietaryProfilePreferences = {
   allergies: [],
   diets: [],
   avoidedIngredients: [],
+  householdSize: 1,
+  nutritionPriorities: [],
   onboardingCompleted: false,
   updatedAt: 'static-snapshot'
 };
@@ -80,12 +84,21 @@ function normalizePreferenceList(values: readonly (string | null | undefined)[])
   return uniquePreferenceValues(values);
 }
 
+function normalizeHouseholdSize(value: unknown) {
+  const numericValue = typeof value === 'number' ? value : Number(value);
+  if (!Number.isFinite(numericValue)) return DEFAULT_DIETARY_PROFILE_PREFERENCES.householdSize;
+
+  return Math.min(12, Math.max(1, Math.round(numericValue)));
+}
+
 export function normalizeDietaryProfilePreferences(preferences: Partial<DietaryProfilePreferences> | null | undefined): DietaryProfilePreferences {
   return {
     userId: preferences?.userId?.trim() || DEFAULT_DIETARY_PROFILE_PREFERENCES.userId,
     allergies: normalizePreferenceList(preferences?.allergies ?? DEFAULT_DIETARY_PROFILE_PREFERENCES.allergies),
     diets: normalizePreferenceList(preferences?.diets ?? DEFAULT_DIETARY_PROFILE_PREFERENCES.diets),
     avoidedIngredients: normalizePreferenceList(preferences?.avoidedIngredients ?? DEFAULT_DIETARY_PROFILE_PREFERENCES.avoidedIngredients),
+    householdSize: normalizeHouseholdSize(preferences?.householdSize),
+    nutritionPriorities: normalizePreferenceList(preferences?.nutritionPriorities ?? DEFAULT_DIETARY_PROFILE_PREFERENCES.nutritionPriorities),
     onboardingCompleted: Boolean(preferences?.onboardingCompleted),
     updatedAt: preferences?.updatedAt || new Date().toISOString()
   };
