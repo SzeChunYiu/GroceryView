@@ -181,6 +181,7 @@ export * from './connectors/bonus-is.js';
 export * from './connectors/iceland-flyer-is.js';
 export * from './connectors/atlantsolia-is.js';
 export * from './connectors/apotek-gardabaer-is.js';
+export * from './connectors/apotekid-is.js';
 export * from './connectors/apoteket-se.js';
 export * from './connectors/okq8-fuel.js';
 export * from './connectors/ob-is.js';
