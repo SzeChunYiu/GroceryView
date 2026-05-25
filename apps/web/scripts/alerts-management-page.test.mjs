@@ -11,7 +11,6 @@ describe('price alert management page', () => {
     const page = await read('src/app/alerts/page.tsx');
     const item = await read('src/components/AlertListItem.tsx');
     const webStore = await read('src/app/api/alerts/store.ts');
-    const nav = await read('src/components/app-nav.tsx');
     const seo = await read('src/lib/seo.ts');
     const sitemap = await read('src/app/sitemap.ts');
     const apiRoutes = await read('../../apps/api/src/routes/alerts.ts');
@@ -30,7 +29,6 @@ describe('price alert management page', () => {
     assert.match(item, /Delete alert/);
     assert.match(webStore, /listPriceAlerts/);
     assert.match(webStore, /deletePriceAlert/);
-    assert.match(nav, /href: '\/alerts'/);
     assert.match(seo, /'\/alerts'/);
     assert.match(sitemap, /entry\('\/alerts'/);
     assert.match(apiRoutes, /webManagementPage: '\/alerts'/);

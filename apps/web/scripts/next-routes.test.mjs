@@ -41,6 +41,20 @@ async function fileExists(relative) {
 }
 
 describe('verified-data UI', () => {
+  it('ships the requested grouped desktop navigation without legacy personal-product links', async () => {
+    const nav = await read('src/components/app-nav.tsx');
+
+    assert.match(nav, /label: 'Markets'[\s\S]*label: 'Overview'[\s\S]*label: 'Chain index'[\s\S]*label: 'Categories'[\s\S]*label: 'Heatmap'[\s\S]*label: 'Screener'/);
+    assert.match(nav, /label: 'Products'[\s\S]*label: 'Browse'[\s\S]*label: 'Compare'/);
+    assert.match(nav, /label: 'Stores'[\s\S]*label: 'Map'[\s\S]*label: 'Stores'/);
+    assert.match(nav, /label: 'Personal'[\s\S]*label: 'Savings'[\s\S]*label: 'Watchlist'[\s\S]*label: 'Weekly basket'[\s\S]*label: 'Meal planner'/);
+    assert.match(nav, /aria-haspopup="true"/);
+    assert.match(nav, /group-focus-within:visible/);
+    assert.match(nav, /group-hover:visible/);
+    assert.match(nav, /from 'lucide-react'/);
+    assert.doesNotMatch(nav, /label: 'Compare items'|label: 'Alerts'|label: 'Favorites'|label: 'Favourites'|label: 'Shopping list'|label: 'Basket'/);
+  });
+
   it('keeps core routes backed by generated verified datasets', async () => {
     for (const file of appFiles) assert.ok((await read(file)).length > 0, `${file} should not be empty`);
     const verified = await read('src/lib/verified-data.ts');
@@ -369,7 +383,7 @@ describe('verified-data UI', () => {
     assert.match(page, /cheapestStoreName/);
     assert.match(page, /signed-in/i);
     assert.match(page, /No anonymous favorites/);
-    assert.match(nav, /href: '\/favorites'/);
+    assert.doesNotMatch(nav, /href: '\/favorites'/);
     assert.match(apiRoute, /favoritesRoutes/);
     assert.match(apiRoute, /users\/\{userId\}\/favorites/);
     assert.match(apiRoute, /sort: \['name', 'price'\]/);
@@ -857,7 +871,7 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(calculator, /localStorage|sessionStorage/);
 
     assert.match(seo, /'\/basket'/);
-    assert.match(nav, /href: '\/basket'/);
+    assert.doesNotMatch(nav, /href: '\/basket'/);
   });
 
   it('surfaces a budget stretch-krona basket optimizer using real basket strategy output', async () => {
@@ -2563,7 +2577,7 @@ ${seo}`;
     assert.match(apiCompare, /nutrition/);
     assert.match(apiCompare, /storePrices/);
     assert.match(apiCompare, /trendPoints/);
-    assert.match(nav, /href: '\/compare-items'/);
+    assert.doesNotMatch(nav, /href: '\/compare-items'/);
     assert.match(seo, /'\/compare-items'/);
     assert.match(sitemap, /entry\('\/compare-items'/);
   });

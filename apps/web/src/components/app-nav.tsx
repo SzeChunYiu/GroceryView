@@ -51,8 +51,7 @@ const navGroups: NavGroup[] = [
     icon: PackageSearch,
     items: [
       { href: '/products', label: 'Browse', icon: PackageSearch },
-      { href: '/compare', label: 'Compare', icon: Tags },
-      { href: '/compare-items', label: 'Compare items', icon: PackageSearch }
+      { href: '/compare', label: 'Compare', icon: Tags }
     ]
   },
   {
@@ -69,9 +68,6 @@ const navGroups: NavGroup[] = [
     items: [
       { href: '/savings-dashboard', label: 'Savings', icon: PiggyBank },
       { href: '/watchlist', label: 'Watchlist', icon: Heart },
-      { href: '/favorites', label: 'Favorites', icon: Heart },
-      { href: '/alerts', label: 'Alerts', icon: Tags },
-      { href: '/basket', label: 'Basket', icon: ShoppingBasket },
       { href: '/weekly-basket', label: 'Weekly basket', icon: ShoppingBasket },
       { href: '/meal-planner', label: 'Meal planner', icon: Utensils }
     ]
