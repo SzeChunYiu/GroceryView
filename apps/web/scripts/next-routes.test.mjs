@@ -311,6 +311,24 @@ describe('verified-data UI', () => {
     assert.match(server, /\/api\/settings\/account/);
   });
 
+  it('maps purchase history CSV imports into settings personalization and budget seeds', async () => {
+    const settings = await read('src/app/settings/page.tsx');
+    const bulkImport = await read('src/components/BulkImportDialog.tsx');
+    const recurringBasket = await read('src/lib/recurring-basket.ts');
+
+    assert.match(settings, /BulkImportDialog/);
+    assert.match(settings, /importMode="purchase-history"/);
+    assert.match(settings, /Import purchase history for recommendations and budgets/);
+    assert.match(bulkImport, /parsePurchaseHistoryCsv/);
+    assert.match(bulkImport, /buildPurchaseHistoryImportPreview/);
+    assert.match(bulkImport, /data-import-mode=\{importMode\}/);
+    assert.match(bulkImport, /Map purchase history/);
+    assert.match(recurringBasket, /PurchaseHistoryImportRow/);
+    assert.match(recurringBasket, /parsePurchaseHistoryCsv/);
+    assert.match(recurringBasket, /recommendationSeed/);
+    assert.match(recurringBasket, /budgetSeedLabel/);
+  });
+
 
 
   it('surfaces the bookmarklet import/export contract and static asset on the basket ideas route', async () => {
