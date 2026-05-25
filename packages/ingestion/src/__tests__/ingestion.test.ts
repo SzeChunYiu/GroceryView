@@ -5145,6 +5145,39 @@ describe('ingestRetailerProduct', () => {
     assert.equal(output.priceObservation.unitPrice, 39.9);
   });
 
+  it('classifies no-barcode loose bakery rows as commodity observations', () => {
+    const output = ingestRetailerProduct({
+      sourceType: 'retailer_online_page',
+      observedAt: '2026-05-22T10:00:00.000Z',
+      parserVersion: 'coop-bakery-v1',
+      rawSnapshotRef: 's3://groceryview-raw/coop/bakery-2026-05-22.json',
+      sourceRunId: 'source-run-2026-05-22',
+      chainId: 'coop',
+      storeId: 'coop-medborgarplatsen',
+      retailerProductId: 'coop-baguette-los',
+      rawName: 'Baguette lösbakat',
+      canonicalName: 'Baguette lösbakat',
+      productId: 'coop-baguette-los',
+      categoryId: 'brod-kakor',
+      packageSize: 1,
+      packageUnit: 'st',
+      price: 12.9,
+      sourceUrl: 'https://example.test/bakery/baguette',
+      soldByWeight: true,
+      variant: 'wheat',
+      isOrganic: false,
+      originCountry: 'SE'
+    });
+
+    assert.equal(output.product.productKind, 'commodity');
+    assert.equal(output.product.commodityId, 'baguette');
+    assert.equal(output.product.variant, 'wheat');
+    assert.equal(output.product.isOrganic, false);
+    assert.equal(output.product.originCountry, 'SE');
+    assert.equal(output.priceObservation.unitPrice, 12.9);
+    assert.equal(output.alias.matchConfidence, 0.68);
+  });
+
   it('maps raw sold-by-weight produce labels to produce class ids without raising match confidence', () => {
     const cases = [
       ['Kvisttomat lösvikt', 'tomatoes'],
