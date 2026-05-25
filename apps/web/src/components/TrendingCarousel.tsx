@@ -4,6 +4,7 @@ import type { TrendingProductPriceChange } from '@groceryview/db';
 import { buildBrandLeaderboardTrends, buildCitySearchTrends, buildCityTrendingItems, type CityTrendingItemFeed } from '@/lib/trends';
 import { BrandLeaderboardModule, TrendingSearchModule } from '@/app/page-sections/trending';
 import type { PersonalizedReorderItem } from '@/lib/personalization';
+import type { NewProductArrival } from '@/lib/new-arrivals';
 
 type PersonalizedTrendingProductPriceChange = TrendingProductPriceChange & {
   personalizationReason?: string;
@@ -60,6 +61,46 @@ function PersonalizedReorderRail({ items }: Readonly<{ items: PersonalizedReorde
   );
 }
 
+export function NewArrivalsCarousel({ items }: Readonly<{ items: NewProductArrival[] }>) {
+  if (items.length === 0) return null;
+
+  return (
+    <section className="mt-8 rounded-[1.75rem] border border-emerald-200 bg-emerald-50/70 p-5 shadow-sm" aria-label="New product arrivals">
+      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.24em] text-emerald-800">New arrivals</p>
+          <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Recently ingested products</h2>
+        </div>
+        <p className="max-w-2xl text-sm font-semibold leading-6 text-emerald-950">
+          Built from verified Axfood latest_prices rows and fresh OpenPrices observations so catalogue growth can be reviewed without synthetic products.
+        </p>
+      </div>
+      <div className="mt-5 flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory" data-new-arrivals-carousel>
+        {items.map((item) => (
+          <Link
+            className="min-w-[17rem] max-w-[17rem] snap-start rounded-2xl border border-emerald-100 bg-white p-4 transition hover:-translate-y-0.5 hover:border-emerald-700"
+            href={`/products/${item.slug}`}
+            key={`${item.slug}-${item.observedAt}`}
+          >
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{item.freshnessLabel}</p>
+            <h3 className="mt-2 line-clamp-2 text-lg font-black leading-6 text-slate-950">{item.name}</h3>
+            <p className="mt-1 line-clamp-1 text-sm font-semibold text-slate-600">{item.brand}</p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {item.badges.map((badge) => (
+                <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-900" key={badge}>{badge}</span>
+              ))}
+            </div>
+            <div className="mt-4 rounded-xl bg-slate-50 p-3 text-xs font-bold leading-5 text-slate-600">
+              <p className="text-slate-950">{item.sourceLabel}</p>
+              <p>{item.chainLabel} · {item.categoryLabel}</p>
+              <p>Observed {item.observedAt.slice(0, 10)}</p>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 function CityTrendingItemsRail({ feed }: Readonly<{ feed: CityTrendingItemFeed }>) {
   if (feed.cards.length === 0) return null;
