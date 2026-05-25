@@ -4,11 +4,19 @@
 - Store locator source: https://handla.ica.se/api/store/v1?groupby=citygroup&customerType=B2C
 - Store locator retrieved: 2026-05-23T00:16:08.083Z
 - Region ID: 6ae1c52a-99a8-4b19-9464-dd01274df39d
-- Real rows fetched: 93229
+- Real rows fetched in checked-in web wire: 87000
+- Full connector fetch rows before web curation: 93229
 - Stores fetched: 324
 - Connector: packages/ingestion/src/connectors/ica.ts
 - Web wire: apps/web/src/lib/ingested/ica.ts
 - Live verification: the latest expanded source URL returned HTTP 200 parseable public promotions JSON via `curl -A "GroceryView/0.1"` on 2026-05-24 Europe/Stockholm; the wired source row count is recorded below.
+
+## Member price flags
+
+- Regeneration pass: 2026-05-25, after the ICA connector member-price mapping landed.
+- `apps/web/src/lib/ingested/ica.ts` now carries `memberOnly?: boolean` on ICA rows. Rows whose public promotion description contains `Stammispris` are emitted with `memberOnly: true`; ordinary list-price and non-member promotion rows are left unflagged.
+- Flagged rows in the checked-in public promotions snapshot: 17,444. No rows or prices were fabricated; the flag is derived from the source promotion text already present on each ICA row.
+- Source provenance remains per-row: every flagged and ordinary row still carries its original `sourceUrl`, `retrievedAt`, store account, region, ordinary price, unit price, promo fields, and product detail URL.
 
 ## Source URLs
 
