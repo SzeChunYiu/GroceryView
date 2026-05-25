@@ -23,6 +23,7 @@ import {
 } from './generated/db-site-ingested-overrides';
 import { dbSiteHomepageTrendingPriceChanges } from './generated/db-site-trending-price-changes';
 import { categoryLabels, pricedProducts } from './openprices-products';
+import { classifyRecentPriceVariance } from './price-intelligence';
 import { allergenRiskBadgesForText } from './search-filters';
 import { osmStores } from './osm-stores';
 import {
@@ -673,6 +674,7 @@ function booleanSearchValue(value: SearchParamValue): boolean {
 function productSearchResultCards(searchResult: typeof rawFacetedProductSearch) {
   return searchResult.products.map((product) => {
     const cheapest = product.currentPrices[0] ?? null;
+    const volatilityBadge = classifyRecentPriceVariance(product.currentPrices);
     return {
       slug: product.slug,
       name: product.canonicalName,
@@ -688,6 +690,7 @@ function productSearchResultCards(searchResult: typeof rawFacetedProductSearch) 
       }) : unknownUnitPriceLabel,
       isAvailable: product.isAvailable,
       chainLabel: cheapest ? `${cheapest.chainName} · ${cheapest.priceType}` : 'Awaiting latest_prices row',
+      volatilityBadge,
       sourceTables: searchResult.evidence.sourceTables,
       allergenRiskBadges: allergenRiskBadgesForText([
         product.canonicalName,
