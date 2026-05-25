@@ -1,4 +1,5 @@
 import { siteUrl } from '@/lib/seo';
+import { categoryLabels, pricedProducts, type PricedProduct } from '@/lib/openprices-products';
 
 export type GroceryIndexTickerWidget = {
   route: '/widgets/grocery-index-ticker';
@@ -17,3 +18,63 @@ export function buildGroceryIndexTickerWidget(sourceConfidence: Record<'high' | 
 }
 
 export const groceryIndexTickerWidget = buildGroceryIndexTickerWidget({ high: 0, medium: 0, low: 0 });
+
+export type CategoryShelfProduct = {
+  slug: string;
+  name: string;
+  brand: string;
+  price: number;
+  metric: string;
+};
+
+export type CategoryTrendingShelf = {
+  slug: string;
+  label: string;
+  fastRising: CategoryShelfProduct[];
+  newlyDiscounted: CategoryShelfProduct[];
+  stableLowPriceStaples: CategoryShelfProduct[];
+};
+
+function latestPair(product: PricedProduct) {
+  const observations = [...product.observations].sort((left, right) => right.date.localeCompare(left.date));
+  const latest = observations[0];
+  const previousDifferent = observations.slice(1).find((observation) => observation.price !== latest?.price);
+  if (!latest || !previousDifferent) return null;
+  return { latest, previousDifferent };
+}
+
+function shelfProduct(product: PricedProduct, metric: string): CategoryShelfProduct {
+  return {
+    slug: product.slug,
+    name: product.name,
+    brand: product.brands || 'Verified product',
+    price: product.priceMedian,
+    metric
+  };
+}
+
+export function buildCategoryTrendingShelves(limit = 6): CategoryTrendingShelf[] {
+  return Object.entries(categoryLabels)
+    .map(([slug, label]) => {
+      const products = pricedProducts.filter((product) => product.category === slug);
+      const fastRising = [...products]
+        .sort((left, right) => right.observationCount - left.observationCount || right.lastObservedAt.localeCompare(left.lastObservedAt))
+        .slice(0, 3)
+        .map((product) => shelfProduct(product, `${product.observationCount} observed prices`));
+      const newlyDiscounted = products
+        .map((product) => ({ product, pair: latestPair(product) }))
+        .filter((row): row is { product: PricedProduct; pair: NonNullable<ReturnType<typeof latestPair>> } => Boolean(row.pair && row.pair.latest.price < row.pair.previousDifferent.price))
+        .sort((left, right) => (right.pair.previousDifferent.price - right.pair.latest.price) - (left.pair.previousDifferent.price - left.pair.latest.price))
+        .slice(0, 3)
+        .map(({ product, pair }) => shelfProduct(product, `down ${(pair.previousDifferent.price - pair.latest.price).toFixed(2)} kr since ${pair.previousDifferent.date}`));
+      const stableLowPriceStaples = [...products]
+        .filter((product) => product.observationCount >= 4 && product.priceMedian <= product.priceMin * 1.08)
+        .sort((left, right) => left.priceMedian - right.priceMedian || right.observationCount - left.observationCount)
+        .slice(0, 3)
+        .map((product) => shelfProduct(product, `${product.observationCount} checks near the low`));
+
+      return { slug, label, fastRising, newlyDiscounted, stableLowPriceStaples };
+    })
+    .filter((shelf) => shelf.fastRising.length > 0 || shelf.newlyDiscounted.length > 0 || shelf.stableLowPriceStaples.length > 0)
+    .slice(0, limit);
+}

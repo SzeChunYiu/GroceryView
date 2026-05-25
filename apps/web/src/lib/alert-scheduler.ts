@@ -29,6 +29,12 @@ export type PredictiveDropAlert = {
   };
 };
 
+export type AlertExplanationTimelineStep = {
+  label: string;
+  detail: string;
+  kind: 'source_price' | 'threshold' | 'prediction';
+};
+
 type PredictiveDropAlertOptions = {
   now?: Date;
   daysAhead?: number;
@@ -96,6 +102,41 @@ export function buildPredictiveDropAlerts(forecasts: PredictiveDropForecast[], o
       },
     }));
 }
+
+export function buildAlertExplanationTimeline({
+  productName,
+  currentPriceText,
+  lowestChain,
+  targetPriceText,
+  lastObservedAt,
+  predictionSource = 'No prediction model input attached'
+}: {
+  productName: string;
+  currentPriceText: string;
+  lowestChain: string;
+  targetPriceText: string;
+  lastObservedAt?: string;
+  predictionSource?: string;
+}): AlertExplanationTimelineStep[] {
+  return [
+    {
+      kind: 'source_price',
+      label: 'Source price checked',
+      detail: `${lowestChain} current price for ${productName}: ${currentPriceText}${lastObservedAt ? ` observed ${lastObservedAt}` : ''}.`
+    },
+    {
+      kind: 'threshold',
+      label: 'Threshold compared',
+      detail: `Alert target is ${targetPriceText}; the alert fires only when verified price evidence is at or below this threshold.`
+    },
+    {
+      kind: 'prediction',
+      label: 'Prediction inputs',
+      detail: predictionSource
+    }
+  ];
+}
+
 
 export const samplePredictiveDropForecasts: PredictiveDropForecast[] = [
   {
