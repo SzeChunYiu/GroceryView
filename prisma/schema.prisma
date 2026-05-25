@@ -30,6 +30,8 @@ model Product {
   nameSv         String?  @map("name_sv")
   nameEn         String?  @map("name_en")
   brand          String?
+  brandId        String?  @map("brand_id") @db.Uuid
+  brandRecord    Brand?   @relation(fields: [brandId], references: [id], onDelete: SetNull)
   categoryPath   String[] @default([]) @map("category_path")
   comparableUnit String   @map("comparable_unit")
   imageUrl       String?  @map("image_url")
@@ -41,10 +43,23 @@ model Product {
   updatedAt      DateTime @updatedAt @map("updated_at")
 
   @@index([deletedAt])
+  @@index([brandId])
   @@index([isVegan])
   @@index([isGlutenFree])
   @@index([isLactoseFree])
   @@map("products")
+}
+
+model Brand {
+  id        String    @id @default(uuid()) @db.Uuid
+  name      String
+  slug      String    @unique
+  logoUrl   String?   @map("logo_url")
+  products  Product[]
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@map("brands")
 }
 
 model UserStoreLoyaltyCard {
