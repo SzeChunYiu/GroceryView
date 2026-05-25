@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { buildPremiumSavingsForecast } from '@/lib/price-intelligence';
 
 type BillingStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'redirecting' | 'error';
 type BrowserSession = { accessToken: string; userId: string };
@@ -16,11 +17,7 @@ type SubscriptionAccessResponse = {
 type CheckoutSessionResponse = { checkoutUrl?: string; plan?: string };
 type PortalSessionResponse = { portalUrl?: string };
 
-const premiumSavingsForecast = [
-  { label: 'Alerts', amount: '42 kr', detail: 'watchlist drops and wait-window alerts' },
-  { label: 'Swaps', amount: '58 kr', detail: 'verified chain substitutions' },
-  { label: 'Basket planning', amount: '33 kr', detail: 'duplicate-buy and pantry timing guidance' }
-];
+const premiumSavingsForecast = buildPremiumSavingsForecast();
 
 function readSession(): BrowserSession {
   const accessToken = sessionStorage.getItem('groceryview:accessToken') || '';
@@ -162,16 +159,16 @@ export function AccountBillingActions() {
           <div>
             <p className="text-sm font-black text-violet-950">Premium savings forecast</p>
             <p className="mt-2 text-sm font-semibold leading-6 text-violet-950">
-              Forecasted monthly savings stay premium-only and combine observed alerts, historical swaps, and basket-planning source rows after subscription access is loaded.
+              Forecasted monthly savings of {premiumSavingsForecast.monthlySavingsLabel} stay premium-only and combine observed alerts, historical swaps, and basket-planning source rows after subscription access is loaded.
             </p>
           </div>
           <p className="rounded-full bg-white px-3 py-1 text-sm font-black text-violet-800">{forecastUnlocked ? 'Unlocked' : 'Locked'}</p>
         </div>
         <div className="mt-3 grid gap-3 md:grid-cols-3">
-          {premiumSavingsForecast.map((driver) => (
+          {premiumSavingsForecast.drivers.map((driver) => (
             <div className="rounded-2xl bg-white p-3" key={driver.label}>
               <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{driver.label}</p>
-              <p className="mt-1 text-2xl font-black text-violet-800">{driver.amount}</p>
+              <p className="mt-1 text-2xl font-black text-violet-800">{driver.amountLabel}</p>
               <p className="mt-1 text-xs font-semibold leading-5 text-slate-600">{driver.detail}</p>
             </div>
           ))}

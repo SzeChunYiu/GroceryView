@@ -6,11 +6,13 @@ import { CheckableListItem } from '@/components/CheckableListItem';
 import { AppNav } from '@/components/app-nav';
 import { BottomNav } from '@/components/bottom-nav';
 import { BulkImportDialog } from '@/components/BulkImportDialog';
+import { PublicSharePreviewCard } from '@/components/list-card';
 import { PullRefreshWrapper } from '@/components/PullRefreshWrapper';
 import { PrintButton } from '@/components/PrintButton';
 import { useList, type ShoppingListItem } from '@/hooks/useList';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { cheapestSourceForProductSlug } from '@/lib/shopping-list-prices';
+import { createPublicListSharePreview } from '@/lib/social';
 
 const OFFLINE_SHOPPING_LIST_CACHE_KEY = 'groceryview:shopping-list:offline-cache:v1';
 
@@ -71,6 +73,7 @@ export function ListSharePreview() {
   const [offlineCacheStatus, setOfflineCacheStatus] = useState('Offline copy is prepared after the list loads.');
   const [shareStatus, setShareStatus] = useState('Create a read-only shopping list link after your basket is ready.');
   const progress = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
+  const publicSharePreview = useMemo(() => createPublicListSharePreview(items), [items]);
   const offlineShoppingListSnapshot = useMemo(() => {
     const lastKnownPrices = items
       .map((item) => item.matchedProductSlug ? cheapestSourceForProductSlug(item.matchedProductSlug) : null)
@@ -176,6 +179,9 @@ export function ListSharePreview() {
             ) : null}
           </div>
           <ShareMetadataPreview items={items} shareUrl={generatedShareUrl || (shareLink?.isValid ? shareLink.token : '')} />
+          <div className="mt-3" data-print-hidden="true">
+            <PublicSharePreviewCard preview={publicSharePreview} />
+          </div>
 
           <div data-print-hidden="true"><BulkImportDialog onImportItems={addImportedItems} /></div>
 

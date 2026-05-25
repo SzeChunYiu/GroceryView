@@ -11,6 +11,7 @@ type BeforeInstallPromptEvent = Event & {
 type Platform = 'android' | 'desktop' | 'ios';
 
 const dismissedKey = 'groceryview:pwa-install-dismissed';
+const educationDismissedKey = 'groceryview:pwa-install-education-dismissed';
 
 function getPlatform(userAgent: string): Platform {
   if (/iphone|ipad|ipod/i.test(userAgent)) return 'ios';
@@ -30,6 +31,51 @@ function stepsFor(platform: Platform, canInstall: boolean) {
   if (platform === 'ios') return 'On iPhone or iPad: tap Share, then Add to Home Screen.';
   if (platform === 'android') return 'On Android: open the browser menu, then tap Install app or Add to Home screen.';
   return 'On desktop: use your browser install button or menu to add GroceryView as an app.';
+}
+
+export function PwaInstallEducationCard() {
+  const [dismissed, setDismissed] = useState(true);
+  const [platform, setPlatform] = useState<Platform>('desktop');
+  const [ready, setReady] = useState(false);
+  const [standalone, setStandalone] = useState(true);
+
+  useEffect(() => {
+    setPlatform(getPlatform(window.navigator.userAgent));
+    setStandalone(isStandalone());
+    setDismissed(window.localStorage.getItem(educationDismissedKey) === 'true');
+    setReady(true);
+  }, []);
+
+  function dismissEducation() {
+    window.localStorage.setItem(educationDismissedKey, 'true');
+    setDismissed(true);
+  }
+
+  if (!ready || standalone || dismissed) return null;
+
+  return (
+    <aside className="mx-auto my-6 max-w-5xl rounded-3xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm" aria-label="Home screen install education">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Install GroceryView</p>
+          <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Add GroceryView to your home screen</h2>
+          <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">{stepsFor(platform, false)}</p>
+        </div>
+        <button
+          className="rounded-full border border-emerald-200 bg-white px-3 py-1.5 text-xs font-black text-emerald-900 hover:border-emerald-400"
+          onClick={dismissEducation}
+          type="button"
+        >
+          Dismiss
+        </button>
+      </div>
+      <ul className="mt-4 grid gap-3 text-sm font-bold text-emerald-950 sm:grid-cols-3">
+        <li className="rounded-2xl bg-white p-3">One-tap access before weekly shopping runs.</li>
+        <li className="rounded-2xl bg-white p-3">Offline shopping-list check-off while in store aisles.</li>
+        <li className="rounded-2xl bg-white p-3">Cached product and store details when reception is weak.</li>
+      </ul>
+    </aside>
+  );
 }
 
 export function PwaInstall() {
