@@ -24,7 +24,9 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
         </p>
       </section>
       <RecentSearchReplayPills />
-      <ProductsPage searchParams={Promise.resolve(resolvedSearchParams)} />
+      <section aria-label="Search results with virtualized product rendering">
+        <ProductsPage searchParams={Promise.resolve(resolvedSearchParams)} />
+      </section>
     </>
   );
 }

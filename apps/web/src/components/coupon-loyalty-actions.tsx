@@ -38,6 +38,15 @@ export function CouponLoyaltyActions() {
   const [loyalty, setLoyalty] = useState<LoyaltyOfferResponse | null>(null);
   const [subscriptionAccess, setSubscriptionAccess] = useState<SubscriptionAccessResponse | null>(null);
   const stackReadyOffers = loyalty?.offers?.filter(isReadyForBasketStack) ?? [];
+  const basketOptimizerInputs = stackReadyOffers.map((offer) => ({
+    key: `${offer.chain}-${offer.productId}`,
+    chain: offer.chain ?? 'chain',
+    productId: offer.productId ?? 'product',
+    savings: offer.savings ?? 0,
+    recommendation: offer.combinable === false
+      ? 'Compare as an exclusive substitute against the regular item price.'
+      : 'Combine with unit-price substitutions and other stackable offers.'
+  }));
 
   function requireSession(): BrowserSession | null {
     const session = readSession();
@@ -107,6 +116,22 @@ export function CouponLoyaltyActions() {
           <p className="mt-2 text-3xl font-black text-amber-800">{stackReadyOffers.length}</p>
           <p className="mt-2 text-sm leading-6 text-slate-600">Offers with product, chain, clipped coupon, and membership gates satisfied can feed the basket builder cheapest-stack comparison.</p>
         </div>
+      </div>
+      <div className="mt-4 rounded-2xl border border-lime-100 bg-lime-50 p-4">
+        <p className="text-sm font-black text-slate-950">Coupon-aware basket optimizer handoff</p>
+        {basketOptimizerInputs.length > 0 ? (
+          <ul className="mt-3 grid gap-2 lg:grid-cols-2">
+            {basketOptimizerInputs.slice(0, 4).map((input) => (
+              <li className="rounded-2xl bg-white p-3 text-sm font-semibold text-lime-950" key={input.key}>
+                {input.chain} · {input.productId}: {input.savings} kr eligible savings. {input.recommendation}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-2 text-sm font-semibold leading-6 text-lime-950">
+            No offer is handed to the basket optimizer until product, chain, coupon clipping, and membership eligibility are all verified.
+          </p>
+        )}
       </div>
       <div className="mt-4 rounded-2xl border border-amber-100 bg-amber-50 p-4">
         <p className="text-sm font-black text-slate-950">Price matrix comparison modes</p>

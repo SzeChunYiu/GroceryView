@@ -710,6 +710,15 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(moderation, /@\/lib\/demo-data|@\/components\/sample-data/);
   });
 
+  it('links admin source health to ingestion runs without public nav clutter', async () => {
+    const sources = await read('src/app/admin/sources/page.tsx');
+    const nav = await read('src/components/app-nav.tsx');
+
+    assert.match(sources, /href="\/admin\/ingestion-runs"/);
+    assert.match(sources, /View ingestion runs/);
+    assert.doesNotMatch(nav, /\/admin\/ingestion-runs/);
+  });
+
 
   it('surfaces crowd price submissions with photo evidence and trust guardrails', async () => {
     const verified = await read('src/lib/verified-data.ts');

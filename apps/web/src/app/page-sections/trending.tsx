@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { ArrowDownRight, BadgeCheck, BarChart3, Clock3, ListPlus, MapPin, Search, TrendingUp } from 'lucide-react';
-import { buildPriceDropDiscoveryRail } from '@/lib/price-events';
+import { buildPriceDropDiscoveryRail, buildTrendingItemDetailCards } from '@/lib/price-events';
 import { buildCityPriceDropTrends, type BrandLeaderboardTrendFeed, type CityPriceDropTrend, type CitySearchTrendFeed } from '@/lib/trends';
 import { categoryLabels, pricedProducts } from '@/lib/openprices-products';
 import type { CategoryTrendingShelf } from '@/lib/grocery-index-widget';
@@ -31,13 +31,16 @@ function confidenceClass(card: CityPriceDropTrend) {
   return 'bg-amber-100 text-amber-950';
 }
 
-const discoveryRailItems = buildPriceDropDiscoveryRail(pricedProducts.map((product) => ({
+const priceEventProducts = pricedProducts.map((product) => ({
   slug: product.slug,
   name: product.name,
   brand: product.brands,
   category: categoryLabels[product.category] ?? product.category,
   observations: product.observations
-})), 6);
+}));
+
+const discoveryRailItems = buildPriceDropDiscoveryRail(priceEventProducts, 6);
+const trendingItemDetailCards = buildTrendingItemDetailCards(priceEventProducts, 4, 'Stockholm');
 
 export function PriceDropDiscoveryRail() {
   if (discoveryRailItems.length === 0) return null;
@@ -55,6 +58,28 @@ export function PriceDropDiscoveryRail() {
           </p>
         </div>
         <div className="mt-4 flex gap-3 overflow-x-auto pb-2" data-price-drop-discovery-track>
+          {trendingItemDetailCards.map((item) => (
+            <Link
+              className="min-w-[17rem] rounded-2xl border border-cyan-200 bg-cyan-50 p-4 transition hover:-translate-y-0.5 hover:border-cyan-700"
+              data-trending-item-detail-card={item.rank}
+              href={`/products/${item.productSlug}`}
+              key={`detail-${item.productSlug}`}
+            >
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">#{item.rank} · {item.city}</p>
+              <h3 className="mt-2 line-clamp-2 text-lg font-black leading-6 text-slate-950">{item.productName}</h3>
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <div className="rounded-xl bg-white p-3">
+                  <p className="text-xs font-bold text-slate-500">Chain</p>
+                  <p className="mt-1 text-sm font-black text-slate-950">{item.chain}</p>
+                </div>
+                <div className="rounded-xl bg-white p-3">
+                  <p className="text-xs font-bold text-slate-500">WoW move</p>
+                  <p className="mt-1 text-sm font-black text-emerald-800">{formatPercent(Math.abs(item.weekOverWeekChangePercent))} down</p>
+                </div>
+              </div>
+              <p className="mt-3 text-xs font-semibold leading-5 text-slate-600">{item.explanation}</p>
+            </Link>
+          ))}
           {discoveryRailItems.map((item) => (
             <Link
               className="min-w-[17rem] rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:-translate-y-0.5 hover:border-emerald-700"

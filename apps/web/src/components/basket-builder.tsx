@@ -32,6 +32,10 @@ export type BasketBuilderProduct = {
   chainPrices?: BasketChainPrice[];
   dealStackOffers?: BasketStackOffer[];
   dietaryTags?: readonly string[];
+  lastPurchasedAt?: string;
+  purchaseCount?: number;
+  shortcutLabel?: string;
+  suggestedQuantity?: number;
 };
 
 export function addBasketBuilderProduct<T extends BasketBuilderProduct>(
@@ -47,12 +51,14 @@ export function addBasketBuilderProduct<T extends BasketBuilderProduct>(
 
 export type BasketBuilderProps<T extends BasketBuilderProduct> = {
   products: readonly T[];
+  pastPurchaseShortcuts?: readonly T[];
   selectedDietaryFilters?: readonly string[];
   onSelectedDietaryFiltersChange?: (filters: string[]) => void;
 };
 
 export function BasketBuilder<T extends BasketBuilderProduct>({
   products,
+  pastPurchaseShortcuts = [],
   selectedDietaryFilters,
   onSelectedDietaryFiltersChange,
 }: BasketBuilderProps<T>) {
@@ -120,6 +126,21 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
 
   return (
     <section aria-label="Basket builder">
+      {pastPurchaseShortcuts.length > 0 ? (
+        <section aria-label="Past purchase shortcuts">
+          <h3>Past purchase shortcuts</h3>
+          <p>Frequently purchased staples can be added with one tap before you build the rest of the basket.</p>
+          <div>
+            {pastPurchaseShortcuts.map((product) => (
+              <button key={`shortcut-${product.id}`} type="button" onClick={() => add(product)}>
+                Add {product.name}
+                {product.shortcutLabel ? ` · ${product.shortcutLabel}` : ''}
+              </button>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
       {availableDietaryTags.length > 0 ? (
         <fieldset aria-label="Dietary filters">
           <legend>Dietary filters</legend>

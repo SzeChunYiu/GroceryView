@@ -171,6 +171,31 @@ type LandingShortcutInput = {
   categorySlug?: string;
 };
 
+export type ReorderProductInput = {
+  slug: string;
+  name: string;
+  brand: string;
+  totalPriceLabel: string;
+  unitPriceLabel: string;
+  packageLabel: string;
+  sourceLabel: string;
+};
+
+export type ReorderProductSignal = {
+  productSlug: string;
+  watchedCount: number;
+  favoriteSaves: number;
+  repeatPurchases: number;
+  lastActionLabel: string;
+};
+
+export type PersonalizedReorderItem = ReorderProductInput & {
+  reorderScore: number;
+  reorderReason: string;
+  signalSummary: string;
+  lastActionLabel: string;
+};
+
 type RecommendationProductInput = {
   slug: string;
   name: string;
@@ -185,6 +210,11 @@ export type PersonalizedRecommendation = RecommendationProductInput & {
 };
 
 const conversionWeight = 4;
+const reorderWeights = {
+  watchedCount: 2,
+  favoriteSaves: 8,
+  repeatPurchases: 12,
+};
 const demoHistoryWeights = [
   { clicks: 12, conversions: 4 },
   { clicks: 18, conversions: 7 },
@@ -195,6 +225,31 @@ const demoHistoryWeights = [
   { clicks: 4, conversions: 1 },
   { clicks: 2, conversions: 1 },
 ];
+const demoReorderSignals: ReorderProductSignal[] = [
+  { productSlug: 'milk', watchedCount: 6, favoriteSaves: 2, repeatPurchases: 5, lastActionLabel: 'bought again last week' },
+  { productSlug: 'bread', watchedCount: 5, favoriteSaves: 3, repeatPurchases: 3, lastActionLabel: 'saved as breakfast staple' },
+  { productSlug: 'banana', watchedCount: 8, favoriteSaves: 1, repeatPurchases: 2, lastActionLabel: 'watched for price drops' },
+  { productSlug: 'coffee', watchedCount: 4, favoriteSaves: 2, repeatPurchases: 2, lastActionLabel: 'favorite pantry refill' },
+];
+
+function reorderSignalScore(signal: Pick<ReorderProductSignal, 'favoriteSaves' | 'repeatPurchases' | 'watchedCount'>) {
+  return (
+    signal.watchedCount * reorderWeights.watchedCount
+    + signal.favoriteSaves * reorderWeights.favoriteSaves
+    + signal.repeatPurchases * reorderWeights.repeatPurchases
+  );
+}
+
+function fallbackReorderSignal(index: number): ReorderProductSignal | null {
+  const signal = demoReorderSignals[index];
+  return signal ? { ...signal, productSlug: '' } : null;
+}
+
+function signalMatchesProduct(productSlug: string, signalSlug: string) {
+  const normalizedProductSlug = productSlug.toLocaleLowerCase('sv-SE');
+  const normalizedSignalSlug = signalSlug.toLocaleLowerCase('sv-SE');
+  return normalizedProductSlug === normalizedSignalSlug || normalizedProductSlug.includes(normalizedSignalSlug);
+}
 
 export function buildDemoHouseholdCategorySignals<T extends CategoryRankInput>(
   categories: readonly T[],
@@ -243,6 +298,36 @@ export function rankLandingShortcuts<T extends LandingShortcutInput>(
     })
     .sort((a, b) => b.score - a.score || a.index - b.index)
     .map(({ shortcut }) => shortcut);
+}
+
+export function buildPersonalizedReorderRail<T extends ReorderProductInput>(
+  products: readonly T[],
+  {
+    limit = 4,
+    signals = demoReorderSignals,
+  }: { limit?: number; signals?: readonly ReorderProductSignal[] } = {},
+): PersonalizedReorderItem[] {
+  return products
+    .map((product, index) => {
+      const signal = signals.find((entry) => signalMatchesProduct(product.slug, entry.productSlug)) ?? fallbackReorderSignal(index);
+      if (!signal) return null;
+
+      const reorderScore = reorderSignalScore(signal);
+      return {
+        ...product,
+        reorderScore,
+        reorderReason: signal.repeatPurchases > 0
+          ? 'Buy again candidate'
+          : signal.favoriteSaves > 0
+            ? 'Favorite staple'
+            : 'Watched product',
+        signalSummary: `${signal.repeatPurchases} reorders · ${signal.favoriteSaves} favorites · ${signal.watchedCount} watches`,
+        lastActionLabel: signal.lastActionLabel,
+      };
+    })
+    .filter((item): item is PersonalizedReorderItem => item !== null)
+    .sort((left, right) => right.reorderScore - left.reorderScore || left.name.localeCompare(right.name, 'sv-SE'))
+    .slice(0, limit);
 }
 
 export function buildPersonalizedRecommendationRail<T extends RecommendationProductInput>(
