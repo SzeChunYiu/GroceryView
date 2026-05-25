@@ -45,6 +45,7 @@ ${outcomeRow('Install dependencies', env('INSTALL_OUTCOME'))}
 ${outcomeRow('Tests', env('TEST_OUTCOME'))}
 ${outcomeRow('Build workspaces', env('BUILD_OUTCOME'))}
 ${outcomeRow('Next profile bundle budget', env('PROFILE_BUNDLE_OUTCOME'))}
+${outcomeRow('Web bundle PR summary', env('BUNDLE_PR_SUMMARY_OUTCOME'))}
 ${outcomeRow('Lighthouse performance budget', env('LIGHTHOUSE_OUTCOME'))}
 ${outcomeRow('Typecheck', env('TYPECHECK_OUTCOME'))}
 ${outcomeRow('Overall job status at report time', env('JOB_STATUS'))}

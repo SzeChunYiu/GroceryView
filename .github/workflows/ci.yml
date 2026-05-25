@@ -63,6 +63,9 @@ jobs:
       - name: Next profile bundle budget
         id: profile_bundle
         run: npm run perf:bundle:profile -w @groceryview/web
+      - name: Web bundle PR summary
+        id: bundle_pr_summary
+        run: npm run perf:bundle:pr-summary -w @groceryview/web
       - name: Lighthouse performance budget
         id: lighthouse_budget
         run: npm run perf:lighthouse:ci -w @groceryview/web
@@ -76,6 +79,7 @@ jobs:
           TEST_OUTCOME: ${{ steps.tests.outcome }}
           BUILD_OUTCOME: ${{ steps.build.outcome }}
           PROFILE_BUNDLE_OUTCOME: ${{ steps.profile_bundle.outcome }}
+          BUNDLE_PR_SUMMARY_OUTCOME: ${{ steps.bundle_pr_summary.outcome }}
           LIGHTHOUSE_OUTCOME: ${{ steps.lighthouse_budget.outcome }}
           TYPECHECK_OUTCOME: ${{ steps.typecheck.outcome }}
           JOB_STATUS: ${{ job.status }}
