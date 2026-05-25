@@ -4536,6 +4536,35 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
                   ) as input_rank
            from input
          ),
+         latest_prior as (
+           select distinct on (ranked_input.ordinal)
+                  ranked_input.ordinal,
+                  observations.id,
+                  observations.product_id,
+                  observations.chain_id,
+                  observations.store_id,
+                  observations.domain,
+                  observations.price_type,
+                  observations.price,
+                  observations.regular_price,
+                  observations.unit_price,
+                  observations.currency,
+                  observations.is_available,
+                  observations.observed_at,
+                  observations.valid_from,
+                  observations.valid_until,
+                  observations.confidence,
+                  observations.provenance
+           from ranked_input
+           join observations on observations.product_id = ranked_input.product_id
+             and observations.chain_id = ranked_input.chain_id
+             and observations.store_id is not distinct from ranked_input.store_id
+             and observations.domain = ranked_input.domain
+             and observations.price_type = ranked_input.price_type
+             and observations.observed_at <= ranked_input.observed_at
+           where ranked_input.input_rank = 1
+           order by ranked_input.ordinal, observations.observed_at desc, observations.created_at desc, observations.id desc
+         ),
          existing as (
            select distinct on (ranked_input.ordinal)
                   ranked_input.ordinal,
@@ -4568,6 +4597,30 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              and observations.confidence = ranked_input.confidence
              and observations.provenance = ranked_input.provenance
            order by ranked_input.ordinal, observations.created_at, observations.id
+         ),
+         change_input as (
+           select ranked_input.*
+           from ranked_input
+           left join latest_prior on latest_prior.ordinal = ranked_input.ordinal
+           where ranked_input.input_rank = 1
+             and (
+               latest_prior.id is null
+               or latest_prior.price is distinct from ranked_input.price
+               or latest_prior.unit_price is distinct from ranked_input.unit_price
+               or latest_prior.currency is distinct from ranked_input.currency
+               or latest_prior.is_available is distinct from ranked_input.is_available
+               or latest_prior.regular_price is distinct from ranked_input.regular_price
+             )
+         ),
+         closed_prior as (
+           update observations
+           set valid_until = change_input.observed_at
+           from change_input
+           join latest_prior on latest_prior.ordinal = change_input.ordinal
+           where observations.id = latest_prior.id
+             and observations.observed_at < change_input.observed_at
+             and (observations.valid_until is null or observations.valid_until > change_input.observed_at)
+           returning observations.id
          ),
          inserted as (
            insert into observations(
@@ -4621,16 +4674,16 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              member_required,
              is_available,
              observed_at,
-             valid_from,
+             coalesce(valid_from, observed_at),
              valid_until,
              confidence,
              provenance
-           from ranked_input
+           from change_input
            where input_rank = 1
              and not exists (
                select 1
                from existing
-               where existing.ordinal = ranked_input.ordinal
+               where existing.ordinal = change_input.ordinal
              )
            on conflict (
              product_id,
@@ -4651,22 +4704,23 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
          ),
          written as (
            select ranked_input.ordinal,
-                  coalesce(inserted.id, existing.id) as id,
-                  coalesce(inserted.product_id, existing.product_id) as product_id,
-                  coalesce(inserted.chain_id, existing.chain_id) as chain_id,
-                  coalesce(inserted.store_id, existing.store_id) as store_id,
-                  coalesce(inserted.domain, existing.domain) as domain,
-                  coalesce(inserted.price_type, existing.price_type) as price_type,
-                  coalesce(inserted.price, existing.price) as price,
-                  coalesce(inserted.regular_price, existing.regular_price) as regular_price,
-                  coalesce(inserted.unit_price, existing.unit_price) as unit_price,
-                  coalesce(inserted.currency, existing.currency) as currency,
-                  coalesce(inserted.is_available, existing.is_available) as is_available,
-                  coalesce(inserted.observed_at, existing.observed_at) as observed_at,
-                  coalesce(inserted.confidence, existing.confidence) as confidence,
-                  coalesce(inserted.provenance, existing.provenance) as provenance
+                  coalesce(inserted.id, existing.id, latest_prior.id) as id,
+                  coalesce(inserted.product_id, existing.product_id, latest_prior.product_id) as product_id,
+                  coalesce(inserted.chain_id, existing.chain_id, latest_prior.chain_id) as chain_id,
+                  coalesce(inserted.store_id, existing.store_id, latest_prior.store_id) as store_id,
+                  coalesce(inserted.domain, existing.domain, latest_prior.domain) as domain,
+                  coalesce(inserted.price_type, existing.price_type, latest_prior.price_type) as price_type,
+                  coalesce(inserted.price, existing.price, latest_prior.price) as price,
+                  coalesce(inserted.regular_price, existing.regular_price, latest_prior.regular_price) as regular_price,
+                  coalesce(inserted.unit_price, existing.unit_price, latest_prior.unit_price) as unit_price,
+                  coalesce(inserted.currency, existing.currency, latest_prior.currency) as currency,
+                  coalesce(inserted.is_available, existing.is_available, latest_prior.is_available) as is_available,
+                  coalesce(inserted.observed_at, existing.observed_at, latest_prior.observed_at) as observed_at,
+                  coalesce(inserted.confidence, existing.confidence, latest_prior.confidence) as confidence,
+                  coalesce(inserted.provenance, existing.provenance, latest_prior.provenance) as provenance
            from ranked_input
            left join existing on existing.ordinal = ranked_input.ordinal
+           left join latest_prior on latest_prior.ordinal = ranked_input.ordinal
            left join inserted on inserted.product_id = ranked_input.product_id
              and inserted.chain_id = ranked_input.chain_id
              and inserted.store_id is not distinct from ranked_input.store_id
@@ -4680,7 +4734,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              and inserted.is_available = ranked_input.is_available
              and inserted.confidence = ranked_input.confidence
              and inserted.provenance = ranked_input.provenance
-           where inserted.id is not null or existing.id is not null
+           where inserted.id is not null or existing.id is not null or latest_prior.id is not null
          ),
          latest_upsert as (
            insert into latest_prices(
