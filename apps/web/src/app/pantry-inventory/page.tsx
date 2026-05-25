@@ -4,7 +4,7 @@ import { useMemo, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { AppNav } from '@/components/app-nav';
 import { BottomNav } from '@/components/bottom-nav';
-import { buildExpiryReminder, type PantryExpiryUrgency } from '@/lib/pantry';
+import { buildExpiryReminder, buildMarkdownSuggestion, type PantryExpiryUrgency } from '@/lib/pantry';
 
 type PantryStatus = 'stocked' | 'consumed' | 'low' | 'replenished';
 
@@ -53,10 +53,15 @@ function Card({ children, className = '' }: Readonly<{ children: ReactNode; clas
 
 export default function PantryInventoryPage() {
   const [items, setItems] = useState(initialPantryItems);
-  const itemsWithExpiry = useMemo(() => items.map((item) => ({
-    ...item,
-    expiryReminder: buildExpiryReminder({ daysUntilExpiry: item.daysUntilExpiry })
-  })), [items]);
+  const itemsWithExpiry = useMemo(() => items.map((item) => {
+    const expiryReminder = buildExpiryReminder({ daysUntilExpiry: item.daysUntilExpiry });
+
+    return {
+      ...item,
+      expiryReminder,
+      markdownSuggestion: buildMarkdownSuggestion(expiryReminder)
+    };
+  }), [items]);
   const statusCounts = useMemo(() => items.reduce<Record<PantryStatus, number>>((counts, item) => {
     counts[item.status] += 1;
     return counts;
@@ -118,8 +123,16 @@ export default function PantryInventoryPage() {
                       <span className={`inline-flex rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.14em] ${expiryStyles[item.expiryReminder.urgency]}`}>
                         {item.expiryReminder.label}
                       </span>
+                      {item.markdownSuggestion.shouldPromote ? (
+                        <span className="inline-flex rounded-full bg-lime-100 px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-lime-900">
+                          {item.markdownSuggestion.label}
+                        </span>
+                      ) : null}
                       {item.expiryReminder.urgency === 'expired' || item.expiryReminder.urgency === 'use-soon' ? (
                         <>
+                          {item.markdownSuggestion.shouldPromote ? (
+                            <span className="inline-flex rounded-full bg-white px-3 py-1 text-xs font-black text-lime-900">{item.markdownSuggestion.detail}</span>
+                          ) : null}
                           <Link className="inline-flex rounded-full bg-white px-3 py-1 text-xs font-black text-emerald-900 transition hover:text-emerald-700" href={item.recipeHref}>Recipe ideas</Link>
                           <Link className="inline-flex rounded-full bg-white px-3 py-1 text-xs font-black text-emerald-900 transition hover:text-emerald-700" href={item.replacementHref}>Replacement deals</Link>
                         </>

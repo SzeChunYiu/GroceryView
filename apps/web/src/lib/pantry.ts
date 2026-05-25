@@ -8,6 +8,13 @@ export type PantryExpiryReminder = {
   urgency: PantryExpiryUrgency;
 };
 
+export type PantryMarkdownSuggestion = {
+  label: string;
+  detail: string;
+  percentOff: number;
+  shouldPromote: boolean;
+};
+
 export type PantryStockItem = {
   productId: string;
   name: string;
@@ -17,6 +24,7 @@ export type PantryStockItem = {
   estimatedDailyUse: number;
   depletionEstimateDays: number | null;
   expiryReminder: PantryExpiryReminder;
+  markdownSuggestion: PantryMarkdownSuggestion;
   status: PantryStockStatus;
 };
 
@@ -70,6 +78,35 @@ export function buildExpiryReminder(row: Pick<PantryStatusRow, 'daysUntilExpiry'
   return { daysUntilExpiry, label: `Expires in ${daysUntilExpiry} days`, urgency: 'planned' };
 }
 
+export function buildMarkdownSuggestion(reminder: PantryExpiryReminder): PantryMarkdownSuggestion {
+  if (reminder.urgency === 'expired') {
+    return {
+      label: 'Pull from sale or compost check',
+      detail: 'Do not suggest a shopper markdown once the tracked expiry date has passed.',
+      percentOff: 0,
+      shouldPromote: false
+    };
+  }
+
+  if (reminder.urgency === 'use-soon') {
+    const days = reminder.daysUntilExpiry ?? 7;
+    const percentOff = days <= 1 ? 50 : days <= 3 ? 35 : 20;
+    return {
+      label: `${percentOff}% use-soon markdown`,
+      detail: 'Suggest a short-dated markdown before adding replacement stock to the list.',
+      percentOff,
+      shouldPromote: true
+    };
+  }
+
+  return {
+    label: 'No markdown needed',
+    detail: 'Expiry is not urgent enough to recommend a markdown.',
+    percentOff: 0,
+    shouldPromote: false
+  };
+}
+
 function getStockStatus(ownedQuantity: number, minimumQuantity: number): PantryStockStatus {
   if (ownedQuantity <= 0) return 'depleted';
   if (ownedQuantity <= minimumQuantity) return 'low';
@@ -80,6 +117,7 @@ export function buildPantryStockItems(rows: PantryStatusRow[]): PantryStockItem[
   return rows.map((row) => {
     const ownedQuantity = roundQuantity(row.remainingQuantity);
     const estimatedDailyUse = estimateDailyUse(row);
+    const expiryReminder = buildExpiryReminder(row);
 
     return {
       productId: row.productId,
@@ -89,7 +127,8 @@ export function buildPantryStockItems(rows: PantryStatusRow[]): PantryStockItem[
       minimumQuantity: row.minimumQuantity,
       estimatedDailyUse,
       depletionEstimateDays: estimateDepletionDays(ownedQuantity, estimatedDailyUse),
-      expiryReminder: buildExpiryReminder(row),
+      expiryReminder,
+      markdownSuggestion: buildMarkdownSuggestion(expiryReminder),
       status: getStockStatus(ownedQuantity, row.minimumQuantity)
     };
   });

@@ -84,6 +84,11 @@ export function PantryTracker({ items }: PantryTrackerProps) {
                 <div className="mt-2 flex flex-wrap gap-2">
                   <p className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-slate-700">{formatDays(item.depletionEstimateDays)}</p>
                   <p className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.14em] ${expiryClasses[item.expiryReminder.urgency]}`}>{item.expiryReminder.label}</p>
+                  {item.markdownSuggestion.shouldPromote ? (
+                    <p className="rounded-full bg-lime-100 px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-lime-900">
+                      {item.markdownSuggestion.label}
+                    </p>
+                  ) : null}
                 </div>
               </div>
               <p className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.18em] ${statusClasses[item.status]}`}>{item.status}</p>
@@ -118,6 +123,9 @@ export function PantryTracker({ items }: PantryTrackerProps) {
             {item.expiryReminder.urgency === 'expired' || item.expiryReminder.urgency === 'use-soon' ? (
               <div className="mt-3 flex flex-wrap gap-2 rounded-2xl border border-amber-200 bg-amber-50 p-3">
                 <span className="text-sm font-black text-amber-950">Use-soon actions</span>
+                {item.markdownSuggestion.shouldPromote ? (
+                  <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-lime-900">{item.markdownSuggestion.detail}</span>
+                ) : null}
                 <Link className="rounded-full bg-white px-3 py-1 text-xs font-black text-emerald-900 hover:text-emerald-700" href={`/meal-planner?ingredient=${item.productId}`}>Find recipes</Link>
                 <Link className="rounded-full bg-white px-3 py-1 text-xs font-black text-emerald-900 hover:text-emerald-700" href={`/deals?replace=${item.productId}`}>Replacement deals</Link>
               </div>
