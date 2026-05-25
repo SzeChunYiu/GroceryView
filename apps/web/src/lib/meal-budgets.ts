@@ -26,6 +26,21 @@ export type BudgetAlternative = {
   reason: string;
 };
 
+export type MonthlyBudgetCategoryInput = {
+  category: string;
+  monthlyLimit: number;
+  plannedSpend: number;
+  actualSpend?: number | null;
+};
+
+export type MonthlyBudgetCategoryProgress = MonthlyBudgetCategoryInput & {
+  basis: 'actual' | 'planned';
+  comparedSpend: number;
+  remaining: number;
+  percentUsed: number;
+  status: 'under' | 'watch' | 'over';
+};
+
 export function extractIngredientsFromMealPlans(mealPlans: MealBudgetPlan[]): ExtractedMealIngredient[] {
   return mealPlans.flatMap((meal) =>
     meal.ingredients
@@ -63,4 +78,24 @@ export function suggestBudgetAlternativesFromMealPlans(mealPlans: MealBudgetPlan
     })
     .filter((alternative): alternative is BudgetAlternative => Boolean(alternative))
     .sort((left, right) => right.estimatedSavings - left.estimatedSavings);
+}
+
+export function buildMonthlyGroceryBudgetTracker(categories: MonthlyBudgetCategoryInput[]): MonthlyBudgetCategoryProgress[] {
+  return categories
+    .filter((category) => category.monthlyLimit > 0 && (category.plannedSpend > 0 || (category.actualSpend ?? 0) > 0))
+    .map((category) => {
+      const hasActualSpend = typeof category.actualSpend === 'number' && Number.isFinite(category.actualSpend);
+      const comparedSpend = hasActualSpend ? category.actualSpend! : category.plannedSpend;
+      const percentUsed = comparedSpend / category.monthlyLimit;
+      const remaining = category.monthlyLimit - comparedSpend;
+      return {
+        ...category,
+        basis: hasActualSpend ? 'actual' : 'planned',
+        comparedSpend,
+        percentUsed,
+        remaining,
+        status: percentUsed >= 1 ? 'over' : percentUsed >= 0.85 ? 'watch' : 'under'
+      };
+    })
+    .sort((left, right) => right.percentUsed - left.percentUsed || left.category.localeCompare(right.category, 'sv'));
 }

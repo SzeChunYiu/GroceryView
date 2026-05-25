@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import { PiggyBank } from 'lucide-react';
+import { BudgetProgressCard } from '@/components/budget-progress-card';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
+import { buildMonthlyGroceryBudgetTracker } from '@/lib/meal-budgets';
 import { elderlyFixedIncomeBudgetTracker, elderlyStaplesStabilityTracker, personalGroceryInflation, savingsDashboard, studentWeeklyBudgetTracker } from '@/lib/demo-data';
 import { ecoBasketScorecard } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
@@ -43,6 +45,22 @@ function formatPercent(value: number) {
   return `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`;
 }
 
+const monthlyGroceryBudgetTracker = buildMonthlyGroceryBudgetTracker(
+  Object.values(
+    studentWeeklyBudgetTracker.plannedRows.reduce<Record<string, { category: string; plannedSpend: number }>>((ledger, row) => {
+      const category = row.category || 'Other groceries';
+      const current = ledger[category] ?? { category, plannedSpend: 0 };
+      current.plannedSpend += row.plannedSpend * 4;
+      ledger[category] = current;
+      return ledger;
+    }, {})
+  ).map((row, index) => ({
+    category: row.category,
+    plannedSpend: Math.round(row.plannedSpend * 100) / 100,
+    monthlyLimit: Math.round(row.plannedSpend * (index === 0 ? 1.05 : 1.18) * 100) / 100,
+    actualSpend: null
+  }))
+);
 
 function SavingsEmptyState() {
   return (
@@ -140,6 +158,26 @@ export default function SavingsDashboardPage() {
           )}
         </Card>
       </div>
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50/70">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Monthly household budget tracker</p>
+            <h2 className="mt-2 text-2xl font-black">Category budget progress</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Planned basket spend is grouped by category and compared against monthly household limits. Actual category receipts are not inferred when the source data only has aggregate receipt totals.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-emerald-900 shadow-sm">
+            {monthlyGroceryBudgetTracker.length.toLocaleString('sv-SE')} categories
+          </p>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {monthlyGroceryBudgetTracker.map((row) => (
+            <BudgetProgressCard key={row.category} row={row} />
+          ))}
+        </div>
+      </Card>
 
       <Card className="mt-6 border-lime-200 bg-lime-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-lime-800">{ecoBasketScorecard.persona}</p>
