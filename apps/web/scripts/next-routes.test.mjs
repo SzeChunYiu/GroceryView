@@ -2800,6 +2800,26 @@ ${seo}`;
     assert.doesNotMatch(shell, /@\/lib\/demo-data/);
   });
 
+  it('surfaces friend price sightings in the social feed with product, store, time, and confidence', async () => {
+    const social = await read('src/lib/social.ts');
+    const feed = await read('src/components/feed/social-feed.tsx');
+    const badge = await read('src/components/confidence-badge.tsx');
+
+    assert.match(social, /FriendPriceSighting/);
+    assert.match(social, /friendPriceSightings/);
+    assert.match(social, /productName/);
+    assert.match(social, /storeName/);
+    assert.match(social, /observedAt/);
+    assert.match(social, /confidence/);
+    assert.match(feed, /Friend price sightings/);
+    assert.match(feed, /listFriendPriceSightings/);
+    assert.match(feed, /sighting\.productName/);
+    assert.match(feed, /sighting\.storeName/);
+    assert.match(feed, /sighting\.observedAt/);
+    assert.match(feed, /ConfidenceBadge/);
+    assert.match(badge, /confidenceCopy/);
+  });
+
   it('surfaces reusable data-freshness confidence badges across public routes', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const shell = await read('src/components/market-shell.tsx');
