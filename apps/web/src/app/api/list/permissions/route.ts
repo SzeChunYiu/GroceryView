@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createListSharePermission, revokeListSharePermission } from '@/lib/list-permissions';
+import {
+  accountListSharePermissions,
+  createListSharePermission,
+  listShareRoles,
+  revokeListSharePermission,
+} from '@/lib/list-permissions';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -32,8 +37,13 @@ export async function POST(request: NextRequest) {
     collaboratorEmail: String(body.collaboratorEmail ?? ''),
     role: typeof body.role === 'string' ? body.role : 'view',
   });
+  const invitationUrl = new URL(`/list?invite=${encodeURIComponent(permission.id)}`, request.nextUrl.origin);
 
-  return NextResponse.json({ permission }, { status: 201 });
+  return NextResponse.json({
+    invitationUrl: invitationUrl.toString(),
+    permission,
+    role: listShareRoles[permission.role],
+  }, { status: 201 });
 }
 
 export async function DELETE(request: NextRequest) {
@@ -41,4 +51,11 @@ export async function DELETE(request: NextRequest) {
   const result = revokeListSharePermission(shareId);
 
   return NextResponse.json(result, { status: result.revoked ? 200 : 404 });
+}
+
+export async function GET() {
+  return NextResponse.json({
+    permissions: accountListSharePermissions,
+    roles: listShareRoles,
+  });
 }

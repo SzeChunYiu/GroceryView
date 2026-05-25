@@ -1,6 +1,6 @@
 import { createHmac } from 'node:crypto';
 
-export type ListShareRole = 'view' | 'comment' | 'edit';
+export type ListShareRole = 'viewer' | 'editor' | 'owner';
 
 export type ListSharePermission = {
   id: string;
@@ -31,20 +31,20 @@ export type PublicListShare = {
 };
 
 export const listShareRoles: Record<ListShareRole, { label: string; description: string; capabilities: string[] }> = {
-  view: {
-    label: 'View only',
+  viewer: {
+    label: 'Viewer',
     description: 'Can open the shared list and compare prices without changing household planning data.',
     capabilities: ['Read list items', 'Compare store totals', 'Export a shopping copy'],
   },
-  comment: {
-    label: 'Can comment',
-    description: 'Can leave timestamped notes on individual list items without changing quantities or checkout state.',
-    capabilities: ['Read list items', 'Add item comments', 'Review comment history'],
-  },
-  edit: {
-    label: 'Can edit',
+  editor: {
+    label: 'Editor',
     description: 'Can add, remove, check off list items, and leave timestamped comments for active household collaboration.',
     capabilities: ['Read list items', 'Update quantities', 'Check off purchased items', 'Add item comments'],
+  },
+  owner: {
+    label: 'Owner',
+    description: 'Can manage the shared list, update items, invite collaborators, and revoke access for the household.',
+    capabilities: ['Read list items', 'Update quantities', 'Invite collaborators', 'Revoke access'],
   },
 };
 
@@ -55,7 +55,7 @@ export const accountListSharePermissions: ListSharePermission[] = [
     listName: 'Weekly staples',
     collaboratorName: 'Alex Roommate',
     collaboratorEmail: 'alex@example.com',
-    role: 'edit',
+    role: 'editor',
     grantedAt: '2026-05-20T08:15:00.000Z',
   },
   {
@@ -64,7 +64,7 @@ export const accountListSharePermissions: ListSharePermission[] = [
     listName: 'Family BBQ',
     collaboratorName: 'Mina Parent',
     collaboratorEmail: 'mina@example.com',
-    role: 'view',
+    role: 'viewer',
     grantedAt: '2026-05-22T16:45:00.000Z',
   },
   {
@@ -73,13 +73,15 @@ export const accountListSharePermissions: ListSharePermission[] = [
     listName: 'Weekly staples',
     collaboratorName: 'Sam Neighbor',
     collaboratorEmail: 'sam@example.com',
-    role: 'comment',
+    role: 'owner',
     grantedAt: '2026-05-23T09:20:00.000Z',
   },
 ];
 
 export function resolveListShareRole(role: string | null | undefined): ListShareRole {
-  return role === 'edit' || role === 'comment' ? role : 'view';
+  if (role === 'owner') return 'owner';
+  if (role === 'editor' || role === 'edit' || role === 'comment') return 'editor';
+  return 'viewer';
 }
 
 export function createListSharePermission(input: {

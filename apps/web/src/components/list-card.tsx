@@ -37,6 +37,23 @@ const roleLabels: Record<FamilyRole, string> = {
   guest: "Guest",
 };
 
+type InvitationRole = "viewer" | "editor" | "owner";
+
+const invitationRoles: Record<InvitationRole, { label: string; helper: string }> = {
+  viewer: {
+    label: "Viewer",
+    helper: "Can open the list and compare prices without changing items.",
+  },
+  editor: {
+    label: "Editor",
+    helper: "Can add notes, update quantities, and check off items while shopping.",
+  },
+  owner: {
+    label: "Owner",
+    helper: "Can manage collaborators, edit the list, and revoke shared access.",
+  },
+};
+
 function formatCommentTime(createdAt: string) {
   return createdAt.replace("T", " ").slice(0, 16);
 }
@@ -86,6 +103,7 @@ export function ListCard({ currentRole, items, onConflictPrompt, publicShareHref
   const [commentsByItem, setCommentsByItem] = useState<Record<string, ListItemComment[]>>(() =>
     Object.fromEntries(items.map((item) => [item.id, item.comments ?? []])),
   );
+  const [invitationRole, setInvitationRole] = useState<InvitationRole>("viewer");
   const { conflictPrompts, items: listItems, updateItem } = useList({
     currentRole,
     initialItems: items,
@@ -148,6 +166,38 @@ export function ListCard({ currentRole, items, onConflictPrompt, publicShareHref
           Public viewers can open a tokenized read-only URL with item details, matched price badges, and cheapest-store comparison without account access or edit controls.
         </p>
       ) : null}
+      <div className="mb-3 rounded-xl border border-indigo-100 bg-indigo-50 p-3">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-indigo-800">
+              Invite collaborator
+            </p>
+            <h3 className="mt-1 text-sm font-black text-slate-950">
+              Role-based list access
+            </h3>
+            <p className="mt-1 text-sm text-slate-700">
+              Send viewer, editor, or owner invitations so each household helper gets only the access they need.
+            </p>
+          </div>
+          <label className="text-sm font-semibold text-slate-700">
+            Invitation role
+            <select
+              className="mt-1 block w-full rounded-md border border-indigo-200 bg-white px-3 py-2 text-slate-900"
+              value={invitationRole}
+              onChange={(event) => setInvitationRole(event.target.value as InvitationRole)}
+            >
+              {Object.entries(invitationRoles).map(([role, config]) => (
+                <option key={role} value={role}>
+                  {config.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+        <p className="mt-3 rounded-lg bg-white px-3 py-2 text-sm font-bold text-indigo-950">
+          {invitationRoles[invitationRole].label}: {invitationRoles[invitationRole].helper}
+        </p>
+      </div>
 
       <ul className="space-y-2">
         {storeOrderedItems.map((item) => {
