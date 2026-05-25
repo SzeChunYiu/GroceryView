@@ -83,9 +83,11 @@ export default async function Image({ params }: Readonly<{ params: Promise<{ id:
             <img
               src={model.image}
               alt=""
+              width={342}
+              height={342}
               style={{
-                maxWidth: '100%',
-                maxHeight: '100%',
+                width: '100%',
+                height: '100%',
                 objectFit: 'contain'
               }}
             />
