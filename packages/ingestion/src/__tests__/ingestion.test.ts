@@ -61,6 +61,7 @@ import {
   fetchOpenFoodFactsRetailerEnrichments,
   fetchBrandedSwedishFuelStations,
   fetchApoteketSeProducts,
+  fetchApohemProducts,
   fetchOverpassFuelStations,
   fetchOverpassGroceryStores,
   fetchSevenElevenSeConvenienceProducts,
@@ -4773,12 +4774,50 @@ describe('ingestRetailerProduct', () => {
 
     assert.equal(output.product.productKind, 'commodity');
     assert.equal(output.product.commodityId, 'tomato');
+    assert.equal(output.product.produceClassId, 'tomatoes');
     assert.equal(output.product.variant, 'vine');
     assert.equal(output.product.isOrganic, false);
     assert.equal(output.product.originCountry, 'SE');
     assert.equal(output.alias.matchConfidence, 0.68);
     assert.equal(output.priceObservation.confidenceScore, 0.68);
     assert.equal(output.priceObservation.unitPrice, 39.9);
+  });
+
+  it('maps raw sold-by-weight produce labels to produce class ids without raising match confidence', () => {
+    const cases = [
+      ['Kvisttomat lösvikt', 'tomatoes'],
+      ['Potatis Fast lösvikt', 'potatoes'],
+      ['Äpple Royal Gala lösvikt', 'apples'],
+      ['Clementiner lösvikt', 'citrus'],
+      ['Färsk basilika i knippe', 'herbs'],
+      ['Champinjoner lösvikt', 'mushrooms'],
+      ['Babyspenat lösvikt', 'leafy-vegetables']
+    ] as const;
+
+    for (const [rawName, produceClassId] of cases) {
+      const output = ingestRetailerProduct({
+        sourceType: 'retailer_online_page',
+        observedAt: '2026-05-22T09:00:00.000Z',
+        parserVersion: 'axfood-produce-v1',
+        rawSnapshotRef: `s3://groceryview-raw/willys/${produceClassId}-2026-05-22.json`,
+        sourceRunId: 'source-run-2026-05-22',
+        chainId: 'willys',
+        retailerProductId: `wil-${produceClassId}`,
+        rawName,
+        canonicalName: rawName,
+        productId: `willys-${produceClassId}`,
+        categoryId: 'frukt-gront',
+        packageSize: 1,
+        packageUnit: 'kg',
+        price: 29.9,
+        soldByWeight: true
+      });
+
+      assert.equal(output.product.productKind, 'commodity');
+      assert.equal(output.product.produceClassId, produceClassId);
+      assert.equal(output.alias.matchConfidence, 0.68);
+      assert.equal(output.priceObservation.confidenceScore, 0.68);
+    }
   });
 
   it('rejects records that cannot preserve parser and raw snapshot provenance', () => {
@@ -7384,6 +7423,58 @@ describe('daily ingestion runner', () => {
     assert.equal(observation.store_id, null);
     assert.equal(observation.price, 49);
     assert.equal(observation.regular_price, 59);
+  });
+
+  it('pages Apohem search results from recordSetCount/pageSize while preserving maxRows and dedupe', async () => {
+    const retrievedAt = '2026-05-23T08:40:34.000Z';
+    const requestedUrls: string[] = [];
+    const product = (ean: string, name: string, price: number) => ({
+      url: `/produkt/${ean}`,
+      displayName: name,
+      brandName: 'Apohem',
+      code: `apohem-${ean}`,
+      variationEAN: ean,
+      price: { current: { inclVat: price, vatPercent: 12 } },
+      stock: { status: 'in_stock' },
+      isotc: true,
+      isPrescriptionProduct: false
+    });
+    const page = (products: unknown[], skip: number) => new Response(`
+      <script>window.CURRENT_PAGE = ${JSON.stringify({
+        listing: {
+          recordSetCount: 4,
+          pageSize: 2,
+          skip,
+          products
+        }
+      })};</script>
+    `, { status: 200, headers: { 'content-type': 'text/html' } });
+
+    const rows = await fetchApohemProducts({
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        if (String(url).includes('skip=2')) {
+          return page([
+            product('7046260976102', 'Apohem duplicate 20 st', 51),
+            product('7046260976103', 'Apohem page two 20 st', 52)
+          ], 2);
+        }
+        return page([
+          product('7046260976101', 'Apohem page one 20 st', 49),
+          product('7046260976102', 'Apohem duplicate 20 st', 50)
+        ], 0);
+      },
+      maxRows: 3,
+      retrievedAt,
+      sourcePaths: ['/sok?q=vitamin']
+    });
+
+    assert.deepEqual(requestedUrls, [
+      'https://www.apohem.se/sok?q=vitamin',
+      'https://www.apohem.se/sok?q=vitamin&skip=2&count=4'
+    ]);
+    assert.deepEqual(rows.map((row) => row.ean), ['7046260976101', '7046260976102', '7046260976103']);
+    assert.equal(rows[2].sourceUrl, 'https://www.apohem.se/sok?q=vitamin&skip=2&count=4');
   });
 
   it('dispatches Apoteket SE public product rows through the daily native connector', async () => {
