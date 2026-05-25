@@ -125,14 +125,21 @@ export function SearchRecoveryPanel({
 
 export function MetricGrid() {
   return (
-    <div className="grid gap-3 md:grid-cols-4">
-      {keyMetrics.map((metric) => (
-        <Card key={metric.label} className="p-4">
-          <p className="text-sm font-semibold text-slate-600">{metric.label}</p>
-          <p className="mt-2 text-3xl font-black tracking-tight text-slate-950">{metric.value}</p>
-          <p className="mt-2 text-sm leading-6 text-slate-600">{metric.detail}</p>
-        </Card>
-      ))}
+    <div>
+      <div className="grid gap-3 md:grid-cols-4">
+        {keyMetrics.map((metric) => (
+          <Card key={metric.label} className="p-4">
+            <p className="text-sm font-semibold text-slate-600">{metric.label}</p>
+            <p className="mt-2 text-3xl font-black tracking-tight text-slate-950">{metric.value}</p>
+            <p className="mt-2 text-sm leading-6 text-slate-600">{metric.detail}</p>
+          </Card>
+        ))}
+      </div>
+      <div className="mt-3 flex justify-end">
+        <Link className="text-sm font-black text-emerald-800 underline decoration-emerald-300 underline-offset-4" href="/index-methodology">
+          Index methodology: /index-methodology
+        </Link>
+      </div>
     </div>
   );
 }
@@ -275,9 +282,14 @@ export function SourceCoverage() {
           <Eyebrow>Data provenance</Eyebrow>
           <h2 className="mt-2 text-2xl font-black tracking-tight">Only verified snapshot data is rendered</h2>
         </div>
-        <Link className="text-sm font-bold text-emerald-800 underline decoration-emerald-300 underline-offset-4" href="/data-sources">
-          Data source notes live in docs/data-sources.md
-        </Link>
+        <div className="flex flex-wrap gap-3 text-sm font-bold">
+          <Link className="text-emerald-800 underline decoration-emerald-300 underline-offset-4" href="/index-methodology">
+            Index methodology: /index-methodology
+          </Link>
+          <Link className="text-emerald-800 underline decoration-emerald-300 underline-offset-4" href="/data-sources">
+            Data source notes live in docs/data-sources.md
+          </Link>
+        </div>
       </div>
       <div className="mt-5 grid gap-3 lg:grid-cols-3">
         {sourceCoverage.map((source) => (
