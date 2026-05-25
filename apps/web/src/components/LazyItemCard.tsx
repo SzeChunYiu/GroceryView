@@ -6,6 +6,7 @@ import { trackItemCardImpression } from '@/lib/analytics';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 
 export type LazyItemCardProps = {
+  aboveFold?: boolean;
   children: ReactNode;
   className: string;
   compareMode: string;
@@ -17,6 +18,7 @@ export type LazyItemCardProps = {
 };
 
 export function LazyItemCard({
+  aboveFold = false,
   children,
   className,
   compareMode,
@@ -44,6 +46,7 @@ export function LazyItemCard({
       className={className}
       data-analytics-item-id={itemId}
       data-analytics-list-id={listId}
+      data-image-loading={aboveFold ? 'eager' : 'lazy'}
       href={href}
       ref={ref}
     >

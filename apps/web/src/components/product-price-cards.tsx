@@ -10,6 +10,8 @@ import type { AdaptiveProductCard } from '@/lib/verified-data';
 type CompareMode = 'adaptive' | 'total' | 'unit';
 
 const storageKey = 'groceryview:product-card-compare-mode';
+const aboveFoldProductCardCount = 3;
+const productImageBlurDataUrl = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQ0IiBoZWlnaHQ9IjEwOCIgdmlld0JveD0iMCAwIDE0NCAxMDgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE0NCIgaGVpZ2h0PSIxMDgiIGZpbGw9IiNmOGZhZmMiLz48Y2lyY2xlIGN4PSI3MiIgY3k9IjU0IiByPSIyOCIgZmlsbD0iI2QxZmFlNSIvPjwvc3ZnPg==';
 const compareModes: Array<{ label: string; value: CompareMode; help: string }> = [
   { label: 'Adaptive', value: 'adaptive', help: 'Commodity cards lead with unit price; branded cards lead with total price.' },
   { label: 'Total', value: 'total', help: 'Sort and lead every card by the observed pack price.' },
@@ -165,71 +167,81 @@ export function ProductPriceCards({
         </div>
       </div>
       <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-        {sortedCards.map((card, index) => (
-          <div className="relative" key={card.slug}>
-            <FavouriteProductToggle
-              className="absolute right-3 top-3 z-10"
-              product={{ slug: card.slug, name: card.name, imageUrl: card.imageUrl }}
-            />
-            <LazyItemCard
-              className="block rounded-2xl border border-slate-200 bg-slate-50 p-4 motion-safe:transition motion-safe:hover:-translate-y-0.5 hover:border-emerald-700"
-              compareMode={compareMode}
-              href={`/products/${card.slug}`}
-              itemId={card.slug}
-              itemName={card.name}
-              listId="adaptive-product-cards"
-              listIndex={index}
-            >
-            {card.imageUrl && card.imageAlt ? (
-              <div className="mb-4 flex aspect-[4/3] items-center justify-center rounded-2xl border border-white bg-white p-3 shadow-sm">
-                <Image
-                  alt={card.imageAlt}
-                  className="max-h-full max-w-full object-contain"
-                  height={144}
-                  sizes="(min-width: 1280px) 16vw, (min-width: 768px) 33vw, 80vw"
-                  src={card.imageUrl}
-                  width={144}
-                />
+        {sortedCards.map((card, index) => {
+          const isAboveFold = index < aboveFoldProductCardCount;
+
+          return (
+            <div className="relative" key={card.slug}>
+              <FavouriteProductToggle
+                className="absolute right-3 top-3 z-10"
+                product={{ slug: card.slug, name: card.name, imageUrl: card.imageUrl }}
+              />
+              <LazyItemCard
+                className="block rounded-2xl border border-slate-200 bg-slate-50 p-4 motion-safe:transition motion-safe:hover:-translate-y-0.5 hover:border-emerald-700"
+                compareMode={compareMode}
+                href={`/products/${card.slug}`}
+                itemId={card.slug}
+                itemName={card.name}
+                aboveFold={isAboveFold}
+                listId="adaptive-product-cards"
+                listIndex={index}
+              >
+              {card.imageUrl && card.imageAlt ? (
+                <div className="mb-4 flex aspect-[4/3] items-center justify-center rounded-2xl border border-white bg-white p-3 shadow-sm">
+                  <Image
+                    alt={card.imageAlt}
+                    className="max-h-full max-w-full object-contain"
+                    blurDataURL={productImageBlurDataUrl}
+                    fetchPriority={isAboveFold ? 'high' : 'auto'}
+                    height={144}
+                    loading={isAboveFold ? 'eager' : 'lazy'}
+                    placeholder="blur"
+                    preload={isAboveFold}
+                    sizes="(min-width: 1280px) 16vw, (min-width: 768px) 33vw, 80vw"
+                    src={card.imageUrl}
+                    width={144}
+                  />
+                </div>
+              ) : (
+                <p className="mb-4 rounded-2xl border border-dashed border-slate-300 bg-white p-3 text-xs font-bold text-slate-500">No synthetic product images: verified image URL missing.</p>
+              )}
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{card.productKind}</p>
+                  <h3 className="mt-2 text-lg font-black text-slate-950">{card.name}</h3>
+                  <p className="mt-1 text-sm text-slate-600">{card.brand}</p>
+                </div>
+                <div className="flex flex-col items-end gap-2">
+                  {card.isAvailable === false ? (
+                    <span className="rounded-full bg-rose-100 px-3 py-1 text-[0.7rem] font-black text-rose-900">Out of stock</span>
+                  ) : null}
+                  {card.priceDropBadge ? (
+                    <span
+                      aria-label={`${card.name} ${card.priceDropLabel ?? '30-day price drop from price_history'}`}
+                      className="rounded-full bg-emerald-100 px-3 py-1 text-[0.7rem] font-black text-emerald-950"
+                      title={`30-day price drop from price_history${card.priceDropAnchorDate ? ` since ${card.priceDropAnchorDate}` : ''}`}
+                    >
+                      {card.priceDropBadge}
+                    </span>
+                  ) : null}
+                  <span className="rounded-full bg-white px-3 py-1 text-[0.7rem] font-black text-slate-700">{resolvedMode(card, compareMode)}</span>
+                </div>
               </div>
-            ) : (
-              <p className="mb-4 rounded-2xl border border-dashed border-slate-300 bg-white p-3 text-xs font-bold text-slate-500">No synthetic product images: verified image URL missing.</p>
-            )}
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{card.productKind}</p>
-                <h3 className="mt-2 text-lg font-black text-slate-950">{card.name}</h3>
-                <p className="mt-1 text-sm text-slate-600">{card.brand}</p>
-              </div>
-              <div className="flex flex-col items-end gap-2">
-                {card.isAvailable === false ? (
-                  <span className="rounded-full bg-rose-100 px-3 py-1 text-[0.7rem] font-black text-rose-900">Out of stock</span>
-                ) : null}
-                {card.priceDropBadge ? (
-                  <span
-                    aria-label={`${card.name} ${card.priceDropLabel ?? '30-day price drop from price_history'}`}
-                    className="rounded-full bg-emerald-100 px-3 py-1 text-[0.7rem] font-black text-emerald-950"
-                    title={`30-day price drop from price_history${card.priceDropAnchorDate ? ` since ${card.priceDropAnchorDate}` : ''}`}
-                  >
-                    {card.priceDropBadge}
-                  </span>
-                ) : null}
-                <span className="rounded-full bg-white px-3 py-1 text-[0.7rem] font-black text-slate-700">{resolvedMode(card, compareMode)}</span>
-              </div>
+              <p className="mt-4 text-3xl font-black text-emerald-800">{primaryLabel(card, compareMode)}</p>
+              <p className="mt-1 text-sm font-semibold text-slate-700">{secondaryLabel(card, compareMode)}</p>
+              <p className="mt-3 text-sm leading-6 text-slate-600">{card.sourceLabel}</p>
+              <PriceHistorySparkline card={card} />
+              <p className="mt-2 rounded-xl bg-blue-50 p-3 text-xs font-bold text-blue-950">{card.confidenceLabel}</p>
+              <VolatilityMethodologyBadge card={card} />
+              {card.cheapestUnitBadge ? (
+                <p className="mt-2 rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-950">{card.cheapestUnitBadge}</p>
+              ) : (
+                <p className="mt-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">cheapest-per-unit badge waits for cross-chain unit evidence</p>
+              )}
+              </LazyItemCard>
             </div>
-            <p className="mt-4 text-3xl font-black text-emerald-800">{primaryLabel(card, compareMode)}</p>
-            <p className="mt-1 text-sm font-semibold text-slate-700">{secondaryLabel(card, compareMode)}</p>
-            <p className="mt-3 text-sm leading-6 text-slate-600">{card.sourceLabel}</p>
-            <PriceHistorySparkline card={card} />
-            <p className="mt-2 rounded-xl bg-blue-50 p-3 text-xs font-bold text-blue-950">{card.confidenceLabel}</p>
-            <VolatilityMethodologyBadge card={card} />
-            {card.cheapestUnitBadge ? (
-              <p className="mt-2 rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-950">{card.cheapestUnitBadge}</p>
-            ) : (
-              <p className="mt-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">cheapest-per-unit badge waits for cross-chain unit evidence</p>
-            )}
-            </LazyItemCard>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );
