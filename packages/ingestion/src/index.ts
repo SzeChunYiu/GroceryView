@@ -2883,6 +2883,7 @@ export type IngestedProduct = {
   categoryId: string;
   productKind: 'branded' | 'commodity';
   commodityId?: string;
+  produceClassId?: string;
   fuelGradeId?: FuelGradeId;
   variant?: string;
   isOrganic: boolean;
@@ -3002,6 +3003,36 @@ function categoryHintsMatch(input: RetailerProductInput, commodity: Commodity): 
     .some((hint) => hint.length > 0 && (category.includes(hint) || hint.includes(category)));
 }
 
+type ProduceClassRule = {
+  produceClassId: string;
+  commodityIds: string[];
+  terms: string[];
+};
+
+const produceClassRules: ProduceClassRule[] = [
+  { produceClassId: 'tomatoes', commodityIds: ['tomato'], terms: ['tomat', 'tomato'] },
+  { produceClassId: 'potatoes', commodityIds: ['potato'], terms: ['potatis', 'potato'] },
+  { produceClassId: 'apples', commodityIds: ['apple'], terms: ['apple', 'apples', 'applen', 'äpple', 'äpplen'] },
+  { produceClassId: 'citrus', commodityIds: ['orange', 'lemon', 'lime'], terms: ['citrus', 'apelsin', 'orange', 'citron', 'lemon', 'lime', 'grapefrukt', 'grape fruit', 'clementin', 'mandarin', 'satsuma'] },
+  { produceClassId: 'herbs', commodityIds: [], terms: ['ort', 'orter', 'örter', 'herb', 'herbs', 'basilika', 'persilja', 'koriander', 'dill', 'timjan', 'rosmarin', 'graslok', 'gräslök', 'mynta'] },
+  { produceClassId: 'mushrooms', commodityIds: ['mushroom'], terms: ['svamp', 'champinjon', 'champinjoner', 'mushroom', 'mushrooms', 'shiitake', 'shitake', 'skogschampinjon', 'ostronskivling', 'portabello', 'portobello', 'enoki'] },
+  { produceClassId: 'leafy-vegetables', commodityIds: ['iceberg-lettuce', 'spinach', 'white-cabbage'], terms: ['sallad', 'lettuce', 'isberg', 'spenat', 'spinach', 'ruccola', 'rucola', 'rocket', 'mangold', 'gronkal', 'grönkål', 'kale', 'vitkal', 'vitkål'] }
+];
+
+function isProduceCommodity(input: RetailerProductInput, commodity?: Commodity): boolean {
+  if (input.soldByWeight === true || input.productKind === 'commodity') return true;
+  return commodity?.categoryPath.some((path) => normalizeSearchText(path).includes('frukt gront')) ?? false;
+}
+
+function resolveProduceClassIdFromText(input: RetailerProductInput, commodity?: Commodity): string | undefined {
+  if (!isProduceCommodity(input, commodity)) return undefined;
+  const haystack = normalizeSearchText(`${input.rawName} ${input.canonicalName} ${input.categoryId} ${commodity?.slug ?? ''} ${commodity?.nameSv ?? ''} ${commodity?.nameEn ?? ''}`);
+  return produceClassRules.find((rule) =>
+    (commodity ? rule.commodityIds.includes(commodity.slug) : false) ||
+    rule.terms.some((term) => haystack.includes(normalizeSearchText(term)))
+  )?.produceClassId;
+}
+
 function resolveCommodity(input: RetailerProductInput): Commodity | null {
   if (input.commodityId) {
     const explicit = findCommodity(input.commodityId);
@@ -3019,6 +3050,7 @@ function resolveCommodity(input: RetailerProductInput): Commodity | null {
 function classifyRetailerProduct(input: RetailerProductInput): {
   productKind: 'branded' | 'commodity';
   commodityId?: string;
+  produceClassId?: string;
   matchConfidence: number;
 } {
   const sourceConfidence = confidenceForSource(input.sourceType);
@@ -3026,10 +3058,12 @@ function classifyRetailerProduct(input: RetailerProductInput): {
   if (!requiresCommodityResolution) return { productKind: 'branded', matchConfidence: sourceConfidence };
 
   const commodity = resolveCommodity(input);
-  if (!commodity) throw new Error(`Could not resolve commodity mapping for ${input.rawName}.`);
+  const produceClassId = resolveProduceClassIdFromText(input, commodity ?? undefined);
+  if (!commodity && !produceClassId) throw new Error(`Could not resolve commodity mapping for ${input.rawName}.`);
   return {
     productKind: 'commodity',
-    commodityId: commodity.slug,
+    commodityId: commodity?.slug,
+    produceClassId,
     matchConfidence: Math.min(sourceConfidence, 0.68)
   };
 }
@@ -3059,6 +3093,7 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
       categoryId: input.categoryId,
       productKind: classification.productKind,
       commodityId: classification.commodityId,
+      produceClassId: classification.produceClassId,
       fuelGradeId: input.fuelGradeId,
       variant: input.variant,
       isOrganic: input.isOrganic ?? (/\b(eko|ekologisk|organic)\b/i.test(input.rawName) || /\b(eko|ekologisk|organic)\b/i.test(input.canonicalName)),
