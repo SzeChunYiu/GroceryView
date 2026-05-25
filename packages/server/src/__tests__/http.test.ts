@@ -1796,7 +1796,22 @@ describe('createHttpHandler', () => {
 
     const freeRead = await handle(new Request('http://localhost/api/scans/history?userId=user-2'));
     assert.equal(freeRead.status, 402);
-    assert.deepEqual((await json(freeRead) as { access: { enforcementReasons: string[] } }).access.enforcementReasons, ['missing_subscription_entitlement']);
+    assert.deepEqual(await json(freeRead), {
+      error: 'premium_scan_history_required',
+      message: 'Active premium subscription is required for OCR scan history.',
+      requiredTier: 'premium',
+      upgradeHref: '/pricing',
+      enforcementReasons: ['missing_subscription_entitlement'],
+      access: {
+        userTier: 'free',
+        premiumFeaturesEnabled: false,
+        adsRemoved: false,
+        checkoutRequired: true,
+        enforcementReasons: ['missing_subscription_entitlement'],
+        accountActions: ['show_upgrade'],
+        summary: 'Free tier: no active subscription entitlement.'
+      }
+    });
 
     const saved = await handle(new Request('http://localhost/api/scans/history?userId=user-1', {
       method: 'POST',
@@ -1830,24 +1845,33 @@ describe('createHttpHandler', () => {
 
     const history = await json(await handle(new Request('http://localhost/api/scans/history?userId=user-1'))) as {
       userId: string;
+      generatedAt: string;
+      retainedDays: number;
       itemCount: number;
-      items: Array<Record<string, unknown>>;
+      rows: Array<Record<string, unknown>>;
       guardrails: string[];
+      entitlement: Record<string, unknown>;
     };
     assert.equal(history.userId, 'user-1');
+    assert.equal(history.generatedAt, '2026-05-20T13:00:00.000Z');
+    assert.equal(history.retainedDays, 90);
     assert.equal(history.itemCount, 1);
-    assert.deepEqual(history.items, [
+    assert.deepEqual(history.rows, [
       {
-        scanId: 'receipt-1',
+        id: 'receipt-1',
         kind: 'receipt',
-        capturedAt: '2026-05-20T12:59:00.000Z',
+        createdAt: '2026-05-20T12:59:00.000Z',
         status: 'parsed',
-        itemCount: 1,
-        totalAmount: 49.9,
-        confidence: 0.91,
-        lowConfidenceRows: ['SMUDGED ITEM']
+        correctionStatus: 'pending_review',
+        redactedSummary: 'Receipt OCR summary available; raw receipt text and payload metadata stay redacted.',
+        redactedMetadata: {
+          itemCount: 1,
+          totalSek: 49.9
+        },
+        lowConfidenceRowCount: 1
       }
     ]);
+    assert.deepEqual(history.entitlement, { requiredTier: 'premium', enforced: true });
     assert.equal(history.guardrails.some((guardrail) => /active premium entitlement/i.test(guardrail)), true);
     assert.deepEqual(requestedUserIds, ['user-2', 'user-1', 'user-1']);
   });

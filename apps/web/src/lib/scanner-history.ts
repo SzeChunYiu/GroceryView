@@ -1,8 +1,9 @@
 export type ScannerHistoryRow = {
   id: string;
   createdAt: string;
-  kind: string;
+  kind: 'receipt' | 'barcode';
   status: string;
+  correctionStatus: 'none' | 'pending_review' | 'corrected' | 'rejected';
   redactedSummary: string;
   itemCount?: number;
   storeName?: string;
@@ -17,6 +18,7 @@ type ScannerHistoryPayload = {
   scans?: unknown;
   rows?: unknown;
   history?: unknown;
+  items?: unknown;
 };
 
 function stringField(value: unknown, fallback: string) {
@@ -33,10 +35,17 @@ function numberField(value: unknown) {
 
 function normalizeRow(row: unknown, index: number): ScannerHistoryRow {
   const value = row && typeof row === 'object' ? row as Record<string, unknown> : {};
-  const createdAt = stringField(value.createdAt ?? value.created_at ?? value.scannedAt, 'Timestamp redacted');
-  const kind = stringField(value.kind ?? value.scanKind, 'receipt');
+  const metadata = value.redactedMetadata && typeof value.redactedMetadata === 'object'
+    ? value.redactedMetadata as Record<string, unknown>
+    : {};
+  const createdAt = stringField(value.createdAt ?? value.created_at ?? value.scannedAt ?? value.capturedAt, 'Timestamp redacted');
+  const kind = stringField(value.kind ?? value.scanKind, 'receipt') === 'barcode' ? 'barcode' : 'receipt';
   const status = stringField(value.status, 'processed');
-  const productSlug = optionalStringField(value.productSlug ?? value.product_slug ?? value.slug);
+  const lowConfidenceRowCount = numberField(value.lowConfidenceRowCount) ?? (
+    Array.isArray(value.lowConfidenceRows) ? value.lowConfidenceRows.length : undefined
+  );
+  const correctionStatus = optionalStringField(value.correctionStatus) ?? (lowConfidenceRowCount ? 'pending_review' : 'none');
+  const productSlug = optionalStringField(metadata.productSlug ?? value.productSlug ?? value.product_slug ?? value.slug);
   const productParam = productSlug ? encodeURIComponent(productSlug) : undefined;
 
   return {
@@ -44,20 +53,22 @@ function normalizeRow(row: unknown, index: number): ScannerHistoryRow {
     createdAt,
     kind,
     status,
-    redactedSummary: stringField(value.redactedSummary ?? value.summary, 'Signed-in scan row available; private receipt details stay redacted.'),
-    itemCount: numberField(value.itemCount ?? value.item_count),
-    storeName: stringField(value.storeName ?? value.store_name, 'Store redacted'),
-    totalSek: numberField(value.totalSek ?? value.total_sek ?? value.total),
+    correctionStatus: ['pending_review', 'corrected', 'rejected'].includes(correctionStatus) ? correctionStatus as ScannerHistoryRow['correctionStatus'] : 'none',
+    redactedSummary: stringField(value.redactedSummary ?? value.summary, 'Signed-in scan row available; raw receipt text and payload metadata stay redacted.'),
+    itemCount: numberField(metadata.itemCount ?? value.itemCount ?? value.item_count),
+    storeName: stringField(metadata.storeName ?? value.storeName ?? value.store_name, 'Store redacted'),
+    totalSek: numberField(metadata.totalSek ?? value.totalSek ?? value.total_sek ?? value.totalAmount ?? value.total),
     productSlug,
-    compareHref: optionalStringField(value.compareHref ?? value.compare_href) ?? (productParam ? `/compare?product=${productParam}` : undefined),
-    listHref: optionalStringField(value.listHref ?? value.list_href) ?? (productParam ? `/list?add=${productParam}` : undefined),
-    reportHref: optionalStringField(value.reportHref ?? value.report_href) ?? (productParam ? `/price-reports?product=${productParam}` : undefined),
+    compareHref: optionalStringField(metadata.compareHref ?? value.compareHref ?? value.compare_href) ?? (productParam ? `/compare?product=${productParam}` : undefined),
+    listHref: optionalStringField(metadata.listHref ?? value.listHref ?? value.list_href) ?? (productParam ? `/list?add=${productParam}` : undefined),
+    reportHref: optionalStringField(metadata.reportHref ?? value.reportHref ?? value.report_href) ?? (productParam ? `/price-reports?product=${productParam}` : undefined),
   };
 }
 
 function payloadRows(payload: ScannerHistoryPayload) {
   if (Array.isArray(payload.scans)) return payload.scans;
   if (Array.isArray(payload.rows)) return payload.rows;
+  if (Array.isArray(payload.items)) return payload.items;
   if (Array.isArray(payload.history)) return payload.history;
   return [];
 }

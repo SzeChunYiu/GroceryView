@@ -9,10 +9,13 @@ import {
   multiWeekStockUpUpdateRowSchema,
   notificationInboxResponseSchema,
   priceObservationSchema,
+  scanHistoryEntitlementErrorSchema,
+  scanHistoryResponseSchema,
   type CompareResponseDto,
   type MultiWeekStockUpListResponseDto,
   type NotificationInboxResponseDto,
-  type PriceObservationDto
+  type PriceObservationDto,
+  type ScanHistoryResponseDto
 } from '../index.js';
 
 const validPrice: PriceObservationDto = {
@@ -134,6 +137,37 @@ const validCompareResponse: CompareResponseDto = {
   missingItemIds: ['butter']
 };
 
+const validScanHistoryResponse: ScanHistoryResponseDto = {
+  userId: 'user-1',
+  generatedAt: '2026-05-20T13:00:00.000Z',
+  retainedDays: 90,
+  itemCount: 1,
+  rows: [
+    {
+      id: 'receipt-1',
+      kind: 'receipt',
+      createdAt: '2026-05-20T12:59:00.000Z',
+      status: 'parsed',
+      correctionStatus: 'pending_review',
+      redactedSummary: 'Receipt OCR summary available; raw receipt text and payload metadata stay redacted.',
+      redactedMetadata: {
+        storeName: 'Store redacted',
+        itemCount: 1,
+        totalSek: 49.9,
+        productSlug: 'zoegas-coffee'
+      },
+      lowConfidenceRowCount: 1
+    }
+  ],
+  guardrails: [
+    'OCR scan history is account-scoped and only available after the server verifies an active premium entitlement.'
+  ],
+  entitlement: {
+    requiredTier: 'premium',
+    enforced: true
+  }
+};
+
 describe('api contract schemas', () => {
   it('exports DTO schemas for the Phase 1 API resources', () => {
     assert.deepEqual(Object.keys(apiContractSchemas).sort(), [
@@ -154,6 +188,9 @@ describe('api contract schemas', () => {
       'product',
       'productPricesResponse',
       'provenance',
+      'scanHistoryEntitlementError',
+      'scanHistoryResponse',
+      'scanHistoryRow',
       'store',
       'watchlist'
     ]);
@@ -280,6 +317,36 @@ describe('api contract schemas', () => {
     );
   });
 
+  it('models premium scan history with redacted metadata and correction status', () => {
+    const parsed = scanHistoryResponseSchema.parse(validScanHistoryResponse);
+
+    assert.equal(parsed.entitlement.requiredTier, 'premium');
+    assert.equal(parsed.entitlement.enforced, true);
+    assert.equal(parsed.rows[0]?.correctionStatus, 'pending_review');
+    assert.equal(parsed.rows[0]?.redactedMetadata.totalSek, 49.9);
+    assert.equal(parsed.rows[0]?.lowConfidenceRowCount, 1);
+    assert.equal(
+      scanHistoryResponseSchema.safeParse({
+        ...validScanHistoryResponse,
+        rows: [{
+          ...validScanHistoryResponse.rows[0]!,
+          correctionStatus: 'unreviewed',
+          rawReceiptText: 'private OCR payload'
+        }]
+      }).success,
+      false
+    );
+
+    const entitlementError = scanHistoryEntitlementErrorSchema.parse({
+      error: 'premium_scan_history_required',
+      message: 'Active premium subscription is required for OCR scan history.',
+      requiredTier: 'premium',
+      upgradeHref: '/pricing',
+      enforcementReasons: ['missing_subscription_entitlement']
+    });
+    assert.deepEqual(entitlementError.enforcementReasons, ['missing_subscription_entitlement']);
+  });
+
 
   it('models signed-in multi-week stock-up rows as observed historical facts, not forecasts', () => {
     const parsed = multiWeekStockUpListResponseSchema.parse(validStockUpList);
@@ -315,6 +382,16 @@ describe('api contract schemas', () => {
     assert.deepEqual(apiContractOpenApiComponents.NotificationInboxResponse.properties.queue.items, {
       $ref: '#/components/schemas/NotificationInboxQueueItem'
     });
+    assert.deepEqual(apiContractOpenApiComponents.ScanHistoryResponse.properties.rows.items, {
+      $ref: '#/components/schemas/ScanHistoryRow'
+    });
+    assert.deepEqual(apiContractOpenApiComponents.ScanHistoryRow.properties.correctionStatus.enum, [
+      'none',
+      'pending_review',
+      'corrected',
+      'rejected'
+    ]);
+    assert.equal(apiContractOpenApiComponents.ScanHistoryResponse.properties.entitlement.properties.enforced.enum[0], true);
     assert.deepEqual(apiContractOpenApiComponents.NotificationInboxResponse.required, [
       'userId',
       'generatedAt',

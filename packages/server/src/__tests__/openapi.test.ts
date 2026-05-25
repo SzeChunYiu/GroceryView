@@ -163,7 +163,28 @@ describe('buildOpenApiDocument', () => {
     assert.match(doc.paths['/api/settings/data-export'].get?.summary ?? '', /download my data|data export/i);
     assert.deepEqual(doc.paths['/api/pantry/replenishment'].post?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/scans/history'].get?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/scans/history'].get?.responses?.['200']?.content?.['application/json']?.schema, {
+      $ref: '#/components/schemas/ScanHistoryResponse'
+    });
     assert.deepEqual(doc.paths['/api/scans/history'].post?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.components.schemas.ScanHistoryResponse.required, [
+      'userId',
+      'generatedAt',
+      'retainedDays',
+      'itemCount',
+      'rows',
+      'guardrails',
+      'entitlement'
+    ]);
+    assert.deepEqual(doc.components.schemas.ScanHistoryResponse.properties.rows.items, {
+      $ref: '#/components/schemas/ScanHistoryRow'
+    });
+    assert.deepEqual(doc.components.schemas.ScanHistoryRow.properties.correctionStatus.enum, [
+      'none',
+      'pending_review',
+      'corrected',
+      'rejected'
+    ]);
     assert.deepEqual(doc.paths['/api/scans/process'].post?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/scans/upload-url'].post?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/metrics/notifications'].get?.security, [{ metricsToken: [] }]);

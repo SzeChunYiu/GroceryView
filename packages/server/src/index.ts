@@ -2006,7 +2006,11 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
     const access = buildSubscriptionAccessPolicy({ entitlement, now });
     if (hasActivePremiumEntitlement({ entitlement, now })) return null;
     return jsonResponse({
-      error: 'Active premium subscription is required for OCR scan history.',
+      error: 'premium_scan_history_required',
+      message: 'Active premium subscription is required for OCR scan history.',
+      requiredTier: 'premium',
+      upgradeHref: '/pricing',
+      enforcementReasons: access.enforcementReasons,
       access
     }, { status: 402 });
   };
@@ -3175,7 +3179,31 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         const premiumError = await requireOcrScanHistoryPremium(user);
         if (premiumError) return premiumError;
         if (method === 'GET') {
-          return jsonResponse(api.getOcrScanHistory(user));
+          const history = api.getOcrScanHistory(user);
+          return jsonResponse({
+            userId: history.userId,
+            generatedAt: (authOptions.now ?? new Date()).toISOString(),
+            retainedDays: 90,
+            itemCount: history.itemCount,
+            rows: history.items.map((item) => ({
+              id: item.scanId,
+              kind: item.kind,
+              createdAt: item.capturedAt,
+              status: item.status,
+              correctionStatus: item.lowConfidenceRows.length > 0 ? 'pending_review' : 'none',
+              redactedSummary: 'Receipt OCR summary available; raw receipt text and payload metadata stay redacted.',
+              redactedMetadata: {
+                ...(item.itemCount === undefined ? {} : { itemCount: item.itemCount }),
+                ...(item.totalAmount === undefined ? {} : { totalSek: item.totalAmount })
+              },
+              lowConfidenceRowCount: item.lowConfidenceRows.length
+            })),
+            guardrails: history.guardrails,
+            entitlement: {
+              requiredTier: 'premium',
+              enforced: true
+            }
+          });
         }
         if (method === 'POST') {
           const body = await readJson(request);
@@ -3440,7 +3468,10 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/privacy/deletion-plan': { post: protectedOperation('Plan account deletion, including friend-shared deal signals, without performing a destructive delete.') },
       '/api/privacy/request-fulfillment': { post: protectedOperation('Classify privacy export, deletion, and ad opt-out requests by fulfillment deadline.') },
       '/api/scans/history': {
-        get: protectedOperation('List premium OCR receipt scan history after entitlement enforcement.'),
+        get: operationWithJsonResponse(
+          protectedOperation('List premium OCR receipt scan history after entitlement enforcement. Returns redacted metadata, correction status, and premium entitlement errors.'),
+          'ScanHistoryResponse'
+        ),
         post: protectedOperation('Persist a premium OCR receipt scan history summary after entitlement enforcement.')
       },
       '/api/scans/process': { post: protectedOperation('Process barcode or receipt scan payloads through configured providers and return review routing work.') },

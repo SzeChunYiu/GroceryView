@@ -174,6 +174,50 @@ export const multiWeekStockUpListResponseSchema = z.object({
   })
 });
 
+export const scanHistoryCorrectionStatusSchema = z.enum(['none', 'pending_review', 'corrected', 'rejected']);
+
+export const scanHistoryRedactedMetadataSchema = z.object({
+  storeName: idSchema.optional(),
+  itemCount: z.number().int().nonnegative().optional(),
+  totalSek: z.number().nonnegative().optional(),
+  productSlug: idSchema.optional(),
+  compareHref: idSchema.optional(),
+  listHref: idSchema.optional(),
+  reportHref: idSchema.optional()
+});
+
+export const scanHistoryRowSchema = z.object({
+  id: idSchema,
+  kind: z.enum(['receipt', 'barcode']),
+  createdAt: isoDateTimeSchema,
+  status: idSchema,
+  correctionStatus: scanHistoryCorrectionStatusSchema,
+  redactedSummary: idSchema,
+  redactedMetadata: scanHistoryRedactedMetadataSchema,
+  lowConfidenceRowCount: z.number().int().nonnegative().default(0)
+});
+
+export const scanHistoryEntitlementErrorSchema = z.object({
+  error: z.literal('premium_scan_history_required'),
+  message: idSchema,
+  requiredTier: z.literal('premium'),
+  upgradeHref: z.literal('/pricing'),
+  enforcementReasons: z.array(idSchema)
+});
+
+export const scanHistoryResponseSchema = z.object({
+  userId: idSchema,
+  generatedAt: isoDateTimeSchema,
+  retainedDays: z.number().int().positive(),
+  itemCount: z.number().int().nonnegative(),
+  rows: z.array(scanHistoryRowSchema),
+  guardrails: z.array(idSchema),
+  entitlement: z.object({
+    requiredTier: z.literal('premium'),
+    enforced: z.literal(true)
+  })
+});
+
 export const alertSchema = z.object({
   id: idSchema,
   userId: idSchema,
@@ -258,6 +302,9 @@ export const apiContractSchemas = {
   priceObservation: priceObservationSchema,
   product: productSchema,
   notificationInboxResponse: notificationInboxResponseSchema,
+  scanHistoryEntitlementError: scanHistoryEntitlementErrorSchema,
+  scanHistoryResponse: scanHistoryResponseSchema,
+  scanHistoryRow: scanHistoryRowSchema,
   productPricesResponse: productPricesResponseSchema,
   provenance: provenanceSchema,
   store: storeSchema,
@@ -289,6 +336,10 @@ export type PriceType = z.infer<typeof priceTypeSchema>;
 export type ProductDto = z.infer<typeof productSchema>;
 export type ProductPricesResponseDto = z.infer<typeof productPricesResponseSchema>;
 export type ProvenanceDto = z.infer<typeof provenanceSchema>;
+export type ScanHistoryCorrectionStatus = z.infer<typeof scanHistoryCorrectionStatusSchema>;
+export type ScanHistoryEntitlementErrorDto = z.infer<typeof scanHistoryEntitlementErrorSchema>;
+export type ScanHistoryResponseDto = z.infer<typeof scanHistoryResponseSchema>;
+export type ScanHistoryRowDto = z.infer<typeof scanHistoryRowSchema>;
 export type SourceType = z.infer<typeof sourceTypeSchema>;
 export type StoreDto = z.infer<typeof storeSchema>;
 export type WatchlistDto = z.infer<typeof watchlistSchema>;
@@ -489,6 +540,71 @@ export const apiContractOpenApiComponents = {
       guardrails: {
         type: 'array',
         items: { type: 'string' }
+      }
+    }
+  },
+  ScanHistoryRow: {
+    type: 'object',
+    required: ['id', 'kind', 'createdAt', 'status', 'correctionStatus', 'redactedSummary', 'redactedMetadata', 'lowConfidenceRowCount'],
+    properties: {
+      id: { type: 'string' },
+      kind: { type: 'string', enum: ['receipt', 'barcode'] },
+      createdAt: { type: 'string', format: 'date-time' },
+      status: { type: 'string' },
+      correctionStatus: { type: 'string', enum: scanHistoryCorrectionStatusSchema.options },
+      redactedSummary: { type: 'string' },
+      redactedMetadata: {
+        type: 'object',
+        properties: {
+          storeName: { type: 'string' },
+          itemCount: { type: 'integer', minimum: 0 },
+          totalSek: { type: 'number', minimum: 0 },
+          productSlug: { type: 'string' },
+          compareHref: { type: 'string' },
+          listHref: { type: 'string' },
+          reportHref: { type: 'string' }
+        }
+      },
+      lowConfidenceRowCount: { type: 'integer', minimum: 0 }
+    }
+  },
+  ScanHistoryEntitlementError: {
+    type: 'object',
+    required: ['error', 'message', 'requiredTier', 'upgradeHref', 'enforcementReasons'],
+    properties: {
+      error: { type: 'string', enum: ['premium_scan_history_required'] },
+      message: { type: 'string' },
+      requiredTier: { type: 'string', enum: ['premium'] },
+      upgradeHref: { type: 'string', enum: ['/pricing'] },
+      enforcementReasons: {
+        type: 'array',
+        items: { type: 'string' }
+      }
+    }
+  },
+  ScanHistoryResponse: {
+    type: 'object',
+    required: ['userId', 'generatedAt', 'retainedDays', 'itemCount', 'rows', 'guardrails', 'entitlement'],
+    properties: {
+      userId: { type: 'string' },
+      generatedAt: { type: 'string', format: 'date-time' },
+      retainedDays: { type: 'integer', minimum: 1 },
+      itemCount: { type: 'integer', minimum: 0 },
+      rows: {
+        type: 'array',
+        items: { $ref: '#/components/schemas/ScanHistoryRow' }
+      },
+      guardrails: {
+        type: 'array',
+        items: { type: 'string' }
+      },
+      entitlement: {
+        type: 'object',
+        required: ['requiredTier', 'enforced'],
+        properties: {
+          requiredTier: { type: 'string', enum: ['premium'] },
+          enforced: { type: 'boolean', enum: [true] }
+        }
       }
     }
   },

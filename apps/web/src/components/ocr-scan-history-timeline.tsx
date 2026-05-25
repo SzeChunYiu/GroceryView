@@ -10,6 +10,7 @@ const redactedFallbackRows: ScannerHistoryRow[] = [
     createdAt: 'Signed-in only',
     kind: 'receipt',
     status: 'redacted fallback',
+    correctionStatus: 'none',
     redactedSummary: 'Previous receipt OCR rows load after sign-in; anonymous visitors only see this redacted shell.',
     storeName: 'Store redacted',
   },
@@ -18,6 +19,7 @@ const redactedFallbackRows: ScannerHistoryRow[] = [
     createdAt: 'Signed-in only',
     kind: 'barcode',
     status: 'redacted fallback',
+    correctionStatus: 'none',
     redactedSummary: 'Barcode scan history stays account-bound and is fetched with the session token.',
     storeName: 'Store redacted',
     productSlug: 'barcode-match',
@@ -87,6 +89,7 @@ export function OcrScanHistoryTimeline() {
               <p className="text-sm font-semibold text-slate-600">{row.createdAt}</p>
             </div>
             <p className="mt-2 text-sm leading-6 text-slate-700">{row.redactedSummary}</p>
+            <p className="mt-2 text-xs font-black uppercase tracking-[0.14em] text-indigo-800">Correction status: {row.correctionStatus}</p>
             <p className="mt-2 text-sm font-semibold text-indigo-900">{row.storeName} {row.itemCount ? `· ${row.itemCount} OCR items` : ''} {row.totalSek ? `· ${row.totalSek} kr` : ''}</p>
             {row.kind === 'barcode' ? (
               <div className="mt-3 flex flex-wrap gap-2">
