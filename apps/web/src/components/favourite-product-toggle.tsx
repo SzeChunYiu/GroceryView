@@ -9,6 +9,7 @@ import {
   toggleFavouriteProduct,
   type FavouriteProductInput
 } from '@/lib/favourites';
+import { rememberBrandPreferenceAction } from '@/lib/personalization';
 
 export function FavouriteProductToggle({
   product,
@@ -50,8 +51,22 @@ export function FavouriteProductToggle({
         setIsReady(true);
         return;
       }
+      if (product.brand) {
+        rememberBrandPreferenceAction({
+          action: next.isFavourite ? 'favorite_added' : 'favorite_removed',
+          brand: product.brand,
+          productSlug: product.slug
+        });
+      }
       setIsFavourite(next.isFavourite);
-      window.dispatchEvent(new CustomEvent(FAVOURITES_UPDATED_EVENT, { detail: { slug: product.slug, isFavourite: next.isFavourite } }));
+      window.dispatchEvent(new CustomEvent(FAVOURITES_UPDATED_EVENT, {
+        detail: {
+          brand: product.brand ?? null,
+          preferenceAction: next.isFavourite ? 'favorite_added' : 'favorite_removed',
+          slug: product.slug,
+          isFavourite: next.isFavourite
+        }
+      }));
     } catch {
       setIsFavourite(false);
       setIsReady(true);

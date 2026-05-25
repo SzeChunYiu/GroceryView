@@ -24,8 +24,10 @@ export type DietaryPreferenceOnboardingContract = {
 export const defaultHouseholdId = 'stockholm-family-demo';
 export const recentSearchHistoryStorageKey = 'groceryview:recent-product-searches';
 export const brandPreferenceStorageKey = 'groceryview:brand-preferences:v1';
+export const brandPreferenceSignalsStorageKey = 'groceryview:brand-preference-signals:v1';
 export const disabledPersonalizationSignalsStorageKey = 'groceryview:personalization-disabled-signals:v1';
 const maxRecentSearchHistory = 10;
+const maxBrandPreferenceSignals = 80;
 
 export type PersonalizationTransparencySignal = {
   id: string;
@@ -53,8 +55,8 @@ export const personalizationTransparencySignals: PersonalizationTransparencySign
   {
     id: 'brand_controls',
     label: 'Brand substitution controls',
-    source: 'Favorite, acceptable, and excluded brand choices saved from settings.',
-    recommendationUse: 'Boosts favorites, allows fallback brands, and suppresses excluded substitutions.',
+    source: 'Favorite, watchlist, ignored-recommendation, acceptable, and excluded brand choices saved on this device.',
+    recommendationUse: 'Learns liked and disliked brands, boosts favorites, allows fallback brands, and suppresses excluded substitutions.',
     clearAction: 'Reset brand controls.'
   },
   {
@@ -197,6 +199,29 @@ type RecommendationProductInput = {
   totalPriceLabel?: string;
 };
 
+export type BrandPreferenceSignalAction =
+  | 'favorite_added'
+  | 'favorite_removed'
+  | 'watchlist_added'
+  | 'watchlist_removed'
+  | 'recommendation_ignored';
+
+export type BrandPreferenceSignal = {
+  action: BrandPreferenceSignalAction;
+  brand: string;
+  observedAt: string;
+  productSlug?: string;
+};
+
+export type LearnedBrandPreference = {
+  brand: string;
+  score: number;
+  tolerance: BrandTolerance;
+  positiveSignals: number;
+  negativeSignals: number;
+  reason: string;
+};
+
 export type PersonalizedRecommendation = RecommendationProductInput & {
   score: number;
   reason: string;
@@ -224,6 +249,91 @@ const demoReorderSignals: ReorderProductSignal[] = [
   { productSlug: 'banana', watchedCount: 8, favoriteSaves: 1, repeatPurchases: 2, lastActionLabel: 'watched for price drops' },
   { productSlug: 'coffee', watchedCount: 4, favoriteSaves: 2, repeatPurchases: 2, lastActionLabel: 'favorite pantry refill' },
 ];
+const brandPreferenceActionWeights: Record<BrandPreferenceSignalAction, number> = {
+  favorite_added: 18,
+  favorite_removed: -8,
+  watchlist_added: 12,
+  watchlist_removed: -6,
+  recommendation_ignored: -30,
+};
+
+type BrandPreferenceStorage = Pick<Storage, 'getItem' | 'setItem'> | null | undefined;
+
+function getBrandPreferenceStorage(): BrandPreferenceStorage {
+  if (typeof window === 'undefined') return null;
+  try {
+    return window.localStorage;
+  } catch {
+    return null;
+  }
+}
+
+function normalizeBrand(value: string) {
+  return value.trim();
+}
+
+function isBrandPreferenceSignal(value: unknown): value is BrandPreferenceSignal {
+  return Boolean(
+    value
+      && typeof value === 'object'
+      && typeof (value as BrandPreferenceSignal).brand === 'string'
+      && typeof (value as BrandPreferenceSignal).action === 'string'
+      && (value as BrandPreferenceSignal).action in brandPreferenceActionWeights
+  );
+}
+
+export function readBrandPreferenceSignals(storage: BrandPreferenceStorage = getBrandPreferenceStorage()): BrandPreferenceSignal[] {
+  if (!storage) return [];
+  try {
+    const parsed = JSON.parse(storage.getItem(brandPreferenceSignalsStorageKey) || '[]') as unknown;
+    return Array.isArray(parsed)
+      ? parsed.filter(isBrandPreferenceSignal).slice(0, maxBrandPreferenceSignals)
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+export function scoreLearnedBrandPreferences(signals: readonly BrandPreferenceSignal[]): LearnedBrandPreference[] {
+  const totals = new Map<string, { brand: string; score: number; positiveSignals: number; negativeSignals: number }>();
+  for (const signal of signals) {
+    const brand = normalizeBrand(signal.brand);
+    if (!brand) continue;
+    const key = brand.toLocaleLowerCase('sv-SE');
+    const weight = brandPreferenceActionWeights[signal.action];
+    const current = totals.get(key) ?? { brand, score: 0, positiveSignals: 0, negativeSignals: 0 };
+    current.score += weight;
+    if (weight > 0) current.positiveSignals += 1;
+    if (weight < 0) current.negativeSignals += 1;
+    totals.set(key, current);
+  }
+
+  return [...totals.values()]
+    .map((entry) => ({
+      ...entry,
+      tolerance: entry.score >= 18 ? 'favorite' as BrandTolerance : entry.score <= -24 ? 'excluded' as BrandTolerance : 'acceptable' as BrandTolerance,
+      reason: `${entry.positiveSignals} liked action${entry.positiveSignals === 1 ? '' : 's'} · ${entry.negativeSignals} negative action${entry.negativeSignals === 1 ? '' : 's'}`
+    }))
+    .sort((left, right) => right.score - left.score || left.brand.localeCompare(right.brand, 'sv-SE'));
+}
+
+export function rememberBrandPreferenceAction(
+  signal: Omit<BrandPreferenceSignal, 'observedAt'>,
+  storage: BrandPreferenceStorage = getBrandPreferenceStorage(),
+) {
+  const brand = normalizeBrand(signal.brand);
+  if (!brand || !storage) return scoreLearnedBrandPreferences(readBrandPreferenceSignals(storage));
+  const next = [
+    { ...signal, brand, observedAt: new Date().toISOString() },
+    ...readBrandPreferenceSignals(storage)
+  ].slice(0, maxBrandPreferenceSignals);
+  try {
+    storage.setItem(brandPreferenceSignalsStorageKey, JSON.stringify(next));
+  } catch {
+    return scoreLearnedBrandPreferences(readBrandPreferenceSignals(storage));
+  }
+  return scoreLearnedBrandPreferences(next);
+}
 
 function reorderSignalScore(signal: Pick<ReorderProductSignal, 'favoriteSaves' | 'repeatPurchases' | 'watchedCount'>) {
   return (
@@ -329,12 +439,17 @@ export function buildPersonalizedRecommendationRail<T extends RecommendationProd
     householdId?: string;
     favoriteBrands?: readonly string[];
     avoidedBrands?: readonly string[];
+    brandPreferenceSignals?: readonly BrandPreferenceSignal[];
     recentListActivity?: readonly string[];
     limit?: number;
   } = {},
 ): PersonalizedRecommendation[] {
   const favoriteBrands = new Set((options.favoriteBrands ?? ['Garant', 'Änglamark', 'Kaffe']).map((brand) => brand.toLocaleLowerCase('sv-SE')));
   const avoidedBrands = new Set((options.avoidedBrands ?? ['Unknown private label']).map((brand) => brand.toLocaleLowerCase('sv-SE')));
+  const learnedBrands = new Map(scoreLearnedBrandPreferences(options.brandPreferenceSignals ?? []).map((preference) => [
+    preference.brand.toLocaleLowerCase('sv-SE'),
+    preference
+  ]));
   const recentWords = (options.recentListActivity ?? ['milk', 'bread', 'coffee', 'fruit'])
     .flatMap((item) => item.toLocaleLowerCase('sv-SE').split(/\s+/))
     .filter((word) => word.length > 2);
@@ -344,11 +459,16 @@ export function buildPersonalizedRecommendationRail<T extends RecommendationProd
       const haystack = `${product.name} ${product.brand ?? ''}`.toLocaleLowerCase('sv-SE');
       const favoriteHit = product.brand ? favoriteBrands.has(product.brand.toLocaleLowerCase('sv-SE')) : false;
       const avoidedHit = product.brand ? avoidedBrands.has(product.brand.toLocaleLowerCase('sv-SE')) : false;
+      const learnedBrand = product.brand ? learnedBrands.get(product.brand.toLocaleLowerCase('sv-SE')) : undefined;
       const listHits = recentWords.filter((word) => haystack.includes(word)).length;
       const historyScore = getHouseholdCategoryScore(product.slug.split('-').slice(0, 2).join('-'), options.householdId ?? defaultHouseholdId);
-      const score = historyScore + listHits * 18 + (favoriteHit ? 24 : 0) - (avoidedHit ? 120 : 0) + Math.max(0, 8 - index);
+      const score = historyScore + listHits * 18 + (favoriteHit ? 24 : 0) - (avoidedHit ? 120 : 0) + (learnedBrand?.score ?? 0) + Math.max(0, 8 - index);
       const reason = avoidedHit
         ? `Avoided brand control lowers ${product.brand} for recommendations and substitutions`
+        : learnedBrand?.tolerance === 'excluded'
+          ? `Ignored recommendation history lowers ${product.brand}: ${learnedBrand.reason}`
+          : learnedBrand?.tolerance === 'favorite'
+            ? `Learned brand preference for ${product.brand}: ${learnedBrand.reason}`
         : favoriteHit
         ? `Favorite brand signal for ${product.brand}`
         : listHits > 0

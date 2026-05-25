@@ -114,7 +114,7 @@ export function FavouriteProductsPageClient({ productCatalogue }: Readonly<{ pro
           {visibleProducts.map(({ savedProduct, liveProduct }) => (
             <Card className="relative overflow-hidden border-rose-100 bg-white p-4" key={liveProduct.slug}>
               <div className="absolute right-3 top-3 z-10">
-                <FavouriteProductToggle product={{ slug: liveProduct.slug, name: liveProduct.name, imageUrl: liveProduct.imageUrl }} />
+                <FavouriteProductToggle product={{ slug: liveProduct.slug, name: liveProduct.name, brand: liveProduct.brand, imageUrl: liveProduct.imageUrl }} />
               </div>
               <Link className="group block pr-24" href={`/products/${liveProduct.slug}`}>
                 {liveProduct.imageUrl && liveProduct.imageAlt ? (

@@ -4,12 +4,14 @@ export const FAVOURITES_UPDATED_EVENT = 'groceryview:favourite-products-updated'
 export type FavouriteProductInput = {
   slug: string;
   name: string;
+  brand?: string | null;
   imageUrl?: string | null;
 };
 
 export type FavouriteProductEntry = {
   slug: string;
   name: string;
+  brand?: string | null;
   imageUrl: string | null;
   savedAt: string;
 };
@@ -22,17 +24,19 @@ function normalizeEntry(value: unknown): FavouriteProductEntry | null {
   if (typeof value === 'string') {
     const slug = value.trim();
     if (!slug) return null;
-    return { slug, name: slug, imageUrl: null, savedAt: '' };
+    return { slug, name: slug, brand: null, imageUrl: null, savedAt: '' };
   }
   if (!isRecord(value) || typeof value.slug !== 'string') return null;
   const slug = value.slug.trim();
   if (!slug) return null;
   const rawName = typeof value.name === 'string' ? value.name.trim() : '';
+  const rawBrand = typeof value.brand === 'string' && value.brand.trim() ? value.brand.trim() : null;
   const rawImage = typeof value.imageUrl === 'string' && value.imageUrl.trim() ? value.imageUrl.trim() : null;
   const rawSavedAt = typeof value.savedAt === 'string' ? value.savedAt : '';
   return {
     slug,
     name: rawName || slug,
+    brand: rawBrand,
     imageUrl: rawImage,
     savedAt: rawSavedAt
   };
@@ -59,6 +63,7 @@ export function serializeFavouriteProductEntries(entries: readonly FavouriteProd
   return JSON.stringify(entries.map((entry) => ({
     slug: entry.slug,
     name: entry.name,
+    brand: entry.brand,
     imageUrl: entry.imageUrl,
     savedAt: entry.savedAt
   })));
@@ -117,6 +122,7 @@ export function toggleFavouriteProduct(
       {
         slug,
         name: product.name.trim() || slug,
+        brand: product.brand?.trim() || null,
         imageUrl: product.imageUrl ?? null,
         savedAt
       },
