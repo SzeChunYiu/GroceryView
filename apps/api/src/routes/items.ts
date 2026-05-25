@@ -3,8 +3,9 @@ export const itemsRoutes = {
   detailAlias: 'items/:id',
   seasonalSalePattern: 'items/:id/seasonal-sale-pattern',
   substitutionSuggestions: 'items/:id/substitution-suggestions',
+  storeComparison: 'items/:id/store-comparison',
   holidayWindow: 'midsommar',
-  description: 'Item detail, seasonalSalePattern metadata, substitutionSuggestions, and localized product names backed by explicit current price evidence.',
+  description: 'Item detail, seasonalSalePattern metadata, substitutionSuggestions, multi-store current price comparison, and localized product names backed by explicit current price evidence.',
   queryParams: ['holiday', 'locale'],
   localeHeader: 'x-groceryview-locale',
   localeCookie: 'NEXT_LOCALE',
@@ -21,9 +22,11 @@ export const itemsRoutes = {
     'evidenceLabel',
     'trigger',
     'suggestions',
+    'storeComparisonRows',
+    'cheapestStore',
     'currentPrice',
     'savingsPercent',
     'guardrail'
   ],
-  guardrail: 'No seasonal sale hint is returned without repeated explicit historical holiday-window price evidence. Substitution suggestions only return same-category, in-stock items with a verified lower current price.'
+  guardrail: 'No seasonal sale hint is returned without repeated explicit historical holiday-window price evidence. Substitution suggestions only return same-category, in-stock items with a verified lower current price. Store comparison charts render only explicit current price rows and highlight the cheapest available row.'
 } as const;
