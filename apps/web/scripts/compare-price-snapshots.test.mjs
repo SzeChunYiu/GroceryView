@@ -96,9 +96,42 @@ describe('compare price snapshots helper', () => {
     assert.deepEqual(result.itemIds, ['milk', 'bread', 'missing']);
     assert.deepEqual(result.missingItemIds, ['missing']);
     assert.deepEqual(result.storeRows, [
-      { itemId: 'milk', itemName: 'Milk', storeName: 'Store A', price: 12.5, priceLabel: '12,50 kr', unitLabel: 'kr/l' },
-      { itemId: 'milk', itemName: 'Milk', storeName: 'Store B', price: 11, priceLabel: '11,00 kr', unitLabel: 'kr/l' },
-      { itemId: 'bread', itemName: 'Bread', storeName: 'Store A', price: 25, priceLabel: '25,00 kr', unitLabel: 'kr/st' }
+      {
+        itemId: 'milk',
+        itemName: 'Milk',
+        storeName: 'Store A',
+        price: 12.5,
+        priceLabel: '12,50 kr',
+        unitLabel: 'kr/l',
+        chainName: 'Store A',
+        packSizeLabel: 'kr/l',
+        normalizedUnitPrice: null,
+        normalizedUnitPriceLabel: undefined
+      },
+      {
+        itemId: 'milk',
+        itemName: 'Milk',
+        storeName: 'Store B',
+        price: 11,
+        priceLabel: '11,00 kr',
+        unitLabel: 'kr/l',
+        chainName: 'Store B',
+        packSizeLabel: 'kr/l',
+        normalizedUnitPrice: null,
+        normalizedUnitPriceLabel: undefined
+      },
+      {
+        itemId: 'bread',
+        itemName: 'Bread',
+        storeName: 'Store A',
+        price: 25,
+        priceLabel: '25,00 kr',
+        unitLabel: 'kr/st',
+        chainName: 'Store A',
+        packSizeLabel: 'kr/st',
+        normalizedUnitPrice: null,
+        normalizedUnitPriceLabel: undefined
+      }
     ]);
   });
 

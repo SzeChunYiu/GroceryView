@@ -10,6 +10,7 @@ export function dataGridStatusClass(tone: DataGridStatusTone) {
   if (tone === 'failing') return 'bg-rose-100 text-rose-900';
   return 'bg-slate-100 text-slate-700';
 }
+export const dataGridVirtualStatusClass = 'rounded-2xl border border-violet-100 bg-white px-4 py-3 text-sm font-black text-slate-700 shadow-sm';
 
 type DataGridProps = ComponentPropsWithoutRef<'div'> & {
   striped?: boolean;
