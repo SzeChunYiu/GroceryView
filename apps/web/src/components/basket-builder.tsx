@@ -16,7 +16,7 @@
  */
 "use client";
 
-import { useMemo, useState } from "react";
+import { type KeyboardEvent, useMemo, useState } from "react";
 
 import {
   buildBasketCouponStackOptimizer,
@@ -48,6 +48,13 @@ export function addBasketBuilderProduct<T extends BasketBuilderProduct>(
   }
 
   return [...products, product];
+}
+
+export function removeBasketBuilderProduct<T extends BasketBuilderProduct>(
+  products: T[],
+  productId: string,
+): T[] {
+  return products.filter((product) => product.id !== productId);
 }
 
 export type BasketBuilderProps<T extends BasketBuilderProduct> = {
@@ -111,6 +118,19 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
 
   function add(product: T) {
     setBasketProducts((current) => addBasketBuilderProduct(current, product));
+  }
+
+  function remove(product: T) {
+    setBasketProducts((current) => removeBasketBuilderProduct(current, product.id));
+  }
+
+  function removeOnBackspace(event: KeyboardEvent<HTMLLIElement>, product: T) {
+    if (event.key !== 'Backspace') return;
+
+    event.preventDefault();
+    if (window.confirm(`Remove ${product.name} from basket?`)) {
+      remove(product);
+    }
   }
 
   function recommendationReasonsFor(product: T) {
@@ -203,7 +223,14 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
       <h2>Basket</h2>
       <ul>
         {basketProducts.map((product) => (
-          <li key={product.id}>{product.name}</li>
+          <li
+            aria-label={`${product.name} basket row`}
+            key={product.id}
+            onKeyDown={(event) => removeOnBackspace(event, product)}
+            tabIndex={0}
+          >
+            {product.name}
+          </li>
         ))}
       </ul>
 
