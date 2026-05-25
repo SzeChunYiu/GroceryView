@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { DealCard } from '@/components/deal-card';
+import { buildDealFeedFilters, dealMatchesFeedFilters, filterDealFeed } from '@/lib/deal-context';
 import { categoryLabels, pricedProducts } from '@/lib/openprices-products';
 import { buildNewProductArrivals } from '@/lib/freshness';
 import { buildPantryReplacementFilter, pantryReplacementMatches } from '@/lib/pantry';
@@ -13,8 +14,12 @@ type SearchParams = Record<string, string | string[] | undefined>;
 type ReplacementDeal = {
   categoryLabel: string;
   categorySlug: string;
+  chainId: string;
+  chainLabel: string;
+  city: string;
   currentPrice: number;
   dealId: string;
+  discountPercent: number;
   imageAlt?: string;
   imageUrl?: string | null;
   originalPrice?: number;
@@ -54,8 +59,12 @@ function flyerDealEndsAt(index: number) {
 const spreadDeals: ReplacementDeal[] = topChainSpreads.map((product) => ({
   categoryLabel: labelFromSlug(product.category),
   categorySlug: product.category,
+  chainId: product.lowestChain,
+  chainLabel: product.lowestChain,
+  city: 'stockholm',
   currentPrice: product.lowestPrice,
   dealId: `spread-${product.slug}`,
+  discountPercent: product.spreadPct,
   imageAlt: `${product.name} product image`,
   imageUrl: product.image,
   originalPrice: product.highestPrice > product.lowestPrice ? product.highestPrice : undefined,
@@ -67,8 +76,12 @@ const spreadDeals: ReplacementDeal[] = topChainSpreads.map((product) => ({
 const priceDropDeals: ReplacementDeal[] = priceDropMoversBoard.map((mover) => ({
   categoryLabel: mover.categoryLabel,
   categorySlug: slugFromLabel(mover.categoryLabel),
+  chainId: 'openprices',
+  chainLabel: 'OpenPrices',
+  city: 'stockholm',
   currentPrice: mover.latestPrice,
   dealId: `drop-${mover.productSlug}`,
+  discountPercent: Math.abs(mover.changePercent),
   imageUrl: mover.imageUrl,
   originalPrice: mover.previousPrice > mover.latestPrice ? mover.previousPrice : undefined,
   productName: mover.productName,
@@ -106,10 +119,29 @@ const newProductArrivals = buildNewProductArrivals(pricedProducts.map((product) 
 export default async function DealsPage({ searchParams }: Readonly<{ searchParams?: Promise<SearchParams> }>) {
   const params = (await searchParams) ?? {};
   const replacementFilter = buildPantryReplacementFilter(paramValue(params.replace));
+  const dealFilters = buildDealFeedFilters({
+    category: params.category,
+    chain: params.chain,
+    city: params.city,
+    minDiscount: params.minDiscount
+  });
+  const filteredReplacementDeals = filterDealFeed(replacementDeals, dealFilters);
   const visibleDeals = (replacementFilter
-    ? replacementDeals.filter((deal) => pantryReplacementMatches(replacementFilter, deal))
-    : replacementDeals
+    ? filteredReplacementDeals.filter((deal) => pantryReplacementMatches(replacementFilter, deal))
+    : filteredReplacementDeals
   ).slice(0, 8);
+  const filteredLocalDropFeed = localDropFeed.filter((item) => dealMatchesFeedFilters({
+    categoryLabel: item.category,
+    categorySlug: slugFromLabel(item.category),
+    chainId: 'openprices',
+    chainLabel: 'OpenPrices',
+    city: item.locality,
+    discountPercent: item.dropPercent * 100
+  }, dealFilters));
+  const cityOptions = [...new Set(replacementDeals.map((deal) => deal.city))];
+  const chainOptions = [...new Set(replacementDeals.map((deal) => deal.chainId))];
+  const categoryOptions = [...new Map(replacementDeals.map((deal) => [deal.categorySlug, deal.categoryLabel])).entries()];
+  const feedFilterLabel = dealFilters.activeLabels.length ? dealFilters.activeLabels.join(' · ') : undefined;
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8 text-slate-950 sm:px-6 lg:px-8">
@@ -153,6 +185,42 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
         </div>
       </section>
 
+      <form className="mt-6 grid gap-3 rounded-[2rem] border border-sky-200 bg-sky-50 p-5 shadow-sm md:grid-cols-5" aria-label="Deal feed filters">
+        {replacementFilter ? <input name="replace" type="hidden" value={replacementFilter.replacementId} /> : null}
+        <label className="text-sm font-black text-sky-950">
+          City
+          <select className="mt-1 block w-full rounded-xl border border-sky-200 bg-white px-3 py-2 text-sm font-bold" defaultValue={dealFilters.city ?? ''} name="city">
+            <option value="">All cities</option>
+            {cityOptions.map((city) => <option key={city} value={city}>{city}</option>)}
+          </select>
+        </label>
+        <label className="text-sm font-black text-sky-950">
+          Chain
+          <select className="mt-1 block w-full rounded-xl border border-sky-200 bg-white px-3 py-2 text-sm font-bold" defaultValue={dealFilters.chain ?? ''} name="chain">
+            <option value="">All chains</option>
+            {chainOptions.map((chain) => <option key={chain} value={chain}>{chain}</option>)}
+          </select>
+        </label>
+        <label className="text-sm font-black text-sky-950">
+          Category
+          <select className="mt-1 block w-full rounded-xl border border-sky-200 bg-white px-3 py-2 text-sm font-bold" defaultValue={dealFilters.category ?? ''} name="category">
+            <option value="">All categories</option>
+            {categoryOptions.map(([slug, label]) => <option key={slug} value={slug}>{label}</option>)}
+          </select>
+        </label>
+        <label className="text-sm font-black text-sky-950">
+          Min discount %
+          <input className="mt-1 block w-full rounded-xl border border-sky-200 bg-white px-3 py-2 text-sm font-bold" defaultValue={dealFilters.minDiscountPct ?? ''} min="0" name="minDiscount" step="5" type="number" />
+        </label>
+        <div className="flex items-end gap-2">
+          <button className="rounded-full bg-sky-900 px-4 py-2 text-sm font-black text-white" type="submit">Apply filters</button>
+          {dealFilters.activeLabels.length ? <Link className="text-sm font-black text-sky-900 underline" href="/deals">Clear</Link> : null}
+        </div>
+        <p className="md:col-span-5 text-sm font-semibold text-sky-950">
+          {dealFilters.activeLabels.length ? `Showing deals for ${dealFilters.activeLabels.join(', ')}.` : 'Filter by shopper city, preferred chain, category, and minimum observed discount.'}
+        </p>
+      </form>
+
       <section className="mt-6 rounded-[2rem] border border-emerald-200 bg-white p-5 shadow-sm" aria-label="Nearby products with recent price and unit-price drops" data-local-price-drop-feed>
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
@@ -163,9 +231,9 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
             Ranked by recent percentage drops, then by normalized unit-price savings. Package-size gaps fall back to per-item savings.
           </p>
         </div>
-        {localDropFeed.length > 0 ? (
+        {filteredLocalDropFeed.length > 0 ? (
           <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {localDropFeed.map((item) => (
+            {filteredLocalDropFeed.map((item) => (
               <DealCard
                 categoryLabel={item.category}
                 currentPrice={item.latestPrice}
@@ -173,6 +241,7 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
                 discountStartedAt={item.latestObservedAt}
                 dropPercentLabel={`${formatPercent(item.dropPercent)} drop`}
                 evidenceLabel={`${item.evidenceLabel}. Unit price moved from ${formatSek(item.previousWeekUnitPrice)}/${item.unitPriceUnit} to ${formatSek(item.latestUnitPrice)}/${item.unitPriceUnit}.`}
+                feedFilterLabel={feedFilterLabel}
                 key={item.productSlug}
                 localityLabel={item.locality}
                 originalPrice={item.previousWeekPrice}
@@ -257,6 +326,7 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
             replacementLabel={replacementFilter ? `Replacement for ${replacementFilter.label}` : undefined}
             sharePath={`/products/${deal.productSlug}`}
             sourceLabel={deal.sourceLabel}
+            feedFilterLabel={feedFilterLabel ?? `${deal.city} · ${deal.chainLabel}`}
             title={deal.productName}
           />
         ))}

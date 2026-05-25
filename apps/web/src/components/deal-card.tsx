@@ -54,6 +54,7 @@ type DealCardProps = {
   dropPercentLabel?: string;
   unitPriceDropLabel?: string;
   evidenceLabel?: string;
+  feedFilterLabel?: string;
   freshnessObservedAt?: string | number | Date | null;
   replacementLabel?: string;
   sourceLabel?: string;
@@ -193,6 +194,7 @@ export function DealCard({
   dropPercentLabel,
   unitPriceDropLabel,
   evidenceLabel,
+  feedFilterLabel,
   freshnessObservedAt,
   replacementLabel,
   sourceLabel,
@@ -347,6 +349,11 @@ export function DealCard({
         {unitPriceDropLabel ? (
           <span className="rounded-full bg-market-mint/15 px-3 py-1 text-xs font-semibold text-market-ink">
             {unitPriceDropLabel}
+          </span>
+        ) : null}
+        {feedFilterLabel ? (
+          <span className="rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-900">
+            {feedFilterLabel}
           </span>
         ) : null}
         {context.streakLabel ? (

@@ -21,6 +21,23 @@ export type DealContext = {
   isNewLowestPrice: boolean;
 };
 
+export type DealFeedFilters = {
+  city?: string;
+  chain?: string;
+  category?: string;
+  minDiscountPct?: number;
+  activeLabels: string[];
+};
+
+export type DealFeedFilterableItem = {
+  categoryLabel?: string;
+  categorySlug?: string;
+  chainId?: string;
+  chainLabel?: string;
+  city?: string;
+  discountPercent?: number;
+};
+
 export type SeasonalProduceMonthPoint = {
   monthIndex?: number;
   monthLabel: string;
@@ -217,6 +234,58 @@ function normalizedTokens(value: string | undefined) {
       .split(/[^a-z0-9]+/i)
       .filter((token) => token.length >= 3)
   );
+}
+
+function filterSlug(value: string | undefined) {
+  return (value ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+function firstParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+export function buildDealFeedFilters(input: {
+  category?: string | string[];
+  chain?: string | string[];
+  city?: string | string[];
+  minDiscount?: string | string[];
+}): DealFeedFilters {
+  const city = filterSlug(firstParam(input.city));
+  const chain = filterSlug(firstParam(input.chain));
+  const category = filterSlug(firstParam(input.category));
+  const minDiscountValue = Number(firstParam(input.minDiscount));
+  const minDiscountPct = Number.isFinite(minDiscountValue) && minDiscountValue > 0 ? minDiscountValue : undefined;
+  const activeLabels = [
+    city ? `city: ${city}` : null,
+    chain ? `chain: ${chain}` : null,
+    category ? `category: ${category}` : null,
+    minDiscountPct ? `min discount: ${minDiscountPct}%` : null
+  ].filter((label): label is string => Boolean(label));
+
+  return {
+    city: city || undefined,
+    chain: chain || undefined,
+    category: category || undefined,
+    minDiscountPct,
+    activeLabels
+  };
+}
+
+export function dealMatchesFeedFilters(deal: DealFeedFilterableItem, filters: DealFeedFilters) {
+  const cityMatches = !filters.city || filterSlug(deal.city) === filters.city;
+  const chainMatches = !filters.chain || filterSlug(deal.chainId ?? deal.chainLabel) === filters.chain;
+  const categoryMatches = !filters.category || filterSlug(deal.categorySlug ?? deal.categoryLabel) === filters.category;
+  const discountMatches = !filters.minDiscountPct || (deal.discountPercent ?? 0) >= filters.minDiscountPct;
+  return cityMatches && chainMatches && categoryMatches && discountMatches;
+}
+
+export function filterDealFeed<T extends DealFeedFilterableItem>(deals: T[], filters: DealFeedFilters) {
+  return deals.filter((deal) => dealMatchesFeedFilters(deal, filters));
 }
 
 function isLinkedSeasonalDeal(row: SeasonalProduceInput, deal: SeasonalDealInput) {
