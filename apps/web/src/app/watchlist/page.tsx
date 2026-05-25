@@ -100,14 +100,14 @@ export default function WatchlistPage() {
                 <WatchlistRow
                   name={alert.productName}
                   price={String(alert.trigger.value)}
-                  store={alert.trigger.storeName}
+                  store={alert.trigger.storeName ?? 'Store not selected'}
                   volatilityLabel={volatilityForProduct(alert.productId)?.label}
                   volatilityDetail={volatilityForProduct(alert.productId)?.detail}
                 />
               </div>
               <div className="mt-3 grid gap-2 text-sm text-slate-700 sm:grid-cols-4">
                 <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Metric: {alert.trigger.metric}</p>
-                <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Store: {alert.trigger.storeName}</p>
+                <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Store: {alert.trigger.storeName ?? 'Store not selected'}</p>
                 <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Value: {String(alert.trigger.value)}</p>
                 <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Target: {watchlistItemForAlert(alert.productId)?.targetPrice ? formatSek(watchlistItemForAlert(alert.productId)!.targetPrice!) : 'No target'}</p>
                 <p className="rounded-2xl bg-amber-50 p-3 font-semibold text-amber-950 sm:col-span-4">

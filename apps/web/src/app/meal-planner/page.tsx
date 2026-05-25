@@ -127,7 +127,7 @@ const recipeProductCandidates = [
 export default async function MealPlannerPage({
   searchParams
 }: Readonly<{ searchParams?: Promise<MealPlannerSearchParams> }>) {
-  const resolvedSearchParams = await Promise.resolve(searchParams ?? {});
+  const resolvedSearchParams = await (searchParams ?? Promise.resolve<MealPlannerSearchParams>({}));
   const selectedIngredientId = firstSearchValue(resolvedSearchParams.ingredient).trim();
   const dealMealConfidenceLevel = confidenceLevel(dealBasedMeals.coverage.confidence);
   const mealBudgetPlans = [

@@ -121,7 +121,7 @@ function zeroResultCategoryShortcuts(query: string, selectedCategory: string | s
 }
 
 export default async function ProductsPage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
-  const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
+  const resolvedSearchParams = await (searchParams ?? Promise.resolve<SearchParams>({}));
   const search = buildProductSearchView(resolvedSearchParams);
   const { categoryFacets, labelFacets, originFacets, chainFacets, priceRange, inStockOnly, resultCards } = search;
   const requestedPage = toPageNumber(resolvedSearchParams.page);
@@ -134,6 +134,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const pageStart = (currentPage - 1) * PRODUCTS_PER_PAGE;
   const rangeStart = resultCards.length === 0 ? 0 : pageStart + 1;
   const rangeEnd = Math.min(pageStart + PRODUCTS_PER_PAGE, resultCards.length);
+  const virtualizedResultCards = resultCards.map((product) => ({ ...product, isAvailable: product.isAvailable ?? undefined }));
   const defaultSearchCount = facetedProductSearch.resultCards.length;
   const zeroResultFallback = relatedSearchFallback(search.query);
   const zeroResultCategories = zeroResultCategoryShortcuts(search.query, resolvedSearchParams.category);
@@ -296,7 +297,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           </div>
         </div>
         {/* product.isAvailable === false is rendered inside VirtualizedProductGrid for measured virtual rows. */}
-        <VirtualizedProductGrid products={resultCards} />
+        <VirtualizedProductGrid products={virtualizedResultCards} />
         {resultCards.length > PRODUCTS_PER_PAGE ? (
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3 text-sm">
             <p className="font-black text-slate-700">

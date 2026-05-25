@@ -28,7 +28,7 @@ type SearchParams = {
 };
 
 export default async function ComparePage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
-  const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
+  const resolvedSearchParams = await (searchParams ?? Promise.resolve<SearchParams>({}));
   const productsParam = resolvedSearchParams.products;
   const comparison = buildChainComparisonTable(productsParam);
   const basketStoreComparison = buildBasketStoreComparison(productsParam);

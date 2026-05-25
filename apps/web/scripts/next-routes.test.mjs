@@ -93,6 +93,7 @@ describe('verified-data UI', () => {
     assert.match(productCards, /Out of stock/);
     assert.match(productsPage, /VirtualizedProductGrid/);
     assert.match(productsPage, /product\.isAvailable === false/);
+    assert.match(productsPage, /resultCards/);
     assert.match(lazyItemCard, /product\.isAvailable === false/);
     assert.match(lazyItemCard, /Out of stock/);
     assert.match(verified, /isAvailable/);
@@ -189,10 +190,15 @@ describe('verified-data UI', () => {
     assert.match(activityStream, /Collaborator additions, removals, price alert changes, and completed items/);
     assert.match(activityStream, /sortSharedListActivityEvents/);
     assert.match(activityLog, /'item_added'/);
+    assert.match(activityLog, /'item_checked'/);
     assert.match(activityLog, /'item_completed'/);
+    assert.match(activityLog, /'item_edited'/);
+    assert.match(activityLog, /'item_removed'/);
     assert.match(activityLog, /'price_alert_changed'/);
     assert.match(activityLog, /publishSharedListItemChecked/);
+    assert.match(activityLog, /publishSharedListItemCompleted/);
     assert.match(activityLog, /publishSharedListItemEdited/);
+    assert.match(activityLog, /publishSharedListPriceAlertChanged/);
   });
 
   it('ships signed-in scanner upload and barcode processing controls without anonymous uploads', async () => {
@@ -3069,9 +3075,10 @@ ${seo}`;
   });
 
   it('ships Nordic per-country terms with consumer protection clauses', async () => {
-    const terms = await read('src/app/[country]/terms/page.tsx');
+    const terms = await read('src/app/[city]/terms/page.tsx');
 
     assert.match(terms, /generateStaticParams/);
+    assert.match(terms, /\(\{ city: entry\.slug \}\)/);
     assert.match(terms, /slug: 'norway'/);
     assert.match(terms, /slug: 'iceland'/);
     assert.match(terms, /Forbrukerkjøpsloven/);
@@ -3375,7 +3382,10 @@ ${seo}`;
     assert.match(manifest, /url: '\/list'/);
     assert.match(worker, /SHOPPING_LIST_CACHE_NAME = 'groceryview-shopping-list-route-v1'/);
     assert.match(worker, /isShoppingListRequest/);
+    assert.match(worker, /SHOPPING_LIST_PATTERNS/);
     assert.match(worker, /\\\/list\\\/\?\$/);
+    assert.match(worker, /\\\/favourites\\\/\?\$/);
+    assert.match(worker, /\\\/favorites\\\/\?\$/);
     assert.match(worker, /shoppingListNetworkFirst/);
     assert.match(registrar, /SHOPPING_LIST_ROUTE_CACHE_NAME = 'groceryview-shopping-list-route-v1'/);
     assert.match(registrar, /OFFLINE_SAVED_LIST_BASE_ROUTES = \['\/list'/);

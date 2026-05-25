@@ -52,7 +52,7 @@ function sortLinkClass(isActive: boolean) {
 }
 
 export default async function FavoritesPage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
-  const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
+  const resolvedSearchParams = await (searchParams ?? Promise.resolve<SearchParams>({}));
   const sort = normalizeSort(resolvedSearchParams.sort);
   const sortedFavoriteItems = sortFavorites(favoriteItems, sort);
   const lowestFavorite = sortedFavoriteItems[0];

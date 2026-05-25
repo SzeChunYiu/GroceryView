@@ -11,7 +11,7 @@ export function generateMetadata() {
 type SearchPageParams = Record<string, string | string[] | undefined>;
 
 export default async function SearchPage({ searchParams }: { searchParams?: Promise<SearchPageParams> }) {
-  const resolvedSearchParams = await (searchParams ?? Promise.resolve({}));
+  const resolvedSearchParams = await (searchParams ?? Promise.resolve<SearchPageParams>({}));
   const subscription = buildSavedSearchSubscription({ searchParams: resolvedSearchParams, path: '/search' });
 
   return (

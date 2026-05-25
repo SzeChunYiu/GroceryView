@@ -23,7 +23,7 @@ function selectedItemsValue(items: string | string[] | undefined) {
 }
 
 export default async function CompareItemsPage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
-  const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
+  const resolvedSearchParams = await (searchParams ?? Promise.resolve<SearchParams>({}));
   const comparison = buildItemComparisonView(resolvedSearchParams);
   const sampleItems = comparison.items.map((item) => item.slug).slice(0, MAX_ITEM_COMPARISON_ITEMS).join(',');
 
