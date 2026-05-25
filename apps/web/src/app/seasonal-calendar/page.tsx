@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { localSeasonalPicks, seasonalProduceCalendar } from '@/lib/verified-data';
+import { buildSeasonalProduceDiscoveryCards } from '@/lib/deal-context';
+import { categoryDealLeaders, localSeasonalPicks, seasonalProduceCalendar } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -8,6 +9,11 @@ export function generateMetadata() {
 }
 
 export default function SeasonalCalendarPage() {
+  const seasonalDiscoveryCards = buildSeasonalProduceDiscoveryCards({
+    deals: categoryDealLeaders,
+    rows: seasonalProduceCalendar.topBestBuys
+  });
+
   return (
     <PageShell>
       <Eyebrow>feat(calendar) · historical price seasonality</Eyebrow>
@@ -57,6 +63,43 @@ export default function SeasonalCalendarPage() {
                 <p className="rounded-2xl bg-emerald-100 p-3 font-black text-emerald-950">historicalMonthlyAverage {row.historicalMonthlyAverageLabel}</p>
                 <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Typical {row.typicalMonthlyAverageLabel} · {row.savingsVsTypicalLabel}</p>
                 <p className="rounded-2xl bg-slate-50 p-3 font-semibold">{row.observationCount} observations · {row.observedMonthCount} months</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-teal-200 bg-teal-50">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-teal-800">Discovery feed cards</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">In-season produce with current deal links</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Cards combine historical seasonal context with categoryDealLeaders current deal evidence. Peak months come from the observed best-buy month and its neighboring calendar buckets; linked deals stay separate from the seasonal price claim.
+            </p>
+          </div>
+          <Link className="rounded-full bg-teal-700 px-5 py-3 text-sm font-black text-white" href="/screener">
+            Open current deals
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {seasonalDiscoveryCards.map((card) => (
+            <Link className="rounded-2xl border border-teal-200 bg-white p-4 shadow-sm hover:border-teal-700" href={`/products/${card.slug}`} key={card.slug}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-teal-800">Peak months {card.peakMonths.join(' / ')}</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{card.productName}</h3>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{card.brand ?? 'Brand not reported'} · {card.categoryLabel}</p>
+              <div className="mt-3 grid gap-2 text-sm text-slate-700">
+                <p className="rounded-2xl bg-teal-100 p-3 font-black text-teal-950">{card.typicalPriceRangeLabel}</p>
+                <p className="rounded-2xl bg-white p-3 font-semibold">Best month {card.bestBuyMonth} · {card.historicalMonthlyAverageLabel} · {card.savingsVsTypicalLabel}</p>
+              </div>
+              <div className="mt-3 space-y-2">
+                {card.linkedCurrentDeals.length > 0 ? card.linkedCurrentDeals.map((deal) => (
+                  <p className="rounded-xl bg-slate-50 p-3 text-xs font-bold leading-5 text-slate-700" key={`${card.slug}-${deal.productSlug}`}>
+                    Current deal: {deal.productName} · {deal.storeName ?? 'store not reported'} · {deal.priceLabel ?? 'price evidence in deal row'}
+                  </p>
+                )) : (
+                  <p className="rounded-xl bg-slate-50 p-3 text-xs font-bold leading-5 text-slate-700">No linked current category deal is available right now.</p>
+                )}
               </div>
             </Link>
           ))}
