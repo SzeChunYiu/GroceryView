@@ -5,6 +5,7 @@ export type ProductRecord = {
   id: string
   name: string
   brand?: string | null
+  barcode?: string | null
   category?: string | null
   imageUrl?: string | null
   sourceUrl?: string | null
@@ -46,6 +47,20 @@ export type DuplicateMergeQueueItem = DuplicateReviewGroup & {
   mergeNote: string
 }
 
+export type DuplicateReconcileWorkflow = {
+  groups: DuplicateReviewGroup[]
+  guardrails: string[]
+  mergeQueue: DuplicateMergeQueueItem[]
+  stats: {
+    inputProductCount: number
+    productCountInGroups: number
+    reviewGroupCount: number
+    readyToMergeCount: number
+    needsConfidenceCount: number
+    keepSeparateCount: number
+  }
+}
+
 const stopWords = new Set(["and", "the", "a", "an", "of", "for"])
 
 function normalize(value?: string | null) {
@@ -83,15 +98,33 @@ function sameText(left?: string | null, right?: string | null) {
   return Boolean(normalizedLeft && normalizedLeft === normalizedRight)
 }
 
+function barcodeFor(product: ProductRecord) {
+  return (product.barcode ?? product.ean ?? product.upc ?? "").replace(/\D/g, "")
+}
+
+export function titleSignatureForProduct(product: ProductRecord) {
+  const key = duplicateProductMatchKey(product)
+  return [
+    key.normalizedBrand,
+    key.normalizedName,
+    key.normalizedSize,
+    key.normalizedUnit
+  ].filter(Boolean).join(":")
+}
+
 function confidenceFor(left: ProductRecord, right: ProductRecord) {
   const signals: string[] = []
   const leftKey = duplicateProductMatchKey(left)
   const rightKey = duplicateProductMatchKey(right)
+  const leftBarcode = barcodeFor(left)
+  const rightBarcode = barcodeFor(right)
+  const leftTitleSignature = titleSignatureForProduct(left)
+  const rightTitleSignature = titleSignatureForProduct(right)
   let score = tokenSimilarity(left.name, right.name) * 0.45
 
-  if (leftKey.ean && leftKey.ean === rightKey.ean) {
+  if (leftBarcode && leftBarcode === rightBarcode) {
     score += 0.65
-    signals.push("same EAN")
+    signals.push("same barcode")
   }
 
   if (leftKey.normalizedBrand && leftKey.normalizedBrand === rightKey.normalizedBrand) {
@@ -123,6 +156,11 @@ function confidenceFor(left: ProductRecord, right: ProductRecord) {
     signals.push("similar names")
   }
 
+  if (leftTitleSignature && leftTitleSignature === rightTitleSignature) {
+    score += 0.15
+    signals.push("same title signature")
+  }
+
   return {
     confidence: Math.min(1, Number(score.toFixed(2))),
     signals,
@@ -137,6 +175,7 @@ export function mergeProductRecords(primary: ProductRecord, duplicate: ProductRe
     category: primary.category || duplicate.category,
     size: primary.size || duplicate.size,
     unit: primary.unit || duplicate.unit,
+    barcode: primary.barcode || duplicate.barcode,
     ean: primary.ean || duplicate.ean,
     upc: primary.upc || duplicate.upc,
   }
@@ -197,7 +236,9 @@ export function buildDuplicateReviewRows(products: ProductRecord[], threshold = 
 function groupIdForCandidate(candidate: DuplicateReviewRow) {
   const sourceKey = duplicateProductMatchKey(candidate.source)
   const matchKey = duplicateProductMatchKey(candidate.match)
-  if (sourceKey.ean && sourceKey.ean === matchKey.ean) return `ean:${sourceKey.ean}`
+  const sourceBarcode = barcodeFor(candidate.source)
+  const matchBarcode = barcodeFor(candidate.match)
+  if (sourceBarcode && sourceBarcode === matchBarcode) return `barcode:${sourceBarcode}`
 
   const keyParts = [
     sourceKey.normalizedBrand,
@@ -245,6 +286,53 @@ export function buildDuplicateReviewGroups(products: ProductRecord[], threshold 
     const rightConfidence = Math.max(...right.candidates.map((candidate) => candidate.confidence))
     return rightConfidence - leftConfidence || right.products.length - left.products.length
   })
+}
+
+function canonicalProductFor(products: ProductRecord[]) {
+  return [...products].sort((left, right) => {
+    const leftScore = (barcodeFor(left) ? 4 : 0) + (left.imageUrl ? 2 : 0) + (left.sourceUrl ? 1 : 0)
+    const rightScore = (barcodeFor(right) ? 4 : 0) + (right.imageUrl ? 2 : 0) + (right.sourceUrl ? 1 : 0)
+    return rightScore - leftScore || left.id.localeCompare(right.id)
+  })[0]!
+}
+
+function mergeNoteFor(group: DuplicateReviewGroup, canonicalProduct: ProductRecord) {
+  const topConfidence = Math.max(...group.candidates.map((candidate) => candidate.confidence))
+  const signalSummary = group.signals.length > 0 ? group.signals.join(", ") : "normalized product attributes"
+  return `Canonical ${canonicalProduct.id} selected for ${Math.round(topConfidence * 100)}% confidence group using ${signalSummary}.`
+}
+
+export function buildDuplicateReconcileWorkflow(products: ProductRecord[], threshold = 0.65): DuplicateReconcileWorkflow {
+  const groups = buildDuplicateReviewGroups(products, threshold)
+  const mergeQueue = groups
+    .filter((group) => group.recommendedAction === "merge")
+    .map((group) => {
+      const canonicalProduct = canonicalProductFor(group.products)
+      return {
+        ...group,
+        canonicalProduct,
+        mergeNote: mergeNoteFor(group, canonicalProduct)
+      }
+    })
+  const productCountInGroups = new Set(groups.flatMap((group) => group.products.map((product) => product.id))).size
+
+  return {
+    groups,
+    mergeQueue,
+    stats: {
+      inputProductCount: products.length,
+      productCountInGroups,
+      reviewGroupCount: groups.length,
+      readyToMergeCount: mergeQueue.length,
+      needsConfidenceCount: groups.filter((group) => group.recommendedAction === "confidence").length,
+      keepSeparateCount: groups.filter((group) => group.recommendedAction === "ignore").length
+    },
+    guardrails: [
+      "Barcode matches can enter the merge queue, but no product is reconciled without an admin decision.",
+      "Brand, title signature, package size, and unit evidence are kept visible for every candidate group.",
+      "Merge previews preserve the strongest observed identifiers and never delete source rows automatically."
+    ]
+  }
 }
 
 export type SubstitutionSavingsProduct = ProductRecord & {
