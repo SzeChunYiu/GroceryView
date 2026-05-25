@@ -1440,10 +1440,19 @@ describe('verified-data UI', () => {
 
   it('surfaces a family weekly meal planner from visible deals', async () => {
     const source = await read('src/app/meal-planner/page.tsx');
+    const checkoutRoute = await read('src/app/api/meal-planner/checkout/route.ts');
     assert.match(source, /familyMealPlannerFromDeals/);
     assert.match(source, /suggestDealBasedMeals/);
     assert.match(source, /Family weekly meal planner/);
     assert.match(source, /lunchboxLeftovers/);
+    assert.match(source, /MealPlanCheckoutAction/);
+    assert.match(source, /\/api\/meal-planner\/checkout/);
+    assert.match(source, /Autopopulate shopping list/);
+    assert.match(source, /checkoutIngredientsPayload/);
+    assert.match(checkoutRoute, /buildMealPlanShoppingListExport/);
+    assert.match(checkoutRoute, /selectedProducts/);
+    assert.match(checkoutRoute, /quantityEstimate/);
+    assert.match(checkoutRoute, /mealPlanShoppingListHref/);
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 

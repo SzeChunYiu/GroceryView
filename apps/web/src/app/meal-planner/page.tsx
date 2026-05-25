@@ -119,6 +119,30 @@ function mealCardClass(meal: MealWithIngredients, productId: string, defaultClas
     : defaultClasses;
 }
 
+function checkoutIngredientsPayload(meal: MealBudgetPlan) {
+  return JSON.stringify(meal.ingredients
+    .filter((ingredient): ingredient is NonNullable<MealBudgetPlan['ingredients'][number]> => Boolean(ingredient))
+    .map((ingredient) => ({
+      category: ingredient.category,
+      name: ingredient.name,
+      price: ingredient.price,
+      productId: ingredient.productId,
+      source: ingredient.source
+    })));
+}
+
+function MealPlanCheckoutAction({ day, meal }: Readonly<{ day: string; meal: MealBudgetPlan }>) {
+  return (
+    <form action="/api/meal-planner/checkout" className="mt-4 flex flex-wrap items-center gap-3 rounded-2xl border border-blue-100 bg-blue-50 p-4" method="post">
+      <input name="day" type="hidden" value={day} />
+      <input name="mealTitle" type="hidden" value={meal.title} />
+      <input name="ingredients" type="hidden" value={checkoutIngredientsPayload(meal)} />
+      <button className="rounded-full bg-blue-800 px-4 py-2 text-sm font-black text-white" type="submit">Autopopulate shopping list</button>
+      <p className="text-sm font-semibold text-blue-950">Transforms this meal-plan day into selected product rows with quantity estimates through /api/meal-planner/checkout.</p>
+    </form>
+  );
+}
+
 const adaptiveBudgetGuardrails = applyAdaptiveMealBudgetGuardrails({
   currentWeeklySpend: 360,
   meals: dealBasedMeals.suggestions,
@@ -309,6 +333,7 @@ export default async function MealPlannerPage({
                 ) : null)}
               </div>
               <MealPlanShoppingListExport meal={meal} />
+              <MealPlanCheckoutAction day={meal.weeknightSlot} meal={meal} />
             </div>
           ))}
         </div>
