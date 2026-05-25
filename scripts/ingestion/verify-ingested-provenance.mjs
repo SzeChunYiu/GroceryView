@@ -220,12 +220,16 @@ function extractJsonExport(text, exportName, fileUrl) {
   }
   const rawValue = text.slice(start, matchingJsonEnd(text, start) + 1);
   try {
-    return JSON.parse(rawValue);
+    return JSON.parse(sanitizeGeneratedJsonValue(rawValue));
   } catch (error) {
     const spreadArray = extractSpreadArrayExport(text, rawValue, fileUrl);
     if (spreadArray) return spreadArray;
     throw error;
   }
+}
+
+function sanitizeGeneratedJsonValue(rawValue) {
+  return rawValue.replace(/([}\]])\s*,\s*,/g, '$1,');
 }
 
 function extractSpreadArrayExport(text, rawValue, fileUrl) {
