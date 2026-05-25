@@ -255,7 +255,14 @@ describe('verified-data UI', () => {
     assert.match(history, /sessionStorage\.getItem\('groceryview:accessToken'/);
     assert.match(history, /sessionStorage\.getItem\('groceryview:userId'/);
     assert.match(history, /fetchScannerHistory/);
+    assert.match(history, /correctionStatusFilters/);
+    assert.match(history, /filterScannerHistoryByCorrectionStatus/);
+    assert.match(history, /aria-pressed=\{active\}/);
     assert.match(history, /redacted fallback/);
+    assert.match(helper, /CorrectionStatusFilter/);
+    assert.match(helper, /normalizeCorrectionStatus/);
+    assert.match(helper, /filterScannerHistoryByCorrectionStatus/);
+    assert.match(helper, /export_ready/);
     assert.match(helper, /\/api\/scans\/history\?userId=\$\{encodeURIComponent\(userId\)\}/);
     assert.match(helper, /Authorization: `Bearer \$\{accessToken\}`/);
     assert.match(helper, /cache: 'no-store'/);
