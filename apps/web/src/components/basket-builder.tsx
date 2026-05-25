@@ -24,11 +24,18 @@ import {
   type BasketStackOffer,
 } from "@/lib/deal-context";
 
+export type BasketBuilderSwap = {
+  id: string;
+  name: string;
+  reason?: string;
+};
+
 export type BasketBuilderProduct = {
   id: string;
   name: string;
   chainPrices?: BasketChainPrice[];
   dealStackOffers?: BasketStackOffer[];
+  suggestedSwaps?: BasketBuilderSwap[];
 };
 
 export function addBasketBuilderProduct<T extends BasketBuilderProduct>(
@@ -55,6 +62,13 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
     offers: basketProducts.flatMap((product) => product.dealStackOffers ?? []),
   });
   const bestChainStack = chainStacks[0];
+  const suggestedSwaps = basketProducts.flatMap((product) =>
+    (product.suggestedSwaps ?? []).map((swap) => ({
+      ...swap,
+      sourceProductId: product.id,
+      sourceProductName: product.name,
+    })),
+  );
 
   function add(product: T) {
     setBasketProducts((current) => addBasketBuilderProduct(current, product));
@@ -73,12 +87,29 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
         ))}
       </ul>
 
-      <h2>Basket</h2>
-      <ul>
-        {basketProducts.map((product) => (
-          <li key={product.id}>{product.name}</li>
-        ))}
-      </ul>
+      <section aria-label="Selected basket items">
+        <h2>Basket</h2>
+        <ul>
+          {basketProducts.map((product) => (
+            <li key={product.id}>{product.name}</li>
+          ))}
+        </ul>
+      </section>
+
+      {suggestedSwaps.length > 0 ? (
+        <section aria-label="Suggested basket swaps">
+          <h2>Suggested swaps</h2>
+          <p>Suggested swaps are shown after Add and never auto-replace a selected basket item.</p>
+          <ul>
+            {suggestedSwaps.map((swap) => (
+              <li key={`${swap.sourceProductId}-${swap.id}`}>
+                {swap.name} for {swap.sourceProductName}
+                {swap.reason ? ` — ${swap.reason}` : ''}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       {bestChainStack ? (
         <section aria-label="Cheapest coupon stack by chain">
