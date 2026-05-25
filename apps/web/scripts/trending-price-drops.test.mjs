@@ -173,7 +173,7 @@ test('city dashboard ships a trending price-drop engine, API feed, and concise c
   assert.match(route, /export function GET\(request: Request\)/);
   assert.match(route, /searchParams\.get\('city'\)/);
   assert.match(route, /searchParams\.get\('limit'\)/);
-  assert.match(route, /buildCityPriceDropTrends\(\{ city, limit \}\)/);
+  assert.match(route, /buildCityPriceDropTrends\(\{ city, limit: filters\.category \|\| filters\.chain \? 12 : limit \}\)/);
   assert.doesNotMatch(route, /console\./);
 
   assert.match(section, /export function TrendingPriceDropCards/);

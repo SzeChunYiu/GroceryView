@@ -1316,21 +1316,22 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const priceHistoryBadge = priceHistoryBadgeFor(product);
   const priceHistoryRangeBadges = priceHistoryRangeBadgesFor(product);
   const priceVsUsualSignal = priceVsUsualSignalFor(product);
+  const priceVsUsualPercentile = priceVsUsualSignal.available ? priceVsUsualSignal.historyPercentile : null;
   const typicalRangeBand = priceTypicalRangeBandFor(product);
-  const priceTrackingInsight = priceVsUsualSignal.available
+  const priceTrackingInsight = priceVsUsualPercentile !== null
     ? {
-      statusLabel: priceVsUsualSignal.historyPercentile <= 25
+      statusLabel: priceVsUsualPercentile <= 25
         ? 'Low vs usual'
-        : priceVsUsualSignal.historyPercentile >= 75
+        : priceVsUsualPercentile >= 75
           ? 'High vs usual'
           : 'Typical vs usual',
-      tone: priceVsUsualSignal.historyPercentile <= 25
+      tone: priceVsUsualPercentile <= 25
         ? 'emerald'
-        : priceVsUsualSignal.historyPercentile >= 75
+        : priceVsUsualPercentile >= 75
           ? 'rose'
           : 'slate',
       confidence: priceVsUsualSignal.observationCount >= 12 ? 'high' as const : priceVsUsualSignal.observationCount >= 5 ? 'medium' as const : 'low' as const,
-      detail: `Current price sits at the ${formatPct(priceVsUsualSignal.historyPercentile)} percentile of this product's own observed 1-year OpenPrices history. Low/typical/high labels use historical facts only, not a forecast.`
+      detail: `Current price sits at the ${formatPct(priceVsUsualPercentile)} percentile of this product's own observed 1-year OpenPrices history. Low/typical/high labels use historical facts only, not a forecast.`
     }
     : null;
   const bestTimeToBuyCards = bestTimeToBuyCardsFor(product);

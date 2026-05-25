@@ -50,5 +50,5 @@ test('web product search API is backed by PostgreSQL full-text search', async ()
   assert.match(route, /matchedSynonyms/);
   assert.match(route, /product_search_database_unconfigured/);
   assert.match(route, /NextResponse\.json\(responsePayload/);
-  assert.match(route, /postgres\.products_tsvector_alias_synonym_expansion/);
+  assert.match(route, /postgres\.products_tsvector_alias_synonym_fuzzy_rank/);
 });

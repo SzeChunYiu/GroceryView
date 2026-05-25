@@ -1,7 +1,7 @@
 import { buildFacetedProductSearch, type RealCatalogSearchPriceRow } from '@groceryview/api';
 import { COMMODITIES, STAPLE_BASKET, SUPPORTED_PRICE_DOMAINS, type Commodity, type ComparableUnit } from '@groceryview/catalog';
 import { buildPriceChartSeries, buildWatchlistAlerts, calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, suggestFriendSharedDeals, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type PriceChartObservation, type ProductMatchInput, type WatchlistItem, type WatchlistPriceType, type WatchlistProductSnapshot } from '@groceryview/core';
-import { majorSwedishGroceryRetailerTypeCoverage, retailerTypes, summarizeTrendingProductPriceChanges, type TrendingPriceChangePoint } from '@groceryview/db';
+import type { TrendingProductPriceChange } from '@groceryview/db';
 import { planReceiptAliasGrowth } from '@groceryview/scanning';
 import { axfoodProducts } from './axfood-products';
 import { icaStorePromotionSourceSummary } from './ingested/ica-source-summary';
@@ -56,6 +56,118 @@ export const snapshot = {
 
 const observedSnapshotCurrency = currencyFromObservation({ currency: 'SEK' });
 const pct = new Intl.NumberFormat('sv-SE', { maximumFractionDigits: 1 });
+
+type TrendingPriceChangePoint = {
+  productId: string;
+  productSlug: string;
+  productName: string;
+  brand?: string;
+  categoryLabel?: string;
+  price: number;
+  currency: string;
+  observedAt: string;
+  chainSlug?: string;
+  chainName?: string;
+  storeSlug?: string;
+  storeName?: string;
+};
+
+const retailerTypes = [
+  'grocery',
+  'pharmacy',
+  'fuel',
+  'convenience',
+  'variety',
+  'cosmetics',
+  'household',
+  'online_marketplace'
+] as const;
+
+const majorSwedishGroceryRetailerTypeCoverage = retailerTypes.map((retailerType) => {
+  const chainSlugs = retailerType === 'grocery' ? ['ica', 'coop', 'willys', 'hemkop', 'lidl', 'netto'] : [];
+  return {
+    retailerType,
+    chainCount: chainSlugs.length,
+    chainSlugs
+  };
+});
+
+function sortTrendingPriceChangePoints(left: TrendingPriceChangePoint, right: TrendingPriceChangePoint): number {
+  const dateDelta = Date.parse(left.observedAt) - Date.parse(right.observedAt);
+  if (dateDelta !== 0) return dateDelta;
+  const productDelta = left.productId.localeCompare(right.productId);
+  if (productDelta !== 0) return productDelta;
+  return `${left.chainSlug ?? ''}:${left.storeSlug ?? ''}`.localeCompare(`${right.chainSlug ?? ''}:${right.storeSlug ?? ''}`);
+}
+
+function summarizeTrendingProductPriceChanges(input: {
+  points: TrendingPriceChangePoint[];
+  asOf: string;
+  windowDays?: number;
+  limit?: number;
+}): TrendingProductPriceChange[] {
+  const limit = Math.min(Math.max(input.limit ?? 10, 1), 10);
+  const windowDays = Math.min(Math.max(input.windowDays ?? 7, 1), 31);
+  const untilMs = Date.parse(input.asOf);
+  if (Number.isNaN(untilMs)) throw new Error(`Invalid trending price asOf date: ${input.asOf}`);
+  const sinceMs = untilMs - windowDays * 24 * 60 * 60 * 1000;
+  const byProduct = new Map<string, TrendingPriceChangePoint[]>();
+
+  for (const point of input.points) {
+    const observedMs = Date.parse(point.observedAt);
+    if (!Number.isFinite(point.price) || Number.isNaN(observedMs) || observedMs > untilMs) continue;
+    byProduct.set(point.productId, [...(byProduct.get(point.productId) ?? []), point]);
+  }
+
+  return [...byProduct.values()]
+    .flatMap((points) => {
+      const sorted = [...points].sort(sortTrendingPriceChangePoints);
+      let previous: TrendingPriceChangePoint | undefined;
+      const windowChanges: Array<{ previous: TrendingPriceChangePoint; latest: TrendingPriceChangePoint }> = [];
+      let observationCount = 0;
+
+      for (const point of sorted) {
+        const observedMs = Date.parse(point.observedAt);
+        if (observedMs >= sinceMs && observedMs <= untilMs) {
+          observationCount += 1;
+          if (previous && Math.abs(previous.price - point.price) >= 0.000001) windowChanges.push({ previous, latest: point });
+        }
+        previous = point;
+      }
+
+      const latestChange = windowChanges.at(-1);
+      if (!latestChange) return [];
+      const { latest, previous: previousPoint } = latestChange;
+      const changeAmount = latest.price - previousPoint.price;
+      return [{
+        productId: latest.productId,
+        productSlug: latest.productSlug,
+        productName: latest.productName,
+        ...(latest.brand ? { brand: latest.brand } : {}),
+        ...(latest.categoryLabel ? { categoryLabel: latest.categoryLabel } : {}),
+        changeCount: windowChanges.length,
+        observationCount,
+        latestPrice: latest.price,
+        previousPrice: previousPoint.price,
+        changeAmount,
+        changePercent: previousPoint.price > 0 ? (changeAmount / previousPoint.price) * 100 : 0,
+        currency: latest.currency,
+        latestObservedAt: latest.observedAt,
+        ...(latest.chainSlug ? { chainSlug: latest.chainSlug } : {}),
+        ...(latest.chainName ? { chainName: latest.chainName } : {}),
+        ...(latest.storeSlug ? { storeSlug: latest.storeSlug } : {}),
+        ...(latest.storeName ? { storeName: latest.storeName } : {})
+      }];
+    })
+    .sort((left, right) =>
+      right.changeCount - left.changeCount ||
+      right.observationCount - left.observationCount ||
+      Math.abs(right.changeAmount) - Math.abs(left.changeAmount) ||
+      left.productName.localeCompare(right.productName, 'sv')
+    )
+    .slice(0, limit)
+    .map((item, index) => ({ rank: index + 1, ...item }));
+}
 
 export function formatSek(value: number | null | undefined) {
   return formatLocalizedMoney(value, { locale: defaultLocale, currency: observedSnapshotCurrency });

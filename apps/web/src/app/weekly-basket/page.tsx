@@ -68,7 +68,7 @@ function WeeklyBasketEmptyState() {
 export default async function WeeklyBasketPage({
   searchParams
 }: Readonly<{ searchParams?: Promise<RecipeBasketSearchParams> }>) {
-  const resolvedSearchParams = await Promise.resolve(searchParams ?? {});
+  const resolvedSearchParams: RecipeBasketSearchParams = searchParams ? await searchParams : {};
   const recipeBasketItems = parseRecipeBasket(firstSearchValue(resolvedSearchParams.recipeBasket));
 
   if (weeklyBasketOptimizerInput.items.length === 0) {

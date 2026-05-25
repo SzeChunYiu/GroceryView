@@ -74,16 +74,18 @@ function overlayWindow(
   const latestValue = values.at(-1) ?? 0;
   const lowValue = values.length ? Math.min(...values) : 0;
   const highValue = values.length ? Math.max(...values) : 0;
+  const windowStart = new Date(windowStartTime).toISOString();
+  const windowEnd = new Date(windowEndTime).toISOString();
 
   return {
     label,
-    rangeLabel: days === null ? `${compareOverlayChart.windowStart.slice(0, 10)} → ${compareOverlayChart.windowEnd.slice(0, 10)}` : `Last ${days} days`,
-    windowStart: new Date(windowStartTime).toISOString(),
-    windowEnd: new Date(windowEndTime).toISOString(),
+    rangeLabel: days === null ? `${windowStart.slice(0, 10)} → ${windowEnd.slice(0, 10)}` : `Last ${days} days`,
+    windowStart,
+    windowEnd,
     pointCount: series.reduce((sum, item) => sum + item.points.length, 0),
     markerCount: 0,
     latestValueLabel: overlayMode === 'index' ? `${latestValue.toLocaleString('sv-SE')} index` : formatSek(latestValue),
-    latestObservedAt: compareOverlayChart.windowEnd,
+    latestObservedAt: compareOverlayChart.windowEnd ?? windowEnd,
     lowValueLabel: overlayMode === 'index' ? `${lowValue.toLocaleString('sv-SE')} index` : formatSek(lowValue),
     highValueLabel: overlayMode === 'index' ? `${highValue.toLocaleString('sv-SE')} index` : formatSek(highValue),
     series

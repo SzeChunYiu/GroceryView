@@ -25,7 +25,7 @@ function isBottomNavItemActive(item: (typeof bottomNavItems)[number], pathname: 
 
 export function BottomNav() {
   const pathname = usePathname();
-  const { impact, selection } = useHaptic();
+  const { impact, scannerShortcut, selection } = useHaptic();
   const [isStandalone, setIsStandalone] = useState(false);
 
   useEffect(() => {
@@ -68,6 +68,7 @@ export function BottomNav() {
               onClick={() => {
                 if (isProminent) {
                   impact();
+                  scannerShortcut();
                 } else {
                   selection();
                 }

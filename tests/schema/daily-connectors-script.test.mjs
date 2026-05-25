@@ -63,6 +63,10 @@ describe('daily connectors export script', () => {
     assert.equal(okq8FuelConnector.domain, 'fuel');
     assert.equal(okq8FuelConnector.requireStoreScopedPrices, false);
     assert.deepEqual(okq8FuelConnector.stores, []);
+    const preemFuelConnector = connectors.find((connector) => connector.connectorId === 'preem-se-business-list-prices');
+    assert.equal(preemFuelConnector.domain, 'fuel');
+    assert.equal(preemFuelConnector.requireStoreScopedPrices, false);
+    assert.deepEqual(preemFuelConnector.stores, []);
     const matsparConnector = connectors.find((connector) => connector.connectorId === 'matspar-public-search');
     assert.equal(matsparConnector.domain, 'grocery');
     assert.equal(matsparConnector.requireStoreScopedPrices, false);
@@ -97,7 +101,9 @@ describe('daily connectors export script', () => {
       'groceryview://daily/matspar/products/public-search',
       'groceryview://daily/pharmacy/products/public',
       'groceryview://daily/apoteket-se/products/public',
-      'https://www.okq8.se/foretag/priser/'
+      'https://www.preem.se/foretag/listpriser/',
+      'https://www.okq8.se/foretag/priser/',
+      'https://olis.ob.is/eldsneytisverd'
     ]);
     assert.deepEqual(connectors.map((connector) => connector.parserVersion), [
       'ica-store-promotions-native-v1',
@@ -113,7 +119,9 @@ describe('daily connectors export script', () => {
       'matspar-public-search-v1',
       'pharmacy-public-products-v1',
       'apoteket-se-public-products-v1',
-      'okq8-fuel-prices-v1'
+      'preem-se-business-list-v1',
+      'okq8-fuel-prices-v1',
+      'ob-is-fuel-prices-v1'
     ]);
   });
 });

@@ -138,13 +138,17 @@ function safeString(value: unknown, fallback = '') {
   return typeof value === 'string' && value.trim().length > 0 ? value.trim() : fallback;
 }
 
+function safeImportSource(value: unknown): PublicListShareItem['importSource'] {
+  return value === 'item-detail' ? 'item-detail' : 'bulk-clipboard';
+}
+
 export function normalizePublicListShareItems(items: unknown[]): PublicListShareItem[] {
   return items
     .filter((item): item is Record<string, unknown> => item !== null && typeof item === 'object' && !Array.isArray(item))
     .map((item, index) => ({
       detail: safeString(item.detail, 'Shared grocery item'),
       id: safeString(item.id, `shared-item-${index + 1}`),
-      importSource: item.importSource === 'item-detail' ? 'item-detail' : 'bulk-clipboard',
+      importSource: safeImportSource(item.importSource),
       matchedProductName: safeString(item.matchedProductName) || undefined,
       matchedProductSlug: safeString(item.matchedProductSlug) || undefined,
       name: safeString(item.name),

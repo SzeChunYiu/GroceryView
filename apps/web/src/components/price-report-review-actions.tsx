@@ -13,7 +13,7 @@ import {
 } from '@/lib/reviews';
 import { COMMUNITY_REVIEW_PROMPT_COPY, COMMUNITY_REVIEW_PROMPTS } from '@/lib/community-reviews';
 import { ReviewPromptForm } from '@/components/review-prompt-form';
-import { sourceDiscrepancyReviewContract } from '@/lib/verified-data';
+import { sourceDiscrepancyReviewContract } from '@/lib/source-discrepancy-review';
 
 // ReviewPromptForm renders COMMUNITY_REVIEW_PROMPTS with aria-label={`${prompt.label} rating`}.
 
@@ -93,7 +93,7 @@ export function PriceReportReviewActions() {
       return;
     }
     setStatus('ready');
-    setMessage(`${decision} action accepted with reviewedByHuman: true writeback. Hide maps to dismiss/reject, escalate maps to needs_more_info, and approve keeps the existing accept_community_report / approve_commodity_mapping writebacks.`);
+    setMessage(`${decision} action accepted with reviewedByHuman: true writeback and status in_progress audit history. Hide maps to dismiss_community_report/reject, escalate maps to needs_more_info, and approve keeps the existing accept_community_report / approve_commodity_mapping writebacks.`);
   }
 
   async function voteCommunityReview(reviewId: string, vote: CommunityReviewVote) {

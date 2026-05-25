@@ -527,9 +527,11 @@ export function buildCouponAwareBasketOptimization({
       const savings = subtotal - total;
       const substitutionLabels = chosen
         .filter((choice) => choice.isSubstitute)
-        .map((choice) => {
+        .map((choice): string => {
           const fallback = `Swap ${choice.originalItem.name ?? choice.originalItem.id} for ${choice.item.name ?? choice.item.id}`;
-          return 'substitutionLabel' in choice.item && choice.item.substitutionLabel ? choice.item.substitutionLabel : fallback;
+          return 'substitutionLabel' in choice.item && typeof choice.item.substitutionLabel === 'string' && choice.item.substitutionLabel
+            ? choice.item.substitutionLabel
+            : fallback;
         });
 
       return [{

@@ -96,6 +96,15 @@ export type BuildChainComparisonTableOptions = {
   compareStoreCapabilities?: readonly DbSiteCompareStoreCapability[];
 };
 
+type BuildCompareNoChainStateInput = {
+  activeFilters: readonly CompareChainId[];
+  chainOrder: typeof COMPARE_CHAIN_ORDER;
+  generatedCapabilities: readonly DbSiteCompareStoreCapability[];
+  missingProductIds: readonly string[];
+};
+
+const buildTypedCompareNoChainState = buildCompareNoChainStateModel as unknown as (input: BuildCompareNoChainStateInput) => ChainCompareNoChainState;
+
 export type BasketStoreSubstitutionExplanation = {
   productName: string;
   storeName: string;
@@ -354,6 +363,7 @@ export function buildChainComparisonTable(
     }
     rows.push(compareProductRow(requestedId, product));
   }
+  const activeFilters: CompareChainId[] = [...(options.activeFilters ?? COMPARE_CHAIN_ORDER.map((chain) => chain.id))];
 
   return {
     requestedIds,
@@ -363,12 +373,12 @@ export function buildChainComparisonTable(
       ? 'postgres.latest_prices/observations via packages/db site snapshot'
       : 'local bundled chain catalogue; production builds prefer packages/db snapshot rows',
     generatedAt: dbSiteSnapshotGeneratedAt,
-    noChainState: buildCompareNoChainStateModel({
-      activeFilters: options.activeFilters ?? COMPARE_CHAIN_ORDER.map((chain) => chain.id),
+    noChainState: buildTypedCompareNoChainState({
+      activeFilters,
       chainOrder: COMPARE_CHAIN_ORDER,
       generatedCapabilities: options.compareStoreCapabilities ?? dbSiteCompareStoreCapabilities,
       missingProductIds
-    }) as ChainCompareNoChainState
+    })
   };
 }
 
