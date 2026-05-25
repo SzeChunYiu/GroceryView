@@ -21,7 +21,7 @@ describe('search-to-savings funnel analytics surface', () => {
 
     assert.match(route, /export async function POST/);
     assert.match(route, /export async function GET/);
-    assert.match(route, /Expected 1-50 aggregate funnel events/);
+    assert.match(route, /Expected 1-50 aggregate funnel/);
     assert.match(store, /recordSearchToSavingsFunnelEvents/);
     assert.match(store, /market/);
     assert.match(store, /device/);
