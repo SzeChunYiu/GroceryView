@@ -38,6 +38,20 @@ export type RecipeProductMatch = ParsedRecipeIngredient & {
   matchScore: number;
 };
 
+export type PurchaseHistoryProductCandidate = {
+  productId?: string;
+  slug?: string;
+  name: string;
+  aliases?: string[];
+};
+
+export type PurchaseHistoryProductMatch = {
+  productId: string;
+  productName: string;
+  matchScore: number;
+  normalizedQuery: string;
+};
+
 export type UnitNormalizationQaProductInput = {
   productId: string;
   productName: string;
@@ -185,6 +199,35 @@ export function parseRecipeIngredients(input: string): ParsedRecipeIngredient[] 
     .filter((ingredient) => wordsFromText(ingredient.normalizedName).length > 0);
 
   return parsed.length > 0 ? parsed : ingredientHintsFromUrl(input).map((hint) => ({ rawText: hint, quantityText: '', normalizedName: hint }));
+}
+
+export function normalizePurchaseHistoryProductName(value: string) {
+  return wordsFromText(value).join(' ');
+}
+
+export function matchPurchaseHistoryRowToProduct(productName: string, candidates: readonly PurchaseHistoryProductCandidate[]): PurchaseHistoryProductMatch | null {
+  const normalizedQuery = normalizePurchaseHistoryProductName(productName);
+  if (!normalizedQuery) return null;
+  const queryWords = normalizedQuery.split(' ').filter(Boolean);
+  const ranked = candidates
+    .map((candidate, index) => {
+      const candidateWords = wordsFromText([candidate.name, ...(candidate.aliases ?? [])].join(' '));
+      const candidateKey = candidateWords.join(' ');
+      const overlap = queryWords.filter((word) => candidateWords.some((candidateWord) => candidateWord.includes(word) || word.includes(candidateWord))).length;
+      const directHit = candidateKey.includes(normalizedQuery) || normalizedQuery.includes(candidateKey) ? 5 : 0;
+      return { candidate, index, score: overlap * 10 + directHit };
+    })
+    .filter((entry) => entry.score > 0)
+    .sort((a, b) => b.score - a.score || a.index - b.index);
+
+  const best = ranked[0];
+  if (!best) return null;
+  return {
+    productId: best.candidate.productId ?? best.candidate.slug ?? normalizedQuery.replace(/\s+/g, '-'),
+    productName: best.candidate.name,
+    matchScore: best.score,
+    normalizedQuery
+  };
 }
 
 function priceLabelFor(candidate: RecipeProductCandidate) {

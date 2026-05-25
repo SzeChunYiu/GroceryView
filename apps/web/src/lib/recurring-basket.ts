@@ -1,3 +1,5 @@
+import { matchPurchaseHistoryRowToProduct, type PurchaseHistoryProductMatch } from './normalization';
+
 export type RecurringBasketLine = {
   productId: string;
   productName: string;
@@ -34,12 +36,15 @@ export type PurchaseHistoryImportRow = {
   storeName: string;
   quantity: number;
   totalSpend: number;
+  productMatch: PurchaseHistoryProductMatch | null;
 };
 
 export type PurchaseHistoryImportPreview = {
   rows: PurchaseHistoryImportRow[];
   recurringCandidates: Array<{
     productName: string;
+    productId?: string;
+    matchScore: number;
     purchaseCount: number;
     totalSpend: number;
     recommendationSeed: string;
@@ -51,6 +56,13 @@ export type PurchaseHistoryImportPreview = {
 const nextWeeklyWindow: RecurringBasketWindow = { startsOn: '2026-05-25', endsOn: '2026-05-31', label: 'Week 22 grocery window' };
 const followingWeeklyWindow: RecurringBasketWindow = { startsOn: '2026-06-01', endsOn: '2026-06-07', label: 'Week 23 grocery window' };
 const twoWeeksAheadWindow: RecurringBasketWindow = { startsOn: '2026-06-08', endsOn: '2026-06-14', label: 'Week 24 grocery window' };
+const purchaseHistoryCatalog = [
+  { name: 'Milk 1L', productId: 'milk-1l', aliases: ['mjolk', 'milk'] },
+  { name: 'Eggs 12-pack', productId: 'eggs-12-pack', aliases: ['egg', 'eggs', 'agg'] },
+  { name: 'Sourdough bread', productId: 'bread-sourdough', aliases: ['bread', 'brod', 'sourdough'] },
+  { name: 'Kaffe', productId: 'kaffe', aliases: ['coffee', 'bryggkaffe'] },
+  { name: 'Havregryn Extra Fylliga', productId: 'havregryn-extra-fylliga-101758934-st', aliases: ['oats', 'oatmeal', 'havregryn'] }
+];
 
 export const weeklyRecurringBasketPlan: RecurringBasketPlan = {
   id: 'weekly-family-basics',
@@ -134,7 +146,8 @@ export function parsePurchaseHistoryCsv(csv: string): PurchaseHistoryImportRow[]
         productName,
         storeName: cells[storeIndex] || 'store not provided',
         quantity: Number.isFinite(quantity) && quantity > 0 ? quantity : 1,
-        totalSpend: Number.isFinite(totalSpend) && totalSpend >= 0 ? totalSpend : 0
+        totalSpend: Number.isFinite(totalSpend) && totalSpend >= 0 ? totalSpend : 0,
+        productMatch: matchPurchaseHistoryRowToProduct(productName, purchaseHistoryCatalog)
       };
     })
     .filter((row): row is PurchaseHistoryImportRow => row !== null);
@@ -150,7 +163,9 @@ export function buildPurchaseHistoryImportPreview(rows: readonly PurchaseHistory
     .map(([productName, productRows]) => {
       const totalSpend = productRows.reduce((sum, row) => sum + row.totalSpend, 0);
       return {
-        productName,
+        productName: productRows[0]?.productMatch?.productName ?? productName,
+        productId: productRows[0]?.productMatch?.productId,
+        matchScore: productRows[0]?.productMatch?.matchScore ?? 0,
         purchaseCount: productRows.length,
         totalSpend,
         recommendationSeed: `${productRows.length} historical purchase${productRows.length === 1 ? '' : 's'} for recommendation ranking`,

@@ -1,3 +1,23 @@
+export type DietaryProfilePreferences = {
+  userId: string;
+  allergies: string[];
+  diets: string[];
+  avoidedIngredients: string[];
+  onboardingCompleted: boolean;
+  updatedAt: string;
+};
+
+export const DIETARY_PROFILE_STORAGE_KEY = 'groceryview:dietary-profile:v1';
+
+export const DEFAULT_DIETARY_PROFILE_PREFERENCES: DietaryProfilePreferences = {
+  userId: 'local-account',
+  allergies: [],
+  diets: [],
+  avoidedIngredients: [],
+  onboardingCompleted: false,
+  updatedAt: 'static-snapshot'
+};
+
 export type HouseholdPricePreferences = {
   householdId: string;
   preferredBrands: string[];
@@ -52,6 +72,48 @@ function browserStorage() {
   if (typeof window === 'undefined') return null;
 
   return window.localStorage;
+}
+
+function normalizePreferenceList(values: readonly (string | null | undefined)[]) {
+  return uniquePreferenceValues(values);
+}
+
+export function normalizeDietaryProfilePreferences(preferences: Partial<DietaryProfilePreferences> | null | undefined): DietaryProfilePreferences {
+  return {
+    userId: preferences?.userId?.trim() || DEFAULT_DIETARY_PROFILE_PREFERENCES.userId,
+    allergies: normalizePreferenceList(preferences?.allergies ?? DEFAULT_DIETARY_PROFILE_PREFERENCES.allergies),
+    diets: normalizePreferenceList(preferences?.diets ?? DEFAULT_DIETARY_PROFILE_PREFERENCES.diets),
+    avoidedIngredients: normalizePreferenceList(preferences?.avoidedIngredients ?? DEFAULT_DIETARY_PROFILE_PREFERENCES.avoidedIngredients),
+    onboardingCompleted: Boolean(preferences?.onboardingCompleted),
+    updatedAt: preferences?.updatedAt || new Date().toISOString()
+  };
+}
+
+export function loadDietaryProfilePreferences(storage: Storage | null = browserStorage()) {
+  if (!storage) return DEFAULT_DIETARY_PROFILE_PREFERENCES;
+
+  try {
+    const parsed = JSON.parse(storage.getItem(DIETARY_PROFILE_STORAGE_KEY) ?? 'null') as Partial<DietaryProfilePreferences> | null;
+
+    return normalizeDietaryProfilePreferences(parsed);
+  } catch {
+    return DEFAULT_DIETARY_PROFILE_PREFERENCES;
+  }
+}
+
+export function saveDietaryProfilePreferences(preferences: Partial<DietaryProfilePreferences>, storage: Storage | null = browserStorage()) {
+  if (!storage) return false;
+
+  try {
+    storage.setItem(DIETARY_PROFILE_STORAGE_KEY, JSON.stringify(normalizeDietaryProfilePreferences({
+      ...preferences,
+      updatedAt: new Date().toISOString()
+    })));
+
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function normalizeHouseholdPricePreferences(preferences: Partial<HouseholdPricePreferences> | null | undefined): HouseholdPricePreferences {
