@@ -92,6 +92,14 @@ GroceryView ingestion layer pulls from (or could pull from). Each entry lists
 - **Lands in:** `packages/ingestion/src/connectors/matspar.ts`, daily DB observations through `groceryview://daily/matspar/products/public-search`, and the generated web artifact `apps/web/src/lib/ingested/matspar.ts`.
 - **Matpriskollen:** still useful for schema comparison, but not yet part of the daily DB connector set.
 
+### 2.9 Apoteket.se public pharmacy catalog ✅ shipped foundation
+- **Connector detail:** [Apoteket.se connector notes](connectors/apoteket-se.md) document the public pharmacy source pages, extracted fields, quirks, edge cases, and last checked-in verification date.
+- **Endpoint patterns:** `https://www.apoteket.se/sok/?q={query}` and `https://www.apoteket.se/kategori/{categoryPath}/`.
+- **What it returns:** public non-prescription product names, SEK prices, package/unit text, and product URLs from embedded page payloads.
+- **Per-branch granularity:** ❌ no by default — online catalog evidence unless a payload supplies explicit `store_id`.
+- **Guardrail:** prescription-only rows, non-SEK prices, and rows without a product name or numeric price are dropped.
+- **Lands in:** `packages/ingestion/src/connectors/apoteket-se.ts` and daily `domain=pharmacy` observations through the pharmacy public-products dispatcher.
+
 ---
 
 ## 2F. Fuel prices
@@ -140,3 +148,9 @@ The cleanest per-branch shot is **ICA via handla.api.ica.se**. Plus: **user rece
 4. **Coop discovery** — find the real `coop.se/handla` JSON endpoint via headless browser inspection.
 5. **Mathem** — try `mathem.se/sv-se/api/products/search/` (with trailing slash) and inspect their `_next/data/` payload for catalog + postcode prices.
 6. **Receipt scanner ground-truth** — finish the `packages/scanning` connector so user-submitted receipts populate per-branch price rows.
+
+### 2.10 Apotek 1 Norway public search 🧪 verified (pharmacy connector candidate)
+- **Endpoint evidence:** `https://www.apotek1.no/sok?searchTerm={query}` exposes public product search pages for Apotek 1 Norway without a signed-in account. Product cards include pharmacy assortment names, package text, price labels where public, and product detail links suitable for a pharmacy-domain connector proof.
+- **Robots posture:** treat as read-only public search evidence; keep crawl rate conservative, send a GroceryView User-Agent, and stop if robots or response headers disallow automated collection.
+- **Per-branch granularity:** ❌ no from public search. Store availability and pharmacy-specific fulfilment remain out of scope until an explicitly permitted endpoint is found.
+- **Connector status:** 🧪 documented / not ingested. Pharmacy rows should land under the pharmacy domain with `requireStoreScopedPrices:false` and must not be mixed into grocery basket totals.

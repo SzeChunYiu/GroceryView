@@ -297,7 +297,7 @@ export function DietFilterPicker({
   }
 
   return (
-    <section className={`rounded-3xl border border-emerald-100 bg-white p-4 shadow-sm ${className}`} aria-labelledby="diet-filter-picker-heading">
+    <section className={`rounded-3xl border border-emerald-100 bg-white p-4 shadow-sm ${className}`} aria-labelledby="diet-filter-picker-heading" data-diet-filter-storage-key={storageKey}>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p id="diet-filter-picker-heading" className="text-sm font-black uppercase tracking-[0.18em] text-emerald-800">
@@ -317,6 +317,7 @@ export function DietFilterPicker({
           const active = currentSelected.includes(option.value);
           return (
             <button
+              data-diet-filter-option={option.value}
               key={option.value}
               type="button"
               aria-pressed={active}
