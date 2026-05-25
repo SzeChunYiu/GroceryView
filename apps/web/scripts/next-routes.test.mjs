@@ -171,7 +171,23 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(household, /@\/lib\/demo-data|@\/components\/sample-data/);
   });
 
+  it('renders collaborative household list activity for add, check, edit, and remove events', async () => {
+    const household = await read('src/app/household/page.tsx');
+    const activityStream = await read('src/components/activity-stream.tsx');
+    const activityLog = await read('src/lib/activity-log.ts');
 
+    assert.match(household, /ActivityStream/);
+    assert.match(household, /householdActivityTimeline/);
+    assert.match(household, /item_added/);
+    assert.match(household, /item_checked/);
+    assert.match(household, /item_edited/);
+    assert.match(household, /item_removed/);
+    assert.match(activityStream, /added, checked, edited, and removed events/);
+    assert.match(activityStream, /sortSharedListActivityEvents/);
+    assert.match(activityLog, /'item_added' \| 'item_checked' \| 'item_edited' \| 'item_removed'/);
+    assert.match(activityLog, /publishSharedListItemChecked/);
+    assert.match(activityLog, /publishSharedListItemEdited/);
+  });
 
   it('ships signed-in scanner upload and barcode processing controls without anonymous uploads', async () => {
     const scanner = await read('src/app/scanner/page.tsx');
