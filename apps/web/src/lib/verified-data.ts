@@ -732,6 +732,7 @@ export type ProductSearchUrlParams = {
   chain?: SearchParamValue;
   minPrice?: SearchParamValue;
   maxPrice?: SearchParamValue;
+  avoidAllergens?: SearchParamValue;
   inStockOnly?: SearchParamValue;
   minConfidence?: SearchParamValue;
   minCarbonScore?: SearchParamValue;
@@ -854,7 +855,7 @@ function carbonScoreForFacetedProduct(product: (typeof rawFacetedProductSearch.p
   });
 }
 
-function productSearchResultCards(searchResult: typeof rawFacetedProductSearch, sort: ProductSearchSortOption = 'relevance', minCarbonScore?: number) {
+function productSearchResultCards(searchResult: typeof rawFacetedProductSearch, sort: ProductSearchSortOption = 'relevance', minCarbonScore?: number, avoidAllergens = false) {
   const cards = searchResult.products.map((product, relevanceIndex) => {
     const cheapest = product.currentPrices[0] ?? null;
     const lowestUnitPrice = product.currentPrices.reduce((lowest, price) => Math.min(lowest, price.unitPrice), Number.POSITIVE_INFINITY);
@@ -892,7 +893,10 @@ function productSearchResultCards(searchResult: typeof rawFacetedProductSearch, 
       sortRelevanceIndex: relevanceIndex,
       sortUnitPrice: Number.isFinite(lowestUnitPrice) ? lowestUnitPrice : Number.MAX_SAFE_INTEGER
     };
-  }).filter((card) => minCarbonScore === undefined || card.carbonScore.score >= minCarbonScore);
+  }).filter((card) => (
+    (minCarbonScore === undefined || card.carbonScore.score >= minCarbonScore)
+    && (!avoidAllergens || card.allergenRiskBadges.length === 0)
+  ));
 
   return cards.sort((left, right) => {
     if (sort === 'unit_price_asc' && left.sortUnitPrice !== right.sortUnitPrice) return left.sortUnitPrice - right.sortUnitPrice;
@@ -915,6 +919,7 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
   const minPrice = numericSearchValue(searchParams.minPrice);
   const maxPrice = numericSearchValue(searchParams.maxPrice);
   const inStockOnly = booleanSearchValue(searchParams.inStockOnly);
+  const avoidAllergens = booleanSearchValue(searchParams.avoidAllergens);
   const minConfidence = confidenceSearchValue(searchParams.minConfidence);
   const minCarbonScore = numericSearchValue(searchParams.minCarbonScore);
   const sort = productSearchSortValue(searchParams.sort);
@@ -933,6 +938,7 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
     ...chains.map((chain) => `chain=${chainDisplayNames[chain] ?? chain}`),
     minPrice !== undefined ? `min unit ${formatSek(minPrice)}` : null,
     maxPrice !== undefined ? `max unit ${formatSek(maxPrice)}` : null,
+    avoidAllergens ? 'allergen-aware filter on' : null,
     inStockOnly ? 'priced/in-stock only' : null,
     minConfidence !== undefined ? `confidence ≥ ${pct.format(minConfidence * 100)}%` : null,
     minCarbonScore !== undefined ? `eco score ≥ ${minCarbonScore}` : null,
@@ -974,8 +980,12 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
       availableLatestPriceCount: searchResult.evidence.availableLatestPriceCount,
       outOfStockLatestPriceCount: searchResult.evidence.outOfStockLatestPriceCount
     },
+    allergenAvoidance: {
+      checked: avoidAllergens,
+      excludedResultCount: productSearchResultCards(searchResult, sort, minCarbonScore, false).filter((card) => card.allergenRiskBadges.length > 0).length
+    },
     activeFilters,
-    resultCards: productSearchResultCards(searchResult, sort, minCarbonScore)
+    resultCards: productSearchResultCards(searchResult, sort, minCarbonScore, avoidAllergens)
   };
 }
 

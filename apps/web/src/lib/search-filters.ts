@@ -196,7 +196,7 @@ export type RemovableSearchFilterChip = {
   href: string;
 };
 
-type SearchFilterChipKey = 'brand' | 'category' | 'chain' | 'dietary' | 'inStockOnly' | 'label' | 'minConfidence' | 'minPrice' | 'maxPrice';
+type SearchFilterChipKey = 'avoidAllergens' | 'brand' | 'category' | 'chain' | 'dietary' | 'inStockOnly' | 'label' | 'minConfidence' | 'minPrice' | 'maxPrice';
 
 type SearchFilterChipOptions = {
   basePath?: string;
@@ -287,6 +287,14 @@ export function buildRemovableSearchFilterChips(searchParams: SearchFilterParams
       id: `label:${label}`,
       label: `Certification: ${displayChipValue(label, options.labels?.label)}`,
       href: chipRemovalHref(searchParams, 'label', label, basePath)
+    });
+  }
+
+  if (searchParamValues(searchParams.avoidAllergens).some((value) => ['1', 'true', 'yes', 'on'].includes(value.toLocaleLowerCase('sv-SE')))) {
+    chips.push({
+      id: 'avoidAllergens',
+      label: 'Allergen filter: exclude risky items',
+      href: chipRemovalHref(searchParams, 'avoidAllergens', 'true', basePath)
     });
   }
 

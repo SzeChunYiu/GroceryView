@@ -15,7 +15,7 @@ import { buildSavedSearchSubscription } from '@/lib/alert-scheduler';
 import { adaptiveProductCards, buildProductSearchView, withProductSearchExplanationBadges, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
-import { buildRemovableSearchFilterChips } from '@/lib/search-filters';
+import { allergenRiskBadgesForText, buildRemovableSearchFilterChips } from '@/lib/search-filters';
 import { buildSearchFilterPreset } from '@/lib/search-presets';
 
 const PRODUCTS_PER_PAGE = 50;
@@ -35,6 +35,7 @@ type SearchParams = {
   chain?: string | string[];
   minPrice?: string | string[];
   maxPrice?: string | string[];
+  avoidAllergens?: string | string[];
   inStockOnly?: string | string[];
   minConfidence?: string | string[];
   minCarbonScore?: string | string[];
@@ -78,6 +79,7 @@ function copySearchParams(params: URLSearchParams, source: SearchParams) {
   setFirstParam(params, 'chain', source.chain);
   setFirstParam(params, 'minPrice', source.minPrice);
   setFirstParam(params, 'maxPrice', source.maxPrice);
+  setFirstParam(params, 'avoidAllergens', source.avoidAllergens);
   setFirstParam(params, 'inStockOnly', source.inStockOnly);
   setFirstParam(params, 'minConfidence', source.minConfidence);
   setFirstParam(params, 'minCarbonScore', source.minCarbonScore);
@@ -144,10 +146,20 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   }));
   const requestedPage = toPageNumber(resolvedSearchParams.page);
   const selectedBrand = normalizeSelectedBrand(resolvedSearchParams.brand);
+  const avoidAllergens = search.allergenAvoidance.checked;
   const baseProductCards = selectedBrand
     ? adaptiveProductCards.filter((card) => card.brand === selectedBrand)
     : adaptiveProductCards;
-  const productCards = withProductSearchExplanationBadges(baseProductCards, search.query);
+  const allergenFilteredProductCards = avoidAllergens
+    ? baseProductCards.filter((card) => allergenRiskBadgesForText([
+      card.name,
+      card.brand,
+      card.packageLabel,
+      card.safetyEvidenceLabel,
+      ...card.safetyProfile.allergenTags
+    ]).length === 0)
+    : baseProductCards;
+  const productCards = withProductSearchExplanationBadges(allergenFilteredProductCards, search.query);
   const totalPages = Math.max(1, Math.ceil(resultCards.length / PRODUCTS_PER_PAGE));
   const currentPage = Math.min(requestedPage, totalPages);
   const pageStart = (currentPage - 1) * PRODUCTS_PER_PAGE;
@@ -174,7 +186,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
     return counts;
   }, {});
 
-  function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'origin' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence', string>>) {
+  function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'origin' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'avoidAllergens' | 'inStockOnly' | 'minConfidence', string>>) {
     const params = new URLSearchParams();
     copySearchParams(params, resolvedSearchParams);
     for (const [key, value] of Object.entries(overrides)) {
@@ -225,6 +237,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
         <form action="/products" className="mt-5 grid gap-3 rounded-2xl border border-violet-100 bg-white p-4 shadow-sm lg:grid-cols-[1.2fr_180px_auto]" method="get">
           {search.originFilters.map((origin) => <input key={origin} name="origin" type="hidden" value={origin} />)}
           {search.sort !== 'relevance' ? <input name="sort" type="hidden" value={search.sort} /> : null}
+          {search.filters.inStockOnly ? <input name="inStockOnly" type="hidden" value="true" /> : null}
           <label className="text-sm font-black text-slate-950" htmlFor="product-search-q">
             Search
             <input className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-950" defaultValue={search.query} id="product-search-q" name="q" />
@@ -236,6 +249,10 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           <div className="flex flex-col justify-end gap-2">
             <button className="rounded-full bg-violet-800 px-4 py-3 text-sm font-black text-white" type="submit">Apply filters</button>
           </div>
+          <label className="flex items-center gap-2 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-black text-rose-950">
+            <input defaultChecked={avoidAllergens} name="avoidAllergens" type="checkbox" value="true" />
+            Exclude allergen-risk items
+          </label>
           <AdvancedFilterDrawer
             activeChips={activeFilterChips}
             brandOptions={productBrandFilterOptions.slice(0, 24)}
@@ -263,6 +280,11 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           ) : null}
         </div>
         <SavedSearchActions resultCount={resultCards.length} subscription={savedSearchSubscription} />
+        {avoidAllergens ? (
+          <p className="mt-3 rounded-2xl border border-rose-200 bg-rose-50 p-3 text-sm font-bold text-rose-950">
+            Allergen-aware search filtering is on; {search.allergenAvoidance.excludedResultCount.toLocaleString('sv-SE')} risky result{search.allergenAvoidance.excludedResultCount === 1 ? '' : 's'} were excluded from results and recommendations.
+          </p>
+        ) : null}
         <OriginFilter
           className="mt-5"
           counts={Object.fromEntries(originFacets.map((facet) => [facet.value, facet.count])) as Partial<Record<OriginFilterCode, number>>}
