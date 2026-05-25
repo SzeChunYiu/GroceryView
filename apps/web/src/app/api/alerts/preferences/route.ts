@@ -1,4 +1,8 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import {
+  tuneRollingAverageAlertThreshold,
+  type RollingAverageThresholdTuning
+} from '@/lib/alert-engine';
 
 type AlertPreferenceCadence = 'immediate' | 'daily_digest' | 'weekly_digest' | 'paused';
 type AlertPreferenceChannel = 'email' | 'push' | 'in_app_digest';
@@ -9,9 +13,15 @@ type StoredAlertPreferencesProfile = {
   cadence: AlertPreferenceCadence;
   channels: AlertPreferenceChannel[];
   maxDailyAlerts: number;
-  minimumConfidence: number;
   sensitivity: AlertPreferenceSensitivity;
-  updatedAt: string;
+  updatedAt: string | null;
+} & RollingAverageThresholdTuning;
+
+type AlertThresholdTuningInput = {
+  rollingAverageVolatility?: number | null;
+  rollingAverageVolatilityPercent?: number | null;
+  rollingAverageWindowDays?: number;
+  volatilityScore?: number | null;
 };
 
 declare global {
@@ -55,11 +65,42 @@ function normalizeChannels(value: unknown): AlertPreferenceChannel[] {
   return Array.from(new Set(channels));
 }
 
-function deliveryLimits(cadence: AlertPreferenceCadence, sensitivity: AlertPreferenceSensitivity) {
-  if (cadence === 'paused') return { maxDailyAlerts: 0, minimumConfidence: 1 };
-  if (cadence === 'weekly_digest') return { maxDailyAlerts: 1, minimumConfidence: sensitivity === 'high' ? 0.72 : 0.82 };
-  if (cadence === 'daily_digest') return { maxDailyAlerts: sensitivity === 'high' ? 3 : 2, minimumConfidence: sensitivity === 'low' ? 0.86 : 0.76 };
-  return { maxDailyAlerts: sensitivity === 'high' ? 8 : sensitivity === 'standard' ? 5 : 3, minimumConfidence: sensitivity === 'high' ? 0.64 : sensitivity === 'standard' ? 0.74 : 0.84 };
+function normalizeOptionalNumber(value: unknown) {
+  if (value === undefined || value === null || value === '') return null;
+  const numeric = typeof value === 'number' ? value : Number(value);
+  return Number.isFinite(numeric) ? numeric : null;
+}
+
+function normalizeRollingAverageWindowDays(value: unknown) {
+  const numeric = normalizeOptionalNumber(value);
+  return numeric === null ? undefined : Math.max(1, Math.round(numeric));
+}
+
+function deliveryLimits(
+  cadence: AlertPreferenceCadence,
+  sensitivity: AlertPreferenceSensitivity,
+  thresholdInput: AlertThresholdTuningInput = {}
+) {
+  const fixedLimits = cadence === 'paused'
+    ? { maxDailyAlerts: 0, baselineThreshold: 1 }
+    : cadence === 'weekly_digest'
+      ? { maxDailyAlerts: 1, baselineThreshold: sensitivity === 'high' ? 0.72 : 0.82 }
+      : cadence === 'daily_digest'
+        ? { maxDailyAlerts: sensitivity === 'high' ? 3 : 2, baselineThreshold: sensitivity === 'low' ? 0.86 : 0.76 }
+        : {
+          maxDailyAlerts: sensitivity === 'high' ? 8 : sensitivity === 'standard' ? 5 : 3,
+          baselineThreshold: sensitivity === 'high' ? 0.64 : sensitivity === 'standard' ? 0.74 : 0.84
+        };
+
+  return {
+    maxDailyAlerts: fixedLimits.maxDailyAlerts,
+    ...tuneRollingAverageAlertThreshold({
+      baselineThreshold: fixedLimits.baselineThreshold,
+      cadence,
+      sensitivity,
+      ...thresholdInput
+    })
+  };
 }
 
 async function readBody(request: NextRequest) {
@@ -74,6 +115,10 @@ async function readBody(request: NextRequest) {
     accountId: form.get('accountId'),
     cadence: form.get('cadence'),
     channels: form.getAll('channels'),
+    rollingAverageVolatility: form.get('rollingAverageVolatility'),
+    rollingAverageVolatilityPercent: form.get('rollingAverageVolatilityPercent') ?? form.get('historicalVolatilityPercent'),
+    rollingAverageWindowDays: form.get('rollingAverageWindowDays'),
+    volatilityScore: form.get('volatilityScore'),
     sensitivity: form.get('sensitivity')
   };
 }
@@ -100,6 +145,12 @@ export async function POST(request: NextRequest) {
   const cadence = normalizeCadence(body.cadence);
   const sensitivity = normalizeSensitivity(body.sensitivity);
   const channels = normalizeChannels(body.channels);
+  const thresholdInput: AlertThresholdTuningInput = {
+    rollingAverageVolatility: normalizeOptionalNumber(body.rollingAverageVolatility),
+    rollingAverageVolatilityPercent: normalizeOptionalNumber(body.rollingAverageVolatilityPercent ?? body.historicalVolatilityPercent),
+    rollingAverageWindowDays: normalizeRollingAverageWindowDays(body.rollingAverageWindowDays),
+    volatilityScore: normalizeOptionalNumber(body.volatilityScore)
+  };
 
   if (!accountId) {
     return NextResponse.json({ error: 'accountId is required to save alert preferences.' }, { status: 400 });
@@ -122,7 +173,7 @@ export async function POST(request: NextRequest) {
     cadence,
     channels: cadence === 'paused' ? [] : channels,
     sensitivity,
-    ...deliveryLimits(cadence, sensitivity),
+    ...deliveryLimits(cadence, sensitivity, thresholdInput),
     updatedAt: new Date().toISOString()
   };
   profiles.set(accountId, profile);
