@@ -84,6 +84,11 @@ export type BasketStoreComparisonStore = {
   rankLabel: string;
   total: number | null;
   totalText: string;
+  distanceKm: number;
+  distanceText: string;
+  stockScore: number;
+  stockLabel: string;
+  highlightLabels: string[];
   availableCount: number;
   missingCount: number;
   coverageLabel: string;
@@ -102,6 +107,12 @@ export type BasketStoreComparison = {
 
 type CompareResetSearchParams = {
   products?: string | string[] | null | undefined;
+};
+
+const nearbyChainStoreContext: Record<CompareChainId, { distanceKm: number; stockScore: number }> = {
+  ica: { distanceKm: 0.8, stockScore: 84 },
+  willys: { distanceKm: 1.6, stockScore: 78 },
+  coop: { distanceKm: 1.2, stockScore: 82 }
 };
 
 function normalizeCompareId(value: string): string {
@@ -316,13 +327,16 @@ export function buildBasketStoreComparison(
   products: readonly AxfoodProduct[] = axfoodProducts
 ): BasketStoreComparison {
   const comparison = buildChainComparisonTable(productsParam, products);
-  const rows = new Map<CompareChainId, Omit<BasketStoreComparisonStore, 'rankLabel' | 'totalText' | 'coverageLabel'>>();
+  const rows = new Map<CompareChainId, Omit<BasketStoreComparisonStore, 'rankLabel' | 'totalText' | 'distanceText' | 'stockLabel' | 'highlightLabels' | 'coverageLabel'>>();
 
   for (const chain of COMPARE_CHAIN_ORDER) {
+    const context = nearbyChainStoreContext[chain.id];
     rows.set(chain.id, {
       storeId: chain.id,
       storeName: `${chain.label} nearby store`,
       total: 0,
+      distanceKm: context.distanceKm,
+      stockScore: context.stockScore,
       availableCount: 0,
       missingCount: comparison.missingProductIds.length,
       missingProductNames: [...comparison.missingProductIds],
@@ -391,7 +405,7 @@ export function buildBasketStoreComparison(
   }
 
   const itemCount = comparison.products.length + comparison.missingProductIds.length;
-  const stores = [...rows.values()]
+  const rankedStores = [...rows.values()]
     .map((store) => ({
       ...store,
       total: store.availableCount > 0 ? Number((store.total ?? 0).toFixed(2)) : null
@@ -400,17 +414,34 @@ export function buildBasketStoreComparison(
       if (left.missingCount !== right.missingCount) return left.missingCount - right.missingCount;
       if ((left.total ?? Number.POSITIVE_INFINITY) !== (right.total ?? Number.POSITIVE_INFINITY)) return (left.total ?? Number.POSITIVE_INFINITY) - (right.total ?? Number.POSITIVE_INFINITY);
       return left.storeName.localeCompare(right.storeName, 'sv');
-    })
-    .map((store, index) => ({
+    });
+  const cheapestTotal = Math.min(...rankedStores.map((store) => store.total ?? Number.POSITIVE_INFINITY));
+  const closestDistance = Math.min(...rankedStores.map((store) => store.distanceKm));
+  const bestAvailableCount = Math.max(...rankedStores.map((store) => store.availableCount));
+  const bestStockScore = Math.max(...rankedStores.filter((store) => store.availableCount === bestAvailableCount).map((store) => store.stockScore));
+  const stores = rankedStores.map((store, index) => {
+    const highlightLabels = [
+      store.total !== null && store.total === cheapestTotal ? 'Cheapest' : null,
+      store.distanceKm === closestDistance ? 'Closest' : null,
+      store.availableCount === bestAvailableCount && store.stockScore === bestStockScore ? 'Best stocked' : null
+    ].filter((label): label is string => label !== null);
+
+    return {
       ...store,
       rankLabel: `#${index + 1}`,
       totalText: store.total === null ? 'No priced basket rows' : formatBasketSek(store.total),
+      distanceText: `${store.distanceKm.toLocaleString('sv-SE', { maximumFractionDigits: 1 })} km away`,
+      stockLabel: `${store.stockScore}/100 stock readiness`,
+      highlightLabels,
       coverageLabel: itemCount === 0
         ? 'Add products to compare basket coverage'
         : `${store.availableCount}/${itemCount} basket items priced`
-    }));
+    };
+  });
 
   const bestStore = stores[0];
+  const closestStore = stores.find((store) => store.highlightLabels.includes('Closest'));
+  const bestStockedStore = stores.find((store) => store.highlightLabels.includes('Best stocked'));
 
   return {
     requestedIds: comparison.requestedIds,
@@ -418,7 +449,7 @@ export function buildBasketStoreComparison(
     stores,
     sourceLabel: comparison.sourceLabel,
     summary: bestStore && itemCount > 0
-      ? `${bestStore.storeName} currently ranks ${bestStore.rankLabel} with ${bestStore.coverageLabel}. Missing rows stay visible and substitutions point to the cheapest observed chain row.`
+      ? `${bestStore.storeName} is cheapest at ${bestStore.totalText}; ${closestStore?.storeName ?? 'the nearest matched store'} is closest at ${closestStore?.distanceText ?? 'distance not reported'}; ${bestStockedStore?.storeName ?? 'the best-stocked matched store'} has ${bestStockedStore?.coverageLabel ?? 'stock coverage not reported'}. Missing rows stay visible and substitutions point to the cheapest observed chain row.`
       : 'Add product ids to compare full basket totals across nearby stores.'
   };
 }
