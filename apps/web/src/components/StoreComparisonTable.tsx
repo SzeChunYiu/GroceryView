@@ -79,8 +79,8 @@ export function StoreComparisonTable({
   }
 
   return (
-    <section className="overflow-hidden rounded-[2rem] border border-emerald-100 bg-white shadow-sm" data-store-comparison-table>
-      <div className="border-b border-emerald-100 bg-emerald-50 px-5 py-4">
+    <section className="overflow-hidden rounded-[2rem] border border-emerald-100 bg-white shadow-sm print:rounded-none print:border-slate-400 print:shadow-none" data-store-comparison-table>
+      <div className="border-b border-emerald-100 bg-emerald-50 px-5 py-4 print:bg-white">
         <h2 className="text-2xl font-black text-emerald-950">Store comparison</h2>
         <p className="mt-2 text-sm font-semibold leading-6 text-emerald-900">
           Compare whole-basket store totals side-by-side. Missing items remain visible, and substitution notes point to the cheapest observed store row instead of estimating unavailable prices.
@@ -200,10 +200,11 @@ export function StoreComparisonTable({
 
       {items.length > 0 ? (
         <div className="overflow-x-auto">
+
         <table className="min-w-full border-collapse text-left">
           <caption className="sr-only">Store prices with loyalty-card discounts applied when selected</caption>
           <thead>
-            <tr className="bg-slate-950 text-white">
+            <tr className="bg-slate-950 text-white print:bg-white print:text-slate-950">
               <th className="px-4 py-3 text-sm font-black">Item</th>
               <th className="px-4 py-3 text-sm font-black">Store</th>
               <th className="px-4 py-3 text-sm font-black">Price</th>
