@@ -2123,6 +2123,24 @@ describe('verified-data UI', () => {
     assert.match(itemsRoute, /maxSuggestions: 3/);
   });
 
+  it('surfaces multi-store item price comparison bars with a cheapest-store highlight', async () => {
+    const component = await read('src/components/StoreComparisonChart.tsx');
+    const itemPage = await read('src/app/items/[id]/page.tsx');
+    const productPage = await read('src/app/products/[slug]/page.tsx');
+    const itemsRoute = await read('../../apps/api/src/routes/items.ts');
+
+    assert.match(component, /data-store-comparison-chart/);
+    assert.match(component, /Multi-store price comparison/);
+    assert.match(component, /Cheapest/);
+    assert.match(component, /bg-emerald-700/);
+    assert.match(itemPage, /StoreComparisonChart/);
+    assert.match(itemPage, /chainPriceRows/);
+    assert.match(itemPage, /storeComparisonRowsForProduct/);
+    assert.match(productPage, /itemDetailAddon/);
+    assert.match(itemsRoute, /priceComparison/);
+    assert.match(itemsRoute, /cheapestStore/);
+  });
+
   it('surfaces eco-conscious local and seasonal picks without origin or carbon invention', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/seasonal-calendar/page.tsx');

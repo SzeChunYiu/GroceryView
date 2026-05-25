@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import type { ReactNode } from 'react';
 import {
   buildPriceChartSeries,
   calculateDealScore,
@@ -1478,7 +1479,11 @@ export function generateStaticParams() {
   return [...axfoodProducts.slice(0, 40), ...pricedProducts.slice(0, 40)].map((product) => ({ slug: product.slug }));
 }
 
-export default async function ProductPage({ params, routeBase = 'products' }: Readonly<{ params: Promise<{ slug: string }>; routeBase?: ProductRouteBase }>) {
+export default async function ProductPage({
+  itemDetailAddon,
+  params,
+  routeBase = 'products'
+}: Readonly<{ itemDetailAddon?: ReactNode; params: Promise<{ slug: string }>; routeBase?: ProductRouteBase }>) {
   const { slug } = await params;
   const product = findProduct(slug);
   if (!product) notFound();
@@ -1606,6 +1611,7 @@ export default async function ProductPage({ params, routeBase = 'products' }: Re
           </dl>
         </Card>
       </div>
+      {itemDetailAddon}
       <BestTimeBadge prediction={bestTimePrediction} />
       {crossChainQuoteRows.length > 0 ? (
         <Card className="mt-6 overflow-hidden border-emerald-200 bg-emerald-50/70">

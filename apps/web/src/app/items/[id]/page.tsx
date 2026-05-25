@@ -4,8 +4,9 @@ import ProductPage, {
   generateStaticParams
 } from '../../products/[slug]/page';
 import { BackInStockBanner } from '@/components/BackInStockBanner';
+import { StoreComparisonChart, type StoreComparisonChartRow } from '@/components/StoreComparisonChart';
 import { ItemDetailListShortcut } from '@/components/item-detail-list-shortcut';
-import { chainPriceRows, findProduct } from '@/lib/verified-data';
+import { chainPriceRows, findProduct, formatSek, labelFromSlug } from '@/lib/verified-data';
 
 export { generateStaticParams };
 
@@ -61,10 +62,33 @@ function backInStockAvailabilityForProduct(product: NonNullable<ReturnType<typeo
   };
 }
 
+function storeComparisonRowsForProduct(product: NonNullable<ReturnType<typeof findProduct>> | undefined): StoreComparisonChartRow[] {
+  if (!product || !('lowestPrice' in product)) return [];
+
+  return chainPriceRows(product)
+    .filter((row) => row.isAvailable !== false && Number.isFinite(row.price) && row.price > 0)
+    .map((row) => ({
+      currentPrice: row.price,
+      currentPriceLabel: formatSek(row.price),
+      storeId: row.chain,
+      storeName: labelFromSlug(row.chain),
+      unitLabel: row.priceText ? `${row.priceText} · ${row.priceUnit}` : row.priceUnit
+    }));
+}
+
 export default async function ItemPage({ params }: Readonly<{ params: Promise<{ id: string }> }>) {
   const { id } = await params;
   const product = findProduct(id);
-  const renderedProductPage = await ProductPage({ params: Promise.resolve({ slug: id }), routeBase: 'items' });
+  const renderedProductPage = await ProductPage({
+    itemDetailAddon: (
+      <StoreComparisonChart
+        productName={product?.name ?? id}
+        rows={storeComparisonRowsForProduct(product)}
+      />
+    ),
+    params: Promise.resolve({ slug: id }),
+    routeBase: 'items'
+  });
 
   return (
     <>
