@@ -65,8 +65,10 @@ import {
 } from './connectors/apoteket-se.js';
 import {
   fetchLidlOffersForAllStores,
+  type LidlOffer,
   type LidlStoreOffer
 } from './connectors/lidl.js';
+import { fetchLidlBulkProducts } from './connectors/lidl-bulk.js';
 import {
   fetchLocalFoodNodesProductsForAllNodes,
   type LocalFoodNodesProduct
@@ -2000,6 +2002,27 @@ function lidlStoreOfferToDailyItem(row: LidlStoreOffer): RetailerConnectorParsed
   };
 }
 
+function lidlBulkOfferToDailyItem(row: LidlOffer): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageText);
+  return {
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: `lidl-${stableKeyPart(row.code)}`,
+    categoryId: stableKeyPart(row.category || 'lidl-products'),
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price,
+    regularPrice: row.regularPrice !== null && row.regularPrice > row.price ? row.regularPrice : undefined,
+    promoText: row.promotionText || undefined,
+    memberOnly: row.memberOnly,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.sourceUrl,
+    imageUrl: row.imageUrl || undefined
+  };
+}
+
 function localFoodNodesProductToDailyItem(row: LocalFoodNodesProduct): RetailerConnectorParsedProduct {
   const quantity = parseNativePackageText(row.packageText);
   return {
@@ -2430,6 +2453,19 @@ export async function fetchDailyConnectorSnapshot(
       retrievedAt
     });
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(lidlStoreOfferToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_LIDL_BULK_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_LIDL_BULK_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchLidlBulkProducts({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      minRows: dailyNativeNumberParam(url, 'minRows'),
+      offerPaths: dailyNativeStringListParam(url, 'paths'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(lidlBulkOfferToDailyItem) });
   }
 
   if (sourceUrl === GROCERYVIEW_DAILY_LOCALFOODNODES_SE_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_LOCALFOODNODES_SE_PRODUCTS_URL}?`)) {
@@ -3541,6 +3577,7 @@ export const GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_PRODUCTS_URL = 'groceryview://da
 export const GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/hemkop/weekly-offers/all-stores';
 export const GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL = 'groceryview://daily/ica/store-promotions/default-stores';
 export const GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL = 'groceryview://daily/lidl/public-offers/all-stores';
+export const GROCERYVIEW_DAILY_LIDL_BULK_PRODUCTS_URL = 'groceryview://daily/lidl/products/bulk';
 export const GROCERYVIEW_DAILY_LOCALFOODNODES_SE_PRODUCTS_URL = 'groceryview://daily/localfoodnodes/se/products/all-nodes';
 export const GROCERYVIEW_DAILY_LYF_OG_HEILSA_IS_PRODUCTS_URL = 'groceryview://daily/is/lyfogheilsa/products/public';
 export const GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/coop/weekly-offers/all-stores';
