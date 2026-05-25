@@ -16,6 +16,7 @@ import {
   midsommarSeasonalHoliday,
   type ItemSubstitutionProduct
 } from '@groceryview/analytics';
+import { ProductBreadcrumb } from '@/components/Breadcrumb';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
@@ -1292,6 +1293,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
         <FunnelStepBeacon step="product_view" />
         <script dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbJsonLd) }} type="application/ld+json" />
         <Eyebrow>{isChain ? 'Axfood chain product' : 'OpenPrices product'}</Eyebrow>
+        <ProductBreadcrumb categoryLabel={labelFromSlug(product.category)} categorySlug={product.category} productName={product.name} />
         <Card className="mt-6 border-dashed border-slate-300 bg-slate-50 text-center">
           <div aria-hidden="true" className="mx-auto flex size-14 items-center justify-center rounded-full bg-white text-3xl shadow-sm">
             🛒
@@ -1354,6 +1356,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
       <script dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbJsonLd) }} type="application/ld+json" />
       <Eyebrow>{isChain ? 'Axfood chain product' : 'OpenPrices product'}</Eyebrow>
       <h1 className="mt-2 max-w-4xl text-4xl font-black tracking-tight">{product.name}</h1>
+      <ProductBreadcrumb categoryLabel={labelFromSlug(product.category)} categorySlug={product.category} productName={product.name} />
       <p className="mt-3 text-lg text-slate-700">{isChain ? product.brand : product.brands || 'Brand not reported'} · {isChain ? product.subline : product.quantity || 'Quantity not reported'}</p>
       <div className="mt-6 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
         <Card>

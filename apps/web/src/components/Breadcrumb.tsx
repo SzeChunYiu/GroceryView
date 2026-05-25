@@ -47,3 +47,20 @@ export function CategoryBreadcrumb({ slug, categoryLabel }: Readonly<{ slug: str
 
   return <Breadcrumb items={items} />;
 }
+
+export function ProductBreadcrumb({
+  categoryLabel,
+  categorySlug,
+  productName
+}: Readonly<{ categoryLabel: string; categorySlug: string; productName: string }>) {
+  return (
+    <Breadcrumb
+      items={[
+        { label: 'Home', href: '/' },
+        { label: 'Products', href: '/products' },
+        { label: categoryLabel, href: `/categories/${categorySlug}` },
+        { label: productName }
+      ]}
+    />
+  );
+}
