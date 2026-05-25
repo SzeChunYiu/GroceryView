@@ -3,13 +3,14 @@
 import Link from 'next/link';
 import { Map, ScanLine, Search, ShoppingBasket, Store, Tags, Watch } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { useHaptic } from '@/hooks/useHaptic';
 
 const bottomNavItems = [
   { href: '/', label: 'Markets', icon: Store, exact: true },
   { href: '/products', label: 'Search', icon: Search },
   { href: '/screener', label: 'Deals', icon: Tags },
-  { href: '/scanner#scan', label: 'Scan', icon: ScanLine, prominent: true, match: 'scanner' },
+  { href: '/scanner?launch=bottom-nav-browser#scan', standaloneHref: '/scanner?launch=bottom-nav-pwa#scan', label: 'Scan', icon: ScanLine, prominent: true, match: 'scanner' },
   { href: '/list', label: 'List', icon: ShoppingBasket },
   { href: '/map', label: 'Nearby', icon: Map },
   { href: '/watchlist', label: 'Watchlist', icon: Watch }
@@ -23,7 +24,19 @@ function isBottomNavItemActive(item: (typeof bottomNavItems)[number], pathname: 
 
 export function BottomNav() {
   const pathname = usePathname();
-  const { impact, selection } = useHaptic();
+  const { scannerShortcut, selection } = useHaptic();
+  const [isStandalone, setIsStandalone] = useState(false);
+
+  useEffect(() => {
+    const standaloneQuery = window.matchMedia('(display-mode: standalone)');
+    const refreshStandalone = () => {
+      setIsStandalone(standaloneQuery.matches || (window.navigator as Navigator & { standalone?: boolean }).standalone === true);
+    };
+
+    refreshStandalone();
+    standaloneQuery.addEventListener('change', refreshStandalone);
+    return () => standaloneQuery.removeEventListener('change', refreshStandalone);
+  }, []);
 
   return (
     <nav
@@ -35,6 +48,7 @@ export function BottomNav() {
           const Icon = item.icon;
           const isActive = isBottomNavItemActive(item, pathname);
           const isProminent = 'prominent' in item && item.prominent;
+          const href = isProminent && 'standaloneHref' in item && isStandalone ? item.standaloneHref : item.href;
 
           return (
             <Link
@@ -48,11 +62,11 @@ export function BottomNav() {
                     ? 'bg-emerald-800 text-white shadow-sm'
                     : 'text-slate-700 hover:bg-emerald-50 hover:text-emerald-900'
               }`}
-              href={item.href}
+              href={href}
               key={item.href}
               onClick={() => {
                 if (isProminent) {
-                  impact();
+                  scannerShortcut();
                 } else {
                   selection();
                 }
