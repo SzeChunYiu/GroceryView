@@ -356,6 +356,33 @@ describe('verified-data UI', () => {
     assert.match(preferences, /onboardingCompleted/);
   });
 
+  it('wires MyFlyer account preferences to the API without local-only persistence', async () => {
+    const page = await read('src/app/[city]/my-flyer/page.tsx');
+    const preferences = await read('src/app/[city]/my-flyer/my-flyer-preferences.tsx');
+    const api = await read('src/app/api/my-flyer/route.ts');
+
+    assert.match(page, /MyFlyerPreferences/);
+    assert.match(preferences, /Country/);
+    assert.match(preferences, /Favorite stores/);
+    assert.match(preferences, /Home location/);
+    assert.match(preferences, /Household size/);
+    assert.match(preferences, /MyFlyer account diet filters/);
+    assert.match(preferences, /Algorithm choice/);
+    assert.match(preferences, /fetch\('\/api\/my-flyer'/);
+    assert.match(preferences, /Authorization: `Bearer \$\{session\.accessToken\}`/);
+    assert.match(preferences, /favorite_stores: splitStores\(favoriteStores\)/);
+    assert.match(preferences, /home_location: homeLocation/);
+    assert.match(preferences, /household_size: householdSize/);
+    assert.match(preferences, /diet_filters: dietFilters/);
+    assert.doesNotMatch(preferences, /localStorage\.setItem|writeStoredDietFilters|writeStoredAlgorithmChoice/);
+    assert.match(api, /export async function PATCH/);
+    assert.match(api, /preferencesSchema/);
+    assert.match(api, /favorite_stores/);
+    assert.match(api, /home_location/);
+    assert.match(api, /household_size/);
+    assert.match(api, /diet_filters/);
+  });
+
   it('maps purchase history CSV imports into settings personalization and budget seeds', async () => {
     const settings = await read('src/app/settings/page.tsx');
     const bulkImport = await read('src/components/BulkImportDialog.tsx');

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { MyFlyerPushActions } from '@/components/my-flyer-push-actions';
 import { axfoodProducts } from '@/lib/axfood-products';
+import { MyFlyerPreferences } from './my-flyer-preferences';
 import { MyFlyerOffers } from './my-flyer-offers';
 import './print-import.css';
 
@@ -91,6 +92,8 @@ export default async function MyFlyerPage({ params }: MyFlyerPageProps) {
             <span className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Print layout</span>
           </div>
         </section>
+
+        <MyFlyerPreferences defaultCountry="se" defaultAlgorithm="watchlist_first" />
 
         <MyFlyerPushActions
           city={city}
