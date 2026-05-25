@@ -5,6 +5,13 @@ export const siteName = 'GroceryView';
 
 const defaultDescription = 'Verified Swedish grocery price intelligence with product tickers, chain comparisons, store coverage, and confidence-labelled savings signals.';
 const localeNegotiatedCurrentRouteCaveat = 'Locale-negotiated current route hreflang alternates share the canonical URL until native route translations exist beyond /sv and /en.';
+export const publicCatalogueRevalidateSeconds = 300;
+export const publicCatalogueCacheControl = `public, s-maxage=${publicCatalogueRevalidateSeconds}, stale-while-revalidate=${publicCatalogueRevalidateSeconds * 3}`;
+const publicCatalogueLandingRoutes = new Set(['/products', '/categories', '/stores']);
+
+export function isPublicCatalogueLandingRoute(path: string) {
+  return publicCatalogueLandingRoutes.has(path.replace(/\/$/, '') || '/');
+}
 
 type RouteMetadataConfig = {
   path: string;
@@ -341,7 +348,13 @@ export function routeMetadata(route: keyof typeof routeMetadataCatalog | RouteMe
     // locale-negotiated alternates stay bound to the current route path.
     alternates: { canonical: canonical, languages: languageAlternateUrls(config.path) },
     other: {
-      'x-groceryview-hreflang-boundary': localeNegotiatedCurrentRouteCaveat
+      'x-groceryview-hreflang-boundary': localeNegotiatedCurrentRouteCaveat,
+      ...(isPublicCatalogueLandingRoute(config.path)
+        ? {
+            'x-groceryview-edge-cache-control': publicCatalogueCacheControl,
+            'x-groceryview-revalidate-seconds': String(publicCatalogueRevalidateSeconds)
+          }
+        : {})
     },
     openGraph: {
       title,

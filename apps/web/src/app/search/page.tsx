@@ -1,4 +1,5 @@
 import ProductsPage from '../products/page';
+import { RecentSearchReplayPills } from '@/components/SearchBar';
 import { SaveSearchSubscriptionButton } from '@/components/saved-search-subscriptions';
 import { buildSavedSearchSubscription } from '@/lib/alert-scheduler';
 import { routeMetadata } from '@/lib/seo';
@@ -16,6 +17,7 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
   return (
     <>
       <SaveSearchSubscriptionButton subscription={subscription} />
+      <RecentSearchReplayPills />
       <ProductsPage searchParams={Promise.resolve(resolvedSearchParams)} />
     </>
   );
