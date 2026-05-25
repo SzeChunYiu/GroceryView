@@ -142,7 +142,9 @@ function checkoutIngredientsPayload(meal: MealBudgetPlan) {
     })));
 }
 
-function MealPlanCheckoutAction({ day, meal }: Readonly<{ day: string; meal: MealBudgetPlan }>) {
+function MealPlanCheckoutAction({ meal }: Readonly<{ meal: MealBudgetPlan & { weeknightSlot?: string } }>) {
+  const day = meal.weeknightSlot ?? 'Suggested meal';
+
   return (
     <form action="/api/meal-planner/checkout" className="mt-4 flex flex-wrap items-center gap-3 rounded-2xl border border-blue-100 bg-blue-50 p-4" method="post">
       <input name="day" type="hidden" value={day} />
@@ -344,7 +346,7 @@ export default async function MealPlannerPage({
                 ) : null)}
               </div>
               <MealPlanShoppingListExport meal={meal} />
-              <MealPlanCheckoutAction day={meal.weeknightSlot} meal={meal} />
+              <MealPlanCheckoutAction meal={meal} />
             </div>
           ))}
         </div>
