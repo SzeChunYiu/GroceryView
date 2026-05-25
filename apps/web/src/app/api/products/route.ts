@@ -106,6 +106,7 @@ function responsePayload(
   return {
     query,
     expandedQueries: expansion.expandedQueries,
+    fuzzyQueries: expansion.fuzzyQueries,
     matchedAliases: expansion.matchedAliases,
     matchedSynonyms: expansion.matchedSynonyms,
     results,
@@ -140,7 +141,7 @@ export async function GET(request: Request) {
   }
 
   const { q: query } = parsedQuery.data;
-  const { expansion, telemetry: expansionTelemetry } = expandGrocerySearchQueryWithTelemetry(query);
+  const { expansion, telemetry: expansionTelemetry } = expandGrocerySearchQueryWithTelemetry(query, 8);
 
   if (query.length < 2) {
     const telemetry = buildPerformanceTelemetry(query, 0, startedAt, expansionTelemetry);

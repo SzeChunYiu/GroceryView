@@ -5,6 +5,7 @@ export type GrocerySearchExpansion = {
   expandedQueries: string[];
   matchedAliases: string[];
   matchedSynonyms: string[];
+  fuzzyQueries: string[];
 };
 
 export type GrocerySearchExpansionTelemetry = {
@@ -25,6 +26,8 @@ const groceryAliasEntries: Array<{ canonical: string; aliases: string[] }> = [
   { canonical: 'tomatoes', aliases: ['tomat', 'tomater'] },
   { canonical: 'private label milk', aliases: ['garant mjolk', 'garant mjölk', 'willys mjolk', 'willys mjölk'] }
 ];
+
+const swedishTypoSeeds = ['kaffe', 'mjölk', 'ägg', 'kyckling', 'yoghurt', 'smör', 'tomater', 'bregott', 'garant mjölk'];
 
 function normalizeAliasText(value: string): string {
   return value
@@ -48,6 +51,36 @@ function addUnique(values: string[], value: string): void {
   if (!values.some((existing) => normalizeAliasText(existing) === normalized)) values.push(value);
 }
 
+function trigrams(value: string) {
+  const padded = `  ${normalizeAliasText(value)} `;
+  const grams = new Set<string>();
+  for (let index = 0; index < padded.length - 2; index += 1) grams.add(padded.slice(index, index + 3));
+  return grams;
+}
+
+export function trigramSimilarity(left: string, right: string) {
+  const leftGrams = trigrams(left);
+  const rightGrams = trigrams(right);
+  if (leftGrams.size === 0 || rightGrams.size === 0) return 0;
+  let shared = 0;
+  for (const gram of leftGrams) if (rightGrams.has(gram)) shared += 1;
+  return (2 * shared) / (leftGrams.size + rightGrams.size);
+}
+
+function fuzzyQueriesFor(normalizedQuery: string) {
+  if (normalizedQuery.length < 3) return [];
+  const candidates = [
+    ...groceryAliasEntries.flatMap((entry) => [entry.canonical, ...entry.aliases]),
+    ...swedishTypoSeeds
+  ];
+  return candidates
+    .map((candidate) => ({ candidate, score: trigramSimilarity(normalizedQuery, candidate) }))
+    .filter((match) => match.score >= 0.45 && normalizeAliasText(match.candidate) !== normalizedQuery)
+    .sort((a, b) => b.score - a.score || a.candidate.localeCompare(b.candidate, 'sv'))
+    .slice(0, 3)
+    .map((match) => match.candidate);
+}
+
 const expansionCache = new Map<string, GrocerySearchExpansion>();
 let expansionCacheRequests = 0;
 let expansionCacheHits = 0;
@@ -57,7 +90,8 @@ function cloneExpansion(expansion: GrocerySearchExpansion): GrocerySearchExpansi
     query: expansion.query,
     expandedQueries: [...expansion.expandedQueries],
     matchedAliases: [...expansion.matchedAliases],
-    matchedSynonyms: [...expansion.matchedSynonyms]
+    matchedSynonyms: [...expansion.matchedSynonyms],
+    fuzzyQueries: [...expansion.fuzzyQueries]
   };
 }
 
@@ -97,11 +131,15 @@ function buildGrocerySearchExpansion(query: string, maxQueries: number): Grocery
     for (const synonymTerm of synonym.terms) addUnique(expandedQueries, synonymTerm);
   }
 
+  const fuzzyQueries = fuzzyQueriesFor(normalizedQuery);
+  for (const fuzzyQuery of fuzzyQueries) addUnique(expandedQueries, fuzzyQuery);
+
   return {
     query: trimmed,
     expandedQueries: expandedQueries.slice(0, maxQueries),
     matchedAliases,
-    matchedSynonyms
+    matchedSynonyms,
+    fuzzyQueries
   };
 }
 
