@@ -85,6 +85,7 @@ export default function WatchlistPage() {
         <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Wait-window recommendations</h2>
         <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
           Forecasted drops are generated before current threshold alerts fire, so shoppers can wait for near-term savings windows instead of buying right before a likely discount.
+          Every predictive row stays labelled as a historical-source-row signal from dated observations; no forecast is shown without source rows.
         </p>
         <div className="mt-4 grid gap-3 lg:grid-cols-3">
           {samplePredictiveDropAlerts.map((alert) => (
