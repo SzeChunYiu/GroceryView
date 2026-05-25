@@ -133,6 +133,20 @@ function fuzzyTokenMatch(queryToken: string, aliasToken: string) {
   return isTypoTolerantTokenMatch(queryToken, aliasToken);
 }
 
+function editDistance(left: string, right: string): number {
+  const previous = Array.from({ length: right.length + 1 }, (_, index) => index);
+  for (let leftIndex = 0; leftIndex < left.length; leftIndex += 1) {
+    const current = [leftIndex + 1];
+    for (let rightIndex = 0; rightIndex < right.length; rightIndex += 1) {
+      current[rightIndex + 1] = left[leftIndex] === right[rightIndex]
+        ? previous[rightIndex]
+        : Math.min(previous[rightIndex], previous[rightIndex + 1], current[rightIndex]) + 1;
+    }
+    previous.splice(0, previous.length, ...current);
+  }
+  return previous[right.length] ?? 0;
+}
+
 function fuzzyAliasMatch(queryTokens: Set<string>, normalizedAlias: string) {
   const aliasTokens = normalizedAlias.split(' ').filter(Boolean);
   if (aliasTokens.length === 0 || queryTokens.size === 0) return false;

@@ -78,6 +78,8 @@ type MealPlannerSearchParams = {
   ingredient?: string | string[];
 };
 
+const defaultMealPlannerSearchParams: MealPlannerSearchParams = {};
+
 type MealWithIngredients = {
   ingredients: Array<{ productId: string; name: string } | null | undefined>;
 };
@@ -167,7 +169,7 @@ const recipeProductCandidates = [
 export default async function MealPlannerPage({
   searchParams
 }: Readonly<{ searchParams?: Promise<MealPlannerSearchParams> }>) {
-  const resolvedSearchParams = await Promise.resolve(searchParams ?? {});
+  const resolvedSearchParams = await (searchParams ?? Promise.resolve(defaultMealPlannerSearchParams));
   const selectedIngredientId = firstSearchValue(resolvedSearchParams.ingredient).trim();
   const dealMealConfidenceLevel = confidenceLevel(dealBasedMeals.coverage.confidence);
   const mealBudgetPlans = [

@@ -207,7 +207,13 @@ export function buildMyFlyerPayload(query: MyFlyerQuery, asOf = new Date()): MyF
     }
   });
 
-  const rows = myBasketPromos
+  const rankedOfferIds = new Set(myBasketPromos.map((offer) => offer.offerId));
+  const completeRankedOffers = [
+    ...myBasketPromos,
+    ...sourceOffers.filter((offer) => !rankedOfferIds.has(offer.offerId))
+  ];
+
+  const rows = completeRankedOffers
     .map((offer) => scoreOffer(offer, query, asOfMs))
     .sort((left, right) =>
       right.offer.savings - left.offer.savings ||

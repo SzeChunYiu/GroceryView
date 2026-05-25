@@ -31,6 +31,7 @@ describe('daily connectors export script', () => {
       'matspar',
       'pharmacy',
       'apoteket',
+      'preem',
       'okq8'
     ]);
     assert.deepEqual(connectors.map((connector) => connector.connectorId), [
@@ -47,6 +48,7 @@ describe('daily connectors export script', () => {
       'matspar-public-search',
       'pharmacy-public-products',
       'apoteket-se-public-products',
+      'preem-se-business-list-prices',
       'okq8-fuel-prices'
     ]);
     assert.equal(
@@ -59,6 +61,10 @@ describe('daily connectors export script', () => {
     assert.equal(okq8FuelConnector.domain, 'fuel');
     assert.equal(okq8FuelConnector.requireStoreScopedPrices, false);
     assert.deepEqual(okq8FuelConnector.stores, []);
+    const preemFuelConnector = connectors.find((connector) => connector.connectorId === 'preem-se-business-list-prices');
+    assert.equal(preemFuelConnector.domain, 'fuel');
+    assert.equal(preemFuelConnector.requireStoreScopedPrices, false);
+    assert.deepEqual(preemFuelConnector.stores, []);
     const matsparConnector = connectors.find((connector) => connector.connectorId === 'matspar-public-search');
     assert.equal(matsparConnector.domain, 'grocery');
     assert.equal(matsparConnector.requireStoreScopedPrices, false);
@@ -93,6 +99,7 @@ describe('daily connectors export script', () => {
       'groceryview://daily/matspar/products/public-search',
       'groceryview://daily/pharmacy/products/public',
       'groceryview://daily/apoteket-se/products/public',
+      'https://www.preem.se/foretag/listpriser/',
       'https://www.okq8.se/foretag/priser/'
     ]);
     assert.deepEqual(connectors.map((connector) => connector.parserVersion), [
@@ -109,6 +116,7 @@ describe('daily connectors export script', () => {
       'matspar-public-search-v1',
       'pharmacy-public-products-v1',
       'apoteket-se-public-products-v1',
+      'preem-se-business-list-v1',
       'okq8-fuel-prices-v1'
     ]);
   });

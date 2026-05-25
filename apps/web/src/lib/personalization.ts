@@ -375,12 +375,12 @@ export function buildPersonalizedReorderRail<T extends ReorderProductInput>(
   }: { limit?: number; signals?: readonly ReorderProductSignal[] } = {},
 ): PersonalizedReorderItem[] {
   return products
-    .map((product, index) => {
+    .reduce<PersonalizedReorderItem[]>((items, product, index) => {
       const signal = signals.find((entry) => signalMatchesProduct(product.slug, entry.productSlug)) ?? fallbackReorderSignal(index);
-      if (!signal) return null;
+      if (!signal) return items;
 
       const reorderScore = reorderSignalScore(signal);
-      return {
+      items.push({
         ...product,
         reorderScore,
         reorderReason: signal.repeatPurchases > 0
@@ -390,9 +390,9 @@ export function buildPersonalizedReorderRail<T extends ReorderProductInput>(
             : 'Watched product',
         signalSummary: `${signal.repeatPurchases} reorders · ${signal.favoriteSaves} favorites · ${signal.watchedCount} watches`,
         lastActionLabel: signal.lastActionLabel,
-      };
-    })
-    .filter((item): item is PersonalizedReorderItem => item !== null)
+      });
+      return items;
+    }, [])
     .sort((left, right) => right.reorderScore - left.reorderScore || left.name.localeCompare(right.name, 'sv-SE'))
     .slice(0, limit);
 }

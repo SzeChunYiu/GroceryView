@@ -18,6 +18,8 @@ type SearchParams = {
   user_id?: string | string[];
 };
 
+const defaultSearchParams: SearchParams = {};
+
 const deliverySurfaces = [
   { label: 'Email', detail: 'Scheduled digest uses this snapshot id, unsubscribe policy, and quiet hours.' },
   { label: 'PWA push', detail: 'Ready alert points back to the already-ranked snapshot instead of re-ranking client-side.' },
@@ -52,7 +54,7 @@ function formatDate(value: string) {
 }
 
 export default async function MyFlyerPage({ searchParams }: Readonly<{ searchParams?: Promise<SearchParams> }>) {
-  const params = await (searchParams ?? Promise.resolve({}));
+  const params = await (searchParams ?? Promise.resolve(defaultSearchParams));
   const algorithm = safeAlgorithm(first(params.algorithm));
   const country = safeCountry(first(params.country));
   const limit = safeLimit(first(params.limit));

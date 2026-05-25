@@ -30,7 +30,8 @@ const compareModes: Array<{ label: string; value: CompareMode; help: string }> =
 ];
 const emptySafetyPreferences: ProductSafetyPreferences = {
   requiredDietaryTags: [],
-  avoidedAllergenTags: []
+  avoidedAllergenTags: [],
+  nutritionPriorityTags: []
 };
 
 function resolvedMode(card: AdaptiveProductCard, compareMode: CompareMode): 'total' | 'unit' {

@@ -46,9 +46,9 @@ test('product search APIs query expanded synonym terms before result ranking', a
 
   assert.match(productsRoute, /expandGrocerySearchQuery/);
   assert.match(productsRoute, /matchedSynonyms/);
-  assert.match(productsRoute, /Promise\.all\(expansion\.expandedQueries\.map/);
-  assert.match(productsRoute, /mergeSearchResults\(batches\)/);
-  assert.match(productsRoute, /postgres\.products_tsvector_alias_synonym_expansion/);
+  assert.match(productsRoute, /fuzzyProductSearchQueries\(query, expansion\)/);
+  assert.match(productsRoute, /rankFuzzyProductResults\(query, batches, expansion\)/);
+  assert.match(productsRoute, /postgres\.products_tsvector_alias_synonym_fuzzy_rank/);
   assert.match(searchRoute, /matchedSynonyms/);
   assert.match(searchRoute, /postgres\.products_tsvector_alias_synonym_expansion/);
 });
