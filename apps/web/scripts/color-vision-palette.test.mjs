@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
-const paletteUrl = new URL('../src/lib/color-vision-palette.json', import.meta.url);
+const paletteUrl = new URL('../src/lib/color-vision-palette.tokens.json', import.meta.url);
 const deficiencyMatrices = {
   normal: [
     [1, 0, 0],
