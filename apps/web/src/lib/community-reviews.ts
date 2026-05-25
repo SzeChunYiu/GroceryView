@@ -42,6 +42,23 @@ export function formatModerationThreshold(value: number) {
   return `${Math.round(value * 100)}%`;
 }
 
+export type ReviewAssignmentScoring = {
+  riskScore?: number | null;
+  confidenceScore?: number | null;
+};
+
+export function formatReviewAssignmentScore(value: number | null | undefined) {
+  return typeof value === 'number' && Number.isFinite(value) ? `${Math.round(value * 100)}%` : 'Not scored';
+}
+
+export function hasReviewAssignmentScoring(assignment: ReviewAssignmentScoring) {
+  return typeof assignment.riskScore === 'number' || typeof assignment.confidenceScore === 'number';
+}
+
+export function reviewAssignmentScoringLabel(assignment: ReviewAssignmentScoring) {
+  return `Risk score ${formatReviewAssignmentScore(assignment.riskScore)} · Confidence score ${formatReviewAssignmentScore(assignment.confidenceScore)}`;
+}
+
 
 export type CommunityReviewPromptMetric = 'price_accuracy' | 'product_quality' | 'store_experience';
 
