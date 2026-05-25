@@ -17,6 +17,8 @@ import {
   ShoppingBasket,
   Store,
   Tags,
+  Moon,
+  Sun,
   Utensils
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
@@ -93,7 +95,8 @@ const navGroups: NavGroup[] = [
 ];
 
 const mobileNavItems = navGroups.flatMap((group) => group.items);
-const installBannerDismissedKey = 'groceryview:install-banner-dismissed';
+const installBannerDismissedKey = "groceryview:install-banner-dismissed";
+const themePreferenceStorageKey = 'groceryview:theme-preference';
 
 function readPersistedLocale(): SupportedLocale {
   const localStorageLocale = normalizeLocale(window.localStorage.getItem(localeStorageKey));
@@ -109,6 +112,19 @@ function readPersistedLocale(): SupportedLocale {
     ?.split('=')[1];
 
   return normalizeLocale(cookieLocale) ?? defaultLocale;
+}
+
+type ThemePreference = 'light' | 'dark';
+
+function applyThemePreference(preference: ThemePreference) {
+  document.documentElement.classList.toggle('dark', preference === 'dark');
+  document.documentElement.style.colorScheme = preference;
+}
+
+function preferredTheme(): ThemePreference {
+  const storedPreference = window.localStorage.getItem(themePreferenceStorageKey);
+  if (storedPreference === 'dark' || storedPreference === 'light') return storedPreference;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
 function isInstalledDisplayMode() {
@@ -133,14 +149,14 @@ function navItemClassName(isActive: boolean, surface: 'mobile' | 'menu') {
     return `inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-sm font-black transition ${
       isActive
         ? 'border-emerald-800 bg-emerald-800 text-white shadow-sm'
-        : 'border-slate-200 bg-white text-slate-700 hover:border-emerald-700 hover:text-emerald-900'
+        : 'border-slate-200 bg-white text-slate-700 dark:text-slate-200 hover:border-emerald-700 hover:text-emerald-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-emerald-400 dark:hover:text-emerald-200'
     }`;
   }
 
   return `flex items-center gap-3 rounded-md px-3 py-2 text-sm font-black transition focus:outline-none ${
     isActive
       ? 'bg-emerald-800 text-white'
-      : 'text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 focus:bg-emerald-50 focus:text-emerald-900'
+      : 'text-slate-700 dark:text-slate-200 hover:bg-emerald-50 hover:text-emerald-900 focus:bg-emerald-50 focus:text-emerald-900 dark:text-slate-200 dark:hover:bg-emerald-950 dark:hover:text-emerald-200 dark:focus:bg-emerald-950 dark:focus:text-emerald-200'
   }`;
 }
 
@@ -178,10 +194,10 @@ function InstallBanner() {
 
   return (
     <aside aria-label="Install GroceryView" className="mx-auto w-full max-w-7xl px-4 pb-4 sm:px-6 lg:px-8">
-      <div className="flex flex-col gap-3 rounded-2xl border border-emerald-200 bg-white/88 p-4 text-sm shadow-sm sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 rounded-2xl border border-emerald-200 bg-white/88 dark:border-emerald-900 dark:bg-slate-900/90 p-4 text-sm shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="font-black text-emerald-950">Add GroceryView to your home screen</p>
-          <p className="mt-1 font-semibold leading-6 text-slate-700">
+          <p className="mt-1 font-semibold leading-6 text-slate-700 dark:text-slate-200">
             iOS: tap Share, then Add to Home Screen. Android: open Chrome menu, then Install app.
           </p>
         </div>
@@ -191,7 +207,7 @@ function InstallBanner() {
           </a>
           <button
             aria-label="Dismiss install banner"
-            className="rounded-full border border-slate-200 px-3 py-2 font-black text-slate-600 transition hover:border-emerald-700 hover:text-emerald-900"
+            className="rounded-full border border-slate-200 px-3 py-2 font-black text-slate-600 dark:text-slate-300 transition hover:border-emerald-700 hover:text-emerald-900"
             onClick={dismissBanner}
             type="button"
           >
@@ -205,6 +221,32 @@ function InstallBanner() {
 
 export function AppNav() {
   const pathname = usePathname();
+  const [themePreference, setThemePreference] = useState<ThemePreference>('light');
+
+  useEffect(() => {
+    const initialPreference = preferredTheme();
+    setThemePreference(initialPreference);
+    applyThemePreference(initialPreference);
+
+    function handleSystemThemeChanged(event: MediaQueryListEvent) {
+      if (window.localStorage.getItem(themePreferenceStorageKey)) return;
+      const nextPreference = event.matches ? 'dark' : 'light';
+      setThemePreference(nextPreference);
+      applyThemePreference(nextPreference);
+    }
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    mediaQuery.addEventListener('change', handleSystemThemeChanged);
+    return () => mediaQuery.removeEventListener('change', handleSystemThemeChanged);
+  }, []);
+
+  function toggleThemePreference() {
+    const nextPreference = themePreference === 'dark' ? 'light' : 'dark';
+    window.localStorage.setItem(themePreferenceStorageKey, nextPreference);
+    setThemePreference(nextPreference);
+    applyThemePreference(nextPreference);
+  }
+
 
   useEffect(() => {
     document.documentElement.lang = readPersistedLocale();
@@ -214,24 +256,33 @@ export function AppNav() {
       if (nextLocale) document.documentElement.lang = nextLocale;
     }
 
-    window.addEventListener('groceryview:locale-changed', handleLocaleChanged);
-    return () => window.removeEventListener('groceryview:locale-changed', handleLocaleChanged);
+    window.addEventListener("groceryview:locale-changed", handleLocaleChanged);
+    return () => window.removeEventListener("groceryview:locale-changed", handleLocaleChanged);
   }, []);
 
   return (
-    <header className="sticky top-0 z-20 border-b border-slate-200 bg-[#f5f1e8]/95 backdrop-blur">
+    <header className="sticky top-0 z-20 border-b border-slate-200 bg-[#f5f1e8]/95 backdrop-blur transition-colors dark:border-slate-800 dark:bg-slate-950/95">
       <nav className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
         <Link className="group flex items-center gap-3" href="/">
           <span className="grid h-11 w-11 place-items-center rounded-2xl bg-emerald-800 text-lg font-black text-white shadow-sm">GV</span>
           <span>
-            <span className="block text-lg font-black tracking-tight text-slate-950">GroceryView</span>
-            <span className="block text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Verified grocery intelligence</span>
+            <span className="block text-lg font-black tracking-tight text-slate-950 dark:text-slate-50">GroceryView</span>
+            <span className="block text-xs font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Verified grocery intelligence</span>
           </span>
         </Link>
         <div className="flex flex-1 flex-col gap-3 lg:items-end">
           <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
             <SearchBar surface="app-nav" />
             <LanguagePreferenceSwitcher />
+            <button
+              aria-label={themePreference === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              className="inline-flex h-10 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 text-sm font-black text-slate-700 shadow-sm transition hover:border-emerald-700 hover:text-emerald-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-emerald-400 dark:hover:text-emerald-200"
+              onClick={toggleThemePreference}
+              type="button"
+            >
+              {themePreference === "dark" ? <Sun className="h-4 w-4" aria-hidden="true" /> : <Moon className="h-4 w-4" aria-hidden="true" />}
+              <span>{themePreference === "dark" ? "Light" : "Dark"}</span>
+            </button>
           </div>
           <div className="flex gap-2 overflow-x-auto pb-1 lg:hidden">
             {mobileNavItems.map((item) => {
@@ -256,7 +307,7 @@ export function AppNav() {
                     className={`inline-flex h-10 shrink-0 items-center gap-2 rounded-full border px-3 text-sm font-black transition focus:border-emerald-700 focus:text-emerald-900 focus:outline-none ${
                       isGroupActive
                         ? 'border-emerald-800 bg-emerald-800 text-white shadow-sm'
-                        : 'border-slate-200 bg-white text-slate-700 hover:border-emerald-700 hover:text-emerald-900'
+                        : 'border-slate-200 bg-white text-slate-700 dark:text-slate-200 hover:border-emerald-700 hover:text-emerald-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-emerald-400 dark:hover:text-emerald-200'
                     }`}
                     type="button"
                   >
@@ -264,7 +315,7 @@ export function AppNav() {
                     {group.label}
                     <ChevronDown className="h-4 w-4" aria-hidden="true" />
                   </button>
-                  <div className="invisible absolute right-0 top-full z-30 mt-2 w-56 rounded-lg border border-slate-200 bg-white p-2 opacity-0 shadow-xl shadow-slate-900/10 transition group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
+                  <div className="invisible absolute right-0 top-full z-30 mt-2 w-56 rounded-lg border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-900 opacity-0 shadow-xl shadow-slate-900/10 transition group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
                     {group.items.map((item) => {
                       const Icon = item.icon;
                       const isActive = isNavItemActive(item, pathname);
@@ -275,7 +326,7 @@ export function AppNav() {
                           href={item.href}
                           key={`${group.label}-${item.href}-${item.label}`}
                         >
-                          <Icon className={`h-4 w-4 ${isActive ? 'text-white' : 'text-slate-500'}`} aria-hidden="true" />
+                          <Icon className={`h-4 w-4 ${isActive ? 'text-white' : 'text-slate-500 dark:text-slate-400'}`} aria-hidden="true" />
                           {item.label}
                         </Link>
                       );
