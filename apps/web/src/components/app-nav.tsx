@@ -193,7 +193,7 @@ export function AppNav() {
         </Link>
         <div className="flex flex-1 flex-col gap-3 lg:items-end">
           <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
-            <SearchBar />
+            <SearchBar surface="app-nav" />
             <LanguagePreferenceSwitcher />
           </div>
           <div className="flex gap-2 overflow-x-auto pb-1 lg:hidden">

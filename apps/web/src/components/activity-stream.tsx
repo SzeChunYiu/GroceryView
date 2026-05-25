@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   getSharedListActivityEvents,
+  sortSharedListActivityEvents,
   subscribeToSharedListActivity,
   type SharedListActivityEvent
 } from '@/lib/activity-log';
@@ -15,7 +16,17 @@ type ActivityStreamProps = {
 const emptyActivityEvents: SharedListActivityEvent[] = [];
 
 function activityLabel(event: SharedListActivityEvent): string {
-  return event.kind === 'item_added' ? 'added' : 'removed';
+  if (event.kind === 'item_added') return 'added';
+  if (event.kind === 'item_checked') return 'checked';
+  if (event.kind === 'item_edited') return 'edited';
+  return 'removed';
+}
+
+function activityTone(event: SharedListActivityEvent): string {
+  if (event.kind === 'item_removed') return 'bg-rose-50 text-rose-800';
+  if (event.kind === 'item_checked') return 'bg-emerald-50 text-emerald-800';
+  if (event.kind === 'item_edited') return 'bg-amber-50 text-amber-900';
+  return 'bg-sky-50 text-sky-800';
 }
 
 function formatTimestamp(timestamp: string): string {
@@ -28,7 +39,8 @@ function formatTimestamp(timestamp: string): string {
 export function ActivityStream({ listId, initialEvents = emptyActivityEvents }: ActivityStreamProps) {
   const seededEvents = useMemo(() => {
     const loggedEvents = getSharedListActivityEvents(listId);
-    return [...loggedEvents, ...initialEvents].filter((event, index, events) => events.findIndex((candidate) => candidate.id === event.id) === index);
+    const deduplicatedEvents = [...loggedEvents, ...initialEvents].filter((event, index, events) => events.findIndex((candidate) => candidate.id === event.id) === index);
+    return sortSharedListActivityEvents(deduplicatedEvents);
   }, [initialEvents, listId]);
   const [events, setEvents] = useState(seededEvents);
 
@@ -39,7 +51,7 @@ export function ActivityStream({ listId, initialEvents = emptyActivityEvents }: 
   useEffect(() => {
     return subscribeToSharedListActivity((event) => {
       if (listId && event.listId !== listId) return;
-      setEvents((current) => [event, ...current.filter((entry) => entry.id !== event.id)]);
+      setEvents((current) => sortSharedListActivityEvents([event, ...current.filter((entry) => entry.id !== event.id)]));
     });
   }, [listId]);
 
@@ -48,7 +60,7 @@ export function ActivityStream({ listId, initialEvents = emptyActivityEvents }: 
       <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Activity stream</p>
       <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Shared-list changes</h2>
       <p className="mt-2 text-sm leading-6 text-slate-600">
-        Collaborator add/remove events include the actor and timestamp so asynchronous shopping-list edits stay transparent.
+        Collaborator added, checked, edited, and removed events include the actor and timestamp so asynchronous shopping-list edits stay transparent.
       </p>
 
       {events.length === 0 ? (
@@ -57,10 +69,18 @@ export function ActivityStream({ listId, initialEvents = emptyActivityEvents }: 
         <ol className="mt-4 space-y-3">
           {events.map((event) => (
             <li className="rounded-2xl border border-slate-100 bg-slate-50 p-4" key={event.id}>
-              <p className="text-sm font-black text-slate-950">
-                {event.actor.name} {activityLabel(event)} {event.itemName}
-              </p>
-              <p className="mt-1 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">{formatTimestamp(event.timestamp)}</p>
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <p className="text-sm font-black text-slate-950">
+                    {event.actor.name} {activityLabel(event)} {event.itemName}
+                  </p>
+                  {event.detail ? <p className="mt-1 text-sm leading-6 text-slate-600">{event.detail}</p> : null}
+                </div>
+                <span className={`inline-flex rounded-full px-3 py-1 text-xs font-black ${activityTone(event)}`}>
+                  {activityLabel(event)}
+                </span>
+              </div>
+              <p className="mt-2 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">{formatTimestamp(event.timestamp)}</p>
             </li>
           ))}
         </ol>

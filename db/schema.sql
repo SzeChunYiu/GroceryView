@@ -4,10 +4,13 @@
 create table if not exists chains (
   id text primary key,
   name text not null,
+  retailer_type text not null default 'grocery' check (retailer_type in ('grocery', 'pharmacy', 'fuel', 'convenience', 'variety', 'cosmetics', 'household', 'online_marketplace')),
   domain text not null default 'grocery' check (domain in ('grocery', 'fuel', 'pharmacy')),
   country_code text not null default 'SE',
   created_at timestamptz not null default now()
 );
+
+create index if not exists chains_retailer_type_idx on chains (retailer_type, country_code, id);
 
 create table if not exists stores (
   id text primary key,
@@ -126,7 +129,16 @@ create table if not exists subscription_entitlements (
 );
 
 create table if not exists user_preferences (
-  user_id text primary key references app_users(id) on delete cascade,
+  id bigserial primary key,
+  user_id text unique references app_users(id) on delete cascade,
+  session_id text unique,
+  country text not null default 'SE',
+  favorite_stores text[] not null default array[]::text[],
+  home_lat numeric(9, 6) check (home_lat is null or home_lat between -90 and 90),
+  home_lng numeric(9, 6) check (home_lng is null or home_lng between -180 and 180),
+  household_size integer check (household_size is null or household_size > 0),
+  diet_filters text[] not null default array[]::text[],
+  algorithm_choice text not null default 'balanced',
   weekly_budget numeric(12, 2),
   monthly_budget numeric(12, 2),
   accept_private_label text not null default 'maybe',
@@ -136,6 +148,7 @@ create table if not exists user_preferences (
   preferred_currency char(3) not null default 'SEK',
   dietary_preferences jsonb not null default '{}'::jsonb,
   notification_preferences jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 

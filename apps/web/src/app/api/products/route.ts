@@ -1,6 +1,8 @@
 import { createPgQueryExecutor, searchProductsByText, type ProductSearchResult } from '@groceryview/db';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+import { recordProductSearchPerformanceTelemetry, type ProductSearchPerformanceTelemetry } from '@/lib/analytics';
+import { expandGrocerySearchQueryWithTelemetry, type GrocerySearchExpansion, type GrocerySearchExpansionTelemetry } from '@/lib/search-suggest';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -47,16 +49,81 @@ async function executorForDatabaseUrl(databaseUrl: string) {
   return createPgQueryExecutor(cachedPool);
 }
 
-function responsePayload(query: string, results: ProductSearchResult[], error?: string) {
+function mergeSearchResults(batches: ProductSearchResult[][]): ProductSearchResult[] {
+  const byId = new Map<string, ProductSearchResult>();
+  for (const results of batches) {
+    for (const result of results) {
+      const existing = byId.get(result.id);
+      if (!existing || result.searchRank > existing.searchRank) byId.set(result.id, result);
+    }
+  }
+  return [...byId.values()].sort((a, b) => b.searchRank - a.searchRank || a.name.localeCompare(b.name)).slice(0, 8);
+}
+
+const productSearchTelemetrySource = 'postgres.products_tsvector_alias_synonym_expansion';
+
+function isTimeoutError(error: unknown) {
+  if (!(error instanceof Error)) return false;
+  return /timeout|timed out|etimedout|statement timeout/i.test(`${error.name} ${error.message}`);
+}
+
+function buildPerformanceTelemetry(
+  query: string,
+  resultCount: number,
+  startedAt: number,
+  expansionTelemetry: GrocerySearchExpansionTelemetry,
+  timedOut = false
+) {
+  return recordProductSearchPerformanceTelemetry({
+    cacheHit: expansionTelemetry.cacheHit,
+    latencyMs: Math.max(0, Date.now() - startedAt),
+    query,
+    resultCount,
+    source: productSearchTelemetrySource,
+    timedOut
+  });
+}
+
+function logPerformanceTelemetry(telemetry: ProductSearchPerformanceTelemetry) {
+  console.info('Product search performance telemetry', {
+    cacheHit: telemetry.cacheHit,
+    cacheHitRate: telemetry.cacheHitRate,
+    latencyMs: telemetry.latencyMs,
+    resultCount: telemetry.resultCount,
+    source: telemetry.source,
+    timedOut: telemetry.timedOut,
+    timeoutRate: telemetry.timeoutRate
+  });
+}
+
+function responsePayload(
+  query: string,
+  results: ProductSearchResult[],
+  expansion: GrocerySearchExpansion,
+  telemetry: ProductSearchPerformanceTelemetry,
+  error?: string
+) {
   return {
     query,
+    expandedQueries: expansion.expandedQueries,
+    matchedAliases: expansion.matchedAliases,
+    matchedSynonyms: expansion.matchedSynonyms,
     results,
-    source: 'postgres.products_tsvector',
+    performanceTelemetry: {
+      cacheHit: telemetry.cacheHit,
+      cacheHitRate: telemetry.cacheHitRate,
+      latencyMs: telemetry.latencyMs,
+      resultCount: telemetry.resultCount,
+      timedOut: telemetry.timedOut,
+      timeoutRate: telemetry.timeoutRate
+    },
+    source: productSearchTelemetrySource,
     ...(error ? { error } : {})
   };
 }
 
 export async function GET(request: Request) {
+  const startedAt = Date.now();
   const parsedQuery = parseProductSearchQuery(request);
   if (!parsedQuery.success) {
     return NextResponse.json(
@@ -73,27 +140,37 @@ export async function GET(request: Request) {
   }
 
   const { q: query } = parsedQuery.data;
+  const { expansion, telemetry: expansionTelemetry } = expandGrocerySearchQueryWithTelemetry(query);
 
   if (query.length < 2) {
-    return NextResponse.json({ query, results: [], source: 'postgres.products_tsvector' });
+    const telemetry = buildPerformanceTelemetry(query, 0, startedAt, expansionTelemetry);
+    logPerformanceTelemetry(telemetry);
+    return NextResponse.json(responsePayload(query, [], expansion, telemetry));
   }
 
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) {
+    const telemetry = buildPerformanceTelemetry(query, 0, startedAt, expansionTelemetry);
+    logPerformanceTelemetry(telemetry);
     return NextResponse.json(
-      responsePayload(query, [], 'product_search_database_unconfigured'),
+      responsePayload(query, [], expansion, telemetry, 'product_search_database_unconfigured'),
       { status: 503 }
     );
   }
 
   try {
     const executor = await executorForDatabaseUrl(databaseUrl);
-    const results = await searchProductsByText(executor, query, { limit: 8 });
-    return NextResponse.json({ query, results, source: 'postgres.products_tsvector' });
+    const batches = await Promise.all(expansion.expandedQueries.map((expandedQuery) => searchProductsByText(executor, expandedQuery, { limit: 8 })));
+    const results = mergeSearchResults(batches);
+    const telemetry = buildPerformanceTelemetry(query, results.length, startedAt, expansionTelemetry);
+    logPerformanceTelemetry(telemetry);
+    return NextResponse.json(responsePayload(query, results, expansion, telemetry));
   } catch (error) {
+    const telemetry = buildPerformanceTelemetry(query, 0, startedAt, expansionTelemetry, isTimeoutError(error));
     console.error('Product search query failed', error instanceof Error ? { name: error.name } : { name: 'unknown' });
+    logPerformanceTelemetry(telemetry);
     return NextResponse.json(
-      responsePayload(query, [], 'product_search_query_failed'),
+      responsePayload(query, [], expansion, telemetry, 'product_search_query_failed'),
       { status: 500 }
     );
   }

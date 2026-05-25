@@ -1,4 +1,14 @@
+import type { PantryItemRecord } from '@groceryview/db';
+
 export type PantryStockStatus = 'healthy' | 'low' | 'depleted';
+
+export type PantryExpiryUrgency = 'expired' | 'use-soon' | 'planned' | 'unknown';
+
+export type PantryExpiryReminder = {
+  daysUntilExpiry: number | null;
+  label: string;
+  urgency: PantryExpiryUrgency;
+};
 
 export type PantryStockItem = {
   productId: string;
@@ -8,6 +18,7 @@ export type PantryStockItem = {
   minimumQuantity: number;
   estimatedDailyUse: number;
   depletionEstimateDays: number | null;
+  expiryReminder: PantryExpiryReminder;
   status: PantryStockStatus;
 };
 
@@ -19,12 +30,14 @@ export type PantryConsumptionEvent = {
   occurredAt: string;
 };
 
-type PantryStatusRow = {
+export type PantryStatusRow = {
   productId: string;
   name: string;
   unit: string;
   remainingQuantity: number;
   minimumQuantity: number;
+  daysUntilExpiry?: number | null;
+  expiresAt?: string | null;
 };
 
 function roundQuantity(value: number) {
@@ -42,10 +55,38 @@ export function estimateDepletionDays(ownedQuantity: number, estimatedDailyUse: 
   return Math.ceil(ownedQuantity / estimatedDailyUse);
 }
 
+export function buildExpiryReminder(row: Pick<PantryStatusRow, 'daysUntilExpiry' | 'expiresAt'>): PantryExpiryReminder {
+  const daysUntilExpiry = row.expiresAt
+    ? Math.ceil((new Date(row.expiresAt).getTime() - Date.now()) / 86_400_000)
+    : typeof row.daysUntilExpiry === 'number'
+      ? Math.ceil(row.daysUntilExpiry)
+      : null;
+
+  if (daysUntilExpiry === null || !Number.isFinite(daysUntilExpiry)) {
+    return { daysUntilExpiry: null, label: 'No expiry date tracked', urgency: 'unknown' };
+  }
+
+  if (daysUntilExpiry < 0) return { daysUntilExpiry, label: `Expired ${Math.abs(daysUntilExpiry)} days ago`, urgency: 'expired' };
+  if (daysUntilExpiry === 0) return { daysUntilExpiry, label: 'Expires today', urgency: 'expired' };
+  if (daysUntilExpiry <= 7) return { daysUntilExpiry, label: `Use within ${daysUntilExpiry} days`, urgency: 'use-soon' };
+  return { daysUntilExpiry, label: `Expires in ${daysUntilExpiry} days`, urgency: 'planned' };
+}
+
 function getStockStatus(ownedQuantity: number, minimumQuantity: number): PantryStockStatus {
   if (ownedQuantity <= 0) return 'depleted';
   if (ownedQuantity <= minimumQuantity) return 'low';
   return 'healthy';
+}
+
+export function pantryStatusRowsFromAccountInventory(items: PantryItemRecord[]): PantryStatusRow[] {
+  return items.map((item) => ({
+    productId: item.productId,
+    name: item.name,
+    unit: item.unit,
+    remainingQuantity: item.quantity,
+    minimumQuantity: item.minimumQuantity,
+    expiresAt: item.expiresOn ?? null
+  }));
 }
 
 export function buildPantryStockItems(rows: PantryStatusRow[]): PantryStockItem[] {
@@ -61,6 +102,7 @@ export function buildPantryStockItems(rows: PantryStatusRow[]): PantryStockItem[
       minimumQuantity: row.minimumQuantity,
       estimatedDailyUse,
       depletionEstimateDays: estimateDepletionDays(ownedQuantity, estimatedDailyUse),
+      expiryReminder: buildExpiryReminder(row),
       status: getStockStatus(ownedQuantity, row.minimumQuantity)
     };
   });

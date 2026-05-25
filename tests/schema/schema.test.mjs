@@ -49,6 +49,14 @@ const requiredColumns = [
   'match_confidence',
   'weekly_budget',
   'monthly_budget',
+  'session_id',
+  'country',
+  'favorite_stores',
+  'home_lat',
+  'home_lng',
+  'household_size',
+  'diet_filters',
+  'algorithm_choice',
   'accept_private_label',
   'target_price',
   'alert_deal_score_at',
@@ -71,6 +79,7 @@ const requiredColumns = [
   'domain',
   'fuel_grade_id',
   'source_kind',
+  'retailer_type',
   'original_price_text'
 ];
 
@@ -112,6 +121,14 @@ describe('db/schema.sql', () => {
     assert.match(schema, /source_kind in \('operator_public_price_page', 'crowd_station_report'\)/);
     assert.match(schema, /reporter_id text references community_reporter_trust/);
     assert.match(schema, /price_observation_id bigint not null references price_observations/);
+  });
+
+  it('classifies chains with the required retailer_type vocabulary and index', () => {
+    assert.match(schema, /retailer_type text not null default 'grocery' check/);
+    for (const retailerType of ['grocery', 'pharmacy', 'fuel', 'convenience', 'variety', 'cosmetics', 'household', 'online_marketplace']) {
+      assert.match(schema, new RegExp(`'${retailerType}'`), `${retailerType} retailer type missing`);
+    }
+    assert.match(schema, /chains_retailer_type_idx/);
   });
 
   it('deduplicates scraper price snapshots by product, store, and observed date', () => {

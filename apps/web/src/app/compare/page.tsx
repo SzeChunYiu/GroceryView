@@ -3,8 +3,9 @@ import { BasketComparisonPrint } from '@/components/basket-comparison-print';
 import { ChainSelector } from '@/components/chain-selector';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
+import { StoreComparisonTable } from '@/components/StoreComparisonTable';
 import { StorePriceMatrix } from '@/components/store-price-matrix';
-import { COMPARE_CHAIN_ORDER, buildChainComparisonTable } from '@/lib/chain-compare';
+import { COMPARE_CHAIN_ORDER, buildBasketStoreComparison, buildChainComparisonTable } from '@/lib/chain-compare';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, commodityComparisons, compareOverlayChart, formatPct, formatSek, matchedChainProducts, privateLabelDupeFinder } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
@@ -31,6 +32,7 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
   const productsParam = resolvedSearchParams.products;
   const comparison = buildChainComparisonTable(productsParam);
+  const basketStoreComparison = buildBasketStoreComparison(productsParam);
   const storeDistance = buildStoreDistanceCompare(productsParam, resolvedSearchParams.routeMode);
   const packagedRows = comparison.products.filter((product) => product.matchType === 'packaged_barcode');
   const commodityRows = comparison.products.filter((product) => product.matchType === 'commodity_alias');
@@ -158,6 +160,15 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
         </p>
       </Card>
       <BasketComparisonPrint chains={COMPARE_CHAIN_ORDER} products={comparison.products} sourceLabel={comparison.sourceLabel} />
+      <div className="mt-6">
+        <StoreComparisonTable
+          basketItemCount={basketStoreComparison.itemCount}
+          basketSourceLabel={basketStoreComparison.sourceLabel}
+          basketStores={basketStoreComparison.stores}
+          items={[]}
+        />
+        <p className="mt-3 text-sm font-semibold leading-6 text-slate-600">{basketStoreComparison.summary}</p>
+      </div>
       <Card className="mt-6 border-cyan-200 bg-cyan-50/70">
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>

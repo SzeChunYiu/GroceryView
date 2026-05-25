@@ -6,6 +6,18 @@ export type SocialFeedPost = Readonly<{
   title: string;
 }>;
 
+export type FriendPriceSighting = Readonly<{
+  confidence: 'high' | 'medium' | 'low';
+  id: string;
+  observedAt: string;
+  postId: string;
+  priceLabel: string;
+  productName: string;
+  productSlug: string;
+  reporter: string;
+  storeName: string;
+}>;
+
 export type SocialComment = Readonly<{
   author: string;
   body: string;
@@ -33,6 +45,31 @@ export const socialFeedPosts: SocialFeedPost[] = [
   }
 ];
 
+export const friendPriceSightings: FriendPriceSighting[] = [
+  {
+    confidence: 'medium',
+    id: 'friend-sighting-oats-hemkop',
+    observedAt: '2026-05-24T08:42:00.000Z',
+    postId: 'weekly-oats-swap',
+    priceLabel: '21,90 kr',
+    productName: 'Store-brand oats 1 kg',
+    productSlug: 'havregryn',
+    reporter: 'Friend sighting',
+    storeName: 'Hemkop Skanstull'
+  },
+  {
+    confidence: 'low',
+    id: 'friend-sighting-basil-willys',
+    observedAt: '2026-05-24T10:12:00.000Z',
+    postId: 'basil-stock-note',
+    priceLabel: '18,90 kr',
+    productName: 'Fresh basil pot',
+    productSlug: 'basilika',
+    reporter: 'Household sighting',
+    storeName: 'Willys Stockholm'
+  }
+];
+
 let socialComments: SocialComment[] = [
   {
     author: 'Linnea',
@@ -50,6 +87,10 @@ export function extractMentions(body: string) {
 
 export function listSocialComments(postId?: string) {
   return socialComments.filter((comment) => !postId || comment.postId === postId);
+}
+
+export function listFriendPriceSightings(postId?: string) {
+  return friendPriceSightings.filter((sighting) => !postId || sighting.postId === postId);
 }
 
 export function createSocialComment(input: Readonly<{ author: string; body: string; parentId?: string; postId: string }>) {

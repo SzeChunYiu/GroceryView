@@ -2,6 +2,8 @@
 
 import { useId, useState } from "react";
 
+import { communityReviewSummaryForProduct } from "@/lib/community-reviews";
+
 type FreshnessVote = "fresh" | "outdated";
 
 export type StoreProductRowProps = {
@@ -30,6 +32,7 @@ export function StoreProductRow({
   const [days, setDays] = useState(shelfLifeDays?.toString() ?? "");
   const [note, setNote] = useState("");
   const [status, setStatus] = useState<SubmitState>("idle");
+  const reviewSummary = communityReviewSummaryForProduct(productName);
 
   async function submitFreshness() {
     setStatus("saving");
@@ -65,6 +68,14 @@ export function StoreProductRow({
         {storeName ? <p>{storeName}</p> : null}
         {priceLabel ? <p>{priceLabel}</p> : null}
       </div>
+
+      {reviewSummary ? (
+        <section aria-label={`${productName} community review summary`}>
+          <p>{reviewSummary.averageRatingLabel}</p>
+          <p>{reviewSummary.reviewCount} community reviews</p>
+          <p>{reviewSummary.topFreshnessComplaint}</p>
+        </section>
+      ) : null}
 
       <fieldset>
         <legend>Freshness signal</legend>

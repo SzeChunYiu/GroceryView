@@ -54,7 +54,9 @@ Migration 014 adds the fuel source contract. `fuel_grades` is the only supported
 
 Retail banners such as ICA, Willys, Coop, Lidl, Hemkop, Netto, and City Gross.
 
-Key columns: `slug`, `name`, `domain`, `country_code`, `website_url`.
+Key columns: `slug`, `name`, `retailer_type`, `domain`, `country_code`, `website_url`.
+
+`retailer_type` is required and indexed for coverage/readiness filtering. Allowed values are `grocery`, `pharmacy`, `fuel`, `convenience`, `variety`, `cosmetics`, `household`, and `online_marketplace`; all Stockholm launch chains are backfilled as `grocery`.
 
 ### `stores`
 
@@ -272,9 +274,9 @@ Primary key: `(user_id, store_id)`.
 
 ### `user_preferences`
 
-App repository budget and authenticated settings preferences.
+App repository budget, authenticated settings, and MyFlyer preference rows. Authenticated users are keyed by `user_id`; anonymous shoppers are keyed by a cookie-backed `session_id`.
 
-Key columns: `user_id`, `weekly_budget`, `monthly_budget`, `preferred_currency`, `notification_channels`, `updated_at`.
+Key columns: `id`, `user_id`, `session_id`, `country`, `favorite_stores`, `home_lat`, `home_lng`, `household_size`, `diet_filters`, `algorithm_choice`, `weekly_budget`, `monthly_budget`, `preferred_currency`, `notification_channels`, `created_at`, `updated_at`.
 
 ### `watchlist_items`
 

@@ -14,6 +14,19 @@ export type NormalizedUnit = UnitAlias & {
   readonly alias: string;
 };
 
+export type UnitNormalizationQaIssueKind =
+  | "missing_unit"
+  | "suspicious_pack_size"
+  | "inconsistent_unit_price";
+
+export type UnitNormalizationQaSeverity = "warning" | "review" | "blocker";
+
+export function unitNormalizationQaSeverity(kind: UnitNormalizationQaIssueKind): UnitNormalizationQaSeverity {
+  if (kind === "missing_unit") return "blocker";
+  if (kind === "inconsistent_unit_price") return "review";
+  return "warning";
+}
+
 const MASS_KG: UnitAlias = {
   canonicalUnit: "kg",
   kind: "mass",
@@ -197,6 +210,31 @@ export function areCompatibleUnits(
   return Boolean(leftUnit && rightUnit && leftUnit.canonicalUnit === rightUnit.canonicalUnit);
 }
 
+export type ParsedPackageSize = {
+  quantity: number;
+  unit: CanonicalUnit;
+  label: string;
+} | null;
+
+export function parsePackageSize(size: string | null | undefined): ParsedPackageSize {
+  if (!size) return null;
+
+  const match = size.trim().toLowerCase().replace(",", ".").match(/(\d+(?:\.\d+)?)\s*([a-zåäö]+)/i);
+  if (!match) return null;
+
+  const quantity = Number(match[1]);
+  const unit = getCanonicalUnit(match[2]);
+  if (!Number.isFinite(quantity) || !unit) return null;
+
+  const canonicalQuantity = quantity * unit.multiplierToCanonical;
+
+  return {
+    quantity: canonicalQuantity,
+    unit: unit.canonicalUnit,
+    label: `${canonicalQuantity.toLocaleString("sv-SE", { maximumFractionDigits: 2 })} ${unit.canonicalUnit}`,
+  };
+}
+
 export const unitNormalizer = Object.freeze({
   normalizeUnitKey,
   getCanonicalUnit,
@@ -204,4 +242,6 @@ export const unitNormalizer = Object.freeze({
   normalizeQuantity,
   normalizeUnitPrice,
   areCompatibleUnits,
+  parsePackageSize,
+  unitNormalizationQaSeverity,
 });

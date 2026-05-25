@@ -11,6 +11,7 @@ export type RetailerQuery = {
 export type RetailerRow = {
   id: string;
   name: string;
+  retailer_type: string;
   logo: string;
   website_url: string;
 };
@@ -18,6 +19,7 @@ export type RetailerRow = {
 export type RetailerMetadata = {
   id: string;
   name: string;
+  retailerType: string;
   logo: string;
   websiteUrl: string;
 };
@@ -32,6 +34,7 @@ function seededRetailerMetadata(slug: MajorSwedishGroceryChainSlug): RetailerMet
   return {
     id: seed.slug,
     name: seed.name,
+    retailerType: seed.retailerType,
     logo: seed.logo,
     websiteUrl: seed.websiteUrl
   };
@@ -41,6 +44,7 @@ export const supportedRetailerMetadata: Record<typeof supportedRetailerIds[numbe
   'city-gross': {
     id: 'city-gross',
     name: 'City Gross',
+    retailerType: 'grocery',
     logo: '/retailers/city-gross.svg',
     websiteUrl: 'https://www.citygross.se/'
   },
@@ -66,6 +70,7 @@ export function buildRetailersQuery(): RetailerQuery {
   return {
     sql: `select chains.slug as id,
                  chains.name,
+                 chains.retailer_type,
                  ${sqlCaseFor('logo')},
                  coalesce(chains.website_url, ${sqlCaseFor('websiteUrl').replace(' as website_url', '')}) as website_url
           from chains
@@ -79,6 +84,7 @@ export function mapRetailerRow(row: RetailerRow): RetailerMetadata {
   return {
     id: row.id,
     name: row.name,
+    retailerType: row.retailer_type,
     logo: row.logo,
     websiteUrl: row.website_url
   };

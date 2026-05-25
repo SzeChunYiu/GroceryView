@@ -45,13 +45,14 @@ function mergeSearchResults(batches: ProductSearchResult[][]): ProductSearchResu
   return [...byId.values()].sort((a, b) => b.searchRank - a.searchRank || a.name.localeCompare(b.name)).slice(0, 8);
 }
 
-function responsePayload(query: string, expandedQueries: string[], matchedAliases: string[], results: ProductSearchResult[], error?: string) {
+function responsePayload(query: string, expandedQueries: string[], matchedAliases: string[], matchedSynonyms: string[], results: ProductSearchResult[], error?: string) {
   return {
     query,
     expandedQueries,
     matchedAliases,
+    matchedSynonyms,
     results,
-    source: 'postgres.products_tsvector_alias_expansion',
+    source: 'postgres.products_tsvector_alias_synonym_expansion',
     ...(error ? { error } : {})
   };
 }
@@ -62,13 +63,13 @@ export async function GET(request: Request) {
   const expansion = expandGrocerySearchQuery(query);
 
   if (query.length < 2) {
-    return NextResponse.json(responsePayload(query, expansion.expandedQueries, expansion.matchedAliases, []));
+    return NextResponse.json(responsePayload(query, expansion.expandedQueries, expansion.matchedAliases, expansion.matchedSynonyms, []));
   }
 
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) {
     return NextResponse.json(
-      responsePayload(query, expansion.expandedQueries, expansion.matchedAliases, [], 'product_search_database_unconfigured'),
+      responsePayload(query, expansion.expandedQueries, expansion.matchedAliases, expansion.matchedSynonyms, [], 'product_search_database_unconfigured'),
       { status: 503 }
     );
   }
@@ -76,11 +77,11 @@ export async function GET(request: Request) {
   try {
     const executor = await executorForDatabaseUrl(databaseUrl);
     const batches = await Promise.all(expansion.expandedQueries.map((expandedQuery) => searchProductsByText(executor, expandedQuery, { limit: 8 })));
-    return NextResponse.json(responsePayload(query, expansion.expandedQueries, expansion.matchedAliases, mergeSearchResults(batches)));
+    return NextResponse.json(responsePayload(query, expansion.expandedQueries, expansion.matchedAliases, expansion.matchedSynonyms, mergeSearchResults(batches)));
   } catch (error) {
     console.error('Product search query failed', error instanceof Error ? { name: error.name } : { name: 'unknown' });
     return NextResponse.json(
-      responsePayload(query, expansion.expandedQueries, expansion.matchedAliases, [], 'product_search_query_failed'),
+      responsePayload(query, expansion.expandedQueries, expansion.matchedAliases, expansion.matchedSynonyms, [], 'product_search_query_failed'),
       { status: 500 }
     );
   }

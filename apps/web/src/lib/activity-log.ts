@@ -1,4 +1,4 @@
-export type SharedListActivityKind = 'item_added' | 'item_removed';
+export type SharedListActivityKind = 'item_added' | 'item_checked' | 'item_edited' | 'item_removed';
 
 export type SharedListActor = {
   id: string;
@@ -13,6 +13,7 @@ export type SharedListActivityEvent = {
   kind: SharedListActivityKind;
   actor: SharedListActor;
   timestamp: string;
+  detail?: string;
 };
 
 export type SharedListActivityInput = {
@@ -21,6 +22,7 @@ export type SharedListActivityInput = {
   itemName: string;
   actor: SharedListActor;
   timestamp?: string | Date;
+  detail?: string;
 };
 
 type ActivitySubscriber = (event: SharedListActivityEvent) => void;
@@ -45,7 +47,7 @@ function activityId(kind: SharedListActivityKind, input: SharedListActivityInput
 }
 
 export function getSharedListActivityEvents(listId?: string): SharedListActivityEvent[] {
-  return activityEvents.filter((event) => listId === undefined || event.listId === listId);
+  return sortSharedListActivityEvents(activityEvents.filter((event) => listId === undefined || event.listId === listId));
 }
 
 export function subscribeToSharedListActivity(subscriber: ActivitySubscriber): () => void {
@@ -53,9 +55,13 @@ export function subscribeToSharedListActivity(subscriber: ActivitySubscriber): (
   return () => subscribers.delete(subscriber);
 }
 
-export function publishSharedListActivity(kind: SharedListActivityKind, input: SharedListActivityInput): SharedListActivityEvent {
+export function sortSharedListActivityEvents(events: readonly SharedListActivityEvent[]): SharedListActivityEvent[] {
+  return [...events].sort((left, right) => Date.parse(right.timestamp) - Date.parse(left.timestamp));
+}
+
+export function buildSharedListActivityEvent(kind: SharedListActivityKind, input: SharedListActivityInput): SharedListActivityEvent {
   const timestamp = isoTimestamp(input.timestamp);
-  const event: SharedListActivityEvent = {
+  return {
     id: activityId(kind, input, timestamp),
     listId: required(input.listId, 'listId'),
     itemId: required(input.itemId, 'itemId'),
@@ -65,8 +71,13 @@ export function publishSharedListActivity(kind: SharedListActivityKind, input: S
       id: required(input.actor.id, 'actor.id'),
       name: required(input.actor.name, 'actor.name')
     },
-    timestamp
+    timestamp,
+    detail: input.detail?.trim() || undefined
   };
+}
+
+export function publishSharedListActivity(kind: SharedListActivityKind, input: SharedListActivityInput): SharedListActivityEvent {
+  const event = buildSharedListActivityEvent(kind, input);
 
   activityEvents.unshift(event);
   for (const subscriber of subscribers) subscriber(event);
@@ -75,6 +86,14 @@ export function publishSharedListActivity(kind: SharedListActivityKind, input: S
 
 export function publishSharedListItemAdded(input: SharedListActivityInput): SharedListActivityEvent {
   return publishSharedListActivity('item_added', input);
+}
+
+export function publishSharedListItemChecked(input: SharedListActivityInput): SharedListActivityEvent {
+  return publishSharedListActivity('item_checked', input);
+}
+
+export function publishSharedListItemEdited(input: SharedListActivityInput): SharedListActivityEvent {
+  return publishSharedListActivity('item_edited', input);
 }
 
 export function publishSharedListItemRemoved(input: SharedListActivityInput): SharedListActivityEvent {
