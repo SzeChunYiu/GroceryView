@@ -17,9 +17,12 @@ describe('PostgreSQL product search query', () => {
     assert.deepEqual(query.values, ['Zoégas coffee', 12]);
     assert.match(query.sql, /websearch_to_tsquery\('simple', unaccent\(\$1\)\)/);
     assert.match(query.sql, /to_tsvector\('simple', unaccent\(coalesce\(products\.canonical_name, ''\) \|\| ' ' \|\| coalesce\(products\.name_sv, ''\) \|\| ' ' \|\| coalesce\(products\.name_en, ''\) \|\| ' ' \|\| coalesce\(products\.brand, ''\)\)\)/);
+    assert.match(query.sql, /regexp_replace\(\$1, '\\\\D', '', 'g'\) as barcode_query/);
+    assert.match(query.sql, /products\.barcode/);
+    assert.match(query.sql, /regexp_replace\(coalesce\(products\.barcode, ''\), '\\\\D', '', 'g'\) = query\.barcode_query/);
     assert.match(query.sql, /products\.domain = 'grocery'/);
     assert.match(query.sql, /products\.deleted_at is null/);
-    assert.match(query.sql, /order by search_rank desc, similarity\(lower\(unaccent\(coalesce\(products\.canonical_name, ''\).*products\.canonical_name asc/s);
+    assert.match(query.sql, /order by case when length\(query\.barcode_query\).*search_rank desc, similarity\(lower\(unaccent\(coalesce\(products\.canonical_name, ''\).*products\.canonical_name asc/s);
     assert.match(query.sql, /limit \$2/);
   });
 
@@ -43,6 +46,7 @@ describe('PostgreSQL product search query', () => {
     assert.deepEqual(mapProductSearchRow({
       id: 'product-1',
       slug: 'zoegas-coffee-450g',
+      barcode: '7311234567890',
       name: 'Zoégas Coffee 450g',
       brand: 'Zoégas',
       image_url: 'https://example.test/coffee.png',
@@ -50,6 +54,7 @@ describe('PostgreSQL product search query', () => {
     }), {
       id: 'product-1',
       slug: 'zoegas-coffee-450g',
+      barcode: '7311234567890',
       name: 'Zoégas Coffee 450g',
       brand: 'Zoégas',
       imageUrl: 'https://example.test/coffee.png',
