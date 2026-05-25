@@ -19,6 +19,34 @@ export interface PriceDropReason {
   detail: string;
 }
 
+export type PriceDropDiscoveryObservation = {
+  date: string;
+  price: number;
+};
+
+export type PriceDropDiscoveryProduct = {
+  slug: string;
+  name: string;
+  brand?: string | null;
+  category?: string | null;
+  observations: PriceDropDiscoveryObservation[];
+};
+
+export type PriceDropDiscoveryRailItem = {
+  rank: number;
+  productSlug: string;
+  productName: string;
+  brand: string;
+  category: string;
+  latestPrice: number;
+  previousWeekPrice: number;
+  dropAmount: number;
+  dropPercent: number;
+  latestObservedAt: string;
+  previousObservedAt: string;
+  evidenceLabel: string;
+};
+
 function includesAny(value: string, needles: string[]) {
   return needles.some((needle) => value.includes(needle));
 }
@@ -83,4 +111,55 @@ export function getPriceDropReasons(input: PriceDropReasonInput): PriceDropReaso
   }
 
   return reasons;
+}
+
+function weekComparisonFor(observations: PriceDropDiscoveryObservation[]) {
+  const ordered = observations
+    .filter((observation) => Number.isFinite(observation.price) && Number.isFinite(Date.parse(`${observation.date}T00:00:00.000Z`)))
+    .sort((left, right) => left.date.localeCompare(right.date));
+  const latest = ordered.at(-1);
+  if (!latest) return null;
+  const latestTime = Date.parse(`${latest.date}T00:00:00.000Z`);
+  const weekStart = latestTime - 9 * 86_400_000;
+  const weekEnd = latestTime - 5 * 86_400_000;
+  const previousWeek = [...ordered]
+    .reverse()
+    .find((observation) => {
+      const observedTime = Date.parse(`${observation.date}T00:00:00.000Z`);
+      return observedTime >= weekStart && observedTime <= weekEnd;
+    });
+  if (!previousWeek || latest.price >= previousWeek.price) return null;
+  return { latest, previousWeek, observationCount: ordered.length };
+}
+
+export function buildPriceDropDiscoveryRail(products: PriceDropDiscoveryProduct[], limit = 6): PriceDropDiscoveryRailItem[] {
+  return products
+    .flatMap((product) => {
+      const comparison = weekComparisonFor(product.observations);
+      if (!comparison) return [];
+      const dropAmount = comparison.previousWeek.price - comparison.latest.price;
+      const dropPercent = dropAmount / comparison.previousWeek.price;
+
+      return [{
+        rank: 0,
+        productSlug: product.slug,
+        productName: product.name,
+        brand: product.brand || 'Brand not reported',
+        category: product.category || 'grocery',
+        latestPrice: comparison.latest.price,
+        previousWeekPrice: comparison.previousWeek.price,
+        dropAmount,
+        dropPercent,
+        latestObservedAt: comparison.latest.date,
+        previousObservedAt: comparison.previousWeek.date,
+        evidenceLabel: `${comparison.observationCount} dated observations; week-over-week compares ${comparison.previousWeek.date} to ${comparison.latest.date}`
+      }];
+    })
+    .sort((left, right) => (
+      right.dropPercent - left.dropPercent
+      || right.dropAmount - left.dropAmount
+      || left.productName.localeCompare(right.productName, 'sv')
+    ))
+    .slice(0, Math.max(1, Math.min(limit, 12)))
+    .map((item, index) => ({ ...item, rank: index + 1 }));
 }
