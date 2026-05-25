@@ -112,7 +112,7 @@ export function allergenRiskBadgesForText(parts: Array<string | null | undefined
 export function searchSynonymBadgesForQuery(query: string): SearchSynonymBadge[] {
   return semanticSynonymsForQuery(query).map((synonym) => ({
     label: `synonym: ${synonym.canonical}`,
-    matchedTerms: [synonym.matchedTerm]
+    matchedTerms: [...new Set([synonym.matchedTerm, ...synonym.terms.slice(0, 2)])]
   }));
 }
 
