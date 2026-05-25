@@ -633,6 +633,23 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(products, /@\/lib\/demo-data|@\/components\/sample-data/);
   });
 
+  it('surfaces community review summaries on product result cards', async () => {
+    const communityReviews = await read('src/lib/community-reviews.ts');
+    const itemGrid = await read('src/components/ItemGrid.tsx');
+    const storeProductRow = await read('src/components/store-product-row.tsx');
+
+    assert.match(communityReviews, /CommunityProductReviewSummary/);
+    assert.match(communityReviews, /averageRatingLabel/);
+    assert.match(communityReviews, /reviewCount/);
+    assert.match(communityReviews, /topFreshnessComplaint/);
+    assert.match(communityReviews, /communityReviewSummaryForProduct/);
+    assert.match(itemGrid, /communityReviewSummaryForProduct\(row\.name\)/);
+    assert.match(itemGrid, /community reviews/);
+    assert.match(itemGrid, /topFreshnessComplaint/);
+    assert.match(storeProductRow, /communityReviewSummaryForProduct\(productName\)/);
+    assert.match(storeProductRow, /community review summary/);
+  });
+
   it('surfaces adjustable moderation risk thresholds for admin review routing', async () => {
     const communityReviews = await read('src/lib/community-reviews.ts');
     const moderation = await read('src/app/admin/moderation/page.tsx');
