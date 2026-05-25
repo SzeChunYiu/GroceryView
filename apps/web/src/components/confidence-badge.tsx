@@ -39,6 +39,7 @@ type ConfidenceBadgeProps = {
   emptyData?: boolean;
   actionLabel?: string;
   onAction?: () => void;
+  methodologyHref?: string;
 };
 
 const levelClasses: Record<ConfidenceBadgeProps["level"], string> = {
@@ -51,7 +52,7 @@ function countryCodeFromDetails(details: ConfidenceBadgeProps['details']) {
   return details?.find((detail) => /country/i.test(detail.label))?.value.trim();
 }
 
-export function ConfidenceBadge({ level, label, observedAt, sampleSize, details, verificationLabel, countryCode, locale, emptyData = false, actionLabel = 'Review confidence data', onAction }: ConfidenceBadgeProps) {
+export function ConfidenceBadge({ level, label, observedAt, sampleSize, details, verificationLabel, countryCode, locale, emptyData = false, actionLabel = 'Review confidence data', onAction, methodologyHref }: ConfidenceBadgeProps) {
   const t = groceryTranslator(locale);
   const displayLabel = label ?? confidenceCopy(level, sampleSize);
   const token = confidenceStateToken(level);
@@ -90,14 +91,20 @@ export function ConfidenceBadge({ level, label, observedAt, sampleSize, details,
       {actionLabel}
     </button>
   ) : null;
+  const methodologyLink = methodologyHref ? (
+    <a className="rounded-lg border border-slate-300 px-3 py-1 text-xs font-semibold text-slate-700" href={methodologyHref}>
+      Methodology
+    </a>
+  ) : null;
 
-  if (!details?.length && !action) return badge;
+  if (!details?.length && !action && !methodologyLink) return badge;
 
   return (
     <div className="inline-block rounded-xl border border-slate-200 bg-white p-2 text-left shadow-sm">
       <div className="flex flex-wrap items-center gap-2">
         {badge}
         {action}
+        {methodologyLink}
       </div>
       {details?.length ? (
         <dl className="mt-2 grid gap-2 text-xs normal-case tracking-normal text-slate-700">
