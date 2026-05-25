@@ -1,6 +1,7 @@
 import { AccountBillingActions } from '@/components/account-billing-actions';
 import { AccountMutationActions } from '@/components/account-mutation-actions';
 import { AdDisclosureActions } from '@/components/ad-disclosure-actions';
+import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { listShareRoles, accountListSharePermissions } from '@/lib/list-permissions';
@@ -198,6 +199,15 @@ export default function AccountPage() {
             </form>
           ))}
         </div>
+      </Card>
+
+      <Card className="mt-6 border-sky-200 bg-sky-50">
+        <Eyebrow>Purchase history import</Eyebrow>
+        <h2 className="mt-2 text-2xl font-black tracking-tight">Seed recommendations from receipt CSVs</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+          Paste loyalty or receipt exports with date, product, store, quantity, and total columns. GroceryView maps rows to known products, summarizes historical spend, and identifies recurring purchases before saving account recommendations.
+        </p>
+        <BulkImportDialog importMode="purchase-history" />
       </Card>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">

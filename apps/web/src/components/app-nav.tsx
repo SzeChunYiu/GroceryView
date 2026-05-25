@@ -8,6 +8,7 @@ import {
   Database,
   Flame,
   Heart,
+  ScanLine,
   Map,
   Newspaper,
   PackageSearch,
@@ -67,12 +68,21 @@ const navGroups: NavGroup[] = [
     ]
   },
   {
+    label: 'Trip',
+    icon: ScanLine,
+    items: [
+      { href: '/scanner', label: 'Scanner', icon: ScanLine },
+      { href: '/list', label: 'Current list', icon: ShoppingBasket },
+      { href: '/screener', label: 'Nearby deals', icon: Tags },
+      { href: '/watchlist', label: 'Watchlist', icon: Heart }
+    ]
+  },
+  {
     label: 'Personal',
     icon: Heart,
     items: [
       { href: '/savings-dashboard', label: 'Savings', icon: PiggyBank },
       { href: '/stockholm/my-flyer', label: 'My Flyer', icon: Newspaper, match: 'my-flyer' },
-      { href: '/watchlist', label: 'Watchlist', icon: Heart },
       { href: '/weekly-basket', label: 'Weekly basket', icon: ShoppingBasket },
       { href: '/meal-planner', label: 'Meal planner', icon: Utensils },
       { href: '/pantry-inventory', label: 'Pantry inventory', icon: ShoppingBasket }
