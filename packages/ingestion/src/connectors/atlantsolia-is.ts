@@ -11,6 +11,14 @@ export type AtlantsoliaIsFuelPriceObservation = {
   chainId: 'atlantsolia-is';
   sourceKind: FuelPriceSourceKind;
   operatorName: 'Atlantsolía';
+  channel: 'store';
+  store_id: string;
+  is_member_price: boolean;
+  membershipProgram?: 'Atlantsolía app/dælulykill';
+  memberDiscountIskPerLitre?: 11;
+  is_subscription_price: false;
+  is_coupon_price: false;
+  is_clearance: false;
   sourceUrl: string;
   observedAt: string;
   effectiveFrom: string;
@@ -20,16 +28,19 @@ export type AtlantsoliaIsFuelPriceObservation = {
     contentDigest: string;
     originalPriceText: string;
     originalStationName?: string;
+    originalStationHref?: string;
   };
 };
 
 export const ATLANTSOLIA_IS_FUEL_PRICES_URL = 'https://www.atlantsolia.is/stodvar/';
 export const ATLANTSOLIA_IS_FUEL_PRICE_PARSER_VERSION = 'atlantsolia-is-fuel-prices-v1';
+export const ATLANTSOLIA_IS_MEMBER_DISCOUNT_ISK_PER_LITRE = 11;
 
 const fuelHeaders: Array<{ needles: string[]; productId: FuelGradeId; label: string }> = [
   { needles: ['95 okt', 'bensín', 'bensin', '95'], productId: 'fuel-95-e10', label: 'Atlantsolía 95 Okt.' },
   { needles: ['dísel', 'diesel'], productId: 'fuel-diesel', label: 'Atlantsolía Dísel' }
 ];
+const noMemberDiscountStations = new Set(['kaplakriki', 'sprengisandur', 'oskjuhlid', 'selfoss', 'akureyri-baldursnes']);
 
 function contentHashFor(body: string) {
   return `sha256:${createHash('sha256').update(body).digest('hex')}`;
@@ -67,6 +78,77 @@ function headerProductId(header: string) {
   return fuelHeaders.find((candidate) => candidate.needles.some((needle) => normalized.includes(needle))) ?? undefined;
 }
 
+function stationIdFromCell(cellHtml: string, stationName: string) {
+  const href = cellHtml.match(/<a\b[^>]*\bhref=["']([^"']+)["'][^>]*>/i)?.[1];
+  const slugFromHref = href?.match(/\/stodvar\/([^/]+)\/?/i)?.[1];
+  if (slugFromHref) return slugFromHref;
+  return stationName
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase('is-IS')
+    .replace(/ð/g, 'd')
+    .replace(/þ/g, 'th')
+    .replace(/æ/g, 'ae')
+    .replace(/ö/g, 'o')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+function stationHrefFromCell(cellHtml: string, sourceUrl: string) {
+  const href = cellHtml.match(/<a\b[^>]*\bhref=["']([^"']+)["'][^>]*>/i)?.[1];
+  return href ? new URL(decodeHtml(href), sourceUrl).toString() : undefined;
+}
+
+function buildFuelRow(input: {
+  capturedAt: string;
+  digest: string;
+  sourceUrl: string;
+  spec: NonNullable<ReturnType<typeof headerProductId>>;
+  price: number;
+  originalPriceText: string;
+  stationName: string;
+  storeId: string;
+  stationHref?: string;
+  isMemberPrice: boolean;
+}): AtlantsoliaIsFuelPriceObservation {
+  return {
+    domain: 'fuel',
+    productId: input.spec.productId,
+    gradeLabel: input.spec.label,
+    pricePerLitre: input.isMemberPrice
+      ? Math.round((input.price - ATLANTSOLIA_IS_MEMBER_DISCOUNT_ISK_PER_LITRE + Number.EPSILON) * 100) / 100
+      : input.price,
+    unit: 'l',
+    currency: 'ISK',
+    chainId: 'atlantsolia-is',
+    sourceKind: 'operator_public_price_page',
+    operatorName: 'Atlantsolía',
+    channel: 'store',
+    store_id: `atlantsolia-is-${input.storeId}`,
+    is_member_price: input.isMemberPrice,
+    ...(input.isMemberPrice
+      ? {
+          membershipProgram: 'Atlantsolía app/dælulykill' as const,
+          memberDiscountIskPerLitre: ATLANTSOLIA_IS_MEMBER_DISCOUNT_ISK_PER_LITRE as const
+        }
+      : {}),
+    is_subscription_price: false,
+    is_coupon_price: false,
+    is_clearance: false,
+    sourceUrl: input.sourceUrl,
+    observedAt: input.capturedAt,
+    effectiveFrom: input.capturedAt.slice(0, 10),
+    provenance: {
+      source: 'atlantsolia_is_fuel_prices',
+      parserVersion: ATLANTSOLIA_IS_FUEL_PRICE_PARSER_VERSION,
+      contentDigest: input.digest,
+      originalPriceText: input.originalPriceText,
+      originalStationName: input.stationName || undefined,
+      originalStationHref: input.stationHref
+    }
+  };
+}
+
 export function parseAtlantsoliaIsFuelPricePage(input: {
   body: string;
   capturedAt: string;
@@ -77,49 +159,65 @@ export function parseAtlantsoliaIsFuelPricePage(input: {
   if (/access denied|innskráning/i.test(input.body)) throw new Error('Atlantsolía IS fuel source blocked/login page');
   const digest = contentHashFor(input.body);
   const tableRows = [...input.body.matchAll(/<tr\b[\s\S]*?<\/tr>/gi)]
-    .map((row) => [...row[0].matchAll(/<t[dh]\b[^>]*>([\s\S]*?)<\/t[dh]>/gi)].map((cell) => textFromHtml(cell[1] ?? '')))
+    .map((row) =>
+      [...row[0].matchAll(/<t[dh]\b[^>]*>([\s\S]*?)<\/t[dh]>/gi)].map((cell) => ({
+        html: cell[1] ?? '',
+        text: textFromHtml(cell[1] ?? '')
+      }))
+    )
     .filter((cells) => cells.length >= 2);
-  const headerRow = tableRows.find((cells) => cells.some((cell) => headerProductId(cell)));
+  const headerRow = tableRows.find((cells) => cells.some((cell) => headerProductId(cell.text)));
   if (!headerRow) return [];
 
   const gradeColumns = headerRow
-    .map((header, index) => ({ index, spec: headerProductId(header) }))
+    .map((header, index) => ({ index, spec: headerProductId(header.text) }))
     .filter((entry): entry is { index: number; spec: NonNullable<ReturnType<typeof headerProductId>> } => entry.spec !== undefined);
-  const bestByGrade = new Map<FuelGradeId, AtlantsoliaIsFuelPriceObservation>();
+  const rows: AtlantsoliaIsFuelPriceObservation[] = [];
 
   for (const cells of tableRows.slice(tableRows.indexOf(headerRow) + 1)) {
-    const stationName = cells[0]?.trim();
+    const stationName = cells[0]?.text.trim() ?? '';
+    if (!stationName) continue;
+    const storeId = stationIdFromCell(cells[0]?.html ?? '', stationName);
+    const stationHref = stationHrefFromCell(cells[0]?.html ?? '', sourceUrl);
+    const emitsMemberDiscount = !noMemberDiscountStations.has(storeId);
     for (const { index, spec } of gradeColumns) {
-      const originalPriceText = cells[index] ?? '';
+      const originalPriceText = cells[index]?.text ?? '';
       const price = parseIcelandicPrice(originalPriceText);
       if (price === undefined) continue;
-      const current = bestByGrade.get(spec.productId);
-      if (current && current.pricePerLitre <= price) continue;
-      bestByGrade.set(spec.productId, {
-        domain: 'fuel',
-        productId: spec.productId,
-        gradeLabel: spec.label,
-        pricePerLitre: price,
-        unit: 'l',
-        currency: 'ISK',
-        chainId: 'atlantsolia-is',
-        sourceKind: 'operator_public_price_page',
-        operatorName: 'Atlantsolía',
-        sourceUrl,
-        observedAt: input.capturedAt,
-        effectiveFrom: input.capturedAt.slice(0, 10),
-        provenance: {
-          source: 'atlantsolia_is_fuel_prices',
-          parserVersion: ATLANTSOLIA_IS_FUEL_PRICE_PARSER_VERSION,
-          contentDigest: digest,
+      rows.push(
+        buildFuelRow({
+          capturedAt: input.capturedAt,
+          digest,
+          sourceUrl,
+          spec,
+          price,
           originalPriceText,
-          originalStationName: stationName || undefined
-        }
-      });
+          stationName,
+          storeId,
+          stationHref,
+          isMemberPrice: false
+        })
+      );
+      if (emitsMemberDiscount) {
+        rows.push(
+          buildFuelRow({
+            capturedAt: input.capturedAt,
+            digest,
+            sourceUrl,
+            spec,
+            price,
+            originalPriceText,
+            stationName,
+            storeId,
+            stationHref,
+            isMemberPrice: true
+          })
+        );
+      }
     }
   }
 
-  return [...bestByGrade.values()];
+  return rows;
 }
 
 export async function fetchAtlantsoliaIsFuelPrices(options: {
