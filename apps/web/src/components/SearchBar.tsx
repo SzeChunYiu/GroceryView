@@ -29,6 +29,10 @@ type ProductSearchResponse = {
 type SearchStatus = 'idle' | 'loading' | 'ready' | 'empty' | 'error';
 
 const MIN_QUERY_LENGTH = 2;
+type RecentProductSearch = RecentSearchHistoryEntry;
+const readRecentProductSearches = readRecentSearchHistory;
+const rememberRecentProductSearch = (query: string, resultCount: number) => rememberRecentSearchHistory(query, resultCount, '/products');
+const clearRecentProductSearches = clearRecentSearchHistory;
 const ZERO_RESULT_FALLBACKS = [
   { categories: ['Dairy', 'Breakfast'], keywords: ['fil', 'milk', 'yogurt', 'cheese', 'lactose'], searches: ['lactosefri mjölk', 'yoghurt', 'ost'] },
   { categories: ['Fruit', 'Vegetables'], keywords: ['apple', 'banana', 'fruit', 'greens', 'veg'], searches: ['äpplen', 'bananer', 'grönsaker'] },
@@ -51,7 +55,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
   const listboxId = useId();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<ProductSearchResult[]>([]);
-  const [recentSearches, setRecentSearches] = useState<RecentSearchHistoryEntry[]>([]);
+  const [recentSearches, setRecentSearches] = useState<RecentProductSearch[]>([]);
   const [isFocused, setIsFocused] = useState(false);
   const [status, setStatus] = useState<SearchStatus>('idle');
   const trimmedQuery = useMemo(() => query.trim(), [query]);
@@ -60,7 +64,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
   const shouldShowDropdown = (status !== 'idle' && trimmedQuery.length >= MIN_QUERY_LENGTH) || shouldShowRecentSearches;
 
   useEffect(() => {
-    setRecentSearches(readRecentSearchHistory());
+    setRecentSearches(readRecentProductSearches());
   }, []);
 
   useEffect(() => {
@@ -84,7 +88,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
         const nextResults = payload.results ?? [];
         setResults(nextResults);
         setStatus(nextResults.length > 0 ? 'ready' : 'empty');
-        if (nextResults.length > 0) setRecentSearches(rememberRecentSearchHistory(trimmedQuery, nextResults.length));
+        if (nextResults.length > 0) setRecentSearches(rememberRecentProductSearch(trimmedQuery, nextResults.length));
         trackSearchToSavingsFunnelStep('landing_search');
       } catch (error) {
         if (controller.signal.aborted) return;
@@ -116,7 +120,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
           onBlur={() => window.setTimeout(() => setIsFocused(false), 120)}
           onChange={(event) => setQuery(event.target.value)}
           onFocus={() => {
-            setRecentSearches(readRecentSearchHistory());
+            setRecentSearches(readRecentProductSearches());
             setIsFocused(true);
           }}
           placeholder="Search product or brand"
@@ -138,7 +142,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
                 <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">Recent searches</p>
                 <button
                   className="text-xs font-black text-slate-500 underline decoration-slate-300 underline-offset-4 hover:text-rose-700"
-                  onClick={() => setRecentSearches(clearRecentSearchHistory())}
+                  onClick={() => setRecentSearches(clearRecentProductSearches())}
                   onMouseDown={(event) => event.preventDefault()}
                   type="button"
                 >
@@ -209,10 +213,10 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
 }
 
 export function RecentSearchReplayPills() {
-  const [recentSearches, setRecentSearches] = useState<RecentSearchHistoryEntry[]>([]);
+  const [recentSearches, setRecentSearches] = useState<RecentProductSearch[]>([]);
 
   useEffect(() => {
-    setRecentSearches(readRecentSearchHistory());
+    setRecentSearches(readRecentProductSearches());
   }, []);
 
   if (recentSearches.length === 0) return null;
@@ -226,7 +230,7 @@ export function RecentSearchReplayPills() {
         </div>
         <button
           className="rounded-full border border-slate-200 px-3 py-1.5 text-xs font-black text-slate-700 hover:border-rose-200 hover:text-rose-700"
-          onClick={() => setRecentSearches(clearRecentSearchHistory())}
+          onClick={() => setRecentSearches(clearRecentProductSearches())}
           type="button"
         >
           Clear all

@@ -129,6 +129,25 @@ function latestVolatilityBandLabel(series: PriceChartTerminalSeries) {
   return `${band.lower.toLocaleString('sv-SE')}–${band.upper.toLocaleString('sv-SE')}`;
 }
 
+export function priceHistorySparklinePath(
+  points: readonly { value: number }[],
+  width = 140,
+  height = 36,
+) {
+  if (points.length < 2) return '';
+  const values = points.map((point) => point.value);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = max - min || 1;
+  return points
+    .map((point, index) => {
+      const x = points.length === 1 ? width / 2 : (index / (points.length - 1)) * width;
+      const y = height - ((point.value - min) / range) * height;
+      return `${index === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(' ');
+}
+
 export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTerminalModel }>) {
   const [activeWindowLabel, setActiveWindowLabel] = useState(chart.defaultWindow);
   const [chartLoadError, setChartLoadError] = useState<string | null>(null);

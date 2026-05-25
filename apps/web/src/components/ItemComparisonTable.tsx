@@ -42,8 +42,48 @@ function StorePriceCell({ item }: { item: ItemComparisonItem }) {
           <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-500">{price.storeName}</p>
           <p className="mt-1 text-lg font-black text-slate-950">{price.priceLabel}</p>
           <p className="text-xs font-semibold text-slate-500">{price.unitLabel}</p>
+          <ComparisonSparkline item={item} label={`${item.name} at ${price.storeName}`} />
         </div>
       ))}
+    </div>
+  );
+}
+
+function comparisonSparklinePath(points: ItemComparisonItem['trendPoints'], width = 132, height = 36) {
+  if (points.length < 2) return '';
+  const prices = points.map((point) => point.price);
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
+  const range = max - min || 1;
+  return points
+    .map((point, index) => {
+      const x = points.length === 1 ? width / 2 : (index / (points.length - 1)) * width;
+      const y = height - ((point.price - min) / range) * height;
+      return `${index === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(' ');
+}
+
+function ComparisonSparkline({ item, label }: { item: ItemComparisonItem; label: string }) {
+  const path = comparisonSparklinePath(item.trendPoints);
+  if (!path) {
+    return <p className="mt-2 text-xs font-semibold text-slate-500">Price history sparkline waits for at least two observations.</p>;
+  }
+
+  const latest = item.trendPoints.at(-1);
+  return (
+    <div className="mt-3" data-comparison-price-history-sparkline={item.slug}>
+      <svg
+        aria-label={`${label} compact historical price sparkline`}
+        className="h-10 w-full overflow-visible"
+        preserveAspectRatio="none"
+        role="img"
+        viewBox="0 0 132 36"
+      >
+        <title>{`${label} price history sparkline`}</title>
+        <path d={path} fill="none" stroke="#4f46e5" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" vectorEffect="non-scaling-stroke" />
+      </svg>
+      <p className="mt-1 text-[0.68rem] font-bold text-indigo-800">{item.trendSummary} · latest {latest?.priceLabel ?? item.cheapestPriceLabel}</p>
     </div>
   );
 }
@@ -54,6 +94,7 @@ function TrendChartCell({ item }: { item: ItemComparisonItem }) {
   return (
     <div className="grid gap-2">
       <p className="text-xs font-black uppercase tracking-[0.14em] text-indigo-700">{item.trendSummary}</p>
+      <ComparisonSparkline item={item} label={item.name} />
       <div className="flex h-24 items-end gap-1 rounded-2xl bg-indigo-50 p-3" aria-label={`${item.name} trend charts`}>
         {item.trendPoints.map((point) => (
           <span

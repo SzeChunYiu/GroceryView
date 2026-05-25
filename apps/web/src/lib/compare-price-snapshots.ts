@@ -9,6 +9,13 @@ export type ComparePriceSnapshotStoreRow = {
   price: number | null;
   priceLabel: string;
   unitLabel: string;
+  historyPoints?: ComparePriceSnapshotHistoryPoint[];
+};
+
+export type ComparePriceSnapshotHistoryPoint = {
+  date: string;
+  price: number;
+  priceLabel: string;
 };
 
 export type ComparePriceSnapshotsResult = {
@@ -30,6 +37,8 @@ type StorePriceRowPayload = {
   price?: unknown;
   priceLabel?: unknown;
   unitLabel?: unknown;
+  historyPoints?: unknown;
+  priceHistory?: unknown;
 };
 
 type CompareItemPayload = {
@@ -73,6 +82,40 @@ function numberOrNull(value: unknown) {
   return typeof value === 'number' && Number.isFinite(value) ? value : null;
 }
 
+function historyPointsFromPayload(value: unknown): ComparePriceSnapshotHistoryPoint[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter((point): point is { date?: unknown; time?: unknown; price?: unknown; value?: unknown; priceLabel?: unknown } => point !== null && typeof point === 'object')
+    .map((point) => {
+      const price = numberOrNull(point.price) ?? numberOrNull(point.value);
+      const date = stringOrFallback(point.date, stringOrFallback(point.time, ''));
+      if (!date || price === null) return null;
+      return {
+        date,
+        price,
+        priceLabel: stringOrFallback(point.priceLabel, `${price.toLocaleString('sv-SE')} kr`)
+      };
+    })
+    .filter((point): point is ComparePriceSnapshotHistoryPoint => point !== null)
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .slice(-12);
+}
+
+export function buildComparePriceSnapshotSparkline(points: readonly ComparePriceSnapshotHistoryPoint[], width = 140, height = 36) {
+  if (points.length < 2) return '';
+  const prices = points.map((point) => point.price);
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
+  const range = max - min || 1;
+  return points
+    .map((point, index) => {
+      const x = points.length === 1 ? width / 2 : (index / (points.length - 1)) * width;
+      const y = height - ((point.price - min) / range) * height;
+      return `${index === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(' ');
+}
+
 function fallbackResult(itemIds: string[]): ComparePriceSnapshotsResult {
   return {
     itemIds,
@@ -103,13 +146,15 @@ function directStoreRowsFromPayload(payload: unknown): ComparePriceSnapshotStore
     .filter((row): row is StorePriceRowPayload => row !== null && typeof row === 'object')
     .map((row) => {
       const itemId = stringOrFallback(row.itemId, 'unknown-item');
+      const historyPoints = historyPointsFromPayload(row.historyPoints ?? row.priceHistory);
       return {
         itemId,
         itemName: stringOrFallback(row.itemName, itemId),
         storeName: stringOrFallback(row.storeName, 'Unknown store'),
         price: numberOrNull(row.price),
         priceLabel: stringOrFallback(row.priceLabel, 'Price unavailable'),
-        unitLabel: stringOrFallback(row.unitLabel, 'Unit unavailable')
+        unitLabel: stringOrFallback(row.unitLabel, 'Unit unavailable'),
+        ...(historyPoints.length > 0 ? { historyPoints } : {})
       };
     });
 }
@@ -122,14 +167,18 @@ function nestedStoreRowsFromPayload(payload: unknown): ComparePriceSnapshotStore
 
     return storePrices
       .filter((row): row is StorePriceRowPayload => row !== null && typeof row === 'object')
-      .map((row) => ({
-        itemId,
-        itemName,
-        storeName: stringOrFallback(row.storeName, 'Unknown store'),
-        price: numberOrNull(row.price),
-        priceLabel: stringOrFallback(row.priceLabel, 'Price unavailable'),
-        unitLabel: stringOrFallback(row.unitLabel, 'Unit unavailable')
-      }));
+      .map((row) => {
+        const historyPoints = historyPointsFromPayload(row.historyPoints ?? row.priceHistory);
+        return {
+          itemId,
+          itemName,
+          storeName: stringOrFallback(row.storeName, 'Unknown store'),
+          price: numberOrNull(row.price),
+          priceLabel: stringOrFallback(row.priceLabel, 'Price unavailable'),
+          unitLabel: stringOrFallback(row.unitLabel, 'Unit unavailable'),
+          ...(historyPoints.length > 0 ? { historyPoints } : {})
+        };
+      });
   });
 }
 
