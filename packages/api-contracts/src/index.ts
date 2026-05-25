@@ -129,6 +129,41 @@ export const basketSchema = z.object({
   items: z.array(basketItemSchema)
 });
 
+export const accountReceiptSpendRowSchema = z.object({
+  id: idSchema,
+  userId: idSchema,
+  purchasedAt: isoDateTimeSchema,
+  totalAmount: z.number().nonnegative(),
+  merchantName: z.string().trim().optional(),
+  sourceTable: z.enum(['receipt_uploads', 'purchase_history'])
+});
+
+export const accountReceiptSpendForecastResponseSchema = z.object({
+  userId: idSchema.nullable(),
+  protected: z.literal(true),
+  endpoint: z.literal('/api/savings-dashboard/spend-forecast'),
+  sourceTables: z.tuple([z.literal('receipt_uploads'), z.literal('purchase_history')]),
+  sourceContext: z.literal('observed account source rows'),
+  forecast: z.object({
+    receiptCount: z.number().int().nonnegative(),
+    actualSpend: z.number().nonnegative(),
+    projectedMonthlySpend: z.number().nonnegative().nullable(),
+    averageReceiptTotal: z.number().nonnegative().nullable(),
+    confidence: confidenceSchema,
+    coverageLabel: idSchema
+  }).nullable(),
+  rows: z.array(accountReceiptSpendRowSchema),
+  watchpoints: z.array(z.object({
+    label: idSchema,
+    product: idSchema,
+    store: idSchema,
+    signal: idSchema,
+    action: idSchema,
+    href: idSchema
+  })),
+  guardrails: z.array(idSchema)
+});
+
 export const multiWeekStockUpConfidenceSchema = z.enum(['high', 'medium', 'low']);
 
 export const multiWeekStockUpRowSchema = z.object({
@@ -243,6 +278,8 @@ export const compareResponseSchema = z.object({
 });
 
 export const apiContractSchemas = {
+  accountReceiptSpendForecastResponse: accountReceiptSpendForecastResponseSchema,
+  accountReceiptSpendRow: accountReceiptSpendRowSchema,
   alert: alertSchema,
   basket: basketSchema,
   basketItem: basketItemSchema,
@@ -265,6 +302,8 @@ export const apiContractSchemas = {
 } as const;
 
 export type AlertDto = z.infer<typeof alertSchema>;
+export type AccountReceiptSpendForecastResponseDto = z.infer<typeof accountReceiptSpendForecastResponseSchema>;
+export type AccountReceiptSpendRowDto = z.infer<typeof accountReceiptSpendRowSchema>;
 export type BasketDto = z.infer<typeof basketSchema>;
 export type BasketItemDto = z.infer<typeof basketItemSchema>;
 export type ComparePriceSnapshotDto = z.infer<typeof comparePriceSnapshotSchema>;

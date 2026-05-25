@@ -3,7 +3,8 @@ import { PiggyBank } from 'lucide-react';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
-import { elderlyFixedIncomeBudgetTracker, elderlyStaplesStabilityTracker, personalGroceryInflation, savingsDashboard, studentWeeklyBudgetTracker } from '@/lib/demo-data';
+import { loadAccountReceiptSpendForecast } from '@/lib/account-receipt-spend-forecast';
+import { elderlyFixedIncomeBudgetTracker, elderlyStaplesStabilityTracker, personalGroceryInflation, studentWeeklyBudgetTracker } from '@/lib/demo-data';
 import { ecoBasketScorecard } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -61,7 +62,8 @@ export default function SavingsDashboardPage() {
   const topContributions = [...personalGroceryInflation.itemContributions]
     .sort((a, b) => Math.abs(b.changeAmount) - Math.abs(a.changeAmount))
     .slice(0, 5);
-  const visibleWatchpoints = savingsDashboard.watchpoints.slice(0, 4);
+  const accountSpendForecast = loadAccountReceiptSpendForecast({ userId: null });
+  const visibleWatchpoints = accountSpendForecast.watchpoints.slice(0, 4);
 
   return (
     <PageShell>
@@ -240,8 +242,35 @@ export default function SavingsDashboardPage() {
       </Card>
 
       <Card className="mt-6">
+        <h2 className="text-2xl font-black">Signed-in receipt spend forecast</h2>
+        <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">
+          The spend forecast now loads through <code className="rounded bg-slate-100 px-1 py-0.5">{accountSpendForecast.endpoint}</code> and stays empty until production auth returns receipt_uploads or purchase_history rows for the signed-in account.
+        </p>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          <div className="rounded-2xl bg-slate-50 p-4">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">Protected source</p>
+            <p className="mt-2 text-lg font-black text-slate-950">{accountSpendForecast.sourceTables.join(' + ')}</p>
+            <p className="mt-1 text-sm font-semibold text-slate-600">signed-in account rows only</p>
+          </div>
+          <div className="rounded-2xl bg-slate-50 p-4">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">Receipt rows</p>
+            <p className="mt-2 text-3xl font-black text-slate-950">{accountSpendForecast.forecast?.receiptCount ?? 0}</p>
+            <p className="mt-1 text-sm font-semibold text-slate-600">no anonymous receipt substitute</p>
+          </div>
+          <div className="rounded-2xl bg-slate-50 p-4">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">Projected month</p>
+            <p className="mt-2 text-3xl font-black text-slate-950">{formatSek(accountSpendForecast.forecast?.projectedMonthlySpend)}</p>
+            <p className="mt-1 text-sm font-semibold text-slate-600">{accountSpendForecast.forecast?.confidence ?? 'unverified'} confidence</p>
+          </div>
+        </div>
+        <ul className="mt-4 list-disc space-y-1 pl-5 text-sm font-semibold text-slate-700">
+          {accountSpendForecast.guardrails.map((guardrail) => <li key={guardrail}>{guardrail}</li>)}
+        </ul>
+      </Card>
+
+      <Card className="mt-6">
         <h2 className="text-2xl font-black">Savings watchpoints</h2>
-        <p className="mt-2 text-sm font-semibold text-slate-600">Month-to-date planned spend {savingsDashboard.monthToDate.plannedSpend}; avoided spend {savingsDashboard.monthToDate.avoidedSpend}; best district {savingsDashboard.monthToDate.bestDistrict}.</p>
+        <p className="mt-2 text-sm font-semibold text-slate-600">Watchpoints are populated only from the protected receipt spend forecast loader; demo purchaseHistory rows are no longer used on this dashboard.</p>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           {visibleWatchpoints.length > 0 ? (
             visibleWatchpoints.map((watchpoint) => (
