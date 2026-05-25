@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { osmStoreHolidayWarningLabel, osmStoreOpeningHoursLabel, osmStores, type OsmStore } from '@/lib/osm-stores';
 import { cheapestMapChain, mapChainIndexScores } from '@/lib/map-chain-index';
 import { trackStoreDirectionsClick } from '@/lib/analytics';
-import type { StoreDistanceRow } from '@/lib/store-distance';
+import type { NearbyDealRecommendation, StoreDistanceRow } from '@/lib/store-distance';
 
 // Free, no-API-key vector tiles (© OpenMapTiles / OpenFreeMap, data © OSM).
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/bright';
@@ -97,6 +97,10 @@ function formatDistance(km: number): string {
   return `${km.toFixed(km < 10 ? 1 : 0)} km`;
 }
 
+function distanceMetersFromUser(userLocation: { lat: number; lng: number }, deal: NearbyDealRecommendation): number {
+  return Math.round(distanceKm([userLocation.lng, userLocation.lat], [deal.mapLng, deal.mapLat]) * 1000);
+}
+
 function toFeatureCollection(): GeoJSON.FeatureCollection<GeoJSON.Point> {
   return {
     type: 'FeatureCollection',
@@ -162,11 +166,23 @@ function districtHeatCollection(): GeoJSON.FeatureCollection<GeoJSON.Point> {
 
 type RouteSavingsMapRow = StoreDistanceRow & { expectedBasketSavingsSek?: number };
 
-export function StoreMap({ routeRecommendations = [] }: Readonly<{ routeRecommendations?: RouteSavingsMapRow[] }>) {
+export function StoreMap({
+  nearbyDealRecommendations = [],
+  routeRecommendations = []
+}: Readonly<{ nearbyDealRecommendations?: NearbyDealRecommendation[]; routeRecommendations?: RouteSavingsMapRow[] }>) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const [storeCount, setStoreCount] = useState(0);
   const [selectedStoreSlug, setSelectedStoreSlug] = useState(syncedMapListStores[0]?.slug ?? '');
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [geoStatus, setGeoStatus] = useState('Using map-center distance until location is approved.');
+
+  const rankedNearbyDeals = useMemo(() => {
+    if (!userLocation) return nearbyDealRecommendations;
+    return nearbyDealRecommendations
+      .map((deal) => ({ ...deal, distanceMeters: distanceMetersFromUser(userLocation, deal) }))
+      .sort((left, right) => left.distanceMeters - right.distanceMeters || right.savingsSek - left.savingsSek);
+  }, [nearbyDealRecommendations, userLocation]);
 
   function focusStore(store: OsmStore) {
     setSelectedStoreSlug(store.slug);
@@ -176,6 +192,22 @@ export function StoreMap({ routeRecommendations = [] }: Readonly<{ routeRecommen
       duration: 700,
     });
   }
+
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      setGeoStatus('Browser geolocation is unavailable; showing map-center deal distance.');
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation({ lat: position.coords.latitude, lng: position.coords.longitude });
+        setGeoStatus('Sorted with your approved browser location.');
+      },
+      () => setGeoStatus('Location was not approved; showing map-center deal distance.'),
+      { enableHighAccuracy: false, maximumAge: 300000, timeout: 5000 },
+    );
+  }, []);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -414,6 +446,13 @@ export function StoreMap({ routeRecommendations = [] }: Readonly<{ routeRecommen
             <div className="mt-1">Rank combines distance, basket total, and opening status.</div>
           </div>
         ) : null}
+        {rankedNearbyDeals.length > 0 ? (
+          <div className="mt-2 border-t border-market-ink/10 pt-2 text-market-ink/70" data-nearby-deal-map-legend="true">
+            <div className="font-bold uppercase tracking-wide text-market-ink/55">Nearby deal</div>
+            <div>{rankedNearbyDeals[0]?.dealName} · save {rankedNearbyDeals[0]?.savingsSek.toFixed(0)} SEK</div>
+            <div className="mt-1">{geoStatus}</div>
+          </div>
+        ) : null}
       </div>
 
       <div className="absolute bottom-3 right-3 top-3 flex w-[min(22rem,calc(100%-1.5rem))] flex-col rounded-2xl border border-white/70 bg-white/95 p-3 text-slate-950 shadow-2xl backdrop-blur">
@@ -437,6 +476,25 @@ export function StoreMap({ routeRecommendations = [] }: Readonly<{ routeRecommen
                     </div>
                     <p className="mt-1 font-semibold text-slate-600">
                       {store.totalMinutes} min · {store.basketTotalSek.toFixed(2)} SEK basket · {store.openingStatusLabel} · saves {(store.expectedBasketSavingsSek ?? 0).toFixed(2)} SEK
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
+          {rankedNearbyDeals.length > 0 ? (
+            <div className="rounded-2xl border border-fuchsia-100 bg-fuchsia-50 p-3" data-nearby-deals-panel="true">
+              <p className="text-[11px] font-black uppercase tracking-[0.16em] text-fuchsia-800">Deals near visible stores</p>
+              <p className="mt-1 text-xs font-semibold leading-5 text-fuchsia-900">{geoStatus}</p>
+              <div className="mt-2 space-y-2">
+                {rankedNearbyDeals.slice(0, 3).map((deal, index) => (
+                  <div className="rounded-xl bg-white/80 p-2 text-xs" key={deal.id}>
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="font-black text-slate-950">#{index + 1} {deal.dealName}</p>
+                      <span className="font-black text-fuchsia-800">-{deal.savingsSek.toFixed(0)} SEK</span>
+                    </div>
+                    <p className="mt-1 font-semibold text-slate-600">
+                      {formatDistance(deal.distanceMeters / 1000)} · {deal.storeName} · {deal.offerMechanicText}
                     </p>
                   </div>
                 ))}

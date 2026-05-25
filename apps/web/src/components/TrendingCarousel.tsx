@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowDownRight, ArrowUpRight, History } from 'lucide-react';
 import type { TrendingProductPriceChange } from '@groceryview/db';
@@ -22,6 +23,36 @@ function formatPercent(value: number) {
   return `${value > 0 ? '+' : ''}${new Intl.NumberFormat('sv-SE', { maximumFractionDigits: 1 }).format(value)}%`;
 }
 
+type CarouselImageCandidate = {
+  imageAlt?: string | null;
+  imageUrl?: string | null;
+};
+
+const carouselImagePolicy = {
+  loading: 'lazy',
+  placeholder: 'empty',
+  sizes: '(min-width: 1024px) 15rem, 70vw'
+} as const;
+
+function CarouselProductImage({ fallbackAlt, item }: Readonly<{ fallbackAlt: string; item: CarouselImageCandidate }>) {
+  if (!item.imageUrl) return null;
+
+  return (
+    <div className="mb-3 flex aspect-[4/3] items-center justify-center rounded-2xl bg-white p-3 ring-1 ring-slate-200">
+      <Image
+        alt={item.imageAlt ?? fallbackAlt}
+        className="max-h-full max-w-full object-contain"
+        height={144}
+        loading={carouselImagePolicy.loading}
+        placeholder={carouselImagePolicy.placeholder}
+        sizes={carouselImagePolicy.sizes}
+        src={item.imageUrl}
+        width={192}
+      />
+    </div>
+  );
+}
+
 function PersonalizedReorderRail({ items }: Readonly<{ items: PersonalizedReorderItem[] }>) {
   if (items.length === 0) return null;
 
@@ -44,6 +75,7 @@ function PersonalizedReorderRail({ items }: Readonly<{ items: PersonalizedReorde
             href={`/products/${item.slug}`}
             key={item.slug}
           >
+            <CarouselProductImage fallbackAlt={`${item.name} product image`} item={item as CarouselImageCandidate} />
             <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{item.reorderReason}</p>
             <h3 className="mt-2 line-clamp-2 text-lg font-black leading-6 text-slate-950">{item.name}</h3>
             <p className="mt-1 line-clamp-1 text-sm font-semibold text-slate-600">{item.brand}</p>
@@ -177,6 +209,7 @@ export function TrendingCarousel({ items, reorderItems = [] }: Readonly<{
                 href={`/products/${item.productSlug}`}
                 key={item.productSlug}
               >
+                <CarouselProductImage fallbackAlt={`${item.productName} product image`} item={item as CarouselImageCandidate} />
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">#{item.rank} · {item.categoryLabel ?? 'Grocery'}</p>
