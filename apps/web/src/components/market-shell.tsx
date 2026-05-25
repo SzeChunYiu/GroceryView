@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, MetricGrid, PageShell, SourceCoverage, TopSpreads } from './data-ui';
+import { FunnelStepBeacon } from './funnel-step-beacon';
 import { ProductPriceCards } from './product-price-cards';
 import { TrendingCarousel } from './TrendingCarousel';
 import { buildChainIndexTrendSeries } from '@/lib/chain-index-data';
@@ -138,6 +139,7 @@ function heatmapTileClass(heatScore: number) {
 export function MarketShell() {
   return (
     <PageShell>
+      <FunnelStepBeacon step="landing_search" />
       <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-stretch">
         <div className="rounded-[2rem] bg-slate-950 p-6 text-white shadow-xl md:p-8">
           <Eyebrow>Sweden grocery snapshot</Eyebrow>

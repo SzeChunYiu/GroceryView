@@ -49,6 +49,11 @@ export const routeMetadataCatalog = {
     description: 'Verified account profile metadata is withheld in the static build unless production authentication returns a real session.',
     noIndex: true
   },
+  '/analytics/funnel': {
+    title: 'Search-to-savings funnel analytics | GroceryView',
+    description: 'Track aggregate product funnel drop-offs by market, device, and guest/account state without exposing personal data.',
+    noIndex: true
+  },
   '/basket-ideas': {
     title: 'Basket ideas and import contracts | GroceryView',
     description: 'Plan student staples, basket imports, retailer handoff support, and verified account-bound basket review guardrails.'

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { elderlyFixedIncomeBudgetTracker, elderlyStaplesStabilityTracker, personalGroceryInflation, savingsDashboard, studentWeeklyBudgetTracker } from '@/lib/demo-data';
 import { ecoBasketScorecard } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
@@ -48,6 +49,7 @@ export default function SavingsDashboardPage() {
 
   return (
     <PageShell>
+      <FunnelStepBeacon step="savings_action" />
       <Eyebrow>Personal grocery inflation</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Savings dashboard</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">

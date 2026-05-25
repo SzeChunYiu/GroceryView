@@ -7,7 +7,19 @@ export type ItemCardImpression = {
   observedAt: string;
 };
 
+export type SearchToSavingsFunnelStepId =
+  | 'landing_search'
+  | 'product_view'
+  | 'compare_view'
+  | 'watchlist_alert'
+  | 'basket_view'
+  | 'savings_action';
+
+type FunnelDeviceSegment = 'desktop' | 'mobile' | 'tablet' | 'unknown';
+type FunnelAccountSegment = 'guest' | 'account' | 'unknown';
+
 const impressionEndpoint = '/api/analytics/item-card-impressions';
+const searchToSavingsFunnelEndpoint = '/api/analytics/search-to-savings-funnel';
 const maxBatchSize = 20;
 const flushDelayMs = 1200;
 
@@ -71,6 +83,57 @@ export function trackItemCardImpression(event: Omit<ItemCardImpression, 'observe
 
 if (typeof window !== 'undefined') {
   window.addEventListener('pagehide', flushItemCardImpressions);
+}
+
+function currentFunnelDevice(): FunnelDeviceSegment {
+  if (typeof window === 'undefined') return 'unknown';
+  if (window.matchMedia('(max-width: 640px)').matches) return 'mobile';
+  if (window.matchMedia('(max-width: 1024px)').matches) return 'tablet';
+  return 'desktop';
+}
+
+function currentFunnelMarket() {
+  if (typeof document === 'undefined') return 'unknown';
+  const locale = document.documentElement.lang || navigator.language || 'unknown';
+  const region = locale.toLocaleLowerCase('en-US').startsWith('sv') ? 'se' : (locale.split('-')[1] ?? locale);
+  return /^[a-z]{2}$/i.test(region) ? region.toLocaleLowerCase('en-US') : 'unknown';
+}
+
+function currentFunnelAccountState(): FunnelAccountSegment {
+  if (typeof window === 'undefined') return 'unknown';
+  try {
+    return window.sessionStorage.getItem('groceryview:accessToken') || window.sessionStorage.getItem('groceryview:userId')
+      ? 'account'
+      : 'guest';
+  } catch {
+    return 'unknown';
+  }
+}
+
+export function trackSearchToSavingsFunnelStep(step: SearchToSavingsFunnelStepId) {
+  if (typeof window === 'undefined') return;
+
+  const payload = JSON.stringify({
+    events: [{
+      step,
+      count: 1,
+      market: currentFunnelMarket(),
+      device: currentFunnelDevice(),
+      accountState: currentFunnelAccountState()
+    }]
+  });
+
+  if (navigator.sendBeacon) {
+    const sent = navigator.sendBeacon(searchToSavingsFunnelEndpoint, new Blob([payload], { type: 'application/json' }));
+    if (sent) return;
+  }
+
+  void fetch(searchToSavingsFunnelEndpoint, {
+    body: payload,
+    headers: { 'content-type': 'application/json' },
+    keepalive: true,
+    method: 'POST'
+  }).catch(() => undefined);
 }
 
 export type StoreEngagementEvent = {

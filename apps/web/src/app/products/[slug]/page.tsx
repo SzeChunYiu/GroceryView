@@ -16,6 +16,7 @@ import {
   type ItemSubstitutionProduct
 } from '@groceryview/analytics';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { PriceIntelligenceCard, type PriceIntelligenceScoreCard } from '@/components/price-intelligence-card';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
 import { PriceIntelligenceCard, type PriceIntelligenceScoreCard } from '@/components/price-intelligence-card';
@@ -1188,6 +1189,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
     const breadcrumbJsonLd = breadcrumbJsonLdFor(product);
     return (
       <PageShell>
+        <FunnelStepBeacon step="product_view" />
         <script dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbJsonLd) }} type="application/ld+json" />
         <Eyebrow>{isChain ? 'Axfood chain product' : 'OpenPrices product'}</Eyebrow>
         <Card className="mt-6 border-dashed border-slate-300 bg-slate-50 text-center">
@@ -1224,6 +1226,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const breadcrumbJsonLd = breadcrumbJsonLdFor(product);
   return (
     <PageShell>
+      <FunnelStepBeacon step="product_view" />
       <script dangerouslySetInnerHTML={{ __html: jsonLd(productJsonLd) }} type="application/ld+json" />
       <script dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbJsonLd) }} type="application/ld+json" />
       <Eyebrow>{isChain ? 'Axfood chain product' : 'OpenPrices product'}</Eyebrow>
