@@ -1,4 +1,5 @@
 import { createGroceryViewApi, type FlyerOffer } from '@groceryview/api';
+import { rankMyBasketPromos } from '@groceryview/core';
 
 export const myFlyerAlgorithms = ['best_savings', 'best_unit_price', 'watchlist_first'] as const;
 export const myFlyerCountries = ['se', 'no', 'dk', 'fi'] as const;
@@ -71,7 +72,9 @@ function profileForUser(userId: string) {
   const watchedProducts = hash % 3 === 0 ? new Set(['coffee', 'butter']) : new Set(['milk', 'private-label-milk']);
   const watchedCategories = hash % 5 === 0 ? new Set(['dairy']) : new Set(['coffee']);
 
-  return { favoriteStores, watchedProducts, watchedCategories };
+  const recentBasketProducts = hash % 2 === 0 ? new Set(['oat-milk', 'milk']) : new Set(['coffee', 'pasta']);
+
+  return { favoriteStores, watchedProducts, watchedCategories, recentBasketProducts };
 }
 
 function startOfIsoWeek(asOf: Date) {
@@ -103,6 +106,12 @@ function unitPriceFor(offer: FlyerOffer) {
   return round(offer.offerPrice / packageAmount);
 }
 
+function unitEconomicsEvidence(offer: FlyerOffer, unitPrice: number | null) {
+  if (unitPrice === null) return 'missing package or effective unit-price evidence';
+  if (offer.packageQuantity && offer.packageUnit) return `${offer.packageQuantity}${offer.packageUnit} package evidence`;
+  return `${unitPrice} SEK/${offer.effectiveUnitPriceUnit ?? 'unit'} effective unit price evidence`;
+}
+
 function expiryScoreFor(offer: FlyerOffer, asOfMs: number) {
   const validThroughMs = Date.parse(offer.validThrough);
   if (!Number.isFinite(validThroughMs)) return 0;
@@ -128,6 +137,7 @@ function scoreOffer(offer: FlyerOffer, query: MyFlyerQuery, asOfMs: number): Omi
   const explanation = [
     `${query.algorithm} ranker`,
     `${round(savings)} SEK savings`,
+    unitEconomicsEvidence(offer, unitPrice),
     profile.favoriteStores.has(offer.storeId) ? 'favorite store boost' : 'all-store eligible',
     watchlist > 0 ? 'watchlist or category match' : 'general weekly promotion',
     offer.priceType === 'member_flyer' ? 'member flyer label retained' : 'public flyer price'
@@ -181,15 +191,26 @@ export function buildMyFlyerPayload(query: MyFlyerQuery, asOf = new Date()): MyF
     ? report.offers.filter((offer) => unitPriceFor(offer) !== null)
     : report.offers;
 
-  const rows = sourceOffers
+  const myBasketPromos = rankMyBasketPromos({
+    asOf,
+    promos: sourceOffers.map((offer) => ({
+      ...offer,
+      promoId: offer.offerId,
+      listingId: offer.productId,
+      coveredListingIds: [offer.productId, offer.category],
+      savings: offer.savings
+    })),
+    topN: query.limit,
+    user: {
+      watchlist: [...profileForUser(query.userId).watchedProducts, ...profileForUser(query.userId).watchedCategories].map((listingId) => ({ listingId })),
+      recentBasketHistory: [...profileForUser(query.userId).recentBasketProducts].map((listingId) => ({ listingId, purchasedAt: asOf }))
+    }
+  });
+
+  const rows = myBasketPromos
     .map((offer) => scoreOffer(offer, query, asOfMs))
     .sort((left, right) =>
-      right.personalizedScore - left.personalizedScore ||
-      right.offer.confidence - left.offer.confidence ||
-      Date.parse(left.offer.validThrough) - Date.parse(right.offer.validThrough) ||
-      left.offer.chain.localeCompare(right.offer.chain) ||
-      left.offer.storeName.localeCompare(right.offer.storeName) ||
-      left.offer.productName.localeCompare(right.offer.productName) ||
+      right.offer.savings - left.offer.savings ||
       left.offer.offerId.localeCompare(right.offer.offerId)
     )
     .slice(0, query.limit)

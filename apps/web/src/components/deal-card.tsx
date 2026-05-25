@@ -29,6 +29,12 @@ export type SponsoredDealPlacement = {
   surface?: string;
 };
 
+const dealCardImagePolicy = {
+  loading: 'lazy',
+  placeholder: 'empty',
+  sizes: '(min-width: 1280px) 22vw, (min-width: 768px) 44vw, 92vw'
+} as const;
+
 type DealCardProps = {
   title: string;
   currentPrice: number;
@@ -61,6 +67,7 @@ type DealCardProps = {
   sourceLabel?: string;
   sponsoredPlacement?: SponsoredDealPlacement;
   dealEndsAt?: string;
+  urgencyRankLabel?: string;
   imagePriority?: boolean;
   verificationLabel?: string;
 };
@@ -157,9 +164,9 @@ function LazyDealImage({
           className="object-cover"
           fill
           fetchPriority={priority ? 'high' : 'auto'}
-          loading={priority ? 'eager' : 'lazy'}
-          placeholder="empty"
-          sizes="(min-width: 1280px) 22vw, (min-width: 768px) 44vw, 92vw"
+          loading={priority ? 'eager' : dealCardImagePolicy.loading}
+          placeholder={dealCardImagePolicy.placeholder}
+          sizes={dealCardImagePolicy.sizes}
           src={src}
         />
       ) : (
@@ -201,6 +208,7 @@ export function DealCard({
   sourceLabel,
   sponsoredPlacement,
   dealEndsAt,
+  urgencyRankLabel,
   imagePriority = false,
   verificationLabel
 }: DealCardProps) {
@@ -337,6 +345,9 @@ export function DealCard({
         <div className="flex flex-col items-end gap-2">
           {countdownLabel ? (
             <span className="rounded-full bg-rose-100 px-3 py-1 text-xs font-black text-rose-800">{countdownLabel}</span>
+          ) : null}
+          {urgencyRankLabel ? (
+            <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-black text-orange-900">{urgencyRankLabel}</span>
           ) : null}
           {context.isNewLowestPrice ? (
             <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">New low</span>
