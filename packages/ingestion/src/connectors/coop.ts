@@ -1567,6 +1567,19 @@ function splitCoopDrPdfPages(lines: readonly string[]): string[][] {
   return chunks;
 }
 
+function ordinaryPriceFromCoopDrLines(lines: readonly string[], startIndex: number, endIndex: number): number | null {
+  for (const line of lines.slice(startIndex, endIndex)) {
+    const match = line.match(/\bord\.\s*pris(?:\s+från)?\s+(\d{1,4})(?::|,|\.|-)(\d{0,2})/iu);
+    if (!match) continue;
+    const kronor = Number(match[1]);
+    const oreText = match[2] ?? '';
+    const ore = oreText.length === 0 ? 0 : Number(oreText.padEnd(2, '0'));
+    const price = kronor + ore / 100;
+    if (Number.isFinite(price)) return price;
+  }
+  return null;
+}
+
 function unitTextFromCoopDrLine(line: string): string {
   const normalized = line.trim().toLowerCase();
   if (/^\/(st|kg|ask|förp|liter|l|hg|påse|frp)$/.test(normalized)) return normalized;
