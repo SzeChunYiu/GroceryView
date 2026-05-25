@@ -67,6 +67,11 @@ describe('workspace package scripts', () => {
     for (const workspace of ['@groceryview/core', '@groceryview/monetization', '@groceryview/api']) {
       assert.match(packages.mobile.scripts.test, new RegExp(`npm run build -w ${workspace.replace('/', '\\/')}`));
     }
+
+    for (const workspace of workspacePackageImportsFrom('apps/web/src/')) {
+      assert.match(packages.web.scripts['build:deps'], new RegExp(`npm run build -w ${workspace.replace('/', '\\/')}`));
+    }
+    assert.match(packages.web.scripts.build, /npm run build:deps &&/);
   });
 
   it('runs ingested data provenance verification from the root test script', () => {
