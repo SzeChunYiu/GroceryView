@@ -125,3 +125,12 @@ export function communityReviewPromptFor(metric: CommunityReviewPromptMetric) {
 export function communityReviewSummaryForProduct(productName: string): CommunityProductReviewSummary | null {
   return communityProductReviewSummaries.find((summary) => summary.productMatcher.test(productName)) ?? null;
 }
+
+export function communityReviewVotingCopy(upvotes: number, downvotes: number) {
+  const helpfulScore = upvotes - downvotes;
+  return {
+    helpfulScore,
+    label: `${helpfulScore} helpful vote${Math.abs(helpfulScore) === 1 ? '' : 's'}`,
+    sortReason: 'Reviews sort by net helpful votes, then total upvotes, then recency.'
+  };
+}

@@ -5,7 +5,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { LazyItemCard } from './LazyItemCard';
 import { FavouriteProductToggle } from './favourite-product-toggle';
 import { readStoredSafetyPreferences, SAFETY_PREFERENCES_CHANGED_EVENT, type ProductSafetyPreferences } from './cert-filter';
+import { communityReviewVotingCopy } from '@/lib/community-reviews';
 import { volatilityBadgeMethodology } from '@/lib/price-intelligence';
+import { communityReviewVoteLabel, defaultCommunityPriceReviews, sortCommunityReviewsByTrust } from '@/lib/reviews';
 import type { SearchExplanationBadge } from '@/lib/search-filters';
 import { listFriendPriceSightingsForProduct } from '@/lib/social';
 import type { AdaptiveProductCard } from '@/lib/verified-data';
@@ -75,6 +77,28 @@ function SafetyWarningBanner({ card, preferences }: Readonly<{ card: AdaptivePro
         {warnings.map((warning) => <li key={warning}>{warning}</li>)}
       </ul>
       <p className="mt-2 text-rose-900">{card.safetyEvidenceLabel}</p>
+    </div>
+  );
+}
+
+function CommunityReviewVotingControls({ card }: Readonly<{ card: AdaptiveProductCard }>) {
+  const review = sortCommunityReviewsByTrust(defaultCommunityPriceReviews)
+    .find((candidate) => card.name.toLocaleLowerCase('sv-SE').includes(candidate.productName.split(' ')[0]!.toLocaleLowerCase('sv-SE'))
+      || candidate.productName.toLocaleLowerCase('sv-SE').includes(card.name.split(' ')[0]!.toLocaleLowerCase('sv-SE')));
+  if (!review) return null;
+  const votingCopy = communityReviewVotingCopy(review.upvotes, review.downvotes);
+
+  return (
+    <div className="mt-3 rounded-2xl border border-violet-100 bg-white p-3 text-xs font-bold text-slate-700">
+      <p className="font-black uppercase tracking-[0.16em] text-violet-800">Community review</p>
+      <p className="mt-2 text-sm font-black text-slate-950">{review.storeName} · {review.priceLabel}</p>
+      <p className="mt-1 leading-5">{review.body}</p>
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <span className="rounded-full bg-violet-900 px-3 py-1.5 text-white">Helpful control</span>
+        <span className="rounded-full border border-violet-200 bg-white px-3 py-1.5 text-violet-900">Not helpful control</span>
+        <span className="rounded-full bg-violet-50 px-3 py-1.5 text-violet-900">{communityReviewVoteLabel(review)}</span>
+      </div>
+      <p className="mt-2 text-[0.7rem] text-slate-500">{votingCopy.label} · {votingCopy.sortReason}</p>
     </div>
   );
 }
@@ -314,6 +338,7 @@ export function ProductPriceCards({
             <SearchExplanationBadges badges={(card as ProductCardWithSearchExplanations).searchExplanationBadges} />
             <p className="mt-3 text-sm leading-6 text-slate-600">{card.sourceLabel}</p>
             <FriendPriceSightingsPanel card={card} />
+            <CommunityReviewVotingControls card={card} />
             <SafetyWarningBanner card={card} preferences={safetyPreferences} />
             <PriceHistorySparkline card={card} />
             <p className="mt-2 rounded-xl bg-blue-50 p-3 text-xs font-bold text-blue-950">{card.confidenceLabel}</p>

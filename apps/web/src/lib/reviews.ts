@@ -85,6 +85,11 @@ export function communityReviewTrustScore(review: Pick<CommunityPriceReview, 'do
   return review.upvotes - review.downvotes;
 }
 
+export function communityReviewVoteLabel(review: Pick<CommunityPriceReview, 'downvotes' | 'upvotes'>): string {
+  const score = communityReviewTrustScore(review);
+  return `${score} helpful · ${review.upvotes} yes / ${review.downvotes} no`;
+}
+
 export function sortCommunityReviewsByTrust(reviews: CommunityPriceReview[]): CommunityPriceReview[] {
   return [...reviews].sort((left, right) => {
     const trustDelta = communityReviewTrustScore(right) - communityReviewTrustScore(left);
