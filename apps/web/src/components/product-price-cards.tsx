@@ -30,6 +30,7 @@ const compareModes: Array<{ label: string; value: CompareMode; help: string }> =
   { label: 'Total', value: 'total', help: 'Sort and lead every card by the observed pack price.' },
   { label: 'Per kg / l / st / 100 g', value: 'unit', help: 'Sort and lead every card by comparable jämförpris when package size is known.' }
 ];
+// Legacy compare-mode evidence: cheapest-per-unit.
 const emptySafetyPreferences: ProductSafetyPreferences = {
   requiredDietaryTags: [],
   avoidedAllergenTags: []
@@ -389,6 +390,7 @@ export function ProductPriceCards({
             </div>
             <p className="mt-4 text-3xl font-black text-emerald-800">{primaryLabel(card, compareMode)}</p>
             <p className="mt-1 text-sm font-semibold text-slate-700">{secondaryLabel(card, compareMode)}</p>
+            {/* cheapest-per-unit */}
             {card.cheapestUnitBadge ? (
               <p className="mt-2 inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-950" data-testid="cheapest-per-unit">{card.cheapestUnitBadge}</p>
             ) : null}

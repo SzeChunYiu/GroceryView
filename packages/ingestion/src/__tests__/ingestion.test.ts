@@ -112,6 +112,7 @@ import {
   fetchLyfOgHeilsaProducts,
   parseLyfOgHeilsaProducts,
   parseIcaReklambladOffers,
+  parseIcaReklambladStructuredPromotion,
   parseIcaStorePromotions,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
@@ -1446,6 +1447,7 @@ describe('fetchCoopProducts', () => {
       promotionText: 'Arvid Nordquist 2 för 130-2 för 130:-',
       promotionPrice: 130,
       medMeraRequired: false,
+      is_member_price: false,
       availableOnline: true,
       sourceUrl: buildCoopSearchUrl(),
       productUrl: 'https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-mellanrost-7310760012896/',
@@ -3127,8 +3129,37 @@ describe('fetchIcaReklambladOffers', () => {
       flyerUrl: 'https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1',
       flyerPdfUrl: buildEmaginPdfUrl('https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1'),
       imageUrl: 'https://assets.icanet.se/7310401000374.jpg',
-      retrievedAt: '2026-05-21T01:45:00.000Z'
+      retrievedAt: '2026-05-21T01:45:00.000Z',
+      structuredPromotion: {
+        kind: 'multi_buy',
+        memberOnly: false,
+        price: 40,
+        quantity: 3,
+        sourceText: '3 för 40 kr'
+      }
     }]);
+  });
+
+  it('structures ICA flyer x-for-y, percent-off, and member-price mechanics', () => {
+    assert.deepEqual(parseIcaReklambladStructuredPromotion('3 för 40 kr'), {
+      kind: 'multi_buy',
+      memberOnly: false,
+      price: 40,
+      quantity: 3,
+      sourceText: '3 för 40 kr'
+    });
+    assert.deepEqual(parseIcaReklambladStructuredPromotion('25% rabatt'), {
+      kind: 'percent_off',
+      memberOnly: false,
+      percentOff: 25,
+      sourceText: '25% rabatt'
+    });
+    assert.deepEqual(parseIcaReklambladStructuredPromotion('Medlemspris 39,90 kr/st'), {
+      kind: 'member_price',
+      memberOnly: true,
+      price: 39.9,
+      sourceText: 'Medlemspris 39,90 kr/st'
+    });
   });
 
   it('fetches ICA reklamblad offer rows from the public store offer page', async () => {
@@ -5865,10 +5896,13 @@ function dailyConnectorFixture(chainId: string) {
   };
 }
 
-function firstBatchObservation(executor: DailyIngestionExecutor) {
+function batchObservations(executor: DailyIngestionExecutor) {
   const observationInsert = executor.calls.find((call) => call.sql.includes('insert into observations'));
-  const observations = JSON.parse(String(observationInsert?.params[0])) as Array<Record<string, unknown>>;
-  return observations[0] ?? {};
+  return JSON.parse(String(observationInsert?.params[0])) as Array<Record<string, unknown>>;
+}
+
+function firstBatchObservation(executor: DailyIngestionExecutor) {
+  return batchObservations(executor)[0] ?? {};
 }
 
 function firstBatchProduct(executor: DailyIngestionExecutor) {
@@ -7102,22 +7136,25 @@ describe('daily ingestion runner', () => {
           manufacturerName: 'Coop',
           packageSizeInformation: '100-pack',
           availableOnline: false,
-          salesPriceData: { b2cPrice: 19.5 }
+          salesPriceData: { b2cPrice: 19.5 },
+          onlinePromotions: [{ message: 'Medlemspris', priceData: { b2cPrice: 15 }, medMeraRequired: true }]
         }] } }), { status: 200, headers: { 'content-type': 'application/json' } });
       }
     });
 
     assert.equal(result.status, 'succeeded');
-    assert.equal(result.acceptedCount, 1);
+    assert.equal(result.acceptedCount, 2);
     assert.deepEqual(requestedUrls.filter((url) => !url.includes('handla')), [
       buildCoopStoresUrl(),
       buildCoopStoreInfoUrl('251300'),
       buildCoopSearchUrl('251300')
     ]);
-    const observation = firstBatchObservation(executor);
-    assert.equal(observation.store_id, 'store-db-2');
-    assert.equal(observation.price, 19.5);
-    assert.equal(observation.is_available, false);
+    const observations = batchObservations(executor);
+    assert.deepEqual(observations.map((observation) => [observation.store_id, observation.price, observation.member_required, observation.regular_price]), [
+      ['store-db-2', 19.5, false, undefined],
+      ['store-db-2', 15, true, 19.5]
+    ]);
+    assert.equal(observations[0]?.is_available, false);
   });
 
 
