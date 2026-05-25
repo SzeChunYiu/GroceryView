@@ -3225,6 +3225,27 @@ ${seo}`;
     assert.match(layout, /ServiceWorkerRegistrar/);
   });
 
+  it('caches the active shopping list and last known prices for offline store trips', async () => {
+    const manifest = await read('src/app/manifest.ts');
+    const worker = await read('public/sw.js');
+    const registrar = await read('src/lib/swRegister.ts');
+    const shoppingListPage = await read('src/app/list/page.tsx');
+
+    assert.match(manifest, /Open shopping list/);
+    assert.match(manifest, /url: '\/list'/);
+    assert.match(worker, /SHOPPING_LIST_CACHE_NAME = 'groceryview-shopping-list-route-v1'/);
+    assert.match(worker, /isShoppingListRequest/);
+    assert.match(worker, /\\\/list\\\/\?\$/);
+    assert.match(worker, /shoppingListNetworkFirst/);
+    assert.match(registrar, /SHOPPING_LIST_ROUTE_CACHE_NAME = 'groceryview-shopping-list-route-v1'/);
+    assert.match(registrar, /cache\.add\('\/list'\)/);
+    assert.doesNotMatch(registrar, /console\./);
+    assert.match(shoppingListPage, /OFFLINE_SHOPPING_LIST_CACHE_KEY = 'groceryview:shopping-list:offline-cache:v1'/);
+    assert.match(shoppingListPage, /cheapestSourceForProductSlug/);
+    assert.match(shoppingListPage, /lastKnownPrices/);
+    assert.match(shoppingListPage, /window\.localStorage\.setItem\(OFFLINE_SHOPPING_LIST_CACHE_KEY/);
+  });
+
 
   it('embeds Google Maps pins and directions on store detail pages', async () => {
     const storePage = await read('src/app/stores/[slug]/page.tsx');

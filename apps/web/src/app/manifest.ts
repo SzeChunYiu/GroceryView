@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'GroceryView verified grocery terminal',
     short_name: 'GroceryView',
-    description: 'Install GroceryView for mobile-first Swedish grocery price checks with verified prices and source confidence.',
+    description: 'Install GroceryView for mobile-first Swedish grocery price checks, shopping lists, and offline store trips.',
     id: '/',
     start_url: '/',
     scope: '/',
@@ -33,6 +33,13 @@ export default function manifest(): MetadataRoute.Manifest {
         short_name: 'Compare',
         description: 'Open the verified chain price comparison route.',
         url: '/compare',
+        icons: [{ src: '/pwa-icon.svg', sizes: 'any', type: 'image/svg+xml' }]
+      },
+      {
+        name: 'Open shopping list',
+        short_name: 'List',
+        description: 'Open the offline-ready active shopping list.',
+        url: '/list',
         icons: [{ src: '/pwa-icon.svg', sizes: 'any', type: 'image/svg+xml' }]
       },
       {
