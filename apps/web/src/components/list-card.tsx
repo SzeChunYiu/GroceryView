@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import type { PublicSharePreview } from "../lib/social";
 import { getStoreLayoutDepartment, sortItemsByStoreLayout, type StoreLayoutChain } from "../lib/trip-planner";
@@ -25,6 +26,7 @@ type ListCardProps = {
   currentRole: FamilyRole;
   items: CommentableSharedListItem[];
   onConflictPrompt?: (prompt: ListConflictPrompt) => void;
+  publicShareHref?: string;
   selectedChain?: StoreLayoutChain;
 };
 
@@ -80,7 +82,7 @@ export function PublicSharePreviewCard({
   );
 }
 
-export function ListCard({ currentRole, items, onConflictPrompt, selectedChain = "ica" }: ListCardProps) {
+export function ListCard({ currentRole, items, onConflictPrompt, publicShareHref, selectedChain = "ica" }: ListCardProps) {
   const [commentsByItem, setCommentsByItem] = useState<Record<string, ListItemComment[]>>(() =>
     Object.fromEntries(items.map((item) => [item.id, item.comments ?? []])),
   );
@@ -130,10 +132,22 @@ export function ListCard({ currentRole, items, onConflictPrompt, selectedChain =
             Editing another role&apos;s item creates a checkout conflict prompt. Items are ordered by the selected store layout.
           </p>
         </div>
-        <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
-          Acting as {roleLabels[currentRole]}
-        </span>
+        <div className="flex flex-col items-end gap-2">
+          <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
+            Acting as {roleLabels[currentRole]}
+          </span>
+          {publicShareHref ? (
+            <Link className="rounded-full bg-sky-800 px-3 py-1 text-xs font-black text-white" href={publicShareHref}>
+              Public read-only share
+            </Link>
+          ) : null}
+        </div>
       </div>
+      {publicShareHref ? (
+        <p className="mb-3 rounded-xl bg-sky-50 px-3 py-2 text-sm font-bold text-sky-950">
+          Public viewers can open a tokenized read-only URL with item details, matched price badges, and cheapest-store comparison without account access or edit controls.
+        </p>
+      ) : null}
 
       <ul className="space-y-2">
         {storeOrderedItems.map((item) => {
