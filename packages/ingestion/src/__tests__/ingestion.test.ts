@@ -126,6 +126,7 @@ import {
   GROCERYVIEW_DAILY_LYF_OG_HEILSA_IS_PRODUCTS_URL,
   GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL,
   GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL,
+  GROCERYVIEW_DAILY_SNABBGROSS_ALL_STORE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_OB_IS_FUEL_PRICES_URL,
   GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL,
   GROCERYVIEW_DAILY_APOTEKET_SE_PRODUCTS_URL,
@@ -6355,6 +6356,121 @@ describe('daily ingestion runner', () => {
     assert.equal(observationRows[0]?.store_id, 'store-db-2');
     assert.equal(observationRows[0]?.domain, 'grocery');
     assert.equal(observationRows[0]?.is_available, false);
+  });
+
+  it('materializes Snabbgross all-store daily products with configured store coverage and regular prices', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-24T04:30:00.000Z',
+      connectors: [{
+        connectorId: 'snabbgross-products-all-stores',
+        chainId: 'snabbgross',
+        sourceType: 'official_api',
+        endpointUrl: GROCERYVIEW_DAILY_SNABBGROSS_ALL_STORE_PRODUCTS_URL,
+        parserVersion: 'snabbgross-normalized-json-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [
+          {
+            storeId: 'sg-arsta',
+            name: 'Snabbgross Årsta',
+            address: 'Partihandlarvägen 50',
+            city: 'Stockholm',
+            countryCode: 'SE',
+            district: 'Stockholms län',
+            latitude: 59.2924,
+            longitude: 18.0458,
+            storeType: 'wholesale'
+          },
+          {
+            storeId: 'sg-goteborg',
+            name: 'Snabbgross Göteborg',
+            address: 'Exportgatan 30',
+            city: 'Göteborg',
+            countryCode: 'SE',
+            district: 'Västra Götaland',
+            latitude: 57.7491,
+            longitude: 11.9962,
+            storeType: 'wholesale'
+          }
+        ]
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return new Response(JSON.stringify({
+          items: [
+            {
+              storeId: 'sg-arsta',
+              retailerProductId: 'sg-idealmakaroner-5kg-arsta',
+              rawName: 'Kungsörnen Idealmakaroner 5 kg',
+              canonicalName: 'Idealmakaroner 5 kg',
+              productId: 'snabbgross-idealmakaroner-5kg',
+              categoryId: 'pasta',
+              brand: 'Kungsörnen',
+              packageSize: 5,
+              packageUnit: 'kg',
+              price: 79.9,
+              regularPrice: 99.9,
+              promoText: 'Storpackskampanj',
+              memberOnly: false,
+              isAvailable: true,
+              sourceUrl: 'https://www.snabbgross.se/produkt/idealmakaroner-5kg'
+            },
+            {
+              storeId: 'sg-goteborg',
+              retailerProductId: 'sg-rapsolja-10l-goteborg',
+              rawName: 'Rapsolja 10 l',
+              canonicalName: 'Rapsolja 10 l',
+              productId: 'snabbgross-rapsolja-10l',
+              categoryId: 'olja',
+              brand: 'Snabbgross',
+              packageSize: 10,
+              packageUnit: 'l',
+              price: 189,
+              memberOnly: false,
+              isAvailable: true,
+              sourceUrl: 'https://www.snabbgross.se/produkt/rapsolja-10l'
+            }
+          ]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.persistedRuns, 1);
+    assert.equal(result.acceptedCount, 2);
+    assert.deepEqual(result.blockers, []);
+    assert.deepEqual(requestedUrls, [GROCERYVIEW_DAILY_SNABBGROSS_ALL_STORE_PRODUCTS_URL]);
+
+    const chainInsert = executor.calls.find((call) => call.sql.includes('insert into chains'));
+    assert.equal(chainInsert?.params[0], 'snabbgross');
+
+    const storeInserts = executor.calls.filter((call) => call.sql.includes('insert into stores'));
+    assert.deepEqual(storeInserts.map((call) => call.params.slice(0, 12)), [
+      ['sg-arsta', 'chain-db-1', 'sg-arsta', 'Snabbgross Årsta', 'Partihandlarvägen 50', 'Stockholm', 'Stockholms län', 'SE', 59.2924, 18.0458, 'wholesale', 'grocery'],
+      ['sg-goteborg', 'chain-db-1', 'sg-goteborg', 'Snabbgross Göteborg', 'Exportgatan 30', 'Göteborg', 'Västra Götaland', 'SE', 57.7491, 11.9962, 'wholesale', 'grocery']
+    ]);
+
+    const product = firstBatchProduct(executor);
+    assert.equal(product.slug, 'snabbgross-idealmakaroner-5kg');
+    assert.equal(product.brand, 'Kungsörnen');
+    assert.equal(product.package_size, 5);
+    assert.equal(product.package_unit, 'kg');
+
+    const observations = batchObservations(executor);
+    assert.deepEqual(observations.map((observation) => [
+      observation.store_id,
+      observation.retailer_product_ref,
+      observation.price,
+      observation.regular_price,
+      observation.promotion_text
+    ]), [
+      ['store-db-2', 'sg-idealmakaroner-5kg-arsta', 79.9, 99.9, 'Storpackskampanj'],
+      ['store-db-3', 'sg-rapsolja-10l-goteborg', 189, undefined, undefined]
+    ]);
   });
 
   it('caches and rewrites product image URLs while persisting daily connector runs when enabled', async () => {
