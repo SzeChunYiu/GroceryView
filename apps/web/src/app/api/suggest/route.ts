@@ -13,7 +13,7 @@ type Suggestion = {
   href: string;
   slug: string;
   score: number;
-  match: 'prefix' | 'word-prefix' | 'contains';
+  match: 'prefix' | 'word-prefix' | 'contains' | 'fuzzy';
   detail?: string;
 };
 
@@ -39,9 +39,11 @@ function normalizedSearchText(value: string) {
 
 function matchScore(label: string, query: string) {
   const normalizedLabel = normalizedSearchText(label);
+  const fuzzyMatch = fuzzySuggestMatch(label, query);
   if (normalizedLabel.startsWith(query)) return { score: 0, match: 'prefix' as const };
   if (normalizedLabel.split(/\s+/).some((word) => word.startsWith(query))) return { score: 1, match: 'word-prefix' as const };
   if (normalizedLabel.includes(query)) return { score: 2, match: 'contains' as const };
+  if (fuzzyMatch) return { score: 3 + fuzzyMatch.score, match: 'fuzzy' as const };
   return null;
 }
 

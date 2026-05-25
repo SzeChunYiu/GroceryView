@@ -3,16 +3,19 @@ import { PostgresQueryExecutorService } from '../database/postgres-query-executo
 
 export const allowedPreferenceCurrencies = ['SEK', 'EUR', 'NOK', 'DKK'] as const;
 export const allowedNotificationChannels = ['push', 'email', 'telegram'] as const;
+export const allowedMyFlyerAlgorithmChoices = ['balanced', 'best_savings', 'best_unit_price', 'watchlist_first'] as const;
 
 export type UserPreferencePatch = {
   currency?: (typeof allowedPreferenceCurrencies)[number];
   preferredStores?: string[];
   notificationChannels?: Array<(typeof allowedNotificationChannels)[number]>;
+  algorithm_choice?: (typeof allowedMyFlyerAlgorithmChoices)[number];
 };
 
 type PreferenceRow = {
   preferred_currency: string;
   notification_channels: string[] | null;
+  algorithm_choice: string;
 };
 
 @Injectable()
@@ -34,15 +37,16 @@ export class SettingsService {
       [userId]
     );
 
-    if (patch.currency !== undefined || patch.notificationChannels !== undefined) {
+    if (patch.currency !== undefined || patch.notificationChannels !== undefined || patch.algorithm_choice !== undefined) {
       await this.executor.query(
-        `insert into user_preferences(user_id, weekly_budget, monthly_budget, preferred_currency, notification_channels)
-         values ($1, 0, 0, coalesce($2::text, 'SEK'), coalesce($3::text[], array[]::text[]))
+        `insert into user_preferences(user_id, weekly_budget, monthly_budget, preferred_currency, notification_channels, algorithm_choice)
+         values ($1, 0, 0, coalesce($2::text, 'SEK'), coalesce($3::text[], array[]::text[]), coalesce($4::text, 'balanced'))
          on conflict (user_id) do update set
            preferred_currency = coalesce($2::text, user_preferences.preferred_currency),
            notification_channels = coalesce($3::text[], user_preferences.notification_channels),
+           algorithm_choice = coalesce($4::text, user_preferences.algorithm_choice),
            updated_at = now()`,
-        [userId, patch.currency ?? null, patch.notificationChannels ?? null]
+        [userId, patch.currency ?? null, patch.notificationChannels ?? null, patch.algorithm_choice ?? null]
       );
     }
 
@@ -61,7 +65,7 @@ export class SettingsService {
 
   private async fetchPreferences(userId: string) {
     const preferenceRows = await this.executor.query<PreferenceRow>(
-      `select preferred_currency, notification_channels
+      `select preferred_currency, notification_channels, algorithm_choice
        from user_preferences
        where user_id = $1`,
       [userId]
@@ -76,7 +80,8 @@ export class SettingsService {
       userId,
       currency: preference?.preferred_currency ?? 'SEK',
       preferredStores: storeRows.map((row) => row.store_id),
-      notificationChannels: preference?.notification_channels ?? []
+      notificationChannels: preference?.notification_channels ?? [],
+      algorithm_choice: preference?.algorithm_choice ?? 'balanced'
     };
   }
 }
