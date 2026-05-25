@@ -155,8 +155,8 @@ export const DEFAULT_MATSPAR_SEARCH_QUERIES = [
   'barnmat',
   'blojor'
 ] as const;
-export const DEFAULT_MATSPAR_SEARCH_PAGES = [1, 2, 3, 4, 5, 6, 7, 8] as const;
-export const DEFAULT_MATSPAR_MAX_ROWS = 16000;
+export const DEFAULT_MATSPAR_SEARCH_PAGES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as const;
+export const DEFAULT_MATSPAR_MAX_ROWS = 20000;
 export const MATSPAR_MINIMUM_ROWS = 100;
 
 export type FetchMatsparProductsOptions = {
