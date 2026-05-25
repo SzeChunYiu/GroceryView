@@ -1,10 +1,13 @@
 import { buildPrivacyExport } from '@groceryview/core';
 import { BulkImportDialog } from '@/components/BulkImportDialog';
+import { ChainSelector } from '@/components/chain-selector';
 import { SettingsDataExportActions } from '@/components/settings-data-export-actions';
 import { DietaryProfileOnboarding } from '@/components/diet-filter-picker';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { groupPreferredBrandControls } from '@/lib/personalization';
 import { routeMetadata } from '@/lib/seo';
+import { DEFAULT_PREFERRED_STORE_SETTINGS } from '@/lib/user-preferences';
+import { storeUniverse } from '@/lib/verified-data';
 
 export function generateMetadata() {
   return routeMetadata('/settings');
@@ -30,6 +33,33 @@ const dataExportContract = buildPrivacyExport(
   '2026-05-20T12:00:00.000Z'
 );
 
+const preferredStoreSettings = DEFAULT_PREFERRED_STORE_SETTINGS;
+const supportedChains = ['ICA', 'Willys', 'Hemköp', 'Coop', 'Lidl', 'City Gross'];
+const homeStoreChoices = storeUniverse.slice(0, 6);
+const selectedHomeStoreId = homeStoreChoices.some((store) => store.slug === preferredStoreSettings.homeStoreId)
+  ? preferredStoreSettings.homeStoreId
+  : homeStoreChoices[0]?.slug;
+const homeStoreOptions = homeStoreChoices.map((store) => ({
+  id: store.slug,
+  label: store.name,
+  value: store.slug,
+  description: `${store.brand} · ${store.city || store.district || 'Sweden'}`,
+  selected: store.slug === selectedHomeStoreId
+}));
+const favoriteChainOptions = supportedChains.map((chain) => ({
+  id: `favorite-${chain.toLowerCase().replace(/\s+/g, '-')}`,
+  label: chain,
+  value: chain,
+  selected: preferredStoreSettings.favoriteChains.includes(chain)
+}));
+const blockedChainOptions = supportedChains.map((chain) => ({
+  id: `blocked-${chain.toLowerCase().replace(/\s+/g, '-')}`,
+  label: chain,
+  value: chain,
+  selected: preferredStoreSettings.blockedChains.includes(chain),
+  disabled: preferredStoreSettings.favoriteChains.includes(chain)
+}));
+
 export default function SettingsPage() {
   const brandControls = groupPreferredBrandControls();
 
@@ -42,6 +72,62 @@ export default function SettingsPage() {
       </p>
 
       <SettingsDataExportActions />
+
+      <Card className="mt-6 border-violet-200 bg-violet-50">
+        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-violet-800">Preferred stores</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Shopper chain and travel settings</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+              Recommendations can prefer favorite chains, suppress blocked chains, anchor comparisons to a home store, and cap travel suggestions to a practical radius.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-violet-900">{preferredStoreSettings.maxTravelRadiusKm} km max</p>
+        </div>
+        <form className="mt-5 grid gap-4 lg:grid-cols-2">
+          <ChainSelector
+            className="rounded-3xl border border-violet-100 bg-white/85 p-4 shadow-sm"
+            description="Favorite chains are ranked first when equivalent verified prices are available."
+            interactive
+            label="Favorite chains"
+            name="favoriteChains"
+            options={favoriteChainOptions}
+          />
+          <ChainSelector
+            className="rounded-3xl border border-violet-100 bg-white/85 p-4 shadow-sm"
+            description="Blocked chains are excluded from recommendation copy unless a user explicitly re-enables them."
+            interactive
+            label="Blocked chains"
+            name="blockedChains"
+            options={blockedChainOptions}
+          />
+          <ChainSelector
+            className="rounded-3xl border border-violet-100 bg-white/85 p-4 shadow-sm"
+            description="The home store anchors nearby-store comparisons and trip planning defaults."
+            interactive
+            label="Home store"
+            name="homeStoreId"
+            options={homeStoreOptions}
+            selectionMode="single"
+          />
+          <div className="rounded-3xl border border-violet-100 bg-white/85 p-4 shadow-sm">
+            <label className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800" htmlFor="maxTravelRadiusKm">Max travel radius</label>
+            <p className="mt-1 text-xs font-semibold leading-5 text-slate-600">Caps store recommendations to shops the household is willing to visit.</p>
+            <div className="mt-4 flex items-center gap-3">
+              <input
+                className="w-full accent-violet-800"
+                defaultValue={preferredStoreSettings.maxTravelRadiusKm}
+                id="maxTravelRadiusKm"
+                max="50"
+                min="1"
+                name="maxTravelRadiusKm"
+                type="range"
+              />
+              <output className="rounded-full bg-violet-100 px-3 py-1 text-sm font-black text-violet-950">{preferredStoreSettings.maxTravelRadiusKm} km</output>
+            </div>
+          </div>
+        </form>
+      </Card>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Personalization setup</p>

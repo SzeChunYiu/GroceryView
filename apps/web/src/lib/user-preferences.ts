@@ -25,6 +25,15 @@ export type HouseholdPricePreferences = {
   updatedAt: string;
 };
 
+export type PreferredStoreSettings = {
+  userId: string;
+  favoriteChains: string[];
+  blockedChains: string[];
+  homeStoreId: string;
+  maxTravelRadiusKm: number;
+  updatedAt: string;
+};
+
 export type PricePreferenceChoice = {
   brand?: string | null;
   store?: string | null;
@@ -35,7 +44,13 @@ export type PricePreferenceCandidate = PricePreferenceChoice & {
   storeName?: string | null;
 };
 
+export type PreferredStoreCandidate = PricePreferenceCandidate & {
+  storeId?: string | null;
+  distanceKm?: number | null;
+};
+
 export const HOUSEHOLD_PRICE_PREFERENCE_STORAGE_KEY = 'groceryview:household-price-preferences:v1';
+export const PREFERRED_STORE_SETTINGS_STORAGE_KEY = 'groceryview:preferred-store-settings:v1';
 
 export const DEFAULT_HOUSEHOLD_PRICE_PREFERENCES: HouseholdPricePreferences = {
   householdId: 'local-household',
@@ -44,7 +59,18 @@ export const DEFAULT_HOUSEHOLD_PRICE_PREFERENCES: HouseholdPricePreferences = {
   updatedAt: 'static-snapshot'
 };
 
+export const DEFAULT_PREFERRED_STORE_SETTINGS: PreferredStoreSettings = {
+  userId: 'local-account',
+  favoriteChains: ['Willys', 'Hemköp'],
+  blockedChains: [],
+  homeStoreId: 'willys-stockholm-odenplan',
+  maxTravelRadiusKm: 5,
+  updatedAt: 'static-snapshot'
+};
+
 const MAX_LEARNED_VALUES = 6;
+const MIN_TRAVEL_RADIUS_KM = 1;
+const MAX_TRAVEL_RADIUS_KM = 50;
 
 function normalizedValue(value?: string | null) {
   return value?.trim().toLowerCase() ?? '';
@@ -147,6 +173,67 @@ export function saveHouseholdPricePreferences(preferences: Partial<HouseholdPric
   } catch {
     return false;
   }
+}
+
+function normalizeTravelRadius(value: number | null | undefined) {
+  if (!Number.isFinite(value)) return DEFAULT_PREFERRED_STORE_SETTINGS.maxTravelRadiusKm;
+  return Math.min(MAX_TRAVEL_RADIUS_KM, Math.max(MIN_TRAVEL_RADIUS_KM, Math.round(value!)));
+}
+
+export function normalizePreferredStoreSettings(preferences: Partial<PreferredStoreSettings> | null | undefined): PreferredStoreSettings {
+  const favoriteChains = uniquePreferenceValues(preferences?.favoriteChains ?? DEFAULT_PREFERRED_STORE_SETTINGS.favoriteChains);
+  const blockedChains = uniquePreferenceValues(preferences?.blockedChains ?? []);
+
+  return {
+    userId: preferences?.userId?.trim() || DEFAULT_PREFERRED_STORE_SETTINGS.userId,
+    favoriteChains,
+    blockedChains: blockedChains.filter((chain) => !favoriteChains.map(normalizedValue).includes(normalizedValue(chain))),
+    homeStoreId: preferences?.homeStoreId?.trim() || DEFAULT_PREFERRED_STORE_SETTINGS.homeStoreId,
+    maxTravelRadiusKm: normalizeTravelRadius(preferences?.maxTravelRadiusKm),
+    updatedAt: preferences?.updatedAt || new Date().toISOString()
+  };
+}
+
+export function loadPreferredStoreSettings(storage: Storage | null = browserStorage()) {
+  if (!storage) return DEFAULT_PREFERRED_STORE_SETTINGS;
+
+  try {
+    const parsed = JSON.parse(storage.getItem(PREFERRED_STORE_SETTINGS_STORAGE_KEY) ?? 'null') as Partial<PreferredStoreSettings> | null;
+
+    return normalizePreferredStoreSettings(parsed);
+  } catch {
+    return DEFAULT_PREFERRED_STORE_SETTINGS;
+  }
+}
+
+export function savePreferredStoreSettings(preferences: Partial<PreferredStoreSettings>, storage: Storage | null = browserStorage()) {
+  if (!storage) return false;
+
+  try {
+    storage.setItem(PREFERRED_STORE_SETTINGS_STORAGE_KEY, JSON.stringify(normalizePreferredStoreSettings({
+      ...preferences,
+      updatedAt: new Date().toISOString()
+    })));
+
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function preferredStoreSettingsScore(
+  candidate: PreferredStoreCandidate,
+  preferences: PreferredStoreSettings = DEFAULT_PREFERRED_STORE_SETTINGS
+) {
+  const favoriteChains = new Set(preferences.favoriteChains.map(normalizedValue));
+  const blockedChains = new Set(preferences.blockedChains.map(normalizedValue));
+  const candidateChains = [candidate.chain, candidate.store, candidate.storeName].map(normalizedValue);
+  const isBlocked = candidateChains.some((chain) => blockedChains.has(chain));
+  const isFavorite = candidateChains.some((chain) => favoriteChains.has(chain));
+  const distanceKm = candidate.distanceKm ?? 0;
+
+  if (isBlocked || distanceKm > preferences.maxTravelRadiusKm) return -100;
+  return (isFavorite ? 3 : 0) + (candidate.storeId === preferences.homeStoreId ? 2 : 0);
 }
 
 export function learnHouseholdPricePreferenceChoice(
