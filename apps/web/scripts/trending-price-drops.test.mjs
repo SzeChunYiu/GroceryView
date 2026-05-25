@@ -79,7 +79,8 @@ function loadTsModule(relative, mocks = {}) {
       return new Proxy({}, { get: () => Icon });
     }
     if (specifier.startsWith('@/') || specifier.startsWith('.')) {
-      const resolved = resolveLocalModule(normalize(absolute.slice(rootPath.length + 1)), specifier);
+      const fromRoot = normalize(absolute.slice(rootPath.length).replace(/^[/\\]/, ''));
+      const resolved = resolveLocalModule(fromRoot, specifier);
       return loadTsModule(normalize(resolved.slice(rootPath.length + 1)), mocks);
     }
     return require(specifier);
