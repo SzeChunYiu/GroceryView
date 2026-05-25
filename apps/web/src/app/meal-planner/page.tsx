@@ -200,6 +200,9 @@ export default async function MealPlannerPage({
       <Eyebrow>{COPY.hero.eyebrow}</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">{COPY.hero.title}</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">{COPY.hero.description}</p>
+      <Link className="mt-4 inline-flex rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white hover:bg-slate-800" href="/cart-assistant?budget=500&diet=vegetarian&household=2&meals=pasta%20lunchboxes,tofu%20bowls,quick%20dinners">
+        Open cart assistant
+      </Link>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr_1fr]">
         <Card>
