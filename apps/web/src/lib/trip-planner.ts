@@ -268,12 +268,22 @@ export function getStoreLayoutDepartment(itemName: string, chain: StoreLayoutCha
   return storeLayoutDepartments[chain].find((department) => department.keywords.some((keyword) => normalized.includes(keyword))) ?? storeLayoutDepartments[chain][storeLayoutDepartments[chain].length - 1];
 }
 
-export function storeLayoutDepartmentsForOrder(chain: StoreLayoutChain = 'ica', groupOrder: StoreLayoutGroupOrder = 'store-layout') {
-  return groupOrder === 'reverse-layout' ? [...storeLayoutDepartments[chain]].reverse() : storeLayoutDepartments[chain];
+export function storeLayoutDepartmentsForOrder(chain: StoreLayoutChain = 'ica', groupOrder: StoreLayoutGroupOrder = 'store-layout', departmentOrder?: string[]) {
+  const departments = storeLayoutDepartments[chain];
+  const orderedDepartments = Array.isArray(departmentOrder) && departmentOrder.length > 0
+    ? [
+      ...departmentOrder
+        .map((departmentId) => departments.find((department) => department.id === departmentId))
+        .filter((department): department is StoreLayoutDepartment => department !== undefined),
+      ...departments.filter((department) => !departmentOrder.includes(department.id))
+    ]
+    : departments;
+
+  return groupOrder === 'reverse-layout' ? [...orderedDepartments].reverse() : orderedDepartments;
 }
 
-export function sortItemsByStoreLayout<TItem extends { name: string }>(items: TItem[], chain: StoreLayoutChain = 'ica', groupOrder: StoreLayoutGroupOrder = 'store-layout') {
-  const departments = storeLayoutDepartmentsForOrder(chain, groupOrder);
+export function sortItemsByStoreLayout<TItem extends { name: string }>(items: TItem[], chain: StoreLayoutChain = 'ica', groupOrder: StoreLayoutGroupOrder = 'store-layout', departmentOrder?: string[]) {
+  const departments = storeLayoutDepartmentsForOrder(chain, groupOrder, departmentOrder);
   return [...items].sort((left, right) => {
     const leftDepartment = getStoreLayoutDepartment(left.name, chain);
     const rightDepartment = getStoreLayoutDepartment(right.name, chain);

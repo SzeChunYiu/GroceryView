@@ -1,9 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import type { PublicSharePreview } from "../lib/social";
-import { getStoreLayoutDepartment, sortItemsByStoreLayout, type StoreLayoutChain, type StoreLayoutGroupOrder } from "../lib/trip-planner";
+import {
+  STORE_AISLE_LAYOUT_STORAGE_KEY,
+  defaultStoreAisleLayoutPreference,
+  moveStoreAisleDepartment,
+  storeAisleLayoutChains,
+  storeAisleLayoutPreferenceForChain,
+  storeAisleLayoutPreferenceFromStorage,
+  type StoreAisleLayoutPreference,
+} from "../lib/list-sequencing";
+import { getStoreLayoutDepartment, sortItemsByStoreLayout, storeLayoutDepartmentsForOrder, type StoreLayoutChain, type StoreLayoutGroupOrder } from "../lib/trip-planner";
 import {
   useList,
   type FamilyRole,
@@ -104,6 +113,9 @@ export function PublicSharePreviewCard({
 }
 
 export function ListCard({ currentRole, groupOrder = "store-layout", items, mealPlanImport, onConflictPrompt, publicShareHref, selectedChain = "ica" }: ListCardProps) {
+  const defaultAisleLayoutPreference = defaultStoreAisleLayoutPreference(selectedChain, groupOrder);
+  const [aisleLayoutPreference, setAisleLayoutPreference] = useState<StoreAisleLayoutPreference>(defaultAisleLayoutPreference);
+  const [hasLoadedAisleLayoutPreference, setHasLoadedAisleLayoutPreference] = useState(false);
   const [commentsByItem, setCommentsByItem] = useState<Record<string, ListItemComment[]>>(() =>
     Object.fromEntries(items.map((item) => [item.id, item.comments ?? []])),
   );
@@ -112,7 +124,34 @@ export function ListCard({ currentRole, groupOrder = "store-layout", items, meal
     initialItems: items,
     onConflictPrompt,
   });
-  const storeOrderedItems = sortItemsByStoreLayout(listItems, selectedChain, groupOrder);
+  const aisleDepartments = storeLayoutDepartmentsForOrder(
+    aisleLayoutPreference.chain,
+    aisleLayoutPreference.groupOrder,
+    aisleLayoutPreference.departmentOrder,
+  );
+  const storeOrderedItems = sortItemsByStoreLayout(
+    listItems,
+    aisleLayoutPreference.chain,
+    aisleLayoutPreference.groupOrder,
+    aisleLayoutPreference.departmentOrder,
+  );
+
+  useEffect(() => {
+    setAisleLayoutPreference(storeAisleLayoutPreferenceFromStorage(
+      window.localStorage.getItem(STORE_AISLE_LAYOUT_STORAGE_KEY),
+      defaultAisleLayoutPreference,
+    ));
+    setHasLoadedAisleLayoutPreference(true);
+  }, [defaultAisleLayoutPreference.chain, defaultAisleLayoutPreference.groupOrder]);
+
+  useEffect(() => {
+    if (!hasLoadedAisleLayoutPreference) return;
+    try {
+      window.localStorage.setItem(STORE_AISLE_LAYOUT_STORAGE_KEY, JSON.stringify(aisleLayoutPreference));
+    } catch {
+      // Keep the list sortable even when storage is unavailable.
+    }
+  }, [aisleLayoutPreference, hasLoadedAisleLayoutPreference]);
 
   function addComment(itemId: string, event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -186,6 +225,75 @@ export function ListCard({ currentRole, groupOrder = "store-layout", items, meal
           ) : null}
         </div>
       ) : null}
+
+      <div className="mb-3 rounded-xl border border-emerald-100 bg-emerald-50 p-3" data-store-aisle-layout-controls>
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="text-sm font-semibold text-emerald-950" htmlFor="stored-list-chain">
+              Preferred store
+              <select
+                className="mt-1 block rounded-md border border-emerald-200 bg-white px-3 py-2 text-slate-950"
+                id="stored-list-chain"
+                value={aisleLayoutPreference.chain}
+                onChange={(event) => setAisleLayoutPreference((current) => (
+                  storeAisleLayoutPreferenceForChain(current, event.target.value as StoreLayoutChain)
+                ))}
+              >
+                {storeAisleLayoutChains.map((chain) => <option key={chain} value={chain}>{chain.toUpperCase()}</option>)}
+              </select>
+            </label>
+            <label className="text-sm font-semibold text-emerald-950" htmlFor="stored-list-group-order">
+              Route direction
+              <select
+                className="mt-1 block rounded-md border border-emerald-200 bg-white px-3 py-2 text-slate-950"
+                id="stored-list-group-order"
+                value={aisleLayoutPreference.groupOrder}
+                onChange={(event) => setAisleLayoutPreference((current) => ({
+                  ...current,
+                  groupOrder: event.target.value as StoreLayoutGroupOrder,
+                }))}
+              >
+                <option value="store-layout">Entrance to checkout</option>
+                <option value="reverse-layout">Checkout to entrance</option>
+              </select>
+            </label>
+          </div>
+          <button
+            className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-bold text-emerald-900"
+            type="button"
+            onClick={() => setAisleLayoutPreference(defaultStoreAisleLayoutPreference(aisleLayoutPreference.chain, aisleLayoutPreference.groupOrder))}
+          >
+            Reset aisle order
+          </button>
+        </div>
+        <ol className="mt-3 grid gap-2 md:grid-cols-2" aria-label="Saved aisle route order">
+          {aisleDepartments.map((department, index) => (
+            <li key={department.id} className="flex items-center justify-between gap-3 rounded-lg bg-white px-3 py-2 text-sm font-semibold text-slate-800">
+              <span>{index + 1}. {department.label}</span>
+              <span className="flex gap-1">
+                <button
+                  aria-label={`Move ${department.label} earlier`}
+                  className="rounded-md border border-slate-200 px-2 py-1 text-xs font-black text-slate-700 disabled:opacity-40"
+                  disabled={index === 0}
+                  type="button"
+                  onClick={() => setAisleLayoutPreference((current) => moveStoreAisleDepartment(current, department.id, -1))}
+                >
+                  Up
+                </button>
+                <button
+                  aria-label={`Move ${department.label} later`}
+                  className="rounded-md border border-slate-200 px-2 py-1 text-xs font-black text-slate-700 disabled:opacity-40"
+                  disabled={index === aisleDepartments.length - 1}
+                  type="button"
+                  onClick={() => setAisleLayoutPreference((current) => moveStoreAisleDepartment(current, department.id, 1))}
+                >
+                  Down
+                </button>
+              </span>
+            </li>
+          ))}
+        </ol>
+      </div>
 
       <ul className="space-y-2">
         {storeOrderedItems.map((item) => {
