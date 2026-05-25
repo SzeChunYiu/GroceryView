@@ -219,13 +219,17 @@ async function extractJsonExport(text, exportName, file) {
   const end = matchingJsonEnd(text, start);
   const jsonLike = text.slice(start, end + 1);
   try {
-    return JSON.parse(jsonLike);
+    return JSON.parse(normalizeJsonLikeArray(jsonLike));
   } catch (error) {
     if (jsonLike.startsWith('[') && jsonLike.includes('...')) {
       return extractSpreadArrayExport(text, jsonLike, file, exportName);
     }
     throw error;
   }
+}
+
+function normalizeJsonLikeArray(jsonLike) {
+  return jsonLike.replace(/,\s*,/g, ',');
 }
 
 async function extractSpreadArrayExport(text, jsonLike, file, exportName) {
