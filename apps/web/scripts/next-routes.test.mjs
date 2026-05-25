@@ -2184,7 +2184,7 @@ ${seo}`;
     assert.match(bottomNav, /Search/);
     assert.match(bottomNav, /Map/);
     assert.match(bottomNav, /ScanLine/);
-    assert.match(bottomNav, /href: '\/scanner#scan'/);
+    assert.match(bottomNav, /href: '\/scanner[^']*#scan'/);
     assert.match(bottomNav, /label: 'Scan'/);
     assert.match(bottomNav, /grid-cols-8/);
     assert.match(bottomNav, /useHaptic/);
@@ -3666,6 +3666,7 @@ ${seo}`;
     const products = await read('src/app/products/page.tsx');
     const shell = await read('src/components/market-shell.tsx');
     const cards = await read('src/components/product-price-cards.tsx');
+    const compareModeRoute = await read('src/app/api/account/price-compare-mode/route.ts');
 
     assert.match(verified, /export const adaptiveProductCards/);
     assert.match(verified, /export const productBrandFilterOptions/);
@@ -3704,12 +3705,19 @@ ${seo}`;
     assert.match(cards, /7-day price history/);
     assert.match(cards, /Compare by:/);
     assert.match(cards, /localStorage/);
+    assert.match(cards, /window\.sessionStorage\.getItem\('groceryview:accessToken'\)/);
+    assert.match(cards, /\/api\/account\/price-compare-mode/);
+    assert.match(cards, /groceryview:product-card-compare-mode-changed/);
     assert.match(cards, /unitSortPrice/);
     assert.match(cards, /totalSortPrice/);
-    assert.match(cards, /cheapest-per-unit/);
+    assert.match(cards, /card\.cheapestUnitBadge/);
     assert.match(cards, /Out of stock/);
     assert.match(cards, /No synthetic product images/);
     assert.match(cards, /No synthetic unit prices/);
+    assert.match(compareModeRoute, /export async function PATCH/);
+    assert.match(compareModeRoute, /export function GET/);
+    assert.match(compareModeRoute, /accountCompareModePreferences/);
+    assert.match(compareModeRoute, /Signed-in bearer token required/);
   });
 
   it('surfaces verified source coverage on the data sources route', async () => {
@@ -3922,6 +3930,16 @@ ${seo}`;
     assert.match(docs, /\/coverage/);
     assert.doesNotMatch(route, /@\/lib\/demo-data/);
     assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
+  it('emits source-backed ItemList JSON-LD on category index pages', async () => {
+    const source = await read('src/app/index/[symbol]/page.tsx');
+
+    assert.match(source, /type="application\/ld\+json"/);
+    assert.match(source, /'@type': 'ItemList'/);
+    assert.match(source, /categoryItemListJsonLd\(definition, rows\)/);
+    assert.match(source, /priceCurrency: 'SEK'/);
+    assert.doesNotMatch(source, /location|PostalAddress/);
   });
 
   it('surfaces brand-tier indices on the chain index route using the real core brand-tier output', async () => {

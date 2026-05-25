@@ -26,9 +26,21 @@ type ListCardProps = {
   currentRole: FamilyRole;
   groupOrder?: StoreLayoutGroupOrder;
   items: CommentableSharedListItem[];
+  mealPlanImport?: MealPlanListImportSummary;
   onConflictPrompt?: (prompt: ListConflictPrompt) => void;
   publicShareHref?: string;
   selectedChain?: StoreLayoutChain;
+};
+
+export type MealPlanListImportSummary = {
+  chainTotals: Array<{
+    chain: string;
+    estimatedTotalLabel: string;
+    itemCount: number;
+  }>;
+  estimatedTotalLabel: string;
+  itemCount: number;
+  mealTitle: string;
 };
 
 const roleLabels: Record<FamilyRole, string> = {
@@ -91,7 +103,7 @@ export function PublicSharePreviewCard({
   );
 }
 
-export function ListCard({ currentRole, groupOrder = "store-layout", items, onConflictPrompt, publicShareHref, selectedChain = "ica" }: ListCardProps) {
+export function ListCard({ currentRole, groupOrder = "store-layout", items, mealPlanImport, onConflictPrompt, publicShareHref, selectedChain = "ica" }: ListCardProps) {
   const [commentsByItem, setCommentsByItem] = useState<Record<string, ListItemComment[]>>(() =>
     Object.fromEntries(items.map((item) => [item.id, item.comments ?? []])),
   );
@@ -156,6 +168,23 @@ export function ListCard({ currentRole, groupOrder = "store-layout", items, onCo
         <p className="mb-3 rounded-xl bg-sky-50 px-3 py-2 text-sm font-bold text-sky-950">
           Public viewers can open a tokenized read-only URL with item details, matched price badges, and cheapest-store comparison without account access or edit controls.
         </p>
+      ) : null}
+      {mealPlanImport ? (
+        <div className="mb-3 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-950" data-meal-plan-list-import>
+          <p className="font-black">Imported meal plan: {mealPlanImport.mealTitle}</p>
+          <p className="mt-1 font-semibold">
+            {mealPlanImport.itemCount} deduplicated grocery item{mealPlanImport.itemCount === 1 ? '' : 's'} · estimated total {mealPlanImport.estimatedTotalLabel}.
+          </p>
+          {mealPlanImport.chainTotals.length > 0 ? (
+            <div className="mt-2 flex flex-wrap gap-2">
+              {mealPlanImport.chainTotals.map((chain) => (
+                <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-emerald-900" key={chain.chain}>
+                  {chain.chain}: {chain.estimatedTotalLabel} · {chain.itemCount} item{chain.itemCount === 1 ? '' : 's'}
+                </span>
+              ))}
+            </div>
+          ) : null}
+        </div>
       ) : null}
 
       <ul className="space-y-2">
