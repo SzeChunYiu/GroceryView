@@ -19,6 +19,7 @@ import {
 import { buildNoResultCorrectionWorkflow } from '@/lib/search-alias-review';
 import type { SearchExplanationBadge } from '@/lib/search-filters';
 import { authenticatedSavedSearchShortcuts } from '@/lib/saved-searches';
+import { productSearchUrl, SEARCH_SUGGEST_DEBOUNCE_MS, searchSuggestUrl } from '@/hooks/useSearch';
 import { Skeleton } from './ui/skeleton';
 
 type ProductSearchResult = {
@@ -237,7 +238,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
       setStatus('loading');
       try {
         try {
-          const suggestResponse = await fetch(`/api/suggest?q=${encodeURIComponent(trimmedQuery)}&country=SE`, {
+          const suggestResponse = await fetch(searchSuggestUrl(trimmedQuery, 'SE'), {
             signal: controller.signal,
             headers: { Accept: 'application/json' }
           });
@@ -258,7 +259,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
           }
         }
 
-        const response = await fetch(`/api/products?q=${encodeURIComponent(trimmedQuery)}`, {
+        const response = await fetch(productSearchUrl(trimmedQuery), {
           signal: controller.signal,
           headers: { Accept: 'application/json' }
         });
@@ -280,7 +281,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
         setQueryRecovery(undefined);
         setStatus('error');
       }
-    }, 300);
+    }, SEARCH_SUGGEST_DEBOUNCE_MS);
 
     return () => {
       window.clearTimeout(timeout);
