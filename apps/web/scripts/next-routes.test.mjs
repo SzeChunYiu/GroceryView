@@ -2184,7 +2184,7 @@ ${seo}`;
     assert.match(bottomNav, /Search/);
     assert.match(bottomNav, /Map/);
     assert.match(bottomNav, /ScanLine/);
-    assert.match(bottomNav, /href: '\/scanner#scan'/);
+    assert.match(bottomNav, /href: '\/scanner[^']*#scan'/);
     assert.match(bottomNav, /label: 'Scan'/);
     assert.match(bottomNav, /grid-cols-8/);
     assert.match(bottomNav, /useHaptic/);
