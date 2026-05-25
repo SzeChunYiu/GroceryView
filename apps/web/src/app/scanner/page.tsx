@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { OcrScanHistoryTimeline } from '@/components/ocr-scan-history-timeline';
+import { BarcodeScanner } from '@/components/barcode-scanner';
 import { ScannerUploadActions } from '@/components/scanner-upload-actions';
 import { barcodeMissFallbackProducts } from '@/lib/openfoodfacts-catalog';
 import { routeMetadata } from '@/lib/seo';
@@ -130,6 +131,7 @@ export default function ScannerPage() {
           The scanner controls below can read EAN-8, EAN-13, UPC-A, and UPC-E frames in-browser, link exact catalogue matches to product detail pages, or prepare a missing-product submission draft when no match exists.
         </p>
       </Card>
+      <BarcodeScanner />
       <div id="scan" className="scroll-mt-24">
         <ScannerUploadActions fallbackProducts={barcodeMissFallbackProducts} />
       </div>

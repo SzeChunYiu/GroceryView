@@ -139,6 +139,17 @@ export type BasketChainStack = {
   items: BasketItemStack[];
 };
 
+export type BasketSubstitutionCandidate = BasketStackItem & {
+  replacesItemId: string;
+  substitutionLabel?: string;
+};
+
+export type CouponAwareBasketOptimization = BasketChainStack & {
+  substitutionCount: number;
+  substitutionLabels: string[];
+  recommendationLabel: string;
+};
+
 const dayInMs = 24 * 60 * 60 * 1000;
 const seasonalMonthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const;
 
@@ -326,6 +337,88 @@ function bestItemStack(item: BasketStackItem, chainPrice: BasketChainPrice, offe
     savings,
     appliedOffers: bestOffers
   };
+}
+
+function chainPriceFor(item: BasketStackItem, chain: string) {
+  return item.chainPrices?.find((price) => price.chain === chain);
+}
+
+function couponAwareChoiceFor(
+  item: BasketStackItem,
+  chain: string,
+  offers: BasketStackOffer[],
+  substitutes: BasketSubstitutionCandidate[]
+) {
+  const choices = [
+    { isSubstitute: false, originalItem: item, item },
+    ...substitutes
+      .filter((substitute) => substitute.replacesItemId === item.id)
+      .map((substitute) => ({ isSubstitute: true, originalItem: item, item: substitute }))
+  ];
+
+  return choices
+    .flatMap((choice) => {
+      const chainPrice = chainPriceFor(choice.item, chain);
+      return chainPrice ? [{ ...choice, stack: bestItemStack(choice.item, chainPrice, offers) }] : [];
+    })
+    .sort((left, right) => (
+      left.stack.finalPrice - right.stack.finalPrice
+      || right.stack.savings - left.stack.savings
+      || Number(left.isSubstitute) - Number(right.isSubstitute)
+      || (left.item.name ?? left.item.id).localeCompare(right.item.name ?? right.item.id)
+    ))[0];
+}
+
+type CouponAwareChoice = NonNullable<ReturnType<typeof couponAwareChoiceFor>>;
+
+export function buildCouponAwareBasketOptimization({
+  currency = 'SEK',
+  items,
+  locale = 'sv-SE',
+  offers = [],
+  substitutes = []
+}: {
+  currency?: string;
+  items: BasketStackItem[];
+  locale?: string;
+  offers?: BasketStackOffer[];
+  substitutes?: BasketSubstitutionCandidate[];
+}): CouponAwareBasketOptimization[] {
+  const chainNames = [...new Set([...items, ...substitutes].flatMap((item) => item.chainPrices?.map((price) => price.chain) ?? []))];
+
+  return chainNames
+    .flatMap((chain) => {
+      const choices = items.map((item) => couponAwareChoiceFor(item, chain, offers, substitutes));
+      if (choices.some((choice) => choice === undefined)) return [];
+
+      const chosen = choices.filter((choice): choice is CouponAwareChoice => choice !== undefined);
+      const stackedItems = chosen.map((choice) => choice.stack);
+      const subtotal = stackedItems.reduce((sum, item) => sum + item.basePrice, 0);
+      const total = stackedItems.reduce((sum, item) => sum + item.finalPrice, 0);
+      const savings = subtotal - total;
+      const substitutionLabels = chosen
+        .filter((choice) => choice.isSubstitute)
+        .map((choice) => {
+          const fallback = `Swap ${choice.originalItem.name ?? choice.originalItem.id} for ${choice.item.name ?? choice.item.id}`;
+          return 'substitutionLabel' in choice.item && choice.item.substitutionLabel ? choice.item.substitutionLabel : fallback;
+        });
+
+      return [{
+        chain,
+        subtotal,
+        total,
+        savings,
+        totalLabel: formatPrice(total, locale, currency),
+        savingsLabel: formatPrice(savings, locale, currency),
+        items: stackedItems,
+        substitutionCount: substitutionLabels.length,
+        substitutionLabels,
+        recommendationLabel: substitutionLabels.length > 0
+          ? `${chain}: ${substitutionLabels.length} substitution${substitutionLabels.length === 1 ? '' : 's'} plus eligible coupons`
+          : `${chain}: keep selected items and apply eligible coupons`
+      }];
+    })
+    .sort((a, b) => a.total - b.total || b.savings - a.savings || b.substitutionCount - a.substitutionCount || a.chain.localeCompare(b.chain));
 }
 
 export function buildBasketCouponStackOptimizer({
