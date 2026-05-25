@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ActiveFilterChips, AdvancedFilterDrawer } from '@/components/FilterPanel';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { FriendPriceCard } from '@/components/friend-price-card';
 import { PriceReportReviewActions } from '@/components/price-report-review-actions';
 import { OriginFilter, type OriginFilterCode } from '@/components/origin-filter';
 import { ProductPriceCards } from '@/components/product-price-cards';
@@ -11,6 +12,7 @@ import { adaptiveProductCards, buildProductSearchView, facetedProductSearch, for
 import { publicCatalogueRevalidateSeconds, routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
 import { buildRemovableSearchFilterChips } from '@/lib/search-filters';
+import { listFriendPriceSightings } from '@/lib/social';
 
 const PRODUCTS_PER_PAGE = 50;
 
@@ -146,6 +148,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
       brand: Object.fromEntries(productBrandFilterOptions.map((brand) => [brand.value, brand.label]))
     }
   });
+  const friendPriceComparisonSightings = listFriendPriceSightings().slice(0, 3);
 
   function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'origin' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence', string>>) {
     const params = new URLSearchParams();
@@ -337,6 +340,24 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           </Link>
         </div>
         <PriceReportReviewActions />
+      </Card>
+
+      <Card className="mt-8 border-fuchsia-200 bg-fuchsia-50/70">
+        <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-fuchsia-800">Friend price comparisons</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Anonymized local prices saved or reported by friends</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Product cards can show same-product prices recently reported or saved by friends and household members, including the store, observation date, and confidence label.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-fuchsia-900 shadow-sm">{friendPriceComparisonSightings.length} social signals</p>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          {friendPriceComparisonSightings.map((sighting) => (
+            <FriendPriceCard key={sighting.id} sighting={sighting} />
+          ))}
+        </div>
       </Card>
 
       <Card className="mt-8 border-rose-200 bg-rose-50/70">

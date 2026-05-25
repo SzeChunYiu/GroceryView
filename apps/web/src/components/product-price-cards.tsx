@@ -7,7 +7,7 @@ import { FavouriteProductToggle } from './favourite-product-toggle';
 import { readStoredSafetyPreferences, SAFETY_PREFERENCES_CHANGED_EVENT, type ProductSafetyPreferences } from './cert-filter';
 import { volatilityBadgeMethodology } from '@/lib/price-intelligence';
 import type { SearchExplanationBadge } from '@/lib/search-filters';
-import { listFriendPriceSightingsForProduct } from '@/lib/social';
+import { friendPriceSightingSummary, listFriendPriceSightingsForProduct } from '@/lib/social';
 import type { AdaptiveProductCard } from '@/lib/verified-data';
 
 type CompareMode = 'adaptive' | 'total' | 'unit';
@@ -151,14 +151,15 @@ function FriendPriceSightingsPanel({ card }: Readonly<{ card: AdaptiveProductCar
 
   return (
     <div className="mt-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-3">
-      <p className="text-[0.65rem] font-black uppercase tracking-[0.18em] text-emerald-900">Opt-in friend sightings</p>
+      <p className="text-[0.65rem] font-black uppercase tracking-[0.18em] text-emerald-900">Friend price comparison cards</p>
       <ul className="mt-2 space-y-2">
         {sightings.map((sighting) => (
           <li className="rounded-xl bg-white p-2 text-xs text-slate-700" key={sighting.id}>
             <p className="font-black text-slate-950">{sighting.priceLabel} · {sighting.storeName}</p>
             <p className="mt-1 font-semibold">
-              {sighting.reporter} · {new Date(sighting.observedAt).toLocaleDateString('sv-SE')} · {sighting.confidence} confidence
+              {sighting.reporter} · {friendPriceSightingSummary(sighting)} · {sighting.observedAt.slice(0, 10)} · {sighting.confidence} confidence
             </p>
+            {sighting.note ? <p className="mt-1 font-semibold text-emerald-900">{sighting.note}</p> : null}
           </li>
         ))}
       </ul>
