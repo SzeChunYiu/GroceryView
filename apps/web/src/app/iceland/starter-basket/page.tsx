@@ -32,7 +32,7 @@ export default function IcelandStarterBasketPage() {
         <p className="text-xs font-black uppercase tracking-[0.24em] text-slate-500">Iceland preview</p>
         <h1 className="mt-3 text-4xl font-black tracking-tight">Reykjavik starter basket</h1>
         <p className="mt-4 max-w-3xl text-base font-semibold leading-7 text-slate-700">
-          {readiness.benchmarkLabel} for dairy, bread, produce, meat/fish, pantry, and household hygiene. {readiness.guardrail}
+          {readiness.benchmarkLabel} against {readiness.institutionalComparator} for dairy, bread, produce, meat/fish, pantry, and household hygiene. {readiness.guardrail}
         </p>
         <div className="mt-6 grid gap-3 md:grid-cols-4">
           <p className="rounded-2xl bg-slate-950 p-4 text-sm font-black text-white">Items <span className="block text-3xl">{readiness.itemCount}</span></p>
@@ -73,7 +73,18 @@ export default function IcelandStarterBasketPage() {
         </div>
         <p className="mt-4 text-sm font-semibold leading-6 text-slate-600">{readiness.confidenceLabel}</p>
       </section>
+
+      <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <h2 className="text-2xl font-black">Benchmark surfaces</h2>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          {readiness.benchmarkSurfaces.map((surface) => (
+            <a className="rounded-xl bg-slate-50 p-4 text-sm font-black text-slate-800" href={surface.route} key={surface.route}>
+              {surface.role}
+              <span className="mt-1 block text-xs uppercase tracking-[0.16em] text-slate-500">{surface.status.replaceAll('_', ' ')}</span>
+            </a>
+          ))}
+        </div>
+      </section>
     </main>
   );
 }
-

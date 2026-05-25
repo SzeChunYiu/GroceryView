@@ -9,6 +9,12 @@ export type IcelandStarterBasketItem = {
   priceStatus: 'awaiting_live_iceland_observation';
 };
 
+export type IcelandStarterBasketBenchmarkSurface = {
+  route: '/chain-index' | '/compare' | '/iceland/starter-basket';
+  role: 'chain-index benchmark' | 'basket-comparison benchmark' | 'source taxonomy';
+  status: 'ready_as_taxonomy' | 'blocked_until_live_prices';
+};
+
 const starterBasketGroups: Array<{
   category: IcelandStarterBasketCategory;
   benchmarkRole: IcelandStarterBasketItem['benchmarkRole'];
@@ -154,6 +160,12 @@ export const icelandStarterBasketChainTargets = [
   { chainId: 'hagkaup', label: 'Hagkaup', role: 'premium benchmark' }
 ] as const;
 
+export const icelandStarterBasketBenchmarkSurfaces: IcelandStarterBasketBenchmarkSurface[] = [
+  { route: '/iceland/starter-basket', role: 'source taxonomy', status: 'ready_as_taxonomy' },
+  { route: '/chain-index', role: 'chain-index benchmark', status: 'blocked_until_live_prices' },
+  { route: '/compare', role: 'basket-comparison benchmark', status: 'blocked_until_live_prices' }
+];
+
 export function buildIcelandStarterBasketReadiness() {
   const categoryCounts = Object.fromEntries(
     starterBasketGroups.map((group) => [group.category, group.items.length])
@@ -162,14 +174,16 @@ export function buildIcelandStarterBasketReadiness() {
   return {
     market: 'IS',
     cityScope: 'Reykjavik starter basket',
+    institutionalComparator: 'Verdgattin staple basket coverage',
     benchmarkLabel: '80-staple parity target',
     itemCount: icelandStarterBasketItems.length,
     categoryCounts,
     chainTargets: icelandStarterBasketChainTargets,
+    benchmarkSurfaces: icelandStarterBasketBenchmarkSurfaces,
     livePriceObservationCount: 0,
     chainIndexStatus: 'blocked_until_live_reykjavik_prices',
+    basketComparisonStatus: 'blocked_until_live_reykjavik_prices',
     confidenceLabel: 'preview taxonomy only; no Iceland prices are claimed',
     guardrail: 'This basket defines coverage targets for Reykjavik. It does not publish ISK prices, cheapest-chain claims, or nationwide Iceland coverage until live source observations pass readiness checks.'
   };
 }
-

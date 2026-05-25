@@ -4,6 +4,7 @@ import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
 import { buildBrandTierPriceObservations, buildChainIndexTrendSeries, buildChainPriceObservations, buildMatchedBasketChainPriceObservations } from '@/lib/chain-index-data';
 import { buildGroceryIndexTickerWidget } from '@/lib/grocery-index-widget';
+import { buildIcelandStarterBasketReadiness } from '@/lib/iceland-starter-basket';
 import { categorySummaries, formatPct, formatSek, freshFoodChainIndex, marketHeatmapTiles, matchedChainProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -55,6 +56,7 @@ function heatTileTone(value: number) {
 }
 
 export default function ChainIndexPage() {
+  const icelandStarterBasket = buildIcelandStarterBasketReadiness();
   const willysWins = matchedChainProducts.filter((product) => product.lowestChain === 'willys').length;
   const hemkopWins = matchedChainProducts.filter((product) => product.lowestChain === 'hemkop').length;
   const averageSpread = matchedChainProducts.reduce((sum, product) => sum + product.spreadPct, 0) / matchedChainProducts.length;
@@ -71,6 +73,34 @@ export default function ChainIndexPage() {
         <Card><p className="text-sm font-black text-slate-600">Average spread</p><p className="mt-2 text-4xl font-black text-emerald-800">{formatPct(averageSpread)}</p></Card>
         <Card><p className="text-sm font-black text-slate-600">Lowest-price wins</p><p className="mt-2 text-xl font-black text-slate-950">Willys {willysWins} · Hemköp {hemkopWins}</p></Card>
       </div>
+
+      <Card className="mt-6 border-sky-200 bg-sky-50/70">
+        <div className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
+          <div>
+            <Eyebrow>Iceland MVP benchmark</Eyebrow>
+            <h2 className="mt-2 text-3xl font-black tracking-tight text-sky-950">Reykjavik 80-staple chain-index seed</h2>
+            <p className="mt-3 text-sm font-semibold leading-6 text-sky-950">
+              {icelandStarterBasket.benchmarkLabel} mirrors {icelandStarterBasket.institutionalComparator} across dairy, bread, produce, meat/fish, pantry, and hygiene. The chain-index stays {icelandStarterBasket.chainIndexStatus.replaceAll('_', ' ')} until Reykjavik source observations are live.
+            </p>
+            <Link className="mt-4 inline-flex rounded-full bg-sky-900 px-4 py-2 text-sm font-black text-white" href="/iceland/starter-basket">
+              Open Iceland starter basket
+            </Link>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <p className="rounded-2xl bg-white/85 p-4 text-sm font-black text-sky-950">Targets <span className="mt-2 block text-4xl">{icelandStarterBasket.itemCount}</span></p>
+            <p className="rounded-2xl bg-white/85 p-4 text-sm font-black text-sky-950">Live ISK prices <span className="mt-2 block text-4xl">{icelandStarterBasket.livePriceObservationCount}</span></p>
+            <p className="rounded-2xl bg-white/85 p-4 text-sm font-black text-sky-950">Scope <span className="mt-2 block text-lg">{icelandStarterBasket.cityScope}</span></p>
+          </div>
+        </div>
+        <div className="mt-4 grid gap-2 md:grid-cols-3">
+          {icelandStarterBasket.benchmarkSurfaces.map((surface) => (
+            <p className="rounded-2xl bg-white/85 p-3 text-sm font-bold text-sky-950" key={surface.route}>
+              {surface.route} · {surface.role} · {surface.status.replaceAll('_', ' ')}
+            </p>
+          ))}
+        </div>
+        <p className="mt-4 rounded-2xl bg-white/85 p-4 text-sm font-bold leading-6 text-sky-950">{icelandStarterBasket.guardrail}</p>
+      </Card>
 
       <Card className="mt-6 border-indigo-200 bg-indigo-50">
         <div className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">

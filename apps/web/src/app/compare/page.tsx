@@ -9,6 +9,7 @@ import { StoreComparisonTable } from '@/components/StoreComparisonTable';
 import { StorePriceMatrix } from '@/components/store-price-matrix';
 import { COMPARE_CHAIN_ORDER, buildBasketStoreComparison, buildChainComparisonTable, parseCompareChainsParam } from '@/lib/chain-compare';
 import { fetchComparePriceSnapshots, type ComparePriceSnapshotStoreRow } from '@/lib/compare-price-snapshots';
+import { buildIcelandStarterBasketReadiness } from '@/lib/iceland-starter-basket';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, commodityComparisons, compareOverlayChart, formatPct, formatSek, matchedChainProducts, privateLabelDupeFinder } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
@@ -157,6 +158,7 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
   const productsParam = resolvedSearchParams.products;
   const compareSnapshots = await fetchComparePriceSnapshots(productsParam, { endpoint: '/api/compare' });
+  const icelandStarterBasket = buildIcelandStarterBasketReadiness();
   const hasEndpointRequestedItems = compareSnapshots.itemIds.length > 0;
   const endpointMatrix = endpointSnapshotMatrix(compareSnapshots.storeRows, compareSnapshots.itemIds);
   const overlayMode = firstSearchValue(resolvedSearchParams.overlayMode) === 'index' ? 'index' as const : 'price' as const;
@@ -221,6 +223,29 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
         state={{ chains: firstSearchValue(resolvedSearchParams.chains) || 'all', overlayMode, products: firstSearchValue(productsParam), routeMode: firstSearchValue(resolvedSearchParams.routeMode), view: 'chain-compare' }}
         surface="compare"
       />
+      <Card className="mt-6 border-sky-200 bg-sky-50/70">
+        <div className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-sky-800">Iceland basket benchmark</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-sky-950">Reykjavik starter basket is comparison-ready as taxonomy only</h2>
+            <p className="mt-3 text-sm font-semibold leading-6 text-sky-950">
+              {icelandStarterBasket.itemCount} parity targets mirror {icelandStarterBasket.institutionalComparator}, but basket comparison stays {icelandStarterBasket.basketComparisonStatus.replaceAll('_', ' ')} because there are {icelandStarterBasket.livePriceObservationCount} live Iceland price observations.
+            </p>
+            <Link className="mt-4 inline-flex rounded-full bg-sky-900 px-4 py-2 text-sm font-black text-white" href="/iceland/starter-basket">
+              Review Iceland targets
+            </Link>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3">
+            {Object.entries(icelandStarterBasket.categoryCounts).map(([category, count]) => (
+              <p className="rounded-2xl bg-white/85 p-3 text-sm font-black capitalize text-sky-950" key={category}>
+                {category.replace('-', ' ')}
+                <span className="mt-1 block text-3xl">{count}</span>
+              </p>
+            ))}
+          </div>
+        </div>
+        <p className="mt-4 rounded-2xl bg-white/85 p-4 text-sm font-bold leading-6 text-sky-950">{icelandStarterBasket.guardrail}</p>
+      </Card>
       <Card className="mt-6 overflow-hidden border-emerald-200 bg-gradient-to-br from-white via-emerald-50 to-sky-50">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
           <div>
