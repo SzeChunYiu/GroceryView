@@ -30,6 +30,9 @@ export type StoreBasketComparisonStore = {
   storeName: string;
   rankLabel: string;
   totalText: string;
+  distanceText?: string;
+  stockLabel?: string;
+  highlightLabels?: string[];
   availableCount: number;
   missingCount: number;
   coverageLabel: string;
@@ -112,13 +115,26 @@ export function StoreComparisonTable({
                   <div>
                     <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">{store.rankLabel} nearby store</p>
                     <h3 className="mt-2 text-xl font-black text-slate-950">{store.storeName}</h3>
+                    {store.highlightLabels && store.highlightLabels.length > 0 ? (
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {store.highlightLabels.map((label) => (
+                          <span className="rounded-full bg-emerald-100 px-2 py-1 text-[0.68rem] font-black uppercase tracking-[0.12em] text-emerald-900" key={`${store.storeId}-${label}`}>
+                            {label}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
                   </div>
                   <p className={store.missingCount === 0 ? 'rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-900' : 'rounded-full bg-amber-100 px-3 py-1 text-xs font-black text-amber-950'}>
                     {store.missingCount === 0 ? 'complete' : `${store.missingCount} missing`}
                   </p>
                 </div>
                 <p className="mt-3 text-4xl font-black text-emerald-900">{store.totalText}</p>
-                <p className="mt-2 text-sm font-semibold text-slate-600">{store.coverageLabel}</p>
+                <div className="mt-2 grid gap-2 text-sm font-semibold text-slate-600">
+                  <p>{store.coverageLabel}</p>
+                  {store.distanceText ? <p>{store.distanceText}</p> : null}
+                  {store.stockLabel ? <p>{store.stockLabel}</p> : null}
+                </div>
                 {store.missingProductNames.length > 0 ? (
                   <p className="mt-3 text-xs font-semibold leading-5 text-amber-950">
                     Missing: {store.missingProductNames.slice(0, 3).join(', ')}{store.missingProductNames.length > 3 ? ` +${store.missingProductNames.length - 3} more` : ''}
@@ -135,6 +151,7 @@ export function StoreComparisonTable({
                 <tr>
                   <th className="px-4 py-3 font-black">Store</th>
                   <th className="px-4 py-3 font-black">Basket total</th>
+                  <th className="px-4 py-3 font-black">Decision highlights</th>
                   <th className="px-4 py-3 font-black">Coverage</th>
                   <th className="px-4 py-3 font-black">Missing items</th>
                   <th className="px-4 py-3 font-black">Substitution explanations</th>
@@ -145,6 +162,15 @@ export function StoreComparisonTable({
                   <tr className="border-t border-slate-100 align-top" key={`${store.storeId}-basket`}>
                     <th className="px-4 py-4 font-black text-slate-950">{store.storeName}</th>
                     <td className="px-4 py-4 font-black text-emerald-900">{store.totalText}</td>
+                    <td className="px-4 py-4 text-sm font-semibold text-slate-700">
+                      <div className="flex flex-wrap gap-1">
+                        {(store.highlightLabels ?? []).map((label) => (
+                          <span className="rounded-full bg-emerald-50 px-2 py-1 text-xs font-black text-emerald-900" key={`${store.storeId}-table-${label}`}>{label}</span>
+                        ))}
+                      </div>
+                      <p className="mt-2">{store.distanceText ?? 'Distance not reported'}</p>
+                      <p className="mt-1">{store.stockLabel ?? 'Stock readiness not reported'}</p>
+                    </td>
                     <td className="px-4 py-4 font-semibold text-slate-700">{store.coverageLabel}</td>
                     <td className="px-4 py-4 text-sm font-semibold text-slate-600">
                       {store.missingProductNames.length > 0 ? store.missingProductNames.join(', ') : 'No missing basket rows'}
