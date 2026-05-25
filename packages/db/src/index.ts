@@ -5,6 +5,7 @@ import { ACTIVE_PRODUCTS_PREDICATE } from './queries/items.js';
 export * from './client.js';
 export * from './queries/categories.js';
 export * from './queries/analytics.js';
+export * from './queries/availability.js';
 export * from './queries/deals.js';
 export * from './queries/favorites.js';
 export * from './queries/items.js';
