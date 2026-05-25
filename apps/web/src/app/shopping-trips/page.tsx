@@ -5,6 +5,7 @@ import { defaultStoreRouteChecklist, osmStores } from '@/lib/osm-stores';
 import { basketTripCostContract, budgetCheapestStoreRoutingPlanner, deliveryVsInStoreComparison, elderlyNearestDeliveryPlanner, formatSek, fulfillmentSlotsContract } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 import { activeShoppingTripEstimates } from '@/lib/trip-planner';
+import { summarizeBudgetCategoryBreakdown, summarizeWeeklyBudgetProgress } from '@/lib/meal-budgets';
 
 export function generateMetadata() {
   return routeMetadata('/shopping-trips');
@@ -38,6 +39,13 @@ const routeChecklistGroups = defaultStoreRouteChecklist.stopOrder
 const routeChecklistCheckedCount = defaultStoreRouteChecklist.items.filter((item) => item.checked).length;
 const routeChecklistTotalCount = defaultStoreRouteChecklist.items.length;
 const routeChecklistProgress = routeChecklistTotalCount > 0 ? Math.round((routeChecklistCheckedCount / routeChecklistTotalCount) * 100) : 0;
+const tripBudget = summarizeWeeklyBudgetProgress({ plannedTotal: 642, weeklyBudget: 700 });
+const tripCategoryBreakdown = summarizeBudgetCategoryBreakdown([
+  { category: "Produce", currentPrice: 164 },
+  { category: "Dairy", currentPrice: 138 },
+  { category: "Pantry", currentPrice: 211 },
+  { category: "Household", currentPrice: 129 }
+]);
 
 export default function FeaturePage() {
   const route = 'shopping-trips';
@@ -92,6 +100,23 @@ export default function FeaturePage() {
         </div>
       </Card>
       <ConsentedShoppingTripPlanner />
+      <Card className="mt-6 border-amber-200 bg-amber-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-800">Trip budget progress</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight">Remaining budget before checkout</h2>
+        <p className="mt-3 text-sm leading-6 text-slate-700">Projected trip spend is {formatSek(tripBudget.plannedTotal)} against a {formatSek(tripBudget.weeklyBudget)} budget, leaving {formatSek(tripBudget.remaining)} before overspend.</p>
+        <div className="mt-4 h-3 overflow-hidden rounded-full bg-white">
+          <div className="h-full rounded-full bg-amber-600" style={{ width: `${tripBudget.percentUsed}%` }} />
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-4">
+          {tripCategoryBreakdown.map((row) => (
+            <div className="rounded-2xl bg-white p-4" key={row.category}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-800">{row.category}</p>
+              <p className="mt-2 text-2xl font-black text-slate-950">{formatSek(row.total)}</p>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{row.sharePct.toFixed(0)}% of trip</p>
+            </div>
+          ))}
+        </div>
+      </Card>
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Store route checklist</p>
         <h2 className="mt-2 text-2xl font-black tracking-tight">Grouped by selected-store aisle and department</h2>
