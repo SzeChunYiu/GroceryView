@@ -4744,6 +4744,13 @@ function writeDailyIngestionBlockerLog(path: string, result: DailyIngestionRunRe
     lines.push(...result.blockers.map((blocker) => `- ${blocker}`));
   }
 
+  lines.push('', 'deferralReasons:');
+  if (!result.deferralReasons || result.deferralReasons.length === 0) {
+    lines.push('- none');
+  } else {
+    lines.push(...result.deferralReasons.map((reason) => `- ${reason}`));
+  }
+
   writeFileSync(path, `${lines.join('\n')}\n`);
 }
 
@@ -4997,13 +5004,43 @@ async function runDailyIngestionConnector(input: {
 
 export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<DailyIngestionRunResult> {
   const maxConcurrency = Math.max(1, normalizeDailyRunnerInteger(input.maxConcurrency, 1));
+  const sourceMarketMaxConcurrency = Math.max(1, normalizeDailyRunnerInteger(input.sourceMarketMaxConcurrency, 1));
   const connectorStartDelayMs = normalizeDailyRunnerInteger(input.connectorStartDelayMs, 0);
   const retryAttempts = normalizeDailyRunnerInteger(input.connectorRetryAttempts, 0);
   const retryBaseDelayMs = normalizeDailyRunnerInteger(input.connectorRetryBaseDelayMs, 250);
   const results = new Array<DailyConnectorRunPersistenceResult | undefined>(input.connectors.length);
-  let nextConnectorIndex = 0;
+  const claimedConnectorIndexes = new Set<number>();
+  const activeSourceMarketCounts = new Map<string, number>();
+  const deferralReasons = new Set<string>();
   let nextConnectorStartAt = 0;
   let connectorStartsScheduled = 0;
+
+  function sourceMarketKey(config: DailyIngestionConnectorConfig): string {
+    return `${normalizeDailyDomain(config.domain)}:${normalizeDailySlug(config.chainId)}`;
+  }
+
+  function claimNextConnectorIndex(): number | null {
+    for (const [index, config] of input.connectors.entries()) {
+      if (claimedConnectorIndexes.has(index)) continue;
+      const key = sourceMarketKey(config);
+      const activeCount = activeSourceMarketCounts.get(key) ?? 0;
+      if (activeCount >= sourceMarketMaxConcurrency) {
+        deferralReasons.add(`${key}:deferred_source_market_backpressure active=${activeCount} limit=${sourceMarketMaxConcurrency}`);
+        continue;
+      }
+      claimedConnectorIndexes.add(index);
+      activeSourceMarketCounts.set(key, activeCount + 1);
+      return index;
+    }
+    return null;
+  }
+
+  function releaseConnectorIndex(config: DailyIngestionConnectorConfig): void {
+    const key = sourceMarketKey(config);
+    const activeCount = activeSourceMarketCounts.get(key) ?? 0;
+    if (activeCount <= 1) activeSourceMarketCounts.delete(key);
+    else activeSourceMarketCounts.set(key, activeCount - 1);
+  }
 
   async function waitForConnectorStartSlot(): Promise<void> {
     if (connectorStartDelayMs <= 0) return;
@@ -5016,23 +5053,30 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
   }
 
   async function worker(): Promise<void> {
-    while (nextConnectorIndex < input.connectors.length) {
-      const connectorIndex = nextConnectorIndex;
-      nextConnectorIndex += 1;
+    while (claimedConnectorIndexes.size < input.connectors.length) {
+      const connectorIndex = claimNextConnectorIndex();
+      if (connectorIndex === null) {
+        await waitForDailyRunnerDelay(Math.max(1, connectorStartDelayMs || 25));
+        continue;
+      }
       const config = input.connectors[connectorIndex];
       if (!config) continue;
-      await waitForConnectorStartSlot();
-      results[connectorIndex] = await runDailyIngestionConnector({
-        executor: input.executor,
-        requestedAt: input.requestedAt,
-        config,
-        fetchImpl: input.fetchImpl,
-        retryAttempts,
-        retryBaseDelayMs,
-        zeroRowAlertLogPath: input.zeroRowAlertLogPath ?? DEFAULT_DAILY_ZERO_ROW_ALERT_LOG_PATH,
-        zeroRowAlertStatePath: input.zeroRowAlertStatePath ?? DEFAULT_DAILY_ZERO_ROW_ALERT_STATE_PATH,
-        zeroRowAlertWebhookUrl: input.zeroRowAlertWebhookUrl
-      });
+      try {
+        await waitForConnectorStartSlot();
+        results[connectorIndex] = await runDailyIngestionConnector({
+          executor: input.executor,
+          requestedAt: input.requestedAt,
+          config,
+          fetchImpl: input.fetchImpl,
+          retryAttempts,
+          retryBaseDelayMs,
+          zeroRowAlertLogPath: input.zeroRowAlertLogPath ?? DEFAULT_DAILY_ZERO_ROW_ALERT_LOG_PATH,
+          zeroRowAlertStatePath: input.zeroRowAlertStatePath ?? DEFAULT_DAILY_ZERO_ROW_ALERT_STATE_PATH,
+          zeroRowAlertWebhookUrl: input.zeroRowAlertWebhookUrl
+        });
+      } finally {
+        releaseConnectorIndex(config);
+      }
     }
   }
 
@@ -5091,6 +5135,7 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
   const runResult: DailyIngestionRunResult = {
     status: blockers.length === 0 ? 'succeeded' : persistedRuns > 0 ? 'partial' : 'blocked',
     blockers,
+    ...(deferralReasons.size > 0 ? { deferralReasons: [...deferralReasons] } : {}),
     persistedRuns,
     acceptedCount,
     rejectedCount,

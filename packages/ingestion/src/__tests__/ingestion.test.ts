@@ -6195,6 +6195,7 @@ describe('daily ingestion runner', () => {
     assert.equal(configs.connectors[0].chainId, 'ica');
     assert.deepEqual(configs.runtimeOptions, {
       maxConcurrency: 1,
+      sourceMarketMaxConcurrency: 1,
       connectorStartDelayMs: 0,
       connectorRetryAttempts: 0,
       connectorRetryBaseDelayMs: 250,
@@ -6206,6 +6207,7 @@ describe('daily ingestion runner', () => {
     const configs = buildDailyConnectorConfigsFromEnv({
       DATABASE_URL: 'postgres://user:secret@example/groceryview',
       GROCERYVIEW_DAILY_MAX_CONCURRENCY: '3',
+      GROCERYVIEW_DAILY_SOURCE_MARKET_MAX_CONCURRENCY: '1',
       GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS: '125',
       GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS: '2',
       GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS: '500',
@@ -6226,6 +6228,7 @@ describe('daily ingestion runner', () => {
 
     assert.deepEqual(configs.runtimeOptions, {
       maxConcurrency: 3,
+      sourceMarketMaxConcurrency: 1,
       connectorStartDelayMs: 125,
       connectorRetryAttempts: 2,
       connectorRetryBaseDelayMs: 500,
@@ -6238,6 +6241,7 @@ describe('daily ingestion runner', () => {
     assert.deepEqual(configs.runner, {
       maxConnectors: undefined,
       maxConcurrency: 3,
+      sourceMarketMaxConcurrency: 1,
       connectorStartDelayMs: 125,
       connectorRetryAttempts: 2,
       connectorRetryBaseDelayMs: 500,
@@ -8296,6 +8300,47 @@ describe('daily ingestion runner', () => {
     ]);
     assert.equal(attempts.get('ica'), 2);
     assert.equal(active.max, 2);
+  });
+
+  it('records source-market backpressure and lets one bad source stop without starving the daily run', async () => {
+    const executor = new DailyIngestionExecutor();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-22T16:45:00.000Z',
+      maxConcurrency: 3,
+      sourceMarketMaxConcurrency: 1,
+      connectorStartDelayMs: 1,
+      connectors: [
+        { ...dailyConnectorFixture('ica'), connectorId: 'ica-empty-json', requireStoreScopedPrices: false },
+        { ...dailyConnectorFixture('ica'), connectorId: 'ica-normalized-json-backfill', endpointUrl: 'https://sources.example.test/ica/backfill.json', requireStoreScopedPrices: false },
+        { ...dailyConnectorFixture('willys'), requireStoreScopedPrices: false }
+      ],
+      fetchImpl: async (url) => {
+        const urlText = String(url);
+        if (urlText.includes('/ica/products.json')) {
+          return new Response(JSON.stringify({ items: [] }), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        const chainId = urlText.includes('/willys/') ? 'willys' : 'ica';
+        return new Response(JSON.stringify({
+          items: [{
+            retailerProductId: `${chainId}-coffee`,
+            rawName: `${chainId} Coffee 450g`,
+            canonicalName: `${chainId} Coffee 450g`,
+            productId: `${chainId}-coffee-450g`,
+            categoryId: 'coffee',
+            brand: chainId.toUpperCase(),
+            packageSize: 450,
+            packageUnit: 'g',
+            price: 49.9
+          }]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    assert.equal(result.status, 'partial');
+    assert.equal(result.persistedRuns, 2);
+    assert.equal(result.blockers.includes('ica:no_accepted_products'), true);
+    assert.equal(result.deferralReasons?.some((reason) => reason.includes('grocery:ica:deferred_source_market_backpressure')), true);
   });
 
   it('fails closed before persistence when store-scoped prices omit configured branch metadata', async () => {
