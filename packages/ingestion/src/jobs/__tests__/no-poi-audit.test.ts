@@ -60,11 +60,18 @@ describe('NO POI audit ingestion', () => {
     assert.equal(rows.length, 3);
     assert.equal(rows[0].domain, 'grocery');
     assert.equal(rows[0].chain, 'rema_1000');
+    assert.equal(rows[0].canonicalChainId, 'rema-1000');
+    assert.equal(rows[0].operatorGroupId, 'rema-1000-norge');
+    assert.equal(rows[0].storeFormat, 'discount');
+    assert.equal(rows[0].municipality, 'Oslo');
+    assert.equal(rows[0].chainReviewStatus, 'clear');
     assert.equal(rows[0].phone, '+47 22 00 00 00');
     assert.equal(rows[1].domain, 'pharmacy');
     assert.equal(rows[1].chain, 'apotek_1');
     assert.equal(rows[2].domain, 'fuel');
     assert.equal(rows[2].chain, 'circle_k');
+    assert.equal(rows[2].canonicalChainId, null);
+    assert.equal(rows[2].chainReviewStatus, 'needs_review');
     assert.equal(rows[2].openingHours, '24/7');
   });
 
@@ -72,6 +79,7 @@ describe('NO POI audit ingestion', () => {
     assert.equal(matchNorwayPoiChain(['KIWI']), 'kiwi');
     assert.equal(matchNorwayPoiChain(['Meny']), 'meny');
     assert.equal(matchNorwayPoiChain(['Coop Extra']), 'coop');
+    assert.equal(matchNorwayPoiChain(['Coop Obs']), 'coop');
     assert.equal(matchNorwayPoiChain(['Bunnpris']), 'bunnpris');
     assert.equal(matchNorwayPoiChain(['Vitusapotek']), 'vitusapotek');
     assert.equal(matchNorwayPoiChain(['Boots Apotek']), 'boots_apotek');

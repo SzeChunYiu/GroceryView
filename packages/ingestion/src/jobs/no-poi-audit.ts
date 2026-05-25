@@ -1,3 +1,12 @@
+import {
+  attachNorwayStoreOperator,
+  matchNorwayCanonicalChain,
+  type NorwayChainId,
+  type NorwayOperatorGroupId,
+  type NorwayStoreChannel,
+  type NorwayStoreFormat
+} from '@groceryview/catalog';
+
 type OsmType = 'node' | 'way' | 'relation';
 
 export type NorwayPoiDomain = 'grocery' | 'pharmacy' | 'fuel';
@@ -22,6 +31,8 @@ export type NorwayPoiChain =
   | 'st1'
   | 'unknown';
 
+export type NorwayPoiReviewStatus = 'clear' | 'needs_review';
+
 export type NorwayPoiAuditRow = {
   osmType: OsmType;
   osmId: number;
@@ -30,6 +41,13 @@ export type NorwayPoiAuditRow = {
   operator: string;
   domain: NorwayPoiDomain;
   chain: NorwayPoiChain;
+  canonicalChainId: NorwayChainId | null;
+  operatorGroupId: NorwayOperatorGroupId | null;
+  storeFormat: NorwayStoreFormat | null;
+  channel: NorwayStoreChannel | null;
+  municipality: string;
+  chainReviewStatus: NorwayPoiReviewStatus;
+  chainReviewReason: string;
   shop: string;
   amenity: string;
   latitude: number;
@@ -127,6 +145,15 @@ export function normalizeNorwayPoi(element: OverpassElement, retrievedAt: string
   const name = text(tags.name) || brand || operator;
 
   if (!osmType || osmId === null || latitude === null || longitude === null || !domain || !name) return null;
+  const operatorAttachment = attachNorwayStoreOperator({
+    name,
+    brand,
+    operator,
+    municipality: text(tags['addr:municipality']) || text(tags['addr:city']),
+    latitude,
+    longitude,
+    onlineOnly: /oda/i.test([brand, name, operator].join(' '))
+  });
 
   return {
     osmType,
@@ -136,6 +163,13 @@ export function normalizeNorwayPoi(element: OverpassElement, retrievedAt: string
     operator,
     domain,
     chain: matchNorwayPoiChain([brand, name, operator]),
+    canonicalChainId: operatorAttachment.canonicalChainId,
+    operatorGroupId: operatorAttachment.operatorGroupId,
+    storeFormat: operatorAttachment.storeFormat,
+    channel: operatorAttachment.channel,
+    municipality: operatorAttachment.municipality,
+    chainReviewStatus: operatorAttachment.review.status,
+    chainReviewReason: operatorAttachment.review.reasons.join(','),
     shop,
     amenity,
     latitude,
@@ -153,15 +187,16 @@ export function normalizeNorwayPoi(element: OverpassElement, retrievedAt: string
 }
 
 export function matchNorwayPoiChain(values: unknown[]): NorwayPoiChain {
+  const canonicalChain = matchNorwayCanonicalChain(values);
+  if (canonicalChain?.id === 'rema-1000') return 'rema_1000';
+  if (canonicalChain?.id === 'kiwi') return 'kiwi';
+  if (canonicalChain?.id === 'meny') return 'meny';
+  if (canonicalChain?.id === 'joker') return 'joker';
+  if (canonicalChain?.id === 'spar') return 'spar';
+  if (canonicalChain?.operatorGroupId === 'coop-norge') return 'coop';
+  if (canonicalChain?.id === 'bunnpris') return 'bunnpris';
+  if (canonicalChain?.id === 'oda') return 'oda';
   const haystack = normalizedSearchText(values);
-  if (/\brema\s*1000\b/.test(haystack)) return 'rema_1000';
-  if (/\bkiwi\b/.test(haystack)) return 'kiwi';
-  if (/\bmeny\b/.test(haystack)) return 'meny';
-  if (/\bjoker\b/.test(haystack)) return 'joker';
-  if (/\bspar\b/.test(haystack)) return 'spar';
-  if (/\bcoop\b|\bextra\b|\bobs?\b|\bprix\b|\bmega\b/.test(haystack)) return 'coop';
-  if (/\bbunnpris\b/.test(haystack)) return 'bunnpris';
-  if (/\boda\b/.test(haystack)) return 'oda';
   if (/\bapotek\s*1\b/.test(haystack)) return 'apotek_1';
   if (/\bvitusapotek\b|\bvitus\s*apotek\b/.test(haystack)) return 'vitusapotek';
   if (/\bboots\s*apotek\b/.test(haystack)) return 'boots_apotek';

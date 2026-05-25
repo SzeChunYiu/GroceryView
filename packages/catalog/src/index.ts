@@ -9,6 +9,19 @@ export type CatalogProductCoverage = {
 
 export { COMMODITIES, STAPLE_BASKET, findCommodity, inferBonusIsGroceryCategory, type Commodity, type ComparableUnit, type GroceryCategoryInference } from './commodities.js';
 export { SUPPORTED_PRICE_DOMAINS, findPriceDomain, type PriceDomain, type PriceDomainItem, type PriceDomainSlug } from './domains.js';
+export {
+  NORWAY_CANONICAL_CHAINS,
+  attachNorwayStoreOperator,
+  findNorwayCanonicalChain,
+  matchNorwayCanonicalChain,
+  type NorwayCanonicalChain,
+  type NorwayChainId,
+  type NorwayOperatorGroupId,
+  type NorwayStoreChannel,
+  type NorwayStoreFormat,
+  type NorwayStoreOperatorAttachment,
+  type NorwayStoreOperatorAttachmentInput
+} from './norway-chain-taxonomy.js';
 
 export type CatalogCoverageInput = {
   targetProducts?: string[];
