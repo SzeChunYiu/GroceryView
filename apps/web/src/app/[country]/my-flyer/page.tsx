@@ -6,7 +6,7 @@ import { MyFlyerPreferences } from './my-flyer-preferences';
 import { MyFlyerOffers } from './my-flyer-offers';
 import './print-import.css';
 
-type MyFlyerPageProps = Readonly<{ params: Promise<{ city: string }> }>;
+type MyFlyerPageProps = Readonly<{ params: Promise<{ country: string }> }>;
 
 const visibleChains = ['willys', 'hemkop'] as const;
 const generatedAt = '2026-05-24';
@@ -37,8 +37,8 @@ const flyerProducts = axfoodProducts
   .map((product) => ({ product, offer: printablePrice(product) }));
 
 export async function generateMetadata({ params }: MyFlyerPageProps): Promise<Metadata> {
-  const { city } = await params;
-  const marketName = titleCaseSegment(city || 'se');
+  const { country } = await params;
+  const marketName = titleCaseSegment(country || 'se');
   return {
     title: `${marketName} MyFlyer | GroceryView`,
     description: 'A printable two-column GroceryView flyer with expanded product images and print-only offer cards.'
@@ -46,8 +46,8 @@ export async function generateMetadata({ params }: MyFlyerPageProps): Promise<Me
 }
 
 export default async function MyFlyerPage({ params }: MyFlyerPageProps) {
-  const { city } = await params;
-  const marketName = titleCaseSegment(city || 'se');
+  const { country } = await params;
+  const marketName = titleCaseSegment(country || 'se');
   const totalSavings = flyerProducts.reduce((sum, row) => sum + (row.offer.savings ?? 0), 0);
 
   return (
@@ -97,7 +97,7 @@ export default async function MyFlyerPage({ params }: MyFlyerPageProps) {
         <MyFlyerPreferences defaultCountry="se" defaultAlgorithm="watchlist_first" />
 
         <MyFlyerPushActions
-          city={city}
+          city={country}
           country="se"
           defaultAlgorithm="watchlist_first"
           limit={flyerProducts.length}
