@@ -65,6 +65,42 @@ export type ShortTermPriceForecast = {
   points: ShortTermPriceForecastPoint[];
 };
 
+export type BestTimeToBuyDecision = 'buy_now' | 'wait_for_flyer' | 'watch_volatility';
+
+export type FlyerWindow = {
+  storeName: string;
+  categoryLabel: string;
+  startsAt: string;
+  endsAt: string;
+  expectedDiscountPct?: number | null;
+};
+
+export type BestTimeToBuyAlertInput = {
+  productId: string;
+  productName: string;
+  currentPrice: number;
+  currentStoreName: string;
+  priceHistory: PriceForecastObservation[];
+  upcomingFlyerWindows: FlyerWindow[];
+  now?: string | Date;
+};
+
+export type BestTimeToBuyAlertRecommendation = {
+  productId: string;
+  productName: string;
+  decision: BestTimeToBuyDecision;
+  decisionLabel: string;
+  confidenceLabel: string;
+  currentPrice: number;
+  currentStoreName: string;
+  volatilityScore: number;
+  observedPriceCount: number;
+  observedRangeLabel: string;
+  upcomingFlyerWindow: FlyerWindow | null;
+  flyerWindowLabel: string;
+  rationale: string;
+};
+
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
@@ -178,6 +214,68 @@ export function volatilityBadgeMethodology(points: ReadonlyArray<ObservedPricePo
     rangeLabel: `${low.toFixed(2)}-${high.toFixed(2)} SEK observed range`,
     summary: 'The 0-100 volatility score is the observed high-low spread divided by the average observed price, capped at 100.',
     forecastBoundary: 'No future price forecast is made from this badge; it only explains historical observed prices.'
+  };
+}
+
+function averagePrice(points: ReadonlyArray<PriceForecastObservation>) {
+  const prices = points.map((point) => point.price).filter((price) => Number.isFinite(price) && price > 0);
+  return prices.length > 0 ? prices.reduce((sum, price) => sum + price, 0) / prices.length : null;
+}
+
+function daysUntil(startsAt: string, now: Date) {
+  const start = Date.parse(startsAt);
+  if (!Number.isFinite(start)) return null;
+  return Math.ceil((start - now.getTime()) / (24 * 60 * 60 * 1000));
+}
+
+function nextFlyerWindow(windows: ReadonlyArray<FlyerWindow>, now: Date) {
+  return [...windows]
+    .map((window) => ({ window, days: daysUntil(window.startsAt, now) }))
+    .filter((entry): entry is { window: FlyerWindow; days: number } => entry.days !== null && entry.days >= 0 && entry.days <= 21)
+    .sort((left, right) => left.days - right.days)[0] ?? null;
+}
+
+function bestTimeConfidenceLabel(observedPriceCount: number, hasFlyerWindow: boolean) {
+  if (observedPriceCount >= 4 && hasFlyerWindow) return 'high confidence timing rule';
+  if (observedPriceCount >= 3 || hasFlyerWindow) return 'medium confidence timing rule';
+  return 'limited timing evidence';
+}
+
+export function buildBestTimeToBuyAlert(input: BestTimeToBuyAlertInput): BestTimeToBuyAlertRecommendation {
+  const now = input.now instanceof Date ? input.now : new Date(input.now ?? Date.now());
+  const volatility = volatilityBadgeMethodology(input.priceHistory);
+  const historicalAverage = averagePrice(input.priceHistory);
+  const currentVsAveragePct = historicalAverage && historicalAverage > 0
+    ? ((input.currentPrice - historicalAverage) / historicalAverage) * 100
+    : 0;
+  const flyer = nextFlyerWindow(input.upcomingFlyerWindows, now);
+  const expectedDiscountPct = flyer?.window.expectedDiscountPct ?? 0;
+  const shouldBuyNow = currentVsAveragePct <= -5 || (!flyer && currentVsAveragePct <= -2);
+  const shouldWaitForFlyer = !shouldBuyNow && Boolean(flyer) && (volatility.score >= 8 || expectedDiscountPct >= 5 || currentVsAveragePct > -3);
+  const decision: BestTimeToBuyDecision = shouldBuyNow ? 'buy_now' : shouldWaitForFlyer ? 'wait_for_flyer' : 'watch_volatility';
+  const decisionLabel = decision === 'buy_now' ? 'Buy now' : decision === 'wait_for_flyer' ? 'Wait for flyer' : 'Keep watching';
+  const flyerWindowLabel = flyer
+    ? `${flyer.window.storeName} ${flyer.window.categoryLabel} window starts in ${flyer.days} day${flyer.days === 1 ? '' : 's'}`
+    : 'No upcoming flyer window inside 21 days';
+
+  return {
+    productId: input.productId,
+    productName: input.productName,
+    decision,
+    decisionLabel,
+    confidenceLabel: bestTimeConfidenceLabel(volatility.observationCount, Boolean(flyer)),
+    currentPrice: input.currentPrice,
+    currentStoreName: input.currentStoreName,
+    volatilityScore: volatility.score,
+    observedPriceCount: volatility.observationCount,
+    observedRangeLabel: volatility.rangeLabel,
+    upcomingFlyerWindow: flyer?.window ?? null,
+    flyerWindowLabel,
+    rationale: decision === 'buy_now'
+      ? `Current price is ${Math.abs(currentVsAveragePct).toFixed(1)}% below the observed historical average, so the alert can recommend buying without a future-price forecast.`
+      : decision === 'wait_for_flyer'
+        ? `Historical volatility score ${volatility.score} plus the upcoming flyer window makes waiting more useful than buying at the current observed price.`
+        : `Current price is close to historical observations and no strong flyer signal is available, so keep the watchlist alert active.`
   };
 }
 
