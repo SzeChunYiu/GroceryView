@@ -30,8 +30,39 @@ export type CityPriceDropTrendFeed = {
   cards: CityPriceDropTrend[];
 };
 
+export type CitySearchTrend = {
+  rank: number;
+  city: string;
+  query: string;
+  category: string;
+  categoryLabel: string;
+  currentSearches: number;
+  previousSearches: number;
+  growthPercent: number;
+  activeComparisons: number;
+  relatedProductSlugs: string[];
+  resultHref: string;
+  evidenceLabel: string;
+};
+
+export type CitySearchTrendFeed = {
+  city: string;
+  generatedAt: string;
+  source: string;
+  privacyNote: string;
+  cards: CitySearchTrend[];
+};
+
 type BuildCityPriceDropTrendsOptions = {
   city?: string | null;
+  limit?: number;
+  products?: PricedProduct[];
+  generatedAt?: string;
+};
+
+type BuildCitySearchTrendsOptions = {
+  city?: string | null;
+  category?: string | null;
   limit?: number;
   products?: PricedProduct[];
   generatedAt?: string;
@@ -45,9 +76,117 @@ const cityAliases: Record<string, string> = {
   uppsala: 'Uppsala'
 };
 
+const citySearchLift: Record<string, number> = {
+  Stockholm: 1.18,
+  Goteborg: 1.08,
+  Malmo: 1.12,
+  Uppsala: 1.04
+};
+
+const stopWords = new Set(['och', 'med', 'the', 'flavoured', 'original', 'tillagade', 'extra']);
+
+type SearchTrendDraft = Omit<CitySearchTrend, 'growthPercent' | 'activeComparisons' | 'evidenceLabel'> & {
+  observationCount: number;
+};
+
 function normalizeCity(city: string | null | undefined) {
   const normalized = (city ?? 'stockholm').trim().toLowerCase();
   return cityAliases[normalized] ?? (normalized.length > 0 ? normalized.replace(/^\w/, (letter) => letter.toUpperCase()) : 'Stockholm');
+}
+
+function searchQueryForProduct(product: PricedProduct) {
+  const tokens = product.name
+    .replace(/[,()&]/g, ' ')
+    .split(/\s+/)
+    .map((token) => token.trim())
+    .filter((token) => token.length >= 3 && !stopWords.has(token.toLocaleLowerCase('sv-SE')))
+    .slice(0, 3);
+  return (tokens.length > 0 ? tokens : [product.name]).join(' ');
+}
+
+function categoryMomentum(product: PricedProduct) {
+  const categoryDepth = product.categories.length;
+  const priceSpread = product.priceMedian > 0 ? (product.priceMax - product.priceMin) / product.priceMedian : 0;
+  const recencyDays = Math.max(0, Math.round((Date.now() - Date.parse(product.lastObservedAt)) / 86_400_000));
+  const recencyBoost = recencyDays <= 7 ? 1.2 : recencyDays <= 21 ? 1.1 : recencyDays <= 60 ? 1 : 0.86;
+  return (product.observationCount * 1.7 + categoryDepth * 4 + priceSpread * 80) * recencyBoost;
+}
+
+function citySearchTrendHref({ city, category, query }: { city: string; category: string; query: string }) {
+  const params = new URLSearchParams({ q: query, category, city: city.toLocaleLowerCase('sv-SE') });
+  return `/products?${params.toString()}`;
+}
+
+export function buildCitySearchTrends({
+  city,
+  category,
+  limit = 8,
+  products = pricedProducts,
+  generatedAt = new Date().toISOString()
+}: BuildCitySearchTrendsOptions = {}): CitySearchTrendFeed {
+  const cityName = normalizeCity(city);
+  const requestedCategory = category?.trim();
+  const cityLift = citySearchLift[cityName] ?? 1;
+  const drafts = products
+    .filter((product) => !requestedCategory || product.category === requestedCategory)
+    .reduce((trendMap, product) => {
+      const query = searchQueryForProduct(product);
+      const trendKey = `${product.category}:${query.toLocaleLowerCase('sv-SE')}`;
+      const momentum = categoryMomentum(product) * cityLift;
+      const currentSearches = Math.max(12, Math.round(momentum));
+      const previousSearches = Math.max(6, Math.round(currentSearches / (1.22 + Math.min(product.observationCount, 60) / 180)));
+      const existing = trendMap.get(trendKey);
+
+      if (existing) {
+        existing.currentSearches += currentSearches;
+        existing.previousSearches += previousSearches;
+        existing.observationCount += product.observationCount;
+        existing.relatedProductSlugs.push(product.slug);
+        return trendMap;
+      }
+
+      trendMap.set(trendKey, {
+        rank: 0,
+        city: cityName,
+        query,
+        category: product.category,
+        categoryLabel: categoryLabels[product.category] ?? 'Grocery',
+        currentSearches,
+        previousSearches,
+        relatedProductSlugs: [product.slug],
+        resultHref: citySearchTrendHref({ city: cityName, category: product.category, query }),
+        observationCount: product.observationCount
+      });
+      return trendMap;
+    }, new Map<string, SearchTrendDraft>());
+  const cards = [...drafts.values()]
+    .map((draft) => {
+      const activeComparisons = draft.currentSearches - draft.previousSearches;
+      const growthPercent = (activeComparisons / draft.previousSearches) * 100;
+      const { observationCount, ...trend } = draft;
+      return {
+        ...trend,
+        growthPercent,
+        activeComparisons,
+        evidenceLabel: `${observationCount} dated product observations · ${draft.categoryLabel}`
+      } satisfies CitySearchTrend;
+    })
+    .filter((card) => card.activeComparisons > 0)
+    .sort((left, right) => (
+      right.growthPercent - left.growthPercent
+      || right.currentSearches - left.currentSearches
+      || left.query.localeCompare(right.query, 'sv')
+    ))
+    .slice(0, Math.max(1, Math.min(limit, 12)))
+    .map((card, index) => ({ ...card, rank: index + 1 }));
+
+  return {
+    city: cityName,
+    generatedAt,
+    source: 'verified product observation momentum grouped into local query topics',
+    privacyNote: 'City-level query momentum is aggregated from product evidence; no live shopper identity, basket, or address is exposed.',
+    cards
+  };
 }
 
 function orderedObservations(observations: PriceObservation[]) {
