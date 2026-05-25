@@ -380,13 +380,14 @@ export default async function ScreenerPage({ searchParams }: Readonly<{ searchPa
 
         <div className="overflow-hidden sm:overflow-x-auto">
           <table className="w-full border-separate border-spacing-y-3 text-left text-sm sm:min-w-[920px] sm:border-collapse sm:border-spacing-y-0">
+            <caption className="sr-only">Verified deal screener rows sorted by {sortOptions.find((option) => option.mode === mode)?.label.toLowerCase()}.</caption>
             <thead className="hidden bg-slate-50 text-xs font-black uppercase tracking-[0.16em] text-slate-500 sm:table-header-group">
               <tr>
-                <th className="px-5 py-3">Product</th>
-                <th className="px-5 py-3">Signal</th>
-                <th className="px-5 py-3">Price</th>
-                <th className="px-5 py-3">Comparison</th>
-                <th className="px-5 py-3">Confidence</th>
+                <th className="px-5 py-3" scope="col">Product</th>
+                <th className="px-5 py-3" scope="col">Signal</th>
+                <th className="px-5 py-3" scope="col">Price</th>
+                <th className="px-5 py-3" scope="col">Comparison</th>
+                <th className="px-5 py-3" scope="col">Confidence</th>
               </tr>
             </thead>
             <tbody className="block sm:table-row-group sm:divide-y sm:divide-slate-200">

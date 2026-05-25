@@ -1537,7 +1537,7 @@ export default async function ProductPage({ params, routeBase = 'products' }: Re
           {product.image ? (
             <div className="relative mb-5 aspect-square w-full overflow-hidden rounded-[2rem] border border-slate-100 bg-slate-50 shadow-inner">
               <Image
-                alt={product.name}
+                alt={`${product.name} product image`}
                 className="object-contain p-4"
                 fill
                 referrerPolicy="no-referrer"
@@ -1591,13 +1591,14 @@ export default async function ProductPage({ params, routeBase = 'products' }: Re
           </div>
           <div className="mt-5 overflow-x-auto rounded-2xl border border-emerald-100 bg-white shadow-sm">
             <table className="min-w-full divide-y divide-emerald-100 text-left text-sm">
+              <caption className="sr-only">Current chain prices for {product.name}, including unit price, median comparison, and confidence.</caption>
               <thead className="bg-emerald-900 text-white">
                 <tr>
-                  <th className="px-4 py-3 font-black">Chain</th>
-                  <th className="px-4 py-3 font-black">Current price</th>
-                  <th className="px-4 py-3 font-black">Unit price</th>
-                  <th className="px-4 py-3 font-black">Vs basket median</th>
-                  <th className="px-4 py-3 font-black">Confidence</th>
+                  <th className="px-4 py-3 font-black" scope="col">Chain</th>
+                  <th className="px-4 py-3 font-black" scope="col">Current price</th>
+                  <th className="px-4 py-3 font-black" scope="col">Unit price</th>
+                  <th className="px-4 py-3 font-black" scope="col">Vs basket median</th>
+                  <th className="px-4 py-3 font-black" scope="col">Confidence</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-emerald-100">
