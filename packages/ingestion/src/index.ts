@@ -19,6 +19,7 @@ import {
   type ImageCacheOptions as ProductImageCacheOptions,
   type ImageCacheProduct
 } from '@groceryview/image-cache';
+import { formatIngestRowZodIssues, ingestRowSchema } from './contract.js';
 import {
   fetchCityGrossProductsForAllStores,
   type CityGrossProduct
@@ -3292,7 +3293,22 @@ export type IngestionBatchPlan = {
 export function planIngestionBatch(inputs: RetailerProductInput[]): IngestionBatchPlan {
   const accepted: IngestionOutput[] = [];
   const rejected: Array<{ input: RetailerProductInput; reason: string }> = [];
-  for (const input of inputs) {
+  for (const [index, input] of inputs.entries()) {
+    const contractResult = ingestRowSchema.safeParse(input);
+    if (!contractResult.success) {
+      const reason = 'Ingest row contract violation: ' + formatIngestRowZodIssues(contractResult.error.issues);
+      console.error('[ingestion-contract] rejected malformed connector row', {
+        index,
+        issues: contractResult.error.issues.map((issue) => ({
+          path: issue.path.join('.'),
+          code: issue.code,
+          message: issue.message
+        }))
+      });
+      rejected.push({ input, reason });
+      continue;
+    }
+
     try {
       accepted.push(ingestRetailerProduct(input));
     } catch (error) {
