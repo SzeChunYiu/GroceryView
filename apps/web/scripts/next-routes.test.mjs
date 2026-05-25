@@ -453,6 +453,7 @@ describe('verified-data UI', () => {
   it('surfaces account-bound saved baskets and favorite stores on the account route', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const account = await read('src/app/account/page.tsx');
+    const bestTimeRoute = await read('src/app/api/alerts/best-time/route.ts');
     const server = await read('../../packages/server/src/index.ts');
     const schema = await read('../../db/schema.sql');
 
@@ -472,6 +473,13 @@ describe('verified-data UI', () => {
     assert.match(account, /Destructive action gated/);
     assert.match(account, /Type DELETE ACCOUNT/);
     assert.match(account, /reauthenticates/);
+    assert.match(account, /action="\/api\/alerts\/best-time"/);
+    assert.match(account, /name="targetStores"/);
+    assert.match(account, /name="categories"/);
+    assert.match(account, /name="confidenceThreshold"/);
+    assert.match(bestTimeRoute, /request\.formData\(\)/);
+    assert.match(bestTimeRoute, /ruleInputs/);
+    assert.match(bestTimeRoute, /recommendation: recommendation \?/);
     assert.match(server, /favorite-stores/);
     assert.match(schema, /create table if not exists weekly_baskets/);
     assert.match(schema, /create table if not exists basket_items/);
