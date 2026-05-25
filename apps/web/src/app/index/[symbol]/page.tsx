@@ -72,6 +72,10 @@ const chainIndexReport = calculateChainPriceIndex([
 ]);
 const chainIndexTrend = buildChainIndexTrendSeries();
 
+function jsonLd(value: unknown) {
+  return JSON.stringify(value).replace(/</g, '\\u003c');
+}
+
 function chainSlug(chainId: string) {
   return chainId
     .toLowerCase()
@@ -300,10 +304,43 @@ function chainChart(chain: ChainPriceIndex): PriceChartTerminalModel {
   };
 }
 
+function categoryItemListJsonLd(definition: CategoryDefinition, rows: CategoryConstituent[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: `${definition.label} fixed-basket constituents`,
+    description: definition.description,
+    numberOfItems: rows.length,
+    itemListOrder: 'https://schema.org/ItemListOrderDescending',
+    itemListElement: rows.slice(0, 36).map((row, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'Product',
+        name: row.productName,
+        sku: row.id,
+        ...(row.brand && row.brand !== 'Brand not reported' ? { brand: { '@type': 'Brand', name: row.brand } } : {}),
+        offers: {
+          '@type': 'Offer',
+          price: Number(row.currentUnitPrice.toFixed(2)),
+          priceCurrency: 'SEK',
+          seller: { '@type': 'Organization', name: row.currentLabel }
+        },
+        additionalProperty: [
+          { '@type': 'PropertyValue', name: 'baselineChain', value: row.baselineLabel },
+          { '@type': 'PropertyValue', name: 'baselineUnitPriceSek', value: Number(row.baseUnitPrice.toFixed(2)) },
+          { '@type': 'PropertyValue', name: 'movementPercent', value: Number(row.movementPercent.toFixed(2)) }
+        ]
+      }
+    }))
+  };
+}
+
 function CategoryIndexPage({ definition, index, rows }: Readonly<{ definition: CategoryDefinition; index: FixedBasketIndex; rows: CategoryConstituent[] }>) {
   const averageSaving = rows.reduce((sum, row) => sum + Math.abs(row.movementPercent), 0) / rows.length;
   return (
     <PageShell>
+      <script dangerouslySetInnerHTML={{ __html: jsonLd(categoryItemListJsonLd(definition, rows)) }} type="application/ld+json" />
       <Eyebrow>Index symbol</Eyebrow>
       <div className="mt-2 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
         <div>
