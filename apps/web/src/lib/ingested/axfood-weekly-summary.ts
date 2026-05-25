@@ -2,10 +2,10 @@ import type { ChainIndexTrendReport } from '../chain-index-data';
 
 export const willysSourceSummary = {
   source: 'willys.se public search JSON',
-  retrievedAt: '2026-05-24T22:11:12.471Z',
-  rowCount: 11278,
+  retrievedAt: '2026-05-25T06:29:56.563Z',
+  rowCount: 11198,
   sourceUrlPattern: 'https://www.willys.se/search?q={query}',
-  sourceUrlCount: 133
+  sourceUrlCount: 132
 };
 
 export const hemkopSourceSummary = {
@@ -18,8 +18,8 @@ export const hemkopSourceSummary = {
 
 export const willysWeeklyDiscountSourceSummary = {
   source: 'willys.se public Axfood campaign JSON',
-  retrievedAt: '2026-05-24T22:11:12.471Z',
-  rowCount: 46365,
+  retrievedAt: '2026-05-25T06:29:56.563Z',
+  rowCount: 46905,
   storeSourceUrl: 'https://www.willys.se/axfood/rest/store',
   sourceUrlPattern: 'https://www.willys.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100',
   storeCount: 254,
