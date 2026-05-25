@@ -35,7 +35,39 @@ export async function generateMetadata({ params }: Readonly<{ params: Promise<{ 
   const { slug } = await params;
   const product = findProduct(slug);
   if (!product) notFound();
-  return metadataForProduct(product);
+  const metadata = metadataForProduct(product);
+  const categoryLabel = labelFromSlug(product.category);
+  const brand = 'lowestPrice' in product ? product.brand : product.brands;
+  const priceLabel = formatSek(productCurrentPrice(product));
+  const title = `${product.name} price ticker | GroceryView`;
+  const description = [product.name, brand, categoryLabel, priceLabel].filter(Boolean).join(' · ');
+  const image = {
+    url: `/products/${product.slug}/opengraph-image`,
+    width: 1200,
+    height: 630,
+    alt: `${product.name} · ${categoryLabel}`
+  };
+
+  return {
+    ...metadata,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `${siteUrl}/products/${product.slug}`,
+      siteName: 'GroceryView',
+      locale: 'sv_SE',
+      type: 'website',
+      images: [image]
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [{ url: image.url, alt: image.alt }]
+    }
+  };
 }
 
 const REQUIRED_CHAIN_COVERAGE = 6;

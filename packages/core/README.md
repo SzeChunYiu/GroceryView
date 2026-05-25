@@ -1,6 +1,6 @@
 # @groceryview/core
 
-Pure TypeScript grocery pricing, promotion, basket, ranking, matching, and notification logic shared by GroceryView apps. The package has no runtime I/O: callers pass verified observations, basket rows, or product fixtures in and receive deterministic plans, scores, summaries, and review decisions back.
+Pure TypeScript grocery pricing, promotion, basket, ranking, matching, and notification logic shared by GroceryView apps. The package has no runtime I/O: callers pass verified observations, basket rows, or product fixtures in and receive deterministic plans, scores, summaries, and review decisions back. Browser apps, APIs, jobs, and tests can import it without database, network, filesystem, or framework dependencies.
 
 ## Install/import
 
