@@ -6295,6 +6295,75 @@ describe('daily ingestion runner', () => {
     ]);
   });
 
+  it('keeps daily products with null and empty barcodes on separate slug upsert paths', async () => {
+    const executor = new DailyIngestionExecutor();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-21T03:17:00.000Z',
+      connectors: [
+        {
+          connectorId: 'willys-normalized-json',
+          chainId: 'willys',
+          sourceType: 'official_api',
+          endpointUrl: 'https://sources.example.test/willys/products.json',
+          parserVersion: 'normalized-json-v1',
+          robotsTxtStatus: 'not_applicable',
+          legalReviewStatus: 'approved',
+          hasDataAgreement: true,
+          stores: [{ storeId: '2110', name: 'Willys Kungsbacka Hede', address: 'Tölöleden 3', city: 'Kungsbacka' }]
+        }
+      ],
+      fetchImpl: async () => new Response(JSON.stringify({
+        items: [
+          {
+            storeId: '2110',
+            retailerProductId: 'wil-null-barcode-1',
+            rawName: 'Loose Apple Red',
+            canonicalName: 'Loose Apple Red',
+            productId: 'willys-loose-apple-red',
+            categoryId: 'produce',
+            barcode: null,
+            packageSize: 1,
+            packageUnit: 'kg',
+            price: 24.9
+          },
+          {
+            storeId: '2110',
+            retailerProductId: 'wil-empty-barcode-2',
+            rawName: 'Loose Apple Green',
+            canonicalName: 'Loose Apple Green',
+            productId: 'willys-loose-apple-green',
+            categoryId: 'produce',
+            barcode: '   ',
+            packageSize: 1,
+            packageUnit: 'kg',
+            price: 22.9
+          }
+        ]
+      }), { status: 200, headers: { 'content-type': 'application/json' } })
+    });
+
+    assert.equal(result.acceptedCount, 2);
+    const productInsert = executor.calls.find((call) => call.sql.includes('jsonb_to_recordset') && call.sql.includes('insert into products'));
+    assert.ok(productInsert, 'daily ingestion should batch upsert null-barcode products');
+    assert.match(productInsert.sql, /where barcode is not null/);
+    assert.match(productInsert.sql, /left join products existing on existing\.barcode = input\.barcode and input\.barcode is not null/);
+    const products = JSON.parse(String(productInsert.params[0])) as Array<{ slug: string; barcode: string | null }>;
+    assert.deepEqual(products.map((product) => [product.slug, product.barcode]), [
+      ['willys-loose-apple-red', null],
+      ['willys-loose-apple-green', null]
+    ]);
+
+    const aliasInsert = executor.calls.find((call) => call.sql.includes('jsonb_to_recordset') && call.sql.includes('insert into aliases'));
+    assert.ok(aliasInsert, 'daily ingestion should batch upsert aliases for both null-barcode rows');
+    const aliases = JSON.parse(String(aliasInsert.params[0])) as Array<{ product_id: string }>;
+    assert.deepEqual(aliases.map((alias) => alias.product_id), [
+      'product-db-willys-loose-apple-red',
+      'product-db-willys-loose-apple-green'
+    ]);
+  });
+
+
   it('upserts every configured daily store before writing partial store-scoped observations', async () => {
     const executor = new DailyIngestionExecutor();
     const result = await runDailyIngestion({
