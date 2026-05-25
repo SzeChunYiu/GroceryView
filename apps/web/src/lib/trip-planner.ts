@@ -1,4 +1,14 @@
 export type RouteMode = 'fastest' | 'balanced' | 'accessibility';
+export type TripOriginSource = 'public_snapshot' | 'consented_geolocation';
+
+export type TripOrigin = {
+  source: TripOriginSource;
+  label: string;
+  latitude: number;
+  longitude: number;
+  accuracyMeters?: number;
+  observedAt?: string;
+};
 
 export type TripPlannerItem = {
   name: string;
@@ -32,6 +42,12 @@ export type AisleStop = {
 export type TripEstimate = {
   listId: string;
   listName: string;
+  originAccuracyMeters?: number;
+  originApproachMinutes: number;
+  originDistanceMeters: number;
+  originLabel: string;
+  originSource: TripOriginSource;
+  routeRecalculatedAt?: string;
   routeMode: RouteMode;
   routeModeLabel: string;
   routeModeDescription: string;
@@ -111,9 +127,41 @@ export const activeShoppingLists: ActiveShoppingList[] = [
   }
 ];
 
+export const publicSnapshotTripOrigin: TripOrigin = {
+  source: 'public_snapshot',
+  label: 'Public snapshot origin · no private shopper location',
+  latitude: 55.60498,
+  longitude: 13.00382
+};
+
+export function consentedTripOrigin(latitude: number, longitude: number, accuracyMeters?: number): TripOrigin {
+  return {
+    source: 'consented_geolocation',
+    label: 'Consented browser location',
+    latitude,
+    longitude,
+    accuracyMeters,
+    observedAt: new Date().toISOString()
+  };
+}
+
+const SHOPPING_TRIP_STORE = { latitude: 55.60587, longitude: 13.00073 };
 const ENTRY_EXIT_METERS = 80;
 const METERS_PER_AISLE_STOP = 35;
 const METERS_PER_AISLE_GAP = 18;
+
+function distanceMeters(from: Pick<TripOrigin, 'latitude' | 'longitude'>, to: { latitude: number; longitude: number }) {
+  const earthRadiusMeters = 6_371_000;
+  const toRad = (degrees: number) => (degrees * Math.PI) / 180;
+  const dLat = toRad(to.latitude - from.latitude);
+  const dLng = toRad(to.longitude - from.longitude);
+  const lat1 = toRad(from.latitude);
+  const lat2 = toRad(to.latitude);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.sin(dLng / 2) ** 2 * Math.cos(lat1) * Math.cos(lat2);
+  return Math.round(2 * earthRadiusMeters * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+}
 
 export function getAisleTraversal(items: TripPlannerItem[], routeMode: RouteMode = 'balanced') {
   const uniqueAisles = Array.from(new Set(items.filter((item) => !item.picked).map((item) => item.aisle))).sort((a, b) => a - b);
@@ -125,7 +173,11 @@ export function getAisleTraversal(items: TripPlannerItem[], routeMode: RouteMode
   return uniqueAisles;
 }
 
-export function estimateTripCompletion(list: ActiveShoppingList, selectedRouteMode: RouteMode = list.routeMode): TripEstimate {
+export function estimateTripCompletion(
+  list: ActiveShoppingList,
+  selectedRouteMode: RouteMode = list.routeMode,
+  origin: TripOrigin = publicSnapshotTripOrigin
+): TripEstimate {
   const profile = routeModeProfiles[selectedRouteMode];
   const remainingItems = list.items.filter((item) => !item.picked);
   const aisleTraversal = getAisleTraversal(remainingItems, selectedRouteMode);
@@ -144,13 +196,23 @@ export function estimateTripCompletion(list: ActiveShoppingList, selectedRouteMo
   const walkingMeters = remainingItems.length === 0 ? 0 : ENTRY_EXIT_METERS + aisleTraversal.length * METERS_PER_AISLE_STOP + aisleGapMeters;
   const turnSeconds = Math.max(0, aisleTraversal.length - 1) * profile.turnPenaltySeconds;
   const walkingMinutes = Math.ceil((walkingMeters / profile.metersPerMinute) + (turnSeconds / 60));
+  const originDistanceMeters = distanceMeters(origin, SHOPPING_TRIP_STORE);
+  const originApproachMinutes = origin.source === 'consented_geolocation'
+    ? Math.ceil(originDistanceMeters / profile.metersPerMinute)
+    : 0;
   const pickingMinutes = Math.ceil((remainingItems.length * profile.secondsPerItem) / 60);
   const checkoutMinutes = remainingItems.length === 0 ? 0 : (list.checkoutMinutes ?? 6);
-  const estimatedCompletionMinutes = walkingMinutes + pickingMinutes + checkoutMinutes;
+  const estimatedCompletionMinutes = originApproachMinutes + walkingMinutes + pickingMinutes + checkoutMinutes;
 
   return {
     listId: list.id,
     listName: list.name,
+    originAccuracyMeters: origin.accuracyMeters,
+    originApproachMinutes,
+    originDistanceMeters,
+    originLabel: origin.label,
+    originSource: origin.source,
+    routeRecalculatedAt: origin.observedAt,
     routeMode: selectedRouteMode,
     routeModeLabel: profile.label,
     routeModeDescription: profile.description,
