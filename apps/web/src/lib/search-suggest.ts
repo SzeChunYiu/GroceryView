@@ -7,6 +7,13 @@ export type GrocerySearchExpansion = {
   matchedSynonyms: string[];
 };
 
+export type GrocerySearchExpansionTelemetry = {
+  cacheHit: boolean;
+  cacheHitRate: number;
+  cacheHits: number;
+  cacheRequests: number;
+};
+
 const groceryAliasEntries: Array<{ canonical: string; aliases: string[] }> = [
   { canonical: 'coffee', aliases: ['kaffe', 'kafe', 'java', 'zoegas', 'zogas', 'zoégas'] },
   { canonical: 'Zoégas coffee', aliases: ['zoegas', 'zogas', 'zoégas brygg', 'zoegas brygg'] },
@@ -41,7 +48,29 @@ function addUnique(values: string[], value: string): void {
   if (!values.some((existing) => normalizeAliasText(existing) === normalized)) values.push(value);
 }
 
-export function expandGrocerySearchQuery(query: string, maxQueries = 5): GrocerySearchExpansion {
+const expansionCache = new Map<string, GrocerySearchExpansion>();
+let expansionCacheRequests = 0;
+let expansionCacheHits = 0;
+
+function cloneExpansion(expansion: GrocerySearchExpansion): GrocerySearchExpansion {
+  return {
+    query: expansion.query,
+    expandedQueries: [...expansion.expandedQueries],
+    matchedAliases: [...expansion.matchedAliases],
+    matchedSynonyms: [...expansion.matchedSynonyms]
+  };
+}
+
+function expansionTelemetry(cacheHit: boolean): GrocerySearchExpansionTelemetry {
+  return {
+    cacheHit,
+    cacheHitRate: expansionCacheRequests === 0 ? 0 : expansionCacheHits / expansionCacheRequests,
+    cacheHits: expansionCacheHits,
+    cacheRequests: expansionCacheRequests
+  };
+}
+
+function buildGrocerySearchExpansion(query: string, maxQueries: number): GrocerySearchExpansion {
   const trimmed = query.trim().replace(/\s+/g, ' ');
   const normalizedQuery = normalizeAliasText(trimmed);
   const tokens = new Set(normalizedQuery.split(' ').filter(Boolean));
@@ -74,4 +103,29 @@ export function expandGrocerySearchQuery(query: string, maxQueries = 5): Grocery
     matchedAliases,
     matchedSynonyms
   };
+}
+
+export function expandGrocerySearchQueryWithTelemetry(query: string, maxQueries = 5) {
+  expansionCacheRequests += 1;
+  const cacheKey = `${maxQueries}:${query.trim().replace(/\s+/g, ' ')}`;
+  const cached = expansionCache.get(cacheKey);
+  if (cached) {
+    expansionCacheHits += 1;
+    return {
+      expansion: cloneExpansion(cached),
+      telemetry: expansionTelemetry(true)
+    };
+  }
+
+  const expansion = buildGrocerySearchExpansion(query, maxQueries);
+  expansionCache.set(cacheKey, cloneExpansion(expansion));
+
+  return {
+    expansion,
+    telemetry: expansionTelemetry(false)
+  };
+}
+
+export function expandGrocerySearchQuery(query: string, maxQueries = 5): GrocerySearchExpansion {
+  return expandGrocerySearchQueryWithTelemetry(query, maxQueries).expansion;
 }
