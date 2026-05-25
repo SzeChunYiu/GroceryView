@@ -1,7 +1,7 @@
 # Mushrooms product-class map
 
-Status: operator reference for GroceryView product-class matching.  
-Ticket: factory-tickets #1708.  
+Status: operator reference for GroceryView product-class matching.
+Ticket: factory-tickets #1708.
 Last evidence pass: 2026-05-25.
 
 This document defines the canonical mushroom sub-classes used when normalising

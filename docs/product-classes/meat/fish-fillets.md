@@ -1,7 +1,7 @@
 # Fish fillets product-class map
 
-Status: operator reference for GroceryView product-class matching.  
-Ticket: factory-tickets #1714.  
+Status: operator reference for GroceryView product-class matching.
+Ticket: factory-tickets #1714.
 Last evidence pass: 2026-05-25.
 
 This document defines the canonical fish-fillet classes used when normalising
