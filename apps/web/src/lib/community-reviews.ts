@@ -43,7 +43,7 @@ export function formatModerationThreshold(value: number) {
 }
 
 
-export type CommunityReviewPromptMetric = 'taste' | 'freshness' | 'package_size' | 'substitution_quality';
+export type CommunityReviewPromptMetric = 'price_accuracy' | 'product_quality' | 'store_experience' | 'taste' | 'freshness' | 'package_size' | 'substitution_quality';
 
 export type CommunityProductReviewSummary = {
   averageRating: number;
@@ -94,6 +94,33 @@ export type CommunityReviewPromptResponse = {
 };
 
 export const COMMUNITY_REVIEW_PROMPTS: CommunityReviewPrompt[] = [
+  {
+    id: 'price_accuracy',
+    label: 'Price accuracy',
+    question: 'Did the submitted shelf, receipt, or app price match what shoppers can actually pay?',
+    helper: 'Capture whether the price evidence is current, legible, and tied to the same product, store, and unit.',
+    lowLabel: 'Wrong price',
+    highLabel: 'Accurate price',
+    trustReason: 'Price accuracy is the core signal that makes crowdsourced grocery data becomes more trustworthy.'
+  },
+  {
+    id: 'product_quality',
+    label: 'Product quality',
+    question: 'Did the item quality match what the price report promised?',
+    helper: 'Note damaged packaging, freshness, substitutions, or quality caveats that change the value of the deal.',
+    lowLabel: 'Poor quality',
+    highLabel: 'Great quality',
+    trustReason: 'Product quality keeps cheap but unusable items from looking like reliable grocery savings.'
+  },
+  {
+    id: 'store_experience',
+    label: 'Store experience',
+    question: 'Was the price easy to find and purchase at the store or online checkout?',
+    helper: 'Rate stock availability, shelf-label clarity, checkout surprises, and staff or pickup friction.',
+    lowLabel: 'Hard to buy',
+    highLabel: 'Easy to buy',
+    trustReason: 'Store experience separates a trustworthy live deal from one that shoppers cannot redeem.'
+  },
   {
     id: 'taste',
     label: 'Taste',

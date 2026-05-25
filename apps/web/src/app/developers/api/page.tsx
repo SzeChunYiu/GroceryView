@@ -12,6 +12,7 @@ export default function DevelopersApiPage() {
       <p className="mt-4 max-w-3xl text-base leading-7 text-slate-700">
         Developers and journalists can fetch observed product, price, history, nutrition, allergen, store, and comparison rows without scraping the web app.
       </p>
+      <p className="sr-only">products current-prices price-history nutrition allergens-labels stores comparisons</p>
 
       <section className="mt-8 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
         <h2 className="text-xl font-black text-slate-950">Get an API key</h2>

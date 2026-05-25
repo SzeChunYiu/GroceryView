@@ -1,4 +1,5 @@
 import { readFile } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 
 const INGESTED_DIR = new URL('../../apps/web/src/lib/ingested/', import.meta.url);
 
@@ -126,8 +127,8 @@ const failures = [];
 for (const dataset of DATASETS) {
   const fileUrl = new URL(dataset.file, INGESTED_DIR);
   const text = await readFile(fileUrl, 'utf8');
-  const rows = await extractJsonExport(text, dataset.rows, fileUrl);
-  const source = await extractJsonExport(text, dataset.source, fileUrl);
+  const rows = extractJsonExport(text, dataset.rows, fileUrl);
+  const source = extractJsonExport(text, dataset.source, fileUrl);
   const sourceRowCount = rowCount(source, dataset.sourceRowCount);
   const label = `${dataset.file}:${dataset.rows}`;
   const duplicateKeys = countDuplicates(rows.map((row) => rowKey(row, dataset.key)));
@@ -205,7 +206,7 @@ if (failures.length > 0) {
   console.log(JSON.stringify({ status: 'ok', summaries }, null, 2));
 }
 
-async function extractJsonExport(text, exportName, fileUrl) {
+function extractJsonExport(text, exportName, fileUrl) {
   const marker = `export const ${exportName}`;
   const markerIndex = text.indexOf(marker);
   if (markerIndex < 0) {
@@ -217,53 +218,43 @@ async function extractJsonExport(text, exportName, fileUrl) {
   if (start < 0) {
     throw new Error(`Missing JSON value for export ${exportName}`);
   }
-  const valueText = text.slice(start, matchingJsonEnd(text, start) + 1);
+  const rawValue = text.slice(start, matchingJsonEnd(text, start) + 1);
   try {
-    return JSON.parse(sanitizeJsonValue(valueText));
+    return JSON.parse(sanitizeJsonValue(rawValue));
   } catch (error) {
-    const spreadNames = arraySpreadNames(valueText);
-    if (spreadNames.length === 0 || !fileUrl) throw error;
-    const chunks = [];
-    for (const spreadName of spreadNames) {
-      const chunkUrl = resolveNamedImport(text, spreadName, fileUrl);
-      const chunkText = await readFile(chunkUrl, 'utf8');
-      chunks.push(...await extractJsonExport(chunkText, spreadName, chunkUrl));
-    }
-    return chunks;
+    const spreadArray = extractSpreadArrayExport(text, rawValue, fileUrl);
+    if (spreadArray) return spreadArray;
+    throw error;
   }
 }
 
+function extractSpreadArrayExport(text, rawValue, fileUrl) {
+  if (!rawValue.trimStart().startsWith('[') || !rawValue.includes('...')) return null;
+
+  const rows = [];
+  const spreadIdentifiers = [...rawValue.matchAll(/\.\.\.([A-Za-z_$][\w$]*)/g)].map((match) => match[1]);
+  if (spreadIdentifiers.length === 0) return null;
+
+  for (const identifier of spreadIdentifiers) {
+    const importMatch = text.match(new RegExp(`import \\{\\s*${identifier}\\s*\\} from ['"]([^'"]+)['"];`));
+    if (!importMatch) return null;
+    const importPath = importMatch[1].endsWith('.ts') ? importMatch[1] : `${importMatch[1]}.ts`;
+    const importedUrl = new URL(importPath, fileUrl);
+    const importedText = readFileSync(importedUrl, 'utf8');
+    const chunkRows = extractJsonExport(importedText, identifier, importedUrl);
+    if (!Array.isArray(chunkRows)) return null;
+    rows.push(...chunkRows);
+  }
+
+  return rows;
+}
+
 function sanitizeJsonValue(valueText) {
-  // Generated TypeScript arrays may contain sparse-array elisions (`,,`), which
-  // are valid JavaScript but invalid JSON. The provenance verifier only needs
-  // concrete rows, so collapse elisions before JSON parsing.
   let sanitized = valueText;
   while (/,\s*,/.test(sanitized)) {
     sanitized = sanitized.replace(/,\s*,/g, ',');
   }
   return sanitized;
-}
-
-function arraySpreadNames(valueText) {
-  const trimmed = valueText.trim();
-  if (!trimmed.startsWith('[') || !trimmed.endsWith(']')) return [];
-  const body = trimmed.slice(1, -1).trim();
-  if (!body) return [];
-  const names = [];
-  for (const part of body.split(',')) {
-    const match = part.trim().match(/^\.\.\.([A-Za-z_$][\w$]*)$/);
-    if (!match) return [];
-    names.push(match[1]);
-  }
-  return names;
-}
-
-function resolveNamedImport(text, importName, fileUrl) {
-  const pattern = new RegExp(`import\\s+\\{\\s*${importName}\\s*\\}\\s+from\\s+['"]([^'"]+)['"]`);
-  const match = text.match(pattern);
-  if (!match) throw new Error(`Missing import for spread export ${importName}`);
-  const specifier = match[1].endsWith('.ts') ? match[1] : `${match[1]}.ts`;
-  return new URL(specifier, fileUrl);
 }
 
 function firstJsonStart(text, fromIndex) {

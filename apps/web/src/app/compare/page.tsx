@@ -3,6 +3,7 @@ import { BasketComparisonPrint } from '@/components/basket-comparison-print';
 import { ChainSelector } from '@/components/chain-selector';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
+import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
 import { StoreComparisonTable } from '@/components/StoreComparisonTable';
 import { StorePriceMatrix } from '@/components/store-price-matrix';
 import { COMPARE_CHAIN_ORDER, buildBasketStoreComparison, buildChainComparisonTable, parseCompareChainsParam } from '@/lib/chain-compare';
@@ -25,9 +26,86 @@ function formatComparableUnitPrice(value: number | null | undefined, unitLabel: 
 
 type SearchParams = {
   chains?: string | string[];
+  overlayMode?: string | string[];
   products?: string | string[];
   routeMode?: string | string[];
 };
+
+function firstSearchValue(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] ?? '' : value ?? '';
+}
+
+function overlayModeHref(productsParam: string | string[] | undefined, chainsParam: string | string[] | undefined, overlayMode: 'price' | 'index') {
+  const params = new URLSearchParams();
+  const products = firstSearchValue(productsParam);
+  const chains = firstSearchValue(chainsParam);
+  if (products) params.set('products', products);
+  if (chains) params.set('chains', chains);
+  if (overlayMode === 'index') params.set('overlayMode', 'index');
+  return `/compare${params.toString() ? `?${params.toString()}` : ''}`;
+}
+
+function overlayWindow(
+  label: PriceChartTerminalWindow['label'],
+  days: number | null,
+  overlayMode: 'price' | 'index'
+): PriceChartTerminalWindow {
+  const allTimes = compareOverlayChart.overlaySeries.flatMap((series) => series.points.map((point) => Date.parse(point.time)));
+  const windowEndTime = Math.max(...allTimes);
+  const windowStartTime = days === null ? Math.min(...allTimes) : windowEndTime - days * 24 * 60 * 60 * 1000;
+  const series = compareOverlayChart.overlaySeries.map((item) => {
+    const visiblePoints = item.points.filter((point) => Date.parse(point.time) >= windowStartTime && Date.parse(point.time) <= windowEndTime);
+    const baseValue = visiblePoints[0]?.value ?? item.points[0]?.value ?? 1;
+    return {
+      id: item.id,
+      storeName: item.productName,
+      sourceType: item.sourceType,
+      lineStyle: item.lineStyle,
+      points: visiblePoints.map((point) => ({
+        time: point.time,
+        value: overlayMode === 'index' && baseValue > 0 ? Math.round((point.value / baseValue) * 10000) / 100 : point.value,
+        confidence: point.confidence,
+        provenanceLabel: point.provenanceLabel
+      })),
+      markers: []
+    };
+  });
+  const values = series.flatMap((item) => item.points.map((point) => point.value));
+  const latestValue = values.at(-1) ?? 0;
+  const lowValue = values.length ? Math.min(...values) : 0;
+  const highValue = values.length ? Math.max(...values) : 0;
+
+  return {
+    label,
+    rangeLabel: days === null ? `${compareOverlayChart.windowStart.slice(0, 10)} → ${compareOverlayChart.windowEnd.slice(0, 10)}` : `Last ${days} days`,
+    windowStart: new Date(windowStartTime).toISOString(),
+    windowEnd: new Date(windowEndTime).toISOString(),
+    pointCount: series.reduce((sum, item) => sum + item.points.length, 0),
+    markerCount: 0,
+    latestValueLabel: overlayMode === 'index' ? `${latestValue.toLocaleString('sv-SE')} index` : formatSek(latestValue),
+    latestObservedAt: compareOverlayChart.windowEnd,
+    lowValueLabel: overlayMode === 'index' ? `${lowValue.toLocaleString('sv-SE')} index` : formatSek(lowValue),
+    highValueLabel: overlayMode === 'index' ? `${highValue.toLocaleString('sv-SE')} index` : formatSek(highValue),
+    series
+  };
+}
+
+function overlayTerminalModel(overlayMode: 'price' | 'index'): PriceChartTerminalModel {
+  return {
+    available: compareOverlayChart.overlaySeries.length > 0,
+    title: overlayMode === 'index' ? 'Normalized product overlay (first point = 100)' : 'Product price overlay',
+    sourceLabel: compareOverlayChart.coverageLabel,
+    confidenceLabel: compareOverlayChart.confidenceLabel,
+    caveat: `${compareOverlayChart.guardrail} ${overlayMode === 'index' ? 'Index mode normalizes each visible series to 100 at its first point.' : 'Price mode shows observed SEK values.'}`,
+    defaultWindow: '1Y',
+    windows: [
+      overlayWindow('1M', 30, overlayMode),
+      overlayWindow('3M', 90, overlayMode),
+      overlayWindow('1Y', 365, overlayMode),
+      overlayWindow('ALL', null, overlayMode)
+    ]
+  };
+}
 
 function compareHref(productsParam: string | string[] | undefined, selectedChainIds: string[]) {
   const params = new URLSearchParams();
@@ -41,6 +119,8 @@ function compareHref(productsParam: string | string[] | undefined, selectedChain
 export default async function ComparePage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
   const productsParam = resolvedSearchParams.products;
+  const overlayMode = firstSearchValue(resolvedSearchParams.overlayMode) === 'index' ? 'index' as const : 'price' as const;
+  const overlayChartModel = overlayTerminalModel(overlayMode);
   const comparison = buildChainComparisonTable(productsParam);
   const selectedChainIds = parseCompareChainsParam(resolvedSearchParams.chains);
   const basketStoreComparison = buildBasketStoreComparison(productsParam, resolvedSearchParams.chains);
@@ -297,6 +377,17 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
           </div>
         </div>
         <div className="mt-5 grid gap-3 md:grid-cols-2">
+          <div className="md:col-span-2">
+            <div className="mb-3 flex flex-wrap gap-2">
+              <Link className={`rounded-full px-4 py-2 text-xs font-black ${overlayMode === 'price' ? 'bg-indigo-900 text-white' : 'bg-white text-indigo-900 ring-1 ring-indigo-200'}`} href={overlayModeHref(productsParam, resolvedSearchParams.chains, 'price')}>
+                Price mode
+              </Link>
+              <Link className={`rounded-full px-4 py-2 text-xs font-black ${overlayMode === 'index' ? 'bg-indigo-900 text-white' : 'bg-white text-indigo-900 ring-1 ring-indigo-200'}`} href={overlayModeHref(productsParam, resolvedSearchParams.chains, 'index')}>
+                Normalized index mode
+              </Link>
+            </div>
+            <PriceChartTerminal chart={overlayChartModel} />
+          </div>
           {compareOverlayChart.overlaySeries.map((series) => {
             const values = series.sparklinePoints.map((point) => point.value);
             const low = values.length ? Math.min(...values) : 0;

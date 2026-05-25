@@ -1,5 +1,7 @@
 import { axfoodProducts, type AxfoodProduct, type ChainPrice } from './axfood-products';
+import { buildCompareNoChainState as buildCompareNoChainStateModel } from './chain-compare-no-chain-state.js';
 import { dbSiteSnapshotGeneratedAt } from './generated/db-site-products';
+import { dbSiteCompareStoreCapabilities, type DbSiteCompareStoreCapability } from './generated/db-site-ingested-overrides';
 import { commodityComparisonForProduct } from './verified-data';
 
 export const COMPARE_CHAIN_ORDER = [
@@ -61,6 +63,37 @@ export type ChainComparisonTable = {
   products: ChainCompareProductRow[];
   sourceLabel: string;
   generatedAt: string | null;
+  noChainState: ChainCompareNoChainState;
+};
+
+export type ChainCompareCapabilitySource =
+  | 'generated dbSiteCompareStoreCapabilities'
+  | 'fallback compare chain order'
+  | 'mixed generated dbSiteCompareStoreCapabilities + fallback compare chain order';
+
+export type ChainCompareNoChainCapability = {
+  chainId: CompareChainId;
+  chainName: string;
+  coupon: boolean;
+  delivery: boolean;
+  pickup: boolean;
+  evidenceLabel: string;
+  evidenceUpdatedAt: string | null;
+  capabilitySource: Exclude<ChainCompareCapabilitySource, 'mixed generated dbSiteCompareStoreCapabilities + fallback compare chain order'>;
+};
+
+export type ChainCompareNoChainState = {
+  activeFilters: CompareChainId[];
+  capabilities: ChainCompareNoChainCapability[];
+  capabilitySource: ChainCompareCapabilitySource;
+  evidenceUpdatedAt: string | null;
+  missingProductIds: string[];
+  missingIdGuardrail: string;
+};
+
+export type BuildChainComparisonTableOptions = {
+  activeFilters?: readonly CompareChainId[];
+  compareStoreCapabilities?: readonly DbSiteCompareStoreCapability[];
 };
 
 export type BasketStoreSubstitutionExplanation = {
@@ -305,7 +338,8 @@ function compareProductRow(requestedId: string, product: AxfoodProduct): ChainCo
 
 export function buildChainComparisonTable(
   productsParam: string | string[] | null | undefined,
-  products: readonly AxfoodProduct[] = axfoodProducts
+  products: readonly AxfoodProduct[] = axfoodProducts,
+  options: BuildChainComparisonTableOptions = {}
 ): ChainComparisonTable {
   const requestedIds = parseCompareProductsParam(productsParam);
   const byId = productLookup(products);
@@ -328,7 +362,13 @@ export function buildChainComparisonTable(
     sourceLabel: dbSiteSnapshotGeneratedAt
       ? 'postgres.latest_prices/observations via packages/db site snapshot'
       : 'local bundled chain catalogue; production builds prefer packages/db snapshot rows',
-    generatedAt: dbSiteSnapshotGeneratedAt
+    generatedAt: dbSiteSnapshotGeneratedAt,
+    noChainState: buildCompareNoChainStateModel({
+      activeFilters: options.activeFilters ?? COMPARE_CHAIN_ORDER.map((chain) => chain.id),
+      chainOrder: COMPARE_CHAIN_ORDER,
+      generatedCapabilities: options.compareStoreCapabilities ?? dbSiteCompareStoreCapabilities,
+      missingProductIds
+    }) as ChainCompareNoChainState
   };
 }
 
