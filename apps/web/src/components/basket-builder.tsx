@@ -34,6 +34,7 @@ export type BasketBuilderProduct = {
   dietaryTags?: readonly string[];
   lastPurchasedAt?: string;
   purchaseCount?: number;
+  recommendationReasons?: readonly string[];
   shortcutLabel?: string;
   suggestedQuantity?: number;
 };
@@ -112,6 +113,21 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
     setBasketProducts((current) => addBasketBuilderProduct(current, product));
   }
 
+  function recommendationReasonsFor(product: T) {
+    const reasons = [...(product.recommendationReasons ?? [])];
+    if ((product.purchaseCount ?? 0) > 1) {
+      reasons.push('Frequently bought together from past baskets');
+    }
+    if (product.dietaryTags?.some((tag) => activeDietaryFilterSet.has(tag))) {
+      reasons.push('Matches dietary preference');
+    }
+    if (product.dealStackOffers?.some((offer) => offer.amount > 0)) {
+      reasons.push('Cheaper substitute when the eligible offer is stacked');
+    }
+
+    return [...new Set(reasons)].slice(0, 3);
+  }
+
   function toggleDietaryFilter(tag: string) {
     const nextFilters = activeDietaryFilterSet.has(tag)
       ? activeDietaryFilters.filter((filter) => filter !== tag)
@@ -135,6 +151,7 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
               <button key={`shortcut-${product.id}`} type="button" onClick={() => add(product)}>
                 Add {product.name}
                 {product.shortcutLabel ? ` · ${product.shortcutLabel}` : ''}
+                {recommendationReasonsFor(product).length > 0 ? ` · ${recommendationReasonsFor(product)[0]}` : ''}
               </button>
             ))}
           </div>
@@ -162,14 +179,22 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
       ) : null}
 
       <ul>
-        {filteredProducts.map((product) => (
-          <li key={product.id}>
-            <span>{product.name}</span>
-            <button type="button" onClick={() => add(product)}>
-              Add
-            </button>
-          </li>
-        ))}
+        {filteredProducts.map((product) => {
+          const recommendationReasons = recommendationReasonsFor(product);
+          return (
+            <li key={product.id}>
+              <span>{product.name}</span>
+              <button type="button" onClick={() => add(product)}>
+                Add
+              </button>
+              {recommendationReasons.length > 0 ? (
+                <ul aria-label={`${product.name} recommendation reasons`}>
+                  {recommendationReasons.map((reason) => <li key={reason}>{reason}</li>)}
+                </ul>
+              ) : null}
+            </li>
+          );
+        })}
       </ul>
       {filteredProducts.length === 0 ? (
         <p>No products match the selected dietary filters.</p>
@@ -192,6 +217,7 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
                 {suggestion.reason === 'high_unit_price'
                   ? ` to save ${suggestion.savingsLabel}`
                   : ' because the selected chain is missing the current item'}.
+                <span> Reason: {suggestion.reason === 'high_unit_price' ? 'cheaper substitute' : 'store coverage substitute'}.</span>
               </li>
             ))}
           </ul>

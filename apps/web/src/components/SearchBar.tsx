@@ -287,6 +287,14 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
   }
 
   function handleSearchKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key === 'Enter' && activeOptionIndex >= 0) {
+      const option = document.querySelector<HTMLAnchorElement>(`[data-search-option-index="${activeOptionIndex}"]`);
+      if (option) {
+        event.preventDefault();
+        option.click();
+      }
+      return;
+    }
     if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp' && event.key !== 'Escape') return;
     if (event.key === 'Escape') {
       setIsFocused(false);
