@@ -1,4 +1,5 @@
 import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { ConsentedShoppingTripPlanner } from '@/hooks/useGeolocation';
 import { defaultStoreRouteChecklist, osmStores } from '@/lib/osm-stores';
 import { basketTripCostContract, budgetCheapestStoreRoutingPlanner, deliveryVsInStoreComparison, elderlyNearestDeliveryPlanner, formatSek, fulfillmentSlotsContract } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
@@ -46,7 +47,7 @@ export default function FeaturePage() {
         <p className="text-sm font-black uppercase tracking-[0.2em] text-indigo-800">Time-to-complete estimator</p>
         <h2 className="mt-2 text-2xl font-black tracking-tight">Active-list aisle traversal and completion time</h2>
         <p className="mt-3 text-sm leading-6 text-slate-700">
-          Each active list uses its selected route mode to estimate remaining pick time, walking time, checkout time, and the aisle order a shopper should follow. Picked items are ignored so the time-to-complete stays focused on the current trip.
+          Each active list uses its selected route mode to estimate remaining pick time, walking time, checkout time, and the aisle order a shopper should follow. Picked items are ignored so the time-to-complete stays focused on the current trip, and the public snapshot keeps private location closed until a signed-in shopper consents.
         </p>
         <div className="mt-4 grid gap-4 lg:grid-cols-3">
           {activeShoppingTripEstimates.map((estimate) => (
@@ -54,6 +55,7 @@ export default function FeaturePage() {
               <p className="text-xs font-black uppercase tracking-[0.18em] text-indigo-800">{estimate.routeModeLabel}</p>
               <h3 className="mt-2 text-lg font-black text-slate-950">{estimate.listName}</h3>
               <p className="mt-2 text-sm font-semibold text-slate-700">{estimate.routeModeDescription}</p>
+              <p className="mt-2 rounded-xl bg-indigo-50 p-2 text-xs font-bold text-indigo-900">{estimate.originLabel}</p>
               <dl className="mt-3 space-y-2 text-sm">
                 <div className="flex justify-between gap-3">
                   <dt className="font-semibold text-slate-600">remaining items</dt>
@@ -66,6 +68,10 @@ export default function FeaturePage() {
                 <div className="flex justify-between gap-3">
                   <dt className="font-semibold text-slate-600">walking + picking</dt>
                   <dd className="font-black text-slate-950">{estimate.walkingMinutes + estimate.pickingMinutes} min</dd>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <dt className="font-semibold text-slate-600">origin approach</dt>
+                  <dd className="font-black text-slate-950">{estimate.originApproachMinutes} min</dd>
                 </div>
                 <div className="flex justify-between gap-3 border-t border-indigo-100 pt-2">
                   <dt className="font-black text-slate-950">time to complete</dt>
@@ -81,6 +87,7 @@ export default function FeaturePage() {
           ))}
         </div>
       </Card>
+      <ConsentedShoppingTripPlanner />
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Store route checklist</p>
         <h2 className="mt-2 text-2xl font-black tracking-tight">Grouped by selected-store aisle and department</h2>
