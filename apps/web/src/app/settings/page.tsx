@@ -1,6 +1,7 @@
 import { buildPrivacyExport } from '@groceryview/core';
 import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { SettingsDataExportActions } from '@/components/settings-data-export-actions';
+import { DietaryProfileOnboarding } from '@/components/diet-filter-picker';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { groupPreferredBrandControls } from '@/lib/personalization';
 import { routeMetadata } from '@/lib/seo';
@@ -41,6 +42,15 @@ export default function SettingsPage() {
       </p>
 
       <SettingsDataExportActions />
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Personalization setup</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Dietary profile for onboarding and settings edits</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+          Save allergies, diets, and avoided ingredients before recommendations are trusted. The same durable profile can be updated later from settings.
+        </p>
+        <DietaryProfileOnboarding className="mt-4" />
+      </Card>
 
       <Card className="mt-6 border-cyan-200 bg-cyan-50">
         <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
