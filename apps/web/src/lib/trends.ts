@@ -53,6 +53,30 @@ export type CitySearchTrendFeed = {
   cards: CitySearchTrend[];
 };
 
+export type CategoryInflationTrend = {
+  rank: number;
+  category: string;
+  categoryLabel: string;
+  latestMonth: string;
+  previousMonth: string;
+  latestAveragePrice: number;
+  previousAveragePrice: number;
+  changeAmount: number;
+  changePercent: number;
+  basketAverageChangePercent: number;
+  fasterThanBasket: boolean;
+  productCount: number;
+  observationCount: number;
+  callout: string;
+};
+
+export type CategoryInflationTrendFeed = {
+  generatedAt: string;
+  source: string;
+  basketAverageChangePercent: number;
+  cards: CategoryInflationTrend[];
+};
+
 type BuildCityPriceDropTrendsOptions = {
   city?: string | null;
   limit?: number;
@@ -63,6 +87,12 @@ type BuildCityPriceDropTrendsOptions = {
 type BuildCitySearchTrendsOptions = {
   city?: string | null;
   category?: string | null;
+  limit?: number;
+  products?: PricedProduct[];
+  generatedAt?: string;
+};
+
+type BuildCategoryInflationTrendsOptions = {
   limit?: number;
   products?: PricedProduct[];
   generatedAt?: string;
@@ -291,6 +321,115 @@ export function buildCityPriceDropTrends({
     city: cityName,
     generatedAt,
     source: 'openprices-products.observations',
+    cards
+  };
+}
+
+type CategoryMonthBucket = {
+  category: string;
+  month: string;
+  totalPrice: number;
+  observationCount: number;
+  productSlugs: Set<string>;
+};
+
+function observationMonth(date: string) {
+  return date.slice(0, 7);
+}
+
+export function buildCategoryInflationTrends({
+  limit = 6,
+  products = pricedProducts,
+  generatedAt = new Date().toISOString()
+}: BuildCategoryInflationTrendsOptions = {}): CategoryInflationTrendFeed {
+  const buckets = products.reduce((map, product) => {
+    product.observations.forEach((observation) => {
+      if (!Number.isFinite(observation.price) || Date.parse(observation.date) <= 0) return;
+      const month = observationMonth(observation.date);
+      const key = `${product.category}:${month}`;
+      const bucket = map.get(key) ?? {
+        category: product.category,
+        month,
+        totalPrice: 0,
+        observationCount: 0,
+        productSlugs: new Set<string>()
+      };
+      bucket.totalPrice += observation.price;
+      bucket.observationCount += 1;
+      bucket.productSlugs.add(product.slug);
+      map.set(key, bucket);
+    });
+    return map;
+  }, new Map<string, CategoryMonthBucket>());
+
+  const byCategory = [...buckets.values()].reduce((map, bucket) => {
+    const list = map.get(bucket.category) ?? [];
+    list.push(bucket);
+    map.set(bucket.category, list);
+    return map;
+  }, new Map<string, CategoryMonthBucket[]>());
+
+  const drafts = [...byCategory.entries()].flatMap(([category, months]) => {
+    const ordered = months
+      .filter((month) => month.observationCount > 0)
+      .sort((left, right) => left.month.localeCompare(right.month));
+    const latest = ordered.at(-1);
+    const previous = ordered.at(-2);
+    if (!latest || !previous) return [];
+
+    const latestAveragePrice = latest.totalPrice / latest.observationCount;
+    const previousAveragePrice = previous.totalPrice / previous.observationCount;
+    if (previousAveragePrice <= 0) return [];
+
+    const changeAmount = latestAveragePrice - previousAveragePrice;
+    const changePercent = (changeAmount / previousAveragePrice) * 100;
+
+    return [{
+      rank: 0,
+      category,
+      categoryLabel: categoryLabels[category] ?? 'Grocery',
+      latestMonth: latest.month,
+      previousMonth: previous.month,
+      latestAveragePrice,
+      previousAveragePrice,
+      changeAmount,
+      changePercent,
+      basketAverageChangePercent: 0,
+      fasterThanBasket: false,
+      productCount: latest.productSlugs.size,
+      observationCount: latest.observationCount + previous.observationCount,
+      callout: ''
+    }];
+  });
+
+  const basketAverageChangePercent = drafts.length > 0
+    ? drafts.reduce((sum, draft) => sum + draft.changePercent, 0) / drafts.length
+    : 0;
+
+  const cards = drafts
+    .map((draft) => {
+      const spread = draft.changePercent - basketAverageChangePercent;
+      return {
+        ...draft,
+        basketAverageChangePercent,
+        fasterThanBasket: spread > 0,
+        callout: spread > 0
+          ? `${draft.categoryLabel} is rising ${spread.toFixed(1)} pts faster than the basket average.`
+          : `${draft.categoryLabel} is ${Math.abs(spread).toFixed(1)} pts below the basket average.`
+      } satisfies CategoryInflationTrend;
+    })
+    .sort((left, right) => (
+      right.changePercent - left.changePercent
+      || right.observationCount - left.observationCount
+      || left.categoryLabel.localeCompare(right.categoryLabel, 'sv')
+    ))
+    .slice(0, Math.max(1, Math.min(limit, 12)))
+    .map((card, index) => ({ ...card, rank: index + 1 }));
+
+  return {
+    generatedAt,
+    source: 'OpenPrices monthly category observations',
+    basketAverageChangePercent,
     cards
   };
 }
