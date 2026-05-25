@@ -102,8 +102,14 @@ const chainRetailerTypes = {
   coop: 'grocery',
   lidl: 'grocery',
   netto: 'grocery',
-  '7-eleven-se': 'convenience',
-  seven_eleven_se: 'convenience',
+  okq8: 'fuel_convenience',
+  'circle-k': 'fuel_convenience',
+  circle_k: 'fuel_convenience',
+  preem: 'fuel_convenience',
+  st1: 'fuel_convenience',
+  '7-eleven': 'fuel_convenience',
+  '7-eleven-se': 'fuel_convenience',
+  seven_eleven_se: 'fuel_convenience',
   apohem: 'pharmacy',
   'apotek-hjartat': 'pharmacy',
   apoteket: 'pharmacy',
@@ -140,6 +146,12 @@ const chainRetailerTypes = {
   'life-se': 'health_food'
 } as const;
 const retailerTypeLabels: Record<string, string> = {
+  grocery: 'Grocery',
+  pharmacy: 'Pharmacy',
+  fuel_convenience: 'Fuel convenience',
+  variety: 'Variety',
+  cosmetics: 'Cosmetics',
+  household: 'Household',
   ethnic_asian: 'Ethnic Asian',
   ethnic_polish_eastern_european: 'Polish / Eastern European',
   ethnic_middle_eastern: 'Middle Eastern',
@@ -150,6 +162,24 @@ const retailerTypeLabels: Record<string, string> = {
   kosher_halal: 'Kosher / halal',
   online_marketplace: 'Online marketplace'
 };
+const allowedCrossChainRetailerTypes = new Set([
+  'grocery',
+  'pharmacy',
+  'fuel_convenience',
+  'convenience',
+  'variety',
+  'cosmetics',
+  'household',
+  'ethnic_asian',
+  'ethnic_polish_eastern_european',
+  'ethnic_middle_eastern',
+  'ethnic_indian_south_asian',
+  'ethnic_latin',
+  'ethnic_african',
+  'health_food',
+  'kosher_halal',
+  'online_marketplace'
+]);
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
@@ -175,7 +205,9 @@ function formatSignedPct(value: number | null | undefined) {
   return `${value > 0 ? '+' : ''}${formatPct(value)}`;
 }
 
-function retailerTypeForChain(chain: string) {
+function retailerTypeForChain(chain: string, explicitRetailerType?: string | null) {
+  const normalizedRetailerType = explicitRetailerType?.trim().toLocaleLowerCase('sv-SE').replace(/[-\s]+/g, '_');
+  if (normalizedRetailerType && allowedCrossChainRetailerTypes.has(normalizedRetailerType)) return normalizedRetailerType;
   return chainRetailerTypes[chain as keyof typeof chainRetailerTypes] ?? 'grocery';
 }
 
@@ -187,7 +219,7 @@ function crossChainQuoteRowsFor(product: (typeof axfoodProducts)[number]) {
   const rows = chainPriceRows(product)
     .map((row) => {
       const normalizedUnitPrice = normalizeUnitPriceForPackageText(row.price, product.subline);
-      const retailerType = retailerTypeForChain(row.chain);
+      const retailerType = retailerTypeForChain(row.chain, (row as { retailerType?: string }).retailerType);
       return {
         ...row,
         retailerType,
@@ -198,13 +230,13 @@ function crossChainQuoteRowsFor(product: (typeof axfoodProducts)[number]) {
     })
     .sort((left, right) => left.effectiveUnitPrice - right.effectiveUnitPrice || left.chain.localeCompare(right.chain));
   const basketMedianPrice = medianFor(rows.map((row) => row.price));
-  const cheapestPrice = rows[0]?.price ?? null;
+  const cheapestEffectiveUnitPrice = rows[0]?.effectiveUnitPrice ?? null;
 
   return rows.map((row) => ({
     ...row,
     basketMedianPrice,
     deltaVsMedian: basketMedianPrice && basketMedianPrice > 0 ? ((row.price - basketMedianPrice) / basketMedianPrice) * 100 : null,
-    isCheapest: cheapestPrice !== null && row.price === cheapestPrice
+    isCheapest: cheapestEffectiveUnitPrice !== null && row.effectiveUnitPrice === cheapestEffectiveUnitPrice
   }));
 }
 

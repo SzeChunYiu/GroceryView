@@ -1155,6 +1155,24 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(nav, /href: '\/basket'/);
   });
 
+  it('shows product price comparison rows across retailer types sorted by effective unit price', async () => {
+    const route = await read('src/app/products/[slug]/page.tsx');
+
+    assert.match(route, /chainPriceRows\(product\)/);
+    assert.match(route, /matchedChainProducts\.find/);
+    assert.match(route, /retailerTypeForChain\(row\.chain/);
+    assert.match(route, /fuel_convenience/);
+    assert.match(route, /grocery: 'Grocery'/);
+    assert.match(route, /pharmacy: 'Pharmacy'/);
+    assert.match(route, /variety: 'Variety'/);
+    assert.match(route, /cosmetics: 'Cosmetics'/);
+    assert.match(route, /row\.effectiveUnitPrice === cheapestEffectiveUnitPrice/);
+    assert.match(route, /left\.effectiveUnitPrice - right\.effectiveUnitPrice/);
+    assert.match(route, /row\.retailerTypeLabel/);
+    assert.match(route, /Rows include grocery, pharmacy, variety, cosmetics/);
+    assert.doesNotMatch(route, /@\/lib\/demo-data|@\/components\/sample-data/);
+  });
+
   it('surfaces a budget stretch-krona basket optimizer using real basket strategy output', async () => {
     const source = await read('src/app/weekly-basket/page.tsx');
     const demo = await read('src/lib/demo-data.ts');
