@@ -1,4 +1,6 @@
-export type CrossCategoryRetailerType = 'grocery' | 'variety' | 'pharmacy' | 'online' | 'other' | (string & {});
+import type { RetailerType } from '../types/chain.js';
+
+export type CrossCategoryRetailerType = RetailerType | 'online' | 'other' | (string & {});
 
 export type CrossCategoryPriceBasis = 'package' | 'unit';
 
