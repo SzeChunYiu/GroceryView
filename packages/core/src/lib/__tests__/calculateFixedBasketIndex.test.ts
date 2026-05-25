@@ -30,15 +30,28 @@ describe('calculateFixedBasketIndex', () => {
     });
   });
 
-  it('rejects an empty component list', () => {
-    expect(() => calculateFixedBasketIndex({
+  it('returns a low-confidence null index for an empty component list', () => {
+    const index = calculateFixedBasketIndex({
       id: 'empty-weekly-staples',
       label: 'Empty Weekly Staples',
       country: 'SE',
       baseDate: '2026-01-01',
       currentDate: '2026-05-24',
       components: []
-    })).toThrow('At least one SE component is required to calculate an index.');
+    });
+
+    expect(index).toMatchObject({
+      id: 'empty-weekly-staples',
+      label: 'Empty Weekly Staples',
+      country: 'SE',
+      currency: 'SEK',
+      baseDate: '2026-01-01',
+      currentDate: '2026-05-24',
+      value: null,
+      movementPercent: null,
+      confidence: 'low',
+      components: []
+    });
   });
 
   it('rejects a malformed basket component without a positive base price', () => {
