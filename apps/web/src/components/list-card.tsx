@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import type { PublicSharePreview } from "../lib/social";
-import { getStoreLayoutDepartment, sortItemsByStoreLayout, type StoreLayoutChain } from "../lib/trip-planner";
+import { getStoreLayoutDepartment, sortItemsByStoreLayout, type StoreLayoutChain, type StoreLayoutGroupOrder } from "../lib/trip-planner";
 import {
   useList,
   type FamilyRole,
@@ -23,6 +23,7 @@ export type CommentableSharedListItem = SharedListItem & {
 
 type ListCardProps = {
   currentRole: FamilyRole;
+  groupOrder?: StoreLayoutGroupOrder;
   items: CommentableSharedListItem[];
   onConflictPrompt?: (prompt: ListConflictPrompt) => void;
   selectedChain?: StoreLayoutChain;
@@ -80,7 +81,7 @@ export function PublicSharePreviewCard({
   );
 }
 
-export function ListCard({ currentRole, items, onConflictPrompt, selectedChain = "ica" }: ListCardProps) {
+export function ListCard({ currentRole, groupOrder = "store-layout", items, onConflictPrompt, selectedChain = "ica" }: ListCardProps) {
   const [commentsByItem, setCommentsByItem] = useState<Record<string, ListItemComment[]>>(() =>
     Object.fromEntries(items.map((item) => [item.id, item.comments ?? []])),
   );
@@ -89,7 +90,7 @@ export function ListCard({ currentRole, items, onConflictPrompt, selectedChain =
     initialItems: items,
     onConflictPrompt,
   });
-  const storeOrderedItems = sortItemsByStoreLayout(listItems, selectedChain);
+  const storeOrderedItems = sortItemsByStoreLayout(listItems, selectedChain, groupOrder);
 
   function addComment(itemId: string, event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
