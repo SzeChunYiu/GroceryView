@@ -1,3 +1,5 @@
+import { normalizeUnitPriceForPackageText } from './normalization'
+
 export type ProductRecord = {
   id: string
   name: string
@@ -5,6 +7,22 @@ export type ProductRecord = {
   category?: string | null
   size?: string | null
   upc?: string | null
+}
+
+export type CheaperSubstitutionProduct = ProductRecord & {
+  price: number
+  packageText: string
+}
+
+export type CheaperSubstitutionSuggestion = {
+  source: CheaperSubstitutionProduct
+  substitute: CheaperSubstitutionProduct
+  sourceUnitPrice: number
+  substituteUnitPrice: number
+  comparableUnit: 'kg' | 'l' | 'piece'
+  savingsPerUnit: number
+  savingsPercent: number
+  reasons: string[]
 }
 
 export type DuplicateCandidate = {
@@ -51,6 +69,10 @@ function sameText(left?: string | null, right?: string | null) {
   const normalizedRight = normalize(right)
 
   return Boolean(normalizedLeft && normalizedLeft === normalizedRight)
+}
+
+export function normalizedCategory(value?: string | null) {
+  return normalize(value).replace(/\s+/g, '-')
 }
 
 function confidenceFor(left: ProductRecord, right: ProductRecord) {
@@ -124,4 +146,51 @@ export function findDuplicateProducts(products: ProductRecord[], threshold = 0.5
   }
 
   return candidates.sort((left, right) => right.confidence - left.confidence)
+}
+
+export function findCheaperBasketSubstitutions(
+  products: CheaperSubstitutionProduct[],
+  selectedProducts: CheaperSubstitutionProduct[],
+): CheaperSubstitutionSuggestion[] {
+  const selectedIds = new Set(selectedProducts.map((product) => product.id))
+  const suggestions: CheaperSubstitutionSuggestion[] = []
+
+  for (const source of selectedProducts) {
+    const sourceCategory = normalizedCategory(source.category)
+    const sourceUnitPrice = normalizeUnitPriceForPackageText(source.price, source.packageText)
+    if (!sourceCategory || !sourceUnitPrice) continue
+
+    const candidates = products
+      .filter((candidate) => candidate.id !== source.id && !selectedIds.has(candidate.id))
+      .map((candidate) => {
+        const candidateCategory = normalizedCategory(candidate.category)
+        const candidateUnitPrice = normalizeUnitPriceForPackageText(candidate.price, candidate.packageText)
+        if (!candidateCategory || candidateCategory !== sourceCategory || !candidateUnitPrice) return null
+        if (candidateUnitPrice.comparableUnit !== sourceUnitPrice.comparableUnit) return null
+        if (candidateUnitPrice.value >= sourceUnitPrice.value) return null
+
+        const savingsPerUnit = sourceUnitPrice.value - candidateUnitPrice.value
+        return {
+          source,
+          substitute: candidate,
+          sourceUnitPrice: Number(sourceUnitPrice.value.toFixed(2)),
+          substituteUnitPrice: Number(candidateUnitPrice.value.toFixed(2)),
+          comparableUnit: sourceUnitPrice.comparableUnit,
+          savingsPerUnit: Number(savingsPerUnit.toFixed(2)),
+          savingsPercent: Number(((savingsPerUnit / sourceUnitPrice.value) * 100).toFixed(1)),
+          reasons: [
+            'same category',
+            `normalized ${sourceUnitPrice.comparableUnit} unit`,
+            sameText(source.brand, candidate.brand) ? 'same brand' : 'lower unit price'
+          ]
+        }
+      })
+      .filter((candidate): candidate is CheaperSubstitutionSuggestion => candidate !== null)
+      .sort((left, right) => right.savingsPerUnit - left.savingsPerUnit)
+
+    const bestCandidate = candidates[0]
+    if (bestCandidate) suggestions.push(bestCandidate)
+  }
+
+  return suggestions.sort((left, right) => right.savingsPerUnit - left.savingsPerUnit)
 }

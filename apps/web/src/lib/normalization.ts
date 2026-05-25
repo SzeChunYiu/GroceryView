@@ -8,6 +8,12 @@ export type NormalizedUnitPrice = PackageEvidence & {
   comparableUnit: 'kg' | 'l' | 'piece';
 };
 
+export function comparableUnitLabel(unit: NormalizedUnitPrice['comparableUnit']) {
+  if (unit === 'kg') return 'kr/kg';
+  if (unit === 'l') return 'kr/l';
+  return 'kr/st';
+}
+
 function normalizePackageAmount(amount: number, unit: string): PackageEvidence | null {
   if (!Number.isFinite(amount) || amount <= 0) return null;
   if (unit === 'kg') return { packageSize: amount * 1000, packageUnit: 'g' };

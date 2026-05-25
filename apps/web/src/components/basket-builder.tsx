@@ -4,7 +4,7 @@
  *
  * @example
  * ```tsx
- * <BasketBuilder products={[{ id: "milk", name: "Milk" }]} />
+ * <BasketBuilder products={[{ id: "milk", name: "Milk", price: 18, packageText: "1 l", category: "dairy" }]} />
  * ```
  *
  * @param props - BasketBuilder component props.
@@ -17,8 +17,10 @@
 "use client";
 
 import { useState } from "react";
+import { findCheaperBasketSubstitutions, type CheaperSubstitutionProduct } from "@/lib/deduplicate-products";
+import { comparableUnitLabel } from "@/lib/normalization";
 
-export type BasketBuilderProduct = {
+export type BasketBuilderProduct = CheaperSubstitutionProduct & {
   id: string;
   name: string;
 };
@@ -42,6 +44,7 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
   products,
 }: BasketBuilderProps<T>) {
   const [basketProducts, setBasketProducts] = useState<T[]>([]);
+  const suggestions = findCheaperBasketSubstitutions([...products], basketProducts);
 
   function add(product: T) {
     setBasketProducts((current) => addBasketBuilderProduct(current, product));
@@ -53,6 +56,10 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
         {products.map((product) => (
           <li key={product.id}>
             <span>{product.name}</span>
+            <span>
+              {" "}
+              {product.price.toLocaleString("sv-SE")} kr / {product.packageText}
+            </span>
             <button type="button" onClick={() => add(product)}>
               Add
             </button>
@@ -66,6 +73,31 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
           <li key={product.id}>{product.name}</li>
         ))}
       </ul>
+
+      {suggestions.length > 0 ? (
+        <section aria-label="Cheaper substitution suggestions">
+          <h2>Cheaper substitutions</h2>
+          <ul>
+            {suggestions.map((suggestion) => (
+              <li key={`${suggestion.source.id}:${suggestion.substitute.id}`}>
+                <span>
+                  Swap {suggestion.source.name} for {suggestion.substitute.name}
+                </span>
+                <span>
+                  {" "}
+                  Save {suggestion.savingsPerUnit.toLocaleString("sv-SE")}{" "}
+                  {comparableUnitLabel(suggestion.comparableUnit)} (
+                  {suggestion.savingsPercent.toLocaleString("sv-SE")}%)
+                </span>
+                <span> - Review only, not auto-applied</span>
+                <button type="button" onClick={() => add(suggestion.substitute)}>
+                  Add substitute
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
     </section>
   );
 }
