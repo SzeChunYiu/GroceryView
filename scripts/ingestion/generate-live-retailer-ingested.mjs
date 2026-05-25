@@ -24,6 +24,8 @@ import {
   DEFAULT_OPENFOODFACTS_SWEDEN_CATALOG_MAX_PAGES,
   DEFAULT_ICA_REKLAMBLAD_OFFER_PAGE_URLS,
   DEFAULT_ICA_REKLAMBLAD_MAX_ROWS,
+  SWEDISH_COUNTY_ISO3166_2_CODES,
+  SWEDISH_GROCERY_SHOP_VALUES,
   DEFAULT_WILLYS_SEARCH_QUERIES,
   DEFAULT_WILLYS_LIVE_PRODUCT_MAX_ROWS,
   DEFAULT_WILLYS_LIVE_WEEKLY_DISCOUNT_MAX_ROWS,
@@ -42,9 +44,12 @@ import {
   buildOpenFoodFactsSwedenSearchUrl,
   fetchIcaReklambladOffers,
   fetchOkq8FuelPrices,
+  fetchOverpassGroceryStores,
   fetchPharmacyProducts,
   fetchSevenElevenSeConvenienceProducts,
   fetchSt1FuelPrices,
+  buildSwedishCountyGroceryOverpassQuery,
+  buildSwedishCountyGroceryShopOverpassQuery,
   fetchWillysProducts,
   fetchWillysWeeklyDiscountsForAllStores
 } from '../../packages/ingestion/dist/index.js';
@@ -212,6 +217,15 @@ if (shouldRun('ica-reklamblad')) {
   });
   await writeIcaReklamblad(icaReklambladOffers);
   summary.icaReklambladOffers = icaReklambladOffers.length;
+}
+
+if (shouldRun('overpass')) {
+  const { rows, sourceFetches } = await fetchSwedenOverpassGroceryStores({ retrievedAt });
+  await writeOverpass(rows, {
+    summary: `Swedish county fallback extract for shop=${SWEDISH_GROCERY_SHOP_VALUES.join('|')}. Counties that timed out on the combined regex query were fetched with exact per-shop county queries.`,
+    sourceFetches
+  });
+  summary.overpassStores = rows.length;
 }
 
 if (shouldRun('okq8-fuel-prices')) {
@@ -1090,10 +1104,13 @@ async function writeSt1FuelPrices(rows) {
 }
 
 async function writeOverpass(rows, query) {
+  const querySummary = typeof query === 'string' ? query : query.summary;
+  const sourceFetches = typeof query === 'string' ? [] : query.sourceFetches;
+  const countyCodes = unique(sourceFetches.map((fetch) => fetch.countyCode));
   await writeGeneratedFile('overpass.ts', [
-    '// AUTO-GENERATED from Overpass API for OpenStreetMap grocery stores in Stockholms län.',
+    '// AUTO-GENERATED from Overpass API for OpenStreetMap grocery stores in Sweden.',
     '// Source URL: https://overpass-api.de/api/interpreter',
-    `// Query: ${oneLine(query)}`,
+    `// Query: ${oneLine(querySummary)}`,
     `// Retrieved: ${retrievedAt}`,
     `// Row count: ${rows.length} real OSM rows fetched from overpass-api.de.`,
     '// Source data: (C) OpenStreetMap contributors, ODbL.',
@@ -1122,7 +1139,10 @@ async function writeOverpass(rows, query) {
       retrievedAt,
       rowCount: rows.length,
       sourceUrl: 'https://overpass-api.de/api/interpreter',
-      query,
+      sourceUrls: ['https://overpass-api.de/api/interpreter'],
+      query: querySummary,
+      countyCodes,
+      sourceFetches,
       license: 'ODbL, (C) OpenStreetMap contributors'
     })} as const;`,
     '',
@@ -1176,6 +1196,78 @@ async function writeSevenElevenSe(rows) {
     `export const sevenElevenSeProducts: SevenElevenSeIngestedProduct[] = ${literal(rows)};`,
     ''
   ]);
+}
+
+async function fetchSwedenOverpassGroceryStores({ retrievedAt }) {
+  const rowsByKey = new Map();
+  const sourceFetches = [];
+  const fetchImpl = retryingOverpassFetch();
+
+  for (const countyCode of SWEDISH_COUNTY_ISO3166_2_CODES) {
+    const query = buildSwedishCountyGroceryOverpassQuery(countyCode);
+    try {
+      const rows = await fetchOverpassGroceryStores({ fetchImpl, query, retrievedAt });
+      for (const row of rows) {
+        rowsByKey.set(`${row.osmType}:${row.osmId}`, row);
+      }
+      sourceFetches.push({
+        countyCode,
+        queryType: 'county-regex',
+        rowCount: rows.length,
+        sourceUrl: 'https://overpass-api.de/api/interpreter',
+        query
+      });
+      continue;
+    } catch (error) {
+      sourceFetches.push({
+        countyCode,
+        queryType: 'county-regex',
+        rowCount: 0,
+        sourceUrl: 'https://overpass-api.de/api/interpreter',
+        query,
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+
+    for (const shop of SWEDISH_GROCERY_SHOP_VALUES) {
+      const fallbackQuery = buildSwedishCountyGroceryShopOverpassQuery(countyCode, shop);
+      const rows = await fetchOverpassGroceryStores({ fetchImpl, query: fallbackQuery, retrievedAt });
+      for (const row of rows) {
+        rowsByKey.set(`${row.osmType}:${row.osmId}`, row);
+      }
+      sourceFetches.push({
+        countyCode,
+        queryType: `county-shop-${shop}`,
+        rowCount: rows.length,
+        sourceUrl: 'https://overpass-api.de/api/interpreter',
+        query: fallbackQuery
+      });
+    }
+  }
+
+  return {
+    rows: [...rowsByKey.values()].sort((left, right) => left.osmType.localeCompare(right.osmType) || left.osmId - right.osmId),
+    sourceFetches
+  };
+}
+
+function retryingOverpassFetch() {
+  let previousRequest = Promise.resolve();
+  return async (url, init) => {
+    previousRequest = previousRequest.then(() => sleep(4_000));
+    await previousRequest;
+    let response = await fetch(url, init);
+    for (const delayMs of [15_000, 45_000, 90_000]) {
+      if (response.status !== 429 && response.status !== 504) break;
+      await sleep(delayMs);
+      response = await fetch(url, init);
+    }
+    return response;
+  };
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 async function writeIcaReklamblad(rows) {
