@@ -411,6 +411,14 @@ export default async function WatchlistPage({
         <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
           This family tracker calls buildWatchlistAlerts for diaper packs and exposes diaperUnitPrice so parents can compare price per diaper without estimating missing loyalty-wallet offers.
         </p>
+        <div className="mt-4 flex flex-wrap gap-2 text-xs font-black uppercase tracking-[0.14em] text-blue-900">
+          {babyDiaperPriceTracker.brandFilters.map((brand) => (
+            <span className="rounded-full bg-white px-3 py-2 shadow-sm" key={brand}>Brand {brand}</span>
+          ))}
+          {babyDiaperPriceTracker.sizeFilters.map((size) => (
+            <span className="rounded-full bg-white px-3 py-2 shadow-sm" key={size}>Size {size}</span>
+          ))}
+        </div>
         <div className="mt-4 grid gap-3 lg:grid-cols-2">
           {babyDiaperPriceTracker.rows.map((row) => (
             <Link className="rounded-2xl border border-blue-200 bg-white p-4 hover:border-blue-700" href={`/products/${row.productId}`} key={row.productId}>
@@ -425,7 +433,13 @@ export default async function WatchlistPage({
                 <p className="rounded-2xl bg-blue-100 p-3 font-semibold">Best {row.bestPrice} SEK</p>
                 <p className="rounded-2xl bg-blue-100 p-3 font-semibold">diaperUnitPrice {row.diaperUnitPrice.toFixed(2)} SEK</p>
                 <p className="rounded-2xl bg-emerald-50 p-3 font-black text-emerald-900">Deal Score {row.dealScore}</p>
+                <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Brand {row.diaperBrand}</p>
+                <p className="rounded-2xl bg-slate-50 p-3 font-semibold">{row.diaperStageLabel}</p>
+                <p className="rounded-2xl bg-slate-50 p-3 font-semibold">{row.targetPriceLabel}</p>
               </div>
+              <p className="mt-3 rounded-2xl bg-blue-950 p-3 text-xs font-black uppercase tracking-[0.14em] text-blue-100">
+                {row.historicalLowBadge} · strictMatchKey {row.strictMatchKey}
+              </p>
             </Link>
           ))}
         </div>

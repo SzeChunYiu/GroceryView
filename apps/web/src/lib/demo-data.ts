@@ -2614,7 +2614,27 @@ export const budgetEssentialsPriceDropAlerts = {
   }
 };
 
-export const babyDiaperWatchlistInputs: { favoriteStoreIds: string[]; watchlist: WatchlistItem[]; products: (WatchlistProductSnapshot & { source: string; diaperUnitPrice: number })[] } = {
+type BabyDiaperWatchlistProduct = WatchlistProductSnapshot & {
+  source: string;
+  diaperUnitPrice: number;
+};
+
+function diaperBrandFromName(productName: string) {
+  const brand = productName.match(/^(Libero|Pampers)\b/i)?.[1];
+  return brand ? brand[0]!.toUpperCase() + brand.slice(1).toLowerCase() : 'Brand not parsed';
+}
+
+function diaperSizeFromName(productName: string) {
+  return Number(productName.match(/\b(?:size|strl)\s*(\d+)\b/i)?.[1] ?? NaN);
+}
+
+function diaperStrictMatchKey(productName: string) {
+  const brand = diaperBrandFromName(productName).toLowerCase();
+  const size = diaperSizeFromName(productName);
+  return Number.isFinite(size) ? `${brand}:size-${size}` : `${brand}:size-unparsed`;
+}
+
+export const babyDiaperWatchlistInputs: { favoriteStoreIds: string[]; watchlist: WatchlistItem[]; products: BabyDiaperWatchlistProduct[] } = {
   favoriteStoreIds: ['willys-odenplan', 'hemkop-hornstull', 'coop-medborgarplatsen'],
   watchlist: [
     { productId: 'libero-touch-size-4-88p', targetPrice: 179, alertDealScoreAt: 75, favoriteStoresOnly: true, allowedPriceTypes: ['member', 'promotion'] },
@@ -2660,14 +2680,26 @@ export const babyDiaperPriceTracker = {
   persona: 'Families with kids',
   title: 'Baby & diaper price tracking',
   alerts: babyDiaperAlerts,
-  rows: babyDiaperWatchlistInputs.products.map((product) => ({
-    ...product,
-    diaperUnitPrice: product.diaperUnitPrice,
-    alertCount: babyDiaperAlerts.filter((alert) => alert.productId === product.productId).length
-  })),
+  brandFilters: [...new Set(babyDiaperWatchlistInputs.products.map((product) => diaperBrandFromName(product.productName)))],
+  sizeFilters: [...new Set(babyDiaperWatchlistInputs.products.map((product) => diaperSizeFromName(product.productName)).filter(Number.isFinite))].sort((left, right) => left - right),
+  rows: babyDiaperWatchlistInputs.products.map((product) => {
+    const watch = babyDiaperWatchlistInputs.watchlist.find((item) => item.productId === product.productId);
+    const diaperSize = diaperSizeFromName(product.productName);
+    return {
+      ...product,
+      diaperBrand: diaperBrandFromName(product.productName),
+      diaperSize: Number.isFinite(diaperSize) ? diaperSize : null,
+      diaperStageLabel: Number.isFinite(diaperSize) ? `Size ${diaperSize}` : 'Size not parsed',
+      diaperUnitPrice: product.diaperUnitPrice,
+      strictMatchKey: diaperStrictMatchKey(product.productName),
+      targetPriceLabel: watch?.targetPrice === undefined ? 'No target price' : `${watch.targetPrice} SEK target`,
+      historicalLowBadge: product.isNew52WeekLow ? 'New 52-week low' : 'No new historical low',
+      alertCount: babyDiaperAlerts.filter((alert) => alert.productId === product.productId).length
+    };
+  }),
   coverage: {
     confidence: 'medium',
-    caveat: 'Diaper tracking uses visible pack counts and watchlist alert rules; missing private loyalty wallet offers are not estimated.'
+    caveat: 'Diaper tracking uses visible pack counts, strict brand/size match keys, and watchlist target prices; missing private loyalty wallet offers are not estimated.'
   }
 };
 
