@@ -10,7 +10,7 @@ import { SavedSearchAction } from '@/components/saved-search-action';
 import { VirtualizedProductGrid } from '@/components/LazyItemCard';
 import { apohemSource } from '@/lib/ingested/apohem';
 import { buildSavedSearchSubscription } from '@/lib/alert-scheduler';
-import { adaptiveProductCards, buildProductSearchView, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
+import { adaptiveProductCards, buildProductSearchView, withProductSearchExplanationBadges, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
 import { publicCatalogueRevalidateSeconds, routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
 import { buildRemovableSearchFilterChips } from '@/lib/search-filters';
@@ -132,9 +132,10 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const { categoryFacets, labelFacets, originFacets, chainFacets, priceRange, inStockOnly, resultCards } = search;
   const requestedPage = toPageNumber(resolvedSearchParams.page);
   const selectedBrand = normalizeSelectedBrand(resolvedSearchParams.brand);
-  const productCards = selectedBrand
+  const baseProductCards = selectedBrand
     ? adaptiveProductCards.filter((card) => card.brand === selectedBrand)
     : adaptiveProductCards;
+  const productCards = withProductSearchExplanationBadges(baseProductCards, search.query);
   const totalPages = Math.max(1, Math.ceil(resultCards.length / PRODUCTS_PER_PAGE));
   const currentPage = Math.min(requestedPage, totalPages);
   const pageStart = (currentPage - 1) * PRODUCTS_PER_PAGE;
