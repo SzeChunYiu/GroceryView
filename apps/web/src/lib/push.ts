@@ -20,6 +20,98 @@ export type SavePushConsentInput = {
 
 const accessTokenStorageKey = 'groceryview:accessToken';
 const userIdStorageKey = 'groceryview:userId';
+export const myFlyerReadyPushChannel = 'my-flyer-ready';
+
+export type StoredNotificationSubscription = {
+  accountId: string;
+  channels: string[];
+  deliveryEnabled: boolean;
+  permission: NotificationPermissionState;
+  subscription: PushSubscriptionJSON | null;
+  tokenId: string | null;
+  updatedAt: string;
+  userAgent: string | null;
+};
+
+export type MyFlyerReadyPushPayload = {
+  generatedAt: string;
+  rows: Array<{
+    offer: {
+      chain: string;
+      productName: string;
+      savings: number;
+    };
+  }>;
+  userId: string;
+};
+
+export type MyFlyerReadyPushDeliveryResult = {
+  delivered: number;
+  failed: number;
+  skipped: number;
+};
+
+declare global {
+  var groceryViewNotificationSubscriptions: Map<string, StoredNotificationSubscription> | undefined;
+}
+
+function notificationSubscriptionStore() {
+  const store = globalThis.groceryViewNotificationSubscriptions ?? new Map<string, StoredNotificationSubscription>();
+  globalThis.groceryViewNotificationSubscriptions = store;
+  return store;
+}
+
+export function listPushSubscriptionsForChannel(channel: string) {
+  return [...notificationSubscriptionStore().values()].filter((record) => (
+    record.deliveryEnabled &&
+    record.permission === 'granted' &&
+    record.channels.includes(channel) &&
+    Boolean(record.subscription?.endpoint)
+  ));
+}
+
+export function buildMyFlyerReadyPushSummary(payload: MyFlyerReadyPushPayload) {
+  const topOffer = payload.rows[0]?.offer;
+  const prefix = `${payload.rows.length} MyFlyer deal${payload.rows.length === 1 ? '' : 's'} ready`;
+  if (!topOffer) return `${prefix} for your weekly flyer.`;
+  return `${prefix}: ${topOffer.productName} at ${topOffer.chain} saves ${Math.round(topOffer.savings)} kr.`;
+}
+
+export async function deliverMyFlyerReadyPushes(payload: MyFlyerReadyPushPayload, fetcher: typeof fetch = fetch): Promise<MyFlyerReadyPushDeliveryResult> {
+  const subscriptions = listPushSubscriptionsForChannel(myFlyerReadyPushChannel)
+    .filter((record) => record.accountId === payload.userId);
+  const summary = buildMyFlyerReadyPushSummary(payload);
+  const notification = {
+    body: summary,
+    generatedAt: payload.generatedAt,
+    tag: myFlyerReadyPushChannel,
+    title: 'MyFlyer is ready',
+    type: myFlyerReadyPushChannel,
+    url: `/se/my-flyer?user_id=${encodeURIComponent(payload.userId)}`
+  };
+  let delivered = 0;
+  let failed = 0;
+
+  await Promise.all(subscriptions.map(async (record) => {
+    try {
+      const response = await fetcher(record.subscription!.endpoint!, {
+        body: JSON.stringify(notification),
+        headers: {
+          'content-type': 'application/json',
+          ttl: '3600',
+          urgency: 'normal'
+        },
+        method: 'POST'
+      });
+      if (response.ok || response.status === 201 || response.status === 202) delivered += 1;
+      else failed += 1;
+    } catch {
+      failed += 1;
+    }
+  }));
+
+  return { delivered, failed, skipped: subscriptions.length === 0 ? 1 : 0 };
+}
 
 function browserSessionStorage(): Storage | null {
   if (typeof window === 'undefined') return null;

@@ -7,6 +7,7 @@ import {
   myFlyerCountries,
   type MyFlyerQuery
 } from '@/lib/my-flyer';
+import { deliverMyFlyerReadyPushes } from '@/lib/push';
 
 const querySchema = z.object({
   user_id: z.string().trim().min(1).max(128).regex(/^[A-Za-z0-9._:-]+$/),
@@ -25,7 +26,7 @@ function badRequest(error: z.ZodError) {
   }, { status: 400 });
 }
 
-export function GET(request: Request) {
+export async function GET(request: Request) {
   const parsed = querySchema.safeParse(Object.fromEntries(new URL(request.url).searchParams));
   if (!parsed.success) return badRequest(parsed.error);
 
@@ -36,11 +37,16 @@ export function GET(request: Request) {
     limit: parsed.data.limit
   };
   const { payload, cacheStatus } = getCachedMyFlyerPayload(query);
+  const pushResult = cacheStatus === 'MISS'
+    ? await deliverMyFlyerReadyPushes(payload)
+    : { delivered: 0, failed: 0, skipped: 0 };
 
   return NextResponse.json(payload, {
     headers: {
       'Cache-Control': 'private, max-age=3600',
-      'X-MyFlyer-Cache': cacheStatus
+      'X-MyFlyer-Cache': cacheStatus,
+      'X-MyFlyer-Push-Delivered': String(pushResult.delivered),
+      'X-MyFlyer-Push-Failed': String(pushResult.failed)
     }
   });
 }

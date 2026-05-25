@@ -155,3 +155,31 @@ self.addEventListener('fetch', (event) => {
 
   event.respondWith(itemPageNetworkFirst(event.request));
 });
+
+self.addEventListener('push', (event) => {
+  const fallback = {
+    body: 'Your weekly MyFlyer is ready.',
+    tag: 'my-flyer-ready',
+    title: 'MyFlyer is ready',
+    url: '/se/my-flyer'
+  };
+  let payload = fallback;
+
+  try {
+    payload = event.data ? { ...fallback, ...event.data.json() } : fallback;
+  } catch {
+    payload = fallback;
+  }
+
+  event.waitUntil(self.registration.showNotification(payload.title, {
+    body: payload.body,
+    data: { url: payload.url },
+    tag: payload.tag
+  }));
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = event.notification.data?.url || '/se/my-flyer';
+  event.waitUntil(self.clients.openWindow(url));
+});

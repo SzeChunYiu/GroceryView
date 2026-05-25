@@ -1,26 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import type { StoredNotificationSubscription } from '@/lib/push';
+
 type NotificationPermissionState = 'default' | 'denied' | 'granted' | 'unsupported';
-
-type NotificationSubscription = {
-  endpoint: string;
-  expirationTime?: number | null;
-  keys: {
-    auth: string;
-    p256dh: string;
-  };
-};
-
-type StoredNotificationSubscription = {
-  accountId: string;
-  channels: string[];
-  deliveryEnabled: boolean;
-  permission: NotificationPermissionState;
-  subscription: NotificationSubscription | null;
-  tokenId: string | null;
-  updatedAt: string;
-  userAgent: string | null;
-};
 
 declare global {
   var groceryViewNotificationSubscriptions: Map<string, StoredNotificationSubscription> | undefined;
@@ -44,7 +26,7 @@ function normalizePermission(value: unknown): NotificationPermissionState | null
   return value === 'default' || value === 'denied' || value === 'granted' || value === 'unsupported' ? value : null;
 }
 
-function normalizeSubscription(value: unknown): NotificationSubscription | null {
+function normalizeSubscription(value: unknown): PushSubscriptionJSON | null {
   if (!value || typeof value !== 'object') return null;
 
   const candidate = value as { endpoint?: unknown; expirationTime?: unknown; keys?: { auth?: unknown; p256dh?: unknown } };

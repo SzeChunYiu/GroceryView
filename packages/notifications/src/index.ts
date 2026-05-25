@@ -28,6 +28,20 @@ export type DeliveryNotification = {
   recipient: string;
 };
 
+export type MyFlyerReadySubscription = {
+  accountId: string;
+  channels: string[];
+  deliveryEnabled: boolean;
+  endpoint: string;
+};
+
+export type MyFlyerReadyNotificationInput = {
+  generatedAt: string;
+  rowCount: number;
+  subscriptions: MyFlyerReadySubscription[];
+  summary: string;
+};
+
 export type NotificationSuppressionReason = 'unsubscribed' | 'bounce' | 'complaint';
 
 export type NotificationSuppression = {
@@ -480,6 +494,22 @@ export function summarizeDeliveryResults(results: DeliveryResult[]): DeliveryRes
     },
     { total: 0, sent: 0, skipped: 0, failedNoProvider: 0, failedProviderError: 0, failed: 0 }
   );
+}
+
+export function planMyFlyerReadyPushNotifications(input: MyFlyerReadyNotificationInput): DeliveryNotification[] {
+  if (input.rowCount <= 0) return [];
+
+  return input.subscriptions
+    .filter((subscription) => subscription.deliveryEnabled && subscription.channels.includes('my-flyer-ready') && subscription.endpoint.trim())
+    .map((subscription) => ({
+      body: input.summary,
+      channel: 'push' as const,
+      priority: 'normal' as const,
+      recipient: subscription.endpoint,
+      sendAt: input.generatedAt,
+      title: 'MyFlyer is ready',
+      type: 'my-flyer-ready'
+    }));
 }
 
 function humanizeSubjectType(subjectType: HumanReviewSlaAssignment['subjectType']): string {
