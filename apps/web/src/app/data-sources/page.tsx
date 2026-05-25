@@ -1,5 +1,8 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { axfoodProducts } from '@/lib/axfood-products';
+import { buildUnitNormalizationQaReport } from '@/lib/normalization';
+import { pricedProducts } from '@/lib/openprices-products';
 import {
   allStoreDailyRunnerReadiness,
   apiPerformanceReadiness,
@@ -19,6 +22,21 @@ import {
   timescaleDbEvaluation
 } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
+
+const unitNormalizationQaReport = buildUnitNormalizationQaReport([
+  ...axfoodProducts.map((product) => ({
+    productId: product.slug,
+    productName: product.name,
+    packageText: product.subline,
+    price: product.lowestPrice
+  })),
+  ...pricedProducts.map((product) => ({
+    productId: product.slug,
+    productName: product.name,
+    packageText: product.quantity,
+    price: product.priceMedian
+  }))
+]);
 
 export function generateMetadata() {
   return routeMetadata('/data-sources');
@@ -145,6 +163,41 @@ export default function DataSourcesPage() {
             </Link>
           ))}
         </div>
+      </Card>
+
+      <Card className="mt-6 border-amber-200 bg-amber-50/70">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-amber-800">Unit normalization QA</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Missing units, suspicious pack sizes, and unit-price conversion checks</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+              The QA report parses package text before basket comparison trusts comparable unit prices. Rows with missing units or suspicious pack sizes stay reviewable instead of receiving synthetic kr/kg, kr/l, or kr/st values.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-amber-900 shadow-sm">
+            {unitNormalizationQaReport.issueCount.toLocaleString('sv-SE')} QA issues
+          </p>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          <Metric label="Missing units" value={unitNormalizationQaReport.missingUnitCount.toLocaleString('sv-SE')} />
+          <Metric label="Suspicious pack sizes" value={unitNormalizationQaReport.suspiciousPackSizeCount.toLocaleString('sv-SE')} />
+          <Metric label="Inconsistent conversions" value={unitNormalizationQaReport.inconsistentUnitPriceCount.toLocaleString('sv-SE')} />
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-2">
+          {unitNormalizationQaReport.issues.slice(0, 6).map((issue) => (
+            <section className="rounded-2xl border border-amber-100 bg-white p-4 shadow-sm" key={`${issue.kind}-${issue.productId}`}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-800">{issue.kind} · {issue.severity}</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{issue.productName}</h3>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{issue.productId} · {issue.packageText}</p>
+              <p className="mt-3 text-sm font-semibold leading-6 text-slate-700">{issue.detail}</p>
+            </section>
+          ))}
+        </div>
+        <ul className="mt-4 grid gap-2 text-sm font-semibold leading-6 text-amber-950 md:grid-cols-3">
+          {unitNormalizationQaReport.guardrails.map((guardrail) => (
+            <li className="rounded-2xl bg-white p-3" key={guardrail}>• {guardrail}</li>
+          ))}
+        </ul>
       </Card>
 
       <Card className="mt-6">
