@@ -81,6 +81,18 @@ export type SourceFreshnessSlaRow = SourceFreshnessSlaConfig & {
   status: SourceFreshnessSlaStatus;
 };
 
+export type SourceHealthFailureState = 'healthy' | 'warning' | 'failed';
+
+export type SourceHealthDashboardRow = SourceFreshnessSlaRow & {
+  failureCount: number;
+  failureState: SourceHealthFailureState;
+  lastRefreshAt: string;
+  latestStatus: IngestionPipelineRun['latestStatus'];
+  previousRowCount: number;
+  rowCountDelta: number;
+  staleDataThresholdHours: number;
+};
+
 export const sourceFreshnessSlaMonitoredAt = '2026-05-24T12:00:00.000Z';
 
 const sourceFreshnessSlaConfigs: SourceFreshnessSlaConfig[] = [
@@ -201,6 +213,55 @@ export const ingestionPipelineMonitorSummary = {
   sourceCount: ingestionPipelineMonitorRows.length,
   totalFailures: ingestionPipelineMonitorRows.reduce((total, source) => total + source.failureCount, 0),
   totalRows: ingestionPipelineMonitorRows.reduce((total, source) => total + source.rowCount, 0)
+};
+
+const sourceRowCountDeltasBySource: Record<string, number> = {
+  'Axfood chain price snapshot': 128,
+  'ICA store-scoped promotions': -42,
+  'OpenPrices SEK observations': 64,
+  'OpenFoodFacts metadata catalog': 211,
+  'OKQ8 fuel operator prices': 0,
+  'Sweden store directory': -7
+};
+
+function failureStateForSource(source: SourceFreshnessSlaRow): SourceHealthFailureState {
+  const pipeline = ingestionPipelineMonitorRows.find((row) => row.sourceName === source.sourceName);
+
+  if (pipeline?.latestStatus === 'failed' || source.status === 'breached') {
+    return 'failed';
+  }
+
+  if ((pipeline?.failureCount ?? 0) > 0 || pipeline?.latestStatus === 'warning' || source.status === 'watch') {
+    return 'warning';
+  }
+
+  return 'healthy';
+}
+
+export const sourceHealthDashboardRows: SourceHealthDashboardRow[] = sourceFreshnessSlaDashboard.map((source) => {
+  const pipeline = ingestionPipelineMonitorRows.find((row) => row.sourceName === source.sourceName);
+  const rowCountDelta = sourceRowCountDeltasBySource[source.sourceName] ?? 0;
+
+  return {
+    ...source,
+    failureCount: pipeline?.failureCount ?? 0,
+    failureState: failureStateForSource(source),
+    lastRefreshAt: source.lastSuccessfulIngestAt,
+    latestStatus: pipeline?.latestStatus ?? (source.status === 'breached' ? 'failed' : source.status === 'watch' ? 'warning' : 'succeeded'),
+    previousRowCount: Math.max(0, source.rowCount - rowCountDelta),
+    rowCountDelta,
+    staleDataThresholdHours: source.expectedRefreshHours
+  };
+});
+
+export const sourceHealthDashboardSummary = {
+  failingSourceCount: sourceHealthDashboardRows.filter((source) => source.failureState === 'failed').length,
+  monitoredAt: sourceFreshnessSlaMonitoredAt,
+  rowCountDelta: sourceHealthDashboardRows.reduce((total, source) => total + source.rowCountDelta, 0),
+  sourceCount: sourceHealthDashboardRows.length,
+  staleSourceCount: sourceHealthDashboardRows.filter((source) => source.status !== 'within-sla').length,
+  totalRows: sourceHealthDashboardRows.reduce((total, source) => total + source.rowCount, 0),
+  warningSourceCount: sourceHealthDashboardRows.filter((source) => source.failureState === 'warning').length
 };
 
 export type SourceManagementAction = {
