@@ -1,5 +1,6 @@
 export * from './lib/rankers/nearby.js';
 export * from './lib/rankers/premium.js';
+export * from './lib/rankers/organic.js';
 export type DealScoreInput = {
   currentCityPercentile: number;
   knownPromoHistoryPercentile: number;
