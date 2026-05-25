@@ -225,7 +225,7 @@ function isProductNameCandidate(value: string): boolean {
 function categoryForSevenElevenSeProduct(name: string): SevenElevenSeProductCategory {
   if (/\b(JUICE|SHAKE|DRYCK|KAFFE|LATTE|SMOOTHIE)\b/i.test(name)) return 'drink';
   if (/\b(SALLAD|WRAP|PANE LUNGO|SEDANINI)\b/i.test(name)) return 'lunch';
-  if (/\b(FRALLA|POLARKLÄMMA|CHIAPUDDING|YOGHURT|ÄGG\s*&\s*KAVIAR|LEVERPASTEJ)\b/i.test(name)) return 'breakfast';
+  if (/\b(CROISSANTFRALLA|FRALLA|POLARKLÄMMA|CHIAPUDDING|YOGHURT|ÄGG\s*&\s*KAVIAR|LEVERPASTEJ)\b/i.test(name)) return 'breakfast';
   if (/\b(MUFFIN|BULLE|WIENER|CUPCAKE|COOKIE|BISKVI|CROISSANT|PAIN AU|DELICATOBOLL|CHOKLADBOLL|KAKA|FIKA)\b/i.test(name)) return 'bakery';
   if (/\b(CHIPS|GODIS|SNACK|NÖTTER|BAR)\b/i.test(name)) return 'snack';
   return 'convenience';
