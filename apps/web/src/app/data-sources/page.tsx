@@ -3,9 +3,11 @@ import { Card, Eyebrow, PageShell, SourceFreshnessStatusBadge, SourceManagementA
 import { DataGrid, DataGridProductCell, dataGridActionClass } from '@/components/data-grid';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { buildDuplicateMergeQueue, type ProductRecord } from '@/lib/deduplicate-products';
+import { COMPARE_CHAIN_ORDER } from '@/lib/chain-compare';
 import { buildUnitNormalizationQaReport } from '@/lib/normalization';
 import { pricedProducts } from '@/lib/openprices-products';
 import { dbSiteAxfoodProducts, dbSiteSnapshotGeneratedAt } from '@/lib/generated/db-site-products';
+import { dbSiteCompareStoreCapabilities } from '@/lib/generated/db-site-ingested-overrides';
 import {
   allStoreDailyRunnerReadiness,
   apiPerformanceReadiness,
@@ -92,6 +94,12 @@ const duplicateReviewActionLabels = {
   ignore: 'Ignore',
   confidence: 'Check confidence'
 };
+
+const compareChainLabels = new Map(COMPARE_CHAIN_ORDER.map((chain) => [chain.id, chain.label]));
+
+function compareChainCapabilityAnchor(chainId: string) {
+  return `compare-chain-capability-${chainId}`;
+}
 
 export function generateMetadata() {
   return routeMetadata('/data-sources');
@@ -409,6 +417,40 @@ export default function DataSourcesPage() {
         <div className="mt-4 grid gap-2 md:grid-cols-3">
           {icaStorePromotionEvidence.guardrails.map((guardrail) => (
             <p className="rounded-2xl bg-white p-3 text-xs font-bold leading-5 text-red-950" key={guardrail}>{guardrail}</p>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50/70">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-800">Compare capability audit</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Per-chain compare filter evidence</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              These anchored rows back the compare page no-chain capability list so ICA, Willys, and Coop filter gaps can link directly to source evidence.
+            </p>
+          </div>
+          <Link className="rounded-full bg-white px-4 py-2 text-sm font-black text-emerald-900 shadow-sm" href="/compare">
+            Open compare filters
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {dbSiteCompareStoreCapabilities.map((capability) => (
+            <section
+              className="scroll-mt-24 rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm"
+              id={compareChainCapabilityAnchor(capability.chainId)}
+              key={capability.chainId}
+            >
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">compare-chain-capability · {capability.chainId}</p>
+              <h3 className="mt-2 text-xl font-black text-slate-950">{compareChainLabels.get(capability.chainId) ?? capability.chainId}</h3>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{capability.evidenceLabel}</p>
+              <div className="mt-3 grid grid-cols-3 gap-2 text-xs font-black">
+                <span className={capability.coupon ? 'rounded-full bg-emerald-50 px-2 py-1 text-emerald-800' : 'rounded-full bg-slate-100 px-2 py-1 text-slate-500'}>Coupon</span>
+                <span className={capability.delivery ? 'rounded-full bg-emerald-50 px-2 py-1 text-emerald-800' : 'rounded-full bg-slate-100 px-2 py-1 text-slate-500'}>Delivery</span>
+                <span className={capability.pickup ? 'rounded-full bg-emerald-50 px-2 py-1 text-emerald-800' : 'rounded-full bg-slate-100 px-2 py-1 text-slate-500'}>Pickup</span>
+              </div>
+              <p className="mt-3 text-xs font-semibold text-slate-500">Evidence updated {capability.evidenceUpdatedAt}</p>
+            </section>
           ))}
         </div>
       </Card>

@@ -116,6 +116,10 @@ function compareHref(productsParam: string | string[] | undefined, selectedChain
   return `/compare${query ? `?${query}` : ''}`;
 }
 
+function compareChainCapabilityAnchor(chainId: string) {
+  return `compare-chain-capability-${chainId}`;
+}
+
 export default async function ComparePage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
   const productsParam = resolvedSearchParams.products;
@@ -262,6 +266,39 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
         <p className="mt-3 text-xs font-semibold text-slate-500">
           Source: {comparison.sourceLabel}{comparison.generatedAt ? ` · generated ${comparison.generatedAt}` : ''}.
         </p>
+      </Card>
+      <Card className="mt-6 border-emerald-200 bg-emerald-50/70">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-800">No-chain capability list</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Compare capability evidence</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Coupon, delivery, and pickup filters stay visible only with explicit source flags. Each row links to the matching data-sources audit anchor.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-emerald-900 shadow-sm">
+            {comparison.noChainState.capabilitySource}
+          </p>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          {comparison.noChainState.capabilities.map((capability) => (
+            <Link
+              className="rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-700"
+              href={`/data-sources#${compareChainCapabilityAnchor(capability.chainId)}`}
+              key={capability.chainId}
+            >
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">{capability.capabilitySource}</p>
+              <h3 className="mt-2 text-xl font-black text-slate-950">{capability.chainName}</h3>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{capability.evidenceLabel}</p>
+              <div className="mt-3 grid grid-cols-3 gap-2 text-xs font-black">
+                <span className={capability.coupon ? 'rounded-full bg-emerald-50 px-2 py-1 text-emerald-800' : 'rounded-full bg-slate-100 px-2 py-1 text-slate-500'}>Coupon</span>
+                <span className={capability.delivery ? 'rounded-full bg-emerald-50 px-2 py-1 text-emerald-800' : 'rounded-full bg-slate-100 px-2 py-1 text-slate-500'}>Delivery</span>
+                <span className={capability.pickup ? 'rounded-full bg-emerald-50 px-2 py-1 text-emerald-800' : 'rounded-full bg-slate-100 px-2 py-1 text-slate-500'}>Pickup</span>
+              </div>
+              <p className="mt-3 text-xs font-semibold text-slate-500">Updated {capability.evidenceUpdatedAt ?? 'fallback only'}</p>
+            </Link>
+          ))}
+        </div>
       </Card>
       <div className="mt-6">
         <StoreComparisonTable
