@@ -2,7 +2,7 @@
 // Mirrors the store fixtures in packages/ingestion/src/index.ts.
 // Real prices replace these as packages/ingestion connectors come online.
 
-import { buildExpiryDealRadar, buildPriceChartSeries, buildWatchlistAlerts, calculateMealCostBreakdown, calculatePersonalGroceryInflation, compareBasketStrategies, planGroceryAlertChannelDefault, planMultiWeekStockUpList, planNotifications, planPantryReplenishment, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeBudget, summarizeCategoryDealLeaders, summarizePriceHistory, summarizeStoreBasketCoverage, type BasketComparisonInput, type HouseholdSnapshot, type PantryDeal, type PantryInventoryItem, type PriceChartObservation, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
+import { buildExpiryDealRadar, buildPriceChartSeries, buildWatchlistAlerts, calculateMealCostBreakdown, calculatePersonalGroceryInflation, compareBasketStrategies, forecastGrocerySpend, planGroceryAlertChannelDefault, planMultiWeekStockUpList, planNotifications, planPantryReplenishment, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeBudget, summarizeCategoryDealLeaders, summarizePriceHistory, summarizeStoreBasketCoverage, type BasketComparisonInput, type HouseholdSnapshot, type PantryDeal, type PantryInventoryItem, type PriceChartObservation, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
 import { pricedProducts } from './openprices-products';
 
 export const products = [
@@ -3136,6 +3136,22 @@ export const elderlyFixedIncomeBudgetTracker = {
     caveat: 'Fixed-income budget uses visible receipts and planned basket totals; cash purchases without receipts are not estimated.'
   }
 };
+
+export const purchaseHistory = [
+  { purchasedAt: '2026-02-03T17:10:00.000Z', totalSpend: 512.4, storeId: 'willys-odenplan', receiptId: 'demo-2026-02-03' },
+  { purchasedAt: '2026-02-17T16:30:00.000Z', totalSpend: 438.7, storeId: 'hemkop-skanstull', receiptId: 'demo-2026-02-17' },
+  { purchasedAt: '2026-03-04T18:20:00.000Z', totalSpend: 529.2, storeId: 'willys-odenplan', receiptId: 'demo-2026-03-04' },
+  { purchasedAt: '2026-03-18T16:45:00.000Z', totalSpend: 472.9, storeId: 'coop-norra-stationsgatan', receiptId: 'demo-2026-03-18' },
+  { purchasedAt: '2026-04-02T17:35:00.000Z', totalSpend: 548.6, storeId: 'willys-odenplan', receiptId: 'demo-2026-04-02' },
+  { purchasedAt: '2026-04-16T18:05:00.000Z', totalSpend: 503.1, storeId: 'hemkop-skanstull', receiptId: 'demo-2026-04-16' },
+  { purchasedAt: '2026-05-07T17:50:00.000Z', totalSpend: 571.3, storeId: 'willys-odenplan', receiptId: 'demo-2026-05-07' },
+  { purchasedAt: '2026-05-21T18:15:00.000Z', totalSpend: 596.8, storeId: 'hemkop-skanstull', receiptId: 'demo-2026-05-21' }
+];
+
+export const grocerySpendForecast = forecastGrocerySpend({
+  purchase_history: purchaseHistory,
+  asOf: '2026-05-24T12:00:00.000Z'
+});
 
 export const personalGroceryInflation = calculatePersonalGroceryInflation({
   baseDate: 'previous weekly basket',

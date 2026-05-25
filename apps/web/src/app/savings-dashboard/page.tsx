@@ -3,7 +3,7 @@ import { PiggyBank } from 'lucide-react';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
-import { elderlyFixedIncomeBudgetTracker, elderlyStaplesStabilityTracker, personalGroceryInflation, savingsDashboard, studentWeeklyBudgetTracker } from '@/lib/demo-data';
+import { elderlyFixedIncomeBudgetTracker, elderlyStaplesStabilityTracker, grocerySpendForecast, personalGroceryInflation, savingsDashboard, studentWeeklyBudgetTracker } from '@/lib/demo-data';
 import { ecoBasketScorecard } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -96,6 +96,49 @@ export default function SavingsDashboardPage() {
           </div>
         </Card>
       </div>
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Next month forecast</p>
+            <h2 className="mt-2 text-2xl font-black">Grocery-spend forecast for {grocerySpendForecast.forecastMonth}</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+              Forecasted from purchase_history receipts only: {grocerySpendForecast.observedMonths} observed months, {formatSek(grocerySpendForecast.observedSpend)} total observed spend, and no synthetic basket rows.
+            </p>
+          </div>
+          <ConfidenceBadge
+            level={grocerySpendForecast.confidence}
+            label={`${grocerySpendForecast.confidence} forecast confidence`}
+            sampleSize={grocerySpendForecast.monthSummaries.reduce((sum, month) => sum + month.receiptCount, 0)}
+          />
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          <div className="rounded-2xl bg-white p-4">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">Predicted spend</p>
+            <p className="mt-2 text-3xl font-black text-emerald-900">{formatSek(grocerySpendForecast.predictedSpend)}</p>
+          </div>
+          <div className="rounded-2xl bg-white p-4">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">3-month baseline</p>
+            <p className="mt-2 text-3xl font-black text-slate-950">{formatSek(grocerySpendForecast.baselineMonthlySpend)}</p>
+          </div>
+          <div className="rounded-2xl bg-white p-4">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">Trend vs baseline</p>
+            <p className="mt-2 text-3xl font-black text-slate-950">{formatPercent(grocerySpendForecast.trendPercent)}</p>
+          </div>
+        </div>
+        <div className="mt-4 grid gap-2 md:grid-cols-4">
+          {grocerySpendForecast.monthSummaries.map((month) => (
+            <div className="rounded-2xl border border-emerald-100 bg-white/80 p-3" key={month.month}>
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{month.month}</p>
+              <p className="mt-1 text-lg font-black text-slate-950">{formatSek(month.spend)}</p>
+              <p className="text-xs font-semibold text-slate-600">{month.receiptCount} receipts</p>
+            </div>
+          ))}
+        </div>
+        {grocerySpendForecast.warnings.length > 0 ? (
+          <p className="mt-4 rounded-2xl bg-amber-50 p-4 text-sm font-bold text-amber-950">{grocerySpendForecast.warnings.join(' ')}</p>
+        ) : null}
+      </Card>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
         <Card>
