@@ -140,9 +140,9 @@ export function ActiveFilterChips({ chips }: ActiveFilterChipsProps) {
   }
 
   return (
-    <div aria-label="Saved search filters" className="flex flex-wrap gap-2">
+    <div aria-label="Active removable search filters" className="flex flex-wrap gap-2">
       {chips.map((chip) => (
-        <Link className="rounded-full bg-violet-900 px-3 py-2 text-xs font-black text-white shadow-sm transition hover:bg-violet-700" href={chip.href} key={chip.id}>
+        <Link aria-label={`Remove ${chip.label}`} className="rounded-full bg-violet-900 px-3 py-2 text-xs font-black text-white shadow-sm transition hover:bg-violet-700" href={chip.href} key={chip.id}>
           {chip.label}
           <span aria-hidden="true" className="ml-2">×</span>
           <span className="sr-only">Remove {chip.label}</span>
