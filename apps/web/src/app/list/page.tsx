@@ -5,6 +5,7 @@ import { ListSharePreview } from '@/components/list-share-preview';
 import { createPublicListShareToken, publicListSharePath, type PublicListShareItem } from '@/lib/list-permissions';
 import { storeLayoutDepartments, storeLayoutDepartmentsForOrder, type StoreLayoutChain, type StoreLayoutGroupOrder } from '@/lib/trip-planner';
 import { metadataForShoppingListShare } from '@/lib/seo';
+import { OFFLINE_LIST_EDIT_RECONCILIATION_STEPS, offlineListSyncStatusCopy } from '@/lib/offline-sync';
 
 const demoItems = [
   { id: 'bananas', name: 'Bananas', quantity: '1 bunch', ownerRole: 'guardian' as const },
@@ -57,9 +58,30 @@ export default async function ShoppingListPage({ searchParams }: { searchParams?
     listId: 'weekly-staples'
   });
   const publicShareHref = publicListSharePath(publicShareToken);
+  const pendingOfflineCopy = offlineListSyncStatusCopy({ isOnline: false, pendingEdits: 2 });
+  const syncedOfflineCopy = offlineListSyncStatusCopy({ isOnline: true, pendingEdits: 0, lastSyncedAt: 'after background sync' });
 
   return (
     <div className="space-y-6">
+      <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4" aria-labelledby="offline-sync-title">
+        <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">Offline edit reconciliation</p>
+        <h2 id="offline-sync-title" className="mt-1 text-xl font-bold text-slate-950">Pending edits stay visible until sync finishes</h2>
+        <div className="mt-3 grid gap-3 md:grid-cols-2">
+          <div className="rounded-xl border border-amber-200 bg-white px-3 py-2" role="status">
+            <p className="text-sm font-black text-amber-900">{pendingOfflineCopy.label}</p>
+            <p className="mt-1 text-sm text-amber-950">{pendingOfflineCopy.helper} {pendingOfflineCopy.detail}</p>
+          </div>
+          <div className="rounded-xl border border-emerald-200 bg-white px-3 py-2" role="status">
+            <p className="text-sm font-black text-emerald-900">{syncedOfflineCopy.label}</p>
+            <p className="mt-1 text-sm text-emerald-950">{syncedOfflineCopy.helper} {syncedOfflineCopy.detail}</p>
+          </div>
+        </div>
+        <ul className="mt-3 space-y-2 text-sm font-semibold text-amber-950">
+          {OFFLINE_LIST_EDIT_RECONCILIATION_STEPS.map((step) => (
+            <li key={step} className="rounded-xl bg-white/70 px-3 py-2">{step}</li>
+          ))}
+        </ul>
+      </section>
       <ListSharePreview />
       <section className="rounded-2xl border border-sky-200 bg-sky-50 p-4">
         <p className="text-xs font-semibold uppercase tracking-wide text-sky-800">Public share page</p>

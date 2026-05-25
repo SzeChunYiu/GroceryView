@@ -2184,7 +2184,7 @@ ${seo}`;
     assert.match(bottomNav, /Search/);
     assert.match(bottomNav, /Map/);
     assert.match(bottomNav, /ScanLine/);
-    assert.match(bottomNav, /href: '\/scanner#scan'/);
+    assert.match(bottomNav, /href: '\/scanner[^']*#scan'/);
     assert.match(bottomNav, /label: 'Scan'/);
     assert.match(bottomNav, /grid-cols-8/);
     assert.match(bottomNav, /useHaptic/);
@@ -3922,6 +3922,16 @@ ${seo}`;
     assert.match(docs, /\/coverage/);
     assert.doesNotMatch(route, /@\/lib\/demo-data/);
     assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
+  it('emits source-backed ItemList JSON-LD on category index pages', async () => {
+    const source = await read('src/app/index/[symbol]/page.tsx');
+
+    assert.match(source, /type="application\/ld\+json"/);
+    assert.match(source, /'@type': 'ItemList'/);
+    assert.match(source, /categoryItemListJsonLd\(definition, rows\)/);
+    assert.match(source, /priceCurrency: 'SEK'/);
+    assert.doesNotMatch(source, /location|PostalAddress/);
   });
 
   it('surfaces brand-tier indices on the chain index route using the real core brand-tier output', async () => {
