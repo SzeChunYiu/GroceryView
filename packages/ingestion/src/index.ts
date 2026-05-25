@@ -113,6 +113,7 @@ import {
   type WillysWeeklyDiscount
 } from './connectors/willys.js';
 import { fetchWillysBulkProducts } from './connectors/willys-bulk.js';
+import { assertMarketSourceTermsGate } from './market-source-registry.js';
 
 export * from './connectors/openfoodfacts.js';
 export * from './connectors/all-store-runner.js';
@@ -201,6 +202,7 @@ export * from './store-enumerator.js';
 export * from './store-enumerator.js';
 export * from './unit-price.js';
 export * from './pipeline.js';
+export * from './market-source-registry.js';
 
 export type SourceType =
   | 'official_api'
@@ -3417,13 +3419,15 @@ export type DailyIngestionEnv = Partial<Record<
   | 'GROCERYVIEW_DAILY_ZERO_ROW_ALERT_LOG_PATH'
   | 'GROCERYVIEW_DAILY_ZERO_ROW_ALERT_STATE_PATH'
   | 'GROCERYVIEW_DAILY_ZERO_ROW_ALERT_WEBHOOK_URL'
+  | 'GROCERYVIEW_DEV_ALLOW_SOURCE_TERMS_OVERRIDE'
   | 'GROCERYVIEW_DAILY_STORE_CONCURRENCY'
   | 'GROCERYVIEW_DAILY_STORE_START_DELAY_MS'
   | 'GROCERYVIEW_DAILY_STORE_RETRY_ATTEMPTS'
   | 'GROCERYVIEW_DAILY_STORE_RETRY_BASE_DELAY_MS'
   | 'GROCERYVIEW_IMAGE_CACHE_ENABLED'
   | 'GROCERYVIEW_IMAGE_CACHE_PUBLIC_DIR'
-  | 'GROCERYVIEW_IMAGE_CACHE_MAX_BYTES',
+  | 'GROCERYVIEW_IMAGE_CACHE_MAX_BYTES'
+  | 'NODE_ENV',
   string
 >>;
 
@@ -3694,6 +3698,17 @@ export function buildDailyConnectorConfigsFromEnv(env: DailyIngestionEnv): Daily
       storeRetryBaseDelayMs: connector.storeRetryBaseDelayMs ?? storeRunnerOptions.storeRetryBaseDelayMs
     })
   }));
+  const allowDevSourceTermsOverride =
+    env.NODE_ENV !== 'production' && dailyEnvFlagEnabled(env.GROCERYVIEW_DEV_ALLOW_SOURCE_TERMS_OVERRIDE);
+  for (const connector of connectors) {
+    assertMarketSourceTermsGate({
+      connectorId: connector.connectorId,
+      chainId: connector.chainId,
+      sourceType: connector.sourceType,
+      endpointUrl: connector.endpointUrl,
+      allowDevOverride: allowDevSourceTermsOverride
+    });
+  }
   const runtimeOptions = {
     maxConcurrency: parseDailyEnvInteger(env.GROCERYVIEW_DAILY_MAX_CONCURRENCY, 1, 'GROCERYVIEW_DAILY_MAX_CONCURRENCY'),
     connectorStartDelayMs: parseDailyEnvInteger(env.GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS, 0, 'GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS'),

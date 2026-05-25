@@ -162,6 +162,9 @@ import {
   parseRetailerProductJsonSnapshot,
   persistOpenFoodFactsProductMetadata,
   parseSt1FuelPriceHtml,
+  assertMarketSourceTermsGate,
+  marketSourceRegistry,
+  planMarketSourceTermsGate,
   planIngestionBatch,
   planOfferVisibilityBoundary,
   planRetailerConnectorRun,
@@ -5247,6 +5250,56 @@ describe('planRetailerSourceAccess', () => {
   });
 });
 
+describe('market source terms gate', () => {
+  it('records market, access method, terms, rate limit, credentials, coverage, and owner fields', () => {
+    const willys = marketSourceRegistry.find((source) => source.sourceId === 'se:willys:products-all-stores');
+
+    assert.ok(willys);
+    assert.equal(willys.market, 'SE');
+    assert.equal(willys.accessMethod, 'official_api');
+    assert.equal(willys.termsStatus, 'approved');
+    assert.equal(willys.credentials, 'partner_agreement');
+    assert.match(willys.rateLimit, /daily/i);
+    assert.match(willys.coverage, /Sweden Willys/i);
+    assert.equal(willys.owner, 'Data Ops - Axfood');
+  });
+
+  it('blocks unknown sources unless a development override is explicit', () => {
+    assert.throws(() => assertMarketSourceTermsGate({
+      connectorId: 'unreviewed-source',
+      chainId: 'unreviewed',
+      sourceType: 'retailer_online_page'
+    }), /market source terms gate blocked unreviewed-source/i);
+
+    const override = planMarketSourceTermsGate({
+      connectorId: 'unreviewed-source',
+      chainId: 'unreviewed',
+      sourceType: 'retailer_online_page',
+      allowDevOverride: true
+    });
+
+    assert.equal(override.status, 'dev_override');
+    assert.deepEqual(override.requiredActions, ['market_source_registry_entry_required']);
+  });
+
+  it('blocks pending registry entries from production worker use', () => {
+    assert.throws(() => assertMarketSourceTermsGate({
+      connectorId: 'rema-1000-no-search',
+      chainId: 'rema_1000_no',
+      sourceType: 'retailer_online_page'
+    }), /REMA 1000 Norway public search review is pending/);
+  });
+
+  it('blocks registered connector ids when the endpoint is outside the registered source prefix', () => {
+    assert.throws(() => assertMarketSourceTermsGate({
+      connectorId: 'willys-products-all-stores',
+      chainId: 'willys',
+      sourceType: 'official_api',
+      endpointUrl: 'https://unreviewed.example.test/willys.json'
+    }), /registered_endpoint_url_required/);
+  });
+});
+
 describe('planRetailerSurfacePolicy', () => {
   it('covers every target retailer and required source-policy surface', () => {
     const chains = ['city_gross', 'coop', 'hemkop', 'ica', 'lidl', 'willys'] as const;
@@ -6014,7 +6067,18 @@ class DailyIngestionExecutor implements QueryExecutor {
   }
 }
 
-function dailyConnectorFixture(chainId: string) {
+type DailyConnectorFixture = {
+  connectorId: string;
+  chainId: string;
+  sourceType: 'official_api' | 'retailer_online_page' | 'flyer_campaign';
+  endpointUrl: string;
+  parserVersion: string;
+  robotsTxtStatus: 'allow' | 'disallow' | 'not_applicable' | 'unknown';
+  legalReviewStatus: 'approved' | 'pending' | 'rejected';
+  hasDataAgreement: boolean;
+};
+
+function dailyConnectorFixture(chainId: string): DailyConnectorFixture {
   return {
     connectorId: `${chainId}-normalized-json`,
     chainId,
@@ -6025,6 +6089,72 @@ function dailyConnectorFixture(chainId: string) {
     legalReviewStatus: 'approved' as const,
     hasDataAgreement: true
   };
+}
+
+function dailyRegisteredConnectorFixture(chainId: string) {
+  const fixtures: Record<string, DailyConnectorFixture> = {
+    ica: {
+      connectorId: 'ica-store-promotions-default-stores',
+      chainId: 'ica',
+      sourceType: 'official_api',
+      endpointUrl: GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL,
+      parserVersion: 'ica-store-promotions-native-v1',
+      robotsTxtStatus: 'not_applicable',
+      legalReviewStatus: 'approved',
+      hasDataAgreement: true
+    },
+    willys: {
+      connectorId: 'willys-products-all-stores',
+      chainId: 'willys',
+      sourceType: 'official_api',
+      endpointUrl: GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL,
+      parserVersion: 'willys-products-native-v1',
+      robotsTxtStatus: 'not_applicable',
+      legalReviewStatus: 'approved',
+      hasDataAgreement: true
+    },
+    coop: {
+      connectorId: 'coop-products-all-stores',
+      chainId: 'coop',
+      sourceType: 'official_api',
+      endpointUrl: GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL,
+      parserVersion: 'coop-products-native-v1',
+      robotsTxtStatus: 'not_applicable',
+      legalReviewStatus: 'approved',
+      hasDataAgreement: true
+    },
+    hemkop: {
+      connectorId: 'hemkop-products-all-stores',
+      chainId: 'hemkop',
+      sourceType: 'official_api',
+      endpointUrl: GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_PRODUCTS_URL,
+      parserVersion: 'hemkop-products-native-v1',
+      robotsTxtStatus: 'not_applicable',
+      legalReviewStatus: 'approved',
+      hasDataAgreement: true
+    },
+    lidl: {
+      connectorId: 'lidl-public-offers-all-stores',
+      chainId: 'lidl',
+      sourceType: 'retailer_online_page',
+      endpointUrl: GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL,
+      parserVersion: 'lidl-public-offers-native-v1',
+      robotsTxtStatus: 'allow',
+      legalReviewStatus: 'approved',
+      hasDataAgreement: true
+    },
+    city_gross: {
+      connectorId: 'city-gross-products-bulk',
+      chainId: 'city_gross',
+      sourceType: 'official_api',
+      endpointUrl: GROCERYVIEW_DAILY_CITY_GROSS_BULK_PRODUCTS_URL,
+      parserVersion: 'citygross-bulk-native-v1',
+      robotsTxtStatus: 'not_applicable',
+      legalReviewStatus: 'approved',
+      hasDataAgreement: true
+    }
+  };
+  return fixtures[chainId] ?? dailyConnectorFixture(chainId);
 }
 
 function batchObservations(executor: DailyIngestionExecutor) {
@@ -6181,12 +6311,12 @@ describe('daily ingestion runner', () => {
     const configs = buildDailyConnectorConfigsFromEnv({
       DATABASE_URL: 'postgres://user:secret@example/groceryview',
       GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify([
-        dailyConnectorFixture('ica'),
-        dailyConnectorFixture('willys'),
-        dailyConnectorFixture('coop'),
-        dailyConnectorFixture('hemkop'),
-        dailyConnectorFixture('lidl'),
-        dailyConnectorFixture('city_gross')
+        dailyRegisteredConnectorFixture('ica'),
+        dailyRegisteredConnectorFixture('willys'),
+        dailyRegisteredConnectorFixture('coop'),
+        dailyRegisteredConnectorFixture('hemkop'),
+        dailyRegisteredConnectorFixture('lidl'),
+        dailyRegisteredConnectorFixture('city_gross')
       ])
     });
 
@@ -6202,6 +6332,31 @@ describe('daily ingestion runner', () => {
     });
   });
 
+  it('refuses unregistered daily worker source configs unless development override is explicit', () => {
+    const connectors = [
+      { ...dailyRegisteredConnectorFixture('ica'), connectorId: 'unregistered-ica-source' },
+      dailyRegisteredConnectorFixture('willys'),
+      dailyRegisteredConnectorFixture('coop'),
+      dailyRegisteredConnectorFixture('hemkop'),
+      dailyRegisteredConnectorFixture('lidl'),
+      dailyRegisteredConnectorFixture('city_gross')
+    ];
+
+    assert.throws(() => buildDailyConnectorConfigsFromEnv({
+      DATABASE_URL: 'postgres://user:secret@example/groceryview',
+      GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify(connectors)
+    }), /market source terms gate blocked unregistered-ica-source/i);
+
+    const configs = buildDailyConnectorConfigsFromEnv({
+      DATABASE_URL: 'postgres://user:secret@example/groceryview',
+      GROCERYVIEW_DEV_ALLOW_SOURCE_TERMS_OVERRIDE: '1',
+      NODE_ENV: 'development',
+      GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify(connectors)
+    });
+
+    assert.equal(configs.connectors[0].connectorId, 'unregistered-ica-source');
+  });
+
   it('loads bounded runner options and the blocker log override from environment', () => {
     const configs = buildDailyConnectorConfigsFromEnv({
       DATABASE_URL: 'postgres://user:secret@example/groceryview',
@@ -6215,12 +6370,12 @@ describe('daily ingestion runner', () => {
       GROCERYVIEW_DAILY_STORE_RETRY_BASE_DELAY_MS: '250',
       GROCERYVIEW_DAILY_BLOCKER_LOG_PATH: '/tmp/groceryview-ingestion-blockers.txt',
       GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify([
-        dailyConnectorFixture('ica'),
-        dailyConnectorFixture('willys'),
-        dailyConnectorFixture('coop'),
-        dailyConnectorFixture('hemkop'),
-        dailyConnectorFixture('lidl'),
-        dailyConnectorFixture('city_gross')
+        dailyRegisteredConnectorFixture('ica'),
+        dailyRegisteredConnectorFixture('willys'),
+        dailyRegisteredConnectorFixture('coop'),
+        dailyRegisteredConnectorFixture('hemkop'),
+        dailyRegisteredConnectorFixture('lidl'),
+        dailyRegisteredConnectorFixture('city_gross')
       ])
     });
 
@@ -6252,12 +6407,12 @@ describe('daily ingestion runner', () => {
     const configs = buildDailyConnectorConfigsFromEnv({
       DATABASE_URL: 'postgres://user:secret@example/groceryview',
       GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify([
-        dailyConnectorFixture('ica'),
-        dailyConnectorFixture('willys'),
-        dailyConnectorFixture('coop'),
-        dailyConnectorFixture('hemkop'),
-        dailyConnectorFixture('lidl'),
-        dailyConnectorFixture('city_gross'),
+        dailyRegisteredConnectorFixture('ica'),
+        dailyRegisteredConnectorFixture('willys'),
+        dailyRegisteredConnectorFixture('coop'),
+        dailyRegisteredConnectorFixture('hemkop'),
+        dailyRegisteredConnectorFixture('lidl'),
+        dailyRegisteredConnectorFixture('city_gross'),
         {
           connectorId: 'pharmacy-public-products',
           chainId: 'pharmacy',
@@ -6282,12 +6437,12 @@ describe('daily ingestion runner', () => {
   it('loads connector config from a file path to avoid oversized process environments', () => {
     const connectorPath = join(mkdtempSync(join(tmpdir(), 'groceryview-connectors-')), 'connectors.json');
     writeFileSync(connectorPath, JSON.stringify([
-      dailyConnectorFixture('ica'),
-      dailyConnectorFixture('willys'),
-      dailyConnectorFixture('coop'),
-      dailyConnectorFixture('hemkop'),
-      dailyConnectorFixture('lidl'),
-      dailyConnectorFixture('city_gross')
+      dailyRegisteredConnectorFixture('ica'),
+      dailyRegisteredConnectorFixture('willys'),
+      dailyRegisteredConnectorFixture('coop'),
+      dailyRegisteredConnectorFixture('hemkop'),
+      dailyRegisteredConnectorFixture('lidl'),
+      dailyRegisteredConnectorFixture('city_gross')
     ]));
 
     const configs = buildDailyConnectorConfigsFromEnv({
@@ -6304,12 +6459,12 @@ describe('daily ingestion runner', () => {
     const configs = buildDailyConnectorConfigsFromEnv({
       DATABASE_URL: 'postgres://user:secret@example/groceryview',
       GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify([
-        dailyConnectorFixture('ica'),
-        dailyConnectorFixture('willys'),
-        dailyConnectorFixture('coop'),
-        dailyConnectorFixture('hemkop'),
-        dailyConnectorFixture('lidl'),
-        dailyConnectorFixture('city_gross')
+        dailyRegisteredConnectorFixture('ica'),
+        dailyRegisteredConnectorFixture('willys'),
+        dailyRegisteredConnectorFixture('coop'),
+        dailyRegisteredConnectorFixture('hemkop'),
+        dailyRegisteredConnectorFixture('lidl'),
+        dailyRegisteredConnectorFixture('city_gross')
       ]),
       GROCERYVIEW_DAILY_MAX_CONNECTORS: '4',
       GROCERYVIEW_DAILY_MAX_CONCURRENCY: '2',
