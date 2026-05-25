@@ -3,7 +3,7 @@ import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/c
 import { OcrScanHistoryTimeline } from '@/components/ocr-scan-history-timeline';
 import { BarcodeScanner } from '@/components/barcode-scanner';
 import { ScannerUploadActions } from '@/components/scanner-upload-actions';
-import { barcodeLookupSourceOrder, barcodeMissFallbackProducts } from '@/lib/openfoodfacts-catalog';
+import { barcodeLookupSourceOrder, barcodeMissFallbackProducts, lookupOpenFoodFactsBarcode } from '@/lib/openfoodfacts-catalog';
 import { routeMetadata } from '@/lib/seo';
 import { receiptFedAliasGrowthPlan } from '@/lib/verified-data';
 
@@ -15,6 +15,7 @@ export const dynamic = 'force-static';
 
 const route = 'scanner';
 
+type ScannerSearchParams = Readonly<{ ean?: string | string[]; barcode?: string | string[]; handoff?: string | string[] }>;
 
 const premiumOcrScanHistory = {
   tier: 'Premium OCR history',
@@ -29,10 +30,49 @@ const premiumOcrScanHistory = {
   ]
 };
 
-export default function ScannerPage() {
+export default async function ScannerPage({ searchParams }: Readonly<{ searchParams?: Promise<ScannerSearchParams> }>) {
+  const params = (await searchParams) ?? {};
+  const barcodeLookup = lookupOpenFoodFactsBarcode(params.ean ?? params.barcode);
+  const handoffSource = Array.isArray(params.handoff) ? params.handoff[0] : params.handoff;
+
   return (
     <PageShell>
       <NoVerifiedData route={route} title="Receipt scanner has no production uploads in this static snapshot" />
+      <div id="barcode-scan" className="scroll-mt-24">
+      <Card className="mt-6 border-sky-200 bg-sky-50/80">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-sky-800">Barcode product lookup</p>
+            <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950">Search bar camera handoff</h1>
+            <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Camera actions can route an EAN into this scanner page as <code className="rounded bg-white px-1 py-0.5">?ean=...</code>. GroceryView only links to an OpenFoodFacts product when the barcode is an exact catalogue code.
+            </p>
+          </div>
+          <Link className="rounded-full bg-sky-900 px-5 py-3 text-sm font-black text-white" href="/products">
+            Browse products
+          </Link>
+        </div>
+        {barcodeLookup ? (
+          <div className="mt-5 rounded-2xl bg-white p-4">
+            <p className="text-sm font-black text-slate-950">{barcodeLookup.lookupLabel}</p>
+            <p className="mt-1 text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
+              {handoffSource ? `handoff ${handoffSource} · ` : ''}EAN {barcodeLookup.barcode}
+            </p>
+            {barcodeLookup.product ? (
+              <Link className="mt-3 inline-flex rounded-full bg-emerald-900 px-4 py-2 text-sm font-black text-white" href={`/products/${barcodeLookup.product.slug}`}>
+                Open {barcodeLookup.product.name}
+              </Link>
+            ) : (
+              <p className="mt-3 text-sm font-semibold leading-6 text-slate-700">Use receipt upload or manual search below; unmatched barcodes are not guessed from partial digits.</p>
+            )}
+          </div>
+        ) : (
+          <p className="mt-5 rounded-2xl bg-white p-4 text-sm font-semibold leading-6 text-slate-700">
+            No barcode supplied yet. Start from the SearchBar camera action or add an EAN manually to the URL for product lookup.
+          </p>
+        )}
+      </Card>
+      </div>
       <Card className="mt-6 border-indigo-200 bg-indigo-50/80">
         <div className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
@@ -123,6 +163,13 @@ export default function ScannerPage() {
           <Link className="rounded-full border border-indigo-200 px-4 py-2 text-sm font-black text-indigo-900" href="/screener">Nearby deals</Link>
           <Link className="rounded-full border border-indigo-200 px-4 py-2 text-sm font-black text-indigo-900" href="/watchlist">Watchlist</Link>
         </div>
+      </Card>
+      <Card className="mt-6 border-amber-200 bg-amber-50/70">
+        <p className="text-xs font-black uppercase tracking-[0.22em] text-amber-800">In-store barcode mode</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Camera EAN lookup resolves products before upload flows</h2>
+        <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-amber-950">
+          The scanner controls below can read EAN-8, EAN-13, UPC-A, and UPC-E frames in-browser, link exact catalogue matches to product detail pages, or prepare a missing-product submission draft when no match exists.
+        </p>
       </Card>
       <BarcodeScanner />
       <div id="scan" className="scroll-mt-24">

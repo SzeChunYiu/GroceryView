@@ -5,6 +5,10 @@ import { buildBrandLeaderboardTrends, buildCitySearchTrends, buildCityTrendingIt
 import { BrandLeaderboardModule, TrendingSearchModule } from '@/app/page-sections/trending';
 import type { PersonalizedReorderItem } from '@/lib/personalization';
 
+type PersonalizedTrendingProductPriceChange = TrendingProductPriceChange & {
+  personalizationReason?: string;
+};
+
 function formatMoney(value: number, currency: string) {
   return new Intl.NumberFormat('sv-SE', {
     style: 'currency',
@@ -89,7 +93,7 @@ function CityTrendingItemsRail({ feed }: Readonly<{ feed: CityTrendingItemFeed }
 }
 
 export function TrendingCarousel({ items, reorderItems = [] }: Readonly<{
-  items: TrendingProductPriceChange[];
+  items: PersonalizedTrendingProductPriceChange[];
   reorderItems?: PersonalizedReorderItem[];
 }>) {
   const searchFeed = buildCitySearchTrends({ city: 'stockholm', limit: 6 });
@@ -158,6 +162,11 @@ export function TrendingCarousel({ items, reorderItems = [] }: Readonly<{
                   <History aria-hidden="true" size={16} />
                   {item.changeCount} changes · {item.observationCount} observations
                 </p>
+                {item.personalizationReason ? (
+                  <p className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-cyan-800">
+                    Ranked for you: {item.personalizationReason}
+                  </p>
+                ) : null}
                 <p className="mt-2 text-xs font-semibold leading-5 text-slate-500">
                   {formatPercent(item.changePercent)} from {formatMoney(item.previousPrice, item.currency)} · latest {item.latestObservedAt.slice(0, 10)}
                 </p>

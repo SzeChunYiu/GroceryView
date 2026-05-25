@@ -112,3 +112,30 @@ export const barcodeLookupSourceOrder = [
   'OpenPrices product observations',
   'GroceryView manual product queue'
 ];
+
+export type BarcodeLookupResult = {
+  barcode: string;
+  found: boolean;
+  product: OpenFoodFactsCatalogProduct | null;
+  lookupLabel: string;
+};
+
+export function normalizeBarcodeForLookup(value: string | string[] | undefined) {
+  const rawValue = Array.isArray(value) ? value[0] : value;
+  return (rawValue ?? '').replace(/\D/g, '').slice(0, 14);
+}
+
+export function lookupOpenFoodFactsBarcode(value: string | string[] | undefined): BarcodeLookupResult | null {
+  const barcode = normalizeBarcodeForLookup(value);
+  if (!barcode) return null;
+
+  const product = openFoodFactsCatalog.find((candidate) => candidate.code === barcode) ?? null;
+  return {
+    barcode,
+    found: Boolean(product),
+    product,
+    lookupLabel: product
+      ? `Matched ${product.name} from OpenFoodFacts barcode ${barcode}`
+      : `No exact OpenFoodFacts barcode match for ${barcode}`
+  };
+}
