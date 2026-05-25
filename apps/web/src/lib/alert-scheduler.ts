@@ -281,6 +281,7 @@ const savedSearchFilterLabels: Record<string, string> = {
   category: 'category',
   label: 'label',
   dietary: 'dietary',
+  origin: 'origin',
   chain: 'chain',
   brand: 'brand',
   minPrice: 'min price',

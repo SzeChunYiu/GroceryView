@@ -1,5 +1,5 @@
 import { fuzzyEditDistance, isTypoTolerantTokenMatch } from './search-fuzzy';
-import { semanticSynonymsForQuery } from './search-synonyms';
+import { semanticSynonymsForQuery, synonymExpansionWeight } from './search-synonyms';
 
 export type GrocerySearchExpansion = {
   query: string;
@@ -210,10 +210,11 @@ function buildGrocerySearchExpansion(query: string, maxQueries: number): Grocery
   }
 
   for (const synonym of semanticSynonymsForQuery(trimmed)) {
+    const synonymWeight = synonymExpansionWeight(synonym.intent);
     addUnique(matchedSynonyms, synonym.matchedTerm);
-    addWeightedQuery(expandedQueries, queryWeights, synonym.canonical, 0.9);
+    addWeightedQuery(expandedQueries, queryWeights, synonym.canonical, synonymWeight);
     for (const synonymTerm of synonym.terms) addUnique(expandedQueries, synonymTerm);
-    for (const synonymTerm of synonym.terms) queryWeights[synonymTerm] = Math.max(queryWeights[synonymTerm] ?? 0, 0.75);
+    for (const synonymTerm of synonym.terms) queryWeights[synonymTerm] = Math.max(queryWeights[synonymTerm] ?? 0, synonymWeight * 0.85);
   }
 
   const limitedExpandedQueries = expandedQueries.slice(0, maxQueries);
@@ -258,7 +259,7 @@ export type MisspelledQueryRecovery = {
   popularAlternatives: string[];
 };
 
-const popularRecoveryQueries = ['mjölk', 'kaffe', 'havregryn', 'ägg', 'yoghurt', 'pasta'];
+const popularRecoveryQueries = ['mjölk', 'kaffe', 'havregryn', 'ägg', 'yoghurt', 'pasta', 'äpple'];
 
 export function phoneticRankedQueryHints(query: string, maxSuggestions = 4) {
   const normalizedQuery = normalizeAliasText(query);

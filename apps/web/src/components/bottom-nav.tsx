@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Map, ScanLine, Search, ShoppingBasket, Store, Tags, Watch } from 'lucide-react';
+import { Map, MessageCircle, ScanLine, Search, ShoppingBasket, Store, Tags, Watch } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useHaptic } from '@/hooks/useHaptic';
@@ -13,7 +13,8 @@ const bottomNavItems = [
   { href: '/scanner?launch=bottom-nav-browser#scan', standaloneHref: '/scanner?launch=bottom-nav-pwa#scan', label: 'Scan', icon: ScanLine, prominent: true, match: 'scanner' },
   { href: '/list', label: 'List', icon: ShoppingBasket },
   { href: '/map', label: 'Nearby', icon: Map },
-  { href: '/watchlist', label: 'Watchlist', icon: Watch }
+  { href: '/watchlist', label: 'Watchlist', icon: Watch },
+  { href: '/contact', label: 'Contact', icon: MessageCircle }
 ];
 
 function isBottomNavItemActive(item: (typeof bottomNavItems)[number], pathname: string) {
@@ -43,7 +44,7 @@ export function BottomNav() {
       aria-label="Primary mobile navigation"
       className="fixed inset-x-3 bottom-3 z-30 rounded-[1.5rem] border border-white/45 bg-white/72 px-2 py-2 shadow-[0_18px_45px_rgba(15,23,42,0.22)] backdrop-blur-xl supports-[backdrop-filter]:bg-white/58 lg:hidden"
     >
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-8 gap-1">
         {bottomNavItems.map((item) => {
           const Icon = item.icon;
           const isActive = isBottomNavItemActive(item, pathname);

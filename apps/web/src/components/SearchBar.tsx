@@ -29,6 +29,10 @@ type ProductSearchResult = {
 
 type ProductSearchResponse = {
   query: string;
+  queryRecovery?: {
+    didYouMean: string[];
+    popularAlternatives: string[];
+  };
   results: ProductSearchResult[];
   error?: string;
 };
@@ -130,6 +134,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
   const [results, setResults] = useState<ProductSearchResult[]>([]);
   const [facetChips, setFacetChips] = useState<HeaderSearchFacetChip[]>([]);
   const [suggestGroups, setSuggestGroups] = useState<HeaderSuggestGroup[]>([]);
+  const [queryRecovery, setQueryRecovery] = useState<ProductSearchResponse['queryRecovery']>(undefined);
   const [recentSearches, setRecentSearches] = useState<RecentSearchHistoryEntry[]>([]);
   const [savedSearches, setSavedSearches] = useState<SavedSearchEntry[]>([]);
   const [activeOptionIndex, setActiveOptionIndex] = useState(-1);
@@ -214,6 +219,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
       setResults([]);
       setFacetChips([]);
       setSuggestGroups([]);
+      setQueryRecovery(undefined);
       setActiveOptionIndex(-1);
       setStatus('idle');
       return;
@@ -254,6 +260,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
         if (controller.signal.aborted) return;
         const nextResults = payload.results ?? [];
         setResults(nextResults);
+        setQueryRecovery(payload.queryRecovery);
         setStatus(nextResults.length > 0 ? 'ready' : 'empty');
         if (nextResults.length > 0) setRecentSearches(rememberRecentSearchHistory(trimmedQuery, nextResults.length));
         trackSearchToSavingsFunnelStep('landing_search');
@@ -263,6 +270,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
         setResults([]);
         setFacetChips([]);
         setSuggestGroups([]);
+        setQueryRecovery(undefined);
         setStatus('error');
       }
     }, 300);
@@ -517,6 +525,15 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
           {status === 'empty' ? (
             <div className="px-4 py-3">
               <p className="text-sm font-bold text-slate-700">No products matched “{trimmedQuery}”.</p>
+              {queryRecovery && queryRecovery.didYouMean.length > 0 ? (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {queryRecovery.didYouMean.map((suggestion) => (
+                    <Link className="rounded-full bg-amber-50 px-3 py-1 text-xs font-black text-amber-950" href={`/products?q=${encodeURIComponent(suggestion)}`} key={suggestion}>
+                      Did you mean {suggestion}?
+                    </Link>
+                  ))}
+                </div>
+              ) : null}
               <p className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-slate-500">Try related searches</p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {emptyFallback.searches.map((search) => (
