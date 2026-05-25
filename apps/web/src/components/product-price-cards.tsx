@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
+import { ConfidenceBadge } from './confidence-badge';
 import { LazyItemCard } from './LazyItemCard';
 import { FavouriteProductToggle } from './favourite-product-toggle';
 import { readStoredSafetyPreferences, SAFETY_PREFERENCES_CHANGED_EVENT, type ProductSafetyPreferences } from './cert-filter';
@@ -316,6 +317,14 @@ export function ProductPriceCards({
             <FriendPriceSightingsPanel card={card} />
             <SafetyWarningBanner card={card} preferences={safetyPreferences} />
             <PriceHistorySparkline card={card} />
+            <div className="mt-2">
+              <ConfidenceBadge
+                details={card.confidenceDrilldown.rows}
+                label="Price confidence"
+                level={card.confidenceLevel}
+                sampleSize={card.confidenceDrilldown.sourceCount}
+              />
+            </div>
             <p className="mt-2 rounded-xl bg-blue-50 p-3 text-xs font-bold text-blue-950">{card.confidenceLabel}</p>
             <VolatilityMethodologyBadge card={card} />
             {card.cheapestUnitBadge ? (

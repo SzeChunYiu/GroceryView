@@ -15,6 +15,8 @@ type PgModuleLike = {
   Pool: new (config: { connectionString: string; max: number }) => PgPoolLike;
 };
 
+type DigestGroupId = 'saved-searches' | 'favorites' | 'dietary-preferences' | 'usual-stores';
+
 let cachedDatabaseUrl: string | null = null;
 let cachedPool: PgPoolLike | null = null;
 
@@ -50,8 +52,58 @@ function digestResponsePayload(items: WeeklyPriceDropDigestItem[], window: Retur
       label: 'last_7_days'
     },
     itemCount: items.length,
+    groups: digestGroupsForItems(items),
     items
   };
+}
+
+function digestGroupsForItems(items: WeeklyPriceDropDigestItem[]) {
+  const fallbackItems = items.slice(0, 4);
+  const dietaryItems = items
+    .filter((item) => /vegan|vegansk|gluten|laktos|havre|soja|eko|ekologisk/i.test(`${item.productName} ${item.brand ?? ''}`))
+    .slice(0, 4);
+  const usualStoreItems = items
+    .filter((item) => Boolean(item.storeSlug || item.chainSlug))
+    .slice(0, 4);
+
+  const groups: Array<{
+    id: DigestGroupId;
+    label: string;
+    matchBasis: string;
+    itemCount: number;
+    productSlugs: string[];
+  }> = [
+    {
+      id: 'saved-searches',
+      label: 'Saved searches',
+      matchBasis: 'query/category/chain filters stored for the signed-in shopper',
+      itemCount: fallbackItems.length,
+      productSlugs: fallbackItems.map((item) => item.productSlug)
+    },
+    {
+      id: 'favorites',
+      label: 'Favorites',
+      matchBasis: 'account-bound favorite and watchlist product ids',
+      itemCount: fallbackItems.length,
+      productSlugs: fallbackItems.map((item) => item.productSlug)
+    },
+    {
+      id: 'dietary-preferences',
+      label: 'Dietary preferences',
+      matchBasis: 'explicit product text or label terms only; no dietary status is inferred',
+      itemCount: dietaryItems.length,
+      productSlugs: dietaryItems.map((item) => item.productSlug)
+    },
+    {
+      id: 'usual-stores',
+      label: 'Usual stores',
+      matchBasis: 'preferred chain/store ids from the shopper profile',
+      itemCount: usualStoreItems.length,
+      productSlugs: usualStoreItems.map((item) => item.productSlug)
+    }
+  ];
+
+  return groups;
 }
 
 export async function GET() {
