@@ -4,6 +4,8 @@ export type SharedListActivityKind =
   | 'item_completed'
   | 'item_edited'
   | 'item_removed'
+  | 'permission_changed'
+  | 'price_changed'
   | 'price_alert_changed';
 
 export type SharedListActor = {
@@ -108,6 +110,14 @@ export function publishSharedListItemEdited(input: SharedListActivityInput): Sha
 
 export function publishSharedListItemRemoved(input: SharedListActivityInput): SharedListActivityEvent {
   return publishSharedListActivity('item_removed', input);
+}
+
+export function publishSharedListPermissionChanged(input: SharedListActivityInput): SharedListActivityEvent {
+  return publishSharedListActivity('permission_changed', input);
+}
+
+export function publishSharedListPriceChanged(input: SharedListActivityInput): SharedListActivityEvent {
+  return publishSharedListActivity('price_changed', input);
 }
 
 export function publishSharedListPriceAlertChanged(input: SharedListActivityInput): SharedListActivityEvent {

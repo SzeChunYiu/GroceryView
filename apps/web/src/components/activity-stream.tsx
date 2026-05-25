@@ -20,6 +20,8 @@ function activityLabel(event: SharedListActivityEvent): string {
   if (event.kind === 'item_checked') return 'checked';
   if (event.kind === 'item_completed') return 'completed';
   if (event.kind === 'item_edited') return 'edited';
+  if (event.kind === 'permission_changed') return 'changed permissions for';
+  if (event.kind === 'price_changed') return 'updated price for';
   if (event.kind === 'price_alert_changed') return 'updated alert for';
   return 'removed';
 }
@@ -27,7 +29,8 @@ function activityLabel(event: SharedListActivityEvent): string {
 function activityTone(event: SharedListActivityEvent): string {
   if (event.kind === 'item_removed') return 'bg-rose-50 text-rose-800';
   if (event.kind === 'item_checked' || event.kind === 'item_completed') return 'bg-emerald-50 text-emerald-800';
-  if (event.kind === 'price_alert_changed') return 'bg-violet-50 text-violet-800';
+  if (event.kind === 'permission_changed') return 'bg-blue-50 text-blue-800';
+  if (event.kind === 'price_alert_changed' || event.kind === 'price_changed') return 'bg-violet-50 text-violet-800';
   if (event.kind === 'item_edited') return 'bg-amber-50 text-amber-900';
   return 'bg-sky-50 text-sky-800';
 }

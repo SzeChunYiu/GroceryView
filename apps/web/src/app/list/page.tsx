@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { ActivityStream } from '@/components/activity-stream';
 import { ListCard } from '@/components/list-card';
 import { ListSharePreview } from '@/components/list-share-preview';
+import { buildSharedListActivityEvent } from '@/lib/activity-log';
 import { publicListSharePath } from '@/lib/list-permissions';
 import { storeLayoutDepartments, type StoreLayoutChain } from '@/lib/trip-planner';
 import { metadataForShoppingListShare } from '@/lib/seo';
@@ -19,6 +21,42 @@ type ListPageSearchParams = {
 };
 
 const storeChains = Object.keys(storeLayoutDepartments) as StoreLayoutChain[];
+const demoListId = 'household-weekly-list';
+const demoActor = { id: 'guardian', name: 'Alex' };
+const sharedListActivityEvents = [
+  buildSharedListActivityEvent('permission_changed', {
+    actor: demoActor,
+    detail: 'Mia can now check off items but cannot change list sharing.',
+    itemId: 'permissions',
+    itemName: 'household access',
+    listId: demoListId,
+    timestamp: '2026-05-25T08:10:00.000Z'
+  }),
+  buildSharedListActivityEvent('item_added', {
+    actor: { id: 'partner', name: 'Mia' },
+    detail: 'Added for tomorrow morning before the shared trip.',
+    itemId: 'oat-milk',
+    itemName: 'Oat milk',
+    listId: demoListId,
+    timestamp: '2026-05-25T08:28:00.000Z'
+  }),
+  buildSharedListActivityEvent('item_checked', {
+    actor: { id: 'teen', name: 'Sam' },
+    detail: 'Checked in the dairy aisle.',
+    itemId: 'bananas',
+    itemName: 'Bananas',
+    listId: demoListId,
+    timestamp: '2026-05-25T09:02:00.000Z'
+  }),
+  buildSharedListActivityEvent('price_changed', {
+    actor: { id: 'price-bot', name: 'GroceryView price bot' },
+    detail: 'Sparkling water moved from 39.90 kr to 36.90 kr at the selected chain.',
+    itemId: 'sparkling-water',
+    itemName: 'Sparkling water',
+    listId: demoListId,
+    timestamp: '2026-05-25T09:35:00.000Z'
+  })
+];
 
 function normalizeChain(chain: string | string[] | undefined): StoreLayoutChain {
   const requested = Array.isArray(chain) ? chain[0] : chain;
@@ -66,6 +104,7 @@ export default async function ShoppingListPage({ searchParams }: { searchParams?
           Approximate route: {storeLayoutDepartments[selectedChain].map((department) => department.label).join(' → ')}.
         </p>
       </section>
+      <ActivityStream initialEvents={sharedListActivityEvents} listId={demoListId} />
       <ListCard currentRole="guardian" items={demoItems} selectedChain={selectedChain} />
     </div>
   );
