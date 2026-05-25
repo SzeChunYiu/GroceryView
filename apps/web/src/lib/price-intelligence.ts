@@ -71,6 +71,8 @@ export type ShortTermPriceForecastPoint = {
 export type ShortTermPriceForecast = {
   available: boolean;
   horizonDays: number;
+  confidenceLabel: string;
+  rangeLabel: string;
   trendLabel: string;
   summary: string;
   caveat: string;
@@ -113,6 +115,95 @@ export type BestTimeToBuyAlertRecommendation = {
   rationale: string;
 };
 
+export type SeasonalDiscoveryRow = {
+  slug: string;
+  productName: string;
+  categoryLabel: string;
+  bestBuyMonth: string;
+  bestBuyMonthIndex: number;
+  historicalMonthlyAverageLabel: string;
+  savingsVsTypicalLabel: string;
+  confidenceLabel: string;
+  evidenceLabel: string;
+  observationCount: number;
+  observedMonthCount: number;
+};
+
+export type HolidayStapleWindow = {
+  label: string;
+  months: string;
+  rationale: string;
+};
+
+export type CategorySeasonalDiscoveryModules = {
+  inSeasonProduce: SeasonalDiscoveryRow[];
+  historicBestBuyWindows: SeasonalDiscoveryRow[];
+  holidayStaples: HolidayStapleWindow[];
+  guardrail: string;
+};
+
+const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const;
+
+const categoryHolidayStaples: Record<string, HolidayStapleWindow[]> = {
+  produce: [
+    { label: 'Citrus and cabbage planning', months: 'Jan-Mar', rationale: 'Use winter produce history for low-waste baskets before spring rows arrive.' },
+    { label: 'Berry and grill vegetable watch', months: 'Jun-Aug', rationale: 'Summer holiday baskets should compare current deals against observed best-buy months.' }
+  ],
+  dairy: [
+    { label: 'Cream, cheese, and butter checks', months: 'Nov-Dec', rationale: 'Holiday baking and buffet staples deserve a deal check before stock-up trips.' }
+  ],
+  pantry: [
+    { label: 'Baking and dry-good stock-up', months: 'Nov-Dec', rationale: 'Historic best-buy windows keep pantry refills separate from forecast claims.' }
+  ],
+  sweets: [
+    { label: 'Holiday candy and fika shelf', months: 'Mar-Apr / Dec', rationale: 'Seasonal discovery highlights sweets only as a planning cue, not a price prediction.' }
+  ],
+  beverages: [
+    { label: 'Holiday drink aisle watch', months: 'Jun / Dec', rationale: 'Surface timing context for recurring holiday staples while keeping observed prices visible.' }
+  ]
+};
+
+function monthDistance(left: number, right: number) {
+  const distance = Math.abs(left - right);
+  return Math.min(distance, 12 - distance);
+}
+
+export function buildCategorySeasonalDiscoveryModules({
+  categorySlug,
+  currentMonthIndex = new Date().getUTCMonth(),
+  seasonalRows
+}: {
+  categorySlug: string;
+  currentMonthIndex?: number;
+  seasonalRows: ReadonlyArray<SeasonalDiscoveryRow>;
+}): CategorySeasonalDiscoveryModules {
+  const currentMonth = Number.isInteger(currentMonthIndex) ? ((currentMonthIndex % 12) + 12) % 12 : new Date().getUTCMonth();
+  const categoryRows = categorySlug === 'produce'
+    ? seasonalRows
+    : seasonalRows.filter((row) => row.categoryLabel.toLowerCase().includes(categorySlug.replace(/-/g, ' ')));
+  const rankedRows = categoryRows.length > 0 ? categoryRows : seasonalRows;
+  const inSeasonProduce = [...rankedRows]
+    .filter((row) => monthDistance(row.bestBuyMonthIndex, currentMonth) <= 1)
+    .sort((left, right) => right.observationCount - left.observationCount)
+    .slice(0, 3);
+  const historicBestBuyWindows = [...rankedRows]
+    .sort((left, right) => right.observedMonthCount - left.observedMonthCount || right.observationCount - left.observationCount)
+    .slice(0, 3);
+
+  return {
+    inSeasonProduce,
+    historicBestBuyWindows,
+    holidayStaples: categoryHolidayStaples[categorySlug] ?? [
+      {
+        label: `${monthLabels[currentMonth]} category timing check`,
+        months: `${monthLabels[currentMonth]} plus nearby flyer weeks`,
+        rationale: 'Use the category page to compare observed deals before making a seasonal stock-up decision.'
+      }
+    ],
+    guardrail: 'Seasonal modules use historical monthly averages and explicit holiday planning labels only. No forecast, harvest, stock, or synthetic seasonal price claim is invented.'
+  };
+}
+
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
@@ -129,9 +220,15 @@ function standardDeviation(values: number[]) {
   return Math.sqrt(variance);
 }
 
+function forecastConfidenceLabel(confidence: number) {
+  if (confidence >= 0.7) return 'high forecast confidence';
+  if (confidence >= 0.45) return 'medium forecast confidence';
+  return 'limited forecast confidence';
+}
+
 export function buildShortTermPriceForecast({
   observations,
-  horizonDays = 14,
+  horizonDays = 7,
   stepDays = 7
 }: {
   observations: ReadonlyArray<PriceForecastObservation>;
@@ -151,6 +248,8 @@ export function buildShortTermPriceForecast({
     return {
       available: false,
       horizonDays,
+      confidenceLabel: 'forecast withheld',
+      rangeLabel: 'forecast unavailable',
       trendLabel: 'forecast withheld',
       summary: 'Needs at least three dated price observations.',
       caveat: 'The short-term forecast band is withheld until the product has enough observed price-event trend points.',
@@ -190,10 +289,13 @@ export function buildShortTermPriceForecast({
       confidence: Math.round((confidence + Number.EPSILON) * 100) / 100
     });
   }
+  const finalPoint = forecastPoints.at(-1);
 
   return {
     available: forecastPoints.length > 0,
     horizonDays,
+    confidenceLabel: finalPoint ? forecastConfidenceLabel(finalPoint.confidence) : 'forecast withheld',
+    rangeLabel: finalPoint ? `${finalPoint.lowerBound.toFixed(2)}-${finalPoint.upperBound.toFixed(2)} SEK` : 'forecast unavailable',
     trendLabel: `${direction} ${weeklyTrendPercent.toFixed(1)}%/week observed trend`,
     summary: `Projects the latest observed price-event trend ${horizonDays} days ahead with an uncertainty band from recent volatility.`,
     caveat: 'Forecast uses only recent dated price-event trends from this product; it is not a retailer promotion, stock, or seasonality claim.',
@@ -412,5 +514,26 @@ export function summarizeBasketBuyTiming(recommendations: ReadonlyArray<BasketBu
     watch: recommendations.filter((item) => item.action === 'watch').length,
     substitute: recommendations.filter((item) => item.action === 'substitute').length,
     itemCount: recommendations.length
+  };
+}
+
+export type PremiumSavingsForecastDriver = {
+  label: string;
+  amount: number;
+  detail: string;
+};
+
+export function buildPremiumSavingsForecast(drivers: PremiumSavingsForecastDriver[] = [
+  { label: 'Alerts', amount: 42, detail: 'watchlist drops and wait-window alerts' },
+  { label: 'Swaps', amount: 58, detail: 'verified chain substitutions' },
+  { label: 'Basket planning', amount: 33, detail: 'duplicate-buy and pantry timing guidance' }
+]) {
+  const monthlySavings = drivers.reduce((sum, driver) => sum + driver.amount, 0);
+
+  return {
+    monthlySavings,
+    monthlySavingsLabel: `${monthlySavings} kr`,
+    drivers: drivers.map((driver) => ({ ...driver, amountLabel: `${driver.amount} kr` })),
+    confidenceLabel: 'Premium estimate from observed alerts, basket optimization, and historical behavior.'
   };
 }

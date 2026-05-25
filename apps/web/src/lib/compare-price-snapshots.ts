@@ -9,6 +9,23 @@ export type ComparePriceSnapshotStoreRow = {
   price: number | null;
   priceLabel: string;
   unitLabel: string;
+  chainName?: string;
+  packSizeLabel?: string;
+  normalizedUnitPrice?: number | null;
+  normalizedUnitPriceLabel?: string;
+};
+
+export type ComparePriceSnapshotOverlayOption = {
+  key: string;
+  itemId: string;
+  itemName: string;
+  label: string;
+  storeName: string;
+  packSizeLabel: string;
+  price: number | null;
+  priceLabel: string;
+  unitLabel: string;
+  basis: 'chain' | 'pack-size' | 'store-price';
 };
 
 export type ComparePriceSnapshotsResult = {
@@ -30,6 +47,10 @@ type StorePriceRowPayload = {
   price?: unknown;
   priceLabel?: unknown;
   unitLabel?: unknown;
+  chainName?: unknown;
+  packSizeLabel?: unknown;
+  normalizedUnitPrice?: unknown;
+  normalizedUnitPriceLabel?: unknown;
 };
 
 type CompareItemPayload = {
@@ -73,6 +94,43 @@ function numberOrNull(value: unknown) {
   return typeof value === 'number' && Number.isFinite(value) ? value : null;
 }
 
+function overlayBasisFor(row: Pick<ComparePriceSnapshotStoreRow, 'chainName' | 'packSizeLabel' | 'storeName' | 'unitLabel'>): ComparePriceSnapshotOverlayOption['basis'] {
+  if (row.chainName && row.chainName !== row.storeName) return 'chain';
+  if (row.packSizeLabel && row.packSizeLabel !== row.unitLabel) return 'pack-size';
+  return 'store-price';
+}
+
+export function comparePriceSnapshotOverlayOptions(storeRows: ComparePriceSnapshotStoreRow[], maxItems = 2): ComparePriceSnapshotOverlayOption[] {
+  return storeRows
+    .filter((row) => row.price !== null || (row.normalizedUnitPrice !== undefined && row.normalizedUnitPrice !== null))
+    .map((row) => {
+      const price = row.normalizedUnitPrice ?? row.price;
+      const priceLabel = row.normalizedUnitPriceLabel ?? row.priceLabel;
+      const packSizeLabel = row.packSizeLabel ?? row.unitLabel;
+      const label = `${row.chainName ?? row.storeName} · ${packSizeLabel}`;
+
+      return {
+        key: `${row.itemId}-${row.storeName}-${packSizeLabel}`,
+        itemId: row.itemId,
+        itemName: row.itemName,
+        label,
+        storeName: row.chainName ?? row.storeName,
+        packSizeLabel,
+        price,
+        priceLabel,
+        unitLabel: row.unitLabel,
+        basis: overlayBasisFor(row)
+      };
+    })
+    .sort((left, right) => {
+      if (left.price === null && right.price === null) return left.label.localeCompare(right.label);
+      if (left.price === null) return 1;
+      if (right.price === null) return -1;
+      return left.price - right.price;
+    })
+    .slice(0, Math.max(0, maxItems));
+}
+
 function fallbackResult(itemIds: string[]): ComparePriceSnapshotsResult {
   return {
     itemIds,
@@ -103,13 +161,19 @@ function directStoreRowsFromPayload(payload: unknown): ComparePriceSnapshotStore
     .filter((row): row is StorePriceRowPayload => row !== null && typeof row === 'object')
     .map((row) => {
       const itemId = stringOrFallback(row.itemId, 'unknown-item');
+      const storeName = stringOrFallback(row.storeName, 'Unknown store');
+      const unitLabel = stringOrFallback(row.unitLabel, 'Unit unavailable');
       return {
         itemId,
         itemName: stringOrFallback(row.itemName, itemId),
-        storeName: stringOrFallback(row.storeName, 'Unknown store'),
+        storeName,
         price: numberOrNull(row.price),
         priceLabel: stringOrFallback(row.priceLabel, 'Price unavailable'),
-        unitLabel: stringOrFallback(row.unitLabel, 'Unit unavailable')
+        unitLabel,
+        chainName: stringOrFallback(row.chainName, storeName),
+        packSizeLabel: stringOrFallback(row.packSizeLabel, unitLabel),
+        normalizedUnitPrice: numberOrNull(row.normalizedUnitPrice),
+        normalizedUnitPriceLabel: stringOrFallback(row.normalizedUnitPriceLabel, '') || undefined
       };
     });
 }
@@ -122,14 +186,22 @@ function nestedStoreRowsFromPayload(payload: unknown): ComparePriceSnapshotStore
 
     return storePrices
       .filter((row): row is StorePriceRowPayload => row !== null && typeof row === 'object')
-      .map((row) => ({
-        itemId,
-        itemName,
-        storeName: stringOrFallback(row.storeName, 'Unknown store'),
-        price: numberOrNull(row.price),
-        priceLabel: stringOrFallback(row.priceLabel, 'Price unavailable'),
-        unitLabel: stringOrFallback(row.unitLabel, 'Unit unavailable')
-      }));
+      .map((row) => {
+        const storeName = stringOrFallback(row.storeName, 'Unknown store');
+        const unitLabel = stringOrFallback(row.unitLabel, 'Unit unavailable');
+        return {
+          itemId,
+          itemName,
+          storeName,
+          price: numberOrNull(row.price),
+          priceLabel: stringOrFallback(row.priceLabel, 'Price unavailable'),
+          unitLabel,
+          chainName: stringOrFallback(row.chainName, storeName),
+          packSizeLabel: stringOrFallback(row.packSizeLabel, unitLabel),
+          normalizedUnitPrice: numberOrNull(row.normalizedUnitPrice),
+          normalizedUnitPriceLabel: stringOrFallback(row.normalizedUnitPriceLabel, '') || undefined
+        };
+      });
   });
 }
 

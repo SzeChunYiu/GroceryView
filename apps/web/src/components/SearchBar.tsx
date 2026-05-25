@@ -1,9 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import { Search } from 'lucide-react';
-import { useEffect, useId, useMemo, useState } from 'react';
-import { readRecentProductSearches, rememberRecentProductSearch, trackSearchToSavingsFunnelStep, type RecentProductSearch } from '@/lib/analytics';
+import { Mic, Search } from 'lucide-react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { trackSearchToSavingsFunnelStep, trackVoiceSearchInput } from '@/lib/analytics';
+import {
+  clearRecentSearchHistory,
+  readRecentSearchHistory,
+  rememberRecentSearchHistory,
+  type RecentSearchHistoryEntry
+} from '@/lib/personalization';
 
 type ProductSearchResult = {
   id: string;
@@ -20,7 +26,46 @@ type ProductSearchResponse = {
   error?: string;
 };
 
+type HeaderSearchFacetChip = {
+  kind: 'category' | 'chain' | 'diet' | 'price-range';
+  label: string;
+  href: string;
+  count?: number;
+};
+
+type HeaderSuggestResponse = {
+  facets?: HeaderSearchFacetChip[];
+};
+
 type SearchStatus = 'idle' | 'loading' | 'ready' | 'empty' | 'error';
+type VoiceSearchStatus = 'idle' | 'listening' | 'unsupported' | 'error';
+
+type GrocerySpeechRecognitionEvent = {
+  results: {
+    [index: number]: {
+      [index: number]: { transcript: string };
+    };
+  };
+};
+
+type GrocerySpeechRecognition = {
+  abort: () => void;
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  maxAlternatives: number;
+  onend: (() => void) | null;
+  onerror: (() => void) | null;
+  onresult: ((event: GrocerySpeechRecognitionEvent) => void) | null;
+  onstart: (() => void) | null;
+  start: () => void;
+};
+
+type GrocerySpeechRecognitionConstructor = new () => GrocerySpeechRecognition;
+type VoiceSearchWindow = Window & {
+  SpeechRecognition?: GrocerySpeechRecognitionConstructor;
+  webkitSpeechRecognition?: GrocerySpeechRecognitionConstructor;
+};
 
 const MIN_QUERY_LENGTH = 2;
 const ZERO_RESULT_FALLBACKS = [
@@ -45,21 +90,81 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
   const listboxId = useId();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<ProductSearchResult[]>([]);
-  const [recentSearches, setRecentSearches] = useState<RecentProductSearch[]>([]);
+  const [facetChips, setFacetChips] = useState<HeaderSearchFacetChip[]>([]);
+  const [recentSearches, setRecentSearches] = useState<RecentSearchHistoryEntry[]>([]);
   const [isFocused, setIsFocused] = useState(false);
   const [status, setStatus] = useState<SearchStatus>('idle');
+  const [voiceStatus, setVoiceStatus] = useState<VoiceSearchStatus>('idle');
+  const voiceRecognitionRef = useRef<GrocerySpeechRecognition | null>(null);
   const trimmedQuery = useMemo(() => query.trim(), [query]);
   const emptyFallback = useMemo(() => zeroResultFallbacks(trimmedQuery), [trimmedQuery]);
   const shouldShowRecentSearches = isFocused && trimmedQuery.length === 0 && recentSearches.length > 0;
   const shouldShowDropdown = (status !== 'idle' && trimmedQuery.length >= MIN_QUERY_LENGTH) || shouldShowRecentSearches;
 
   useEffect(() => {
-    setRecentSearches(readRecentProductSearches());
+    setRecentSearches(readRecentSearchHistory());
   }, []);
+
+  useEffect(() => () => {
+    voiceRecognitionRef.current?.abort();
+    voiceRecognitionRef.current = null;
+  }, []);
+
+  function submitVoiceQuery(nextQuery: string) {
+    const trimmedVoiceQuery = nextQuery.trim();
+    if (!trimmedVoiceQuery) return;
+    setQuery(trimmedVoiceQuery);
+    setIsFocused(true);
+    trackVoiceSearchInput({ query: trimmedVoiceQuery, status: 'submitted', surface });
+    window.setTimeout(() => {
+      window.location.assign(`/products?q=${encodeURIComponent(trimmedVoiceQuery)}`);
+    }, 250);
+  }
+
+  function startVoiceSearch() {
+    const voiceWindow = window as VoiceSearchWindow;
+    const Recognition = voiceWindow.SpeechRecognition ?? voiceWindow.webkitSpeechRecognition;
+    if (!Recognition) {
+      setVoiceStatus('unsupported');
+      trackVoiceSearchInput({ status: 'unsupported', surface });
+      return;
+    }
+
+    voiceRecognitionRef.current?.abort();
+    const recognition = new Recognition();
+    voiceRecognitionRef.current = recognition;
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = navigator.language || 'sv-SE';
+    recognition.maxAlternatives = 1;
+    recognition.onstart = () => {
+      setVoiceStatus('listening');
+      trackVoiceSearchInput({ status: 'started', surface });
+    };
+    recognition.onresult = (event) => {
+      submitVoiceQuery(event.results[0]?.[0]?.transcript ?? '');
+    };
+    recognition.onerror = () => {
+      setVoiceStatus('error');
+      trackVoiceSearchInput({ status: 'error', surface });
+    };
+    recognition.onend = () => {
+      setVoiceStatus((current) => current === 'listening' ? 'idle' : current);
+      voiceRecognitionRef.current = null;
+    };
+
+    try {
+      recognition.start();
+    } catch {
+      setVoiceStatus('error');
+      trackVoiceSearchInput({ status: 'error', surface });
+    }
+  }
 
   useEffect(() => {
     if (trimmedQuery.length < MIN_QUERY_LENGTH) {
       setResults([]);
+      setFacetChips([]);
       setStatus('idle');
       return;
     }
@@ -68,6 +173,21 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
     const timeout = window.setTimeout(async () => {
       setStatus('loading');
       try {
+        try {
+          const suggestResponse = await fetch(`/api/suggest?q=${encodeURIComponent(trimmedQuery)}`, {
+            signal: controller.signal,
+            headers: { Accept: 'application/json' }
+          });
+          if (suggestResponse.ok) {
+            const suggestPayload = await suggestResponse.json() as HeaderSuggestResponse;
+            if (!controller.signal.aborted) setFacetChips(suggestPayload.facets ?? []);
+          } else if (!controller.signal.aborted) {
+            setFacetChips([]);
+          }
+        } catch {
+          if (!controller.signal.aborted) setFacetChips([]);
+        }
+
         const response = await fetch(`/api/products?q=${encodeURIComponent(trimmedQuery)}`, {
           signal: controller.signal,
           headers: { Accept: 'application/json' }
@@ -78,12 +198,13 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
         const nextResults = payload.results ?? [];
         setResults(nextResults);
         setStatus(nextResults.length > 0 ? 'ready' : 'empty');
-        if (nextResults.length > 0) setRecentSearches(rememberRecentProductSearch(trimmedQuery, nextResults.length));
+        if (nextResults.length > 0) setRecentSearches(rememberRecentSearchHistory(trimmedQuery, nextResults.length));
         trackSearchToSavingsFunnelStep('landing_search');
       } catch (error) {
         if (controller.signal.aborted) return;
         console.error('Product search request failed', error instanceof Error ? { name: error.name } : { name: 'unknown' });
         setResults([]);
+        setFacetChips([]);
         setStatus('error');
       }
     }, 300);
@@ -110,7 +231,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
           onBlur={() => window.setTimeout(() => setIsFocused(false), 120)}
           onChange={(event) => setQuery(event.target.value)}
           onFocus={() => {
-            setRecentSearches(readRecentProductSearches());
+            setRecentSearches(readRecentSearchHistory());
             setIsFocused(true);
           }}
           placeholder="Search product or brand"
@@ -118,7 +239,23 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
           type="search"
           value={query}
         />
+        <button
+          aria-label={voiceStatus === 'listening' ? 'Listening for grocery search' : 'Search by voice'}
+          className="rounded-full p-2 text-slate-500 transition hover:bg-emerald-50 hover:text-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
+          disabled={voiceStatus === 'listening'}
+          onClick={startVoiceSearch}
+          onMouseDown={(event) => event.preventDefault()}
+          title={voiceStatus === 'unsupported' ? 'Voice search is not supported in this browser' : 'Search by voice'}
+          type="button"
+        >
+          <Mic className={voiceStatus === 'listening' ? 'h-4 w-4 animate-pulse text-emerald-700' : 'h-4 w-4'} aria-hidden="true" />
+        </button>
       </div>
+      {voiceStatus === 'unsupported' || voiceStatus === 'error' ? (
+        <p className="mt-2 px-4 text-xs font-bold text-amber-800" role="status">
+          {voiceStatus === 'unsupported' ? 'Voice search is not supported in this browser yet.' : 'Voice search could not start. Try typing your grocery search.'}
+        </p>
+      ) : null}
 
       {shouldShowDropdown ? (
         <div
@@ -128,7 +265,17 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
         >
           {shouldShowRecentSearches ? (
             <div className="px-4 py-3" data-recent-product-searches>
-              <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">Recent searches</p>
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">Recent searches</p>
+                <button
+                  className="text-xs font-black text-slate-500 underline decoration-slate-300 underline-offset-4 hover:text-rose-700"
+                  onClick={() => setRecentSearches(clearRecentSearchHistory())}
+                  onMouseDown={(event) => event.preventDefault()}
+                  type="button"
+                >
+                  Clear all
+                </button>
+              </div>
               <div className="mt-2 grid gap-2">
                 {recentSearches.map((search) => (
                   <Link
@@ -146,6 +293,24 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
           ) : null}
           {status === 'loading' ? (
             <p className="px-4 py-3 text-sm font-bold text-slate-600">Searching verified products…</p>
+          ) : null}
+          {facetChips.length > 0 ? (
+            <div className="border-t border-slate-100 px-4 py-3">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">Refine search</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {facetChips.map((facet) => (
+                  <Link
+                    className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-900 transition hover:bg-emerald-100"
+                    href={facet.href}
+                    key={`${facet.kind}-${facet.href}`}
+                    role="option"
+                  >
+                    {facet.label}
+                    {facet.count ? <span className="ml-1 text-emerald-700">({facet.count})</span> : null}
+                  </Link>
+                ))}
+              </div>
+            </div>
           ) : null}
           {status === 'error' ? (
             <p className="px-4 py-3 text-sm font-bold text-rose-800">Product search is temporarily unavailable.</p>
@@ -189,5 +354,45 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
         </div>
       ) : null}
     </div>
+  );
+}
+
+export function RecentSearchReplayPills() {
+  const [recentSearches, setRecentSearches] = useState<RecentSearchHistoryEntry[]>([]);
+
+  useEffect(() => {
+    setRecentSearches(readRecentSearchHistory());
+  }, []);
+
+  if (recentSearches.length === 0) return null;
+
+  return (
+    <section className="mx-auto mb-4 w-full max-w-5xl rounded-3xl border border-emerald-100 bg-white p-4 shadow-sm" data-search-history-replay>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">Recent searches</p>
+          <p className="mt-1 text-sm font-semibold text-slate-600">Replay successful grocery searches saved on this device.</p>
+        </div>
+        <button
+          className="rounded-full border border-slate-200 px-3 py-1.5 text-xs font-black text-slate-700 hover:border-rose-200 hover:text-rose-700"
+          onClick={() => setRecentSearches(clearRecentSearchHistory())}
+          type="button"
+        >
+          Clear all
+        </button>
+      </div>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {recentSearches.map((search) => (
+          <Link
+            className="rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-black text-emerald-950 hover:bg-emerald-100"
+            href={search.href}
+            key={`${search.query}-${search.searchedAt}`}
+          >
+            {search.query}
+            <span className="ml-2 text-xs font-semibold text-emerald-800">{search.resultCount}</span>
+          </Link>
+        ))}
+      </div>
+    </section>
   );
 }

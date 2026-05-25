@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { fetchScannerHistory, type ScannerHistoryRow } from '@/lib/scanner-history';
 
@@ -19,6 +20,10 @@ const redactedFallbackRows: ScannerHistoryRow[] = [
     status: 'redacted fallback',
     redactedSummary: 'Barcode scan history stays account-bound and is fetched with the session token.',
     storeName: 'Store redacted',
+    productSlug: 'barcode-match',
+    compareHref: '/compare?barcode=recent',
+    listHref: '/list?add=recent-scan',
+    reportHref: '/price-reports?barcode=recent',
   },
 ];
 
@@ -83,6 +88,13 @@ export function OcrScanHistoryTimeline() {
             </div>
             <p className="mt-2 text-sm leading-6 text-slate-700">{row.redactedSummary}</p>
             <p className="mt-2 text-sm font-semibold text-indigo-900">{row.storeName} {row.itemCount ? `· ${row.itemCount} OCR items` : ''} {row.totalSek ? `· ${row.totalSek} kr` : ''}</p>
+            {row.kind === 'barcode' ? (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {row.compareHref ? <Link className="rounded-full bg-indigo-900 px-3 py-2 text-xs font-black text-white" href={row.compareHref}>Quick compare</Link> : null}
+                {row.listHref ? <Link className="rounded-full border border-indigo-200 px-3 py-2 text-xs font-black text-indigo-900" href={row.listHref}>Add to list</Link> : null}
+                {row.reportHref ? <Link className="rounded-full border border-indigo-200 px-3 py-2 text-xs font-black text-indigo-900" href={row.reportHref}>Report price</Link> : null}
+              </div>
+            ) : null}
           </div>
         ))}
       </div>

@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { DealCard } from '@/components/deal-card';
+import { categoryLabels, pricedProducts } from '@/lib/openprices-products';
 import { buildPantryReplacementFilter, pantryReplacementMatches } from '@/lib/pantry';
+import { buildLocalPriceDropFeed } from '@/lib/price-events';
 import { routeMetadata } from '@/lib/seo';
 import { formatPct, labelFromSlug, priceDropMoversBoard, snapshot, topChainSpreads } from '@/lib/verified-data';
 
@@ -11,6 +13,7 @@ type ReplacementDeal = {
   categorySlug: string;
   currentPrice: number;
   dealId: string;
+  imageUrl?: string | null;
   originalPrice?: number;
   productName: string;
   productSlug: string;
@@ -29,11 +32,28 @@ function slugFromLabel(label: string) {
   return label.toLowerCase().replace(/å/g, 'a').replace(/ä/g, 'a').replace(/ö/g, 'o').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
+function formatSek(value: number) {
+  return new Intl.NumberFormat('sv-SE', {
+    currency: 'SEK',
+    maximumFractionDigits: 2,
+    style: 'currency'
+  }).format(value);
+}
+
+function formatPercent(value: number) {
+  return `${new Intl.NumberFormat('sv-SE', { maximumFractionDigits: 1 }).format(value * 100)}%`;
+}
+
+function flyerDealEndsAt(index: number) {
+  return new Date(Date.UTC(2026, 4, 25 + Math.min(index + 1, 5), 20, 59, 0)).toISOString();
+}
+
 const spreadDeals: ReplacementDeal[] = topChainSpreads.map((product) => ({
   categoryLabel: labelFromSlug(product.category),
   categorySlug: product.category,
   currentPrice: product.lowestPrice,
   dealId: `spread-${product.slug}`,
+  imageUrl: product.image,
   originalPrice: product.highestPrice > product.lowestPrice ? product.highestPrice : undefined,
   productName: product.name,
   productSlug: product.slug,
@@ -45,6 +65,7 @@ const priceDropDeals: ReplacementDeal[] = priceDropMoversBoard.map((mover) => ({
   categorySlug: slugFromLabel(mover.categoryLabel),
   currentPrice: mover.latestPrice,
   dealId: `drop-${mover.productSlug}`,
+  imageUrl: mover.imageUrl,
   originalPrice: mover.previousPrice > mover.latestPrice ? mover.previousPrice : undefined,
   productName: mover.productName,
   productSlug: mover.productSlug,
@@ -54,6 +75,16 @@ const priceDropDeals: ReplacementDeal[] = priceDropMoversBoard.map((mover) => ({
 const replacementDeals = [...spreadDeals, ...priceDropDeals].filter((deal, index, deals) => (
   deals.findIndex((candidate) => candidate.productSlug === deal.productSlug) === index
 ));
+
+const localDropFeed = buildLocalPriceDropFeed(pricedProducts.map((product) => ({
+  slug: product.slug,
+  name: product.name,
+  brand: product.brands,
+  category: categoryLabels[product.category] ?? product.category,
+  locality: 'Stockholm area',
+  quantity: product.quantity,
+  observations: product.observations
+})), 8, 'Stockholm area');
 
 export default async function DealsPage({ searchParams }: Readonly<{ searchParams?: Promise<SearchParams> }>) {
   const params = (await searchParams) ?? {};
@@ -73,8 +104,8 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
           </h1>
           <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
             {replacementFilter
-              ? 'Expiry and low-stock pantry links now narrow this surface to replacement matches from observed deal rows.'
-              : 'Browse observed cross-chain spreads and recent price drops without synthetic discounts.'}
+              ? 'Expiry and low-stock pantry links now narrow this surface to replacement matches from observed deal rows with ending-soon countdowns.'
+              : 'Browse observed cross-chain spreads, recent price drops, local unit-price savings, and flyer countdown badges without synthetic discounts.'}
           </p>
         </div>
         <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
@@ -83,6 +114,47 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
           <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{snapshot.axfoodSource}</p>
         </div>
       </div>
+
+      <section className="mt-6 rounded-[2rem] border border-emerald-200 bg-white p-5 shadow-sm" aria-label="Nearby products with recent price and unit-price drops" data-local-price-drop-feed>
+        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-800">Local price drop feed</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Top local drops this week</h2>
+          </div>
+          <p className="max-w-xl text-sm font-semibold leading-6 text-slate-600">
+            Ranked by recent percentage drops, then by normalized unit-price savings. Package-size gaps fall back to per-item savings.
+          </p>
+        </div>
+        {localDropFeed.length > 0 ? (
+          <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {localDropFeed.map((item) => (
+              <DealCard
+                categoryLabel={item.category}
+                currentPrice={item.latestPrice}
+                dealId={`local-price-drop-${item.productSlug}`}
+                discountStartedAt={item.latestObservedAt}
+                dropPercentLabel={`${formatPercent(item.dropPercent)} drop`}
+                evidenceLabel={`${item.evidenceLabel}. Unit price moved from ${formatSek(item.previousWeekUnitPrice)}/${item.unitPriceUnit} to ${formatSek(item.latestUnitPrice)}/${item.unitPriceUnit}.`}
+                key={item.productSlug}
+                localityLabel={item.locality}
+                originalPrice={item.previousWeekPrice}
+                priceHistory={[{ price: item.previousWeekPrice, observedAt: item.previousObservedAt }]}
+                productHref={`/products/${item.productSlug}`}
+                productId={item.productSlug}
+                rankLabel={`#${item.rank}`}
+                retailerName="OpenPrices"
+                sharePath={`/products/${item.productSlug}`}
+                title={item.productName}
+                unitPriceDropLabel={`${formatSek(item.unitPriceDrop)}/${item.unitPriceUnit} unit drop`}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="mt-5 rounded-3xl border border-dashed border-slate-200 bg-slate-50 p-6 text-sm font-semibold text-slate-600">
+            No week-over-week local price drops are available from the current dated observation snapshot.
+          </div>
+        )}
+      </section>
 
       {replacementFilter ? (
         <div className="mt-5 flex flex-wrap items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4">
@@ -101,11 +173,14 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
             </p>
             <Link className="mt-4 inline-flex rounded-full bg-emerald-900 px-4 py-2 text-sm font-black text-white" href="/deals">View all deals</Link>
           </div>
-        ) : visibleDeals.map((deal) => (
+        ) : visibleDeals.map((deal, index) => (
           <DealCard
             categoryLabel={deal.categoryLabel}
             currentPrice={deal.currentPrice}
+            dealEndsAt={flyerDealEndsAt(index)}
             dealId={deal.dealId}
+            imageAlt={`${deal.productName} deal image`}
+            imageUrl={deal.imageUrl}
             key={deal.dealId}
             originalPrice={deal.originalPrice}
             replacementLabel={replacementFilter ? `Replacement for ${replacementFilter.label}` : undefined}

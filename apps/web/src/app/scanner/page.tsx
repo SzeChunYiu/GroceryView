@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { OcrScanHistoryTimeline } from '@/components/ocr-scan-history-timeline';
 import { ScannerUploadActions } from '@/components/scanner-upload-actions';
+import { barcodeMissFallbackProducts } from '@/lib/openfoodfacts-catalog';
 import { routeMetadata } from '@/lib/seo';
 import { receiptFedAliasGrowthPlan } from '@/lib/verified-data';
 
@@ -112,15 +113,18 @@ export default function ScannerPage() {
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <Link className="rounded-full bg-indigo-900 px-4 py-2 text-sm font-black text-white" href="#scan">Scan receipt</Link>
+          <Link className="rounded-full border border-indigo-200 px-4 py-2 text-sm font-black text-indigo-900" href="#scan-history">Recent scans</Link>
           <Link className="rounded-full border border-indigo-200 px-4 py-2 text-sm font-black text-indigo-900" href="/list">Current list</Link>
           <Link className="rounded-full border border-indigo-200 px-4 py-2 text-sm font-black text-indigo-900" href="/screener">Nearby deals</Link>
           <Link className="rounded-full border border-indigo-200 px-4 py-2 text-sm font-black text-indigo-900" href="/watchlist">Watchlist</Link>
         </div>
       </Card>
       <div id="scan" className="scroll-mt-24">
-        <ScannerUploadActions />
+        <ScannerUploadActions fallbackProducts={barcodeMissFallbackProducts} />
       </div>
-      <OcrScanHistoryTimeline />
+      <div id="scan-history" className="scroll-mt-24">
+        <OcrScanHistoryTimeline />
+      </div>
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
         <TopSpreads limit={5} />
         <SourceCoverage />

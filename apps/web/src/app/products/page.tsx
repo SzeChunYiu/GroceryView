@@ -1,7 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { ChainFilterInput } from './chain-filter-input';
-import { ActiveFilterChips } from '@/components/FilterPanel';
+import { ActiveFilterChips, AdvancedFilterDrawer } from '@/components/FilterPanel';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { PriceReportReviewActions } from '@/components/price-report-review-actions';
 import { OriginFilter, type OriginFilterCode } from '@/components/origin-filter';
@@ -9,11 +8,13 @@ import { ProductPriceCards } from '@/components/product-price-cards';
 import { VirtualizedProductGrid } from '@/components/LazyItemCard';
 import { apohemSource } from '@/lib/ingested/apohem';
 import { adaptiveProductCards, buildProductSearchView, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
-import { routeMetadata } from '@/lib/seo';
+import { publicCatalogueRevalidateSeconds, routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
 import { buildRemovableSearchFilterChips } from '@/lib/search-filters';
 
 const PRODUCTS_PER_PAGE = 50;
+
+export const revalidate = publicCatalogueRevalidateSeconds;
 
 export function generateMetadata() {
   return routeMetadata('/products');
@@ -79,7 +80,7 @@ function productsPageUrl(page: number, selectedBrand = '', searchParams: SearchP
   if (selectedBrand) params.set('brand', selectedBrand);
   if (page > 1) params.set('page', String(page));
   const query = params.toString();
-  return query ? `/products?` : '/products';
+  return query ? `/products?${query}` : '/products';
 }
 
 const ZERO_RESULT_RELATED_SEARCHES = [
@@ -133,7 +134,6 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const pageStart = (currentPage - 1) * PRODUCTS_PER_PAGE;
   const rangeStart = resultCards.length === 0 ? 0 : pageStart + 1;
   const rangeEnd = Math.min(pageStart + PRODUCTS_PER_PAGE, resultCards.length);
-  const chainFilterProducts = resultCards.map((product) => product.slug).join('|');
   const defaultSearchCount = facetedProductSearch.resultCards.length;
   const zeroResultFallback = relatedSearchFallback(search.query);
   const zeroResultCategories = zeroResultCategoryShortcuts(search.query, resolvedSearchParams.category);
@@ -141,7 +141,9 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
     basePath: '/products',
     labels: {
       chain: Object.fromEntries(search.chainFacets.map((facet) => [facet.value, facet.label])),
-      dietary: Object.fromEntries(search.dietaryFilters.map((filter) => [filter.value, filter.label]))
+      dietary: Object.fromEntries(search.dietaryFilters.map((filter) => [filter.value, filter.label])),
+      label: Object.fromEntries(search.labelFacets.map((facet) => [facet.value, facet.label])),
+      brand: Object.fromEntries(productBrandFilterOptions.map((brand) => [brand.value, brand.label]))
     }
   });
   const volatilityBadgeCounts = resultCards.reduce<Record<string, number>>((counts, product) => {
@@ -197,52 +199,32 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             {inStockOnly.productCount.toLocaleString('sv-SE')} priced products · {inStockOnly.latestPriceCount.toLocaleString('sv-SE')} latest_prices rows
           </div>
         </div>
-        <form action="/products" className="mt-5 grid gap-3 rounded-2xl border border-violet-100 bg-white p-4 shadow-sm lg:grid-cols-[1.2fr_0.6fr_0.6fr_0.6fr_auto]" method="get">
-          {selectedBrand ? <input name="brand" type="hidden" value={selectedBrand} /> : null}
-          {search.filters.categories.length > 0 ? <input name="category" type="hidden" value={search.filters.categories.join(',')} /> : null}
-          {search.labelFilters.length > 0 ? <input name="label" type="hidden" value={search.labelFilters.join(',')} /> : null}
+        <form action="/products" className="mt-5 grid gap-3 rounded-2xl border border-violet-100 bg-white p-4 shadow-sm lg:grid-cols-[1.2fr_auto]" method="get">
           {search.originFilters.map((origin) => <input key={origin} name="origin" type="hidden" value={origin} />)}
-          <ChainFilterInput chains={search.filters.chains} products={chainFilterProducts} />
           <label className="text-sm font-black text-slate-950" htmlFor="product-search-q">
             Search
             <input className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-950" defaultValue={search.query} id="product-search-q" name="q" />
           </label>
-          <label className="text-sm font-black text-slate-950" htmlFor="product-search-min-price">
-            Min unit SEK
-            <input className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-950" defaultValue={search.filters.minPrice ?? ''} id="product-search-min-price" min="0" name="minPrice" step="0.01" type="number" />
-          </label>
-          <label className="text-sm font-black text-slate-950" htmlFor="product-search-max-price">
-            Max unit SEK
-            <input className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-950" defaultValue={search.filters.maxPrice ?? ''} id="product-search-max-price" min="0" name="maxPrice" step="0.01" type="number" />
-          </label>
-          <label className="text-sm font-black text-slate-950" htmlFor="product-search-confidence">
-            Min confidence
-            <input className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-950" defaultValue={search.filters.minConfidence ?? ''} id="product-search-confidence" max="1" min="0" name="minConfidence" step="0.01" type="number" />
-          </label>
-          <div className="rounded-2xl border border-emerald-100 bg-emerald-50/80 p-3 lg:col-span-4">
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Dietary filters</p>
-            <div className="mt-2 grid gap-2 sm:grid-cols-3">
-              {search.dietaryFilters.map((filter) => (
-                <label className="flex items-start gap-2 rounded-2xl bg-white px-3 py-2 text-sm font-black text-emerald-950 shadow-sm" key={filter.value}>
-                  <input className="mt-1" defaultChecked={filter.checked} name="dietary" type="checkbox" value={filter.value} />
-                  <span>
-                    {filter.label}
-                    <span className="block text-xs font-semibold text-emerald-700">{filter.count.toLocaleString('sv-SE')} evidence rows · {filter.evidenceSummary}</span>
-                  </span>
-                </label>
-              ))}
-            </div>
-            <p className="mt-2 text-xs font-semibold leading-5 text-emerald-900">
-              Gluten-free, lactose-free, and vegan filters require verified label metadata or explicit product text; GroceryView does not infer dietary status from shopper profiles.
-            </p>
-          </div>
           <div className="flex flex-col justify-end gap-2">
-            <label className="flex items-center gap-2 rounded-2xl bg-violet-50 px-3 py-2 text-sm font-black text-violet-950">
-              <input defaultChecked={search.filters.inStockOnly} name="inStockOnly" type="checkbox" value="true" />
-              In-stock only
-            </label>
             <button className="rounded-full bg-violet-800 px-4 py-3 text-sm font-black text-white" type="submit">Apply filters</button>
           </div>
+          <AdvancedFilterDrawer
+            activeChips={activeFilterChips}
+            brandOptions={productBrandFilterOptions.slice(0, 24)}
+            categoryFacets={categoryFacets}
+            chainFacets={chainFacets}
+            dietaryFilters={search.dietaryFilters}
+            inStockOnly={search.filters.inStockOnly}
+            labelFacets={labelFacets}
+            maxPrice={search.filters.maxPrice}
+            minConfidence={search.filters.minConfidence}
+            minPrice={search.filters.minPrice}
+            priceRange={priceRange}
+            selectedBrand={selectedBrand}
+            selectedCategories={search.filters.categories}
+            selectedChains={search.filters.chains}
+            selectedLabels={search.labelFilters}
+          />
         </form>
         <div className="mt-4">
           <p className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-violet-800">Saved filter chips</p>

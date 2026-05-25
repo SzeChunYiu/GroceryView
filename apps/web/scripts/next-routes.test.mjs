@@ -49,7 +49,8 @@ describe('verified-data UI', () => {
     assert.match(nav, /label: 'Markets'[\s\S]*label: 'Overview'[\s\S]*label: 'Chain index'[\s\S]*label: 'Categories'[\s\S]*label: 'Heatmap'[\s\S]*label: 'Screener'/);
     assert.match(nav, /label: 'Products'[\s\S]*label: 'Browse'[\s\S]*label: 'Compare'/);
     assert.match(nav, /label: 'Stores'[\s\S]*label: 'Map'[\s\S]*label: 'Stores'/);
-    assert.match(nav, /label: 'Personal'[\s\S]*label: 'Savings'[\s\S]*label: 'My Flyer'[\s\S]*label: 'Watchlist'[\s\S]*label: 'Weekly basket'[\s\S]*label: 'Meal planner'/);
+    assert.match(nav, /label: 'Trip'[\s\S]*label: 'Current list'[\s\S]*label: 'Nearby deals'[\s\S]*label: 'Watchlist'/);
+    assert.match(nav, /label: 'Personal'[\s\S]*label: 'Savings'[\s\S]*label: 'My Flyer'[\s\S]*label: 'Weekly basket'[\s\S]*label: 'Meal planner'/);
     assert.match(nav, /aria-haspopup="true"/);
     assert.match(nav, /group-focus-within:visible/);
     assert.match(nav, /group-hover:visible/);
@@ -185,9 +186,11 @@ describe('verified-data UI', () => {
     assert.match(household, /item_checked/);
     assert.match(household, /item_edited/);
     assert.match(household, /item_removed/);
-    assert.match(activityStream, /added, checked, edited, and removed events/);
+    assert.match(activityStream, /Collaborator additions, removals, price alert changes, and completed items/);
     assert.match(activityStream, /sortSharedListActivityEvents/);
-    assert.match(activityLog, /'item_added' \| 'item_checked' \| 'item_edited' \| 'item_removed'/);
+    assert.match(activityLog, /'item_added'/);
+    assert.match(activityLog, /'item_completed'/);
+    assert.match(activityLog, /'price_alert_changed'/);
     assert.match(activityLog, /publishSharedListItemChecked/);
     assert.match(activityLog, /publishSharedListItemEdited/);
   });
@@ -1760,7 +1763,8 @@ describe('verified-data UI', () => {
     assert.match(previewWorkflow, /pull_request:/);
     assert.match(previewWorkflow, /environment: 'Preview'/);
     assert.match(previewWorkflow, /core\.exportVariable\('LHCI_PREVIEW_URL'/);
-    assert.match(previewWorkflow, /npm run perf:lighthouse:preview -w @groceryview\/web/);
+    assert.match(previewWorkflow, /\.\/node_modules\/\.bin\/lhci autorun --config=\.lighthouserc\.json/);
+    assert.match(previewWorkflow, /--collect\.url=\$\{base\}\$\{route\}/);
     assert.match(verified, /export const webPerformanceBudgetGate/);
     assert.match(verified, /Core Web Vitals budget/);
     assert.match(verified, /≤ 0\.15 layout shift/);
@@ -2137,9 +2141,10 @@ ${seo}`;
     assert.match(bottomNav, /grid-cols-7/);
     assert.match(bottomNav, /useHaptic/);
     assert.match(bottomNav, /impact\(\)/);
-    assert.match(bottomNav, /My Flyer/);
+    assert.match(bottomNav, /Deals/);
+    assert.match(bottomNav, /List/);
+    assert.match(bottomNav, /Nearby/);
     assert.match(bottomNav, /Watchlist/);
-    assert.match(bottomNav, /Me/);
     assert.match(dataUi, /import \{ BottomNav \} from '\.\/bottom-nav'/);
     assert.match(dataUi, /pb-20/);
     assert.match(dataUi, /lg:pb-6/);
@@ -2151,7 +2156,7 @@ ${seo}`;
     const haptic = await read('src/hooks/useHaptic.ts');
 
     assert.match(scanner, /Mobile scanner shortcut/);
-    assert.match(scanner, /Bottom nav opens scan controls with haptic feedback/);
+    assert.match(scanner, /Bottom nav keeps in-store workflows one tap away/);
     assert.match(scanner, /id="scan"/);
     assert.match(scanner, /ScannerUploadActions/);
     assert.match(haptic, /impact: \(\) => vibrate\(\[10, 18, 10\]\)/);
@@ -2873,7 +2878,7 @@ ${seo}`;
     assert.match(social, /storeName/);
     assert.match(social, /observedAt/);
     assert.match(social, /confidence/);
-    assert.match(feed, /Friend price sightings/);
+    assert.match(feed, /Opt-in friend price sightings/);
     assert.match(feed, /listFriendPriceSightings/);
     assert.match(feed, /sighting\.productName/);
     assert.match(feed, /sighting\.storeName/);
@@ -3503,6 +3508,7 @@ ${seo}`;
   it('uses crawlable URL query params for instant product search facets', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const products = await read('src/app/products/page.tsx');
+    const filterPanel = await read('src/components/FilterPanel.tsx');
     const api = await read('../../packages/api/src/index.ts');
 
     assert.match(api, /labels\?: string\[\]/);
@@ -3528,7 +3534,9 @@ ${seo}`;
     assert.match(products, /href=\{searchFacetUrl\(\{ label: facet\.value \}\)\}/);
     assert.match(products, /href=\{searchFacetUrl\(\{ chain: facet\.value \}\)\}/);
     assert.match(products, /name="q"/);
-    assert.match(products, /name="inStockOnly"/);
+    assert.match(products, /<AdvancedFilterDrawer/);
+    assert.match(products, /inStockOnly=\{search\.filters\.inStockOnly\}/);
+    assert.match(filterPanel, /name="inStockOnly"/);
     assert.doesNotMatch(api, /Math\.random|placeholder/i);
   });
 
@@ -3556,6 +3564,7 @@ ${seo}`;
   it('adds common dietary allergen checkbox filters to product listing search', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const products = await read('src/app/products/page.tsx');
+    const filterPanel = await read('src/components/FilterPanel.tsx');
 
     assert.match(verified, /export const commonDietaryFilterOptions = /);
     assert.match(verified, /value: 'glutenfree'/);
@@ -3572,12 +3581,13 @@ ${seo}`;
 
     assert.match(products, /dietary\?: string \| string\[\]/);
     assert.match(products, /setAllParams\(params, 'dietary', source\.dietary\)/);
-    assert.match(products, /Dietary filters/);
-    assert.match(products, /search\.dietaryFilters\.map/);
-    assert.match(products, /name="dietary"/);
-    assert.match(products, /value=\{filter\.value\}/);
-    assert.match(products, /defaultChecked=\{filter\.checked\}/);
-    assert.match(products, /filter\.label/);
+    assert.match(products, /dietaryFilters=\{search\.dietaryFilters\}/);
+    assert.match(filterPanel, /Diet and certification/);
+    assert.match(filterPanel, /dietaryFilters\.map/);
+    assert.match(filterPanel, /name="dietary"/);
+    assert.match(filterPanel, /value=\{filter\.value\}/);
+    assert.match(filterPanel, /defaultChecked=\{filter\.checked\}/);
+    assert.match(filterPanel, /optionLabel\(filter\)/);
   });
 
   it('surfaces account-bound save-to-watchlist hearts on product cards', async () => {
