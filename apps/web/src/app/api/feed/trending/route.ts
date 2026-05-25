@@ -31,7 +31,7 @@ export function GET(request: Request) {
     chain: normalizeFilterSlug(searchParams.get('chain'))
   };
   const csv = (name: string) => (searchParams.get(name) ?? '').split(',').map((value) => value.trim()).filter(Boolean);
-  const feed = buildCityPriceDropTrends({ city, limit: filters.category || filters.chain ? 12 : limit });
+  const feed = buildCityPriceDropTrends({ city, limit });
   const filteredCards = feed.cards.filter((card) => cardMatchesFilter(card, filters));
   const cards = rankTrendingDealsForHousehold(filteredCards, {
     householdId: searchParams.get('householdId') ?? undefined,
