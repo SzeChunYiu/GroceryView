@@ -105,6 +105,17 @@ describe('infra/db PostgreSQL schema contract', () => {
     }
   });
 
+  it('classifies every chain with indexed retailer_type metadata', () => {
+    const chains = tableDefinition('chains');
+    assert.match(chains, /retailer_type text not null default 'grocery' check/);
+    for (const retailerType of ['grocery', 'pharmacy', 'fuel', 'convenience', 'variety', 'cosmetics', 'household', 'online_marketplace']) {
+      assert.match(chains, new RegExp(`'${retailerType}'`), `${retailerType} missing from chains retailer_type check`);
+      assert.match(allMigrations, new RegExp(`'${retailerType}'`), `${retailerType} missing from retailer_type migrations`);
+    }
+    assert.match(allMigrations, /create index if not exists chains_retailer_type_idx/);
+    assert.match(schemaDoc, /`retailer_type` is required and indexed/);
+  });
+
   it('stores immutable price facts with type, time, confidence, and provenance', () => {
     const observations = tableDefinition('observations');
     for (const column of ['price_type', 'observed_at', 'confidence', 'provenance']) {

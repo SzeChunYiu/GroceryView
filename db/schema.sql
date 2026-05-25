@@ -4,10 +4,13 @@
 create table if not exists chains (
   id text primary key,
   name text not null,
+  retailer_type text not null default 'grocery' check (retailer_type in ('grocery', 'pharmacy', 'fuel', 'convenience', 'variety', 'cosmetics', 'household', 'online_marketplace')),
   domain text not null default 'grocery' check (domain in ('grocery', 'fuel', 'pharmacy')),
   country_code text not null default 'SE',
   created_at timestamptz not null default now()
 );
+
+create index if not exists chains_retailer_type_idx on chains (retailer_type, country_code, id);
 
 create table if not exists stores (
   id text primary key,

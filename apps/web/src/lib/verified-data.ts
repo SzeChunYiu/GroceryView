@@ -1,7 +1,7 @@
 import { buildFacetedProductSearch, type RealCatalogSearchPriceRow } from '@groceryview/api';
 import { COMMODITIES, STAPLE_BASKET, SUPPORTED_PRICE_DOMAINS, type Commodity, type ComparableUnit } from '@groceryview/catalog';
 import { buildPriceChartSeries, buildWatchlistAlerts, calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, suggestFriendSharedDeals, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type PriceChartObservation, type ProductMatchInput, type WatchlistItem, type WatchlistPriceType, type WatchlistProductSnapshot } from '@groceryview/core';
-import { summarizeTrendingProductPriceChanges, type TrendingPriceChangePoint } from '@groceryview/db';
+import { majorSwedishGroceryRetailerTypeCoverage, retailerTypes, summarizeTrendingProductPriceChanges, type TrendingPriceChangePoint } from '@groceryview/db';
 import { planReceiptAliasGrowth } from '@groceryview/scanning';
 import { axfoodProducts } from './axfood-products';
 import { icaStorePromotionSourceSummary } from './ingested/ica-source-summary';
@@ -3412,6 +3412,23 @@ export const sourceCoverage = [
     caveat: 'Location data only; prices are not inferred from store locations.'
   }
 ];
+
+export const retailerTypeCoverage = majorSwedishGroceryRetailerTypeCoverage.map((row) => ({
+  retailerType: row.retailerType,
+  label: row.retailerType.replace(/_/g, ' '),
+  status: row.chainCount > 0 ? 'tracked' : 'schema-ready',
+  chainCount: row.chainCount,
+  chainSlugs: row.chainSlugs,
+  coverageLabel: row.chainCount > 0
+    ? `${row.chainCount} seeded ${row.retailerType.replace(/_/g, ' ')} chain${row.chainCount === 1 ? '' : 's'}`
+    : 'No seeded chains yet'
+}));
+
+export const retailerTypeCoverageSummary = {
+  allowedTypeCount: retailerTypes.length,
+  trackedTypeCount: retailerTypeCoverage.filter((row) => row.chainCount > 0).length,
+  trackedChainCount: retailerTypeCoverage.reduce((sum, row) => sum + row.chainCount, 0)
+};
 
 function sourceKindFor(name: string) {
   if (name === 'Axfood chain price snapshot') return 'axfood';

@@ -3803,8 +3803,12 @@ ${seo}`;
 
     assert.match(verified, /perClassFreshnessLagReport/);
     assert.match(verified, /freshnessLagSummary/);
+    assert.match(verified, /retailerTypeCoverage/);
+    assert.match(verified, /majorSwedishGroceryRetailerTypeCoverage/);
     assert.match(verified, /freshWindowDays: freshnessLagWindowDays/);
     assert.match(route, /perClassFreshnessLagReport\.map/);
+    assert.match(route, /retailerTypeCoverage\.map/);
+    assert.match(route, /Retailer type coverage/);
     assert.match(route, /observations older than/);
     assert.match(route, /SourceCoverage/);
     assert.match(route, /routeMetadata\('\/coverage'\)/);

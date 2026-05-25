@@ -9,6 +9,7 @@ create table if not exists chains (
   id uuid primary key default gen_random_uuid(),
   slug text not null unique check (slug ~ '^[a-z0-9][a-z0-9-]*$'),
   name text not null,
+  retailer_type text not null default 'grocery' check (retailer_type in ('grocery', 'pharmacy', 'fuel', 'convenience', 'variety', 'cosmetics', 'household', 'online_marketplace')),
   country_code char(2) not null default 'SE',
   website_url text,
   created_at timestamptz not null default now(),

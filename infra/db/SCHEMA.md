@@ -54,7 +54,9 @@ Migration 014 adds the fuel source contract. `fuel_grades` is the only supported
 
 Retail banners such as ICA, Willys, Coop, Lidl, Hemkop, Netto, and City Gross.
 
-Key columns: `slug`, `name`, `domain`, `country_code`, `website_url`.
+Key columns: `slug`, `name`, `retailer_type`, `domain`, `country_code`, `website_url`.
+
+`retailer_type` is required and indexed for coverage/readiness filtering. Allowed values are `grocery`, `pharmacy`, `fuel`, `convenience`, `variety`, `cosmetics`, `household`, and `online_marketplace`; all Stockholm launch chains are backfilled as `grocery`.
 
 ### `stores`
 
