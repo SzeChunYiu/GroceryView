@@ -12,6 +12,8 @@ const sourceTypes = [
 
 const productKinds = ['branded', 'commodity'] as const;
 
+const certLevels = ['krav', 'eu_eco', 'free_range', 'asc', 'msc', 'rainforest_alliance', 'fairtrade', 'conventional'] as const;
+
 const fuelSourceKinds = ['operator_public_price_page', 'crowd_station_report'] as const;
 
 const nonEmptyString = z.string().trim().min(1);
@@ -52,6 +54,7 @@ export const ingestRowSchema = z.object({
   variant: optionalNonEmptyString,
   isOrganic: z.boolean().optional(),
   originCountry: nonEmptyString.regex(/^[A-Za-z]{2}$/, 'must be an ISO-3166 alpha-2 code').transform((value) => value.toUpperCase()).optional(),
+  certLevel: z.enum(certLevels).optional(),
   soldByWeight: z.boolean().optional(),
   packageSize: positiveNumber,
   packageUnit: nonEmptyString,

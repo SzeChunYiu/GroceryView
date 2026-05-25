@@ -12,6 +12,12 @@ describe('daily ingestion persistence SQL', () => {
     assert.match(dbSource, /unit_price numeric\(12, 4\)/);
     assert.match(dbSource, /confidence numeric\(5, 4\)/);
     assert.match(dbSource, /domain text/);
+    assert.match(dbSource, /origin_country char\(2\)/);
+    assert.match(dbSource, /cert_level text/);
+    assert.match(dbSource, /origin_country: observation\.originCountry \?\? null/);
+    assert.match(dbSource, /cert_level: observation\.certLevel \?\? null/);
+    assert.match(ingestionSource, /originCountry: accepted\.priceObservation\.originCountry/);
+    assert.match(ingestionSource, /certLevel: accepted\.priceObservation\.certLevel/);
     assert.match(dbSource, /partition by\s+product_id,\s*chain_id,\s*store_id,\s*domain,\s*price_type,\s*observed_at,\s*retailer_product_ref,\s*price,\s*unit_price,\s*currency,\s*is_available,\s*confidence,\s*provenance/is);
     assert.match(dbSource, /observations\.domain = ranked_input\.domain/);
     assert.match(dbSource, /observations\.price = ranked_input\.price/);

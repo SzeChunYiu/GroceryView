@@ -4998,7 +4998,8 @@ describe('ingestRetailerProduct', () => {
       soldByWeight: true,
       variant: 'vine',
       isOrganic: false,
-      originCountry: 'SE'
+      originCountry: 'SE',
+      certLevel: 'krav'
     });
 
     assert.equal(output.product.productKind, 'commodity');
@@ -5007,6 +5008,8 @@ describe('ingestRetailerProduct', () => {
     assert.equal(output.product.variant, 'vine');
     assert.equal(output.product.isOrganic, false);
     assert.equal(output.product.originCountry, 'SE');
+    assert.equal(output.priceObservation.originCountry, 'SE');
+    assert.equal(output.priceObservation.certLevel, 'krav');
     assert.equal(output.alias.matchConfidence, 0.68);
     assert.equal(output.priceObservation.confidenceScore, 0.68);
     assert.equal(output.priceObservation.unitPrice, 39.9);
