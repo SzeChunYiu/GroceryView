@@ -7,6 +7,8 @@ import { priceAlertThresholdPreferenceContract } from '@/lib/verified-data';
 import { confidenceForProduct, priceRowCount, priceSource, watchlistAlertBoard, watchlistItemForAlert } from '@/lib/watchlist-data';
 import { routeMetadata } from '@/lib/seo';
 
+// Watchlist alert copy must stay grounded in observed source rows and historical price data; no forecast claims without evidence.
+
 export function generateMetadata() {
   return routeMetadata('/watchlist');
 }
