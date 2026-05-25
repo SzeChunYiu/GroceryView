@@ -125,8 +125,8 @@ const failures = [];
 
 for (const dataset of DATASETS) {
   const text = await readFile(new URL(dataset.file, INGESTED_DIR), 'utf8');
-  const rows = extractJsonExport(text, dataset.rows);
-  const source = extractJsonExport(text, dataset.source);
+  const rows = await extractJsonExport(text, dataset.rows, dataset.file);
+  const source = await extractJsonExport(text, dataset.source, dataset.file);
   const sourceRowCount = rowCount(source, dataset.sourceRowCount);
   const label = `${dataset.file}:${dataset.rows}`;
   const duplicateKeys = countDuplicates(rows.map((row) => rowKey(row, dataset.key)));
@@ -204,7 +204,7 @@ if (failures.length > 0) {
   console.log(JSON.stringify({ status: 'ok', summaries }, null, 2));
 }
 
-function extractJsonExport(text, exportName) {
+async function extractJsonExport(text, exportName, file) {
   const marker = `export const ${exportName}`;
   const markerIndex = text.indexOf(marker);
   if (markerIndex < 0) {
@@ -216,7 +216,34 @@ function extractJsonExport(text, exportName) {
   if (start < 0) {
     throw new Error(`Missing JSON value for export ${exportName}`);
   }
-  return JSON.parse(text.slice(start, matchingJsonEnd(text, start) + 1));
+  const end = matchingJsonEnd(text, start);
+  const jsonLike = text.slice(start, end + 1);
+  try {
+    return JSON.parse(jsonLike);
+  } catch (error) {
+    if (jsonLike.startsWith('[') && jsonLike.includes('...')) {
+      return extractSpreadArrayExport(text, jsonLike, file, exportName);
+    }
+    throw error;
+  }
+}
+
+async function extractSpreadArrayExport(text, jsonLike, file, exportName) {
+  const imports = new Map();
+  for (const match of text.matchAll(/import \{ ([A-Za-z0-9_]+) \} from '([^']+)'/g)) {
+    imports.set(match[1], match[2]);
+  }
+
+  const rows = [];
+  for (const match of jsonLike.matchAll(/\.\.\.([A-Za-z0-9_]+)/g)) {
+    const binding = match[1];
+    const importPath = imports.get(binding);
+    if (!importPath) throw new Error(`Missing import for spread ${binding} in ${exportName}`);
+    const chunkPath = importPath.endsWith('.ts') ? importPath : `${importPath}.ts`;
+    const chunkText = await readFile(new URL(chunkPath, new URL(file, INGESTED_DIR)), 'utf8');
+    rows.push(...await extractJsonExport(chunkText, binding, chunkPath));
+  }
+  return rows;
 }
 
 function firstJsonStart(text, fromIndex) {
