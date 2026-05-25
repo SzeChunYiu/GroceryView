@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { PwaInstall } from '@/components/pwa-install';
 import { ConsentManager } from '@/components/consent-manager';
 import { SkipLink } from '@/components/SkipLink';
+import { EngagementReporter } from '@/lib/engagement';
 import { ServiceWorkerRegistrar } from '@/lib/swRegister';
 import { Providers } from './providers';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -79,6 +80,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <Providers>{children}</Providers>
         </div>
         <ConsentManager />
+        <EngagementReporter />
         <ServiceWorkerRegistrar />
         <PwaInstall />
       </body>
