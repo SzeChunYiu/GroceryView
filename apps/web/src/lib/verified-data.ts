@@ -1,6 +1,6 @@
 import { buildFacetedProductSearch, type RealCatalogSearchPriceRow } from '@groceryview/api';
 import { COMMODITIES, STAPLE_BASKET, SUPPORTED_PRICE_DOMAINS, type Commodity, type ComparableUnit } from '@groceryview/catalog';
-import { buildPriceChartSeries, buildWatchlistAlerts, calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, suggestFriendSharedDeals, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type PriceChartObservation, type ProductMatchInput, type WatchlistItem, type WatchlistPriceType, type WatchlistProductSnapshot } from '@groceryview/core';
+import { buildPriceChartSeries, buildWatchlistAlerts, calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, suggestFriendSharedDeals, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type MultiWeekStockUpHistoryPoint, type PriceChartObservation, type ProductMatchInput, type WatchlistItem, type WatchlistPriceType, type WatchlistProductSnapshot } from '@groceryview/core';
 import { planReceiptAliasGrowth } from '@groceryview/scanning';
 import { calculateCarbonScore, type ProductCarbonScore } from '../../../../packages/core/src/lib/carbonScore';
 import { axfoodProducts } from './axfood-products';
@@ -295,6 +295,38 @@ function dailyObservedPricePoints(product: (typeof pricedProducts)[number]) {
     storeId: 'openprices-community'
   }));
 }
+
+
+function stockUpHistoryFromObservedProduct(product: (typeof pricedProducts)[number] | undefined): MultiWeekStockUpHistoryPoint[] {
+  if (!product || product.observations.length < 2) return [];
+  return product.observations
+    .filter((observation) => Number.isFinite(observation.price) && observation.price > 0 && observation.date)
+    .map((observation) => ({
+      observedAt: `${observation.date}T00:00:00.000Z`,
+      unitPrice: observation.price,
+      sourceType: 'shelf' as const,
+      confidence: product.observationCount >= 6 ? 0.82 : 0.62
+    }));
+}
+
+function bestObservedStockUpProduct(predicate: (product: (typeof pricedProducts)[number]) => boolean) {
+  return [...pricedProducts]
+    .filter((product) => predicate(product) && product.observations.length >= 2)
+    .sort((left, right) => right.observationCount - left.observationCount || right.lastObservedAt.localeCompare(left.lastObservedAt))[0];
+}
+
+export const weeklyBasketLiveStockUpHistoryByProductId: Record<string, MultiWeekStockUpHistoryPoint[]> = {
+  coffee: stockUpHistoryFromObservedProduct(bestObservedStockUpProduct((product) => product.category === 'coffee-tea' || /coffee|kaffe/i.test(product.name))),
+  milk: stockUpHistoryFromObservedProduct(bestObservedStockUpProduct((product) => product.category === 'dairy' && /milk|mjölk|mjolk|havredryck/i.test(product.name))),
+  butter: stockUpHistoryFromObservedProduct(bestObservedStockUpProduct((product) => product.category === 'dairy' || /butter|smör|smor/i.test(product.name)))
+};
+
+export const weeklyBasketLiveStockUpEvidence = {
+  sourceTables: ['postgres.latest_prices', 'postgres.observations', 'generated db-site/openprices snapshot'],
+  noForecast: true,
+  minimumHistoryRows: 2,
+  caveat: 'Uses persisted observed price history when enough rows exist; missing basket items keep partial-coverage confidence visible and no forecast copy is shown.'
+};
 
 function priceDropBadgeLabel(changePercent: number): string {
   return `${Math.round(changePercent)}%`;
