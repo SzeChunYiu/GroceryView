@@ -15,6 +15,14 @@ export type ComparePriceSnapshotStoreRow = {
   normalizedUnitPriceLabel?: string;
 };
 
+export type ComparePriceVolatilityKind = 'stable' | 'volatile' | 'promotional-cycle';
+
+export type ComparePriceVolatilityLabel = {
+  kind: ComparePriceVolatilityKind;
+  label: 'Stable' | 'Volatile' | 'Promotional cycle';
+  detail: string;
+};
+
 export type ComparePriceSnapshotOverlayOption = {
   key: string;
   itemId: string;
@@ -92,6 +100,75 @@ function stringOrFallback(value: unknown, fallback: string) {
 
 function numberOrNull(value: unknown) {
   return typeof value === 'number' && Number.isFinite(value) ? value : null;
+}
+
+function priceForVolatility(row: Pick<ComparePriceSnapshotStoreRow, 'price' | 'normalizedUnitPrice'>) {
+  return row.normalizedUnitPrice ?? row.price;
+}
+
+function promotionalText(value: string) {
+  return /campaign|coupon|deal|discount|erbjudande|extrapris|kampanj|loyalty|member|promotion|rabatt|rea|savings/i.test(value);
+}
+
+function spreadPercent(values: number[]) {
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const midpoint = (min + max) / 2;
+  return midpoint > 0 ? ((max - min) / midpoint) * 100 : 0;
+}
+
+export function comparePriceSnapshotVolatilityLabel(
+  row: ComparePriceSnapshotStoreRow,
+  peerRows: ComparePriceSnapshotStoreRow[] = [],
+  options: { promotionalHint?: boolean } = {}
+): ComparePriceVolatilityLabel {
+  const rowText = [row.priceLabel, row.unitLabel, row.chainName, row.packSizeLabel, row.storeName].filter(Boolean).join(' ');
+  if (options.promotionalHint || promotionalText(rowText)) {
+    return {
+      kind: 'promotional-cycle',
+      label: 'Promotional cycle',
+      detail: 'Promotion, member, coupon, or campaign evidence is attached to this row, so the price may not persist.'
+    };
+  }
+
+  const currentPrice = priceForVolatility(row);
+  const peerPrices = peerRows
+    .filter((peer) => peer.itemId === row.itemId)
+    .map(priceForVolatility)
+    .filter((price): price is number => typeof price === 'number' && Number.isFinite(price) && price > 0);
+
+  if (peerPrices.length >= 2) {
+    const spread = spreadPercent(peerPrices);
+    const minPeerPrice = Math.min(...peerPrices);
+
+    if (typeof currentPrice === 'number' && currentPrice <= minPeerPrice * 1.05 && spread >= 18) {
+      return {
+        kind: 'promotional-cycle',
+        label: 'Promotional cycle',
+        detail: `This is within 5% of the observed low while comparison rows span ${Math.round(spread)}%, so treat it as a cycle-sensitive price.`
+      };
+    }
+
+    if (spread >= 15) {
+      return {
+        kind: 'volatile',
+        label: 'Volatile',
+        detail: `Comparison rows for this item span ${Math.round(spread)}%, so today's price is less likely to persist.`
+      };
+    }
+
+    return {
+      kind: 'stable',
+      label: 'Stable',
+      detail: `Comparison rows for this item sit inside a ${Math.round(spread)}% spread with no promotion evidence.`
+    };
+  }
+
+  return {
+    kind: 'stable',
+    label: 'Stable',
+    detail: 'No promotion wording or wide comparison spread is attached to this row.'
+  };
 }
 
 function overlayBasisFor(row: Pick<ComparePriceSnapshotStoreRow, 'chainName' | 'packSizeLabel' | 'storeName' | 'unitLabel'>): ComparePriceSnapshotOverlayOption['basis'] {

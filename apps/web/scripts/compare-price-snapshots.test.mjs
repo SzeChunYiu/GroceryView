@@ -44,6 +44,7 @@ function installTypeScriptRuntime() {
 
 const cleanupRuntime = installTypeScriptRuntime();
 const {
+  comparePriceSnapshotVolatilityLabel,
   fetchComparePriceSnapshots,
   parseCompareItemIdsParam
 } = require('../src/lib/compare-price-snapshots.js');
@@ -153,5 +154,45 @@ describe('compare price snapshots helper', () => {
     });
     assert.equal(notOk.endpointUnavailable, true);
     assert.deepEqual(notOk.missingItemIds, ['milk', 'bread']);
+  });
+
+  it('labels stable volatile and promotional-cycle comparison prices from row evidence', () => {
+    const stableRow = {
+      itemId: 'milk',
+      itemName: 'Milk',
+      storeName: 'Store A',
+      price: 20,
+      priceLabel: '20,00 kr',
+      unitLabel: 'kr/l'
+    };
+    const stablePeer = {
+      ...stableRow,
+      storeName: 'Store B',
+      price: 21,
+      priceLabel: '21,00 kr'
+    };
+    const volatilePeer = {
+      ...stableRow,
+      storeName: 'Store C',
+      price: 30,
+      priceLabel: '30,00 kr'
+    };
+    const promotionRow = {
+      ...stableRow,
+      storeName: 'Store D',
+      price: 12,
+      priceLabel: '12,00 kr campaign'
+    };
+    const cycleLowRow = {
+      ...stableRow,
+      storeName: 'Store E',
+      price: 12,
+      priceLabel: '12,00 kr'
+    };
+
+    assert.equal(comparePriceSnapshotVolatilityLabel(stableRow, [stableRow, stablePeer]).kind, 'stable');
+    assert.equal(comparePriceSnapshotVolatilityLabel(volatilePeer, [stableRow, volatilePeer]).kind, 'volatile');
+    assert.equal(comparePriceSnapshotVolatilityLabel(promotionRow, [stableRow, volatilePeer, promotionRow]).kind, 'promotional-cycle');
+    assert.equal(comparePriceSnapshotVolatilityLabel(cycleLowRow, [stableRow, volatilePeer, cycleLowRow]).kind, 'promotional-cycle');
   });
 });

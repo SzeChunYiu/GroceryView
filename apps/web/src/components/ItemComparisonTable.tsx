@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { comparePriceSnapshotOverlayOptions, type ComparePriceSnapshotStoreRow } from '@/lib/compare-price-snapshots';
+import { comparePriceSnapshotOverlayOptions, comparePriceSnapshotVolatilityLabel, type ComparePriceSnapshotStoreRow } from '@/lib/compare-price-snapshots';
 import type { buildItemComparisonView } from '@/lib/verified-data';
 
 type ItemComparisonView = ReturnType<typeof buildItemComparisonView>;
@@ -36,15 +36,39 @@ function StorePriceCell({ item }: { item: ItemComparisonItem }) {
     );
   }
 
+  const snapshotRows = item.storePrices.map((price): ComparePriceSnapshotStoreRow => ({
+    itemId: item.slug,
+    itemName: item.name,
+    storeName: price.storeName,
+    price: price.price,
+    priceLabel: price.priceLabel,
+    unitLabel: price.unitLabel,
+    chainName: price.storeName,
+    packSizeLabel: item.nutrition.quantity
+  }));
+
   return (
     <div className="grid gap-2">
-      {item.storePrices.map((price) => (
-        <div className="rounded-2xl bg-slate-50 p-3" key={`${item.slug}-${price.storeName}`}>
-          <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-500">{price.storeName}</p>
-          <p className="mt-1 text-lg font-black text-slate-950">{price.priceLabel}</p>
-          <p className="text-xs font-semibold text-slate-500">{price.unitLabel}</p>
-        </div>
-      ))}
+      {snapshotRows.map((price) => {
+        const volatility = comparePriceSnapshotVolatilityLabel(price, snapshotRows);
+        const badgeClass = volatility.kind === 'stable'
+          ? 'bg-emerald-100 text-emerald-900'
+          : volatility.kind === 'volatile'
+            ? 'bg-amber-100 text-amber-950'
+            : 'bg-violet-100 text-violet-950';
+
+        return (
+          <div className="rounded-2xl bg-slate-50 p-3" key={`${item.slug}-${price.storeName}`}>
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-500">{price.storeName}</p>
+            <p className="mt-1 text-lg font-black text-slate-950">{price.priceLabel}</p>
+            <p className="text-xs font-semibold text-slate-500">{price.unitLabel}</p>
+            <p className={`mt-2 inline-flex rounded-full px-2 py-1 text-[0.68rem] font-black uppercase tracking-[0.12em] ${badgeClass}`}>
+              {volatility.label}
+            </p>
+            <p className="mt-1 text-xs font-semibold leading-5 text-slate-500">{volatility.detail}</p>
+          </div>
+        );
+      })}
     </div>
   );
 }

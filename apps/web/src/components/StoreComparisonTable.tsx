@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { comparePriceSnapshotVolatilityLabel, type ComparePriceSnapshotStoreRow } from '@/lib/compare-price-snapshots';
 
 export type StoreComparisonPrice = {
   storeId: string;
@@ -213,6 +214,24 @@ export function StoreComparisonTable({
             {items.flatMap((item) => item.prices.map((price) => {
               const hasHeldCard = Boolean(price.loyaltyCardId && heldCards.has(price.loyaltyCardId));
               const showLoyaltyPrice = hasHeldCard && Boolean(price.loyaltyPriceLabel);
+              const rowForVolatility: ComparePriceSnapshotStoreRow = {
+                itemId: item.id,
+                itemName: item.name,
+                storeName: price.storeName,
+                price: null,
+                priceLabel: showLoyaltyPrice ? price.loyaltyPriceLabel ?? price.basePriceLabel : price.basePriceLabel,
+                unitLabel: price.unitLabel ?? 'Unit unavailable',
+                chainName: price.storeName,
+                packSizeLabel: price.unitLabel ?? 'Unit unavailable'
+              };
+              const volatility = comparePriceSnapshotVolatilityLabel(rowForVolatility, [], {
+                promotionalHint: showLoyaltyPrice || Boolean(price.loyaltyPriceLabel)
+              });
+              const volatilityClass = volatility.kind === 'stable'
+                ? 'bg-emerald-50 text-emerald-900'
+                : volatility.kind === 'volatile'
+                  ? 'bg-amber-50 text-amber-950'
+                  : 'bg-violet-50 text-violet-950';
 
               return (
                 <tr className="border-t border-slate-100" key={`${item.id}-${price.storeId}`}>
@@ -235,6 +254,10 @@ export function StoreComparisonTable({
                       </div>
                     )}
                     {price.unitLabel ? <p className="mt-1 text-xs font-semibold text-slate-500">{price.unitLabel}</p> : null}
+                    <p className={`mt-2 inline-flex rounded-full px-2 py-1 text-[0.68rem] font-black uppercase tracking-[0.12em] ${volatilityClass}`}>
+                      {volatility.label}
+                    </p>
+                    <p className="mt-1 max-w-sm text-xs font-semibold leading-5 text-slate-500">{volatility.detail}</p>
                   </td>
                 </tr>
               );
