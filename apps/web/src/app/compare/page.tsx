@@ -91,7 +91,7 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
               Add ?products=product-slug-1,product-slug-2 to render DB-backed comparison rows. Missing product ids: {comparison.missingProductIds.join(', ') || 'none yet'}.
             </p>
           ) : null}
-          <StorePriceMatrix chains={COMPARE_CHAIN_ORDER} products={comparison.products} />
+          <StorePriceMatrix chains={COMPARE_CHAIN_ORDER} products={comparison.products} sourceGeneratedAt={comparison.generatedAt} sourceLabel={comparison.sourceLabel} />
           {rowSections.map((section) => (
             <div className="overflow-hidden rounded-3xl border border-emerald-100 bg-white shadow-sm" key={section.id}>
               <div className="border-b border-emerald-100 bg-emerald-50 px-4 py-3">
