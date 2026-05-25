@@ -2947,9 +2947,10 @@ ${seo}`;
   });
 
   it('ships Nordic per-country terms with consumer protection clauses', async () => {
-    const terms = await read('src/app/[country]/terms/page.tsx');
+    const terms = await read('src/app/[city]/terms/page.tsx');
 
     assert.match(terms, /generateStaticParams/);
+    assert.match(terms, /\(\{ city: entry\.slug \}\)/);
     assert.match(terms, /slug: 'norway'/);
     assert.match(terms, /slug: 'iceland'/);
     assert.match(terms, /Forbrukerkjøpsloven/);

@@ -100,11 +100,11 @@ function findCountryTerms(country: string) {
 }
 
 export function generateStaticParams() {
-  return countryTerms.map((entry) => ({ country: entry.slug }));
+  return countryTerms.map((entry) => ({ city: entry.slug }));
 }
 
-export async function generateMetadata({ params }: Readonly<{ params: Promise<{ country: string }> }>) {
-  const { country } = await params;
+export async function generateMetadata({ params }: Readonly<{ params: Promise<{ city: string }> }>) {
+  const { city: country } = await params;
   const terms = findCountryTerms(country);
   if (!terms) notFound();
 
@@ -115,8 +115,8 @@ export async function generateMetadata({ params }: Readonly<{ params: Promise<{ 
   });
 }
 
-export default async function CountryTermsPage({ params }: Readonly<{ params: Promise<{ country: string }> }>) {
-  const { country } = await params;
+export default async function CountryTermsPage({ params }: Readonly<{ params: Promise<{ city: string }> }>) {
+  const { city: country } = await params;
   const terms = findCountryTerms(country);
   if (!terms) notFound();
 
