@@ -132,6 +132,7 @@ export * from './connectors/hemkop.js';
 export * from './connectors/ica.js';
 export * from './connectors/ica-bulk.js';
 export * from './connectors/ica-reklamblad.js';
+export * from './connectors/bunnpris-flyer-no.js';
 export {
   ICA_STAMMIS_OFFERS_URL,
   fetchIcaStammisOffers,
