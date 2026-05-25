@@ -36,6 +36,21 @@ const storeSitemapRecords: StoreSitemapRecord[] = osmStores.map((store) => ({
 }));
 
 const countryTermsRoutes = ['sweden', 'norway', 'denmark', 'finland', 'iceland'] as const;
+const nordicCountryRoutes = ['se', 'no', 'is'] as const;
+const nordicHreflangByCountry: Record<typeof nordicCountryRoutes[number], string> = {
+  se: 'sv-SE',
+  no: 'nb-NO',
+  is: 'is-IS'
+};
+const nordicLogicalRoutes = [
+  '/terms',
+  '/rescue',
+  '/group-buys',
+  '/greedflation',
+  '/account/subscriptions',
+  '/fuel/route',
+  '/receipts/upload'
+] as const;
 
 function lastModifiedFrom(updatedAt: string | undefined) {
   if (!updatedAt) return fallbackLastModified;
@@ -57,14 +72,31 @@ function entry(
   path: string,
   priority: number,
   changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'],
-  lastModified = fallbackLastModified
+  lastModified = fallbackLastModified,
+  alternates?: MetadataRoute.Sitemap[number]['alternates']
 ) {
   return {
     url: `${siteUrl}${path}`,
     lastModified,
     changeFrequency,
-    priority
+    priority,
+    ...(alternates ? { alternates } : {})
   };
+}
+
+function nordicAlternatesFor(logicalPath: string): MetadataRoute.Sitemap[number]['alternates'] {
+  return {
+    languages: Object.fromEntries(
+      nordicCountryRoutes.map((country) => [nordicHreflangByCountry[country], `${siteUrl}/${country}${logicalPath}`])
+    )
+  };
+}
+
+function buildNordicCountrySitemapEntries(): MetadataRoute.Sitemap {
+  return nordicLogicalRoutes.flatMap((logicalPath) => {
+    const alternates = nordicAlternatesFor(logicalPath);
+    return nordicCountryRoutes.map((country) => entry(`/${country}${logicalPath}`, 0.64, 'weekly', fallbackLastModified, alternates));
+  });
 }
 
 export function buildCatalogSitemapEntries(): MetadataRoute.Sitemap {
@@ -121,6 +153,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     ...staticRoutes,
+    ...buildNordicCountrySitemapEntries(),
     ...buildCatalogSitemapEntries(),
     ...seoLandingRoutes
   ];
