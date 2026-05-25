@@ -27,6 +27,13 @@ type DealCardProps = {
   outboundStoreUrl?: string;
   affiliateCampaignId?: string;
   sharePath?: string;
+  productHref?: string;
+  rankLabel?: string;
+  categoryLabel?: string;
+  localityLabel?: string;
+  dropPercentLabel?: string;
+  unitPriceDropLabel?: string;
+  evidenceLabel?: string;
 };
 
 function formatPrice(value: number, locale: string, currency: string) {
@@ -99,7 +106,14 @@ export function DealCard({
   outboundDealUrl,
   outboundStoreUrl,
   affiliateCampaignId,
-  sharePath
+  sharePath,
+  productHref,
+  rankLabel,
+  categoryLabel,
+  localityLabel,
+  dropPercentLabel,
+  unitPriceDropLabel,
+  evidenceLabel
 }: DealCardProps) {
   const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle');
   const context = buildDealContext({ currentPrice, discountStartedAt, priceHistory, currency, locale });
@@ -148,7 +162,18 @@ export function DealCard({
     <article className="rounded-2xl border border-market-ink/10 bg-white p-4 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h3 className="text-base font-semibold text-market-ink">{title}</h3>
+          {rankLabel || categoryLabel || localityLabel ? (
+            <p className="mb-2 text-xs font-black uppercase tracking-[0.16em] text-emerald-800">
+              {[rankLabel, categoryLabel, localityLabel].filter(Boolean).join(' · ')}
+            </p>
+          ) : null}
+          <h3 className="text-base font-semibold text-market-ink">
+            {productHref ? (
+              <a className="hover:text-emerald-700 hover:underline" href={productHref}>
+                {title}
+              </a>
+            ) : title}
+          </h3>
           <p className="mt-2 text-2xl font-bold text-market-ink">{formatPrice(currentPrice, locale, currency)}</p>
           {originalPrice ? (
             <p className="text-sm text-market-ink/60">
@@ -162,6 +187,16 @@ export function DealCard({
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2" aria-label="Deal history context">
+        {dropPercentLabel ? (
+          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-900">
+            {dropPercentLabel}
+          </span>
+        ) : null}
+        {unitPriceDropLabel ? (
+          <span className="rounded-full bg-market-mint/15 px-3 py-1 text-xs font-semibold text-market-ink">
+            {unitPriceDropLabel}
+          </span>
+        ) : null}
         {context.streakLabel ? (
           <span className="rounded-full bg-market-mint/15 px-3 py-1 text-xs font-semibold text-market-ink">
             {context.streakLabel}
@@ -173,6 +208,12 @@ export function DealCard({
           </span>
         ) : null}
       </div>
+
+      {evidenceLabel ? (
+        <p className="mt-3 rounded-2xl bg-slate-50 px-3 py-2 text-xs font-semibold leading-5 text-market-ink/70">
+          {evidenceLabel}
+        </p>
+      ) : null}
 
       {dealLinkMetadata || storeLinkMetadata ? (
         <div className="mt-4 flex flex-wrap gap-3" aria-label="Outbound store and deal links with affiliate disclosure">
