@@ -139,8 +139,10 @@ export class RealCatalogService {
     minPrice?: string;
     maxPrice?: string;
     limit?: string;
+    cursor?: string;
     productNameLocale?: ProductNameLocale;
   }) {
+    const limit = limitQuery(query.limit);
     const filters: FacetedProductSearchFilters = {
       query: query.q?.trim() ?? '',
       categories: csv(query.category),
@@ -150,7 +152,7 @@ export class RealCatalogService {
       priceTypes: priceTypes(query.priceType),
       minPrice: numberQuery(query.minPrice, 'minPrice'),
       maxPrice: numberQuery(query.maxPrice, 'maxPrice'),
-      limit: limitQuery(query.limit)
+      limit
     };
     if (filters.minPrice !== undefined && filters.maxPrice !== undefined && filters.minPrice > filters.maxPrice) {
       throw new BadRequestException('minPrice must be less than or equal to maxPrice.');
@@ -170,10 +172,18 @@ export class RealCatalogService {
       priceTypeFilters.length > 0 ? priceTypeFilters : null,
       filters.minPrice ?? null,
       filters.maxPrice ?? null,
-      filters.limit,
-      query.productNameLocale ?? null
+      filters.limit + 1,
+      query.productNameLocale ?? null,
+      query.cursor?.trim() || null
     ]);
-    return buildFacetedProductSearch({ rows: rows.map(mapCatalogRow), filters });
+    const productSlugs = [...new Set(rows.map((row) => row.slug))];
+    const pageSlugs = new Set(productSlugs.slice(0, limit));
+    const pageRows = rows.filter((row) => pageSlugs.has(row.slug));
+    const nextCursor = productSlugs.length > limit ? productSlugs[limit - 1] : null;
+    return {
+      ...buildFacetedProductSearch({ rows: pageRows.map(mapCatalogRow), filters }),
+      pagination: { nextCursor }
+    };
   }
 
   async compareBasket(input: {
@@ -349,6 +359,7 @@ export class RealCatalogService {
           )
           and ($2::text[] is null or exists (select 1 from unnest(products.category_path) category where lower(category) = any($2::text[])))
           and ($3::text[] is null or lower(coalesce(products.brand, '')) = any($3::text[]))
+          and ($11::text is null or products.slug > $11::text)
           and (
             ($4::text[] is null and $5::text[] is null and $6::text[] is null and $7::numeric is null and $8::numeric is null)
             or exists (

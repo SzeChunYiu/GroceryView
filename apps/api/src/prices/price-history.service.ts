@@ -19,6 +19,7 @@ export type ProductPriceHistoryFilter = {
   observedFrom?: string;
   observedTo?: string;
   limit?: number;
+  cursor?: string;
 };
 
 type ProductRow = {
@@ -137,6 +138,7 @@ export class PriceHistoryService {
          and ($6::timestamptz is null or observations.observed_at >= $6::timestamptz)
          and ($7::timestamptz is null or observations.observed_at <= $7::timestamptz)
          and ($8::numeric is null or observations.confidence >= $8::numeric)
+         and ($10::timestamptz is null or observations.observed_at < $10::timestamptz)
        order by observations.observed_at desc, chains.slug, stores.name, observations.price_type, observations.id
        limit $9`,
       [
@@ -148,11 +150,15 @@ export class PriceHistoryService {
         filter.observedFrom ?? null,
         filter.observedTo ?? null,
         filter.minConfidence ?? null,
-        filter.limit ?? 500
+        (filter.limit ?? 500) + 1,
+        filter.cursor ?? null
       ]
     );
+    const requestedLimit = filter.limit ?? 500;
+    const pageRows = rows.slice(0, requestedLimit);
+    const nextCursor = rows.length > requestedLimit ? iso(pageRows[pageRows.length - 1].observed_at) : null;
 
-    if (rows.length === 0) {
+    if (pageRows.length === 0) {
       return buildEmptyProductPriceHistoryReport({
         productId: product.id,
         productSlug: product.slug,
@@ -160,7 +166,7 @@ export class PriceHistoryService {
       }, filter, { sourceTables: productPriceHistorySourceTables });
     }
 
-    return buildProductPriceHistoryReport(rows.map((row): ProductPriceHistoryObservationInput => ({
+    const report = buildProductPriceHistoryReport(pageRows.map((row): ProductPriceHistoryObservationInput => ({
       observationId: row.id,
       productId: product.id,
       productSlug: product.slug,
@@ -195,5 +201,6 @@ export class PriceHistoryService {
       productSlug: product.slug,
       productName: product.canonical_name
     }, filter, { sourceTables: productPriceHistorySourceTables });
+    return { ...report, pagination: { nextCursor } } as ProductPriceHistoryReport;
   }
 }

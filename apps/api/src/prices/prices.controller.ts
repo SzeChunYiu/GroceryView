@@ -69,12 +69,13 @@ export class PricesController {
     @Query('from') observedFrom?: string,
     @Query('to') observedTo?: string,
     @Query('limit') limit?: string,
+    @Query('cursor') cursor?: string,
     @Query('locale') locale?: string,
     @Headers('x-groceryview-locale') groceryViewLocale?: string,
     @Headers('accept-language') acceptLanguage?: string,
     @Headers('cookie') cookie?: string
   ) {
-    const filter = parsePriceHistoryFilter({ priceType, chain, store, sourceRun, minConfidence, observedFrom, observedTo, limit });
+    const filter = parsePriceHistoryFilter({ priceType, chain, store, sourceRun, minConfidence, observedFrom, observedTo, limit, cursor });
     const report = await traceApiRoute(apiRouteTraceSpans.prices, { route: 'prices.history', productId, priceType: filter.priceType, chain: filter.chain, store: filter.store }, () => this.priceHistory.getProductPriceHistory(
       productId,
       filter,
@@ -98,12 +99,13 @@ export class PricesController {
     @Query('from') observedFrom?: string,
     @Query('to') observedTo?: string,
     @Query('limit') limit?: string,
+    @Query('cursor') cursor?: string,
     @Query('locale') locale?: string,
     @Headers('x-groceryview-locale') groceryViewLocale?: string,
     @Headers('accept-language') acceptLanguage?: string,
     @Headers('cookie') cookie?: string
   ) {
-    const filter = parsePriceHistoryFilter({ priceType, chain, store, sourceRun, minConfidence, observedFrom, observedTo, limit });
+    const filter = parsePriceHistoryFilter({ priceType, chain, store, sourceRun, minConfidence, observedFrom, observedTo, limit, cursor });
     const report = await this.priceHistory.getProductPriceHistory(
       productId,
       filter,
@@ -200,6 +202,7 @@ function parsePriceHistoryFilter(input: {
   observedFrom?: string;
   observedTo?: string;
   limit?: string;
+  cursor?: string;
 }): ProductPriceHistoryFilter {
   const parsedPriceType = parseOptionalPriceType(input.priceType);
   const parsedChain = parseOptionalIdentifier(input.chain, 'chain');
@@ -212,6 +215,7 @@ function parsePriceHistoryFilter(input: {
     throw new BadRequestException('from must be before or equal to to.');
   }
   const parsedLimit = parseOptionalLimit(input.limit);
+  const parsedCursor = parseOptionalDate(input.cursor, 'cursor');
   return {
     ...(parsedPriceType ? { priceType: parsedPriceType } : {}),
     ...(parsedChain ? { chain: parsedChain } : {}),
@@ -220,6 +224,7 @@ function parsePriceHistoryFilter(input: {
     ...(parsedMinConfidence === undefined ? {} : { minConfidence: parsedMinConfidence }),
     ...(parsedFrom ? { observedFrom: parsedFrom } : {}),
     ...(parsedTo ? { observedTo: parsedTo } : {}),
-    ...(parsedLimit ? { limit: parsedLimit } : {})
+    ...(parsedLimit ? { limit: parsedLimit } : {}),
+    ...(parsedCursor ? { cursor: parsedCursor } : {})
   };
 }

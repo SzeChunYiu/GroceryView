@@ -35,6 +35,7 @@ export class ProductsController {
     @Query('minPrice') minPrice?: string,
     @Query('maxPrice') maxPrice?: string,
     @Query('limit') limit?: string,
+    @Query('cursor') cursor?: string,
     @Query('locale') locale?: string,
     @Headers('x-groceryview-locale') groceryViewLocale?: string,
     @Headers('accept-language') acceptLanguage?: string,
@@ -50,6 +51,7 @@ export class ProductsController {
       minPrice,
       maxPrice,
       limit,
+      cursor,
       productNameLocale: resolveProductNameLocale({ locale, groceryViewLocale, acceptLanguage, cookie })
     }));
   }
