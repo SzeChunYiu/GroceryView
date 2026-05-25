@@ -1,5 +1,6 @@
 import { AccountBillingActions } from '@/components/account-billing-actions';
 import { AccountMutationActions } from '@/components/account-mutation-actions';
+import { NotificationOptInToggle } from './preferences/notifications';
 import { AdDisclosureActions } from '@/components/ad-disclosure-actions';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
@@ -328,6 +329,8 @@ export default function AccountPage() {
           </div>
         </div>
       </Card>
+
+      <NotificationOptInToggle />
 
       <Card
         className="mt-6 border-indigo-200 bg-indigo-50"
