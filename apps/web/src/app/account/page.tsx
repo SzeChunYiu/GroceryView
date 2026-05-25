@@ -503,7 +503,9 @@ export default function AccountPage() {
       </Card>
 
       <AccountMutationActions />
-      <p className="mt-6 rounded-2xl bg-violet-50 p-4 text-sm font-bold text-violet-950">Premium forecast preview: {premiumSavingsForecast.monthlySavingsLabel} estimated monthly savings before checkout.</p>
+      <p className="mt-6 rounded-2xl bg-violet-50 p-4 text-sm font-bold text-violet-950">
+        Premium forecast preview: {premiumSavingsForecast.monthlySavingsLabel} estimated monthly savings before checkout. Review the <a className="underline decoration-2 underline-offset-4" href="/pricing#premium-ocr-history">Premium OCR history plan</a> before opening checkout.
+      </p>
       <AccountBillingActions />
       <AdDisclosureActions />
 
