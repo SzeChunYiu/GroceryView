@@ -1,6 +1,13 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { existsSync, readFileSync } from 'node:fs';
 import { access, readFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
+import { dirname, resolve } from 'node:path';
+
+const require = createRequire(import.meta.url);
+const Module = require('node:module');
+const ts = require('typescript');
 
 const appFiles = [
   'src/app/page.tsx',
@@ -44,6 +51,44 @@ async function fileExists(relative) {
   }
 }
 
+function loadProductJsonLdModule() {
+  const originalResolveFilename = Module._resolveFilename;
+  const originalTsLoader = Module._extensions['.ts'];
+
+  Module._extensions['.ts'] = function transpileTypeScript(module, filename) {
+    const source = readFileSync(filename, 'utf8');
+    const { outputText } = ts.transpileModule(source, {
+      compilerOptions: {
+        esModuleInterop: true,
+        module: ts.ModuleKind.CommonJS,
+        moduleResolution: ts.ModuleResolutionKind.Node10,
+        target: ts.ScriptTarget.ES2022
+      },
+      fileName: filename
+    });
+    module._compile(outputText, filename);
+  };
+
+  Module._resolveFilename = function resolveTypeScriptSiblings(request, parent, isMain, options) {
+    if (request.startsWith('.') && parent?.filename) {
+      const extensionless = resolve(dirname(parent.filename), request.replace(/\.js$/, ''));
+      for (const extension of ['.ts', '.tsx']) {
+        const candidate = `${extensionless}${extension}`;
+        if (existsSync(candidate)) return originalResolveFilename.call(this, candidate, parent, isMain, options);
+      }
+    }
+    return originalResolveFilename.call(this, request, parent, isMain, options);
+  };
+
+  try {
+    return require('../src/lib/product-json-ld.ts');
+  } finally {
+    Module._resolveFilename = originalResolveFilename;
+    if (originalTsLoader) Module._extensions['.ts'] = originalTsLoader;
+    else delete Module._extensions['.ts'];
+  }
+}
+
 describe('verified-data UI', () => {
   it('ships the requested grouped desktop navigation without legacy personal-product links', async () => {
     const nav = await read('src/components/app-nav.tsx');
@@ -68,6 +113,54 @@ describe('verified-data UI', () => {
     assert.match(verified, /osmStores/);
     assert.match(verified, /matchedChainProducts/);
     assert.match(verified, /sourceCoverage/);
+  });
+
+  it('serializes product JSON-LD through a runtime-importable helper without placeholder fields', () => {
+    const { productJsonLdFor, productOfferFor } = loadProductJsonLdModule();
+    const axfoodProduct = {
+      slug: 'havregryn-extra-fylliga-101758934-st',
+      name: 'Havregryn Extra Fylliga',
+      brand: 'Axa',
+      category: 'skafferi',
+      image: 'https://assets.axfood.se/image/upload/f_auto,t_200/07310130013669_C1R1_s01',
+      chains: {
+        willys: { price: 18.83, isAvailable: true },
+        hemkop: { price: 25.5, isAvailable: true }
+      },
+      lowestPrice: 18.83,
+      highestPrice: 25.5,
+      inChains: ['hemkop', 'willys']
+    };
+    const openPricesProduct = {
+      slug: 'n-t-cr-me-original-7311590002262',
+      name: 'Nöt-Crème Original',
+      brands: '',
+      category: 'breakfast',
+      image: 'https://images.openfoodfacts.org/images/products/731/159/000/2262/front_sv.22.400.jpg',
+      priceMin: 19.9,
+      priceMax: 25,
+      observationCount: 22
+    };
+
+    const axfoodJsonLd = productJsonLdFor(axfoodProduct);
+    assert.equal(axfoodJsonLd['@type'], 'Product');
+    assert.deepEqual(axfoodJsonLd.brand, { '@type': 'Brand', name: 'Axa' });
+    assert.equal(axfoodJsonLd.offers['@type'], 'AggregateOffer');
+    assert.equal(axfoodJsonLd.offers.lowPrice, 18.83);
+    assert.equal(axfoodJsonLd.offers.highPrice, 25.5);
+    assert.equal(axfoodJsonLd.offers.offerCount, 2);
+    assert.equal(axfoodJsonLd.offers.availability, 'https://schema.org/InStock');
+
+    const openPricesOffer = productOfferFor(openPricesProduct);
+    const openPricesJsonLd = productJsonLdFor(openPricesProduct);
+    assert.equal(openPricesJsonLd['@type'], 'Product');
+    assert.equal(openPricesJsonLd.offers['@type'], 'AggregateOffer');
+    assert.equal(openPricesOffer.lowPrice, 19.9);
+    assert.equal(openPricesOffer.highPrice, 25);
+    assert.equal(openPricesOffer.offerCount, 22);
+    assert.equal('brand' in openPricesJsonLd, false);
+    assert.equal('availability' in openPricesOffer, false);
+    assert.equal(JSON.stringify(openPricesJsonLd).includes('Brand not reported'), false);
   });
 
 
@@ -3014,6 +3107,7 @@ ${seo}`;
   it('ships JSON-LD organization, site search, product offer, and breadcrumb metadata', async () => {
     const layout = await read('src/app/layout.tsx');
     const productRoute = await read('src/app/products/[slug]/page.tsx');
+    const productJsonLd = await read('src/lib/product-json-ld.ts');
 
     assert.match(layout, /application\/ld\+json/);
     assert.match(layout, /'@type': 'Organization'/);
@@ -3023,11 +3117,11 @@ ${seo}`;
     assert.match(layout, /https:\/\/grocery-web-mu\.vercel\.app/);
 
     assert.match(productRoute, /productJsonLdFor/);
-    assert.match(productRoute, /'@type': 'Product'/);
-    assert.match(productRoute, /'@type': 'AggregateOffer'/);
-    assert.match(productRoute, /lowPrice/);
-    assert.match(productRoute, /highPrice/);
-    assert.match(productRoute, /priceCurrency: 'SEK'/);
+    assert.match(productJsonLd, /'@type': 'Product'/);
+    assert.match(productJsonLd, /'@type': 'AggregateOffer'/);
+    assert.match(productJsonLd, /lowPrice/);
+    assert.match(productJsonLd, /highPrice/);
+    assert.match(productJsonLd, /priceCurrency: 'SEK'/);
     assert.match(productRoute, /breadcrumbJsonLdFor/);
     assert.match(productRoute, /'@type': 'BreadcrumbList'/);
     assert.match(productRoute, /application\/ld\+json/);

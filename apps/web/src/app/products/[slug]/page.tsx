@@ -28,6 +28,7 @@ import { buildShortTermPriceForecast } from '@/lib/price-intelligence';
 import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug, matchedChainProducts } from '@/lib/verified-data';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { normalizeUnitPriceForPackageText, packageEvidenceFromText } from '@/lib/normalization';
+import { productJsonLdFor } from '@/lib/product-json-ld';
 import { metadataForProduct } from '@/lib/seo';
 import { listFriendPriceSightingsForProduct, listFriendPriceSightingsForProductChains } from '@/lib/social';
 import { localPriceStatisticsForProduct } from '@/lib/geo-price-statistics';
@@ -203,42 +204,6 @@ function itemSubstitutionProductFor(product: NonNullable<ReturnType<typeof findP
     usualPrice: productUsualPrice(product),
     inStock: productIsInStock(product),
     observedAt: 'lowestPrice' in product ? null : latestObservationFor(product)?.date ?? null
-  };
-}
-
-function productOfferBounds(product: NonNullable<ReturnType<typeof findProduct>>) {
-  if ('lowestPrice' in product) {
-    const prices = chainPriceRows(product)
-      .map((row) => row.price)
-      .filter((price): price is number => typeof price === 'number' && Number.isFinite(price));
-    return {
-      lowPrice: prices.length ? Math.min(...prices) : product.lowestPrice,
-      highPrice: prices.length ? Math.max(...prices) : product.highestPrice,
-      offerCount: Math.max(prices.length, product.inChains.length)
-    };
-  }
-
-  return { lowPrice: product.priceMin, highPrice: product.priceMax, offerCount: product.observationCount };
-}
-
-function productJsonLdFor(product: NonNullable<ReturnType<typeof findProduct>>) {
-  const bounds = productOfferBounds(product);
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: product.name,
-    image: product.image ? [product.image] : undefined,
-    brand: { '@type': 'Brand', name: productBrand(product) },
-    category: labelFromSlug(product.category),
-    offers: {
-      '@type': 'AggregateOffer',
-      priceCurrency: 'SEK',
-      lowPrice: bounds.lowPrice,
-      highPrice: bounds.highPrice,
-      offerCount: bounds.offerCount,
-      availability: 'https://schema.org/InStock',
-      url: `${siteUrl}/products/${product.slug}`
-    }
   };
 }
 
