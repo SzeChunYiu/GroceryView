@@ -15,11 +15,68 @@ export type SearchToSavingsFunnelStepId =
   | 'basket_view'
   | 'savings_action';
 
+export type CoreProductFunnelId =
+  | 'search_to_product'
+  | 'product_to_alert'
+  | 'list_to_store'
+  | 'deal_click';
+
+export type CoreProductFunnelEventName = 'entry' | 'success';
+
+export type CoreProductFunnelDefinition = {
+  id: CoreProductFunnelId;
+  label: string;
+  entryEvent: string;
+  successEvent: string;
+  strategyQuestion: string;
+};
+
+export const coreProductFunnelDefinitions: CoreProductFunnelDefinition[] = [
+  {
+    id: 'search_to_product',
+    label: 'Search to product',
+    entryEvent: 'landing_search',
+    successEvent: 'product_view',
+    strategyQuestion: 'Which search paths create product detail engagement?'
+  },
+  {
+    id: 'product_to_alert',
+    label: 'Product to alert',
+    entryEvent: 'product_view',
+    successEvent: 'watchlist_alert',
+    strategyQuestion: 'Which product pages motivate shoppers to save a price target?'
+  },
+  {
+    id: 'list_to_store',
+    label: 'List to store',
+    entryEvent: 'basket_view',
+    successEvent: 'store_directions_click',
+    strategyQuestion: 'Which shopping-list flows lead to store intent?'
+  },
+  {
+    id: 'deal_click',
+    label: 'Deal click',
+    entryEvent: 'deal_card_view',
+    successEvent: 'savings_action',
+    strategyQuestion: 'Which deal modules create measurable savings actions?'
+  }
+];
+
+export function getCoreProductFunnelDashboardRows() {
+  return coreProductFunnelDefinitions.map((funnel) => ({
+    ...funnel,
+    status: 'tracking-ready' as const,
+    currentWindow: 'Awaiting aggregate event export',
+    privacyGuardrail: 'Uses aggregate event names only; no product ids, user ids, search terms, or prices are displayed in admin.'
+  }));
+}
+
 type FunnelDeviceSegment = 'desktop' | 'mobile' | 'tablet' | 'unknown';
 type FunnelAccountSegment = 'guest' | 'account' | 'unknown';
 
 const impressionEndpoint = '/api/analytics/item-card-impressions';
 const searchToSavingsFunnelEndpoint = '/api/analytics/search-to-savings-funnel';
+const coreProductFunnelEndpoint = '/api/analytics/core-product-funnels';
 const maxBatchSize = 20;
 const flushDelayMs = 1200;
 
@@ -129,6 +186,33 @@ export function trackSearchToSavingsFunnelStep(step: SearchToSavingsFunnelStepId
   }
 
   void fetch(searchToSavingsFunnelEndpoint, {
+    body: payload,
+    headers: { 'content-type': 'application/json' },
+    keepalive: true,
+    method: 'POST'
+  }).catch(() => undefined);
+}
+
+export function trackCoreProductFunnelEvent(funnelId: CoreProductFunnelId, eventName: CoreProductFunnelEventName) {
+  if (typeof window === 'undefined') return;
+
+  const payload = JSON.stringify({
+    events: [{
+      funnelId,
+      eventName,
+      market: currentFunnelMarket(),
+      device: currentFunnelDevice(),
+      accountState: currentFunnelAccountState(),
+      count: 1
+    }]
+  });
+
+  if (navigator.sendBeacon) {
+    const sent = navigator.sendBeacon(coreProductFunnelEndpoint, new Blob([payload], { type: 'application/json' }));
+    if (sent) return;
+  }
+
+  void fetch(coreProductFunnelEndpoint, {
     body: payload,
     headers: { 'content-type': 'application/json' },
     keepalive: true,

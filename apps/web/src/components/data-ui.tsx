@@ -13,6 +13,7 @@ import {
 } from '@/lib/verified-data';
 import type { PrivateFeatureRoute } from '@/lib/verified-data';
 import { freshnessCopy, sourceLimitationCopy } from '@/lib/content-style';
+import { getCoreProductFunnelDashboardRows } from '@/lib/analytics';
 
 export function PageShell({ children }: Readonly<{ children: ReactNode }>) {
   return (
@@ -67,6 +68,44 @@ export function SourceCoverage() {
             <p className="mt-3 text-sm leading-6 text-slate-600">Source: {source.source}. {freshnessCopy(source.freshness)}.</p>
             <p className="mt-2 rounded-xl bg-amber-50 p-3 text-sm font-semibold text-amber-900">{sourceLimitationCopy(source.caveat)}</p>
           </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+export function CoreFunnelDashboard() {
+  const rows = getCoreProductFunnelDashboardRows();
+
+  return (
+    <Card>
+      <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+        <div>
+          <Eyebrow>Core funnel analytics</Eyebrow>
+          <h2 className="mt-2 text-2xl font-black tracking-tight">Workflow value dashboard</h2>
+        </div>
+        <Link className="text-sm font-bold text-emerald-800 underline decoration-emerald-300 underline-offset-4" href="/analytics/funnel">
+          Search-to-savings funnel
+        </Link>
+      </div>
+      <div className="mt-5 grid gap-3 lg:grid-cols-4">
+        {rows.map((row) => (
+          <article className="rounded-2xl border border-slate-200 bg-slate-50 p-4" data-core-funnel={row.id} key={row.id}>
+            <p className="text-sm font-black text-slate-950">{row.label}</p>
+            <p className="mt-2 text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{row.status}</p>
+            <dl className="mt-3 space-y-2 text-sm text-slate-700">
+              <div>
+                <dt className="font-black text-slate-950">Entry</dt>
+                <dd>{row.entryEvent}</dd>
+              </div>
+              <div>
+                <dt className="font-black text-slate-950">Success</dt>
+                <dd>{row.successEvent}</dd>
+              </div>
+            </dl>
+            <p className="mt-3 text-sm font-semibold leading-6 text-slate-600">{row.strategyQuestion}</p>
+            <p className="mt-3 rounded-xl bg-white p-3 text-xs font-bold text-slate-600">{row.currentWindow}. {row.privacyGuardrail}</p>
+          </article>
         ))}
       </div>
     </Card>
