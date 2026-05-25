@@ -28,6 +28,7 @@ export type PublicListShare = {
   isExpired: boolean;
   items: PublicListShareItem[];
   listId: string;
+  updatedAt: string;
 };
 
 export const listShareRoles: Record<ListShareRole, { label: string; description: string; capabilities: string[] }> = {
@@ -144,6 +145,7 @@ function decodeSharePayload(shareId: string) {
       expiresAt?: unknown;
       items?: unknown;
       listId?: unknown;
+      updatedAt?: unknown;
     };
   } catch {
     return null;
@@ -162,10 +164,11 @@ export function readPublicListShare(shareId: string): PublicListShare | null {
     expiresAt,
     isExpired: Number.isFinite(expiresAtMs) && expiresAtMs <= Date.now(),
     items: Array.isArray(payload.items) ? normalizePublicListShareItems(payload.items) : [],
-    listId: safeString(payload.listId, 'shared-shopping-list')
+    listId: safeString(payload.listId, 'shared-shopping-list'),
+    updatedAt: safeString(payload.updatedAt, safeString(payload.createdAt, new Date(0).toISOString()))
   };
 }
 
 export function publicListSharePath(shareId: string) {
-  return `/lists/${encodeURIComponent(shareId)}`;
+  return `/list/shared/${encodeURIComponent(shareId)}`;
 }
