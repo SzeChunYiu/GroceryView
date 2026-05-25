@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { buildExpiryDealRadar } from '@groceryview/core';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
-import { expiryDealRadarReports } from '@/lib/demo-data';
+import { expiryDealRadarReports } from '@/lib/expiry-deals-data';
 import { routeMetadata } from '@/lib/seo';
 
 const expiryDealReports = expiryDealRadarReports;
