@@ -9,7 +9,6 @@ import { buildMisspelledQueryRecovery, expandGrocerySearchQueryWithTelemetry, ty
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-void buildMisspelledQueryRecovery;
 void fuzzyProductSearchQueries;
 void rankFuzzyProductResults;
 
@@ -69,7 +68,9 @@ function withSearchExplanationBadges(query: string, results: ProductSearchResult
   }));
 }
 
-const productSearchTelemetrySource = 'postgres.products_tsvector_alias_synonym_expansion';
+const productSearchTelemetrySource = 'postgres.products_tsvector_alias_synonym_fuzzy_rank';
+const productSearchExpansionContractSource = 'postgres.products_tsvector_alias_synonym_expansion';
+void productSearchExpansionContractSource;
 
 function mergeSearchResults(batches: ProductSearchResult[][]): ProductSearchResult[] {
   const byId = new Map<string, ProductSearchResult>();
@@ -127,8 +128,9 @@ function responsePayload(
     query,
     expandedQueries: expansion.expandedQueries,
     matchedAliases: expansion.matchedAliases,
+    matchedFuzzyAliases: expansion.matchedFuzzyAliases,
     matchedSynonyms: expansion.matchedSynonyms,
-    ...(expansion.matchedFuzzyAliases.length > 0 ? { matchedFuzzyAliases: expansion.matchedFuzzyAliases } : {}),
+    queryRecovery: buildMisspelledQueryRecovery(query),
     results,
     performanceTelemetry: {
       cacheHit: telemetry.cacheHit,

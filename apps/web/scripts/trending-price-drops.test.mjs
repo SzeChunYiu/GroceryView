@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { access, readFile, readFileSync } from 'node:fs';
-import { dirname, join, normalize } from 'node:path';
+import { dirname, join, normalize, relative } from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import test from 'node:test';
@@ -79,8 +79,9 @@ function loadTsModule(relative, mocks = {}) {
       return new Proxy({}, { get: () => Icon });
     }
     if (specifier.startsWith('@/') || specifier.startsWith('.')) {
-      const resolved = resolveLocalModule(normalize(absolute.slice(rootPath.length + 1)), specifier);
-      return loadTsModule(normalize(resolved.slice(rootPath.length + 1)), mocks);
+      const fromRoot = normalize(relative(rootPath, absolute));
+      const resolved = resolveLocalModule(fromRoot, specifier);
+      return loadTsModule(normalize(relative(rootPath, resolved)), mocks);
     }
     return require(specifier);
   };

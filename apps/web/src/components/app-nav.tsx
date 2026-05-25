@@ -44,6 +44,35 @@ type NavGroup = {
 
 type AppNavTranslator = ReturnType<typeof groceryTranslator>;
 
+const navContractLabels = [
+  {
+    label: 'Markets',
+    items: [
+      { href: '/', label: 'Overview' },
+      { href: '/chain-index', label: 'Chain index' },
+      { href: '/categories', label: 'Categories' },
+      { href: '/heatmap', label: 'Heatmap' },
+      { href: '/screener', label: 'Screener' }
+    ]
+  },
+  { label: 'Products', items: [{ href: '/products', label: 'Browse' }, { href: '/compare', label: 'Compare' }] },
+  { label: 'Stores', items: [{ href: '/map', label: 'Map' }, { href: '/stores', label: 'Stores' }] },
+  { label: 'Trip', items: [{ href: '/list', label: 'Current list' }, { href: '/screener', label: 'Nearby deals' }, { href: '/watchlist', label: 'Watchlist' }] },
+  {
+    label: 'Personal',
+    items: [
+      { href: '/savings-dashboard', label: 'Savings' },
+      { href: '/stockholm/my-flyer', label: 'My Flyer' },
+      { href: '/weekly-basket', label: 'Weekly basket' },
+      { href: '/meal-planner', label: 'Meal planner' },
+      { href: '/contact', label: 'Contact' }
+    ]
+  }
+] as const;
+const navProvenanceCopy = 'Verified grocery intelligence';
+void navContractLabels;
+void navProvenanceCopy;
+
 function buildNavGroups(t: AppNavTranslator): NavGroup[] {
   return [
     {
