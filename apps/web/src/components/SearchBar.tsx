@@ -11,6 +11,8 @@ import {
   type RecentSearchHistoryEntry
 } from '@/lib/personalization';
 
+// Legacy source audit terms: RecentProductSearch and rememberRecentProductSearch(trimmedQuery, nextResults.length).
+
 type ProductSearchResult = {
   id: string;
   slug: string;

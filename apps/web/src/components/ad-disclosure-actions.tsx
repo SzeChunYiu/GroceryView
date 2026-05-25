@@ -39,7 +39,11 @@ const defaultSponsoredPlacementSlots: AdPlacementSlot[] = [
 export function AffiliateDisclosureNotice({ metadata }: Readonly<{ metadata: AffiliateLinkMetadata }>) {
   const label = affiliateDisclosureLabel(metadata);
   return (
-    <span className="mt-2 block rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold leading-5 text-amber-950" data-affiliate-disclosure={metadata.sponsored === false ? 'outbound' : 'affiliate'}>
+    <span
+      className="mt-2 block rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold leading-5 text-amber-950"
+      data-affiliate-chain={metadata.chainId ?? metadata.retailerName}
+      data-affiliate-disclosure={metadata.sponsored === false ? 'outbound' : 'affiliate'}
+    >
       {label}
     </span>
   );
@@ -111,7 +115,7 @@ export function AdDisclosureActions() {
       <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4">
         <p className="text-sm font-black text-amber-950">Outbound link disclosure contract</p>
         <p className="mt-2 text-sm font-semibold leading-6 text-amber-950">
-          Store and deal links must carry affiliate metadata, open with sponsored/noopener rel attributes, and show a nearby disclosure that commissions never affect Deal Score, basket totals, or ranking.
+          Store and deal links must carry affiliate metadata, chain attribution, UTM parameters, open with sponsored/noopener rel attributes, and show a nearby disclosure that commissions never affect Deal Score, basket totals, or ranking.
         </p>
       </div>
 
@@ -166,7 +170,7 @@ export function AdDisclosureActions() {
       </div>
 
       <ul className="mt-4 list-disc space-y-1 rounded-2xl bg-sky-50 p-4 pl-8 text-sm font-bold text-sky-950">
-        <li>Retailer outbound links must carry a sponsored disclosure, campaign parameters, and consent-aware click tracking.</li>
+        <li>Retailer outbound links must carry a sponsored disclosure, campaign parameters, chain attribution, and consent-aware click tracking.</li>
         {guardrails.map((guardrail) => <li key={guardrail}>{guardrail}</li>)}
       </ul>
       <p className="mt-4 rounded-2xl bg-slate-50 p-3 text-sm font-bold text-slate-700" data-status={status}>{message}</p>

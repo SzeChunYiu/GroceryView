@@ -31,6 +31,7 @@ type DealCardProps = {
   currency?: string;
   locale?: string;
   retailerName?: string;
+  chainId?: string;
   productId?: string;
   dealId?: string;
   outboundDealUrl?: string;
@@ -50,6 +51,7 @@ function formatPrice(value: number, locale: string, currency: string) {
 
 function outboundMetadata({
   campaignId,
+  chainId,
   dealId,
   destinationUrl,
   placement,
@@ -60,6 +62,7 @@ function outboundMetadata({
 }: AffiliateLinkMetadata) {
   return {
     campaignId,
+    chainId,
     dealId,
     destinationUrl,
     placement,
@@ -83,6 +86,7 @@ function OutboundAffiliateLink({
       <a
         className="inline-flex w-full items-center justify-center rounded-full bg-market-mint px-4 py-2 text-sm font-black text-market-ink transition hover:bg-emerald-300"
         data-affiliate-campaign={metadata.campaignId ?? metadata.surface}
+        data-affiliate-chain={metadata.chainId ?? metadata.retailerName}
         data-affiliate-disclosure={disclosureKind}
         data-affiliate-placement={metadata.placement}
         data-affiliate-retailer={metadata.retailerName}
@@ -109,6 +113,7 @@ export function DealCard({
   currency = 'SEK',
   locale = 'sv-SE',
   retailerName = 'the retailer',
+  chainId,
   productId,
   dealId,
   outboundDealUrl,
@@ -125,6 +130,7 @@ export function DealCard({
   const context = buildDealContext({ currentPrice, discountStartedAt, priceHistory, currency, locale });
   const dealLinkMetadata = outboundDealUrl ? outboundMetadata({
     campaignId: affiliateCampaignId,
+    chainId,
     dealId,
     destinationUrl: outboundDealUrl,
     placement: 'deal_card',
@@ -135,6 +141,7 @@ export function DealCard({
   }) : null;
   const storeLinkMetadata = outboundStoreUrl ? outboundMetadata({
     campaignId: affiliateCampaignId,
+    chainId,
     dealId,
     destinationUrl: outboundStoreUrl,
     placement: 'store_link',

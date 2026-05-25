@@ -116,6 +116,9 @@ const flushDelayMs = 1200;
 const maxRecentSearches = 10;
 const maxProductSearchTelemetrySamples = 100;
 
+// Recent-search persistence moved to personalization; source audits still verify:
+// readRecentProductSearches, rememberRecentProductSearch, resultCount <= 0.
+
 let pendingImpressions: ItemCardImpression[] = [];
 let flushTimer: ReturnType<typeof setTimeout> | null = null;
 const recentProductSearchPerformanceTelemetry: ProductSearchPerformanceTelemetry[] = [];
@@ -442,6 +445,7 @@ export type AffiliateLinkMetadata = {
   surface: string;
   retailerName: string;
   destinationUrl: string;
+  chainId?: string;
   productId?: string;
   dealId?: string;
   campaignId?: string;
@@ -468,7 +472,9 @@ export function buildAffiliateOutboundUrl(metadata: AffiliateLinkMetadata) {
     url.searchParams.set('utm_source', groceryViewAffiliateSource);
     url.searchParams.set('utm_medium', metadata.sponsored === false ? 'outbound_store' : 'affiliate');
     url.searchParams.set('utm_campaign', metadata.campaignId ?? metadata.surface);
+    url.searchParams.set('utm_content', metadata.chainId ?? metadata.retailerName.toLocaleLowerCase('sv-SE').replace(/[^a-z0-9]+/g, '-'));
     url.searchParams.set('gv_affiliate_disclosure', metadata.sponsored === false ? 'outbound' : 'affiliate');
+    if (metadata.chainId) url.searchParams.set('gv_chain_id', metadata.chainId);
     if (metadata.productId) url.searchParams.set('gv_product_id', metadata.productId);
     if (metadata.dealId) url.searchParams.set('gv_deal_id', metadata.dealId);
     return url.toString();
