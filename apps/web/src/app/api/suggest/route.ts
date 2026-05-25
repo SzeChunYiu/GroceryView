@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { adaptiveProductCards, categorySummaries } from '@/lib/verified-data';
+import { headerSearchFacetChips } from '@/lib/search-filters';
+import { adaptiveProductCards, buildProductSearchView, categorySummaries, formatSek } from '@/lib/verified-data';
 
 export const revalidate = 60;
 
@@ -95,10 +96,20 @@ export async function GET(request: Request) {
     );
   }
 
+  const searchView = buildProductSearchView({ q: query });
+
   return NextResponse.json(
     {
       query,
       suggestions: cachedSuggestions(query),
+      facets: headerSearchFacetChips({
+        query,
+        categoryFacets: searchView.categoryFacets,
+        chainFacets: searchView.chainFacets,
+        dietaryFilters: searchView.dietaryFilters,
+        priceRange: searchView.priceRange,
+        formatPrice: formatSek
+      }),
       limit: SUGGESTION_LIMIT,
       source: 'verified product and category snapshots'
     },

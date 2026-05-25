@@ -114,7 +114,7 @@ export function VirtualizedProductGrid({ products }: Readonly<{ products: Virtua
           {products.slice(rowIndex * columns, rowIndex * columns + columns).map((product, productOffset) => (
             <LazyItemCard className="group rounded-2xl border border-violet-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-violet-700" compareMode="products-grid" href={`/products/${product.slug}`} itemId={product.slug} itemName={product.name} key={product.slug} listId="products-grid" listIndex={rowIndex * columns + productOffset}>
               <div className="flex gap-3">
-                {product.imageUrl ? <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-white p-2 ring-1 ring-violet-100"><Image alt={`${product.name} product image`} className="max-h-full max-w-full object-contain transition group-hover:scale-105" height={80} sizes="80px" src={product.imageUrl} width={80} /></div> : null}
+                {product.imageUrl ? <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-white p-2 ring-1 ring-violet-100"><Image alt={`${product.name} product image`} className="max-h-full max-w-full object-contain transition group-hover:scale-105" height={80} loading="lazy" placeholder="empty" sizes="80px" src={product.imageUrl} width={80} /></div> : null}
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">{product.brand}</p>
