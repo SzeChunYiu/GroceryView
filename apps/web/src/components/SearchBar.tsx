@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Search } from 'lucide-react';
 import { useEffect, useId, useMemo, useState } from 'react';
+import { trackSearchToSavingsFunnelStep } from '@/lib/analytics';
 
 type ProductSearchResult = {
   id: string;
@@ -69,6 +70,7 @@ export function SearchBar() {
         if (controller.signal.aborted) return;
         setResults(payload.results ?? []);
         setStatus((payload.results ?? []).length > 0 ? 'ready' : 'empty');
+        trackSearchToSavingsFunnelStep('landing_search');
       } catch (error) {
         if (controller.signal.aborted) return;
         console.error('Product search request failed', error instanceof Error ? { name: error.name } : { name: 'unknown' });

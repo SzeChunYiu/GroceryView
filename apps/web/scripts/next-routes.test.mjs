@@ -1075,20 +1075,6 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(route, /NoVerifiedData/);
   });
 
-  it('surfaces deal-hunter specialty and premium tier tracking from the real brand-tier index', async () => {
-    const route = await read('src/app/deals/page.tsx');
-
-    assert.match(route, /calculateBrandTierIndices/);
-    assert.match(route, /buildBrandTierPriceObservations/);
-    assert.match(route, /premiumTierTracking/);
-    assert.match(route, /Specialty & premium tier tracking/);
-    assert.match(route, /premiumGapPercent/);
-    assert.match(route, /premium tier/i);
-    assert.match(route, /specialty basket/i);
-    assert.match(route, /not a forecast/i);
-    assert.match(route, /observed brand-tier basket/i);
-    assert.doesNotMatch(route, /NoVerifiedData/);
-  });
 
   it('surfaces account-safe custom price alert thresholds on the watchlist route', async () => {
     const verified = await read('src/lib/verified-data.ts');
@@ -1273,14 +1259,6 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
-  it('surfaces expiry deal radar on the deals route using the real core radar output', async () => {
-    const source = await read('src/app/deals/page.tsx');
-    assert.match(source, /expiryDealRadar/);
-    assert.match(source, /buildExpiryDealRadar/);
-    assert.match(source, /radarScore/);
-    assert.match(source, /staleReportIds/);
-    assert.doesNotMatch(source, /NoVerifiedData/);
-  });
 
   it('surfaces a dedicated near-expiry deal radar page with confidence-backed core output', async () => {
     const source = await read('src/app/expiry-deals/page.tsx');
@@ -1293,13 +1271,12 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
-  it('surfaces a deal screener landing card on the deals route with dedicated /screener navigation', async () => {
+  it('redirects the legacy deals route to the verified deal screener', async () => {
     const route = await read('src/app/deals/page.tsx');
-    assert.match(route, /Deal screener/);
-    assert.match(route, /Dedicated verified screener/i);
-    assert.match(route, /Open verified deal screener/);
-    assert.match(route, /screenerDefaultHref\(\)/);
-    assert.doesNotMatch(route, /dealScreener/);
+
+    assert.match(route, /redirect\('\/screener'\)/);
+    assert.match(route, /generateMetadata/);
+    assert.match(route, /routeMetadata\('\/deals'\)/);
   });
 
   it('surfaces a verified deal screener on the dedicated screener route', async () => {
@@ -1390,38 +1367,7 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(route, /process\.env\.DATABASE_URL.*json/i);
   });
 
-  it('surfaces offer expiry reminders from real Matpriskollen validity windows', async () => {
-    const verified = await read('src/lib/verified-data.ts');
-    const route = await read('src/app/deals/page.tsx');
 
-    assert.match(verified, /matpriskollenOffers/);
-    assert.match(verified, /offerExpiryReminderBoard/);
-    assert.match(verified, /validFrom/);
-    assert.match(verified, /validTo/);
-    assert.match(route, /Offer expiry reminders/);
-    assert.match(route, /validTo/);
-    assert.match(route, /No deal starts tomorrow claim/);
-    assert.match(route, /sourceUrl/);
-    assert.doesNotMatch(route, /@\/components\/sample-data/);
-  });
-
-  it('surfaces ICA e-magin digital-catalog offers from generated weekly offer rows', async () => {
-    const verified = await read('src/lib/verified-data.ts');
-    const shell = await read('src/components/market-shell.tsx');
-    const deals = await read('src/app/deals/page.tsx');
-
-    assert.match(verified, /icaReklambladOffers/);
-    assert.match(verified, /digitalCatalogueOfferBoard/);
-    assert.match(verified, /flyerPdfUrl/);
-    assert.match(verified, /sourceUrl/);
-    assert.match(shell, /Flyer \/ digital-catalog ingestion/);
-    assert.match(shell, /Open e-magin flyer/);
-    assert.match(shell, /offer price text, jämförpris, ordinary price/i);
-    assert.match(deals, /ICA e-magin catalogue offers/);
-    assert.match(deals, /real weekly offer rows/);
-    assert.match(deals, /flyerPdfUrl retained/);
-    assert.doesNotMatch(shell, /@\/lib\/demo-data|@\/components\/sample-data/);
-  });
 
   it('wires the latest ICA store-scoped promotion import to visible source surfaces', async () => {
     const generated = await read('src/lib/ingested/ica.ts');
@@ -1510,38 +1456,8 @@ describe('verified-data UI', () => {
 
 
 
-  it('surfaces a retailer flyer validity calendar without unsupported tomorrow claims', async () => {
-    const verified = await read('src/lib/verified-data.ts');
-    const route = await read('src/app/deals/page.tsx');
 
-    assert.match(verified, /flyerValidityCalendar/);
-    assert.match(verified, /validityDays/);
-    assert.match(verified, /startsTomorrow/);
-    assert.match(verified, /matpriskollenOffers/);
-    assert.match(route, /Flyer validity calendar/);
-    assert.match(route, /Starts tomorrow/);
-    assert.match(route, /unsupportedTomorrowClaim/);
-    assert.match(route, /validFrom/);
-    assert.match(route, /validTo/);
-  });
 
-  it('surfaces a student single-portion deal finder using real deal ranking output', async () => {
-    const source = await read('src/app/deals/page.tsx');
-    assert.match(source, /singlePortionDealFinder/);
-    assert.match(source, /rankDealOpportunities/);
-    assert.match(source, /Single-portion deals/);
-    assert.match(source, /portionLabel/);
-    assert.doesNotMatch(source, /NoVerifiedData/);
-  });
-
-  it('surfaces a kids snack and lunchbox deal feed using real deal ranking output', async () => {
-    const source = await read('src/app/deals/page.tsx');
-    assert.match(source, /kidsSnackLunchboxDeals/);
-    assert.match(source, /rankDealOpportunities/);
-    assert.match(source, /Kids snack & lunchbox deals/);
-    assert.match(source, /lunchboxFit/);
-    assert.doesNotMatch(source, /NoVerifiedData/);
-  });
 
   it('surfaces nutrition per krona on the nutrition value route using the real core ranking output', async () => {
     const source = await read('src/app/nutrition-value/page.tsx');
@@ -2871,7 +2787,7 @@ ${seo}`;
     assert.match(singularProductRoute, /generateProductMetadata/);
     assert.match(singularProductRoute, /params\.then\(\(\{ id \}\) => \(\{ slug: id \}\)\)/);
 
-    assert.match(canonicalProductRoute, /<img/);
+    assert.match(canonicalProductRoute, /<Image/);
     assert.match(canonicalProductRoute, /src=\{product\.image/);
     assert.match(canonicalProductRoute, /alt=\{product\.name\}/);
     assert.match(canonicalProductRoute, /Primary price evidence/);
@@ -3046,6 +2962,16 @@ ${seo}`;
     assert.doesNotMatch(sitemap, /osmStores\.slice\(0,\s*80\)/);
   });
 
+  it('emits sitemap entries for Nordic country terms URLs', async () => {
+    const sitemap = await read('src/app/sitemap.ts');
+
+    assert.match(sitemap, /countryTermsRoutes/);
+    for (const country of ['sweden', 'norway', 'denmark', 'finland', 'iceland']) {
+      assert.match(sitemap, new RegExp(`'${country}'`));
+    }
+    assert.match(sitemap, /entry\(`\/\$\{country\}\/terms`, 0\.52, 'monthly'\)/);
+  });
+
   it('keeps public item and search entry points in sitemap and canonical metadata coverage', async () => {
     const seo = await read('src/lib/seo.ts');
     const sitemap = await read('src/app/sitemap.ts');
@@ -3163,6 +3089,26 @@ ${seo}`;
     assert.match(localeHome, /\/sv/);
     assert.match(localeHome, /\/en/);
     assert.doesNotMatch(seo, /NoVerifiedData/);
+  });
+
+  it('keeps programmatic city/product SEO pages canonicalized behind coverage guards', async () => {
+    const seo = await read('src/lib/seo.ts');
+    const landing = await read('src/lib/seo-landing-pages.ts');
+
+    assert.match(seo, /canonicalPath\?: string/);
+    assert.match(seo, /const alternatePath = config\.canonicalPath \?\? config\.path/);
+    assert.match(seo, /canonical: canonical, languages: languageAlternateUrls\(alternatePath\)/);
+    assert.match(seo, /follow: config\.noIndexFollow \?\? false/);
+
+    assert.match(landing, /programmaticSeoIndexingGuard/);
+    assert.match(landing, /minimumVerifiedChainRows: 2/);
+    assert.match(landing, /minimumCityVerifiedChainRows: 3/);
+    assert.match(landing, /hasCitySpecificAvailability: false/);
+    assert.match(landing, /cityCheapestLandingSeoDecision/);
+    assert.match(landing, /canonicalPath: indexable \? cityPath : fallbackCanonicalPath/);
+    assert.match(landing, /noIndex: !indexable/);
+    assert.match(landing, /metadataForCityCheapestLanding/);
+    assert.match(landing, /noIndexFollow: seoDecision\.noIndexFollow/);
   });
 
   it('ships an installable PWA-first web manifest for mobile grocery checks', async () => {

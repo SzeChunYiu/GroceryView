@@ -370,6 +370,19 @@ function CategoryIndexPage({ definition, index, rows }: Readonly<{ definition: C
   );
 }
 
+function EmptyCategoryIndexPage({ definition }: Readonly<{ definition: CategoryDefinition }>) {
+  return (
+    <PageShell>
+      <Eyebrow>Index symbol</Eyebrow>
+      <Card className="mt-4 text-center">
+        <div className="text-5xl" aria-hidden="true">🧺</div>
+        <h1 className="mt-4 text-3xl font-black tracking-tight">No products in {definition.label} yet</h1>
+        <p className="mt-3 text-base font-semibold text-slate-600">Try another GroceryView index while matched products are added.</p>
+      </Card>
+    </PageShell>
+  );
+}
+
 function ChainIndexPage({ chain }: Readonly<{ chain: ChainPriceIndex }>) {
   const fixedBasketMirror = fixedBasketForChain(chain);
 
@@ -452,7 +465,7 @@ export default async function IndexSymbolPage({ params }: Readonly<{ params: Pro
   const category = categoryBySymbol.get(symbol as CategorySymbol);
   if (category) {
     const fixedBasket = fixedBasketFor(category);
-    if (!fixedBasket) notFound();
+    if (!fixedBasket) return <EmptyCategoryIndexPage definition={category} />;
     return <CategoryIndexPage definition={category} index={fixedBasket.index} rows={fixedBasket.rows} />;
   }
 

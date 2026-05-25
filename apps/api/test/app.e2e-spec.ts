@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, it } from 'node:test';
 import { type INestApplication } from '@nestjs/common';
 import { Test, type TestingModule } from '@nestjs/testing';
@@ -6,6 +8,7 @@ import request from 'supertest';
 import { createSessionToken } from '@groceryview/auth';
 import { AppModule } from '../src/app.module.js';
 import { configureApp } from '../src/configure-app.js';
+import { createOpenApiYaml } from '../src/openapi.js';
 import { PostgresQueryExecutorService } from '../src/database/postgres-query-executor.service.js';
 
 class RecordingPriceHistoryExecutor {
@@ -565,6 +568,13 @@ describe('GroceryView API app', () => {
       process.env.AUTH_SECRET = previousAuthSecret;
     }
   });
+
+  it('keeps committed OpenAPI YAML in sync with the generated Nest document', async () => {
+    const generated = createOpenApiYaml(app);
+    const committed = await readFile(resolve(process.cwd(), 'docs/openapi.yaml'), 'utf8');
+    assert.equal(committed, generated);
+  });
+
 
   it('handles CORS preflight for production and local development origins with credentials', async () => {
     const productionPreflight = await request(app.getHttpServer())

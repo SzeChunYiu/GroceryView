@@ -35,6 +35,8 @@ const storeSitemapRecords: StoreSitemapRecord[] = osmStores.map((store) => ({
   updatedAt: store.retrievedDate
 }));
 
+const countryTermsRoutes = ['sweden', 'norway', 'denmark', 'finland', 'iceland'] as const;
+
 function lastModifiedFrom(updatedAt: string | undefined) {
   if (!updatedAt) return fallbackLastModified;
   const value = new Date(updatedAt);
@@ -103,7 +105,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     entry('/data-sources', 0.65, 'weekly'),
     entry('/openprices-depth', 0.65, 'daily'),
     entry('/store-coverage', 0.65, 'weekly'),
-    entry('/chain-coverage', 0.65, 'weekly')
+    entry('/chain-coverage', 0.65, 'weekly'),
+    ...countryTermsRoutes.map((country) => entry(`/${country}/terms`, 0.52, 'monthly'))
   ];
 
   const seoLandingRoutes = seoLandingProducts.flatMap((product) => [

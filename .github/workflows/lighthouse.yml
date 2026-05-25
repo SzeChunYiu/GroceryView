@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   lighthouse:
-    name: Vercel preview performance budget
+    name: Vercel preview Lighthouse budget
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
