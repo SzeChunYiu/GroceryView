@@ -12,10 +12,10 @@ import { OFFLINE_LIST_EDIT_RECONCILIATION_STEPS, offlineListSyncStatusCopy } fro
 import { listPresenceParticipants, summarizeListPresence } from '@/lib/list-presence';
 
 const demoItems = [
-  { id: 'bananas', name: 'Bananas', quantity: '1 bunch', ownerRole: 'guardian' as const },
-  { id: 'oat-milk', name: 'Oat milk', quantity: '2 cartons', ownerRole: 'partner' as const, matchedProductSlug: 'havregryn-extra-fylliga-101758934-st' },
-  { id: 'pasta-sauce', name: 'Pasta sauce', quantity: '1 jar', ownerRole: 'teen' as const, matchedProductSlug: 'makaroner-pasta-101302991-st' },
-  { id: 'sparkling-water', name: 'Sparkling water', quantity: '6-pack', ownerRole: 'guest' as const }
+  { id: 'bananas', name: 'Bananas', quantity: '1 bunch', quantityCount: 1, estimatedUnitPriceSek: 24.9, ownerRole: 'guardian' as const },
+  { id: 'oat-milk', name: 'Oat milk', quantity: '2 cartons', quantityCount: 2, estimatedUnitPriceSek: 19.9, ownerRole: 'partner' as const, matchedProductSlug: 'havregryn-extra-fylliga-101758934-st' },
+  { id: 'pasta-sauce', name: 'Pasta sauce', quantity: '1 jar', quantityCount: 1, estimatedUnitPriceSek: 29.9, ownerRole: 'teen' as const, matchedProductSlug: 'makaroner-pasta-101302991-st' },
+  { id: 'sparkling-water', name: 'Sparkling water', quantity: '6-pack', quantityCount: 6, estimatedUnitPriceSek: 7.5, ownerRole: 'guest' as const }
 ];
 
 const publicDemoShareItems: PublicListShareItem[] = demoItems.map((item) => ({
@@ -49,6 +49,12 @@ function normalizeGroupOrder(groupOrder: string | string[] | undefined): StoreLa
 
 function formatSek(value: number) {
   return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);
+}
+
+function quantityCountFromLabel(quantity: string) {
+  const leadingNumber = quantity.match(/^\s*(\d+)/)?.[1];
+  const parsedQuantity = leadingNumber ? Number(leadingNumber) : 1;
+  return Number.isFinite(parsedQuantity) ? Math.max(1, Math.round(parsedQuantity)) : 1;
 }
 
 function mealPlanExportFromParam(value: string | string[] | undefined): MealPlanShoppingListExport | null {
@@ -85,9 +91,14 @@ export default async function ShoppingListPage({ searchParams }: { searchParams?
     matchedProductSlug: item.productId,
     name: item.name,
     ownerRole: 'guardian' as const,
-    quantity: item.quantity
+    quantity: item.quantity,
+    quantityCount: quantityCountFromLabel(item.quantity),
+    estimatedUnitPriceSek: undefined
   })) ?? [];
   const listItems = [...mealPlanItems, ...demoItems.filter((item) => !mealPlanItems.some((mealItem) => mealItem.id === item.id))];
+  const estimatedListTotalSek = listItems.reduce((sum, item) => (
+    sum + (item.estimatedUnitPriceSek ?? 0) * (item.quantityCount ?? quantityCountFromLabel(item.quantity))
+  ), 0);
   const reorderWarnings = reorderWarningsForMatchedProducts(listItems);
   const publicShareToken = shareToken ?? createPublicListShareToken({
     expiresAt: '2026-06-30T23:59:59.000Z',
@@ -174,6 +185,11 @@ export default async function ShoppingListPage({ searchParams }: { searchParams?
         </div>
       </section>
       <ListSharePreview />
+      <section className="rounded-2xl border border-emerald-200 bg-white p-4 shadow-sm" aria-labelledby="quantity-total-title">
+        <p className="text-xs font-semibold uppercase tracking-wide text-emerald-800">Quantity-aware list total</p>
+        <h2 id="quantity-total-title" className="mt-1 text-xl font-bold text-slate-950">{formatSek(estimatedListTotalSek)} demo basket estimate</h2>
+        <p className="mt-1 text-sm text-slate-600">Household staples and meal-plan imports are counted with their current quantities.</p>
+      </section>
       {reorderWarnings.length > 0 ? (
         <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4" aria-labelledby="reorder-warning-title">
           <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">Verified reorder warnings</p>

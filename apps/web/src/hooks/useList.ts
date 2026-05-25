@@ -6,12 +6,14 @@ import { parseMealPlanShoppingListExport } from '@/lib/meal-budgets';
 export type ShoppingListItem = {
   checked: boolean;
   detail: string;
+  estimatedUnitPriceSek?: number;
   id: string;
   importSource?: 'starter' | 'bulk-clipboard' | 'item-detail' | 'meal-plan';
   matchedProductName?: string;
   matchedProductSlug?: string;
   name: string;
   quantity: string;
+  quantityCount?: number;
 };
 
 export type BulkImportedListItemInput = Omit<ShoppingListItem, 'checked'> & {
@@ -80,6 +82,7 @@ const LIST_SHARE_PUBLIC_SECRET = process.env.NEXT_PUBLIC_LIST_SHARE_SECRET || 'l
 
 export const BUDGET_HISTORY_STORAGE_KEY = 'groceryview:shopping-list:budget-history:v1';
 export const BUDGET_HISTORY_SAVE_DELAY_MS = 400;
+const DEFAULT_QUANTITY_COUNT = 1;
 
 export type BudgetHistorySnapshot = {
   checkedCount: number;
@@ -140,33 +143,66 @@ const baseListItems: Omit<ShoppingListItem, 'checked'>[] = [
     id: 'coffee-weekly-top-up',
     name: 'Coffee',
     quantity: '1 package',
+    quantityCount: 1,
+    estimatedUnitPriceSek: 49.9,
     detail: 'Weekly basket top-up item'
   },
   {
     id: 'oats-breakfast-staple',
     name: 'Oats',
     quantity: '1 bag',
+    quantityCount: 1,
+    estimatedUnitPriceSek: 22.9,
     detail: 'Breakfast staple'
   },
   {
     id: 'milk-dairy-run',
     name: 'Milk or fil',
     quantity: '2 cartons',
+    quantityCount: 2,
+    estimatedUnitPriceSek: 18.9,
     detail: 'Dairy aisle check'
   },
   {
     id: 'frozen-vegetables',
     name: 'Frozen vegetables',
     quantity: '1 bag',
+    quantityCount: 1,
+    estimatedUnitPriceSek: 29.9,
     detail: 'Dinner backup item'
   },
   {
     id: 'fresh-fruit',
     name: 'Fresh fruit',
     quantity: '1 basket',
+    quantityCount: 1,
+    estimatedUnitPriceSek: 34.9,
     detail: 'Snack and lunchbox item'
   }
 ];
+
+function normalizeQuantityCount(value: unknown): number {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return DEFAULT_QUANTITY_COUNT;
+  return Math.max(1, Math.round(value));
+}
+
+function quantityCountFromLabel(quantity: string): number {
+  const leadingNumber = quantity.match(/^\s*(\d+)/)?.[1];
+  return normalizeQuantityCount(leadingNumber ? Number(leadingNumber) : DEFAULT_QUANTITY_COUNT);
+}
+
+function displayQuantityForCount(currentQuantity: string, quantityCount: number): string {
+  const normalizedCount = normalizeQuantityCount(quantityCount);
+  const unitLabel = currentQuantity.replace(/^\s*\d+\s*/, '').trim();
+  const safeUnitLabel = unitLabel && !/^\d/.test(unitLabel) ? unitLabel : normalizedCount === 1 ? 'item' : 'items';
+  return `${normalizedCount} ${safeUnitLabel}`;
+}
+
+function estimatedUnitPriceFromItem(item: Pick<ShoppingListItem, 'estimatedUnitPriceSek'>): number {
+  return typeof item.estimatedUnitPriceSek === 'number' && Number.isFinite(item.estimatedUnitPriceSek) && item.estimatedUnitPriceSek > 0
+    ? item.estimatedUnitPriceSek
+    : 0;
+}
 
 function listStateFromStorage(value: string | null): Required<PersistedListState> {
   const empty = { checkedById: {}, importedItems: [] };
@@ -197,6 +233,8 @@ function listStateFromStorage(value: string | null): Required<PersistedListState
         && typeof item.id === 'string'
         && typeof item.name === 'string'
         && typeof item.quantity === 'string'
+        && (item.quantityCount === undefined || typeof item.quantityCount === 'number')
+        && (item.estimatedUnitPriceSek === undefined || typeof item.estimatedUnitPriceSek === 'number')
         && typeof item.detail === 'string'
       ))
       : [];
@@ -218,7 +256,8 @@ function mealPlanItemsFromSearchParam(value: string): MealPlanListItemInput[] {
     matchedProductName: item.name,
     matchedProductSlug: item.productId,
     name: item.name,
-    quantity: item.quantity
+    quantity: item.quantity,
+    quantityCount: quantityCountFromLabel(item.quantity)
   }));
 }
 
@@ -229,7 +268,8 @@ function withCheckedState(checkedById: Record<string, boolean>, importedItems: P
 
   return [...uniqueItems.values()].map((item) => ({
     ...item,
-    checked: checkedById[item.id] === true
+    checked: checkedById[item.id] === true,
+    quantityCount: normalizeQuantityCount(item.quantityCount ?? quantityCountFromLabel(item.quantity))
   }));
 }
 
@@ -281,6 +321,8 @@ async function verifyShareToken(token: string): Promise<ShareLinkState> {
       && typeof item.id === 'string'
       && typeof item.name === 'string'
       && typeof item.quantity === 'string'
+      && (item.quantityCount === undefined || typeof item.quantityCount === 'number')
+      && (item.estimatedUnitPriceSek === undefined || typeof item.estimatedUnitPriceSek === 'number')
       && typeof item.detail === 'string'
     ))
     : [];
@@ -309,7 +351,9 @@ function persistCheckedState(items: ShoppingListItem[]) {
         matchedProductName: item.matchedProductName,
         matchedProductSlug: item.matchedProductSlug,
         name: item.name,
-        quantity: item.quantity
+        quantity: item.quantity,
+        quantityCount: normalizeQuantityCount(item.quantityCount ?? quantityCountFromLabel(item.quantity)),
+        estimatedUnitPriceSek: item.estimatedUnitPriceSek
       }));
     localStorage.setItem(LIST_STORAGE_KEY, JSON.stringify({ checkedById, importedItems }));
   } catch {
@@ -474,7 +518,12 @@ export function useList() {
       const existingIds = new Set(currentItems.map((item) => item.id));
       const nextImportedItems = importedItems
         .filter((item) => !existingIds.has(item.id))
-        .map((item) => ({ ...item, importSource: 'bulk-clipboard' as const, checked: false }));
+        .map((item) => ({
+          ...item,
+          importSource: 'bulk-clipboard' as const,
+          checked: false,
+          quantityCount: normalizeQuantityCount(item.quantityCount ?? quantityCountFromLabel(item.quantity))
+        }));
 
       return [...currentItems, ...nextImportedItems];
     });
@@ -488,7 +537,9 @@ export function useList() {
       matchedProductName: input.name,
       matchedProductSlug: input.productId,
       name: input.name,
-      quantity: input.quantity
+      quantity: input.quantity,
+      quantityCount: normalizeQuantityCount(input.quantityCount ?? quantityCountFromLabel(input.quantity)),
+      estimatedUnitPriceSek: input.estimatedUnitPriceSek
     };
     const alreadyOnList = items.some((currentItem) => currentItem.id === item.id);
     if (!alreadyOnList) {
@@ -501,9 +552,32 @@ export function useList() {
     return { added: !alreadyOnList, item };
   }, [items]);
 
+  const updateItemQuantity = useCallback((itemId: string, quantityCount: number) => {
+    setItems((currentItems) => currentItems.map((item) => {
+      if (item.id !== itemId) return item;
+
+      const nextQuantityCount = normalizeQuantityCount(quantityCount);
+      return {
+        ...item,
+        quantity: displayQuantityForCount(item.quantity, nextQuantityCount),
+        quantityCount: nextQuantityCount
+      };
+    }));
+  }, []);
+
   const checkedCount = useMemo(() => items.filter((item) => item.checked).length, [items]);
   const totalCount = items.length;
   const remainingCount = totalCount - checkedCount;
+  const estimatedTotalSek = useMemo(() => (
+    Number(items.reduce((sum, item) => (
+      sum + normalizeQuantityCount(item.quantityCount ?? quantityCountFromLabel(item.quantity)) * estimatedUnitPriceFromItem(item)
+    ), 0).toFixed(2))
+  ), [items]);
+  const remainingEstimatedTotalSek = useMemo(() => (
+    Number(items.filter((item) => !item.checked).reduce((sum, item) => (
+      sum + normalizeQuantityCount(item.quantityCount ?? quantityCountFromLabel(item.quantity)) * estimatedUnitPriceFromItem(item)
+    ), 0).toFixed(2))
+  ), [items]);
   const budgetSnapshot = useMemo(() => ({
     checkedCount,
     remainingCount,
@@ -528,12 +602,15 @@ export function useList() {
     addProductItem,
     addImportedItems,
     checkedCount,
+    estimatedTotalSek,
     hasLoadedBrowserState,
     items,
     remainingCount,
+    remainingEstimatedTotalSek,
     resetCheckedState,
     shareLink,
     toggleItemChecked,
-    totalCount
+    totalCount,
+    updateItemQuantity
   };
 }

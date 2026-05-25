@@ -36,6 +36,10 @@ function itemThumbnail(item: ShoppingListItem) {
   return axfoodProducts.find((product) => product.slug === item.matchedProductSlug)?.image ?? null;
 }
 
+function formatSek(value: number) {
+  return new Intl.NumberFormat('sv-SE', { currency: 'SEK', maximumFractionDigits: 2, style: 'currency' }).format(value);
+}
+
 function ShareMetadataPreview({ items, shareUrl }: Readonly<{ items: readonly ShoppingListItem[]; shareUrl: string }>) {
   if (!shareUrl) return null;
 
@@ -68,7 +72,20 @@ function ShareMetadataPreview({ items, shareUrl }: Readonly<{ items: readonly Sh
 }
 
 export function ListSharePreview() {
-  const { addImportedItems, checkedCount, hasLoadedBrowserState, items, remainingCount, resetCheckedState, shareLink, toggleItemChecked, totalCount } = useList();
+  const {
+    addImportedItems,
+    checkedCount,
+    estimatedTotalSek,
+    hasLoadedBrowserState,
+    items,
+    remainingCount,
+    remainingEstimatedTotalSek,
+    resetCheckedState,
+    shareLink,
+    toggleItemChecked,
+    totalCount,
+    updateItemQuantity
+  } = useList();
   const [generatedShareUrl, setGeneratedShareUrl] = useState('');
   const [offlineCacheStatus, setOfflineCacheStatus] = useState('Offline copy is prepared after the list loads.');
   const [shareStatus, setShareStatus] = useState('Create a read-only shopping list link after your basket is ready.');
@@ -146,6 +163,8 @@ export function ListSharePreview() {
               <p className="text-sm font-black uppercase tracking-[0.18em] text-emerald-800">Trip progress</p>
               <p className="mt-1 text-3xl font-black text-slate-950">{checkedCount}/{totalCount}</p>
               <p className="text-sm font-semibold text-slate-600">{remainingCount} left to collect</p>
+              <p className="mt-3 text-sm font-black text-slate-950">{formatSek(estimatedTotalSek)} total</p>
+              <p className="text-xs font-semibold text-slate-500">{formatSek(remainingEstimatedTotalSek)} remaining</p>
             </div>
           </div>
 
@@ -216,7 +235,7 @@ export function ListSharePreview() {
 
             <ul className="shopping-list-print-items mt-5 space-y-3">
               {items.map((item) => (
-                <CheckableListItem item={item} key={item.id} onToggle={toggleItemChecked} />
+                <CheckableListItem item={item} key={item.id} onQuantityChange={updateItemQuantity} onToggle={toggleItemChecked} />
               ))}
             </ul>
           </section>
@@ -228,13 +247,13 @@ export function ListSharePreview() {
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.24em] text-emerald-800">GroceryView shopping list</p>
               <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950">Today&apos;s basket</h1>
-              <p className="mt-2 text-sm font-semibold text-slate-700">{checkedCount}/{totalCount} complete · {remainingCount} left to collect</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">{checkedCount}/{totalCount} complete · {remainingCount} left to collect · {formatSek(estimatedTotalSek)} total</p>
             </div>
             <p className="text-right text-xs font-bold uppercase tracking-[0.18em] text-slate-500">A4 print view</p>
           </div>
           <ul className="shopping-list-print-items mt-5 space-y-3">
             {items.map((item) => (
-              <CheckableListItem item={item} key={`print-${item.id}`} onToggle={toggleItemChecked} />
+              <CheckableListItem item={item} key={`print-${item.id}`} onQuantityChange={updateItemQuantity} onToggle={toggleItemChecked} />
             ))}
           </ul>
         </section>

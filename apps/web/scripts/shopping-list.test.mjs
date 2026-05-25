@@ -8,10 +8,11 @@ async function read(relative) {
 
 describe('shopping list route', () => {
   it('ships the requested route, checkable row component, and localStorage-backed hook', async () => {
-    const [page, listSharePreview, row, hook, shareRoute, bulkImport, searchRoute, reorderSuggestions] = await Promise.all([
+    const [page, listSharePreview, row, quantitySelector, hook, shareRoute, bulkImport, searchRoute, reorderSuggestions] = await Promise.all([
       read('src/app/list/page.tsx'),
       read('src/components/list-share-preview.tsx'),
       read('src/components/CheckableListItem.tsx'),
+      read('src/components/QuantitySelector.tsx'),
       read('src/hooks/useList.ts'),
       read('src/app/api/list/share/route.ts'),
       read('src/components/BulkImportDialog.tsx'),
@@ -24,24 +25,43 @@ describe('shopping list route', () => {
     assert.match(page, /reorderWarningsForMatchedProducts/);
     assert.match(page, /matchedProductSlug: item\.productId/);
     assert.match(page, /Verified reorder warnings/);
+    assert.match(page, /quantityCount/);
+    assert.match(page, /estimatedUnitPriceSek/);
+    assert.match(page, /estimatedListTotalSek/);
     assert.match(listSharePreview, /useList/);
     assert.match(listSharePreview, /CheckableListItem/);
     assert.match(listSharePreview, /BulkImportDialog/);
     assert.match(listSharePreview, /addImportedItems/);
+    assert.match(listSharePreview, /estimatedTotalSek/);
+    assert.match(listSharePreview, /remainingEstimatedTotalSek/);
+    assert.match(listSharePreview, /updateItemQuantity/);
     assert.match(listSharePreview, /Shopping list/);
 
     assert.match(row, /'use client'/);
+    assert.match(row, /QuantitySelector/);
     assert.match(row, /type="checkbox"/);
     assert.match(row, /checked=\{item\.checked\}/);
     assert.match(row, /onToggle\(item\.id\)/);
+    assert.match(row, /onQuantityChange\(item\.id, nextQuantity\)/);
     assert.match(row, /line-through/);
     assert.match(row, /matchedProductSlug/);
+
+    assert.match(quantitySelector, /'use client'/);
+    assert.match(quantitySelector, /aria-label/);
+    assert.match(quantitySelector, /Decrease quantity/);
+    assert.match(quantitySelector, /Increase quantity/);
+    assert.match(quantitySelector, /type="number"/);
 
     assert.match(hook, /'use client'/);
     assert.match(hook, /localStorage\.getItem\(LIST_STORAGE_KEY\)/);
     assert.match(hook, /localStorage\.setItem\(LIST_STORAGE_KEY/);
     assert.match(hook, /toggleItemChecked/);
     assert.match(hook, /checked: !item\.checked/);
+    assert.match(hook, /quantityCount/);
+    assert.match(hook, /estimatedUnitPriceSek/);
+    assert.match(hook, /updateItemQuantity/);
+    assert.match(hook, /estimatedTotalSek/);
+    assert.match(hook, /remainingEstimatedTotalSek/);
     assert.match(hook, /addImportedItems/);
     assert.match(hook, /importSource: 'bulk-clipboard'/);
     assert.match(hook, /matchedProductSlug/);
