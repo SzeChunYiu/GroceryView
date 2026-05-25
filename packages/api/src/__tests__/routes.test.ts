@@ -15,6 +15,7 @@ import {
   buildRealChainPriceIndices,
   buildRealBasketComparison,
   createGroceryViewApi,
+  productPriceHistoryCsvEndpoint,
   productPriceHistoryEndpoint,
   realBrandPriceIndicesEndpoint,
   realCategoryPriceIndicesEndpoint,
@@ -155,6 +156,22 @@ describe('createGroceryViewApi', () => {
       actionPath: 'price-history',
       path: '/products/:productId/price-history',
       queryParams: ['priceType', 'chain', 'store', 'sourceRun', 'minConfidence', 'from', 'to', 'limit']
+    });
+    assert.deepEqual(productPriceHistoryCsvEndpoint, {
+      method: 'GET',
+      controllerPath: 'products/:productId',
+      actionPath: 'history.csv',
+      path: '/products/:productId/history.csv',
+      pathParams: ['productId'],
+      queryParams: productPriceHistoryEndpoint.queryParams,
+      response: {
+        contentType: 'text/csv; charset=utf-8',
+        contentDisposition: {
+          type: 'attachment',
+          filenamePattern: '{productSlug}-history.csv'
+        },
+        columns: ['observedAt', 'chainName', 'storeName', 'priceType', 'price', 'unitPrice', 'currency', 'confidence']
+      }
     });
 
     const report = buildProductPriceHistoryReport([
