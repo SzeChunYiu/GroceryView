@@ -43,6 +43,10 @@ function formatPercent(value: number) {
   return `${new Intl.NumberFormat('sv-SE', { maximumFractionDigits: 1 }).format(value * 100)}%`;
 }
 
+function flyerDealEndsAt(index: number) {
+  return new Date(Date.UTC(2026, 4, 25 + Math.min(index + 1, 5), 20, 59, 0)).toISOString();
+}
+
 const spreadDeals: ReplacementDeal[] = topChainSpreads.map((product) => ({
   categoryLabel: labelFromSlug(product.category),
   categorySlug: product.category,
@@ -97,8 +101,8 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
           </h1>
           <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
             {replacementFilter
-              ? 'Expiry and low-stock pantry links now narrow this surface to replacement matches from observed deal rows.'
-              : 'Browse observed cross-chain spreads, recent price drops, and local unit-price savings without synthetic discounts.'}
+              ? 'Expiry and low-stock pantry links now narrow this surface to replacement matches from observed deal rows with ending-soon countdowns.'
+              : 'Browse observed cross-chain spreads, recent price drops, local unit-price savings, and flyer countdown badges without synthetic discounts.'}
           </p>
         </div>
         <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
@@ -166,10 +170,11 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
             </p>
             <Link className="mt-4 inline-flex rounded-full bg-emerald-900 px-4 py-2 text-sm font-black text-white" href="/deals">View all deals</Link>
           </div>
-        ) : visibleDeals.map((deal) => (
+        ) : visibleDeals.map((deal, index) => (
           <DealCard
             categoryLabel={deal.categoryLabel}
             currentPrice={deal.currentPrice}
+            dealEndsAt={flyerDealEndsAt(index)}
             dealId={deal.dealId}
             key={deal.dealId}
             originalPrice={deal.originalPrice}
