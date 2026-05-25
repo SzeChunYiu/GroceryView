@@ -23,6 +23,7 @@ import {
 } from './generated/db-site-ingested-overrides';
 import { dbSiteHomepageTrendingPriceChanges } from './generated/db-site-trending-price-changes';
 import { categoryLabels, pricedProducts } from './openprices-products';
+import { buildProductPriceHistorySparkline } from './price-events';
 import { allergenRiskBadgesForText } from './search-filters';
 import { osmStores } from './osm-stores';
 import {
@@ -2049,6 +2050,14 @@ export type AdaptiveProductCard = {
     date: string;
     price: number;
     priceLabel: string;
+    unitPrice: number | null;
+    unitPriceLabel: string | null;
+    chartValue: number;
+    chartValueLabel: string;
+    chainLabel: string;
+    storeLabel: string;
+    sourceType: string;
+    evidenceLabel: string;
   }>;
   sparklineLabel: string;
   isAvailable: boolean;
@@ -2132,13 +2141,26 @@ function sevenDaySparklinePoints(product: (typeof productUniverse)[number]): Ada
   const series = priceChartSeries.series[0];
   if (!series) return [];
 
-  return series.points
-    .slice(-7)
-    .map((point) => ({
-      date: point.time.slice(0, 10),
-      price: point.value,
-      priceLabel: formatSek(point.value)
-    }));
+  return buildProductPriceHistorySparkline(
+    series.points.map((point) => {
+      const normalizedUnit = normalizeComparableUnitPrice(point.value, product.quantity);
+      return {
+        observedAt: point.time,
+        price: point.value,
+        priceLabel: formatSek(point.value),
+        unitPrice: normalizedUnit?.unitPrice ?? null,
+        unitPriceLabel: normalizedUnit ? formatLocalizedUnitPrice(normalizedUnit.unitPrice, {
+          locale: defaultLocale,
+          currency: observedSnapshotCurrency,
+          unit: normalizedUnit.unitLabel.replace('kr/', '')
+        }) : null,
+        chainName: point.provenanceLabel?.includes('OpenPrices') ? 'OpenPrices community' : series.sourceType,
+        storeName: series.storeName,
+        sourceType: series.sourceType
+      };
+    }),
+    7
+  );
 }
 
 export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((product) => {
@@ -2186,7 +2208,7 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
     sparklineWindowDays: 7,
     sparklinePoints,
     sparklineLabel: sparklinePoints.length >= 2
-      ? `${sparklinePoints.length} observed daily points from price_daily/OpenPrices history`
+      ? `${sparklinePoints.length} observed unit-price points from price_daily/OpenPrices history by chain and store`
       : '7-day sparkline waits for at least two observed price-history points',
     isAvailable,
     safetyProfile,

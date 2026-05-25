@@ -47,12 +47,69 @@ export type PriceDropDiscoveryRailItem = {
   evidenceLabel: string;
 };
 
+export type ProductPriceHistorySparklineObservation = {
+  observedAt: string;
+  price: number;
+  priceLabel: string;
+  unitPrice?: number | null;
+  unitPriceLabel?: string | null;
+  chainName?: string | null;
+  storeName?: string | null;
+  sourceType?: string | null;
+};
+
+export type ProductPriceHistorySparklinePoint = {
+  date: string;
+  price: number;
+  priceLabel: string;
+  unitPrice: number | null;
+  unitPriceLabel: string | null;
+  chartValue: number;
+  chartValueLabel: string;
+  chainLabel: string;
+  storeLabel: string;
+  sourceType: string;
+  evidenceLabel: string;
+};
+
 function includesAny(value: string, needles: string[]) {
   return needles.some((needle) => value.includes(needle));
 }
 
 function normalizeText(...parts: Array<string | null | undefined>) {
   return parts.filter(Boolean).join(' ').toLocaleLowerCase('sv-SE');
+}
+
+export function buildProductPriceHistorySparkline(
+  observations: ProductPriceHistorySparklineObservation[],
+  limit = 7
+): ProductPriceHistorySparklinePoint[] {
+  return observations
+    .filter((observation) => Number.isFinite(observation.price) && Number.isFinite(Date.parse(observation.observedAt)))
+    .sort((left, right) => left.observedAt.localeCompare(right.observedAt))
+    .slice(-Math.max(2, Math.min(limit, 14)))
+    .map((observation) => {
+      const unitPrice = typeof observation.unitPrice === 'number' && Number.isFinite(observation.unitPrice) ? observation.unitPrice : null;
+      const chartValue = unitPrice ?? observation.price;
+      const chartValueLabel = unitPrice ? observation.unitPriceLabel || observation.priceLabel : observation.priceLabel;
+      const chainLabel = observation.chainName || observation.sourceType || 'Observed source';
+      const storeLabel = observation.storeName || 'Store not reported';
+      const sourceType = observation.sourceType || 'observed';
+
+      return {
+        date: observation.observedAt.slice(0, 10),
+        price: observation.price,
+        priceLabel: observation.priceLabel,
+        unitPrice,
+        unitPriceLabel: unitPrice ? chartValueLabel : null,
+        chartValue,
+        chartValueLabel,
+        chainLabel,
+        storeLabel,
+        sourceType,
+        evidenceLabel: `${chainLabel} · ${storeLabel} · ${sourceType}`
+      };
+    });
 }
 
 export function getPriceDropPercent({ currentPrice, previousPrice }: PriceDropReasonInput): number | null {

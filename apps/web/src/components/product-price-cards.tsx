@@ -76,14 +76,14 @@ function SafetyWarningBanner({ card, preferences }: Readonly<{ card: AdaptivePro
 
 function sparklinePath(points: AdaptiveProductCard['sparklinePoints'], width = 160, height = 44) {
   if (points.length < 2) return null;
-  const prices = points.map((point) => point.price);
+  const prices = points.map((point) => point.chartValue);
   const min = Math.min(...prices);
   const max = Math.max(...prices);
   const range = max - min || 1;
   return points
     .map((point, index) => {
       const x = (index / (points.length - 1)) * width;
-      const y = height - ((point.price - min) / range) * height;
+      const y = height - ((point.chartValue - min) / range) * height;
       return `${index === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`;
     })
     .join(' ');
@@ -92,29 +92,38 @@ function sparklinePath(points: AdaptiveProductCard['sparklinePoints'], width = 1
 function PriceHistorySparkline({ card }: Readonly<{ card: AdaptiveProductCard }>) {
   const path = sparklinePath(card.sparklinePoints);
   const latest = card.sparklinePoints.at(-1);
+  const chainStoreLabels = [...new Set(card.sparklinePoints.map((point) => `${point.chainLabel} · ${point.storeLabel}`))].slice(0, 2);
 
   return (
-    <div className="mt-3 rounded-2xl border border-slate-200 bg-white p-3">
+    <div className="mt-3 rounded-2xl border border-slate-200 bg-white p-3" data-product-row-price-history-sparkline="true">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-[0.65rem] font-black uppercase tracking-[0.18em] text-slate-500">7-day price history</p>
-        <p className="text-xs font-bold text-slate-700">{latest?.priceLabel ?? 'No line yet'}</p>
+        <p className="text-[0.65rem] font-black uppercase tracking-[0.18em] text-slate-500">7-day price history · unit view</p>
+        <p className="text-xs font-bold text-slate-700">{latest?.chartValueLabel ?? 'No line yet'}</p>
       </div>
       {path ? (
         <svg
-          aria-label={`${card.name} 7-day price history sparkline`}
+          aria-label={`${card.name} 7-day unit price history sparkline by chain and store`}
           className="mt-2 h-11 w-full overflow-visible motion-reduce:transition-none"
           data-chart-motion="static"
           preserveAspectRatio="none"
           role="img"
           viewBox="0 0 160 44"
         >
-          <title>{`${card.name} 7-day price history`}</title>
+          <title>{`${card.name} 7-day unit price history by chain and store`}</title>
           <path d="M 0 44 L 160 44" fill="none" stroke="#e2e8f0" strokeWidth="1" vectorEffect="non-scaling-stroke" />
           <path d={path} fill="none" stroke="#059669" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" vectorEffect="non-scaling-stroke" />
         </svg>
       ) : (
         <p className="mt-2 rounded-xl bg-slate-50 p-2 text-xs font-semibold text-slate-600">Needs at least two observed price-history points.</p>
       )}
+      {latest ? (
+        <p className="mt-2 rounded-xl bg-emerald-50 p-2 text-xs font-bold text-emerald-950">
+          Latest observed row: {latest.chainLabel} · {latest.storeLabel} · {latest.sourceType} · pack {latest.priceLabel}
+        </p>
+      ) : null}
+      {chainStoreLabels.length > 0 ? (
+        <p className="mt-2 text-xs font-semibold text-slate-600">Series: {chainStoreLabels.join(' / ')}</p>
+      ) : null}
       <p className="mt-2 text-xs font-semibold text-slate-600">{card.sparklineLabel}</p>
     </div>
   );

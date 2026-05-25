@@ -129,6 +129,14 @@ function latestVolatilityBandLabel(series: PriceChartTerminalSeries) {
   return `${band.lower.toLocaleString('sv-SE')}–${band.upper.toLocaleString('sv-SE')}`;
 }
 
+function seriesUnitHistoryLabel(series: PriceChartTerminalSeries) {
+  const first = series.points[0];
+  const latest = series.points.at(-1);
+  if (!first || !latest) return 'No observed unit-price history yet';
+  const direction = latest.value < first.value ? 'below' : latest.value > first.value ? 'above' : 'equal to';
+  return `${latest.value.toLocaleString('sv-SE')} latest observed unit price is ${direction} ${first.value.toLocaleString('sv-SE')} first observed point`;
+}
+
 export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTerminalModel }>) {
   const [activeWindowLabel, setActiveWindowLabel] = useState(chart.defaultWindow);
   const [chartLoadError, setChartLoadError] = useState<string | null>(null);
@@ -383,9 +391,12 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
               </div>
             ) : null}
             {activeWindow.series.map((series) => (
-              <div className="rounded-2xl border border-white/10 bg-white/10 p-4" key={series.id}>
+              <div className="rounded-2xl border border-white/10 bg-white/10 p-4" data-chain-store-unit-price-history={series.id} key={series.id}>
                 <p className="text-sm font-black text-white">{series.storeName} · {series.sourceType}</p>
                 <p className="mt-1 text-xs font-semibold text-slate-300">lineStyle {series.lineStyle} · {series.points.length} points · {series.markers.length} markers</p>
+                <p className="mt-2 text-xs font-bold text-cyan-100">
+                  Chain/store unit-price history: {seriesUnitHistoryLabel(series)}.
+                </p>
                 <p className="mt-2 text-xs font-bold text-emerald-100">
                   Expected band: {latestVolatilityBandLabel(series)} around latest observed price.
                 </p>
