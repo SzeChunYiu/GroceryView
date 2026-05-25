@@ -436,6 +436,40 @@ export default function SavingsDashboardPage() {
             <p className="mt-1 text-sm font-semibold text-slate-600">after planned basket</p>
           </div>
         </div>
+        <div className="mt-4 grid gap-3 lg:grid-cols-[1fr_1fr]">
+          <div className="rounded-2xl border border-indigo-200 bg-white p-5">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-indigo-800">{elderlyFixedIncomeBudgetTracker.essentialStaplesBasket.title}</p>
+            <p className="mt-2 text-4xl font-black text-indigo-950">{formatSek(elderlyFixedIncomeBudgetTracker.essentialStaplesBasket.cost)}</p>
+            <p className="mt-2 text-lg font-black text-slate-950">
+              {formatSek(elderlyFixedIncomeBudgetTracker.essentialStaplesBasket.remainingMonthlyBudgetAfterStaples)} left after essentials
+            </p>
+            <div className="mt-4 grid gap-2">
+              {elderlyFixedIncomeBudgetTracker.essentialStaplesBasket.rows.map((row) => (
+                <Link className="rounded-2xl bg-indigo-50 p-4 text-left hover:bg-indigo-100" href={`/products/${row.id}`} key={row.id}>
+                  <span className="block text-lg font-black text-slate-950">{row.name}</span>
+                  <span className="mt-1 block text-sm font-semibold text-slate-700">{row.quantity} × basket row · {row.store}</span>
+                  <span className="mt-2 block text-2xl font-black text-indigo-900">{formatSek(row.currentPrice)}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-2xl border border-emerald-200 bg-white p-5">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-emerald-800">Cheaper swaps</p>
+            <p className="mt-2 text-lg font-semibold leading-7 text-slate-700">Large-tap swap cards use only cheaper rows already present in the visible basket catalogue.</p>
+            <div className="mt-4 grid gap-3">
+              {elderlyFixedIncomeBudgetTracker.cheaperSwaps.map((swap) => (
+                <Link className="rounded-2xl bg-emerald-50 p-4 hover:bg-emerald-100" href={`/products/${swap.alternativeProductId}`} key={`${swap.productId}-${swap.alternativeProductId}`}>
+                  <span className="block text-lg font-black text-slate-950">{swap.productName}</span>
+                  <span className="mt-1 block text-sm font-semibold text-slate-700">Swap to {swap.alternativeName}</span>
+                  <span className="mt-2 block text-2xl font-black text-emerald-900">Save {formatSek(swap.estimatedSavings)}</span>
+                </Link>
+              ))}
+              {elderlyFixedIncomeBudgetTracker.cheaperSwaps.length === 0 ? (
+                <p className="rounded-2xl bg-slate-50 p-4 text-lg font-black text-slate-700">No cheaper covered swaps in the current essential basket.</p>
+              ) : null}
+            </div>
+          </div>
+        </div>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           {elderlyFixedIncomeBudgetTracker.guardrails.map((guardrail) => (
             <div className="rounded-2xl border border-indigo-200 bg-white p-4" key={guardrail.label}>

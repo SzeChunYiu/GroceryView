@@ -4,6 +4,7 @@
 
 import { buildExpiryDealRadar, buildPriceChartSeries, buildWatchlistAlerts, calculateMealCostBreakdown, calculatePersonalGroceryInflation, compareBasketStrategies, forecastGrocerySpend, planGroceryAlertChannelDefault, planMultiWeekStockUpList, planNotifications, planPantryReplenishment, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeBudget, summarizeCategoryDealLeaders, summarizePriceHistory, summarizeStoreBasketCoverage, type BasketComparisonInput, type HouseholdSnapshot, type PantryDeal, type PantryInventoryItem, type PriceChartObservation, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
 import { parseVerifiedProductQuantity, pricedProducts, type VerifiedQuantityMetadata } from './openprices-products';
+import { suggestCheaperBasketAlternatives } from './meal-budgets';
 
 export const products = [
   {
@@ -3168,6 +3169,35 @@ export const elderlyFixedIncomeBudgetInput = {
   receiptTotalsThisMonth: [612.4, 548.2, 391.8, 228.5]
 };
 
+const elderlyEssentialStapleSlugs = [
+  'arla-milk-1l',
+  'skogaholm-rostbrod-500g',
+  'zoegas-coffee-450g',
+  'garant-havregryn-1kg',
+  'garant-svensk-potatis-2kg',
+  'grumme-handdisk-original-500ml'
+];
+
+const elderlyWeeklyBasketBudgetItems = weeklyBasket.map((row) => {
+  const product = products.find((candidate) => candidate.slug === row.slug);
+  const category = product ? (categoryByTopDeal.get(product.ticker) ?? 'Staples') : 'Staples';
+  return {
+    id: row.slug,
+    name: product?.name ?? row.slug,
+    category,
+    currentPrice: parseSekAmount(row.total),
+    quantity: row.qty,
+    store: product?.store ?? 'Visible basket source',
+    confidence: product?.confidence ?? 'medium',
+    observedAt: product?.observedAt ?? 'latest visible basket row'
+  };
+});
+
+const elderlyEssentialStaplesBasketRows = elderlyWeeklyBasketBudgetItems.filter((row) => elderlyEssentialStapleSlugs.includes(row.id));
+const elderlyCheaperSwapRows = suggestCheaperBasketAlternatives(elderlyEssentialStaplesBasketRows, elderlyWeeklyBasketBudgetItems).slice(0, 3);
+const elderlyEssentialStaplesBasketCost = Math.round(elderlyEssentialStaplesBasketRows.reduce((sum, row) => sum + row.currentPrice, 0) * 100) / 100;
+const elderlyFixedIncomeBudgetSummary = summarizeBudget(elderlyFixedIncomeBudgetInput);
+
 export const elderlyFixedIncomeBudgetTracker = {
   persona: 'Elderly / seniors',
   title: 'Fixed-income monthly budget',
@@ -3176,7 +3206,14 @@ export const elderlyFixedIncomeBudgetTracker = {
     amount: elderlyFixedIncomeBudgetInput.monthlyBudget,
     cadence: 'monthly fixed-income plan'
   },
-  summary: summarizeBudget(elderlyFixedIncomeBudgetInput),
+  summary: elderlyFixedIncomeBudgetSummary,
+  essentialStaplesBasket: {
+    title: 'Essential staples basket',
+    cost: elderlyEssentialStaplesBasketCost,
+    remainingMonthlyBudgetAfterStaples: Math.round((elderlyFixedIncomeBudgetSummary.monthlyRemainingActual - elderlyEssentialStaplesBasketCost) * 100) / 100,
+    rows: elderlyEssentialStaplesBasketRows
+  },
+  cheaperSwaps: elderlyCheaperSwapRows,
   guardrails: [
     { label: 'Staples first', action: 'Reserve milk, oats, coffee, and pharmacy-adjacent household basics before discretionary deals.' },
     { label: 'No estimate padding', action: 'Only scanned receipts and the visible planned basket count toward the monthly envelope.' },
@@ -3184,7 +3221,7 @@ export const elderlyFixedIncomeBudgetTracker = {
   ],
   coverage: {
     confidence: 'medium',
-    caveat: 'Fixed-income budget uses visible receipts and planned basket totals; cash purchases without receipts are not estimated.'
+    caveat: 'Fixed-income budget uses visible receipts, observed weekly basket rows, and product confidence labels; cash purchases without receipts are not estimated.'
   }
 };
 
