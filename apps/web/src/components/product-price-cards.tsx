@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import { LazyItemCard } from './LazyItemCard';
+import { FreshnessBadge } from './confidence-badge';
 import { FavouriteProductToggle } from './favourite-product-toggle';
 import { readStoredSafetyPreferences, SAFETY_PREFERENCES_CHANGED_EVENT, type ProductSafetyPreferences } from './cert-filter';
 import { volatilityBadgeMethodology } from '@/lib/price-intelligence';
@@ -48,6 +49,10 @@ function secondaryLabel(card: AdaptiveProductCard, compareMode: CompareMode) {
     ? card.totalPriceLabel
     : card.unitPriceLabel;
   return `${alternatePrice} · ${card.packageLabel}`;
+}
+
+function latestCardObservedAt(card: AdaptiveProductCard) {
+  return card.sparklinePoints.at(-1)?.date ?? card.priceDropAnchorDate ?? null;
 }
 
 function safetyWarnings(card: AdaptiveProductCard, preferences: ProductSafetyPreferences) {
@@ -313,6 +318,9 @@ export function ProductPriceCards({
             <p className="mt-1 text-sm font-semibold text-slate-700">{secondaryLabel(card, compareMode)}</p>
             <SearchExplanationBadges badges={(card as ProductCardWithSearchExplanations).searchExplanationBadges} />
             <p className="mt-3 text-sm leading-6 text-slate-600">{card.sourceLabel}</p>
+            <div className="mt-2 flex flex-wrap gap-2" data-product-card-freshness>
+              <FreshnessBadge context={`${card.name} listing freshness`} observedAt={latestCardObservedAt(card)} />
+            </div>
             <FriendPriceSightingsPanel card={card} />
             <SafetyWarningBanner card={card} preferences={safetyPreferences} />
             <PriceHistorySparkline card={card} />

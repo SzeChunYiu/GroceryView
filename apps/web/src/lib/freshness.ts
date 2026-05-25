@@ -8,6 +8,8 @@ export interface PriceFreshness {
   isStale: boolean;
 }
 
+export type FreshnessBadgeTone = "neutral" | "positive" | "warning" | "critical";
+
 export interface StoreReliabilityScore {
   feedFreshness: PriceFreshness;
   priceObservationCount: number;
@@ -101,6 +103,17 @@ export function getPriceFreshness(
     refreshHint: "Recently refreshed price.",
     isStale: false,
   };
+}
+
+export function freshnessBadgeTone(level: FreshnessLevel): FreshnessBadgeTone {
+  if (level === "fresh") return "positive";
+  if (level === "aging") return "warning";
+  if (level === "stale") return "critical";
+  return "neutral";
+}
+
+export function freshnessBadgeAriaLabel(freshness: PriceFreshness, context = "Price freshness"): string {
+  return `${context}: ${freshness.label}. ${freshness.refreshHint}`;
 }
 
 export function getStoreReliabilityScore({
