@@ -168,6 +168,66 @@ export const sourceFreshnessSlaSummary = {
   breachedSourceCount: sourceFreshnessSlaDashboard.filter((source) => source.status === 'breached').length,
 };
 
+export type IngestionPipelineHealthStatus = 'healthy' | 'watch' | 'failing';
+
+export type IngestionPipelineHealthRow = {
+  connectorName: string;
+  chain: string;
+  rowCount: number;
+  successRatePct: number;
+  freshnessLabel: string;
+  lastSuccessfulIngestAt: string;
+  recentFailureCount: number;
+  recentFailureSummary: string;
+  status: IngestionPipelineHealthStatus;
+};
+
+const recentFailureProfiles: Record<string, { recentFailureCount: number; recentFailureSummary: string }> = {
+  'ICA store-scoped promotions': {
+    recentFailureCount: 2,
+    recentFailureSummary: '2 store endpoints skipped with empty promotion payloads',
+  },
+  'Sweden store directory': {
+    recentFailureCount: 1,
+    recentFailureSummary: 'Overpass throttling review paused the next directory run',
+  },
+};
+
+function pipelineHealthStatus(source: SourceFreshnessSlaRow, recentFailureCount: number): IngestionPipelineHealthStatus {
+  if (source.status === 'breached' || recentFailureCount >= 3) return 'failing';
+  if (source.status === 'watch' || recentFailureCount > 0) return 'watch';
+  return 'healthy';
+}
+
+export const ingestionPipelineHealthRows: IngestionPipelineHealthRow[] = sourceFreshnessSlaDashboard.map((source) => {
+  const failures = recentFailureProfiles[source.sourceName] ?? {
+    recentFailureCount: 0,
+    recentFailureSummary: source.failureStatus,
+  };
+  const status = pipelineHealthStatus(source, failures.recentFailureCount);
+  const successRatePenalty = failures.recentFailureCount * 4 + (source.status === 'breached' ? 12 : source.status === 'watch' ? 4 : 0);
+
+  return {
+    connectorName: source.sourceName,
+    chain: source.chain,
+    rowCount: source.rowCount,
+    successRatePct: Math.max(80, 100 - successRatePenalty),
+    freshnessLabel: `${source.ingestLagHours}h / ${source.expectedRefreshHours}h SLA`,
+    lastSuccessfulIngestAt: source.lastSuccessfulIngestAt,
+    recentFailureCount: failures.recentFailureCount,
+    recentFailureSummary: failures.recentFailureSummary,
+    status,
+  };
+});
+
+export const ingestionPipelineHealthSummary = {
+  monitoredAt: sourceFreshnessSlaMonitoredAt,
+  connectorCount: ingestionPipelineHealthRows.length,
+  healthyCount: ingestionPipelineHealthRows.filter((row) => row.status === 'healthy').length,
+  failingCount: ingestionPipelineHealthRows.filter((row) => row.status === 'failing').length,
+  totalRows: ingestionPipelineHealthRows.reduce((total, row) => total + row.rowCount, 0),
+};
+
 export type SourceManagementAction = {
   id: string;
   sourceName: string;

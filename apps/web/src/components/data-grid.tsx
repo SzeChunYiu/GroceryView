@@ -2,6 +2,14 @@ import type { ComponentPropsWithoutRef } from 'react';
 
 export const dataGridRowStripingClass = '[&_tbody_tr:nth-child(even)]:bg-slate-50 [&_[role=row]:nth-child(even)]:bg-slate-50';
 export const dataGridActionClass = 'rounded-full border border-slate-300 px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-slate-700';
+export type DataGridStatusTone = 'healthy' | 'watch' | 'failing' | 'neutral';
+
+export function dataGridStatusClass(tone: DataGridStatusTone) {
+  if (tone === 'healthy') return 'bg-emerald-100 text-emerald-900';
+  if (tone === 'watch') return 'bg-amber-100 text-amber-950';
+  if (tone === 'failing') return 'bg-rose-100 text-rose-900';
+  return 'bg-slate-100 text-slate-700';
+}
 
 type DataGridProps = ComponentPropsWithoutRef<'div'> & {
   striped?: boolean;

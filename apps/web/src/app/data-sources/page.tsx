@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceFreshnessStatusBadge, SourceManagementActionsPanel } from '@/components/data-ui';
-import { DataGrid, dataGridActionClass } from '@/components/data-grid';
+import { DataGrid, dataGridActionClass, dataGridStatusClass } from '@/components/data-grid';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { buildDuplicateReviewRows, type ProductRecord } from '@/lib/deduplicate-products';
 import { buildUnitNormalizationQaReport } from '@/lib/normalization';
@@ -24,7 +24,15 @@ import {
   timescaleDbEvaluation
 } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
-import { partnerOnboardingIntake, sourceFreshnessSlaDashboard, sourceFreshnessSlaSummary, sourceManagementActions, sourceManagementSummary } from '@/lib/source-health';
+import {
+  ingestionPipelineHealthRows,
+  ingestionPipelineHealthSummary,
+  partnerOnboardingIntake,
+  sourceFreshnessSlaDashboard,
+  sourceFreshnessSlaSummary,
+  sourceManagementActions,
+  sourceManagementSummary
+} from '@/lib/source-health';
 
 const unitNormalizationQaReport = buildUnitNormalizationQaReport([
   ...axfoodProducts.map((product) => ({
@@ -88,6 +96,63 @@ export default function DataSourcesPage() {
         <Metric label="Source groups" value={sourceCoverage.length.toLocaleString('sv-SE')} />
         <Metric label="Brand ledgers" value={storeBrandLedger.length.toLocaleString('sv-SE')} />
       </div>
+
+      <Card className="mt-6 border-indigo-200 bg-indigo-50/70">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-indigo-800">Ingestion pipeline health</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Connector success, rows, freshness, and failures</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Operators can scan each connector's success rate, current row volume, freshness SLA, and recent failure notes before stale source data reaches shoppers.
+            </p>
+          </div>
+          <div className="grid gap-2 rounded-2xl bg-white p-3 text-sm font-black text-indigo-950 shadow-sm">
+            <p>{ingestionPipelineHealthSummary.healthyCount.toLocaleString('sv-SE')} healthy connectors</p>
+            <p>{ingestionPipelineHealthSummary.failingCount.toLocaleString('sv-SE')} failing</p>
+            <p>{ingestionPipelineHealthSummary.totalRows.toLocaleString('sv-SE')} rows monitored</p>
+          </div>
+        </div>
+        <DataGrid className="mt-5 overflow-x-auto bg-white" dense>
+          <table>
+            <thead>
+              <tr className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">
+                <th>Connector</th>
+                <th>Success</th>
+                <th>Rows</th>
+                <th>Freshness</th>
+                <th>Recent failures</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody className="text-sm font-semibold text-slate-700">
+              {ingestionPipelineHealthRows.map((row) => (
+                <tr key={row.connectorName}>
+                  <td>
+                    <p className="font-black text-slate-950">{row.connectorName}</p>
+                    <p className="text-xs text-slate-500">{row.chain}</p>
+                  </td>
+                  <td>{row.successRatePct}%</td>
+                  <td>{row.rowCount.toLocaleString('sv-SE')}</td>
+                  <td>
+                    <p>{row.freshnessLabel}</p>
+                    <p className="text-xs text-slate-500">last success {row.lastSuccessfulIngestAt}</p>
+                  </td>
+                  <td>
+                    <p className="font-black text-slate-950">{row.recentFailureCount.toLocaleString('sv-SE')}</p>
+                    <p className="text-xs text-slate-500">{row.recentFailureSummary}</p>
+                  </td>
+                  <td>
+                    <span className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.14em] ${dataGridStatusClass(row.status)}`}>
+                      {row.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </DataGrid>
+        <p className="mt-3 text-xs font-bold text-indigo-950">Monitored {ingestionPipelineHealthSummary.monitoredAt}.</p>
+      </Card>
 
       <Card className="mt-6 border-cyan-200 bg-cyan-50/70">
         <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
