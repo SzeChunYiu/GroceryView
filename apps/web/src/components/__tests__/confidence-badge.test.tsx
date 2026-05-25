@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict';
-import { afterEach, test } from 'node:test';
-import { cleanup, render, screen } from '@testing-library/react';
+import { test } from 'node:test';
+import { setupComponentTestDom } from '@/test/component-test-dom';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ConfidenceBadge } from '../confidence-badge';
 
-afterEach(() => cleanup());
+setupComponentTestDom();
 
 test('ConfidenceBadge disables the action and does not fire it when empty data is shown', async () => {
   let actionCount = 0;

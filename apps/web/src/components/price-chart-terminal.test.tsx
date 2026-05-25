@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
-import { afterEach, test } from 'node:test';
-import { cleanup, render, screen } from '@testing-library/react';
+import { test } from 'node:test';
+import { setupComponentTestDom } from '@/test/component-test-dom';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PriceChartTerminal, type PriceChartTerminalModel } from './price-chart-terminal';
 
@@ -27,14 +28,14 @@ function activeElementLabel() {
   return document.activeElement?.textContent?.replace(/\s+/g, ' ').trim() ?? '';
 }
 
-afterEach(() => cleanup());
+setupComponentTestDom();
 
 test('PriceChartTerminal exposes a logical tab and shift-tab order for every timeframe control', async () => {
   render(<PriceChartTerminal chart={chart} />);
   const user = userEvent.setup();
 
   for (const label of ['1W', '1M', '3M', '1Y', 'ALL']) {
-    assert.ok(screen.getByRole('button', { name: label }), `${label} timeframe button is reachable by role`);
+    assert.ok(screen.getByRole('button', { name: new RegExp(`Show ${label} range price chart window`) }), `${label} timeframe button is reachable by role`);
   }
 
   const forwardOrder: string[] = [];

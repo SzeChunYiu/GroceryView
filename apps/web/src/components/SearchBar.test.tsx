@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { afterEach, test } from 'node:test';
-import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import { setupComponentTestDom } from '@/test/component-test-dom';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SearchBar } from './SearchBar';
 import { recentSearchHistoryStorageKey } from '@/lib/personalization';
@@ -12,8 +13,9 @@ function seedRecentSearches() {
   ]));
 }
 
+setupComponentTestDom();
+
 afterEach(() => {
-  cleanup();
   window.localStorage.clear();
 });
 
