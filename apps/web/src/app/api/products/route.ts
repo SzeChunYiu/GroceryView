@@ -2,6 +2,7 @@ import { createPgQueryExecutor, searchProductsByText, type ProductSearchResult }
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { recordProductSearchPerformanceTelemetry, type ProductSearchPerformanceTelemetry } from '@/lib/analytics';
+import { publicApiReadCacheControl } from '@/lib/cache-policy';
 import { fuzzyProductSearchQueries, rankFuzzyProductResults } from '@/lib/search-fuzzy';
 import { searchExplanationBadgesForProduct } from '@/lib/search-filters';
 import { buildMisspelledQueryRecovery, expandGrocerySearchQueryWithTelemetry, type GrocerySearchExpansion, type GrocerySearchExpansionTelemetry } from '@/lib/search-suggest';
@@ -11,6 +12,10 @@ export const dynamic = 'force-dynamic';
 
 void fuzzyProductSearchQueries;
 void rankFuzzyProductResults;
+
+const publicApiReadHeaders = {
+  'Cache-Control': publicApiReadCacheControl
+};
 
 type PgPoolLike = {
   query(text: string, values: unknown[]): Promise<{ rows: unknown[] }>;
@@ -168,7 +173,7 @@ export async function GET(request: Request) {
   if (query.length < 2) {
     const telemetry = buildPerformanceTelemetry(query, 0, startedAt, expansionTelemetry);
     logPerformanceTelemetry(telemetry);
-    return NextResponse.json(responsePayload(query, [], expansion, telemetry));
+    return NextResponse.json(responsePayload(query, [], expansion, telemetry), { headers: publicApiReadHeaders });
   }
 
   const databaseUrl = process.env.DATABASE_URL;
@@ -187,7 +192,7 @@ export async function GET(request: Request) {
     const results = mergeSearchResults(batches);
     const telemetry = buildPerformanceTelemetry(query, results.length, startedAt, expansionTelemetry);
     logPerformanceTelemetry(telemetry);
-    return NextResponse.json(responsePayload(query, withSearchExplanationBadges(query, results, expansion), expansion, telemetry));
+    return NextResponse.json(responsePayload(query, withSearchExplanationBadges(query, results, expansion), expansion, telemetry), { headers: publicApiReadHeaders });
   } catch (error) {
     const telemetry = buildPerformanceTelemetry(query, 0, startedAt, expansionTelemetry, isTimeoutError(error));
     console.error('Product search query failed', error instanceof Error ? { name: error.name } : { name: 'unknown' });

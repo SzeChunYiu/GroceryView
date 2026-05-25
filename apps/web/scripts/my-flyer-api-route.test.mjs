@@ -251,7 +251,7 @@ describe('my-flyer API payload', () => {
     assert.match(route, /algorithm: z\.enum\(myFlyerAlgorithms\)\.default\('watchlist_first'\)/);
     assert.match(route, /country: z\.enum\(myFlyerCountries\)\.default\('se'\)/);
     assert.match(route, /limit: z\.coerce\.number\(\)\.int\(\)\.min\(1\)\.max\(50\)\.default\(12\)/);
-    assert.match(route, /'Cache-Control': 'private, max-age=3600'/);
+    assert.match(route, /'Cache-Control': privateAccountCacheControl/);
     assert.match(route, /'X-MyFlyer-Cache'/);
   });
 
