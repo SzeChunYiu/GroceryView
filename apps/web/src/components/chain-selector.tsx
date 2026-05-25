@@ -3,15 +3,20 @@ import Link from 'next/link';
 export type ChainSelectorOption = {
   id: string;
   label: string;
+  value?: string;
   description?: string;
   href?: string;
   selected?: boolean;
+  disabled?: boolean;
 };
 
 type ChainSelectorProps = {
   label: string;
   description?: string;
   options: ChainSelectorOption[];
+  name?: string;
+  interactive?: boolean;
+  selectionMode?: 'single' | 'multiple';
   className?: string;
 };
 
@@ -19,15 +24,16 @@ function toId(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'chain-selector';
 }
 
-export function ChainSelector({ label, description, options, className = '' }: ChainSelectorProps) {
+export function ChainSelector({ label, description, options, name, interactive = false, selectionMode = 'multiple', className = '' }: ChainSelectorProps) {
   const selectorId = toId(label);
   const descriptionId = description ? `${selectorId}-description` : undefined;
+  const inputType = selectionMode === 'single' ? 'radio' : 'checkbox';
 
   return (
     <section className={className} aria-labelledby={`${selectorId}-label`} aria-describedby={descriptionId}>
       <p id={`${selectorId}-label`} className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{label}</p>
       {description ? <p id={descriptionId} className="mt-1 text-xs font-semibold leading-5 text-slate-600">{description}</p> : null}
-      <div className="mt-3 flex flex-wrap gap-2" role="listbox" aria-label={label} aria-multiselectable="true">
+      <div className="mt-3 flex flex-wrap gap-2" role="listbox" aria-label={label} aria-multiselectable={selectionMode === 'multiple' ? 'true' : 'false'}>
         {options.map((option) => {
           const content = (
             <>
@@ -50,6 +56,23 @@ export function ChainSelector({ label, description, options, className = '' }: C
             >
               {content}
             </Link>
+          ) : interactive ? (
+            <label
+              aria-selected={option.selected ? 'true' : 'false'}
+              className={`${classes} inline-flex cursor-pointer items-center gap-2`}
+              key={option.id}
+              role="option"
+            >
+              <input
+                className="h-4 w-4 accent-emerald-800"
+                defaultChecked={option.selected}
+                disabled={option.disabled}
+                name={name ?? selectorId}
+                type={inputType}
+                value={option.value ?? option.id}
+              />
+              {content}
+            </label>
           ) : (
             <span
               aria-selected={option.selected ? 'true' : 'false'}

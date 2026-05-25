@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useMemo, useState, useTransition } from 'react';
 import { compareBasketStrategies, summarizeStoreBasketCoverage } from '@groceryview/core';
 import { buildSmartBasketSubstituteSuggestions } from '@/lib/recurring-basket';
-import { suggestCheaperBasketAlternatives, summarizeWeeklyBudgetProgress } from '@/lib/meal-budgets';
+import { suggestCheaperBasketAlternatives, summarizeWeeklyBudgetProgress, summarizeWeeklyGroceryBudgetTracker } from '@/lib/meal-budgets';
 
 export type BasketCalculatorPriceRow = {
   chainId: string;
@@ -81,10 +81,21 @@ export function BasketCalculator({ products, sourceLabel, weeklyBudgetSek }: Rea
 
   const comparison = useMemo(() => compareBasketStrategies(basketInput), [basketInput]);
   const coverage = useMemo(() => summarizeStoreBasketCoverage(basketInput), [basketInput]);
+  const plannedCatalogCost = useMemo(() => products.reduce((sum, product) => {
+    const price = cheapestProductPrice(product);
+    return Number.isFinite(price) ? sum + price : sum;
+  }, 0), [products]);
   const weeklyBudgetProgress = useMemo(() => summarizeWeeklyBudgetProgress({
     plannedTotal: comparison.cheapestByProduct.total,
     weeklyBudget
   }), [comparison.cheapestByProduct.total, weeklyBudget]);
+  const weeklyGroceryBudgetTracker = useMemo(() => summarizeWeeklyGroceryBudgetTracker({
+    plannedBasketCost: plannedCatalogCost,
+    actualCheckedItemsCost: comparison.cheapestByProduct.total,
+    weeklyAllowance: weeklyBudget,
+    plannedItemCount: products.length,
+    checkedItemCount: selectedProducts.length
+  }), [comparison.cheapestByProduct.total, plannedCatalogCost, products.length, selectedProducts.length, weeklyBudget]);
   const budgetAlternatives = useMemo(() => suggestCheaperBasketAlternatives(
     selectedProducts.map((product) => ({
       id: product.id,
@@ -231,7 +242,7 @@ export function BasketCalculator({ products, sourceLabel, weeklyBudgetSek }: Rea
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="text-xs font-black uppercase tracking-[0.22em] text-amber-800">Weekly budget progress</p>
-              <h3 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Planned split basket vs. weekly budget</h3>
+              <h3 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Planned basket, checked items, and weekly allowance</h3>
             </div>
             <label className="text-sm font-black text-amber-950">
               Budget
@@ -245,22 +256,37 @@ export function BasketCalculator({ products, sourceLabel, weeklyBudgetSek }: Rea
               />
             </label>
           </div>
-          <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <p className="text-sm font-black uppercase tracking-[0.18em] text-amber-800">Planned total</p>
-              <p className="mt-1 text-4xl font-black text-slate-950">{formatSek(weeklyBudgetProgress.plannedTotal)}</p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-3">
+            <div className="rounded-2xl bg-white/80 p-3">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-800">Planned basket</p>
+              <p className="mt-1 text-2xl font-black text-slate-950">{formatSek(weeklyGroceryBudgetTracker.plannedBasketCost)}</p>
+              <p className="mt-1 text-xs font-bold text-slate-600">{weeklyGroceryBudgetTracker.plannedItemCount ?? products.length} catalogue items</p>
             </div>
-            <p className={`rounded-full px-3 py-1 text-sm font-black ${weeklyBudgetProgress.status === 'over' ? 'bg-rose-100 text-rose-900' : weeklyBudgetProgress.status === 'near' ? 'bg-amber-100 text-amber-950' : 'bg-emerald-100 text-emerald-950'}`}>
-              {weeklyBudgetProgress.status === 'over' ? `${formatSek(Math.abs(weeklyBudgetProgress.remaining))} over` : `${formatSek(weeklyBudgetProgress.remaining)} left`}
-            </p>
+            <div className="rounded-2xl bg-white/80 p-3">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-800">Actual checked items</p>
+              <p className="mt-1 text-2xl font-black text-slate-950">{formatSek(weeklyGroceryBudgetTracker.actualCheckedItemsCost)}</p>
+              <p className="mt-1 text-xs font-bold text-slate-600">{weeklyGroceryBudgetTracker.checkedItemCount ?? selectedProducts.length} checked</p>
+            </div>
+            <div className="rounded-2xl bg-white/80 p-3">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-800">Remaining allowance</p>
+              <p className={`mt-1 text-2xl font-black ${weeklyGroceryBudgetTracker.remainingWeeklyAllowance < 0 ? 'text-rose-800' : 'text-emerald-800'}`}>
+                {formatSek(weeklyGroceryBudgetTracker.remainingWeeklyAllowance)}
+              </p>
+              <p className="mt-1 text-xs font-bold text-slate-600">after checked items</p>
+            </div>
           </div>
           <div className="mt-4 h-3 overflow-hidden rounded-full bg-white">
             <div
-              className={`h-full rounded-full ${weeklyBudgetProgress.status === 'over' ? 'bg-rose-600' : weeklyBudgetProgress.status === 'near' ? 'bg-amber-500' : 'bg-emerald-600'}`}
-              style={{ width: `${Math.min(100, weeklyBudgetProgress.percentUsed)}%` }}
+              className={`h-full rounded-full ${weeklyGroceryBudgetTracker.status === 'over' ? 'bg-rose-600' : weeklyGroceryBudgetTracker.status === 'near' ? 'bg-amber-500' : 'bg-emerald-600'}`}
+              style={{ width: `${Math.min(100, weeklyGroceryBudgetTracker.checkedSpendPercent)}%` }}
             />
           </div>
-          <p className="mt-3 text-sm font-semibold leading-6 text-amber-950">{weeklyBudgetProgress.warning}</p>
+          <p className="mt-3 text-sm font-semibold leading-6 text-amber-950">
+            {weeklyGroceryBudgetTracker.warning} Full-plan cushion: {formatSek(weeklyGroceryBudgetTracker.plannedRemainingAllowance)}.
+          </p>
+          <p className="mt-2 rounded-2xl bg-white/70 p-3 text-sm font-semibold text-amber-950">
+            Split-basket planned total is {formatSek(weeklyBudgetProgress.plannedTotal)}; {weeklyBudgetProgress.status === 'over' ? `${formatSek(Math.abs(weeklyBudgetProgress.remaining))} over` : `${formatSek(weeklyBudgetProgress.remaining)} left`} against the editable budget.
+          </p>
           <div className="mt-4 space-y-2">
             {budgetAlternatives.length > 0 ? budgetAlternatives.map((alternative) => (
               <Link

@@ -589,7 +589,23 @@ export type ProductSearchUrlParams = {
   maxPrice?: SearchParamValue;
   inStockOnly?: SearchParamValue;
   minConfidence?: SearchParamValue;
+  sort?: SearchParamValue;
 };
+
+export type ProductSearchSortOption = 'relevance' | 'unit_price_asc' | 'confidence_desc' | 'newest_observation' | 'nearest_store';
+
+export const productSearchSortOptions: Array<{ value: ProductSearchSortOption; label: string; description: string }> = [
+  { value: 'relevance', label: 'Relevance', description: 'Keep the verified search relevance and price order.' },
+  { value: 'unit_price_asc', label: 'Lowest unit price', description: 'Prioritize the cheapest comparable kr/kg, kr/l, or each price.' },
+  { value: 'confidence_desc', label: 'Highest confidence', description: 'Prioritize rows with the strongest price observation confidence.' },
+  { value: 'newest_observation', label: 'Newest observation', description: 'Prioritize recently observed prices.' },
+  { value: 'nearest_store', label: 'Nearest store', description: 'Use location-aware store ranking when location is available.' }
+];
+
+function productSearchSortValue(value: SearchParamValue): ProductSearchSortOption {
+  const requested = firstSearchValue(value);
+  return productSearchSortOptions.some((option) => option.value === requested) ? requested as ProductSearchSortOption : 'relevance';
+}
 
 function firstSearchValue(value: SearchParamValue): string {
   const raw = Array.isArray(value) ? value[0] : value;
@@ -671,9 +687,22 @@ function booleanSearchValue(value: SearchParamValue): boolean {
   return ['1', 'true', 'yes', 'on'].includes(firstSearchValue(value).toLocaleLowerCase('sv-SE'));
 }
 
-function productSearchResultCards(searchResult: typeof rawFacetedProductSearch) {
-  return searchResult.products.map((product) => {
+function nearestStoreRankFor(product: (typeof rawFacetedProductSearch.products)[number]) {
+  const nearestChainOrder = ['willys', 'hemköp', 'ica', 'coop', 'lidl'];
+  const ranks = product.currentPrices.map((price) => {
+    const chain = price.chainSlug.toLocaleLowerCase('sv-SE');
+    const chainRank = nearestChainOrder.findIndex((candidate) => chain.includes(candidate));
+    return chainRank === -1 ? nearestChainOrder.length : chainRank;
+  });
+  return ranks.length ? Math.min(...ranks) : Number.MAX_SAFE_INTEGER;
+}
+
+function productSearchResultCards(searchResult: typeof rawFacetedProductSearch, sort: ProductSearchSortOption = 'relevance') {
+  const cards = searchResult.products.map((product, relevanceIndex) => {
     const cheapest = product.currentPrices[0] ?? null;
+    const lowestUnitPrice = product.currentPrices.reduce((lowest, price) => Math.min(lowest, price.unitPrice), Number.POSITIVE_INFINITY);
+    const highestConfidence = product.currentPrices.reduce((highest, price) => Math.max(highest, price.confidence), 0);
+    const newestObservedAt = product.currentPrices.reduce((newest, price) => price.observedAt > newest ? price.observedAt : newest, '');
     const volatilityBadge = classifyRecentPriceVariance(product.currentPrices);
     return {
       slug: product.slug,
@@ -697,8 +726,21 @@ function productSearchResultCards(searchResult: typeof rawFacetedProductSearch) 
         product.brand,
         product.categoryPath.join(' '),
         product.labels.join(' ')
-      ])
+      ]),
+      sortConfidence: highestConfidence,
+      sortNearestStoreRank: nearestStoreRankFor(product),
+      sortNewestObservedAt: newestObservedAt,
+      sortRelevanceIndex: relevanceIndex,
+      sortUnitPrice: Number.isFinite(lowestUnitPrice) ? lowestUnitPrice : Number.MAX_SAFE_INTEGER
     };
+  });
+
+  return cards.sort((left, right) => {
+    if (sort === 'unit_price_asc' && left.sortUnitPrice !== right.sortUnitPrice) return left.sortUnitPrice - right.sortUnitPrice;
+    if (sort === 'confidence_desc' && left.sortConfidence !== right.sortConfidence) return right.sortConfidence - left.sortConfidence;
+    if (sort === 'newest_observation' && left.sortNewestObservedAt !== right.sortNewestObservedAt) return right.sortNewestObservedAt.localeCompare(left.sortNewestObservedAt);
+    if (sort === 'nearest_store' && left.sortNearestStoreRank !== right.sortNearestStoreRank) return left.sortNearestStoreRank - right.sortNearestStoreRank;
+    return left.sortRelevanceIndex - right.sortRelevanceIndex;
   });
 }
 
@@ -714,6 +756,7 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
   const maxPrice = numericSearchValue(searchParams.maxPrice);
   const inStockOnly = booleanSearchValue(searchParams.inStockOnly);
   const minConfidence = confidenceSearchValue(searchParams.minConfidence);
+  const sort = productSearchSortValue(searchParams.sort);
   const filters = { query, categories, labels, originCountries, chains, minPrice, maxPrice, inStockOnly, minConfidence, limit: 100 };
   const searchResult = buildFacetedProductSearch({ rows: facetedSearchRows, filters });
 
@@ -730,12 +773,15 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
     minPrice !== undefined ? `min unit ${formatSek(minPrice)}` : null,
     maxPrice !== undefined ? `max unit ${formatSek(maxPrice)}` : null,
     inStockOnly ? 'priced/in-stock only' : null,
-    minConfidence !== undefined ? `confidence ≥ ${pct.format(minConfidence * 100)}%` : null
+    minConfidence !== undefined ? `confidence ≥ ${pct.format(minConfidence * 100)}%` : null,
+    sort !== 'relevance' ? `sort=${productSearchSortOptions.find((option) => option.value === sort)?.label ?? sort}` : null
   ].filter((item): item is string => item !== null);
 
   return {
     ...searchResult,
     title: 'Instant faceted search',
+    sort,
+    sortOptions: productSearchSortOptions,
     categoryFacets: searchResult.facets.categories.slice(0, 6),
     chainFacets: searchResult.facets.chains,
     labelFacets: searchResult.facets.labels.map((facet) => ({ ...facet, label: readableLabel(facet.value) })).slice(0, 8),
@@ -767,7 +813,7 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
       outOfStockLatestPriceCount: searchResult.evidence.outOfStockLatestPriceCount
     },
     activeFilters,
-    resultCards: productSearchResultCards(searchResult)
+    resultCards: productSearchResultCards(searchResult, sort)
   };
 }
 
@@ -4617,6 +4663,37 @@ export const sourceDiscrepancyReportOptions = [
   { id: 'wrong_unit', label: 'Wrong unit', reviewerHint: 'Check package text, normalized unit, and unit-price conversion.' },
   { id: 'missing_image', label: 'Missing image', reviewerHint: 'Confirm the source image URL is absent or broken before requesting a refresh.' },
   { id: 'unavailable_product', label: 'Unavailable product', reviewerHint: 'Verify store availability or stale catalogue rows before hiding the item.' }
+] as const;
+
+export const storeProductStockFreshnessExamples = [
+  {
+    productId: 'demo-live-stock',
+    storeId: 'willys',
+    availability: 'live',
+    observedAt: '2026-05-25T08:00:00.000Z',
+    source: 'retailer store feed'
+  },
+  {
+    productId: 'demo-stale-stock',
+    storeId: 'hemkop',
+    availability: 'stale',
+    observedAt: '2026-05-12T08:00:00.000Z',
+    source: 'retailer store feed'
+  },
+  {
+    productId: 'demo-inferred-stock',
+    storeId: 'willys',
+    availability: 'inferred',
+    observedAt: null,
+    source: 'priced row without stock field'
+  },
+  {
+    productId: 'demo-unavailable-stock',
+    storeId: 'hemkop',
+    availability: 'unavailable',
+    observedAt: '2026-05-25T08:00:00.000Z',
+    source: 'retailer store feed'
+  }
 ] as const;
 
 export const sourceDiscrepancyReviewContract = {
