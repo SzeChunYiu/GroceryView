@@ -1,4 +1,4 @@
-import palette from './color-vision-palette.json';
+import palette from './color-vision-palette.tokens.json';
 
 export type PriceState = keyof typeof palette.price;
 export type ConfidenceState = keyof typeof palette.confidence;
