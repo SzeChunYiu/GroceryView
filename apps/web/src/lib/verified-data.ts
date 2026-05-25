@@ -4317,3 +4317,114 @@ export function chainPriceRows(product: (typeof axfoodProducts)[number]) {
 
   return rows.filter((row): row is (typeof rows)[number] & { price: number } => typeof row.price === 'number' && Number.isFinite(row.price));
 }
+
+export type CountryCoverageCode = 'SE' | 'NO' | 'IS';
+
+export type PerCountryCoverageSource = {
+  chain: string;
+  connector: string;
+  source: string;
+  rows: number;
+  coverage: string;
+  freshness: string;
+  caveat: string;
+};
+
+export type PerCountryCoverage = {
+  country: CountryCoverageCode;
+  label: string;
+  currency: string;
+  status: 'active' | 'blocked_no_verified_connectors';
+  sources: PerCountryCoverageSource[];
+  guardrails: string[];
+};
+
+export function perCountryCoverage(country: string): PerCountryCoverage | null {
+  const normalized = country.trim().toUpperCase();
+  if (normalized === 'SE') {
+    return {
+      country: 'SE',
+      label: 'Sweden',
+      currency: 'SEK',
+      status: 'active',
+      sources: [
+        {
+          chain: 'Willys / Hemköp',
+          connector: 'Axfood chain price snapshot',
+          source: snapshot.axfoodSource,
+          rows: axfoodProducts.length,
+          coverage: `${matchedChainProducts.length} Willys/Hemköp cross-chain matches`,
+          freshness: snapshot.retrievedLabel,
+          caveat: 'Chain-wide online catalogue prices; not per-branch shelf prices.'
+        },
+        {
+          chain: 'ICA',
+          connector: 'ICA store-scoped promotions',
+          source: snapshot.icaStorePromotionsSource,
+          rows: icaStorePromotionEvidence.storeScopedRows,
+          coverage: `${icaStorePromotionEvidence.storeEndpointCount.toLocaleString('sv-SE')} store endpoints including ${icaStorePromotionEvidence.latestStore?.storeName ?? 'latest store not reported'}`,
+          freshness: icaStorePromotionEvidence.latestStore?.retrievedAt ?? 'Not reported',
+          caveat: 'Store-scoped promotion listing rows; no branch shelf-price, inventory, or checkout-total claim.'
+        },
+        {
+          chain: 'OpenPrices community observations',
+          connector: 'OpenPrices SEK observations',
+          source: snapshot.openPricesSource,
+          rows: pricedProducts.length,
+          coverage: `${new Set(pricedProducts.map((product) => product.code)).size} EAN-coded products`,
+          freshness: freshestOpenPrices[0]?.lastObservedAt ?? 'Not reported',
+          caveat: 'Community observations; every row shows observation count and latest date.'
+        },
+        {
+          chain: 'OpenFoodFacts Sweden catalog',
+          connector: 'OpenFoodFacts metadata catalog',
+          source: snapshot.openFoodFactsCatalogSource,
+          rows: openFoodFactsCatalog.length,
+          coverage: `${openFoodFactsCatalogSummary.brands.toLocaleString('sv-SE')} brands · ${openFoodFactsCatalogSummary.categories.toLocaleString('sv-SE')} category tags`,
+          freshness: openFoodFactsCatalogSummary.latestRetrieved || 'Not reported',
+          caveat: 'Metadata-only product catalog; GroceryView prices are not inferred from these rows.'
+        },
+        {
+          chain: 'OKQ8 fuel',
+          connector: 'OKQ8 fuel operator prices',
+          source: verifiedFuelPriceSource.sourceUrl,
+          rows: verifiedFuelPriceObservations.length,
+          coverage: `${new Set(verifiedFuelPriceObservations.map((row) => row.grade)).size} fuel grades`,
+          freshness: verifiedFuelPriceObservations.map((row) => row.effectiveFrom).sort().at(-1) ?? 'Not reported',
+          caveat: verifiedFuelPriceSource.caveat
+        },
+        {
+          chain: 'Sweden store directory',
+          connector: 'OpenStreetMap store directory',
+          source: snapshot.osmSource,
+          rows: osmStores.length,
+          coverage: `${new Set(osmStores.map((store) => store.brand)).size} brands across Sweden`,
+          freshness: osmStores[0]?.retrievedDate ?? 'Not reported',
+          caveat: 'Location data only; prices are not inferred from store locations.'
+        }
+      ],
+      guardrails: [
+        'Only sources present in the generated verified-data snapshot are listed.',
+        'Country pages do not invent connector names for markets without active verified rows.',
+        'Per-branch price, stock, or checkout claims remain blocked unless the source caveat explicitly allows them.'
+      ]
+    };
+  }
+
+  if (normalized === 'NO' || normalized === 'IS') {
+    return {
+      country: normalized as 'NO' | 'IS',
+      label: normalized === 'NO' ? 'Norway' : 'Iceland',
+      currency: normalized === 'NO' ? 'NOK' : 'ISK',
+      status: 'blocked_no_verified_connectors',
+      sources: [],
+      guardrails: [
+        `${normalized} has no active country-scoped chain connector rows in the current verified-data snapshot.`,
+        'No source names, chain coverage, prices, or freshness claims are fabricated for this country page.',
+        'Add connector-backed rows to verified-data before enabling shopper-facing country source claims.'
+      ]
+    };
+  }
+
+  return null;
+}
