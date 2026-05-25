@@ -39,6 +39,64 @@ const categories: PharmacyProductCategory[] = ['otc', 'supplement', 'beauty'];
 const sourceHostnames = apohemSource.sourceUrls.map((sourceUrl) => new URL(sourceUrl).hostname);
 const uniqueSourceHostnames = [...new Set(sourceHostnames)];
 
+type ActiveIngredientRule = {
+  ingredient: 'paracetamol' | 'ibuprofen';
+  brandedBrands: string[];
+  genericName: string;
+};
+
+type GenericSavingsMatch = {
+  ingredient: string;
+  branded: ApohemIngestedProduct;
+  generic: ApohemIngestedProduct;
+  averageBrandedPrice: number;
+  averageGenericPrice: number;
+  averageSavings: number;
+};
+
+const activeIngredientRules: ActiveIngredientRule[] = [
+  { ingredient: 'paracetamol', brandedBrands: ['Alvedon', 'Panodil'], genericName: 'paracetamol' },
+  { ingredient: 'ibuprofen', brandedBrands: ['Ipren'], genericName: 'ibuprofen' }
+];
+
+function productText(product: ApohemIngestedProduct) {
+  return `${product.name} ${product.brand}`.toLocaleLowerCase('sv-SE');
+}
+
+function hasActiveIngredient(product: ApohemIngestedProduct, ingredient: ActiveIngredientRule['ingredient']) {
+  return product.category === 'otc' && productText(product).includes(ingredient);
+}
+
+function isBrandedMedication(product: ApohemIngestedProduct, rule: ActiveIngredientRule) {
+  return rule.brandedBrands.some((brand) => product.brand.toLocaleLowerCase('sv-SE') === brand.toLocaleLowerCase('sv-SE'));
+}
+
+function averagePrice(rows: ApohemIngestedProduct[]) {
+  if (rows.length === 0) return 0;
+  return Math.round((rows.reduce((sum, row) => sum + row.price, 0) / rows.length) * 100) / 100;
+}
+
+function genericSavingsMatches() {
+  return activeIngredientRules.flatMap<GenericSavingsMatch>((rule) => {
+    const ingredientRows = apohemProducts.filter((product) => hasActiveIngredient(product, rule.ingredient));
+    const brandedRows = ingredientRows.filter((product) => isBrandedMedication(product, rule));
+    const genericRows = ingredientRows.filter((product) => !isBrandedMedication(product, rule));
+    if (brandedRows.length === 0 || genericRows.length === 0) return [];
+
+    const averageBrandedPrice = averagePrice(brandedRows);
+    const averageGenericPrice = averagePrice(genericRows);
+    const averageSavings = Math.max(0, Math.round((averageBrandedPrice - averageGenericPrice) * 100) / 100);
+
+    return rule.brandedBrands.flatMap((brand) => {
+      const branded = brandedRows.find((product) => product.brand === brand);
+      const generic = genericRows.find((product) => productText(product).includes(rule.genericName));
+      return branded && generic ? [{ ingredient: rule.ingredient, branded, generic, averageBrandedPrice, averageGenericPrice, averageSavings }] : [];
+    });
+  });
+}
+
+const genericSavings = genericSavingsMatches();
+
 function countBy<T extends string>(rows: readonly ApohemIngestedProduct[], key: (row: ApohemIngestedProduct) => T) {
   return rows.reduce<Record<T, number>>((counts, row) => {
     counts[key(row)] = (counts[key(row)] ?? 0) + 1;
@@ -125,6 +183,39 @@ export default function PharmacyPage() {
         OTC, supplement, and beauty rows are shown as public catalog evidence only. Prescription medicine, medical advice,
         stock availability claims, and cheapest-pharmacy claims stay excluded from this surface.
       </section>
+
+      {genericSavings.length > 0 ? (
+        <Card className="border-emerald-200 bg-emerald-50">
+          <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+            <div>
+              <Eyebrow>Generic medicine comparison</Eyebrow>
+              <h2 className="mt-2 text-2xl font-black text-emerald-950">Branded OTC rows linked to same-ingredient generics</h2>
+              <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-emerald-950">
+                Matches are grouped only when the public product title names the same active ingredient. Average savings compare branded rows with generic rows in the same active-ingredient group; this is price evidence, not medical advice.
+              </p>
+            </div>
+            <p className="rounded-2xl bg-white p-4 text-center text-sm font-black text-emerald-950 shadow-sm">
+              {genericSavings.length} branded OTC matches
+            </p>
+          </div>
+          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {genericSavings.map((match) => (
+              <div className="rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm" key={`${match.branded.ean}-${match.generic.ean}`}>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{match.ingredient}</p>
+                <h3 className="mt-2 text-lg font-black text-slate-950">{match.branded.name}</h3>
+                <p className="mt-1 text-sm font-semibold text-slate-600">Branded: {match.branded.brand} · {match.branded.priceText}</p>
+                <a className="mt-3 block rounded-xl border border-emerald-100 bg-emerald-50 p-3 text-sm font-bold text-emerald-950 hover:border-emerald-700" href={match.generic.productUrl}>
+                  Generic match: {match.generic.name} · {match.generic.priceText}
+                </a>
+                <p className="mt-3 text-sm font-black text-emerald-950">
+                  Avg savings {formatSek(match.averageSavings)} ({formatSek(match.averageBrandedPrice)} branded avg vs {formatSek(match.averageGenericPrice)} generic avg)
+                </p>
+                <p className="mt-2 text-xs font-semibold text-slate-600">Linked via active ingredient in title; compare dosage and package count before purchase.</p>
+              </div>
+            ))}
+          </div>
+        </Card>
+      ) : null}
 
       <Card className="border-indigo-200 bg-indigo-50">
         <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
