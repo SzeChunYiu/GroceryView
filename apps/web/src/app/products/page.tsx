@@ -8,6 +8,7 @@ import { ProductSortSelect } from '@/components/product-sort-select';
 import { ProductPriceCards } from '@/components/product-price-cards';
 import { NewArrivalsCarousel } from '@/components/TrendingCarousel';
 import { SavedSearchAction } from '@/components/saved-search-action';
+import { MissingProductRequestForm } from '@/components/SearchBar';
 import { VirtualizedProductGrid } from '@/components/LazyItemCard';
 import { apohemSource } from '@/lib/ingested/apohem';
 import { newProductArrivals } from '@/lib/new-arrivals';
@@ -15,6 +16,7 @@ import { buildSavedSearchSubscription } from '@/lib/alert-scheduler';
 import { adaptiveProductCards, buildProductSearchView, withProductSearchExplanationBadges, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
 import { publicCatalogueRevalidateSeconds, routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
+import { buildMissingProductRequest, missingProductRequestMailto } from '@/lib/missing-product-requests';
 import { buildRemovableSearchFilterChips } from '@/lib/search-filters';
 import { buildSearchFilterPreset } from '@/lib/search-presets';
 
@@ -40,6 +42,11 @@ type SearchParams = {
   brand?: string | string[];
   sort?: string | string[];
   page?: string | string[];
+  requestMissingProduct?: string | string[];
+  missingQuery?: string | string[];
+  barcode?: string | string[];
+  preferredStore?: string | string[];
+  shopperEmail?: string | string[];
 };
 
 function toPageNumber(value: string | string[] | undefined): number {
@@ -148,6 +155,14 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const zeroResultFallback = relatedSearchFallback(search.query);
   const zeroResultCategories = zeroResultCategoryShortcuts(search.query, resolvedSearchParams.category);
   const savedSearchSubscription = buildSavedSearchSubscription({ searchParams: resolvedSearchParams, path: '/products' });
+  const missingProductRequest = resolvedSearchParams.requestMissingProduct
+    ? buildMissingProductRequest({
+      missingQuery: Array.isArray(resolvedSearchParams.missingQuery) ? resolvedSearchParams.missingQuery[0] ?? search.query : resolvedSearchParams.missingQuery ?? search.query,
+      barcode: Array.isArray(resolvedSearchParams.barcode) ? resolvedSearchParams.barcode[0] : resolvedSearchParams.barcode,
+      preferredStore: Array.isArray(resolvedSearchParams.preferredStore) ? resolvedSearchParams.preferredStore[0] : resolvedSearchParams.preferredStore,
+      shopperEmail: Array.isArray(resolvedSearchParams.shopperEmail) ? resolvedSearchParams.shopperEmail[0] : resolvedSearchParams.shopperEmail
+    })
+    : null;
   const activeFilterChips = buildRemovableSearchFilterChips(resolvedSearchParams, {
     basePath: '/products',
     labels: {
@@ -284,6 +299,12 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
                 </div>
               </div>
             </div>
+            <MissingProductRequestForm query={search.query} />
+            {missingProductRequest ? (
+              <p className="mt-3 text-sm font-bold text-amber-950">
+                Request captured locally. <a className="underline" href={missingProductRequestMailto(missingProductRequest)}>Send to catalogue team</a> for follow-up.
+              </p>
+            ) : null}
           </div>
         ) : null}
         <div className="mt-5 grid gap-3 lg:grid-cols-4">

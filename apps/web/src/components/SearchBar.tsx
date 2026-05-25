@@ -602,3 +602,30 @@ export function RecentSearchReplayPills() {
     </section>
   );
 }
+
+export function MissingProductRequestForm({ query }: Readonly<{ query: string }>) {
+  return (
+    <form action="/products" className="mt-4 grid gap-3 rounded-2xl border border-amber-200 bg-white p-4" data-missing-product-request="true" method="get">
+      <input name="requestMissingProduct" type="hidden" value="1" />
+      <label className="text-sm font-black text-slate-950">
+        Missing query
+        <input className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold" defaultValue={query} name="missingQuery" />
+      </label>
+      <div className="grid gap-3 md:grid-cols-3">
+        <label className="text-sm font-black text-slate-950">
+          Barcode (optional)
+          <input className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold" inputMode="numeric" name="barcode" />
+        </label>
+        <label className="text-sm font-black text-slate-950">
+          Preferred store (optional)
+          <input className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold" name="preferredStore" placeholder="Willys, ICA, Coop..." />
+        </label>
+        <label className="text-sm font-black text-slate-950">
+          Email for follow-up (optional)
+          <input className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold" name="shopperEmail" type="email" />
+        </label>
+      </div>
+      <button className="rounded-full bg-amber-700 px-4 py-2 text-sm font-black text-white" type="submit">Capture missing product request</button>
+    </form>
+  );
+}
