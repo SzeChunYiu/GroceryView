@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceFreshnessStatusBadge } from '@/components/data-ui';
-import { DataGrid, dataGridActionClass } from '@/components/data-grid';
+import { DataGrid, DataGridProductCell, dataGridActionClass } from '@/components/data-grid';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { buildDuplicateReviewRows, type ProductRecord } from '@/lib/deduplicate-products';
 import { buildUnitNormalizationQaReport } from '@/lib/normalization';
@@ -41,13 +41,20 @@ const unitNormalizationQaReport = buildUnitNormalizationQaReport([
   }))
 ]);
 
+function axfoodSourceUrl(product: (typeof axfoodProducts)[number]) {
+  return Object.values(product.chains).find((chain) => chain.url)?.url || `/products/${product.slug}`;
+}
+
 const duplicateReviewProducts: ProductRecord[] = [
   ...axfoodProducts.slice(0, 120).map((product) => ({
     id: `axfood:${product.code}`,
     name: product.name,
     brand: product.brand,
     category: product.category,
+    imageUrl: product.image,
+    sourceUrl: axfoodSourceUrl(product),
     size: product.subline,
+    unitLabel: product.subline,
     upc: product.code
   })),
   ...pricedProducts.slice(0, 120).map((product) => ({
@@ -55,7 +62,10 @@ const duplicateReviewProducts: ProductRecord[] = [
     name: product.name,
     brand: product.brands,
     category: product.category,
+    imageUrl: product.image,
+    sourceUrl: `https://world.openfoodfacts.org/product/${product.code}`,
     size: product.quantity,
+    unitLabel: product.quantity || 'OpenPrices unit not reported',
     upc: product.code
   }))
 ];
@@ -170,12 +180,22 @@ export default function DataSourcesPage() {
               {duplicateReviewRows.map((candidate) => (
                 <tr key={candidate.id}>
                   <td>
-                    <p className="font-black text-slate-950">{candidate.source.name}</p>
-                    <p className="text-xs text-slate-500">{candidate.source.brand || 'Unknown brand'} · {candidate.source.size || 'size missing'}</p>
+                    <DataGridProductCell
+                      brand={candidate.source.brand}
+                      imageUrl={candidate.source.imageUrl}
+                      name={candidate.source.name}
+                      sourceUrl={candidate.source.sourceUrl}
+                      unitLabel={candidate.source.unitLabel || candidate.source.size}
+                    />
                   </td>
                   <td>
-                    <p className="font-black text-slate-950">{candidate.match.name}</p>
-                    <p className="text-xs text-slate-500">{candidate.match.brand || 'Unknown brand'} · {candidate.match.size || 'size missing'}</p>
+                    <DataGridProductCell
+                      brand={candidate.match.brand}
+                      imageUrl={candidate.match.imageUrl}
+                      name={candidate.match.name}
+                      sourceUrl={candidate.match.sourceUrl}
+                      unitLabel={candidate.match.unitLabel || candidate.match.size}
+                    />
                   </td>
                   <td>
                     <p className="font-black text-sky-900">{Math.round(candidate.confidence * 100)}%</p>
