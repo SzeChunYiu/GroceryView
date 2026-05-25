@@ -2,6 +2,7 @@
 
 import type { ShoppingListItem } from '@/hooks/useList';
 import { useHaptic } from '@/hooks/useHaptic';
+import { cheapestSourceForProductSlug } from '@/lib/shopping-list-prices';
 
 type CheckableListItemProps = {
   item: ShoppingListItem;
@@ -10,6 +11,7 @@ type CheckableListItemProps = {
 
 export function CheckableListItem({ item, onToggle }: Readonly<CheckableListItemProps>) {
   const { selection } = useHaptic();
+  const cheapestSource = cheapestSourceForProductSlug(item.matchedProductSlug);
 
   function toggleItem() {
     if (!item.checked) selection();
@@ -47,9 +49,20 @@ export function CheckableListItem({ item, onToggle }: Readonly<CheckableListItem
         </span>
       </label>
       {item.matchedProductSlug ? (
-        <p className="mt-3 rounded-xl bg-sky-50 px-3 py-2 text-xs font-black text-sky-900">
-          Matched catalog product: {item.matchedProductName ?? item.matchedProductSlug} · matchedProductSlug: {item.matchedProductSlug}
-        </p>
+        <div className="mt-3 space-y-2">
+          <p className="rounded-xl bg-sky-50 px-3 py-2 text-xs font-black text-sky-900">
+            Matched catalog product: {item.matchedProductName ?? item.matchedProductSlug} · matchedProductSlug: {item.matchedProductSlug}
+          </p>
+          {cheapestSource ? (
+            <p className="rounded-xl bg-emerald-50 px-3 py-2 text-xs font-black text-emerald-950">
+              Cheapest source: {cheapestSource.chainLabel} · {cheapestSource.priceLabel} · spread {cheapestSource.spreadPercent.toFixed(1)}%
+            </p>
+          ) : (
+            <p className="rounded-xl bg-amber-50 px-3 py-2 text-xs font-black text-amber-950">
+              Cheapest source unavailable until a verified latest price row exists for this item.
+            </p>
+          )}
+        </div>
       ) : null}
     </li>
   );

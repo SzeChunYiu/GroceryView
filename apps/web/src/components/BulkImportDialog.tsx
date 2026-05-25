@@ -34,6 +34,19 @@ export const productCatalogMatches: ProductCatalogMatch[] = [
     productName: 'Svensk Honung',
     productSlug: 'svensk-honung-101550069-st'
   },
+
+  {
+    category: 'pantry',
+    keywords: ['salt', 'salt med jod', 'jozo'],
+    productName: 'Salt med Jod Extra Fint',
+    productSlug: 'salt-med-jod-extra-fint-100454982-st'
+  },
+  {
+    category: 'pantry',
+    keywords: ['sugar', 'socker', 'dansukker'],
+    productName: 'Socker',
+    productSlug: 'socker-101325504-st'
+  },
   {
     category: 'coffee',
     keywords: ['coffee', 'kaffe', 'bryggkaffe'],
