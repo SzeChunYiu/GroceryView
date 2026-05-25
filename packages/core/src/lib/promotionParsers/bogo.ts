@@ -30,7 +30,7 @@ export function parseBogoPromotion(text: string): BogoPromotion | null {
     return buy && free ? { kind: 'bogo', buy, free } : null;
   }
 
-  const forPriceMatch = normalized.match(/\b(\d+)\s*(?:f[öo]r|/|-)\s*(\d+)\b/i);
+  const forPriceMatch = normalized.match(/\b(\d+)\s*(?:f[öo]r|\/|-)\s*(\d+)\b/i);
   if (forPriceMatch) {
     const total = toPositiveInt(forPriceMatch[1]);
     const paid = toPositiveInt(forPriceMatch[2]);
