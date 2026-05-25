@@ -251,6 +251,10 @@ export const routeMetadataCatalog = {
     title: 'Sweden grocery store directory | GroceryView',
     description: 'Browse verified Swedish grocery store locations, brands, formats, and source coverage from OpenStreetMap.'
   },
+  '/stores/ica': {
+    title: 'ICA store locator map | GroceryView',
+    description: 'Browse verified ICA and Maxi ICA OpenStreetMap locations with a visual locator map, synced store list, and clear no-price-inference guardrails.'
+  },
   '/unit-price-alerts': {
     title: 'Unit-price spread alerts | GroceryView',
     description: 'Spot wide unit-price spreads and cheapest-per-unit opportunities across matched chain products.'
