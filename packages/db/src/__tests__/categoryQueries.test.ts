@@ -12,6 +12,7 @@ describe('category tree queries', () => {
     assert.deepEqual(query.values, []);
     assert.match(query.sql, /from products/i);
     assert.match(query.sql, /generate_subscripts\(products\.category_path, 1\)/i);
+    assert.match(query.sql, /products\.deleted_at is null/i);
     assert.match(query.sql, /count\(distinct product_id\)::int as item_count/i);
     assert.match(query.sql, /parent_id/i);
     assert.match(query.sql, /order by depth, parent_id nulls first, name/i);

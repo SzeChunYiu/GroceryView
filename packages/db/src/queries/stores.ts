@@ -3,6 +3,8 @@ export type StoreAssortmentOverviewQuery = {
   values: [storeSlug: string, limit: number];
 };
 
+import { ACTIVE_PRODUCTS_PREDICATE } from './items.js';
+
 export type StoreAssortmentOverviewQueryOptions = {
   limit?: number;
 };
@@ -128,6 +130,7 @@ export function buildStoreAssortmentOverviewQuery(
           where stores.slug = $1
             and latest_prices.domain = 'grocery'
             and coalesce(latest_prices.is_available, true) = true
+            and ${ACTIVE_PRODUCTS_PREDICATE}
           order by category_label asc, products.canonical_name asc
           limit $2`,
     values: [storeSlug, clampLimit(options.limit)]

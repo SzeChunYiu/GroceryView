@@ -14,6 +14,7 @@ describe('store assortment overview queries', () => {
     assert.match(query.sql, /from stores/);
     assert.match(query.sql, /join latest_prices on latest_prices\.store_id = stores\.id/);
     assert.match(query.sql, /join products on products\.id = latest_prices\.product_id/);
+    assert.match(query.sql, /products\.deleted_at is null/);
     assert.match(query.sql, /stores\.opening_hours/);
     assert.match(query.sql, /order by category_label asc, products\.canonical_name asc/);
   });

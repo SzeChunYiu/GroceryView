@@ -1,3 +1,5 @@
+import { ACTIVE_PRODUCTS_PREDICATE } from './items.js';
+
 export type ProductSearchQueryOptions = {
   limit?: number;
 };
@@ -98,6 +100,7 @@ export function buildProductSearchQuery(query: string, options: ProductSearchQue
             from products
             cross join query
            where products.domain = 'grocery'
+             and ${ACTIVE_PRODUCTS_PREDICATE}
              and (
                ${searchVector} @@ query.search_query
                or ${normalizedSearchDocument} like '%' || query.fuzzy_query || '%'
@@ -138,6 +141,7 @@ export function buildProductSuggestQuery(query: string, options: ProductSuggestQ
             from products
             cross join query
            where products.domain = 'grocery'
+             and ${ACTIVE_PRODUCTS_PREDICATE}
              and (
                products.canonical_name ilike query.raw_prefix || '%'
                or coalesce(products.name_sv, '') ilike query.raw_prefix || '%'

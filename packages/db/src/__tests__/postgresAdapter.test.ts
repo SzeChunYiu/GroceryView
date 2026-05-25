@@ -1174,6 +1174,7 @@ describe('createPostgresCatalogReader', () => {
 
     assert.match(executor.calls[0]!.sql, /from products/);
     assert.match(executor.calls[0]!.sql, /where slug = \$1/);
+    assert.match(executor.calls[0]!.sql, /products\.deleted_at is null/);
     assert.deepEqual(executor.calls[0]!.params, ['bryggkaffe-450g']);
   });
 
@@ -1212,6 +1213,7 @@ describe('createPostgresCatalogReader', () => {
     assert.match(executor.calls[0]!.sql, /cross join \(select nullif\(trim\(\$1::text\), ''\) as term\) as query/);
     assert.match(executor.calls[0]!.sql, /products\.barcode = query\.term/);
     assert.match(executor.calls[0]!.sql, /products\.canonical_name % query\.term/);
+    assert.match(executor.calls[0]!.sql, /products\.deleted_at is null/);
     assert.match(executor.calls[0]!.sql, /aliases\.normalized_alias % lower\(query\.term\)/);
     assert.match(executor.calls[0]!.sql, /category_path @> \$2::text\[\]/);
     assert.match(executor.calls[0]!.sql, /when products\.barcode = query\.term then 0/);
@@ -1386,6 +1388,7 @@ describe('createPostgresCatalogReader', () => {
     assert.match(executor.calls[0]!.sql, /left join latest_prices on latest_prices\.product_id = products\.id/);
     assert.match(executor.calls[0]!.sql, /left join chains on chains\.id = latest_prices\.chain_id/);
     assert.match(executor.calls[0]!.sql, /left join stores on stores\.id = latest_prices\.store_id/);
+    assert.match(executor.calls[0]!.sql, /products\.deleted_at is null/);
     assert.match(executor.calls[0]!.sql, /array_agg\(distinct replace\(chains\.slug, '-', '_'\)\)/);
     assert.match(executor.calls[0]!.sql, /array_agg\(distinct latest_prices\.price_type\)/);
     assert.match(executor.calls[0]!.sql, /latest_prices\.price_type/);
@@ -2127,6 +2130,7 @@ describe('createPostgresSiteSnapshotReader', () => {
     assert.match(executor.calls[0]!.sql, /latest_prices\.is_available/);
     assert.match(executor.calls[0]!.sql, /observations\.is_available/);
     assert.match(executor.calls[0]!.sql, /join products on products\.id = latest_prices\.product_id/);
+    assert.match(executor.calls[0]!.sql, /products\.deleted_at is null/);
     assert.match(executor.calls[0]!.sql, /join chains on chains\.id = latest_prices\.chain_id/);
     assert.match(executor.calls[0]!.sql, /left join stores on stores\.id = latest_prices\.store_id/);
     assert.match(executor.calls[0]!.sql, /latest_prices\.confidence >= \$1/);
@@ -2174,6 +2178,7 @@ describe('createPostgresWeeklyPriceDropDigestReader', () => {
     assert.match(executor.calls[0]!.sql, /weekly_price_drop_digest/);
     assert.match(executor.calls[0]!.sql, /from latest_prices/);
     assert.match(executor.calls[0]!.sql, /join products on products\.id = latest_prices\.product_id/);
+    assert.match(executor.calls[0]!.sql, /products\.deleted_at is null/);
     assert.match(executor.calls[0]!.sql, /left join stores on stores\.id = latest_prices\.store_id/);
     assert.match(executor.calls[0]!.sql, /latest_prices\.domain = 'grocery'/);
     assert.match(executor.calls[0]!.sql, /latest_prices\.observed_at >= \$1::timestamptz/);
@@ -2329,6 +2334,7 @@ describe('createPostgresTrendingPriceChangeReader', () => {
     assert.match(executor.calls[0]!.sql, /from observations/);
     assert.match(executor.calls[0]!.sql, /lag\(observations\.price\) over/);
     assert.match(executor.calls[0]!.sql, /observations\.domain = 'grocery'/);
+    assert.match(executor.calls[0]!.sql, /products\.deleted_at is null/);
     assert.match(executor.calls[0]!.sql, /observations\.observed_at >= \(\$1::timestamptz - interval '31 days'\)/);
     assert.match(executor.calls[0]!.sql, /observed_at >= \$1::timestamptz/);
     assert.match(executor.calls[0]!.sql, /limit \$3/);

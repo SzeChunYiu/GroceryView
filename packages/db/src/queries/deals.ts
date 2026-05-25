@@ -1,3 +1,5 @@
+import { ACTIVE_PRODUCTS_PREDICATE } from './items.js';
+
 export type RollingAverageDealQuery = {
   sql: string;
   values: [asOf: string, category: string | null];
@@ -113,6 +115,7 @@ export function buildRollingAverageDealsQuery(asOf: string, category?: string): 
             join stores on stores.id = current_prices.store_id
             join chains on chains.id = current_prices.chain_id
            where current_prices.price < rolling_averages.rolling_average_price
+             and ${ACTIVE_PRODUCTS_PREDICATE}
              and ($2::text is null or exists (select 1 from unnest(products.category_path) category where lower(category) = lower($2::text)))
            order by discount_percentage desc, products.canonical_name asc, stores.name asc`,
     values: [asOf, category?.trim() ? category.trim() : null]

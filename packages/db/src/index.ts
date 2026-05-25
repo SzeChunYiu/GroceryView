@@ -1,10 +1,12 @@
 import { buildUserAccountDeletionQueries } from './queries/users.js';
 import { contentHashForPayload } from './content-hash.js';
+import { ACTIVE_PRODUCTS_PREDICATE } from './queries/items.js';
 
 export * from './client.js';
 export * from './queries/categories.js';
 export * from './queries/deals.js';
 export * from './queries/favorites.js';
+export * from './queries/items.js';
 export * from './queries/personalized.js';
 export * from './queries/productSearch.js';
 export * from './queries/stores.js';
@@ -3165,6 +3167,7 @@ async function upsertOpenPricesProduct(executor: QueryExecutor, product: OpenPri
        package_size = excluded.package_size,
        package_unit = excluded.package_unit,
        comparable_unit = excluded.comparable_unit,
+       deleted_at = null,
        updated_at = now()
      returning id`,
     [
@@ -3321,7 +3324,8 @@ export function createPostgresCatalogReader(executor: QueryExecutor): PostgresCa
                 created_at,
                 updated_at
          from products
-         where slug = $1`,
+         where slug = $1
+           and ${ACTIVE_PRODUCTS_PREDICATE}`,
         [slug]
       );
       const row = rows[0];
@@ -3351,7 +3355,8 @@ export function createPostgresCatalogReader(executor: QueryExecutor): PostgresCa
                 updated_at
          from products
          cross join (select nullif(trim($1::text), '') as term) as query
-         where (
+         where ${ACTIVE_PRODUCTS_PREDICATE}
+           and (
              query.term is null
              or products.barcode = query.term
              or products.canonical_name ilike '%' || query.term || '%'
@@ -3503,6 +3508,7 @@ export function createPostgresCatalogReader(executor: QueryExecutor): PostgresCa
          left join latest_prices on latest_prices.product_id = products.id
          left join chains on chains.id = latest_prices.chain_id
          left join stores on stores.id = latest_prices.store_id
+         where ${ACTIVE_PRODUCTS_PREDICATE}
          group by products.id, products.category_path
          order by products.id
          limit $1`,
@@ -4683,6 +4689,7 @@ export function createPostgresSiteSnapshotReader(executor: QueryExecutor): Postg
          left join stores on stores.id = latest_prices.store_id
          where latest_prices.confidence >= $1
            and latest_prices.domain = 'grocery'
+           and ${ACTIVE_PRODUCTS_PREDICATE}
          order by latest_prices.observed_at desc, products.slug, chains.slug, stores.slug nulls last, latest_prices.price_type
          limit $2`,
         [minConfidence, limit]
@@ -4719,6 +4726,7 @@ export function createPostgresWeeklyPriceDropDigestReader(executor: QueryExecuto
          join chains on chains.id = latest_prices.chain_id
          left join stores on stores.id = latest_prices.store_id
          where latest_prices.domain = 'grocery'
+           and ${ACTIVE_PRODUCTS_PREDICATE}
            and latest_prices.observed_at >= $1::timestamptz
            and latest_prices.observed_at < $2::timestamptz
            and latest_prices.regular_price is not null
@@ -4763,6 +4771,7 @@ export function createPostgresTrendingPriceChangeReader(executor: QueryExecutor)
            join chains on chains.id = observations.chain_id
            left join stores on stores.id = observations.store_id
            where observations.domain = 'grocery'
+             and ${ACTIVE_PRODUCTS_PREDICATE}
              and observations.observed_at >= ($1::timestamptz - interval '31 days')
              and observations.observed_at < $2::timestamptz
              and observations.price >= 0
