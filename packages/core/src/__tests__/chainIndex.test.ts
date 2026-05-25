@@ -2,8 +2,17 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { calculateChainPriceIndex, type ChainPriceObservation } from '../index.js';
 
-function obs(chainId: string, category: string, unitPrice: number): ChainPriceObservation {
-  return { chainId, category, unitPrice };
+function obs(
+  chainId: string,
+  category: string,
+  unitPrice: number,
+  matchedProductId?: string,
+  basketWeight?: number
+): ChainPriceObservation {
+  const observation: ChainPriceObservation = { chainId, category, unitPrice };
+  if (matchedProductId) observation.matchedProductId = matchedProductId;
+  if (basketWeight !== undefined) observation.basketWeight = basketWeight;
+  return observation;
 }
 
 describe('calculateChainPriceIndex', () => {
@@ -74,5 +83,56 @@ describe('calculateChainPriceIndex', () => {
     assert.equal(cell.confidence, 'low');
     // Raw ratio would be ~0.09 (index ~9); shrinkage must pull it far toward 100.
     assert.ok(cell.index > 60, `shrinkage should pull a 1-obs cell toward market (got ${cell.index})`);
+  });
+
+  it('raises confidence from matched-basket products without drifting from the 100-centred scale', () => {
+    const observations: ChainPriceObservation[] = [];
+    for (let i = 0; i < 12; i += 1) {
+      const productId = `matched-product-${i}`;
+      observations.push(obs('willys', 'pantry · st', 90, productId));
+      observations.push(obs('hemkop', 'pantry · st', 110, productId));
+    }
+
+    const summary = calculateChainPriceIndex(observations);
+    const willys = summary.chains.find((chain) => chain.chainId === 'willys');
+    const hemkop = summary.chains.find((chain) => chain.chainId === 'hemkop');
+
+    assert.ok(willys && hemkop);
+    assert.equal(summary.matchedBasketProductIds.length, 12);
+    assert.equal(willys.confidence, 'high');
+    assert.equal(hemkop.confidence, 'high');
+    assert.equal(willys.matchedBasketCoveragePercent, 100);
+    assert.equal(hemkop.matchedBasketCoveragePercent, 100);
+    assert.equal(Math.round(((willys.overallIndex + hemkop.overallIndex) / 2) * 10) / 10, 100);
+  });
+
+  it('reports missing matched-basket products for partially covered chains', () => {
+    const summary = calculateChainPriceIndex([
+      obs('willys', 'dairy · st', 10, 'milk'),
+      obs('willys', 'dairy · st', 20, 'yogurt'),
+      obs('hemkop', 'dairy · st', 12, 'milk')
+    ]);
+
+    const hemkop = summary.chains.find((chain) => chain.chainId === 'hemkop');
+
+    assert.ok(hemkop);
+    assert.equal(hemkop.matchedBasketCoveragePercent, 50);
+    assert.deepEqual(hemkop.missingMatchedBasketProductIds, ['yogurt']);
+    assert.equal(hemkop.confidence, 'low');
+  });
+
+  it('weights matched-basket categories by basket exposure', () => {
+    const summary = calculateChainPriceIndex([
+      obs('willys', 'dairy · st', 90, 'milk', 10),
+      obs('hemkop', 'dairy · st', 110, 'milk', 10),
+      obs('willys', 'snacks · st', 120, 'chips', 1),
+      obs('hemkop', 'snacks · st', 80, 'chips', 1)
+    ]);
+
+    const willys = summary.chains.find((chain) => chain.chainId === 'willys');
+    const hemkop = summary.chains.find((chain) => chain.chainId === 'hemkop');
+
+    assert.ok(willys && hemkop);
+    assert.ok(willys.overallIndex < hemkop.overallIndex);
   });
 });

@@ -5099,14 +5099,16 @@ export function calculatePersonalGroceryInflation(input: PersonalInflationInput)
 //      to up/down moves),
 //   5. coverage + confidence are reported per cell and overall, and low-coverage
 //      cells are flagged `estimated` so the UI can mark modelled values honestly.
-// Matched-basket refinement (EAN / fuzzy product matching) can layer on top later
-// for the categories where it's available, raising confidence without changing
-// the scale.
+// Matched-basket refinement (EAN / fuzzy product matching) can add product ids
+// for rows where it is available, raising confidence and exposing basket
+// coverage without changing the scale.
 
 export type ChainPriceObservation = {
   chainId: string;
   category: string;
   unitPrice: number; // SEK per comparable unit (kg / l / pcs)
+  matchedProductId?: string;
+  basketWeight?: number; // optional relative spend/exposure weight for matched-basket rows
 };
 
 export type ChainCategoryIndex = {
@@ -5124,6 +5126,9 @@ export type ChainPriceIndex = {
   observations: number;
   categoriesCovered: number;
   confidence: 'high' | 'medium' | 'low';
+  matchedBasketProductIds: string[];
+  matchedBasketCoveragePercent: number;
+  missingMatchedBasketProductIds: string[];
   byCategory: ChainCategoryIndex[];
 };
 
@@ -5131,6 +5136,7 @@ export type ChainPriceIndexSummary = {
   chains: ChainPriceIndex[]; // sorted cheapest (lowest index) first
   categories: string[]; // every category present in the market
   marketReferenceByCategory: Record<string, number>;
+  matchedBasketProductIds: string[];
   generatedFrom: number; // total observations used
 };
 
@@ -5151,26 +5157,36 @@ function weightedGeometricMean(values: number[], weights: number[]): number {
   return Math.exp(logSum / weightSum);
 }
 
+function observationBasketWeight(observation: ChainPriceObservation): number {
+  return Number.isFinite(observation.basketWeight) && (observation.basketWeight ?? 0) > 0 ? observation.basketWeight! : 1;
+}
+
 export function calculateChainPriceIndex(observations: ChainPriceObservation[]): ChainPriceIndexSummary {
   const usable = observations.filter(
     (o) => Number.isFinite(o.unitPrice) && o.unitPrice > 0 && Boolean(o.chainId) && Boolean(o.category)
   );
   if (usable.length === 0) {
-    return { chains: [], categories: [], marketReferenceByCategory: {}, generatedFrom: 0 };
+    return { chains: [], categories: [], marketReferenceByCategory: {}, matchedBasketProductIds: [], generatedFrom: 0 };
   }
+
+  const matchedBasketProductIds = [...new Set(
+    usable.map((o) => o.matchedProductId?.trim()).filter((id): id is string => Boolean(id))
+  )].sort((a, b) => a.localeCompare(b));
 
   // Market reference (median unit price) + size per category, across all chains.
   const marketByCategory = new Map<string, number[]>();
+  const marketWeightByCategory = new Map<string, number>();
   for (const o of usable) {
     const arr = marketByCategory.get(o.category) ?? [];
     arr.push(o.unitPrice);
     marketByCategory.set(o.category, arr);
+    marketWeightByCategory.set(o.category, (marketWeightByCategory.get(o.category) ?? 0) + observationBasketWeight(o));
   }
   const marketReferenceByCategory: Record<string, number> = {};
   const marketCategorySize: Record<string, number> = {};
   for (const [category, prices] of marketByCategory) {
     marketReferenceByCategory[category] = median(prices);
-    marketCategorySize[category] = prices.length;
+    marketCategorySize[category] = marketWeightByCategory.get(category) ?? prices.length;
   }
   const categories = [...marketByCategory.keys()].sort((a, b) => a.localeCompare(b));
 
@@ -5194,6 +5210,15 @@ export function calculateChainPriceIndex(observations: ChainPriceObservation[]):
     const byCategory: ChainCategoryIndex[] = [];
     const ratios: number[] = [];
     const weights: number[] = [];
+    const matchedBasketProductIdsForChain = [...new Set(
+      rows.map((row) => row.matchedProductId?.trim()).filter((id): id is string => Boolean(id))
+    )].sort((a, b) => a.localeCompare(b));
+    const missingMatchedBasketProductIds = matchedBasketProductIds.filter(
+      (productId) => !matchedBasketProductIdsForChain.includes(productId)
+    );
+    const matchedBasketCoveragePercent = matchedBasketProductIds.length === 0
+      ? 0
+      : roundMoney((matchedBasketProductIdsForChain.length / matchedBasketProductIds.length) * 100);
     for (const [category, prices] of chainByCategory) {
       const reference = marketReferenceByCategory[category];
       if (!reference || reference <= 0) continue;
@@ -5218,10 +5243,12 @@ export function calculateChainPriceIndex(observations: ChainPriceObservation[]):
 
     const overall = roundMoney(weightedGeometricMean(ratios, weights) * 100) || 100;
     const totalObs = rows.length;
+    const matchedBasketConfidenceBoost = matchedBasketProductIdsForChain.length >= 12 && matchedBasketCoveragePercent >= 80;
+    const matchedBasketMediumConfidence = matchedBasketProductIdsForChain.length >= 4 && matchedBasketCoveragePercent >= 50;
     const confidence =
-      totalObs >= 30 && byCategory.length >= 4
+      matchedBasketConfidenceBoost || (totalObs >= 30 && byCategory.length >= 4)
         ? 'high'
-        : totalObs >= 10 && byCategory.length >= 2
+        : matchedBasketMediumConfidence || (totalObs >= 10 && byCategory.length >= 2)
           ? 'medium'
           : 'low';
 
@@ -5231,13 +5258,16 @@ export function calculateChainPriceIndex(observations: ChainPriceObservation[]):
       observations: totalObs,
       categoriesCovered: byCategory.length,
       confidence,
+      matchedBasketProductIds: matchedBasketProductIdsForChain,
+      matchedBasketCoveragePercent,
+      missingMatchedBasketProductIds,
       byCategory
     });
   }
 
   chains.sort((a, b) => a.overallIndex - b.overallIndex);
 
-  return { chains, categories, marketReferenceByCategory, generatedFrom: usable.length };
+  return { chains, categories, marketReferenceByCategory, matchedBasketProductIds, generatedFrom: usable.length };
 }
 export * from './lib/extractors/loosePacked.js';
 
