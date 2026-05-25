@@ -13,6 +13,8 @@ type SearchParams = Record<string, string | string[] | undefined>;
 type ReplacementDeal = {
   categoryLabel: string;
   categorySlug: string;
+  chainLabel: string;
+  chainSlug: string;
   currentPrice: number;
   dealId: string;
   imageAlt?: string;
@@ -35,6 +37,10 @@ function slugFromLabel(label: string) {
   return label.toLowerCase().replace(/å/g, 'a').replace(/ä/g, 'a').replace(/ö/g, 'o').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
+function normalizeFilterSlug(value: string | undefined) {
+  return value?.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-') || undefined;
+}
+
 function formatSek(value: number) {
   return new Intl.NumberFormat('sv-SE', {
     currency: 'SEK',
@@ -54,6 +60,8 @@ function flyerDealEndsAt(index: number) {
 const spreadDeals: ReplacementDeal[] = topChainSpreads.map((product) => ({
   categoryLabel: labelFromSlug(product.category),
   categorySlug: product.category,
+  chainLabel: product.lowestChain,
+  chainSlug: slugFromLabel(product.lowestChain),
   currentPrice: product.lowestPrice,
   dealId: `spread-${product.slug}`,
   imageAlt: `${product.name} product image`,
@@ -67,6 +75,8 @@ const spreadDeals: ReplacementDeal[] = topChainSpreads.map((product) => ({
 const priceDropDeals: ReplacementDeal[] = priceDropMoversBoard.map((mover) => ({
   categoryLabel: mover.categoryLabel,
   categorySlug: slugFromLabel(mover.categoryLabel),
+  chainLabel: 'OpenPrices',
+  chainSlug: 'openprices',
   currentPrice: mover.latestPrice,
   dealId: `drop-${mover.productSlug}`,
   imageUrl: mover.imageUrl,
@@ -80,6 +90,11 @@ const replacementDeals = [...spreadDeals, ...priceDropDeals].filter((deal, index
   deals.findIndex((candidate) => candidate.productSlug === deal.productSlug) === index
 ));
 
+const chainFilterOptions = Array.from(new Map([
+  ...replacementDeals.map((deal) => [deal.chainSlug, { label: deal.chainLabel, slug: deal.chainSlug }] as const),
+  ['openprices', { label: 'OpenPrices', slug: 'openprices' }] as const
+]).values()).slice(0, 7);
+const categoryFilterOptions = Array.from(new Map(replacementDeals.map((deal) => [deal.categorySlug, { label: deal.categoryLabel, slug: deal.categorySlug }])).values()).slice(0, 8);
 const cityTrendingFeed = buildCityTrendingItems({ city: 'stockholm', limit: 4 });
 
 const localDropFeed = buildLocalPriceDropFeed(pricedProducts.map((product) => ({
@@ -91,6 +106,38 @@ const localDropFeed = buildLocalPriceDropFeed(pricedProducts.map((product) => ({
   quantity: product.quantity,
   observations: product.observations
 })), 8, 'Stockholm area');
+
+function FilterPills({
+  activeSlug,
+  allHref,
+  label,
+  options,
+  toHref
+}: Readonly<{
+  activeSlug?: string;
+  allHref: string;
+  label: string;
+  options: Array<{ label: string; slug: string }>;
+  toHref: (slug: string) => string;
+}>) {
+  return (
+    <div>
+      <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{label}</p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        <Link className={`rounded-full px-3 py-1 text-xs font-black ${activeSlug ? 'bg-white text-slate-700' : 'bg-sky-900 text-white'}`} href={allHref}>All</Link>
+        {options.map((option) => (
+          <Link
+            className={`rounded-full px-3 py-1 text-xs font-black ${activeSlug === option.slug ? 'bg-sky-900 text-white' : 'bg-white text-slate-700'}`}
+            href={toHref(option.slug)}
+            key={`${label}-${option.slug}`}
+          >
+            {option.label}
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 const newProductArrivals = buildNewProductArrivals(pricedProducts.map((product) => ({
   slug: product.slug,
@@ -106,10 +153,30 @@ const newProductArrivals = buildNewProductArrivals(pricedProducts.map((product) 
 export default async function DealsPage({ searchParams }: Readonly<{ searchParams?: Promise<SearchParams> }>) {
   const params = (await searchParams) ?? {};
   const replacementFilter = buildPantryReplacementFilter(paramValue(params.replace));
+  const requestedCategory = normalizeFilterSlug(paramValue(params.category));
+  const requestedChain = normalizeFilterSlug(paramValue(params.chain));
+  const replacementParam = paramValue(params.replace);
+  const filterHref = ({ category, chain }: { category?: string | null; chain?: string | null }) => {
+    const nextCategory = category === undefined ? requestedCategory : category;
+    const nextChain = chain === undefined ? requestedChain : chain;
+    const nextParams = new URLSearchParams();
+    if (replacementParam) nextParams.set('replace', replacementParam);
+    if (nextCategory) nextParams.set('category', nextCategory);
+    if (nextChain) nextParams.set('chain', nextChain);
+    const query = nextParams.toString();
+    return query ? `/deals?${query}` : '/deals';
+  };
+  const matchesSelectedFilters = (deal: ReplacementDeal) => (
+    (!requestedCategory || deal.categorySlug === requestedCategory)
+    && (!requestedChain || deal.chainSlug === requestedChain)
+  );
   const visibleDeals = (replacementFilter
     ? replacementDeals.filter((deal) => pantryReplacementMatches(replacementFilter, deal))
     : replacementDeals
-  ).slice(0, 8);
+  ).filter(matchesSelectedFilters).slice(0, 8);
+  const visibleLocalDropFeed = localDropFeed
+    .filter((item) => !requestedCategory || slugFromLabel(item.category) === requestedCategory)
+    .filter(() => !requestedChain || requestedChain === 'openprices');
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8 text-slate-950 sm:px-6 lg:px-8">
@@ -131,6 +198,33 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
           <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{snapshot.axfoodSource}</p>
         </div>
       </div>
+
+      <section className="mt-6 rounded-[2rem] border border-sky-200 bg-sky-50/70 p-5 shadow-sm" aria-label="Deal feed filters by chain and category">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-sky-800">Feed filters</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Narrow price drops by store and category</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">Use quick filters to keep broad deal feeds focused on preferred chains and grocery aisles.</p>
+          </div>
+          <Link className="rounded-full bg-white px-4 py-2 text-sm font-black text-sky-900 shadow-sm" href="/deals">Clear filters</Link>
+        </div>
+        <div className="mt-4 grid gap-4 lg:grid-cols-2">
+          <FilterPills
+            activeSlug={requestedChain}
+            allHref={filterHref({ chain: null })}
+            label="Chains"
+            options={chainFilterOptions}
+            toHref={(slug) => filterHref({ chain: slug })}
+          />
+          <FilterPills
+            activeSlug={requestedCategory}
+            allHref={filterHref({ category: null })}
+            label="Categories"
+            options={categoryFilterOptions}
+            toHref={(slug) => filterHref({ category: slug })}
+          />
+        </div>
+      </section>
 
       <section className="mt-6 rounded-[2rem] border border-orange-200 bg-orange-50/80 p-5 shadow-sm" aria-label="City trending deal discovery" data-city-trending-deals={cityTrendingFeed.city}>
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
@@ -163,11 +257,12 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
             Ranked by recent percentage drops, then by normalized unit-price savings. Package-size gaps fall back to per-item savings.
           </p>
         </div>
-        {localDropFeed.length > 0 ? (
+        {visibleLocalDropFeed.length > 0 ? (
           <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {localDropFeed.map((item) => (
+            {visibleLocalDropFeed.map((item) => (
               <DealCard
                 categoryLabel={item.category}
+                chainLabel="OpenPrices"
                 currentPrice={item.latestPrice}
                 dealId={`local-price-drop-${item.productSlug}`}
                 discountStartedAt={item.latestObservedAt}
@@ -246,6 +341,7 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
         ) : visibleDeals.map((deal, index) => (
           <DealCard
             categoryLabel={deal.categoryLabel}
+            chainLabel={deal.chainLabel}
             currentPrice={deal.currentPrice}
             dealEndsAt={flyerDealEndsAt(index)}
             dealId={deal.dealId}
