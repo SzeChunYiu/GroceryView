@@ -20,77 +20,99 @@ const HEMKOP_QUERIES = DEFAULT_HEMKOP_SEARCH_QUERIES;
 const LIDL_OFFER_PATHS = DEFAULT_LIDL_OFFER_PATHS;
 
 const retrievedAt = new Date().toISOString();
+const requestedSources = new Set((process.env.GROCERYVIEW_INGEST_SOURCES ?? 'citygross,willys,hemkop,lidl')
+  .split(',')
+  .map((source) => source.trim().toLowerCase())
+  .filter(Boolean));
+const shouldRun = (source) => requestedSources.has(source);
 
 await mkdir(INGESTED_DIR, { recursive: true });
 await mkdir(GENERATED_DIR, { recursive: true });
 
-const cityGrossProducts = await fetchCityGrossProductsForAllStores({
-  maxStores: 40,
-  queries: CITY_GROSS_QUERIES,
-  maxRowsPerStore: 180,
-  pageSize: 24,
-  retrievedAt
-});
-await writeCityGross(cityGrossProducts);
+let cityGrossProducts = [];
+let willysProducts = [];
+let willysWeeklyDiscounts = [];
+let hemkopProducts = [];
+let hemkopWeeklyDiscounts = [];
+let lidlStoreOffers = [];
 
-const willysProducts = await fetchWillysProducts({
-  maxRows: 1200,
-  retrievedAt
-});
-const willysWeeklyDiscounts = await fetchWillysWeeklyDiscountsForAllStores({
-  maxRows: 50000,
-  pageSize: 100,
-  retrievedAt
-});
-await writeWillys(willysProducts, willysWeeklyDiscounts);
+if (shouldRun('citygross')) {
+  cityGrossProducts = await fetchCityGrossProductsForAllStores({
+    maxStores: 40,
+    queries: CITY_GROSS_QUERIES,
+    maxRowsPerStore: 180,
+    pageSize: 24,
+    retrievedAt
+  });
+  await writeCityGross(cityGrossProducts);
+}
 
-const hemkopProducts = await fetchHemkopProducts({
-  queries: HEMKOP_QUERIES,
-  maxRows: 4200,
-  pageSize: 100,
-  retrievedAt
-});
-const hemkopWeeklyDiscounts = await fetchHemkopWeeklyDiscountsForAllStores({
-  maxRows: 30000,
-  pageSize: 100,
-  retrievedAt
-});
-await writeHemkop(hemkopProducts, hemkopWeeklyDiscounts);
+if (shouldRun('willys')) {
+  willysProducts = await fetchWillysProducts({
+    maxRows: 1200,
+    retrievedAt
+  });
+  willysWeeklyDiscounts = await fetchWillysWeeklyDiscountsForAllStores({
+    maxRows: 50000,
+    pageSize: 100,
+    retrievedAt
+  });
+  await writeWillys(willysProducts, willysWeeklyDiscounts);
+}
 
-const lidlStoreOffers = await fetchLidlOffersForAllStores({
-  maxStores: 40,
-  offerPaths: LIDL_OFFER_PATHS,
-  maxRows: 150,
-  retrievedAt
-});
-await writeLidl(lidlStoreOffers);
+if (shouldRun('hemkop')) {
+  hemkopProducts = await fetchHemkopProducts({
+    queries: HEMKOP_QUERIES,
+    maxRows: 4200,
+    pageSize: 100,
+    retrievedAt
+  });
+  hemkopWeeklyDiscounts = await fetchHemkopWeeklyDiscountsForAllStores({
+    maxRows: 60000,
+    pageSize: 100,
+    retrievedAt
+  });
+  await writeHemkop(hemkopProducts, hemkopWeeklyDiscounts);
+}
 
-await writeDbSiteIngestedOverrides([
-  buildCompareStoreCapability({
-    chainId: 'city_gross',
-    productRows: cityGrossProducts,
-    pickupRows: cityGrossProducts
-  }),
-  buildCompareStoreCapability({
-    chainId: 'willys',
-    productRows: willysProducts,
-    couponRows: willysWeeklyDiscounts,
-    deliveryRows: willysProducts.filter((row) => row.online === true),
-    pickupRows: willysWeeklyDiscounts
-  }),
-  buildCompareStoreCapability({
-    chainId: 'hemkop',
-    productRows: hemkopProducts,
-    couponRows: hemkopWeeklyDiscounts,
-    deliveryRows: hemkopProducts.filter((row) => row.online === true),
-    pickupRows: hemkopWeeklyDiscounts
-  }),
-  buildCompareStoreCapability({
-    chainId: 'lidl',
-    couponRows: lidlStoreOffers.filter((row) => row.memberOnly === true),
-    pickupRows: lidlStoreOffers
-  })
-]);
+if (shouldRun('lidl')) {
+  lidlStoreOffers = await fetchLidlOffersForAllStores({
+    maxStores: 40,
+    offerPaths: LIDL_OFFER_PATHS,
+    maxRows: 150,
+    retrievedAt
+  });
+  await writeLidl(lidlStoreOffers);
+}
+
+if (['citygross', 'willys', 'hemkop', 'lidl'].every((source) => shouldRun(source))) {
+  await writeDbSiteIngestedOverrides([
+    buildCompareStoreCapability({
+      chainId: 'city_gross',
+      productRows: cityGrossProducts,
+      pickupRows: cityGrossProducts
+    }),
+    buildCompareStoreCapability({
+      chainId: 'willys',
+      productRows: willysProducts,
+      couponRows: willysWeeklyDiscounts,
+      deliveryRows: willysProducts.filter((row) => row.online === true),
+      pickupRows: willysWeeklyDiscounts
+    }),
+    buildCompareStoreCapability({
+      chainId: 'hemkop',
+      productRows: hemkopProducts,
+      couponRows: hemkopWeeklyDiscounts,
+      deliveryRows: hemkopProducts.filter((row) => row.online === true),
+      pickupRows: hemkopWeeklyDiscounts
+    }),
+    buildCompareStoreCapability({
+      chainId: 'lidl',
+      couponRows: lidlStoreOffers.filter((row) => row.memberOnly === true),
+      pickupRows: lidlStoreOffers
+    })
+  ]);
+}
 
 console.log(JSON.stringify({
   retrievedAt,
@@ -465,6 +487,9 @@ async function writeIcaReklamblad(rows) {
 }
 
 async function writeGeneratedFile(fileName, lines) {
+  while (lines.at(-1) === '') {
+    lines.pop();
+  }
   await writeFile(new URL(fileName, INGESTED_DIR), `${lines.join('\n')}\n`);
 }
 
