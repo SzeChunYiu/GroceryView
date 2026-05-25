@@ -4,6 +4,7 @@ import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/componen
 import { RecipeImporter } from '@/components/recipe-importer';
 import { dealBasedMealInputs, dealBasedMeals, familyMealPlannerFromDeals, freezerBatchCookPlanner, products, studentDealRecipes } from '@/lib/demo-data';
 import { extractIngredientsFromMealPlans, suggestBudgetAlternativesFromMealPlans } from '@/lib/meal-budgets';
+import { mergeMealPlanIngredientsForWeeklyBasket } from '@/lib/unit-normalizer';
 import { dietarySubstitutionAssistantContract } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -106,6 +107,15 @@ function mealCardClass(meal: MealWithIngredients, productId: string, defaultClas
     ? `${defaultClasses} border-amber-400 bg-amber-50 shadow-sm`
     : defaultClasses;
 }
+
+
+const mealPlanBasketIngredients = mergeMealPlanIngredientsForWeeklyBasket([
+  { mealTitle: 'Taco night', name: 'Tomatoes', quantity: 400, unit: 'g' },
+  { mealTitle: 'Pasta lunchboxes', name: 'Tomatoes', quantity: 0.6, unit: 'kg' },
+  { mealTitle: 'Pancake breakfast', name: 'Milk', quantity: 5, unit: 'dl' },
+  { mealTitle: 'Family stew', name: 'Milk', quantity: 500, unit: 'ml' },
+  { mealTitle: 'Freezer curry', name: 'Onion', quantity: 3, unit: 'st' }
+]);
 
 const recipeProductCandidates = [
   ...dealBasedMealInputs.map((product) => ({
@@ -239,6 +249,29 @@ export default async function MealPlannerPage({
                   </Link>
                 ) : null)}
               </div>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+
+      <Card className="mt-6 border-lime-200 bg-lime-50">
+        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+          <div>
+            <Eyebrow>Weekly basket handoff</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Merged meal-plan ingredients</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+              Duplicate meal ingredients are consolidated with mergeMealPlanIngredientsForWeeklyBasket before they become weekly basket rows, so grams, kilograms, deciliters, and milliliters roll up into one shopping quantity.
+            </p>
+          </div>
+          <Link className="rounded-full bg-lime-700 px-4 py-2 text-sm font-black text-white" href="/weekly-basket#meal-plan-ingredient-basket">Open weekly basket</Link>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          {mealPlanBasketIngredients.map((ingredient) => (
+            <div className="rounded-2xl bg-white p-4 shadow-sm" key={`${ingredient.name}-${ingredient.unit}`}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-700">{ingredient.quantityLabel}</p>
+              <p className="mt-2 font-black text-slate-950">{ingredient.name}</p>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{ingredient.mealTitles.join(', ')}</p>
             </div>
           ))}
         </div>
