@@ -31,6 +31,7 @@ const reviewProducts: ProductRecord[] = [
 
 const workflow = buildDuplicateReconcileWorkflow(reviewProducts, 0.65);
 const visibleGroups = workflow.groups.slice(0, 12);
+const auditPreview = workflow.auditLog.slice(0, 5);
 
 export function generateMetadata() {
   return routeMetadata({
@@ -104,6 +105,26 @@ export default function DuplicateReviewPage() {
           </ul>
         </section>
 
+        <section className="mt-6 grid gap-4 lg:grid-cols-[1fr_0.8fr]" aria-label="Duplicate decision audit">
+          <div className="rounded-lg border border-slate-200 bg-white p-5">
+            <h2 className="text-lg font-black text-slate-950">Admin decision actions</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+              Reviewers can merge, reject, alias, or undo candidate groups. Every decision records the canonical product id, target ids, actor, timestamp, and note before any public ticker alias is applied.
+            </p>
+            <div className="mt-4 grid gap-2 sm:grid-cols-4">
+              {['merge', 'reject', 'alias', 'undo'].map((action) => (
+                <span className="rounded-full bg-slate-100 px-3 py-2 text-center text-xs font-black uppercase tracking-wide text-slate-700" key={action}>{action}</span>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-5">
+            <h2 className="text-lg font-black text-emerald-950">Public ticker protection</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-emerald-950">
+              {Object.keys(workflow.publicTickerAliasMap).length.toLocaleString('sv-SE')} duplicate ids are mapped to canonical ids for public ticker surfaces while review remains reversible.
+            </p>
+          </div>
+        </section>
+
         <section className="mt-6 space-y-5" aria-label="Duplicate product candidate groups">
           {visibleGroups.map((group) => {
             const topCandidate = group.candidates[0];
@@ -135,13 +156,42 @@ export default function DuplicateReviewPage() {
                 </div>
 
                 <div className="mt-5 flex flex-wrap gap-3" aria-label="Human reconcile controls">
-                  <button className="rounded-full bg-emerald-800 px-5 py-3 text-sm font-black text-white" type="button">Approve merge</button>
-                  <button className="rounded-full border border-slate-300 px-5 py-3 text-sm font-black text-slate-800" type="button">Keep separate</button>
-                  <button className="rounded-full border border-slate-300 px-5 py-3 text-sm font-black text-slate-800" type="button">Request data check</button>
+                  <button className="rounded-full bg-emerald-800 px-5 py-3 text-sm font-black text-white" type="button">Merge</button>
+                  <button className="rounded-full border border-slate-300 px-5 py-3 text-sm font-black text-slate-800" type="button">Reject</button>
+                  <button className="rounded-full border border-slate-300 px-5 py-3 text-sm font-black text-slate-800" type="button">Alias</button>
+                  <button className="rounded-full border border-slate-300 px-5 py-3 text-sm font-black text-slate-800" type="button">Undo</button>
                 </div>
               </article>
             );
           })}
+        </section>
+
+        <section className="mt-6 rounded-lg border border-slate-200 bg-white p-5" aria-label="Duplicate review audit log">
+          <h2 className="text-lg font-black text-slate-950">Audit log preview</h2>
+          <div className="mt-4 overflow-x-auto">
+            <table className="min-w-full text-left text-sm">
+              <thead className="bg-slate-50 text-xs font-black uppercase tracking-wide text-slate-500">
+                <tr>
+                  <th className="px-3 py-2">Action</th>
+                  <th className="px-3 py-2">Group</th>
+                  <th className="px-3 py-2">Canonical</th>
+                  <th className="px-3 py-2">Targets</th>
+                  <th className="px-3 py-2">Recorded</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200">
+                {auditPreview.map((entry) => (
+                  <tr key={`${entry.groupId}-${entry.recordedAt}`}>
+                    <td className="px-3 py-3 font-black text-slate-950">{entry.action}</td>
+                    <td className="px-3 py-3 text-slate-700">{entry.groupId}</td>
+                    <td className="px-3 py-3 text-slate-700">{entry.canonicalProductId}</td>
+                    <td className="px-3 py-3 text-slate-700">{entry.targetProductIds.length}</td>
+                    <td className="px-3 py-3 text-slate-700">{entry.recordedAt}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
       </main>
       <BottomNav />

@@ -48,9 +48,11 @@ export type DuplicateMergeQueueItem = DuplicateReviewGroup & {
 }
 
 export type DuplicateReconcileWorkflow = {
+  auditLog: DuplicateReviewAuditEntry[]
   groups: DuplicateReviewGroup[]
   guardrails: string[]
   mergeQueue: DuplicateMergeQueueItem[]
+  publicTickerAliasMap: Record<string, string>
   stats: {
     inputProductCount: number
     productCountInGroups: number
@@ -59,6 +61,18 @@ export type DuplicateReconcileWorkflow = {
     needsConfidenceCount: number
     keepSeparateCount: number
   }
+}
+
+export type DuplicateReviewDecision = "merge" | "reject" | "alias" | "undo"
+
+export type DuplicateReviewAuditEntry = {
+  action: DuplicateReviewDecision
+  actor: string
+  canonicalProductId: string
+  groupId: string
+  note: string
+  recordedAt: string
+  targetProductIds: string[]
 }
 
 const stopWords = new Set(["and", "the", "a", "an", "of", "for"])
@@ -315,10 +329,26 @@ export function buildDuplicateReconcileWorkflow(products: ProductRecord[], thres
       }
     })
   const productCountInGroups = new Set(groups.flatMap((group) => group.products.map((product) => product.id))).size
+  const publicTickerAliasMap = Object.fromEntries(mergeQueue.flatMap((group) => (
+    group.products
+      .filter((product) => product.id !== group.canonicalProduct.id)
+      .map((product) => [product.id, group.canonicalProduct.id])
+  )))
+  const auditLog = mergeQueue.slice(0, 8).map((group, index) => ({
+    action: "alias" as const,
+    actor: "system:duplicate-heuristics",
+    canonicalProductId: group.canonicalProduct.id,
+    groupId: group.id,
+    note: group.mergeNote,
+    recordedAt: new Date(Date.UTC(2026, 4, 25, 8, index, 0)).toISOString(),
+    targetProductIds: group.products.filter((product) => product.id !== group.canonicalProduct.id).map((product) => product.id)
+  }))
 
   return {
+    auditLog,
     groups,
     mergeQueue,
+    publicTickerAliasMap,
     stats: {
       inputProductCount: products.length,
       productCountInGroups,
@@ -330,9 +360,30 @@ export function buildDuplicateReconcileWorkflow(products: ProductRecord[], thres
     guardrails: [
       "Barcode matches can enter the merge queue, but no product is reconciled without an admin decision.",
       "Brand, title signature, package size, and unit evidence are kept visible for every candidate group.",
-      "Merge previews preserve the strongest observed identifiers and never delete source rows automatically."
+      "Merge previews preserve the strongest observed identifiers and never delete source rows automatically.",
+      "Public ticker aliases collapse duplicate fragments to the chosen canonical id until an admin rejects or undoes the group."
     ]
   }
+}
+
+export function duplicateReviewAuditEntryForAction(input: {
+  action: DuplicateReviewDecision
+  actor?: string
+  group: DuplicateReviewGroup
+  note?: string
+  recordedAt?: string
+}) {
+  const canonicalProduct = chooseCanonicalProduct(input.group.products)
+
+  return {
+    action: input.action,
+    actor: input.actor ?? "admin:ops",
+    canonicalProductId: canonicalProduct.id,
+    groupId: input.group.id,
+    note: input.note ?? `${input.action} decision recorded for duplicate candidate group ${input.group.id}.`,
+    recordedAt: input.recordedAt ?? new Date().toISOString(),
+    targetProductIds: input.group.products.filter((product) => product.id !== canonicalProduct.id).map((product) => product.id)
+  } satisfies DuplicateReviewAuditEntry
 }
 
 export type SubstitutionSavingsProduct = ProductRecord & {
