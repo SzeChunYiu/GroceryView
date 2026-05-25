@@ -22,6 +22,10 @@ const productSearchQuerySchema = z.object({
   q: z.string().trim().max(120).default('')
 }).strict();
 
+const productSearchCacheHeaders = {
+  'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300'
+};
+
 function parseProductSearchQuery(request: Request) {
   const searchParams = new URL(request.url).searchParams;
   const rawQuery = Object.fromEntries(searchParams.entries()) as Record<string, unknown>;
@@ -91,21 +95,27 @@ export async function GET(request: Request) {
   const expansion = expandGrocerySearchQuery(query);
 
   if (query.length < 2) {
-    return NextResponse.json(responsePayload(query, [], expansion));
+    return NextResponse.json(
+      responsePayload(query, [], expansion),
+      { headers: productSearchCacheHeaders }
+    );
   }
 
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) {
     return NextResponse.json(
       responsePayload(query, [], expansion, 'product_search_database_unconfigured'),
-      { status: 503 }
+      { status: 503, headers: productSearchCacheHeaders }
     );
   }
 
   try {
     const executor = await executorForDatabaseUrl(databaseUrl);
     const batches = await Promise.all(expansion.expandedQueries.map((expandedQuery) => searchProductsByText(executor, expandedQuery, { limit: 8 })));
-    return NextResponse.json(responsePayload(query, mergeSearchResults(batches), expansion));
+    return NextResponse.json(
+      responsePayload(query, mergeSearchResults(batches), expansion),
+      { headers: productSearchCacheHeaders }
+    );
   } catch (error) {
     console.error('Product search query failed', error instanceof Error ? { name: error.name } : { name: 'unknown' });
     return NextResponse.json(

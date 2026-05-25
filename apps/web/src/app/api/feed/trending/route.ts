@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server';
 import { buildCityPriceDropTrends } from '@/lib/trends';
 
 export const dynamic = 'force-static';
+export const revalidate = 300;
+
+const trendingFeedCacheHeaders = {
+  'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600'
+};
 
 function parseLimit(value: string | null) {
   if (!value) return 6;
@@ -15,5 +20,8 @@ export function GET(request: Request) {
   const city = searchParams.get('city') ?? 'stockholm';
   const limit = parseLimit(searchParams.get('limit'));
 
-  return NextResponse.json(buildCityPriceDropTrends({ city, limit }));
+  return NextResponse.json(
+    buildCityPriceDropTrends({ city, limit }),
+    { headers: trendingFeedCacheHeaders }
+  );
 }

@@ -22,6 +22,9 @@ type CachedSuggestions = {
 
 const SUGGESTION_LIMIT = 10;
 const CACHE_TTL_MS = 60_000;
+const suggestCacheHeaders = {
+  'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300'
+};
 const suggestionCache = new Map<string, CachedSuggestions>();
 
 function normalizedSearchText(value: string) {
@@ -103,9 +106,7 @@ export async function GET(request: Request) {
       source: 'verified product and category snapshots'
     },
     {
-      headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=60'
-      }
+      headers: suggestCacheHeaders
     }
   );
 }
