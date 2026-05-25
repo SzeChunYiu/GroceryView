@@ -7,7 +7,7 @@ import { OriginFilter, type OriginFilterCode } from '@/components/origin-filter'
 import { ProductSortSelect } from '@/components/product-sort-select';
 import { ProductPriceCards } from '@/components/product-price-cards';
 import { NewArrivalsCarousel } from '@/components/TrendingCarousel';
-import { SavedSearchAction } from '@/components/saved-search-action';
+import { SavedSearchActions } from '@/components/saved-search-actions';
 import { VirtualizedProductGrid } from '@/components/LazyItemCard';
 import { apohemSource } from '@/lib/ingested/apohem';
 import { newProductArrivals } from '@/lib/new-arrivals';
@@ -242,13 +242,13 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           />
         </form>
         <div className="mt-4">
-          <p className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-violet-800">Saved filter chips</p>
+          <p className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-violet-800">Removable filter chips</p>
           <ActiveFilterChips chips={activeFilterChips} />
           {search.activeFilters.length > 0 ? (
             <p className="mt-2 text-xs font-semibold text-violet-900">Active URL filters: {search.activeFilters.join(' · ')}</p>
           ) : null}
         </div>
-        <SavedSearchAction subscription={savedSearchSubscription} />
+        <SavedSearchActions resultCount={resultCards.length} subscription={savedSearchSubscription} />
         <OriginFilter
           className="mt-5"
           counts={Object.fromEntries(originFacets.map((facet) => [facet.value, facet.count])) as Partial<Record<OriginFilterCode, number>>}
