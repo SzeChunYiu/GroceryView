@@ -593,6 +593,28 @@ describe('verified-data UI', () => {
     assert.match(server, /Session user is not a registered human reviewer/);
   });
 
+  it('surfaces community review prompts on product pages after price reports', async () => {
+    const communityReviews = await read('src/lib/community-reviews.ts');
+    const actions = await read('src/components/price-report-review-actions.tsx');
+    const products = await read('src/app/products/page.tsx');
+
+    assert.match(communityReviews, /COMMUNITY_REVIEW_PROMPTS/);
+    assert.match(communityReviews, /price_accuracy/);
+    assert.match(communityReviews, /product_quality/);
+    assert.match(communityReviews, /store_experience/);
+    assert.match(communityReviews, /crowdsourced grocery data becomes more trustworthy/);
+    assert.match(actions, /COMMUNITY_REVIEW_PROMPTS/);
+    assert.match(actions, /Community validation prompts/);
+    assert.match(actions, /aria-label=\{`\$\{prompt\.label\} rating`\}/);
+    assert.match(communityReviews, /Price accuracy/);
+    assert.match(communityReviews, /Product quality/);
+    assert.match(communityReviews, /Store experience/);
+    assert.match(products, /PriceReportReviewActions/);
+    assert.match(products, /Review prompts after a price report/);
+    assert.match(products, /price accuracy, product quality, and store experience/);
+    assert.doesNotMatch(products, /@\/lib\/demo-data|@\/components\/sample-data/);
+  });
+
   it('surfaces adjustable moderation risk thresholds for admin review routing', async () => {
     const communityReviews = await read('src/lib/community-reviews.ts');
     const moderation = await read('src/app/admin/moderation/page.tsx');

@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ChainFilterInput } from './chain-filter-input';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { PriceReportReviewActions } from '@/components/price-report-review-actions';
 import { OriginFilter, type OriginFilterCode } from '@/components/origin-filter';
 import { ProductPriceCards } from '@/components/product-price-cards';
 import { apohemSource } from '@/lib/ingested/apohem';
@@ -358,6 +359,24 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           </div>
         ) : null}
       </Card>
+
+      <Card className="mt-8 border-violet-200 bg-violet-50/70">
+        <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-violet-800">Community validation</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Review prompts after a price report</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Product pages now ask shoppers to rate price accuracy, product quality, and store experience after they submit or verify a report.
+              These prompts improve trust in crowdsourced grocery data without publishing anonymous moderation decisions.
+            </p>
+          </div>
+          <Link className="rounded-full bg-violet-800 px-5 py-3 text-sm font-black text-white" href="/price-reports">
+            Open price reports
+          </Link>
+        </div>
+        <PriceReportReviewActions />
+      </Card>
+
       <Card className="mt-8 border-rose-200 bg-rose-50/70">
         <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
           <div>
