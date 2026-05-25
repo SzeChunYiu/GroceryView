@@ -1823,8 +1823,19 @@ export function planRecurringBasketDigest(input: RecurringBasketDigestInput): Re
   };
 }
 
+export type FixedBasketIndexCountry = 'SE' | 'NO' | 'IS';
+export type FixedBasketIndexCurrency = 'SEK' | 'NOK' | 'ISK';
+
+const fixedBasketIndexCurrencyByCountry: Record<FixedBasketIndexCountry, FixedBasketIndexCurrency> = {
+  SE: 'SEK',
+  NO: 'NOK',
+  IS: 'ISK'
+};
+
 export type IndexComponent = {
   productId: string;
+  country: FixedBasketIndexCountry;
+  currency: FixedBasketIndexCurrency;
   baseUnitPrice: number;
   currentUnitPrice: number;
   weight: number;
@@ -1833,6 +1844,7 @@ export type IndexComponent = {
 export type FixedBasketIndexInput = {
   id: string;
   label: string;
+  country: FixedBasketIndexCountry;
   baseDate: string;
   currentDate: string;
   components: IndexComponent[];
@@ -1841,6 +1853,8 @@ export type FixedBasketIndexInput = {
 export type FixedBasketIndex = {
   id: string;
   label: string;
+  country: FixedBasketIndexCountry;
+  currency: FixedBasketIndexCurrency;
   baseDate: string;
   currentDate: string;
   value: number;
@@ -1850,23 +1864,33 @@ export type FixedBasketIndex = {
 };
 
 export function calculateFixedBasketIndex(input: FixedBasketIndexInput): FixedBasketIndex {
-  if (input.components.length === 0) {
-    throw new Error('At least one component is required to calculate an index.');
+  const expectedCurrency = fixedBasketIndexCurrencyByCountry[input.country];
+  const countryComponents = input.components.filter((component) => component.country === input.country);
+  if (countryComponents.length === 0) {
+    throw new Error(`At least one ${input.country} component is required to calculate an index.`);
   }
-  const base = input.components.reduce((sum, component) => sum + component.baseUnitPrice * component.weight, 0);
-  const current = input.components.reduce((sum, component) => sum + component.currentUnitPrice * component.weight, 0);
+
+  const currencyMismatch = countryComponents.find((component) => component.currency !== expectedCurrency);
+  if (currencyMismatch) {
+    throw new Error(`Fixed basket index cannot mix currencies: ${input.country} observations must use ${expectedCurrency}.`);
+  }
+
+  const base = countryComponents.reduce((sum, component) => sum + component.baseUnitPrice * component.weight, 0);
+  const current = countryComponents.reduce((sum, component) => sum + component.currentUnitPrice * component.weight, 0);
   if (base <= 0) throw new Error('Base basket value must be positive.');
   const value = roundMoney((current / base) * 100);
 
   return {
     id: input.id,
     label: input.label,
+    country: input.country,
+    currency: expectedCurrency,
     baseDate: input.baseDate,
     currentDate: input.currentDate,
     value,
     movementPercent: roundMoney(value - 100),
-    confidence: input.components.length >= 5 ? 'high' : input.components.length >= 2 ? 'medium' : 'low',
-    components: input.components
+    confidence: countryComponents.length >= 5 ? 'high' : countryComponents.length >= 2 ? 'medium' : 'low',
+    components: countryComponents
   };
 }
 
@@ -2307,6 +2331,8 @@ export type BrandTier = 'national' | 'premium' | 'standard_private_label' | 'bud
 export type BrandTierPriceObservation = {
   brandTier: BrandTier;
   category: string;
+  country?: FixedBasketIndexCountry;
+  currency?: FixedBasketIndexCurrency;
   baseUnitPrice: number;
   currentUnitPrice: number;
 };
@@ -2349,9 +2375,17 @@ export function calculateBrandTierIndices(observations: BrandTierPriceObservatio
     .map(([brandTier, rows]) => calculateFixedBasketIndex({
       id: `${brandTier}-index`,
       label: brandTierLabels[brandTier],
+      country: 'SE',
       baseDate: 'brand-tier-base',
       currentDate: 'brand-tier-current',
-      components: rows.map((row) => ({ productId: row.category, baseUnitPrice: row.baseUnitPrice, currentUnitPrice: row.currentUnitPrice, weight: 1 }))
+      components: rows.map((row) => ({
+        productId: row.category,
+        country: row.country ?? 'SE',
+        currency: row.currency ?? 'SEK',
+        baseUnitPrice: row.baseUnitPrice,
+        currentUnitPrice: row.currentUnitPrice,
+        weight: 1
+      }))
     }))
     .map((index) => ({
       brandTier: index.id.replace('-index', '') as BrandTier,
