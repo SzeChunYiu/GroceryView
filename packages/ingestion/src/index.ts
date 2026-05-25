@@ -3338,7 +3338,7 @@ export function planIngestionBatch(inputs: RetailerProductInput[]): IngestionBat
     }
 
     try {
-      accepted.push(ingestRetailerProduct(input));
+      accepted.push(ingestRetailerProduct(contractResult.data as RetailerProductInput));
     } catch (error) {
       rejected.push({ input, reason: error instanceof Error ? error.message : 'Unknown ingestion error.' });
     }
