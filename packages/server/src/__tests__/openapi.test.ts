@@ -38,6 +38,7 @@ describe('buildOpenApiDocument', () => {
       '/api/deals',
       '/api/deals/discounts',
       '/api/deals/flyer-offers',
+      '/api/deals/friend-share-signals',
       '/api/expiry-deals/radar',
       '/api/fuel',
       '/api/health',
@@ -87,6 +88,7 @@ describe('buildOpenApiDocument', () => {
       '/api/scans/history',
       '/api/scans/process',
       '/api/scans/upload-url',
+      '/api/settings',
       '/api/settings/account',
       '/api/settings/data-export',
       '/api/stores',
@@ -157,6 +159,9 @@ describe('buildOpenApiDocument', () => {
     assert.deepEqual(doc.paths['/api/privacy/export'].get?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/privacy/deletion-plan'].post?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/privacy/request-fulfillment'].post?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/settings'].get?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/settings'].patch?.security, [{ bearerAuth: [] }]);
+    assert.match(doc.paths['/api/settings'].patch?.summary ?? '', /preferred store/i);
     assert.deepEqual(doc.paths['/api/settings/account'].delete?.security, [{ bearerAuth: [] }]);
     assert.match(doc.paths['/api/settings/account'].delete?.summary ?? '', /delete.*account|account deletion/i);
     assert.deepEqual(doc.paths['/api/settings/data-export'].get?.security, [{ bearerAuth: [] }]);

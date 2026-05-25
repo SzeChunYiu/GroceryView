@@ -907,6 +907,56 @@ function cursorPaginatedEnvelope<T>(items: T[], params: URLSearchParams) {
 }
 
 const watchlistPriceTypes = ['shelf', 'member', 'promotion', 'estimated'] as const satisfies readonly WatchlistPriceType[];
+const settingsCurrencies = ['SEK', 'EUR', 'NOK', 'DKK'] as const;
+const settingsNotificationChannels = ['push', 'email', 'telegram'] as const;
+const settingsAlgorithms = ['balanced', 'best_savings', 'best_unit_price', 'watchlist_first'] as const;
+
+type UserSettingsPreferences = {
+  userId: string;
+  currency: (typeof settingsCurrencies)[number];
+  preferredStores: string[];
+  notificationChannels: Array<(typeof settingsNotificationChannels)[number]>;
+  algorithm_choice: (typeof settingsAlgorithms)[number];
+};
+
+function normalizePreferredStoreSlugs(value: unknown): string[] | undefined {
+  const stores = optionalStringArray(value, 'preferredStores');
+  if (stores === undefined) return undefined;
+  if (stores.length < 1 || stores.length > 5) throw new Error('preferredStores must contain 1 to 5 ordered store slugs.');
+  const normalized = stores.map((store) => store.trim().toLowerCase());
+  if (normalized.some((store) => !/^[a-z0-9][a-z0-9-]*$/.test(store))) {
+    throw new Error('preferredStores must contain store slugs only.');
+  }
+  return [...new Set(normalized)];
+}
+
+function settingsPreferencesPatchFromBody(body: JsonRecord): Partial<Omit<UserSettingsPreferences, 'userId'>> {
+  const patch: Partial<Omit<UserSettingsPreferences, 'userId'>> = {};
+  if (body.currency !== undefined) {
+    if (!settingsCurrencies.includes(body.currency as (typeof settingsCurrencies)[number])) {
+      throw new Error(`currency must be one of: ${settingsCurrencies.join(', ')}.`);
+    }
+    patch.currency = body.currency as UserSettingsPreferences['currency'];
+  }
+  const preferredStores = normalizePreferredStoreSlugs(body.preferredStores);
+  if (preferredStores !== undefined) patch.preferredStores = preferredStores;
+  if (body.notificationChannels !== undefined) {
+    const channels = optionalStringArray(body.notificationChannels, 'notificationChannels') ?? [];
+    for (const channel of channels) {
+      if (!settingsNotificationChannels.includes(channel as (typeof settingsNotificationChannels)[number])) {
+        throw new Error(`notificationChannels must contain only: ${settingsNotificationChannels.join(', ')}.`);
+      }
+    }
+    patch.notificationChannels = channels as UserSettingsPreferences['notificationChannels'];
+  }
+  if (body.algorithm_choice !== undefined) {
+    if (!settingsAlgorithms.includes(body.algorithm_choice as (typeof settingsAlgorithms)[number])) {
+      throw new Error(`algorithm_choice must be one of: ${settingsAlgorithms.join(', ')}.`);
+    }
+    patch.algorithm_choice = body.algorithm_choice as UserSettingsPreferences['algorithm_choice'];
+  }
+  return patch;
+}
 
 function optionalWatchlistPriceTypes(value: unknown): WatchlistPriceType[] | undefined {
   const values = optionalStringArray(value, 'allowedPriceTypes');
@@ -2017,6 +2067,16 @@ function parseBillingSubscriptionWebhookBody(body: JsonRecord, authOptions: Auth
 }
 
 export function createHttpHandler(api = createGroceryViewApi(), authOptions: AuthOptions = {}): HttpHandler {
+  const settingsPreferences = new Map<string, UserSettingsPreferences>();
+
+  const settingsForUser = (userId: string): UserSettingsPreferences => settingsPreferences.get(userId) ?? {
+    userId,
+    currency: 'SEK',
+    preferredStores: [],
+    notificationChannels: [],
+    algorithm_choice: 'balanced'
+  };
+
   const requireSession = async (request: Request): Promise<SessionPayload | Response> => {
     if (!authOptions.authSecret) return errorResponse(503, 'Auth secret is not configured.');
     const token = parseBearerToken(request.headers.get('authorization'));
@@ -3197,6 +3257,20 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         }
       }
 
+      if (path === '/api/settings') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') return jsonResponse(settingsForUser(user));
+        if (method === 'PATCH') {
+          const body = await readJson(request);
+          const next = { ...settingsForUser(user), ...settingsPreferencesPatchFromBody(body), userId: user };
+          settingsPreferences.set(user, next);
+          return jsonResponse(next);
+        }
+      }
+
       if (path === '/api/privacy/export' || path === '/api/settings/data-export') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
@@ -3518,6 +3592,10 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/households/join': { post: protectedOperation('Join an existing household from a signed-in invite token.') },
       '/api/households/current/basket/check': { post: protectedOperation('Check or uncheck a shared household shopping-list item with member attribution.') },
       '/api/privacy/export': { get: protectedOperation('Export signed-in user profile, favorite-store, watchlist, receipt, household, and friend-shared deal signal data.') },
+      '/api/settings': {
+        get: protectedOperation('Read signed-in user preferences including ordered preferred store slugs.'),
+        patch: protectedOperation('Persist signed-in user preferences including 1-5 ordered preferred store slugs.')
+      },
       '/api/settings/account': { delete: protectedOperation('Delete the signed-in account after confirmation, wiping lists, alerts, preferences, and profile rows.') },
       '/api/settings/data-export': { get: protectedOperation('Download my data JSON export with lists, alerts, preferences, and analytics event records.') },
       '/api/privacy/deletion-plan': { post: protectedOperation('Plan account deletion, including friend-shared deal signals, without performing a destructive delete.') },

@@ -15,6 +15,8 @@ describe('authenticated HTTP routes', () => {
 
     const unauthenticatedPrivacyExport = await handle(new Request('http://localhost/api/privacy/export?userId=user-1'));
     assert.equal(unauthenticatedPrivacyExport.status, 401);
+    const unauthenticatedSettings = await handle(new Request('http://localhost/api/settings?userId=user-1'));
+    assert.equal(unauthenticatedSettings.status, 401);
     const unauthenticatedSettingsExport = await handle(new Request('http://localhost/api/settings/data-export?userId=user-1'));
     assert.equal(unauthenticatedSettingsExport.status, 401);
     const unauthenticatedSettingsDelete = await handle(new Request('http://localhost/api/settings/account?userId=user-1', {
@@ -82,6 +84,12 @@ describe('authenticated HTTP routes', () => {
       headers: { authorization: `Bearer ${wrongUserToken}` }
     }));
     assert.equal(forbiddenSettingsExport.status, 403);
+    const forbiddenSettings = await handle(new Request('http://localhost/api/settings?userId=user-1', {
+      method: 'PATCH',
+      headers: { authorization: `Bearer ${wrongUserToken}` },
+      body: JSON.stringify({ preferredStores: ['willys-odenplan'] })
+    }));
+    assert.equal(forbiddenSettings.status, 403);
     const forbiddenSettingsDelete = await handle(new Request('http://localhost/api/settings/account?userId=user-1', {
       method: 'DELETE',
       headers: { authorization: `Bearer ${wrongUserToken}` },
@@ -160,6 +168,10 @@ describe('authenticated HTTP routes', () => {
       headers: { authorization: `Bearer ${token}` }
     }));
     assert.equal(authorizedSettingsExport.status, 200);
+    const authorizedSettings = await handle(new Request('http://localhost/api/settings?userId=user-1', {
+      headers: { authorization: `Bearer ${token}` }
+    }));
+    assert.equal(authorizedSettings.status, 200);
     const authorizedSettingsDelete = await handle(new Request('http://localhost/api/settings/account?userId=user-1', {
       method: 'DELETE',
       headers: { authorization: `Bearer ${token}` },
