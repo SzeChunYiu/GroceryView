@@ -3,6 +3,7 @@ import { paydayRankScore, resolvePaydayContext } from './lib/rankers/payday.js';
 export * from './lib/rankers/nearby.js';
 export * from './lib/rankers/premium.js';
 export * from './lib/rankers/myBasket.js';
+export * from './lib/fuelRoute.js';
 export * from './lib/spendForecast.js';
 export type DealScoreInput = {
   currentCityPercentile: number;
