@@ -43,6 +43,7 @@ import {
   fetchIcaReklambladOffers,
   fetchOkq8FuelPrices,
   fetchPharmacyProducts,
+  fetchSevenElevenSeConvenienceProducts,
   fetchSt1FuelPrices,
   fetchWillysProducts,
   fetchWillysWeeklyDiscountsForAllStores
@@ -240,6 +241,12 @@ if (shouldRun('apohem')) {
   });
   await writeApohem(pharmacyProducts);
   summary.pharmacyProducts = pharmacyProducts.length;
+}
+
+if (shouldRun('seven-eleven-se')) {
+  const sevenElevenSeProducts = await fetchSevenElevenSeConvenienceProducts({ retrievedAt });
+  await writeSevenElevenSe(sevenElevenSeProducts);
+  summary.sevenElevenSeProducts = sevenElevenSeProducts.length;
 }
 
 if (['citygross', 'willys', 'hemkop', 'lidl'].some((source) => shouldRun(source))) {
@@ -1120,6 +1127,53 @@ async function writeOverpass(rows, query) {
     })} as const;`,
     '',
     `export const overpassStores: OverpassIngestedStore[] = ${literal(rows)};`,
+    ''
+  ]);
+}
+
+async function writeSevenElevenSe(rows) {
+  const sourceUrls = unique(rows.map((row) => row.sourceUrl));
+  const pdfUrls = unique(rows.map((row) => row.pdfUrl));
+  await writeGeneratedFile('seven-eleven-se.ts', [
+    '// AUTO-GENERATED from 7-Eleven Sweden public B2B assortment PDF.',
+    `// sourceUrl: ${sourceUrls[0] ?? 'https://7-eleven.se/foretagsbestallningar/'}`,
+    `// pdfUrl: ${pdfUrls[0] ?? 'https://storage.googleapis.com/seveneleven-media-bucket-prod/1/2025/06/7E-Sortimentlista-B2B-A4-enkelsidor.pdf'}`,
+    `// retrievedAt: ${retrievedAt}`,
+    `// rowCount: ${rows.length} real convenience-product rows parsed from the public PDF.`,
+    '',
+    "export type SevenElevenSeIngestedProduct = {",
+    '  productId: string;',
+    "  chainId: 'seven_eleven_se';",
+    "  chainName: '7-Eleven Sweden';",
+    "  category: 'breakfast' | 'bakery' | 'lunch' | 'drink' | 'snack' | 'convenience';",
+    '  name: string;',
+    '  priceMin: number;',
+    '  priceMax: number;',
+    '  priceText: string;',
+    "  currency: 'SEK';",
+    '  depositIncluded: boolean;',
+    "  dietaryTags: Array<'lacto_vegetarian' | 'vegetarian' | 'plant_based' | 'vegan'>;",
+    '  sourceUrl: string;',
+    '  pdfUrl: string;',
+    '  retrievedAt: string;',
+    '  provenance: {',
+    "    source: 'seven_eleven_se_b2b_assortment_pdf';",
+    '    parserVersion: string;',
+    '    rawSnapshotRef: string;',
+    '  };',
+    '};',
+    '',
+    `export const sevenElevenSeSource = ${literal({
+      source: 'seven_eleven_se_b2b_assortment_pdf',
+      retrievedAt,
+      rowCount: rows.length,
+      sourceUrl: sourceUrls[0] ?? null,
+      sourceUrls,
+      pdfUrl: pdfUrls[0] ?? null,
+      pdfUrls
+    })} as const;`,
+    '',
+    `export const sevenElevenSeProducts: SevenElevenSeIngestedProduct[] = ${literal(rows)};`,
     ''
   ]);
 }
