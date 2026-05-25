@@ -34,6 +34,14 @@ export function createPostgresSiteSnapshotReader(executor) {
     }
   };
 }
+
+export function createPostgresTrendingPriceChangeReader(executor) {
+  return {
+    async listTrendingProductPriceChanges() {
+      await executor.query({ text: 'select fixture_trending_price_changes' });
+    }
+  };
+}
 \`);
 
 const pgModuleUrl = 'data:text/javascript;charset=utf-8,' + encodeURIComponent(\`

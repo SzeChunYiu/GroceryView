@@ -23,6 +23,7 @@ const appFiles = [
   'src/app/openprices-depth/page.tsx',
   'src/app/settings/page.tsx',
   'src/app/admin/moderation/page.tsx',
+  'src/app/admin/ingestion-runs/page.tsx',
   'src/components/market-shell.tsx',
   'src/components/settings-data-export-actions.tsx',
   'src/components/data-ui.tsx',
@@ -679,6 +680,31 @@ describe('verified-data UI', () => {
     assert.match(moderation, /High risk starts at/);
     assert.match(moderation, /tune review routing/);
     assert.doesNotMatch(moderation, /@\/lib\/demo-data|@\/components\/sample-data/);
+  });
+
+  it('surfaces ingestion pipeline run history for admin diagnostics', async () => {
+    const sourceHealth = await read('src/lib/source-health.ts');
+    const page = await read('src/app/admin/ingestion-runs/page.tsx');
+    const dataGrid = await read('src/components/data-grid.tsx');
+
+    assert.match(sourceHealth, /export type IngestionRunHistoryEntry/);
+    assert.match(sourceHealth, /export const ingestionRunHistory/);
+    assert.match(sourceHealth, /getIngestionRunHistory/);
+    assert.match(sourceHealth, /summarizeIngestionRuns/);
+    assert.match(sourceHealth, /durationSeconds/);
+    assert.match(sourceHealth, /rowCounts/);
+    assert.match(sourceHealth, /warnings/);
+    assert.match(sourceHealth, /diagnostics/);
+    assert.match(page, /Ingestion run history/);
+    assert.match(page, /StatusBadge/);
+    assert.match(page, /formatDuration/);
+    assert.match(page, /Accepted rows/);
+    assert.match(page, /Rejected rows/);
+    assert.match(sourceHealth, /Connector diagnostics/);
+    assert.match(page, /<DataGrid density="compact">/);
+    assert.match(dataGrid, /density\?: 'comfortable' \| 'compact'/);
+    assert.match(dataGrid, /overflow-x-auto/);
+    assert.doesNotMatch(page, /@\/lib\/demo-data|@\/components\/sample-data/);
   });
 
 
