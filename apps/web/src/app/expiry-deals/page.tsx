@@ -30,7 +30,18 @@ const staleReports = expiryDealRadarReports.filter((report) => radar.staleReport
 const confidenceLevel = rankedActiveItems.some((item) => item.verification === 'needs_confirmation') ? 'medium' : 'high';
 
 export function generateMetadata() {
-  return routeMetadata('/expiry-deals');
+  const metadata = routeMetadata('/expiry-deals');
+  const openGraph = metadata.openGraph;
+
+  return {
+    ...metadata,
+    twitter: {
+      card: 'summary_large_image',
+      title: openGraph?.title ?? metadata.title,
+      description: openGraph?.description ?? metadata.description,
+      images: openGraph?.images
+    }
+  };
 }
 
 function formatSek(value: number) {
