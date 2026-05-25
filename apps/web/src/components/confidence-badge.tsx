@@ -1,6 +1,7 @@
 import { confidenceCopy, type ConfidenceLevel } from '@/lib/content-style';
 import { confidenceStateToken } from '@/lib/color-vision-palette';
 import { getPriceFreshness } from '@/lib/freshness';
+import { groceryTranslator, type SupportedLocale } from '@/lib/i18n';
 
 type ConfidenceBadgeProps = {
   level: ConfidenceLevel;
@@ -12,6 +13,7 @@ type ConfidenceBadgeProps = {
     value: string;
   }>;
   verificationLabel?: string;
+  locale?: SupportedLocale;
 };
 
 const levelClasses: Record<ConfidenceBadgeProps["level"], string> = {
@@ -20,17 +22,18 @@ const levelClasses: Record<ConfidenceBadgeProps["level"], string> = {
   low: "border-amber-200 bg-amber-50 text-amber-900",
 };
 
-export function ConfidenceBadge({ level, label, observedAt, sampleSize, details, verificationLabel }: ConfidenceBadgeProps) {
+export function ConfidenceBadge({ level, label, observedAt, sampleSize, details, verificationLabel, locale }: ConfidenceBadgeProps) {
+  const t = groceryTranslator(locale);
   const displayLabel = label ?? confidenceCopy(level, sampleSize);
   const token = confidenceStateToken(level);
-  const sampleCopy = sampleSize !== undefined ? `Sample size ${sampleSize}.` : '';
+  const sampleCopy = sampleSize !== undefined ? t('confidence-badge.sampleSize', { sampleSize }) : '';
   const freshness = observedAt !== undefined ? getPriceFreshness(observedAt) : null;
   const verificationCopy = verificationLabel?.trim();
   const detailCopy = [
     sampleCopy,
-    freshness ? `Freshness ${freshness.label}. ${freshness.refreshHint}` : '',
-    verificationCopy ? `Verification ${verificationCopy}.` : '',
-    `${token.meaning}. Indicator ${token.indicator}.`
+    freshness ? t('confidence-badge.freshness', { label: freshness.label, refreshHint: freshness.refreshHint }) : '',
+    verificationCopy ? t('confidence-badge.verification', { verificationLabel: verificationCopy }) : '',
+    t('confidence-badge.indicator', { meaning: token.meaning, indicator: token.indicator })
   ].filter(Boolean).join(' ');
   const badge = (
     <span
