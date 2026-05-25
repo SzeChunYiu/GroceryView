@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { readOnlyEdgeCacheHeaders } from '@/lib/cache-headers';
 import { headerSearchFacetChips } from '@/lib/search-filters';
 import { adaptiveProductCards, buildProductSearchView, categorySummaries, formatSek } from '@/lib/verified-data';
 
@@ -114,9 +115,7 @@ export async function GET(request: Request) {
       source: 'verified product and category snapshots'
     },
     {
-      headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=60'
-      }
+      headers: readOnlyEdgeCacheHeaders('suggest')
     }
   );
 }

@@ -2,6 +2,7 @@ import { createPgQueryExecutor, searchProductsByText, type ProductSearchResult }
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { recordProductSearchPerformanceTelemetry, type ProductSearchPerformanceTelemetry } from '@/lib/analytics';
+import { readOnlyEdgeCacheHeaders } from '@/lib/cache-headers';
 import { expandGrocerySearchQueryWithTelemetry, type GrocerySearchExpansion, type GrocerySearchExpansionTelemetry } from '@/lib/search-suggest';
 
 export const runtime = 'nodejs';
@@ -122,6 +123,23 @@ function responsePayload(
   };
 }
 
+function productSearchResponse(
+  query: string,
+  results: ProductSearchResult[],
+  expansion: GrocerySearchExpansion,
+  telemetry: ProductSearchPerformanceTelemetry,
+  init: { status?: number } = {},
+  error?: string
+) {
+  return NextResponse.json(
+    responsePayload(query, results, expansion, telemetry, error),
+    {
+      ...init,
+      headers: readOnlyEdgeCacheHeaders('product-search')
+    }
+  );
+}
+
 export async function GET(request: Request) {
   const startedAt = Date.now();
   const parsedQuery = parseProductSearchQuery(request);
@@ -145,17 +163,14 @@ export async function GET(request: Request) {
   if (query.length < 2) {
     const telemetry = buildPerformanceTelemetry(query, 0, startedAt, expansionTelemetry);
     logPerformanceTelemetry(telemetry);
-    return NextResponse.json(responsePayload(query, [], expansion, telemetry));
+    return productSearchResponse(query, [], expansion, telemetry);
   }
 
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) {
     const telemetry = buildPerformanceTelemetry(query, 0, startedAt, expansionTelemetry);
     logPerformanceTelemetry(telemetry);
-    return NextResponse.json(
-      responsePayload(query, [], expansion, telemetry, 'product_search_database_unconfigured'),
-      { status: 503 }
-    );
+    return productSearchResponse(query, [], expansion, telemetry, { status: 503 }, 'product_search_database_unconfigured');
   }
 
   try {
@@ -164,14 +179,11 @@ export async function GET(request: Request) {
     const results = mergeSearchResults(batches);
     const telemetry = buildPerformanceTelemetry(query, results.length, startedAt, expansionTelemetry);
     logPerformanceTelemetry(telemetry);
-    return NextResponse.json(responsePayload(query, results, expansion, telemetry));
+    return productSearchResponse(query, results, expansion, telemetry);
   } catch (error) {
     const telemetry = buildPerformanceTelemetry(query, 0, startedAt, expansionTelemetry, isTimeoutError(error));
     console.error('Product search query failed', error instanceof Error ? { name: error.name } : { name: 'unknown' });
     logPerformanceTelemetry(telemetry);
-    return NextResponse.json(
-      responsePayload(query, [], expansion, telemetry, 'product_search_query_failed'),
-      { status: 500 }
-    );
+    return productSearchResponse(query, [], expansion, telemetry, { status: 500 }, 'product_search_query_failed');
   }
 }
