@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import {
   buildPriceChartSeries,
   calculateDealScore,
+  getBenchmarksFor,
   recommendSmartSwaps,
   scoreBand,
   summarizePriceHistory,
@@ -17,6 +18,7 @@ import {
   type ItemSubstitutionProduct
 } from '@groceryview/analytics';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { BenchmarkLayerBadge } from '@/components/benchmark-layer-badge';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { PriceIntelligenceCard, type PriceIntelligenceScoreCard } from '@/components/price-intelligence-card';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
@@ -53,6 +55,7 @@ const historyWindowDefinitions = [
   { label: '365-day', rangeDays: 365, title: 'Observed 365-day low/high' }
 ] as const;
 const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const;
+const productBenchmarks = getBenchmarksFor('SE', 'grocery');
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
@@ -1232,6 +1235,27 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
       <Eyebrow>{isChain ? 'Axfood chain product' : 'OpenPrices product'}</Eyebrow>
       <h1 className="mt-2 max-w-4xl text-4xl font-black tracking-tight">{product.name}</h1>
       <p className="mt-3 text-lg text-slate-700">{isChain ? product.brand : product.brands || 'Brand not reported'} · {isChain ? product.subline : product.quantity || 'Quantity not reported'}</p>
+      <Card className="mt-6 border-sky-200 bg-sky-50">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <Eyebrow>Official benchmark context</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black text-sky-950">Official benchmark exists for this category — ingestion planned</h2>
+            <p className="mt-3 text-sm font-semibold leading-6 text-sky-950">
+              This product page shows observed retail price evidence only. CPI and upstream agriculture sources are registry-only today, so no official benchmark value is displayed or interpolated.
+            </p>
+          </div>
+          <Link className="rounded-full bg-white px-4 py-2 text-sm font-black text-sky-900 underline decoration-sky-300 underline-offset-4" href="/se/benchmarks">
+            View SE benchmarks
+          </Link>
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {productBenchmarks.map((source) => (
+            <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-2 text-xs font-black text-sky-950" key={source.id}>
+              <BenchmarkLayerBadge layer={source.layer} /> {source.label}
+            </span>
+          ))}
+        </div>
+      </Card>
       <div className="mt-6 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
         <Card>
           {product.image ? (

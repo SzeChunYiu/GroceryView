@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import { getBenchmarksFor } from '@groceryview/core';
+import { BenchmarkLayerBadge } from '@/components/benchmark-layer-badge';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { formatFuelPrice, fuelPriceSourceSchema, fuelPriceTargetAlerts, verifiedFuelPriceObservations, verifiedFuelPriceSource } from '@/lib/fuel-prices';
 import { fuelStations, fuelStationSource, type FuelStationChain } from '@/lib/ingested/fuel-stations';
@@ -30,6 +32,7 @@ const fuelChainColors: Record<FuelStationChain, string> = {
   Qstar: '#6f42c1',
   Shell: '#ffd100'
 };
+const fuelBenchmarks = getBenchmarksFor('SE', 'fuel');
 
 function fuelStationPosition(latitude: number, longitude: number) {
   const x = ((longitude - fuelMapBounds.minLon) / (fuelMapBounds.maxLon - fuelMapBounds.minLon)) * 100;
@@ -63,6 +66,28 @@ export default function FuelPage() {
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
         GroceryView now renders fuel only from domain=fuel observations with price per litre and source provenance. The first operator source is OKQ8&apos;s public fuel price page; crowd reports remain schema-ready but empty.
       </p>
+
+      <Card className="mt-6 border-orange-200 bg-orange-50">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <Eyebrow>Official fuel benchmark context</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black text-orange-950">Official benchmark exists for fuel — ingestion planned</h2>
+            <p className="mt-3 text-sm font-semibold leading-6 text-orange-950">
+              Fuel observations below are operator retail rows. Official CPI fuel categories are registry-only today, so the page links the source registry without rendering fabricated index values.
+            </p>
+          </div>
+          <Link className="rounded-full bg-white px-4 py-2 text-sm font-black text-orange-900 underline decoration-orange-300 underline-offset-4" href="/se/benchmarks">
+            View SE benchmarks
+          </Link>
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {fuelBenchmarks.map((source) => (
+            <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-2 text-xs font-black text-orange-950" key={source.id}>
+              <BenchmarkLayerBadge layer={source.layer} /> {source.label}
+            </span>
+          ))}
+        </div>
+      </Card>
 
       <div className="mt-6 grid gap-4 md:grid-cols-3">
         <Card>

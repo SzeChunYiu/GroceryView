@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { calculateBrandTierIndices, calculateChainPriceIndex } from '@groceryview/core';
+import { calculateBrandTierIndices, calculateChainPriceIndex, getBenchmarksFor } from '@groceryview/core';
+import { BenchmarkLayerBadge } from '@/components/benchmark-layer-badge';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
 import { buildBrandTierPriceObservations, buildChainIndexTrendSeries, buildChainPriceObservations, buildMatchedBasketChainPriceObservations } from '@/lib/chain-index-data';
@@ -29,6 +30,7 @@ const widgetSourceConfidence = matchedBasketRefinedIndex.chains.reduce(
 );
 
 const groceryIndexTickerWidget = buildGroceryIndexTickerWidget(widgetSourceConfidence);
+const chainIndexBenchmarks = getBenchmarksFor('SE', 'grocery');
 
 function tierTone(value: number) {
   if (value < 95) return 'text-emerald-800 bg-emerald-50';
@@ -63,6 +65,27 @@ export default function ChainIndexPage() {
       <Eyebrow>Chain index</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Willys/Hemköp matched-product index</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">The index is computed only from products with the same Axfood code in both chain catalogues. It does not mix unmatched SKUs or branch-location data.</p>
+      <Card className="mt-6 border-sky-200 bg-sky-50">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <Eyebrow>Official benchmark context</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black text-sky-950">Official benchmarks exist — ingestion planned</h2>
+            <p className="mt-3 text-sm font-semibold leading-6 text-sky-950">
+              Chain Price Index remains GroceryView retail-observation evidence. Official CPI and upstream agriculture sources are documented for side-by-side comparison, but none are live here yet, so no official benchmark value is shown.
+            </p>
+          </div>
+          <Link className="rounded-full bg-white px-4 py-2 text-sm font-black text-sky-900 underline decoration-sky-300 underline-offset-4" href="/se/benchmarks">
+            View SE benchmarks
+          </Link>
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {chainIndexBenchmarks.map((source) => (
+            <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-2 text-xs font-black text-sky-950" key={source.id}>
+              <BenchmarkLayerBadge layer={source.layer} /> {source.label}
+            </span>
+          ))}
+        </div>
+      </Card>
       <div className="mt-6 grid gap-4 md:grid-cols-3">
         <Card><p className="text-sm font-black text-slate-600">Matched products</p><p className="mt-2 text-4xl font-black text-emerald-800">{matchedChainProducts.length}</p></Card>
         <Card><p className="text-sm font-black text-slate-600">Average spread</p><p className="mt-2 text-4xl font-black text-emerald-800">{formatPct(averageSpread)}</p></Card>

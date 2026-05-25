@@ -1,6 +1,7 @@
 export * from './lib/rankers/nearby.js';
 export * from './lib/rankers/premium.js';
 export * from './lib/rankers/myBasket.js';
+export * from './lib/benchmarkRegistry.js';
 export type DealScoreInput = {
   currentCityPercentile: number;
   knownPromoHistoryPercentile: number;
