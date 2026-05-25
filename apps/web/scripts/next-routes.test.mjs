@@ -368,8 +368,8 @@ describe('verified-data UI', () => {
   });
 
   it('wires MyFlyer account preferences to the API without local-only persistence', async () => {
-    const page = await read('src/app/[city]/my-flyer/page.tsx');
-    const preferences = await read('src/app/[city]/my-flyer/my-flyer-preferences.tsx');
+    const page = await read('src/app/[country]/my-flyer/page.tsx');
+    const preferences = await read('src/app/[country]/my-flyer/my-flyer-preferences.tsx');
     const api = await read('src/app/api/my-flyer/route.ts');
 
     assert.match(page, /MyFlyerPreferences/);
@@ -3313,7 +3313,7 @@ ${seo}`;
       'src/app/watchlist/page.tsx',
       'src/app/widgets/grocery-index-ticker/page.tsx',
       'src/app/weekly-basket/page.tsx',
-      'src/app/[city]/billigaste/[slug]/page.tsx'
+      'src/app/[country]/billigaste/[slug]/page.tsx'
     ];
     const seo = await read('src/lib/seo.ts');
 
@@ -3510,7 +3510,7 @@ ${seo}`;
     const landingComponent = await read('src/components/seo-landing-page.tsx');
     const cheapestRoute = await read('src/app/billigaste/[slug]/page.tsx');
     const compareRoute = await read('src/app/prisjamforelse/[slug]/page.tsx');
-    const cityRoute = await read('src/app/[city]/billigaste/[slug]/page.tsx');
+    const cityRoute = await read('src/app/[country]/billigaste/[slug]/page.tsx');
     const products = await read('src/app/products/page.tsx');
     const sitemap = await read('src/app/sitemap.ts');
 

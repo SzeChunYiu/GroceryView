@@ -75,3 +75,38 @@ jobs:
         run: npm run build
       - name: Test
         run: npm test
+
+  accessibility-gate:
+    name: WCAG 2.2 AA accessibility gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with: { node-version: 22, cache: npm }
+      - name: Cache node_modules
+        id: nm
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            apps/*/node_modules
+            packages/*/node_modules
+          key: nm-${{ runner.os }}-node22-${{ hashFiles('package-lock.json') }}
+      - name: Install
+        if: steps.nm.outputs.cache-hit != 'true'
+        run: npm ci
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run axe WCAG gate
+        run: npm run a11y:ci -w @groceryview/web
+      - name: Upload accessibility artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wcag-2-2-aa-accessibility-gate-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            apps/web/e2e/test-results/a11y/*.json
+            apps/web/e2e/test-results/junit.xml
+            apps/web/e2e/playwright-report
+          if-no-files-found: ignore

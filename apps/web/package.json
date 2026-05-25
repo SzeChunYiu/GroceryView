@@ -12,6 +12,7 @@
     "start": "next start",
     "test": "node --test scripts/*.test.mjs",
     "e2e": "playwright test --config playwright.config.ts",
+    "a11y:ci": "playwright test --config playwright.config.ts --project=chromium e2e/accessibility/wcag-aa-gate.spec.ts",
     "build:deps": "npm run build -w @groceryview/core && npm run build -w @groceryview/analytics && npm run build -w @groceryview/api && npm run build -w @groceryview/catalog && npm run build -w @groceryview/db && npm run build -w @groceryview/ops && npm run build -w @groceryview/scanning"
   },
   "dependencies": {

@@ -31,6 +31,28 @@ Status values:
 | Consistent help | Manual WCAG 2.2 AA review | 3.2.6 | pass | Help/status content appears in-page near affected controls; no page has a hidden help-only flow. |
 | Accessible authentication | Manual WCAG 2.2 AA review | 3.3.8 | pass | Public browsing does not require an authentication challenge. |
 
+## Release gate
+
+Run `npm run a11y:ci -w @groceryview/web` before release. The command starts the local web app through Playwright unless `PLAYWRIGHT_BASE_URL` is explicitly set for a deployed preview. CI runs this command in the `WCAG 2.2 AA accessibility gate` job for pull requests, pushes to `main`, merge queue candidates, and manual workflow dispatches.
+
+The gate uses Playwright Chromium plus axe-core against core public routes: `/`, `/compare`, `/list`, `/scanner`, `/stores`, and `/pricing`. It fails on every unexcepted `serious` or `critical` axe violation tagged for WCAG 2.0/2.1/2.2 AA or axe best practice, and writes `apps/web/e2e/test-results/a11y/wcag-aa-gate-report.json` as the machine-readable report artifact.
+
+Exceptions must be added to `apps/web/e2e/accessibility/wcag-aa-exceptions.json` with the exact route, axe rule id, selector target, GitHub issue URL, expiry date, and reason. Expired exceptions fail the gate. New serious/critical violations without an active exception fail the gate.
+
+## Manual WCAG 2.2 AA checklist artifact
+
+Automation cannot fully prove several AA criteria. Review these before release and link evidence in the release checklist or PR:
+
+| Criterion | Manual check | Evidence expected |
+| --- | --- | --- |
+| 2.1.1 Keyboard | Complete the primary grocery compare, list, scanner, store discovery, and pricing journeys with keyboard only. | PR comment or release checklist entry naming the tested routes and browser. |
+| 2.4.3 Focus order | Confirm focus moves in visual/logical order through navigation, filters, modals, and list actions. | Notes for any non-obvious focus movement or linked fix issue. |
+| 2.4.7 Focus visible | Confirm every focused control has a visible indicator in light and high-contrast surfaces. | Screenshot or reviewer note for affected route groups. |
+| 2.5.7 Dragging movements | Confirm no core grocery workflow requires dragging; any drag feature has button/input alternative. | Route list and linked issue for any missing non-drag alternative. |
+| 2.5.8 Target size | Spot-check dense grocery controls and scanner actions meet practical target sizing or have equivalent controls. | Route list and linked issue for cramped controls. |
+| 3.2.6 Consistent help | Confirm support/help/status affordances stay consistently discoverable across public flows. | Reviewer note naming any intentional exceptions. |
+| 3.3.8 Accessible authentication | Confirm account and premium prompts do not rely on memory, puzzle, or transcription-only steps. | Reviewer note for login/pricing/account prompts. |
+
 ## Current gate
 
 - Fails: 0
