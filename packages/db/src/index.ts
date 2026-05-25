@@ -371,6 +371,7 @@ export type HouseholdPlanRecord = {
 };
 
 export type PriceType = 'shelf' | 'online' | 'member' | 'promotion' | 'receipt' | 'community' | 'estimated';
+export type PriceObservationChannel = 'packaged' | 'loose' | 'pre_packed' | 'counter_meat' | 'counter_deli' | 'counter_fish';
 
 export type ProductCatalogRecord = {
   productId: string;
@@ -533,6 +534,7 @@ export type PriceObservationRecord = {
   rawRecordId?: string;
   retailerProductRef?: string;
   priceType: PriceType;
+  channel?: PriceObservationChannel;
   price: number;
   regularPrice?: number;
   unitPrice: number;
@@ -577,6 +579,7 @@ export type PriceObservationHistoryFilter = {
   chainId?: string;
   storeId?: string;
   priceType?: PriceType;
+  channel?: PriceObservationChannel;
   observedFrom?: string;
   observedTo?: string;
   limit?: number;
@@ -587,6 +590,7 @@ export type LatestPriceRecord = {
   chainId: string;
   storeId?: string;
   priceType: PriceType;
+  channel: PriceObservationChannel;
   observationId: string;
   price: number;
   regularPrice?: number;
@@ -620,6 +624,7 @@ export type WeeklyPriceDropDigestItem = {
   storeSlug?: string;
   storeName?: string;
   priceType: PriceType;
+  channel: PriceObservationChannel;
   price: number;
   regularPrice: number;
   savingsAmount: number;
@@ -1684,6 +1689,7 @@ type LatestPriceRow = {
   chain_id: string;
   store_id: string | null;
   price_type: PriceType;
+  channel: PriceObservationChannel;
   observation_id: string;
   price: string | number;
   regular_price: string | number | null;
@@ -1731,6 +1737,7 @@ type WeeklyPriceDropDigestRow = {
   store_slug: string | null;
   store_name: string | null;
   price_type: PriceType;
+  channel: PriceObservationChannel;
   price: string | number;
   regular_price: string | number;
   savings_amount: string | number;
@@ -1768,6 +1775,7 @@ type PriceObservationHistoryRow = {
   raw_record_id: string | null;
   retailer_product_ref: string | null;
   price_type: PriceType;
+  channel: PriceObservationChannel;
   price: string | number;
   regular_price: string | number | null;
   unit_price: string | number;
@@ -1908,6 +1916,7 @@ function mapLatestPrice(row: LatestPriceRow): LatestPriceRecord {
     chainId: row.chain_id,
     ...(row.store_id ? { storeId: row.store_id } : {}),
     priceType: row.price_type,
+    channel: row.channel ?? 'packaged',
     observationId: row.observation_id,
     price: Number(row.price),
     ...(row.regular_price === null ? {} : { regularPrice: Number(row.regular_price) }),
@@ -1929,7 +1938,8 @@ function sameLatestPriceKey(row: LatestPriceRow, observation: PriceObservationRe
   return row.product_id === observation.productId &&
     row.chain_id === observation.chainId &&
     (row.store_id ?? null) === (observation.storeId ?? null) &&
-    row.price_type === observation.priceType;
+    row.price_type === observation.priceType &&
+    (row.channel ?? 'packaged') === (observation.channel ?? 'packaged');
 }
 
 function latestPriceIsUnchanged(row: LatestPriceRow, observation: PriceObservationRecord): boolean {
@@ -2011,6 +2021,7 @@ function mapWeeklyPriceDropDigestRow(row: WeeklyPriceDropDigestRow, index: numbe
     ...(row.store_slug ? { storeSlug: row.store_slug } : {}),
     ...(row.store_name ? { storeName: row.store_name } : {}),
     priceType: row.price_type,
+    channel: row.channel ?? 'packaged',
     price,
     regularPrice,
     savingsAmount,
@@ -2150,6 +2161,7 @@ function mapPriceObservationHistory(row: PriceObservationHistoryRow): PriceObser
     ...(row.raw_record_id ? { rawRecordId: row.raw_record_id } : {}),
     ...(row.retailer_product_ref ? { retailerProductRef: row.retailer_product_ref } : {}),
     priceType: row.price_type,
+    channel: row.channel ?? 'packaged',
     price: Number(row.price),
     ...(row.regular_price === null ? {} : { regularPrice: Number(row.regular_price) }),
     unitPrice: Number(row.unit_price),
@@ -3830,7 +3842,8 @@ export const POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS = [
   '017_observation_availability',
   '018_household_collaboration_rls',
   '019_price_snapshot_unique_index',
-  '025_friend_shared_deal_signals'
+  '025_friend_shared_deal_signals',
+  '026_observation_counter_channels'
 ] as const;
 
 function assertProbe(condition: boolean, message: string): void {
@@ -4130,7 +4143,7 @@ export function buildPostgresRepositorySmokeProbes(input: BuildPostgresRepositor
         const latestRows = await executor.query<LatestPriceProbeRow>(
           `select observation_id
            from latest_prices
-           where product_id = $1 and chain_id = $2 and store_id is null and price_type = 'online'`,
+           where product_id = $1 and chain_id = $2 and store_id is null and price_type = 'online' and channel = 'packaged'`,
           [productId, chainId]
         );
         assertProbe(
@@ -4185,13 +4198,14 @@ async function findExistingObservationId(executor: QueryExecutor, observation: P
        and domain = $4
        and retailer_product_ref is not distinct from $5
        and price_type = $6
-       and observed_at = $7
-       and price = $8
-       and unit_price = $9
-       and currency = $10
-       and is_available = $11
-       and confidence = $12
-       and provenance = $13::jsonb
+       and channel = $7
+       and observed_at = $8
+       and price = $9
+       and unit_price = $10
+       and currency = $11
+       and is_available = $12
+       and confidence = $13
+       and provenance = $14::jsonb
      order by id
      limit 1`,
     [
@@ -4201,6 +4215,7 @@ async function findExistingObservationId(executor: QueryExecutor, observation: P
       observation.domain ?? 'grocery',
       observation.retailerProductRef ?? null,
       observation.priceType,
+      observation.channel ?? 'packaged',
       observation.observedAt,
       observation.price,
       observation.unitPrice,
@@ -4353,6 +4368,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            raw_record_id,
            retailer_product_ref,
            price_type,
+           channel,
            price,
            regular_price,
            unit_price,
@@ -4371,7 +4387,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            provenance
          ) values (
            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12,
-           $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24::jsonb
+           $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25::jsonb
          )
          on conflict (
            product_id,
@@ -4380,6 +4396,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            domain,
            retailer_product_ref,
            price_type,
+           channel,
            observed_at,
            price,
            unit_price,
@@ -4398,6 +4415,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
           observation.rawRecordId ?? null,
           observation.retailerProductRef ?? null,
           observation.priceType,
+          observation.channel ?? 'packaged',
           observation.price,
           observation.regularPrice ?? null,
           observation.unitPrice,
@@ -4426,6 +4444,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            store_id,
            domain,
            price_type,
+           channel,
            observation_id,
            price,
            regular_price,
@@ -4435,8 +4454,8 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            is_available,
            confidence,
            provenance
-         ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14::jsonb)
-         on conflict (product_id, chain_id, store_id, price_type) do update set
+         ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15::jsonb)
+         on conflict (product_id, chain_id, store_id, price_type, channel) do update set
            observation_id = excluded.observation_id,
            price = excluded.price,
            regular_price = excluded.regular_price,
@@ -4455,6 +4474,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
           observation.storeId ?? null,
           observation.domain ?? 'grocery',
           observation.priceType,
+          observation.channel ?? 'packaged',
           observationId,
           observation.price,
           observation.regularPrice ?? null,
@@ -4485,6 +4505,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              raw_record_id uuid,
              retailer_product_ref text,
              price_type text,
+             channel text,
              price numeric(12, 2),
              regular_price numeric(12, 2),
              unit_price numeric(12, 4),
@@ -4506,7 +4527,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
          ranked_input as (
            select input.*,
                   row_number() over (
-                    partition by product_id, chain_id, store_id, domain, price_type, observed_at, retailer_product_ref, price, unit_price, currency, is_available, confidence, provenance
+                    partition by product_id, chain_id, store_id, domain, price_type, channel, observed_at, retailer_product_ref, price, unit_price, currency, is_available, confidence, provenance
                     order by ordinal
                   ) as input_rank
            from input
@@ -4520,6 +4541,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
                   observations.store_id,
                   observations.domain,
                   observations.price_type,
+                  observations.channel,
                   observations.price,
                   observations.regular_price,
                   observations.unit_price,
@@ -4534,6 +4556,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              and observations.store_id is not distinct from ranked_input.store_id
              and observations.domain = ranked_input.domain
              and observations.price_type = ranked_input.price_type
+             and observations.channel = ranked_input.channel
              and observations.observed_at = ranked_input.observed_at
              and observations.retailer_product_ref is not distinct from ranked_input.retailer_product_ref
              and observations.price = ranked_input.price
@@ -4554,6 +4577,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              raw_record_id,
              retailer_product_ref,
              price_type,
+             channel,
              price,
              regular_price,
              unit_price,
@@ -4580,6 +4604,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              raw_record_id,
              retailer_product_ref,
              price_type,
+             channel,
              price,
              regular_price,
              unit_price,
@@ -4610,6 +4635,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              domain,
              retailer_product_ref,
              price_type,
+             channel,
              observed_at,
              price,
              unit_price,
@@ -4618,7 +4644,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              confidence,
              provenance
            ) do nothing
-           returning id, product_id, chain_id, store_id, domain, retailer_product_ref, price_type, price, regular_price, unit_price, currency, is_available, observed_at, confidence, provenance
+           returning id, product_id, chain_id, store_id, domain, retailer_product_ref, price_type, channel, price, regular_price, unit_price, currency, is_available, observed_at, confidence, provenance
          ),
          written as (
            select ranked_input.ordinal,
@@ -4628,6 +4654,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
                   coalesce(inserted.store_id, existing.store_id) as store_id,
                   coalesce(inserted.domain, existing.domain) as domain,
                   coalesce(inserted.price_type, existing.price_type) as price_type,
+                  coalesce(inserted.channel, existing.channel) as channel,
                   coalesce(inserted.price, existing.price) as price,
                   coalesce(inserted.regular_price, existing.regular_price) as regular_price,
                   coalesce(inserted.unit_price, existing.unit_price) as unit_price,
@@ -4643,6 +4670,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              and inserted.store_id is not distinct from ranked_input.store_id
              and inserted.domain = ranked_input.domain
              and inserted.price_type = ranked_input.price_type
+             and inserted.channel = ranked_input.channel
              and inserted.observed_at = ranked_input.observed_at
              and inserted.retailer_product_ref is not distinct from ranked_input.retailer_product_ref
              and inserted.price = ranked_input.price
@@ -4660,6 +4688,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              store_id,
              domain,
              price_type,
+             channel,
              observation_id,
              price,
              regular_price,
@@ -4676,6 +4705,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              store_id,
              domain,
              price_type,
+             channel,
              id,
              price,
              regular_price,
@@ -4686,12 +4716,13 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              confidence,
              provenance
            from (
-             select distinct on (product_id, chain_id, store_id, price_type)
+             select distinct on (product_id, chain_id, store_id, price_type, channel)
                product_id,
                chain_id,
                store_id,
                domain,
                price_type,
+               channel,
                id,
                price,
                regular_price,
@@ -4702,9 +4733,9 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
                confidence,
                provenance
              from written
-             order by product_id, chain_id, store_id, price_type, observed_at desc, id desc
+             order by product_id, chain_id, store_id, price_type, channel, observed_at desc, id desc
            ) latest_input
-           on conflict (product_id, chain_id, store_id, price_type) do update set
+           on conflict (product_id, chain_id, store_id, price_type, channel) do update set
              observation_id = excluded.observation_id,
              price = excluded.price,
              regular_price = excluded.regular_price,
@@ -4732,6 +4763,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
           raw_record_id: observation.rawRecordId ?? null,
           retailer_product_ref: observation.retailerProductRef ?? null,
           price_type: observation.priceType,
+          channel: observation.channel ?? 'packaged',
           price: observation.price,
           regular_price: observation.regularPrice ?? null,
           unit_price: observation.unitPrice,
@@ -4788,6 +4820,7 @@ export function createPostgresSiteSnapshotReader(executor: QueryExecutor): Postg
                 stores.name as store_name,
                 stores.city,
                 latest_prices.price_type,
+                latest_prices.channel,
                 latest_prices.observation_id,
                 latest_prices.price,
                 latest_prices.regular_price,
@@ -4814,7 +4847,7 @@ export function createPostgresSiteSnapshotReader(executor: QueryExecutor): Postg
          where latest_prices.confidence >= $1
            and latest_prices.domain = 'grocery'
            and ${ACTIVE_PRODUCTS_PREDICATE}
-         order by latest_prices.observed_at desc, products.slug, chains.slug, stores.slug nulls last, latest_prices.price_type
+         order by latest_prices.observed_at desc, products.slug, chains.slug, stores.slug nulls last, latest_prices.price_type, latest_prices.channel
          limit $2`,
         [minConfidence, limit]
       );
@@ -4838,6 +4871,7 @@ export function createPostgresWeeklyPriceDropDigestReader(executor: QueryExecuto
                 stores.slug as store_slug,
                 stores.name as store_name,
                 latest_prices.price_type,
+                latest_prices.channel,
                 latest_prices.price,
                 latest_prices.regular_price,
                 round((latest_prices.regular_price - latest_prices.price)::numeric, 2) as savings_amount,
@@ -4856,7 +4890,7 @@ export function createPostgresWeeklyPriceDropDigestReader(executor: QueryExecuto
            and latest_prices.regular_price is not null
            and latest_prices.regular_price > latest_prices.price
            and latest_prices.price >= 0
-         order by drop_percent desc, savings_amount desc, latest_prices.observed_at desc, products.slug, chains.slug, stores.slug nulls last, latest_prices.price_type
+         order by drop_percent desc, savings_amount desc, latest_prices.observed_at desc, products.slug, chains.slug, stores.slug nulls last, latest_prices.price_type, latest_prices.channel
          limit $3`,
         [filter.since, filter.until, limit]
       );
@@ -4887,7 +4921,7 @@ export function createPostgresTrendingPriceChangeReader(executor: QueryExecutor)
                   observations.currency,
                   observations.observed_at,
                   lag(observations.price) over (
-                    partition by observations.product_id, observations.chain_id, observations.store_id, observations.price_type
+                    partition by observations.product_id, observations.chain_id, observations.store_id, observations.price_type, observations.channel
                     order by observations.observed_at, observations.id
                   ) as previous_price
            from observations
@@ -4990,6 +5024,7 @@ export function createPostgresPriceReader(executor: QueryExecutor): PostgresPric
                 chain_id,
                 store_id,
                 price_type,
+                channel,
                 observation_id,
                 price,
                 regular_price,
@@ -5001,7 +5036,7 @@ export function createPostgresPriceReader(executor: QueryExecutor): PostgresPric
                 provenance
          from latest_prices
          where product_id = $1
-         order by observed_at desc, chain_id, store_id, price_type`,
+         order by observed_at desc, chain_id, store_id, price_type, channel`,
         [productId]
       );
       return rows.map(mapLatestPrice);
@@ -5018,6 +5053,7 @@ export function createPostgresPriceReader(executor: QueryExecutor): PostgresPric
                 raw_record_id,
                 retailer_product_ref,
                 price_type,
+                channel,
                 price,
                 regular_price,
                 unit_price,
@@ -5039,15 +5075,17 @@ export function createPostgresPriceReader(executor: QueryExecutor): PostgresPric
            and ($2::uuid is null or chain_id = $2::uuid)
            and ($3::uuid is null or store_id = $3::uuid)
            and ($4::text is null or price_type = $4)
-           and ($5::timestamptz is null or observed_at >= $5::timestamptz)
-           and ($6::timestamptz is null or observed_at <= $6::timestamptz)
-         order by observed_at desc, chain_id, store_id, price_type, id
-         limit $7`,
+           and ($5::text is null or channel = $5)
+           and ($6::timestamptz is null or observed_at >= $6::timestamptz)
+           and ($7::timestamptz is null or observed_at <= $7::timestamptz)
+         order by observed_at desc, chain_id, store_id, price_type, channel, id
+         limit $8`,
         [
           filter.productId,
           filter.chainId ?? null,
           filter.storeId ?? null,
           filter.priceType ?? null,
+          filter.channel ?? null,
           filter.observedFrom ?? null,
           filter.observedTo ?? null,
           limit

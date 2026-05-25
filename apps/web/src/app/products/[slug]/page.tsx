@@ -138,9 +138,12 @@ function quoteConfidenceLevel(row: ReturnType<typeof crossChainQuoteRowsFor>[num
 function counterPriceLabelFor(row: ReturnType<typeof crossChainQuoteRowsFor>[number]) {
   const counterPriceCallContract = 'counterPriceLabelFor\\(row\\)';
   void counterPriceCallContract;
-  const priceKind = (row as { priceType?: string; productKind?: string }).priceType ?? (row as { productKind?: string }).productKind;
+  const priceKind = (row as { channel?: string; priceType?: string; productKind?: string }).channel ?? (row as { priceType?: string; productKind?: string }).priceType ?? (row as { productKind?: string }).productKind;
+  if (priceKind === 'counter_meat') return 'Counter meat price';
   if (priceKind === 'counter_fish') return 'Counter fish price';
   if (priceKind === 'counter_deli') return 'Counter deli price';
+  if (priceKind === 'loose') return 'Loose-weight price';
+  if (priceKind === 'pre_packed') return 'Pre-packed price';
   return 'Shelf price';
 }
 
@@ -1438,6 +1441,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
               <thead className="bg-emerald-900 text-white">
                 <tr>
                   <th className="px-4 py-3 font-black">Chain</th>
+                  <th className="px-4 py-3 font-black">Channel</th>
                   <th className="px-4 py-3 font-black">Current price</th>
                   <th className="px-4 py-3 font-black">Unit price</th>
                   <th className="px-4 py-3 font-black">Vs basket median</th>
@@ -1451,8 +1455,9 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
                       {row.chain}
                       {row.isCheapest ? <span className="ml-2 rounded-full bg-emerald-800 px-2 py-1 text-xs text-white">cheapest</span> : null}
                     </td>
+                    <td className="px-4 py-3 font-black text-slate-700">{counterPriceLabelFor(row)}</td>
                     <td className="px-4 py-3 font-black text-emerald-900">{formatSek(row.price)}</td>
-                    <td className="px-4 py-3 font-semibold text-slate-700">{row.priceText} · {row.priceUnit}<span className="ml-2 rounded-full bg-slate-100 px-2 py-1 text-xs font-black text-slate-600">{counterPriceLabelFor(row)}</span></td>
+                    <td className="px-4 py-3 font-semibold text-slate-700">{row.priceText} · {row.priceUnit}</td>
                     <td className={`px-4 py-3 font-black ${row.deltaVsMedian && row.deltaVsMedian > 0 ? 'text-rose-800' : 'text-emerald-800'}`}>
                       {formatSignedPct(row.deltaVsMedian)}
                     </td>

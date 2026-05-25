@@ -30,6 +30,12 @@ describe('detectLoosePackedChannel', () => {
     assert.ok(detection.prePackedSignals.length > 0);
   });
 
+  it('detects in-store counter service channels for meat deli and fish', () => {
+    assert.equal(detectLoosePackedChannel('Entrecote from manuell köttdisk 329 kr/kg').channel, 'counter_meat');
+    assert.equal(detectLoosePackedChannel('Skivad salami från charkdisk').channel, 'counter_deli');
+    assert.equal(detectLoosePackedChannel('Laxfilé fiskdisk pris/kg').channel, 'counter_fish');
+  });
+
   it('keeps store/canonical observations separate by channel', () => {
     assert.notEqual(
       buildChannelTrackingKey({ storeId: 'ica-city', canonicalId: 'apple-red', channel: 'loose' }),

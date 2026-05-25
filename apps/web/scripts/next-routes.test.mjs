@@ -1207,10 +1207,15 @@ describe('verified-data UI', () => {
     const product = await read('src/app/products/[slug]/page.tsx');
 
     assert.match(product, /function counterPriceLabelFor/);
+    assert.match(product, /channel\?: string/);
+    assert.match(product, /priceKind === 'counter_meat'/);
+    assert.match(product, /Counter meat price/);
     assert.match(product, /priceKind === 'counter_fish'/);
     assert.match(product, /Counter fish price/);
     assert.match(product, /priceKind === 'counter_deli'/);
     assert.match(product, /Counter deli price/);
+    assert.match(product, /Loose-weight price/);
+    assert.match(product, /Pre-packed price/);
     assert.match(product, /Shelf price/);
     assert.match(product, /counterPriceLabelFor\(row\)/);
   });

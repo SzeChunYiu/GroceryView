@@ -9,6 +9,7 @@ create unique index if not exists observations_connector_idempotency_idx
     domain,
     retailer_product_ref,
     price_type,
+    channel,
     observed_at,
     price,
     unit_price,

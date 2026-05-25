@@ -25,6 +25,7 @@ const validPrice: PriceObservationDto = {
   price: { amount: 49.9, currency: 'SEK' },
   unitPrice: { amount: 110.89, currency: 'SEK' },
   priceType: 'promotion',
+  channel: 'packaged',
   confidence: 'high',
   observedAt: '2026-05-19T10:00:00.000Z',
   sourceType: 'retailer_page',
@@ -190,6 +191,7 @@ describe('api contract schemas', () => {
 
   it('accepts price observations only when provenance fields are present', () => {
     assert.equal(priceObservationSchema.parse(validPrice).priceType, 'promotion');
+    assert.equal(priceObservationSchema.parse({ ...validPrice, channel: 'counter_fish' }).channel, 'counter_fish');
 
     const result = priceObservationSchema.safeParse({
       ...validPrice,
@@ -337,11 +339,13 @@ describe('api contract schemas', () => {
     assert.ok(fuel.required.includes('fuelGrade'));
     assert.ok(fuel.required.includes('pricePerLitre'));
     assert.ok(price.required.includes('priceType'));
+    assert.ok(price.required.includes('channel'));
     assert.ok(price.required.includes('confidence'));
     assert.ok(price.required.includes('observedAt'));
     assert.ok(price.required.includes('sourceType'));
     assert.ok(price.required.includes('provenance'));
     assert.deepEqual(price.properties.priceType.enum, ['shelf', 'member', 'promotion', 'estimated']);
+    assert.deepEqual(price.properties.channel.enum, ['packaged', 'loose', 'pre_packed', 'counter_meat', 'counter_deli', 'counter_fish']);
     assert.deepEqual(apiContractOpenApiComponents.FuelPriceObservation.properties.fuelGrade.enum, ['95', '98', 'diesel', 'hvo100', 'e85']);
     assert.deepEqual(apiContractOpenApiComponents.NotificationInboxResponse.properties.queue.items, {
       $ref: '#/components/schemas/NotificationInboxQueueItem'

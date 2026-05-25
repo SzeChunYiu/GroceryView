@@ -4,6 +4,7 @@ export const idSchema = z.string().trim().min(1);
 export const isoDateTimeSchema = z.string().datetime({ offset: true });
 
 export const priceTypeSchema = z.enum(['shelf', 'member', 'promotion', 'estimated']);
+export const priceObservationChannelSchema = z.enum(['packaged', 'loose', 'pre_packed', 'counter_meat', 'counter_deli', 'counter_fish']);
 export const confidenceSchema = z.enum(['high', 'medium', 'low', 'unverified']);
 export const sourceTypeSchema = z.enum(['retailer_api', 'retailer_page', 'receipt_scan', 'manual_review', 'seed_stub']);
 export const priceDomainSchema = z.enum(['grocery', 'fuel', 'pharmacy']);
@@ -69,6 +70,7 @@ export const priceObservationSchema = z.object({
   price: moneyAmountSchema,
   unitPrice: moneyAmountSchema.optional(),
   priceType: priceTypeSchema,
+  channel: priceObservationChannelSchema.default('packaged'),
   confidence: confidenceSchema,
   observedAt: isoDateTimeSchema,
   sourceType: sourceTypeSchema,
@@ -314,6 +316,7 @@ export type NotificationInboxResponseDto = z.infer<typeof notificationInboxRespo
 export type NotificationInboxSummaryDto = z.infer<typeof notificationInboxSummarySchema>;
 export type PriceDomain = z.infer<typeof priceDomainSchema>;
 export type PriceObservationDto = z.infer<typeof priceObservationSchema>;
+export type PriceObservationChannel = z.infer<typeof priceObservationChannelSchema>;
 export type PriceType = z.infer<typeof priceTypeSchema>;
 export type ProductDto = z.infer<typeof productSchema>;
 export type ProductPricesResponseDto = z.infer<typeof productPricesResponseSchema>;
@@ -328,7 +331,7 @@ export type FriendSharedDealSignalListResponseDto = z.infer<typeof friendSharedD
 export const apiContractOpenApiComponents = {
   PriceObservation: {
     type: 'object',
-    required: ['id', 'productId', 'storeId', 'price', 'priceType', 'confidence', 'observedAt', 'sourceType', 'provenance'],
+    required: ['id', 'productId', 'storeId', 'price', 'priceType', 'channel', 'confidence', 'observedAt', 'sourceType', 'provenance'],
     properties: {
       id: { type: 'string' },
       domain: { type: 'string', enum: priceDomainSchema.options },
@@ -337,6 +340,7 @@ export const apiContractOpenApiComponents = {
       price: { $ref: '#/components/schemas/MoneyAmount' },
       unitPrice: { $ref: '#/components/schemas/MoneyAmount' },
       priceType: { type: 'string', enum: priceTypeSchema.options },
+      channel: { type: 'string', enum: priceObservationChannelSchema.options },
       confidence: { type: 'string', enum: confidenceSchema.options },
       observedAt: { type: 'string', format: 'date-time' },
       sourceType: { type: 'string', enum: sourceTypeSchema.options },

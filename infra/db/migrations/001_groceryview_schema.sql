@@ -102,6 +102,7 @@ create table if not exists observations (
   raw_record_id uuid references raw_records(id) on delete set null,
   retailer_product_ref text,
   price_type text not null check (price_type in ('shelf', 'online', 'member', 'promotion', 'receipt', 'community', 'estimated')),
+  channel text not null default 'packaged' check (channel in ('packaged', 'loose', 'pre_packed', 'counter_meat', 'counter_deli', 'counter_fish')),
   price numeric(12, 2) not null check (price >= 0),
   regular_price numeric(12, 2) check (regular_price is null or regular_price >= 0),
   unit_price numeric(12, 4) not null check (unit_price >= 0),
@@ -127,6 +128,7 @@ create table if not exists latest_prices (
   chain_id uuid not null references chains(id) on delete cascade,
   store_id uuid references stores(id) on delete cascade,
   price_type text not null check (price_type in ('shelf', 'online', 'member', 'promotion', 'receipt', 'community', 'estimated')),
+  channel text not null default 'packaged' check (channel in ('packaged', 'loose', 'pre_packed', 'counter_meat', 'counter_deli', 'counter_fish')),
   observation_id uuid not null references observations(id) on delete restrict,
   price numeric(12, 2) not null check (price >= 0),
   regular_price numeric(12, 2) check (regular_price is null or regular_price >= 0),
@@ -136,7 +138,7 @@ create table if not exists latest_prices (
   confidence numeric(5, 4) not null check (confidence between 0 and 1),
   provenance jsonb not null default '{}'::jsonb,
   updated_at timestamptz not null default now(),
-  unique nulls not distinct (product_id, chain_id, store_id, price_type)
+  unique nulls not distinct (product_id, chain_id, store_id, price_type, channel)
 );
 
 create table if not exists users (

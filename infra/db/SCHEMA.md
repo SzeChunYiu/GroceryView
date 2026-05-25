@@ -141,13 +141,15 @@ Indexes: `fuel_price_source_observations_grade_idx`.
 
 Immutable normalized price facts. This is the canonical table for historical charts and price provenance.
 
-Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `source_run_id`, `raw_record_id`, `retailer_product_ref`, `origin_country`, `cert_level`, `price_type`, `price`, `regular_price`, `unit_price`, `currency`, `quantity`, `quantity_unit`, promotion fields, `member_required`, `is_available`, `observed_at`, validity window fields, `confidence`, `provenance`.
+Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `source_run_id`, `raw_record_id`, `retailer_product_ref`, `origin_country`, `cert_level`, `price_type`, `channel`, `price`, `regular_price`, `unit_price`, `currency`, `quantity`, `quantity_unit`, promotion fields, `member_required`, `is_available`, `observed_at`, validity window fields, `confidence`, `provenance`.
 
 Fresh-product origin/certification columns live on the observation because country-of-origin and certification can vary by chain, batch, or date even when the catalog product is the same.
 
 `observations.is_available` defaults true for historical rows and is set false when connector evidence shows a product is out-of-stock, not found, or backed by an empty stock response. The field is part of connector replay idempotency so a stock-state change can append an immutable fact without overwriting price history.
 
-Write policy: daily ingestion uses change-only writes. Before inserting a new immutable observation, the PostgreSQL writer compares the incoming `(product_id, chain_id, store_id, price_type)` price tuple with `latest_prices`; unchanged current snapshots reuse the existing `observation_id` instead of creating another daily duplicate. Changed rows keep temporal state by writing `valid_from` from source evidence or defaulting it to `observed_at`.
+`observations.channel` separates physical merchandising/service channels from `price_type`: `packaged`, `loose`, `pre_packed`, `counter_meat`, `counter_deli`, and `counter_fish`. This lets connectors emit both packaged shelf prices and in-store counter service prices for the same product/store without overwriting either row.
+
+Write policy: daily ingestion uses change-only writes. Before inserting a new immutable observation, the PostgreSQL writer compares the incoming `(product_id, chain_id, store_id, price_type, channel)` price tuple with `latest_prices`; unchanged current snapshots reuse the existing `observation_id` instead of creating another daily duplicate. Changed rows keep temporal state by writing `valid_from` from source evidence or defaulting it to `observed_at`.
 
 Allowed `price_type` values: `shelf`, `online`, `member`, `promotion`, `receipt`, `community`, `estimated`.
 
@@ -167,11 +169,11 @@ Indexes: parent and per-partition product/time, store/time, price type/time, dom
 
 Materialized latest price lookup for API and UI reads, and the write-side change detector for daily ingestion. Each row references the observation that won the rollup.
 
-Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `price_type`, `observation_id`, `price`, `regular_price`, `unit_price`, `currency`, `observed_at`, `is_available`, `confidence`, `provenance`, `updated_at`.
+Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `price_type`, `channel`, `observation_id`, `price`, `regular_price`, `unit_price`, `currency`, `observed_at`, `is_available`, `confidence`, `provenance`, `updated_at`.
 
 `latest_prices.is_available` is copied from the winning observation so API and static ProductCard surfaces can show an `Out of stock` badge without scanning raw history.
 
-Primary key: `(product_id, chain_id, store_id, price_type)`.
+Primary key: `(product_id, chain_id, store_id, price_type, channel)`. Packaged and in-store counter prices must remain side-by-side rather than competing for one latest row.
 
 Snapshot IO note: the DB-backed site snapshot exporter was identified as the likely Supabase Disk IO hot read after the all-store daily runner and DB snapshot work landed. Keep `scripts/ingestion/export-db-site-snapshot.mjs` on the `latest_prices_grocery_snapshot_idx` access pattern: filter to `domain='grocery'`, bound confidence/limit, and read the latest rows from `latest_prices` before joining metadata. Do not replace it with a raw `observations` scan or an unbounded latest-price export; preserve the change-only write path so unchanged daily snapshots reuse existing observations instead of silently dropping writes.
 

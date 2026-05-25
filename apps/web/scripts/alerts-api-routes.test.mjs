@@ -73,12 +73,18 @@ describe('open price history JSON API route', () => {
     assert.match(route, /product_id must be a UUID/);
     assert.match(route, /Unsupported query parameter/);
     assert.match(route, /price_type must be one of/);
+    assert.match(route, /channel must be one of/);
+    assert.match(route, /channel: row\.channel \?\? 'packaged'/);
     assert.match(route, /open_price_history_database_unconfigured/);
     assert.match(route, /CODE_LICENSE = 'Apache-2.0'/);
     assert.match(route, /DATA_LICENSE = 'CC-BY-4.0'/);
     assert.match(route, /sourceRunId/);
     assert.match(route, /rawRecordId/);
     assert.match(route, /provenance/);
+    assert.match(docs, /`channel`/);
+    assert.match(docs, /counter_meat/);
+    assert.match(docs, /counter_deli/);
+    assert.match(docs, /counter_fish/);
 
     assert.match(docs, /GET \/api\/v1\/products\/\{id\}\/history/);
     assert.match(docs, /researchers, journalists/);

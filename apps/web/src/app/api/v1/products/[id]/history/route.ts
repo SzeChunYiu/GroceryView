@@ -1,6 +1,7 @@
 import {
   createPgQueryExecutor,
   createPostgresPriceReader,
+  type PriceObservationChannel,
   type PriceObservationHistoryRecord,
   type PriceType
 } from '@groceryview/db';
@@ -12,7 +13,8 @@ export const dynamic = 'force-dynamic';
 const productIdPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const uuidPattern = productIdPattern;
 const supportedPriceTypes = new Set<PriceType>(['shelf', 'online', 'member', 'promotion', 'receipt', 'community']);
-const supportedQueryParams = new Set(['limit', 'price_type', 'chain_id', 'store_id', 'from', 'to']);
+const supportedChannels = new Set<PriceObservationChannel>(['packaged', 'loose', 'pre_packed', 'counter_meat', 'counter_deli', 'counter_fish']);
+const supportedQueryParams = new Set(['limit', 'price_type', 'channel', 'chain_id', 'store_id', 'from', 'to']);
 const DEFAULT_LIMIT = 200;
 const MAX_LIMIT = 1000;
 const RATE_LIMIT_WINDOW_MS = 60_000;
@@ -133,6 +135,14 @@ function parsePriceType(value: string | null) {
   return { value: value as PriceType };
 }
 
+function parseChannel(value: string | null) {
+  if (value === null) return { value: undefined };
+  if (!supportedChannels.has(value as PriceObservationChannel)) {
+    return { error: `channel must be one of ${[...supportedChannels].join(', ')}` };
+  }
+  return { value: value as PriceObservationChannel };
+}
+
 function parseHistoryQuery(request: Request) {
   const searchParams = new URL(request.url).searchParams;
   const unsupported = [...searchParams.keys()].filter((key) => !supportedQueryParams.has(key));
@@ -146,6 +156,8 @@ function parseHistoryQuery(request: Request) {
   if ('error' in limit) return { error: limit.error };
   const priceType = parsePriceType(searchParams.get('price_type'));
   if ('error' in priceType) return { error: priceType.error };
+  const channel = parseChannel(searchParams.get('channel'));
+  if ('error' in channel) return { error: channel.error };
   const chainId = parseUuid(searchParams.get('chain_id'), 'chain_id');
   if ('error' in chainId) return { error: chainId.error };
   const storeId = parseUuid(searchParams.get('store_id'), 'store_id');
@@ -162,6 +174,7 @@ function parseHistoryQuery(request: Request) {
     value: {
       limit: limit.value,
       priceType: priceType.value,
+      channel: channel.value,
       chainId: chainId.value,
       storeId: storeId.value,
       observedFrom: from.value,
@@ -177,6 +190,7 @@ function historyRow(row: PriceObservationHistoryRecord) {
     chainId: row.chainId,
     storeId: row.storeId ?? null,
     priceType: row.priceType,
+    channel: row.channel ?? 'packaged',
     price: row.price,
     regularPrice: row.regularPrice ?? null,
     unitPrice: row.unitPrice,
@@ -251,6 +265,7 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
           limit: parsedQuery.value.limit,
           filters: {
             priceType: parsedQuery.value.priceType ?? null,
+            channel: parsedQuery.value.channel ?? null,
             chainId: parsedQuery.value.chainId ?? null,
             storeId: parsedQuery.value.storeId ?? null,
             from: parsedQuery.value.observedFrom ?? null,

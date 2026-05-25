@@ -22,6 +22,7 @@ The endpoint allows 60 requests per minute per client IP. Responses include `X-R
 | --- | --- | --- |
 | `limit` | No | Integer from 1 to 1000. Defaults to 200. |
 | `price_type` | No | One of `shelf`, `online`, `member`, `promotion`, `receipt`, or `community`. |
+| `channel` | No | One of `packaged`, `loose`, `pre_packed`, `counter_meat`, `counter_deli`, or `counter_fish`; this keeps packaged shelf rows separate from in-store counter service rows. |
 | `chain_id` | No | Retail chain UUID filter. |
 | `store_id` | No | Store UUID filter. |
 | `from` | No | Inclusive ISO-8601 `observedAt` lower bound. |
@@ -43,6 +44,7 @@ Unsupported or repeated query parameters return `400` so published notebooks fai
       "chainId": "22222222-2222-2222-2222-222222222222",
       "storeId": null,
       "priceType": "promotion",
+      "channel": "counter_deli",
       "price": 44.9,
       "regularPrice": 59.9,
       "unitPrice": 99.7778,
@@ -69,6 +71,7 @@ Unsupported or repeated query parameters return `400` so published notebooks fai
     "limit": 200,
     "filters": {
       "priceType": "promotion",
+      "channel": "counter_deli",
       "chainId": null,
       "storeId": null,
       "from": null,

@@ -7,6 +7,7 @@ import {
   createPostgresPriceObservationWriter,
   createPostgresProductAliasRepository,
   createPostgresSourceRecordWriter,
+  type PriceObservationChannel as DbPriceObservationChannel,
   type PriceType as DbPriceType,
   type PriceObservationRecord,
   type QueryExecutor,
@@ -2885,6 +2886,7 @@ export type RetailerProductInput = {
   categoryId: string;
   barcode?: string;
   productKind?: 'branded' | 'commodity';
+  channel?: DbPriceObservationChannel;
   commodityId?: string;
   fuelGradeId?: FuelGradeId;
   fuelSource?: {
@@ -2971,6 +2973,7 @@ export type IngestedPriceObservation = {
   memberPrice?: number;
   promoType?: string;
   priceType: PriceType;
+  channel: DbPriceObservationChannel;
   validFrom?: string;
   validUntil?: string;
   sourceType: SourceType;
@@ -3021,7 +3024,10 @@ function validateInput(input: RetailerProductInput): void {
   if (input.validFrom !== undefined && Number.isNaN(Date.parse(input.validFrom))) throw new Error('validFrom must be an ISO date.');
   if (input.validUntil !== undefined && Number.isNaN(Date.parse(input.validUntil))) throw new Error('validUntil must be an ISO date.');
   if (input.originCountry !== undefined && !/^[a-z]{2}$/i.test(input.originCountry)) throw new Error('originCountry must be an ISO-3166 alpha-2 code.');
+  if (input.channel !== undefined && !priceObservationChannels.has(input.channel)) throw new Error('channel must be packaged, loose, pre_packed, counter_meat, counter_deli, or counter_fish.');
 }
+
+const priceObservationChannels = new Set<DbPriceObservationChannel>(['packaged', 'loose', 'pre_packed', 'counter_meat', 'counter_deli', 'counter_fish']);
 
 function priceTypeForSource(input: RetailerProductInput, hasPromotion: boolean): PriceType {
   if (input.sourceType === 'estimated') return 'estimated';
@@ -3226,6 +3232,7 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
       promoPrice: hasPromotion ? input.price : undefined,
       promoType: hasPromotion ? 'discount' : undefined,
       priceType,
+      channel: input.channel ?? 'packaged',
       validFrom: input.validFrom,
       validUntil: input.validUntil,
       sourceType: input.sourceType,
@@ -4519,6 +4526,7 @@ async function persistDailyConnectorOutput(input: {
         productId: accepted.product.id,
         storeId: accepted.priceObservation.storeId,
         priceType: accepted.priceObservation.priceType,
+        channel: accepted.priceObservation.channel,
         price: accepted.priceObservation.price,
         isAvailable: accepted.priceObservation.isAvailable,
         observedAt: accepted.priceObservation.observedAt
@@ -4545,6 +4553,7 @@ async function persistDailyConnectorOutput(input: {
           productId: accepted.product.id,
           retailerProductId: accepted.priceObservation.retailerProductId ?? null,
           storeId: accepted.priceObservation.storeId ?? null,
+          channel: accepted.priceObservation.channel,
           observedAt: accepted.priceObservation.observedAt,
           price: accepted.priceObservation.price,
           isAvailable: accepted.priceObservation.isAvailable
@@ -4558,6 +4567,7 @@ async function persistDailyConnectorOutput(input: {
         sourceRunId: sourceRun.sourceRunId,
         retailerProductRef: accepted.priceObservation.retailerProductId,
         priceType: dbPriceTypeForIngested(accepted.priceObservation.priceType),
+        channel: accepted.priceObservation.channel,
         price: accepted.priceObservation.price,
         regularPrice: accepted.priceObservation.regularPrice,
         unitPrice: accepted.priceObservation.unitPrice,

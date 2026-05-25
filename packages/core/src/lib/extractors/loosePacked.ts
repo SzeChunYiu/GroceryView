@@ -1,4 +1,4 @@
-export type ProductPackingChannel = 'loose' | 'pre_packed' | 'mixed' | 'unknown';
+export type ProductPackingChannel = 'packaged' | 'loose' | 'pre_packed' | 'mixed' | 'counter_meat' | 'counter_deli' | 'counter_fish' | 'unknown';
 export type ProductPackingSignal = 'loose' | 'pre_packed';
 
 export type LoosePackedInput = {
@@ -14,6 +14,7 @@ export type LoosePackedDetection = {
   confidence: 'high' | 'medium' | 'low';
   looseSignals: string[];
   prePackedSignals: string[];
+  counterSignals: string[];
   reason: string;
 };
 
@@ -42,6 +43,29 @@ const PRE_PACKED_PATTERNS: RegExp[] = [
   /\bst\b/iu,
   /\b(?:ca\s*)?\d+(?:[,.]\d+)?\s*(?:g|gram)\b/iu,
   /\b\d+(?:[,.]\d+)?\s*(?:kg)\s*(?:paket|tr[aå]g|f[oö]rpack)/iu
+];
+
+const COUNTER_MEAT_PATTERNS: RegExp[] = [
+  /\bk[oö]tt\s*disk(?:en)?\b/iu,
+  /\bmanuell\s*k[oö]tt\b/iu,
+  /\bbutiksstyckat\b/iu,
+  /\bserved\s*meat\s*counter\b/iu,
+  /\bmeat\s*counter\b/iu
+];
+
+const COUNTER_DELI_PATTERNS: RegExp[] = [
+  /\bdelikatess\s*disk(?:en)?\b/iu,
+  /\bchark\s*disk(?:en)?\b/iu,
+  /\bmanuell\s*(?:deli|delikatess|chark)\b/iu,
+  /\bdeli\s*counter\b/iu
+];
+
+const COUNTER_FISH_PATTERNS: RegExp[] = [
+  /\bfisk\s*disk(?:en)?\b/iu,
+  /\bmanuell\s*fisk\b/iu,
+  /\bfiskhandlare\b/iu,
+  /\bfish\s*counter\b/iu,
+  /\bseafood\s*counter\b/iu
 ];
 
 const normalize = (value: string): string =>
@@ -73,12 +97,31 @@ export function detectLoosePackedChannel(input: LoosePackedInput | string): Loos
       confidence: 'low',
       looseSignals: [],
       prePackedSignals: [],
+      counterSignals: [],
       reason: 'No product text was provided.'
     };
   }
 
   const looseSignals = collectSignals(text, LOOSE_PATTERNS);
   const prePackedSignals = collectSignals(text, PRE_PACKED_PATTERNS);
+  const counterSignalsByChannel = [
+    { channel: 'counter_meat' as const, signals: collectSignals(text, COUNTER_MEAT_PATTERNS) },
+    { channel: 'counter_deli' as const, signals: collectSignals(text, COUNTER_DELI_PATTERNS) },
+    { channel: 'counter_fish' as const, signals: collectSignals(text, COUNTER_FISH_PATTERNS) }
+  ];
+  const counterDetection = counterSignalsByChannel.find((candidate) => candidate.signals.length > 0);
+  const counterSignals = unique(counterSignalsByChannel.flatMap((candidate) => candidate.signals));
+
+  if (counterDetection) {
+    return {
+      channel: counterDetection.channel,
+      confidence: counterDetection.signals.length > 1 ? 'high' : 'medium',
+      looseSignals,
+      prePackedSignals,
+      counterSignals,
+      reason: 'In-store counter service language was found; keep this observation separate from packaged shelf prices.'
+    };
+  }
 
   if (looseSignals.length > 0 && prePackedSignals.length > 0) {
     return {
@@ -86,6 +129,7 @@ export function detectLoosePackedChannel(input: LoosePackedInput | string): Loos
       confidence: 'medium',
       looseSignals,
       prePackedSignals,
+      counterSignals,
       reason: 'Both loose-weight and pre-packed packaging signals were found; keep channel-specific observations separate.'
     };
   }
@@ -96,6 +140,7 @@ export function detectLoosePackedChannel(input: LoosePackedInput | string): Loos
       confidence: looseSignals.length > 1 ? 'high' : 'medium',
       looseSignals,
       prePackedSignals,
+      counterSignals,
       reason: 'Loose-weight product language was found.'
     };
   }
@@ -106,6 +151,7 @@ export function detectLoosePackedChannel(input: LoosePackedInput | string): Loos
       confidence: prePackedSignals.length > 1 ? 'high' : 'medium',
       looseSignals,
       prePackedSignals,
+      counterSignals,
       reason: 'Pre-packed packaging language was found.'
     };
   }
@@ -115,6 +161,7 @@ export function detectLoosePackedChannel(input: LoosePackedInput | string): Loos
     confidence: 'low',
     looseSignals,
     prePackedSignals,
+    counterSignals,
     reason: 'No loose-weight or pre-packed packaging signal was found.'
   };
 }

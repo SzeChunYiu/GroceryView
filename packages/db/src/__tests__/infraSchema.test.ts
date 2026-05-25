@@ -120,11 +120,23 @@ describe('infra/db PostgreSQL schema contract', () => {
 
   it('stores immutable price facts with type, time, confidence, and provenance', () => {
     const observations = tableDefinition('observations');
-    for (const column of ['price_type', 'observed_at', 'confidence', 'provenance']) {
+    for (const column of ['price_type', 'channel', 'observed_at', 'confidence', 'provenance']) {
       assert.match(observations, new RegExp(`\\b${column}\\b`), `observations.${column} missing`);
     }
     assert.match(observations, /price_type text not null check/);
+    assert.match(observations, /channel text not null default 'packaged' check/);
     assert.match(observations, /confidence numeric\(5, 4\) not null check \(confidence between 0 and 1\)/);
+  });
+
+  it('separates packaged and in-store counter price observations by channel', () => {
+    assert.match(allMigrations, /026_observation_counter_channels|counter_meat/);
+    for (const channel of ['packaged', 'loose', 'pre_packed', 'counter_meat', 'counter_deli', 'counter_fish']) {
+      assert.match(allMigrations, new RegExp(`'${channel}'`), `${channel} missing from channel checks`);
+      assert.match(schemaDoc, new RegExp(channel), `${channel} missing from schema docs`);
+    }
+    assert.match(allMigrations, /observations_connector_idempotency_idx[\s\S]*price_type,[\s\S]*channel,[\s\S]*observed_at/);
+    assert.match(allMigrations, /unique nulls not distinct \(product_id, chain_id, store_id, price_type, channel\)/);
+    assert.match(schemaDoc, /\(product_id, chain_id, store_id, price_type, channel\)/);
   });
 
   it('tracks observed product availability without deleting price facts', () => {
@@ -148,6 +160,7 @@ describe('infra/db PostgreSQL schema contract', () => {
       'domain',
       'retailer_product_ref',
       'price_type',
+      'channel',
       'observed_at',
       'price',
       'unit_price',
@@ -182,7 +195,7 @@ describe('infra/db PostgreSQL schema contract', () => {
   it('keeps latest prices derived from observations and uniquely addressable', () => {
     const latestPrices = tableDefinition('latest_prices');
     assert.match(latestPrices, /observation_id uuid not null references observations\(id\)/);
-    assert.match(latestPrices, /unique nulls not distinct \(product_id, chain_id, store_id, price_type\)/);
+    assert.match(latestPrices, /unique nulls not distinct \(product_id, chain_id, store_id, price_type, channel\)/);
   });
 
   it('indexes latest_prices for bounded DB-backed site snapshot exports', () => {

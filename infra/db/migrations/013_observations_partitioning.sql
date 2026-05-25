@@ -16,6 +16,7 @@ create table if not exists observations_v2 (
   raw_record_id uuid references raw_records(id) on delete set null,
   retailer_product_ref text,
   price_type text not null check (price_type in ('shelf', 'online', 'member', 'promotion', 'receipt', 'community', 'estimated')),
+  channel text not null default 'packaged' check (channel in ('packaged', 'loose', 'pre_packed', 'counter_meat', 'counter_deli', 'counter_fish')),
   price numeric(12, 2) not null check (price >= 0),
   regular_price numeric(12, 2) check (regular_price is null or regular_price >= 0),
   unit_price numeric(12, 4) not null check (unit_price >= 0),
@@ -42,6 +43,7 @@ create index if not exists observations_v2_observed_brin_idx on observations_v2 
 create index if not exists observations_v2_product_observed_idx on observations_v2 (product_id, observed_at desc);
 create index if not exists observations_v2_store_observed_idx on observations_v2 (store_id, observed_at desc) where store_id is not null;
 create index if not exists observations_v2_price_type_idx on observations_v2 (price_type, observed_at desc);
+create index if not exists observations_v2_channel_observed_idx on observations_v2 (channel, observed_at desc);
 create index if not exists observations_v2_domain_observed_idx on observations_v2 (domain, observed_at desc);
 create index if not exists observations_v2_provenance_gin_idx on observations_v2 using gin (provenance);
 
@@ -69,6 +71,7 @@ begin
   execute format('create index if not exists %I on %I (product_id, observed_at desc)', partition_name || '_product_observed_idx', partition_name);
   execute format('create index if not exists %I on %I (store_id, observed_at desc) where store_id is not null', partition_name || '_store_observed_idx', partition_name);
   execute format('create index if not exists %I on %I (price_type, observed_at desc)', partition_name || '_price_type_idx', partition_name);
+  execute format('create index if not exists %I on %I (channel, observed_at desc)', partition_name || '_channel_observed_idx', partition_name);
   execute format('create index if not exists %I on %I (domain, observed_at desc)', partition_name || '_domain_observed_idx', partition_name);
   execute format('create index if not exists %I on %I using gin (provenance)', partition_name || '_provenance_gin_idx', partition_name);
 
@@ -158,6 +161,7 @@ begin
     raw_record_id,
     retailer_product_ref,
     price_type,
+    channel,
     price,
     regular_price,
     unit_price,
@@ -185,6 +189,7 @@ begin
     new.raw_record_id,
     new.retailer_product_ref,
     new.price_type,
+    coalesce(new.channel, 'packaged'),
     new.price,
     new.regular_price,
     new.unit_price,
@@ -211,6 +216,7 @@ begin
     raw_record_id = excluded.raw_record_id,
     retailer_product_ref = excluded.retailer_product_ref,
     price_type = excluded.price_type,
+    channel = excluded.channel,
     price = excluded.price,
     regular_price = excluded.regular_price,
     unit_price = excluded.unit_price,
@@ -243,6 +249,7 @@ insert into observations_v2(
   raw_record_id,
   retailer_product_ref,
   price_type,
+  channel,
   price,
   regular_price,
   unit_price,
@@ -270,6 +277,7 @@ select
   raw_record_id,
   retailer_product_ref,
   price_type,
+  coalesce(channel, 'packaged'),
   price,
   regular_price,
   unit_price,
@@ -296,6 +304,7 @@ on conflict (id, observed_at) do update set
   raw_record_id = excluded.raw_record_id,
   retailer_product_ref = excluded.retailer_product_ref,
   price_type = excluded.price_type,
+  channel = excluded.channel,
   price = excluded.price,
   regular_price = excluded.regular_price,
   unit_price = excluded.unit_price,
