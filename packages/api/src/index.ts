@@ -38,6 +38,8 @@ import {
   type RetailerHandoffPlan,
   type RetailerHandoffSupport,
   type BrandTierIndexSummary,
+  type FixedBasketIndexCountry,
+  type FixedBasketIndexCurrency,
   type BrandTierPriceObservation,
   type BrandTier,
   type BudgetSummary,
@@ -330,6 +332,8 @@ export type RealPriceIndexRow = {
   currentUnitPrice?: number;
   baseObservedAt?: string;
   currentObservedAt?: string;
+  country?: FixedBasketIndexCountry;
+  currency?: FixedBasketIndexCurrency;
 };
 
 export type RealChainPriceIndexSummary = ChainPriceIndexSummary & {
@@ -2538,6 +2542,8 @@ function indexComponentFor(product: ProductDetail) {
   if (!first || !current) return null;
   return {
     productId: product.id,
+    country: 'SE' as const,
+    currency: 'SEK' as const,
     baseUnitPrice: first.price,
     currentUnitPrice: current.price,
     weight: 1
@@ -2565,6 +2571,7 @@ function buildStockholmGroceryIndex() {
   return calculateFixedBasketIndex({
     id: 'stockholm-grocery-index',
     label: 'Stockholm Grocery Index',
+    country: 'SE',
     baseDate: indexBaseDate(products),
     currentDate: indexCurrentDate(products),
     components
@@ -2825,10 +2832,13 @@ export function buildRealCategoryPriceIndices(rows: RealPriceIndexRow[]): Catego
     const index = calculateFixedBasketIndex({
       id: `${category}-category-price-index`,
       label: `${category[0]?.toUpperCase() ?? ''}${category.slice(1)} Price Index`,
+      country: categoryRows.find((row) => row.country)?.country ?? 'SE',
       baseDate: earliestIso(categoryRows.map((row) => row.baseObservedAt)),
       currentDate: latestIso(categoryRows.map((row) => row.currentObservedAt)),
       components: categoryRows.map((row) => ({
         productId: row.productSlug || row.productId,
+        country: row.country ?? 'SE',
+        currency: row.currency ?? 'SEK',
         baseUnitPrice: row.baseUnitPrice,
         currentUnitPrice: row.currentUnitPrice,
         weight: 1
@@ -2926,6 +2936,7 @@ function buildCategoryPriceIndices(): CategoryPriceIndexSummary {
     const index = calculateFixedBasketIndex({
       id: `${category}-category-price-index`,
       label: `${category[0]?.toUpperCase() ?? ''}${category.slice(1)} Price Index`,
+      country: 'SE',
       baseDate: indexBaseDate(categoryProducts),
       currentDate: indexCurrentDate(categoryProducts),
       components
