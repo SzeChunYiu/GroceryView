@@ -7,7 +7,7 @@ const defaultDescription = 'Verified Swedish grocery price intelligence with pro
 const localeNegotiatedCurrentRouteCaveat = 'Locale-negotiated current route hreflang alternates share the canonical URL until native route translations exist beyond /sv and /en.';
 export const publicCatalogueRevalidateSeconds = 300;
 export const publicCatalogueCacheControl = `public, s-maxage=${publicCatalogueRevalidateSeconds}, stale-while-revalidate=${publicCatalogueRevalidateSeconds * 3}`;
-const publicCatalogueLandingRoutes = new Set(['/products', '/categories', '/stores']);
+const publicCatalogueLandingRoutes = new Set(['/products', '/categories', '/deals', '/stores', '/store-coverage']);
 
 export function isPublicCatalogueLandingRoute(path: string) {
   return publicCatalogueLandingRoutes.has(path.replace(/\/$/, '') || '/');

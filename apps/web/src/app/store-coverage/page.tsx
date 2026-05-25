@@ -1,13 +1,14 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
 import { formatPct, sourceCoverage, storeBrandLedger, storeFormatCoverage } from '@/lib/verified-data';
-import { routeMetadata } from '@/lib/seo';
+import { publicCatalogueRevalidateSeconds, routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
   return routeMetadata('/store-coverage');
 }
 
 export const dynamic = 'force-static';
+export const revalidate = publicCatalogueRevalidateSeconds;
 
 const storeSource = sourceCoverage.find((source) => source.name === 'Sweden store directory');
 

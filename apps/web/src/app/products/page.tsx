@@ -14,6 +14,7 @@ import { buildRemovableSearchFilterChips } from '@/lib/search-filters';
 
 const PRODUCTS_PER_PAGE = 50;
 
+export const dynamic = 'force-static';
 export const revalidate = publicCatalogueRevalidateSeconds;
 
 export function generateMetadata() {

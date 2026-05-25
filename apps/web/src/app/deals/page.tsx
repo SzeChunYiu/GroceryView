@@ -3,7 +3,7 @@ import { DealCard } from '@/components/deal-card';
 import { categoryLabels, pricedProducts } from '@/lib/openprices-products';
 import { buildPantryReplacementFilter, pantryReplacementMatches } from '@/lib/pantry';
 import { buildLocalPriceDropFeed } from '@/lib/price-events';
-import { routeMetadata } from '@/lib/seo';
+import { publicCatalogueRevalidateSeconds, routeMetadata } from '@/lib/seo';
 import { formatPct, labelFromSlug, priceDropMoversBoard, snapshot, topChainSpreads } from '@/lib/verified-data';
 
 type SearchParams = Record<string, string | string[] | undefined>;
@@ -23,6 +23,9 @@ type ReplacementDeal = {
 export function generateMetadata() {
   return routeMetadata('/deals');
 }
+
+export const dynamic = 'force-static';
+export const revalidate = publicCatalogueRevalidateSeconds;
 
 function paramValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
