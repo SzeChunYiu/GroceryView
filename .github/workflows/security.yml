@@ -1,0 +1,83 @@
+name: Security
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  dependency-audit:
+    name: Dependency vulnerability gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Run expiry-bound npm audit gate
+        run: node scripts/security/check-npm-audit.mjs --waivers .github/security/npm-audit-waivers.json --summary security-npm-audit-summary.json
+      - name: Publish dependency summary
+        if: always()
+        run: |
+          {
+            echo "### Dependency vulnerability gate"
+            node -e "const fs=require('node:fs'); const p='security-npm-audit-summary.json'; if (!fs.existsSync(p)) { console.log('- Summary: missing'); process.exit(0); } const s=JSON.parse(fs.readFileSync(p,'utf8')); console.log('- High/Critical findings: `' + s.highOrCriticalCount + '`'); console.log('- Waived findings: `' + s.waivedCount + '`'); console.log('- Unwaived findings: `' + s.unwaivedCount + '`');"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload dependency summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-npm-audit-summary
+          path: security-npm-audit-summary.json
+          if-no-files-found: warn
+
+  secret-scan:
+    name: Secret scanning gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish secret scan summary
+        if: always()
+        run: |
+          {
+            echo "### Secret scanning gate"
+            echo "- Scanner: \`gitleaks\`"
+            echo "- Result: \`${{ job.status }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  static-analysis:
+    name: TypeScript/Node static analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: javascript-typescript
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v4
+      - name: Publish static analysis summary
+        if: always()
+        run: |
+          {
+            echo "### Static analysis gate"
+            echo "- Analyzer: \`CodeQL javascript-typescript\`"
+            echo "- Result: \`${{ job.status }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
