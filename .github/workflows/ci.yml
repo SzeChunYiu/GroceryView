@@ -20,8 +20,10 @@ jobs:
       - name: Install dependencies
         id: install
         run: npm ci
-      - name: Run tests
+      - name: Run tests with SE/NO/IS fixtures
         id: tests
+        env:
+          GROCERYVIEW_CI_FIXTURE_COUNTRIES: SE,NO,IS
         run: npm test
       - name: Build workspaces
         id: build
