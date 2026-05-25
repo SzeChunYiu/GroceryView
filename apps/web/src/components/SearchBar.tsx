@@ -27,6 +27,10 @@ type ProductSearchResult = {
 };
 
 type ProductSearchResponse = {
+  fuzzyMatching?: {
+    algorithm: string;
+    minSimilarity: number;
+  };
   query: string;
   results: ProductSearchResult[];
   error?: string;
@@ -131,6 +135,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
   const [suggestGroups, setSuggestGroups] = useState<HeaderSuggestGroup[]>([]);
   const [recentSearches, setRecentSearches] = useState<RecentSearchHistoryEntry[]>([]);
   const [savedSearches, setSavedSearches] = useState<SavedSearchEntry[]>([]);
+  const [fuzzyMatchingLabel, setFuzzyMatchingLabel] = useState('');
   const [activeOptionIndex, setActiveOptionIndex] = useState(-1);
   const [isFocused, setIsFocused] = useState(false);
   const [status, setStatus] = useState<SearchStatus>('idle');
@@ -214,12 +219,14 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
       setFacetChips([]);
       setSuggestGroups([]);
       setActiveOptionIndex(-1);
+      setFuzzyMatchingLabel('');
       setStatus('idle');
       return;
     }
 
     const controller = new AbortController();
     const timeout = window.setTimeout(async () => {
+      setFuzzyMatchingLabel('');
       setStatus('loading');
       try {
         try {
@@ -253,6 +260,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
         if (controller.signal.aborted) return;
         const nextResults = payload.results ?? [];
         setResults(nextResults);
+        setFuzzyMatchingLabel(payload.fuzzyMatching ? 'Typo-tolerant fuzzy ranking is blending text search with trigram matches.' : '');
         setStatus(nextResults.length > 0 ? 'ready' : 'empty');
         if (nextResults.length > 0) setRecentSearches(rememberRecentSearchHistory(trimmedQuery, nextResults.length));
         trackSearchToSavingsFunnelStep('landing_search');
@@ -262,6 +270,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
         setResults([]);
         setFacetChips([]);
         setSuggestGroups([]);
+        setFuzzyMatchingLabel('');
         setStatus('error');
       }
     }, 300);
@@ -429,6 +438,9 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
           ) : null}
           {status === 'loading' ? (
             <p className="px-4 py-3 text-sm font-bold text-slate-600">Searching verified products…</p>
+          ) : null}
+          {fuzzyMatchingLabel && (status === 'ready' || status === 'empty') ? (
+            <p className="border-t border-slate-100 px-4 py-2 text-xs font-bold text-emerald-800">{fuzzyMatchingLabel}</p>
           ) : null}
           {suggestGroups.length > 0 ? (
             <div className="max-h-96 overflow-y-auto border-t border-slate-100">

@@ -82,7 +82,8 @@ export function buildProductSearchQuery(query: string, options: ProductSearchQue
   const searchDocument = "coalesce(products.canonical_name, '') || ' ' || coalesce(products.name_sv, '') || ' ' || coalesce(products.name_en, '') || ' ' || coalesce(products.brand, '')";
   const normalizedSearchDocument = `lower(unaccent(${searchDocument}))`;
   const searchVector = `to_tsvector('simple', unaccent(${searchDocument}))`;
-  const fuzzyRank = `similarity(${normalizedSearchDocument}, query.fuzzy_query)`;
+  const trigramRank = `greatest(similarity(${normalizedSearchDocument}, query.fuzzy_query), word_similarity(query.fuzzy_query, ${normalizedSearchDocument}))`;
+  const blendedRank = `greatest(ts_rank_cd(${searchVector}, query.search_query), ${trigramRank} * 0.85)`;
 
   return {
     sql: `with query as (
@@ -94,16 +95,17 @@ export function buildProductSearchQuery(query: string, options: ProductSearchQue
                  products.canonical_name as name,
                  products.brand,
                  products.image_url,
-                 greatest(ts_rank_cd(${searchVector}, query.search_query), ${fuzzyRank}) as search_rank
+                 ${blendedRank} as search_rank
             from products
             cross join query
            where products.domain = 'grocery'
              and (
                ${searchVector} @@ query.search_query
                or ${normalizedSearchDocument} like '%' || query.fuzzy_query || '%'
-               or ${fuzzyRank} >= 0.2
+               or ${normalizedSearchDocument} % query.fuzzy_query
+               or ${trigramRank} >= 0.2
              )
-           order by search_rank desc, ${fuzzyRank} desc, products.canonical_name asc
+           order by search_rank desc, ${trigramRank} desc, products.canonical_name asc
            limit $2`,
     values: [normalizedQuery, clampLimit(options.limit)]
   };

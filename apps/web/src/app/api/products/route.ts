@@ -75,7 +75,7 @@ function withSearchExplanationBadges(query: string, results: ProductSearchResult
   }));
 }
 
-const productSearchTelemetrySource = 'postgres.products_tsvector_alias_synonym_expansion';
+const productSearchTelemetrySource = 'postgres.products_tsvector_trigram_fuzzy_alias_synonym_expansion';
 
 function isTimeoutError(error: unknown) {
   if (!(error instanceof Error)) return false;
@@ -131,6 +131,10 @@ function responsePayload(
       resultCount: telemetry.resultCount,
       timedOut: telemetry.timedOut,
       timeoutRate: telemetry.timeoutRate
+    },
+    fuzzyMatching: {
+      algorithm: 'tsvector_trigram_blend',
+      minSimilarity: 0.2
     },
     source: productSearchTelemetrySource,
     ...(error ? { error } : {})
