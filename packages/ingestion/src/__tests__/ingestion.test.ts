@@ -4773,12 +4773,50 @@ describe('ingestRetailerProduct', () => {
 
     assert.equal(output.product.productKind, 'commodity');
     assert.equal(output.product.commodityId, 'tomato');
+    assert.equal(output.product.produceClassId, 'tomatoes');
     assert.equal(output.product.variant, 'vine');
     assert.equal(output.product.isOrganic, false);
     assert.equal(output.product.originCountry, 'SE');
     assert.equal(output.alias.matchConfidence, 0.68);
     assert.equal(output.priceObservation.confidenceScore, 0.68);
     assert.equal(output.priceObservation.unitPrice, 39.9);
+  });
+
+  it('maps raw sold-by-weight produce labels to produce class ids without raising match confidence', () => {
+    const cases = [
+      ['Kvisttomat lösvikt', 'tomatoes'],
+      ['Potatis Fast lösvikt', 'potatoes'],
+      ['Äpple Royal Gala lösvikt', 'apples'],
+      ['Clementiner lösvikt', 'citrus'],
+      ['Färsk basilika i knippe', 'herbs'],
+      ['Champinjoner lösvikt', 'mushrooms'],
+      ['Babyspenat lösvikt', 'leafy-vegetables']
+    ] as const;
+
+    for (const [rawName, produceClassId] of cases) {
+      const output = ingestRetailerProduct({
+        sourceType: 'retailer_online_page',
+        observedAt: '2026-05-22T09:00:00.000Z',
+        parserVersion: 'axfood-produce-v1',
+        rawSnapshotRef: `s3://groceryview-raw/willys/${produceClassId}-2026-05-22.json`,
+        sourceRunId: 'source-run-2026-05-22',
+        chainId: 'willys',
+        retailerProductId: `wil-${produceClassId}`,
+        rawName,
+        canonicalName: rawName,
+        productId: `willys-${produceClassId}`,
+        categoryId: 'frukt-gront',
+        packageSize: 1,
+        packageUnit: 'kg',
+        price: 29.9,
+        soldByWeight: true
+      });
+
+      assert.equal(output.product.productKind, 'commodity');
+      assert.equal(output.product.produceClassId, produceClassId);
+      assert.equal(output.alias.matchConfidence, 0.68);
+      assert.equal(output.priceObservation.confidenceScore, 0.68);
+    }
   });
 
   it('rejects records that cannot preserve parser and raw snapshot provenance', () => {
