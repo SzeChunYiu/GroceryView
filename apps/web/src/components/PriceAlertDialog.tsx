@@ -12,6 +12,9 @@ type PriceAlertDialogProps = {
   comparableProducts?: SubstitutionSavingsProduct[];
   activeAlertCount?: number;
   freeAlertLimit?: number;
+  initialChain?: string;
+  initialTargetPrice?: string;
+  priceChartContext?: string;
   premiumFeaturesEnabled?: boolean;
 };
 
@@ -36,10 +39,13 @@ export function PriceAlertDialog({
   comparableProducts = demoComparableProducts,
   activeAlertCount = 0,
   freeAlertLimit = 3,
+  initialChain,
+  initialTargetPrice = '',
+  priceChartContext,
   premiumFeaturesEnabled = false
 }: PriceAlertDialogProps) {
   const freeLimitReached = !premiumFeaturesEnabled && activeAlertCount >= freeAlertLimit;
-  const [targetPrice, setTargetPrice] = useState('');
+  const [targetPrice, setTargetPrice] = useState(initialTargetPrice);
   const [error, setError] = useState<string | null>(null);
   const alertProductName = productName ?? product.name;
   const substitutions = findSubstitutionSavings(product, comparableProducts);
@@ -72,9 +78,27 @@ export function PriceAlertDialog({
       }}
     >
       <h2 className="text-xl font-black text-slate-950">Create a price alert for {alertProductName}</h2>
+      {initialChain || priceChartContext ? (
+        <p className="mt-3 rounded-2xl bg-emerald-50 p-3 text-sm font-bold text-emerald-950">
+          Prefilled from price chart{initialChain ? ` · ${initialChain}` : ''}{priceChartContext ? ` · ${priceChartContext}` : ''}.
+        </p>
+      ) : null}
       <p className="mt-3 rounded-2xl bg-amber-50 p-3 text-sm font-bold text-amber-900">
         Free accounts include {freeAlertLimit} active price alerts. Premium unlocks unlimited alerts, priority checks, and earlier deal notifications.
       </p>
+      {initialChain ? (
+        <>
+          <label className="mt-4 block text-sm font-bold text-slate-700" htmlFor="price-alert-chain">
+            Chain
+          </label>
+          <input
+            className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-950"
+            id="price-alert-chain"
+            readOnly
+            value={initialChain}
+          />
+        </>
+      ) : null}
       <label className="mt-4 block text-sm font-bold text-slate-700" htmlFor="price-alert-target">
         Target price
       </label>

@@ -35,6 +35,16 @@ export type AlertExplanationTimelineStep = {
   kind: 'source_price' | 'threshold' | 'prediction';
 };
 
+export type TargetPriceAlertDraft = {
+  productName: string;
+  chain: string;
+  sourcePrice: number;
+  sourcePriceText: string;
+  targetPrice: number;
+  targetPriceText: string;
+  thresholdReason: string;
+};
+
 type PredictiveDropAlertOptions = {
   now?: Date;
   daysAhead?: number;
@@ -64,6 +74,26 @@ function toSeverity(daysAway: number, savingsPercent: number): PredictiveDropAle
 
 function formatSek(value: number) {
   return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);
+}
+
+export function buildTargetPriceAlertDraftFromChartPoint(input: {
+  chain: string;
+  productName: string;
+  sourcePrice: number;
+  targetDiscountPercent?: number;
+}): TargetPriceAlertDraft {
+  const targetDiscountPercent = input.targetDiscountPercent ?? 10;
+  const targetPrice = Math.max(0.01, Math.round((input.sourcePrice * (1 - targetDiscountPercent / 100) + Number.EPSILON) * 100) / 100);
+
+  return {
+    productName: input.productName,
+    chain: input.chain,
+    sourcePrice: input.sourcePrice,
+    sourcePriceText: formatSek(input.sourcePrice),
+    targetPrice,
+    targetPriceText: formatSek(targetPrice),
+    thresholdReason: `${targetDiscountPercent}% below the selected chart price`
+  };
 }
 
 export function buildPredictiveDropAlerts(forecasts: PredictiveDropForecast[], options: PredictiveDropAlertOptions = {}): PredictiveDropAlert[] {

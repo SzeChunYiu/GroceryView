@@ -1,6 +1,8 @@
 'use client';
 
 import { type KeyboardEvent, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { buildTargetPriceAlertDraftFromChartPoint } from '@/lib/alert-scheduler';
+import { PriceAlertDialog } from './PriceAlertDialog';
 import { formatPriceChartTerminalReadout } from '../lib/price-chart-terminal-readout.js';
 export { formatPriceChartTerminalReadout, priceChartTerminalLatestPoint } from '../lib/price-chart-terminal-readout.js';
 
@@ -160,6 +162,17 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
   const visiblePointCount = visibleSeries.reduce((total, series) => total + series.points.length, 0);
   const visibleMarkerCount = visibleSeries.reduce((total, series) => total + series.markers.length, 0);
   const latestReadout = formatPriceChartTerminalReadout(activeWindow);
+  const targetAlertDraft = useMemo(() => {
+    const selectedSeries = visibleSeries[0];
+    const selectedPoint = selectedSeries?.points.at(-1);
+    if (!selectedSeries || !selectedPoint) return null;
+
+    return buildTargetPriceAlertDraftFromChartPoint({
+      chain: selectedSeries.storeName,
+      productName: chart.title,
+      sourcePrice: selectedPoint.value
+    });
+  }, [chart.title, visibleSeries]);
   const handleWindowKeyDown = (
     event: KeyboardEvent<HTMLButtonElement>,
     windowLabel: PriceChartTerminalWindow['label']
@@ -461,6 +474,18 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
           {chart.caveat}
         </p>
       )}
+
+      {targetAlertDraft ? (
+        <div className="mt-5 rounded-[1.75rem] bg-slate-100 p-1 text-slate-950">
+          <PriceAlertDialog
+            initialChain={targetAlertDraft.chain}
+            initialTargetPrice={targetAlertDraft.targetPrice.toFixed(2)}
+            key={`${targetAlertDraft.chain}-${targetAlertDraft.targetPrice}`}
+            priceChartContext={`${targetAlertDraft.targetPriceText} target, ${targetAlertDraft.thresholdReason}`}
+            productName={targetAlertDraft.productName}
+          />
+        </div>
+      ) : null}
 
       <p className="mt-4 text-xs font-semibold text-slate-400">{chart.sourceLabel} · {chart.confidenceLabel}</p>
     </section>
