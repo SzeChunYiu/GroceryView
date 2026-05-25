@@ -407,10 +407,15 @@ export default async function WeeklyBasketPage({
               The same compareBasketStrategies engine now includes eligible member prices only after the shopper enables that chain. Public shelf rows remain the baseline; member prices are only counted for enabled loyalty chains.
             </p>
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
-              <p className="rounded-2xl bg-white p-4 shadow-sm">
-                <span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">Member-adjusted split</span>
-                <span className="mt-1 block text-2xl font-black text-violet-900">{formatSek(loyaltyAdjustedBasketComparison.comparison.cheapestByProduct.total)}</span>
-              </p>
+              {loyaltyAdjustedBasketComparison.scenarioRows.map((scenario) => (
+                <p className="rounded-2xl bg-white p-4 shadow-sm" key={scenario.label}>
+                  <span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">{scenario.label}</span>
+                  <span className="mt-1 block text-2xl font-black text-violet-900">{formatSek(scenario.total)}</span>
+                  <span className="mt-2 block text-xs font-semibold leading-5 text-slate-600">{scenario.detail}</span>
+                </p>
+              ))}
+            </div>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <p className="rounded-2xl bg-white p-4 shadow-sm">
                 <span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">memberSavingsTotal</span>
                 <span className="mt-1 block text-2xl font-black text-violet-900">{formatSek(loyaltyAdjustedBasketComparison.memberSavingsTotal)}</span>

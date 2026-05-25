@@ -17,6 +17,11 @@ type DataGridProductCellProps = {
   unitLabel?: string | null;
 };
 
+type DataGridIssueBadgeProps = {
+  children: string;
+  tone?: 'danger' | 'review' | 'warning';
+};
+
 export function DataGrid({ className = '', striped = true, dense = false, ...props }: Readonly<DataGridProps>) {
   const striping = striped ? dataGridRowStripingClass : '';
   return (
@@ -54,5 +59,19 @@ export function DataGridProductCell({ brand, imageUrl, name, sourceUrl, unitLabe
         )}
       </div>
     </div>
+  );
+}
+
+export function DataGridIssueBadge({ children, tone = 'warning' }: Readonly<DataGridIssueBadgeProps>) {
+  const toneClass = tone === 'danger'
+    ? 'border-red-200 bg-red-50 text-red-800'
+    : tone === 'review'
+      ? 'border-violet-200 bg-violet-50 text-violet-800'
+      : 'border-amber-200 bg-amber-50 text-amber-800';
+
+  return (
+    <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-black uppercase tracking-[0.14em] ${toneClass}`}>
+      {children}
+    </span>
   );
 }
