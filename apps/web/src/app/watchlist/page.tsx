@@ -22,6 +22,7 @@ function formatSek(value: number) {
 type RecipeBasketSearchParams = {
   recipeBasket?: string | string[];
 };
+const emptyRecipeBasketSearchParams: RecipeBasketSearchParams = {};
 
 function firstSearchValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] ?? '' : value ?? '';
@@ -40,7 +41,7 @@ function parseRecipeWatchlist(value: string) {
 export default async function WatchlistPage({
   searchParams
 }: Readonly<{ searchParams?: Promise<RecipeBasketSearchParams> }>) {
-  const resolvedSearchParams = await Promise.resolve(searchParams ?? {});
+  const resolvedSearchParams = await (searchParams ?? Promise.resolve(emptyRecipeBasketSearchParams));
   const recipeWatchlistItems = parseRecipeWatchlist(firstSearchValue(resolvedSearchParams.recipeBasket));
   const { watchlistAlerts, plannedNotifications, watchedProducts, eligiblePriceRows, coverageConfidence } = watchlistAlertBoard;
   const bestTimeAlertSetups = watchlistAlertBoard.inputs.products.slice(0, 3).map((product, index) => {
