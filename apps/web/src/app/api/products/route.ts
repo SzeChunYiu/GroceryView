@@ -2,6 +2,7 @@ import { createPgQueryExecutor, searchProductsByText, type ProductSearchResult }
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { recordProductSearchPerformanceTelemetry, type ProductSearchPerformanceTelemetry } from '@/lib/analytics';
+import { buildStalePriceArchiveQuery, summarizeStalePriceArchive, type StalePriceArchiveSummary } from '@/lib/freshness';
 import { fuzzyProductSearchQueries, rankFuzzyProductResults } from '@/lib/search-fuzzy';
 import { searchExplanationBadgesForProduct } from '@/lib/search-filters';
 import { buildMisspelledQueryRecovery, expandGrocerySearchQueryWithTelemetry, type GrocerySearchExpansion, type GrocerySearchExpansionTelemetry } from '@/lib/search-suggest';
@@ -117,11 +118,23 @@ function logPerformanceTelemetry(telemetry: ProductSearchPerformanceTelemetry) {
   });
 }
 
+async function runStalePriceAutoArchive(executor: ReturnType<typeof createPgQueryExecutor>): Promise<StalePriceArchiveSummary> {
+  const archiveQuery = buildStalePriceArchiveQuery();
+  try {
+    const archivedRows = await executor.query<{ product_id: string }>(archiveQuery.sql, archiveQuery.values);
+    return summarizeStalePriceArchive(archivedRows.length, archiveQuery);
+  } catch (error) {
+    console.error('Stale price auto-archive failed', error instanceof Error ? { name: error.name } : { name: 'unknown' });
+    return summarizeStalePriceArchive(0, archiveQuery, 'failed');
+  }
+}
+
 function responsePayload(
   query: string,
   results: ProductSearchResult[],
   expansion: GrocerySearchExpansion,
   telemetry: ProductSearchPerformanceTelemetry,
+  stalePriceArchive?: StalePriceArchiveSummary,
   error?: string
 ) {
   return {
@@ -140,6 +153,7 @@ function responsePayload(
       timedOut: telemetry.timedOut,
       timeoutRate: telemetry.timeoutRate
     },
+    ...(stalePriceArchive ? { stalePriceArchive } : {}),
     source: productSearchTelemetrySource,
     ...(error ? { error } : {})
   };
@@ -176,24 +190,25 @@ export async function GET(request: Request) {
     const telemetry = buildPerformanceTelemetry(query, 0, startedAt, expansionTelemetry);
     logPerformanceTelemetry(telemetry);
     return NextResponse.json(
-      responsePayload(query, [], expansion, telemetry, 'product_search_database_unconfigured'),
+      responsePayload(query, [], expansion, telemetry, undefined, 'product_search_database_unconfigured'),
       { status: 503 }
     );
   }
 
   try {
     const executor = await executorForDatabaseUrl(databaseUrl);
+    const stalePriceArchive = await runStalePriceAutoArchive(executor);
     const batches = await Promise.all(expansion.expandedQueries.map((expandedQuery) => searchProductsByText(executor, expandedQuery, { limit: 8 })));
     const results = mergeSearchResults(batches);
     const telemetry = buildPerformanceTelemetry(query, results.length, startedAt, expansionTelemetry);
     logPerformanceTelemetry(telemetry);
-    return NextResponse.json(responsePayload(query, withSearchExplanationBadges(query, results, expansion), expansion, telemetry));
+    return NextResponse.json(responsePayload(query, withSearchExplanationBadges(query, results, expansion), expansion, telemetry, stalePriceArchive));
   } catch (error) {
     const telemetry = buildPerformanceTelemetry(query, 0, startedAt, expansionTelemetry, isTimeoutError(error));
     console.error('Product search query failed', error instanceof Error ? { name: error.name } : { name: 'unknown' });
     logPerformanceTelemetry(telemetry);
     return NextResponse.json(
-      responsePayload(query, [], expansion, telemetry, 'product_search_query_failed'),
+      responsePayload(query, [], expansion, telemetry, undefined, 'product_search_query_failed'),
       { status: 500 }
     );
   }

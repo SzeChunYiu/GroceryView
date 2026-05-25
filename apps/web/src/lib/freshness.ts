@@ -57,7 +57,22 @@ export interface NewArrivalFeedItem {
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
 const AGING_AFTER_DAYS = 2;
 const STALE_AFTER_DAYS = 7;
+export const DEFAULT_STALE_PRICE_ARCHIVE_THRESHOLD_DAYS = 14;
 const DEFAULT_STORE_RELIABILITY_CATEGORIES = ["branch price feed"];
+
+export type StalePriceArchiveQuery = {
+  cutoffObservedAt: string;
+  sql: string;
+  thresholdDays: number;
+  values: [string];
+};
+
+export type StalePriceArchiveSummary = {
+  archivedCount: number;
+  cutoffObservedAt: string;
+  status: "archived" | "skipped" | "failed";
+  thresholdDays: number;
+};
 
 function validIsoDate(value: string | null | undefined): string | null {
   if (!value) return null;
@@ -141,6 +156,43 @@ export function getPriceFreshness(
     ageInDays,
     refreshHint: "Recently refreshed price.",
     isStale: false,
+  };
+}
+
+export function stalePriceArchiveCutoff(now: Date = new Date(), thresholdDays = DEFAULT_STALE_PRICE_ARCHIVE_THRESHOLD_DAYS) {
+  const safeThresholdDays = Math.max(1, Math.trunc(Number.isFinite(thresholdDays) ? thresholdDays : DEFAULT_STALE_PRICE_ARCHIVE_THRESHOLD_DAYS));
+  return new Date(now.getTime() - safeThresholdDays * DAY_IN_MS).toISOString();
+}
+
+export function buildStalePriceArchiveQuery(
+  now: Date = new Date(),
+  thresholdDays = DEFAULT_STALE_PRICE_ARCHIVE_THRESHOLD_DAYS
+): StalePriceArchiveQuery {
+  const safeThresholdDays = Math.max(1, Math.trunc(Number.isFinite(thresholdDays) ? thresholdDays : DEFAULT_STALE_PRICE_ARCHIVE_THRESHOLD_DAYS));
+  const cutoffObservedAt = stalePriceArchiveCutoff(now, safeThresholdDays);
+
+  return {
+    cutoffObservedAt,
+    sql: `update latest_prices
+set is_available = false
+where observed_at < $1::timestamptz
+  and coalesce(is_available, true) = true
+returning product_id`,
+    thresholdDays: safeThresholdDays,
+    values: [cutoffObservedAt]
+  };
+}
+
+export function summarizeStalePriceArchive(
+  archivedCount: number,
+  query: Pick<StalePriceArchiveQuery, "cutoffObservedAt" | "thresholdDays">,
+  status: StalePriceArchiveSummary["status"] = "archived"
+): StalePriceArchiveSummary {
+  return {
+    archivedCount: Math.max(0, Math.trunc(Number.isFinite(archivedCount) ? archivedCount : 0)),
+    cutoffObservedAt: query.cutoffObservedAt,
+    status,
+    thresholdDays: query.thresholdDays
   };
 }
 

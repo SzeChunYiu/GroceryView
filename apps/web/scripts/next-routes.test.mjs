@@ -3613,6 +3613,8 @@ ${seo}`;
   it('surfaces instant faceted product search from real catalogue price rows', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const products = await read('src/app/products/page.tsx');
+    const productsRoute = await read('src/app/api/products/route.ts');
+    const freshness = await read('src/lib/freshness.ts');
     const packageJson = await read('package.json');
 
     assert.match(verified, /buildFacetedProductSearch/);
@@ -3628,6 +3630,11 @@ ${seo}`;
     assert.match(products, /inStockOnly/);
     assert.match(products, /kr\/kg|kr\/l|per-unit/i);
     assert.match(products, /latest_prices/);
+    assert.match(productsRoute, /runStalePriceAutoArchive/);
+    assert.match(productsRoute, /stalePriceArchive/);
+    assert.match(freshness, /buildStalePriceArchiveQuery/);
+    assert.match(freshness, /is_available = false/);
+    assert.match(freshness, /DEFAULT_STALE_PRICE_ARCHIVE_THRESHOLD_DAYS/);
     assert.match(packageJson, /@groceryview\/api/);
   });
 
