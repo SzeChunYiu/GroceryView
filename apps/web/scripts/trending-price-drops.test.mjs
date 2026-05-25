@@ -10,6 +10,7 @@ const require = createRequire(import.meta.url);
 const ts = require('typescript');
 const root = new URL('../', import.meta.url);
 const rootPath = fileURLToPath(root);
+const rootPrefix = rootPath.endsWith('/') || rootPath.endsWith('\\') ? rootPath : `${rootPath}/`;
 const moduleCache = new Map();
 
 const read = (relative) => new Promise((resolve, reject) => {
@@ -79,8 +80,8 @@ function loadTsModule(relative, mocks = {}) {
       return new Proxy({}, { get: () => Icon });
     }
     if (specifier.startsWith('@/') || specifier.startsWith('.')) {
-      const resolved = resolveLocalModule(normalize(absolute.slice(rootPath.length + 1)), specifier);
-      return loadTsModule(normalize(resolved.slice(rootPath.length + 1)), mocks);
+      const resolved = resolveLocalModule(normalize(absolute.slice(rootPrefix.length)), specifier);
+      return loadTsModule(normalize(resolved.slice(rootPrefix.length)), mocks);
     }
     return require(specifier);
   };
