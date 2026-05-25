@@ -3,6 +3,7 @@ import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { StoreMap } from '@/components/store-map';
 import { buildChainPriceObservations } from '@/lib/chain-index-data';
 import { basketCostHeatmap } from '@/lib/map-basket-cost-heatmap';
+import { storeAvailabilityChainOptions, storeAvailabilityDistanceOptionsKm, storeAvailabilitySignal } from '@/lib/osm-stores';
 import { formatPct, storePricePercentileRanks, storeUniverse } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 import { buildStoreDistanceCompare } from '@/lib/store-distance';
@@ -22,6 +23,11 @@ const routeAwareNearestStorePlan = buildStoreDistanceCompare(
   'walk'
 );
 const topRouteAwareStores = routeAwareNearestStorePlan.rows.slice(0, 4);
+const mapAvailabilityFilterSummary = {
+  chains: storeAvailabilityChainOptions.filter((chain) => chain !== 'all').length,
+  distanceOptions: storeAvailabilityDistanceOptionsKm,
+  likelyStockedStores: storeUniverse.slice(0, 80).filter((store) => storeAvailabilitySignal(store).likelyInStock).length
+};
 
 function normaliseBrand(brand: string) {
   const lower = brand.toLowerCase();
@@ -147,6 +153,7 @@ export default function MapPage() {
             <h2 className="mt-2 text-3xl font-black">Interactive store map with linked list selection</h2>
             <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-200">
               The map ↔ list sync uses verified OSM coordinates and chain-index proxy colors. Cluster and marker popovers expose map-center distance plus source-provided hours status without inventing branch-level basket prices.
+              Availability filters narrow markers by chain, distance, opening-hours evidence, and products likely in stock from store format and chain coverage.
             </p>
           </div>
           <div className="rounded-2xl bg-white/10 p-4 text-right">
@@ -157,6 +164,39 @@ export default function MapPage() {
         </div>
         <div className="h-[620px] overflow-hidden border-t border-white/10 bg-slate-900">
           <StoreMap routeRecommendations={topRouteAwareStores.slice(0, 3)} />
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-teal-200 bg-teal-50" data-map-availability-filter-overview="true">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto]">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-teal-800">Nearest store availability filters</p>
+            <h2 className="mt-2 text-3xl font-black text-teal-950">Filter the map before comparing nearby stores</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-teal-900">
+              The interactive panel exposes chain, distance, source opening-hours, and products-likely-in-stock filters.
+              Likely-stocked rows are a conservative availability signal from OSM shop format plus known grocery chain coverage, not a live shelf or checkout guarantee.
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white/80 p-4 text-right">
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-teal-800">Filter set</p>
+            <p className="mt-2 text-2xl font-black text-teal-950">{mapAvailabilityFilterSummary.chains} chains</p>
+            <p className="mt-2 text-sm font-semibold text-teal-900">
+              {mapAvailabilityFilterSummary.distanceOptions.join('/')} km · {mapAvailabilityFilterSummary.likelyStockedStores} likely stocked sample rows
+            </p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-4">
+          {[
+            ['Chain', 'Restrict markers to ICA, Coop, Willys, Lidl, Hemköp, City Gross, Tempo/local, or other OSM brands.'],
+            ['Distance', 'Limit stores to a selected radius from the Stockholm map center before list rows are shown.'],
+            ['Opening hours', 'Keep only stores where source data exposes an open-now status; missing hours stay visible by default.'],
+            ['Products likely in stock', 'Prioritize supermarket and covered-chain stores for staple basket availability without claiming live inventory.']
+          ].map(([label, detail]) => (
+            <div className="rounded-2xl bg-white/80 p-4" key={label}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-teal-700">{label}</p>
+              <p className="mt-2 text-sm font-semibold leading-6 text-teal-950">{detail}</p>
+            </div>
+          ))}
         </div>
       </Card>
 

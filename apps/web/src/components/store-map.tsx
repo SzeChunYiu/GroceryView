@@ -1,9 +1,17 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { osmStores, type OsmStore } from '@/lib/osm-stores';
+import {
+  osmStores,
+  storeAvailabilityChainOptions,
+  storeAvailabilityDistanceOptionsKm,
+  storeAvailabilityFilterDefaults,
+  storeAvailabilitySignal,
+  type OsmStore,
+  type StoreAvailabilityFilter
+} from '@/lib/osm-stores';
 import { cheapestMapChain, mapChainIndexScores } from '@/lib/map-chain-index';
 import { trackStoreDirectionsClick } from '@/lib/analytics';
 import type { StoreDistanceRow } from '@/lib/store-distance';
@@ -98,31 +106,47 @@ function formatDistance(km: number): string {
 }
 
 function storeOpenHoursLabel(store: OsmStore & { openingHours?: string; opening_hours?: string }): string {
-  return store.openingHours || store.opening_hours || 'Open-hours data not published in current OSM snapshot';
+  return storeAvailabilitySignal(store).openingHoursLabel;
 }
 
-function toFeatureCollection(): GeoJSON.FeatureCollection<GeoJSON.Point> {
+function storeMatchesAvailabilityFilter(store: OsmStore, filter: StoreAvailabilityFilter): boolean {
+  const signal = storeAvailabilitySignal(store);
+  const distanceFromCenter = distanceKm(STOCKHOLM, [store.lng, store.lat]);
+  if (filter.chain !== 'all' && signal.chainFamily !== filter.chain) return false;
+  if (distanceFromCenter > filter.distanceKm) return false;
+  if (filter.openNowOnly && !signal.openingHoursLabel.toLowerCase().includes('open now')) return false;
+  if (filter.likelyInStockOnly && !signal.likelyInStock) return false;
+  return true;
+}
+
+function toFeatureCollection(stores: OsmStore[]): GeoJSON.FeatureCollection<GeoJSON.Point> {
   return {
     type: 'FeatureCollection',
-    features: osmStores
+    features: stores
       .filter((s) => Number.isFinite(s.lat) && Number.isFinite(s.lng))
-      .map((s) => ({
-        type: 'Feature',
-        geometry: { type: 'Point', coordinates: [s.lng, s.lat] },
-        properties: {
-          slug: s.slug,
-          name: s.name,
-          brand: s.brand || 'Other',
-          chainIndex: chainIndexScore(s.brand || ''),
-          format: s.format || 'store',
-          district: s.district || s.city || '',
-          address: s.address || '',
-          color: chainIndexColor(chainIndexScore(s.brand || ''), chainColor(s.brand || '')),
-          lat: s.lat,
-          lng: s.lng,
-          openHours: storeOpenHoursLabel(s),
-        },
-      })),
+      .map((s) => {
+        const availability = storeAvailabilitySignal(s);
+        return {
+          type: 'Feature',
+          geometry: { type: 'Point', coordinates: [s.lng, s.lat] },
+          properties: {
+            slug: s.slug,
+            name: s.name,
+            brand: s.brand || 'Other',
+            chainFamily: availability.chainFamily,
+            chainIndex: chainIndexScore(s.brand || ''),
+            format: s.format || 'store',
+            district: s.district || s.city || '',
+            address: s.address || '',
+            color: chainIndexColor(chainIndexScore(s.brand || ''), chainColor(s.brand || '')),
+            lat: s.lat,
+            lng: s.lng,
+            openHours: availability.openingHoursLabel,
+            likelyInStock: availability.likelyInStock,
+            likelyInStockLabel: availability.likelyInStockLabel,
+          },
+        };
+      }),
   };
 }
 
@@ -168,6 +192,18 @@ export function StoreMap({ routeRecommendations = [] }: Readonly<{ routeRecommen
   const mapRef = useRef<maplibregl.Map | null>(null);
   const [storeCount, setStoreCount] = useState(0);
   const [selectedStoreSlug, setSelectedStoreSlug] = useState(syncedMapListStores[0]?.slug ?? '');
+  const [availabilityFilter, setAvailabilityFilter] = useState<StoreAvailabilityFilter>(storeAvailabilityFilterDefaults);
+  const filteredStores = useMemo(
+    () => osmStores.filter((store) => Number.isFinite(store.lat) && Number.isFinite(store.lng) && storeMatchesAvailabilityFilter(store, availabilityFilter)),
+    [availabilityFilter]
+  );
+  const filteredListStores = filteredStores.slice(0, 8);
+  const filteredRouteRecommendations = routeRecommendations.filter((store) => {
+    if (availabilityFilter.chain !== 'all' && store.chainName !== availabilityFilter.chain) return false;
+    if (store.distanceMeters > availabilityFilter.distanceKm * 1000) return false;
+    if (availabilityFilter.openNowOnly && store.openingStatus !== 'open_now') return false;
+    return true;
+  });
 
   function focusStore(store: OsmStore) {
     setSelectedStoreSlug(store.slug);
@@ -181,7 +217,7 @@ export function StoreMap({ routeRecommendations = [] }: Readonly<{ routeRecommen
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const data = toFeatureCollection();
+    const data = toFeatureCollection(filteredStores);
     setStoreCount(data.features.length);
 
     const handleDirectionsClick = (event: MouseEvent) => {
@@ -358,6 +394,7 @@ export function StoreMap({ routeRecommendations = [] }: Readonly<{ routeRecommen
                ${where ? `<div style="font-size:12px;color:#64748b;margin-top:2px">${where}</div>` : ''}
                <div style="font-size:12px;color:#64748b;margin-top:2px">${formatDistance(distanceKm([mapCenter.lng, mapCenter.lat], [lng, lat]))} from map center</div>
                <div style="font-size:12px;color:#64748b;margin-top:2px">Hours: ${escapeHtml(String(p.openHours || 'Open-hours unavailable'))}</div>
+               <div style="font-size:12px;color:#64748b;margin-top:2px">Stock filter: ${escapeHtml(String(p.likelyInStockLabel || 'Availability signal unavailable'))}</div>
                <a href="${directions}" target="_blank" rel="noopener noreferrer"
                   data-store-directions="true" data-store-slug="${escapeHtml(String(p.slug || ''))}" data-store-name="${escapeHtml(String(p.name || ''))}" data-store-brand="${escapeHtml(String(p.brand || ''))}"
                   style="display:inline-block;margin-top:8px;font-size:12px;font-weight:600;color:#1D8649">
@@ -378,7 +415,7 @@ export function StoreMap({ routeRecommendations = [] }: Readonly<{ routeRecommen
       mapRef.current = null;
       map.remove();
     };
-  }, []);
+  }, [filteredStores]);
 
   return (
     <div className="relative h-full w-full">
@@ -388,6 +425,9 @@ export function StoreMap({ routeRecommendations = [] }: Readonly<{ routeRecommen
       <div className="pointer-events-none absolute left-3 top-3 rounded-lg border border-market-ink/10 bg-white/95 px-3 py-2 text-xs shadow-sm backdrop-blur">
         <div className="mb-1 font-bold uppercase tracking-wide text-market-ink/55">
           {storeCount.toLocaleString()} stores
+        </div>
+        <div className="mb-2 text-market-ink/70" data-map-availability-filter-summary="true">
+          {availabilityFilter.chain === 'all' ? 'All chains' : availabilityFilter.chain} · within {availabilityFilter.distanceKm} km
         </div>
         <ul className="space-y-0.5">
           {CHAIN_COLORS.map((c) => (
@@ -406,16 +446,16 @@ export function StoreMap({ routeRecommendations = [] }: Readonly<{ routeRecommen
           <div>{cheapestMapChain ? `${cheapestMapChain.chainId} · index ${cheapestMapChain.overallIndex.toFixed(1)}` : 'Awaiting index coverage'}</div>
           <div className="mt-1">Green &lt; 96 · amber 96-103 · red &gt; 103</div>
         </div>
-        {routeRecommendations.length > 0 ? (
+        {filteredRouteRecommendations.length > 0 ? (
           <div className="mt-2 border-t border-market-ink/10 pt-2 text-market-ink/70" data-route-aware-map-legend="true">
             <div className="font-bold uppercase tracking-wide text-market-ink/55">Route-aware nearest</div>
-            <div>{routeRecommendations[0]?.storeName} · {routeRecommendations[0]?.totalMinutes} min</div>
+            <div>{filteredRouteRecommendations[0]?.storeName} · {filteredRouteRecommendations[0]?.totalMinutes} min</div>
             <div className="mt-1">Rank combines distance, basket total, and opening status.</div>
           </div>
         ) : null}
       </div>
 
-      <div className="absolute bottom-3 right-3 top-3 flex w-[min(22rem,calc(100%-1.5rem))] flex-col rounded-2xl border border-white/70 bg-white/95 p-3 text-slate-950 shadow-2xl backdrop-blur">
+      <div className="absolute bottom-3 right-3 top-3 flex w-[min(24rem,calc(100%-1.5rem))] flex-col rounded-2xl border border-white/70 bg-white/95 p-3 text-slate-950 shadow-2xl backdrop-blur">
         <div className="rounded-xl bg-slate-950 px-4 py-3 text-white">
           <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-200">Synced map + list</p>
           <h3 className="mt-1 text-lg font-black">Linked store selection</h3>
@@ -423,12 +463,74 @@ export function StoreMap({ routeRecommendations = [] }: Readonly<{ routeRecommen
             Click a list row to fly the map; click a marker to update the selected row.
           </p>
         </div>
+        <div className="mt-3 rounded-2xl border border-slate-200 bg-slate-50 p-3" data-map-availability-filters="true">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-[11px] font-black uppercase tracking-[0.16em] text-slate-500">Availability filters</p>
+              <p className="mt-1 text-xs font-semibold text-slate-600">Chain, distance, opening hours, and products likely in stock.</p>
+            </div>
+            <button
+              className="rounded-full bg-white px-3 py-2 text-xs font-black text-slate-700 ring-1 ring-slate-200"
+              onClick={() => setAvailabilityFilter(storeAvailabilityFilterDefaults)}
+              type="button"
+            >
+              Reset
+            </button>
+          </div>
+          <label className="mt-3 block text-xs font-black uppercase tracking-[0.12em] text-slate-500" htmlFor="map-chain-filter">Chain</label>
+          <select
+            className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-800"
+            id="map-chain-filter"
+            onChange={(event) => setAvailabilityFilter((current) => ({ ...current, chain: event.target.value }))}
+            value={availabilityFilter.chain}
+          >
+            {storeAvailabilityChainOptions.map((chain) => (
+              <option key={chain} value={chain}>{chain === 'all' ? 'All chains' : chain}</option>
+            ))}
+          </select>
+          <div className="mt-3">
+            <p className="text-xs font-black uppercase tracking-[0.12em] text-slate-500">Distance from Stockholm map center</p>
+            <div className="mt-2 grid grid-cols-4 gap-1">
+              {storeAvailabilityDistanceOptionsKm.map((distance) => (
+                <button
+                  aria-pressed={availabilityFilter.distanceKm === distance}
+                  className={`rounded-full px-2 py-2 text-xs font-black ${
+                    availabilityFilter.distanceKm === distance ? 'bg-emerald-700 text-white' : 'bg-white text-slate-700 ring-1 ring-slate-200'
+                  }`}
+                  key={distance}
+                  onClick={() => setAvailabilityFilter((current) => ({ ...current, distanceKm: distance }))}
+                  type="button"
+                >
+                  {distance} km
+                </button>
+              ))}
+            </div>
+          </div>
+          <label className="mt-3 flex items-center gap-2 text-xs font-bold text-slate-700">
+            <input
+              checked={availabilityFilter.openNowOnly}
+              className="h-4 w-4 rounded border-slate-300 text-emerald-700"
+              onChange={(event) => setAvailabilityFilter((current) => ({ ...current, openNowOnly: event.target.checked }))}
+              type="checkbox"
+            />
+            Source says open now
+          </label>
+          <label className="mt-2 flex items-center gap-2 text-xs font-bold text-slate-700">
+            <input
+              checked={availabilityFilter.likelyInStockOnly}
+              className="h-4 w-4 rounded border-slate-300 text-emerald-700"
+              onChange={(event) => setAvailabilityFilter((current) => ({ ...current, likelyInStockOnly: event.target.checked }))}
+              type="checkbox"
+            />
+            Products likely in stock
+          </label>
+        </div>
         <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
-          {routeRecommendations.length > 0 ? (
+          {filteredRouteRecommendations.length > 0 ? (
             <div className="rounded-2xl border border-cyan-100 bg-cyan-50 p-3" data-route-aware-nearest-panel="true">
               <p className="text-[11px] font-black uppercase tracking-[0.16em] text-cyan-800">Route-aware nearest stores</p>
               <div className="mt-2 space-y-2">
-                {routeRecommendations.slice(0, 3).map((store, index) => (
+                {filteredRouteRecommendations.slice(0, 3).map((store, index) => (
                   <div className="rounded-xl bg-white/80 p-2 text-xs" key={store.id}>
                     <div className="flex items-start justify-between gap-2">
                       <p className="font-black text-slate-950">#{index + 1} {store.storeName}</p>
@@ -442,9 +544,10 @@ export function StoreMap({ routeRecommendations = [] }: Readonly<{ routeRecommen
               </div>
             </div>
           ) : null}
-          {syncedMapListStores.map((store) => {
+          {filteredListStores.map((store) => {
             const selected = selectedStoreSlug === store.slug;
             const score = chainIndexScore(store.brand || '');
+            const availability = storeAvailabilitySignal(store);
             return (
               <button
                 aria-pressed={selected}
@@ -470,12 +573,18 @@ export function StoreMap({ routeRecommendations = [] }: Readonly<{ routeRecommen
                   />
                 </div>
                 <div className="mt-3 flex flex-wrap gap-2 text-[11px] font-black uppercase tracking-[0.12em]">
-                  <span className="rounded-full bg-slate-100 px-2 py-1 text-slate-600">{store.brand || 'Other'}</span>
+                  <span className="rounded-full bg-slate-100 px-2 py-1 text-slate-600">{availability.chainFamily}</span>
                   <span className="rounded-full bg-emerald-100 px-2 py-1 text-emerald-800">{chainIndexLabel(store)}</span>
+                  <span className="rounded-full bg-cyan-100 px-2 py-1 text-cyan-800">{availability.likelyInStock ? 'Likely stocked' : 'Stock unknown'}</span>
                 </div>
               </button>
             );
           })}
+          {filteredListStores.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-4 text-sm font-semibold text-slate-600">
+              No stores match these availability filters. Broaden the chain, distance, opening-hours, or likely-stocked settings.
+            </div>
+          ) : null}
         </div>
       </div>
     </div>

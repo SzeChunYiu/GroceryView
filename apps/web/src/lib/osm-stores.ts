@@ -9,6 +9,61 @@ export type OsmStore = {
   source: 'osm'; retrievedDate: string;
 };
 
+export type StoreAvailabilityFilter = {
+  chain: string;
+  distanceKm: number;
+  openNowOnly: boolean;
+  likelyInStockOnly: boolean;
+};
+
+export type StoreAvailabilitySignal = {
+  chainFamily: string;
+  likelyInStock: boolean;
+  likelyInStockLabel: string;
+  openingHoursLabel: string;
+};
+
+export const storeAvailabilityFilterDefaults: StoreAvailabilityFilter = {
+  chain: 'all',
+  distanceKm: 5,
+  openNowOnly: false,
+  likelyInStockOnly: false
+};
+
+export const storeAvailabilityChainOptions = ['all', 'ICA', 'Coop', 'Willys', 'Lidl', 'Hemköp', 'City Gross', 'Tempo / local', 'Other'] as const;
+export const storeAvailabilityDistanceOptionsKm = [1, 3, 5, 10] as const;
+
+export function storeAvailabilitySignal(store: OsmStore & { openingHours?: string; opening_hours?: string }): StoreAvailabilitySignal {
+  const brand = store.brand || store.name || '';
+  const lower = brand.toLowerCase();
+  const chainFamily = lower.includes('ica')
+    ? 'ICA'
+    : lower.includes('coop') || lower.includes('x:tra')
+      ? 'Coop'
+      : lower.includes('willys')
+        ? 'Willys'
+        : lower.includes('lidl')
+          ? 'Lidl'
+          : lower.includes('hemköp') || lower.includes('hemkop')
+            ? 'Hemköp'
+            : lower.includes('city gross')
+              ? 'City Gross'
+              : lower.includes('tempo') || lower.includes('handlarn') || lower.includes('matöppet') || lower.includes('matoppet')
+                ? 'Tempo / local'
+                : 'Other';
+  const openingHoursLabel = store.openingHours || store.opening_hours || 'Open-hours data not published in current OSM snapshot';
+  const likelyInStock = store.shop === 'supermarket' || ['ICA', 'Coop', 'Willys', 'Lidl', 'Hemköp', 'City Gross'].includes(chainFamily);
+
+  return {
+    chainFamily,
+    likelyInStock,
+    likelyInStockLabel: likelyInStock
+      ? 'Likely stocked for staple basket categories from store format and chain coverage'
+      : 'Stock confidence unavailable for staple basket categories',
+    openingHoursLabel
+  };
+}
+
 export type StoreRouteChecklistItem = {
   aisleLabel: string;
   checked: boolean;

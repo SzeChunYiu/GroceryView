@@ -9,13 +9,20 @@ async function loadProductsRoute() {
     .replace("import { createPgQueryExecutor, searchProductsByText, type ProductSearchResult } from '@groceryview/db';", 'const createPgQueryExecutor = () => ({}); const searchProductsByText = async () => [];')
     .replace("import { NextResponse } from 'next/server';", 'const NextResponse = { json: (body, init) => Response.json(body, init) };')
     .replace("import { z } from 'zod';", '')
-    .replace("import { expandGrocerySearchQuery } from '@/lib/search-suggest';", 'const expandGrocerySearchQuery = (query) => ({ query, expandedQueries: query ? [query] : [], matchedAliases: [], matchedSynonyms: [] });')
+    .replace("import { recordProductSearchPerformanceTelemetry, type ProductSearchPerformanceTelemetry } from '@/lib/analytics';", 'const recordProductSearchPerformanceTelemetry = ({ cacheHit, latencyMs, query, resultCount, source, timedOut = false }) => ({ cacheHit, cacheHitRate: cacheHit ? 1 : 0, latencyMs, query, resultCount, source, timedOut, timeoutRate: timedOut ? 1 : 0 });')
+    .replace("import { expandGrocerySearchQueryWithTelemetry, type GrocerySearchExpansion, type GrocerySearchExpansionTelemetry } from '@/lib/search-suggest';", 'const expandGrocerySearchQueryWithTelemetry = (query) => ({ expansion: { query, expandedQueries: query ? [query] : [], matchedAliases: [], matchedSynonyms: [] }, telemetry: { cacheHit: false } });')
     .replace(/type PgPoolLike = \{[\s\S]*?\};\n\n/, '')
     .replace(/type PgModuleLike = \{[\s\S]*?\};\n\n/, '')
     .replace(/let cachedDatabaseUrl: string \| null = null;/, 'let cachedDatabaseUrl = null;')
     .replace(/let cachedPool: PgPoolLike \| null = null;/, 'let cachedPool = null;')
     .replace(/request: Request/g, 'request')
     .replace(/databaseUrl: string/g, 'databaseUrl')
+    .replace(/error: unknown/g, 'error')
+    .replace(/query: string/g, 'query')
+    .replace(/resultCount: number/g, 'resultCount')
+    .replace(/startedAt: number/g, 'startedAt')
+    .replace(/timedOut = false/g, 'timedOut = false')
+    .replace(/error\?: string/g, 'error')
     .replace(/: Promise<PgModuleLike>/g, '')
     .replace(/ as \(specifier: string\) => Promise<unknown>/g, '')
     .replace(/ as Partial<PgModuleLike>/g, '')
@@ -23,7 +30,10 @@ async function loadProductsRoute() {
     .replace(/new Map<string, ProductSearchResult>\(\)/g, 'new Map()')
     .replace(/: ProductSearchResult\[\]\[\]/g, '')
     .replace(/: ProductSearchResult\[\]/g, '')
-    .replace(/function responsePayload\(query: string, results, expansion = expandGrocerySearchQuery\(query\), error\?: string\)/, 'function responsePayload(query, results, expansion = expandGrocerySearchQuery(query), error)')
+    .replace(/: ProductSearchPerformanceTelemetry/g, '')
+    .replace(/: GrocerySearchExpansionTelemetry/g, '')
+    .replace(/: GrocerySearchExpansion/g, '')
+    .replace(/function responsePayload\(\s*query: string,\s*results,\s*expansion,\s*telemetry,\s*error\?: string\s*\)/, 'function responsePayload(query, results, expansion, telemetry, error)')
     .replace('export async function GET(request)', 'async function GET(request)')
     .replace(/export const /g, 'const ');
 
@@ -35,14 +45,40 @@ test('products route validation accepts q-only searches and rejects unexpected q
 
   const accepted = await GET(new Request('https://groceryview.test/api/products?q=a'));
   assert.equal(accepted.status, 200);
-  assert.deepEqual(await accepted.json(), {
+  const acceptedBody = await accepted.json();
+  assert.deepEqual(
+    {
+      query: acceptedBody.query,
+      expandedQueries: acceptedBody.expandedQueries,
+      matchedAliases: acceptedBody.matchedAliases,
+      matchedSynonyms: acceptedBody.matchedSynonyms,
+      performanceTelemetry: {
+        cacheHit: acceptedBody.performanceTelemetry.cacheHit,
+        cacheHitRate: acceptedBody.performanceTelemetry.cacheHitRate,
+        resultCount: acceptedBody.performanceTelemetry.resultCount,
+        timedOut: acceptedBody.performanceTelemetry.timedOut,
+        timeoutRate: acceptedBody.performanceTelemetry.timeoutRate
+      },
+      results: acceptedBody.results,
+      source: acceptedBody.source
+    },
+    {
     query: 'a',
     expandedQueries: ['a'],
     matchedAliases: [],
     matchedSynonyms: [],
+    performanceTelemetry: {
+      cacheHit: false,
+      cacheHitRate: 0,
+      resultCount: 0,
+      timedOut: false,
+      timeoutRate: 0
+    },
     results: [],
     source: 'postgres.products_tsvector_alias_synonym_expansion'
-  });
+    }
+  );
+  assert.equal(typeof acceptedBody.performanceTelemetry.latencyMs, 'number');
 
   const rejected = await GET(new Request('https://groceryview.test/api/products?q=a&limit=8'));
   assert.equal(rejected.status, 400);
