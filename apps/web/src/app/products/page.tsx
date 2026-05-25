@@ -4,6 +4,7 @@ import { ActiveFilterChips, AdvancedFilterDrawer } from '@/components/FilterPane
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { PriceReportReviewActions } from '@/components/price-report-review-actions';
 import { OriginFilter, type OriginFilterCode } from '@/components/origin-filter';
+import { ProductSortSelect } from '@/components/product-sort-select';
 import { ProductPriceCards } from '@/components/product-price-cards';
 import { VirtualizedProductGrid } from '@/components/LazyItemCard';
 import { apohemSource } from '@/lib/ingested/apohem';
@@ -32,6 +33,7 @@ type SearchParams = {
   inStockOnly?: string | string[];
   minConfidence?: string | string[];
   brand?: string | string[];
+  sort?: string | string[];
   page?: string | string[];
 };
 
@@ -72,6 +74,7 @@ function copySearchParams(params: URLSearchParams, source: SearchParams) {
   setFirstParam(params, 'maxPrice', source.maxPrice);
   setFirstParam(params, 'inStockOnly', source.inStockOnly);
   setFirstParam(params, 'minConfidence', source.minConfidence);
+  setFirstParam(params, 'sort', source.sort);
 }
 
 function productsPageUrl(page: number, selectedBrand = '', searchParams: SearchParams = {}) {
@@ -196,6 +199,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
         </div>
         <form action="/products" className="mt-5 grid gap-3 rounded-2xl border border-violet-100 bg-white p-4 shadow-sm lg:grid-cols-[1.2fr_auto]" method="get">
           {search.originFilters.map((origin) => <input key={origin} name="origin" type="hidden" value={origin} />)}
+          {search.sort !== 'relevance' ? <input name="sort" type="hidden" value={search.sort} /> : null}
           <label className="text-sm font-black text-slate-950" htmlFor="product-search-q">
             Search
             <input className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-950" defaultValue={search.query} id="product-search-q" name="q" />
@@ -233,6 +237,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           counts={Object.fromEntries(originFacets.map((facet) => [facet.value, facet.count])) as Partial<Record<OriginFilterCode, number>>}
           selected={search.originFilters}
         />
+        <ProductSortSelect searchParams={{ ...resolvedSearchParams, brand: selectedBrand }} selectedSort={search.sort} />
         {resultCards.length === 0 ? (
           <div className="mt-5 rounded-3xl border border-amber-200 bg-amber-50 p-5">
             <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-800">No exact matches</p>
