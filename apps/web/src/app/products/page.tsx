@@ -516,16 +516,24 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
         </div>
         <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           {immigrantFamiliarBrandSearch.map((brand) => (
-            <Link className="rounded-2xl border border-sky-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-sky-700" href={`/products/${brand.verifiedProductSlug}`} key={`${brand.reportedBrand}-${brand.verifiedProductSlug}`}>
+            <article className="rounded-2xl border border-sky-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-sky-700" key={`${brand.reportedBrand}-${brand.verifiedProductSlug}`}>
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-sky-700">{brand.reportedBrand}</p>
               <h3 className="mt-2 text-lg font-black text-slate-950">{brand.productName}</h3>
               <p className="mt-1 text-xs font-semibold text-slate-500">{brand.categoryLabel}</p>
               <p className="mt-3 text-xs leading-5 text-slate-600">searchTokens: {brand.searchTokens}</p>
+              <p className="mt-2 text-xs font-semibold leading-5 text-slate-600">
+                Alias review keeps transliterations and non-Swedish familiar names in the admin queue before they change shopper ranking.
+              </p>
               <div className="mt-3 flex items-center justify-between gap-2 text-xs font-black text-slate-700">
                 <span>{formatSek(brand.verifiedPrice)}</span>
                 <span>{brand.evidenceLabel}</span>
               </div>
-            </Link>
+              <div className="mt-3 flex flex-wrap gap-2 text-xs font-black">
+                <Link className="rounded-full bg-sky-700 px-3 py-2 text-white" href={`/products/${brand.verifiedProductSlug}`}>Availability</Link>
+                <Link className="rounded-full bg-white px-3 py-2 text-sky-950 ring-1 ring-sky-200" href={`/compare?q=${encodeURIComponent(brand.productName)}`}>Compare prices</Link>
+                <Link className="rounded-full bg-amber-50 px-3 py-2 text-amber-950 ring-1 ring-amber-200" href={`/admin/search-aliases?candidate=${encodeURIComponent(brand.reportedBrand)}`}>Review alias</Link>
+              </div>
+            </article>
           ))}
         </div>
       </Card>
