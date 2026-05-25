@@ -136,6 +136,85 @@ describe('rankDealOpportunities', () => {
 
     assert.deepEqual(opportunities.map((deal) => deal.productId), ['milk']);
   });
+
+  it('boosts essential categories around Swedish payday without changing organic deal scores', () => {
+    const opportunities = rankDealOpportunities({
+      countryCode: 'SE',
+      rankedAt: '2026-05-25T10:00:00.000Z',
+      deals: [
+        {
+          productId: 'chips',
+          productName: 'Potato Chips',
+          storeId: 'ica-city',
+          storeName: 'ICA City',
+          currentPrice: 19.9,
+          regularPrice: 29.9,
+          dealScore: 83,
+          sourceConfidence: 0.9,
+          productCategory: 'snacks'
+        },
+        {
+          productId: 'milk',
+          productName: 'Milk 1L',
+          storeId: 'willys-odenplan',
+          storeName: 'Willys Odenplan',
+          currentPrice: 11.9,
+          regularPrice: 16.9,
+          dealScore: 78,
+          sourceConfidence: 0.9,
+          productCategory: 'dairy'
+        },
+        {
+          productId: 'bread',
+          productName: 'Sourdough Bread',
+          storeId: 'coop-odenplan',
+          storeName: 'Coop Odenplan',
+          currentPrice: 24.9,
+          regularPrice: 34.9,
+          dealScore: 76,
+          sourceConfidence: 0.9,
+          productCategory: 'bread'
+        }
+      ]
+    });
+
+    assert.deepEqual(opportunities.map((deal) => deal.productId), ['milk', 'bread', 'chips']);
+    assert.equal(opportunities[0]!.dealScore, 78);
+  });
+
+  it('does not boost Swedish essentials outside the payday window', () => {
+    const opportunities = rankDealOpportunities({
+      countryCode: 'SE',
+      rankedAt: '2026-05-15T10:00:00.000Z',
+      deals: [
+        {
+          productId: 'chips',
+          productName: 'Potato Chips',
+          storeId: 'ica-city',
+          storeName: 'ICA City',
+          currentPrice: 19.9,
+          regularPrice: 29.9,
+          dealScore: 83,
+          sourceConfidence: 0.9,
+          productCategory: 'snacks'
+        },
+        {
+          productId: 'milk',
+          productName: 'Milk 1L',
+          storeId: 'willys-odenplan',
+          storeName: 'Willys Odenplan',
+          currentPrice: 11.9,
+          regularPrice: 16.9,
+          dealScore: 78,
+          sourceConfidence: 0.9,
+          productCategory: 'dairy'
+        }
+      ]
+    });
+
+    assert.deepEqual(opportunities.map((deal) => deal.productId), ['chips', 'milk']);
+  });
+
 });
 
 describe('suggestFriendSharedDeals', () => {
