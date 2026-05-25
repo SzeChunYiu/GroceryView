@@ -140,3 +140,9 @@ The cleanest per-branch shot is **ICA via handla.api.ica.se**. Plus: **user rece
 4. **Coop discovery** — find the real `coop.se/handla` JSON endpoint via headless browser inspection.
 5. **Mathem** — try `mathem.se/sv-se/api/products/search/` (with trailing slash) and inspect their `_next/data/` payload for catalog + postcode prices.
 6. **Receipt scanner ground-truth** — finish the `packages/scanning` connector so user-submitted receipts populate per-branch price rows.
+
+### 2.10 Apotek 1 Norway public search 🧪 verified (pharmacy connector candidate)
+- **Endpoint evidence:** `https://www.apotek1.no/sok?searchTerm={query}` exposes public product search pages for Apotek 1 Norway without a signed-in account. Product cards include pharmacy assortment names, package text, price labels where public, and product detail links suitable for a pharmacy-domain connector proof.
+- **Robots posture:** treat as read-only public search evidence; keep crawl rate conservative, send a GroceryView User-Agent, and stop if robots or response headers disallow automated collection.
+- **Per-branch granularity:** ❌ no from public search. Store availability and pharmacy-specific fulfilment remain out of scope until an explicitly permitted endpoint is found.
+- **Connector status:** 🧪 documented / not ingested. Pharmacy rows should land under the pharmacy domain with `requireStoreScopedPrices:false` and must not be mixed into grocery basket totals.

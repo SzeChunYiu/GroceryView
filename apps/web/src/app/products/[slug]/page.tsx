@@ -17,6 +17,7 @@ import {
   type ItemSubstitutionProduct
 } from '@groceryview/analytics';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { ConfidenceBadge } from '@/components/confidence-badge';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { FriendPriceSightings } from '@/components/friend-price-sightings';
 import { PriceIntelligenceCard, type PriceIntelligenceScoreCard } from '@/components/price-intelligence-card';
@@ -24,7 +25,7 @@ import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTermin
 import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
 import { buildShortTermPriceForecast } from '@/lib/price-intelligence';
-import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
+import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug, matchedChainProducts } from '@/lib/verified-data';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { normalizeUnitPriceForPackageText, packageEvidenceFromText } from '@/lib/normalization';
 import { metadataForProduct } from '@/lib/seo';
@@ -74,6 +75,29 @@ function medianFor(values: number[]) {
   if (sorted.length === 0) return null;
   const midpoint = Math.floor(sorted.length / 2);
   return sorted.length % 2 === 0 ? (sorted[midpoint - 1]! + sorted[midpoint]!) / 2 : sorted[midpoint]!;
+}
+
+function formatSignedPct(value: number | null | undefined) {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return 'Not reported';
+  return `${value > 0 ? '+' : ''}${formatPct(value)}`;
+}
+
+function crossChainQuoteRowsFor(product: (typeof axfoodProducts)[number]) {
+  const rows = chainPriceRows(product).sort((left, right) => left.price - right.price || left.chain.localeCompare(right.chain));
+  const basketMedianPrice = medianFor(rows.map((row) => row.price));
+  const cheapestPrice = rows[0]?.price ?? null;
+
+  return rows.map((row) => ({
+    ...row,
+    basketMedianPrice,
+    deltaVsMedian: basketMedianPrice && basketMedianPrice > 0 ? ((row.price - basketMedianPrice) / basketMedianPrice) * 100 : null,
+    isCheapest: cheapestPrice !== null && row.price === cheapestPrice
+  }));
+}
+
+function quoteConfidenceLevel(row: ReturnType<typeof crossChainQuoteRowsFor>[number], rowCount: number) {
+  if (row.isAvailable === false) return 'low';
+  return rowCount >= 2 ? 'high' : 'medium';
 }
 
 function quantileFor(values: number[], quantile: number) {
@@ -1241,6 +1265,8 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
     );
   }
   const chainRows = isChain ? chainPriceRows(product) : [];
+  const matchedChainProduct = isChain ? matchedChainProducts.find((candidate) => candidate.slug === product.slug) ?? product : null;
+  const crossChainQuoteRows = matchedChainProduct ? crossChainQuoteRowsFor(matchedChainProduct) : [];
   const friendPriceSightings = isChain
     ? listFriendPriceSightingsForProductChains(product.slug, chainRows.map((row) => row.chain))
     : listFriendPriceSightingsForProduct(product.slug);
@@ -1314,6 +1340,58 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           </dl>
         </Card>
       </div>
+      {crossChainQuoteRows.length > 0 ? (
+        <Card className="mt-6 overflow-hidden border-emerald-200 bg-emerald-50/70">
+          <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-800">Cross-chain quote table</p>
+              <h2 className="mt-2 text-2xl font-black text-slate-950">Current prices by chain</h2>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+                Uses the real chainPriceRows / matchedChainProducts snapshot for this matched item. Delta compares each current quote with the median of the displayed chain basket; unavailable or missing prices are not fabricated.
+              </p>
+            </div>
+            <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-emerald-900 shadow-sm">
+              Median {formatSek(crossChainQuoteRows[0]?.basketMedianPrice)}
+            </p>
+          </div>
+          <div className="mt-5 overflow-x-auto rounded-2xl border border-emerald-100 bg-white shadow-sm">
+            <table className="min-w-full divide-y divide-emerald-100 text-left text-sm">
+              <thead className="bg-emerald-900 text-white">
+                <tr>
+                  <th className="px-4 py-3 font-black">Chain</th>
+                  <th className="px-4 py-3 font-black">Current price</th>
+                  <th className="px-4 py-3 font-black">Unit price</th>
+                  <th className="px-4 py-3 font-black">Vs basket median</th>
+                  <th className="px-4 py-3 font-black">Confidence</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-emerald-100">
+                {crossChainQuoteRows.map((row) => (
+                  <tr className={row.isCheapest ? 'bg-emerald-50' : 'bg-white'} key={row.chain}>
+                    <td className="px-4 py-3 font-black text-slate-950">
+                      {row.chain}
+                      {row.isCheapest ? <span className="ml-2 rounded-full bg-emerald-800 px-2 py-1 text-xs text-white">cheapest</span> : null}
+                    </td>
+                    <td className="px-4 py-3 font-black text-emerald-900">{formatSek(row.price)}</td>
+                    <td className="px-4 py-3 font-semibold text-slate-700">{row.priceText} · {row.priceUnit}</td>
+                    <td className={`px-4 py-3 font-black ${row.deltaVsMedian && row.deltaVsMedian > 0 ? 'text-rose-800' : 'text-emerald-800'}`}>
+                      {formatSignedPct(row.deltaVsMedian)}
+                    </td>
+                    <td className="px-4 py-3">
+                      <ConfidenceBadge
+                        level={quoteConfidenceLevel(row, crossChainQuoteRows.length)}
+                        label={row.isCheapest ? 'Cheapest verified quote' : 'Verified quote'}
+                        sampleSize={crossChainQuoteRows.length}
+                        verificationLabel={row.savings ? `saving ${formatSek(row.savings)}` : 'current chain row'}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      ) : null}
       <Card className="mt-6 border-slate-200 bg-slate-50">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>

@@ -1,4 +1,5 @@
 import { semanticSynonymsForQuery } from './search-synonyms';
+import { phoneticRankedQueryHints } from './search-suggest';
 
 export type AllergenRiskBadge = {
   label: string;
@@ -11,7 +12,7 @@ export type SearchSynonymBadge = {
 };
 
 export type SearchExplanationBadge = {
-  kind: 'name' | 'brand' | 'category' | 'barcode' | 'synonym';
+  kind: 'name' | 'brand' | 'category' | 'barcode' | 'synonym' | 'phonetic';
   label: string;
   matchedTerms: string[];
 };
@@ -112,7 +113,15 @@ export function allergenRiskBadgesForText(parts: Array<string | null | undefined
 export function searchSynonymBadgesForQuery(query: string): SearchSynonymBadge[] {
   return semanticSynonymsForQuery(query).map((synonym) => ({
     label: `synonym: ${synonym.canonical}`,
-    matchedTerms: [synonym.matchedTerm]
+    matchedTerms: [...new Set([synonym.matchedTerm, ...synonym.terms.slice(0, 2)])]
+  }));
+}
+
+export function phoneticSearchBadgesForQuery(query: string): SearchExplanationBadge[] {
+  return phoneticRankedQueryHints(query, 3).map((hint) => ({
+    kind: 'phonetic',
+    label: `sounds like: ${hint}`,
+    matchedTerms: [query]
   }));
 }
 
@@ -285,7 +294,7 @@ export function buildRemovableSearchFilterChips(searchParams: SearchFilterParams
   if (minPrice) {
     chips.push({
       id: `minPrice:${minPrice}`,
-      label: `Min unit price: ${minPrice} SEK`,
+      label: `Unit-price range: ≥ ${minPrice} SEK`,
       href: chipRemovalHref(searchParams, 'minPrice', minPrice, basePath)
     });
   }
@@ -294,7 +303,7 @@ export function buildRemovableSearchFilterChips(searchParams: SearchFilterParams
   if (maxPrice) {
     chips.push({
       id: `maxPrice:${maxPrice}`,
-      label: `Max unit price: ${maxPrice} SEK`,
+      label: `Unit-price range: ≤ ${maxPrice} SEK`,
       href: chipRemovalHref(searchParams, 'maxPrice', maxPrice, basePath)
     });
   }
