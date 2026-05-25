@@ -84,6 +84,40 @@ function loadMyFlyerModule() {
   }
 }
 
+function flyerOffer(overrides = {}) {
+  return {
+    offerId: 'offer-base',
+    flyerId: 'flyer-base',
+    chain: 'willys',
+    storeId: 'willys-odenplan',
+    storeName: 'Willys Odenplan',
+    branchDistrict: 'Stockholm',
+    productId: 'base-product',
+    productName: 'Base Product',
+    category: 'skafferi',
+    regularPrice: 50,
+    offerPrice: 40,
+    savings: 10,
+    discountPercent: 20,
+    currency: 'SEK',
+    packageQuantity: 1,
+    packageUnit: 'kg',
+    effectiveUnitPrice: 40,
+    effectiveUnitPriceUnit: 'kg',
+    priceType: 'flyer',
+    validFrom: '2026-05-19T00:00:00.000Z',
+    validThrough: '2026-05-25T21:59:59.000Z',
+    observedAt: '2026-05-19T06:30:00.000Z',
+    sourceType: 'weekly_flyer',
+    sourceUrl: 'https://www.willys.se/erbjudanden/stockholm/vecka-21',
+    sourceRunId: 'source-run-willys-flyer-2026-05-19',
+    confidence: 0.9,
+    dealScore: 80,
+    band: 'good',
+    ...overrides
+  };
+}
+
 describe('my-flyer API payload', () => {
   it('ranks active weekly flyer rows per user and algorithm', () => {
     const { cleanup, module } = loadMyFlyerModule();
@@ -106,6 +140,47 @@ describe('my-flyer API payload', () => {
       assert.match(payload.rows[0].explanation.join(' '), /watchlist_first ranker/);
       assert.ok(payload.rows.every((row) => row.offer.sourceUrl && row.offer.sourceRunId));
       assert.ok(payload.rows.every((row) => row.offer.packageQuantity && row.offer.packageUnit));
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('ranks organic eco flyer rows by savings and excludes untagged rows', () => {
+    const { cleanup, module } = loadMyFlyerModule();
+    try {
+      const ranked = module.rankOrganicEcoListings([
+        flyerOffer({
+          offerId: 'untagged-high-savings',
+          productId: 'untagged-high-savings',
+          productName: 'Untagged High Savings',
+          labels: [],
+          savings: 50
+        }),
+        flyerOffer({
+          offerId: 'organic-lower-savings',
+          productId: 'organic-lower-savings',
+          productName: 'Organic Lower Savings',
+          labels: ['ecological'],
+          savings: 8
+        }),
+        flyerOffer({
+          offerId: 'organic-higher-savings',
+          productId: 'organic-higher-savings',
+          productName: 'Organic Higher Savings',
+          tags: ['KRAV'],
+          savings: 18
+        }),
+        flyerOffer({
+          offerId: 'organic-without-source',
+          productId: 'organic-without-source',
+          productName: 'Organic Without Source',
+          labels: ['organic'],
+          sourceRunId: '',
+          savings: 80
+        })
+      ]);
+
+      assert.deepEqual(ranked.map((offer) => offer.offerId), ['organic-higher-savings', 'organic-lower-savings']);
     } finally {
       cleanup();
     }
