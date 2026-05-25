@@ -115,6 +115,7 @@ export * from './connectors/all-store-runner.js';
 export * from './connectors/overpass.js';
 export * from './connectors/fuel-stations.js';
 export * from './jobs/is-poi-audit.js';
+export * from './jobs/no-poi-audit.js';
 export * from './connectors/citygross.js';
 export {
   CITY_GROSS_KLUBBEN_OFFERS_URL,
