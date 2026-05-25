@@ -8,20 +8,28 @@ import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { PullRefreshWrapper } from '@/components/PullRefreshWrapper';
 import { PrintButton } from '@/components/PrintButton';
 import { useList } from '@/hooks/useList';
-import { cheapestSourceForProductSlug } from '@/lib/shopping-list-prices';
+import {
+  cheapestSourceForProductSlug,
+  mergeLastKnownShoppingListPrices,
+  parseOfflineShoppingListSnapshot,
+  shoppingListPriceSourceForProductSlug,
+  type OfflineShoppingListSnapshot
+} from '@/lib/shopping-list-prices';
 
 const OFFLINE_SHOPPING_LIST_CACHE_KEY = 'groceryview:shopping-list:offline-cache:v1';
 
 export default function ShoppingListPage() {
   const { addImportedItems, checkedCount, hasLoadedBrowserState, items, remainingCount, resetCheckedState, shareLink, toggleItemChecked, totalCount } = useList();
   const [generatedShareUrl, setGeneratedShareUrl] = useState('');
+  const [offlineCachedSnapshot, setOfflineCachedSnapshot] = useState<OfflineShoppingListSnapshot | null>(null);
   const [offlineCacheStatus, setOfflineCacheStatus] = useState('Offline copy is prepared after the list loads.');
   const [shareStatus, setShareStatus] = useState('Create a read-only shopping list link after your basket is ready.');
   const progress = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
   const offlineShoppingListSnapshot = useMemo(() => {
-    const lastKnownPrices = items
+    const livePrices = items
       .map((item) => item.matchedProductSlug ? cheapestSourceForProductSlug(item.matchedProductSlug) : null)
       .filter((source): source is NonNullable<ReturnType<typeof cheapestSourceForProductSlug>> => source !== null);
+    const lastKnownPrices = mergeLastKnownShoppingListPrices(livePrices, offlineCachedSnapshot);
 
     return {
       cachedAt: new Date().toISOString(),
@@ -31,7 +39,18 @@ export default function ShoppingListPage() {
       remainingCount,
       totalCount
     };
-  }, [checkedCount, items, remainingCount, totalCount]);
+  }, [checkedCount, items, offlineCachedSnapshot, remainingCount, totalCount]);
+  const priceSourcesBySlug = useMemo(() => new Map(items
+    .map((item) => {
+      const source = shoppingListPriceSourceForProductSlug(item.matchedProductSlug, offlineShoppingListSnapshot);
+      return item.matchedProductSlug && source ? [item.matchedProductSlug, source] as const : null;
+    })
+    .filter((entry): entry is readonly [string, NonNullable<ReturnType<typeof shoppingListPriceSourceForProductSlug>>] => entry !== null)), [items, offlineShoppingListSnapshot]);
+
+  useEffect(() => {
+    if (!hasLoadedBrowserState) return;
+    setOfflineCachedSnapshot(parseOfflineShoppingListSnapshot(window.localStorage.getItem(OFFLINE_SHOPPING_LIST_CACHE_KEY)));
+  }, [hasLoadedBrowserState]);
 
   useEffect(() => {
     if (!hasLoadedBrowserState || shareLink?.isValid) return;
@@ -156,7 +175,7 @@ export default function ShoppingListPage() {
 
             <ul className="shopping-list-print-items mt-5 space-y-3">
               {items.map((item) => (
-                <CheckableListItem item={item} key={item.id} onToggle={toggleItemChecked} />
+                <CheckableListItem item={item} key={item.id} onToggle={toggleItemChecked} priceSource={item.matchedProductSlug ? priceSourcesBySlug.get(item.matchedProductSlug) ?? null : null} />
               ))}
             </ul>
           </section>
@@ -174,7 +193,7 @@ export default function ShoppingListPage() {
           </div>
           <ul className="shopping-list-print-items mt-5 space-y-3">
             {items.map((item) => (
-              <CheckableListItem item={item} key={`print-${item.id}`} onToggle={toggleItemChecked} />
+              <CheckableListItem item={item} key={`print-${item.id}`} onToggle={toggleItemChecked} priceSource={item.matchedProductSlug ? priceSourcesBySlug.get(item.matchedProductSlug) ?? null : null} />
             ))}
           </ul>
         </section>

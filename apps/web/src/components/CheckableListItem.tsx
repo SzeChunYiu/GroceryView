@@ -2,16 +2,17 @@
 
 import type { ShoppingListItem } from '@/hooks/useList';
 import { useHaptic } from '@/hooks/useHaptic';
-import { cheapestSourceForProductSlug } from '@/lib/shopping-list-prices';
+import { shoppingListPriceSourceForProductSlug, type ShoppingListPriceSource } from '@/lib/shopping-list-prices';
 
 type CheckableListItemProps = {
   item: ShoppingListItem;
   onToggle: (itemId: string) => void;
+  priceSource?: ShoppingListPriceSource | null;
 };
 
-export function CheckableListItem({ item, onToggle }: Readonly<CheckableListItemProps>) {
+export function CheckableListItem({ item, onToggle, priceSource }: Readonly<CheckableListItemProps>) {
   const { selection } = useHaptic();
-  const cheapestSource = cheapestSourceForProductSlug(item.matchedProductSlug);
+  const resolvedPriceSource = priceSource ?? shoppingListPriceSourceForProductSlug(item.matchedProductSlug, null);
 
   function toggleItem() {
     if (!item.checked) selection();
@@ -53,9 +54,10 @@ export function CheckableListItem({ item, onToggle }: Readonly<CheckableListItem
           <p className="rounded-xl bg-sky-50 px-3 py-2 text-xs font-black text-sky-900">
             Matched catalog product: {item.matchedProductName ?? item.matchedProductSlug} · matchedProductSlug: {item.matchedProductSlug}
           </p>
-          {cheapestSource ? (
-            <p className="rounded-xl bg-emerald-50 px-3 py-2 text-xs font-black text-emerald-950">
-              Cheapest source: {cheapestSource.chainLabel} · {cheapestSource.priceLabel} · spread {cheapestSource.spreadPercent.toFixed(1)}%
+          {resolvedPriceSource ? (
+            <p className={`rounded-xl px-3 py-2 text-xs font-black ${resolvedPriceSource.freshness === 'cached' ? 'bg-amber-50 text-amber-950' : 'bg-emerald-50 text-emerald-950'}`}>
+              {resolvedPriceSource.freshness === 'cached' ? 'Last known price' : 'Cheapest source'}: {resolvedPriceSource.chainLabel} · {resolvedPriceSource.priceLabel} · spread {resolvedPriceSource.spreadPercent.toFixed(1)}%
+              {resolvedPriceSource.freshness === 'cached' && resolvedPriceSource.cachedAt ? ` · saved ${resolvedPriceSource.cachedAt.slice(0, 10)}` : ''}
             </p>
           ) : (
             <p className="rounded-xl bg-amber-50 px-3 py-2 text-xs font-black text-amber-950">
