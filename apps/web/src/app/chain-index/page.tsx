@@ -19,6 +19,7 @@ const matchedBasketRefinedIndex = calculateChainPriceIndex([
   ...matchedBasketObservations
 ]);
 const chainIndexTrendSeries = buildChainIndexTrendSeries();
+const matchedBasketConstituents = matchedBasketRefinedIndex.matchedBasketProductIds.slice(0, 12);
 
 const widgetSourceConfidence = matchedBasketRefinedIndex.chains.reduce(
   (summary, chain) => ({
@@ -170,9 +171,17 @@ export default function ChainIndexPage() {
             <div className="rounded-2xl bg-white/80 p-4" key={chain.chainId}>
               <p className="text-sm font-black uppercase tracking-[0.18em] text-blue-700">{chain.chainId}</p>
               <p className="mt-2 text-3xl font-black text-blue-950">{chain.overallIndex.toFixed(1)}</p>
-              <p className="mt-1 text-sm font-semibold text-blue-900">{chain.confidence} confidence · {chain.categoriesCovered} categories</p>
+              <p className="mt-1 text-sm font-semibold text-blue-900">{chain.confidence} confidence · {chain.categoriesCovered} categories · {chain.matchedBasketCoveragePercent.toFixed(0)}% basket coverage</p>
             </div>
           ))}
+        </div>
+        <div className="mt-5 rounded-2xl bg-white/80 p-4">
+          <p className="text-sm font-black text-blue-950">Matched basket constituents</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {matchedBasketConstituents.map((productId) => (
+              <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-black text-blue-950" key={productId}>{productId}</span>
+            ))}
+          </div>
         </div>
       </Card>
 

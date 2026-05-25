@@ -127,12 +127,15 @@ export function buildChainPriceObservations(): ChainPriceObservation[] {
 export function buildMatchedBasketChainPriceObservations(): ChainPriceObservation[] {
   const out: ChainPriceObservation[] = [];
   for (const product of axfoodProducts) {
-    const category = `${normaliseCategory(product.category, product.name, product.brand)} · st`;
+    if (product.inChains.length < 2) continue;
+    const normalizedCategory = normaliseCategory(product.category, product.name, product.brand);
+    const basketWeight = householdCategoryExposureWeights[normalizedCategory]?.sharePercent ?? 1;
+    const category = `${normalizedCategory} · st`;
     if (product.chains.willys?.price != null) {
-      out.push({ chainId: 'Willys', category, unitPrice: product.chains.willys.price });
+      out.push({ chainId: 'Willys', category, unitPrice: product.chains.willys.price, matchedProductId: product.code, basketWeight });
     }
     if (product.chains.hemkop?.price != null) {
-      out.push({ chainId: 'Hemköp', category, unitPrice: product.chains.hemkop.price });
+      out.push({ chainId: 'Hemköp', category, unitPrice: product.chains.hemkop.price, matchedProductId: product.code, basketWeight });
     }
   }
   return out;
