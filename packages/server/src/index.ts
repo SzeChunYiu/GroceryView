@@ -2,6 +2,7 @@ import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
+import { z, type ZodIssue } from 'zod';
 import { pathToFileURL } from 'node:url';
 import {
   buildFlyerOfferReport,
@@ -439,6 +440,111 @@ async function cachedJsonResponse(cache: ApiResponseCache | undefined, url: URL,
 
 function errorResponse(status: number, error: string): Response {
   return jsonResponse({ error }, { status });
+}
+
+const contactRequestMaxBytes = 8 * 1024;
+const contactRateLimitWindowMs = 60 * 60 * 1000;
+const contactRateLimitMaxRequests = 5;
+
+const contactRequestSchema = z.object({
+  name: z.string().trim().min(1).max(120),
+  email: z.string().trim().email().max(254),
+  subject: z.string().trim().min(1).max(160).optional(),
+  message: z.string().trim().min(10).max(4000),
+  consent: z.literal(true),
+  source: z.enum(['web', 'mobile']).optional()
+}).strict();
+
+type ContactRateLimitEntry = {
+  windowStartedAt: number;
+  count: number;
+};
+
+const contactRateLimitBuckets = new Map<string, ContactRateLimitEntry>();
+
+function structuredContactError(status: number, code: string, message: string, details?: unknown, headers?: HeadersInit): Response {
+  return jsonResponse({ ok: false, error: { code, message, ...(details === undefined ? {} : { details }) } }, { status, headers });
+}
+
+function contactValidationDetails(issues: ZodIssue[]) {
+  return issues.map((issue) => ({
+    path: issue.path.join('.') || 'body',
+    code: issue.code,
+    message: issue.message
+  }));
+}
+
+function contactClientKey(request: Request): string {
+  const forwardedFor = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
+  return forwardedFor || request.headers.get('x-real-ip')?.trim() || 'anonymous';
+}
+
+function contactRateLimitResponse(request: Request, now: Date): Response | null {
+  const key = contactClientKey(request);
+  const nowMs = now.getTime();
+  const current = contactRateLimitBuckets.get(key);
+  const bucket = current && nowMs - current.windowStartedAt < contactRateLimitWindowMs
+    ? current
+    : { windowStartedAt: nowMs, count: 0 };
+  bucket.count += 1;
+  contactRateLimitBuckets.set(key, bucket);
+  if (bucket.count <= contactRateLimitMaxRequests) return null;
+  const retryAfterSeconds = Math.max(1, Math.ceil((bucket.windowStartedAt + contactRateLimitWindowMs - nowMs) / 1000));
+  return structuredContactError(
+    429,
+    'contact_rate_limited',
+    'Too many contact requests. Please try again later.',
+    { retryAfterSeconds },
+    { 'retry-after': String(retryAfterSeconds) }
+  );
+}
+
+async function contactRequestFromBody(request: Request): Promise<z.infer<typeof contactRequestSchema> | Response> {
+  const contentType = request.headers.get('content-type') ?? '';
+  if (!/^application\/json(?:\s*;|$)/i.test(contentType)) {
+    return structuredContactError(415, 'unsupported_media_type', 'POST /api/contact requires an application/json request body.');
+  }
+
+  const contentLength = request.headers.get('content-length');
+  if (contentLength !== null && Number(contentLength) > contactRequestMaxBytes) {
+    return structuredContactError(413, 'payload_too_large', 'Contact request body exceeds the 8 KiB limit.');
+  }
+
+  const text = await request.text();
+  if (Buffer.byteLength(text, 'utf8') > contactRequestMaxBytes) {
+    return structuredContactError(413, 'payload_too_large', 'Contact request body exceeds the 8 KiB limit.');
+  }
+
+  let body: unknown;
+  try {
+    body = JSON.parse(text);
+  } catch {
+    return structuredContactError(400, 'invalid_json', 'Request body must be valid JSON.');
+  }
+
+  const parsed = contactRequestSchema.safeParse(body);
+  if (!parsed.success) {
+    return structuredContactError(400, 'validation_failed', 'Contact request body failed validation.', contactValidationDetails(parsed.error.issues));
+  }
+  return parsed.data;
+}
+
+async function contactAcknowledgement(request: Request, now: Date): Promise<Response> {
+  if (process.env.CONTACT_FORM_DISABLED === 'true') {
+    return structuredContactError(503, 'contact_unavailable', 'Contact intake is temporarily unavailable.');
+  }
+  const rateLimited = contactRateLimitResponse(request, now);
+  if (rateLimited) return rateLimited;
+
+  const body = await contactRequestFromBody(request);
+  if (body instanceof Response) return body;
+
+  const digest = createHash('sha256')
+    .update(`${body.email}\0${body.name}\0${body.subject ?? ''}\0${now.toISOString()}`)
+    .digest('hex')
+    .slice(0, 16);
+
+  return jsonResponse({ ok: true, status: 'accepted', requestId: `contact_${digest}`, receivedAt: now.toISOString() }, { status: 202 });
 }
 
 class MalformedPostBodyError extends Error {
@@ -2006,6 +2112,17 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         }
       }
 
+      if (path === '/api/contact') {
+        if (method === 'POST') {
+          try {
+            return await contactAcknowledgement(request, authOptions.now ?? new Date());
+          } catch {
+            return structuredContactError(500, 'contact_internal_error', 'Contact request could not be accepted.');
+          }
+        }
+        return structuredContactError(405, 'method_not_allowed', 'POST /api/contact is the only supported contact method.');
+      }
+
       if (method === 'GET' && path === '/api/openapi.json') return jsonResponse(buildOpenApiDocument());
       if (method === 'GET' && path === '/api/market/overview') {
         return cachedJsonResponse(authOptions.apiResponseCache, url, apiHotEndpointCacheTtlSeconds[path], () => api.getMarketOverview());
@@ -3257,6 +3374,9 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/products/search': { get: publicOperation('Search products.') },
       '/api/products/{id}': { get: publicOperation('Get product detail.') },
       '/api/products/{id}/deal-score': { get: publicOperation('Get Deal Score v1 report with customer-facing reasons.') },
+      '/api/contact': {
+        post: publicOperation('Accept a contact form request and return an asynchronous acknowledgement without echoing the message body.')
+      },
       '/api/products/{id}/equivalents': { get: publicOperation('Get comparable products in the same category.') },
       '/api/products/{id}/price-spread': { get: publicOperation('Get product price spread across current verified store quotes.') },
       '/api/products/{id}/cheapest-now': { get: publicOperation('Get the cheapest current product quote by observed chain for retailer overlays.') },
