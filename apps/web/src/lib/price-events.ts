@@ -261,3 +261,29 @@ export function buildPriceHistorySparklinePath(
     })
     .join(' ');
 }
+
+export type TrendingItemDetailCard = {
+  rank: number;
+  productSlug: string;
+  productName: string;
+  city: string;
+  chain: string;
+  currentPrice: number;
+  previousWeekPrice: number;
+  weekOverWeekChangePercent: number;
+  explanation: string;
+};
+
+export function buildTrendingItemDetailCards(products: PriceDropDiscoveryProduct[], limit = 6, city = 'Stockholm'): TrendingItemDetailCard[] {
+  return buildPriceDropDiscoveryRail(products, limit).map((item) => ({
+    rank: item.rank,
+    productSlug: item.productSlug,
+    productName: item.productName,
+    city,
+    chain: item.locality,
+    currentPrice: item.latestPrice,
+    previousWeekPrice: item.previousWeekPrice,
+    weekOverWeekChangePercent: -Math.abs(item.dropPercent * 100),
+    explanation: `${item.productName} is down ${Math.abs(item.dropPercent * 100).toFixed(1)}% week over week in ${city}; latest ${item.latestObservedAt} vs ${item.previousObservedAt}.`
+  }));
+}
