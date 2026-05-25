@@ -26,5 +26,51 @@
     "freshness": "Freshness {label}. {refreshHint}",
     "verification": "Verification {verificationLabel}.",
     "indicator": "{meaning}. Indicator {indicator}."
+  },
+  "app-nav": {
+    "tagline": "Verified grocery intelligence",
+    "groups": {
+      "markets": "Markets",
+      "products": "Products",
+      "stores": "Stores",
+      "trip": "Trip",
+      "personal": "Personal"
+    },
+    "items": {
+      "overview": "Overview",
+      "chainIndex": "Chain index",
+      "funnel": "Funnel",
+      "categories": "Categories",
+      "heatmap": "Heatmap",
+      "screener": "Screener",
+      "browse": "Browse",
+      "newArrivals": "New arrivals",
+      "compare": "Compare",
+      "map": "Map",
+      "stores": "Stores",
+      "scanner": "Scanner",
+      "currentList": "Current list",
+      "nearbyDeals": "Nearby deals",
+      "watchlist": "Watchlist",
+      "savings": "Savings",
+      "myFlyer": "My Flyer",
+      "weeklyBasket": "Weekly basket",
+      "mealPlanner": "Meal planner",
+      "pantryInventory": "Pantry inventory",
+      "contact": "Contact"
+    },
+    "theme": {
+      "switchToLight": "Switch to light mode",
+      "switchToDark": "Switch to dark mode",
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "install": {
+      "label": "Install GroceryView",
+      "title": "Add GroceryView to your home screen",
+      "instructions": "iOS: tap Share, then Add to Home Screen. Android: open Chrome menu, then Install app.",
+      "cta": "PWA ready",
+      "dismiss": "Dismiss install banner"
+    }
   }
 }

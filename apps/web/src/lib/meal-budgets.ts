@@ -35,7 +35,15 @@ export type MealPlanShoppingListItem = {
   quantity: string;
 };
 
+export type MealPlanChainTotal = {
+  chain: string;
+  estimatedTotal: number;
+  itemCount: number;
+};
+
 export type MealPlanShoppingListExport = {
+  chainTotals: MealPlanChainTotal[];
+  estimatedTotal: number;
   items: MealPlanShoppingListItem[];
   mealTitle: string;
   source: 'meal-planner';
@@ -256,6 +264,10 @@ function mealPlanListItemKey(ingredient: MealBudgetIngredient) {
     : `plain:${ingredient.category}:${ingredient.name}`;
 }
 
+function mealPlanQuantityLabel(uses: number) {
+  return `${uses} ${uses === 1 ? 'normalized recipe portion' : 'normalized recipe portions'}`;
+}
+
 export function buildMealPlanShoppingListItems(mealPlans: MealBudgetPlan[]): MealPlanShoppingListItem[] {
   const groupedIngredients = new Map<string, {
     category: string;
@@ -305,14 +317,41 @@ export function buildMealPlanShoppingListItems(mealPlans: MealBudgetPlan[]): Mea
         id: `meal-plan-${mealPlanListItemSlug(key)}`,
         name: ingredient.name,
         productId: ingredient.productId,
-        quantity: ingredient.uses === 1 ? '1 recipe portion' : `${ingredient.uses} recipe portions`
+        quantity: mealPlanQuantityLabel(ingredient.uses)
       } satisfies MealPlanShoppingListItem;
     })
     .sort((left, right) => left.category.localeCompare(right.category, 'sv-SE') || left.name.localeCompare(right.name, 'sv-SE'));
 }
 
+export function estimateMealPlanChainTotals(mealPlans: MealBudgetPlan[]): MealPlanChainTotal[] {
+  const totals = new Map<string, MealPlanChainTotal>();
+  const seen = new Set<string>();
+
+  for (const meal of mealPlans) {
+    for (const ingredient of meal.ingredients) {
+      if (!ingredient || !Number.isFinite(ingredient.price) || ingredient.price <= 0) continue;
+      const chain = ingredient.source || 'Visible deal pool';
+      const key = `${chain}:${mealPlanListItemKey(ingredient)}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+
+      const current = totals.get(chain) ?? { chain, estimatedTotal: 0, itemCount: 0 };
+      current.estimatedTotal += ingredient.price;
+      current.itemCount += 1;
+      totals.set(chain, current);
+    }
+  }
+
+  return [...totals.values()]
+    .map((total) => ({ ...total, estimatedTotal: Number(total.estimatedTotal.toFixed(2)) }))
+    .sort((left, right) => left.estimatedTotal - right.estimatedTotal || left.chain.localeCompare(right.chain, 'sv-SE'));
+}
+
 export function buildMealPlanShoppingListExport(mealPlans: MealBudgetPlan[], mealTitle: string): MealPlanShoppingListExport {
+  const chainTotals = estimateMealPlanChainTotals(mealPlans);
   return {
+    chainTotals,
+    estimatedTotal: Number(chainTotals.reduce((sum, chain) => sum + chain.estimatedTotal, 0).toFixed(2)),
     items: buildMealPlanShoppingListItems(mealPlans),
     mealTitle,
     source: 'meal-planner'
@@ -340,6 +379,16 @@ export function parseMealPlanShoppingListExport(value: string): MealPlanShopping
     ));
 
     return {
+      chainTotals: Array.isArray(parsed.chainTotals)
+        ? parsed.chainTotals.filter((total): total is MealPlanChainTotal => (
+          total !== null
+          && typeof total === 'object'
+          && typeof total.chain === 'string'
+          && typeof total.estimatedTotal === 'number'
+          && typeof total.itemCount === 'number'
+        ))
+        : [],
+      estimatedTotal: typeof parsed.estimatedTotal === 'number' ? parsed.estimatedTotal : 0,
       items,
       mealTitle: parsed.mealTitle,
       source: 'meal-planner'

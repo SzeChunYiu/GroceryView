@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { FavoriteStorePicker } from '@/components/favorite-store-picker';
 
 const dietOptions = ['organic', 'vegetarian', 'vegan', 'gluten-free', 'lactose-free'];
 const algorithmOptions = ['watchlist_first', 'best_savings', 'best_unit_price'];
@@ -101,9 +102,9 @@ export function MyFlyerPreferences({ defaultCountry, defaultAlgorithm }: MyFlyer
         <label className="text-sm font-black text-slate-700">Household size
           <input className="mt-1 w-full rounded-2xl border border-emerald-200 bg-white px-3 py-2" min={1} max={12} onChange={(event) => setHouseholdSize(Number(event.target.value))} type="number" value={householdSize} />
         </label>
-        <label className="text-sm font-black text-slate-700 md:col-span-2">Favorite stores
-          <input className="mt-1 w-full rounded-2xl border border-emerald-200 bg-white px-3 py-2" onChange={(event) => setFavoriteStores(event.target.value)} value={favoriteStores} />
-        </label>
+        <div className="md:col-span-2">
+          <FavoriteStorePicker selectedStoreSlugs={splitStores(favoriteStores)} onChange={(stores) => setFavoriteStores(stores.join(', '))} />
+        </div>
         <label className="text-sm font-black text-slate-700">Algorithm choice
           <select className="mt-1 w-full rounded-2xl border border-emerald-200 bg-white px-3 py-2" onChange={(event) => setAlgorithm(event.target.value)} value={algorithm}>
             {algorithmOptions.map((option) => <option key={option} value={option}>{option}</option>)}

@@ -6,14 +6,16 @@ import type { KeyboardEvent, ReactNode } from 'react';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { trackSearchToSavingsFunnelStep, trackVoiceSearchInput } from '@/lib/analytics';
 import {
-  clearRecentSearchHistory,
   pinSavedSearch,
-  readRecentSearchHistory,
   readSavedSearches,
-  rememberRecentSearchHistory,
-  type RecentSearchHistoryEntry,
   type SavedSearchEntry
 } from '@/lib/personalization';
+import {
+  clearRecentSearchHistory,
+  readRecentSearchHistory,
+  rememberRecentSearchHistory,
+  type RecentSearchHistoryEntry
+} from '@/lib/search-history';
 import { buildNoResultCorrectionWorkflow } from '@/lib/search-alias-review';
 import type { SearchExplanationBadge } from '@/lib/search-filters';
 import { authenticatedSavedSearchShortcuts } from '@/lib/saved-searches';
