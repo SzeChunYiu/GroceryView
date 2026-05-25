@@ -66,6 +66,11 @@ import {
   type LocalFoodNodesProduct
 } from './connectors/localfoodnodes-se.js';
 import {
+  DEFAULT_LYF_OG_HEILSA_PAGE_DATA_PATHS,
+  fetchLyfOgHeilsaProducts,
+  type LyfOgHeilsaProduct
+} from './connectors/lyfogheilsa-is.js';
+import {
   fetchOkq8FuelPrices,
   OKQ8_FUEL_PRICES_URL,
   type FuelGradeId,
@@ -108,6 +113,7 @@ export * from './connectors/ica-reklamblad.js';
 export * from './connectors/lidl.js';
 export * from './connectors/localfoodnodes-se.js';
 export * from './connectors/seven-eleven-no.js';
+export * from './connectors/lyfogheilsa-is.js';
 export * from './connectors/mathem.js';
 export * from './connectors/matpriskollen.js';
 export * from './connectors/matspar.js';
@@ -2057,6 +2063,30 @@ function sevenElevenSeProductToDailyItem(row: SevenElevenSeProduct): RetailerCon
   };
 }
 
+function lyfOgHeilsaProductToDailyItem(row: LyfOgHeilsaProduct): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.name);
+  return {
+    sourceType: 'retailer_online_page',
+    chainId: row.chain,
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: `lyf-og-heilsa-is-${stableKeyPart(row.code)}`,
+    categoryId: `pharmacy-${stableKeyPart(row.category)}`,
+    brand: undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price,
+    regularPrice: row.originalPrice !== null && row.originalPrice > row.price ? row.originalPrice : undefined,
+    promoText: row.originalPrice !== null && row.originalPrice > row.price ? 'Public Lyf og heilsa discounted price' : undefined,
+    memberOnly: false,
+    isAvailable: true,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.sourceUrl,
+    imageUrl: row.imageUrl || undefined
+  };
+}
+
 function pharmacyProductToDailyItem(row: ApohemProduct): RetailerConnectorParsedProduct {
   const quantity = parseNativePackageText(row.name);
   const barcode = validDailyBarcode(row.ean);
@@ -2348,6 +2378,18 @@ export async function fetchDailyConnectorSnapshot(
       retrievedAt
     });
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(sevenElevenSeProductToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_LYF_OG_HEILSA_IS_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_LYF_OG_HEILSA_IS_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchLyfOgHeilsaProducts({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      sourcePaths: dailyNativeStringListParam(url, 'sourcePaths') ?? DEFAULT_LYF_OG_HEILSA_PAGE_DATA_PATHS,
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(lyfOgHeilsaProductToDailyItem) });
   }
 
   if (sourceUrl === GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL}?`)) {
@@ -3190,6 +3232,7 @@ export const GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview
 export const GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL = 'groceryview://daily/ica/store-promotions/default-stores';
 export const GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL = 'groceryview://daily/lidl/public-offers/all-stores';
 export const GROCERYVIEW_DAILY_LOCALFOODNODES_SE_PRODUCTS_URL = 'groceryview://daily/localfoodnodes/se/products/all-nodes';
+export const GROCERYVIEW_DAILY_LYF_OG_HEILSA_IS_PRODUCTS_URL = 'groceryview://daily/is/lyfogheilsa/products/public';
 export const GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/coop/weekly-offers/all-stores';
 export const GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/coop/products/all-stores';
 export const GROCERYVIEW_DAILY_CITY_GROSS_BULK_PRODUCTS_URL = 'groceryview://daily/city-gross/products/bulk';
