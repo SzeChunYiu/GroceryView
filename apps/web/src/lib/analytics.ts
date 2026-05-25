@@ -402,6 +402,41 @@ export function trackDealShare(event: Omit<DealShareEvent, 'observedAt' | 'refer
   }).catch(() => undefined);
 }
 
+export type SponsoredPlacementImpression = {
+  label: string;
+  observedAt: string;
+  placementId: string;
+  provider: string;
+  separatedFromOrganicRankings: boolean;
+  surface: string;
+};
+
+const sponsoredPlacementImpressionEndpoint = '/api/analytics/sponsored-placement-impressions';
+
+export function trackSponsoredPlacementImpression(event: Omit<SponsoredPlacementImpression, 'observedAt'>) {
+  if (typeof window === 'undefined') return;
+
+  const payloadEvent: SponsoredPlacementImpression = {
+    ...event,
+    observedAt: new Date().toISOString()
+  };
+
+  window.dispatchEvent(new CustomEvent('groceryview:sponsored-placement-impression', { detail: payloadEvent }));
+  const payload = JSON.stringify({ event: payloadEvent });
+
+  if (navigator.sendBeacon) {
+    const sent = navigator.sendBeacon(sponsoredPlacementImpressionEndpoint, new Blob([payload], { type: 'application/json' }));
+    if (sent) return;
+  }
+
+  void fetch(sponsoredPlacementImpressionEndpoint, {
+    body: payload,
+    headers: { 'content-type': 'application/json' },
+    keepalive: true,
+    method: 'POST'
+  }).catch(() => undefined);
+}
+
 export type AffiliateLinkMetadata = {
   placement: 'deal_card' | 'store_link' | 'source_link';
   surface: string;
@@ -414,6 +449,7 @@ export type AffiliateLinkMetadata = {
 };
 
 export type AffiliateOutboundClickEvent = AffiliateLinkMetadata & {
+  consentGranted: boolean;
   disclosureLabel: string;
   observedAt: string;
 };
@@ -441,11 +477,21 @@ export function buildAffiliateOutboundUrl(metadata: AffiliateLinkMetadata) {
   }
 }
 
+function hasAnalyticsConsent() {
+  try {
+    return window.localStorage.getItem('groceryview:analytics-consent') === 'granted';
+  } catch {
+    return false;
+  }
+}
+
 function sendAffiliateOutboundClick(event: AffiliateOutboundClickEvent) {
   if (typeof window === 'undefined') return;
 
-  const payload = JSON.stringify({ event });
   window.dispatchEvent(new CustomEvent('groceryview:affiliate-outbound-click', { detail: event }));
+  if (!event.consentGranted) return;
+
+  const payload = JSON.stringify({ event });
   if (navigator.sendBeacon) {
     const sent = navigator.sendBeacon(affiliateOutboundEndpoint, new Blob([payload], { type: 'application/json' }));
     if (sent) return;
@@ -462,6 +508,7 @@ function sendAffiliateOutboundClick(event: AffiliateOutboundClickEvent) {
 export function trackAffiliateOutboundClick(metadata: AffiliateLinkMetadata) {
   sendAffiliateOutboundClick({
     ...metadata,
+    consentGranted: hasAnalyticsConsent(),
     disclosureLabel: affiliateDisclosureLabel(metadata),
     observedAt: new Date().toISOString()
   });
@@ -474,8 +521,10 @@ export function affiliateOutboundClickScript(metadata: AffiliateLinkMetadata) {
   }).replace(/</g, '\\u003c');
 
   return `(() => {
-    const event = { ...${payload}, observedAt: new Date().toISOString() };
+    const consentGranted = (() => { try { return window.localStorage.getItem('groceryview:analytics-consent') === 'granted'; } catch { return false; } })();
+    const event = { ...${payload}, consentGranted, observedAt: new Date().toISOString() };
     window.dispatchEvent(new CustomEvent('groceryview:affiliate-outbound-click', { detail: event }));
+    if (!consentGranted) return;
     const body = JSON.stringify({ event });
     if (navigator.sendBeacon && navigator.sendBeacon('${affiliateOutboundEndpoint}', new Blob([body], { type: 'application/json' }))) return;
     fetch('${affiliateOutboundEndpoint}', { body, headers: { 'content-type': 'application/json' }, keepalive: true, method: 'POST' }).catch(() => undefined);

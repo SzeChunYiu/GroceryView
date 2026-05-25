@@ -6,6 +6,8 @@ import { affiliateDisclosureLabel, buildAffiliateOutboundUrl, type AffiliateLink
 type DisclosureStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
 type BrowserSession = { accessToken: string; userId: string };
 type AdPlacementSlot = {
+  disclosure?: string;
+  id?: string;
   surface?: string;
   provider?: string;
   label?: string;
@@ -23,6 +25,16 @@ type AdDisclosureReport = {
   guardrails?: string[];
 };
 
+const defaultSponsoredPlacementSlots: AdPlacementSlot[] = [
+  {
+    disclosure: 'Paid grocery partner placement shown in a clearly separated discovery rail slot.',
+    id: 'sponsored-discovery-rail',
+    label: 'Sponsored',
+    organicRankingSeparated: true,
+    provider: 'GroceryView Ads',
+    surface: 'discovery_rail'
+  }
+];
 
 export function AffiliateDisclosureNotice({ metadata }: Readonly<{ metadata: AffiliateLinkMetadata }>) {
   const label = affiliateDisclosureLabel(metadata);
@@ -82,6 +94,7 @@ export function AdDisclosureActions() {
 
   const excludedSurfaces = disclosure?.excludedSurfaces ?? disclosure?.placementPlan?.excludedSurfaces ?? [];
   const slots = disclosure?.placementPlan?.slots ?? [];
+  const sponsoredSlotPreview = slots.length ? slots : defaultSponsoredPlacementSlots;
   const guardrails = disclosure?.guardrails ?? ['Sponsored placements cannot change Deal Score, basket totals, or store ordering.'];
 
   return (
@@ -89,7 +102,7 @@ export function AdDisclosureActions() {
       <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-800">Signed-in ad disclosure</p>
       <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Account-bound sponsored placement rules</h2>
       <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
-        These controls call the protected ad disclosure endpoint with the sessionStorage bearer token. Public pages can explain GroceryView ad policy, but sponsored-slot eligibility, premium removals, and excluded surfaces stay tied to the signed-in account entitlement.
+        These controls call the protected ad disclosure endpoint with the sessionStorage bearer token. Public pages can explain GroceryView ad policy, including sponsored affiliate retailer links, but sponsored-slot eligibility, premium removals, and excluded surfaces stay tied to the signed-in account entitlement.
       </p>
       <div className="mt-4 flex flex-wrap gap-2">
         <button className="rounded-full bg-sky-700 px-4 py-2 text-sm font-black text-white" onClick={loadAdDisclosure} type="button">Load signed-in ad disclosure</button>
@@ -131,7 +144,29 @@ export function AdDisclosureActions() {
         </ul>
       ) : null}
 
+      <div className="mt-4 rounded-3xl border border-amber-200 bg-amber-50 p-4" aria-label="Sponsored discovery rail slot preview">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-800">Sponsored discovery slots</p>
+        <p className="mt-2 text-sm font-semibold leading-6 text-amber-950">
+          These labeled components can appear in discovery rails, but they remain outside organic deal rankings and cannot affect Deal Score.
+        </p>
+        <ul className="mt-3 grid gap-3 lg:grid-cols-2">
+          {sponsoredSlotPreview.slice(0, 4).map((slot, index) => (
+            <li className="rounded-2xl border border-amber-300 bg-white p-4 text-sm" key={slot.id ?? `${slot.surface ?? 'surface'}-${index}`}>
+              <p className="font-black uppercase tracking-[0.18em] text-amber-800">{slot.label ?? 'Sponsored'}</p>
+              <p className="mt-2 font-black text-slate-950">{slot.surface ?? 'discovery_rail'} · {slot.provider ?? 'provider'}</p>
+              <p className="mt-1 font-semibold leading-6 text-slate-700">
+                {slot.disclosure ?? 'Paid placement shown in a separate sponsored slot.'}
+              </p>
+              <p className="mt-2 rounded-full bg-amber-100 px-3 py-1 text-xs font-black text-amber-900">
+                organicRankingSeparated: {String(slot.organicRankingSeparated ?? true)}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </div>
+
       <ul className="mt-4 list-disc space-y-1 rounded-2xl bg-sky-50 p-4 pl-8 text-sm font-bold text-sky-950">
+        <li>Retailer outbound links must carry a sponsored disclosure, campaign parameters, and consent-aware click tracking.</li>
         {guardrails.map((guardrail) => <li key={guardrail}>{guardrail}</li>)}
       </ul>
       <p className="mt-4 rounded-2xl bg-slate-50 p-3 text-sm font-bold text-slate-700" data-status={status}>{message}</p>
