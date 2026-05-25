@@ -18,6 +18,7 @@ export type RecipeProductCandidate = {
   slug?: string;
   name: string;
   price?: number | string;
+  nutritionPerKronaLabel?: string;
   unitPrice?: string;
   store?: string;
   source?: string;
@@ -32,7 +33,9 @@ export type ParsedRecipeIngredient = {
 export type RecipeProductMatch = ParsedRecipeIngredient & {
   productId: string;
   productName: string;
+  price: number | null;
   priceLabel: string;
+  nutritionPerKronaLabel: string | null;
   unitPriceLabel: string;
   storeLabel: string;
   sourceLabel: string;
@@ -311,7 +314,9 @@ export function suggestRecipeProductMatches(
       ...ingredient,
       productId: best?.productId ?? best?.slug ?? ingredient.normalizedName.toLowerCase().replace(/\s+/g, '-'),
       productName: best?.name ?? ingredient.normalizedName,
+      price: typeof best?.price === 'number' && Number.isFinite(best.price) ? best.price : null,
       priceLabel: best ? priceLabelFor(best) : 'price pending',
+      nutritionPerKronaLabel: best?.nutritionPerKronaLabel ?? null,
       unitPriceLabel: best?.unitPrice ?? 'unit price pending',
       storeLabel: best?.store ?? 'store pending',
       sourceLabel: best?.source ?? 'recipe parser match',
