@@ -8,6 +8,15 @@ export const confidenceSchema = z.enum(['high', 'medium', 'low', 'unverified']);
 export const sourceTypeSchema = z.enum(['retailer_api', 'retailer_page', 'receipt_scan', 'manual_review', 'seed_stub']);
 export const priceDomainSchema = z.enum(['grocery', 'fuel', 'pharmacy']);
 export const fuelGradeSchema = z.enum(['95', '98', 'diesel', 'hvo100', 'e85']);
+export const marketCodeSchema = z.enum(['SE', 'NO', 'IS', 'DK', 'EU']);
+export const currencyCodeSchema = z.enum(['SEK', 'NOK', 'ISK', 'DKK', 'EUR']);
+export const marketCurrencyByMarket: Record<z.infer<typeof marketCodeSchema>, z.infer<typeof currencyCodeSchema>> = {
+  SE: 'SEK',
+  NO: 'NOK',
+  IS: 'ISK',
+  DK: 'DKK',
+  EU: 'EUR'
+};
 export const fuelPriceSourceSchema = z.discriminatedUnion('kind', [
   z.object({
     kind: z.literal('operator_public_price_page'),
@@ -36,8 +45,56 @@ export const provenanceSchema = z.object({
 
 export const moneyAmountSchema = z.object({
   amount: z.number().nonnegative(),
-  currency: z.literal('SEK')
+  currency: currencyCodeSchema
 });
+
+export const marketPriceContextSchema = z.object({
+  market: marketCodeSchema,
+  currency: currencyCodeSchema
+}).superRefine((context, ctx) => {
+  const expectedCurrency = marketCurrencyByMarket[context.market];
+  if (context.currency !== expectedCurrency) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Market ${context.market} prices must use ${expectedCurrency}.`,
+      path: ['currency']
+    });
+  }
+});
+
+export const priceFeeTypeSchema = z.enum(['delivery', 'pickup', 'service', 'small_basket']);
+export const priceComponentSchema = z.object({
+  amount: moneyAmountSchema,
+  label: idSchema,
+  includedInDisplayedPrice: z.boolean().default(false)
+});
+export const priceBreakdownSchema = z.object({
+  vatIncluded: z.boolean(),
+  vatRatePercent: z.number().min(0).max(100).nullable(),
+  taxIncluded: z.boolean().default(true),
+  deposit: priceComponentSchema.optional(),
+  memberPrice: z.object({
+    amount: moneyAmountSchema,
+    memberOnly: z.boolean().default(true),
+    loyaltyProgramId: idSchema.optional()
+  }).optional(),
+  onlineFees: z.array(priceComponentSchema.extend({
+    type: priceFeeTypeSchema,
+    appliesTo: z.enum(['basket', 'order', 'line_item']).default('order')
+  })).default([])
+});
+
+function currenciesFromPriceBreakdown(value: z.infer<typeof priceBreakdownSchema>) {
+  return [
+    value.deposit?.amount.currency,
+    value.memberPrice?.amount.currency,
+    ...value.onlineFees.map((fee) => fee.amount.currency)
+  ].filter((currency): currency is z.infer<typeof currencyCodeSchema> => Boolean(currency));
+}
+
+function addCurrencyIssue(ctx: z.RefinementCtx, path: Array<string | number>, message: string) {
+  ctx.addIssue({ code: z.ZodIssueCode.custom, message, path });
+}
 
 export const storeSchema = z.object({
   id: idSchema,
@@ -61,13 +118,15 @@ export const productSchema = z.object({
   })
 });
 
-export const priceObservationSchema = z.object({
+const priceObservationBaseSchema = z.object({
   id: idSchema,
   domain: priceDomainSchema.default('grocery'),
+  market: marketPriceContextSchema.optional(),
   productId: idSchema,
   storeId: idSchema,
   price: moneyAmountSchema,
   unitPrice: moneyAmountSchema.optional(),
+  priceBreakdown: priceBreakdownSchema.optional(),
   priceType: priceTypeSchema,
   confidence: confidenceSchema,
   observedAt: isoDateTimeSchema,
@@ -83,6 +142,24 @@ export const priceObservationSchema = z.object({
     .optional()
 });
 
+function validatePriceObservationCurrency(observation: z.infer<typeof priceObservationBaseSchema>, ctx: z.RefinementCtx) {
+  if (observation.market && observation.price.currency !== observation.market.currency) {
+    addCurrencyIssue(ctx, ['price', 'currency'], 'Price currency must match the observation market currency.');
+  }
+  if (observation.unitPrice && observation.unitPrice.currency !== observation.price.currency) {
+    addCurrencyIssue(ctx, ['unitPrice', 'currency'], 'Unit price currency must match the observation price currency.');
+  }
+  if (observation.priceBreakdown) {
+    currenciesFromPriceBreakdown(observation.priceBreakdown).forEach((currency) => {
+      if (currency !== observation.price.currency) {
+        addCurrencyIssue(ctx, ['priceBreakdown'], 'Tax, deposit, member price, and online fee components must use the observation price currency.');
+      }
+    });
+  }
+}
+
+export const priceObservationSchema = priceObservationBaseSchema.superRefine(validatePriceObservationCurrency);
+
 export const fuelPriceObservationSchema = z.object({
   id: idSchema,
   domain: z.literal('fuel'),
@@ -96,9 +173,9 @@ export const fuelPriceObservationSchema = z.object({
   provenance: provenanceSchema
 });
 
-export const latestPriceSchema = priceObservationSchema.extend({
+export const latestPriceSchema = priceObservationBaseSchema.extend({
   supersedesObservationIds: z.array(idSchema).default([])
-});
+}).superRefine(validatePriceObservationCurrency);
 
 export const fuelPricesResponseSchema = z.object({
   domain: z.literal('fuel'),
@@ -227,9 +304,21 @@ export const compareItemIdsSchema = z.array(idSchema);
 export const comparePriceSnapshotSchema = z.object({
   price: moneyAmountSchema,
   unitPrice: moneyAmountSchema.optional(),
+  priceBreakdown: priceBreakdownSchema.optional(),
   priceType: priceTypeSchema,
   confidence: confidenceSchema,
   observedAt: isoDateTimeSchema
+}).superRefine((snapshot, ctx) => {
+  if (snapshot.unitPrice && snapshot.unitPrice.currency !== snapshot.price.currency) {
+    addCurrencyIssue(ctx, ['unitPrice', 'currency'], 'Unit price currency must match the snapshot price currency.');
+  }
+  if (snapshot.priceBreakdown) {
+    currenciesFromPriceBreakdown(snapshot.priceBreakdown).forEach((currency) => {
+      if (currency !== snapshot.price.currency) {
+        addCurrencyIssue(ctx, ['priceBreakdown'], 'Snapshot price components must use the snapshot price currency.');
+      }
+    });
+  }
 });
 
 export const compareStoreItemPricesSchema = z.record(idSchema, comparePriceSnapshotSchema);
@@ -237,9 +326,24 @@ export const compareStoresSchema = z.record(idSchema, compareStoreItemPricesSche
 export const compareMissingItemIdsSchema = z.array(idSchema);
 
 export const compareResponseSchema = z.object({
+  market: marketPriceContextSchema.optional(),
   itemIds: compareItemIdsSchema,
   stores: compareStoresSchema,
   missingItemIds: compareMissingItemIdsSchema
+}).superRefine((response, ctx) => {
+  const currencies = new Set<string>();
+  for (const store of Object.values(response.stores)) {
+    for (const snapshot of Object.values(store)) {
+      currencies.add(snapshot.price.currency);
+      if (snapshot.unitPrice) currencies.add(snapshot.unitPrice.currency);
+    }
+  }
+  if (currencies.size > 1) {
+    addCurrencyIssue(ctx, ['stores'], 'Compare responses cannot mix currencies across stores or items.');
+  }
+  if (response.market && currencies.size === 1 && !currencies.has(response.market.currency)) {
+    addCurrencyIssue(ctx, ['market', 'currency'], 'Compare response currency must match its market.');
+  }
 });
 
 export const apiContractSchemas = {
@@ -247,15 +351,19 @@ export const apiContractSchemas = {
   basket: basketSchema,
   basketItem: basketItemSchema,
   compareResponse: compareResponseSchema,
+  currencyCode: currencyCodeSchema,
   latestPrice: latestPriceSchema,
   fuelPriceObservation: fuelPriceObservationSchema,
   fuelPriceSource: fuelPriceSourceSchema,
   fuelPricesResponse: fuelPricesResponseSchema,
+  marketPriceContext: marketPriceContextSchema,
   multiWeekStockUpCreateRow: multiWeekStockUpCreateRowSchema,
   multiWeekStockUpListResponse: multiWeekStockUpListResponseSchema,
   multiWeekStockUpRow: multiWeekStockUpRowSchema,
   multiWeekStockUpUpdateRow: multiWeekStockUpUpdateRowSchema,
   priceObservation: priceObservationSchema,
+  priceBreakdown: priceBreakdownSchema,
+  priceComponent: priceComponentSchema,
   product: productSchema,
   notificationInboxResponse: notificationInboxResponseSchema,
   productPricesResponse: productPricesResponseSchema,
@@ -270,11 +378,14 @@ export type BasketItemDto = z.infer<typeof basketItemSchema>;
 export type ComparePriceSnapshotDto = z.infer<typeof comparePriceSnapshotSchema>;
 export type CompareResponseDto = z.infer<typeof compareResponseSchema>;
 export type Confidence = z.infer<typeof confidenceSchema>;
+export type CurrencyCode = z.infer<typeof currencyCodeSchema>;
 export type FuelGrade = z.infer<typeof fuelGradeSchema>;
 export type FuelPriceObservationDto = z.infer<typeof fuelPriceObservationSchema>;
 export type FuelPriceSourceDto = z.infer<typeof fuelPriceSourceSchema>;
 export type FuelPricesResponseDto = z.infer<typeof fuelPricesResponseSchema>;
 export type LatestPriceDto = z.infer<typeof latestPriceSchema>;
+export type MarketCode = z.infer<typeof marketCodeSchema>;
+export type MarketPriceContextDto = z.infer<typeof marketPriceContextSchema>;
 export type MultiWeekStockUpConfidence = z.infer<typeof multiWeekStockUpConfidenceSchema>;
 export type MultiWeekStockUpCreateRowDto = z.infer<typeof multiWeekStockUpCreateRowSchema>;
 export type MultiWeekStockUpListResponseDto = z.infer<typeof multiWeekStockUpListResponseSchema>;
@@ -284,6 +395,8 @@ export type NotificationInboxQueueItemDto = z.infer<typeof notificationInboxQueu
 export type NotificationInboxResponseDto = z.infer<typeof notificationInboxResponseSchema>;
 export type NotificationInboxSummaryDto = z.infer<typeof notificationInboxSummarySchema>;
 export type PriceDomain = z.infer<typeof priceDomainSchema>;
+export type PriceBreakdownDto = z.infer<typeof priceBreakdownSchema>;
+export type PriceComponentDto = z.infer<typeof priceComponentSchema>;
 export type PriceObservationDto = z.infer<typeof priceObservationSchema>;
 export type PriceType = z.infer<typeof priceTypeSchema>;
 export type ProductDto = z.infer<typeof productSchema>;
@@ -300,10 +413,12 @@ export const apiContractOpenApiComponents = {
     properties: {
       id: { type: 'string' },
       domain: { type: 'string', enum: priceDomainSchema.options },
+      market: { $ref: '#/components/schemas/MarketPriceContext' },
       productId: { type: 'string' },
       storeId: { type: 'string' },
       price: { $ref: '#/components/schemas/MoneyAmount' },
       unitPrice: { $ref: '#/components/schemas/MoneyAmount' },
+      priceBreakdown: { $ref: '#/components/schemas/PriceBreakdown' },
       priceType: { type: 'string', enum: priceTypeSchema.options },
       confidence: { type: 'string', enum: confidenceSchema.options },
       observedAt: { type: 'string', format: 'date-time' },
@@ -508,7 +623,59 @@ export const apiContractOpenApiComponents = {
     required: ['amount', 'currency'],
     properties: {
       amount: { type: 'number', minimum: 0 },
-      currency: { type: 'string', enum: ['SEK'] }
+      currency: { type: 'string', enum: currencyCodeSchema.options }
+    }
+  },
+  MarketPriceContext: {
+    type: 'object',
+    required: ['market', 'currency'],
+    properties: {
+      market: { type: 'string', enum: marketCodeSchema.options },
+      currency: { type: 'string', enum: currencyCodeSchema.options }
+    }
+  },
+  PriceComponent: {
+    type: 'object',
+    required: ['amount', 'label'],
+    properties: {
+      amount: { $ref: '#/components/schemas/MoneyAmount' },
+      label: { type: 'string' },
+      includedInDisplayedPrice: { type: 'boolean' }
+    }
+  },
+  PriceBreakdown: {
+    type: 'object',
+    required: ['vatIncluded', 'vatRatePercent'],
+    properties: {
+      vatIncluded: { type: 'boolean' },
+      vatRatePercent: { type: 'number', minimum: 0, maximum: 100, nullable: true },
+      taxIncluded: { type: 'boolean' },
+      deposit: { $ref: '#/components/schemas/PriceComponent' },
+      memberPrice: {
+        type: 'object',
+        required: ['amount'],
+        properties: {
+          amount: { $ref: '#/components/schemas/MoneyAmount' },
+          memberOnly: { type: 'boolean' },
+          loyaltyProgramId: { type: 'string' }
+        }
+      },
+      onlineFees: {
+        type: 'array',
+        items: {
+          allOf: [
+            { $ref: '#/components/schemas/PriceComponent' },
+            {
+              type: 'object',
+              required: ['type'],
+              properties: {
+                type: { type: 'string', enum: priceFeeTypeSchema.options },
+                appliesTo: { type: 'string', enum: ['basket', 'order', 'line_item'] }
+              }
+            }
+          ]
+        }
+      }
     }
   },
   Promotion: {

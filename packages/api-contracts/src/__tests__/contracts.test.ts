@@ -4,10 +4,13 @@ import {
   apiContractOpenApiComponents,
   apiContractSchemas,
   compareResponseSchema,
+  currencyCodeSchema,
   fuelPriceObservationSchema,
+  marketPriceContextSchema,
   multiWeekStockUpListResponseSchema,
   multiWeekStockUpUpdateRowSchema,
   notificationInboxResponseSchema,
+  priceBreakdownSchema,
   priceObservationSchema,
   type CompareResponseDto,
   type MultiWeekStockUpListResponseDto,
@@ -20,8 +23,19 @@ const validPrice: PriceObservationDto = {
   domain: 'grocery',
   productId: 'coffee',
   storeId: 'willys-odenplan',
+  market: { market: 'SE', currency: 'SEK' },
   price: { amount: 49.9, currency: 'SEK' },
   unitPrice: { amount: 110.89, currency: 'SEK' },
+  priceBreakdown: {
+    vatIncluded: true,
+    vatRatePercent: 12,
+    taxIncluded: true,
+    deposit: { amount: { amount: 1, currency: 'SEK' }, label: 'pant', includedInDisplayedPrice: false },
+    memberPrice: { amount: { amount: 44.9, currency: 'SEK' }, memberOnly: true, loyaltyProgramId: 'willys-plus' },
+    onlineFees: [
+      { type: 'delivery', amount: { amount: 49, currency: 'SEK' }, label: 'online delivery fee', includedInDisplayedPrice: false, appliesTo: 'order' }
+    ]
+  },
   priceType: 'promotion',
   confidence: 'high',
   observedAt: '2026-05-19T10:00:00.000Z',
@@ -105,6 +119,7 @@ const validStockUpList: MultiWeekStockUpListResponseDto = {
 };
 
 const validCompareResponse: CompareResponseDto = {
+  market: { market: 'SE', currency: 'SEK' },
   itemIds: ['coffee', 'milk'],
   stores: {
     'willys-odenplan': {
@@ -141,15 +156,19 @@ describe('api contract schemas', () => {
       'basket',
       'basketItem',
       'compareResponse',
+      'currencyCode',
       'fuelPriceObservation',
       'fuelPriceSource',
       'fuelPricesResponse',
       'latestPrice',
+      'marketPriceContext',
       'multiWeekStockUpCreateRow',
       'multiWeekStockUpListResponse',
       'multiWeekStockUpRow',
       'multiWeekStockUpUpdateRow',
       'notificationInboxResponse',
+      'priceBreakdown',
+      'priceComponent',
       'priceObservation',
       'product',
       'productPricesResponse',
@@ -199,6 +218,80 @@ describe('api contract schemas', () => {
       const fields = result.error.issues.map((issue) => issue.path.join('.')).sort();
       assert.deepEqual(fields, ['confidence', 'observedAt', 'provenance', 'sourceType']);
     }
+  });
+
+  it('models multi-currency market price components without mixing currencies', () => {
+    assert.deepEqual(currencyCodeSchema.options, ['SEK', 'NOK', 'ISK', 'DKK', 'EUR']);
+    assert.deepEqual(marketPriceContextSchema.parse({ market: 'IS', currency: 'ISK' }), { market: 'IS', currency: 'ISK' });
+    assert.equal(marketPriceContextSchema.safeParse({ market: 'NO', currency: 'SEK' }).success, false);
+
+    const parsedBreakdown = priceBreakdownSchema.parse({
+      vatIncluded: true,
+      vatRatePercent: 15,
+      deposit: { amount: { amount: 25, currency: 'ISK' }, label: 'Iceland bottle deposit', includedInDisplayedPrice: false },
+      memberPrice: { amount: { amount: 399, currency: 'ISK' }, memberOnly: true },
+      onlineFees: [
+        { type: 'pickup', amount: { amount: 0, currency: 'ISK' }, label: 'pickup fee', includedInDisplayedPrice: true }
+      ]
+    });
+    assert.equal(parsedBreakdown.onlineFees[0]?.appliesTo, 'order');
+
+    assert.equal(priceObservationSchema.parse({
+      ...validPrice,
+      market: { market: 'NO', currency: 'NOK' },
+      price: { amount: 49.9, currency: 'NOK' },
+      unitPrice: { amount: 110.89, currency: 'NOK' },
+      priceBreakdown: {
+        vatIncluded: true,
+        vatRatePercent: 15,
+        memberPrice: { amount: { amount: 44.9, currency: 'NOK' }, memberOnly: true },
+        onlineFees: [
+          { type: 'delivery', amount: { amount: 59, currency: 'NOK' }, label: 'delivery fee' }
+        ]
+      }
+    }).market?.currency, 'NOK');
+
+    assert.equal(priceObservationSchema.safeParse({
+      ...validPrice,
+      priceBreakdown: {
+        vatIncluded: true,
+        vatRatePercent: 12,
+        deposit: { amount: { amount: 1, currency: 'NOK' }, label: 'wrong currency deposit' }
+      }
+    }).success, false);
+  });
+
+  it('rejects compare responses that mix currencies across markets', () => {
+    assert.equal(compareResponseSchema.safeParse({
+      ...validCompareResponse,
+      stores: {
+        ...validCompareResponse.stores,
+        'bonus-reykjavik': {
+          coffee: {
+            price: { amount: 399, currency: 'ISK' },
+            priceType: 'shelf',
+            confidence: 'low',
+            observedAt: '2026-05-21T09:00:00.000Z'
+          }
+        }
+      }
+    }).success, false);
+
+    assert.equal(compareResponseSchema.parse({
+      ...validCompareResponse,
+      market: { market: 'IS', currency: 'ISK' },
+      stores: {
+        'bonus-reykjavik': {
+          coffee: {
+            price: { amount: 399, currency: 'ISK' },
+            unitPrice: { amount: 798, currency: 'ISK' },
+            priceType: 'shelf',
+            confidence: 'low',
+            observedAt: '2026-05-21T09:00:00.000Z'
+          }
+        }
+      }
+    }).market?.currency, 'ISK');
   });
 
   it('models fuel price observations by grade and source kind', () => {
@@ -312,6 +405,8 @@ describe('api contract schemas', () => {
     assert.ok(price.required.includes('provenance'));
     assert.deepEqual(price.properties.priceType.enum, ['shelf', 'member', 'promotion', 'estimated']);
     assert.deepEqual(apiContractOpenApiComponents.FuelPriceObservation.properties.fuelGrade.enum, ['95', '98', 'diesel', 'hvo100', 'e85']);
+    assert.deepEqual(apiContractOpenApiComponents.MoneyAmount.properties.currency.enum, ['SEK', 'NOK', 'ISK', 'DKK', 'EUR']);
+    assert.equal(apiContractOpenApiComponents.PriceObservation.properties.priceBreakdown.$ref, '#/components/schemas/PriceBreakdown');
     assert.deepEqual(apiContractOpenApiComponents.NotificationInboxResponse.properties.queue.items, {
       $ref: '#/components/schemas/NotificationInboxQueueItem'
     });
