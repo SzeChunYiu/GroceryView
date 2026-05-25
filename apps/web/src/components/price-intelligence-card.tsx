@@ -22,6 +22,33 @@ export interface PriceIntelligenceCardProps {
   title?: string;
 }
 
+export interface BestTimeForecastPanelProps {
+  confidenceLabel: string;
+  expectedMovementLabel: string;
+  guidance: string;
+  headline: string;
+  recommendationCount: number;
+}
+
+export function BestTimeForecastPanel({ confidenceLabel, expectedMovementLabel, guidance, headline, recommendationCount }: BestTimeForecastPanelProps) {
+  return (
+    <section className="mt-6 rounded-[2rem] border border-sky-200 bg-sky-50/90 p-5 shadow-sm">
+      <p className="text-xs font-black uppercase tracking-[0.22em] text-sky-800">Best time to buy forecast</p>
+      <div className="mt-2 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+        <div>
+          <h2 className="text-2xl font-black text-slate-950">{headline}</h2>
+          <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">{guidance}</p>
+        </div>
+        <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-sky-900">{recommendationCount} scored items</p>
+      </div>
+      <div className="mt-4 grid gap-3 md:grid-cols-2">
+        <p className="rounded-2xl bg-white/85 p-4 text-sm font-bold text-slate-700">Confidence: {confidenceLabel}</p>
+        <p className="rounded-2xl bg-white/85 p-4 text-sm font-bold text-slate-700">{expectedMovementLabel}</p>
+      </div>
+    </section>
+  );
+}
+
 export function PriceIntelligenceCard({
   cards,
   emptyState = 'Not enough dated price observations exist to score likely buying windows.',

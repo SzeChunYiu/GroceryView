@@ -1,4 +1,5 @@
 export type FreshnessLevel = "unknown" | "fresh" | "aging" | "stale";
+export type StockFreshnessStatus = "live" | "stale" | "inferred" | "unavailable";
 
 export interface PriceFreshness {
   level: FreshnessLevel;
@@ -18,6 +19,14 @@ export interface StoreReliabilityScore {
   missingCategoryWarning: string;
   scoreLabel: string;
   tone: "strong" | "limited" | "blocked";
+}
+
+export interface StoreProductStockFreshness {
+  status: StockFreshnessStatus;
+  label: string;
+  detail: string;
+  ageInDays: number | null;
+  actionable: boolean;
 }
 
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
@@ -103,6 +112,56 @@ export function getPriceFreshness(
   };
 }
 
+export function getStoreProductStockFreshness({
+  availability,
+  observedAt,
+  now = new Date(),
+}: {
+  availability?: StockFreshnessStatus | boolean | null;
+  observedAt?: string | number | Date | null;
+  now?: Date;
+}): StoreProductStockFreshness {
+  const ageInDays = getScrapeAgeInDays(observedAt, now);
+
+  if (availability === false || availability === "unavailable") {
+    return {
+      status: "unavailable",
+      label: "Unavailable",
+      detail: "Source marks this item unavailable for this store.",
+      ageInDays,
+      actionable: false,
+    };
+  }
+
+  if (availability === "inferred" || (availability === undefined && ageInDays === null)) {
+    return {
+      status: "inferred",
+      label: "Inferred availability",
+      detail: "Availability is inferred from a priced row; verify before visiting.",
+      ageInDays,
+      actionable: true,
+    };
+  }
+
+  if (availability === "stale" || (ageInDays !== null && ageInDays >= STALE_AFTER_DAYS)) {
+    return {
+      status: "stale",
+      label: "Stale stock",
+      detail: ageInDays === null ? "Stock evidence is stale." : `Last stock signal was ${ageInDays} days ago.`,
+      ageInDays,
+      actionable: false,
+    };
+  }
+
+  return {
+    status: "live",
+    label: "Live stock",
+    detail: ageInDays === null ? "Current store feed reports this item as available." : formatScrapeAge(ageInDays),
+    ageInDays,
+    actionable: true,
+  };
+}
+
 export function getStoreReliabilityScore({
   feedRetrievedAt,
   now = new Date(),
@@ -143,4 +202,51 @@ export function getStoreReliabilityScore({
         : "Store comparison blocked",
     tone,
   };
+}
+
+export type ProductArrivalInput = {
+  slug: string;
+  name: string;
+  brand?: string | null;
+  category?: string | null;
+  image?: string | null;
+  price: number;
+  lastObservedAt?: string | null;
+  observationCount?: number;
+};
+
+export type NewProductArrival = ProductArrivalInput & {
+  chainLabel: string;
+  freshnessBadge: string;
+  arrivalScore: number;
+};
+
+function inferArrivalChainLabel(product: ProductArrivalInput): string {
+  const brand = product.brand?.toLowerCase() ?? "";
+  if (brand.includes("garant") || brand.includes("eldorado") || brand.includes("axfood")) return "Axfood feed";
+  if (brand.includes("ica")) return "ICA feed";
+  if (brand.includes("coop")) return "Coop feed";
+  return "OpenPrices feed";
+}
+
+export function buildNewProductArrivals(
+  products: ProductArrivalInput[],
+  limit = 6,
+  now: Date = new Date(),
+): NewProductArrival[] {
+  return products
+    .map((product) => {
+      const freshness = getPriceFreshness(product.lastObservedAt, now);
+      const age = freshness.ageInDays ?? 999;
+      const observationCount = product.observationCount ?? 0;
+      return {
+        ...product,
+        chainLabel: inferArrivalChainLabel(product),
+        freshnessBadge: freshness.label,
+        arrivalScore: age * 10 + Math.min(observationCount, 9),
+      };
+    })
+    .filter((product) => product.lastObservedAt)
+    .sort((left, right) => left.arrivalScore - right.arrivalScore || left.name.localeCompare(right.name))
+    .slice(0, limit);
 }
