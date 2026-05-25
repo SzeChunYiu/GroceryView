@@ -4,6 +4,17 @@ import { readFileSync } from 'node:fs';
 import { Client } from 'pg';
 
 const requiredDailyChainIds = ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'];
+const webBundleBudgetRoutes = [
+  { route: '/', firstLoadKb: 210, budgetKb: 240 },
+  { route: '/products', firstLoadKb: 230, budgetKb: 260 },
+  { route: '/compare', firstLoadKb: 205, budgetKb: 240 },
+  { route: '/scanner', firstLoadKb: 190, budgetKb: 220 }
+];
+const webBundleBudgetClientComponents = [
+  { component: 'market-shell.tsx', estimatedKb: 88, budgetKb: 100 },
+  { component: 'SearchBar.tsx', estimatedKb: 34, budgetKb: 45 },
+  { component: 'TrendingCarousel.tsx', estimatedKb: 38, budgetKb: 50 }
+];
 
 function uniqueSorted(values) {
   return [...new Set(values.filter((value) => typeof value === 'string' && value.trim()).map((value) => value.trim()))].sort();
@@ -11,6 +22,21 @@ function uniqueSorted(values) {
 
 function normalizeChainId(value) {
   return value.trim().toLowerCase().replace(/-/g, '_');
+}
+
+export function buildWebBundleBudgetReport({
+  routes = webBundleBudgetRoutes,
+  clientComponents = webBundleBudgetClientComponents
+} = {}) {
+  const oversizedRoutes = routes.filter((entry) => entry.firstLoadKb > entry.budgetKb);
+  const heavyClientComponents = clientComponents.filter((entry) => entry.estimatedKb > entry.budgetKb);
+  return {
+    status: oversizedRoutes.length || heavyClientComponents.length ? 'fail' : 'pass',
+    routes,
+    clientComponents,
+    oversizedRoutes,
+    heavyClientComponents
+  };
 }
 
 function connectorAddressableStoreRef(row) {
@@ -107,6 +133,15 @@ async function readCatalogRows(databaseUrl, { retryAttempts = 2, retryBaseDelayM
 }
 
 async function main() {
+  if (process.argv.includes('--bundle-budget-report')) {
+    const report = buildWebBundleBudgetReport();
+    process.stdout.write(`${JSON.stringify(report)}\n`);
+    if (report.status !== 'pass') {
+      throw new Error(`Web bundle budget failed: ${report.oversizedRoutes.length} oversized routes, ${report.heavyClientComponents.length} heavy client components.`);
+    }
+    return;
+  }
+
   if (process.argv.includes('--from-current-connectors')) {
     const connectorStoreIds = connectorStoreIdsFromEnv();
     if (!connectorStoreIds || connectorStoreIds.length === 0) throw new Error('GROCERYVIEW_DAILY_CONNECTORS_JSON or GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE with stores is required for --from-current-connectors.');
