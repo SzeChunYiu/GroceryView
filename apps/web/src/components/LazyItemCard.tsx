@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { trackItemCardImpression } from '@/lib/analytics';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
+import { PriceBadge } from './price-badge';
+import type { RecentPriceVarianceBadge } from '@/lib/price-intelligence';
 import { dataGridVirtualStatusClass } from '@/components/data-grid';
 
 export type LazyItemCardProps = {
@@ -64,6 +66,7 @@ type VirtualizedProduct = {
   slug: string;
   sourceTables: string[];
   unitPriceLabel: string;
+  volatilityBadge?: RecentPriceVarianceBadge | null;
 };
 
 const ESTIMATED_ROW_HEIGHT = 236;
@@ -187,7 +190,10 @@ export function VirtualizedProductGrid({ products, resultLabel = 'Virtualized pr
                 </div>
               </div>
               <div className="mt-4 grid gap-2 text-xs font-black text-slate-700">
-                <p>{product.cheapestPriceLabel} · {product.unitPriceLabel}</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <PriceBadge className="px-2 py-0.5 text-xs" price={product.cheapestPriceLabel} varianceBadge={product.volatilityBadge} />
+                  <span>{product.unitPriceLabel}</span>
+                </div>
                 <p>{product.chainLabel}</p>
                 <p className="text-violet-800">sourceTables: {product.sourceTables.join(' · ')}</p>
               </div>
