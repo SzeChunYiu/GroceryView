@@ -280,7 +280,7 @@ export function buildSavedSearchSubscription(input: {
     href: `${input.path ?? '/search'}${query ? `?${query}` : ''}`,
     filters,
     createdAt: input.createdAt ?? new Date().toISOString(),
-    alertReason: 'Notify when newly matching verified products appear or an existing match posts a verified price drop.',
+    alertReason: 'Notify when newly matching verified deals appear or an existing match posts a verified price drop.',
     alertRules: defaultSavedSearchAlertRules
   };
 }
