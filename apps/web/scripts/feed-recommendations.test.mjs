@@ -18,3 +18,15 @@ test('recommended deals rail has an explicit empty state without sample deal car
   assert.doesNotMatch(trending, /discoveryRailItems\.length === 0\) return null/);
   assert.doesNotMatch(trending, /sample deal|fake deal|invented discount/i);
 });
+
+test('recommended deal feed shapes signed-in account preferences and fails closed anonymously', async () => {
+  const source = await read('src/lib/feed-recommendations.ts');
+  const route = await read('src/app/api/feed/recommended-deals/route.ts');
+
+  assert.match(source, /shapeAccountRecommendationPreferences/);
+  assert.match(source, /favoriteBrands: stringArray\(record\.favoriteBrands\)/);
+  assert.match(source, /source: 'anonymous-static-feed'/);
+  assert.match(source, /source: 'signed-in-account-preferences'/);
+  assert.match(route, /x-groceryview-account-preferences/);
+  assert.match(route, /buildRecommendedDealsFeed/);
+});
