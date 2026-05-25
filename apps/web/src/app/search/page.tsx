@@ -18,7 +18,7 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
     <>
       <SaveSearchSubscriptionButton subscription={subscription} />
       <RecentSearchReplayPills />
-      <ProductsPage searchParams={Promise.resolve(resolvedSearchParams)} />
+      <ProductsPage searchParams={Promise.resolve(resolvedSearchParams)} basePath="/search" />
     </>
   );
 }

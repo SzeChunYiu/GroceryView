@@ -1,4 +1,4 @@
-import { buildFacetedProductSearch, type RealCatalogSearchPriceRow } from '@groceryview/api';
+import { buildFacetedProductSearch, type RealCatalogPriceType, type RealCatalogSearchPriceRow } from '@groceryview/api';
 import { COMMODITIES, STAPLE_BASKET, SUPPORTED_PRICE_DOMAINS, type Commodity, type ComparableUnit } from '@groceryview/catalog';
 import { buildPriceChartSeries, buildWatchlistAlerts, calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, suggestFriendSharedDeals, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type PriceChartObservation, type ProductMatchInput, type WatchlistItem, type WatchlistPriceType, type WatchlistProductSnapshot } from '@groceryview/core';
 import { majorSwedishGroceryRetailerTypeCoverage, retailerTypes, summarizeTrendingProductPriceChanges, type TrendingPriceChangePoint } from '@groceryview/db';
@@ -584,6 +584,7 @@ export type ProductSearchUrlParams = {
   origin?: SearchParamValue;
   dietary?: SearchParamValue;
   chain?: SearchParamValue;
+  priceType?: SearchParamValue;
   minPrice?: SearchParamValue;
   maxPrice?: SearchParamValue;
   inStockOnly?: SearchParamValue;
@@ -605,6 +606,13 @@ function dietarySearchValues(value: SearchParamValue): CommonDietaryFilterValue[
   return commonDietaryFilterOptions
     .filter((option) => requested.has(option.value))
     .map((option) => option.value);
+}
+
+const searchablePriceTypes: RealCatalogPriceType[] = ['shelf', 'online', 'member', 'promotion', 'receipt', 'community', 'estimated'];
+
+function priceTypeSearchValues(value: SearchParamValue): RealCatalogPriceType[] {
+  const requested = new Set(listSearchValues(value).map((item) => item.toLocaleLowerCase('sv-SE')));
+  return searchablePriceTypes.filter((priceType) => requested.has(priceType));
 }
 
 export const supportedOriginCountries = ['SE', 'NO', 'IS', 'DK', 'FI', 'DE', 'NL', 'ES', 'IT', 'PL', 'IE'] as const;
@@ -707,11 +715,12 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
   const dietaryLabels = dietarySearchValues(searchParams.dietary);
   const labels = [...new Set([...labelFilters, ...dietaryLabels])];
   const chains = listSearchValues(searchParams.chain);
+  const priceTypes = priceTypeSearchValues(searchParams.priceType);
   const minPrice = numericSearchValue(searchParams.minPrice);
   const maxPrice = numericSearchValue(searchParams.maxPrice);
   const inStockOnly = booleanSearchValue(searchParams.inStockOnly);
   const minConfidence = confidenceSearchValue(searchParams.minConfidence);
-  const filters = { query, categories, labels, originCountries, chains, minPrice, maxPrice, inStockOnly, minConfidence, limit: 100 };
+  const filters = { query, categories, labels, originCountries, chains, priceTypes, minPrice, maxPrice, inStockOnly, minConfidence, limit: 100 };
   const searchResult = buildFacetedProductSearch({ rows: facetedSearchRows, filters });
 
   const activeFilters = [
@@ -724,6 +733,7 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
       return `dietary=${dietaryFilterLabel}`;
     }),
     ...chains.map((chain) => `chain=${chainDisplayNames[chain] ?? chain}`),
+    ...priceTypes.map((priceType) => `priceType=${readableLabel(priceType)}`),
     minPrice !== undefined ? `min unit ${formatSek(minPrice)}` : null,
     maxPrice !== undefined ? `max unit ${formatSek(maxPrice)}` : null,
     inStockOnly ? 'priced/in-stock only' : null,
@@ -735,6 +745,7 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
     title: 'Instant faceted search',
     categoryFacets: searchResult.facets.categories.slice(0, 6),
     chainFacets: searchResult.facets.chains,
+    priceTypeFacets: searchResult.facets.priceTypes.map((facet) => ({ ...facet, label: readableLabel(facet.value), checked: priceTypes.includes(facet.value) })),
     labelFacets: searchResult.facets.labels.map((facet) => ({ ...facet, label: readableLabel(facet.value) })).slice(0, 8),
     labelFilters,
     originFilters: originCountries,

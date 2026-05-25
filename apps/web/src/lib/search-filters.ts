@@ -148,7 +148,7 @@ export type RemovableSearchFilterChip = {
   href: string;
 };
 
-type SearchFilterChipKey = 'category' | 'chain' | 'dietary' | 'minPrice' | 'maxPrice';
+type SearchFilterChipKey = 'category' | 'chain' | 'dietary' | 'priceType' | 'minPrice' | 'maxPrice';
 
 type SearchFilterChipOptions = {
   basePath?: string;
@@ -157,7 +157,7 @@ type SearchFilterChipOptions = {
 
 type SearchFilterParams = Record<string, SearchFilterParamValue>;
 
-const multiValueChipKeys = new Set<SearchFilterChipKey>(['category', 'chain', 'dietary']);
+const multiValueChipKeys = new Set<SearchFilterChipKey>(['category', 'chain', 'dietary', 'priceType']);
 
 function searchParamValues(value: SearchFilterParamValue): string[] {
   const rawValues = Array.isArray(value) ? value : value ? [value] : [];
@@ -223,6 +223,14 @@ export function buildRemovableSearchFilterChips(searchParams: SearchFilterParams
       id: `dietary:${dietary}`,
       label: `Dietary: ${displayChipValue(dietary, options.labels?.dietary)}`,
       href: chipRemovalHref(searchParams, 'dietary', dietary, basePath)
+    });
+  }
+
+  for (const priceType of searchParamValues(searchParams.priceType)) {
+    chips.push({
+      id: `priceType:${priceType}`,
+      label: `Promotion: ${displayChipValue(priceType, options.labels?.priceType)}`,
+      href: chipRemovalHref(searchParams, 'priceType', priceType, basePath)
     });
   }
 
