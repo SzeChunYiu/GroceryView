@@ -44,6 +44,37 @@ const lidlStoreOffers = dbSiteLidlStoreOffers.length > 0 ? dbSiteLidlStoreOffers
 const lidlSource = dbSiteLidlStoreOffers.length > 0 ? dbSiteLidlSource : staticLidlSource;
 const matpriskollenOffers = dbSiteMatpriskollenOffers.length > 0 ? dbSiteMatpriskollenOffers : staticMatpriskollenOffers;
 
+function unitAuditProductId(source: string, id: string) {
+  return `${source}-${id}`.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+export const unitNormalizationAuditFilterOptions = {
+  sources: [
+    { value: 'Axfood', label: 'Axfood' },
+    { value: 'OpenPrices', label: 'OpenPrices' },
+    { value: 'Mathem', label: 'Mathem' }
+  ],
+  severities: [
+    { value: 'blocker', label: 'Blocker' },
+    { value: 'review', label: 'Review' },
+    { value: 'warning', label: 'Warning' }
+  ],
+  issueTypes: [
+    { value: 'missing_unit', label: 'Missing package text' },
+    { value: 'suspicious_pack_size', label: 'Suspicious pack size' },
+    { value: 'inconsistent_unit_price', label: 'Unit-price mismatch' }
+  ]
+};
+
+export const unitNormalizationMathemAuditInputs = mathemProducts.slice(0, 250).map((product) => ({
+  productId: unitAuditProductId('mathem', product.code || product.name),
+  productName: product.name,
+  packageText: product.packageText,
+  price: typeof product.price === 'number' ? product.price : Number(product.price),
+  reportedUnitPrice: typeof product.unitPrice === 'number' ? product.unitPrice : null,
+  source: 'Mathem'
+}));
+
 export const snapshot = {
   retrievedLabel: '20-21 May 2026',
   axfoodSource: 'Willys and Hemköp public search endpoints',
