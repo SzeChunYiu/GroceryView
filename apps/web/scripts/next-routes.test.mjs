@@ -49,7 +49,8 @@ describe('verified-data UI', () => {
     assert.match(nav, /label: 'Markets'[\s\S]*label: 'Overview'[\s\S]*label: 'Chain index'[\s\S]*label: 'Categories'[\s\S]*label: 'Heatmap'[\s\S]*label: 'Screener'/);
     assert.match(nav, /label: 'Products'[\s\S]*label: 'Browse'[\s\S]*label: 'Compare'/);
     assert.match(nav, /label: 'Stores'[\s\S]*label: 'Map'[\s\S]*label: 'Stores'/);
-    assert.match(nav, /label: 'Personal'[\s\S]*label: 'Savings'[\s\S]*label: 'My Flyer'[\s\S]*label: 'Watchlist'[\s\S]*label: 'Weekly basket'[\s\S]*label: 'Meal planner'/);
+    assert.match(nav, /label: 'Trip'[\s\S]*label: 'Current list'[\s\S]*label: 'Nearby deals'[\s\S]*label: 'Watchlist'/);
+    assert.match(nav, /label: 'Personal'[\s\S]*label: 'Savings'[\s\S]*label: 'My Flyer'[\s\S]*label: 'Weekly basket'[\s\S]*label: 'Meal planner'/);
     assert.match(nav, /aria-haspopup="true"/);
     assert.match(nav, /group-focus-within:visible/);
     assert.match(nav, /group-hover:visible/);
@@ -85,12 +86,15 @@ describe('verified-data UI', () => {
   it('surfaces latest_prices availability as an out-of-stock product card badge', async () => {
     const productCards = await read('src/components/product-price-cards.tsx');
     const productsPage = await read('src/app/products/page.tsx');
+    const lazyItemCard = await read('src/components/LazyItemCard.tsx');
     const verified = await read('src/lib/verified-data.ts');
 
     assert.match(productCards, /card\.isAvailable === false/);
     assert.match(productCards, /Out of stock/);
+    assert.match(productsPage, /VirtualizedProductGrid/);
     assert.match(productsPage, /product\.isAvailable === false/);
-    assert.match(productsPage, /Out of stock/);
+    assert.match(lazyItemCard, /product\.isAvailable === false/);
+    assert.match(lazyItemCard, /Out of stock/);
     assert.match(verified, /isAvailable/);
     assert.match(verified, /outOfStockLatestPriceCount/);
   });
@@ -1405,10 +1409,12 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
-  it('redirects the legacy deals route to the verified deal screener', async () => {
+  it('surfaces replacement deal radar filters on the deals route', async () => {
     const route = await read('src/app/deals/page.tsx');
 
-    assert.match(route, /redirect\('\/screener'\)/);
+    assert.match(route, /buildPantryReplacementFilter/);
+    assert.match(route, /pantryReplacementMatches/);
+    assert.match(route, /Replacement deals for/);
     assert.match(route, /generateMetadata/);
     assert.match(route, /routeMetadata\('\/deals'\)/);
   });
@@ -2132,9 +2138,10 @@ ${seo}`;
     assert.match(bottomNav, /grid-cols-7/);
     assert.match(bottomNav, /useHaptic/);
     assert.match(bottomNav, /impact\(\)/);
-    assert.match(bottomNav, /My Flyer/);
+    assert.match(bottomNav, /Deals/);
+    assert.match(bottomNav, /List/);
+    assert.match(bottomNav, /Nearby/);
     assert.match(bottomNav, /Watchlist/);
-    assert.match(bottomNav, /Me/);
     assert.match(dataUi, /import \{ BottomNav \} from '\.\/bottom-nav'/);
     assert.match(dataUi, /pb-20/);
     assert.match(dataUi, /lg:pb-6/);
@@ -2146,7 +2153,7 @@ ${seo}`;
     const haptic = await read('src/hooks/useHaptic.ts');
 
     assert.match(scanner, /Mobile scanner shortcut/);
-    assert.match(scanner, /Bottom nav opens scan controls with haptic feedback/);
+    assert.match(scanner, /Bottom nav keeps in-store workflows one tap away/);
     assert.match(scanner, /id="scan"/);
     assert.match(scanner, /ScannerUploadActions/);
     assert.match(haptic, /impact: \(\) => vibrate\(\[10, 18, 10\]\)/);
@@ -2868,7 +2875,7 @@ ${seo}`;
     assert.match(social, /storeName/);
     assert.match(social, /observedAt/);
     assert.match(social, /confidence/);
-    assert.match(feed, /Friend price sightings/);
+    assert.match(feed, /Opt-in friend price sightings/);
     assert.match(feed, /listFriendPriceSightings/);
     assert.match(feed, /sighting\.productName/);
     assert.match(feed, /sighting\.storeName/);
@@ -3359,6 +3366,7 @@ ${seo}`;
     const worker = await read('public/sw.js');
     const registrar = await read('src/lib/swRegister.ts');
     const shoppingListPage = await read('src/app/list/page.tsx');
+    const listSharePreview = await read('src/components/list-share-preview.tsx');
 
     assert.match(manifest, /Open shopping list/);
     assert.match(manifest, /url: '\/list'/);
@@ -3370,10 +3378,11 @@ ${seo}`;
     assert.match(registrar, /OFFLINE_SAVED_LIST_BASE_ROUTES = \['\/list'/);
     assert.match(registrar, /cache\.add\(route\)/);
     assert.doesNotMatch(registrar, /console\./);
-    assert.match(shoppingListPage, /OFFLINE_SHOPPING_LIST_CACHE_KEY = 'groceryview:shopping-list:offline-cache:v1'/);
-    assert.match(shoppingListPage, /cheapestSourceForProductSlug/);
-    assert.match(shoppingListPage, /lastKnownPrices/);
-    assert.match(shoppingListPage, /window\.localStorage\.setItem\(OFFLINE_SHOPPING_LIST_CACHE_KEY/);
+    assert.match(shoppingListPage, /ListSharePreview/);
+    assert.match(listSharePreview, /OFFLINE_SHOPPING_LIST_CACHE_KEY = 'groceryview:shopping-list:offline-cache:v1'/);
+    assert.match(listSharePreview, /cheapestSourceForProductSlug/);
+    assert.match(listSharePreview, /lastKnownPrices/);
+    assert.match(listSharePreview, /window\.localStorage\.setItem\(OFFLINE_SHOPPING_LIST_CACHE_KEY/);
   });
 
 
