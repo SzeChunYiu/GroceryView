@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import {
@@ -3334,6 +3334,9 @@ export type DailyIngestionEnv = Partial<Record<
   | 'GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS'
   | 'GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS'
   | 'GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS'
+  | 'GROCERYVIEW_DAILY_ZERO_ROW_ALERT_LOG_PATH'
+  | 'GROCERYVIEW_DAILY_ZERO_ROW_ALERT_STATE_PATH'
+  | 'GROCERYVIEW_DAILY_ZERO_ROW_ALERT_WEBHOOK_URL'
   | 'GROCERYVIEW_DAILY_STORE_CONCURRENCY'
   | 'GROCERYVIEW_DAILY_STORE_START_DELAY_MS'
   | 'GROCERYVIEW_DAILY_STORE_RETRY_ATTEMPTS'
@@ -3378,6 +3381,12 @@ export type DailyIngestionRunInput = {
   connectorRetryBaseDelayMs?: number;
   /** File path for durable blocker diagnostics when a country-wide run is partial or blocked. */
   blockerLogPath?: string;
+  /** JSONL alert sink used when a connector returns zero rows for more than 24 hours. */
+  zeroRowAlertLogPath?: string;
+  /** JSON state file used to track first-seen zero-row connector runs. */
+  zeroRowAlertStatePath?: string;
+  /** Optional webhook URL that receives zero-row alert payloads. */
+  zeroRowAlertWebhookUrl?: string;
   /** Optional product image cache that downloads external product images and rewrites products.image_url at ingest time. */
   imageCache?: false | DailyIngestionImageCacheOptions;
 };
@@ -3410,12 +3419,17 @@ export type DailyIngestionRunResult = {
 type IdRow = { id: string };
 
 export const DEFAULT_DAILY_INGESTION_BLOCKER_LOG_PATH = 'codex-tasks/ingestion-blockers.txt';
+export const DEFAULT_DAILY_ZERO_ROW_ALERT_LOG_PATH = '/tmp/ingest-alerts.jsonl';
+export const DEFAULT_DAILY_ZERO_ROW_ALERT_STATE_PATH = '/tmp/ingest-zero-row-state.json';
 
 export type DailyIngestionRuntimeOptions = Required<Pick<
   DailyIngestionRunInput,
   'maxConcurrency' | 'connectorStartDelayMs' | 'connectorRetryAttempts' | 'connectorRetryBaseDelayMs'
 >> & {
   blockerLogPath: string;
+  zeroRowAlertLogPath: string;
+  zeroRowAlertStatePath: string;
+  zeroRowAlertWebhookUrl: string;
 };
 
 const dailyRequiredConnectorFields = [
@@ -3604,7 +3618,10 @@ export function buildDailyConnectorConfigsFromEnv(env: DailyIngestionEnv): Daily
     connectorStartDelayMs: parseDailyEnvInteger(env.GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS, 0, 'GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS'),
     connectorRetryAttempts: parseDailyEnvInteger(env.GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS, 0, 'GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS'),
     connectorRetryBaseDelayMs: parseDailyEnvInteger(env.GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS, 250, 'GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS'),
-    blockerLogPath: env.GROCERYVIEW_DAILY_BLOCKER_LOG_PATH?.trim() || DEFAULT_DAILY_INGESTION_BLOCKER_LOG_PATH
+    blockerLogPath: env.GROCERYVIEW_DAILY_BLOCKER_LOG_PATH?.trim() || DEFAULT_DAILY_INGESTION_BLOCKER_LOG_PATH,
+    zeroRowAlertLogPath: env.GROCERYVIEW_DAILY_ZERO_ROW_ALERT_LOG_PATH?.trim() || DEFAULT_DAILY_ZERO_ROW_ALERT_LOG_PATH,
+    zeroRowAlertStatePath: env.GROCERYVIEW_DAILY_ZERO_ROW_ALERT_STATE_PATH?.trim() || DEFAULT_DAILY_ZERO_ROW_ALERT_STATE_PATH,
+    zeroRowAlertWebhookUrl: env.GROCERYVIEW_DAILY_ZERO_ROW_ALERT_WEBHOOK_URL?.trim() || ''
   };
   return {
     databaseUrl,
@@ -4665,6 +4682,78 @@ function isTransientDailyDatabaseError(error: unknown): boolean {
   return /connection\s+(?:to database\s+)?closed|terminating connection|connection terminated|database system is not accepting connections|EDBHANDLEREXITED|ECONNRESET|ECONNREFUSED|econnrefused|EPIPE|timeout|Connection terminated unexpectedly/i.test(message);
 }
 
+type ZeroRowAlertState = Record<string, { firstZeroRowsAt: string; lastAlertedAt?: string }>;
+
+function readZeroRowAlertState(path: string): ZeroRowAlertState {
+  try {
+    const parsed = JSON.parse(readFileSync(path, 'utf8')) as unknown;
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed as ZeroRowAlertState : {};
+  } catch {
+    return {};
+  }
+}
+
+function writeZeroRowAlertState(path: string, state: ZeroRowAlertState): void {
+  mkdirSync(dirname(path), { recursive: true });
+  writeFileSync(path, `${JSON.stringify(state, null, 2)}\n`);
+}
+
+async function maybeEmitZeroRowConnectorAlert(input: {
+  config: DailyIngestionConnectorConfig;
+  requestedAt: string;
+  fetchImpl?: typeof fetch;
+  logPath: string;
+  statePath: string;
+  webhookUrl?: string;
+}): Promise<void> {
+  const stateKey = `${input.config.chainId}:${input.config.connectorId}`;
+  const state = readZeroRowAlertState(input.statePath);
+  const existing = state[stateKey];
+  const firstZeroRowsAt = existing?.firstZeroRowsAt ?? input.requestedAt;
+  state[stateKey] = { ...existing, firstZeroRowsAt };
+  writeZeroRowAlertState(input.statePath, state);
+
+  const zeroRowsSinceMs = Date.parse(input.requestedAt) - Date.parse(firstZeroRowsAt);
+  if (!Number.isFinite(zeroRowsSinceMs) || zeroRowsSinceMs <= 24 * 60 * 60 * 1000) return;
+  if (existing?.lastAlertedAt?.slice(0, 10) === input.requestedAt.slice(0, 10)) return;
+
+  const payload = {
+    type: 'daily_ingestion_zero_rows',
+    connectorId: input.config.connectorId,
+    chainId: input.config.chainId,
+    firstZeroRowsAt,
+    alertedAt: input.requestedAt,
+    zeroRowsForHours: Math.round((zeroRowsSinceMs / (60 * 60 * 1000)) * 10) / 10
+  };
+
+  mkdirSync(dirname(input.logPath), { recursive: true });
+  appendFileSync(input.logPath, `${JSON.stringify(payload)}\n`);
+  state[stateKey] = { firstZeroRowsAt, lastAlertedAt: input.requestedAt };
+  writeZeroRowAlertState(input.statePath, state);
+
+  if (input.webhookUrl?.trim()) {
+    const fetchImpl = input.fetchImpl ?? globalThis.fetch;
+    try {
+      await fetchImpl(input.webhookUrl, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+    } catch (error) {
+      process.stderr.write(`[daily-ingestion] zero-row alert webhook failed: ${error instanceof Error ? error.message : String(error)}\n`);
+    }
+  }
+}
+
+function clearZeroRowConnectorState(config: DailyIngestionConnectorConfig, statePath: string): void {
+  const state = readZeroRowAlertState(statePath);
+  const stateKey = `${config.chainId}:${config.connectorId}`;
+  if (state[stateKey]) {
+    delete state[stateKey];
+    writeZeroRowAlertState(statePath, state);
+  }
+}
+
 export function createDailyIngestionQueryExecutor(
   client: PgLikeClient,
   options: { retryAttempts?: number; retryBaseDelayMs?: number } = {}
@@ -4696,6 +4785,9 @@ async function runDailyIngestionConnector(input: {
   fetchImpl?: typeof fetch;
   retryAttempts: number;
   retryBaseDelayMs: number;
+  zeroRowAlertLogPath: string;
+  zeroRowAlertStatePath: string;
+  zeroRowAlertWebhookUrl?: string;
 }): Promise<DailyConnectorRunPersistenceResult> {
   const { executor, config, requestedAt, fetchImpl, retryAttempts, retryBaseDelayMs } = input;
   const runConfig = { ...config, requestedAt };
@@ -4750,6 +4842,14 @@ async function runDailyIngestionConnector(input: {
     }
 
     if (result.acceptedCount === 0) {
+      await maybeEmitZeroRowConnectorAlert({
+        config,
+        requestedAt,
+        fetchImpl,
+        logPath: input.zeroRowAlertLogPath,
+        statePath: input.zeroRowAlertStatePath,
+        webhookUrl: input.zeroRowAlertWebhookUrl
+      });
       return {
         blockers: [`${config.chainId}:no_accepted_products`],
         persistedRuns: 0,
@@ -4760,6 +4860,7 @@ async function runDailyIngestionConnector(input: {
         observationIds: []
       };
     }
+    clearZeroRowConnectorState(config, input.zeroRowAlertStatePath);
 
     const storeScopeBlockers = validateStoreScopedConnectorOutput(runConfig, result);
     const storeCoverageBlockers = storeScopeBlockers.length === 0
@@ -4846,7 +4947,10 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
         config,
         fetchImpl: input.fetchImpl,
         retryAttempts,
-        retryBaseDelayMs
+        retryBaseDelayMs,
+        zeroRowAlertLogPath: input.zeroRowAlertLogPath ?? DEFAULT_DAILY_ZERO_ROW_ALERT_LOG_PATH,
+        zeroRowAlertStatePath: input.zeroRowAlertStatePath ?? DEFAULT_DAILY_ZERO_ROW_ALERT_STATE_PATH,
+        zeroRowAlertWebhookUrl: input.zeroRowAlertWebhookUrl
       });
     }
   }
