@@ -2,7 +2,7 @@ import { calculateChainPriceIndex } from '@groceryview/core';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { SavedViewActions } from '@/components/saved-view-actions';
 import { StoreDistanceCard } from '@/components/StoreDistanceCard';
-import { StoreMap } from '@/components/store-map';
+import { StoreMap, type BranchDistrictHeatOverlayPoint } from '@/components/store-map';
 import { buildChainPriceObservations } from '@/lib/chain-index-data';
 import { basketCostHeatmap } from '@/lib/map-basket-cost-heatmap';
 import { buildStoreInventoryConfidence } from '@/lib/osm-stores';
@@ -18,7 +18,7 @@ const chainIndexSummary = calculateChainPriceIndex(buildChainPriceObservations()
 const chainIndexByBrand = new Map(chainIndexSummary.chains.map((chain) => [chain.chainId.toLowerCase(), chain]));
 const cheapestChainNearMe = chainIndexSummary.chains[0];
 const cheapestBranchNearMe = storePricePercentileRanks[0] ?? null;
-const districtHeatOverlay = buildDistrictHeatOverlay();
+const branchDistrictHeatOverlay = buildBranchDistrictHeatOverlay();
 const regionalPriceStatisticsGate = buildRegionalPriceStatisticsGate();
 const routeAwareNearestStorePlan = buildStoreDistanceCompare(
   'makaroner-pasta-101302991-st,havregryn-extra-fylliga-101758934-st,svensk-honung-101550069-st',
@@ -70,44 +70,74 @@ function markerTone(index?: number) {
   return 'border-amber-300 bg-amber-50 text-amber-950';
 }
 
-function heatTone(index: number) {
-  if (index < 96) return 'bg-emerald-100 text-emerald-950';
-  if (index > 104) return 'bg-rose-100 text-rose-950';
-  return 'bg-amber-100 text-amber-950';
-}
-
 function basketHeatTone(tone: string) {
   if (tone === 'cool') return 'border-emerald-200 bg-emerald-50 text-emerald-950';
   if (tone === 'hot') return 'border-rose-200 bg-rose-50 text-rose-950';
   return 'border-amber-200 bg-amber-50 text-amber-950';
 }
 
-function buildDistrictHeatOverlay() {
-  const districts = new Map<string, { totalStores: number; coveredStores: number; indexTotal: number; chains: Set<string> }>();
-  for (const store of storeUniverse) {
-    const district = store.district || store.city || 'Unknown district';
-    const current = districts.get(district) ?? { totalStores: 0, coveredStores: 0, indexTotal: 0, chains: new Set<string>() };
-    current.totalStores += 1;
-    const chain = chainIndexByBrand.get(normaliseBrand(store.brand));
-    if (chain) {
-      current.coveredStores += 1;
-      current.indexTotal += chain.overallIndex;
-      current.chains.add(chain.chainId);
-    }
-    districts.set(district, current);
+function branchHeatTone(index: number) {
+  if (index < 88) return 'border-emerald-200 bg-emerald-50 text-emerald-950';
+  if (index > 94) return 'border-rose-200 bg-rose-50 text-rose-950';
+  return 'border-amber-200 bg-amber-50 text-amber-950';
+}
+
+function branchHeatColor(index: number) {
+  if (index < 88) return '#1D8649';
+  if (index > 94) return '#D94F3D';
+  return '#F59E0B';
+}
+
+function buildBranchDistrictHeatOverlay(): BranchDistrictHeatOverlayPoint[] {
+  const rows = new Map<string, {
+    indexTotal: number;
+    latTotal: number;
+    lngTotal: number;
+    observationCount: number;
+    regularPriceObservationCount: number;
+    sourceStores: Set<string>;
+  }>();
+
+  for (const rank of storePricePercentileRanks) {
+    const store = storeUniverse.find((candidate) => candidate.slug === rank.osmSlug);
+    if (!store || !Number.isFinite(store.lat) || !Number.isFinite(store.lng)) continue;
+    const district = store.district || rank.kommun || store.city || 'District not reported';
+    const current = rows.get(district) ?? {
+      indexTotal: 0,
+      latTotal: 0,
+      lngTotal: 0,
+      observationCount: 0,
+      regularPriceObservationCount: 0,
+      sourceStores: new Set<string>()
+    };
+    current.indexTotal += rank.averageRelativeIndex;
+    current.latTotal += store.lat;
+    current.lngTotal += store.lng;
+    current.observationCount += rank.matchedPerBranchObservationCount;
+    current.regularPriceObservationCount += rank.regularPriceObservationCount;
+    current.sourceStores.add(rank.osmSlug);
+    rows.set(district, current);
   }
 
-  return [...districts.entries()]
-    .map(([district, row]) => ({
-      district,
-      totalStores: row.totalStores,
-      coveredStores: row.coveredStores,
-      averageIndex: row.coveredStores > 0 ? row.indexTotal / row.coveredStores : 100,
-      chainCount: row.chains.size,
-      coverageShare: row.totalStores > 0 ? row.coveredStores / row.totalStores : 0
-    }))
-    .filter((row) => row.coveredStores > 0)
-    .sort((a, b) => a.averageIndex - b.averageIndex || b.coveredStores - a.coveredStores)
+  return [...rows.entries()]
+    .map(([district, row]) => {
+      const storeCount = row.sourceStores.size;
+      const averageRelativeIndex = row.indexTotal / Math.max(1, storeCount);
+      return {
+        district,
+        lng: row.lngTotal / Math.max(1, storeCount),
+        lat: row.latTotal / Math.max(1, storeCount),
+        storeCount,
+        observationCount: row.observationCount,
+        regularPriceObservationCount: row.regularPriceObservationCount,
+        averageRelativeIndex,
+        coverageLabel: `${storeCount.toLocaleString('sv-SE')} Lidl branch store(s), ${row.observationCount.toLocaleString('sv-SE')} public offer rows, ${row.regularPriceObservationCount.toLocaleString('sv-SE')} regular-price baselines`,
+        staleWarning: 'Stale-data warning: branch heat uses the latest static Lidl public offer ingestion and must be refreshed before treating it as current shelf price.',
+        heatColor: branchHeatColor(averageRelativeIndex)
+      };
+    })
+    .filter((row) => row.storeCount > 0 && row.regularPriceObservationCount > 0)
+    .sort((a, b) => a.averageRelativeIndex - b.averageRelativeIndex || b.observationCount - a.observationCount)
     .slice(0, 12);
 }
 
@@ -192,7 +222,11 @@ export default function MapPage() {
           </div>
         </div>
         <div className="h-[620px] overflow-hidden border-t border-white/10 bg-slate-900">
-          <StoreMap nearbyDealRecommendations={nearbyDealRecommendations} routeRecommendations={topRouteSavingsHints.slice(0, 3)} />
+          <StoreMap
+            branchDistrictHeatOverlay={branchDistrictHeatOverlay}
+            nearbyDealRecommendations={nearbyDealRecommendations}
+            routeRecommendations={topRouteSavingsHints.slice(0, 3)}
+          />
         </div>
       </Card>
 
@@ -364,27 +398,33 @@ export default function MapPage() {
       <Card className="mt-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-black">District price heat overlay</h2>
+            <h2 className="text-2xl font-black">District price heat overlay from branch offers</h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
-              District heat uses OSM store districts plus each store brand's chain-index proxy. It is not a branch-price claim; districts with missing chain coverage are excluded from the ranked overlay.
+              District heat uses matched per-branch Lidl public offer rows with regular-price baselines. It does not infer neighborhood prices for other chains, products, or stores without matching branch observations.
             </p>
           </div>
-          <p className="rounded-full bg-slate-100 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-slate-700">chain-index proxy</p>
+          <p className="rounded-full bg-slate-100 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-slate-700">per-branch Lidl offers</p>
         </div>
         <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {districtHeatOverlay.map((district) => (
-            <div className={`rounded-2xl p-4 ${heatTone(district.averageIndex)}`} key={district.district}>
+          {branchDistrictHeatOverlay.map((district) => (
+            <div className={`rounded-2xl border p-4 ${branchHeatTone(district.averageRelativeIndex)}`} key={district.district}>
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="font-black">{district.district}</p>
-                  <p className="mt-1 text-sm font-semibold opacity-80">{district.coveredStores} of {district.totalStores} stores covered · {district.chainCount} chains</p>
+                  <p className="mt-1 text-sm font-semibold opacity-80">{district.storeCount} matched branch store(s) · {district.observationCount.toLocaleString('sv-SE')} offer rows</p>
                 </div>
-                <p className="text-3xl font-black">{district.averageIndex.toFixed(1)}</p>
+                <p className="text-3xl font-black">{district.averageRelativeIndex.toFixed(1)}</p>
               </div>
-              <p className="mt-3 text-xs font-semibold opacity-80">Coverage {formatPct(district.coverageShare * 100)} of OSM stores in district.</p>
+              <p className="mt-3 text-xs font-semibold opacity-80">{district.coverageLabel}</p>
+              <p className="mt-2 rounded-xl bg-white/70 p-2 text-xs font-bold leading-5 opacity-80">{district.staleWarning}</p>
             </div>
           ))}
         </div>
+        {branchDistrictHeatOverlay.length === 0 ? (
+          <p className="mt-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm font-semibold text-slate-700">
+            No district heat is rendered until branch-level offer rows can be matched to OSM store coordinates and regular-price baselines.
+          </p>
+        ) : null}
       </Card>
 
       <Card className="mt-6 border-fuchsia-200 bg-fuchsia-50">

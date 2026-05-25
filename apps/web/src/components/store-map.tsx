@@ -15,6 +15,18 @@ const MAP_STYLE = 'https://tiles.openfreemap.org/styles/bright';
 const STOCKHOLM: [number, number] = [18.0686, 59.3293];
 
 type ChainColor = { match: RegExp; label: string; color: string };
+export type BranchDistrictHeatOverlayPoint = {
+  district: string;
+  lng: number;
+  lat: number;
+  storeCount: number;
+  observationCount: number;
+  regularPriceObservationCount: number;
+  averageRelativeIndex: number;
+  coverageLabel: string;
+  staleWarning: string;
+  heatColor: string;
+};
 
 // Distinct hue per Swedish grocery chain family so markers read at a glance.
 const CHAIN_COLORS: ChainColor[] = [
@@ -64,12 +76,6 @@ function chainIndexLabel(store: OsmStore): string {
   if (score < 96) return `Index ${score.toFixed(1)} · cheaper chain signal`;
   if (score > 103) return `Index ${score.toFixed(1)} · higher-price chain signal`;
   return `Index ${score.toFixed(1)} · market band`;
-}
-
-function districtHeatColor(score: number): string {
-  if (score < 96) return '#1D8649';
-  if (score <= 103) return '#F59E0B';
-  return '#D94F3D';
 }
 
 function escapeHtml(value: string): string {
@@ -128,49 +134,37 @@ function toFeatureCollection(): GeoJSON.FeatureCollection<GeoJSON.Point> {
   };
 }
 
-function districtHeatCollection(): GeoJSON.FeatureCollection<GeoJSON.Point> {
-  const byDistrict = new Map<string, { lng: number; lat: number; count: number; scoreSum: number; scored: number }>();
-  for (const store of osmStores) {
-    if (!Number.isFinite(store.lat) || !Number.isFinite(store.lng)) continue;
-    const district = store.district || store.city || 'Stockholm';
-    const score = chainIndexScore(store.brand || '');
-    const current = byDistrict.get(district) ?? { lng: 0, lat: 0, count: 0, scoreSum: 0, scored: 0 };
-    current.lng += store.lng;
-    current.lat += store.lat;
-    current.count += 1;
-    if (score != null) {
-      current.scoreSum += score;
-      current.scored += 1;
-    }
-    byDistrict.set(district, current);
-  }
-
+function districtHeatCollection(branchDistrictHeatOverlay: BranchDistrictHeatOverlayPoint[] = []): GeoJSON.FeatureCollection<GeoJSON.Point> {
   return {
     type: 'FeatureCollection',
-    features: [...byDistrict.entries()]
-      .filter(([, value]) => value.scored > 0)
-      .map(([district, value]) => {
-        const averageScore = value.scoreSum / value.scored;
-        return {
-          type: 'Feature',
-          geometry: { type: 'Point', coordinates: [value.lng / value.count, value.lat / value.count] },
-          properties: {
-            district,
-            storeCount: value.count,
-            averageScore,
-            heatColor: districtHeatColor(averageScore),
-          },
-        };
-      }),
+    features: branchDistrictHeatOverlay.map((row) => ({
+      type: 'Feature',
+      geometry: { type: 'Point', coordinates: [row.lng, row.lat] },
+      properties: {
+        district: row.district,
+        storeCount: row.storeCount,
+        observationCount: row.observationCount,
+        regularPriceObservationCount: row.regularPriceObservationCount,
+        averageScore: row.averageRelativeIndex,
+        coverageLabel: row.coverageLabel,
+        staleWarning: row.staleWarning,
+        heatColor: row.heatColor,
+      },
+    })),
   };
 }
 
 type RouteSavingsMapRow = StoreDistanceRow & { expectedBasketSavingsSek?: number };
 
 export function StoreMap({
+  branchDistrictHeatOverlay = [],
   nearbyDealRecommendations = [],
   routeRecommendations = []
-}: Readonly<{ nearbyDealRecommendations?: NearbyDealRecommendation[]; routeRecommendations?: RouteSavingsMapRow[] }>) {
+}: Readonly<{
+  branchDistrictHeatOverlay?: BranchDistrictHeatOverlayPoint[];
+  nearbyDealRecommendations?: NearbyDealRecommendation[];
+  routeRecommendations?: RouteSavingsMapRow[];
+}>) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const [storeCount, setStoreCount] = useState(0);
@@ -267,7 +261,7 @@ export function StoreMap({
     map.on('load', () => {
       map.addSource('district-heat', {
         type: 'geojson',
-        data: districtHeatCollection(),
+        data: districtHeatCollection(branchDistrictHeatOverlay),
       });
       map.addLayer({
         id: 'district-heat',
@@ -279,6 +273,25 @@ export function StoreMap({
           'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 24, 12, 72, 15, 130],
           'circle-blur': 0.7,
         },
+      });
+
+      map.on('click', 'district-heat', (e) => {
+        const feature = e.features?.[0];
+        if (!feature) return;
+        const p = feature.properties as Record<string, string | number | undefined>;
+        const [lng, lat] = (feature.geometry as GeoJSON.Point).coordinates;
+        popup
+          .setLngLat([lng, lat])
+          .setHTML(
+            `<div style="font-family:inherit;min-width:220px">
+              <strong style="font-size:14px">${escapeHtml(String(p.district ?? 'District'))}</strong>
+              <div style="font-size:12px;color:#475569;margin-top:4px">Relative branch-offer index ${Number(p.averageScore ?? 0).toFixed(1)} (lower is cheaper)</div>
+              <div style="font-size:12px;color:#475569;margin-top:2px">${Number(p.storeCount ?? 0).toLocaleString()} matched branch store(s) · ${Number(p.observationCount ?? 0).toLocaleString()} offer rows</div>
+              <div style="font-size:12px;color:#475569;margin-top:2px">${escapeHtml(String(p.coverageLabel ?? 'Coverage not reported'))}</div>
+              <div style="font-size:12px;color:#92400e;margin-top:6px">${escapeHtml(String(p.staleWarning ?? 'Freshness warning not reported'))}</div>
+            </div>`,
+          )
+          .addTo(map);
       });
 
       map.addSource('stores', {
@@ -412,7 +425,7 @@ export function StoreMap({
           .addTo(map);
       });
 
-      for (const layer of ['clusters', 'store-points']) {
+      for (const layer of ['clusters', 'store-points', 'district-heat']) {
         map.on('mouseenter', layer, () => (map.getCanvas().style.cursor = 'pointer'));
         map.on('mouseleave', layer, () => (map.getCanvas().style.cursor = ''));
       }
@@ -423,7 +436,7 @@ export function StoreMap({
       mapRef.current = null;
       map.remove();
     };
-  }, []);
+  }, [branchDistrictHeatOverlay]);
 
   return (
     <div className="relative h-full w-full">
@@ -446,6 +459,11 @@ export function StoreMap({
             <span className="text-market-ink/70">Other</span>
           </li>
         </ul>
+        <div className="mt-2 border-t border-market-ink/10 pt-2 text-market-ink/70">
+          <div className="font-bold uppercase tracking-wide text-market-ink/55">District branch heat</div>
+          <div>{branchDistrictHeatOverlay.length > 0 ? `${branchDistrictHeatOverlay.length} districts from branch offers` : 'Awaiting branch observations'}</div>
+          <div className="mt-1">Green lower · amber market band · red higher</div>
+        </div>
         <div className="mt-2 border-t border-market-ink/10 pt-2 text-market-ink/70">
           <div className="font-bold uppercase tracking-wide text-market-ink/55">Cheapest chain near me</div>
           <div>{cheapestMapChain ? `${cheapestMapChain.chainId} · index ${cheapestMapChain.overallIndex.toFixed(1)}` : 'Awaiting index coverage'}</div>
