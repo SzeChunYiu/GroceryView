@@ -11,14 +11,14 @@ import { VirtualizedProductGrid } from '@/components/LazyItemCard';
 import { apohemSource } from '@/lib/ingested/apohem';
 import { buildSavedSearchSubscription } from '@/lib/alert-scheduler';
 import { adaptiveProductCards, buildProductSearchView, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
-import { publicCatalogueRevalidateSeconds, routeMetadata } from '@/lib/seo';
+import { routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
 import { buildRemovableSearchFilterChips } from '@/lib/search-filters';
 import { buildSearchFilterPreset } from '@/lib/search-presets';
 
 const PRODUCTS_PER_PAGE = 50;
 
-export const revalidate = publicCatalogueRevalidateSeconds;
+export const revalidate = 300;
 
 export function generateMetadata() {
   return routeMetadata('/products');
@@ -140,7 +140,8 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const pageStart = (currentPage - 1) * PRODUCTS_PER_PAGE;
   const rangeStart = resultCards.length === 0 ? 0 : pageStart + 1;
   const rangeEnd = Math.min(pageStart + PRODUCTS_PER_PAGE, resultCards.length);
-  const virtualizedResultLabel = `Virtualized product results, ${resultCards.length.toLocaleString('sv-SE')} matches`;
+  const pagedResultCards = resultCards.slice(pageStart, rangeEnd);
+  const virtualizedResultLabel = `Virtualized product results, ${rangeStart.toLocaleString('sv-SE')}–${rangeEnd.toLocaleString('sv-SE')} of ${resultCards.length.toLocaleString('sv-SE')} matches`;
   const defaultSearchCount = facetedProductSearch.resultCards.length;
   const zeroResultFallback = relatedSearchFallback(search.query);
   const zeroResultCategories = zeroResultCategoryShortcuts(search.query, resolvedSearchParams.category);
