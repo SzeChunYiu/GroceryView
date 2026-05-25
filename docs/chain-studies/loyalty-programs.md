@@ -1,0 +1,22 @@
+# Loyalty-program enrollment URLs and shopper trade-offs
+
+Last checked: 2026-05-25. Scope is Swedish grocery chains and grocery-adjacent pharmacy chains currently useful for GroceryView account/loyalty UI planning.
+
+| Chain | Program | Enrollment URL | Cost | What shoppers get | Data shoppers give up / operational notes |
+| --- | --- | --- | --- | --- | --- |
+| ICA | Stammis | https://www.ica.se/stammis/ | Free for base Stammis; paid ICA bank/card products are optional add-ons | Stammis prices, personal offers, points/bonus, shared Stammis household, app shopping lists/receipts, partner benefits via ICA Banken/Försäkring and Apotek Hjärtat | Swedish identity/login flow; purchase history, linked payment/card identifiers when connected, household sharing choices, contact details, app/list activity, and consent choices for personalized offers |
+| Coop | Coop Medlem | https://www.coop.se/medlem/bli-medlem/ | 100 SEK refundable member stake | Member prices, bonus points, partner offers, local consumer-coop ownership, welcome gift | Swedish identity/address or in-store registration path; purchase history, contact details, selected bonus payout method, partner-offer interactions |
+| Willys | Willys Plus | https://www.willys.se/Om-oss/willysplus/Willysappen | Free | Plus prices/offers, value checks, digital receipts, app account, self-scanning where available, linked card/Swish discount application | Personal identity/contact details; purchase history; linked card/Swish tokens if connected in store; marketing preferences; app and self-scanning usage |
+| Hemköp | Klubb Hemköp | https://www.hemkop.se/registrera/privat/identifiera | Free | Points and bonus checks, welcome points, personal offers, club days, weekly club prices, digital receipts, recipes/inspiration | Swedish personal-number/BankID style onboarding; purchase history; digital receipt history; contact details; personalization/marketing preferences |
+| City Gross | City Gross PRIO | https://www.citygross.se/om-city-gross/att-vara-formanskund | Free | PRIO prices, personal 5%/10% coupons when criteria are met, app PRIO card, digital receipts, self-scanning, online ordering, partner offers | Account/contact details; purchase and coupon history; app/self-scanning activity; household-shopping assumptions; partner-offer engagement |
+| Lidl | Lidl Plus | https://www.lidl.se/c/lidl-plus/s10017033 | Free; shopper pays own data/connection costs | App-only coupons, Lidl Plus prices, digital card/receipts, partner offers, Lidl Pay/Charge features where enabled | App account, verified mobile number, purchase and app behavior, coupon activation/redemption, device/app telemetry, payment/charge data where enabled, personalization consent state |
+| Apotek Hjärtat | Klubb Hjärtat | https://www.apotekhjartat.se/klubb-hjartat | Free | Bonus, member offers, student/senior discounts, early access to sales, bonus links with ICA e-commerce where applicable | Health-adjacent purchase history and consent choices, BankID/login identity, contact details, bonus consent, sensitive-product handling constraints |
+| Apoteket | Apoteket+ / Apotekets kundklubb | https://www.apoteket.se/kundklubb-registrering/ | Free | Bonus, member prices/offers, senior discounts, digital channels and pharmacy account benefits | BankID/Freja+ identity, contact details, purchase history; special consent requirements for OTC/sensitive health and sex-health products before benefits apply |
+| Mathem | Mathem account / referral coupons | https://www.mathem.se/se/user/signup/ | Free account; delivery/service fees are order-specific rather than loyalty-program dues | Saved delivery/order account, invitation/referral coupons when eligible, personalized e-commerce experience | Account/contact and delivery-address data, order history, referral-link activity, payment/delivery preferences; no standalone points club found |
+
+## UI implementation notes
+
+- Treat `cost` as a display string, not a boolean: Coop has a refundable stake, ICA has free base membership plus optional paid card products, and Mathem is an account/referral program rather than a classic points club.
+- Show a privacy tooltip before connect: pharmacy programs and grocery programs can expose sensitive basket patterns.
+- Keep a per-chain `lastVerifiedAt` field so stale enrollment URLs can be rechecked before launch.
+- Do not infer eligibility from URL alone: BankID, Swedish personal-number, age, app, store, or country-of-residence requirements vary by program.
