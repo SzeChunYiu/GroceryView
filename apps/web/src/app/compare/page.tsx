@@ -7,7 +7,7 @@ import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTermin
 import { SavedViewActions } from '@/components/saved-view-actions';
 import { StoreComparisonTable } from '@/components/StoreComparisonTable';
 import { StorePriceMatrix } from '@/components/store-price-matrix';
-import { COMPARE_CHAIN_ORDER, buildBasketStoreComparison, buildChainComparisonTable, parseCompareChainsParam } from '@/lib/chain-compare';
+import { COMPARE_CHAIN_ORDER, buildBasketStoreComparison, buildChainComparisonTable, parseCompareChainsParam, type ChainCompareProductRow } from '@/lib/chain-compare';
 import { fetchComparePriceSnapshots, type ComparePriceSnapshotStoreRow } from '@/lib/compare-price-snapshots';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, commodityComparisons, compareOverlayChart, formatPct, formatSek, matchedChainProducts, privateLabelDupeFinder } from '@/lib/verified-data';
@@ -28,23 +28,62 @@ function formatComparableUnitPrice(value: number | null | undefined, unitLabel: 
 
 type SearchParams = {
   chains?: string | string[];
+  coupon?: string | string[];
+  delivery?: string | string[];
   overlayMode?: string | string[];
+  pickup?: string | string[];
   products?: string | string[];
   routeMode?: string | string[];
 };
+
+type StoreCapabilityFilter = 'coupon' | 'delivery' | 'pickup';
+
+const storeCapabilityFilters: Array<{ id: StoreCapabilityFilter; label: string; description: string }> = [
+  { id: 'coupon', label: 'Coupons', description: 'Only show selected stores with available coupon or offer evidence.' },
+  { id: 'delivery', label: 'Home delivery', description: 'Only show selected stores with online home-delivery evidence.' },
+  { id: 'pickup', label: 'Pickup', description: 'Only show selected stores with pickup or store-fulfilment evidence.' }
+];
 
 function firstSearchValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] ?? '' : value ?? '';
 }
 
-function overlayModeHref(productsParam: string | string[] | undefined, chainsParam: string | string[] | undefined, overlayMode: 'price' | 'index') {
+function searchFlagEnabled(value: string | string[] | undefined) {
+  const normalized = firstSearchValue(value).trim().toLowerCase();
+  return normalized === '1' || normalized === 'true' || normalized === 'yes' || normalized === 'on';
+}
+
+function activeStoreCapabilityFilters(searchParams: SearchParams): StoreCapabilityFilter[] {
+  return storeCapabilityFilters
+    .map((filter) => filter.id)
+    .filter((filter) => searchFlagEnabled(searchParams[filter]));
+}
+
+function appendStoreCapabilityFilters(params: URLSearchParams, searchParams: SearchParams, override?: { filter: StoreCapabilityFilter; enabled: boolean }) {
+  for (const filter of storeCapabilityFilters) {
+    const enabled = override?.filter === filter.id ? override.enabled : searchFlagEnabled(searchParams[filter.id]);
+    if (enabled) params.set(filter.id, '1');
+  }
+}
+
+function filteredCompareHref(searchParams: SearchParams, override: { chains?: string; overlayMode?: 'price' | 'index'; routeMode?: string; storeFilter?: StoreCapabilityFilter }) {
   const params = new URLSearchParams();
-  const products = firstSearchValue(productsParam);
-  const chains = firstSearchValue(chainsParam);
+  const products = firstSearchValue(searchParams.products);
+  const chains = override.chains ?? firstSearchValue(searchParams.chains);
+  const routeMode = override.routeMode ?? firstSearchValue(searchParams.routeMode);
+  const nextOverlayMode = override.overlayMode ?? (firstSearchValue(searchParams.overlayMode) === 'index' ? 'index' : 'price');
   if (products) params.set('products', products);
   if (chains) params.set('chains', chains);
-  if (overlayMode === 'index') params.set('overlayMode', 'index');
+  if (nextOverlayMode === 'index') params.set('overlayMode', 'index');
+  if (routeMode) params.set('routeMode', routeMode);
+  appendStoreCapabilityFilters(params, searchParams, override.storeFilter
+    ? { filter: override.storeFilter, enabled: !searchFlagEnabled(searchParams[override.storeFilter]) }
+    : undefined);
   return `/compare${params.toString() ? `?${params.toString()}` : ''}`;
+}
+
+function overlayModeHref(searchParams: SearchParams, overlayMode: 'price' | 'index') {
+  return filteredCompareHref(searchParams, { overlayMode });
 }
 
 function overlayWindow(
@@ -113,13 +152,23 @@ function overlayTerminalModel(overlayMode: 'price' | 'index'): PriceChartTermina
   };
 }
 
-function compareHref(productsParam: string | string[] | undefined, selectedChainIds: string[]) {
-  const params = new URLSearchParams();
-  const products = Array.isArray(productsParam) ? productsParam[0] : productsParam;
-  if (products) params.set('products', products);
-  if (selectedChainIds.length < COMPARE_CHAIN_ORDER.length) params.set('chains', selectedChainIds.join(','));
-  const query = params.toString();
-  return `/compare${query ? `?${query}` : ''}`;
+function compareHref(searchParams: SearchParams, selectedChainIds: string[]) {
+  return filteredCompareHref(searchParams, {
+    chains: selectedChainIds.length < COMPARE_CHAIN_ORDER.length ? selectedChainIds.join(',') : ''
+  });
+}
+
+function bestVisiblePrice(product: ChainCompareProductRow, selectedChainIds: string[]) {
+  const selectedChainSet = new Set(selectedChainIds);
+  const bestCell = product.cells
+    .filter((cell) => selectedChainSet.has(cell.chainId))
+    .filter((cell) => cell.status === 'priced' && cell.price !== null)
+    .sort((left, right) => (left.price ?? Number.POSITIVE_INFINITY) - (right.price ?? Number.POSITIVE_INFINITY))[0];
+
+  return {
+    chainName: bestCell?.chainName ?? 'Awaiting selected store row',
+    priceText: bestCell?.priceText ?? 'No selected store price yet'
+  };
 }
 
 function endpointSnapshotMatrix(snapshotRows: ComparePriceSnapshotStoreRow[], requestedItemIds: string[]) {
@@ -161,9 +210,25 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
   const endpointMatrix = endpointSnapshotMatrix(compareSnapshots.storeRows, compareSnapshots.itemIds);
   const overlayMode = firstSearchValue(resolvedSearchParams.overlayMode) === 'index' ? 'index' as const : 'price' as const;
   const overlayChartModel = overlayTerminalModel(overlayMode);
-  const comparison = buildChainComparisonTable(hasEndpointRequestedItems ? undefined : productsParam);
-  const selectedChainIds = parseCompareChainsParam(resolvedSearchParams.chains);
-  const basketStoreComparison = buildBasketStoreComparison(productsParam, resolvedSearchParams.chains);
+  const baseComparison = buildChainComparisonTable(hasEndpointRequestedItems ? undefined : productsParam);
+  const selectedStoreCapabilityFilters = activeStoreCapabilityFilters(resolvedSearchParams);
+  const requestedChainIds = parseCompareChainsParam(resolvedSearchParams.chains);
+  const selectedChainIds = requestedChainIds.filter((chainId) => {
+    const capability = baseComparison.noChainState.capabilities.find((item) => item.chainId === chainId);
+    return selectedStoreCapabilityFilters.every((filter) => capability?.[filter] === true);
+  });
+  const visibleChains = COMPARE_CHAIN_ORDER.filter((chain) => selectedChainIds.includes(chain.id));
+  const comparison = buildChainComparisonTable(hasEndpointRequestedItems ? undefined : productsParam, undefined, { activeFilters: selectedChainIds });
+  const basketStoreComparison = selectedChainIds.length > 0
+    ? buildBasketStoreComparison(productsParam, selectedChainIds.join(','))
+    : {
+      requestedIds: comparison.requestedIds,
+      selectedChainIds,
+      itemCount: comparison.products.length + comparison.missingProductIds.length,
+      stores: [],
+      sourceLabel: comparison.sourceLabel,
+      summary: 'No selected store matches every active coupon, delivery, and pickup filter. Clear a store option to compare basket totals again.'
+    };
   const cheapestBasketStore = basketStoreComparison.stores.find((store) => store.highlightLabels.includes('Cheapest'));
   const closestBasketStore = basketStoreComparison.stores.find((store) => store.highlightLabels.includes('Closest'));
   const bestStockedBasketStore = basketStoreComparison.stores.find((store) => store.highlightLabels.includes('Best stocked'));
@@ -173,19 +238,19 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
   const sampleProductsHref = '/compare?products=makaroner-pasta-101302991-st,havregryn-extra-fylliga-101758934-st';
   const chainSelectorOptions = COMPARE_CHAIN_ORDER.map((chain) => ({
     href: compareHref(
-      productsParam,
-      selectedChainIds.includes(chain.id)
-        ? selectedChainIds.length === 1
-          ? selectedChainIds
-          : selectedChainIds.filter((chainId) => chainId !== chain.id)
-        : [...selectedChainIds, chain.id]
+      resolvedSearchParams,
+      requestedChainIds.includes(chain.id)
+        ? requestedChainIds.length === 1
+          ? requestedChainIds
+          : requestedChainIds.filter((chainId) => chainId !== chain.id)
+        : [...requestedChainIds, chain.id]
     ),
     id: chain.id,
     label: chain.label,
-    description: selectedChainIds.includes(chain.id)
+    description: requestedChainIds.includes(chain.id)
       ? 'Shown in the side-by-side basket comparison.'
       : 'Add this chain to the side-by-side basket comparison.',
-    selected: selectedChainIds.includes(chain.id)
+    selected: requestedChainIds.includes(chain.id)
   }));
   const rowSections = [
     {
@@ -206,7 +271,16 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
   if (firstSearchValue(resolvedSearchParams.chains)) currentCompareParams.set('chains', firstSearchValue(resolvedSearchParams.chains));
   if (overlayMode === 'index') currentCompareParams.set('overlayMode', 'index');
   if (firstSearchValue(resolvedSearchParams.routeMode)) currentCompareParams.set('routeMode', firstSearchValue(resolvedSearchParams.routeMode));
+  appendStoreCapabilityFilters(currentCompareParams, resolvedSearchParams);
   const currentCompareHref = `/compare${currentCompareParams.toString() ? `?${currentCompareParams.toString()}` : ''}`;
+  const storeCapabilityOptions = storeCapabilityFilters.map((filter) => ({
+    href: filteredCompareHref(resolvedSearchParams, { storeFilter: filter.id }),
+    id: filter.id,
+    label: filter.label,
+    description: filter.description,
+    selected: selectedStoreCapabilityFilters.includes(filter.id)
+  }));
+  const noSelectedStoresMatch = selectedStoreCapabilityFilters.length > 0 && selectedChainIds.length === 0;
 
   return (
     <PageShell>
@@ -217,8 +291,8 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
       <SavedViewActions
         href={currentCompareHref}
         label="Comparable chain price view"
-        resultLabel={`${comparison.products.length || endpointMatrix.products.length} comparison rows · overlay ${overlayMode} · missing rows labelled`}
-        state={{ chains: firstSearchValue(resolvedSearchParams.chains) || 'all', overlayMode, products: firstSearchValue(productsParam), routeMode: firstSearchValue(resolvedSearchParams.routeMode), view: 'chain-compare' }}
+        resultLabel={`${comparison.products.length || endpointMatrix.products.length} comparison rows · overlay ${overlayMode} · ${selectedStoreCapabilityFilters.length} store filter(s) · missing rows labelled`}
+        state={{ chains: firstSearchValue(resolvedSearchParams.chains) || 'all', overlayMode, products: firstSearchValue(productsParam), routeMode: firstSearchValue(resolvedSearchParams.routeMode), storeFilters: selectedStoreCapabilityFilters.join(',') || 'none', view: 'chain-compare' }}
         surface="compare"
       />
       <Card className="mt-6 overflow-hidden border-emerald-200 bg-gradient-to-br from-white via-emerald-50 to-sky-50">
@@ -237,6 +311,12 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
               description="All supported chains stay selected so the existing ?products= query string continues to drive the comparison table."
               label="Compare chains"
               options={chainSelectorOptions}
+            />
+            <ChainSelector
+              className="rounded-3xl border border-sky-100 bg-white/80 p-4 shadow-sm"
+              description="Filter the selected stores by available checkout options before comparing prices or basket totals."
+              label="Store options"
+              options={storeCapabilityOptions}
             />
             <Link className="justify-self-start rounded-full bg-emerald-900 px-4 py-2 text-sm font-black text-white shadow-sm" href={sampleProductsHref}>
               Try sample products
@@ -261,13 +341,25 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
               ) : null}
             </div>
           ) : null}
+          {noSelectedStoresMatch ? (
+            <div className="rounded-3xl border border-amber-200 bg-amber-50 p-5 shadow-sm">
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-800">No selected store match</p>
+              <h3 className="mt-2 text-lg font-black text-amber-950">No chain matches every active store option</h3>
+              <p className="mt-2 text-sm font-semibold leading-6 text-amber-950">
+                Coupon, home delivery, and pickup filters are applied to the currently selected chains only. Clear an option or add another chain to compare checkout-ready stores again.
+              </p>
+              <Link className="mt-3 inline-flex rounded-full bg-amber-900 px-4 py-2 text-sm font-black text-white" href={compareHref({ ...resolvedSearchParams, coupon: undefined, delivery: undefined, pickup: undefined }, requestedChainIds)}>
+                Clear store options
+              </Link>
+            </div>
+          ) : null}
           {!hasEndpointRequestedItems && comparison.products.length === 0 ? (
             <p className="rounded-3xl border border-emerald-100 bg-white p-5 text-sm font-semibold text-slate-600 shadow-sm">
               Add ?products=product-slug-1,product-slug-2 to render DB-backed comparison rows. Missing product ids: {comparison.missingProductIds.join(', ') || 'none yet'}.
             </p>
           ) : null}
-          {!hasEndpointRequestedItems ? <StorePriceMatrix chains={COMPARE_CHAIN_ORDER} products={comparison.products} sourceGeneratedAt={comparison.generatedAt} sourceLabel={comparison.sourceLabel} /> : null}
-          {!hasEndpointRequestedItems ? rowSections.map((section) => (
+          {!hasEndpointRequestedItems && !noSelectedStoresMatch ? <StorePriceMatrix chains={visibleChains} products={comparison.products} sourceGeneratedAt={comparison.generatedAt} sourceLabel={comparison.sourceLabel} /> : null}
+          {!hasEndpointRequestedItems && !noSelectedStoresMatch ? rowSections.map((section) => (
             <div className="overflow-hidden rounded-3xl border border-emerald-100 bg-white shadow-sm" key={section.id}>
               <div className="border-b border-emerald-100 bg-emerald-50 px-4 py-3">
                 <h3 className="text-sm font-black text-emerald-950">{section.title}</h3>
@@ -280,41 +372,45 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
                     <thead className="bg-slate-950 text-white">
                       <tr>
                         <th className="px-4 py-3 font-black">Product</th>
-                        {COMPARE_CHAIN_ORDER.map((chain) => (
+                        {visibleChains.map((chain) => (
                           <th className="px-4 py-3 font-black" key={chain.id}>{chain.label}</th>
                         ))}
                         <th className="px-4 py-3 font-black">Best chain</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {section.rows.map((product) => (
-                        <tr className="border-t border-slate-100 align-top" key={`${section.id}-${product.productSlug}`}>
-                          <th className="px-4 py-4 font-black text-slate-950">
-                            <Link className="underline decoration-emerald-300 underline-offset-4" href={`/products/${product.productSlug}`}>{product.productName}</Link>
-                            <span className="mt-1 block text-xs font-semibold text-slate-500">{product.brand || 'Brand not reported'} · {product.packageLabel}</span>
-                            <span className="mt-2 inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700">{product.matchLabel}</span>
-                            <span className="mt-2 block text-xs font-semibold leading-5 text-slate-500">{product.confidenceLabel}</span>
-                          </th>
-                          {product.cells.map((cell) => (
-                            <td className="px-4 py-4" key={`${product.productSlug}-${cell.chainId}`}>
-                              <p className={cell.status === 'priced' ? 'font-black text-emerald-900' : 'font-black text-slate-400'}>{cell.priceText}</p>
-                              <p className="mt-1 text-xs font-semibold text-slate-500">{cell.unitLabel}</p>
-                              {cell.productSlug ? (
-                                <Link className="mt-2 block text-xs font-black text-emerald-800 underline decoration-emerald-300 underline-offset-4" href={`/products/${cell.productSlug}`}>
-                                  {cell.productName ?? cell.productSlug}
-                                </Link>
-                              ) : null}
-                              {cell.sourceConfidence !== null ? (
-                                <p className="mt-1 text-xs font-semibold text-slate-500">sourceConfidence {formatPct(cell.sourceConfidence * 100)}</p>
-                              ) : null}
+                      {section.rows.map((product) => {
+                        const visibleBestPrice = bestVisiblePrice(product, selectedChainIds);
+
+                        return (
+                          <tr className="border-t border-slate-100 align-top" key={`${section.id}-${product.productSlug}`}>
+                            <th className="px-4 py-4 font-black text-slate-950">
+                              <Link className="underline decoration-emerald-300 underline-offset-4" href={`/products/${product.productSlug}`}>{product.productName}</Link>
+                              <span className="mt-1 block text-xs font-semibold text-slate-500">{product.brand || 'Brand not reported'} · {product.packageLabel}</span>
+                              <span className="mt-2 inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700">{product.matchLabel}</span>
+                              <span className="mt-2 block text-xs font-semibold leading-5 text-slate-500">{product.confidenceLabel}</span>
+                            </th>
+                            {visibleChains.map((chain) => product.cells.find((cell) => cell.chainId === chain.id)).map((cell) => cell ? (
+                              <td className="px-4 py-4" key={`${product.productSlug}-${cell.chainId}`}>
+                                <p className={cell.status === 'priced' ? 'font-black text-emerald-900' : 'font-black text-slate-400'}>{cell.priceText}</p>
+                                <p className="mt-1 text-xs font-semibold text-slate-500">{cell.unitLabel}</p>
+                                {cell.productSlug ? (
+                                  <Link className="mt-2 block text-xs font-black text-emerald-800 underline decoration-emerald-300 underline-offset-4" href={`/products/${cell.productSlug}`}>
+                                    {cell.productName ?? cell.productSlug}
+                                  </Link>
+                                ) : null}
+                                {cell.sourceConfidence !== null ? (
+                                  <p className="mt-1 text-xs font-semibold text-slate-500">sourceConfidence {formatPct(cell.sourceConfidence * 100)}</p>
+                                ) : null}
+                              </td>
+                            ) : null)}
+                            <td className="px-4 py-4">
+                              <p className="rounded-2xl bg-emerald-50 px-3 py-2 font-black text-emerald-950">{visibleBestPrice.chainName}</p>
+                              <p className="mt-1 text-xs font-semibold text-slate-500">{visibleBestPrice.priceText}</p>
                             </td>
-                          ))}
-                          <td className="px-4 py-4">
-                            <p className="rounded-2xl bg-emerald-50 px-3 py-2 font-black text-emerald-950">{product.bestChainName}</p>
-                            <p className="mt-1 text-xs font-semibold text-slate-500">{product.bestPriceText}</p>
-                          </td>
-                        </tr>
-                      ))}
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -379,7 +475,7 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
             {(['walk', 'drive'] as const).map((mode) => (
               <Link
                 className={mode === storeDistance.mode ? 'rounded-full bg-cyan-900 px-4 py-2 text-sm font-black text-white shadow-sm' : 'rounded-full bg-white px-4 py-2 text-sm font-black text-cyan-900 shadow-sm'}
-                href={`/compare?routeMode=${mode}${productsParam ? `&products=${Array.isArray(productsParam) ? productsParam[0] : productsParam}` : ''}`}
+                href={filteredCompareHref(resolvedSearchParams, { routeMode: mode })}
                 key={mode}
               >
                 {mode === 'walk' ? 'Walk time' : 'Drive time'}
@@ -452,10 +548,10 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
         <div className="mt-5 grid gap-3 md:grid-cols-2">
           <div className="md:col-span-2">
             <div className="mb-3 flex flex-wrap gap-2">
-              <Link className={`rounded-full px-4 py-2 text-xs font-black ${overlayMode === 'price' ? 'bg-indigo-900 text-white' : 'bg-white text-indigo-900 ring-1 ring-indigo-200'}`} href={overlayModeHref(productsParam, resolvedSearchParams.chains, 'price')}>
+              <Link className={`rounded-full px-4 py-2 text-xs font-black ${overlayMode === 'price' ? 'bg-indigo-900 text-white' : 'bg-white text-indigo-900 ring-1 ring-indigo-200'}`} href={overlayModeHref(resolvedSearchParams, 'price')}>
                 Price mode
               </Link>
-              <Link className={`rounded-full px-4 py-2 text-xs font-black ${overlayMode === 'index' ? 'bg-indigo-900 text-white' : 'bg-white text-indigo-900 ring-1 ring-indigo-200'}`} href={overlayModeHref(productsParam, resolvedSearchParams.chains, 'index')}>
+              <Link className={`rounded-full px-4 py-2 text-xs font-black ${overlayMode === 'index' ? 'bg-indigo-900 text-white' : 'bg-white text-indigo-900 ring-1 ring-indigo-200'}`} href={overlayModeHref(resolvedSearchParams, 'index')}>
                 Normalized index mode
               </Link>
             </div>
