@@ -4,6 +4,7 @@ import { SavedViewActions } from '@/components/saved-view-actions';
 import { StoreDistanceCard } from '@/components/StoreDistanceCard';
 import { StoreMap } from '@/components/store-map';
 import { buildChainPriceObservations } from '@/lib/chain-index-data';
+import { storeMatchesOperatingHoursFilter, type OperatingHoursFilter } from '@/lib/geolocation';
 import { basketCostHeatmap } from '@/lib/map-basket-cost-heatmap';
 import { buildStoreInventoryConfidence } from '@/lib/osm-stores';
 import { formatPct, storePricePercentileRanks, storeUniverse } from '@/lib/verified-data';
@@ -35,6 +36,17 @@ const topRouteAwareStoreInventory = topRouteSavingsHints.map((store) => {
   const osmStore = osmStoreForRouteStore(store);
   return osmStore ? buildStoreInventoryConfidence(osmStore) : null;
 });
+const operatingHoursFilters: Array<{ href: string; id: OperatingHoursFilter | null; label: string; detail: string }> = [
+  { href: '/map', id: null, label: 'All stores', detail: 'Show every mapped store in the OSM extract.' },
+  { href: '/map?hours=open-now', id: 'open-now', label: 'Open now', detail: 'Map only stores whose OSM hours match the current local time.' },
+  { href: '/map?hours=open-evening', id: 'open-evening', label: 'Open this evening', detail: 'Map stores open around 18:00 or 20:00 today.' },
+  { href: '/map?hours=open-24h', id: 'open-24h', label: '24h', detail: 'Map stores labelled 24/7 or 00:00-24:00.' }
+];
+
+function parseOperatingHoursFilter(value: string | string[] | undefined): OperatingHoursFilter | null {
+  const raw = Array.isArray(value) ? value[0] : value;
+  return raw === 'open-now' || raw === 'open-evening' || raw === 'open-24h' ? raw : null;
+}
 
 function normaliseBrand(brand: string) {
   const lower = brand.toLowerCase();
@@ -158,8 +170,11 @@ function buildRegionalPriceStatisticsGate() {
   };
 }
 
-export default function MapPage() {
-  const visibleStores = storeUniverse.slice(0, 80);
+export default async function MapPage({ searchParams }: Readonly<{ searchParams?: Promise<Record<string, string | string[] | undefined>> }>) {
+  const params = await (searchParams ?? Promise.resolve({}));
+  const selectedHoursFilter = parseOperatingHoursFilter(params.hours);
+  const filteredStores = storeUniverse.filter((store) => storeMatchesOperatingHoursFilter(store, selectedHoursFilter));
+  const visibleStores = filteredStores.slice(0, 80);
   return (
     <PageShell>
       <Eyebrow>Map data</Eyebrow>
@@ -171,10 +186,35 @@ export default function MapPage() {
       <SavedViewActions
         href="/map"
         label="Store map with chain-index overlay"
-        resultLabel={`${visibleStores.length} visible OSM stores · chain-index marker colors · no private location by default`}
-        state={{ overlay: 'chain-index', routeMode: routeAwareNearestStorePlan.mode, sort: 'map-center-distance', view: 'store-map' }}
+        resultLabel={`${visibleStores.length} visible OSM stores · ${selectedHoursFilter ?? 'all-hours'} · chain-index marker colors · no private location by default`}
+        state={{ hours: selectedHoursFilter ?? 'all', overlay: 'chain-index', routeMode: routeAwareNearestStorePlan.mode, sort: 'map-center-distance', view: 'store-map' }}
         surface="map"
       />
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Operating-hours filter</p>
+            <h2 className="mt-2 text-2xl font-black text-emerald-950">Avoid closed stores in comparison views</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-emerald-900">
+              {visibleStores.length.toLocaleString('sv-SE')} mapped stores match {selectedHoursFilter ? operatingHoursFilters.find((filter) => filter.id === selectedHoursFilter)?.label.toLowerCase() : 'all visible hours states'}.
+              Filtered map markers still use OSM source hours and do not infer branch prices or private shopper location.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {operatingHoursFilters.map((filter) => (
+              <a
+                className={`rounded-full px-3 py-2 text-sm font-black ${filter.id === selectedHoursFilter ? 'bg-emerald-800 text-white' : 'bg-white text-emerald-950 hover:bg-emerald-100'}`}
+                href={filter.href}
+                key={filter.label}
+                title={filter.detail}
+              >
+                {filter.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      </Card>
 
       <Card className="mt-6 overflow-hidden border-slate-200 bg-slate-950 p-0 text-white">
         <div className="grid gap-4 p-6 lg:grid-cols-[1fr_auto]">
@@ -192,7 +232,7 @@ export default function MapPage() {
           </div>
         </div>
         <div className="h-[620px] overflow-hidden border-t border-white/10 bg-slate-900">
-          <StoreMap nearbyDealRecommendations={nearbyDealRecommendations} routeRecommendations={topRouteSavingsHints.slice(0, 3)} />
+          <StoreMap nearbyDealRecommendations={nearbyDealRecommendations} routeRecommendations={topRouteSavingsHints.slice(0, 3)} stores={visibleStores} />
         </div>
       </Card>
 
