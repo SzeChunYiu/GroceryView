@@ -3178,6 +3178,7 @@ export const priceDropMoversBoard = pricedProducts
     return [{
       productSlug: product.slug,
       productName: product.name,
+      imageUrl: product.image || null,
       categoryLabel: labelFromSlug(product.category),
       latestPrice: summary.latestPrice,
       previousPrice,
