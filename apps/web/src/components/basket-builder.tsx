@@ -23,7 +23,8 @@ import {
   type BasketChainPrice,
   type BasketStackOffer,
 } from "@/lib/deal-context";
-import { buildSmartBasketSubstituteSuggestions, type BasketSubstituteProduct } from "@/lib/recurring-basket";
+import { buildPantryDepletionSuggestions } from "@/lib/pantry";
+import { buildSmartBasketSubstituteSuggestions, recurringBasketHistoryByProduct, type BasketSubstituteProduct } from "@/lib/recurring-basket";
 
 export type BasketBuilderProduct = {
   id: string;
@@ -32,6 +33,9 @@ export type BasketBuilderProduct = {
   chainPrices?: BasketChainPrice[];
   dealStackOffers?: BasketStackOffer[];
   dietaryTags?: readonly string[];
+  estimatedDailyUse?: number;
+  pantryAgeDays?: number;
+  pantryQuantity?: number;
 };
 
 export function addBasketBuilderProduct<T extends BasketBuilderProduct>(
@@ -101,6 +105,19 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
     })),
     unavailableChainNames: substituteChainNames
   });
+  const basketProductIds = new Set(basketProducts.map((product) => product.id));
+  const pantryDepletionSuggestions = buildPantryDepletionSuggestions(
+    products
+      .filter((product) => !basketProductIds.has(product.id))
+      .map((product) => ({
+        productId: product.id,
+        productName: product.name,
+        pantryQuantity: product.pantryQuantity,
+        pantryAgeDays: product.pantryAgeDays,
+        estimatedDailyUse: product.estimatedDailyUse,
+        recurringPurchaseCount: recurringBasketHistoryByProduct[product.id]?.purchaseCount
+      }))
+  );
 
   function add(product: T) {
     setBasketProducts((current) => addBasketBuilderProduct(current, product));
@@ -160,6 +177,19 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
           <li key={product.id}>{product.name}</li>
         ))}
       </ul>
+
+      {pantryDepletionSuggestions.length > 0 ? (
+        <section aria-label="Pantry depletion suggestions">
+          <h3>Pantry replenishment suggestions</h3>
+          <ul>
+            {pantryDepletionSuggestions.map((suggestion) => (
+              <li key={suggestion.productId}>
+                Add {suggestion.productName}: {suggestion.reason} ({suggestion.priority} priority).
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       {smartSubstitutes.length > 0 ? (
         <section aria-label="Smart substitute suggestions">

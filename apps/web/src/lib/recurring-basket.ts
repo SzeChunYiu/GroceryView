@@ -309,3 +309,13 @@ export function buildPurchaseHistoryImportPreview(rows: readonly PurchaseHistory
     totalSpend: rows.reduce((sum, row) => sum + row.totalSpend, 0)
   };
 }
+
+export const recurringBasketHistoryByProduct = Object.fromEntries(
+  weeklyRecurringBasketPlan.lines.map((line, index) => [
+    line.productId,
+    {
+      purchaseCount: Math.max(1, line.templateQuantity),
+      lastPurchasedAt: index === 0 ? '2026-05-18' : '2026-05-20'
+    }
+  ] as const)
+);

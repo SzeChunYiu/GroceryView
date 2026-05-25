@@ -248,3 +248,52 @@ export function buildPantryDealEvidenceMap(
       .filter((entry): entry is readonly [string, PantryDealEvidence] => entry[1] !== null)
   );
 }
+
+export type PantryDepletionCandidate = {
+  productId: string;
+  productName: string;
+  pantryQuantity?: number;
+  pantryAgeDays?: number;
+  estimatedDailyUse?: number;
+  recurringPurchaseCount?: number;
+};
+
+export type PantryDepletionSuggestion = {
+  productId: string;
+  productName: string;
+  priority: 'high' | 'medium';
+  reason: string;
+  daysUntilDepleted: number | null;
+};
+
+export function buildPantryDepletionSuggestions(candidates: readonly PantryDepletionCandidate[]): PantryDepletionSuggestion[] {
+  return candidates
+    .map((candidate) => {
+      const quantity = candidate.pantryQuantity ?? 0;
+      const dailyUse = candidate.estimatedDailyUse ?? (candidate.recurringPurchaseCount ? 0.25 : 0);
+      const daysUntilDepleted = dailyUse > 0 ? estimateDepletionDays(quantity, dailyUse) : null;
+      const isOldStaple = (candidate.pantryAgeDays ?? 0) >= 21 && (candidate.recurringPurchaseCount ?? 0) > 0;
+      const shouldSuggest = daysUntilDepleted !== null ? daysUntilDepleted <= 5 : isOldStaple;
+      if (!shouldSuggest) return null;
+
+      const priority = daysUntilDepleted !== null && daysUntilDepleted <= 2 ? 'high' : 'medium';
+      const reason = daysUntilDepleted !== null
+        ? `${daysUntilDepleted} day${daysUntilDepleted === 1 ? '' : 's'} of pantry stock left at expected use`
+        : `Recurring staple last checked ${candidate.pantryAgeDays} days ago`;
+
+      return {
+        productId: candidate.productId,
+        productName: candidate.productName,
+        priority,
+        reason,
+        daysUntilDepleted
+      } satisfies PantryDepletionSuggestion;
+    })
+    .filter((suggestion): suggestion is PantryDepletionSuggestion => suggestion !== null)
+    .sort((left, right) => {
+      const priorityDelta = (left.priority === 'high' ? 0 : 1) - (right.priority === 'high' ? 0 : 1);
+      if (priorityDelta !== 0) return priorityDelta;
+      return (left.daysUntilDepleted ?? 99) - (right.daysUntilDepleted ?? 99) || left.productName.localeCompare(right.productName, 'sv');
+    })
+    .slice(0, 4);
+}
