@@ -145,6 +145,7 @@ export * from './connectors/lidl.js';
 export * from './connectors/localfoodnodes-se.js';
 export * from './connectors/seven-eleven-no.js';
 export * from './connectors/lyfogheilsa-is.js';
+export * from './connectors/livsmedelsverket-recalls-se.js';
 export * from './connectors/mast-recalls-is.js';
 export * from './connectors/mathem.js';
 export * from './connectors/matpriskollen.js';

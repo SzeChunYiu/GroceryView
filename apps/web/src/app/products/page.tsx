@@ -39,6 +39,7 @@ type SearchParams = {
   inStockOnly?: string | string[];
   minConfidence?: string | string[];
   minCarbonScore?: string | string[];
+  excludeRecalls?: string | string[];
   brand?: string | string[];
   sort?: string | string[];
   page?: string | string[];
@@ -83,6 +84,7 @@ function copySearchParams(params: URLSearchParams, source: SearchParams) {
   setFirstParam(params, 'inStockOnly', source.inStockOnly);
   setFirstParam(params, 'minConfidence', source.minConfidence);
   setFirstParam(params, 'minCarbonScore', source.minCarbonScore);
+  setFirstParam(params, 'excludeRecalls', source.excludeRecalls);
   setFirstParam(params, 'sort', source.sort);
 }
 
@@ -253,6 +255,10 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             <input defaultChecked={avoidAllergens} name="avoidAllergens" type="checkbox" value="true" />
             Exclude allergen-risk items
           </label>
+          <label className="flex items-center gap-2 rounded-2xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm font-black text-orange-950">
+            <input defaultChecked={search.recallSafety.checked} name="excludeRecalls" type="checkbox" value="true" />
+            Hide Livsmedelsverket recall matches
+          </label>
           <AdvancedFilterDrawer
             activeChips={activeFilterChips}
             brandOptions={productBrandFilterOptions.slice(0, 24)}
@@ -285,6 +291,15 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             Allergen-aware search filtering is on; {search.allergenAvoidance.excludedResultCount.toLocaleString('sv-SE')} risky result{search.allergenAvoidance.excludedResultCount === 1 ? '' : 's'} were excluded from results and recommendations.
           </p>
         ) : null}
+        {search.recallSafety.checked ? (
+          <p className="mt-3 rounded-2xl border border-orange-200 bg-orange-50 p-3 text-sm font-bold text-orange-950">
+            Livsmedelsverket recall filtering is on from {search.recallSafety.source}; {search.recallSafety.excludedResultCount.toLocaleString('sv-SE')} result{search.recallSafety.excludedResultCount === 1 ? '' : 's'} matched {search.recallSafety.alertCount.toLocaleString('sv-SE')} active recall alert{search.recallSafety.alertCount === 1 ? '' : 's'} and were hidden.
+          </p>
+        ) : (
+          <p className="mt-3 rounded-2xl border border-orange-100 bg-white p-3 text-sm font-semibold text-orange-950">
+            Recall safety filter available: hide products matching {search.recallSafety.alertCount.toLocaleString('sv-SE')} current Livsmedelsverket RSS alert{search.recallSafety.alertCount === 1 ? '' : 's'}.
+          </p>
+        )}
         <OriginFilter
           className="mt-5"
           counts={Object.fromEntries(originFacets.map((facet) => [facet.value, facet.count])) as Partial<Record<OriginFilterCode, number>>}

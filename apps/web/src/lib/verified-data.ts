@@ -744,6 +744,7 @@ export type ProductSearchUrlParams = {
   inStockOnly?: SearchParamValue;
   minConfidence?: SearchParamValue;
   minCarbonScore?: SearchParamValue;
+  excludeRecalls?: SearchParamValue;
   sort?: SearchParamValue;
 };
 
@@ -757,6 +758,29 @@ export const productSearchSortOptions: Array<{ value: ProductSearchSortOption; l
   { value: 'nearest_store', label: 'Nearest store', description: 'Use location-aware store ranking when location is available.' },
   { value: 'carbon_score_desc', label: 'Best eco score', description: 'Prioritize the strongest carbon-footprint score from OpenFoodFacts-style evidence and origin heuristics.' }
 ];
+
+export const livsmedelsverketRecallFilterPreview = {
+  source: 'Livsmedelsverket återkallanden RSS',
+  sourceUrl: 'https://www.livsmedelsverket.se/rss/rss-aterkallanden/',
+  alerts: [
+    {
+      alertId: 'livsmedelsverket-se-lidl-kuljanka-dumplings-2026-05-22',
+      affectedProduct: 'Dumplings med kyckling och Dumplings med biff och fläsk',
+      brandNeedles: ['kuljanka', 'lidl'],
+      productNeedles: ['dumpling', 'dumplings'],
+      hazard: 'microbiological',
+      publishedAt: '2026-05-22T17:08:27.000Z'
+    },
+    {
+      alertId: 'livsmedelsverket-se-zeinas-toum-2026-05-22',
+      affectedProduct: 'Zeinas Toum 200 gram',
+      brandNeedles: ['zeinas'],
+      productNeedles: ['toum'],
+      hazard: 'allergen',
+      publishedAt: '2026-05-22T14:58:13.000Z'
+    }
+  ]
+} as const;
 
 function productSearchSortValue(value: SearchParamValue): ProductSearchSortOption {
   const requested = firstSearchValue(value);
@@ -841,6 +865,15 @@ function confidenceSearchValue(value: SearchParamValue): number | undefined {
 
 function booleanSearchValue(value: SearchParamValue): boolean {
   return ['1', 'true', 'yes', 'on'].includes(firstSearchValue(value).toLocaleLowerCase('sv-SE'));
+}
+
+function isRecallMatchedSearchCard(card: { name: string; brand?: string; categoryLabel?: string }) {
+  const haystack = [card.name, card.brand ?? '', card.categoryLabel ?? ''].join(' ').toLocaleLowerCase('sv-SE');
+  return livsmedelsverketRecallFilterPreview.alerts.some((alert) => {
+    const productMatch = alert.productNeedles.some((needle) => haystack.includes(needle));
+    const brandMatch = alert.brandNeedles.length === 0 || alert.brandNeedles.some((needle) => haystack.includes(needle));
+    return productMatch && brandMatch;
+  });
 }
 
 function nearestStoreRankFor(product: (typeof rawFacetedProductSearch.products)[number]) {
@@ -928,6 +961,7 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
   const maxPrice = numericSearchValue(searchParams.maxPrice);
   const inStockOnly = booleanSearchValue(searchParams.inStockOnly);
   const avoidAllergens = booleanSearchValue(searchParams.avoidAllergens);
+  const excludeRecalls = booleanSearchValue(searchParams.excludeRecalls);
   const minConfidence = confidenceSearchValue(searchParams.minConfidence);
   const minCarbonScore = numericSearchValue(searchParams.minCarbonScore);
   const sort = productSearchSortValue(searchParams.sort);
@@ -947,11 +981,15 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
     minPrice !== undefined ? `min unit ${formatSek(minPrice)}` : null,
     maxPrice !== undefined ? `max unit ${formatSek(maxPrice)}` : null,
     avoidAllergens ? 'allergen-aware filter on' : null,
+    excludeRecalls ? 'recall safety filter on' : null,
     inStockOnly ? 'priced/in-stock only' : null,
     minConfidence !== undefined ? `confidence ≥ ${pct.format(minConfidence * 100)}%` : null,
     minCarbonScore !== undefined ? `eco score ≥ ${minCarbonScore}` : null,
     sort !== 'relevance' ? `sort=${productSearchSortOptions.find((option) => option.value === sort)?.label ?? sort}` : null
   ].filter((item): item is string => item !== null);
+
+  const unfilteredResultCards = productSearchResultCards(searchResult, sort, minCarbonScore, avoidAllergens);
+  const recallExcludedResultCount = unfilteredResultCards.filter(isRecallMatchedSearchCard).length;
 
   return {
     ...searchResult,
@@ -992,8 +1030,15 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
       checked: avoidAllergens,
       excludedResultCount: productSearchResultCards(searchResult, sort, minCarbonScore, false).filter((card) => card.allergenRiskBadges.length > 0).length
     },
+    recallSafety: {
+      checked: excludeRecalls,
+      source: livsmedelsverketRecallFilterPreview.source,
+      sourceUrl: livsmedelsverketRecallFilterPreview.sourceUrl,
+      alertCount: livsmedelsverketRecallFilterPreview.alerts.length,
+      excludedResultCount: recallExcludedResultCount
+    },
     activeFilters,
-    resultCards: productSearchResultCards(searchResult, sort, minCarbonScore, avoidAllergens)
+    resultCards: excludeRecalls ? unfilteredResultCards.filter((card) => !isRecallMatchedSearchCard(card)) : unfilteredResultCards
   };
 }
 
