@@ -96,6 +96,13 @@
       "indicator": "●",
       "label": "Low confidence",
       "meaning": "Low source confidence with sparse coverage"
+    },
+    "unknown": {
+      "foreground": "#475569",
+      "background": "#f8fafc",
+      "indicator": "?",
+      "label": "Unknown confidence",
+      "meaning": "Unknown source confidence until coverage data is available"
     }
   }
 }
