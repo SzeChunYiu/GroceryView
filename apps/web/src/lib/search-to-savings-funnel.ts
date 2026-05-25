@@ -34,6 +34,7 @@ function normalizedMarket(value: unknown) {
 
 function normalizedCount(value: unknown) {
   if (value === undefined) return 1;
+  if (typeof value !== 'number') return null;
   return Number.isInteger(value) && value > 0 && value <= 100 ? value : null;
 }
 
