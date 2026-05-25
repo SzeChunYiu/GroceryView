@@ -59,6 +59,8 @@ create table if not exists products (
   created_at timestamptz not null default now()
 );
 
+create unique index if not exists products_barcode_unique_idx on products (barcode) where barcode is not null;
+
 create table if not exists product_aliases (
   id bigserial primary key,
   raw_name text not null,
