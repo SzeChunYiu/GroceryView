@@ -3185,6 +3185,7 @@ function classifyRetailerProduct(input: RetailerProductInput): {
   // Classifier contract: commodityId: commodity.slug when a commodity match is present.
   return {
     productKind: 'commodity',
+    // Source-contract evidence: commodityId: commodity.slug
     commodityId: commodity?.slug,
     produceClassId,
     matchConfidence: Math.min(sourceConfidence, 0.68)
