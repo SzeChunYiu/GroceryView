@@ -22,6 +22,15 @@ export type DietaryPreferenceOnboardingContract = {
 };
 
 export const defaultHouseholdId = 'stockholm-family-demo';
+export const recentSearchHistoryStorageKey = 'groceryview:recent-product-searches';
+const maxRecentSearchHistory = 10;
+
+export type RecentSearchHistoryEntry = {
+  query: string;
+  href: string;
+  resultCount: number;
+  searchedAt: string;
+};
 
 export const householdCategorySignals: HouseholdCategorySignal[] = [
   { householdId: defaultHouseholdId, categorySlug: 'mejeri-ost-agg', clicks: 18, conversions: 7 },
@@ -31,6 +40,45 @@ export const householdCategorySignals: HouseholdCategorySignal[] = [
   { householdId: 'new-arrival-demo', categorySlug: 'skafferi', clicks: 14, conversions: 6 },
   { householdId: 'new-arrival-demo', categorySlug: 'frys', clicks: 9, conversions: 3 },
 ];
+
+export function readRecentSearchHistory(): RecentSearchHistoryEntry[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(recentSearchHistoryStorageKey) || '[]') as RecentSearchHistoryEntry[];
+    return Array.isArray(parsed)
+      ? parsed
+        .filter((entry) => typeof entry.query === 'string' && entry.query.trim().length > 0)
+        .slice(0, maxRecentSearchHistory)
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+export function rememberRecentSearchHistory(query: string, resultCount: number, basePath = '/search') {
+  if (typeof window === 'undefined') return [];
+  const trimmedQuery = query.trim();
+  if (!trimmedQuery || resultCount <= 0) return readRecentSearchHistory();
+
+  const next = [
+    {
+      query: trimmedQuery,
+      href: `${basePath}?q=${encodeURIComponent(trimmedQuery)}`,
+      resultCount,
+      searchedAt: new Date().toISOString()
+    },
+    ...readRecentSearchHistory().filter((entry) => entry.query.toLocaleLowerCase('sv-SE') !== trimmedQuery.toLocaleLowerCase('sv-SE'))
+  ].slice(0, maxRecentSearchHistory);
+
+  window.localStorage.setItem(recentSearchHistoryStorageKey, JSON.stringify(next));
+  return next;
+}
+
+export function clearRecentSearchHistory() {
+  if (typeof window === 'undefined') return [];
+  window.localStorage.removeItem(recentSearchHistoryStorageKey);
+  return [];
+}
 
 export const dietaryPreferenceOnboardingContract: DietaryPreferenceOnboardingContract = {
   endpoint: '/api/account/dietary-preferences',
