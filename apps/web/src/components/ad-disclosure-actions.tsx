@@ -8,6 +8,7 @@ import {
   type AffiliateDisclosureKind,
   type AffiliateLinkMetadata
 } from '@/lib/analytics';
+import { buildDealMonetizationDisclosure } from '@/lib/deal-context';
 
 type DisclosureStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
 type BrowserSession = { accessToken: string; userId: string };
@@ -75,11 +76,18 @@ const disclosurePreviewLinks: Record<AffiliateDisclosureKind, AffiliateLinkMetad
 };
 
 export function AffiliateDisclosureNotice({ metadata }: Readonly<{ metadata: AffiliateLinkMetadata }>) {
+  const kind = affiliateDisclosureKind(metadata);
   const label = affiliateDisclosureLabel(metadata);
+  const disclosure = buildDealMonetizationDisclosure({ kind, retailerName: metadata.retailerName });
   return (
-    <span className="mt-2 block rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold leading-5 text-amber-950" data-affiliate-disclosure={affiliateDisclosureKind(metadata)}>
-      {label}
-    </span>
+    <div className="mt-2 block rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold leading-5 text-amber-950" data-affiliate-disclosure={kind}>
+      <span className="block font-black uppercase tracking-[0.14em]">{disclosure.partnerLabel}</span>
+      <span>{label}</span>
+      <details className="mt-1">
+        <summary className="cursor-pointer font-black">{disclosure.actionLabel}</summary>
+        <span className="mt-1 block">{disclosure.complianceNote}</span>
+      </details>
+    </div>
   );
 }
 

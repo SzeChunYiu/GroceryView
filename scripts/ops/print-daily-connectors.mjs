@@ -147,12 +147,38 @@ const CONNECTOR_TEMPLATES = [
     stores: []
   },
   {
+    connectorId: 'preem-se-business-list-prices',
+    chainId: 'preem',
+    domain: 'fuel',
+    sourceType: 'retailer_online_page',
+    endpointUrl: 'https://www.preem.se/foretag/listpriser/',
+    parserVersion: 'preem-se-business-list-v1',
+    robotsTxtStatus: 'allow',
+    legalReviewStatus: 'approved',
+    hasDataAgreement: false,
+    requireStoreScopedPrices: false,
+    stores: []
+  },
+  {
     connectorId: 'okq8-fuel-prices',
     chainId: 'okq8',
     domain: 'fuel',
     sourceType: 'retailer_online_page',
     endpointUrl: 'https://www.okq8.se/foretag/priser/',
     parserVersion: 'okq8-fuel-prices-v1',
+    robotsTxtStatus: 'allow',
+    legalReviewStatus: 'approved',
+    hasDataAgreement: false,
+    requireStoreScopedPrices: false,
+    stores: []
+  },
+  {
+    connectorId: 'ob-is-fuel-prices',
+    chainId: 'ob-is',
+    domain: 'fuel',
+    sourceType: 'retailer_online_page',
+    endpointUrl: 'https://olis.ob.is/eldsneytisverd',
+    parserVersion: 'ob-is-fuel-prices-v1',
     robotsTxtStatus: 'allow',
     legalReviewStatus: 'approved',
     hasDataAgreement: false,

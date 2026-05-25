@@ -39,6 +39,12 @@ type ApohemSearchProduct = {
   isPrescriptionProduct?: unknown;
 };
 
+type ApohemPageInfo = {
+  recordSetCount: number;
+  pageSize: number;
+  skip: number;
+};
+
 type ApotekHjartatProduct = {
   url?: unknown;
   productName?: unknown;
@@ -152,14 +158,26 @@ export async function fetchApohemProducts(options: FetchApohemProductsOptions = 
   const seen = new Set<string>();
 
   for (const sourcePath of options.sourcePaths ?? DEFAULT_APOHEM_SOURCE_PATHS) {
-    const sourceUrl = absoluteUrl(sourcePath, APOHEM_BASE_URL);
-    const response = await fetchImpl(sourceUrl, htmlHeaders());
-    if (!response.ok) {
-      throw new Error(`Apohem request failed for ${sourceUrl}: ${response.status}`);
-    }
-    addRows(rows, seen, parseApohemProducts(await response.text(), sourceUrl, retrievedAt), options.maxRows);
-    if (options.maxRows && rows.length >= options.maxRows) {
-      return rows;
+    const baseSourceUrl = absoluteUrl(sourcePath, APOHEM_BASE_URL);
+    const visitedUrls = new Set<string>();
+    let sourceUrl: string | null = baseSourceUrl;
+
+    while (sourceUrl) {
+      if (visitedUrls.has(sourceUrl)) {
+        break;
+      }
+      visitedUrls.add(sourceUrl);
+
+      const response = await fetchImpl(sourceUrl, htmlHeaders());
+      if (!response.ok) {
+        throw new Error(`Apohem request failed for ${sourceUrl}: ${response.status}`);
+      }
+      const page = parseApohemPage(await response.text(), sourceUrl, retrievedAt);
+      addRows(rows, seen, page.products, options.maxRows);
+      if (options.maxRows && rows.length >= options.maxRows) {
+        return rows;
+      }
+      sourceUrl = nextApohemPageUrl(baseSourceUrl, page.pageInfo);
     }
   }
 
@@ -200,8 +218,13 @@ export async function fetchPharmacyProducts(options: FetchApohemProductsOptions 
 }
 
 export function parseApohemProducts(html: string, sourceUrl: string, retrievedAt: string): ApohemProduct[] {
+  return parseApohemPage(html, sourceUrl, retrievedAt).products;
+}
+
+function parseApohemPage(html: string, sourceUrl: string, retrievedAt: string): { pageInfo: ApohemPageInfo | null; products: ApohemProduct[] } {
   const data = extractWindowJsonObject(html, 'CURRENT_PAGE');
   const products: ApohemSearchProduct[] = [];
+  const pageInfo = extractApohemPageInfo(data);
   visit(data, (value) => {
     const candidate = value as ApohemSearchProduct;
     if (candidate.price && candidate.displayName && candidate.variationEAN) {
@@ -209,9 +232,12 @@ export function parseApohemProducts(html: string, sourceUrl: string, retrievedAt
     }
   });
 
-  return products
-    .map((product) => normalizeApohemProduct(product, sourceUrl, retrievedAt))
-    .filter((product): product is ApohemProduct => product !== null);
+  return {
+    pageInfo,
+    products: products
+      .map((product) => normalizeApohemProduct(product, sourceUrl, retrievedAt))
+      .filter((product): product is ApohemProduct => product !== null)
+  };
 }
 
 export function parseApotekHjartatProducts(html: string, sourceUrl: string, retrievedAt: string): ApohemProduct[] {
@@ -331,6 +357,41 @@ function addRows(
       return;
     }
   }
+}
+
+function extractApohemPageInfo(data: unknown): ApohemPageInfo | null {
+  let pageInfo: ApohemPageInfo | null = null;
+  visit(data, (value) => {
+    if (pageInfo) {
+      return;
+    }
+    const recordSetCount = numberFromText(value.recordSetCount);
+    const pageSize = numberFromText(value.pageSize);
+    if (recordSetCount === null || pageSize === null || recordSetCount <= pageSize || pageSize <= 0) {
+      return;
+    }
+    pageInfo = {
+      recordSetCount,
+      pageSize,
+      skip: numberFromText(value.skip) ?? numberFromText(value.Skip) ?? 0
+    };
+  });
+  return pageInfo;
+}
+
+function nextApohemPageUrl(baseSourceUrl: string, pageInfo: ApohemPageInfo | null): string | null {
+  if (!pageInfo) {
+    return null;
+  }
+  const nextSkip = pageInfo.skip + pageInfo.pageSize;
+  if (nextSkip >= pageInfo.recordSetCount) {
+    return null;
+  }
+
+  const url = new URL(baseSourceUrl);
+  url.searchParams.set('skip', String(nextSkip));
+  url.searchParams.set('count', String(Math.min(pageInfo.recordSetCount, nextSkip + pageInfo.pageSize)));
+  return url.toString();
 }
 
 function apohemCategory(product: ApohemSearchProduct, sourceUrl: string): PharmacyProductCategory {

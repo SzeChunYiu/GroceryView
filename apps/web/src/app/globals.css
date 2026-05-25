@@ -38,3 +38,41 @@ button, input, select, textarea { font: inherit; }
     transition-duration: 1ms !important;
   }
 }
+
+:root.dark {
+  color-scheme: dark;
+  background: #020617;
+  color: #e2e8f0;
+}
+
+.dark body {
+  background:
+    radial-gradient(circle at 15% 8%, rgba(16, 185, 129, 0.12), transparent 28rem),
+    radial-gradient(circle at 86% 14%, rgba(245, 158, 11, 0.1), transparent 24rem),
+    #020617;
+  color: #e2e8f0;
+}
+
+.dark :where(.bg-white, .bg-white\/70, .bg-white\/80, .bg-white\/85, .bg-white\/88) {
+  background-color: rgb(15 23 42 / 0.92);
+}
+
+.dark :where(.bg-slate-50, .bg-slate-100) {
+  background-color: rgb(30 41 59 / 0.86);
+}
+
+.dark :where(.text-slate-950, .text-slate-900) {
+  color: #f8fafc;
+}
+
+.dark :where(.text-slate-800, .text-slate-700, .text-slate-600) {
+  color: #cbd5e1;
+}
+
+.dark :where(.text-slate-500) {
+  color: #94a3b8;
+}
+
+.dark :where(.border-slate-100, .border-slate-200) {
+  border-color: #334155;
+}

@@ -65,6 +65,9 @@ const requestedSources = new Set((process.env.GROCERYVIEW_INGEST_SOURCES ?? '')
   .map((source) => source.trim().toLowerCase())
   .filter(Boolean));
 const shouldRun = (source) => requestedSources.size === 0 || requestedSources.has(source);
+const dbSiteOverrideSources = ['citygross', 'willys', 'hemkop', 'lidl'];
+const shouldWriteDbSiteOverrides = requestedSources.size === 0
+  || dbSiteOverrideSources.every((source) => requestedSources.has(source));
 
 const CITY_GROSS_QUERIES = DEFAULT_CITY_GROSS_PRODUCT_QUERIES;
 const COOP_QUERIES = DEFAULT_COOP_PRODUCT_QUERIES;
@@ -276,7 +279,7 @@ if (shouldRun('seven-eleven-se')) {
   summary.sevenElevenSeProducts = sevenElevenSeProducts.length;
 }
 
-if (['citygross', 'willys', 'hemkop', 'lidl'].some((source) => shouldRun(source))) {
+if (shouldWriteDbSiteOverrides) {
   await writeDbSiteIngestedOverrides([
     buildCompareStoreCapability({
       chainId: 'city_gross',
@@ -458,6 +461,7 @@ async function writeCoop(products, weeklyDiscounts) {
 }
 
 async function writeWillys(products, weeklyDiscounts) {
+  const productsWithOriginCountry = withAxfoodOriginCountry(products);
   const productSourceUrls = unique(products.map((row) => row.sourceUrl));
   const weeklySourceUrls = unique(weeklyDiscounts.map((row) => row.sourceUrl));
   const weeklyStoreIds = unique(weeklyDiscounts.map((row) => row.storeId));
@@ -487,6 +491,7 @@ async function writeWillys(products, weeklyDiscounts) {
     '  unitPriceUnit: string;',
     '  imageUrl: string;',
     '  labels: string[];',
+    '  originCountry: string | null;',
     '  online: boolean;',
     '  outOfStock: boolean;',
     '  sourceUrl: string;',
@@ -530,7 +535,7 @@ async function writeWillys(products, weeklyDiscounts) {
       sourceUrls: productSourceUrls
     })} as const;`,
     '',
-    `export const willysProducts: WillysIngestedProduct[] = ${literal(products)};`,
+    `export const willysProducts: WillysIngestedProduct[] = ${literal(productsWithOriginCountry)};`,
     '',
     `export const willysWeeklyDiscountSource = ${literal({
       source: 'willys.se public Axfood campaign JSON',
@@ -548,6 +553,7 @@ async function writeWillys(products, weeklyDiscounts) {
 }
 
 async function writeHemkop(products, weeklyDiscounts) {
+  const productsWithOriginCountry = withAxfoodOriginCountry(products);
   const productSourceUrls = unique(products.map((row) => row.sourceUrl));
   const weeklySourceUrls = unique(weeklyDiscounts.map((row) => row.sourceUrl));
   const weeklyStoreIds = unique(weeklyDiscounts.map((row) => row.storeId));
@@ -577,6 +583,7 @@ async function writeHemkop(products, weeklyDiscounts) {
     '  unitPriceUnit: string;',
     '  imageUrl: string;',
     '  labels: string[];',
+    '  originCountry: string | null;',
     '  online: boolean;',
     '  outOfStock: boolean;',
     '  sourceUrl: string;',
@@ -620,7 +627,7 @@ async function writeHemkop(products, weeklyDiscounts) {
       sourceUrls: productSourceUrls
     })} as const;`,
     '',
-    `export const hemkopProducts: HemkopIngestedProduct[] = ${literal(products)};`,
+    `export const hemkopProducts: HemkopIngestedProduct[] = ${literal(productsWithOriginCountry)};`,
     '',
     `export const hemkopWeeklyDiscountSource = ${literal({
       source: 'hemkop.se public Axfood campaign JSON',
@@ -1373,11 +1380,11 @@ async function writeIcaReklamblad(rows) {
 
 async function writeGeneratedFile(fileName, lines) {
   while (lines.at(-1) === '') lines.pop();
-  await writeFile(new URL(fileName, INGESTED_DIR), `${lines.join('\n')}\n`);
+  await writeFile(new URL(fileName, INGESTED_DIR), withSingleTrailingNewline(lines.join('\n')));
 }
 
 async function writeDbSiteIngestedOverrides(compareStoreCapabilities) {
-  await writeFile(new URL('db-site-ingested-overrides.ts', GENERATED_DIR), `${[
+  await writeFile(new URL('db-site-ingested-overrides.ts', GENERATED_DIR), withSingleTrailingNewline([
     '// AUTO-GENERATED from live retailer ingestion by scripts/ingestion/generate-live-retailer-ingested.mjs.',
     `// Generated at: ${retrievedAt}`,
     `// Compare store capability row count: ${compareStoreCapabilities.length}`,
@@ -1408,7 +1415,7 @@ async function writeDbSiteIngestedOverrides(compareStoreCapabilities) {
     `export const dbSiteIcaReklambladSource = ${literal({ source: 'postgres.latest_prices/observations ICA flyer-compatible fallback', retrievedAt: null, rowCount: 0 })} as const;`,
     `export const dbSiteMathemSource = ${literal({ source: 'postgres.latest_prices/observations Mathem-compatible fallback', retrievedAt: null, rowCount: 0 })} as const;`,
     ''
-  ].join('\n')}\n`);
+  ].join('\n')));
 }
 
 function buildCompareStoreCapability({ chainId, productRows = [], couponRows = [], deliveryRows = [], pickupRows = [] }) {
@@ -1437,12 +1444,32 @@ function latestRetrievedAt(rows) {
     .at(-1) ?? null;
 }
 
+function normalizeOriginCountry(value) {
+  if (typeof value !== 'string') return null;
+  const normalized = value.trim().toUpperCase();
+  return /^[A-Z]{2}$/.test(normalized) ? normalized : null;
+}
+
+function inferAxfoodOriginCountry(row) {
+  const labels = Array.isArray(row.labels) ? row.labels : [];
+  if (labels.some((label) => /swedish|from_sweden|milk_from_sweden|meat_from_sweden/i.test(label))) return 'SE';
+  return normalizeOriginCountry(row.originCountry);
+}
+
+function withAxfoodOriginCountry(rows) {
+  return rows.map((row) => ({ ...row, originCountry: inferAxfoodOriginCountry(row) }));
+}
+
 function unique(values) {
   return [...new Set(values.filter(Boolean))];
 }
 
 function literal(value) {
   return JSON.stringify(value, null, 2);
+}
+
+function withSingleTrailingNewline(value) {
+  return `${value.replace(/\n+$/u, '')}\n`;
 }
 
 function oneLine(value) {

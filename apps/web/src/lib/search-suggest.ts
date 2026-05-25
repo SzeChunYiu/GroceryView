@@ -1,5 +1,5 @@
-import { isTypoTolerantTokenMatch } from './search-fuzzy';
-import { semanticSynonymsForQuery } from './search-synonyms';
+import { fuzzyEditDistance, isTypoTolerantTokenMatch } from './search-fuzzy';
+import { semanticSynonymsForQuery, synonymExpansionWeight } from './search-synonyms';
 
 export type GrocerySearchExpansion = {
   query: string;
@@ -47,6 +47,8 @@ const groceryAliasEntries: Array<{ canonical: string; aliases: WeightedAlias[] }
   { canonical: 'chicken', aliases: [{ value: 'kyck', weight: 1 }, { value: 'kyckling', weight: 1.2 }, { value: 'chix', weight: 0.8 }] },
   { canonical: 'yogurt', aliases: [{ value: 'yoghurt', weight: 1.15 }, { value: 'fil', weight: 0.9 }, { value: 'grekisk yoghurt', weight: 1.2 }] },
   { canonical: 'butter', aliases: [{ value: 'smor', weight: 1.05 }, { value: 'smör', weight: 1.2 }, { value: 'bregott', weight: 1.1 }] },
+  { canonical: 'apples', aliases: [{ value: 'apple', weight: 1.05 }, { value: 'äpple', weight: 1.2 }, { value: 'aple', weight: 0.9 }, { value: 'royal gala', weight: 1.1 }] },
+  { canonical: 'pasta', aliases: [{ value: 'makaroner', weight: 1.15 }, { value: 'spagetti', weight: 1 }, { value: 'spaghetti', weight: 1.05 }] },
   { canonical: 'tomatoes', aliases: [{ value: 'tomat', weight: 1.1 }, { value: 'tomater', weight: 1.2 }] },
   { canonical: 'private label milk', aliases: [{ value: 'garant mjolk', weight: 1.15 }, { value: 'garant mjölk', weight: 1.25 }, { value: 'willys mjolk', weight: 1.15 }, { value: 'willys mjölk', weight: 1.25 }] }
 ];
@@ -138,6 +140,20 @@ function fuzzyAliasMatch(queryTokens: Set<string>, normalizedAlias: string) {
   return aliasTokens.every((aliasToken) => queryTokenList.some((queryToken) => fuzzyTokenMatch(queryToken, aliasToken)));
 }
 
+export function phoneticGroceryKey(value: string) {
+  return normalizeAliasText(value)
+    .replace(/sch|skj|stj|sj/g, '7')
+    .replace(/tj|kj|ch/g, '6')
+    .replace(/ph/g, 'f')
+    .replace(/ck/g, 'k')
+    .replace(/[cq]/g, 'k')
+    .replace(/[vw]/g, 'v')
+    .replace(/z/g, 's')
+    .replace(/[aeiouy]+/g, 'a')
+    .replace(/(.)\1+/g, '$1')
+    .replace(/\s+/g, '');
+}
+
 const expansionCache = new Map<string, GrocerySearchExpansion>();
 let expansionCacheRequests = 0;
 let expansionCacheHits = 0;
@@ -181,6 +197,10 @@ function buildGrocerySearchExpansion(query: string, maxQueries: number): Grocery
         addUnique(matchedAliases, alias.value);
         addWeightedQuery(expandedQueries, queryWeights, entry.canonical, alias.weight);
         for (const canonicalToken of normalizeAliasText(entry.canonical).split(' ')) addWeightedQuery(expandedQueries, queryWeights, canonicalToken, alias.weight * 0.85);
+      } else if (normalizedQuery.length >= 3 && phoneticGroceryKey(normalizedQuery) === phoneticGroceryKey(normalizedAlias)) {
+        addUnique(matchedFuzzyAliases, alias.value);
+        addWeightedQuery(expandedQueries, queryWeights, entry.canonical, alias.weight * 0.8);
+        for (const canonicalToken of normalizeAliasText(entry.canonical).split(' ')) addWeightedQuery(expandedQueries, queryWeights, canonicalToken, alias.weight * 0.7);
       } else if (fuzzyAliasMatch(tokens, normalizedAlias)) {
         addUnique(matchedFuzzyAliases, alias.value);
         addWeightedQuery(expandedQueries, queryWeights, entry.canonical, alias.weight * 0.75);
@@ -190,10 +210,11 @@ function buildGrocerySearchExpansion(query: string, maxQueries: number): Grocery
   }
 
   for (const synonym of semanticSynonymsForQuery(trimmed)) {
+    const synonymWeight = synonymExpansionWeight(synonym.intent);
     addUnique(matchedSynonyms, synonym.matchedTerm);
-    addWeightedQuery(expandedQueries, queryWeights, synonym.canonical, 0.9);
+    addWeightedQuery(expandedQueries, queryWeights, synonym.canonical, synonymWeight);
     for (const synonymTerm of synonym.terms) addUnique(expandedQueries, synonymTerm);
-    for (const synonymTerm of synonym.terms) queryWeights[synonymTerm] = Math.max(queryWeights[synonymTerm] ?? 0, 0.75);
+    for (const synonymTerm of synonym.terms) queryWeights[synonymTerm] = Math.max(queryWeights[synonymTerm] ?? 0, synonymWeight * 0.85);
   }
 
   const limitedExpandedQueries = expandedQueries.slice(0, maxQueries);
@@ -238,13 +259,31 @@ export type MisspelledQueryRecovery = {
   popularAlternatives: string[];
 };
 
-const popularRecoveryQueries = ['mjölk', 'kaffe', 'havregryn', 'ägg', 'yoghurt', 'pasta'];
+const popularRecoveryQueries = ['mjölk', 'kaffe', 'havregryn', 'ägg', 'yoghurt', 'pasta', 'äpple'];
+
+export function phoneticRankedQueryHints(query: string, maxSuggestions = 4) {
+  const normalizedQuery = normalizeAliasText(query);
+  const queryKey = phoneticGroceryKey(normalizedQuery);
+  if (normalizedQuery.length < 3 || !queryKey) return [];
+
+  const aliasCandidates = groceryAliasEntries.flatMap((entry) => [entry.canonical, ...entry.aliases.map((alias) => alias.value)]);
+  return aliasCandidates
+    .map((candidate) => {
+      const candidateKey = phoneticGroceryKey(candidate);
+      return { candidate, distance: fuzzyEditDistance(candidateKey, queryKey), exact: candidateKey === queryKey };
+    })
+    .filter((row) => row.exact || row.distance <= 1)
+    .sort((left, right) => Number(right.exact) - Number(left.exact) || left.distance - right.distance || left.candidate.localeCompare(right.candidate, 'sv'))
+    .map((row) => row.candidate)
+    .filter((candidate, index, values) => values.findIndex((value) => normalizeAliasText(value) === normalizeAliasText(candidate)) === index)
+    .slice(0, maxSuggestions);
+}
 
 export function buildMisspelledQueryRecovery(query: string, maxSuggestions = 4): MisspelledQueryRecovery {
   const normalizedQuery = normalizeAliasText(query);
   const aliasCandidates = groceryAliasEntries.flatMap((entry) => [entry.canonical, ...entry.aliases.map((alias) => alias.value)]);
   const didYouMean = aliasCandidates
-    .map((candidate) => ({ candidate, distance: editDistance(normalizeAliasText(candidate), normalizedQuery) }))
+    .map((candidate) => ({ candidate, distance: fuzzyEditDistance(normalizeAliasText(candidate), normalizedQuery) }))
     .filter((row) => normalizedQuery.length >= 3 && row.distance <= Math.max(2, Math.floor(normalizedQuery.length / 3)))
     .sort((left, right) => left.distance - right.distance || left.candidate.localeCompare(right.candidate, 'sv'))
     .map((row) => row.candidate)
@@ -252,7 +291,7 @@ export function buildMisspelledQueryRecovery(query: string, maxSuggestions = 4):
     .slice(0, maxSuggestions);
 
   const expansion = expandGrocerySearchQuery(query, maxSuggestions);
-  const popularAlternatives = [...expansion.expandedQueries, ...popularRecoveryQueries]
+  const popularAlternatives = [...expansion.expandedQueries, ...phoneticRankedQueryHints(query, maxSuggestions), ...popularRecoveryQueries]
     .filter((candidate) => normalizeAliasText(candidate) !== normalizedQuery)
     .filter((candidate, index, values) => values.findIndex((value) => normalizeAliasText(value) === normalizeAliasText(candidate)) === index)
     .slice(0, maxSuggestions);

@@ -18,6 +18,11 @@ type ProductCardWithSearchExplanations = AdaptiveProductCard & {
 };
 
 const storageKey = 'groceryview:product-card-compare-mode';
+const productCardImagePolicy = {
+  loading: 'lazy',
+  placeholder: 'empty',
+  sizes: '(min-width: 1280px) 16vw, (min-width: 768px) 33vw, 80vw'
+} as const;
 const compareModes: Array<{ label: string; value: CompareMode; help: string }> = [
   { label: 'Adaptive', value: 'adaptive', help: 'Commodity cards lead with unit price; branded cards lead with total price.' },
   { label: 'Total', value: 'total', help: 'Sort and lead every card by the observed pack price.' },
@@ -167,7 +172,7 @@ function SearchExplanationBadges({ badges }: Readonly<{ badges?: SearchExplanati
   if (!badges || badges.length === 0) return null;
 
   return (
-    <div className="mt-3 flex flex-wrap gap-2" data-search-explanation-badges>
+    <div aria-label="Search result match explanations" className="mt-3 flex flex-wrap gap-2" data-search-explanation-badges>
       {badges.slice(0, 4).map((badge) => (
         <span
           className="rounded-full bg-indigo-100 px-2.5 py-1 text-[0.65rem] font-black uppercase tracking-[0.14em] text-indigo-950"
@@ -298,9 +303,9 @@ export function ProductPriceCards({
                   alt={card.imageAlt}
                   className="max-h-full max-w-full object-contain"
                   height={144}
-                  loading="lazy"
-                  placeholder="empty"
-                  sizes="(min-width: 1280px) 16vw, (min-width: 768px) 33vw, 80vw"
+                  loading={productCardImagePolicy.loading}
+                  placeholder={productCardImagePolicy.placeholder}
+                  sizes={productCardImagePolicy.sizes}
                   src={card.imageUrl}
                   width={144}
                 />
