@@ -16,8 +16,9 @@ import { sourceDiscrepancyReviewContract } from '@/lib/verified-data';
 
 type ReviewStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
 type BrowserSession = { accessToken: string; userId: string };
-type ReviewDecision = 'approve' | 'reject' | 'needs_more_info';
-type ReviewModerationAction = 'approve' | 'hide' | 'escalate';
+type ReviewDecision = 'approve' | 'hide' | 'escalate';
+type ApiReviewDecision = 'approve' | 'reject' | 'needs_more_info';
+type ReviewModerationAction = ReviewDecision;
 type Assignment = { id: string; reviewId?: string; subjectType?: 'product_match' | 'community_report' | 'commodity_mapping' | 'price_report' | 'duplicate_product_report' | 'source_discrepancy_report'; subjectId?: string; priority?: string; reason?: string; assigneeId?: string; dueAt?: string; status?: string };
 type AssignmentResponse = { assignments?: Assignment[]; sla?: { status?: string; overdueAssignments?: number; breachedReviewIds?: string[] } };
 
@@ -71,10 +72,11 @@ export function PriceReportReviewActions() {
     const session = requireSession();
     if (!session || !assignmentId.trim()) return;
     const { accessToken, userId } = session;
+    const apiDecision: ApiReviewDecision = decision === 'hide' ? 'reject' : decision === 'escalate' ? 'needs_more_info' : 'approve';
     const response = await fetch(`/api/human-review/assignments/${encodeURIComponent(assignmentId)}/decisions?userId=${encodeURIComponent(userId)}`, {
       method: 'POST',
       headers: { 'content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
-      body: JSON.stringify({ decision, notes })
+      body: JSON.stringify({ decision: apiDecision, notes: `${decision}: ${notes}` })
     });
     if (!response.ok) {
       setStatus('error');
@@ -82,7 +84,7 @@ export function PriceReportReviewActions() {
       return;
     }
     setStatus('ready');
-    setMessage(`${decision} decision accepted with reviewedByHuman: true writeback. needs_more_info leaves assignment status in_progress; community_report and price_report approvals map to accept_community_report and rejections map to dismiss_community_report; duplicate_product_report decisions route to catalog merge review; source_discrepancy_report decisions create source QA follow-up; commodity_mapping approvals map to approve_commodity_mapping and rejections map to reject_commodity_mapping.`);
+    setMessage(`${decision} action accepted with reviewedByHuman: true writeback. Hide maps to dismiss/reject, escalate maps to needs_more_info, and approve keeps the existing accept_community_report / approve_commodity_mapping writebacks.`);
   }
 
   async function voteCommunityReview(reviewId: string, vote: CommunityReviewVote) {
@@ -161,8 +163,8 @@ export function PriceReportReviewActions() {
       </div>
       <div className="mt-3 flex flex-wrap gap-2">
         <button className="rounded-full border border-slate-300 px-4 py-2 text-sm font-black text-slate-800" disabled={!assignmentId.trim()} onClick={() => decideReview('approve')} type="button">Approve evidence</button>
-        <button className="rounded-full border border-slate-300 px-4 py-2 text-sm font-black text-slate-800" disabled={!assignmentId.trim()} onClick={() => decideReview('reject')} type="button">Reject evidence</button>
-        <button className="rounded-full border border-amber-300 px-4 py-2 text-sm font-black text-amber-900" disabled={!assignmentId.trim()} onClick={() => decideReview('needs_more_info')} type="button">Request more info</button>
+        <button className="rounded-full border border-slate-300 px-4 py-2 text-sm font-black text-slate-800" disabled={!assignmentId.trim()} onClick={() => decideReview('hide')} type="button">Hide report</button>
+        <button className="rounded-full border border-amber-300 px-4 py-2 text-sm font-black text-amber-900" disabled={!assignmentId.trim()} onClick={() => decideReview('escalate')} type="button">Escalate</button>
       </div>
 
 
@@ -178,7 +180,6 @@ export function PriceReportReviewActions() {
           ))}
         </ul>
       </div>
-
 
       <div className="mt-6 rounded-3xl border border-violet-200 bg-violet-50/70 p-4" aria-label="Community validation prompt review">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-violet-800">Community validation prompts</p>

@@ -18,6 +18,7 @@ const appFiles = [
   'src/app/chain-coverage/page.tsx',
   'src/app/coverage/page.tsx',
   'src/app/map/page.tsx',
+  'src/app/my-flyer/page.tsx',
   'src/app/data-sources/page.tsx',
   'src/app/store-coverage/page.tsx',
   'src/app/openprices-depth/page.tsx',
@@ -68,6 +69,15 @@ describe('verified-data UI', () => {
     assert.match(verified, /sourceCoverage/);
   });
 
+
+  it('renders the authenticated MyFlyer route from a server digest snapshot', async () => {
+    const route = await read('src/app/my-flyer/page.tsx');
+    assert.match(route, /getCachedMyFlyerPayload/);
+    assert.match(route, /Ranking controls/);
+    assert.match(route, /Delivery surfaces/);
+    assert.match(route, /email, push, print, PDF, and share/);
+    assert.doesNotMatch(route, /useState|useEffect/);
+  });
 
   it('renders the consent banner visible in the first HTML pass to avoid homepage CLS', async () => {
     const consentManager = await read('src/components/consent-manager.tsx');
