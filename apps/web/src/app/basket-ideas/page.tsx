@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { studentBasicsBoard } from '@/lib/demo-data';
+import { basketIdeaRecommendationExplanations } from '@/lib/personalization';
 import { basketImportExportContract, basketImportReviewContract, retailerBasketTransferContract, retailerDeepLinkQualityContract, retailerHandoffContract, stockoutSubstitutionContract } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -14,6 +15,7 @@ function formatSek(value: number) {
 
 export default function BasketIdeasPage() {
   const { comparison, coverage } = studentBasicsBoard;
+  const frequentlyBoughtTogetherIds = studentBasicsBoard.items.slice(0, 2).map((item) => item.productId);
   return (
     <PageShell>
       <Eyebrow>Student staples</Eyebrow>
@@ -44,17 +46,36 @@ export default function BasketIdeasPage() {
         <Card>
           <h2 className="text-2xl font-black">Cheapest basics basket</h2>
           <div className="mt-4 space-y-3">
-            {studentBasicsBoard.items.map((item) => (
-              <Link className="block rounded-2xl border border-slate-200 p-4 hover:border-emerald-700" href={`/products/${item.productId}`} key={item.productId}>
-                <div className="flex flex-wrap items-start justify-between gap-4">
-                  <div>
-                    <p className="text-xl font-black text-slate-950">{item.name}</p>
-                    <p className="mt-1 text-sm text-slate-600">{item.quantity} × {formatSek(item.unitPrice)} at {item.storeName}</p>
+            {studentBasicsBoard.items.map((item) => {
+              const recommendationReasons = basketIdeaRecommendationExplanations({
+                productId: item.productId,
+                name: item.name,
+                storeName: item.storeName,
+                unitPrice: item.unitPrice,
+                dietaryTags: item.productId.includes('rice') || item.productId.includes('pasta') ? ['vegetarian'] : []
+              }, {
+                cheapestStoreName: comparison.bestSingleStore?.storeName,
+                dietaryPreferences: ['vegetarian'],
+                frequentlyBoughtTogetherIds
+              });
+
+              return (
+                <Link className="block rounded-2xl border border-slate-200 p-4 hover:border-emerald-700" href={`/products/${item.productId}`} key={item.productId}>
+                  <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div>
+                      <p className="text-xl font-black text-slate-950">{item.name}</p>
+                      <p className="mt-1 text-sm text-slate-600">{item.quantity} × {formatSek(item.unitPrice)} at {item.storeName}</p>
+                      <ul className="mt-3 flex flex-wrap gap-2" aria-label={`${item.name} recommendation explanations`}>
+                        {recommendationReasons.map((reason) => (
+                          <li className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-900" key={reason}>{reason}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <p className="text-2xl font-black text-emerald-800">{formatSek(item.lineTotal)}</p>
                   </div>
-                  <p className="text-2xl font-black text-emerald-800">{formatSek(item.lineTotal)}</p>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         </Card>
         <Card>
