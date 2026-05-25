@@ -40,6 +40,23 @@ loyalty/member-price-adjusted basket (the feature *no* rival has).
 
 Ship a **visibly populated Stockholm grocery price terminal** at
 
+## Local Development
+
+Start the local API stack with Docker Compose:
+
+```bash
+docker compose up api
+```
+
+The compose stack starts PostgreSQL on `localhost:5432`, Redis on `localhost:6379`,
+and the API server on `http://localhost:3001`. The API receives
+`DATABASE_URL=postgresql://groceryview:groceryview@postgres:5432/groceryview`,
+`DATABASE_POOL_MODE=direct`, and `REDIS_URL=redis://redis:6379` inside the
+container.
+
+Stop the stack with `docker compose down`; add `-v` when you also want to remove
+the local PostgreSQL and dependency volumes.
+
 ## ✅ Recently shipped (last 15 merged `feat:`/`wire:` PRs)
 
 - #3256 feat(web): lazy load card images with placeholders

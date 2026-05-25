@@ -17,10 +17,15 @@ export type ScrapeSchedulerConfig = {
   retailers: RetailerScrapeScheduleConfig[];
 };
 
+export type ApiRedisConfig = {
+  url: string | undefined;
+};
+
 export type ApiConfig = {
   cors: ApiCorsConfig;
   database: ApiDatabaseConfig;
   requestLogging: RequestLoggingConfig;
+  redis: ApiRedisConfig;
   scrapeScheduler: ScrapeSchedulerConfig;
 };
 
@@ -83,6 +88,12 @@ function loadScrapeSchedulerConfig(env: NodeJS.ProcessEnv): ScrapeSchedulerConfi
   };
 }
 
+function loadRedisConfig(env: NodeJS.ProcessEnv): ApiRedisConfig {
+  return {
+    url: env.REDIS_URL?.trim() || undefined
+  };
+}
+
 export function loadApiConfig(env: NodeJS.ProcessEnv = process.env): ApiConfig {
   return {
     cors: loadCorsConfig(env),
@@ -91,6 +102,7 @@ export function loadApiConfig(env: NodeJS.ProcessEnv = process.env): ApiConfig {
       enabled: parseBooleanFlag(env.REQUEST_LOGGING_ENABLED, true),
       serviceName: env.API_SERVICE_NAME?.trim() || 'groceryview-api'
     },
+    redis: loadRedisConfig(env),
     scrapeScheduler: loadScrapeSchedulerConfig(env)
   };
 }
