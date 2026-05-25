@@ -1419,6 +1419,11 @@ describe('verified-data UI', () => {
     assert.match(source, /buildWatchlistAlerts/);
     assert.match(source, /Baby & diaper price tracking/);
     assert.match(source, /diaperUnitPrice/);
+    assert.match(source, /brandFilters/);
+    assert.match(source, /sizeFilters/);
+    assert.match(source, /strictMatchKey/);
+    assert.match(source, /historicalLowBadge/);
+    assert.match(source, /targetPriceLabel/);
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
