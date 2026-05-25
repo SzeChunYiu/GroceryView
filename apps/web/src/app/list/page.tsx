@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ListCard } from '@/components/list-card';
+import { ListCard, type MealPlanListImportSummary } from '@/components/list-card';
 import { ListSharePreview } from '@/components/list-share-preview';
 import { createPublicListShareToken, publicListSharePath, type PublicListShareItem } from '@/lib/list-permissions';
+import { parseMealPlanShoppingListExport, type MealPlanShoppingListExport } from '@/lib/meal-budgets';
 import { storeLayoutDepartments, storeLayoutDepartmentsForOrder, type StoreLayoutChain, type StoreLayoutGroupOrder } from '@/lib/trip-planner';
 import { metadataForShoppingListShare } from '@/lib/seo';
+import { OFFLINE_LIST_EDIT_RECONCILIATION_STEPS, offlineListSyncStatusCopy } from '@/lib/offline-sync';
 
 const demoItems = [
   { id: 'bananas', name: 'Bananas', quantity: '1 bunch', ownerRole: 'guardian' as const },
@@ -26,6 +28,7 @@ const publicDemoShareItems: PublicListShareItem[] = demoItems.map((item) => ({
 type ListPageSearchParams = {
   chain?: string | string[];
   groupOrder?: string | string[];
+  mealPlan?: string | string[];
   share?: string | string[];
 };
 
@@ -41,6 +44,28 @@ function normalizeGroupOrder(groupOrder: string | string[] | undefined): StoreLa
   return requested === 'reverse-layout' ? 'reverse-layout' : 'store-layout';
 }
 
+function formatSek(value: number) {
+  return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);
+}
+
+function mealPlanExportFromParam(value: string | string[] | undefined): MealPlanShoppingListExport | null {
+  const raw = Array.isArray(value) ? value[0] : value;
+  return raw ? parseMealPlanShoppingListExport(raw) : null;
+}
+
+function mealPlanImportSummary(exportPayload: MealPlanShoppingListExport): MealPlanListImportSummary {
+  return {
+    chainTotals: exportPayload.chainTotals.map((chain) => ({
+      chain: chain.chain,
+      estimatedTotalLabel: formatSek(chain.estimatedTotal),
+      itemCount: chain.itemCount
+    })),
+    estimatedTotalLabel: formatSek(exportPayload.estimatedTotal),
+    itemCount: exportPayload.items.length,
+    mealTitle: exportPayload.mealTitle
+  };
+}
+
 export async function generateMetadata({ searchParams }: { searchParams?: Promise<ListPageSearchParams> }): Promise<Metadata> {
   const resolvedSearchParams = await (searchParams ?? Promise.resolve({}));
   return metadataForShoppingListShare(resolvedSearchParams.share);
@@ -51,15 +76,44 @@ export default async function ShoppingListPage({ searchParams }: { searchParams?
   const selectedChain = normalizeChain(resolvedSearchParams.chain);
   const groupOrder = normalizeGroupOrder(resolvedSearchParams.groupOrder);
   const shareToken = Array.isArray(resolvedSearchParams.share) ? resolvedSearchParams.share[0] : resolvedSearchParams.share;
+  const mealPlanExport = mealPlanExportFromParam(resolvedSearchParams.mealPlan);
+  const mealPlanItems = mealPlanExport?.items.map((item) => ({
+    id: item.id,
+    name: item.name,
+    ownerRole: 'guardian' as const,
+    quantity: item.quantity
+  })) ?? [];
+  const listItems = [...mealPlanItems, ...demoItems.filter((item) => !mealPlanItems.some((mealItem) => mealItem.id === item.id))];
   const publicShareToken = shareToken ?? createPublicListShareToken({
     expiresAt: '2026-06-30T23:59:59.000Z',
     items: publicDemoShareItems,
     listId: 'weekly-staples'
   });
   const publicShareHref = publicListSharePath(publicShareToken);
+  const pendingOfflineCopy = offlineListSyncStatusCopy({ isOnline: false, pendingEdits: 2 });
+  const syncedOfflineCopy = offlineListSyncStatusCopy({ isOnline: true, pendingEdits: 0, lastSyncedAt: 'after background sync' });
 
   return (
     <div className="space-y-6">
+      <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4" aria-labelledby="offline-sync-title">
+        <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">Offline edit reconciliation</p>
+        <h2 id="offline-sync-title" className="mt-1 text-xl font-bold text-slate-950">Pending edits stay visible until sync finishes</h2>
+        <div className="mt-3 grid gap-3 md:grid-cols-2">
+          <div className="rounded-xl border border-amber-200 bg-white px-3 py-2" role="status">
+            <p className="text-sm font-black text-amber-900">{pendingOfflineCopy.label}</p>
+            <p className="mt-1 text-sm text-amber-950">{pendingOfflineCopy.helper} {pendingOfflineCopy.detail}</p>
+          </div>
+          <div className="rounded-xl border border-emerald-200 bg-white px-3 py-2" role="status">
+            <p className="text-sm font-black text-emerald-900">{syncedOfflineCopy.label}</p>
+            <p className="mt-1 text-sm text-emerald-950">{syncedOfflineCopy.helper} {syncedOfflineCopy.detail}</p>
+          </div>
+        </div>
+        <ul className="mt-3 space-y-2 text-sm font-semibold text-amber-950">
+          {OFFLINE_LIST_EDIT_RECONCILIATION_STEPS.map((step) => (
+            <li key={step} className="rounded-xl bg-white/70 px-3 py-2">{step}</li>
+          ))}
+        </ul>
+      </section>
       <ListSharePreview />
       <section className="rounded-2xl border border-sky-200 bg-sky-50 p-4">
         <p className="text-xs font-semibold uppercase tracking-wide text-sky-800">Public share page</p>
@@ -94,7 +148,14 @@ export default async function ShoppingListPage({ searchParams }: { searchParams?
           Approximate route: {storeLayoutDepartmentsForOrder(selectedChain, groupOrder).map((department) => department.label).join(' → ')}.
         </p>
       </section>
-      <ListCard currentRole="guardian" groupOrder={groupOrder} items={demoItems} publicShareHref={publicShareHref} selectedChain={selectedChain} />
+      <ListCard
+        currentRole="guardian"
+        groupOrder={groupOrder}
+        items={listItems}
+        mealPlanImport={mealPlanExport ? mealPlanImportSummary(mealPlanExport) : undefined}
+        publicShareHref={publicShareHref}
+        selectedChain={selectedChain}
+      />
     </div>
   );
 }

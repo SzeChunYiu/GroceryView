@@ -6,19 +6,29 @@ export const requiredGithubActionSecrets = [
   'DATABASE_URL',
   'GROCERYVIEW_SERVER_URL',
   'GROCERYVIEW_API_BASE_URL',
-  'EXPO_TOKEN',
   'VERCEL_TOKEN',
   'VERCEL_ORG_ID',
   'VERCEL_PROJECT_ID',
   'METRICS_TOKEN',
-  'RESEND_API_KEY',
   'WEEKLY_DIGEST_FROM_EMAIL',
   'GROCERYVIEW_SCANNER_BEARER_TOKEN'
 ];
 
+// Secrets used only in optional side-workflows (mobile builds, email digest, smoke tests).
+// Missing entries are reported as warnings, not deploy blockers.
+export const pendingGithubActionSecrets = [
+  'EXPO_TOKEN',
+  'RESEND_API_KEY'
+];
+
 export const requiredGithubActionVariables = [
   'GROCERYVIEW_PRODUCTION_URL',
-  'GROCERYVIEW_TERMINAL_PRODUCT_ID',
+  'GROCERYVIEW_TERMINAL_PRODUCT_ID'
+];
+
+// Variables used only in optional side-workflows (smoke tests).
+// Missing entries are reported as warnings, not deploy blockers.
+export const pendingGithubActionVariables = [
   'GROCERYVIEW_SCANNER_USER_ID'
 ];
 
@@ -111,6 +121,7 @@ export function findInvalidDbRecoverySecrets(env) {
 function uniqueSecretNames() {
   return Array.from(new Set([
     ...requiredGithubActionSecrets,
+    ...pendingGithubActionSecrets,
     ...requiredRuntimeSecrets,
     ...pendingRuntimeSecrets,
     ...requiredDbCutoverSecrets,
@@ -122,6 +133,7 @@ function uniqueSecretNames() {
 function uniqueVariableNames() {
   return Array.from(new Set([
     ...requiredGithubActionVariables,
+    ...pendingGithubActionVariables,
     ...requiredDbRecoveryVariables,
     ...runtimeSecretsSatisfiableByVariables
   ]));
@@ -251,6 +263,8 @@ function main() {
     : readGithubVariableNames(repo, environment);
   const missingGithubActionSecrets = findMissingSecrets(requiredGithubActionSecrets, secretNames);
   const missingGithubActionVariables = findMissingSecrets(requiredGithubActionVariables, variableNames);
+  const pendingGithubActionSecretsMissing = findMissingSecrets(pendingGithubActionSecrets, secretNames);
+  const pendingGithubActionVariablesMissing = findMissingSecrets(pendingGithubActionVariables, variableNames);
   const missingRuntimeSecrets = findMissingRuntimeSecrets(requiredRuntimeSecrets, secretNames, variableNames);
   const pendingRuntimeSecretsMissing = findMissingSecrets(pendingRuntimeSecrets, secretNames);
   const missingDbCutoverSecrets = findMissingSecrets(requiredDbCutoverSecrets, secretNames);
@@ -280,6 +294,8 @@ function main() {
     blocker: status === 'ready' ? undefined : resultBlocker(scope, checks),
     missingGithubActionSecrets,
     missingGithubActionVariables,
+    pendingGithubActionSecretsMissing,
+    pendingGithubActionVariablesMissing,
     missingRuntimeSecrets,
     pendingRuntimeSecretsMissing,
     missingDbCutoverSecrets,

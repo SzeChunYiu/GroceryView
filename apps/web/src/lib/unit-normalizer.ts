@@ -27,6 +27,18 @@ export function unitNormalizationQaSeverity(kind: UnitNormalizationQaIssueKind):
   return "warning";
 }
 
+export function unitNormalizationQaIssueLabel(kind: UnitNormalizationQaIssueKind) {
+  if (kind === "missing_unit") return "Missing unit";
+  if (kind === "inconsistent_unit_price") return "Extreme unit price";
+  return "Suspicious pack size";
+}
+
+export function unitNormalizationQaSeverityLabel(severity: UnitNormalizationQaSeverity) {
+  if (severity === "blocker") return "Blocker";
+  if (severity === "review") return "Needs review";
+  return "Warning";
+}
+
 const MASS_KG: UnitAlias = {
   canonicalUnit: "kg",
   kind: "mass",
@@ -302,5 +314,7 @@ export const unitNormalizer = Object.freeze({
   areCompatibleUnits,
   parsePackageSize,
   mergeMealPlanIngredientsForWeeklyBasket,
+  unitNormalizationQaIssueLabel,
   unitNormalizationQaSeverity,
+  unitNormalizationQaSeverityLabel,
 });
