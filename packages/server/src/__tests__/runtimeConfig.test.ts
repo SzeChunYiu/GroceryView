@@ -68,6 +68,7 @@ class RecordingPgPool {
           'weekly_baskets',
           'basket_items',
           'basket_import_review_items',
+          'friend_shared_deal_signals',
           'human_review_assignments',
           'human_reviewers',
           'community_reporter_trust',
@@ -110,7 +111,8 @@ class RecordingPgPool {
           '016_observation_connector_idempotency',
           '017_observation_availability',
           '018_household_collaboration_rls',
-          '019_price_snapshot_unique_index'
+          '019_price_snapshot_unique_index',
+          '025_friend_shared_deal_signals'
         ].map((version) => ({ version }))
       };
     }

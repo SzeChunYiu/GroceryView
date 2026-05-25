@@ -1554,6 +1554,40 @@ describe('createGroceryViewApi', () => {
     assert.deepEqual(api.getBasket('user-1').items, []);
   });
 
+  it('plans multi-week stock-up rows from account baskets without forecasting missing history', () => {
+    const api = createGroceryViewApi();
+
+    api.addBasketItem('stock-user-1', { productId: 'coffee', quantity: 2 });
+    api.addBasketItem('stock-user-1', { productId: 'milk', quantity: 6 });
+    api.updateBudget('stock-user-1', { weeklyBudget: 1000, monthlyBudget: 4000 });
+
+    const plan = api.getMultiWeekStockUpPlan('stock-user-1', {
+      asOf: '2026-05-20T12:00:00.000Z',
+      planningWeeks: 3,
+      historyByProductId: {
+        milk: []
+      }
+    });
+
+    assert.equal(plan.userId, 'stock-user-1');
+    assert.equal(plan.planningWeeks, 3);
+    assert.equal(plan.weeklyBudget, 1000);
+    assert.equal(plan.itemCount, 1);
+    assert.equal(plan.coverage.observedItemCount, 1);
+    assert.equal(plan.coverage.totalItemCount, 2);
+    assert.deepEqual(plan.coverage.missingHistoryProductIds, ['milk']);
+    assert.equal(plan.coverage.confidence, 'low');
+    assert.equal(plan.evidence.noForecast, true);
+    assert.match(plan.guardrails[0] ?? '', /No price forecast/i);
+    assert.equal(plan.rows[0]?.productId, 'coffee');
+    assert.equal(plan.rows[0]?.weeklyNeedUnits, 2);
+    assert.equal(plan.rows[0]?.observationCount, 3);
+    assert.equal(plan.rows[0]?.historicalLowUnitPrice, 49.9);
+    assert.equal(plan.rows[0]?.typicalUnitPrice, 59.9);
+    assert.equal(plan.rows[0]?.upfrontCost, 299.4);
+    assert.equal(plan.rows[0]?.weeklyBudgetSharePercent, 9.98);
+  });
+
   it('summarizes category budgets from the current basket and reports unbudgeted spend', () => {
     const api = createGroceryViewApi();
 

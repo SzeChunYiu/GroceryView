@@ -7,6 +7,7 @@ import {
   calculateDealScore,
   calculateFixedBasketIndex,
   compareBasketStrategies,
+  planMultiWeekStockUpList,
   planBasketFulfillmentSlots,
   planBasketImportExport,
   planBasketTripCost,
@@ -51,6 +52,9 @@ import {
   type LocalOfferBasketSummary,
   type MealDeal,
   type MealSuggestion,
+  type MultiWeekStockUpConfidence,
+  type MultiWeekStockUpHistoryPoint,
+  type MultiWeekStockUpPlan,
   type PriceChartAdapterResult,
   type PriceChartObservation,
   type PriceHistoryConfidenceDisclosure,
@@ -1174,6 +1178,37 @@ export type WatchlistPriceAlertReport = {
 export type UserBudgetPatch = {
   weeklyBudget: number;
   monthlyBudget: number;
+};
+
+export type MultiWeekStockUpPlannerOptions = {
+  asOf?: string;
+  planningWeeks?: number;
+  weeklyBudget?: number;
+  historyByProductId?: Record<string, MultiWeekStockUpHistoryPoint[]>;
+};
+
+export type MultiWeekStockUpPlannerRow = MultiWeekStockUpPlan['rows'][number] & {
+  rowId: string;
+  userId: string;
+  storeId?: string;
+  weeklyNeedUnits: number;
+  packageUnits: number;
+  noForecastReason: string;
+  updatedAt: string;
+};
+
+export type MultiWeekStockUpPlannerReport = Omit<MultiWeekStockUpPlan, 'rows' | 'coverage'> & {
+  userId: string;
+  itemCount: number;
+  rows: MultiWeekStockUpPlannerRow[];
+  coverage: MultiWeekStockUpPlan['coverage'] & {
+    missingHistoryProductIds: string[];
+  };
+  evidence: {
+    sourceTables: string[];
+    noForecast: true;
+    historicalPriceFields: string[];
+  };
 };
 
 export type CategoryBudgetPatch = {
@@ -2572,6 +2607,38 @@ function storeForId(storeId: string): Store | undefined {
 
 function sortedHistory(product: ProductDetail) {
   return [...product.history].sort((left, right) => Date.parse(left.date) - Date.parse(right.date));
+}
+
+const stockUpPlannerNoForecastReason =
+  'No price forecast: the list combines current basket prices with factual observed low/typical context and spreads today\'s budget impact across the planning horizon.';
+
+const stockUpPlannerHistoricalPriceFields = [
+  'historicalLowUnitPrice',
+  'typicalUnitPrice',
+  'confidence',
+  'historyWindowStart',
+  'historyWindowEnd',
+  'observationCount'
+];
+
+function confidenceForHistoryPoint(product: ProductDetail, point: { verified: boolean }): number {
+  if (!point.verified) return 0.35;
+  return Math.max(0.65, Math.min(0.95, product.dealSignals.sourceConfidence));
+}
+
+function stockUpHistoryForProduct(product: ProductDetail): MultiWeekStockUpHistoryPoint[] {
+  return sortedHistory(product).map((point) => ({
+    observedAt: toIsoObservedAt(point.date),
+    unitPrice: point.price,
+    sourceType: point.verified ? 'shelf' : 'estimated',
+    confidence: confidenceForHistoryPoint(product, point)
+  }));
+}
+
+function stockUpCoverageConfidence(values: MultiWeekStockUpConfidence[], missingHistoryCount: number): MultiWeekStockUpConfidence {
+  if (missingHistoryCount > 0 || values.includes('low')) return 'low';
+  if (values.length === 0 || values.includes('medium')) return 'medium';
+  return 'high';
 }
 
 function latestObservedAt(product: ProductDetail): string | null {
@@ -5337,6 +5404,91 @@ export function createGroceryViewApi() {
     compareBasket(userId: string): BasketComparisonResult {
       const favoriteStoreIds = this.getFavoriteStores(userId).map((store) => store.id);
       return compareBasketStrategies({ favoriteStoreIds, items: basketInputItems(baskets.get(userId) ?? []) });
+    },
+
+    getMultiWeekStockUpPlan(userId: string, options: MultiWeekStockUpPlannerOptions = {}): MultiWeekStockUpPlannerReport {
+      requireNonEmptyId(userId, 'userId');
+      const basketItems = baskets.get(userId) ?? [];
+      const asOf = options.asOf ?? '2026-05-20T12:00:00.000Z';
+      const planningWeeks = options.planningWeeks ?? 3;
+      const savedWeeklyBudget = budgets.get(userId)?.weeklyBudget;
+      const weeklyBudget = options.weeklyBudget ?? (savedWeeklyBudget && savedWeeklyBudget > 0 ? savedWeeklyBudget : 800);
+      const missingHistoryProductIds: string[] = [];
+      const weeklyNeedByProductId = new Map<string, number>();
+      const packageUnitsByProductId = new Map<string, number>();
+      const plannedItems = basketItems.flatMap((item) => {
+        const product = products.find((candidate) => candidate.id === item.productId);
+        if (!product) return [];
+        const bestPrice = bestPriceFor(product);
+        const history = options.historyByProductId?.[product.id] ?? stockUpHistoryForProduct(product);
+        if (!bestPrice || history.length === 0) {
+          missingHistoryProductIds.push(product.id);
+          return [];
+        }
+        weeklyNeedByProductId.set(product.id, item.quantity);
+        packageUnitsByProductId.set(product.id, 1);
+        return [{
+          productId: product.id,
+          productName: product.name,
+          storeName: bestPrice.storeName,
+          weeklyNeedUnits: item.quantity,
+          packageUnits: 1,
+          comparableUnit: 'basket unit',
+          currentUnitPrice: bestPrice.price,
+          history,
+          seasonalityNote: 'Generated from account basket lines and dated product price history; no future shelf-price projection.'
+        }];
+      });
+
+      const plan = planMultiWeekStockUpList({
+        asOf,
+        planningWeeks,
+        weeklyBudget,
+        items: plannedItems
+      });
+      const rowConfidence = plan.rows.map((row) => row.confidence);
+      const coverageConfidence = stockUpCoverageConfidence(rowConfidence, missingHistoryProductIds.length);
+
+      return {
+        userId,
+        itemCount: plan.rows.length,
+        asOf: plan.asOf,
+        planningWeeks: plan.planningWeeks,
+        weeklyBudget: plan.weeklyBudget,
+        totalUpfrontCost: plan.totalUpfrontCost,
+        weeklyEquivalentCost: plan.weeklyEquivalentCost,
+        weeklyBudgetSharePercent: plan.weeklyBudgetSharePercent,
+        rows: plan.rows.map((row) => {
+          const product = products.find((candidate) => candidate.id === row.productId);
+          const bestPrice = product ? bestPriceFor(product) : null;
+          return {
+            ...row,
+            rowId: row.productId,
+            userId,
+            ...(bestPrice ? { storeId: bestPrice.storeId } : {}),
+            weeklyNeedUnits: weeklyNeedByProductId.get(row.productId) ?? 1,
+            packageUnits: packageUnitsByProductId.get(row.productId) ?? 1,
+            noForecastReason: stockUpPlannerNoForecastReason,
+            updatedAt: asOf
+          };
+        }),
+        coverage: {
+          ...plan.coverage,
+          confidence: coverageConfidence,
+          observedItemCount: plan.rows.length,
+          totalItemCount: basketItems.length,
+          missingHistoryProductIds,
+          caveat: missingHistoryProductIds.length > 0
+            ? 'Some basket items have no usable historical price rows; missing history lowers coverage instead of producing a forecast.'
+            : plan.coverage.caveat
+        },
+        guardrails: plan.guardrails,
+        evidence: {
+          sourceTables: ['basket_items', 'products.history', 'latest_prices'],
+          noForecast: true,
+          historicalPriceFields: stockUpPlannerHistoricalPriceFields
+        }
+      };
     },
 
     compareBasketReport(userId: string): BasketComparisonReport {

@@ -91,7 +91,7 @@ export function StockUpListActions({ draftRows }: StockUpListActionsProps) {
     const session = requireSession();
     if (!session) return;
     try {
-      const response = await fetch(`/users/${encodeURIComponent(session.userId)}/basket/stock-up-list`, {
+      const response = await fetch(`/api/basket/stock-up-list?userId=${encodeURIComponent(session.userId)}`, {
         headers: { Authorization: `Bearer ${session.accessToken}` }
       });
       if (!response.ok) {

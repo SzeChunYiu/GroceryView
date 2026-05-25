@@ -2922,6 +2922,20 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (method === 'GET') return jsonResponse(api.getBasket(user));
       }
 
+      if (path === '/api/basket/stock-up-list') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') {
+          return jsonResponse(api.getMultiWeekStockUpPlan(user, {
+            asOf: url.searchParams.get('asOf') ?? undefined,
+            planningWeeks: optionalQueryNumber(url, 'planningWeeks'),
+            weeklyBudget: optionalQueryNumber(url, 'weeklyBudget')
+          }));
+        }
+      }
+
       if (path === '/api/basket/items') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
@@ -3565,6 +3579,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/basket/transfer/{retailerId}': { get: protectedOperation('Preflight secure retailer basket transfer and block unless capability is verified.') },
       '/api/basket/recurring-digest': { get: protectedOperation('Get recurring basket changes, missing-price blockers, and suggested review actions.') },
       '/api/basket/stores/{storeId}/quote': { get: protectedOperation('Quote the current basket at one store with missing-price labels.') },
+      '/api/basket/stock-up-list': { get: protectedOperation('Plan a multi-week stock-up list from signed-in basket items and observed price history without forecasting.') },
       '/api/budget': { patch: protectedOperation('Update budget.') },
       '/api/budget/categories': {
         get: protectedOperation('Get category budget summary.'),
