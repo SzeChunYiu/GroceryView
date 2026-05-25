@@ -32,6 +32,51 @@ export function Card({ children, className = '' }: Readonly<{ children: ReactNod
   return <section className={`rounded-[1.75rem] border border-slate-200 bg-white/88 p-5 shadow-sm ${className}`}>{children}</section>;
 }
 
+export function DashboardHero({
+  actions,
+  children,
+  eyebrow,
+  title
+}: Readonly<{ actions?: ReactNode; children: ReactNode; eyebrow: string; title: string }>) {
+  return (
+    <section className="rounded-[2rem] border border-emerald-200 bg-white/90 p-6 shadow-sm">
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+        <div className="max-w-4xl">
+          <Eyebrow>{eyebrow}</Eyebrow>
+          <h1 className="mt-2 text-4xl font-black tracking-tight text-slate-950 md:text-5xl">{title}</h1>
+          <div className="mt-4 text-lg leading-8 text-slate-700">{children}</div>
+        </div>
+        {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
+      </div>
+    </section>
+  );
+}
+
+export function AdminMetricCard({
+  detail,
+  label,
+  value
+}: Readonly<{ detail: ReactNode; label: string; value: string }>) {
+  return (
+    <Card className="p-4">
+      <p className="text-sm font-semibold text-slate-600">{label}</p>
+      <p className="mt-2 text-3xl font-black tracking-tight text-slate-950">{value}</p>
+      <div className="mt-2 text-sm leading-6 text-slate-600">{detail}</div>
+    </Card>
+  );
+}
+
+export function StatusBadge({ children, tone = 'neutral' }: Readonly<{ children: ReactNode; tone?: 'neutral' | 'success' | 'warning' }>) {
+  const toneClass =
+    tone === 'success'
+      ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
+      : tone === 'warning'
+        ? 'border-amber-200 bg-amber-50 text-amber-950'
+        : 'border-slate-200 bg-slate-50 text-slate-700';
+
+  return <span className={`rounded-full border px-3 py-1 text-xs font-black uppercase tracking-[0.14em] ${toneClass}`}>{children}</span>;
+}
+
 export function MetricGrid() {
   return (
     <div className="grid gap-3 md:grid-cols-4">
