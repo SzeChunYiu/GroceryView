@@ -60,7 +60,7 @@ export default function AdminReviewsPage() {
           </p>
         </div>
 
-        <section className="mt-6 grid gap-4 md:grid-cols-3" aria-label="Review moderation queue summary">
+        <section className="mt-6 grid gap-4 md:grid-cols-4" aria-label="Review moderation queue summary">
           <div className="rounded-[1.5rem] border border-rose-200 bg-white p-5 shadow-sm">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-800">Flagged reviews</p>
             <p className="mt-2 text-3xl font-black text-slate-950">{queueCounts.flaggedReviews}</p>
@@ -72,6 +72,10 @@ export default function AdminReviewsPage() {
           <div className="rounded-[1.5rem] border border-emerald-200 bg-white p-5 shadow-sm">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Freshness votes</p>
             <p className="mt-2 text-3xl font-black text-slate-950">{queueCounts.freshnessVotes}</p>
+          </div>
+          <div className="rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Total queue</p>
+            <p className="mt-2 text-3xl font-black text-slate-950">{reviewQueue.length}</p>
           </div>
         </section>
 

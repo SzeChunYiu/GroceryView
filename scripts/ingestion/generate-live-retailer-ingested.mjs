@@ -65,6 +65,9 @@ const requestedSources = new Set((process.env.GROCERYVIEW_INGEST_SOURCES ?? '')
   .map((source) => source.trim().toLowerCase())
   .filter(Boolean));
 const shouldRun = (source) => requestedSources.size === 0 || requestedSources.has(source);
+const dbSiteOverrideSources = ['citygross', 'willys', 'hemkop', 'lidl'];
+const shouldWriteDbSiteOverrides = requestedSources.size === 0
+  || dbSiteOverrideSources.every((source) => requestedSources.has(source));
 
 const CITY_GROSS_QUERIES = DEFAULT_CITY_GROSS_PRODUCT_QUERIES;
 const COOP_QUERIES = DEFAULT_COOP_PRODUCT_QUERIES;
@@ -276,7 +279,7 @@ if (shouldRun('seven-eleven-se')) {
   summary.sevenElevenSeProducts = sevenElevenSeProducts.length;
 }
 
-if (['citygross', 'willys', 'hemkop', 'lidl'].some((source) => shouldRun(source))) {
+if (shouldWriteDbSiteOverrides) {
   await writeDbSiteIngestedOverrides([
     buildCompareStoreCapability({
       chainId: 'city_gross',
@@ -1413,11 +1416,11 @@ async function writeChunkedGeneratedArray({ directoryName, exportPrefix, rows, c
 
 async function writeGeneratedFile(fileName, lines) {
   while (lines.at(-1) === '') lines.pop();
-  await writeFile(new URL(fileName, INGESTED_DIR), `${lines.join('\n')}\n`);
+  await writeFile(new URL(fileName, INGESTED_DIR), withSingleTrailingNewline(lines.join('\n')));
 }
 
 async function writeDbSiteIngestedOverrides(compareStoreCapabilities) {
-  await writeFile(new URL('db-site-ingested-overrides.ts', GENERATED_DIR), `${[
+  await writeFile(new URL('db-site-ingested-overrides.ts', GENERATED_DIR), withSingleTrailingNewline([
     '// AUTO-GENERATED from live retailer ingestion by scripts/ingestion/generate-live-retailer-ingested.mjs.',
     `// Generated at: ${retrievedAt}`,
     `// Compare store capability row count: ${compareStoreCapabilities.length}`,
@@ -1448,7 +1451,7 @@ async function writeDbSiteIngestedOverrides(compareStoreCapabilities) {
     `export const dbSiteIcaReklambladSource = ${literal({ source: 'postgres.latest_prices/observations ICA flyer-compatible fallback', retrievedAt: null, rowCount: 0 })} as const;`,
     `export const dbSiteMathemSource = ${literal({ source: 'postgres.latest_prices/observations Mathem-compatible fallback', retrievedAt: null, rowCount: 0 })} as const;`,
     ''
-  ].join('\n')}\n`);
+  ].join('\n')));
 }
 
 function buildCompareStoreCapability({ chainId, productRows = [], couponRows = [], deliveryRows = [], pickupRows = [] }) {
@@ -1483,6 +1486,10 @@ function unique(values) {
 
 function literal(value) {
   return JSON.stringify(value, null, 2);
+}
+
+function withSingleTrailingNewline(value) {
+  return `${value.replace(/\n+$/u, '')}\n`;
 }
 
 function oneLine(value) {
