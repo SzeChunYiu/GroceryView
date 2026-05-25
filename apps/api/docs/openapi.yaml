@@ -37,6 +37,10 @@
         "properties": {},
         "type": "object"
       },
+      "PasswordChangeDto": {
+        "properties": {},
+        "type": "object"
+      },
       "SettingsPatchDto": {
         "properties": {},
         "type": "object"
@@ -81,6 +85,29 @@
         },
         "tags": [
           "root"
+        ]
+      }
+    },
+    "/admin/coverage": {
+      "get": {
+        "operationId": "AdminController_coverage",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-groceryview-role",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Admin"
         ]
       }
     },
@@ -248,6 +275,35 @@
         "responses": {
           "200": {
             "description": "Save authenticated user preferences for currency, preferred stores, notification channels, and MyFlyer algorithm_choice"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/settings/profile/password": {
+      "patch": {
+        "operationId": "AuthenticatedSettingsController_updatePassword",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordChangeDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Verify the current password and persist a rotated password credential for the signed-in account"
           }
         },
         "security": [
@@ -593,10 +649,19 @@
     "/market/overview": {
       "get": {
         "operationId": "MarketController_overview",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "market",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Stockholm grocery market overview"
+            "description": "Country-scoped grocery market overview"
           }
         },
         "tags": [

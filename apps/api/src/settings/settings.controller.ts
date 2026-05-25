@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, HttpCode, Patch, Req, ServiceUnavailableException, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { planAccountDeletion } from '@groceryview/core';
-import { ArrayMaxSize, ArrayMinSize, IsArray, IsIn, IsOptional, IsString, Matches } from 'class-validator';
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsIn, IsOptional, IsString, Matches, MinLength } from 'class-validator';
 import { AuthGuard, authenticatedUserId, type AuthenticatedRequest } from '../middleware/auth.js';
 import { settingsRoutes } from '../routes/settings.js';
 import { buildDemoUserDataExport } from './data-export.js';
@@ -30,6 +30,16 @@ class SettingsPatchDto {
   algorithm_choice?: (typeof allowedMyFlyerAlgorithmChoices)[number];
 }
 
+class PasswordChangeDto {
+  @IsString()
+  @MinLength(8)
+  currentPassword!: string;
+
+  @IsString()
+  @MinLength(8)
+  newPassword!: string;
+}
+
 @ApiTags('settings')
 @ApiBearerAuth()
 @Controller(settingsRoutes.settings)
@@ -54,6 +64,16 @@ export class AuthenticatedSettingsController {
       throw new ServiceUnavailableException('DATABASE_URL is required to save authenticated settings.');
     }
     return this.settings.savePreferences(authenticatedUserId(request), body);
+  }
+
+  @Patch(settingsRoutes.profilePassword)
+  @UseGuards(AuthGuard)
+  @ApiOkResponse({ description: settingsRoutes.passwordChangeDescription })
+  async updatePassword(@Req() request: AuthenticatedRequest, @Body() body: PasswordChangeDto) {
+    if (!this.settings.isConfigured()) {
+      throw new ServiceUnavailableException('DATABASE_URL is required to change authenticated profile passwords.');
+    }
+    return this.settings.changePassword(authenticatedUserId(request), body);
   }
 }
 

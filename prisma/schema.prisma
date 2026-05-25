@@ -87,8 +87,32 @@ model User {
   updatedAt     DateTime  @updatedAt @map("updated_at")
   accounts      Account[]
   sessions      Session[]
+  passwordCredential PasswordCredential?
+  passwordChanges    PasswordChange[]
 
   @@map("users")
+}
+
+model PasswordCredential {
+  userId       String   @id @map("user_id")
+  passwordHash String   @map("password_hash") @db.Text
+  algorithm    String   @default("scrypt")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  changedAt    DateTime @default(now()) @map("changed_at")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("password_credentials")
+}
+
+model PasswordChange {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id")
+  changedAt DateTime @default(now()) @map("changed_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, changedAt])
+  @@map("password_changes")
 }
 
 model Account {
