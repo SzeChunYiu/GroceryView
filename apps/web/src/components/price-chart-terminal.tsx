@@ -22,7 +22,7 @@ export { formatPriceChartTerminalReadout, priceChartTerminalLatestPoint } from '
  */
 type LineStyleName = 'solid' | 'dashed' | 'dotted';
 type ChartLoadStatus = 'idle' | 'loading' | 'ready' | 'failed';
-type PriceChartTerminalMetricId = 'price' | 'unitPrice';
+export type PriceChartTerminalMetricId = 'price' | 'unitPrice';
 type LightweightChartsModule = typeof import('lightweight-charts');
 type LightweightChartsValues = Pick<LightweightChartsModule, 'ColorType' | 'LineSeries' | 'LineStyle' | 'createChart'>;
 
