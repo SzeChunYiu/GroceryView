@@ -111,6 +111,43 @@ describe('my-flyer API payload', () => {
     }
   });
 
+  it('uses authenticated favorite store watchlist and recent basket signals without user_id fallback profiles', () => {
+    const source = readFileSync(new URL('../src/lib/my-flyer.ts', import.meta.url), 'utf8');
+    assert.doesNotMatch(source, /profileForUser|userHash/);
+    assert.match(source, /buildMyFlyerUserSignals/);
+    assert.match(source, /favoriteStoreIds/);
+    assert.match(source, /watchlistProductIds/);
+    assert.match(source, /recentBasketProductIds/);
+
+    const { cleanup, module } = loadMyFlyerModule();
+    try {
+      const payload = module.buildMyFlyerPayload({
+        userId: 'user-1',
+        algorithm: 'watchlist_first',
+        country: 'se',
+        limit: 4,
+        userSignals: module.buildMyFlyerUserSignals({
+          authenticated: true,
+          favoriteStoreIds: ['willys-odenplan'],
+          watchlistProductIds: ['private-label-milk'],
+          watchlistCategories: ['dairy'],
+          recentBasketProductIds: ['milk'],
+          recentBasketCategories: ['dairy']
+        })
+      }, new Date('2026-05-20T12:00:00.000Z'));
+
+      assert.equal(payload.rows[0].offer.productId, 'private-label-milk');
+      assert.equal(payload.rows[0].scoreBreakdown.watchlist, 18);
+      assert.equal(payload.rows[0].scoreBreakdown.favoriteStore, 12);
+      assert.equal(payload.rows[0].scoreBreakdown.recentBasket, 10);
+      assert.match(payload.rows[0].explanation.join(' '), /authenticated user preference signals/);
+      assert.match(payload.source.guardrails.join(' '), /does not derive a deterministic profile from user_id/);
+      assert.match(payload.cache.key, /session-user-preferences/);
+    } finally {
+      cleanup();
+    }
+  });
+
 
   it('uses API-provided unit economics for best-unit-price ranking without productId hints', () => {
     const source = readFileSync(new URL('../src/lib/my-flyer.ts', import.meta.url), 'utf8');
@@ -173,6 +210,12 @@ describe('my-flyer API payload', () => {
 
     assert.match(route, /z\.object/);
     assert.match(route, /user_id/);
+    assert.match(route, /authorization/);
+    assert.match(route, /x-groceryview-user-id/);
+    assert.match(route, /x-groceryview-favorite-stores/);
+    assert.match(route, /x-groceryview-watchlist-products/);
+    assert.match(route, /x-groceryview-recent-basket-products/);
+    assert.match(route, /authenticatedSignalsFromRequest/);
     assert.match(route, /algorithm: z\.enum\(myFlyerAlgorithms\)\.default\('watchlist_first'\)/);
     assert.match(route, /country: z\.enum\(myFlyerCountries\)\.default\('se'\)/);
     assert.match(route, /limit: z\.coerce\.number\(\)\.int\(\)\.min\(1\)\.max\(50\)\.default\(12\)/);

@@ -11,6 +11,17 @@ export type MyFlyerQuery = {
   algorithm: MyFlyerAlgorithm;
   country: MyFlyerCountry;
   limit: number;
+  userSignals?: MyFlyerUserSignals;
+};
+
+export type MyFlyerUserSignals = {
+  authenticated: boolean;
+  favoriteStoreIds: string[];
+  watchlistProductIds: string[];
+  watchlistCategories: string[];
+  recentBasketProductIds: string[];
+  recentBasketCategories: string[];
+  source: 'session-user-preferences' | 'anonymous-empty';
 };
 
 export type MyFlyerRow = {
@@ -21,6 +32,7 @@ export type MyFlyerRow = {
     savings: number;
     unitPrice: number | null;
     watchlist: number;
+    recentBasket: number;
     favoriteStore: number;
     confidence: number;
     expiry: number;
@@ -52,26 +64,69 @@ const api = createGroceryViewApi();
 const myFlyerCache = new Map<string, { expiresAt: number; payload: MyFlyerPayload }>();
 const ttlSeconds = 60 * 60;
 
+const emptyUserSignals: MyFlyerUserSignals = {
+  authenticated: false,
+  favoriteStoreIds: [],
+  watchlistProductIds: [],
+  watchlistCategories: [],
+  recentBasketProductIds: [],
+  recentBasketCategories: [],
+  source: 'anonymous-empty'
+};
+
 function round(value: number, digits = 2) {
   const factor = 10 ** digits;
   return Math.round((value + Number.EPSILON) * factor) / factor;
 }
 
-function userHash(userId: string) {
-  let hash = 0;
-  for (const char of userId) {
-    hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
-  }
-  return hash;
+function normalizedSignal(value: string) {
+  return value.trim().toLowerCase();
 }
 
-function profileForUser(userId: string) {
-  const hash = userHash(userId);
-  const favoriteStores = hash % 2 === 0 ? new Set(['willys-odenplan', 'lidl-sveavagen']) : new Set(['coop-odenplan']);
-  const watchedProducts = hash % 3 === 0 ? new Set(['coffee', 'butter']) : new Set(['milk', 'private-label-milk']);
-  const watchedCategories = hash % 5 === 0 ? new Set(['dairy']) : new Set(['coffee']);
+function uniqueSignals(values: readonly string[] = []) {
+  const seen = new Set<string>();
+  const signals: string[] = [];
+  for (const value of values) {
+    const normalized = normalizedSignal(value);
+    if (!normalized || seen.has(normalized)) continue;
+    seen.add(normalized);
+    signals.push(normalized);
+  }
+  return signals.slice(0, 50);
+}
 
-  return { favoriteStores, watchedProducts, watchedCategories };
+export function buildMyFlyerUserSignals(signals: Partial<MyFlyerUserSignals> | null | undefined): MyFlyerUserSignals {
+  if (!signals?.authenticated) return emptyUserSignals;
+
+  return {
+    authenticated: true,
+    favoriteStoreIds: uniqueSignals(signals.favoriteStoreIds),
+    watchlistProductIds: uniqueSignals(signals.watchlistProductIds),
+    watchlistCategories: uniqueSignals(signals.watchlistCategories),
+    recentBasketProductIds: uniqueSignals(signals.recentBasketProductIds),
+    recentBasketCategories: uniqueSignals(signals.recentBasketCategories),
+    source: 'session-user-preferences'
+  };
+}
+
+function signalSet(values: readonly string[] = []) {
+  return new Set(uniqueSignals(values));
+}
+
+function signalsForQuery(query: MyFlyerQuery) {
+  return buildMyFlyerUserSignals(query.userSignals);
+}
+
+function signalFingerprint(signals: MyFlyerUserSignals) {
+  if (!signals.authenticated) return 'anonymous-empty';
+  return [
+    signals.source,
+    `stores=${signals.favoriteStoreIds.join('|')}`,
+    `watch=${signals.watchlistProductIds.join('|')}`,
+    `watchCat=${signals.watchlistCategories.join('|')}`,
+    `basket=${signals.recentBasketProductIds.join('|')}`,
+    `basketCat=${signals.recentBasketCategories.join('|')}`
+  ].join(';');
 }
 
 function startOfIsoWeek(asOf: Date) {
@@ -111,25 +166,33 @@ function expiryScoreFor(offer: FlyerOffer, asOfMs: number) {
 }
 
 function scoreOffer(offer: FlyerOffer, query: MyFlyerQuery, asOfMs: number): Omit<MyFlyerRow, 'rank'> {
-  const profile = profileForUser(query.userId);
+  const signals = signalsForQuery(query);
+  const favoriteStores = signalSet(signals.favoriteStoreIds);
+  const watchedProducts = signalSet(signals.watchlistProductIds);
+  const watchedCategories = signalSet(signals.watchlistCategories);
+  const recentBasketProducts = signalSet(signals.recentBasketProductIds);
+  const recentBasketCategories = signalSet(signals.recentBasketCategories);
   const unitPrice = unitPriceFor(offer);
   const savings = offer.savings;
   const unitPriceScore = unitPrice === null ? 0 : round(Math.max(0, 30 - unitPrice / 4), 2);
-  const watchlist = profile.watchedProducts.has(offer.productId) || profile.watchedCategories.has(offer.category) ? 18 : 0;
-  const favoriteStore = profile.favoriteStores.has(offer.storeId) ? 12 : 0;
+  const watchlist = watchedProducts.has(offer.productId) || watchedCategories.has(offer.category) ? 18 : 0;
+  const recentBasket = recentBasketProducts.has(offer.productId) || recentBasketCategories.has(offer.category) ? 10 : 0;
+  const favoriteStore = favoriteStores.has(offer.storeId) ? 12 : 0;
   const confidence = round(offer.confidence * 10, 1);
   const expiry = expiryScoreFor(offer, asOfMs);
   const algorithmScore = {
-    best_savings: savings * 3 + confidence + favoriteStore / 2 + watchlist / 3,
-    best_unit_price: unitPriceScore * 3 + savings + confidence + favoriteStore / 2 + watchlist / 3,
-    watchlist_first: watchlist * 3 + favoriteStore + savings * 1.5 + confidence + expiry
+    best_savings: savings * 3 + confidence + favoriteStore / 2 + watchlist / 3 + recentBasket / 3,
+    best_unit_price: unitPriceScore * 3 + savings + confidence + favoriteStore / 2 + watchlist / 3 + recentBasket / 3,
+    watchlist_first: watchlist * 3 + recentBasket * 2 + favoriteStore + savings * 1.5 + confidence + expiry
   }[query.algorithm];
 
   const explanation = [
     `${query.algorithm} ranker`,
     `${round(savings)} SEK savings`,
-    profile.favoriteStores.has(offer.storeId) ? 'favorite store boost' : 'all-store eligible',
+    favoriteStores.has(offer.storeId) ? 'authenticated favorite store boost' : 'all-store eligible',
     watchlist > 0 ? 'watchlist or category match' : 'general weekly promotion',
+    recentBasket > 0 ? 'recent basket signal match' : 'no recent basket match',
+    signals.authenticated ? 'authenticated user preference signals' : 'no authenticated user signals',
     offer.priceType === 'member_flyer' ? 'member flyer label retained' : 'public flyer price'
   ];
 
@@ -140,6 +203,7 @@ function scoreOffer(offer: FlyerOffer, query: MyFlyerQuery, asOfMs: number): Omi
       savings,
       unitPrice,
       watchlist,
+      recentBasket,
       favoriteStore,
       confidence,
       expiry
@@ -149,7 +213,7 @@ function scoreOffer(offer: FlyerOffer, query: MyFlyerQuery, asOfMs: number): Omi
 }
 
 function cacheKeyFor(query: MyFlyerQuery) {
-  return `my-flyer:${query.userId}:${query.country}:${query.algorithm}:${query.limit}`;
+  return `my-flyer:${query.userId}:${query.country}:${query.algorithm}:${query.limit}:${signalFingerprint(signalsForQuery(query))}`;
 }
 
 export function buildMyFlyerPayload(query: MyFlyerQuery, asOf = new Date()): MyFlyerPayload {
@@ -209,7 +273,8 @@ export function buildMyFlyerPayload(query: MyFlyerQuery, asOf = new Date()): MyF
       offerCount: report.offerCount,
       guardrails: [
         ...report.guardrails,
-        'Best unit price ranking excludes flyer rows that lack package quantity, package unit, or effective unit-price evidence.'
+        'Best unit price ranking excludes flyer rows that lack package quantity, package unit, or effective unit-price evidence.',
+        'Authenticated favorite stores, watchlist, and recent basket signals are used only when supplied by the session/user-preference source; MyFlyer does not derive a deterministic profile from user_id.'
       ]
     },
     rows
