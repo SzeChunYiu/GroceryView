@@ -533,6 +533,7 @@ function productLabelsWithDietaryEvidence(product: (typeof axfoodProducts)[numbe
 
 export const facetedSearchRows: RealCatalogSearchPriceRow[] = axfoodProducts.flatMap((product) => {
   const packageAmount = unitAmountFromPackage(product.subline);
+  const originCountry = originCountryForAxfoodProduct(product);
   return chainPriceRows(product).flatMap((priceRow) => {
     const price = priceRow.price;
     if (typeof price !== 'number') return [];
@@ -544,6 +545,7 @@ export const facetedSearchRows: RealCatalogSearchPriceRow[] = axfoodProducts.fla
       canonicalName: product.name,
       brand: product.brand,
       categoryPath: [labelFromSlug(product.category)],
+      ...(originCountry ? { originCountry } : {}),
       labels: productLabelsWithDietaryEvidence(product),
       ...(packageAmount ? { packageSize: packageAmount.amount, packageUnit: packageAmount.unit } : {}),
       comparableUnit,
@@ -574,6 +576,7 @@ export type ProductSearchUrlParams = {
   q?: SearchParamValue;
   category?: SearchParamValue;
   label?: SearchParamValue;
+  origin?: SearchParamValue;
   dietary?: SearchParamValue;
   chain?: SearchParamValue;
   minPrice?: SearchParamValue;
@@ -597,6 +600,52 @@ function dietarySearchValues(value: SearchParamValue): CommonDietaryFilterValue[
   return commonDietaryFilterOptions
     .filter((option) => requested.has(option.value))
     .map((option) => option.value);
+}
+
+export const supportedOriginCountries = ['SE', 'NO', 'IS', 'DK', 'FI', 'DE', 'NL', 'ES', 'IT', 'PL', 'IE'] as const;
+
+export type SupportedOriginCountry = (typeof supportedOriginCountries)[number];
+
+export const originCountryLabels: Record<SupportedOriginCountry, string> = {
+  SE: 'Sweden',
+  NO: 'Norway',
+  IS: 'Iceland',
+  DK: 'Denmark',
+  FI: 'Finland',
+  DE: 'Germany',
+  NL: 'Netherlands',
+  ES: 'Spain',
+  IT: 'Italy',
+  PL: 'Poland',
+  IE: 'Ireland'
+};
+
+function originSearchValues(value: SearchParamValue): SupportedOriginCountry[] {
+  const requested = new Set(listSearchValues(value).map((item) => item.toUpperCase()));
+  return supportedOriginCountries.filter((country) => requested.has(country));
+}
+
+function originCountryForBarcode(barcode: string): SupportedOriginCountry | null {
+  if (/^73/.test(barcode)) return 'SE';
+  if (/^70/.test(barcode)) return 'NO';
+  if (/^569/.test(barcode)) return 'IS';
+  if (/^57/.test(barcode)) return 'DK';
+  if (/^64/.test(barcode)) return 'FI';
+  if (/^4[0-4]/.test(barcode)) return 'DE';
+  if (/^87/.test(barcode)) return 'NL';
+  if (/^84/.test(barcode)) return 'ES';
+  if (/^8[0-3]/.test(barcode)) return 'IT';
+  if (/^590/.test(barcode)) return 'PL';
+  if (/^539/.test(barcode)) return 'IE';
+  return null;
+}
+
+function originCountryForAxfoodProduct(product: (typeof axfoodProducts)[number]): SupportedOriginCountry | null {
+  const labels = new Set(product.labels.map((label) => label.toLocaleLowerCase('sv-SE')));
+  if (labels.has('swedish_flag') || labels.has('from_sweden') || labels.has('meat_from_sweden')) return 'SE';
+
+  const barcode = product.image?.match(/(\d{13})/)?.[1] ?? '';
+  return originCountryForBarcode(barcode);
 }
 
 function numericSearchValue(value: SearchParamValue): number | undefined {
@@ -649,6 +698,7 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
   const query = firstSearchValue(searchParams.q);
   const categories = listSearchValues(searchParams.category);
   const labelFilters = listSearchValues(searchParams.label);
+  const originCountries = originSearchValues(searchParams.origin);
   const dietaryLabels = dietarySearchValues(searchParams.dietary);
   const labels = [...new Set([...labelFilters, ...dietaryLabels])];
   const chains = listSearchValues(searchParams.chain);
@@ -656,13 +706,14 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
   const maxPrice = numericSearchValue(searchParams.maxPrice);
   const inStockOnly = booleanSearchValue(searchParams.inStockOnly);
   const minConfidence = confidenceSearchValue(searchParams.minConfidence);
-  const filters = { query, categories, labels, chains, minPrice, maxPrice, inStockOnly, minConfidence, limit: 100 };
+  const filters = { query, categories, labels, originCountries, chains, minPrice, maxPrice, inStockOnly, minConfidence, limit: 100 };
   const searchResult = buildFacetedProductSearch({ rows: facetedSearchRows, filters });
 
   const activeFilters = [
     query ? `q=${query}` : null,
     ...categories.map((category) => `category=${category}`),
     ...labelFilters.map((label) => `label=${readableLabel(label)}`),
+    ...originCountries.map((country) => `origin=${originCountryLabels[country]}`),
     ...dietaryLabels.map((dietaryLabel) => {
       const dietaryFilterLabel = commonDietaryFilterOptions.find((option) => option.value === dietaryLabel)?.label ?? readableLabel(dietaryLabel);
       return `dietary=${dietaryFilterLabel}`;
@@ -681,6 +732,15 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
     chainFacets: searchResult.facets.chains,
     labelFacets: searchResult.facets.labels.map((facet) => ({ ...facet, label: readableLabel(facet.value) })).slice(0, 8),
     labelFilters,
+    originFilters: originCountries,
+    originFacets: supportedOriginCountries.map((country) => {
+      const facet = searchResult.facets.origins.find((candidate) => candidate.value.toUpperCase() === country);
+      return {
+        value: country,
+        label: originCountryLabels[country],
+        count: facet?.count ?? 0
+      };
+    }),
     dietaryFilters: commonDietaryFilterOptions.map((option) => {
       const facet = searchResult.facets.labels.find((candidate) => candidate.value === option.value);
       return {

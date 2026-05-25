@@ -33,6 +33,7 @@ describe('createGroceryViewApi', () => {
       canonicalName: 'Standardmjolk 3% 1 l',
       brand: 'Arla',
       categoryPath: ['Dairy', 'Milk'],
+      originCountry: 'SE',
       packageSize: 1,
       packageUnit: 'l',
       comparableUnit: 'l',
@@ -56,6 +57,7 @@ describe('createGroceryViewApi', () => {
       canonicalName: 'Standardmjolk 3% 1 l',
       brand: 'Arla',
       categoryPath: ['Dairy', 'Milk'],
+      originCountry: 'SE',
       packageSize: 1,
       packageUnit: 'l',
       comparableUnit: 'l',
@@ -78,6 +80,7 @@ describe('createGroceryViewApi', () => {
       slug: 'smor-500g',
       canonicalName: 'Smor 500 g',
       categoryPath: ['Dairy', 'Butter'],
+      originCountry: 'DK',
       packageSize: 500,
       packageUnit: 'g',
       comparableUnit: 'kg',
@@ -241,12 +244,12 @@ describe('createGroceryViewApi', () => {
       controllerPath: 'products',
       actionPath: 'search/faceted',
       path: '/products/search/faceted',
-      queryParams: ['q', 'category', 'brand', 'label', 'chain', 'store', 'priceType', 'minPrice', 'maxPrice', 'inStockOnly', 'minConfidence', 'limit']
+      queryParams: ['q', 'category', 'brand', 'label', 'origin', 'chain', 'store', 'priceType', 'minPrice', 'maxPrice', 'inStockOnly', 'minConfidence', 'limit']
     });
 
     const result = buildFacetedProductSearch({
       rows: realRows,
-      filters: { query: 'mjolk', categories: ['Dairy'], chains: ['willys'], limit: 10 }
+      filters: { query: 'mjolk', categories: ['Dairy'], originCountries: ['SE'], chains: ['willys'], limit: 10 }
     });
 
     assert.equal(result.count, 1);
@@ -255,8 +258,11 @@ describe('createGroceryViewApi', () => {
     assert.equal(result.products[0]?.currentPrices[0]?.observationId, 'obs-milk-willys');
     assert.equal(result.products[0]?.currentPrices[0]?.isAvailable, true);
     assert.deepEqual(result.filters.labels, []);
+    assert.deepEqual(result.filters.originCountries, ['SE']);
+    assert.equal(result.products[0]?.originCountry, 'SE');
     assert.equal(result.products[0]?.currentPrices.some((price) => price.chainSlug === 'coop'), false);
     assert.deepEqual(result.facets.categories.find((facet) => facet.value === 'Dairy'), { value: 'Dairy', count: 1 });
+    assert.deepEqual(result.facets.origins.find((facet) => facet.value === 'SE'), { value: 'SE', count: 1 });
     assert.deepEqual(result.facets.chains.find((facet) => facet.value === 'willys'), { value: 'willys', label: 'Willys', count: 1 });
     assert.deepEqual(result.facets.priceRange, { min: 14.9, max: 14.9 });
     assert.deepEqual(result.evidence.sourceTables, ['products', 'latest_prices', 'chains', 'stores']);
