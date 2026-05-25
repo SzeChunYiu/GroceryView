@@ -5,6 +5,7 @@ import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, RoutePerformanceBudgetPanel, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { elderlyFixedIncomeBudgetTracker, elderlyStaplesStabilityTracker, grocerySpendForecast, personalGroceryInflation, savingsDashboard, studentWeeklyBudgetTracker } from '@/lib/demo-data';
+import { summarizeWeeklyGroceryBudgetTracker } from '@/lib/meal-budgets';
 import { buildCategoryInflationTrends } from '@/lib/trends';
 import { ecoBasketScorecard } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
@@ -76,6 +77,12 @@ export default function SavingsDashboardPage() {
   const visibleWatchpoints = savingsDashboard.watchpoints.slice(0, 4);
   const categoryInflationTrends = buildCategoryInflationTrends({ limit: 4 });
   const forecastReceiptCount = grocerySpendForecast.confidenceDrivers.receiptCount;
+  const weeklyGroceryBudgetTracker = summarizeWeeklyGroceryBudgetTracker({
+    plannedBasketCost: studentWeeklyBudgetTracker.summary.estimatedBasketTotal,
+    actualCheckedItemsCost: studentWeeklyBudgetTracker.summary.weeklyActualSpend,
+    weeklyAllowance: studentWeeklyBudgetTracker.summary.weeklyBudget,
+    plannedItemCount: studentWeeklyBudgetTracker.plannedRows.length
+  });
 
   return (
     <PageShell>
@@ -114,6 +121,47 @@ export default function SavingsDashboardPage() {
       <div className="mt-6">
         <RoutePerformanceBudgetPanel reports={recentRoutePerformanceBudgetReports} />
       </div>
+
+      <Card className="mt-6 border-amber-200 bg-amber-50">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-800">Weekly grocery budget tracker</p>
+            <h2 className="mt-2 text-2xl font-black">Planned basket cost vs. checked items</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Compares the planned student basket, actual checked grocery spend this week, and the allowance left before checkout planning continues.
+            </p>
+          </div>
+          <p className={`rounded-full px-3 py-1 text-sm font-black ${weeklyGroceryBudgetTracker.status === 'over' ? 'bg-rose-100 text-rose-900' : weeklyGroceryBudgetTracker.status === 'near' ? 'bg-amber-100 text-amber-950' : 'bg-emerald-100 text-emerald-950'}`}>
+            {weeklyGroceryBudgetTracker.status}
+          </p>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          <div className="rounded-2xl bg-white p-4">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">Planned basket cost</p>
+            <p className="mt-2 text-3xl font-black text-slate-950">{formatSek(weeklyGroceryBudgetTracker.plannedBasketCost)}</p>
+            <p className="mt-1 text-sm font-semibold text-slate-600">{weeklyGroceryBudgetTracker.plannedItemCount} planned rows</p>
+          </div>
+          <div className="rounded-2xl bg-white p-4">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">Actual checked items</p>
+            <p className="mt-2 text-3xl font-black text-amber-900">{formatSek(weeklyGroceryBudgetTracker.actualCheckedItemsCost)}</p>
+            <p className="mt-1 text-sm font-semibold text-slate-600">{weeklyGroceryBudgetTracker.checkedSpendPercent.toFixed(0)}% of allowance checked</p>
+          </div>
+          <div className="rounded-2xl bg-white p-4">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">Remaining weekly allowance</p>
+            <p className={`mt-2 text-3xl font-black ${weeklyGroceryBudgetTracker.remainingWeeklyAllowance < 0 ? 'text-rose-800' : 'text-emerald-800'}`}>
+              {formatSek(weeklyGroceryBudgetTracker.remainingWeeklyAllowance)}
+            </p>
+            <p className="mt-1 text-sm font-semibold text-slate-600">planned cushion {formatSek(weeklyGroceryBudgetTracker.plannedRemainingAllowance)}</p>
+          </div>
+        </div>
+        <div className="mt-4 h-3 overflow-hidden rounded-full bg-white">
+          <div
+            className={`h-full rounded-full ${weeklyGroceryBudgetTracker.status === 'over' ? 'bg-rose-600' : weeklyGroceryBudgetTracker.status === 'near' ? 'bg-amber-500' : 'bg-emerald-600'}`}
+            style={{ width: `${Math.min(100, weeklyGroceryBudgetTracker.checkedSpendPercent)}%` }}
+          />
+        </div>
+        <p className="mt-3 text-sm font-semibold leading-6 text-amber-950">{weeklyGroceryBudgetTracker.warning}</p>
+      </Card>
 
       <section className="mt-6">
         <div className="flex flex-wrap items-end justify-between gap-3">

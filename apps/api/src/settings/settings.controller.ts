@@ -5,7 +5,7 @@ import { IsArray, IsIn, IsOptional, IsString } from 'class-validator';
 import { AuthGuard, authenticatedUserId, type AuthenticatedRequest } from '../middleware/auth.js';
 import { settingsRoutes } from '../routes/settings.js';
 import { buildDemoUserDataExport } from './data-export.js';
-import { allowedNotificationChannels, allowedPreferenceCurrencies, SettingsService } from './settings.service.js';
+import { allowedMyFlyerAlgorithmChoices, allowedNotificationChannels, allowedPreferenceCurrencies, SettingsService } from './settings.service.js';
 
 class SettingsPatchDto {
   @IsOptional()
@@ -21,6 +21,10 @@ class SettingsPatchDto {
   @IsArray()
   @IsIn(allowedNotificationChannels, { each: true })
   notificationChannels?: Array<(typeof allowedNotificationChannels)[number]>;
+
+  @IsOptional()
+  @IsIn(allowedMyFlyerAlgorithmChoices)
+  algorithm_choice?: (typeof allowedMyFlyerAlgorithmChoices)[number];
 }
 
 @ApiTags('settings')

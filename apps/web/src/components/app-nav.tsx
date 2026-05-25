@@ -58,6 +58,7 @@ const navGroups: NavGroup[] = [
     icon: PackageSearch,
     items: [
       { href: '/products', label: 'Browse', icon: PackageSearch },
+      { href: '/new-arrivals', label: 'New arrivals', icon: PackageSearch },
       { href: '/compare', label: 'Compare', icon: Tags }
     ]
   },

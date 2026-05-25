@@ -5,6 +5,7 @@ import { defaultPushNotificationPreferences, type PushNotificationPreferenceKey,
 
 type NotificationInboxStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
 type BestTimeRuleStatus = 'idle' | 'blocked' | 'saving' | 'saved' | 'error';
+type PreferenceSaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 type AlertChannel = 'push' | 'email';
 type NotificationInboxQueueItem = {
   id: string;
@@ -53,9 +54,9 @@ const BEST_TIME_CATEGORIES = [
 
 const PUSH_NOTIFICATION_PREFERENCES: { key: PushNotificationPreferenceKey; label: string; description: string }[] = [
   { key: 'priceDrops', label: 'Price drops', description: 'Push when a watched item or saved search gets a verified lower price.' },
-  { key: 'stockChanges', label: 'Stock changes', description: 'Push when unavailable basket staples return to stock.' },
-  { key: 'listCollaboration', label: 'List collaboration', description: 'Push when household members add, claim, or complete shared list items.' },
-  { key: 'budgetWarnings', label: 'Budget warnings', description: 'Push before baskets or recurring shops cross a weekly budget limit.' }
+  { key: 'bestTimeBuys', label: 'Best-time-to-buy alerts', description: 'Push when verified seasonality and flyer-window signals recommend buying now or waiting.' },
+  { key: 'pantryExpiry', label: 'Expiring pantry items', description: 'Push reminders before tracked pantry staples expire or need use-soon recipes.' },
+  { key: 'weeklyBasketDigests', label: 'Weekly basket digests', description: 'Push the recurring basket recap when comparable totals, substitutes, or missing prices need review.' }
 ];
 
 function readSession(): BrowserSession {
@@ -67,7 +68,35 @@ function readSession(): BrowserSession {
 
 export function PushNotificationPreferenceControls() {
   const [preferences, setPreferences] = useState<PushNotificationPreferences>(defaultPushNotificationPreferences);
+  const [saveStatus, setSaveStatus] = useState<PreferenceSaveStatus>('idle');
+  const [saveMessage, setSaveMessage] = useState('Save the enabled alert types before requesting a browser push token.');
   const enabledCount = Object.values(preferences).filter(Boolean).length;
+  const enabledChannels = PUSH_NOTIFICATION_PREFERENCES.filter((preference) => preferences[preference.key]).map((preference) => preference.key);
+
+  async function savePreferences() {
+    const { userId } = readSession();
+    setSaveStatus('saving');
+    const response = await fetch('/api/notifications/subscription', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        accountId: userId || 'signed-in-user-id',
+        channels: enabledChannels,
+        deliveryEnabled: false,
+        permission: 'unsupported',
+        preferences
+      })
+    });
+
+    if (!response.ok) {
+      setSaveStatus('error');
+      setSaveMessage('Could not save push notification preferences.');
+      return;
+    }
+
+    setSaveStatus('saved');
+    setSaveMessage(`Saved ${enabledChannels.length} push preference${enabledChannels.length === 1 ? '' : 's'} for price alerts and digests.`);
+  }
 
   return (
     <section className="mt-4 rounded-3xl border border-indigo-200 bg-white/85 p-5" aria-label="Push notification preference controls">
@@ -76,10 +105,10 @@ export function PushNotificationPreferenceControls() {
           <p className="text-xs font-black uppercase tracking-[0.2em] text-indigo-800">Push notification preferences</p>
           <h3 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Choose which high-value mobile alerts can interrupt you</h3>
           <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
-            Granular toggles keep price drops, stock changes, list collaboration, and budget warnings independently controllable before notification delivery.
+            Granular toggles keep price drops, best-time-to-buy alerts, expiring pantry reminders, and weekly basket digests independently controllable before notification delivery.
           </p>
         </div>
-        <p className="rounded-full bg-indigo-100 px-4 py-2 text-sm font-black text-indigo-900">{enabledCount}/4 enabled</p>
+        <p className="rounded-full bg-indigo-100 px-4 py-2 text-sm font-black text-indigo-900">{enabledCount}/{PUSH_NOTIFICATION_PREFERENCES.length} enabled</p>
       </div>
       <div className="mt-4 grid gap-3 md:grid-cols-2">
         {PUSH_NOTIFICATION_PREFERENCES.map((preference) => (
@@ -96,6 +125,10 @@ export function PushNotificationPreferenceControls() {
             </span>
           </label>
         ))}
+      </div>
+      <div className="mt-4 flex flex-col gap-3 rounded-2xl bg-indigo-50/70 p-4 md:flex-row md:items-center md:justify-between">
+        <p className="text-sm font-bold text-indigo-950" data-status={saveStatus}>{saveMessage}</p>
+        <button className="rounded-full bg-indigo-900 px-4 py-2 text-sm font-black text-white" onClick={savePreferences} type="button">Save push preferences</button>
       </div>
     </section>
   );
