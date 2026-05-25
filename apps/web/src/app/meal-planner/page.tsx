@@ -3,6 +3,7 @@ import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { RecipeImporter } from '@/components/recipe-importer';
 import { dealBasedMealInputs, dealBasedMeals, familyMealPlannerFromDeals, freezerBatchCookPlanner, products, studentDealRecipes } from '@/lib/demo-data';
+import { applyAdaptiveMealBudgetGuardrails } from '@/lib/meal-cost-estimator';
 import { buildMealPlanShoppingListExport, extractIngredientsFromMealPlans, mealPlanShoppingListHref, suggestBudgetAlternativesFromMealPlans, type MealBudgetPlan } from '@/lib/meal-budgets';
 import { mergeMealPlanIngredientsForWeeklyBasket } from '@/lib/unit-normalizer';
 import { dietarySubstitutionAssistantContract } from '@/lib/verified-data';
@@ -33,6 +34,16 @@ const COPY = {
   },
   suggestedMeals: {
     title: 'Suggested meals',
+  },
+  guardrails: {
+    eyebrow: 'Adaptive budget guardrails',
+    title: 'Weekly envelope protects constrained weeks',
+    description:
+      'Meal generation now checks the current weekly budget envelope before ranking recipes. Recipes that would overspend are hidden from recommendations, while tight fits are demoted below safer dinners.',
+    remainingLabel: 'Remaining before meal',
+    reserveLabel: 'Reserve target',
+    demotedLabel: 'Demoted recipes',
+    hiddenLabel: 'Hidden recipes',
   },
   student: {
     title: 'Student deal recipes',
@@ -107,6 +118,13 @@ function mealCardClass(meal: MealWithIngredients, productId: string, defaultClas
     ? `${defaultClasses} border-amber-400 bg-amber-50 shadow-sm`
     : defaultClasses;
 }
+
+const adaptiveBudgetGuardrails = applyAdaptiveMealBudgetGuardrails({
+  currentWeeklySpend: 360,
+  meals: dealBasedMeals.suggestions,
+  reservePercent: 0.15,
+  weeklyBudgetEnvelope: 500
+});
 
 const mealPlanBasketIngredients = mergeMealPlanIngredientsForWeeklyBasket([
   { mealTitle: 'Taco night', name: 'Tomatoes', quantity: 400, unit: 'g' },
@@ -263,7 +281,7 @@ export default async function MealPlannerPage({
       <Card className="mt-6">
         <h2 className="text-2xl font-black">{COPY.suggestedMeals.title}</h2>
         <div className="mt-4 space-y-4">
-          {dealBasedMeals.suggestions.map((meal) => (
+          {adaptiveBudgetGuardrails.recommendedMeals.map((meal) => (
             <div
               className={mealCardClass(meal, selectedIngredientId, 'rounded-3xl border border-slate-200 p-5')}
               data-use-soon-meal-match={mealUsesIngredient(meal, selectedIngredientId) ? selectedIngredientId : undefined}
@@ -273,6 +291,7 @@ export default async function MealPlannerPage({
                 <div>
                   <p className="text-2xl font-black text-slate-950">{meal.title}</p>
                   <p className="mt-1 text-sm font-semibold text-slate-700">{meal.reason}</p>
+                  <p className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-emerald-800">{meal.budgetGuardrail.reason}</p>
                   {mealUsesIngredient(meal, selectedIngredientId) ? <p className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-amber-800">Uses use-soon pantry item</p> : null}
                 </div>
                 <div className="text-right">
@@ -293,6 +312,40 @@ export default async function MealPlannerPage({
             </div>
           ))}
         </div>
+      </Card>
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50">
+        <Eyebrow>{COPY.guardrails.eyebrow}</Eyebrow>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">{COPY.guardrails.title}</h2>
+        <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">{COPY.guardrails.description}</p>
+        <div className="mt-4 grid gap-4 md:grid-cols-4">
+          <div className="rounded-2xl bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">{COPY.guardrails.remainingLabel}</p>
+            <p className="mt-2 text-2xl font-black text-slate-950">{formatSek(adaptiveBudgetGuardrails.summary.remainingBeforeMeal)}</p>
+          </div>
+          <div className="rounded-2xl bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">{COPY.guardrails.reserveLabel}</p>
+            <p className="mt-2 text-2xl font-black text-slate-950">{formatSek(adaptiveBudgetGuardrails.summary.reserveTarget)}</p>
+          </div>
+          <div className="rounded-2xl bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">{COPY.guardrails.demotedLabel}</p>
+            <p className="mt-2 text-2xl font-black text-slate-950">{adaptiveBudgetGuardrails.summary.demotedCount}</p>
+          </div>
+          <div className="rounded-2xl bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">{COPY.guardrails.hiddenLabel}</p>
+            <p className="mt-2 text-2xl font-black text-slate-950">{adaptiveBudgetGuardrails.summary.hiddenCount}</p>
+          </div>
+        </div>
+        {adaptiveBudgetGuardrails.demotedMeals.length > 0 ? (
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
+            {adaptiveBudgetGuardrails.demotedMeals.map((meal) => (
+              <div className="rounded-2xl border border-emerald-100 bg-white p-4" key={meal.title}>
+                <p className="font-black text-slate-950">{meal.title}</p>
+                <p className="mt-1 text-sm font-semibold text-slate-700">{meal.budgetGuardrail.reason}</p>
+              </div>
+            ))}
+          </div>
+        ) : null}
       </Card>
 
 
