@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { ArrowDownRight, BadgeCheck, Clock3, MapPin, Search, TrendingUp } from 'lucide-react';
+import { buildPriceDropDiscoveryRail } from '@/lib/price-events';
 import { buildCityPriceDropTrends, type CityPriceDropTrend, type CitySearchTrendFeed } from '@/lib/trends';
+import { categoryLabels, pricedProducts } from '@/lib/openprices-products';
 
 function formatSek(value: number) {
   return new Intl.NumberFormat('sv-SE', {
@@ -26,6 +28,67 @@ function confidenceClass(card: CityPriceDropTrend) {
   if (card.confidenceLabel === 'high') return 'bg-emerald-100 text-emerald-900';
   if (card.confidenceLabel === 'medium') return 'bg-cyan-100 text-cyan-950';
   return 'bg-amber-100 text-amber-950';
+}
+
+const discoveryRailItems = buildPriceDropDiscoveryRail(pricedProducts.map((product) => ({
+  slug: product.slug,
+  name: product.name,
+  brand: product.brands,
+  category: categoryLabels[product.category] ?? product.category,
+  observations: product.observations
+})), 6);
+
+export function PriceDropDiscoveryRail() {
+  if (discoveryRailItems.length === 0) return null;
+
+  return (
+    <section className="mx-auto mt-4 max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Week-over-week price-drop discovery" data-price-drop-discovery-rail>
+      <div className="rounded-[1.75rem] border border-emerald-200 bg-white p-4 shadow-sm md:p-5">
+        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-800">Open before shopping</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Steepest verified week-over-week price drops</h2>
+          </div>
+          <p className="max-w-xl text-sm font-semibold leading-6 text-slate-600">
+            Built from dated OpenPrices observations only. Each card compares the latest price with a verified observation from 5-9 days earlier.
+          </p>
+        </div>
+        <div className="mt-4 flex gap-3 overflow-x-auto pb-2" data-price-drop-discovery-track>
+          {discoveryRailItems.map((item) => (
+            <Link
+              className="min-w-[17rem] rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:-translate-y-0.5 hover:border-emerald-700"
+              data-price-drop-discovery-card={item.rank}
+              href={`/products/${item.productSlug}`}
+              key={item.productSlug}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">#{item.rank} · {item.category}</p>
+                  <h3 className="mt-2 line-clamp-2 text-lg font-black leading-6 text-slate-950">{item.productName}</h3>
+                  <p className="mt-1 line-clamp-1 text-sm font-semibold text-slate-600">{item.brand}</p>
+                </div>
+                <span className="rounded-full bg-emerald-100 p-2 text-emerald-800" aria-label="Week-over-week price dropped">
+                  <ArrowDownRight aria-hidden="true" size={20} strokeWidth={3} />
+                </span>
+              </div>
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <div className="rounded-xl bg-white p-3">
+                  <p className="text-xs font-bold text-slate-500">Now</p>
+                  <p className="mt-1 text-lg font-black text-slate-950">{formatSek(item.latestPrice)}</p>
+                </div>
+                <div className="rounded-xl bg-white p-3">
+                  <p className="text-xs font-bold text-slate-500">7-day drop</p>
+                  <p className="mt-1 text-lg font-black text-emerald-800">{formatPercent(item.dropPercent * 100)}</p>
+                </div>
+              </div>
+              <p className="mt-3 text-sm font-black text-emerald-800">Save {formatSek(item.dropAmount)} vs {formatSek(item.previousWeekPrice)}</p>
+              <p className="mt-2 text-xs font-semibold leading-5 text-slate-500">{item.evidenceLabel}</p>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 }
 
 export function TrendingSearchModule({ feed }: Readonly<{ feed: CitySearchTrendFeed }>) {

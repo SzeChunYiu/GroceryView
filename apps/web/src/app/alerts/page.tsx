@@ -1,6 +1,9 @@
 import { AlertManagementPanel, type AlertProductSummary } from '@/components/AlertListItem';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
+import { SavedSearchSubscriptionsPanel } from '@/components/saved-search-subscriptions';
+import type { SavedSearchDealCandidate } from '@/lib/alert-scheduler';
+import { FREE_PRICE_ALERT_LIMIT } from '@/app/api/alerts/store';
 import { formatSek, matchedChainProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -21,6 +24,17 @@ const alertProductSummaries: AlertProductSummary[] = matchedChainProducts.slice(
     productHref: `/products/${product.slug}`
   };
 });
+
+const savedSearchDealCandidates: SavedSearchDealCandidate[] = matchedChainProducts.slice(0, 80).map((product) => ({
+  id: product.slug,
+  name: product.name,
+  href: `/products/${product.slug}`,
+  category: product.category,
+  chain: product.lowestChain,
+  labels: product.labels,
+  currentPriceText: formatSek(product.lowestPrice),
+  dealSummary: `${product.lowestChain} currently has the lowest verified chain price for this product.`
+}));
 
 export default function AlertsPage() {
   return (
@@ -44,13 +58,14 @@ export default function AlertsPage() {
           <p className="mt-1 text-sm font-semibold text-slate-600">lists and deletes only rows for the supplied email</p>
         </Card>
         <Card className="p-4">
-          <p className="text-sm font-black text-slate-600">Guardrail</p>
-          <p className="mt-2 text-xl font-black text-slate-950">No synthetic prices</p>
-          <p className="mt-1 text-sm font-semibold text-slate-600">missing current prices stay labelled unavailable</p>
+          <p className="text-sm font-black text-slate-600">Free alert limit</p>
+          <p className="mt-2 text-xl font-black text-slate-950">{FREE_PRICE_ALERT_LIMIT} active alerts</p>
+          <p className="mt-1 text-sm font-semibold text-slate-600">premium unlocks unlimited alerts, priority checks, and earlier deal notifications</p>
         </Card>
       </div>
 
       <AlertManagementPanel products={alertProductSummaries} />
+      <SavedSearchSubscriptionsPanel candidates={savedSearchDealCandidates} />
     </PageShell>
   );
 }

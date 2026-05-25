@@ -171,7 +171,23 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(household, /@\/lib\/demo-data|@\/components\/sample-data/);
   });
 
+  it('renders collaborative household list activity for add, check, edit, and remove events', async () => {
+    const household = await read('src/app/household/page.tsx');
+    const activityStream = await read('src/components/activity-stream.tsx');
+    const activityLog = await read('src/lib/activity-log.ts');
 
+    assert.match(household, /ActivityStream/);
+    assert.match(household, /householdActivityTimeline/);
+    assert.match(household, /item_added/);
+    assert.match(household, /item_checked/);
+    assert.match(household, /item_edited/);
+    assert.match(household, /item_removed/);
+    assert.match(activityStream, /added, checked, edited, and removed events/);
+    assert.match(activityStream, /sortSharedListActivityEvents/);
+    assert.match(activityLog, /'item_added' \| 'item_checked' \| 'item_edited' \| 'item_removed'/);
+    assert.match(activityLog, /publishSharedListItemChecked/);
+    assert.match(activityLog, /publishSharedListItemEdited/);
+  });
 
   it('ships signed-in scanner upload and barcode processing controls without anonymous uploads', async () => {
     const scanner = await read('src/app/scanner/page.tsx');
@@ -309,6 +325,24 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(actions, /localStorage\.setItem\('groceryview:userId'/);
     assert.match(server, /\/api\/settings\/data-export/);
     assert.match(server, /\/api\/settings\/account/);
+  });
+
+  it('maps purchase history CSV imports into settings personalization and budget seeds', async () => {
+    const settings = await read('src/app/settings/page.tsx');
+    const bulkImport = await read('src/components/BulkImportDialog.tsx');
+    const recurringBasket = await read('src/lib/recurring-basket.ts');
+
+    assert.match(settings, /BulkImportDialog/);
+    assert.match(settings, /importMode="purchase-history"/);
+    assert.match(settings, /Import purchase history for recommendations and budgets/);
+    assert.match(bulkImport, /parsePurchaseHistoryCsv/);
+    assert.match(bulkImport, /buildPurchaseHistoryImportPreview/);
+    assert.match(bulkImport, /data-import-mode=\{importMode\}/);
+    assert.match(bulkImport, /Map purchase history/);
+    assert.match(recurringBasket, /PurchaseHistoryImportRow/);
+    assert.match(recurringBasket, /parsePurchaseHistoryCsv/);
+    assert.match(recurringBasket, /recommendationSeed/);
+    assert.match(recurringBasket, /budgetSeedLabel/);
   });
 
 
@@ -613,6 +647,23 @@ describe('verified-data UI', () => {
     assert.match(products, /Review prompts after a price report/);
     assert.match(products, /price accuracy, product quality, and store experience/);
     assert.doesNotMatch(products, /@\/lib\/demo-data|@\/components\/sample-data/);
+  });
+
+  it('surfaces community review summaries on product result cards', async () => {
+    const communityReviews = await read('src/lib/community-reviews.ts');
+    const itemGrid = await read('src/components/ItemGrid.tsx');
+    const storeProductRow = await read('src/components/store-product-row.tsx');
+
+    assert.match(communityReviews, /CommunityProductReviewSummary/);
+    assert.match(communityReviews, /averageRatingLabel/);
+    assert.match(communityReviews, /reviewCount/);
+    assert.match(communityReviews, /topFreshnessComplaint/);
+    assert.match(communityReviews, /communityReviewSummaryForProduct/);
+    assert.match(itemGrid, /communityReviewSummaryForProduct\(row\.name\)/);
+    assert.match(itemGrid, /community reviews/);
+    assert.match(itemGrid, /topFreshnessComplaint/);
+    assert.match(storeProductRow, /communityReviewSummaryForProduct\(productName\)/);
+    assert.match(storeProductRow, /community review summary/);
   });
 
   it('surfaces adjustable moderation risk thresholds for admin review routing', async () => {
@@ -2054,6 +2105,12 @@ ${seo}`;
     assert.match(bottomNav, /Markets/);
     assert.match(bottomNav, /Search/);
     assert.match(bottomNav, /Map/);
+    assert.match(bottomNav, /ScanLine/);
+    assert.match(bottomNav, /href: '\/scanner#scan'/);
+    assert.match(bottomNav, /label: 'Scan'/);
+    assert.match(bottomNav, /grid-cols-7/);
+    assert.match(bottomNav, /useHaptic/);
+    assert.match(bottomNav, /impact\(\)/);
     assert.match(bottomNav, /My Flyer/);
     assert.match(bottomNav, /Watchlist/);
     assert.match(bottomNav, /Me/);
@@ -2061,6 +2118,17 @@ ${seo}`;
     assert.match(dataUi, /pb-20/);
     assert.match(dataUi, /lg:pb-6/);
     assert.match(dataUi, /<BottomNav \/>/);
+  });
+
+  it('surfaces scanner quick action copy and target anchor for mobile bottom nav', async () => {
+    const scanner = await read('src/app/scanner/page.tsx');
+    const haptic = await read('src/hooks/useHaptic.ts');
+
+    assert.match(scanner, /Mobile scanner shortcut/);
+    assert.match(scanner, /Bottom nav opens scan controls with haptic feedback/);
+    assert.match(scanner, /id="scan"/);
+    assert.match(scanner, /ScannerUploadActions/);
+    assert.match(haptic, /impact: \(\) => vibrate\(\[10, 18, 10\]\)/);
   });
 
   it('colors map store markers by chain index and highlights the cheapest nearby chain', async () => {
@@ -2440,6 +2508,9 @@ ${seo}`;
     assert.match(source, /priceMoveNotesFor/);
     assert.match(source, /priceChangeEventLogFor/);
     assert.match(source, /Why this price moved/);
+    assert.match(source, /price_change/);
+    assert.match(source, /chartMarkerKey/);
+    assert.match(source, /data-price-move-chart-marker/);
     assert.match(source, /sourceProvenance/);
     assert.match(source, /consecutive OpenPrices rows/);
     assert.match(source, /No news or retailer cause is inferred/);
@@ -2765,6 +2836,26 @@ ${seo}`;
     assert.doesNotMatch(shell, /@\/lib\/demo-data/);
   });
 
+  it('surfaces friend price sightings in the social feed with product, store, time, and confidence', async () => {
+    const social = await read('src/lib/social.ts');
+    const feed = await read('src/components/feed/social-feed.tsx');
+    const badge = await read('src/components/confidence-badge.tsx');
+
+    assert.match(social, /FriendPriceSighting/);
+    assert.match(social, /friendPriceSightings/);
+    assert.match(social, /productName/);
+    assert.match(social, /storeName/);
+    assert.match(social, /observedAt/);
+    assert.match(social, /confidence/);
+    assert.match(feed, /Friend price sightings/);
+    assert.match(feed, /listFriendPriceSightings/);
+    assert.match(feed, /sighting\.productName/);
+    assert.match(feed, /sighting\.storeName/);
+    assert.match(feed, /sighting\.observedAt/);
+    assert.match(feed, /ConfidenceBadge/);
+    assert.match(badge, /confidenceCopy/);
+  });
+
   it('surfaces reusable data-freshness confidence badges across public routes', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const shell = await read('src/components/market-shell.tsx');
@@ -2944,6 +3035,23 @@ ${seo}`;
     assert.match(cmp, /\/cookies/);
     assert.match(seo, /'\/cookies'/);
     assert.match(sitemap, /entry\('\/cookies'/);
+  });
+
+  it('ships Nordic per-country terms with consumer protection clauses', async () => {
+    const terms = await read('src/app/[country]/terms/page.tsx');
+
+    assert.match(terms, /generateStaticParams/);
+    assert.match(terms, /slug: 'norway'/);
+    assert.match(terms, /slug: 'iceland'/);
+    assert.match(terms, /Forbrukerkjøpsloven/);
+    assert.match(terms, /Forbrukertilsynet/);
+    assert.match(terms, /Forbrukerradet/);
+    assert.match(terms, /Neytendastofa/);
+    assert.match(terms, /Kærunefnd vöru- og þjónustukaupa/);
+    assert.match(terms, /mandatory consumer protection rules/);
+    assert.match(terms, /notFound\(\)/);
+    assert.match(terms, /\/\$\{terms\.slug\}\/terms/);
+    assert.doesNotMatch(terms, /demo-data|sample-data|mock session|TODO|console\./i);
   });
 
 
@@ -3223,6 +3331,27 @@ ${seo}`;
     assert.match(registrar, /navigator\.serviceWorker\.register\('\/sw\.js'/);
     assert.match(registrar, /ServiceWorkerRegistrar/);
     assert.match(layout, /ServiceWorkerRegistrar/);
+  });
+
+  it('caches the active shopping list and last known prices for offline store trips', async () => {
+    const manifest = await read('src/app/manifest.ts');
+    const worker = await read('public/sw.js');
+    const registrar = await read('src/lib/swRegister.ts');
+    const shoppingListPage = await read('src/app/list/page.tsx');
+
+    assert.match(manifest, /Open shopping list/);
+    assert.match(manifest, /url: '\/list'/);
+    assert.match(worker, /SHOPPING_LIST_CACHE_NAME = 'groceryview-shopping-list-route-v1'/);
+    assert.match(worker, /isShoppingListRequest/);
+    assert.match(worker, /\\\/list\\\/\?\$/);
+    assert.match(worker, /shoppingListNetworkFirst/);
+    assert.match(registrar, /SHOPPING_LIST_ROUTE_CACHE_NAME = 'groceryview-shopping-list-route-v1'/);
+    assert.match(registrar, /cache\.add\('\/list'\)/);
+    assert.doesNotMatch(registrar, /console\./);
+    assert.match(shoppingListPage, /OFFLINE_SHOPPING_LIST_CACHE_KEY = 'groceryview:shopping-list:offline-cache:v1'/);
+    assert.match(shoppingListPage, /cheapestSourceForProductSlug/);
+    assert.match(shoppingListPage, /lastKnownPrices/);
+    assert.match(shoppingListPage, /window\.localStorage\.setItem\(OFFLINE_SHOPPING_LIST_CACHE_KEY/);
   });
 
 
@@ -3690,8 +3819,12 @@ ${seo}`;
 
     assert.match(verified, /perClassFreshnessLagReport/);
     assert.match(verified, /freshnessLagSummary/);
+    assert.match(verified, /retailerTypeCoverage/);
+    assert.match(verified, /majorSwedishGroceryRetailerTypeCoverage/);
     assert.match(verified, /freshWindowDays: freshnessLagWindowDays/);
     assert.match(route, /perClassFreshnessLagReport\.map/);
+    assert.match(route, /retailerTypeCoverage\.map/);
+    assert.match(route, /Retailer type coverage/);
     assert.match(route, /observations older than/);
     assert.match(route, /SourceCoverage/);
     assert.match(route, /routeMetadata\('\/coverage'\)/);

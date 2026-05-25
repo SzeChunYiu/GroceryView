@@ -9,12 +9,29 @@ export const COMPARE_CHAIN_ORDER = [
 ] as const;
 
 export type CompareChainId = (typeof COMPARE_CHAIN_ORDER)[number]['id'];
+export type ChainPriceComparisonMode = 'regular' | 'member' | 'coupon' | 'stacked';
+
+export const CHAIN_PRICE_COMPARISON_MODES: Array<{ id: ChainPriceComparisonMode; label: string; guardrail: string }> = [
+  { id: 'regular', label: 'Regular', guardrail: 'Public shelf/catalogue price.' },
+  { id: 'member', label: 'Member', guardrail: 'Requires signed-in loyalty eligibility before a member price can be counted.' },
+  { id: 'coupon', label: 'Coupon', guardrail: 'Requires an account-bound clipped coupon before savings can be counted.' },
+  { id: 'stacked', label: 'Stacked', guardrail: 'Requires both eligible member price and clipped coupon evidence.' }
+];
+
+export type ChainPriceModeQuote = {
+  mode: ChainPriceComparisonMode;
+  price: number | null;
+  priceText: string;
+  status: 'priced' | 'missing' | 'account_required';
+  guardrail: string;
+};
 
 export type ChainCompareCell = {
   chainId: CompareChainId;
   chainName: string;
   price: number | null;
   priceText: string;
+  priceModes: ChainPriceModeQuote[];
   unitLabel: string;
   status: 'priced' | 'missing';
   sourceUrl: string;
@@ -89,6 +106,7 @@ function formatMissingCell(chainName: string, chainId: CompareChainId): ChainCom
     chainName,
     price: null,
     priceText: 'No DB price row',
+    priceModes: chainPriceModes(null, 'No DB price row'),
     unitLabel: 'packages/db row missing',
     status: 'missing',
     sourceUrl: '',
@@ -98,6 +116,28 @@ function formatMissingCell(chainName: string, chainId: CompareChainId): ChainCom
   };
 }
 
+function chainPriceModes(regularPrice: number | null, regularPriceText: string): ChainPriceModeQuote[] {
+  return CHAIN_PRICE_COMPARISON_MODES.map((mode) => {
+    if (mode.id === 'regular') {
+      return {
+        mode: mode.id,
+        price: regularPrice,
+        priceText: regularPriceText,
+        status: regularPrice === null ? 'missing' : 'priced',
+        guardrail: mode.guardrail
+      };
+    }
+
+    return {
+      mode: mode.id,
+      price: null,
+      priceText: mode.id === 'stacked' ? 'Needs member + coupon evidence' : `Needs ${mode.id} evidence`,
+      status: 'account_required',
+      guardrail: mode.guardrail
+    };
+  });
+}
+
 function formatPackagedPricedCell(chainName: string, chainId: CompareChainId, product: AxfoodProduct, price: ChainPrice): ChainCompareCell {
   if (typeof price.price !== 'number' || !Number.isFinite(price.price)) return formatMissingCell(chainName, chainId);
   return {
@@ -105,6 +145,7 @@ function formatPackagedPricedCell(chainName: string, chainId: CompareChainId, pr
     chainName,
     price: price.price,
     priceText: price.priceText || `${price.price.toLocaleString('sv-SE')} kr`,
+    priceModes: chainPriceModes(price.price, price.priceText || `${price.price.toLocaleString('sv-SE')} kr`),
     unitLabel: price.priceUnit || 'kr/st',
     status: 'priced',
     sourceUrl: price.url,
@@ -133,6 +174,7 @@ function formatCommodityPricedCell(
     chainName,
     price: row.unitPrice,
     priceText: `${row.unitPrice.toLocaleString('sv-SE')} kr`,
+    priceModes: chainPriceModes(row.unitPrice, `${row.unitPrice.toLocaleString('sv-SE')} kr`),
     unitLabel: `commodity/alias kr/${comparableUnit}`,
     status: 'priced',
     sourceUrl: '',

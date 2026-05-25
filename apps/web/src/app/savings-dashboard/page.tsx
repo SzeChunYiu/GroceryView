@@ -1,9 +1,11 @@
 import Link from 'next/link';
 import { PiggyBank } from 'lucide-react';
+import { CategoryInflationCard } from '@/components/category-inflation-card';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
-import { elderlyFixedIncomeBudgetTracker, elderlyStaplesStabilityTracker, personalGroceryInflation, savingsDashboard, studentWeeklyBudgetTracker } from '@/lib/demo-data';
+import { elderlyFixedIncomeBudgetTracker, elderlyStaplesStabilityTracker, grocerySpendForecast, personalGroceryInflation, savingsDashboard, studentWeeklyBudgetTracker } from '@/lib/demo-data';
+import { buildCategoryInflationTrends } from '@/lib/trends';
 import { ecoBasketScorecard } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -43,6 +45,15 @@ function formatPercent(value: number) {
   return `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`;
 }
 
+const premiumSavingsForecast = {
+  totalMonthly: 133,
+  drivers: [
+    { label: 'Alerts', amount: 42, detail: 'price-drop and wait-window alerts across watched staples' },
+    { label: 'Swaps', amount: 58, detail: 'verified same-basket store swaps for eligible rows' },
+    { label: 'Basket planning', amount: 33, detail: 'pantry top-up timing and duplicate-buy prevention' }
+  ],
+  guardrail: 'Premium-only forecast uses signed-in watchpoints and saved basket rows; public dashboards keep the detailed plan locked.'
+};
 
 function SavingsEmptyState() {
   return (
@@ -62,6 +73,7 @@ export default function SavingsDashboardPage() {
     .sort((a, b) => Math.abs(b.changeAmount) - Math.abs(a.changeAmount))
     .slice(0, 5);
   const visibleWatchpoints = savingsDashboard.watchpoints.slice(0, 4);
+  const categoryInflationTrends = buildCategoryInflationTrends({ limit: 4 });
 
   return (
     <PageShell>
@@ -96,6 +108,95 @@ export default function SavingsDashboardPage() {
           </div>
         </Card>
       </div>
+
+      <section className="mt-6">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-700">Category inflation trends</p>
+            <h2 className="mt-2 text-2xl font-black">Month-over-month pressure by aisle</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Latest monthly OpenPrices observations are compared with the prior observed month and flagged when the category is rising faster than the basket average of {formatPercent(categoryInflationTrends.basketAverageChangePercent)}.
+            </p>
+          </div>
+          <p className="text-xs font-bold text-slate-500">Source: {categoryInflationTrends.source}</p>
+        </div>
+        <div className="mt-4 grid gap-4 lg:grid-cols-2">
+          {categoryInflationTrends.cards.map((trend) => <CategoryInflationCard key={trend.category} trend={trend} />)}
+        </div>
+      </section>
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Next month forecast</p>
+            <h2 className="mt-2 text-2xl font-black">Grocery-spend forecast for {grocerySpendForecast.forecastMonth}</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+              Forecasted from purchase_history receipts only: {grocerySpendForecast.observedMonths} observed months, {formatSek(grocerySpendForecast.observedSpend)} total observed spend, and no synthetic basket rows.
+            </p>
+          </div>
+          <ConfidenceBadge
+            level={grocerySpendForecast.confidence}
+            label={`${grocerySpendForecast.confidence} forecast confidence`}
+            sampleSize={grocerySpendForecast.monthSummaries.reduce((sum, month) => sum + month.receiptCount, 0)}
+          />
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          <div className="rounded-2xl bg-white p-4">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">Predicted spend</p>
+            <p className="mt-2 text-3xl font-black text-emerald-900">{formatSek(grocerySpendForecast.predictedSpend)}</p>
+          </div>
+          <div className="rounded-2xl bg-white p-4">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">3-month baseline</p>
+            <p className="mt-2 text-3xl font-black text-slate-950">{formatSek(grocerySpendForecast.baselineMonthlySpend)}</p>
+          </div>
+          <div className="rounded-2xl bg-white p-4">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">Trend vs baseline</p>
+            <p className="mt-2 text-3xl font-black text-slate-950">{formatPercent(grocerySpendForecast.trendPercent)}</p>
+          </div>
+        </div>
+        <div className="mt-4 grid gap-2 md:grid-cols-4">
+          {grocerySpendForecast.monthSummaries.map((month) => (
+            <div className="rounded-2xl border border-emerald-100 bg-white/80 p-3" key={month.month}>
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{month.month}</p>
+              <p className="mt-1 text-lg font-black text-slate-950">{formatSek(month.spend)}</p>
+              <p className="text-xs font-semibold text-slate-600">{month.receiptCount} receipts</p>
+            </div>
+          ))}
+        </div>
+        {grocerySpendForecast.warnings.length > 0 ? (
+          <p className="mt-4 rounded-2xl bg-amber-50 p-4 text-sm font-bold text-amber-950">{grocerySpendForecast.warnings.join(' ')}</p>
+        ) : null}
+      </Card>
+
+      <Card className="mt-6 border-violet-200 bg-violet-50">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-violet-800">Premium savings forecast</p>
+            <h2 className="mt-2 text-2xl font-black">Projected monthly savings from alerts, swaps, and basket planning</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Upgrade-ready households can preview how premium combines their alert queue, store-switch opportunities, and planned baskets into one monthly savings forecast.
+            </p>
+          </div>
+          <div className="rounded-3xl bg-white px-5 py-4 text-center shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Forecast</p>
+            <p className="mt-1 text-4xl font-black text-violet-800">{formatSek(premiumSavingsForecast.totalMonthly)}</p>
+            <p className="text-xs font-bold text-slate-600">next month</p>
+          </div>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          {premiumSavingsForecast.drivers.map((driver) => (
+            <div className="rounded-2xl bg-white p-4" key={driver.label}>
+              <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">{driver.label}</p>
+              <p className="mt-2 text-3xl font-black text-violet-800">{formatSek(driver.amount)}</p>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{driver.detail}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white p-4">
+          <p className="text-sm font-bold text-violet-950">{premiumSavingsForecast.guardrail}</p>
+          <Link className="rounded-full bg-violet-700 px-4 py-2 text-sm font-black text-white" href="/pricing">See premium plan</Link>
+        </div>
+      </Card>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
         <Card>

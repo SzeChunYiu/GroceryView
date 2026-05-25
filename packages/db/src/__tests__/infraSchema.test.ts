@@ -105,6 +105,17 @@ describe('infra/db PostgreSQL schema contract', () => {
     }
   });
 
+  it('classifies every chain with indexed retailer_type metadata', () => {
+    const chains = tableDefinition('chains');
+    assert.match(chains, /retailer_type text not null default 'grocery' check/);
+    for (const retailerType of ['grocery', 'pharmacy', 'fuel', 'convenience', 'variety', 'cosmetics', 'household', 'online_marketplace']) {
+      assert.match(chains, new RegExp(`'${retailerType}'`), `${retailerType} missing from chains retailer_type check`);
+      assert.match(allMigrations, new RegExp(`'${retailerType}'`), `${retailerType} missing from retailer_type migrations`);
+    }
+    assert.match(allMigrations, /create index if not exists chains_retailer_type_idx/);
+    assert.match(schemaDoc, /`retailer_type` is required and indexed/);
+  });
+
   it('stores immutable price facts with type, time, confidence, and provenance', () => {
     const observations = tableDefinition('observations');
     for (const column of ['price_type', 'observed_at', 'confidence', 'provenance']) {
@@ -289,6 +300,9 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(migration, /products_name_trgm_idx on products using gin \(canonical_name gin_trgm_ops\)/);
     assert.match(migration, /products_slug_trgm_idx on products using gin \(slug gin_trgm_ops\)/);
     assert.match(migration, /aliases_normalized_trgm_idx on aliases using gin \(normalized_alias gin_trgm_ops\)/);
+    assert.match(allMigrations, /products_search_suggest_trgm_idx/);
+    assert.match(allMigrations, /products_search_suggest_name_sv_trgm_idx/);
+    assert.match(allMigrations, /products_search_suggest_name_en_trgm_idx/);
   });
 
   it('migrates every table used by the PostgreSQL repository adapter', () => {
@@ -299,6 +313,19 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(repositoryTableDefinition('user_preferences'), /preferred_currency text not null default 'sek'/);
     assert.match(repositoryTableDefinition('user_preferences'), /notification_channels text\[\] not null default array\[\]::text\[\]/);
     assert.match(repositoryTableDefinition('user_preferences'), /notification_channels <@ array\['push', 'email', 'telegram'\]::text\[\]/);
+    assert.match(allMigrations, /add column if not exists id bigint/);
+    assert.match(allMigrations, /add column if not exists session_id text/);
+    assert.match(allMigrations, /add column if not exists country text not null default 'se'/);
+    assert.match(allMigrations, /add column if not exists favorite_stores text\[\] not null default array\[\]::text\[\]/);
+    assert.match(allMigrations, /add column if not exists home_lat numeric\(9, 6\)/);
+    assert.match(allMigrations, /add column if not exists home_lng numeric\(9, 6\)/);
+    assert.match(allMigrations, /add column if not exists household_size integer/);
+    assert.match(allMigrations, /add column if not exists diet_filters text\[\] not null default array\[\]::text\[\]/);
+    assert.match(allMigrations, /add column if not exists algorithm_choice text not null default 'balanced'/);
+    assert.match(allMigrations, /add column if not exists created_at timestamptz not null default now\(\)/);
+    assert.match(allMigrations, /check \(user_id is not null or session_id is not null\)/);
+    assert.match(allMigrations, /create unique index if not exists user_preferences_user_id_key/);
+    assert.match(allMigrations, /create unique index if not exists user_preferences_session_id_key/);
     assert.match(repositoryTableDefinition('weekly_baskets'), /unique \(user_id, week_start\)/);
     assert.match(repositoryTableDefinition('subscription_entitlements'), /user_id text primary key references app_users\(id\) on delete cascade/);
     assert.match(repositoryTableDefinition('subscription_entitlements'), /provider_subscription_id text/);

@@ -1,6 +1,16 @@
+'use client';
+
 import type { ReactNode } from 'react';
+import { useMemo, useState } from 'react';
+import {
+  affiliateDisclosureLabel,
+  buildAffiliateOutboundUrl,
+  trackAffiliateOutboundClick,
+  type AffiliateLinkMetadata,
+  trackDealShare
+} from '@/lib/analytics';
 import { buildDealContext, type DealHistoryPoint } from '@/lib/deal-context';
-import { affiliateDisclosureLabel, buildAffiliateOutboundUrl, type AffiliateLinkMetadata } from '@/lib/analytics';
+import { dealShareUrl } from '@/lib/seo';
 
 type DealCardProps = {
   title: string;
@@ -16,6 +26,7 @@ type DealCardProps = {
   outboundDealUrl?: string;
   outboundStoreUrl?: string;
   affiliateCampaignId?: string;
+  sharePath?: string;
 };
 
 function formatPrice(value: number, locale: string, currency: string) {
@@ -31,7 +42,7 @@ function outboundMetadata({
   retailerName,
   sponsored,
   surface
-}: AffiliateLinkMetadata & { campaignId?: string }) {
+}: AffiliateLinkMetadata) {
   return {
     campaignId,
     dealId,
@@ -61,6 +72,7 @@ function OutboundAffiliateLink({
         data-affiliate-placement={metadata.placement}
         data-affiliate-retailer={metadata.retailerName}
         href={buildAffiliateOutboundUrl(metadata)}
+        onClick={() => trackAffiliateOutboundClick(metadata)}
         rel="sponsored noopener noreferrer"
         target="_blank"
       >
@@ -86,8 +98,10 @@ export function DealCard({
   dealId,
   outboundDealUrl,
   outboundStoreUrl,
-  affiliateCampaignId
+  affiliateCampaignId,
+  sharePath
 }: DealCardProps) {
+  const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle');
   const context = buildDealContext({ currentPrice, discountStartedAt, priceHistory, currency, locale });
   const dealLinkMetadata = outboundDealUrl ? outboundMetadata({
     campaignId: affiliateCampaignId,
@@ -109,6 +123,26 @@ export function DealCard({
     sponsored: false,
     surface: 'deal-card-store'
   }) : null;
+  const shareUrl = useMemo(() => dealShareUrl({ dealId, path: sharePath, title }), [dealId, sharePath, title]);
+  const encodedShareUrl = encodeURIComponent(shareUrl);
+  const encodedShareText = encodeURIComponent(`${title} is ${formatPrice(currentPrice, locale, currency)} on GroceryView`);
+  const analyticsDealId = dealId ?? sharePath ?? title;
+
+  async function copyShareLink() {
+    trackDealShare({ dealId: analyticsDealId, shareUrl, channel: 'copy_link' });
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopyState('copied');
+      window.setTimeout(() => setCopyState('idle'), 1800);
+    } catch {
+      window.prompt('Copy this GroceryView deal link', shareUrl);
+    }
+  }
+
+  function trackNativeShare() {
+    trackDealShare({ dealId: analyticsDealId, shareUrl, channel: 'web_share' });
+  }
 
   return (
     <article className="rounded-2xl border border-market-ink/10 bg-white p-4 shadow-sm">
@@ -146,6 +180,23 @@ export function DealCard({
           {storeLinkMetadata ? <OutboundAffiliateLink metadata={storeLinkMetadata}>Visit {retailerName} store</OutboundAffiliateLink> : null}
         </div>
       ) : null}
+
+      <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-market-ink/10 pt-4" aria-label="Share this deal">
+        <button
+          type="button"
+          onClick={copyShareLink}
+          className="rounded-full bg-market-ink px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-market-ink/85 focus:outline-none focus:ring-2 focus:ring-market-mint"
+        >
+          {copyState === 'copied' ? 'Link copied' : 'Copy deal link'}
+        </button>
+        <a
+          href={`https://twitter.com/intent/tweet?url=${encodedShareUrl}&text=${encodedShareText}`}
+          onClick={trackNativeShare}
+          className="rounded-full bg-market-oat px-3 py-1.5 text-xs font-semibold text-market-ink transition hover:bg-market-oat/80 focus:outline-none focus:ring-2 focus:ring-market-mint"
+        >
+          Share deal
+        </a>
+      </div>
     </article>
   );
 }

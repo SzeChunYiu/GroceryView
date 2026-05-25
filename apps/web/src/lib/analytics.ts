@@ -15,13 +15,22 @@ export type SearchToSavingsFunnelStepId =
   | 'basket_view'
   | 'savings_action';
 
+export type RecentProductSearch = {
+  query: string;
+  href: string;
+  resultCount: number;
+  searchedAt: string;
+};
+
 type FunnelDeviceSegment = 'desktop' | 'mobile' | 'tablet' | 'unknown';
 type FunnelAccountSegment = 'guest' | 'account' | 'unknown';
 
 const impressionEndpoint = '/api/analytics/item-card-impressions';
 const searchToSavingsFunnelEndpoint = '/api/analytics/search-to-savings-funnel';
+export const recentProductSearchesStorageKey = 'groceryview:recent-product-searches';
 const maxBatchSize = 20;
 const flushDelayMs = 1200;
+const maxRecentSearches = 10;
 
 let pendingImpressions: ItemCardImpression[] = [];
 let flushTimer: ReturnType<typeof setTimeout> | null = null;
@@ -136,6 +145,39 @@ export function trackSearchToSavingsFunnelStep(step: SearchToSavingsFunnelStepId
   }).catch(() => undefined);
 }
 
+export function readRecentProductSearches(): RecentProductSearch[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(recentProductSearchesStorageKey) || '[]') as RecentProductSearch[];
+    return Array.isArray(parsed)
+      ? parsed
+        .filter((entry) => typeof entry.query === 'string' && entry.query.trim().length > 0)
+        .slice(0, maxRecentSearches)
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+export function rememberRecentProductSearch(query: string, resultCount: number): RecentProductSearch[] {
+  if (typeof window === 'undefined') return [];
+  const trimmedQuery = query.trim();
+  if (!trimmedQuery || resultCount <= 0) return readRecentProductSearches();
+
+  const next = [
+    {
+      query: trimmedQuery,
+      href: `/products?q=${encodeURIComponent(trimmedQuery)}`,
+      resultCount,
+      searchedAt: new Date().toISOString()
+    },
+    ...readRecentProductSearches().filter((entry) => entry.query.toLocaleLowerCase('sv-SE') !== trimmedQuery.toLocaleLowerCase('sv-SE'))
+  ].slice(0, maxRecentSearches);
+
+  window.localStorage.setItem(recentProductSearchesStorageKey, JSON.stringify(next));
+  return next;
+}
+
 export type StoreEngagementEvent = {
   action: 'store_page_view' | 'store_directions_click';
   brand: string;
@@ -198,6 +240,44 @@ export function storePageViewScript(event: StoreEngagementInput) {
   })();`;
 }
 
+
+export type DealShareChannel = 'copy_link' | 'web_share';
+
+export type DealShareEvent = {
+  channel: DealShareChannel;
+  dealId: string;
+  observedAt: string;
+  referrer?: string;
+  shareUrl: string;
+};
+
+const dealShareEndpoint = '/api/analytics/deal-shares';
+
+export function trackDealShare(event: Omit<DealShareEvent, 'observedAt' | 'referrer'>) {
+  if (typeof window === 'undefined') return;
+
+  const payloadEvent: DealShareEvent = {
+    ...event,
+    observedAt: new Date().toISOString(),
+    referrer: document.referrer || undefined
+  };
+
+  window.dispatchEvent(new CustomEvent('groceryview:deal-share', { detail: payloadEvent }));
+  const payload = JSON.stringify({ event: payloadEvent });
+
+  if (navigator.sendBeacon) {
+    const sent = navigator.sendBeacon(dealShareEndpoint, new Blob([payload], { type: 'application/json' }));
+    if (sent) return;
+  }
+
+  void fetch(dealShareEndpoint, {
+    body: payload,
+    headers: { 'content-type': 'application/json' },
+    keepalive: true,
+    method: 'POST'
+  }).catch(() => undefined);
+}
+
 export type AffiliateLinkMetadata = {
   placement: 'deal_card' | 'store_link' | 'source_link';
   surface: string;
@@ -223,14 +303,18 @@ export function affiliateDisclosureLabel(metadata: Pick<AffiliateLinkMetadata, '
 }
 
 export function buildAffiliateOutboundUrl(metadata: AffiliateLinkMetadata) {
-  const url = new URL(metadata.destinationUrl);
-  url.searchParams.set('utm_source', groceryViewAffiliateSource);
-  url.searchParams.set('utm_medium', metadata.sponsored === false ? 'outbound_store' : 'affiliate');
-  url.searchParams.set('utm_campaign', metadata.campaignId ?? metadata.surface);
-  url.searchParams.set('gv_affiliate_disclosure', metadata.sponsored === false ? 'outbound' : 'affiliate');
-  if (metadata.productId) url.searchParams.set('gv_product_id', metadata.productId);
-  if (metadata.dealId) url.searchParams.set('gv_deal_id', metadata.dealId);
-  return url.toString();
+  try {
+    const url = new URL(metadata.destinationUrl);
+    url.searchParams.set('utm_source', groceryViewAffiliateSource);
+    url.searchParams.set('utm_medium', metadata.sponsored === false ? 'outbound_store' : 'affiliate');
+    url.searchParams.set('utm_campaign', metadata.campaignId ?? metadata.surface);
+    url.searchParams.set('gv_affiliate_disclosure', metadata.sponsored === false ? 'outbound' : 'affiliate');
+    if (metadata.productId) url.searchParams.set('gv_product_id', metadata.productId);
+    if (metadata.dealId) url.searchParams.set('gv_deal_id', metadata.dealId);
+    return url.toString();
+  } catch {
+    return metadata.destinationUrl;
+  }
 }
 
 function sendAffiliateOutboundClick(event: AffiliateOutboundClickEvent) {

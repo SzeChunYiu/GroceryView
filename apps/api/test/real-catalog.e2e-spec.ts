@@ -162,6 +162,25 @@ const productRows = [
   }
 ];
 
+const suggestionRows = [
+  {
+    id: 'product-milk',
+    slug: 'standardmjolk-1l',
+    name: 'Standardmjölk 3% 1 l',
+    brand: 'Arla',
+    image_url: null,
+    match_rank: '1'
+  },
+  {
+    id: 'product-butter',
+    slug: 'smor-500g',
+    name: 'Smör 500 g',
+    brand: null,
+    image_url: null,
+    match_rank: '0.95'
+  }
+];
+
 const priceHistoryRows = [
   {
     id: 'obs-milk-promo',
@@ -363,6 +382,7 @@ class FakePostgresQueryExecutorService {
 
   async query<T>(sql: string, params: unknown[] = []): Promise<T[]> {
     this.calls.push({ sql, params });
+    if (sql.includes('query_prefix') && sql.includes('products.canonical_name')) return suggestionRows as T[];
     if (sql.includes('update aliases') && sql.includes("source_ref = $1")) return [reviewedAliasRow] as T[];
     if (sql.includes('from aliases') && sql.includes("source_ref = $1")) return pendingAliasRows as T[];
     if (sql.includes('from weekly_baskets')) return [{ product_id: 'product-milk', quantity: '2' }] as T[];
@@ -443,6 +463,7 @@ describe('real catalog API endpoints', () => {
 
     assert.ok(docs.body.paths['/products/search/faceted']);
     assert.ok(docs.body.paths['/products/search/reviewer/aliases']);
+    assert.ok(docs.body.paths['/search/suggest']);
     assert.ok(docs.body.paths['/products/search/reviewer/aliases/{aliasId}/approve']);
     assert.ok(docs.body.paths['/products/{productId}/price-history']);
     assert.ok(docs.body.paths['/products/{productId}/cheapest-now']);
@@ -516,6 +537,37 @@ describe('real catalog API endpoints', () => {
     assert.match(database.calls[0]?.sql ?? '', /latest_prices/i);
     assert.match(database.calls[0]?.sql ?? '', /from latest_prices filter_prices/i);
     assert.ok((database.calls[0]?.sql ?? '').indexOf('from latest_prices filter_prices') < (database.calls[0]?.sql ?? '').indexOf('limit $9'));
+  });
+
+  it('serves pg_trgm product prefix suggestions from database rows', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/search/suggest?q=sm&limit=20')
+      .expect(200);
+
+    assert.equal(response.body.query, 'sm');
+    assert.equal(response.body.source, 'postgres.products_trgm_prefix');
+    assert.equal(response.body.suggestions.length, 2);
+    assert.deepEqual(response.body.suggestions[0], {
+      id: 'product-milk',
+      slug: 'standardmjolk-1l',
+      name: 'Standardmjölk 3% 1 l',
+      brand: 'Arla',
+      imageUrl: null,
+      matchRank: 1
+    });
+    assert.deepEqual(response.body.evidence, {
+      sourceTables: ['products'],
+      indexHint: 'products_search_suggest_trgm_idx'
+    });
+    assert.match(database.calls[0]?.sql ?? '', /products\.canonical_name ilike query\.raw_prefix \|\| '%'/i);
+    assert.match(database.calls[0]?.sql ?? '', /lower\(unaccent\(products\.canonical_name\)\) like query\.query_prefix \|\| '%'/i);
+    assert.match(database.calls[0]?.sql ?? '', /products\.domain = 'grocery'/i);
+    assert.deepEqual(database.calls[0]?.params, ['sm', 8]);
+  });
+
+  it('rejects blank product prefix suggestions before querying PostgreSQL', async () => {
+    await request(app.getHttpServer()).get('/search/suggest?q=').expect(400);
+    assert.equal(database.calls.length, 0);
   });
 
   it('serves product names in the requested user language when product locale columns are present', async () => {

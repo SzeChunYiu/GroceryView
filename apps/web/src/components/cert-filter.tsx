@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState } from 'react';
 
 const STORAGE_KEY = 'groceryview:cert-filter:selected';
+export const SAFETY_PREFERENCES_STORAGE_KEY = 'groceryview:safety-preferences';
+export const SAFETY_PREFERENCES_CHANGED_EVENT = 'groceryview:safety-preferences-changed';
 
 export const CERTIFICATION_FILTER_OPTIONS = [
   'KRAV',
@@ -16,6 +18,34 @@ export const CERTIFICATION_FILTER_OPTIONS = [
 ] as const;
 
 export type CertificationFilterOption = (typeof CERTIFICATION_FILTER_OPTIONS)[number];
+export type SafetyDietaryPreference = 'vegan' | 'vegetarian' | 'glutenfree' | 'laktosfree';
+export type SafetyAllergenPreference = 'milk' | 'gluten' | 'nuts' | 'eggs' | 'soy' | 'sesame';
+
+export type ProductSafetyPreferences = {
+  requiredDietaryTags: SafetyDietaryPreference[];
+  avoidedAllergenTags: SafetyAllergenPreference[];
+};
+
+const SAFETY_DIETARY_OPTIONS: Array<{ value: SafetyDietaryPreference; label: string }> = [
+  { value: 'vegan', label: 'Vegan' },
+  { value: 'vegetarian', label: 'Vegetarian' },
+  { value: 'glutenfree', label: 'Gluten-free' },
+  { value: 'laktosfree', label: 'Lactose-free' }
+];
+
+const SAFETY_ALLERGEN_OPTIONS: Array<{ value: SafetyAllergenPreference; label: string }> = [
+  { value: 'milk', label: 'Milk' },
+  { value: 'gluten', label: 'Gluten' },
+  { value: 'nuts', label: 'Nuts' },
+  { value: 'eggs', label: 'Eggs' },
+  { value: 'soy', label: 'Soy' },
+  { value: 'sesame', label: 'Sesame' }
+];
+
+const emptySafetyPreferences: ProductSafetyPreferences = {
+  requiredDietaryTags: [],
+  avoidedAllergenTags: []
+};
 
 type CertFilterProps = Readonly<{
   selected?: readonly CertificationFilterOption[];
@@ -34,6 +64,23 @@ function normaliseSelected(values: readonly string[] | null | undefined): Certif
   }
 
   return CERTIFICATION_FILTER_OPTIONS.filter((option) => values.includes(option));
+}
+
+function normaliseSafetyPreferences(value: unknown): ProductSafetyPreferences {
+  if (!value || typeof value !== 'object') {
+    return emptySafetyPreferences;
+  }
+
+  const candidate = value as Partial<Record<keyof ProductSafetyPreferences, unknown>>;
+  const dietaryValues = Array.isArray(candidate.requiredDietaryTags) ? candidate.requiredDietaryTags : [];
+  const allergenValues = Array.isArray(candidate.avoidedAllergenTags) ? candidate.avoidedAllergenTags : [];
+  const dietarySet = new Set(SAFETY_DIETARY_OPTIONS.map((option) => option.value));
+  const allergenSet = new Set(SAFETY_ALLERGEN_OPTIONS.map((option) => option.value));
+
+  return {
+    requiredDietaryTags: dietaryValues.filter((item): item is SafetyDietaryPreference => typeof item === 'string' && dietarySet.has(item as SafetyDietaryPreference)),
+    avoidedAllergenTags: allergenValues.filter((item): item is SafetyAllergenPreference => typeof item === 'string' && allergenSet.has(item as SafetyAllergenPreference))
+  };
 }
 
 function readStoredSelection(storageKey: string): CertificationFilterOption[] {
@@ -58,6 +105,19 @@ function readStoredSelection(storageKey: string): CertificationFilterOption[] {
   }
 }
 
+export function readStoredSafetyPreferences(storageKey = SAFETY_PREFERENCES_STORAGE_KEY): ProductSafetyPreferences {
+  if (typeof window === 'undefined') {
+    return emptySafetyPreferences;
+  }
+
+  try {
+    const rawValue = window.localStorage.getItem(storageKey);
+    return rawValue ? normaliseSafetyPreferences(JSON.parse(rawValue)) : emptySafetyPreferences;
+  } catch {
+    return emptySafetyPreferences;
+  }
+}
+
 export function CertFilter({ selected, onChange, storageKey = STORAGE_KEY, className = '' }: CertFilterProps) {
   const isControlled = selected !== undefined;
   const [internalSelected, setInternalSelected] = useState<CertificationFilterOption[]>(() =>
@@ -67,11 +127,13 @@ export function CertFilter({ selected, onChange, storageKey = STORAGE_KEY, class
     () => (isControlled ? normaliseSelected(selected) : internalSelected),
     [internalSelected, isControlled, selected]
   );
+  const [safetyPreferences, setSafetyPreferences] = useState<ProductSafetyPreferences>(emptySafetyPreferences);
 
   useEffect(() => {
     if (!isControlled) {
       setInternalSelected(readStoredSelection(storageKey));
     }
+    setSafetyPreferences(readStoredSafetyPreferences());
   }, [isControlled, storageKey]);
 
   useEffect(() => {
@@ -100,6 +162,35 @@ export function CertFilter({ selected, onChange, storageKey = STORAGE_KEY, class
 
   function clearSelected() {
     setSelected([]);
+  }
+
+  function updateSafetyPreferences(nextPreferences: ProductSafetyPreferences) {
+    setSafetyPreferences(nextPreferences);
+
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    window.localStorage.setItem(SAFETY_PREFERENCES_STORAGE_KEY, JSON.stringify(nextPreferences));
+    window.dispatchEvent(new CustomEvent(SAFETY_PREFERENCES_CHANGED_EVENT, { detail: nextPreferences }));
+  }
+
+  function toggleDietaryPreference(option: SafetyDietaryPreference) {
+    updateSafetyPreferences({
+      ...safetyPreferences,
+      requiredDietaryTags: safetyPreferences.requiredDietaryTags.includes(option)
+        ? safetyPreferences.requiredDietaryTags.filter((tag) => tag !== option)
+        : [...safetyPreferences.requiredDietaryTags, option]
+    });
+  }
+
+  function toggleAllergenPreference(option: SafetyAllergenPreference) {
+    updateSafetyPreferences({
+      ...safetyPreferences,
+      avoidedAllergenTags: safetyPreferences.avoidedAllergenTags.includes(option)
+        ? safetyPreferences.avoidedAllergenTags.filter((tag) => tag !== option)
+        : [...safetyPreferences.avoidedAllergenTags, option]
+    });
   }
 
   return (
@@ -137,6 +228,47 @@ export function CertFilter({ selected, onChange, storageKey = STORAGE_KEY, class
             </button>
           );
         })}
+      </div>
+
+      <div className="mt-5 grid gap-4 border-t border-slate-100 pt-4 md:grid-cols-2">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-800">Diet requirements</p>
+          <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="Dietary safety preferences">
+            {SAFETY_DIETARY_OPTIONS.map((option) => {
+              const active = safetyPreferences.requiredDietaryTags.includes(option.value);
+              return (
+                <button
+                  aria-pressed={active}
+                  className={`rounded-full border px-3 py-2 text-sm font-black transition ${active ? 'border-rose-800 bg-rose-800 text-white shadow-sm' : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-rose-300 hover:bg-rose-50 hover:text-rose-950'}`}
+                  key={option.value}
+                  onClick={() => toggleDietaryPreference(option.value)}
+                  type="button"
+                >
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-800">Avoid allergens</p>
+          <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="Allergen avoidance preferences">
+            {SAFETY_ALLERGEN_OPTIONS.map((option) => {
+              const active = safetyPreferences.avoidedAllergenTags.includes(option.value);
+              return (
+                <button
+                  aria-pressed={active}
+                  className={`rounded-full border px-3 py-2 text-sm font-black transition ${active ? 'border-rose-800 bg-rose-800 text-white shadow-sm' : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-rose-300 hover:bg-rose-50 hover:text-rose-950'}`}
+                  key={option.value}
+                  onClick={() => toggleAllergenPreference(option.value)}
+                  type="button"
+                >
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </section>
   );

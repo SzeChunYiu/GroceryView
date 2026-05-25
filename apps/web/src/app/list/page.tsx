@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CheckableListItem } from '@/components/CheckableListItem';
 import { AppNav } from '@/components/app-nav';
 import { BottomNav } from '@/components/bottom-nav';
@@ -8,12 +8,42 @@ import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { PullRefreshWrapper } from '@/components/PullRefreshWrapper';
 import { PrintButton } from '@/components/PrintButton';
 import { useList } from '@/hooks/useList';
+import { cheapestSourceForProductSlug } from '@/lib/shopping-list-prices';
+
+const OFFLINE_SHOPPING_LIST_CACHE_KEY = 'groceryview:shopping-list:offline-cache:v1';
 
 export default function ShoppingListPage() {
-  const { addImportedItems, checkedCount, items, remainingCount, resetCheckedState, shareLink, toggleItemChecked, totalCount } = useList();
+  const { addImportedItems, checkedCount, hasLoadedBrowserState, items, remainingCount, resetCheckedState, shareLink, toggleItemChecked, totalCount } = useList();
   const [generatedShareUrl, setGeneratedShareUrl] = useState('');
+  const [offlineCacheStatus, setOfflineCacheStatus] = useState('Offline copy is prepared after the list loads.');
   const [shareStatus, setShareStatus] = useState('Create a read-only shopping list link after your basket is ready.');
   const progress = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
+  const offlineShoppingListSnapshot = useMemo(() => {
+    const lastKnownPrices = items
+      .map((item) => item.matchedProductSlug ? cheapestSourceForProductSlug(item.matchedProductSlug) : null)
+      .filter((source): source is NonNullable<ReturnType<typeof cheapestSourceForProductSlug>> => source !== null);
+
+    return {
+      cachedAt: new Date().toISOString(),
+      checkedCount,
+      items,
+      lastKnownPrices,
+      remainingCount,
+      totalCount
+    };
+  }, [checkedCount, items, remainingCount, totalCount]);
+
+  useEffect(() => {
+    if (!hasLoadedBrowserState || shareLink?.isValid) return;
+
+    try {
+      window.localStorage.setItem(OFFLINE_SHOPPING_LIST_CACHE_KEY, JSON.stringify(offlineShoppingListSnapshot));
+      setOfflineCacheStatus(`Offline copy saved with ${offlineShoppingListSnapshot.lastKnownPrices.length} last known price${offlineShoppingListSnapshot.lastKnownPrices.length === 1 ? '' : 's'}.`);
+    } catch {
+      setOfflineCacheStatus('Offline copy could not be saved in this browser.');
+    }
+  }, [hasLoadedBrowserState, offlineShoppingListSnapshot, shareLink?.isValid]);
+
   const refreshLatestPrices = useCallback(async () => {
     const productUrls = items
       .map((item) => item.matchedProductSlug)
@@ -79,6 +109,9 @@ export default function ShoppingListPage() {
               Create share link
             </button>
             <p className="text-sm font-semibold text-slate-600">Print view uses A4 spacing and hides navigation, import controls, and mobile chrome.</p>
+          </div>
+          <div className="mt-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-black text-emerald-950" data-print-hidden="true" role="status">
+            {offlineCacheStatus}
           </div>
           <div className="mt-3 rounded-2xl bg-white/80 p-4 text-sm font-semibold text-slate-700" data-print-hidden="true" role="status">
             <p>{shareStatus}</p>
