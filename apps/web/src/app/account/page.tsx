@@ -14,6 +14,7 @@ import { planAccountDeletion } from '@groceryview/core';
 
 const notificationSubscriptionEndpoint = '/api/notifications/subscription';
 const alertPreferencesEndpoint = '/api/alerts/preferences';
+const allergenPreferencesEndpoint = '/api/account/allergen-preferences';
 const notificationVapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? '';
 const notificationChannelPreferences = ['price-drop-alerts', 'basket-reminders'];
 const adaptiveAlertPreferences = {
@@ -240,6 +241,24 @@ export default function AccountPage() {
         <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
           The header SearchBar stores recent searches locally and lets signed-in shoppers pin weekly grocery checks into <code className="rounded bg-white/80 px-1 py-0.5 text-violet-900">{savedSearchesStorageKey}</code>. Saved searches are user-triggered shortcuts, not inferred browsing profiles.
         </p>
+      </Card>
+
+      <Card className="mt-6 border-rose-200 bg-rose-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-rose-800">Allergen avoidance defaults</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight">Product search opens with safety filtering enabled</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+          Signed-in accounts persist allergen avoidance through <code className="rounded bg-white/80 px-1 py-0.5 text-rose-900">{allergenPreferencesEndpoint}</code>. Product search uses that account default only when the URL does not include an explicit <code className="rounded bg-white/80 px-1 py-0.5 text-rose-900">avoidAllergens</code> override.
+        </p>
+        <form action={allergenPreferencesEndpoint} className="mt-4 grid gap-3 rounded-2xl bg-white p-4 shadow-sm sm:grid-cols-[1fr_auto]" method="post">
+          <input name="userId" type="hidden" value="signed-in-user" />
+          <input name="avoidedAllergenTags" type="hidden" value="milk,lactose,gluten,wheat" />
+          <label className="flex items-center gap-2 text-sm font-black text-rose-950">
+            <input defaultChecked name="avoidAllergensByDefault" type="checkbox" value="true" />
+            Enable allergen-risk exclusion by default
+          </label>
+          <button className="rounded-full bg-rose-800 px-4 py-2 text-sm font-black text-white" type="submit">Save default</button>
+          <p className="text-sm leading-6 text-slate-600 sm:col-span-2">Default avoided tags: milk, lactose, gluten, wheat. Shoppers can still turn the filter off from any products URL with <code>avoidAllergens=false</code>.</p>
+        </form>
       </Card>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
