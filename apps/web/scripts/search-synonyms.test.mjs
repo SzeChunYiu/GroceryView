@@ -34,6 +34,8 @@ test('search suggestion expansion includes semantic synonym matches', async () =
 
   assert.match(suggest, /semanticSynonymsForQuery/);
   assert.match(suggest, /matchedSynonyms/);
+  assert.match(suggest, /rankFuzzyGrocerySynonyms/);
+  assert.match(suggest, /matchedFuzzyTerms/);
   assert.match(suggest, /for \(const synonym of semanticSynonymsForQuery\(trimmed\)\)/);
   assert.match(suggest, /for \(const synonymTerm of synonym\.terms\) addUnique\(expandedQueries, synonymTerm\)/);
   assert.match(filters, /searchSynonymBadgesForQuery/);
@@ -46,9 +48,10 @@ test('product search APIs query expanded synonym terms before result ranking', a
 
   assert.match(productsRoute, /expandGrocerySearchQuery/);
   assert.match(productsRoute, /matchedSynonyms/);
-  assert.match(productsRoute, /Promise\.all\(expansion\.expandedQueries\.map/);
+  assert.match(productsRoute, /matchedFuzzyTerms/);
+  assert.match(productsRoute, /rankedQueries\.map/);
   assert.match(productsRoute, /mergeSearchResults\(batches\)/);
-  assert.match(productsRoute, /postgres\.products_tsvector_alias_synonym_expansion/);
+  assert.match(productsRoute, /postgres\.products_tsvector_alias_fuzzy_synonym_expansion/);
   assert.match(searchRoute, /matchedSynonyms/);
   assert.match(searchRoute, /postgres\.products_tsvector_alias_synonym_expansion/);
 });

@@ -10,7 +10,7 @@ async function loadProductsRoute() {
     .replace("import { NextResponse } from 'next/server';", 'const NextResponse = { json: (body, init) => Response.json(body, init) };')
     .replace("import { z } from 'zod';", '')
     .replace("import { recordProductSearchPerformanceTelemetry, type ProductSearchPerformanceTelemetry } from '@/lib/analytics';", 'const recordProductSearchPerformanceTelemetry = (telemetry) => ({ ...telemetry, latencyMs: 0, cacheHitRate: telemetry.cacheHit ? 1 : 0, timeoutRate: telemetry.timedOut ? 1 : 0 });')
-    .replace("import { expandGrocerySearchQueryWithTelemetry, type GrocerySearchExpansion, type GrocerySearchExpansionTelemetry } from '@/lib/search-suggest';", 'const expandGrocerySearchQueryWithTelemetry = (query) => ({ expansion: { query, expandedQueries: query ? [query] : [], matchedAliases: [], matchedSynonyms: [] }, telemetry: { cacheHit: false } });')
+    .replace("import { expandGrocerySearchQueryWithTelemetry, type GrocerySearchExpansion, type GrocerySearchExpansionTelemetry } from '@/lib/search-suggest';", 'const expandGrocerySearchQueryWithTelemetry = (query) => ({ expansion: { query, expandedQueries: query ? [query] : [], matchedAliases: [], matchedFuzzyTerms: [], matchedSynonyms: [] }, telemetry: { cacheHit: false } });')
     .replace(/type PgPoolLike = \{[\s\S]*?\};\n\n/, '')
     .replace(/type PgModuleLike = \{[\s\S]*?\};\n\n/, '')
     .replace(/let cachedDatabaseUrl: string \| null = null;/, 'let cachedDatabaseUrl = null;')
@@ -48,6 +48,7 @@ test('products route validation accepts q-only searches and rejects unexpected q
     query: 'a',
     expandedQueries: ['a'],
     matchedAliases: [],
+    matchedFuzzyTerms: [],
     matchedSynonyms: [],
     performanceTelemetry: {
       cacheHit: false,
@@ -58,7 +59,7 @@ test('products route validation accepts q-only searches and rejects unexpected q
       timeoutRate: 0
     },
     results: [],
-    source: 'postgres.products_tsvector_alias_synonym_expansion'
+    source: 'postgres.products_tsvector_alias_fuzzy_synonym_expansion'
   });
 
   const rejected = await GET(new Request('https://groceryview.test/api/products?q=a&limit=8'));

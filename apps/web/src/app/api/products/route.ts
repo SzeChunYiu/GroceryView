@@ -60,7 +60,7 @@ function mergeSearchResults(batches: ProductSearchResult[][]): ProductSearchResu
   return [...byId.values()].sort((a, b) => b.searchRank - a.searchRank || a.name.localeCompare(b.name)).slice(0, 8);
 }
 
-const productSearchTelemetrySource = 'postgres.products_tsvector_alias_synonym_expansion';
+const productSearchTelemetrySource = 'postgres.products_tsvector_alias_fuzzy_synonym_expansion';
 
 function isTimeoutError(error: unknown) {
   if (!(error instanceof Error)) return false;
@@ -107,6 +107,7 @@ function responsePayload(
     query,
     expandedQueries: expansion.expandedQueries,
     matchedAliases: expansion.matchedAliases,
+    matchedFuzzyTerms: expansion.matchedFuzzyTerms,
     matchedSynonyms: expansion.matchedSynonyms,
     results,
     performanceTelemetry: {
@@ -160,7 +161,8 @@ export async function GET(request: Request) {
 
   try {
     const executor = await executorForDatabaseUrl(databaseUrl);
-    const batches = await Promise.all(expansion.expandedQueries.map((expandedQuery) => searchProductsByText(executor, expandedQuery, { limit: 8 })));
+    const rankedQueries = expansion.expandedQueries.length > 0 ? expansion.expandedQueries : [query];
+    const batches = await Promise.all(rankedQueries.map((expandedQuery) => searchProductsByText(executor, expandedQuery, { limit: 8 })));
     const results = mergeSearchResults(batches);
     const telemetry = buildPerformanceTelemetry(query, results.length, startedAt, expansionTelemetry);
     logPerformanceTelemetry(telemetry);
