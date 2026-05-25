@@ -1974,14 +1974,51 @@ export const loyaltyAdjustedBasketInput: BasketComparisonInput = {
 };
 
 const loyaltyAdjustedBasketResult = compareBasketStrategies(loyaltyAdjustedBasketInput);
+const loyaltyAdjustedShelfOnlyResult = compareBasketStrategies({
+  ...loyaltyAdjustedBasketInput,
+  enabledMemberStoreIds: [],
+  items: loyaltyAdjustedBasketInput.items.map((item) => ({
+    ...item,
+    prices: item.prices.filter((price) => price.priceType !== 'member')
+  }))
+});
+const loyaltyAdjustedAllMemberStoreIds = [...new Set(loyaltyAdjustedBasketInput.items
+  .flatMap((item) => item.prices)
+  .filter((price) => price.priceType === 'member')
+  .map((price) => price.storeId))]
+  .sort();
+const loyaltyAdjustedAllMemberResult = compareBasketStrategies({
+  ...loyaltyAdjustedBasketInput,
+  enabledMemberStoreIds: loyaltyAdjustedAllMemberStoreIds
+});
 
 export const loyaltyAdjustedBasketComparison = {
   persona: 'Loyalty-aware basket shoppers',
   title: 'Loyalty-adjusted basket comparison',
   comparison: loyaltyAdjustedBasketResult,
+  shelfOnlyComparison: loyaltyAdjustedShelfOnlyResult,
+  allMemberComparison: loyaltyAdjustedAllMemberResult,
   enabledMemberStoreIds: loyaltyAdjustedBasketInput.enabledMemberStoreIds ?? [],
+  allMemberStoreIds: loyaltyAdjustedAllMemberStoreIds,
   memberSavingsTotal: loyaltyAdjustedBasketResult.memberSavingsTotal,
   excludedMemberPriceProductIds: loyaltyAdjustedBasketResult.excludedMemberPriceProductIds,
+  scenarioRows: [
+    {
+      label: 'Normal shelf prices',
+      total: loyaltyAdjustedShelfOnlyResult.cheapestByProduct.total,
+      detail: 'Member rows removed; baseline uses only visible shelf prices.'
+    },
+    {
+      label: 'Selected loyalty programs',
+      total: loyaltyAdjustedBasketResult.cheapestByProduct.total,
+      detail: `Enabled: ${(loyaltyAdjustedBasketInput.enabledMemberStoreIds ?? []).join(', ')}. Other member prices stay blocked.`
+    },
+    {
+      label: 'All visible member programs',
+      total: loyaltyAdjustedAllMemberResult.cheapestByProduct.total,
+      detail: `Requires: ${loyaltyAdjustedAllMemberStoreIds.join(', ')}. No account ownership is assumed.`
+    }
+  ],
   guardrail: 'Public shelf prices stay the baseline; member prices are only counted for enabled loyalty chains, and non-enabled member rows remain blockers instead of hidden savings.'
 };
 

@@ -1,4 +1,5 @@
 import { readFile } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 
 const INGESTED_DIR = new URL('../../apps/web/src/lib/ingested/', import.meta.url);
 
@@ -124,9 +125,10 @@ const summaries = [];
 const failures = [];
 
 for (const dataset of DATASETS) {
-  const text = await readFile(new URL(dataset.file, INGESTED_DIR), 'utf8');
-  const rows = extractJsonExport(text, dataset.rows);
-  const source = extractJsonExport(text, dataset.source);
+  const fileUrl = new URL(dataset.file, INGESTED_DIR);
+  const text = await readFile(fileUrl, 'utf8');
+  const rows = extractJsonExport(text, dataset.rows, fileUrl);
+  const source = extractJsonExport(text, dataset.source, fileUrl);
   const sourceRowCount = rowCount(source, dataset.sourceRowCount);
   const label = `${dataset.file}:${dataset.rows}`;
   const duplicateKeys = countDuplicates(rows.map((row) => rowKey(row, dataset.key)));
@@ -204,7 +206,7 @@ if (failures.length > 0) {
   console.log(JSON.stringify({ status: 'ok', summaries }, null, 2));
 }
 
-function extractJsonExport(text, exportName) {
+function extractJsonExport(text, exportName, fileUrl) {
   const marker = `export const ${exportName}`;
   const markerIndex = text.indexOf(marker);
   if (markerIndex < 0) {
@@ -216,7 +218,35 @@ function extractJsonExport(text, exportName) {
   if (start < 0) {
     throw new Error(`Missing JSON value for export ${exportName}`);
   }
-  return JSON.parse(text.slice(start, matchingJsonEnd(text, start) + 1));
+  const rawValue = text.slice(start, matchingJsonEnd(text, start) + 1);
+  try {
+    return JSON.parse(rawValue);
+  } catch (error) {
+    const spreadArray = extractSpreadArrayExport(text, rawValue, fileUrl);
+    if (spreadArray) return spreadArray;
+    throw error;
+  }
+}
+
+function extractSpreadArrayExport(text, rawValue, fileUrl) {
+  if (!rawValue.trimStart().startsWith('[') || !rawValue.includes('...')) return null;
+
+  const rows = [];
+  const spreadIdentifiers = [...rawValue.matchAll(/\.\.\.([A-Za-z_$][\w$]*)/g)].map((match) => match[1]);
+  if (spreadIdentifiers.length === 0) return null;
+
+  for (const identifier of spreadIdentifiers) {
+    const importMatch = text.match(new RegExp(`import \\{\\s*${identifier}\\s*\\} from ['"]([^'"]+)['"];`));
+    if (!importMatch) return null;
+    const importPath = importMatch[1].endsWith('.ts') ? importMatch[1] : `${importMatch[1]}.ts`;
+    const importedUrl = new URL(importPath, fileUrl);
+    const importedText = readFileSync(importedUrl, 'utf8');
+    const chunkRows = extractJsonExport(importedText, identifier, importedUrl);
+    if (!Array.isArray(chunkRows)) return null;
+    rows.push(...chunkRows);
+  }
+
+  return rows;
 }
 
 function firstJsonStart(text, fromIndex) {
