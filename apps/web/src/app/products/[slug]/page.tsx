@@ -17,7 +17,7 @@ import {
   type ItemSubstitutionProduct
 } from '@groceryview/analytics';
 import { predictBestTimeToBuy, type BestTimeToBuyObservation } from '@groceryview/core/src/lib/bestTimeToBuy';
-import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { Card, Eyebrow, PageShell, SourceCitation } from '@/components/data-ui';
 import { BestTimeBadge } from '@/components/best-time-badge';
 import { ProductBreadcrumb } from '@/components/Breadcrumbs';
 import { ConfidenceBadge } from '@/components/confidence-badge';
@@ -1532,6 +1532,15 @@ export default async function ProductPage({ params, routeBase = 'products' }: Re
       <ProductBreadcrumb categoryLabel={labelFromSlug(product.category)} categorySlug={product.category} productHref={productRouteHref(product, routeBase)} productLabel={product.name} />
       <h1 className="mt-2 max-w-4xl text-4xl font-black tracking-tight">{product.name}</h1>
       <p className="mt-3 text-lg text-slate-700">{isChain ? product.brand : product.brands || 'Brand not reported'} · {isChain ? product.subline : product.quantity || 'Quantity not reported'}</p>
+      <div className="mt-4">
+        <SourceCitation
+          confidenceLabel={isChain ? `${chainRows.length} chain price row${chainRows.length === 1 ? '' : 's'}` : `${product.observationCount} OpenPrices observation${product.observationCount === 1 ? '' : 's'}`}
+          connectorRun={isChain ? 'chainPriceRows(product) from verified chain snapshot' : 'OpenPrices observation aggregation'}
+          href={freshnessBadge.evidenceRoute}
+          observedAt={isChain ? freshnessBadge.freshnessLabel : product.lastObservedAt}
+          sourceLabel={isChain ? 'Willys/Hemkop public search snapshot' : 'OpenPrices / Open Food Facts SEK observation'}
+        />
+      </div>
       <div className="mt-6 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
         <Card>
           {product.image ? (

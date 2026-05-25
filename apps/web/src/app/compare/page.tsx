@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { BasketComparisonPrint } from '@/components/basket-comparison-print';
 import { ChainSelector } from '@/components/chain-selector';
-import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { Card, Eyebrow, PageShell, SourceCitation } from '@/components/data-ui';
 import { FamilyPackComparisonPanel } from '@/components/family-pack-comparison';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
@@ -258,6 +258,15 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
       <Eyebrow>Willys vs Hemköp</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Comparable chain prices</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">Rows appear only when the same Axfood product code is present in both chain catalogues. Savings are not shown across unmatched products.</p>
+      <div className="mt-4">
+        <SourceCitation
+          confidenceLabel={`${comparison.products.length || endpointMatrix.products.length} comparison rows; missing chains stay explicit`}
+          connectorRun={hasEndpointRequestedItems ? '/api/compare item snapshot fetch' : 'buildChainComparisonTable snapshot projection'}
+          href="/data-sources"
+          observedAt={comparison.generatedAt}
+          sourceLabel={hasEndpointRequestedItems ? '/api/compare item snapshot rows' : comparison.sourceLabel}
+        />
+      </div>
       <SavedViewActions
         href={currentCompareHref}
         label="Comparable chain price view"

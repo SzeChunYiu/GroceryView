@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { SourceCitation } from '@/components/data-ui';
 import { DealCard } from '@/components/deal-card';
 import { SavedViewActions } from '@/components/saved-view-actions';
 import { categoryLabels, pricedProducts } from '@/lib/openprices-products';
@@ -199,6 +200,15 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
           <p className="mt-2 text-2xl font-black">{snapshot.retrievedLabel}</p>
           <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{snapshot.axfoodSource}</p>
         </div>
+      </div>
+      <div className="mt-4">
+        <SourceCitation
+          confidenceLabel={`${visibleDeals.length} visible deal cards from observed spread/drop rows`}
+          connectorRun="topChainSpreads + priceDropMoversBoard deal feed"
+          href="/data-sources"
+          observedAt={snapshot.retrievedLabel}
+          sourceLabel={snapshot.axfoodSource}
+        />
       </div>
 
       <SavedViewActions

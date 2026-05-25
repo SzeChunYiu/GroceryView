@@ -89,6 +89,51 @@ export function StatusBadge({ children, tone = 'neutral' }: Readonly<{ children:
   return <span className={`rounded-full border px-3 py-1 text-xs font-black uppercase tracking-[0.14em] ${toneClass}`}>{children}</span>;
 }
 
+export function SourceCitation({
+  confidenceLabel,
+  connectorRun,
+  href,
+  observedAt,
+  sourceLabel,
+  unknownReason
+}: Readonly<{
+  confidenceLabel?: string | null;
+  connectorRun?: string | null;
+  href?: string | null;
+  observedAt?: string | null;
+  sourceLabel?: string | null;
+  unknownReason?: string | null;
+}>) {
+  const source = sourceLabel?.trim() || 'Unknown source';
+  const observed = observedAt?.trim() || 'Freshness unknown';
+  const run = connectorRun?.trim() || 'Connector run unknown';
+  const confidence = confidenceLabel?.trim() || 'Confidence unknown';
+  const isUnknown = Boolean(unknownReason || !sourceLabel || !observedAt || !confidenceLabel);
+  const containerClass = isUnknown
+    ? 'border-amber-200 bg-amber-50 text-amber-950'
+    : 'border-emerald-200 bg-emerald-50 text-emerald-950';
+  const chipClass = isUnknown ? 'bg-white text-amber-950' : 'bg-white text-emerald-950';
+  const sourceNode = href
+    ? href.startsWith('/')
+      ? <Link className="font-black underline decoration-current underline-offset-4" href={href}>{source}</Link>
+      : <a className="font-black underline decoration-current underline-offset-4" href={href}>{source}</a>
+    : <span className="font-black">{source}</span>;
+
+  return (
+    <aside className={`rounded-2xl border p-4 ${containerClass}`} aria-label="Source freshness and confidence">
+      <div className="flex flex-wrap items-center gap-2 text-xs font-black uppercase tracking-[0.14em]">
+        <span className={`rounded-full px-3 py-1 ${chipClass}`}>Source</span>
+        <span className={`rounded-full px-3 py-1 ${chipClass}`}>Freshness</span>
+        <span className={`rounded-full px-3 py-1 ${chipClass}`}>Confidence</span>
+      </div>
+      <p className="mt-3 text-sm font-semibold leading-6">
+        {sourceNode} · observed {observed} · {run} · {confidence}
+        {unknownReason ? ` · ${unknownReason}` : ''}
+      </p>
+    </aside>
+  );
+}
+
 export function SearchRecoveryPanel({
   didYouMean,
   popularAlternatives,

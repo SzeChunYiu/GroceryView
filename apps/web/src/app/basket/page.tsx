@@ -1,6 +1,6 @@
 import { BasketCalculator, type BasketCalculatorProduct } from '@/components/basket-calculator';
 import { BasketBuyTiming } from '@/components/basket-buy-timing';
-import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
+import { Card, Eyebrow, PageShell, SourceCitation, SourceCoverage } from '@/components/data-ui';
 import { FamilyPackComparisonPanel } from '@/components/family-pack-comparison';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { dbSiteSnapshotGeneratedAt } from '@/lib/generated/db-site-products';
@@ -102,6 +102,16 @@ export default function BasketPage() {
             Built from {basketProducts.length} product candidates and postgres.latest_prices-shaped chain observations.
           </p>
         </Card>
+      </div>
+      <div className="mt-4">
+        <SourceCitation
+          confidenceLabel={pricedRows > 0 ? `${pricedRows.toLocaleString('sv-SE')} visible basket price rows` : null}
+          connectorRun="chainPriceRows(topChainSpreads) basket projection"
+          href="/data-sources"
+          observedAt={dbSiteSnapshotGeneratedAt}
+          sourceLabel={sourceLabel}
+          unknownReason={dbSiteSnapshotGeneratedAt ? null : 'Generated snapshot time is unavailable, so freshness is not used as a claim.'}
+        />
       </div>
 
       <div className="mt-6 grid gap-6 md:grid-cols-3">
