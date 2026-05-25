@@ -18,6 +18,7 @@ import {
 } from '@groceryview/analytics';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
+import { FriendPriceCard } from '@/components/friend-price-card';
 import { PriceIntelligenceCard, type PriceIntelligenceScoreCard } from '@/components/price-intelligence-card';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
 import { axfoodProducts } from '@/lib/axfood-products';
@@ -27,6 +28,7 @@ import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, fin
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { normalizeUnitPriceForPackageText, packageEvidenceFromText } from '@/lib/normalization';
 import { metadataForProduct } from '@/lib/seo';
+import { listFriendPriceSightingsForProductChains } from '@/lib/social';
 
 export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
   const { slug } = await params;
@@ -1238,6 +1240,8 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
       </PageShell>
     );
   }
+  const chainRows = isChain ? chainPriceRows(product) : [];
+  const friendPriceSightings = listFriendPriceSightingsForProductChains(product.slug, chainRows.map((row) => row.chain));
   const dealVerdict = dealScoreVerdictFor(product);
   const smartSwaps = smartSwapRecommendationsFor(product);
   const itemSubstitutions = itemSubstitutionSuggestionsFor(product);
@@ -1325,6 +1329,25 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           <p className="rounded-2xl bg-white p-4 text-sm font-bold text-slate-700">Confidence: {freshnessBadge.confidenceBadge}</p>
         </div>
       </Card>
+      {friendPriceSightings.length > 0 ? (
+        <Card className="mt-6 border-fuchsia-200 bg-fuchsia-50/70">
+          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-fuchsia-800">Friend price sightings</p>
+              <h2 className="mt-2 text-2xl font-black text-slate-950">Anonymized friend and household prices</h2>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+                Shows permissioned social sightings for this exact product and one of its verified store chains. Private names and unshared sightings stay hidden.
+              </p>
+            </div>
+            <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-fuchsia-900">{friendPriceSightings.length} shared sighting(s)</p>
+          </div>
+          <div className="mt-5 grid gap-3 md:grid-cols-2">
+            {friendPriceSightings.map((sighting) => (
+              <FriendPriceCard key={sighting.id} sighting={sighting} />
+            ))}
+          </div>
+        </Card>
+      ) : null}
       {commodityComparison ? (
         <Card className="mt-6 border-lime-200 bg-lime-50/70">
           <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-start">
@@ -1774,7 +1797,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
         <Card className="mt-6">
           <h2 className="text-2xl font-black">Chain price rows</h2>
           <div className="mt-4 grid gap-3 md:grid-cols-2">
-            {chainPriceRows(product).map((row) => (
+            {chainRows.map((row) => (
               <div className="rounded-2xl border border-slate-200 p-4" key={row.chain}>
                 <p className="text-lg font-black capitalize">{row.chain}</p>
                 <p className="mt-1 text-3xl font-black text-emerald-800">{formatSek(row.price)}</p>

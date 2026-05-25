@@ -21,6 +21,7 @@ export const DEFAULT_DIETARY_PROFILE_PREFERENCES: DietaryProfilePreferences = {
 export type HouseholdPricePreferences = {
   householdId: string;
   preferredBrands: string[];
+  avoidedBrands: string[];
   preferredStores: string[];
   updatedAt: string;
 };
@@ -40,6 +41,7 @@ export const HOUSEHOLD_PRICE_PREFERENCE_STORAGE_KEY = 'groceryview:household-pri
 export const DEFAULT_HOUSEHOLD_PRICE_PREFERENCES: HouseholdPricePreferences = {
   householdId: 'local-household',
   preferredBrands: ['Garant', 'ICA Basic'],
+  avoidedBrands: ['Unknown private label'],
   preferredStores: ['Willys', 'Hemköp'],
   updatedAt: 'static-snapshot'
 };
@@ -117,9 +119,14 @@ export function saveDietaryProfilePreferences(preferences: Partial<DietaryProfil
 }
 
 export function normalizeHouseholdPricePreferences(preferences: Partial<HouseholdPricePreferences> | null | undefined): HouseholdPricePreferences {
+  const avoidedBrands = uniquePreferenceValues(preferences?.avoidedBrands ?? DEFAULT_HOUSEHOLD_PRICE_PREFERENCES.avoidedBrands);
+  const avoidedBrandSet = new Set(avoidedBrands.map(normalizedValue));
+
   return {
     householdId: preferences?.householdId?.trim() || DEFAULT_HOUSEHOLD_PRICE_PREFERENCES.householdId,
-    preferredBrands: uniquePreferenceValues(preferences?.preferredBrands ?? DEFAULT_HOUSEHOLD_PRICE_PREFERENCES.preferredBrands),
+    preferredBrands: uniquePreferenceValues(preferences?.preferredBrands ?? DEFAULT_HOUSEHOLD_PRICE_PREFERENCES.preferredBrands)
+      .filter((brand) => !avoidedBrandSet.has(normalizedValue(brand))),
+    avoidedBrands,
     preferredStores: uniquePreferenceValues(preferences?.preferredStores ?? DEFAULT_HOUSEHOLD_PRICE_PREFERENCES.preferredStores),
     updatedAt: preferences?.updatedAt || new Date().toISOString()
   };
@@ -174,11 +181,13 @@ export function householdPricePreferenceScore(
   preferences: HouseholdPricePreferences = DEFAULT_HOUSEHOLD_PRICE_PREFERENCES
 ) {
   const preferredBrands = new Set(preferences.preferredBrands.map(normalizedValue));
+  const avoidedBrands = new Set(preferences.avoidedBrands.map(normalizedValue));
   const preferredStores = new Set(preferences.preferredStores.map(normalizedValue));
   const candidateStores = [candidate.store, candidate.storeName, candidate.chain].map(normalizedValue);
   let score = 0;
 
   if (preferredBrands.has(normalizedValue(candidate.brand))) score += 1;
+  if (avoidedBrands.has(normalizedValue(candidate.brand))) score -= 4;
   if (candidateStores.some((store) => preferredStores.has(store))) score += 2;
 
   return score;

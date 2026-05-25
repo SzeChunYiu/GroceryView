@@ -3508,6 +3508,7 @@ ${seo}`;
   it('uses crawlable URL query params for instant product search facets', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const products = await read('src/app/products/page.tsx');
+    const filterPanel = await read('src/components/FilterPanel.tsx');
     const api = await read('../../packages/api/src/index.ts');
 
     assert.match(api, /labels\?: string\[\]/);
@@ -3533,7 +3534,9 @@ ${seo}`;
     assert.match(products, /href=\{searchFacetUrl\(\{ label: facet\.value \}\)\}/);
     assert.match(products, /href=\{searchFacetUrl\(\{ chain: facet\.value \}\)\}/);
     assert.match(products, /name="q"/);
-    assert.match(products, /name="inStockOnly"/);
+    assert.match(products, /<AdvancedFilterDrawer/);
+    assert.match(products, /inStockOnly=\{search\.filters\.inStockOnly\}/);
+    assert.match(filterPanel, /name="inStockOnly"/);
     assert.doesNotMatch(api, /Math\.random|placeholder/i);
   });
 
@@ -3561,6 +3564,7 @@ ${seo}`;
   it('adds common dietary allergen checkbox filters to product listing search', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const products = await read('src/app/products/page.tsx');
+    const filterPanel = await read('src/components/FilterPanel.tsx');
 
     assert.match(verified, /export const commonDietaryFilterOptions = /);
     assert.match(verified, /value: 'glutenfree'/);
@@ -3577,12 +3581,13 @@ ${seo}`;
 
     assert.match(products, /dietary\?: string \| string\[\]/);
     assert.match(products, /setAllParams\(params, 'dietary', source\.dietary\)/);
-    assert.match(products, /Dietary filters/);
-    assert.match(products, /search\.dietaryFilters\.map/);
-    assert.match(products, /name="dietary"/);
-    assert.match(products, /value=\{filter\.value\}/);
-    assert.match(products, /defaultChecked=\{filter\.checked\}/);
-    assert.match(products, /filter\.label/);
+    assert.match(products, /dietaryFilters=\{search\.dietaryFilters\}/);
+    assert.match(filterPanel, /Diet and certification/);
+    assert.match(filterPanel, /dietaryFilters\.map/);
+    assert.match(filterPanel, /name="dietary"/);
+    assert.match(filterPanel, /value=\{filter\.value\}/);
+    assert.match(filterPanel, /defaultChecked=\{filter\.checked\}/);
+    assert.match(filterPanel, /optionLabel\(filter\)/);
   });
 
   it('surfaces account-bound save-to-watchlist hearts on product cards', async () => {
