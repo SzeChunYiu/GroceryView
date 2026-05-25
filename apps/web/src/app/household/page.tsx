@@ -77,7 +77,23 @@ const householdActivityTimeline = [
     itemName: topChainSpreads[1]?.name ?? 'Bread',
     actor: { id: 'shopper-preview', name: 'Store shopper' },
     timestamp: '2026-05-20T17:45:00.000Z',
-    detail: 'Marked complete in store so the household sees the latest state.'
+    detail: 'Checked in store so the household sees the latest state.'
+  }),
+  buildSharedListActivityEvent('price_alert_changed', {
+    listId: 'static-household-preview',
+    itemId: topChainSpreads[1]?.slug ?? 'bread-preview',
+    itemName: topChainSpreads[1]?.name ?? 'Bread',
+    actor: { id: 'member-preview', name: 'Household member' },
+    timestamp: '2026-05-20T17:55:00.000Z',
+    detail: 'Lowered the price alert threshold after comparing the verified unit price.'
+  }),
+  buildSharedListActivityEvent('item_completed', {
+    listId: 'static-household-preview',
+    itemId: topChainSpreads[1]?.slug ?? 'bread-preview',
+    itemName: topChainSpreads[1]?.name ?? 'Bread',
+    actor: { id: 'shopper-preview', name: 'Store shopper' },
+    timestamp: '2026-05-20T18:00:00.000Z',
+    detail: 'Marked completed after adding it to the cart.'
   }),
   buildSharedListActivityEvent('item_removed', {
     listId: 'static-household-preview',
