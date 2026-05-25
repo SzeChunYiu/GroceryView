@@ -6,6 +6,7 @@ import { ConfidenceBadge } from '@/components/confidence-badge';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
 import { axfoodProducts, type AxfoodProduct } from '@/lib/axfood-products';
 import { buildChainIndexTrendSeries, buildChainPriceObservations, buildMatchedBasketChainPriceObservations } from '@/lib/chain-index-data';
+import { routeMetadata } from '@/lib/seo';
 import { formatPct, formatSek } from '@/lib/verified-data';
 
 type CategorySymbol = 'grocery' | 'dairy' | 'produce' | 'meat' | 'bakery';
@@ -102,20 +103,13 @@ export async function generateMetadata({ params }: Readonly<{ params: Promise<{ 
   if (!category && !chain) notFound();
 
   const label = category?.label ?? `${chain?.chainId ?? symbol} chain index`;
-  const title = `${label} | GroceryView`;
-  const description = 'Observed GroceryView price index page with fixed-basket and chain-price index calculations.';
-  const images = ['/pwa-icon.svg'];
-
-  return {
-    title,
-    description,
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-      images
-    }
-  };
+  return routeMetadata({
+    path: `/index/${symbol}`,
+    title: `${label} | GroceryView`,
+    description: 'Observed GroceryView price index page with fixed-basket and chain-price index calculations.',
+    imagePath: '/pwa-icon.svg',
+    imageAlt: `${label} GroceryView index card`
+  });
 }
 
 function pricedMatchedProducts(definition: CategoryDefinition): AxfoodProduct[] {

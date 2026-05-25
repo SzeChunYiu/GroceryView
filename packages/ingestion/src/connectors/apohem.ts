@@ -18,6 +18,10 @@ export type ApohemProduct = {
   productUrl: string;
   imageUrl: string;
   isOtc: boolean;
+  channel?: 'online';
+  is_member_price?: boolean;
+  is_coupon_price?: boolean;
+  multi_buy?: string;
   sourceUrl: string;
   retrievedAt: string;
 };
@@ -37,6 +41,17 @@ type ApohemSearchProduct = {
   stock?: { status?: unknown; stockStatus?: unknown };
   isotc?: unknown;
   isPrescriptionProduct?: unknown;
+  campaignLabel?: unknown;
+  promotionLabel?: unknown;
+  badgeText?: unknown;
+  priceLabel?: unknown;
+  offerText?: unknown;
+  discountText?: unknown;
+  multiBuy?: unknown;
+  multibuy?: unknown;
+  isMemberPrice?: unknown;
+  isCouponPrice?: unknown;
+  requiresCoupon?: unknown;
 };
 
 type ApohemPageInfo = {
@@ -271,7 +286,7 @@ export function normalizeApohemProduct(
   }
 
   const originalPrice = numberFromText(product.price?.previous?.inclVat);
-  return {
+  const row: ApohemProduct = {
     chain: 'apohem',
     code: text(product.variationCode) || text(product.code) || ean,
     ean,
@@ -287,9 +302,12 @@ export function normalizeApohemProduct(
     productUrl: absoluteUrl(product.url, APOHEM_BASE_URL),
     imageUrl: absoluteUrl(product.images?.[0]?.url, APOHEM_BASE_URL),
     isOtc: product.isotc === true,
+    channel: 'online',
     sourceUrl,
     retrievedAt
   };
+  applyApohemPricingFlags(row, product as Record<string, unknown>);
+  return row;
 }
 
 export function normalizeApotekHjartatProduct(
@@ -402,6 +420,32 @@ function apohemCategory(product: ApohemSearchProduct, sourceUrl: string): Pharma
     return 'beauty';
   }
   return 'supplement';
+}
+
+function applyApohemPricingFlags(row: ApohemProduct, product: Record<string, unknown>): void {
+  const pricingText = [
+    row.name,
+    text(product.campaignLabel),
+    text(product.promotionLabel),
+    text(product.badgeText),
+    text(product.priceLabel),
+    text(product.offerText),
+    text(product.discountText)
+  ]
+    .join(' ')
+    .toLowerCase();
+
+  if (product.isMemberPrice === true || /club apohem|club deal|medlem|medlemserbjudande/.test(pricingText)) {
+    row.is_member_price = true;
+  }
+  if (product.isCouponPrice === true || product.requiresCoupon === true || /rabattkod|coupon|\bmaj20\b|\bbaby15\b|\bextra10\b/.test(pricingText)) {
+    row.is_coupon_price = true;
+  }
+
+  const multiBuy = text(product.multiBuy) || text(product.multibuy) || text(product.promotionLabel) || text(product.offerText);
+  if (/(\d+\s*(st|för)\s*|\d+\s*%\s*vid köp av\s*\d+|3\s*för\s*2|2\s*för)/i.test(multiBuy)) {
+    row.multi_buy = multiBuy;
+  }
 }
 
 function apotekHjartatCategory(product: ApotekHjartatProduct, sourceUrl: string): PharmacyProductCategory {
