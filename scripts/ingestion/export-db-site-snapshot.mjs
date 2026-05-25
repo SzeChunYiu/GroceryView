@@ -94,6 +94,8 @@ export function buildDbSiteSnapshotArtifact({ generatedAt = new Date().toISOStri
     ...optional(row.validFrom, 'validFrom'),
     ...optional(row.validUntil, 'validUntil'),
     ...optional(row.retailerProductRef, 'retailerProductRef'),
+    ...optional(row.originCountry, 'originCountry'),
+    ...optional(row.certLevel, 'certLevel'),
     provenance: row.provenance ?? {}
   }));
 
@@ -348,7 +350,9 @@ export function buildDbSiteChainPriceObservations(rows) {
       return {
         chainId: chainDisplayName(row),
         category: `${categorySlug(row)} · ${unit}`,
-        unitPrice: Math.round(row.unitPrice * 10000) / 10000
+        unitPrice: Math.round(row.unitPrice * 10000) / 10000,
+        ...optional(row.originCountry, 'originCountry'),
+        ...optional(row.certLevel, 'certLevel')
       };
     })
     .filter(Boolean)
@@ -560,8 +564,13 @@ export function renderDbSiteChainObservationsModule({ generatedAt, rows }) {
     `// Chain index observation row count: ${observations.length}`,
     "import type { ChainPriceObservation } from '@groceryview/core';",
     '',
+    'export type DbSiteChainPriceObservation = ChainPriceObservation & {',
+    '  originCountry?: string;',
+    '  certLevel?: string;',
+    '};',
+    '',
     `export const dbSiteChainObservationsGeneratedAt = ${JSON.stringify(generatedAt)};`,
-    `export const dbSiteSnapshotChainPriceObservations: ChainPriceObservation[] = ${JSON.stringify(observations, null, 2)};`,
+    `export const dbSiteSnapshotChainPriceObservations: DbSiteChainPriceObservation[] = ${JSON.stringify(observations, null, 2)};`,
     ''
   ].join('\n');
 }
