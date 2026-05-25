@@ -13,6 +13,22 @@ export type GrocerySpendForecastInput = {
 
 export type GrocerySpendForecastConfidence = 'high' | 'medium' | 'low';
 
+export type GrocerySpendForecastSkippedRow = {
+  receiptId?: string | undefined;
+  purchasedAt: string;
+  reason: 'invalid-date' | 'future-purchase' | 'invalid-total-spend';
+  detail: string;
+};
+
+export type GrocerySpendForecastConfidenceDrivers = {
+  observedMonths: number;
+  receiptCount: number;
+  highThresholdMonths: number;
+  highThresholdReceipts: number;
+  mediumThresholdMonths: number;
+  mediumThresholdReceipts: number;
+};
+
 export type GrocerySpendForecastMonth = {
   month: string;
   spend: number;
@@ -29,9 +45,15 @@ export type GrocerySpendForecast = {
   observedSpend: number;
   monthSummaries: GrocerySpendForecastMonth[];
   warnings: string[];
+  skippedRows: GrocerySpendForecastSkippedRow[];
+  confidenceDrivers: GrocerySpendForecastConfidenceDrivers;
 };
 
 const MONTH_MS = 31 * 24 * 60 * 60 * 1000;
+const HIGH_CONFIDENCE_MONTHS = 4;
+const HIGH_CONFIDENCE_RECEIPTS = 8;
+const MEDIUM_CONFIDENCE_MONTHS = 2;
+const MEDIUM_CONFIDENCE_RECEIPTS = 3;
 
 function roundMoney(value: number): number {
   return Math.round((value + Number.EPSILON) * 100) / 100;
@@ -52,9 +74,20 @@ function addMonths(month: string, count: number): string {
 }
 
 function confidenceFor(observedMonths: number, receiptCount: number): GrocerySpendForecastConfidence {
-  if (observedMonths >= 4 && receiptCount >= 8) return 'high';
-  if (observedMonths >= 2 && receiptCount >= 3) return 'medium';
+  if (observedMonths >= HIGH_CONFIDENCE_MONTHS && receiptCount >= HIGH_CONFIDENCE_RECEIPTS) return 'high';
+  if (observedMonths >= MEDIUM_CONFIDENCE_MONTHS && receiptCount >= MEDIUM_CONFIDENCE_RECEIPTS) return 'medium';
   return 'low';
+}
+
+function confidenceDrivers(observedMonths: number, receiptCount: number): GrocerySpendForecastConfidenceDrivers {
+  return {
+    observedMonths,
+    receiptCount,
+    highThresholdMonths: HIGH_CONFIDENCE_MONTHS,
+    highThresholdReceipts: HIGH_CONFIDENCE_RECEIPTS,
+    mediumThresholdMonths: MEDIUM_CONFIDENCE_MONTHS,
+    mediumThresholdReceipts: MEDIUM_CONFIDENCE_RECEIPTS
+  };
 }
 
 function linearTrend(months: GrocerySpendForecastMonth[]): number {
@@ -74,16 +107,39 @@ export function forecastGrocerySpend(input: GrocerySpendForecastInput): GroceryS
   if (Number.isNaN(asOf.getTime())) throw new Error('asOf must be an ISO date.');
 
   const warnings: string[] = [];
+  const skippedRows: GrocerySpendForecastSkippedRow[] = [];
   const monthTotals = new Map<string, { spend: number; receiptCount: number }>();
   for (const row of input.purchase_history) {
     const purchasedAt = new Date(row.purchasedAt);
     if (Number.isNaN(purchasedAt.getTime())) {
-      warnings.push(`Skipped purchase with invalid purchasedAt: ${row.purchasedAt}`);
+      const detail = `Skipped purchase with invalid purchasedAt: ${row.purchasedAt}`;
+      skippedRows.push({
+        receiptId: row.receiptId,
+        purchasedAt: row.purchasedAt,
+        reason: 'invalid-date',
+        detail
+      });
+      warnings.push(detail);
       continue;
     }
-    if (purchasedAt.getTime() > asOf.getTime()) continue;
+    if (purchasedAt.getTime() > asOf.getTime()) {
+      skippedRows.push({
+        receiptId: row.receiptId,
+        purchasedAt: row.purchasedAt,
+        reason: 'future-purchase',
+        detail: `Receipt is after asOf and was excluded from the forecast window: ${row.receiptId ?? row.purchasedAt}`
+      });
+      continue;
+    }
     if (!Number.isFinite(row.totalSpend) || row.totalSpend < 0) {
-      warnings.push(`Skipped purchase with invalid totalSpend: ${row.receiptId ?? row.purchasedAt}`);
+      const detail = `Skipped purchase with invalid totalSpend: ${row.receiptId ?? row.purchasedAt}`;
+      skippedRows.push({
+        receiptId: row.receiptId,
+        purchasedAt: row.purchasedAt,
+        reason: 'invalid-total-spend',
+        detail
+      });
+      warnings.push(detail);
       continue;
     }
     const key = monthKey(purchasedAt);
@@ -106,6 +162,7 @@ export function forecastGrocerySpend(input: GrocerySpendForecastInput): GroceryS
   const observedSpend = roundMoney(monthSummaries.reduce((sum, month) => sum + month.spend, 0));
   const observedReceiptCount = monthSummaries.reduce((sum, month) => sum + month.receiptCount, 0);
   const forecastMonth = input.forecastMonth ?? addMonths(monthKey(asOf), 1);
+  const confidenceDriverSummary = confidenceDrivers(observedMonths, observedReceiptCount);
 
   if (observedMonths === 0) {
     return {
@@ -117,7 +174,9 @@ export function forecastGrocerySpend(input: GrocerySpendForecastInput): GroceryS
       observedMonths: 0,
       observedSpend: 0,
       monthSummaries: [],
-      warnings: ['No purchase_history rows were available before asOf.']
+      warnings: ['No purchase_history rows were available before asOf.'],
+      skippedRows,
+      confidenceDrivers: confidenceDriverSummary
     };
   }
 
@@ -141,6 +200,8 @@ export function forecastGrocerySpend(input: GrocerySpendForecastInput): GroceryS
     observedMonths,
     observedSpend,
     monthSummaries,
-    warnings
+    warnings,
+    skippedRows,
+    confidenceDrivers: confidenceDriverSummary
   };
 }
