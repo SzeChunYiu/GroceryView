@@ -2,6 +2,8 @@ export type UnitKind = "mass" | "volume" | "count";
 
 export type CanonicalUnit = "kg" | "l" | "st";
 
+export type UnitNormalizationConfidence = "exact" | "converted" | "estimated";
+
 export type UnitAlias = {
   readonly canonicalUnit: CanonicalUnit;
   readonly kind: UnitKind;
@@ -12,6 +14,8 @@ export type UnitAlias = {
 export type NormalizedUnit = UnitAlias & {
   readonly input: string;
   readonly alias: string;
+  readonly confidence: UnitNormalizationConfidence;
+  readonly confidenceLabel: string;
 };
 
 const MASS_KG: UnitAlias = {
@@ -119,6 +123,30 @@ export const CANONICAL_UNIT_DICTIONARY: Readonly<Record<string, UnitAlias>> = Ob
 
 export const canonicalUnitDictionary = CANONICAL_UNIT_DICTIONARY;
 
+export function unitNormalizationConfidenceFor(alias: string, definition: UnitAlias): {
+  confidence: UnitNormalizationConfidence;
+  confidenceLabel: string;
+} {
+  if (definition.multiplierToCanonical !== 1) {
+    return {
+      confidence: "converted",
+      confidenceLabel: `Converted from ${definition.displayUnit} to ${definition.canonicalUnit}`,
+    };
+  }
+
+  if (alias !== definition.canonicalUnit) {
+    return {
+      confidence: "estimated",
+      confidenceLabel: `Recognized ${alias} as ${definition.canonicalUnit}`,
+    };
+  }
+
+  return {
+    confidence: "exact",
+    confidenceLabel: `Already in ${definition.canonicalUnit}`,
+  };
+}
+
 export function normalizeUnitKey(unit: string): string {
   const unitParts = unit.trim().toLowerCase().split("/");
   const unitPart = unitParts[unitParts.length - 1] ?? unit;
@@ -148,6 +176,7 @@ export function getCanonicalUnit(unit: string | null | undefined): NormalizedUni
     ...definition,
     input: unit,
     alias,
+    ...unitNormalizationConfidenceFor(alias, definition),
   };
 }
 
@@ -158,7 +187,7 @@ export function normalizeUnit(unit: string | null | undefined): CanonicalUnit | 
 export function normalizeQuantity(
   value: number | null | undefined,
   unit: string | null | undefined,
-): { value: number; unit: CanonicalUnit } | null {
+): { value: number; unit: CanonicalUnit; confidence: UnitNormalizationConfidence; confidenceLabel: string } | null {
   const normalizedUnit = getCanonicalUnit(unit);
 
   if (value == null || !Number.isFinite(value) || !normalizedUnit) {
@@ -168,13 +197,15 @@ export function normalizeQuantity(
   return {
     value: value * normalizedUnit.multiplierToCanonical,
     unit: normalizedUnit.canonicalUnit,
+    confidence: normalizedUnit.confidence,
+    confidenceLabel: normalizedUnit.confidenceLabel,
   };
 }
 
 export function normalizeUnitPrice(
   price: number | null | undefined,
   unit: string | null | undefined,
-): { price: number; unit: CanonicalUnit } | null {
+): { price: number; unit: CanonicalUnit; confidence: UnitNormalizationConfidence; confidenceLabel: string } | null {
   const normalizedUnit = getCanonicalUnit(unit);
 
   if (price == null || !Number.isFinite(price) || !normalizedUnit) {
@@ -184,6 +215,8 @@ export function normalizeUnitPrice(
   return {
     price: price / normalizedUnit.multiplierToCanonical,
     unit: normalizedUnit.canonicalUnit,
+    confidence: normalizedUnit.confidence,
+    confidenceLabel: normalizedUnit.confidenceLabel,
   };
 }
 
@@ -204,4 +237,5 @@ export const unitNormalizer = Object.freeze({
   normalizeQuantity,
   normalizeUnitPrice,
   areCompatibleUnits,
+  unitNormalizationConfidenceFor,
 });
