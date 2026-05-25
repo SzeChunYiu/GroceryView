@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { dealBasedMeals, familyMealPlannerFromDeals, freezerBatchCookPlanner, studentDealRecipes } from '@/lib/demo-data';
+import { RecipeImporter } from '@/components/recipe-importer';
+import { dealBasedMealInputs, dealBasedMeals, familyMealPlannerFromDeals, freezerBatchCookPlanner, products, studentDealRecipes } from '@/lib/demo-data';
 import { extractIngredientsFromMealPlans, suggestBudgetAlternativesFromMealPlans } from '@/lib/meal-budgets';
 import { dietarySubstitutionAssistantContract } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
@@ -84,6 +85,23 @@ function confidenceLevel(value: string): 'high' | 'medium' | 'low' {
   return value === 'high' || value === 'medium' || value === 'low' ? value : 'low';
 }
 
+const recipeProductCandidates = [
+  ...dealBasedMealInputs.map((product) => ({
+    productId: product.productId,
+    name: product.name,
+    price: product.price,
+    source: product.source
+  })),
+  ...products.map((product) => ({
+    productId: product.slug,
+    name: product.name,
+    price: product.price,
+    unitPrice: product.unitPrice,
+    store: product.store,
+    source: product.source
+  }))
+];
+
 export default function MealPlannerPage() {
   const dealMealConfidenceLevel = confidenceLevel(dealBasedMeals.coverage.confidence);
   const mealBudgetPlans = [
@@ -136,6 +154,8 @@ export default function MealPlannerPage() {
           <p className="mt-3 font-semibold text-slate-700">{dealBasedMeals.coverage.caveat}</p>
         </Card>
       </div>
+
+      <RecipeImporter candidates={recipeProductCandidates} />
 
       <Card className="mt-6">
         <h2 className="text-2xl font-black">{COPY.suggestedMeals.title}</h2>
