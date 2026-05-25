@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { osmStores, type OsmStore } from '@/lib/osm-stores';
+import { osmStoreHolidayWarningLabel, osmStoreOpeningHoursLabel, osmStores, type OsmStore } from '@/lib/osm-stores';
 import { cheapestMapChain, mapChainIndexScores } from '@/lib/map-chain-index';
 import { trackStoreDirectionsClick } from '@/lib/analytics';
 import type { StoreDistanceRow } from '@/lib/store-distance';
@@ -97,10 +97,6 @@ function formatDistance(km: number): string {
   return `${km.toFixed(km < 10 ? 1 : 0)} km`;
 }
 
-function storeOpenHoursLabel(store: OsmStore & { openingHours?: string; opening_hours?: string }): string {
-  return store.openingHours || store.opening_hours || 'Open-hours data not published in current OSM snapshot';
-}
-
 function toFeatureCollection(): GeoJSON.FeatureCollection<GeoJSON.Point> {
   return {
     type: 'FeatureCollection',
@@ -120,7 +116,8 @@ function toFeatureCollection(): GeoJSON.FeatureCollection<GeoJSON.Point> {
           color: chainIndexColor(chainIndexScore(s.brand || ''), chainColor(s.brand || '')),
           lat: s.lat,
           lng: s.lng,
-          openHours: storeOpenHoursLabel(s),
+          openHours: osmStoreOpeningHoursLabel(s),
+          holidayWarning: osmStoreHolidayWarningLabel(s),
         },
       })),
   };
@@ -313,6 +310,7 @@ export function StoreMap({ routeRecommendations = [] }: Readonly<{ routeRecommen
               return `<li style="margin-top:6px">
                 <strong>${escapeHtml(String(p.name ?? 'Store'))}</strong>
                 <div style="color:#64748b">${distance} from cluster center · ${escapeHtml(String(p.openHours ?? 'Open-hours unavailable'))}</div>
+                <div style="color:#92400e">${escapeHtml(String(p.holidayWarning ?? 'No current holiday closure warning'))}</div>
               </li>`;
             })
             .join('');
@@ -358,6 +356,7 @@ export function StoreMap({ routeRecommendations = [] }: Readonly<{ routeRecommen
                ${where ? `<div style="font-size:12px;color:#64748b;margin-top:2px">${where}</div>` : ''}
                <div style="font-size:12px;color:#64748b;margin-top:2px">${formatDistance(distanceKm([mapCenter.lng, mapCenter.lat], [lng, lat]))} from map center</div>
                <div style="font-size:12px;color:#64748b;margin-top:2px">Hours: ${escapeHtml(String(p.openHours || 'Open-hours unavailable'))}</div>
+               <div style="font-size:12px;color:#92400e;margin-top:2px">${escapeHtml(String(p.holidayWarning || 'No current holiday closure warning'))}</div>
                <a href="${directions}" target="_blank" rel="noopener noreferrer"
                   data-store-directions="true" data-store-slug="${escapeHtml(String(p.slug || ''))}" data-store-name="${escapeHtml(String(p.name || ''))}" data-store-brand="${escapeHtml(String(p.brand || ''))}"
                   style="display:inline-block;margin-top:8px;font-size:12px;font-weight:600;color:#1D8649">
@@ -472,6 +471,8 @@ export function StoreMap({ routeRecommendations = [] }: Readonly<{ routeRecommen
                 <div className="mt-3 flex flex-wrap gap-2 text-[11px] font-black uppercase tracking-[0.12em]">
                   <span className="rounded-full bg-slate-100 px-2 py-1 text-slate-600">{store.brand || 'Other'}</span>
                   <span className="rounded-full bg-emerald-100 px-2 py-1 text-emerald-800">{chainIndexLabel(store)}</span>
+                  <span className="rounded-full bg-amber-100 px-2 py-1 text-amber-800">{osmStoreOpeningHoursLabel(store)}</span>
+                  <span className="rounded-full bg-orange-100 px-2 py-1 text-orange-800">{osmStoreHolidayWarningLabel(store)}</span>
                 </div>
               </button>
             );
