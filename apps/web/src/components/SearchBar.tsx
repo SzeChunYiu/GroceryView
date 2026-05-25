@@ -15,6 +15,7 @@ import {
   type SavedSearchEntry
 } from '@/lib/personalization';
 import type { SearchExplanationBadge } from '@/lib/search-filters';
+import { authenticatedSavedSearchShortcuts } from '@/lib/saved-searches';
 
 type ProductSearchResult = {
   id: string;
@@ -28,6 +29,10 @@ type ProductSearchResult = {
 
 type ProductSearchResponse = {
   query: string;
+  queryRecovery?: {
+    didYouMean: string[];
+    popularAlternatives: string[];
+  };
   results: ProductSearchResult[];
   error?: string;
 };
@@ -129,6 +134,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
   const [results, setResults] = useState<ProductSearchResult[]>([]);
   const [facetChips, setFacetChips] = useState<HeaderSearchFacetChip[]>([]);
   const [suggestGroups, setSuggestGroups] = useState<HeaderSuggestGroup[]>([]);
+  const [queryRecovery, setQueryRecovery] = useState<ProductSearchResponse['queryRecovery']>(undefined);
   const [recentSearches, setRecentSearches] = useState<RecentSearchHistoryEntry[]>([]);
   const [savedSearches, setSavedSearches] = useState<SavedSearchEntry[]>([]);
   const [activeOptionIndex, setActiveOptionIndex] = useState(-1);
@@ -213,6 +219,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
       setResults([]);
       setFacetChips([]);
       setSuggestGroups([]);
+      setQueryRecovery(undefined);
       setActiveOptionIndex(-1);
       setStatus('idle');
       return;
@@ -253,6 +260,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
         if (controller.signal.aborted) return;
         const nextResults = payload.results ?? [];
         setResults(nextResults);
+        setQueryRecovery(payload.queryRecovery);
         setStatus(nextResults.length > 0 ? 'ready' : 'empty');
         if (nextResults.length > 0) setRecentSearches(rememberRecentSearchHistory(trimmedQuery, nextResults.length));
         trackSearchToSavingsFunnelStep('landing_search');
@@ -262,6 +270,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
         setResults([]);
         setFacetChips([]);
         setSuggestGroups([]);
+        setQueryRecovery(undefined);
         setStatus('error');
       }
     }, 300);
@@ -286,11 +295,25 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
     });
   }
 
+  function optionDomId(index: number) {
+    return `${listboxId}-option-${index}`;
+  }
+
+  function optionActiveClass(index: number, activeClass: string) {
+    return activeOptionIndex === index ? activeClass : '';
+  }
+
   function handleSearchKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp' && event.key !== 'Escape') return;
+    if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp' && event.key !== 'Escape' && event.key !== 'Enter') return;
     if (event.key === 'Escape') {
+      event.preventDefault();
       setIsFocused(false);
       setActiveOptionIndex(-1);
+      return;
+    }
+    if (event.key === 'Enter' && activeOptionIndex >= 0) {
+      event.preventDefault();
+      document.getElementById(optionDomId(activeOptionIndex))?.click();
       return;
     }
     if (!shouldShowDropdown || optionCount === 0) return;
@@ -324,6 +347,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
         <Search className="h-4 w-4 text-slate-500" aria-hidden="true" />
         <input
           aria-autocomplete="list"
+          aria-activedescendant={activeOptionIndex >= 0 ? optionDomId(activeOptionIndex) : undefined}
           aria-controls={listboxId}
           aria-expanded={shouldShowDropdown}
           aria-label="Search products"
@@ -394,9 +418,10 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
                   const index = nextOptionIndex();
                   return (
                     <Link
-                      className="rounded-2xl bg-violet-50 px-3 py-2 text-sm font-black text-violet-950 transition hover:bg-violet-100 focus:bg-violet-100 focus:outline-none"
+                      className={`rounded-2xl bg-violet-50 px-3 py-2 text-sm font-black text-violet-950 transition hover:bg-violet-100 focus:bg-violet-100 focus:outline-none ${optionActiveClass(index, 'ring-2 ring-violet-500')}`}
                       data-search-option-index={index}
                       href={search.href}
+                      id={optionDomId(index)}
                       key={`saved-${search.query}-${search.pinnedAt}`}
                       onFocus={() => setActiveOptionIndex(index)}
                       onKeyDown={(event) => handleOptionKeyDown(event, index)}
@@ -412,9 +437,10 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
                   return (
                     <div className="flex items-center gap-2 rounded-2xl bg-slate-50 px-3 py-2" key={`${search.query}-${search.searchedAt}`}>
                       <Link
-                        className="flex-1 text-sm font-black text-slate-800 transition hover:text-emerald-900 focus:outline-none"
+                        className={`flex-1 text-sm font-black text-slate-800 transition hover:text-emerald-900 focus:outline-none ${optionActiveClass(index, 'rounded-xl bg-emerald-50 px-2 py-1 text-emerald-950')}`}
                         data-search-option-index={index}
                         href={search.href}
+                        id={optionDomId(index)}
                         onFocus={() => setActiveOptionIndex(index)}
                         onKeyDown={(event) => handleOptionKeyDown(event, index)}
                         role="option"
@@ -449,9 +475,10 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
                       const index = nextOptionIndex();
                       return (
                         <Link
-                          className="rounded-2xl px-3 py-2 text-sm font-black text-slate-900 transition hover:bg-emerald-50 focus:bg-emerald-50 focus:outline-none"
+                          className={`rounded-2xl px-3 py-2 text-sm font-black text-slate-900 transition hover:bg-emerald-50 focus:bg-emerald-50 focus:outline-none ${optionActiveClass(index, 'bg-emerald-50 ring-2 ring-emerald-500')}`}
                           data-search-option-index={index}
                           href={item.href}
+                          id={optionDomId(index)}
                           key={item.id}
                           onFocus={() => setActiveOptionIndex(index)}
                           onKeyDown={(event) => handleOptionKeyDown(event, index)}
@@ -475,9 +502,10 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
                   const index = nextOptionIndex();
                   return (
                     <Link
-                      className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-900 transition hover:bg-emerald-100 focus:bg-emerald-100 focus:outline-none"
+                      className={`rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-900 transition hover:bg-emerald-100 focus:bg-emerald-100 focus:outline-none ${optionActiveClass(index, 'ring-2 ring-emerald-500')}`}
                       data-search-option-index={index}
                       href={facet.href}
+                      id={optionDomId(index)}
                       key={`${facet.kind}-${facet.href}`}
                       onFocus={() => setActiveOptionIndex(index)}
                       onKeyDown={(event) => handleOptionKeyDown(event, index)}
@@ -497,6 +525,15 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
           {status === 'empty' ? (
             <div className="px-4 py-3">
               <p className="text-sm font-bold text-slate-700">No products matched “{trimmedQuery}”.</p>
+              {queryRecovery && queryRecovery.didYouMean.length > 0 ? (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {queryRecovery.didYouMean.map((suggestion) => (
+                    <Link className="rounded-full bg-amber-50 px-3 py-1 text-xs font-black text-amber-950" href={`/products?q=${encodeURIComponent(suggestion)}`} key={suggestion}>
+                      Did you mean {suggestion}?
+                    </Link>
+                  ))}
+                </div>
+              ) : null}
               <p className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-slate-500">Try related searches</p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {emptyFallback.searches.map((search) => (
@@ -521,9 +558,10 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
                 const index = nextOptionIndex();
                 return (
                   <Link
-                    className="block px-4 py-3 transition hover:bg-emerald-50 focus:bg-emerald-50 focus:outline-none"
+                    className={`block px-4 py-3 transition hover:bg-emerald-50 focus:bg-emerald-50 focus:outline-none ${optionActiveClass(index, 'bg-emerald-50 ring-inset ring-2 ring-emerald-500')}`}
                     data-search-option-index={index}
                     href={`/products/${result.slug}`}
+                    id={optionDomId(index)}
                     key={result.id}
                     onFocus={() => setActiveOptionIndex(index)}
                     onKeyDown={(event) => handleOptionKeyDown(event, index)}
@@ -557,40 +595,76 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
 
 export function RecentSearchReplayPills() {
   const [recentSearches, setRecentSearches] = useState<RecentSearchHistoryEntry[]>([]);
+  const [savedSearches, setSavedSearches] = useState<SavedSearchEntry[]>([]);
 
   useEffect(() => {
     setRecentSearches(readRecentSearchHistory());
+    setSavedSearches(readSavedSearches());
   }, []);
 
-  if (recentSearches.length === 0) return null;
+  if (recentSearches.length === 0 && savedSearches.length === 0 && authenticatedSavedSearchShortcuts.length === 0) return null;
 
   return (
     <section className="mx-auto mb-4 w-full max-w-5xl rounded-3xl border border-emerald-100 bg-white p-4 shadow-sm" data-search-history-replay>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">Recent searches</p>
-          <p className="mt-1 text-sm font-semibold text-slate-600">Replay successful grocery searches saved on this device.</p>
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">Recent and saved searches</p>
+          <p className="mt-1 text-sm font-semibold text-slate-600">Replay successful grocery searches and signed-in shortcuts saved for repeat missions.</p>
         </div>
-        <button
-          className="rounded-full border border-slate-200 px-3 py-1.5 text-xs font-black text-slate-700 hover:border-rose-200 hover:text-rose-700"
-          onClick={() => setRecentSearches(clearRecentSearchHistory())}
-          type="button"
-        >
-          Clear all
-        </button>
-      </div>
-      <div className="mt-3 flex flex-wrap gap-2">
-        {recentSearches.map((search) => (
-          <Link
-            className="rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-black text-emerald-950 hover:bg-emerald-100"
-            href={search.href}
-            key={`${search.query}-${search.searchedAt}`}
+        {recentSearches.length > 0 ? (
+          <button
+            className="rounded-full border border-slate-200 px-3 py-1.5 text-xs font-black text-slate-700 hover:border-rose-200 hover:text-rose-700"
+            onClick={() => setRecentSearches(clearRecentSearchHistory())}
+            type="button"
           >
-            {search.query}
-            <span className="ml-2 text-xs font-semibold text-emerald-800">{search.resultCount}</span>
+            Clear recent
+          </button>
+        ) : null}
+      </div>
+
+      {savedSearches.length > 0 ? (
+        <div className="mt-3 flex flex-wrap gap-2" aria-label="Pinned saved searches">
+          {savedSearches.map((search) => (
+            <Link
+              className="rounded-full bg-violet-50 px-3 py-1.5 text-sm font-black text-violet-950 hover:bg-violet-100"
+              href={search.href}
+              key={`saved-${search.query}-${search.pinnedAt}`}
+            >
+              ★ {search.query}
+              <span className="ml-2 text-xs font-semibold text-violet-800">saved</span>
+            </Link>
+          ))}
+        </div>
+      ) : null}
+
+      <div className="mt-3 flex flex-wrap gap-2" aria-label="Authenticated saved search shortcuts">
+        {authenticatedSavedSearchShortcuts.map((shortcut) => (
+          <Link
+            className="rounded-full bg-indigo-50 px-3 py-1.5 text-sm font-black text-indigo-950 hover:bg-indigo-100"
+            href={shortcut.href}
+            key={shortcut.id}
+            title={shortcut.helper}
+          >
+            {shortcut.label}
+            <span className="ml-2 text-xs font-semibold text-indigo-800">{shortcut.query}</span>
           </Link>
         ))}
       </div>
+
+      {recentSearches.length > 0 ? (
+        <div className="mt-3 flex flex-wrap gap-2" aria-label="Recent searches">
+          {recentSearches.map((search) => (
+            <Link
+              className="rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-black text-emerald-950 hover:bg-emerald-100"
+              href={search.href}
+              key={`${search.query}-${search.searchedAt}`}
+            >
+              {search.query}
+              <span className="ml-2 text-xs font-semibold text-emerald-800">{search.resultCount}</span>
+            </Link>
+          ))}
+        </div>
+      ) : null}
     </section>
   );
 }

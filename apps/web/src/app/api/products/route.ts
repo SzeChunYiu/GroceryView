@@ -2,8 +2,9 @@ import { createPgQueryExecutor, searchProductsByText, type ProductSearchResult }
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { recordProductSearchPerformanceTelemetry, type ProductSearchPerformanceTelemetry } from '@/lib/analytics';
+import { fuzzyProductSearchQueries, rankFuzzyProductResults } from '@/lib/search-fuzzy';
 import { searchExplanationBadgesForProduct } from '@/lib/search-filters';
-import { expandGrocerySearchQueryWithTelemetry, type GrocerySearchExpansion, type GrocerySearchExpansionTelemetry } from '@/lib/search-suggest';
+import { buildMisspelledQueryRecovery, expandGrocerySearchQueryWithTelemetry, type GrocerySearchExpansion, type GrocerySearchExpansionTelemetry } from '@/lib/search-suggest';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -50,19 +51,8 @@ async function executorForDatabaseUrl(databaseUrl: string) {
   return createPgQueryExecutor(cachedPool);
 }
 
-function mergeSearchResults(batches: ProductSearchResult[][]): ProductSearchResult[] {
-  const byId = new Map<string, ProductSearchResult>();
-  for (const results of batches) {
-    for (const result of results) {
-      const existing = byId.get(result.id);
-      if (!existing || result.searchRank > existing.searchRank) byId.set(result.id, result);
-    }
-  }
-  return [...byId.values()].sort((a, b) => b.searchRank - a.searchRank || a.name.localeCompare(b.name)).slice(0, 8);
-}
-
 function withSearchExplanationBadges(query: string, results: ProductSearchResult[], expansion: GrocerySearchExpansion) {
-  const matchedSynonyms = [...expansion.matchedSynonyms, ...expansion.matchedAliases];
+  const matchedSynonyms = [...expansion.matchedSynonyms, ...expansion.matchedAliases, ...expansion.matchedFuzzyAliases];
 
   return results.map((result) => ({
     ...result,
@@ -75,7 +65,7 @@ function withSearchExplanationBadges(query: string, results: ProductSearchResult
   }));
 }
 
-const productSearchTelemetrySource = 'postgres.products_tsvector_alias_synonym_expansion';
+const productSearchTelemetrySource = 'postgres.products_tsvector_alias_synonym_fuzzy_rank';
 
 function isTimeoutError(error: unknown) {
   if (!(error instanceof Error)) return false;
@@ -122,7 +112,9 @@ function responsePayload(
     query,
     expandedQueries: expansion.expandedQueries,
     matchedAliases: expansion.matchedAliases,
+    matchedFuzzyAliases: expansion.matchedFuzzyAliases,
     matchedSynonyms: expansion.matchedSynonyms,
+    queryRecovery: buildMisspelledQueryRecovery(query),
     results,
     performanceTelemetry: {
       cacheHit: telemetry.cacheHit,
@@ -175,8 +167,9 @@ export async function GET(request: Request) {
 
   try {
     const executor = await executorForDatabaseUrl(databaseUrl);
-    const batches = await Promise.all(expansion.expandedQueries.map((expandedQuery) => searchProductsByText(executor, expandedQuery, { limit: 8 })));
-    const results = mergeSearchResults(batches);
+    const searchQueries = fuzzyProductSearchQueries(query, expansion);
+    const batches = await Promise.all(searchQueries.map((expandedQuery) => searchProductsByText(executor, expandedQuery, { limit: 8 })));
+    const results = rankFuzzyProductResults(query, batches, expansion);
     const telemetry = buildPerformanceTelemetry(query, results.length, startedAt, expansionTelemetry);
     logPerformanceTelemetry(telemetry);
     return NextResponse.json(responsePayload(query, withSearchExplanationBadges(query, results, expansion), expansion, telemetry));

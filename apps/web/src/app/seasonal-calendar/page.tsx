@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { PriceIntelligenceCard, type PriceIntelligenceScoreCard } from '@/components/price-intelligence-card';
 import { buildSeasonalProduceDiscoveryCards } from '@/lib/deal-context';
 import { buildCategorySeasonalDiscoveryModules } from '@/lib/price-intelligence';
+import { buildSeasonalDealCalendar } from '@/lib/seasonal-deal-calendar';
 import { categoryDealLeaders, localSeasonalPicks, seasonalProduceCalendar } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -9,11 +11,32 @@ export function generateMetadata() {
   return routeMetadata('/seasonal-calendar');
 }
 
+function seasonalDealScore(savingsVsTypicalPercent: number) {
+  return Math.min(99, Math.max(1, Math.round(55 + savingsVsTypicalPercent * 2)));
+}
+
 export default function SeasonalCalendarPage() {
   const seasonalDiscoveryCards = buildSeasonalProduceDiscoveryCards({
     deals: categoryDealLeaders,
     rows: seasonalProduceCalendar.topBestBuys
   });
+  const seasonalDealCalendar = buildSeasonalDealCalendar({
+    rows: seasonalProduceCalendar.produceSeasonalityRows
+  });
+  const seasonalDealScoreCards: PriceIntelligenceScoreCard[] = seasonalDealCalendar.upcomingWeeks
+    .flatMap((week) => week.products.map((product) => ({
+      id: `${week.weekLabel}-${product.slug}`,
+      title: product.productName,
+      score: seasonalDealScore(product.savingsVsTypicalPercent),
+      scoreLabel: product.savingsVsTypicalLabel,
+      actionLabel: 'Plan pantry purchase',
+      windowLabel: `${week.weekLabel} · ${week.monthLabel} historical low month`,
+      trendSlopeLabel: `${product.observationCount} dated observations`,
+      volatilityLabel: product.confidenceLabel,
+      seasonalContextLabel: `${product.bestBuyMonth} historical monthly average ${product.historicalMonthlyAverageLabel}`,
+      detail: product.evidenceLabel
+    })))
+    .slice(0, 3);
   const produceCategoryModules = buildCategorySeasonalDiscoveryModules({
     categorySlug: 'produce',
     seasonalRows: seasonalProduceCalendar.produceSeasonalityRows
@@ -44,6 +67,65 @@ export default function SeasonalCalendarPage() {
           <p className="mt-3 font-semibold text-slate-700">calendar month buckets with real price history.</p>
         </Card>
       </div>
+
+      <PriceIntelligenceCard
+        cards={seasonalDealScoreCards}
+        emptyState="No products have a historical best-buy month inside the upcoming weekly planning window."
+        summary={`Recommendations are built from historical monthly averages for the ${seasonalDealCalendar.horizonLabel} as of ${seasonalDealCalendar.asOfLabel}; no future price or stock forecast is generated.`}
+        title="Upcoming seasonal deal recommendations"
+      />
+
+      <Card className="mt-6 border-amber-200 bg-amber-50">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-800">Upcoming weeks + holidays</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Products historically cheaper during the next planning windows</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Each recommendation is tied to a best-buy month already observed in dated OpenPrices history, then aligned to upcoming weeks and Swedish grocery holiday planning cues.
+            </p>
+          </div>
+          <p className="rounded-2xl bg-white px-4 py-3 text-sm font-black text-amber-900 shadow-sm">{seasonalDealCalendar.horizonLabel}</p>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-4">
+          {seasonalDealCalendar.upcomingWeeks.slice(0, 4).map((week) => (
+            <div className="rounded-2xl border border-amber-200 bg-white p-4 shadow-sm" key={week.weekLabel}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-800">{week.weekLabel}</p>
+              <p className="mt-1 text-sm font-bold text-slate-600">{week.monthLabel} historical best-buy matches</p>
+              <div className="mt-3 space-y-2">
+                {week.products.length > 0 ? week.products.map((product) => (
+                  <Link className="block rounded-xl bg-amber-50 p-3 text-sm font-bold text-slate-800 hover:text-amber-900" href={`/products/${product.slug}`} key={`${week.weekLabel}-${product.slug}`}>
+                    {product.productName} · {product.historicalMonthlyAverageLabel} · {product.savingsVsTypicalLabel}
+                  </Link>
+                )) : (
+                  <p className="rounded-xl bg-slate-50 p-3 text-sm font-semibold text-slate-600">No historical low-month product in this week.</p>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+        {seasonalDealCalendar.holidayRecommendations.length > 0 ? (
+          <div className="mt-5 grid gap-3 lg:grid-cols-3">
+            {seasonalDealCalendar.holidayRecommendations.map((holiday) => (
+              <div className="rounded-2xl border border-orange-200 bg-white p-4 shadow-sm" key={holiday.holidayLabel}>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-orange-800">{holiday.holidayLabel} · {holiday.monthLabel}</p>
+                <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{holiday.planningLabel}</p>
+                <div className="mt-3 space-y-2">
+                  {holiday.products.map((product) => (
+                    <Link className="block rounded-xl bg-orange-50 p-3 text-sm font-bold text-slate-800 hover:text-orange-900" href={`/products/${product.slug}`} key={`${holiday.holidayLabel}-${product.slug}`}>
+                      {product.productName} · {product.savingsVsTypicalLabel}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : null}
+        <ul className="mt-5 grid gap-3 text-sm font-semibold leading-6 text-slate-700 md:grid-cols-3">
+          {seasonalDealCalendar.guardrails.map((guardrail) => (
+            <li className="rounded-2xl bg-white p-4" key={guardrail}>• {guardrail}</li>
+          ))}
+        </ul>
+      </Card>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">

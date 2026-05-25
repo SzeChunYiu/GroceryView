@@ -62,6 +62,7 @@ export function buildUserDataExportQueries(userId: string): UserDataExportQuery[
       section: 'preferences',
       sql: `select weekly_budget,
                    monthly_budget,
+                   algorithm_choice,
                    updated_at
               from user_preferences
              where user_id = $1`,

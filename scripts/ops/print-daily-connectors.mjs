@@ -147,6 +147,19 @@ const CONNECTOR_TEMPLATES = [
     stores: []
   },
   {
+    connectorId: 'preem-se-business-list-prices',
+    chainId: 'preem',
+    domain: 'fuel',
+    sourceType: 'retailer_online_page',
+    endpointUrl: 'https://www.preem.se/foretag/listpriser/',
+    parserVersion: 'preem-se-business-list-v1',
+    robotsTxtStatus: 'allow',
+    legalReviewStatus: 'approved',
+    hasDataAgreement: false,
+    requireStoreScopedPrices: false,
+    stores: []
+  },
+  {
     connectorId: 'okq8-fuel-prices',
     chainId: 'okq8',
     domain: 'fuel',
