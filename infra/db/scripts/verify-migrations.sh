@@ -75,6 +75,7 @@ REQUIRED_TABLES=(
   app_users
   favorite_stores
   user_preferences
+  substitution_willingness
   watchlist_items
   weekly_baskets
   basket_items

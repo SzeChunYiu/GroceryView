@@ -19,13 +19,18 @@ const basketImportReviewsMigration = readFileSync(join(repoRoot, 'infra/db/migra
 const priceAlertsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/011_price_alerts.sql'), 'utf8').toLowerCase();
 const telegramNotificationsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/018_telegram_notifications.sql'), 'utf8').toLowerCase();
 const friendSharedDealSignalsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/025_friend_shared_deal_signals.sql'), 'utf8').toLowerCase();
+const substitutionWillingnessMigration = readFileSync(join(repoRoot, 'infra/db/migrations/026_user_substitution_willingness.sql'), 'utf8').toLowerCase();
+const serverSubstitutionWillingnessMigration = readFileSync(
+  join(repoRoot, 'packages/server/migrations/20260525143000_create_substitution_willingness_table.sql'),
+  'utf8'
+).toLowerCase();
 const migrationsDir = join(repoRoot, 'infra/db/migrations');
 const allMigrations = readdirSync(migrationsDir)
   .filter((entry) => entry.endsWith('.sql') && !entry.startsWith('._'))
   .sort()
   .map((entry) => readFileSync(join(migrationsDir, entry), 'utf8').toLowerCase())
   .join('\n');
-const repositoryMigrations = `${repositoryMigration}\n${entitlementMigration}\n${alertRulesMigration}\n${pantryInventoryMigration}\n${receiptUploadsMigration}\n${householdPlansMigration}\n${basketImportReviewsMigration}\n${telegramNotificationsMigration}\n${friendSharedDealSignalsMigration}`;
+const repositoryMigrations = `${repositoryMigration}\n${entitlementMigration}\n${alertRulesMigration}\n${pantryInventoryMigration}\n${receiptUploadsMigration}\n${householdPlansMigration}\n${basketImportReviewsMigration}\n${telegramNotificationsMigration}\n${friendSharedDealSignalsMigration}\n${substitutionWillingnessMigration}`;
 const sourcePolicyTables = ['retailer_source_policies'];
 const migrationVerifier = readFileSync(join(repoRoot, 'infra/db/scripts/verify-migrations.sh'), 'utf8').toLowerCase();
 const schemaDoc = readFileSync(join(repoRoot, 'infra/db/SCHEMA.md'), 'utf8').toLowerCase();
@@ -51,6 +56,7 @@ const repositoryTables = [
   'app_users',
   'favorite_stores',
   'user_preferences',
+  'substitution_willingness',
   'watchlist_items',
   'weekly_baskets',
   'basket_items',
@@ -315,6 +321,21 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(repositoryTableDefinition('user_preferences'), /preferred_currency text not null default 'sek'/);
     assert.match(repositoryTableDefinition('user_preferences'), /notification_channels text\[\] not null default array\[\]::text\[\]/);
     assert.match(repositoryTableDefinition('user_preferences'), /notification_channels <@ array\['push', 'email', 'telegram'\]::text\[\]/);
+    const substitutionWillingness = repositoryTableDefinition('substitution_willingness');
+    assert.match(substitutionWillingness, /user_id text not null references app_users\(id\) on delete cascade/);
+    assert.match(substitutionWillingness, /class_id text not null/);
+    assert.match(substitutionWillingness, /willingness text not null check \(willingness in \('strict', 'broad', 'narrow'\)\)/);
+    assert.match(substitutionWillingness, /primary key \(user_id, class_id\)/);
+    assert.match(substitutionWillingnessMigration, /set_default_substitution_willingness/);
+    assert.match(substitutionWillingnessMigration, /new\.willingness = 'broad'/);
+    assert.match(substitutionWillingnessMigration, /new\.willingness = 'narrow'/);
+    assert.match(substitutionWillingnessMigration, /new\.willingness = 'strict'/);
+    assert.match(substitutionWillingnessMigration, /depth > 1/);
+    assert.match(substitutionWillingnessMigration, /substitution_willingness_user_idx/);
+    assert.match(substitutionWillingnessMigration, /substitution_willingness_class_idx/);
+    assert.match(serverSubstitutionWillingnessMigration, /create table if not exists substitution_willingness/);
+    assert.match(serverSubstitutionWillingnessMigration, /set_default_substitution_willingness/);
+    assert.match(schemaDoc, /### `substitution_willingness`/);
     assert.match(allMigrations, /add column if not exists id bigint/);
     assert.match(allMigrations, /add column if not exists session_id text/);
     assert.match(allMigrations, /add column if not exists country text not null default 'se'/);

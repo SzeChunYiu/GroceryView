@@ -10,6 +10,7 @@ export type UserAccountDeletionTable =
   | 'basket_items'
   | 'weekly_baskets'
   | 'watchlist_items'
+  | 'substitution_willingness'
   | 'user_preferences'
   | 'favorite_stores'
   | 'app_users';
@@ -69,6 +70,16 @@ export function buildUserDataExportQueries(userId: string): UserDataExportQuery[
       values: [userId]
     },
     {
+      section: 'preferences',
+      sql: `select class_id,
+                   willingness,
+                   updated_at
+              from substitution_willingness
+             where user_id = $1
+             order by class_id`,
+      values: [userId]
+    },
+    {
       section: 'analytics_events',
       sql: `select $1::text as user_id
              where false`,
@@ -96,6 +107,12 @@ export function buildUserAccountDeletionQueries(userId: string): UserAccountDele
     {
       table: 'watchlist_items',
       sql: `delete from watchlist_items
+             where user_id = $1`,
+      values: [userId]
+    },
+    {
+      table: 'substitution_willingness',
+      sql: `delete from substitution_willingness
              where user_id = $1`,
       values: [userId]
     },

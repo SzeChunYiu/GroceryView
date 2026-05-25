@@ -281,6 +281,18 @@ App repository budget, authenticated settings, and MyFlyer preference rows. Auth
 
 Key columns: `id`, `user_id`, `session_id`, `country`, `favorite_stores`, `home_lat`, `home_lng`, `household_size`, `diet_filters`, `algorithm_choice`, `weekly_budget`, `monthly_budget`, `preferred_currency`, `notification_channels`, `created_at`, `updated_at`.
 
+### `substitution_willingness`
+
+Account-owned class substitution preferences for fresh equivalence-class matching.
+
+Key columns: `user_id`, `class_id`, `willingness`, `created_at`, `updated_at`.
+
+Primary key: `(user_id, class_id)`.
+
+`class_id` stores broad classes only. Produce classes found in `produce_classes` default to `broad`, meat class IDs default to `narrow`, and branded item classes default to `strict`. The trigger rejects produce subclasses below the broad class level so rows like apple varieties do not override a shopper's class-level substitution preference.
+
+Indexes: `substitution_willingness_user_idx` for account settings reads and `substitution_willingness_class_idx` for class-level matching joins.
+
 ### `watchlist_items`
 
 Legacy app repository watchlist rows used by existing package APIs.

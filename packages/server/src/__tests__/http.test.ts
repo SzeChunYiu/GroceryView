@@ -1596,7 +1596,15 @@ describe('createHttpHandler', () => {
     assert.equal(deleted.userId, 'user-1');
     assert.equal(deleted.deleted, true);
     assert.equal(deleted.requiresReauthentication, true);
-    assert.deepEqual(deleted.deletedTables, ['basket_items', 'weekly_baskets', 'watchlist_items', 'user_preferences', 'favorite_stores', 'app_users']);
+    assert.deepEqual(deleted.deletedTables, [
+      'basket_items',
+      'weekly_baskets',
+      'watchlist_items',
+      'substitution_willingness',
+      'user_preferences',
+      'favorite_stores',
+      'app_users'
+    ]);
     assert.deepEqual(api.getFavoriteStores('user-1'), []);
     assert.deepEqual(api.getWatchlist('user-1').items, []);
     assert.deepEqual(api.getBasket('user-1').items, []);

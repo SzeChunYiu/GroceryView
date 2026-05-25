@@ -343,6 +343,7 @@ describe('buildPostgresIntegrationReadinessReport', () => {
       'missing_table:retailer_source_policies',
       'missing_table:source_runs',
       'missing_table:subscription_entitlements',
+      'missing_table:substitution_willingness',
       'missing_table:user_preferences',
       'missing_table:watchlist_items',
       'missing_table:weekly_baskets',
@@ -365,6 +366,7 @@ describe('buildPostgresIntegrationReadinessReport', () => {
       'missing_migration:018_household_collaboration_rls',
       'missing_migration:019_price_snapshot_unique_index',
       'missing_migration:025_friend_shared_deal_signals',
+      'missing_migration:026_user_substitution_willingness',
       'repository_check_fail:human_review_assignment_round_trip',
       'repository_check_not_run:notification_suppression_round_trip'
     ]);
@@ -428,6 +430,7 @@ describe('buildPostgresIntegrationReadinessReport', () => {
         'table:retailer_source_policies',
         'table:source_runs',
         'table:subscription_entitlements',
+        'table:substitution_willingness',
         'table:user_preferences',
         'table:watchlist_items',
         'table:weekly_baskets',
@@ -451,6 +454,7 @@ describe('buildPostgresIntegrationReadinessReport', () => {
         'migration:018_household_collaboration_rls',
         'migration:019_price_snapshot_unique_index',
         'migration:025_friend_shared_deal_signals',
+        'migration:026_user_substitution_willingness',
         'repository_check:favorite_store_round_trip',
         'repository_check:human_review_assignment_round_trip',
         'repository_check:notification_suppression_round_trip',

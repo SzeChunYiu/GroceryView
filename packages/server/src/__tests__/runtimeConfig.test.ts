@@ -64,6 +64,7 @@ class RecordingPgPool {
           'app_users',
           'favorite_stores',
           'user_preferences',
+          'substitution_willingness',
           'watchlist_items',
           'weekly_baskets',
           'basket_items',
@@ -110,7 +111,8 @@ class RecordingPgPool {
           '016_observation_connector_idempotency',
           '017_observation_availability',
           '018_household_collaboration_rls',
-          '019_price_snapshot_unique_index'
+          '019_price_snapshot_unique_index',
+          '026_user_substitution_willingness'
         ].map((version) => ({ version }))
       };
     }
