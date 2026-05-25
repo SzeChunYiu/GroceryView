@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist-integration",
+    "rootDir": "src",
+    "noEmit": false,
+    "baseUrl": ".",
+    "paths": {}
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/connectors/__tests__/**", "src/__tests__/contract.test.ts"]
+}

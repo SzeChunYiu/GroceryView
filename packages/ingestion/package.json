@@ -6,7 +6,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "npm run build -w @groceryview/db && npm run build -w @groceryview/catalog && npm run build -w @groceryview/image-cache && tsc -p tsconfig.build.json",
-    "test": "npm run build -w @groceryview/db && npm run build -w @groceryview/catalog && npm run build -w @groceryview/image-cache && tsc -p tsconfig.test.json && node --test dist-test/__tests__/*.test.js dist-test/connectors/__tests__/*.test.js"
+    "test": "npm run test:integration",
+    "test:integration": "npm run build -w @groceryview/db && npm run build -w @groceryview/catalog && npm run build -w @groceryview/image-cache && rm -rf dist-integration .tmp && mkdir -p .tmp && tsc -p tsconfig.integration.json && TMPDIR=\"$PWD/.tmp\" node --test dist-integration/__tests__/ingestion.test.js"
   },
   "dependencies": {
     "@groceryview/catalog": "0.1.0",
