@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { DataGrid } from '@/components/data-grid';
+import { productAnalyticsDashboard } from '@/lib/analytics';
 import {
   allStoreDailyRunnerReadiness,
   apiPerformanceReadiness,
@@ -40,6 +42,63 @@ export default function DataSourcesPage() {
         <Metric label="Source groups" value={sourceCoverage.length.toLocaleString('sv-SE')} />
         <Metric label="Brand ledgers" value={storeBrandLedger.length.toLocaleString('sv-SE')} />
       </div>
+
+      <Card className="mt-6 border-violet-200 bg-violet-50/70">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-violet-800">Internal product analytics</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">{productAnalyticsDashboard.title}</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Search volume, zero-result queries, list adds, alert creates, and deal clicks are tracked as aggregate product strategy signals so catalogue and UX work can be prioritized from shopper behavior without rendering private rows.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-violet-900 shadow-sm">
+            {productAnalyticsDashboard.windowLabel}
+          </p>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          {productAnalyticsDashboard.summary.map((metric) => (
+            <section className="rounded-2xl border border-violet-100 bg-white p-4 shadow-sm" key={metric.label}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-800">{metric.label}</p>
+              <p className="mt-2 text-lg font-black text-slate-950">{metric.value}</p>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{metric.detail}</p>
+            </section>
+          ))}
+        </div>
+        <DataGrid compact className="mt-5 overflow-x-auto">
+          <table className="min-w-[760px] text-sm">
+            <thead className="bg-violet-950 text-white">
+              <tr>
+                <th className="font-black">Signal</th>
+                <th className="font-black">Current view</th>
+                <th className="font-black">Event</th>
+                <th className="font-black">Owner</th>
+                <th className="font-black">Decision use</th>
+                <th className="font-black">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {productAnalyticsDashboard.metrics.map((metric) => (
+                <tr className="align-top" key={metric.id}>
+                  <th className="font-black text-slate-950">{metric.label}</th>
+                  <td className="font-semibold text-slate-700">{metric.currentValueLabel}</td>
+                  <td className="font-mono text-xs font-black text-violet-900">{metric.eventName}</td>
+                  <td className="font-semibold text-slate-700">{metric.owner}</td>
+                  <td className="max-w-xs text-sm font-semibold leading-6 text-slate-700">{metric.priorityUse}</td>
+                  <td>
+                    <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase text-violet-900">
+                      {metric.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </DataGrid>
+        <p className="mt-4 rounded-2xl bg-white p-4 text-sm font-semibold leading-6 text-violet-950">
+          {productAnalyticsDashboard.privacyGuardrail}
+        </p>
+      </Card>
 
       <Card className="mt-6 border-lime-200 bg-lime-50/70">
         <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">

@@ -197,3 +197,96 @@ export function storePageViewScript(event: StoreEngagementInput) {
     fetch('${storeEngagementEndpoint}', { body, headers: { 'content-type': 'application/json' }, keepalive: true, method: 'POST' }).catch(() => undefined);
   })();`;
 }
+
+export type ProductAnalyticsSignalId =
+  | 'search_volume'
+  | 'zero_result_queries'
+  | 'list_adds'
+  | 'alert_creates'
+  | 'deal_clicks';
+
+export type ProductAnalyticsMetric = {
+  id: ProductAnalyticsSignalId;
+  label: string;
+  currentValueLabel: string;
+  eventName: string;
+  owner: string;
+  priorityUse: string;
+  sourceRoute: string;
+  status: 'instrumented' | 'ready' | 'planned';
+};
+
+export const productAnalyticsDashboard = {
+  title: 'Product analytics dashboard',
+  windowLabel: 'Runtime aggregate window',
+  privacyGuardrail: 'Dashboard metrics use aggregate event counts and route-level labels only; no search terms, user IDs, product IDs, or basket contents are rendered here.',
+  summary: [
+    {
+      label: 'Tracked signals',
+      value: '5',
+      detail: 'Search volume, zero-result queries, list adds, alert creates, and deal clicks.'
+    },
+    {
+      label: 'Live aggregate source',
+      value: '/api/analytics/search-to-savings-funnel',
+      detail: 'Existing funnel endpoint covers search, product, compare, alert, basket, and savings steps.'
+    },
+    {
+      label: 'Personal data rendered',
+      value: '0',
+      detail: 'Only aggregate operational signals are displayed on the internal source dashboard.'
+    }
+  ],
+  metrics: [
+    {
+      id: 'search_volume',
+      label: 'Search volume',
+      currentValueLabel: 'landing_search events',
+      eventName: 'landing_search',
+      owner: 'Catalogue growth',
+      priorityUse: 'Prioritize broad catalogue coverage and ranking improvements.',
+      sourceRoute: '/api/analytics/search-to-savings-funnel',
+      status: 'instrumented'
+    },
+    {
+      id: 'zero_result_queries',
+      label: 'Zero-result queries',
+      currentValueLabel: 'aggregate zero-result count',
+      eventName: 'zero_result_query',
+      owner: 'Search quality',
+      priorityUse: 'Turn failed searches into aliases, missing categories, or ingestion targets.',
+      sourceRoute: '/search',
+      status: 'ready'
+    },
+    {
+      id: 'list_adds',
+      label: 'List adds',
+      currentValueLabel: 'aggregate add-to-list count',
+      eventName: 'list_add',
+      owner: 'Shopping list activation',
+      priorityUse: 'Find products and categories that convert from browsing into planning.',
+      sourceRoute: '/list',
+      status: 'ready'
+    },
+    {
+      id: 'alert_creates',
+      label: 'Alert creates',
+      currentValueLabel: 'watchlist_alert events',
+      eventName: 'watchlist_alert',
+      owner: 'Retention',
+      priorityUse: 'Measure price-drop and threshold alert creation as a repeat-use signal.',
+      sourceRoute: '/api/alerts',
+      status: 'instrumented'
+    },
+    {
+      id: 'deal_clicks',
+      label: 'Deal clicks',
+      currentValueLabel: 'aggregate outbound deal clicks',
+      eventName: 'deal_click',
+      owner: 'Deal discovery',
+      priorityUse: 'Rank deal cards and source partnerships by shopper intent.',
+      sourceRoute: '/deals',
+      status: 'ready'
+    }
+  ] satisfies ProductAnalyticsMetric[]
+};
