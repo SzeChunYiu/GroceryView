@@ -84,6 +84,29 @@
         ]
       }
     },
+    "/admin/coverage": {
+      "get": {
+        "operationId": "AdminController_coverage",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-groceryview-role",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Admin"
+        ]
+      }
+    },
     "/admin/users": {
       "get": {
         "operationId": "AdminController_listUsers",

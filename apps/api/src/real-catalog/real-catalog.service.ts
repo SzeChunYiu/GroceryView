@@ -358,7 +358,7 @@ export class RealCatalogService {
               left join stores filter_stores on filter_stores.id = filter_prices.store_id
               where filter_prices.product_id = products.id
                 and ($4::text[] is null or filter_chains.slug = any($4::text[]))
-                and ($5::text[] is null or filter_stores.slug = any($5::text[]))
+                and ($5::text[] is null or (filter_stores.slug = any($5::text[]) and coalesce(filter_prices.is_available, true) = true))
                 and ($6::text[] is null or filter_prices.price_type = any($6::text[]))
                 and ($7::numeric is null or filter_prices.price >= $7::numeric)
                 and ($8::numeric is null or filter_prices.price <= $8::numeric)
@@ -396,7 +396,7 @@ export class RealCatalogService {
       left join chains on chains.id = latest_prices.chain_id
       left join stores on stores.id = latest_prices.store_id
       where ($4::text[] is null or chains.slug = any($4::text[]))
-        and ($5::text[] is null or stores.slug = any($5::text[]))
+        and ($5::text[] is null or (stores.slug = any($5::text[]) and coalesce(latest_prices.is_available, true) = true))
         and ($6::text[] is null or latest_prices.price_type = any($6::text[]))
         and ($7::numeric is null or latest_prices.price >= $7::numeric)
         and ($8::numeric is null or latest_prices.price <= $8::numeric)

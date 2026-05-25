@@ -54,6 +54,8 @@ type AdvancedFilterDrawerProps = {
   selectedCategories?: readonly string[];
   selectedChains?: readonly string[];
   selectedLabels?: readonly string[];
+  selectedStores?: readonly string[];
+  storeFacets?: readonly FacetOption[];
 };
 
 const searchPresetStorageKey = 'groceryview:advanced-search-presets';
@@ -189,7 +191,9 @@ export function AdvancedFilterDrawer({
   selectedBrand = '',
   selectedCategories = [],
   selectedChains = [],
-  selectedLabels = []
+  selectedLabels = [],
+  selectedStores = [],
+  storeFacets = []
 }: AdvancedFilterDrawerProps) {
   const [isOpen, setIsOpen] = useState(activeChips.length > 0);
   const drawerRef = useRef<HTMLDetailsElement>(null);
@@ -197,6 +201,7 @@ export function AdvancedFilterDrawer({
   const selectedCategorySet = new Set(selectedCategories);
   const selectedChainSet = new Set(selectedChains);
   const selectedLabelSet = new Set(selectedLabels);
+  const selectedStoreSet = new Set(selectedStores);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -273,6 +278,17 @@ export function AdvancedFilterDrawer({
               </label>
             ))}
           </div>
+          {storeFacets.length > 0 ? (
+            <div className="mt-4 grid gap-2">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-sky-700">Selected stores</p>
+              {storeFacets.slice(0, 8).map((facet) => (
+                <label className="flex items-center justify-between gap-3 rounded-xl bg-cyan-50 px-3 py-2 text-sm font-bold text-cyan-950" key={facet.value}>
+                  <span><input className="mr-2" defaultChecked={selectedStoreSet.has(facet.value)} name="store" type="checkbox" value={facet.value} />{optionLabel(facet)}</span>
+                  {facet.count !== undefined ? <span className="text-xs text-cyan-700">{facet.count}</span> : null}
+                </label>
+              ))}
+            </div>
+          ) : null}
         </fieldset>
         <fieldset className="rounded-2xl bg-white p-4">
           <legend className="text-xs font-black uppercase tracking-[0.16em] text-violet-700">Diet and certification</legend>

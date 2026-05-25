@@ -536,6 +536,8 @@ describe('real catalog API endpoints', () => {
     assert.match(database.calls[0]?.sql ?? '', /from products/i);
     assert.match(database.calls[0]?.sql ?? '', /latest_prices/i);
     assert.match(database.calls[0]?.sql ?? '', /from latest_prices filter_prices/i);
+    assert.match(database.calls[0]?.sql ?? '', /filter_stores\.slug = any\(\$5::text\[\]\) and coalesce\(filter_prices\.is_available, true\) = true/i);
+    assert.match(database.calls[0]?.sql ?? '', /stores\.slug = any\(\$5::text\[\]\) and coalesce\(latest_prices\.is_available, true\) = true/i);
     assert.ok((database.calls[0]?.sql ?? '').indexOf('from latest_prices filter_prices') < (database.calls[0]?.sql ?? '').indexOf('limit $9'));
   });
 

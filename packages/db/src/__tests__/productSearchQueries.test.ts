@@ -8,6 +8,7 @@ import {
   suggestProductsByPrefix,
   searchProductsByText
 } from '../queries/productSearch.js';
+import { buildStoreAvailabilityFilter } from '../queries/availability.js';
 
 describe('PostgreSQL product search query', () => {
   it('uses a bounded tsvector search over product name and brand', () => {
@@ -100,5 +101,24 @@ describe('PostgreSQL product search query', () => {
       imageUrl: null,
       matchRank: 1
     });
+  });
+
+  it('builds availability filters for selected store slugs and ids', () => {
+    assert.equal(buildStoreAvailabilityFilter({}), null);
+
+    const filter = buildStoreAvailabilityFilter({
+      storeSlugs: [' willys-odenplan ', 'coop-odenplan,willys-odenplan'],
+      storeIds: ['store-1'],
+      parameterOffset: 4
+    });
+
+    assert.ok(filter);
+    assert.match(filter.sql, /from latest_prices/);
+    assert.match(filter.sql, /join stores on stores\.id = latest_prices\.store_id/);
+    assert.match(filter.sql, /latest_prices\.product_id = products\.id/);
+    assert.match(filter.sql, /coalesce\(latest_prices\.is_available, true\) = true/);
+    assert.match(filter.sql, /stores\.slug = any\(\$4::text\[\]\)/);
+    assert.match(filter.sql, /stores\.id::text = any\(\$5::text\[\]\)/);
+    assert.deepEqual(filter.values, [['coop-odenplan', 'willys-odenplan'], ['store-1']]);
   });
 });

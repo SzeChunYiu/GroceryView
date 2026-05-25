@@ -206,7 +206,7 @@ export type RemovableSearchFilterChip = {
   href: string;
 };
 
-type SearchFilterChipKey = 'avoidAllergens' | 'brand' | 'category' | 'chain' | 'dietary' | 'inStockOnly' | 'label' | 'minConfidence' | 'minPrice' | 'maxPrice';
+type SearchFilterChipKey = 'avoidAllergens' | 'brand' | 'category' | 'chain' | 'dietary' | 'inStockOnly' | 'label' | 'minConfidence' | 'minPrice' | 'maxPrice' | 'store';
 
 type SearchFilterChipOptions = {
   basePath?: string;
@@ -215,7 +215,7 @@ type SearchFilterChipOptions = {
 
 type SearchFilterParams = Record<string, SearchFilterParamValue>;
 
-const multiValueChipKeys = new Set<SearchFilterChipKey>(['category', 'chain', 'dietary', 'label']);
+const multiValueChipKeys = new Set<SearchFilterChipKey>(['category', 'chain', 'dietary', 'label', 'store']);
 
 function searchParamValues(value: SearchFilterParamValue): string[] {
   const rawValues = Array.isArray(value) ? value : value ? [value] : [];
@@ -298,6 +298,14 @@ export function buildRemovableSearchFilterChips(searchParams: SearchFilterParams
       id: `chain:${chain}`,
       label: `Store: ${displayChipValue(chain, options.labels?.chain)}`,
       href: chipRemovalHref(searchParams, 'chain', chain, basePath)
+    });
+  }
+
+  for (const store of searchParamValues(searchParams.store)) {
+    chips.push({
+      id: `store:${store}`,
+      label: `Store availability: ${displayChipValue(store, options.labels?.store)}`,
+      href: chipRemovalHref(searchParams, 'store', store, basePath)
     });
   }
 

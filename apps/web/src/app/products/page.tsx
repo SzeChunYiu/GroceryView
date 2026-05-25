@@ -33,6 +33,7 @@ type SearchParams = {
   origin?: string | string[];
   dietary?: string | string[];
   chain?: string | string[];
+  store?: string | string[];
   minPrice?: string | string[];
   maxPrice?: string | string[];
   avoidAllergens?: string | string[];
@@ -77,6 +78,7 @@ function copySearchParams(params: URLSearchParams, source: SearchParams) {
   setAllParams(params, 'origin', source.origin);
   setAllParams(params, 'dietary', source.dietary);
   setFirstParam(params, 'chain', source.chain);
+  setAllParams(params, 'store', source.store);
   setFirstParam(params, 'minPrice', source.minPrice);
   setFirstParam(params, 'maxPrice', source.maxPrice);
   setFirstParam(params, 'avoidAllergens', source.avoidAllergens);
@@ -175,6 +177,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
     basePath: '/products',
     labels: {
       chain: Object.fromEntries(search.chainFacets.map((facet) => [facet.value, facet.label])),
+      store: Object.fromEntries(search.storeFacets.map((facet) => [facet.value, facet.label])),
       dietary: Object.fromEntries(search.dietaryFilters.map((filter) => [filter.value, filter.label])),
       label: Object.fromEntries(search.labelFacets.map((facet) => [facet.value, facet.label])),
       brand: Object.fromEntries(productBrandFilterOptions.map((brand) => [brand.value, brand.label]))
@@ -187,7 +190,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
     return counts;
   }, {});
 
-  function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'origin' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'avoidAllergens' | 'inStockOnly' | 'minConfidence', string>>) {
+  function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'origin' | 'dietary' | 'chain' | 'store' | 'q' | 'minPrice' | 'maxPrice' | 'avoidAllergens' | 'inStockOnly' | 'minConfidence', string>>) {
     const params = new URLSearchParams();
     copySearchParams(params, resolvedSearchParams);
     for (const [key, value] of Object.entries(overrides)) {
@@ -271,6 +274,8 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             selectedCategories={search.filters.categories}
             selectedChains={search.filters.chains}
             selectedLabels={search.labelFilters}
+            selectedStores={search.filters.stores}
+            storeFacets={search.storeFacets}
           />
         </form>
         <div className="mt-4">

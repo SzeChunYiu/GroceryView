@@ -361,6 +361,66 @@ describe('createGroceryViewApi', () => {
     assert.equal(result.evidence.latestPriceCount, 1);
   });
 
+  it('treats selected store filters as available-at-store filters', () => {
+    const result = buildFacetedProductSearch({
+      rows: [
+        {
+          productId: 'product-rice',
+          slug: 'jasminris-1kg',
+          canonicalName: 'Jasminris 1 kg',
+          brand: 'Garant',
+          categoryPath: ['Pantry', 'Rice'],
+          packageSize: 1,
+          packageUnit: 'kg',
+          comparableUnit: 'kg',
+          observationId: 'obs-rice-odenplan-out',
+          price: 26,
+          unitPrice: 26,
+          currency: 'SEK',
+          priceType: 'online',
+          confidence: 0.95,
+          observedAt: '2026-05-21T09:00:00.000Z',
+          isAvailable: false,
+          chainId: 'chain-willys',
+          chainSlug: 'willys',
+          chainName: 'Willys',
+          storeId: 'store-willys-odenplan',
+          storeSlug: 'willys-odenplan',
+          storeName: 'Willys Odenplan'
+        },
+        {
+          productId: 'product-rice',
+          slug: 'jasminris-1kg',
+          canonicalName: 'Jasminris 1 kg',
+          brand: 'Garant',
+          categoryPath: ['Pantry', 'Rice'],
+          packageSize: 1,
+          packageUnit: 'kg',
+          comparableUnit: 'kg',
+          observationId: 'obs-rice-torsplan-in',
+          price: 27,
+          unitPrice: 27,
+          currency: 'SEK',
+          priceType: 'online',
+          confidence: 0.95,
+          observedAt: '2026-05-21T09:05:00.000Z',
+          isAvailable: true,
+          chainId: 'chain-willys',
+          chainSlug: 'willys',
+          chainName: 'Willys',
+          storeId: 'store-willys-torsplan',
+          storeSlug: 'willys-torsplan',
+          storeName: 'Willys Torsplan'
+        }
+      ],
+      filters: { stores: ['willys-odenplan'], limit: 10 }
+    });
+
+    assert.equal(result.count, 0);
+    assert.deepEqual(result.filters.stores, ['willys-odenplan']);
+    assert.equal(result.evidence.outOfStockLatestPriceCount, 0);
+  });
+
   it('carries latest_prices availability into faceted product cards for out-of-stock badges', () => {
     const result = buildFacetedProductSearch({
       rows: [

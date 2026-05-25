@@ -13,6 +13,8 @@ export const searchRoutes = {
   plainTextLines: 'plainTextLines',
   responseFields: ['matchedProductSlug', 'matchedProductName', 'unmatchedLines'],
   dietaryFilterQueryParam: 'dietary',
+  storeAvailabilityQueryParam: 'store',
+  storeAvailabilityDescription: 'Repeat ?store=store-slug or pass comma-separated store slugs to restrict results to products with latest_prices rows at selected stores.',
   dietaryFilters: [
     { value: 'vegan', productField: 'isVegan' },
     { value: 'gluten-free', productField: 'isGlutenFree' },

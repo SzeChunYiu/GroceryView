@@ -1663,7 +1663,7 @@ export function buildFacetedProductSearch(input: {
     if (originCountryFilters.size > 0 && (!row.originCountry || !originCountryFilters.has(row.originCountry.toLocaleLowerCase('sv-SE')))) continue;
     if (brandFilters.size > 0 && (!row.brand || !brandFilters.has(row.brand.toLocaleLowerCase('sv-SE')))) continue;
     if (chainFilters.size > 0 && (!row.chainSlug || !chainFilters.has(row.chainSlug.toLocaleLowerCase('sv-SE')))) continue;
-    if (storeFilters.size > 0 && (!row.storeSlug || !storeFilters.has(row.storeSlug.toLocaleLowerCase('sv-SE')))) continue;
+    if (storeFilters.size > 0 && (!row.storeSlug || !storeFilters.has(row.storeSlug.toLocaleLowerCase('sv-SE')) || row.isAvailable === false)) continue;
     if (priceTypeFilters.size > 0 && (!row.priceType || !priceTypeFilters.has(row.priceType))) continue;
     if ((minPriceFilter !== undefined || maxPriceFilter !== undefined) && typeof row.unitPrice !== 'number') continue;
     if (minPriceFilter !== undefined && (typeof row.unitPrice !== 'number' || row.unitPrice < minPriceFilter)) continue;

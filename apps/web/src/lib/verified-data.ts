@@ -738,6 +738,7 @@ export type ProductSearchUrlParams = {
   origin?: SearchParamValue;
   dietary?: SearchParamValue;
   chain?: SearchParamValue;
+  store?: SearchParamValue;
   minPrice?: SearchParamValue;
   maxPrice?: SearchParamValue;
   avoidAllergens?: SearchParamValue;
@@ -924,6 +925,7 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
   const dietaryLabels = dietarySearchValues(searchParams.dietary);
   const labels = [...new Set([...labelFilters, ...dietaryLabels])];
   const chains = listSearchValues(searchParams.chain);
+  const stores = listSearchValues(searchParams.store);
   const minPrice = numericSearchValue(searchParams.minPrice);
   const maxPrice = numericSearchValue(searchParams.maxPrice);
   const inStockOnly = booleanSearchValue(searchParams.inStockOnly);
@@ -933,7 +935,7 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
   const minConfidence = confidenceSearchValue(searchParams.minConfidence);
   const minCarbonScore = numericSearchValue(searchParams.minCarbonScore);
   const sort = productSearchSortValue(searchParams.sort);
-  const filters = { query, categories, labels, originCountries, chains, minPrice, maxPrice, inStockOnly, minConfidence, limit: 100 };
+  const filters = { query, categories, labels, originCountries, chains, stores, minPrice, maxPrice, inStockOnly, minConfidence, limit: 100 };
   const searchResult = buildFacetedProductSearch({ rows: facetedSearchRows, filters });
 
   const activeFilters = [
@@ -946,6 +948,7 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
       return `dietary=${dietaryFilterLabel}`;
     }),
     ...chains.map((chain) => `chain=${chainDisplayNames[chain] ?? chain}`),
+    ...stores.map((store) => `store=${store}`),
     minPrice !== undefined ? `min unit ${formatSek(minPrice)}` : null,
     maxPrice !== undefined ? `max unit ${formatSek(maxPrice)}` : null,
     avoidAllergens ? 'allergen-aware filter on' : null,
@@ -962,9 +965,11 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
     sortOptions: productSearchSortOptions,
     categoryFacets: searchResult.facets.categories.slice(0, 6),
     chainFacets: searchResult.facets.chains,
+    storeFacets: searchResult.facets.stores,
     labelFacets: searchResult.facets.labels.map((facet) => ({ ...facet, label: readableLabel(facet.value) })).slice(0, 8),
     labelFilters,
     originFilters: originCountries,
+    storeFilters: stores,
     originFacets: supportedOriginCountries.map((country) => {
       const facet = (searchResult.facets.origins ?? []).find((candidate) => candidate.value.toUpperCase() === country);
       return {
