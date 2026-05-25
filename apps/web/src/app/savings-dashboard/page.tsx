@@ -5,6 +5,7 @@ import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, RoutePerformanceBudgetPanel, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { elderlyFixedIncomeBudgetTracker, elderlyStaplesStabilityTracker, grocerySpendForecast, personalGroceryInflation, savingsDashboard, studentWeeklyBudgetTracker } from '@/lib/demo-data';
+import { buildPremiumSavingsForecast } from '@/lib/price-intelligence';
 import { buildCategoryInflationTrends } from '@/lib/trends';
 import { ecoBasketScorecard } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
@@ -46,15 +47,12 @@ function formatPercent(value: number) {
   return `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`;
 }
 
-const premiumSavingsForecast = {
-  totalMonthly: 133,
-  drivers: [
-    { label: 'Alerts', amount: 42, detail: 'price-drop and wait-window alerts across watched staples' },
-    { label: 'Swaps', amount: 58, detail: 'verified same-basket store swaps for eligible rows' },
-    { label: 'Basket planning', amount: 33, detail: 'pantry top-up timing and duplicate-buy prevention' }
-  ],
-  guardrail: 'Premium-only forecast uses signed-in watchpoints and saved basket rows; public dashboards keep the detailed plan locked.'
-};
+const premiumSavingsForecast = buildPremiumSavingsForecast([
+  { label: 'Alerts', amount: 42, detail: 'price-drop and wait-window alerts across watched staples' },
+  { label: 'Swaps', amount: 58, detail: 'verified same-basket store swaps for eligible rows' },
+  { label: 'Basket planning', amount: 33, detail: 'pantry top-up timing and duplicate-buy prevention' }
+]);
+const premiumSavingsForecastGuardrail = 'Premium-only forecast uses signed-in watchpoints and saved basket rows; public dashboards keep the detailed plan locked.';
 
 function SavingsEmptyState() {
   return (
@@ -223,7 +221,7 @@ export default function SavingsDashboardPage() {
           </div>
           <div className="rounded-3xl bg-white px-5 py-4 text-center shadow-sm">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Forecast</p>
-            <p className="mt-1 text-4xl font-black text-violet-800">{formatSek(premiumSavingsForecast.totalMonthly)}</p>
+            <p className="mt-1 text-4xl font-black text-violet-800">{formatSek(premiumSavingsForecast.monthlySavings)}</p>
             <p className="text-xs font-bold text-slate-600">next month</p>
           </div>
         </div>
@@ -237,7 +235,7 @@ export default function SavingsDashboardPage() {
           ))}
         </div>
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white p-4">
-          <p className="text-sm font-bold text-violet-950">{premiumSavingsForecast.guardrail}</p>
+          <p className="text-sm font-bold text-violet-950">{premiumSavingsForecast.confidenceLabel} {premiumSavingsForecastGuardrail}</p>
           <Link className="rounded-full bg-violet-700 px-4 py-2 text-sm font-black text-white" href="/pricing">See premium plan</Link>
         </div>
       </Card>
