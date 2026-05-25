@@ -3,10 +3,11 @@ import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { NotificationInboxActions } from '@/components/notification-inbox-actions';
+import { WatchlistRow } from '@/components/watchlist-row';
 import { babyDiaperPriceTracker, budgetEssentialsPriceDropAlerts, dealHunterNewProductPriceDropAlerts, weeklyPersonalizedEmailDigest } from '@/lib/demo-data';
 import { samplePredictiveDropAlerts } from '@/lib/alert-scheduler';
 import { priceAlertThresholdPreferenceContract } from '@/lib/verified-data';
-import { confidenceForProduct, priceRowCount, priceDropReasonForAlert, priceDropReasonForProduct, priceSource, watchlistAlertBoard, watchlistItemForAlert } from '@/lib/watchlist-data';
+import { confidenceForProduct, priceRowCount, priceDropReasonForAlert, priceDropReasonForProduct, priceSource, volatilityForProduct, watchlistAlertBoard, watchlistItemForAlert } from '@/lib/watchlist-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -68,6 +69,15 @@ export default function WatchlistPage() {
                   <p className={`text-2xl font-black ${alert.severity === 'urgent' ? 'text-rose-700' : 'text-emerald-800'}`}>{alert.severity}</p>
                   <p className="text-sm font-semibold capitalize text-slate-600">{alert.type.replaceAll('_', ' ')}</p>
                 </div>
+              </div>
+              <div className="mt-3">
+                <WatchlistRow
+                  name={alert.productName}
+                  price={String(alert.trigger.value)}
+                  store={alert.trigger.storeName}
+                  volatilityLabel={volatilityForProduct(alert.productId)?.label}
+                  volatilityDetail={volatilityForProduct(alert.productId)?.detail}
+                />
               </div>
               <div className="mt-3 grid gap-2 text-sm text-slate-700 sm:grid-cols-4">
                 <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Metric: {alert.trigger.metric}</p>

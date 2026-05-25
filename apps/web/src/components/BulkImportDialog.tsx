@@ -216,6 +216,7 @@ export function BulkImportDialog({ importMode = 'shopping-list', onImportItems }
             <div className="rounded-2xl border border-sky-100 bg-white p-3 text-sm font-semibold text-slate-700" key={candidate.productName}>
               <p className="font-black text-slate-950">{candidate.productName}</p>
               <p className="mt-1">{candidate.recommendationSeed}</p>
+              <p className="mt-1 text-xs font-bold text-sky-700">productId: {candidate.productId ?? 'unmatched'} · match score {candidate.matchScore}</p>
               <p className="mt-1 text-xs font-bold text-slate-500">{candidate.budgetSeedLabel}</p>
             </div>
           ))}

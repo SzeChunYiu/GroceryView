@@ -1,4 +1,6 @@
 import { buildWatchlistAlerts, calculateDealScore, planNotifications, type NotificationPreferences, type WatchlistItem, type WatchlistPriceType, type WatchlistProductSnapshot } from '@groceryview/core';
+import { calculatePriceVolatilityScore, type PriceVolatilityScore } from '@/lib/price-events';
+import { pricedProducts } from '@/lib/openprices-products';
 import { chainPriceRows, topChainSpreads } from '@/lib/verified-data';
 
 export type ConfidenceLevel = 'high' | 'medium' | 'low';
@@ -6,6 +8,7 @@ export type WatchlistAlert = ReturnType<typeof buildWatchlistAlerts>[number];
 
 type PricedChainRow = ReturnType<typeof chainPriceRows>[number] & { price: number };
 type VerifiedWatchlistProduct = WatchlistProductSnapshot & {
+  volatility: PriceVolatilityScore;
   source: string;
 };
 
@@ -55,6 +58,7 @@ export const watchlistSourceRows = topChainSpreads
       .sort((left, right) => left.price - right.price || String(left.chain).localeCompare(String(right.chain), 'sv'));
     const cheapest = pricedRows[0];
     if (!cheapest) return null;
+    const openPricesProduct = pricedProducts.find((pricedProduct) => pricedProduct.slug === product.slug);
     const dealScore = calculateDealScore({
       currentCityPercentile: clamp(100 - product.spreadPct * 2, 0, 100),
       knownPromoHistoryPercentile: clamp(100 - product.spreadPct * 2, 0, 100),
@@ -62,7 +66,12 @@ export const watchlistSourceRows = topChainSpreads
       discountDepthPercent: product.spreadPct,
       sourceConfidence: clamp(product.inChains.length / 2, 0, 1)
     });
-    return { product, pricedRows, cheapest, dealScore };
+    const volatility = calculatePriceVolatilityScore({
+      swingPercent: product.spreadPct,
+      lastObservedAt: openPricesProduct?.lastObservedAt ?? notificationNow,
+      now: notificationNow
+    });
+    return { product, pricedRows, cheapest, dealScore, volatility };
   })
   .filter((row): row is NonNullable<typeof row> => row !== null)
   .slice(0, 4);
@@ -75,7 +84,7 @@ const watchlistItems: WatchlistItem[] = watchlistSourceRows.map(({ product, chea
   allowedPriceTypes: [watchlistPriceTypeFor(cheapest)]
 }));
 
-const watchlistProducts: VerifiedWatchlistProduct[] = watchlistSourceRows.map(({ product, pricedRows, cheapest, dealScore }) => ({
+const watchlistProducts: VerifiedWatchlistProduct[] = watchlistSourceRows.map(({ product, pricedRows, cheapest, dealScore, volatility }) => ({
   productId: product.slug,
   productName: product.name,
   bestPrice: cheapest.price,
@@ -88,6 +97,7 @@ const watchlistProducts: VerifiedWatchlistProduct[] = watchlistSourceRows.map(({
     priceType: watchlistPriceTypeFor(row)
   })),
   dealScore,
+  volatility,
   isNew52WeekLow: product.spreadPct >= 20,
   source: `${pricedRows.length} verified Axfood chain price row${pricedRows.length === 1 ? '' : 's'} · ${product.inChains.join(' + ')}`
 }));
@@ -147,6 +157,10 @@ export function confidenceForProduct(productId: string, board = watchlistAlertBo
   if (!product || rows === 0) return 'low';
   if (rows >= 2) return 'high';
   return 'medium';
+}
+
+export function volatilityForProduct(productId: string, board = watchlistAlertBoard): PriceVolatilityScore | null {
+  return productForAlert(productId, board)?.volatility ?? null;
 }
 
 

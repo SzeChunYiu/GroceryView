@@ -102,7 +102,7 @@ export function AdDisclosureActions() {
       <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-800">Signed-in ad disclosure</p>
       <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Account-bound sponsored placement rules</h2>
       <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
-        These controls call the protected ad disclosure endpoint with the sessionStorage bearer token. Public pages can explain GroceryView ad policy, but sponsored-slot eligibility, premium removals, and excluded surfaces stay tied to the signed-in account entitlement.
+        These controls call the protected ad disclosure endpoint with the sessionStorage bearer token. Public pages can explain GroceryView ad policy, including sponsored affiliate retailer links, but sponsored-slot eligibility, premium removals, and excluded surfaces stay tied to the signed-in account entitlement.
       </p>
       <div className="mt-4 flex flex-wrap gap-2">
         <button className="rounded-full bg-sky-700 px-4 py-2 text-sm font-black text-white" onClick={loadAdDisclosure} type="button">Load signed-in ad disclosure</button>
@@ -166,6 +166,7 @@ export function AdDisclosureActions() {
       </div>
 
       <ul className="mt-4 list-disc space-y-1 rounded-2xl bg-sky-50 p-4 pl-8 text-sm font-bold text-sky-950">
+        <li>Retailer outbound links must carry a sponsored disclosure, campaign parameters, and consent-aware click tracking.</li>
         {guardrails.map((guardrail) => <li key={guardrail}>{guardrail}</li>)}
       </ul>
       <p className="mt-4 rounded-2xl bg-slate-50 p-3 text-sm font-bold text-slate-700" data-status={status}>{message}</p>
