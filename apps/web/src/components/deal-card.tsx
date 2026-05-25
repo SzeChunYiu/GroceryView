@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import {
+  affiliateDisclosureKind,
   affiliateDisclosureLabel,
   buildAffiliateOutboundUrl,
   trackAffiliateOutboundClick,
@@ -97,15 +98,19 @@ function OutboundAffiliateLink({
   children: ReactNode;
   metadata: AffiliateLinkMetadata;
 }>) {
-  const disclosureKind = metadata.sponsored === false ? 'outbound' : 'affiliate';
+  const disclosureKind = affiliateDisclosureKind(metadata);
   return (
     <div className="min-w-44 flex-1">
       <a
         className="inline-flex w-full items-center justify-center rounded-full bg-market-mint px-4 py-2 text-sm font-black text-market-ink transition hover:bg-emerald-300"
         data-affiliate-campaign={metadata.campaignId ?? metadata.surface}
+        data-affiliate-deal-id={metadata.dealId}
         data-affiliate-disclosure={disclosureKind}
         data-affiliate-placement={metadata.placement}
+        data-affiliate-product-id={metadata.productId}
         data-affiliate-retailer={metadata.retailerName}
+        data-affiliate-sponsored={String(disclosureKind === 'sponsored')}
+        data-affiliate-surface={metadata.surface}
         href={buildAffiliateOutboundUrl(metadata)}
         onClick={() => trackAffiliateOutboundClick(metadata)}
         rel="sponsored noopener noreferrer"
@@ -157,6 +162,7 @@ export function DealCard({
     campaignId: affiliateCampaignId,
     dealId,
     destinationUrl: outboundDealUrl,
+    disclosureKind: sponsoredPlacement ? 'sponsored' : 'affiliate',
     placement: 'deal_card',
     productId,
     retailerName,
@@ -167,6 +173,7 @@ export function DealCard({
     campaignId: affiliateCampaignId,
     dealId,
     destinationUrl: outboundStoreUrl,
+    disclosureKind: 'outbound',
     placement: 'store_link',
     productId,
     retailerName,
