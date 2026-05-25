@@ -110,6 +110,7 @@ function mealCardClass(meal: MealWithIngredients, productId: string, defaultClas
 function MealPlanShoppingListExport({ meal }: Readonly<{ meal: MealBudgetPlan }>) {
   const exportItems = buildMealPlanShoppingListItems([meal]);
   const categories = [...new Set(exportItems.map((item) => item.category))];
+  const estimatedTotal = exportItems.reduce((sum, item) => sum + item.estimatedPrice, 0);
 
   return (
     <div className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50 p-4" data-meal-plan-shopping-list-export={meal.title}>
@@ -117,7 +118,7 @@ function MealPlanShoppingListExport({ meal }: Readonly<{ meal: MealBudgetPlan }>
         <div>
           <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">Shopping-list export</p>
           <p className="mt-1 text-sm font-semibold text-slate-700">
-            Converts this recipe into {exportItems.length} categorized item{exportItems.length === 1 ? '' : 's'} with quantities: {categories.join(', ')}.
+            Converts this selected recipe into {exportItems.length} categorized item{exportItems.length === 1 ? '' : 's'} with quantities and {formatSek(estimatedTotal)} estimated spend: {categories.join(', ')}.
           </p>
         </div>
         <Link
@@ -130,7 +131,7 @@ function MealPlanShoppingListExport({ meal }: Readonly<{ meal: MealBudgetPlan }>
       <div className="mt-3 flex flex-wrap gap-2">
         {exportItems.map((item) => (
           <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-emerald-950 shadow-sm" key={item.id}>
-            {item.category}: {item.quantity} {item.name}
+            {item.category}: {item.quantity} {item.name} · {item.estimatedPriceLabel}
           </span>
         ))}
       </div>

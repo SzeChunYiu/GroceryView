@@ -29,6 +29,8 @@ export type BudgetAlternative = {
 export type MealPlanShoppingListItem = {
   category: string;
   detail: string;
+  estimatedPrice: number;
+  estimatedPriceLabel: string;
   id: string;
   name: string;
   productId?: string;
@@ -190,9 +192,14 @@ function mealPlanListItemKey(ingredient: MealBudgetIngredient) {
     : `plain:${ingredient.category}:${ingredient.name}`;
 }
 
+function formatMealPlanSek(value: number) {
+  return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);
+}
+
 export function buildMealPlanShoppingListItems(mealPlans: MealBudgetPlan[]): MealPlanShoppingListItem[] {
   const groupedIngredients = new Map<string, {
     category: string;
+    estimatedPrice: number;
     mealTitles: Set<string>;
     name: string;
     productId?: string;
@@ -207,6 +214,7 @@ export function buildMealPlanShoppingListItems(mealPlans: MealBudgetPlan[]): Mea
       const existing = groupedIngredients.get(key);
       if (existing) {
         existing.mealTitles.add(meal.title);
+        existing.estimatedPrice += Number.isFinite(ingredient.price) ? ingredient.price : 0;
         existing.uses += 1;
         if (ingredient.source) existing.sources.add(ingredient.source);
         continue;
@@ -214,6 +222,7 @@ export function buildMealPlanShoppingListItems(mealPlans: MealBudgetPlan[]): Mea
 
       groupedIngredients.set(key, {
         category: ingredient.category,
+        estimatedPrice: Number.isFinite(ingredient.price) ? ingredient.price : 0,
         mealTitles: new Set([meal.title]),
         name: ingredient.name,
         productId: ingredient.productId,
@@ -231,11 +240,15 @@ export function buildMealPlanShoppingListItems(mealPlans: MealBudgetPlan[]): Mea
         `Category: ${ingredient.category}`,
         `Meal plan: ${mealTitles.join(', ')}`
       ];
+      const estimatedPriceLabel = formatMealPlanSek(ingredient.estimatedPrice);
+      detailParts.push(`Estimated price: ${estimatedPriceLabel}`);
       if (sources.length > 0) detailParts.push(`Source: ${sources.join(', ')}`);
 
       return {
         category: ingredient.category,
         detail: detailParts.join(' · '),
+        estimatedPrice: ingredient.estimatedPrice,
+        estimatedPriceLabel,
         id: `meal-plan-${mealPlanListItemSlug(key)}`,
         name: ingredient.name,
         productId: ingredient.productId,
@@ -271,7 +284,14 @@ export function parseMealPlanShoppingListExport(value: string): MealPlanShopping
       && typeof item.name === 'string'
       && typeof item.quantity === 'string'
       && (item.productId === undefined || typeof item.productId === 'string')
-    ));
+    )).map((item) => {
+      const estimatedPrice = Number.isFinite(item.estimatedPrice) ? item.estimatedPrice : 0;
+      return {
+        ...item,
+        estimatedPrice,
+        estimatedPriceLabel: typeof item.estimatedPriceLabel === 'string' ? item.estimatedPriceLabel : formatMealPlanSek(estimatedPrice)
+      };
+    });
 
     return {
       items,
