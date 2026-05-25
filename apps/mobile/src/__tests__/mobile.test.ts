@@ -52,6 +52,7 @@ describe('mobile app foundation', () => {
 
     assert.equal(viewModel.today.marketCity, 'Stockholm');
     assert.equal(viewModel.today.topDeals[0].ticker, 'ZOEGAS-COFFEE-450G');
+    assert.deepEqual(viewModel.today.friendSharedDeals, []);
     assert.equal(viewModel.scan.supportedModes.join(','), 'barcode,receipt');
     assert.equal(viewModel.basket.emptyStateAction, 'Add from deals or scan a barcode');
   });
@@ -254,12 +255,39 @@ describe('mobile app foundation', () => {
     api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
     api.addWatchlistItem('user-1', { productId: 'coffee', targetPrice: 55, alertDealScoreAt: 80, favoriteStoresOnly: true });
     api.updateBudget('user-1', { weeklyBudget: 150, monthlyBudget: 600 });
+    Object.assign(api, {
+      suggestFriendSharedDeals: (userId: string) => userId === 'user-1'
+        ? [
+            {
+              productId: 'friend-milk',
+              ticker: 'ARLA-MILK-1L',
+              productName: 'Arla Milk 1L',
+              storeName: 'Lidl Sveavägen',
+              bestPrice: 13.9,
+              dealScore: 78,
+              verified: true,
+              sharedByCount: 2,
+              privateShareRecordId: 'share-private-1'
+            },
+            {
+              productId: 'unverified-bananas',
+              ticker: 'BANANAS-1KG',
+              productName: 'Bananas 1kg',
+              storeName: 'Private store',
+              bestPrice: 19.9,
+              dealScore: 71,
+              verified: false,
+              sharedByCount: 4
+            }
+          ]
+        : []
+    });
 
     const screen = composeMobileTodayScreen('user-1', api);
     assert.equal(screen.type, 'screen');
     assert.equal(screen.title, 'Stockholm Today');
     assert.equal(screen.state, 'ready');
-    assert.deepEqual(screen.children.map((section) => section.key), ['budget', 'top-deals', 'favorite-stores', 'watchlist', 'actions']);
+    assert.deepEqual(screen.children.map((section) => section.key), ['budget', 'top-deals', 'friend-shared-deals', 'favorite-stores', 'watchlist', 'actions']);
 
     const budget = screen.children.find((section) => section.key === 'budget');
     assert.equal(budget?.type, 'section');
@@ -267,8 +295,15 @@ describe('mobile app foundation', () => {
 
     const topDeals = screen.children.find((section) => section.key === 'top-deals');
     assert.equal(topDeals?.type, 'section');
-    assert.equal(topDeals?.children[0]?.key, 'deal:ZOEGAS-COFFEE-450G');
-    assert.equal('value' in topDeals!.children[0]! ? topDeals!.children[0]!.value : null, '49.90 SEK, score 82');
+    assert.equal(topDeals?.children[0]?.key, 'deal:ARLA-MILK-1L');
+    assert.equal('value' in topDeals!.children[0]! ? topDeals!.children[0]!.value : null, '13.90 SEK, score 78');
+
+    const friendSharedDeals = screen.children.find((section) => section.key === 'friend-shared-deals');
+    assert.equal(friendSharedDeals?.type, 'section');
+    assert.equal(friendSharedDeals?.children[0]?.key, 'friend-shared-deal:friend-milk');
+    assert.equal('value' in friendSharedDeals!.children[0]! ? friendSharedDeals!.children[0]!.value : null, '13.90 SEK at Lidl Sveavägen, 2 opted-in signals, score 78');
+    assert.equal(friendSharedDeals?.children.some((row) => row.key === 'friend-shared-deal:unverified-bananas'), false);
+    assert.doesNotMatch(JSON.stringify(friendSharedDeals), /share-private-1/);
 
     const stores = screen.children.find((section) => section.key === 'favorite-stores');
     assert.equal(stores?.type, 'section');
