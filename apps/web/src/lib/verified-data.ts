@@ -681,6 +681,8 @@ function productSearchResultCards(searchResult: typeof rawFacetedProductSearch) 
         currency: cheapest.currency,
         unit: product.comparableUnit
       }) : unknownUnitPriceLabel,
+      totalSortPrice: product.cheapestPrice,
+      unitSortPrice: cheapest?.unitPrice ?? null,
       isAvailable: product.isAvailable,
       chainLabel: cheapest ? `${cheapest.chainName} · ${cheapest.priceType}` : 'Awaiting latest_prices row',
       sourceTables: searchResult.evidence.sourceTables,

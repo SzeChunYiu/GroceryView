@@ -4,12 +4,10 @@ import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import { LazyItemCard } from './LazyItemCard';
 import { FavouriteProductToggle } from './favourite-product-toggle';
+import { compareModeStorageKey, normalizeCompareMode, type CompareMode } from '@/lib/compare-mode';
 import { volatilityBadgeMethodology } from '@/lib/price-intelligence';
 import type { AdaptiveProductCard } from '@/lib/verified-data';
 
-type CompareMode = 'adaptive' | 'total' | 'unit';
-
-const storageKey = 'groceryview:product-card-compare-mode';
 const compareModes: Array<{ label: string; value: CompareMode; help: string }> = [
   { label: 'Adaptive', value: 'adaptive', help: 'Commodity cards lead with unit price; branded cards lead with total price.' },
   { label: 'Total', value: 'total', help: 'Sort and lead every card by the observed pack price.' },
@@ -120,8 +118,8 @@ export function ProductPriceCards({
   const [compareMode, setCompareMode] = useState<CompareMode>('adaptive');
 
   useEffect(() => {
-    const stored = window.localStorage.getItem(storageKey);
-    if (stored === 'adaptive' || stored === 'total' || stored === 'unit') {
+    const stored = normalizeCompareMode(window.localStorage.getItem(compareModeStorageKey));
+    if (stored) {
       setCompareMode(stored);
     }
   }, []);
@@ -133,7 +131,7 @@ export function ProductPriceCards({
 
   function chooseMode(value: CompareMode) {
     setCompareMode(value);
-    window.localStorage.setItem(storageKey, value);
+    window.localStorage.setItem(compareModeStorageKey, value);
   }
 
   return (

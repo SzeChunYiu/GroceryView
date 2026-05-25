@@ -84,13 +84,15 @@ describe('verified-data UI', () => {
 
   it('surfaces latest_prices availability as an out-of-stock product card badge', async () => {
     const productCards = await read('src/components/product-price-cards.tsx');
+    const searchCards = await read('src/components/product-search-result-cards.tsx');
     const productsPage = await read('src/app/products/page.tsx');
     const verified = await read('src/lib/verified-data.ts');
 
     assert.match(productCards, /card\.isAvailable === false/);
     assert.match(productCards, /Out of stock/);
-    assert.match(productsPage, /product\.isAvailable === false/);
-    assert.match(productsPage, /Out of stock/);
+    assert.match(searchCards, /product\.isAvailable === false/);
+    assert.match(searchCards, /Out of stock/);
+    assert.match(productsPage, /ProductSearchResultCards/);
     assert.match(verified, /isAvailable/);
     assert.match(verified, /outOfStockLatestPriceCount/);
   });
@@ -3421,6 +3423,8 @@ ${seo}`;
     const products = await read('src/app/products/page.tsx');
     const shell = await read('src/components/market-shell.tsx');
     const cards = await read('src/components/product-price-cards.tsx');
+    const searchCards = await read('src/components/product-search-result-cards.tsx');
+    const compareMode = await read('src/lib/compare-mode.ts');
 
     assert.match(verified, /export const adaptiveProductCards/);
     assert.match(verified, /export const productBrandFilterOptions/);
@@ -3435,7 +3439,11 @@ ${seo}`;
     assert.match(verified, /currentPrice - price30dAgo/);
     assert.match(verified, /priceDropBadge/);
     assert.match(verified, /isAvailable/);
+    assert.match(verified, /totalSortPrice: product\.cheapestPrice/);
+    assert.match(verified, /unitSortPrice: cheapest\?\.unitPrice/);
     assert.match(products, /ProductPriceCards/);
+    assert.match(products, /ProductSearchResultCards/);
+    assert.match(products, /cards=\{pagedResultCards\}/);
     assert.match(products, /adaptiveProductCards/);
     assert.match(products, /searchParams/);
     assert.match(products, /resolvedSearchParams\.brand/);
@@ -3465,6 +3473,14 @@ ${seo}`;
     assert.match(cards, /Out of stock/);
     assert.match(cards, /No synthetic product images/);
     assert.match(cards, /No synthetic unit prices/);
+    assert.match(compareMode, /groceryview:product-card-compare-mode/);
+    assert.match(searchCards, /compareModeStorageKey/);
+    assert.match(searchCards, /ProductSearchResultCards/);
+    assert.match(searchCards, /data-search-compare-mode/);
+    assert.match(searchCards, /Search compare by/);
+    assert.match(searchCards, /unitSortPrice/);
+    assert.match(searchCards, /totalSortPrice/);
+    assert.match(searchCards, /localStorage\.setItem\(compareModeStorageKey, value\)/);
   });
 
   it('surfaces verified source coverage on the data sources route', async () => {
