@@ -1,5 +1,7 @@
 import { Card, Eyebrow, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { ActivityStream } from '@/components/activity-stream';
 import { HouseholdPlanActions } from '@/components/household-plan-actions';
+import { buildSharedListActivityEvent } from '@/lib/activity-log';
 import { DEFAULT_HOUSEHOLD_PRICE_PREFERENCES, HOUSEHOLD_PRICE_PREFERENCE_STORAGE_KEY, sortByHouseholdPricePreferences } from '@/lib/user-preferences';
 import { formatPct, formatSek, shareableHouseholdListContract, sourceCoverage, topChainSpreads } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
@@ -52,6 +54,41 @@ const householdEvidence = [
   }
 ];
 
+const householdActivityTimeline = [
+  buildSharedListActivityEvent('item_added', {
+    listId: 'static-household-preview',
+    itemId: topChainSpreads[0]?.slug ?? 'milk-preview',
+    itemName: topChainSpreads[0]?.name ?? 'Milk',
+    actor: { id: 'owner-preview', name: 'Household owner' },
+    timestamp: '2026-05-20T08:15:00.000Z',
+    detail: 'Added from verified chain-spread planning rows.'
+  }),
+  buildSharedListActivityEvent('item_edited', {
+    listId: 'static-household-preview',
+    itemId: topChainSpreads[0]?.slug ?? 'milk-preview',
+    itemName: topChainSpreads[0]?.name ?? 'Milk',
+    actor: { id: 'member-preview', name: 'Household member' },
+    timestamp: '2026-05-20T10:30:00.000Z',
+    detail: 'Updated quantity after checking the planned weekly shop.'
+  }),
+  buildSharedListActivityEvent('item_checked', {
+    listId: 'static-household-preview',
+    itemId: topChainSpreads[1]?.slug ?? 'bread-preview',
+    itemName: topChainSpreads[1]?.name ?? 'Bread',
+    actor: { id: 'shopper-preview', name: 'Store shopper' },
+    timestamp: '2026-05-20T17:45:00.000Z',
+    detail: 'Marked complete in store so the household sees the latest state.'
+  }),
+  buildSharedListActivityEvent('item_removed', {
+    listId: 'static-household-preview',
+    itemId: topChainSpreads[2]?.slug ?? 'snack-preview',
+    itemName: topChainSpreads[2]?.name ?? 'Snack',
+    actor: { id: 'owner-preview', name: 'Household owner' },
+    timestamp: '2026-05-20T18:05:00.000Z',
+    detail: 'Removed after a collaborator found a duplicate list item.'
+  })
+];
+
 export default function FeaturePage() {
   const route = 'household';
   const householdPricePreferences = DEFAULT_HOUSEHOLD_PRICE_PREFERENCES;
@@ -61,6 +98,10 @@ export default function FeaturePage() {
     <PageShell>
       <NoVerifiedData route={route} title={`${titles[route]} has no private production records in this static snapshot`} />
       <HouseholdPlanActions />
+
+      <div className="mt-6">
+        <ActivityStream initialEvents={householdActivityTimeline} listId="static-household-preview" />
+      </div>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
         <Eyebrow>Friend invite onboarding</Eyebrow>
