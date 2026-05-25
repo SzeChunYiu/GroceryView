@@ -475,6 +475,23 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(account, /@\/lib\/demo-data/);
   });
 
+  it('surfaces account reorder recommendations from durable shopper signals', async () => {
+    const account = await read('src/app/account/page.tsx');
+    const component = await read('src/components/account-reorder-recommendations.tsx');
+    const personalization = await read('src/lib/personalization.ts');
+
+    assert.match(account, /AccountReorderRecommendations/);
+    assert.match(component, /Personalized reorder recommendations/);
+    assert.match(component, /favourites, watchlist, pantry, and recurring list signals/);
+    assert.match(component, /buildAccountReorderRecommendations/);
+    assert.match(personalization, /accountReorderSignals/);
+    assert.match(personalization, /favorite/);
+    assert.match(personalization, /watchlist/);
+    assert.match(personalization, /pantry/);
+    assert.match(personalization, /recurring_list/);
+    assert.match(personalization, /confidenceLabel/);
+  });
+
 
   it('ships signed-in ad disclosure controls without anonymous sponsored-ranking state', async () => {
     const account = await read('src/app/account/page.tsx');

@@ -1,5 +1,6 @@
 import { AccountBillingActions } from '@/components/account-billing-actions';
 import { AccountMutationActions } from '@/components/account-mutation-actions';
+import { AccountReorderRecommendations } from '@/components/account-reorder-recommendations';
 import { AdDisclosureActions } from '@/components/ad-disclosure-actions';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
@@ -299,6 +300,8 @@ export default function AccountPage() {
           </div>
         </div>
       </Card>
+
+      <AccountReorderRecommendations />
 
       <Card className="mt-6 border-amber-200 bg-amber-50">
         <div className="grid gap-5 lg:grid-cols-[1fr_0.85fr]">
