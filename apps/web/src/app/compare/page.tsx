@@ -174,6 +174,7 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
             <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Cheapest basket</p>
             <p className="mt-2 text-xl font-black text-emerald-950">{cheapestBasketStore?.storeName ?? 'Add basket items'}</p>
             <p className="mt-1 text-sm font-semibold text-emerald-900">{cheapestBasketStore?.totalText ?? 'No comparable total yet'}</p>
+            <p className="mt-1 text-xs font-bold text-emerald-900">{cheapestBasketStore?.substitutionCount ?? 0} substitution hint(s)</p>
           </Card>
           <Card className="border-cyan-200 bg-cyan-50">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">Closest option</p>
