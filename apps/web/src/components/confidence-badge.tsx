@@ -1,4 +1,5 @@
 import { confidenceCopy, type ConfidenceLevel } from '@/lib/content-style';
+import { confidenceStateToken } from '@/lib/color-vision-palette';
 
 type ConfidenceBadgeProps = {
   level: ConfidenceLevel;
@@ -14,11 +15,15 @@ const levelClasses: Record<ConfidenceBadgeProps["level"], string> = {
 
 export function ConfidenceBadge({ level, label, sampleSize }: ConfidenceBadgeProps) {
   const displayLabel = label ?? confidenceCopy(level, sampleSize);
+  const token = confidenceStateToken(level);
   return (
     <span
+      aria-label={`${displayLabel}. ${token.meaning}. Indicator ${token.indicator}.`}
       className={`inline-flex items-center gap-2 rounded-lg border px-3 py-1 text-xs font-semibold uppercase tracking-wide ${levelClasses[level]}`}
     >
-      <span className="h-2 w-2 rounded-full bg-current" aria-hidden="true" />
+      <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full border border-current px-1 font-black leading-none" aria-hidden="true">
+        {token.indicator}
+      </span>
       {displayLabel}
       {sampleSize !== undefined && label ? <span className="normal-case tracking-normal">n={sampleSize}</span> : null}
     </span>
