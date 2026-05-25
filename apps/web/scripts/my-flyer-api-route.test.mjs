@@ -12,7 +12,7 @@ const ts = require('typescript');
 const scriptsDir = dirname(fileURLToPath(import.meta.url));
 const webRoot = resolve(scriptsDir, '..');
 const repoRoot = resolve(webRoot, '..', '..');
-const workspacePackages = ['api', 'core'];
+const workspacePackages = ['api', 'core', 'monetization'];
 
 function installRuntime() {
   const originalResolveFilename = Module._resolveFilename;

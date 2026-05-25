@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { MyFlyerPushActions } from '@/components/my-flyer-push-actions';
 import { axfoodProducts } from '@/lib/axfood-products';
 import './print-import.css';
 
@@ -6,6 +7,7 @@ type MyFlyerPageProps = Readonly<{ params: Promise<{ city: string }> }>;
 
 const visibleChains = ['willys', 'hemkop'] as const;
 const generatedAt = '2026-05-24';
+const notificationVapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? '';
 
 function titleCaseSegment(value: string) {
   return value
@@ -44,6 +46,7 @@ export default async function MyFlyerPage({ params }: MyFlyerPageProps) {
   const { city } = await params;
   const marketName = titleCaseSegment(city || 'se');
   const totalSavings = flyerProducts.reduce((sum, row) => sum + (row.offer.savings ?? 0), 0);
+  const saveUpToKr = flyerProducts.reduce((max, row) => Math.max(max, row.offer.savings ?? 0), 0);
 
   return (
     <main className="my-flyer-page min-h-screen bg-[#f4efe5] px-4 py-8 text-slate-950 sm:px-6 lg:px-8">
@@ -73,6 +76,18 @@ export default async function MyFlyerPage({ params }: MyFlyerPageProps) {
             <span className="my-flyer-print-meta mt-2 block text-xs">{flyerProducts.length} offers</span>
           </div>
         </header>
+
+        <div className="mt-6">
+          <MyFlyerPushActions
+            accountId="signed-in-user"
+            country="se"
+            dealCount={flyerProducts.length}
+            generatedAt={generatedAt}
+            saveUpToKr={saveUpToKr}
+            url={`/${city || 'se'}/my-flyer`}
+            vapidPublicKey={notificationVapidPublicKey}
+          />
+        </div>
 
         <section className="my-flyer-print-summary my-6 grid gap-3 sm:grid-cols-3">
           <div className="rounded-3xl border border-stone-300 bg-white p-5">

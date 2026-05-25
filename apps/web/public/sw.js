@@ -9,6 +9,8 @@ const ITEM_PAGE_PATTERNS = [
   /^\/prisjamforelse\/[^/]+\/?$/,
   /^\/[^/]+\/billigaste\/[^/]+\/?$/
 ];
+const MY_FLYER_READY_TYPE = 'MY_FLYER_READY_NOTIFICATION';
+const MY_FLYER_READY_TAG = 'groceryview-my-flyer-ready';
 
 function isItemPageRequest(request) {
   if (request.method !== 'GET') return false;
@@ -72,6 +74,44 @@ async function itemPageNetworkFirst(request) {
   }
 }
 
+function normalizeNotificationNumber(value) {
+  return Number.isFinite(value) && value > 0 ? Math.round(value) : 0;
+}
+
+function flyerReadySummary(payload) {
+  const dealCount = normalizeNotificationNumber(payload.dealCount);
+  const savings = normalizeNotificationNumber(payload.saveUpToKr);
+  return `${dealCount} ${dealCount === 1 ? 'deal' : 'deals'} this week, save up to ${savings} kr`;
+}
+
+function parseFlyerReadyPayload(eventData) {
+  if (!eventData) return null;
+
+  try {
+    const payload = eventData.json();
+    return payload && payload.type === MY_FLYER_READY_TYPE ? payload : null;
+  } catch {
+    return null;
+  }
+}
+
+function showFlyerReadyNotification(payload) {
+  const body = payload.summary || flyerReadySummary(payload);
+  return self.registration.showNotification('Your MyFlyer is ready', {
+    body,
+    badge: '/pwa-maskable-icon.svg',
+    data: {
+      ...payload,
+      summary: body,
+      type: MY_FLYER_READY_TYPE,
+      url: payload.url || '/se/my-flyer'
+    },
+    icon: '/pwa-icon.svg',
+    renotify: true,
+    tag: MY_FLYER_READY_TAG
+  });
+}
+
 self.addEventListener('install', () => {
   self.skipWaiting();
 });
@@ -90,4 +130,33 @@ self.addEventListener('fetch', (event) => {
   if (!isItemPageRequest(event.request)) return;
 
   event.respondWith(itemPageNetworkFirst(event.request));
+});
+
+self.addEventListener('push', (event) => {
+  const payload = parseFlyerReadyPayload(event.data);
+  if (!payload) return;
+
+  event.waitUntil(showFlyerReadyNotification(payload));
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data?.type !== MY_FLYER_READY_TYPE) return;
+
+  event.waitUntil(showFlyerReadyNotification(event.data));
+});
+
+self.addEventListener('notificationclick', (event) => {
+  if (event.notification.tag !== MY_FLYER_READY_TAG) return;
+
+  event.notification.close();
+  const targetUrl = event.notification.data?.url || '/se/my-flyer';
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if ('focus' in client && client.url === new URL(targetUrl, self.location.origin).toString()) return client.focus();
+      }
+      if (clients.openWindow) return clients.openWindow(targetUrl);
+      return undefined;
+    })
+  );
 });
