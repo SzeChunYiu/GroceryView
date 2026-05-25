@@ -63,6 +63,11 @@ import {
   type ApoteketSeProductRow
 } from './connectors/apoteket-se.js';
 import {
+  DEFAULT_LLOYDS_APOTEK_SE_SOURCE_URLS,
+  fetchLloydsApotekSeProducts,
+  type LloydsApotekSeProductRow
+} from './connectors/lloyds-apotek-se.js';
+import {
   fetchLidlOffersForAllStores,
   type LidlStoreOffer
 } from './connectors/lidl.js';
@@ -133,6 +138,7 @@ export * from './connectors/willys-bulk.js';
 export * from './connectors/apohem.js';
 export * from './connectors/bonus-is.js';
 export * from './connectors/apoteket-se.js';
+export * from './connectors/lloyds-apotek-se.js';
 export * from './connectors/okq8-fuel.js';
 export * from './connectors/ob-is-fuel.js';
 export * from './connectors/seven-eleven-se.js';
@@ -2189,6 +2195,27 @@ function apoteketSeProductToDailyItem(row: ApoteketSeProductRow): RetailerConnec
   };
 }
 
+function lloydsApotekSeProductToDailyItem(row: LloydsApotekSeProductRow): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(`${row.product_name} ${row.unit}`);
+  return {
+    sourceType: 'retailer_online_page',
+    observedAt: row.observed_at,
+    chainId: row.chain,
+    storeId: row.store_id,
+    retailerProductId: stableKeyPart(`${row.product_name}-${row.unit}`),
+    rawName: row.product_name,
+    canonicalName: row.product_name,
+    productId: `lloyds-apotek-${stableKeyPart(row.product_name)}`,
+    categoryId: 'pharmacy-public',
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price_sek,
+    memberOnly: false,
+    isAvailable: true,
+    sourceUrl: row.source_url
+  };
+}
+
 function dailyNativeSnapshotResult(input: {
   plan: RetailerConnectorRunPlan;
   retrievedAt: string;
@@ -2502,6 +2529,18 @@ export async function fetchDailyConnectorSnapshot(
       observedAt: retrievedAt
     });
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(apoteketSeProductToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_LLOYDS_APOTEK_SE_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_LLOYDS_APOTEK_SE_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchLloydsApotekSeProducts({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      sourceUrls: dailyNativeStringListParam(url, 'sourceUrls') ?? DEFAULT_LLOYDS_APOTEK_SE_SOURCE_URLS,
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      observedAt: retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(lloydsApotekSeProductToDailyItem) });
   }
 
   return await fetchRetailerConnectorSnapshot(plan, options);
@@ -3418,6 +3457,7 @@ export const GROCERYVIEW_DAILY_OB_IS_FUEL_PRICES_URL = OB_IS_FUEL_PRICES_URL;
 export const GROCERYVIEW_DAILY_SEVEN_ELEVEN_SE_CONVENIENCE_PRODUCTS_URL = 'groceryview://daily/seven-eleven-se/convenience-products';
 export const GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL = 'groceryview://daily/pharmacy/products/public';
 export const GROCERYVIEW_DAILY_APOTEKET_SE_PRODUCTS_URL = 'groceryview://daily/apoteket-se/products/public';
+export const GROCERYVIEW_DAILY_LLOYDS_APOTEK_SE_PRODUCTS_URL = 'groceryview://daily/lloyds-apotek-se/products/public';
 
 const requireForDailyIngestion = createRequire(import.meta.url);
 
