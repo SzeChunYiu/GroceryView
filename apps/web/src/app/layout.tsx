@@ -3,6 +3,7 @@ import { ConsentManager } from '@/components/consent-manager';
 import { ServiceWorkerRegistrar } from '@/lib/swRegister';
 import { Providers } from './providers';
 import './globals.css';
+import '@/styles/print.css';
 
 const siteUrl = 'https://grocery-web-mu.vercel.app';
 const organizationJsonLd = {
