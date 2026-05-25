@@ -87,10 +87,16 @@ const categoryConfidenceCounts = categoryRows.reduce(
 );
 
 const chainConfidenceCounts = methodologyIndex.chains.reduce(
-  (summary, chain) => ({
-    ...summary,
-    [chain.confidence]: summary[chain.confidence] + 1
-  }),
+  (summary, chain) => {
+    if (chain.confidence === 'unknown') {
+      return summary;
+    }
+
+    return {
+      ...summary,
+      [chain.confidence]: summary[chain.confidence] + 1
+    };
+  },
   { high: 0, medium: 0, low: 0 } as Record<ConfidenceLevel, number>
 );
 

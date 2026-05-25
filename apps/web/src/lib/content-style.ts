@@ -6,7 +6,7 @@ export type ContentStyleTopic =
   | 'historicalPercentile'
   | 'sourceLimitations';
 
-export type ConfidenceLevel = 'high' | 'medium' | 'low';
+export type ConfidenceLevel = 'high' | 'medium' | 'low' | 'unknown';
 
 export const honestPriceCopyRules: Record<ContentStyleTopic, {
   label: string;

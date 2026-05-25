@@ -13,10 +13,16 @@ const groceryIndex = calculateChainPriceIndex([
 ]);
 
 const sourceConfidence = groceryIndex.chains.reduce(
-  (summary, chain) => ({
-    ...summary,
-    [chain.confidence]: summary[chain.confidence] + 1
-  }),
+  (summary, chain) => {
+    if (chain.confidence === 'unknown') {
+      return summary;
+    }
+
+    return {
+      ...summary,
+      [chain.confidence]: summary[chain.confidence] + 1
+    };
+  },
   { high: 0, medium: 0, low: 0 } as Record<'high' | 'medium' | 'low', number>
 );
 
@@ -26,9 +32,10 @@ function indexTone(index: number) {
   return 'bg-slate-100 text-slate-950';
 }
 
-function confidenceTone(confidence: 'high' | 'medium' | 'low') {
+function confidenceTone(confidence: 'high' | 'medium' | 'low' | 'unknown') {
   if (confidence === 'high') return 'bg-emerald-700 text-white';
   if (confidence === 'medium') return 'bg-blue-700 text-white';
+  if (confidence === 'unknown') return 'bg-slate-200 text-slate-700';
   return 'bg-slate-700 text-white';
 }
 
