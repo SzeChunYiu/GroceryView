@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { calculateBrandTierIndices, calculateChainPriceIndex } from '@groceryview/core';
 import { ConfidenceBadge } from '@/components/confidence-badge';
-import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
+import { Card, Eyebrow, PageShell, SourceCitation, SourceCoverage } from '@/components/data-ui';
 import { buildBrandTierPriceObservations, buildChainIndexTrendSeries, buildChainPriceObservations, buildMatchedBasketChainPriceObservations } from '@/lib/chain-index-data';
 import { buildGroceryIndexTickerWidget } from '@/lib/grocery-index-widget';
 import { categorySummaries, formatPct, formatSek, freshFoodChainIndex, marketHeatmapTiles, matchedChainProducts } from '@/lib/verified-data';
@@ -67,6 +67,15 @@ export default function ChainIndexPage() {
       <Link className="mt-4 inline-flex rounded-full bg-white px-4 py-2 text-sm font-black text-emerald-900 shadow-sm" href="/methodology-changelog">
         View data and methodology changelog
       </Link>
+      <div className="mt-4">
+        <SourceCitation
+          confidenceLabel={`${widgetSourceConfidence.high} high, ${widgetSourceConfidence.medium} medium, ${widgetSourceConfidence.low} low chain confidence rows`}
+          connectorRun="calculateChainPriceIndex(buildChainPriceObservations + matched basket observations)"
+          href="/data-sources"
+          observedAt={chainIndexTrendSeries.series[0]?.latestDate}
+          sourceLabel="Verified chain price observation snapshot"
+        />
+      </div>
       <div className="mt-6 grid gap-4 md:grid-cols-3">
         <Card><p className="text-sm font-black text-slate-600">Matched products</p><p className="mt-2 text-4xl font-black text-emerald-800">{matchedChainProducts.length}</p></Card>
         <Card><p className="text-sm font-black text-slate-600">Average spread</p><p className="mt-2 text-4xl font-black text-emerald-800">{formatPct(averageSpread)}</p></Card>

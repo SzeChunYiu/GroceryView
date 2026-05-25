@@ -1,5 +1,5 @@
 import { calculateChainPriceIndex } from '@groceryview/core';
-import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { Card, Eyebrow, PageShell, SourceCitation } from '@/components/data-ui';
 import { SavedViewActions } from '@/components/saved-view-actions';
 import { StoreDistanceCard } from '@/components/StoreDistanceCard';
 import { StoreMap } from '@/components/store-map';
@@ -182,6 +182,15 @@ export default async function MapPage({ searchParams }: Readonly<{ searchParams?
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
         The website has verified latitude and longitude for OSM stores. Markers are colored by the chain-level price index only; branch-level prices, route times, and store quality scores are not invented.
       </p>
+      <div className="mt-4">
+        <SourceCitation
+          confidenceLabel={`${visibleStores.length} visible OSM stores; marker prices use chain-index proxy only`}
+          connectorRun="storeUniverse OSM snapshot + calculateChainPriceIndex proxy"
+          href="/data-sources"
+          observedAt={visibleStores[0]?.retrievedDate}
+          sourceLabel="OpenStreetMap store coordinates with verified chain-index overlay"
+        />
+      </div>
 
       <SavedViewActions
         href="/map"
