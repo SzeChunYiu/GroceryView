@@ -164,6 +164,14 @@ export const routeMetadataCatalog = {
     title: 'Cookie policy and consent settings | GroceryView',
     description: 'Read GroceryView cookie categories, IAB TCF v2.2 consent signals, Google Consent Mode v2 defaults, and non-personalised ad guardrails.'
   },
+  '/en/cookies': {
+    title: 'Cookie policy | GroceryView',
+    description: 'Read the English GroceryView cookie policy for necessary cookies, optional analytics, ads, personalisation, consent proof, and retention.'
+  },
+  '/en/privacy': {
+    title: 'Privacy policy | GroceryView',
+    description: 'Read the English GroceryView privacy policy for account data, receipts, analytics, ads, retention, deletion, and processors.'
+  },
   '/data-sources': {
     title: 'GroceryView source coverage and claim ledger',
     description: 'Audit every public source, route map, freshness badge, allowed claim, and blocked claim behind the grocery price terminal.'
@@ -265,6 +273,14 @@ export const routeMetadataCatalog = {
     title: 'Settings data export | GroceryView',
     description: 'Download signed-in account data exports for lists, alerts, preferences, analytics events, and other private GDPR sections.',
     noIndex: true
+  },
+  '/sv/cookies': {
+    title: 'Cookiepolicy | GroceryView',
+    description: 'Läs GroceryViews svenska cookiepolicy för nödvändiga cookies, frivillig analys, annonser, personalisering, samtyckesbevis och lagring.'
+  },
+  '/sv/privacy': {
+    title: 'Integritetspolicy | GroceryView',
+    description: 'Läs GroceryViews svenska integritetspolicy för kontodata, kvitton, analys, annonser, lagring, radering och personuppgiftsbiträden.'
   },
   '/seasonal-calendar': {
     title: 'Seasonal produce price calendar | GroceryView',
