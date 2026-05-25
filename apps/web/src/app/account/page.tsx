@@ -4,6 +4,7 @@ import { AdDisclosureActions } from '@/components/ad-disclosure-actions';
 import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { DietaryProfileOnboarding } from '@/components/diet-filter-picker';
 import { listShareRoles, accountListSharePermissions } from '@/lib/list-permissions';
 import { dietaryPreferenceOnboardingContract } from '@/lib/personalization';
 import { routeMetadata } from '@/lib/seo';
@@ -274,6 +275,7 @@ export default function AccountPage() {
             </p>
           </div>
         </div>
+        <DietaryProfileOnboarding className="mt-4 border-lime-100" />
       </Card>
 
       <Card className="mt-6 border-sky-200 bg-sky-50">
