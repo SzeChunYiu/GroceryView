@@ -5,6 +5,7 @@ import {
   basketCompareEndpoint,
   buildFacetedProductSearch,
   buildFlyerOfferReport,
+  buildMyFlyerDigest,
   buildProductLatestPrices,
   buildProductCheapestNowReport,
   buildProductPriceHistoryReport,
@@ -1097,6 +1098,118 @@ describe('createGroceryViewApi', () => {
     assert.equal(report.offers[0]?.packageUnit, 'g');
     assert.equal(report.offers[0]?.effectiveUnitPrice, 110.89);
     assert.equal(report.offers[0]?.effectiveUnitPriceUnit, 'kg');
+  });
+
+  it('builds a server-side MyFlyer digest with user signals and explanation contributions', () => {
+    const api = createGroceryViewApi();
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addWatchlistItem('user-1', {
+      productId: 'private-label-milk',
+      favoriteStoresOnly: false,
+      allowedPriceTypes: ['promotion', 'member']
+    });
+    api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
+
+    const digest = api.getMyFlyerDigest('user-1', {
+      asOf: '2026-05-20T12:00:00.000Z',
+      rankers: [
+        { rankerId: 'watchlist_first', weight: 2 },
+        { rankerId: 'best_savings', weight: 1 }
+      ],
+      signals: { watchlistCategoryIds: ['dairy'], householdSize: 3 },
+      limit: 3
+    });
+
+    assert.equal(digest.mode, 'composed_rankers');
+    assert.deepEqual(digest.rankers.map((ranker) => [ranker.rankerId, ranker.weight]), [
+      ['watchlist_first', 2],
+      ['best_savings', 1]
+    ]);
+    assert.equal(digest.source.signals.favoriteStoreCount, 1);
+    assert.equal(digest.source.signals.watchlistProductCount, 1);
+    assert.equal(digest.source.signals.recentBasketProductCount, 1);
+    assert.equal(digest.items[0]?.productId, 'private-label-milk');
+    assert.equal(digest.items[0]?.memberOnly, true);
+    assert.equal(digest.items[0]?.storeSpecific, true);
+    assert.deepEqual(digest.items[0]?.effectiveUnitPrice, { amount: 12.9, unit: 'l', basis: 'single_pack' });
+    assert.deepEqual(digest.items[0]?.contributions.map((contribution) => contribution.rankerId), ['watchlist_first', 'best_savings']);
+    assert.match(digest.items[0]?.explanation.join(' ') ?? '', /watchlist_first ranker matched/);
+    assert.match(digest.items[0]?.labels.join(' ') ?? '', /member-only flyer price/);
+    assert.match(digest.source.guardrails.join(' '), /active flyer offer or promotion observation rows/);
+    assert.match(digest.source.guardrails.join(' '), /Effective unit price is omitted unless observed offer price and package evidence are both present/);
+  });
+
+  it('omits MyFlyer effective unit price when promotion package evidence is missing', () => {
+    const digest = buildMyFlyerDigest({
+      userId: 'user-1',
+      asOf: '2026-05-20T12:00:00.000Z',
+      ranker: 'best_savings',
+      observations: [{
+        observationId: 'obs-promo-snacks',
+        sourceRunId: 'run-weekly-leaflet',
+        rawRecordId: 'raw-weekly-leaflet',
+        priceType: 'promotion',
+        price: 29.9,
+        regularPrice: 39.9,
+        currency: 'SEK',
+        promotionStartsOn: '2026-05-19T00:00:00.000Z',
+        promotionEndsOn: '2026-05-25T21:59:59.000Z',
+        memberRequired: false,
+        observedAt: '2026-05-19T06:30:00.000Z',
+        confidence: 0.92,
+        provenance: { sourceUrl: 'https://example.test/flyer' },
+        productId: 'product-snacks',
+        productSlug: 'snacks',
+        productName: 'Friday snacks',
+        categoryPath: ['snacks'],
+        chainId: 'chain-willys',
+        chainSlug: 'willys',
+        chainName: 'Willys',
+        storeId: 'store-willys',
+        storeSlug: 'willys-odenplan',
+        storeName: 'Willys Odenplan',
+        storeCity: 'Stockholm'
+      }]
+    });
+
+    assert.equal(digest.offerCount, 1);
+    assert.equal(digest.items[0]?.effectiveUnitPrice, null);
+    assert.match(digest.source.guardrails.join(' '), /package evidence/);
+
+    const unitDigest = buildMyFlyerDigest({
+      userId: 'user-1',
+      asOf: '2026-05-20T12:00:00.000Z',
+      ranker: 'best_unit_price',
+      observations: [{
+        observationId: 'obs-promo-snacks',
+        sourceRunId: 'run-weekly-leaflet',
+        rawRecordId: 'raw-weekly-leaflet',
+        priceType: 'promotion',
+        price: 29.9,
+        regularPrice: 39.9,
+        currency: 'SEK',
+        promotionStartsOn: '2026-05-19T00:00:00.000Z',
+        promotionEndsOn: '2026-05-25T21:59:59.000Z',
+        memberRequired: false,
+        observedAt: '2026-05-19T06:30:00.000Z',
+        confidence: 0.92,
+        provenance: { sourceUrl: 'https://example.test/flyer' },
+        productId: 'product-snacks',
+        productSlug: 'snacks',
+        productName: 'Friday snacks',
+        categoryPath: ['snacks'],
+        chainId: 'chain-willys',
+        chainSlug: 'willys',
+        chainName: 'Willys',
+        storeId: 'store-willys',
+        storeSlug: 'willys-odenplan',
+        storeName: 'Willys Odenplan',
+        storeCity: 'Stockholm'
+      }]
+    });
+
+    assert.equal(unitDigest.offerCount, 0);
+    assert.equal(unitDigest.filteredOut.missingPackageEvidence, 1);
   });
 
   it('serves pantry replenishment plans with live deal and basket duplicate context', () => {

@@ -1109,6 +1109,111 @@ export type FlyerOfferReport = {
   guardrails: string[];
 };
 
+export type MyFlyerRankerId =
+  | 'best_savings'
+  | 'best_unit_price'
+  | 'nearby'
+  | 'watchlist_first'
+  | 'household_fit'
+  | 'diet_safe';
+
+export type MyFlyerRankerChoice = {
+  rankerId: MyFlyerRankerId;
+  weight: number;
+};
+
+export type MyFlyerUserSignals = {
+  favoriteStoreIds?: string[];
+  storeDistancesKm?: Record<string, number>;
+  maxDistanceKm?: number;
+  watchlistProductIds?: string[];
+  watchlistCategoryIds?: string[];
+  recentBasketProductIds?: string[];
+  dietBlockedProductIds?: string[];
+  householdSize?: number;
+};
+
+export type MyFlyerDigestInput = {
+  userId: string;
+  asOf: string;
+  observations?: FlyerOfferObservationInput[];
+  offers?: FlyerOffer[];
+  ranker?: MyFlyerRankerId;
+  rankers?: MyFlyerRankerChoice[];
+  signals?: MyFlyerUserSignals;
+  limit?: number;
+};
+
+export type MyFlyerRankContribution = {
+  rankerId: MyFlyerRankerId;
+  rawScore: number;
+  normalizedScore: number;
+  normalizedWeight: number;
+  weightedScore: number;
+  explanation: string;
+};
+
+export type MyFlyerDigestItem = {
+  rank: number;
+  offerId: string;
+  flyerId: string;
+  productId: string;
+  productName: string;
+  category: string;
+  chain: string;
+  storeId: string;
+  storeName: string;
+  regularPrice: number;
+  offerPrice: number;
+  savings: number;
+  discountPercent: number;
+  currency: 'SEK';
+  memberOnly: boolean;
+  storeSpecific: boolean;
+  validFrom: string;
+  validThrough: string;
+  sourceRunId: string;
+  sourceUrl: string;
+  confidence: number;
+  effectiveUnitPrice: {
+    amount: number;
+    unit: string;
+    basis: 'single_pack';
+  } | null;
+  labels: string[];
+  compositeScore: number;
+  contributions: MyFlyerRankContribution[];
+  explanation: string[];
+};
+
+export type MyFlyerDigest = {
+  userId: string;
+  asOf: string;
+  mode: 'single_ranker' | 'composed_rankers';
+  rankers: MyFlyerRankerChoice[];
+  offerCount: number;
+  filteredOut: {
+    inactive: number;
+    missingPackageEvidence: number;
+    missingDistance: number;
+    dietBlocked: number;
+  };
+  items: MyFlyerDigestItem[];
+  source: {
+    offerInput: 'fixture_flyer_rows' | 'flyer_offer_report' | 'provided_offers';
+    observedOfferCount: number;
+    signals: {
+      favoriteStoreCount: number;
+      watchlistProductCount: number;
+      watchlistCategoryCount: number;
+      recentBasketProductCount: number;
+      dietBlockedProductCount: number;
+      householdSize: number | null;
+    };
+    guardrails: string[];
+  };
+};
+
 export type StoreFlyerOfferReport = {
   storeId: string;
   storeName: string;
@@ -4400,6 +4505,288 @@ function flyerOfferReport(options: {
   return buildFlyerOfferReportFromOffers(asOf, options, activeFlyerOffers(asOf));
 }
 
+const myFlyerRankerIds = new Set<MyFlyerRankerId>([
+  'best_savings',
+  'best_unit_price',
+  'nearby',
+  'watchlist_first',
+  'household_fit',
+  'diet_safe'
+]);
+
+function normalizeMyFlyerRankers(input: Pick<MyFlyerDigestInput, 'ranker' | 'rankers'>): {
+  mode: MyFlyerDigest['mode'];
+  rankers: MyFlyerRankerChoice[];
+} {
+  if (input.rankers !== undefined) {
+    if (input.rankers.length < 2 || input.rankers.length > 3) {
+      throw new Error('Choose 2-3 MyFlyer rankers to compose a weighted ranking.');
+    }
+    const seen = new Set<MyFlyerRankerId>();
+    const rankers = input.rankers.map((choice) => {
+      if (!myFlyerRankerIds.has(choice.rankerId)) throw new Error(`Unknown MyFlyer ranker: ${choice.rankerId}`);
+      requirePositiveFinite(choice.weight, `Weight for ${choice.rankerId}`);
+      if (seen.has(choice.rankerId)) throw new Error(`Duplicate MyFlyer ranker: ${choice.rankerId}`);
+      seen.add(choice.rankerId);
+      return { rankerId: choice.rankerId, weight: choice.weight };
+    });
+    return { mode: 'composed_rankers', rankers };
+  }
+  const ranker = input.ranker ?? 'best_savings';
+  if (!myFlyerRankerIds.has(ranker)) throw new Error(`Unknown MyFlyer ranker: ${ranker}`);
+  return { mode: 'single_ranker', rankers: [{ rankerId: ranker, weight: 1 }] };
+}
+
+function hasEffectiveUnitPriceEvidence(offer: FlyerOffer): boolean {
+  return !!offer.packageQuantity && !!offer.packageUnit && !!offer.effectiveUnitPrice && !!offer.effectiveUnitPriceUnit;
+}
+
+function myFlyerOfferTieBreaker(left: FlyerOffer, right: FlyerOffer): number {
+  return right.confidence - left.confidence ||
+    Date.parse(left.validThrough) - Date.parse(right.validThrough) ||
+    left.chain.localeCompare(right.chain) ||
+    left.storeName.localeCompare(right.storeName) ||
+    left.productName.localeCompare(right.productName) ||
+    left.offerId.localeCompare(right.offerId);
+}
+
+function myFlyerSignalScore(offer: FlyerOffer, signals: MyFlyerUserSignals): {
+  score: number;
+  explanation: string[];
+} {
+  const explanation: string[] = [];
+  let score = 0;
+  if ((signals.favoriteStoreIds ?? []).includes(offer.storeId)) {
+    score += 30;
+    explanation.push(`favorite store ${offer.storeName}`);
+  }
+  if ((signals.watchlistProductIds ?? []).includes(offer.productId)) {
+    score += 50;
+    explanation.push(`watchlist product ${offer.productId}`);
+  }
+  if ((signals.watchlistCategoryIds ?? []).includes(offer.category)) {
+    score += 20;
+    explanation.push(`watchlist category ${offer.category}`);
+  }
+  if ((signals.recentBasketProductIds ?? []).includes(offer.productId)) {
+    score += 25;
+    explanation.push(`recent basket product ${offer.productId}`);
+  }
+  return { score, explanation };
+}
+
+function myFlyerRankerScore(offer: FlyerOffer, rankerId: MyFlyerRankerId, signals: MyFlyerUserSignals): {
+  score: number;
+  explanation: string;
+} {
+  const signalScore = myFlyerSignalScore(offer, signals);
+  if (rankerId === 'best_savings') {
+    return {
+      score: offer.savings + signalScore.score / 10,
+      explanation: signalScore.explanation.length > 0
+        ? `best_savings ranker used SEK savings plus ${signalScore.explanation.join(', ')}`
+        : 'best_savings ranker used SEK savings'
+    };
+  }
+  if (rankerId === 'best_unit_price') {
+    return {
+      score: hasEffectiveUnitPriceEvidence(offer) ? 1000 / offer.effectiveUnitPrice! : 0,
+      explanation: hasEffectiveUnitPriceEvidence(offer)
+        ? `best_unit_price ranker used observed package evidence at ${offer.effectiveUnitPrice} ${offer.currency}/${offer.effectiveUnitPriceUnit}`
+        : 'best_unit_price ranker omitted this offer because package evidence is missing'
+    };
+  }
+  if (rankerId === 'nearby') {
+    const distance = signals.storeDistancesKm?.[offer.storeId];
+    const radius = signals.maxDistanceKm ?? 10;
+    const proximity = distance === undefined ? 0 : Math.max(0, 1 - distance / radius);
+    return {
+      score: roundPrice((offer.savings + signalScore.score / 10) * proximity),
+      explanation: distance === undefined
+        ? 'nearby ranker omitted distance scoring because no store distance was provided'
+        : `nearby ranker discounted savings by ${distance} km from the shopper`
+    };
+  }
+  if (rankerId === 'watchlist_first') {
+    return {
+      score: signalScore.score + offer.savings,
+      explanation: signalScore.explanation.length > 0
+        ? `watchlist_first ranker matched ${signalScore.explanation.join(', ')}`
+        : 'watchlist_first ranker found no private watchlist or recent-basket match'
+    };
+  }
+  if (rankerId === 'household_fit') {
+    const householdSize = signals.householdSize ?? 1;
+    const packageBoost = householdSize >= 4 && (offer.packageQuantity ?? 0) >= 450 ? 20 : 0;
+    return {
+      score: offer.savings + packageBoost,
+      explanation: `household_fit ranker scored one-each savings for household size ${householdSize}`
+    };
+  }
+  return {
+    score: (signals.dietBlockedProductIds ?? []).includes(offer.productId) ? 0 : 100 + offer.confidence * 10,
+    explanation: 'diet_safe ranker only scored offers not blocked by saved diet filters'
+  };
+}
+
+function normalizeRankerScores(
+  offers: FlyerOffer[],
+  rankers: MyFlyerRankerChoice[],
+  signals: MyFlyerUserSignals
+): Array<{ offer: FlyerOffer; compositeScore: number; contributions: MyFlyerRankContribution[] }> {
+  const totalWeight = rankers.reduce((sum, ranker) => sum + ranker.weight, 0);
+  const scoreSets = rankers.map((ranker) => {
+    const scored = offers.map((offer) => myFlyerRankerScore(offer, ranker.rankerId, signals));
+    const rawScores = scored.map((score) => score.score);
+    return {
+      ranker,
+      scored,
+      min: Math.min(...rawScores),
+      max: Math.max(...rawScores)
+    };
+  });
+
+  return offers.map((offer, offerIndex) => {
+    const contributions = scoreSets.map((scoreSet) => {
+      const rawScore = scoreSet.scored[offerIndex]!.score;
+      const normalizedScore = scoreSet.max === scoreSet.min
+        ? 50
+        : ((rawScore - scoreSet.min) / (scoreSet.max - scoreSet.min)) * 100;
+      const normalizedWeight = scoreSet.ranker.weight / totalWeight;
+      const weightedScore = normalizedScore * normalizedWeight;
+      return {
+        rankerId: scoreSet.ranker.rankerId,
+        rawScore: roundPrice(rawScore),
+        normalizedScore: roundPrice(normalizedScore),
+        normalizedWeight: roundPrice(normalizedWeight),
+        weightedScore: roundPrice(weightedScore),
+        explanation: scoreSet.scored[offerIndex]!.explanation
+      };
+    });
+    return {
+      offer,
+      compositeScore: roundPrice(contributions.reduce((sum, contribution) => sum + contribution.weightedScore, 0)),
+      contributions
+    };
+  });
+}
+
+function myFlyerDigestItem(
+  offer: FlyerOffer,
+  rank: number,
+  compositeScore: number,
+  contributions: MyFlyerRankContribution[]
+): MyFlyerDigestItem {
+  const memberOnly = offer.priceType === 'member_flyer';
+  const storeSpecific = offer.storeId.trim().length > 0;
+  const effectiveUnitPrice = hasEffectiveUnitPriceEvidence(offer)
+    ? { amount: offer.effectiveUnitPrice!, unit: offer.effectiveUnitPriceUnit!, basis: 'single_pack' as const }
+    : null;
+  const labels = [
+    offer.chain,
+    storeSpecific ? `store-specific: ${offer.storeName}` : 'chain-wide',
+    memberOnly ? 'member-only flyer price' : 'public flyer price',
+    `source run: ${offer.sourceRunId}`
+  ];
+  return {
+    rank,
+    offerId: offer.offerId,
+    flyerId: offer.flyerId,
+    productId: offer.productId,
+    productName: offer.productName,
+    category: offer.category,
+    chain: offer.chain,
+    storeId: offer.storeId,
+    storeName: offer.storeName,
+    regularPrice: offer.regularPrice,
+    offerPrice: offer.offerPrice,
+    savings: offer.savings,
+    discountPercent: offer.discountPercent,
+    currency: offer.currency,
+    memberOnly,
+    storeSpecific,
+    validFrom: offer.validFrom,
+    validThrough: offer.validThrough,
+    sourceRunId: offer.sourceRunId,
+    sourceUrl: offer.sourceUrl,
+    confidence: offer.confidence,
+    effectiveUnitPrice,
+    labels,
+    compositeScore,
+    contributions,
+    explanation: contributions.map((contribution) => contribution.explanation)
+  };
+}
+
+export function buildMyFlyerDigest(input: MyFlyerDigestInput): MyFlyerDigest {
+  requireNonEmptyId(input.userId, 'userId');
+  const asOf = requireIsoTimestamp(input.asOf, 'asOf');
+  const asOfMs = Date.parse(asOf);
+  const { mode, rankers } = normalizeMyFlyerRankers(input);
+  const signals = input.signals ?? {};
+  const sourceOffers = input.offers !== undefined
+    ? input.offers
+    : input.observations !== undefined
+      ? buildFlyerOfferReport({ observations: input.observations, asOf }).offers
+      : activeFlyerOffers(asOf);
+  const offerInput = input.offers !== undefined
+    ? 'provided_offers'
+    : input.observations !== undefined
+      ? 'flyer_offer_report'
+      : 'fixture_flyer_rows';
+  const activeOffers = sourceOffers.filter((offer) => Date.parse(offer.validFrom) <= asOfMs && asOfMs <= Date.parse(offer.validThrough));
+  const dietBlockedIds = new Set(signals.dietBlockedProductIds ?? []);
+  let filtered = activeOffers.filter((offer) => !dietBlockedIds.has(offer.productId));
+  const dietBlocked = activeOffers.length - filtered.length;
+  const requiresUnitPrice = rankers.some((ranker) => ranker.rankerId === 'best_unit_price');
+  const missingPackageEvidence = filtered.filter((offer) => !hasEffectiveUnitPriceEvidence(offer)).length;
+  if (requiresUnitPrice) {
+    filtered = filtered.filter(hasEffectiveUnitPriceEvidence);
+  }
+  const requiresDistance = rankers.some((ranker) => ranker.rankerId === 'nearby');
+  const missingDistance = filtered.filter((offer) => signals.storeDistancesKm?.[offer.storeId] === undefined).length;
+  if (requiresDistance) {
+    filtered = filtered.filter((offer) => signals.storeDistancesKm?.[offer.storeId] !== undefined);
+  }
+
+  const ranked = normalizeRankerScores(filtered, rankers, signals)
+    .sort((left, right) => right.compositeScore - left.compositeScore || myFlyerOfferTieBreaker(left.offer, right.offer))
+    .slice(0, input.limit ?? 24);
+
+  return {
+    userId: input.userId,
+    asOf,
+    mode,
+    rankers,
+    offerCount: ranked.length,
+    filteredOut: {
+      inactive: sourceOffers.length - activeOffers.length,
+      missingPackageEvidence: requiresUnitPrice ? missingPackageEvidence : 0,
+      missingDistance: requiresDistance ? missingDistance : 0,
+      dietBlocked
+    },
+    items: ranked.map((row, index) => myFlyerDigestItem(row.offer, index + 1, row.compositeScore, row.contributions)),
+    source: {
+      offerInput,
+      observedOfferCount: sourceOffers.length,
+      signals: {
+        favoriteStoreCount: signals.favoriteStoreIds?.length ?? 0,
+        watchlistProductCount: signals.watchlistProductIds?.length ?? 0,
+        watchlistCategoryCount: signals.watchlistCategoryIds?.length ?? 0,
+        recentBasketProductCount: signals.recentBasketProductIds?.length ?? 0,
+        dietBlockedProductCount: signals.dietBlockedProductIds?.length ?? 0,
+        householdSize: signals.householdSize ?? null
+      },
+      guardrails: [
+        'MyFlyer digest items are built only from active flyer offer or promotion observation rows inside their validity window.',
+        'Member, loyalty, and store-specific flyer prices stay labeled before customer action.',
+        'Effective unit price is omitted unless observed offer price and package evidence are both present.',
+        'Ranking explanations cite ranker ids and signal contributions without exposing private raw user history.'
+      ]
+    }
+  };
+}
+
 
 
 const fulfillmentSlotEvidence: Record<string, BasketFulfillmentSlotInput[]> = {
@@ -4902,6 +5289,32 @@ export function createGroceryViewApi() {
 
     getStoreDealSummary(storeId: string): StoreDealSummaryReport {
       return storeDealSummaryFor(storeId);
+    },
+
+    getMyFlyerDigest(userId: string, options: {
+      asOf?: string;
+      ranker?: MyFlyerRankerId;
+      rankers?: MyFlyerRankerChoice[];
+      limit?: number;
+      signals?: Omit<MyFlyerUserSignals, 'favoriteStoreIds' | 'watchlistProductIds' | 'recentBasketProductIds'>;
+    } = {}): MyFlyerDigest {
+      requireNonEmptyId(userId, 'userId');
+      const favoriteStoreIds = this.getFavoriteStores(userId).map((store) => store.id);
+      const watchlistProductIds = (watchlists.get(userId) ?? []).map((item) => item.productId);
+      const recentBasketProductIds = (baskets.get(userId) ?? []).map((item) => item.productId);
+      return buildMyFlyerDigest({
+        userId,
+        asOf: options.asOf ?? '2026-05-20T12:00:00.000Z',
+        ranker: options.ranker,
+        rankers: options.rankers,
+        limit: options.limit,
+        signals: {
+          ...options.signals,
+          favoriteStoreIds,
+          watchlistProductIds,
+          recentBasketProductIds
+        }
+      });
     },
 
     getFlyerOffers(options: { asOf?: string; storeId?: string; chain?: string; category?: string; productId?: string } = {}): FlyerOfferReport {
