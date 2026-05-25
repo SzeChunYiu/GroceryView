@@ -102,9 +102,19 @@ export async function generateMetadata({ params }: Readonly<{ params: Promise<{ 
   if (!category && !chain) notFound();
 
   const label = category?.label ?? `${chain?.chainId ?? symbol} chain index`;
+  const title = `${label} | GroceryView`;
+  const description = 'Observed GroceryView price index page with fixed-basket and chain-price index calculations.';
+  const images = ['/pwa-icon.svg'];
+
   return {
-    title: `${label} | GroceryView`,
-    description: 'Observed GroceryView price index page with fixed-basket and chain-price index calculations.'
+    title,
+    description,
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images
+    }
   };
 }
 
