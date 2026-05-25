@@ -276,6 +276,54 @@ function latestCampaignDateOnOrBefore(dates: readonly string[], date: string): s
   return latest;
 }
 
+
+export type ChainCategoryCoverageGap = {
+  slug: string;
+  label: string;
+  chainId: string;
+  observedProducts: number;
+  matchedProducts: number;
+  targetProducts: number;
+  gapProducts: number;
+  coveragePct: number;
+  trendDirection: 'up' | 'flat' | 'down';
+  actionLabel: string;
+};
+
+function titleFromSlug(slug: string): string {
+  return slug
+    .split('-')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toLocaleUpperCase('sv-SE') + part.slice(1))
+    .join(' ');
+}
+
+export function buildChainCategoryCoverageGaps(limit = 8): ChainCategoryCoverageGap[] {
+  const chains = ['willys', 'hemkop'];
+  const categories = [...new Set(axfoodProducts.map((product) => product.category))];
+
+  return categories.flatMap((slug) => {
+    const products = axfoodProducts.filter((product) => product.category === slug);
+    const matchedProducts = products.filter((product) => product.inChains.length > 1).length;
+    const targetProducts = Math.max(12, Math.ceil(products.length * 0.9));
+
+    return chains.map((chainId) => {
+      const observedProducts = products.filter((product) => product.inChains.includes(chainId)).length;
+      const gapProducts = Math.max(0, targetProducts - observedProducts);
+      const coveragePct = targetProducts > 0 ? observedProducts / targetProducts : 0;
+      const trendDirection = observedProducts >= targetProducts ? 'up' : matchedProducts >= targetProducts * 0.7 ? 'flat' : 'down';
+      const actionLabel = gapProducts === 0
+        ? 'Meets target depth'
+        : `Need ${gapProducts.toLocaleString('sv-SE')} more ${chainId} row${gapProducts === 1 ? '' : 's'}`;
+
+      return { slug, label: titleFromSlug(slug), chainId, observedProducts, matchedProducts, targetProducts, gapProducts, coveragePct, trendDirection, actionLabel };
+    });
+  })
+    .filter((gap) => gap.gapProducts > 0)
+    .sort((left, right) => right.gapProducts - left.gapProducts || left.label.localeCompare(right.label, 'sv'))
+    .slice(0, limit);
+}
+
 export function buildChainIndexTrendSeries(): ChainIndexTrendReport {
   // Precomputed from the generated willysWeeklyDiscounts and hemkopWeeklyDiscounts
   // campaign arrays so Next does not parse 100+ MB of static Axfood rows during build.
