@@ -1,6 +1,7 @@
 import { AlertManagementPanel, type AlertProductSummary } from '@/components/AlertListItem';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
+import { PushNotificationPreferenceControls } from '@/components/notification-inbox-actions';
 import { SavedSearchSubscriptionsPanel } from '@/components/saved-search-subscriptions';
 import { buildAlertExplanationTimeline, buildBestTimeAlertExplanationTimeline, type SavedSearchDealCandidate } from '@/lib/alert-scheduler';
 import { FREE_PRICE_ALERT_LIMIT } from '@/app/api/alerts/store';
@@ -108,6 +109,15 @@ export default function AlertsPage() {
             </li>
           ))}
         </ol>
+      </section>
+
+      <section className="mt-6 rounded-3xl border border-indigo-200 bg-indigo-50 p-5" aria-label="Granular alert preference setup">
+        <p className="text-sm font-black uppercase tracking-[0.18em] text-indigo-800">Notification controls</p>
+        <h2 className="mt-2 text-2xl font-black text-slate-950">Decide which alerts become push notifications</h2>
+        <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+          Shoppers can independently opt into price drops, best-time-to-buy alerts, expiring pantry reminders, and weekly basket digests before granting push delivery.
+        </p>
+        <PushNotificationPreferenceControls />
       </section>
 
       <AlertManagementPanel products={alertProductSummaries} />
