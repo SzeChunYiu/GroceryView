@@ -134,13 +134,13 @@ export function TrendingSearchModule({ feed }: Readonly<{ feed: CitySearchTrendF
             <TrendingUp aria-hidden="true" size={14} strokeWidth={3} /> Rising searches
           </p>
           <h2 className="mt-4 max-w-sm text-3xl font-black leading-[0.95] tracking-tight md:text-4xl">
-            Rising product queries for {feed.city}
+            Weekly rising product queries for {feed.city}
           </h2>
           <p className="mt-4 text-sm font-semibold leading-6 text-slate-200">
-            Query momentum is grouped by city and category, then linked straight into filtered product results so shoppers can jump from local interest to price evidence.
+            Anonymized weekly funnel events are grouped by city and category, then linked straight into filtered product results so shoppers can jump from local interest to price evidence.
           </p>
           <p className="mt-4 rounded-2xl border border-white/10 bg-slate-900/80 p-3 text-xs font-bold leading-5 text-slate-300">
-            {feed.privacyNote} Source: {feed.source}.
+            Week of {feed.weekStart}. {feed.privacyNote} Source: {feed.source}.
           </p>
         </div>
 

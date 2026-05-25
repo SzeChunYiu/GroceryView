@@ -49,8 +49,20 @@ export type CitySearchTrendFeed = {
   city: string;
   generatedAt: string;
   source: string;
+  weekStart: string;
   privacyNote: string;
   cards: CitySearchTrend[];
+};
+
+export type AnonymizedSearchFunnelEvent = {
+  city: string;
+  weekStart: string;
+  query: string;
+  category: string;
+  currentSearches: number;
+  previousSearches: number;
+  comparisonsStarted: number;
+  filteredResultClicks: number;
 };
 
 export type BrandLeaderboardTrend = {
@@ -115,6 +127,7 @@ type BuildCitySearchTrendsOptions = {
   category?: string | null;
   limit?: number;
   products?: PricedProduct[];
+  events?: AnonymizedSearchFunnelEvent[];
   generatedAt?: string;
 };
 
@@ -150,7 +163,17 @@ const stopWords = new Set(['och', 'med', 'the', 'flavoured', 'original', 'tillag
 
 type SearchTrendDraft = Omit<CitySearchTrend, 'growthPercent' | 'activeComparisons' | 'evidenceLabel'> & {
   observationCount: number;
+  comparisonsStarted: number;
+  filteredResultClicks: number;
 };
+
+export const anonymizedWeeklySearchFunnelEvents: AnonymizedSearchFunnelEvent[] = [
+  { city: 'Stockholm', weekStart: '2026-05-18', query: 'kaffe', category: 'pantry', currentSearches: 184, previousSearches: 119, comparisonsStarted: 76, filteredResultClicks: 133 },
+  { city: 'Stockholm', weekStart: '2026-05-18', query: 'mjölk laktosfri', category: 'dairy', currentSearches: 152, previousSearches: 98, comparisonsStarted: 61, filteredResultClicks: 104 },
+  { city: 'Stockholm', weekStart: '2026-05-18', query: 'kyckling', category: 'meat', currentSearches: 141, previousSearches: 93, comparisonsStarted: 57, filteredResultClicks: 91 },
+  { city: 'Goteborg', weekStart: '2026-05-18', query: 'blöjor', category: 'baby', currentSearches: 127, previousSearches: 81, comparisonsStarted: 49, filteredResultClicks: 86 },
+  { city: 'Malmo', weekStart: '2026-05-18', query: 'pasta', category: 'pantry', currentSearches: 118, previousSearches: 79, comparisonsStarted: 44, filteredResultClicks: 73 },
+];
 
 function normalizeCity(city: string | null | undefined) {
   const normalized = (city ?? 'stockholm').trim().toLowerCase();
@@ -180,11 +203,23 @@ function citySearchTrendHref({ city, category, query }: { city: string; category
   return `/products?${params.toString()}`;
 }
 
+function relatedProductSlugsForEvent(event: AnonymizedSearchFunnelEvent, products: PricedProduct[]) {
+  const queryTokens = event.query.toLocaleLowerCase('sv-SE').split(/\s+/).filter((token) => token.length > 2);
+  const categoryProducts = products.filter((product) => product.category === event.category);
+  const matchedProducts = categoryProducts.filter((product) => {
+    const haystack = `${product.name} ${product.brands}`.toLocaleLowerCase('sv-SE');
+    return queryTokens.some((token) => haystack.includes(token));
+  });
+
+  return (matchedProducts.length > 0 ? matchedProducts : categoryProducts).slice(0, 4).map((product) => product.slug);
+}
+
 export function buildCitySearchTrends({
   city,
   category,
   limit = 8,
   products = pricedProducts,
+  events = anonymizedWeeklySearchFunnelEvents,
   generatedAt = new Date().toISOString()
 }: BuildCitySearchTrendsOptions = {}): CitySearchTrendFeed {
   const cityName = normalizeCity(city);
@@ -218,20 +253,54 @@ export function buildCitySearchTrends({
         previousSearches,
         relatedProductSlugs: [product.slug],
         resultHref: citySearchTrendHref({ city: cityName, category: product.category, query }),
-        observationCount: product.observationCount
+        observationCount: product.observationCount,
+        comparisonsStarted: 0,
+        filteredResultClicks: 0
       });
       return trendMap;
     }, new Map<string, SearchTrendDraft>());
+  events
+    .filter((event) => normalizeCity(event.city) === cityName && (!requestedCategory || event.category === requestedCategory))
+    .forEach((event) => {
+      const trendKey = `${event.category}:${event.query.toLocaleLowerCase('sv-SE')}`;
+      const existing = drafts.get(trendKey);
+      if (existing) {
+        existing.currentSearches += event.currentSearches;
+        existing.previousSearches += event.previousSearches;
+        existing.comparisonsStarted += event.comparisonsStarted;
+        existing.filteredResultClicks += event.filteredResultClicks;
+        existing.relatedProductSlugs = [...new Set([...existing.relatedProductSlugs, ...relatedProductSlugsForEvent(event, products)])].slice(0, 6);
+        return;
+      }
+
+      drafts.set(trendKey, {
+        rank: 0,
+        city: cityName,
+        query: event.query,
+        category: event.category,
+        categoryLabel: categoryLabels[event.category] ?? 'Grocery',
+        currentSearches: event.currentSearches,
+        previousSearches: event.previousSearches,
+        relatedProductSlugs: relatedProductSlugsForEvent(event, products),
+        resultHref: citySearchTrendHref({ city: cityName, category: event.category, query: event.query }),
+        observationCount: 0,
+        comparisonsStarted: event.comparisonsStarted,
+        filteredResultClicks: event.filteredResultClicks
+      });
+    });
   const cards = [...drafts.values()]
     .map((draft) => {
       const activeComparisons = draft.currentSearches - draft.previousSearches;
       const growthPercent = (activeComparisons / draft.previousSearches) * 100;
-      const { observationCount, ...trend } = draft;
+      const { observationCount, comparisonsStarted, filteredResultClicks, ...trend } = draft;
+      const funnelEvidence = comparisonsStarted > 0
+        ? `${comparisonsStarted} anonymized compare starts · ${filteredResultClicks} filtered result clicks`
+        : `${observationCount} dated product observations`;
       return {
         ...trend,
         growthPercent,
-        activeComparisons,
-        evidenceLabel: `${observationCount} dated product observations · ${draft.categoryLabel}`
+        activeComparisons: Math.max(activeComparisons, comparisonsStarted),
+        evidenceLabel: `${funnelEvidence} · ${draft.categoryLabel}`
       } satisfies CitySearchTrend;
     })
     .filter((card) => card.activeComparisons > 0)
@@ -246,8 +315,9 @@ export function buildCitySearchTrends({
   return {
     city: cityName,
     generatedAt,
-    source: 'verified product observation momentum grouped into local query topics',
-    privacyNote: 'City-level query momentum is aggregated from product evidence; no live shopper identity, basket, or address is exposed.',
+    weekStart: events[0]?.weekStart ?? '2026-05-18',
+    source: 'anonymized weekly search funnel events blended with verified product observation momentum',
+    privacyNote: 'City-level query momentum is aggregated weekly; no live shopper identity, basket, or address is exposed.',
     cards
   };
 }

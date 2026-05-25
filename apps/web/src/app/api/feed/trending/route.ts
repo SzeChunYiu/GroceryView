@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { buildCityPriceDropTrends } from '@/lib/trends';
+import { buildCityPriceDropTrends, buildCitySearchTrends } from '@/lib/trends';
 
 export const dynamic = 'force-static';
 
@@ -14,6 +14,12 @@ export function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const city = searchParams.get('city') ?? 'stockholm';
   const limit = parseLimit(searchParams.get('limit'));
+  const category = searchParams.get('category');
+  const type = searchParams.get('type') ?? 'searches';
 
-  return NextResponse.json(buildCityPriceDropTrends({ city, limit }));
+  if (type === 'price-drops') {
+    return NextResponse.json(buildCityPriceDropTrends({ city, limit }));
+  }
+
+  return NextResponse.json(buildCitySearchTrends({ city, category, limit }));
 }
