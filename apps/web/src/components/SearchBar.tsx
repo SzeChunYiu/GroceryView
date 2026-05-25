@@ -17,6 +17,7 @@ import {
 import { buildNoResultCorrectionWorkflow } from '@/lib/search-alias-review';
 import type { SearchExplanationBadge } from '@/lib/search-filters';
 import { authenticatedSavedSearchShortcuts } from '@/lib/saved-searches';
+import { Skeleton } from './ui/skeleton';
 
 type ProductSearchResult = {
   id: string;
@@ -30,6 +31,10 @@ type ProductSearchResult = {
 
 type ProductSearchResponse = {
   query: string;
+  queryRecovery?: {
+    didYouMean: string[];
+    popularAlternatives: string[];
+  };
   results: ProductSearchResult[];
   error?: string;
 };
@@ -127,10 +132,12 @@ function HighlightedMatch({ label, ranges = [] }: Readonly<{ label: string; rang
 export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: string }>) {
   const inputId = useId();
   const listboxId = useId();
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<ProductSearchResult[]>([]);
   const [facetChips, setFacetChips] = useState<HeaderSearchFacetChip[]>([]);
   const [suggestGroups, setSuggestGroups] = useState<HeaderSuggestGroup[]>([]);
+  const [queryRecovery, setQueryRecovery] = useState<ProductSearchResponse['queryRecovery']>(undefined);
   const [recentSearches, setRecentSearches] = useState<RecentSearchHistoryEntry[]>([]);
   const [savedSearches, setSavedSearches] = useState<SavedSearchEntry[]>([]);
   const [activeOptionIndex, setActiveOptionIndex] = useState(-1);
@@ -143,6 +150,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
   const noResultWorkflow = useMemo(() => buildNoResultCorrectionWorkflow(trimmedQuery), [trimmedQuery]);
   const shouldShowRecentSearches = isFocused && trimmedQuery.length === 0 && (recentSearches.length > 0 || savedSearches.length > 0);
   const shouldShowDropdown = (status !== 'idle' && trimmedQuery.length >= MIN_QUERY_LENGTH) || shouldShowRecentSearches;
+  const activeOptionId = shouldShowDropdown && activeOptionIndex >= 0 ? `${listboxId}-option-${activeOptionIndex}` : undefined;
   const optionCount = useMemo(() => {
     if (shouldShowRecentSearches) return recentSearches.length + savedSearches.length;
     const groupedCount = suggestGroups.reduce((total, group) => total + group.items.length, 0);
@@ -216,6 +224,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
       setResults([]);
       setFacetChips([]);
       setSuggestGroups([]);
+      setQueryRecovery(undefined);
       setActiveOptionIndex(-1);
       setStatus('idle');
       return;
@@ -256,6 +265,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
         if (controller.signal.aborted) return;
         const nextResults = payload.results ?? [];
         setResults(nextResults);
+        setQueryRecovery(payload.queryRecovery);
         setStatus(nextResults.length > 0 ? 'ready' : 'empty');
         if (nextResults.length > 0) setRecentSearches(rememberRecentSearchHistory(trimmedQuery, nextResults.length));
         trackSearchToSavingsFunnelStep('landing_search');
@@ -265,6 +275,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
         setResults([]);
         setFacetChips([]);
         setSuggestGroups([]);
+        setQueryRecovery(undefined);
         setStatus('error');
       }
     }, 300);
@@ -279,13 +290,21 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
     setActiveOptionIndex(-1);
   }, [trimmedQuery, shouldShowDropdown]);
 
+  function optionA11y(index: number) {
+    return {
+      'aria-selected': activeOptionIndex === index,
+      'data-active-option': activeOptionIndex === index ? 'true' : undefined
+    };
+  }
+
   function focusOption(index: number) {
     if (optionCount === 0) return;
     const nextIndex = (index + optionCount) % optionCount;
     setActiveOptionIndex(nextIndex);
     window.requestAnimationFrame(() => {
       const option = document.querySelector<HTMLElement>(`[data-search-option-index="${nextIndex}"]`);
-      option?.focus();
+      option?.scrollIntoView?.({ block: 'nearest' });
+      inputRef.current?.focus();
     });
   }
 
@@ -341,7 +360,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
         <Search className="h-4 w-4 text-slate-500" aria-hidden="true" />
         <input
           aria-autocomplete="list"
-          aria-activedescendant={activeOptionIndex >= 0 ? optionDomId(activeOptionIndex) : undefined}
+          aria-activedescendant={activeOptionId}
           aria-controls={listboxId}
           aria-expanded={shouldShowDropdown}
           aria-label="Search products"
@@ -357,6 +376,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
           }}
           onKeyDown={handleSearchKeyDown}
           placeholder="Search product or brand"
+          ref={inputRef}
           role="combobox"
           type="search"
           value={query}
@@ -420,6 +440,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
                       onFocus={() => setActiveOptionIndex(index)}
                       onKeyDown={(event) => handleOptionKeyDown(event, index)}
                       role="option"
+                      {...optionA11y(index)}
                     >
                       ★ {search.query}
                       <span className="ml-2 text-xs font-semibold text-violet-700">saved search</span>
@@ -438,6 +459,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
                         onFocus={() => setActiveOptionIndex(index)}
                         onKeyDown={(event) => handleOptionKeyDown(event, index)}
                         role="option"
+                        {...optionA11y(index)}
                       >
                         {search.query}
                         <span className="ml-2 text-xs font-semibold text-slate-500">{search.resultCount} verified result{search.resultCount === 1 ? '' : 's'}</span>
@@ -457,7 +479,10 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
             </div>
           ) : null}
           {status === 'loading' ? (
-            <p className="px-4 py-3 text-sm font-bold text-slate-600">Searching verified products…</p>
+            <div className="grid gap-2 px-4 py-3" aria-label="Loading search suggestions" role="status">
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
+            </div>
           ) : null}
           {suggestGroups.length > 0 ? (
             <div className="max-h-96 overflow-y-auto border-t border-slate-100">
@@ -477,6 +502,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
                           onFocus={() => setActiveOptionIndex(index)}
                           onKeyDown={(event) => handleOptionKeyDown(event, index)}
                           role="option"
+                          {...optionA11y(index)}
                         >
                           <span className="block"><HighlightedMatch label={item.label} ranges={item.matchRanges} /></span>
                           {item.detail ? <span className="mt-0.5 block text-xs font-semibold text-slate-500">{item.detail}</span> : null}
@@ -504,6 +530,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
                       onFocus={() => setActiveOptionIndex(index)}
                       onKeyDown={(event) => handleOptionKeyDown(event, index)}
                       role="option"
+                      {...optionA11y(index)}
                     >
                       {facet.label}
                       {facet.count ? <span className="ml-1 text-emerald-700">({facet.count})</span> : null}
@@ -519,6 +546,15 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
           {status === 'empty' ? (
             <div className="px-4 py-3">
               <p className="text-sm font-bold text-slate-700">No products matched “{trimmedQuery}”.</p>
+              {queryRecovery && queryRecovery.didYouMean.length > 0 ? (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {queryRecovery.didYouMean.map((suggestion) => (
+                    <Link className="rounded-full bg-amber-50 px-3 py-1 text-xs font-black text-amber-950" href={`/products?q=${encodeURIComponent(suggestion)}`} key={suggestion}>
+                      Did you mean {suggestion}?
+                    </Link>
+                  ))}
+                </div>
+              ) : null}
               <p className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-slate-500">Try related searches</p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {noResultWorkflow.suggestedCorrections.map((search) => (
@@ -559,6 +595,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
                     onFocus={() => setActiveOptionIndex(index)}
                     onKeyDown={(event) => handleOptionKeyDown(event, index)}
                     role="option"
+                    {...optionA11y(index)}
                   >
                     <span className="block text-sm font-black text-slate-950">{result.name}</span>
                     <span className="mt-1 block text-xs font-semibold text-slate-600">{result.brand ?? 'Brand not reported'} · PostgreSQL product search</span>

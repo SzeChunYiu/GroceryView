@@ -5,6 +5,7 @@ import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, RoutePerformanceBudgetPanel, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { elderlyFixedIncomeBudgetTracker, elderlyStaplesStabilityTracker, grocerySpendForecast, personalGroceryInflation, savingsDashboard, studentWeeklyBudgetTracker } from '@/lib/demo-data';
+import { buildCategoryInflationExposureCards } from '@/lib/grocery-index-widget';
 import { summarizeWeeklyGroceryBudgetTracker } from '@/lib/meal-budgets';
 import { buildCategoryInflationTrends } from '@/lib/trends';
 import { ecoBasketScorecard } from '@/lib/verified-data';
@@ -76,6 +77,7 @@ export default function SavingsDashboardPage() {
     .slice(0, 5);
   const visibleWatchpoints = savingsDashboard.watchpoints.slice(0, 4);
   const categoryInflationTrends = buildCategoryInflationTrends({ limit: 4 });
+  const categoryExposureCards = buildCategoryInflationExposureCards(4);
   const forecastReceiptCount = grocerySpendForecast.confidenceDrivers.receiptCount;
   const weeklyGroceryBudgetTracker = summarizeWeeklyGroceryBudgetTracker({
     plannedBasketCost: studentWeeklyBudgetTracker.summary.estimatedBasketTotal,
@@ -178,6 +180,28 @@ export default function SavingsDashboardPage() {
           {categoryInflationTrends.cards.map((trend) => <CategoryInflationCard key={trend.category} trend={trend} />)}
         </div>
       </section>
+
+      <Card className="mt-6 border-orange-200 bg-orange-50/70">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-orange-800">Household exposure</p>
+            <h2 className="mt-2 text-2xl font-black">Category pressure translated to budget impact</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Month-over-month category movement is weighted by visible household basket exposure so broad inflation trends become a personal budgeting signal.
+            </p>
+          </div>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-4">
+          {categoryExposureCards.map((card) => (
+            <div className="rounded-2xl bg-white p-4 shadow-sm" key={card.categoryLabel}>
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-orange-700">{card.pressureLabel}</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{card.categoryLabel}</h3>
+              <p className="mt-2 text-3xl font-black text-orange-900">{formatSignedSek(card.monthlyImpactSek)}</p>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{formatPercent(card.changePercent)} MoM · {card.exposureLabel}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
         <div className="flex flex-wrap items-start justify-between gap-4">

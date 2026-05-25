@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 
 type BarcodeScannerDetector = {
   detect(input: CanvasImageSource): Promise<Array<{ rawValue?: string }>>;
@@ -11,6 +11,19 @@ type BarcodeDetectorConstructor = new (options?: { formats?: string[] }) => Barc
 
 type BrowserWithBarcodeDetector = Window & {
   BarcodeDetector?: BarcodeDetectorConstructor;
+};
+
+type BarcodeLookupProduct = {
+  href: string;
+  name: string;
+  brand: string;
+  quantity: string;
+  source: string;
+};
+
+type BarcodeLookupResponse = {
+  status: 'matched' | 'miss';
+  product: BarcodeLookupProduct | null;
 };
 
 const knownBarcodeRoutes: Record<string, string> = {
@@ -34,8 +47,34 @@ export function BarcodeScanner() {
   const [ean, setEan] = useState('0735000123456');
   const [status, setStatus] = useState('idle');
   const [isScanning, setIsScanning] = useState(false);
+  const [resolvedProduct, setResolvedProduct] = useState<BarcodeLookupProduct | null>(null);
   const normalizedEan = normalizeEan(ean);
-  const productHref = useMemo(() => productLookupHref(normalizedEan), [normalizedEan]);
+  const productHref = useMemo(() => resolvedProduct?.href ?? productLookupHref(normalizedEan), [normalizedEan, resolvedProduct]);
+
+  const resolveBarcodeLookup = useCallback(async (value: string) => {
+    const lookupEan = normalizeEan(value);
+    if (lookupEan.length < 8) {
+      setResolvedProduct(null);
+      setStatus('Enter at least 8 barcode digits to resolve a product match.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/barcode?ean=${encodeURIComponent(lookupEan)}`);
+      if (!response.ok) {
+        setResolvedProduct(null);
+        setStatus(`No catalogue product matched EAN ${lookupEan}. Open search fallback or report the missing barcode.`);
+        return;
+      }
+
+      const body = (await response.json()) as BarcodeLookupResponse;
+      setResolvedProduct(body.product);
+      setStatus(body.product ? `Matched ${body.product.name} from ${body.product.source}.` : `No catalogue product matched EAN ${lookupEan}.`);
+    } catch {
+      setResolvedProduct(null);
+      setStatus('Barcode lookup is temporarily unavailable. Open search fallback or try again.');
+    }
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -54,15 +93,16 @@ export function BarcodeScanner() {
         const rawValue = normalizeEan(result?.rawValue ?? '');
         if (rawValue) {
           setEan(rawValue);
-          setStatus(`Detected EAN ${rawValue}. Open the matched product lookup when ready.`);
+          setStatus(`Detected EAN ${rawValue}. Resolving catalogue match...`);
           setIsScanning(false);
+          void resolveBarcodeLookup(rawValue);
         }
       } catch {
         setStatus('Camera frame could not be decoded. Use manual EAN entry below.');
       }
     }, 700);
     return () => window.clearInterval(timer);
-  }, [isScanning]);
+  }, [isScanning, resolveBarcodeLookup]);
 
   async function startCamera() {
     const browserWindow = window as BrowserWithBarcodeDetector;
@@ -97,7 +137,7 @@ export function BarcodeScanner() {
   function submitManualEan(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setEan(normalizedEan);
-    setStatus(normalizedEan ? `Manual EAN ${normalizedEan} is ready for product lookup.` : 'Enter an EAN barcode number to search products.');
+    void resolveBarcodeLookup(normalizedEan);
   }
 
   return (
@@ -115,13 +155,18 @@ export function BarcodeScanner() {
       <form className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto]" onSubmit={submitManualEan}>
         <label className="text-sm font-black text-slate-950" htmlFor="manual-ean">
           Manual EAN fallback
-          <input className="mt-2 w-full rounded-2xl border border-emerald-200 bg-white px-4 py-3 text-sm font-semibold text-slate-950" id="manual-ean" inputMode="numeric" onChange={(event) => setEan(event.target.value)} pattern="[0-9]*" value={ean} />
+          <input className="mt-2 w-full rounded-2xl border border-emerald-200 bg-white px-4 py-3 text-sm font-semibold text-slate-950" id="manual-ean" inputMode="numeric" onChange={(event) => { setEan(event.target.value); setResolvedProduct(null); }} pattern="[0-9]*" value={ean} />
         </label>
         <button className="self-end rounded-full bg-slate-950 px-4 py-3 text-sm font-black text-white" type="submit">Resolve EAN</button>
       </form>
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <Link className="rounded-full bg-emerald-700 px-4 py-2 text-sm font-black text-white" href={productHref}>Open product lookup</Link>
+        <Link className="rounded-full bg-emerald-700 px-4 py-2 text-sm font-black text-white" href={productHref}>{resolvedProduct ? 'Open matched product' : 'Open product lookup'}</Link>
         <span className="text-sm font-bold text-emerald-950">Resolved EAN: {normalizedEan || 'not set'}</span>
+        {resolvedProduct ? (
+          <span className="rounded-full bg-white px-3 py-1 text-sm font-bold text-emerald-950">
+            {resolvedProduct.name} · {resolvedProduct.brand} · {resolvedProduct.quantity}
+          </span>
+        ) : null}
       </div>
       <p aria-live="polite" className="mt-3 rounded-2xl bg-white/80 p-3 text-sm font-bold text-emerald-950">{status}</p>
     </section>

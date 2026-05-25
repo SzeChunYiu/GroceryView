@@ -7,6 +7,7 @@ import { routeMetadata } from '@/lib/seo';
 import { buildNoResultCorrectionWorkflow } from '@/lib/search-alias-review';
 import { authenticatedSavedSearchShortcuts } from '@/lib/saved-searches';
 import { buildMisspelledQueryRecovery } from '@/lib/search-suggest';
+import { phoneticSearchBadgesForQuery } from '@/lib/search-filters';
 import { buildProductSearchView } from '@/lib/verified-data';
 
 export function generateMetadata() {
@@ -22,6 +23,7 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
   const searchView = buildProductSearchView(resolvedSearchParams);
   const recovery = searchView.resultCards.length === 0 ? buildMisspelledQueryRecovery(query) : null;
   const noResultWorkflow = recovery ? buildNoResultCorrectionWorkflow(query) : null;
+  const phoneticBadges = query.trim() ? phoneticSearchBadgesForQuery(query) : [];
 
   return (
     <>
@@ -29,7 +31,7 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
       <section className="mx-auto mb-4 w-full max-w-5xl rounded-3xl border border-emerald-100 bg-emerald-50/80 p-4 shadow-sm" data-voice-search-help>
         <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">Mobile voice search</p>
         <p className="mt-1 text-sm font-semibold leading-6 text-emerald-950">
-          Tap the microphone in the header search bar on supported mobile browsers to dictate grocery terms like "lactosefri mjölk" or "havregryn". Voice entries submit into the same verified product results as typed searches.
+          Tap the microphone in the header search bar on supported mobile browsers to dictate grocery terms like "lactosefri mjölk" or "havregryn". Voice entries submit into the same verified product results as typed searches, then the saved-search action can subscribe to those filters for alerts.
         </p>
       </section>
       <section className="mx-auto mb-4 w-full max-w-5xl rounded-3xl border border-violet-100 bg-violet-50/80 p-4 shadow-sm" aria-label="Saved search shortcuts">
@@ -39,6 +41,19 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
         </p>
       </section>
       <RecentSearchReplayPills />
+      {phoneticBadges.length > 0 ? (
+        <section className="mx-auto mb-4 w-full max-w-5xl rounded-3xl border border-indigo-100 bg-indigo-50 p-4 shadow-sm" data-phonetic-search-ranking>
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-indigo-800">Phonetic typo tolerance</p>
+          <p className="mt-1 text-sm font-semibold leading-6 text-indigo-950">
+            Ranking boosts near matches for Swedish and English grocery terms that sound like "{query}".
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {phoneticBadges.map((badge) => (
+              <span className="rounded-full bg-white px-3 py-2 text-xs font-black text-indigo-900 shadow-sm" key={badge.label}>{badge.label}</span>
+            ))}
+          </div>
+        </section>
+      ) : null}
       {recovery ? <SearchRecoveryPanel didYouMean={recovery.didYouMean} popularAlternatives={recovery.popularAlternatives} query={recovery.query} /> : null}
       {noResultWorkflow && noResultWorkflow.query ? (
         <section className="mx-auto mb-4 w-full max-w-5xl rounded-3xl border border-sky-100 bg-white p-4 shadow-sm" data-no-result-correction-workflow>
