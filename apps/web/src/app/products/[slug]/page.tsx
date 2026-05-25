@@ -16,7 +16,9 @@ import {
   midsommarSeasonalHoliday,
   type ItemSubstitutionProduct
 } from '@groceryview/analytics';
+import { predictBestTimeToBuy, type BestTimeToBuyObservation } from '@groceryview/core/src/lib/bestTimeToBuy';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { BestTimeBadge } from '@/components/best-time-badge';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { FriendPriceSightings } from '@/components/friend-price-sightings';
@@ -813,6 +815,21 @@ function priceChangeEventLogFor(product: NonNullable<ReturnType<typeof findProdu
   };
 }
 
+function bestTimePredictionFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+  const observations: BestTimeToBuyObservation[] = 'lowestPrice' in product
+    ? []
+    : product.observations.map((observation) => ({
+      observedAt: observation.date,
+      price: observation.price
+    }));
+
+  return predictBestTimeToBuy({
+    observations,
+    asOf: 'lowestPrice' in product ? undefined : product.lastObservedAt,
+    productName: product.name
+  });
+}
+
 function bestTimeToBuyScoreCardsFor(product: NonNullable<ReturnType<typeof findProduct>>) {
   if ('lowestPrice' in product || product.observations.length < 3) {
     return {
@@ -1334,6 +1351,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
     }
     : null;
   const bestTimeToBuyCards = bestTimeToBuyCardsFor(product);
+  const bestTimePrediction = bestTimePredictionFor(product);
   const priceChangeLog = priceChangeEventLogFor(product);
   const bestTimeToBuyScoreCards = bestTimeToBuyScoreCardsFor(product);
   const priceMoveNotes = priceMoveNotesFor(product);
@@ -1397,6 +1415,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           </dl>
         </Card>
       </div>
+      <BestTimeBadge prediction={bestTimePrediction} />
       {crossChainQuoteRows.length > 0 ? (
         <Card className="mt-6 overflow-hidden border-emerald-200 bg-emerald-50/70">
           <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
