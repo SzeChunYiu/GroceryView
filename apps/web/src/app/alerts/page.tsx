@@ -73,7 +73,7 @@ export default function AlertsPage() {
       <h1 className="mt-2 text-4xl font-black tracking-tight">Manage active price alerts</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
         Load the alerts tied to your email, compare each target with the current verified lowest chain price when GroceryView has a matching product row, and delete alerts you no longer need.
-        No synthetic prices are used for alert context.
+        Saved search subscriptions also surface matching new deals in this alerts area. No synthetic prices are used for alert context.
       </p>
 
       <div className="mt-6 grid gap-4 md:grid-cols-3">

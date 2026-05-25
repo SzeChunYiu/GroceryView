@@ -247,6 +247,7 @@ export type SavedSearchSubscription = {
   href: string;
   filters: Record<string, string[]>;
   createdAt: string;
+  deliverySurface: 'alerts_area';
   alertReason: string;
   alertRules: SavedSearchAlertRule[];
 };
@@ -345,6 +346,7 @@ export function buildSavedSearchSubscription(input: {
     href: `${input.path ?? '/search'}${query ? `?${query}` : ''}`,
     filters,
     createdAt: input.createdAt ?? new Date().toISOString(),
+    deliverySurface: 'alerts_area',
     alertReason: 'Notify when newly matching verified deals appear or an existing match posts a verified price drop.',
     alertRules: defaultSavedSearchAlertRules
   };
