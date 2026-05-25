@@ -2,6 +2,10 @@ import { parseApoteketSeProducts, type ApoteketSeProductRow } from './apoteket-s
 
 export type LloydsApotekSeProductRow = Omit<ApoteketSeProductRow, 'chain'> & {
   chain: 'lloyds-apotek';
+  channel: 'online';
+  format: 'doz_webshop';
+  is_clearance: boolean;
+  is_subscription_price: false;
 };
 
 export type FetchLloydsApotekSeProductsOptions = {
@@ -12,6 +16,7 @@ export type FetchLloydsApotekSeProductsOptions = {
 };
 
 export const LLOYDS_APOTEK_SE_BASE_URL = 'https://www.lloydsapotek.se';
+export const DOZ_APOTEK_SE_BASE_URL = 'https://dozapotek.se';
 
 export const DEFAULT_LLOYDS_APOTEK_SE_SOURCE_URLS = [
   'https://www.lloydsapotek.se/sok?q=vitamin',
@@ -45,23 +50,54 @@ export async function fetchLloydsApotekSeProducts(options: FetchLloydsApotekSePr
 }
 
 export function parseLloydsApotekSeProducts(html: string, sourceUrl: string, observedAt: string): LloydsApotekSeProductRow[] {
-  return parseApoteketSeProducts(html, sourceUrl, observedAt).map((row) => ({
-    ...row,
-    chain: 'lloyds-apotek',
-    source_url: rebaseLloydsUrl(row.source_url || sourceUrl)
-  }));
+  return parseApoteketSeProducts(html, sourceUrl, observedAt).map((row) => {
+    const source_url = rebaseLloydsUrl(row.source_url || sourceUrl);
+    const lloydsRow: LloydsApotekSeProductRow = {
+      ...row,
+      chain: 'lloyds-apotek',
+      channel: 'online',
+      format: 'doz_webshop',
+      source_url,
+      is_clearance: isClearanceSource(sourceUrl) || isClearanceSource(source_url),
+      is_subscription_price: false
+    };
+    const sourceMultiBuy = multiBuyFromSource(sourceUrl);
+    if (sourceMultiBuy && !lloydsRow.multi_buy) lloydsRow.multi_buy = sourceMultiBuy;
+    return lloydsRow;
+  });
 }
 
 function rebaseLloydsUrl(value: string): string {
   try {
     const url = new URL(value);
     if (url.hostname === 'www.apoteket.se') {
-      return `${LLOYDS_APOTEK_SE_BASE_URL}${url.pathname}${url.search}${url.hash}`;
+      return `${DOZ_APOTEK_SE_BASE_URL}${url.pathname}${url.search}${url.hash}`;
+    }
+    if (url.hostname === 'www.lloydsapotek.se') {
+      return `${DOZ_APOTEK_SE_BASE_URL}${url.pathname}${url.search}${url.hash}`;
     }
   } catch {
     // Keep parser output if it is not a URL.
   }
   return value;
+}
+
+function isClearanceSource(value: string): boolean {
+  return /\/outlet\/kort-hallbarhet\b/i.test(value);
+}
+
+function multiBuyFromSource(value: string): string | null {
+  const path = safePath(value);
+  if (/\/2-for-50-kr-v6-ask\b/i.test(path)) return '2 för 50 kr V6 Tuggummi Ask';
+  return null;
+}
+
+function safePath(value: string): string {
+  try {
+    return new URL(value).pathname;
+  } catch {
+    return value;
+  }
 }
 
 function htmlHeaders(): RequestInit {

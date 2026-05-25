@@ -30,7 +30,11 @@ describe('lloyds-apotek-se connector', () => {
         price_sek: 79,
         unit: '100 st',
         observed_at: OBSERVED_AT,
-        source_url: 'https://www.lloydsapotek.se/produkt/lloyds-d-vitamin-100-tabletter/'
+        source_url: 'https://dozapotek.se/produkt/lloyds-d-vitamin-100-tabletter/',
+        channel: 'online',
+        format: 'doz_webshop',
+        is_clearance: false,
+        is_subscription_price: false
       }
     ]);
   });
@@ -50,5 +54,28 @@ describe('lloyds-apotek-se connector', () => {
     assert.equal(rows[0]?.chain, 'lloyds-apotek');
     assert.equal(requested[0]?.url, SOURCE_URL);
     assert.equal(JSON.stringify(requested[0]?.init?.headers).includes('lloyds-apotek-se-connector'), true);
+  });
+
+  it('flags source-backed DOZ campaign mechanics for outlet and multi-buy pages', () => {
+    const [multiBuy] = parseLloydsApotekSeProducts(fixture([
+      {
+        productName: 'V6 Strong Teeth Spearmint, 50 st',
+        price: { current: { inclVat: 38 } },
+        productUrl: 'https://dozapotek.se/v6-strong-teeth-spearmint-50-st-780872'
+      }
+    ]), 'https://dozapotek.se/aktuella-kampanjer/alltid-pa-doz/2-for-50-kr-v6-ask', OBSERVED_AT);
+    assert.equal(multiBuy?.multi_buy, '2 för 50 kr V6 Tuggummi Ask');
+    assert.equal(multiBuy?.is_clearance, false);
+
+    const [clearance] = parseLloydsApotekSeProducts(fixture([
+      {
+        productName: 'Seyo Peach crush shower gel, 400 ml',
+        price: { current: { inclVat: 34.3 } },
+        productUrl: 'https://dozapotek.se/seyo-peach-crush-shower-gel-400-ml-687867'
+      }
+    ]), 'https://dozapotek.se/aktuella-kampanjer/outlet/kort-hallbarhet', OBSERVED_AT);
+    assert.equal(clearance?.is_clearance, true);
+    assert.equal(clearance?.channel, 'online');
+    assert.equal(clearance?.format, 'doz_webshop');
   });
 });
