@@ -4,6 +4,7 @@ import { ChainSelector } from '@/components/chain-selector';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
+import { SavedViewActions } from '@/components/saved-view-actions';
 import { StoreComparisonTable } from '@/components/StoreComparisonTable';
 import { StorePriceMatrix } from '@/components/store-price-matrix';
 import { COMPARE_CHAIN_ORDER, buildBasketStoreComparison, buildChainComparisonTable, parseCompareChainsParam } from '@/lib/chain-compare';
@@ -200,6 +201,12 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
       rows: packagedRows
     }
   ];
+  const currentCompareParams = new URLSearchParams();
+  if (firstSearchValue(productsParam)) currentCompareParams.set('products', firstSearchValue(productsParam));
+  if (firstSearchValue(resolvedSearchParams.chains)) currentCompareParams.set('chains', firstSearchValue(resolvedSearchParams.chains));
+  if (overlayMode === 'index') currentCompareParams.set('overlayMode', 'index');
+  if (firstSearchValue(resolvedSearchParams.routeMode)) currentCompareParams.set('routeMode', firstSearchValue(resolvedSearchParams.routeMode));
+  const currentCompareHref = `/compare${currentCompareParams.toString() ? `?${currentCompareParams.toString()}` : ''}`;
 
   return (
     <PageShell>
@@ -207,6 +214,13 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
       <Eyebrow>Willys vs Hemköp</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Comparable chain prices</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">Rows appear only when the same Axfood product code is present in both chain catalogues. Savings are not shown across unmatched products.</p>
+      <SavedViewActions
+        href={currentCompareHref}
+        label="Comparable chain price view"
+        resultLabel={`${comparison.products.length || endpointMatrix.products.length} comparison rows · overlay ${overlayMode} · missing rows labelled`}
+        state={{ chains: firstSearchValue(resolvedSearchParams.chains) || 'all', overlayMode, products: firstSearchValue(productsParam), routeMode: firstSearchValue(resolvedSearchParams.routeMode), view: 'chain-compare' }}
+        surface="compare"
+      />
       <Card className="mt-6 overflow-hidden border-emerald-200 bg-gradient-to-br from-white via-emerald-50 to-sky-50">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
           <div>
