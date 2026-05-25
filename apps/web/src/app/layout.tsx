@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { AppShell } from '@/components/app-shell';
 import { PwaInstall } from '@/components/pwa-install';
 import { ConsentManager } from '@/components/consent-manager';
 import { ListToastViewport } from '@/components/Toast';
@@ -87,7 +88,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             dangerouslySetInnerHTML={{ __html: jsonLd([organizationJsonLd, websiteJsonLd]) }}
             type="application/ld+json"
           />
-          <Providers>{children}</Providers>
+          <Providers><AppShell>{children}</AppShell></Providers>
         </div>
         <ConsentManager />
         <EngagementReporter />
