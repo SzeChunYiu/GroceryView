@@ -104,7 +104,9 @@ export default async function MyFlyerPage({ params }: MyFlyerPageProps) {
           Screen-only promo rail hidden by the MyFlyer print stylesheet.
         </div>
 
-        <MyFlyerOffers rows={flyerProducts} />
+        <div className="my-flyer-print-filter-anchor">
+          <MyFlyerOffers rows={flyerProducts} />
+        </div>
 
         <p className="my-flyer-print-note mt-6 text-sm font-semibold text-slate-600">
           Print mode hides navigation and advertising elements, keeps source identifiers visible, and expands product images inside each deal card for easier shelf matching.
