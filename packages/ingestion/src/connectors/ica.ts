@@ -1859,7 +1859,7 @@ export function parseIcaStorePromotions(payload: unknown, options: ParseIcaStore
         imageUrl: imageUrl(product.image),
         productUrl: buildIcaStoreProductUrl(options.storeAccountId, retailerProductId),
         packageSize: packSizeDescription,
-        countryOfOrigin: text(product.countryOfOrigin),
+        countryOfOrigin: countryOfOriginText(product),
         price: price.amount,
         priceCurrency: price.currency,
         unitPrice: unitPrice.amount,
@@ -1916,6 +1916,10 @@ function arrayOfRecords(value: unknown): Array<Record<string, unknown>> {
 
 function text(value: unknown): string {
   return typeof value === 'string' ? value.trim() : '';
+}
+
+function countryOfOriginText(product: Record<string, unknown>) {
+  return text(product.countryOfOrigin) || text(product.originCountry) || text(product.country);
 }
 
 function money(value: unknown): { amount: number | null; currency: string } {

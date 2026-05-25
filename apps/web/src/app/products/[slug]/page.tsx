@@ -1277,6 +1277,22 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const priceHistoryRangeBadges = priceHistoryRangeBadgesFor(product);
   const priceVsUsualSignal = priceVsUsualSignalFor(product);
   const typicalRangeBand = priceTypicalRangeBandFor(product);
+  const priceTrackingInsight = priceVsUsualSignal.available
+    ? {
+      statusLabel: priceVsUsualSignal.historyPercentile <= 25
+        ? 'Low vs usual'
+        : priceVsUsualSignal.historyPercentile >= 75
+          ? 'High vs usual'
+          : 'Typical vs usual',
+      tone: priceVsUsualSignal.historyPercentile <= 25
+        ? 'emerald'
+        : priceVsUsualSignal.historyPercentile >= 75
+          ? 'rose'
+          : 'slate',
+      confidence: priceVsUsualSignal.observationCount >= 12 ? 'high' as const : priceVsUsualSignal.observationCount >= 5 ? 'medium' as const : 'low' as const,
+      detail: `Current price sits at the ${formatPct(priceVsUsualSignal.historyPercentile)} percentile of this product's own observed 1-year OpenPrices history. Low/typical/high labels use historical facts only, not a forecast.`
+    }
+    : null;
   const bestTimeToBuyCards = bestTimeToBuyCardsFor(product);
   const priceChangeLog = priceChangeEventLogFor(product);
   const bestTimeToBuyScoreCards = bestTimeToBuyScoreCardsFor(product);
@@ -1603,6 +1619,25 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
         <p className="mt-4 text-xs font-semibold leading-5 text-slate-600">{intraChainBranchSpread.detail}</p>
       </Card>
       <Card className="mt-6 overflow-hidden border-lime-200 bg-lime-50/80">
+        <div className="mb-5 rounded-[1.5rem] border border-white/70 bg-white/90 p-4 shadow-sm">
+          <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-800">Track-price insight</p>
+              <h2 className={`mt-2 text-2xl font-black ${priceTrackingInsight?.tone === 'emerald' ? 'text-emerald-900' : priceTrackingInsight?.tone === 'rose' ? 'text-rose-900' : 'text-slate-950'}`}>
+                {priceTrackingInsight?.statusLabel ?? 'Price insight withheld'}
+              </h2>
+              <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+                {priceTrackingInsight?.detail ?? 'GroceryView needs at least three dated observations for this product before calling the current price low, typical, or high vs usual.'}
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 md:items-end">
+              {priceTrackingInsight ? <ConfidenceBadge level={priceTrackingInsight.confidence} label={`${priceTrackingInsight.confidence} percentile confidence`} sampleSize={priceVsUsualSignal.observationCount} /> : null}
+              <Link className="rounded-full bg-lime-800 px-4 py-2 text-sm font-black text-white hover:bg-lime-900" href={`/watchlist?trackPrice=${product.slug}`}>
+                Track this price
+              </Link>
+            </div>
+          </div>
+        </div>
         <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.22em] text-lime-800">vs usual signal</p>

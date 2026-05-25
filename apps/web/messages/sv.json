@@ -20,5 +20,51 @@
     "label": "Språk",
     "persisted": "Språkvalet sparas lokalt och i NEXT_LOCALE-kakan.",
     "guardrail": "Arabiska och somaliska öppnas först efter granskade översättningar."
+  },
+  "app-nav": {
+    "tagline": "Verifierad matprisintelligens",
+    "groups": {
+      "markets": "Marknader",
+      "products": "Produkter",
+      "stores": "Butiker",
+      "trip": "Resa",
+      "personal": "Personligt"
+    },
+    "items": {
+      "overview": "Översikt",
+      "chainIndex": "Kedjeindex",
+      "funnel": "Tratt",
+      "categories": "Kategorier",
+      "heatmap": "Värmekarta",
+      "screener": "Screener",
+      "browse": "Bläddra",
+      "newArrivals": "Nya varor",
+      "compare": "Jämför",
+      "map": "Karta",
+      "stores": "Butiker",
+      "scanner": "Skanner",
+      "currentList": "Aktuell lista",
+      "nearbyDeals": "Erbjudanden nära dig",
+      "watchlist": "Bevakningslista",
+      "savings": "Sparande",
+      "myFlyer": "Mitt reklamblad",
+      "weeklyBasket": "Veckokorg",
+      "mealPlanner": "Måltidsplanerare",
+      "pantryInventory": "Skafferilager",
+      "contact": "Kontakt"
+    },
+    "theme": {
+      "switchToLight": "Byt till ljust läge",
+      "switchToDark": "Byt till mörkt läge",
+      "light": "Ljust",
+      "dark": "Mörkt"
+    },
+    "install": {
+      "label": "Installera GroceryView",
+      "title": "Lägg till GroceryView på hemskärmen",
+      "instructions": "iOS: tryck på Dela och sedan Lägg till på hemskärmen. Android: öppna Chrome-menyn och välj Installera app.",
+      "cta": "PWA redo",
+      "dismiss": "Stäng installationsbanner"
+    }
   }
 }

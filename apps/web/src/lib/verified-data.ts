@@ -123,10 +123,13 @@ function adaptiveProductKind(category: string) {
 
 function cheapestUnitBadge(unitPrice: number | null, peerUnitPrices: number[], unitLabel: string) {
   if (unitPrice === null || peerUnitPrices.length < 2) return null;
+  const cheapestPeer = Math.min(...peerUnitPrices);
+  if (!Number.isFinite(cheapestPeer) || unitPrice > cheapestPeer + 0.01) return null;
   const average = peerUnitPrices.reduce((sum, value) => sum + value, 0) / peerUnitPrices.length;
   if (!Number.isFinite(average) || average <= unitPrice) return null;
   const advantage = ((average - unitPrice) / average) * 100;
-  return `cheapest-per-unit · 🟢 -${formatPct(advantage)}/${unitLabel.replace('kr/', '')} vs chain avg`;
+  if (advantage < 3) return null;
+  return `Best unit value · 🟢 -${formatPct(advantage)}/${unitLabel.replace('kr/', '')} vs ${peerUnitPrices.length}-chain avg`;
 }
 
 function clamp(value: number, min: number, max: number) {
@@ -248,6 +251,12 @@ export const compareOverlayChart = {
       highPrice,
       provenanceLabel: latestPoint?.provenanceLabel ?? snapshot.openPricesSource,
       markerCount: series.markers.length,
+      points: points.map((point) => ({
+        time: point.time,
+        value: point.value,
+        confidence: point.confidence,
+        provenanceLabel: point.provenanceLabel
+      })),
       sparklinePoints: points.slice(-8)
     };
   }),

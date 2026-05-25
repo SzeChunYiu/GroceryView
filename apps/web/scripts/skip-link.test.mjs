@@ -12,7 +12,7 @@ test('root layout renders a skip-to-content link before app content', async () =
 
   assert.match(layout, /import \{ SkipLink \} from '@\/components\/SkipLink';/);
   assert.match(layout, /import '\.\.\/styles\/a11y\.css';/);
-  assert.match(layout, /<body>\s*<SkipLink \/>[\s\S]*<div id="main-content" tabIndex=\{-1\}>/);
+  assert.match(layout, /<body>[\s\S]*<SkipLink \/>[\s\S]*<div id="main-content" tabIndex=\{-1\}>/);
 
   assert.match(skipLink, /href="#main-content"/);
   assert.match(skipLink, /Skip to main content/);
