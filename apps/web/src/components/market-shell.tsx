@@ -9,6 +9,7 @@ import { buildSeasonalProduceDiscoveryCards } from '@/lib/deal-context';
 import { defaultLocale, localeReadiness, localeTranslationGuardrails, localizedPriceIntelligenceTerminology, localizedShellCopy, type SupportedLocale } from '@/lib/i18n';
 import { basketCostHeatmap } from '@/lib/map-basket-cost-heatmap';
 import { mapChainIndexScores } from '@/lib/map-chain-index';
+import { buildPersonalizedReorderRail } from '@/lib/personalization';
 import {
   allStoreDailyRunnerReadiness,
   apiPerformanceReadiness,
@@ -64,6 +65,7 @@ const homepageSourceCoverageNames = sourceCoverage.map((source) => source.name);
 const homepageMarketHeatmap = marketHeatmapTiles.slice(0, 6);
 const homepageChainIndexTrend = buildChainIndexTrendSeries().series.slice(0, 2);
 const homepageBasketCostHeatmap = basketCostHeatmap.rows.slice(0, 3);
+const homepagePersonalizedReorderRail = buildPersonalizedReorderRail(homepageAdaptiveProductCards);
 const homepagePharmacyOtcEvidence = pharmacyOtcEvidenceBoard.rows.slice(0, 3);
 const homepageCommodityMappingReview = {
   queue: commodityMappingReviewPlan.queue.slice(0, 2),
@@ -201,7 +203,7 @@ export function MarketShell({ locale = defaultLocale }: { locale?: SupportedLoca
 
       <div className="mt-6"><MetricGrid /></div>
 
-      <TrendingCarousel items={homepageTrendingPriceChanges} />
+      <TrendingCarousel items={homepageTrendingPriceChanges} reorderItems={homepagePersonalizedReorderRail} />
 
       <TrendingPriceDropCards city="stockholm" />
 
