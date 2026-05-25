@@ -1,6 +1,7 @@
 'use client';
 
 import { type KeyboardEvent, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { buildPriceHistorySparklinePath } from '@/lib/price-events';
 import { formatPriceChartTerminalReadout } from '../lib/price-chart-terminal-readout.js';
 export { formatPriceChartTerminalReadout, priceChartTerminalLatestPoint } from '../lib/price-chart-terminal-readout.js';
 
@@ -129,6 +130,29 @@ function latestVolatilityBandLabel(series: PriceChartTerminalSeries) {
   return `${band.lower.toLocaleString('sv-SE')}–${band.upper.toLocaleString('sv-SE')}`;
 }
 
+function csvEscape(value: string | number | undefined) {
+  const text = String(value ?? '');
+  return /[",\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
+}
+
+function priceHistoryCsv(window: PriceChartTerminalWindow | undefined, series: PriceChartTerminalSeries[]) {
+  if (!window) return '';
+  const rows = [
+    ['window', 'series_id', 'store_name', 'source_type', 'date', 'price', 'confidence', 'provenance'],
+    ...series.flatMap((item) => item.points.map((point) => [
+      window.label,
+      item.id,
+      item.storeName,
+      item.sourceType,
+      point.time.slice(0, 10),
+      point.value,
+      point.confidence,
+      point.provenanceLabel ?? ''
+    ]))
+  ];
+  return rows.map((row) => row.map(csvEscape).join(',')).join('\n');
+}
+
 export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTerminalModel }>) {
   const [activeWindowLabel, setActiveWindowLabel] = useState(chart.defaultWindow);
   const [chartLoadError, setChartLoadError] = useState<string | null>(null);
@@ -160,6 +184,10 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
   const visiblePointCount = visibleSeries.reduce((total, series) => total + series.points.length, 0);
   const visibleMarkerCount = visibleSeries.reduce((total, series) => total + series.markers.length, 0);
   const latestReadout = formatPriceChartTerminalReadout(activeWindow);
+  const csvDownloadHref = useMemo(() => {
+    const csv = priceHistoryCsv(activeWindow, visibleSeries);
+    return csv ? `data:text/csv;charset=utf-8,${encodeURIComponent(csv)}` : '#';
+  }, [activeWindow, visibleSeries]);
   const handleWindowKeyDown = (
     event: KeyboardEvent<HTMLButtonElement>,
     windowLabel: PriceChartTerminalWindow['label']
@@ -398,6 +426,16 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
 
       {chart.available && activeWindow && activeWindow.pointCount > 0 ? (
         <>
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-violet-300/30 bg-violet-300/10 p-4">
+            <p className="text-sm font-bold text-violet-100">Premium export: download the visible price-history series as CSV for research or budget planning.</p>
+            <a
+              className="rounded-full bg-violet-200 px-4 py-2 text-sm font-black text-violet-950"
+              download={`${chart.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'price-history'}-${activeWindow.label.toLowerCase()}.csv`}
+              href={csvDownloadHref}
+            >
+              Export CSV
+            </a>
+          </div>
           <div className="mt-5 grid gap-3 md:grid-cols-5">
             <p className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm font-bold text-slate-200">
               Window: <span className="text-white">{activeWindow.rangeLabel}</span>
@@ -444,6 +482,17 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
               <div className="rounded-2xl border border-white/10 bg-white/10 p-4" key={series.id}>
                 <p className="text-sm font-black text-white">{series.storeName} · {series.sourceType}</p>
                 <p className="mt-1 text-xs font-semibold text-slate-300">lineStyle {series.lineStyle} · {series.points.length} points · {series.markers.length} markers</p>
+                {buildPriceHistorySparklinePath(series.points) ? (
+                  <svg
+                    aria-label={`${series.storeName} compact price history sparkline`}
+                    className="mt-3 h-11 w-full rounded-xl bg-slate-950/60 p-1"
+                    preserveAspectRatio="none"
+                    role="img"
+                    viewBox="0 0 160 44"
+                  >
+                    <path d={buildPriceHistorySparklinePath(series.points) ?? ''} fill="none" stroke="#6ee7b7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" vectorEffect="non-scaling-stroke" />
+                  </svg>
+                ) : null}
                 <p className="mt-2 text-xs font-bold text-emerald-100">
                   Expected band: {latestVolatilityBandLabel(series)} around latest observed price.
                 </p>
