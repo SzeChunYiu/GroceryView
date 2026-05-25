@@ -8,6 +8,12 @@ export type ScheduledCronJob = CronJob & {
   nextRunAt: Date;
 };
 
+export const nettoSwedenDailyScrapeCronJob = {
+  expression: '10 3 * * *',
+  name: 'scrape:netto',
+  retailer: 'netto'
+} as const;
+
 type Timer = ReturnType<typeof setTimeout>;
 
 const MAX_LOOKAHEAD_MINUTES = 366 * 24 * 60;
