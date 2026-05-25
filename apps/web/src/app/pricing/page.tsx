@@ -14,52 +14,46 @@ const plans = [
     id: 'free',
     name: 'Free',
     price: '0 kr',
-    summary: 'Verified public prices, product pages, source coverage, and manual scanner upload readiness.',
-    features: ['Current product and chain comparison surfaces', 'Receipt upload processing when signed in', 'No OCR scan history storage']
+    summary: 'Verified public prices, product pages, source coverage, privacy, legal, confidence, and freshness information.',
+    features: ['Core product and chain comparison surfaces', 'Basic price alerts with source confidence', 'Legal, privacy, freshness, and confidence pages stay public']
   },
   {
-    id: 'premium-ocr',
-    name: 'Premium OCR history',
+    id: 'premium',
+    name: 'Premium',
     price: '49 kr / month',
-    summary: 'Power-user scan history and correction workflows for frequent barcode and receipt shoppers.',
-    features: ['Private OCR scan history timeline', 'Advanced line-item correction tools', 'Exportable corrected receipt rows for repeat shops']
+    summary: 'Account-bound power tools for shoppers who need advanced alerts, saved views, exports, and private scan history.',
+    features: ['Advanced alerts and larger watchlists', 'Unlimited saved views after the free cap', 'CSV/API exports and private OCR history']
   }
 ];
 
 const premiumGuardrails = [
-  'OCR scan history requires a signed-in account with an active premium entitlement.',
-  'Static public pages never render private receipt images, extracted line items, or correction drafts.',
-  'Advanced corrections update only the shopper-owned scan review queue after explicit confirmation.'
+  'Premium gates fail closed unless the server sees an active or trialing entitlement.',
+  'Legal, privacy, source confidence, freshness, and core price comparison information are never paywalled.',
+  'Coming-soon features are labelled before checkout and are not sold as active capabilities.'
 ];
 
-const premiumSavingsForecast = [
-  { driver: 'Price-drop alerts', monthly: '42 kr', detail: 'wait for watched staples before checkout' },
-  { driver: 'Store swaps', monthly: '58 kr', detail: 'switch eligible basket rows to the lowest verified chain' },
-  { driver: 'Basket planning', monthly: '33 kr', detail: 'avoid duplicate pantry buys and split bulky trips' }
-];
+const comingSoonFeatures = premiumEntitlementCatalog.filter((gate) => gate.status === 'coming_soon');
 
 export default function PricingPage() {
-  const forecastTotal = '133 kr';
-
   return (
     <PageShell>
       <Eyebrow>Premium</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Plans for grocery price power users</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
-        GroceryView keeps public price intelligence free. Premium adds account-bound OCR scan history and advanced correction tools for shoppers who scan receipts often.
+        GroceryView keeps public price intelligence, confidence, freshness, privacy, and legal information free. Premium adds account-bound workflow tools where server-side entitlement checks are already defined.
       </p>
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         {plans.map((plan) => (
-          <div className="scroll-mt-24" id={plan.id === 'premium-ocr' ? 'premium-ocr-history' : undefined} key={plan.id}>
-            <Card className={plan.id === 'premium-ocr' ? 'h-full border-indigo-200 bg-indigo-50/80 ring-2 ring-indigo-300' : 'h-full bg-white'}>
-              <p className="text-xs font-black uppercase tracking-[0.22em] text-indigo-800">{plan.id === 'premium-ocr' ? 'Upgrade reason' : 'Included'}</p>
+          <div className="scroll-mt-24" id={plan.id === 'premium' ? 'premium' : undefined} key={plan.id}>
+            <Card className={plan.id === 'premium' ? 'h-full border-indigo-200 bg-indigo-50/80 ring-2 ring-indigo-300' : 'h-full bg-white'}>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-indigo-800">{plan.id === 'premium' ? 'Upgrade reason' : 'Included'}</p>
               <h2 className="mt-2 text-2xl font-black text-slate-950">{plan.name}</h2>
               <p className="mt-2 text-4xl font-black text-emerald-800">{plan.price}</p>
               <p className="mt-3 text-sm font-semibold leading-6 text-slate-700">{plan.summary}</p>
               <ul className="mt-4 space-y-2 text-sm font-semibold leading-6 text-slate-700">
                 {plan.features.map((feature) => <li key={feature}>• {feature}</li>)}
               </ul>
-              {plan.id === 'premium-ocr' ? (
+              {plan.id === 'premium' ? (
                 <Link className="mt-4 inline-flex rounded-full bg-indigo-900 px-4 py-2 text-sm font-black text-white" href="/account">
                   Continue to account checkout
                 </Link>
@@ -71,10 +65,10 @@ export default function PricingPage() {
       <Card className="mt-6 border-emerald-200 bg-emerald-50/70">
         <div className="grid gap-5 lg:grid-cols-[1fr_0.8fr] lg:items-start">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-800">OCR premium gate</p>
-            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Scan history stays private and premium-only</h2>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-800">Trust boundary</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Premium gates do not hide public evidence</h2>
             <p className="mt-3 text-sm leading-6 text-slate-700">
-              The premium tier stores prior OCR scans so frequent shoppers can revisit corrections, fix recurring retailer aliases, and reuse cleaned receipt rows. Free accounts can still process a scan, but saved scan history and advanced corrections remain locked.
+              The premium tier adds account-owned workflow depth. Public price evidence, confidence labels, freshness status, privacy rights, and legal terms stay outside the paywall.
             </p>
           </div>
           <Link className="rounded-full bg-emerald-900 px-5 py-3 text-center text-sm font-black text-white shadow-sm" href="/scanner">
@@ -92,7 +86,7 @@ export default function PricingPage() {
             <p className="text-xs font-black uppercase tracking-[0.22em] text-indigo-800">Entitlement gates</p>
             <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Premium features fail closed until subscription access is active</h2>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
-              The entitlement catalog defines the server gate and UI copy for OCR history, advanced forecasts, unlimited alerts, and export features before paid plans launch.
+              The entitlement catalog defines server gates and UI copy for advanced alerts, saved views, export/API access, household sharing, pro terminal tools, and premium OCR history before Stripe subscriptions expand.
             </p>
           </div>
           <Link className="rounded-full bg-indigo-900 px-5 py-3 text-sm font-black text-white shadow-sm" href="/account">
@@ -103,6 +97,7 @@ export default function PricingPage() {
           {premiumEntitlementCatalog.map((gate) => (
             <div className="rounded-2xl bg-white p-4 shadow-sm" key={gate.feature}>
               <p className="text-sm font-black text-slate-950">{gate.label}</p>
+              <p className="mt-1 text-xs font-black uppercase tracking-[0.16em] text-slate-500">{gate.status.replace('_', ' ')}</p>
               <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">Free: {gate.freeLimit}</p>
               <p className="mt-2 rounded-xl bg-indigo-50 p-3 text-sm font-bold leading-6 text-indigo-950">Premium: {gate.premiumAccess}</p>
               <p className="mt-2 font-mono text-xs font-bold text-slate-500">{gate.enforcementReason}</p>
@@ -114,24 +109,20 @@ export default function PricingPage() {
       <Card className="mt-6 border-violet-200 bg-violet-50/80">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.22em] text-violet-800">Premium savings forecast</p>
-            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Forecast monthly savings before you upgrade</h2>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-violet-800">Coming soon</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Planned premium surfaces are labelled honestly</h2>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
-              Premium combines alert timing, store swaps, and basket-planning signals into a signed-in savings forecast so shoppers can see the subscription value before opening checkout.
+              These premium surfaces are present in the entitlement model but are not represented as active paid capabilities until the product surface and billing path are ready.
             </p>
           </div>
-          <div className="rounded-3xl bg-white px-5 py-4 text-center shadow-sm">
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Forecast</p>
-            <p className="mt-1 text-4xl font-black text-violet-800">{forecastTotal}</p>
-            <p className="text-xs font-bold text-slate-600">per month</p>
-          </div>
+          <p className="rounded-full bg-white px-5 py-3 text-sm font-black text-violet-900 shadow-sm">No fabricated savings claims</p>
         </div>
-        <div className="mt-4 grid gap-3 md:grid-cols-3">
-          {premiumSavingsForecast.map((row) => (
-            <div className="rounded-2xl bg-white p-4" key={row.driver}>
-              <p className="text-sm font-black text-slate-950">{row.driver}</p>
-              <p className="mt-2 text-3xl font-black text-violet-800">{row.monthly}</p>
-              <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">{row.detail}</p>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          {comingSoonFeatures.map((row) => (
+            <div className="rounded-2xl bg-white p-4" key={row.feature}>
+              <p className="text-sm font-black text-slate-950">{row.label}</p>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">{row.premiumAccess}</p>
+              <p className="mt-2 font-mono text-xs font-bold text-slate-500">{row.enforcementReason}</p>
             </div>
           ))}
         </div>
