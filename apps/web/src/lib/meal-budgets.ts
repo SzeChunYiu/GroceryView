@@ -26,6 +26,21 @@ export type BudgetAlternative = {
   reason: string;
 };
 
+export type MealPlanShoppingListItem = {
+  category: string;
+  detail: string;
+  id: string;
+  name: string;
+  productId?: string;
+  quantity: string;
+};
+
+export type MealPlanShoppingListExport = {
+  items: MealPlanShoppingListItem[];
+  mealTitle: string;
+  source: 'meal-planner';
+};
+
 export type WeeklyBudgetProgressStatus = 'empty' | 'under' | 'near' | 'over';
 
 export type WeeklyBudgetProgressInput = {
@@ -163,4 +178,107 @@ export function suggestBudgetAlternativesFromMealPlans(mealPlans: MealBudgetPlan
     })
     .filter((alternative): alternative is BudgetAlternative => Boolean(alternative))
     .sort((left, right) => right.estimatedSavings - left.estimatedSavings);
+}
+
+function mealPlanListItemSlug(value: string) {
+  return value.toLocaleLowerCase('sv-SE').normalize('NFKD').replace(/\p{Diacritic}/gu, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 64) || 'ingredient';
+}
+
+function mealPlanListItemKey(ingredient: MealBudgetIngredient) {
+  return ingredient.productId
+    ? `product:${ingredient.productId}`
+    : `plain:${ingredient.category}:${ingredient.name}`;
+}
+
+export function buildMealPlanShoppingListItems(mealPlans: MealBudgetPlan[]): MealPlanShoppingListItem[] {
+  const groupedIngredients = new Map<string, {
+    category: string;
+    mealTitles: Set<string>;
+    name: string;
+    productId?: string;
+    sources: Set<string>;
+    uses: number;
+  }>();
+
+  for (const meal of mealPlans) {
+    for (const ingredient of meal.ingredients) {
+      if (!ingredient) continue;
+      const key = mealPlanListItemKey(ingredient);
+      const existing = groupedIngredients.get(key);
+      if (existing) {
+        existing.mealTitles.add(meal.title);
+        existing.uses += 1;
+        if (ingredient.source) existing.sources.add(ingredient.source);
+        continue;
+      }
+
+      groupedIngredients.set(key, {
+        category: ingredient.category,
+        mealTitles: new Set([meal.title]),
+        name: ingredient.name,
+        productId: ingredient.productId,
+        sources: new Set(ingredient.source ? [ingredient.source] : []),
+        uses: 1
+      });
+    }
+  }
+
+  return [...groupedIngredients.entries()]
+    .map(([key, ingredient]) => {
+      const mealTitles = [...ingredient.mealTitles];
+      const sources = [...ingredient.sources];
+      const detailParts = [
+        `Category: ${ingredient.category}`,
+        `Meal plan: ${mealTitles.join(', ')}`
+      ];
+      if (sources.length > 0) detailParts.push(`Source: ${sources.join(', ')}`);
+
+      return {
+        category: ingredient.category,
+        detail: detailParts.join(' · '),
+        id: `meal-plan-${mealPlanListItemSlug(key)}`,
+        name: ingredient.name,
+        productId: ingredient.productId,
+        quantity: ingredient.uses === 1 ? '1 recipe portion' : `${ingredient.uses} recipe portions`
+      } satisfies MealPlanShoppingListItem;
+    })
+    .sort((left, right) => left.category.localeCompare(right.category, 'sv-SE') || left.name.localeCompare(right.name, 'sv-SE'));
+}
+
+export function buildMealPlanShoppingListExport(mealPlans: MealBudgetPlan[], mealTitle: string): MealPlanShoppingListExport {
+  return {
+    items: buildMealPlanShoppingListItems(mealPlans),
+    mealTitle,
+    source: 'meal-planner'
+  };
+}
+
+export function mealPlanShoppingListHref(mealPlans: MealBudgetPlan[], mealTitle: string) {
+  return `/list?mealPlan=${encodeURIComponent(JSON.stringify(buildMealPlanShoppingListExport(mealPlans, mealTitle)))}`;
+}
+
+export function parseMealPlanShoppingListExport(value: string): MealPlanShoppingListExport | null {
+  try {
+    const parsed = JSON.parse(value) as MealPlanShoppingListExport | null;
+    if (!parsed || parsed.source !== 'meal-planner' || typeof parsed.mealTitle !== 'string' || !Array.isArray(parsed.items)) return null;
+
+    const items = parsed.items.filter((item): item is MealPlanShoppingListItem => (
+      item !== null
+      && typeof item === 'object'
+      && typeof item.category === 'string'
+      && typeof item.detail === 'string'
+      && typeof item.id === 'string'
+      && typeof item.name === 'string'
+      && typeof item.quantity === 'string'
+      && (item.productId === undefined || typeof item.productId === 'string')
+    ));
+
+    return {
+      items,
+      mealTitle: parsed.mealTitle,
+      source: 'meal-planner'
+    };
+  } catch {
+    return null;
+  }
 }

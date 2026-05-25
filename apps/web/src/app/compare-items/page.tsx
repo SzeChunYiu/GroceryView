@@ -26,6 +26,7 @@ export default async function CompareItemsPage({ searchParams }: { searchParams?
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
   const comparison = buildItemComparisonView(resolvedSearchParams);
   const sampleItems = comparison.items.map((item) => item.slug).slice(0, MAX_ITEM_COMPARISON_ITEMS).join(',');
+  const selectedItems = selectedItemsValue(resolvedSearchParams.items) || sampleItems;
 
   return (
     <PageShell>
@@ -77,6 +78,19 @@ export default async function CompareItemsPage({ searchParams }: { searchParams?
           </fieldset>
           <button className="self-end rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white" type="submit">Compare items</button>
         </form>
+      </Card>
+      <Card className="mt-4 border-violet-200 bg-violet-50">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-violet-800">Premium CSV export</p>
+            <p className="mt-2 text-sm font-semibold leading-6 text-violet-950">
+              Export the selected comparison set's price-history evidence for spreadsheet research and monthly budget planning.
+            </p>
+          </div>
+          <Link className="rounded-full bg-violet-800 px-4 py-2 text-sm font-black text-white" href={`/compare-items?items=${encodeURIComponent(selectedItems)}&export=price-history-csv`}>
+            Export comparison CSV
+          </Link>
+        </div>
       </Card>
       <ItemComparisonTable {...comparison} />
     </PageShell>

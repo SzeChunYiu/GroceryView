@@ -2,6 +2,7 @@ import { createPgQueryExecutor, searchProductsByText, type ProductSearchResult }
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { recordProductSearchPerformanceTelemetry, type ProductSearchPerformanceTelemetry } from '@/lib/analytics';
+import { searchExplanationBadgesForProduct } from '@/lib/search-filters';
 import { expandGrocerySearchQueryWithTelemetry, type GrocerySearchExpansion, type GrocerySearchExpansionTelemetry } from '@/lib/search-suggest';
 
 export const runtime = 'nodejs';
@@ -58,6 +59,20 @@ function mergeSearchResults(batches: ProductSearchResult[][]): ProductSearchResu
     }
   }
   return [...byId.values()].sort((a, b) => b.searchRank - a.searchRank || a.name.localeCompare(b.name)).slice(0, 8);
+}
+
+function withSearchExplanationBadges(query: string, results: ProductSearchResult[], expansion: GrocerySearchExpansion) {
+  const matchedSynonyms = [...expansion.matchedSynonyms, ...expansion.matchedAliases];
+
+  return results.map((result) => ({
+    ...result,
+    searchExplanationBadges: searchExplanationBadgesForProduct({
+      brand: result.brand,
+      matchedSynonyms,
+      name: result.name,
+      query
+    })
+  }));
 }
 
 const productSearchTelemetrySource = 'postgres.products_tsvector_alias_synonym_expansion';
@@ -164,7 +179,7 @@ export async function GET(request: Request) {
     const results = mergeSearchResults(batches);
     const telemetry = buildPerformanceTelemetry(query, results.length, startedAt, expansionTelemetry);
     logPerformanceTelemetry(telemetry);
-    return NextResponse.json(responsePayload(query, results, expansion, telemetry));
+    return NextResponse.json(responsePayload(query, withSearchExplanationBadges(query, results, expansion), expansion, telemetry));
   } catch (error) {
     const telemetry = buildPerformanceTelemetry(query, 0, startedAt, expansionTelemetry, isTimeoutError(error));
     console.error('Product search query failed', error instanceof Error ? { name: error.name } : { name: 'unknown' });
