@@ -1878,7 +1878,7 @@ function hemkopWeeklyDiscountToDailyItem(row: HemkopWeeklyDiscount): RetailerCon
     price: row.price,
     regularPrice: regularPrice !== undefined && regularPrice > row.price ? regularPrice : undefined,
     promoText: row.conditionText || row.priceText || undefined,
-    memberOnly: false,
+    memberOnly: row.isMemberPrice,
     observedAt: row.retrievedAt,
     sourceUrl: row.sourceUrl,
     imageUrl: row.imageUrl || undefined
