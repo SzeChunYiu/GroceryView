@@ -4073,6 +4073,37 @@ describe('fetchCoopProductsForAllStores', () => {
 });
 
 describe('fetchWillysProductsForAllStores', () => {
+  it('emits separate Willys list and member price rows when medlemspris is present', async () => {
+    const fetchImpl: typeof fetch = async () => new Response(JSON.stringify({
+      results: [{
+        code: 'willys-member-price-coffee',
+        name: 'Willys medlemspris kaffe',
+        manufacturer: 'Garant',
+        productLine2: '450 g',
+        priceValue: 42.9,
+        price: '42,90 kr',
+        potentialPromotions: [{
+          code: 'member-coffee',
+          mainProductCode: 'willys-member-price-coffee',
+          promotionType: 'MEDLEMSPRIS',
+          cartLabel: 'Medlemspris 35,90 kr',
+          price: 35.9
+        }]
+      }]
+    }), { status: 200, headers: { 'content-type': 'application/json' } });
+
+    const rows = await fetchWillysProducts({
+      fetchImpl,
+      queries: ['kaffe'],
+      retrievedAt: '2026-05-25T12:55:00.000Z'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.is_member_price, row.price, row.listPrice, row.memberPrice, row.priceText]), [
+      [false, 42.9, 42.9, 35.9, '42,90 kr'],
+      [true, 35.9, 42.9, 35.9, 'Medlemspris 35,90 kr']
+    ]);
+  });
+
   it('fans Willys branch product prices across the live store catalog using the store search parameter', async () => {
     const requestedUrls: string[] = [];
     const fetchImpl: typeof fetch = async (url) => {

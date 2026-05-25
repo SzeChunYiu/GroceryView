@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Card, PageShell } from '@/components/data-ui';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { routeMetadata } from '@/lib/seo';
@@ -100,6 +101,10 @@ export default function CookiePolicyPage() {
           <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
             GroceryView uses a GDPR-style category disclosure with IAB TCF v2.2 wording and Google Consent Mode v2 defaults. Optional analytics, ads, and personalisation signals default to denied, and ads remain non-personalised until consent is granted.
           </p>
+          <div className="mt-4 flex flex-wrap gap-3 text-sm font-black text-emerald-800">
+            <Link className="rounded-full bg-white px-4 py-2 shadow-sm underline decoration-emerald-300 underline-offset-4" href="/sv/cookies">Svensk cookiepolicy</Link>
+            <Link className="rounded-full bg-white px-4 py-2 shadow-sm underline decoration-emerald-300 underline-offset-4" href="/en/cookies">English cookie policy</Link>
+          </div>
         </div>
         <ConfidenceBadge level="high" label="core privacy primitives" sampleSize={privacyFulfillmentPlan.items.length} />
       </div>
