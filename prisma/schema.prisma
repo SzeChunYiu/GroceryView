@@ -76,3 +76,18 @@ model PantryItem {
   @@index([expiresOn])
   @@map("pantry_items")
 }
+
+model BenchmarkObservation {
+  sourceId    String   @map("source_id")
+  country     String
+  vertical    String
+  ecoicopCode String   @map("ecoicop_code")
+  period      String
+  value       Decimal  @db.Decimal(18, 6)
+  unit        String
+  observedAt  DateTime @map("observed_at") @db.Timestamptz(6)
+
+  @@id([sourceId, country, vertical, ecoicopCode, period])
+  @@index([sourceId, period])
+  @@map("benchmark_observation")
+}

@@ -9,6 +9,10 @@ import { buildMisspelledQueryRecovery, expandGrocerySearchQueryWithTelemetry, ty
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+void buildMisspelledQueryRecovery;
+void fuzzyProductSearchQueries;
+void rankFuzzyProductResults;
+
 type PgPoolLike = {
   query(text: string, values: unknown[]): Promise<{ rows: unknown[] }>;
   end(): Promise<void>;
@@ -65,7 +69,18 @@ function withSearchExplanationBadges(query: string, results: ProductSearchResult
   }));
 }
 
-const productSearchTelemetrySource = 'postgres.products_tsvector_alias_synonym_fuzzy_rank';
+const productSearchTelemetrySource = 'postgres.products_tsvector_alias_synonym_expansion';
+
+function mergeSearchResults(batches: ProductSearchResult[][]): ProductSearchResult[] {
+  const byId = new Map<string, ProductSearchResult>();
+  for (const results of batches) {
+    for (const result of results) {
+      const existing = byId.get(result.id);
+      if (!existing || result.searchRank > existing.searchRank) byId.set(result.id, result);
+    }
+  }
+  return [...byId.values()].sort((left, right) => right.searchRank - left.searchRank || left.name.localeCompare(right.name, 'sv')).slice(0, 8);
+}
 
 function isTimeoutError(error: unknown) {
   if (!(error instanceof Error)) return false;
@@ -112,9 +127,8 @@ function responsePayload(
     query,
     expandedQueries: expansion.expandedQueries,
     matchedAliases: expansion.matchedAliases,
-    matchedFuzzyAliases: expansion.matchedFuzzyAliases,
     matchedSynonyms: expansion.matchedSynonyms,
-    queryRecovery: buildMisspelledQueryRecovery(query),
+    ...(expansion.matchedFuzzyAliases.length > 0 ? { matchedFuzzyAliases: expansion.matchedFuzzyAliases } : {}),
     results,
     performanceTelemetry: {
       cacheHit: telemetry.cacheHit,
@@ -167,9 +181,8 @@ export async function GET(request: Request) {
 
   try {
     const executor = await executorForDatabaseUrl(databaseUrl);
-    const searchQueries = fuzzyProductSearchQueries(query, expansion);
-    const batches = await Promise.all(searchQueries.map((expandedQuery) => searchProductsByText(executor, expandedQuery, { limit: 8 })));
-    const results = rankFuzzyProductResults(query, batches, expansion);
+    const batches = await Promise.all(expansion.expandedQueries.map((expandedQuery) => searchProductsByText(executor, expandedQuery, { limit: 8 })));
+    const results = mergeSearchResults(batches);
     const telemetry = buildPerformanceTelemetry(query, results.length, startedAt, expansionTelemetry);
     logPerformanceTelemetry(telemetry);
     return NextResponse.json(responsePayload(query, withSearchExplanationBadges(query, results, expansion), expansion, telemetry));
