@@ -6,7 +6,8 @@ import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { ItemGrid, type ItemGridRow } from '@/components/ItemGrid';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { categoryLabels, pricedProducts } from '@/lib/openprices-products';
-import { categoryDealLeaderCandidates, categorySummaries, dataFreshnessBadges, formatPct, formatSek } from '@/lib/verified-data';
+import { buildCategorySeasonalDiscoveryModules } from '@/lib/price-intelligence';
+import { categoryDealLeaderCandidates, categorySummaries, dataFreshnessBadges, formatPct, formatSek, seasonalProduceCalendar } from '@/lib/verified-data';
 import { metadataForCategory } from '@/lib/seo';
 
 export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
@@ -69,6 +70,10 @@ export default async function CategoryPage({ params, searchParams }: Readonly<{ 
   ];
   const categoryFreshnessBadges = dataFreshnessBadges.filter((badge) => badge.sourceKind === 'axfood' || badge.sourceKind === 'openprices');
   const dealLeaders = categoryDealLeadersFor(slug);
+  const seasonalModules = buildCategorySeasonalDiscoveryModules({
+    categorySlug: slug,
+    seasonalRows: seasonalProduceCalendar.produceSeasonalityRows
+  });
 
   return (
     <PageShell>
@@ -103,6 +108,54 @@ export default async function CategoryPage({ params, searchParams }: Readonly<{ 
               No trusted category deal leader yet; GroceryView will not fabricate a category deal without matched chain prices.
             </p>
           ) : null}
+        </div>
+      </Card>
+      <Card className="mt-6 border-lime-200 bg-lime-50">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <Eyebrow>Seasonal discovery</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">In-season produce, holiday staples, and historic best-buy windows</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">{seasonalModules.guardrail}</p>
+          </div>
+          <Link className="rounded-full bg-lime-700 px-5 py-3 text-sm font-black text-white" href="/seasonal-calendar">
+            Full seasonal calendar
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-4 lg:grid-cols-3">
+          <div className="rounded-2xl bg-white p-4">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-800">In-season produce</p>
+            <div className="mt-3 space-y-3">
+              {seasonalModules.inSeasonProduce.map((row) => (
+                <Link className="block rounded-xl bg-lime-50 p-3 text-sm font-bold text-slate-800 hover:text-lime-900" href={`/products/${row.slug}`} key={`seasonal-${row.slug}`}>
+                  {row.productName} · {row.bestBuyMonth} · {row.historicalMonthlyAverageLabel}
+                </Link>
+              ))}
+              {seasonalModules.inSeasonProduce.length === 0 ? <p className="text-sm font-semibold text-slate-600">No nearby best-buy month is backed by enough observations yet.</p> : null}
+            </div>
+          </div>
+          <div className="rounded-2xl bg-white p-4">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-800">Holiday staples</p>
+            <div className="mt-3 space-y-3">
+              {seasonalModules.holidayStaples.map((staple) => (
+                <div className="rounded-xl bg-amber-50 p-3" key={`${staple.label}-${staple.months}`}>
+                  <p className="text-sm font-black text-amber-950">{staple.label}</p>
+                  <p className="mt-1 text-xs font-bold uppercase tracking-[0.14em] text-amber-800">{staple.months}</p>
+                  <p className="mt-2 text-xs font-semibold leading-5 text-slate-700">{staple.rationale}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-2xl bg-white p-4">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Historic best-buy windows</p>
+            <div className="mt-3 space-y-3">
+              {seasonalModules.historicBestBuyWindows.map((row) => (
+                <Link className="block rounded-xl bg-emerald-50 p-3 text-sm font-bold text-slate-800 hover:text-emerald-900" href={`/products/${row.slug}`} key={`window-${row.slug}`}>
+                  <span className="block font-black">{row.productName}</span>
+                  <span className="mt-1 block text-xs leading-5">{row.bestBuyMonth} best-buy · {row.savingsVsTypicalLabel} · {row.confidenceLabel}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
       </Card>
       <Card className="mt-6 border-slate-200 bg-slate-50">
