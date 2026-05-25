@@ -21,6 +21,7 @@ const appFiles = [
   'src/app/data-sources/page.tsx',
   'src/app/store-coverage/page.tsx',
   'src/app/openprices-depth/page.tsx',
+  'src/app/contact/page.tsx',
   'src/app/settings/page.tsx',
   'src/app/admin/moderation/page.tsx',
   'src/components/market-shell.tsx',
@@ -50,7 +51,7 @@ describe('verified-data UI', () => {
     assert.match(nav, /label: 'Products'[\s\S]*label: 'Browse'[\s\S]*label: 'Compare'/);
     assert.match(nav, /label: 'Stores'[\s\S]*label: 'Map'[\s\S]*label: 'Stores'/);
     assert.match(nav, /label: 'Trip'[\s\S]*label: 'Current list'[\s\S]*label: 'Nearby deals'[\s\S]*label: 'Watchlist'/);
-    assert.match(nav, /label: 'Personal'[\s\S]*label: 'Savings'[\s\S]*label: 'My Flyer'[\s\S]*label: 'Weekly basket'[\s\S]*label: 'Meal planner'/);
+    assert.match(nav, /label: 'Personal'[\s\S]*label: 'Savings'[\s\S]*label: 'My Flyer'[\s\S]*label: 'Weekly basket'[\s\S]*label: 'Meal planner'[\s\S]*label: 'Contact'/);
     assert.match(nav, /aria-haspopup="true"/);
     assert.match(nav, /group-focus-within:visible/);
     assert.match(nav, /group-hover:visible/);
@@ -66,6 +67,20 @@ describe('verified-data UI', () => {
     assert.match(verified, /osmStores/);
     assert.match(verified, /matchedChainProducts/);
     assert.match(verified, /sourceCoverage/);
+  });
+
+  it('ships a public contact form wired to the documented contact API', async () => {
+    const contact = await read('src/app/contact/page.tsx');
+    const nav = await read('src/components/app-nav.tsx');
+
+    assert.match(contact, /POST \/api\/contact/);
+    assert.match(contact, /fetch\('\/api\/contact'/);
+    assert.match(contact, /consentToContact/);
+    assert.match(contact, /consent: consentToContact/);
+    assert.match(contact, /response\.status === 202/);
+    assert.match(contact, /validation|rate|429|413|415|503/);
+    assert.doesNotMatch(contact, /console\./);
+    assert.match(nav, /href: '\/contact'/);
   });
 
 

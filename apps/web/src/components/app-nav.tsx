@@ -8,6 +8,7 @@ import {
   Database,
   Flame,
   Heart,
+  Mail,
   ScanLine,
   Map,
   Newspaper,
@@ -87,7 +88,8 @@ const navGroups: NavGroup[] = [
       { href: '/stockholm/my-flyer', label: 'My Flyer', icon: Newspaper, match: 'my-flyer' },
       { href: '/weekly-basket', label: 'Weekly basket', icon: ShoppingBasket },
       { href: '/meal-planner', label: 'Meal planner', icon: Utensils },
-      { href: '/pantry-inventory', label: 'Pantry inventory', icon: ShoppingBasket }
+      { href: '/pantry-inventory', label: 'Pantry inventory', icon: ShoppingBasket },
+      { href: '/contact', label: 'Contact', icon: Mail }
     ]
   }
 ];
