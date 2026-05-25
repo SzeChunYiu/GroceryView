@@ -5,6 +5,8 @@ import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { PriceReportReviewActions } from '@/components/price-report-review-actions';
 import { OriginFilter, type OriginFilterCode } from '@/components/origin-filter';
 import { ProductPriceCards } from '@/components/product-price-cards';
+import { SavedSearchAction } from '@/components/saved-search-action';
+import { buildSavedSearchAlertRules, type SavedSearchFilters } from '@/lib/alert-scheduler';
 import { apohemSource } from '@/lib/ingested/apohem';
 import { adaptiveProductCards, buildProductSearchView, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
@@ -55,6 +57,34 @@ function setAllParams(params: URLSearchParams, key: keyof SearchParams, value: s
     const trimmed = rawValue.trim();
     if (trimmed) params.append(key, trimmed);
   }
+}
+
+function valuesFromParam(value: string | string[] | undefined) {
+  return (Array.isArray(value) ? value : value ? [value] : [])
+    .flatMap((item) => item.split(','))
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function numberFromParam(value: string | string[] | undefined) {
+  const raw = Array.isArray(value) ? value[0] : value;
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function savedSearchFiltersFromParams(searchParams: SearchParams): SavedSearchFilters {
+  return {
+    query: (Array.isArray(searchParams.q) ? searchParams.q[0] : searchParams.q)?.trim() ?? '',
+    categories: valuesFromParam(searchParams.category),
+    labels: valuesFromParam(searchParams.label),
+    dietary: valuesFromParam(searchParams.dietary),
+    origins: valuesFromParam(searchParams.origin),
+    chain: (Array.isArray(searchParams.chain) ? searchParams.chain[0] : searchParams.chain)?.trim() || null,
+    minPrice: numberFromParam(searchParams.minPrice),
+    maxPrice: numberFromParam(searchParams.maxPrice),
+    inStockOnly: (Array.isArray(searchParams.inStockOnly) ? searchParams.inStockOnly[0] : searchParams.inStockOnly) === 'true',
+    minConfidence: numberFromParam(searchParams.minConfidence)
+  };
 }
 
 function copySearchParams(params: URLSearchParams, source: SearchParams) {
@@ -135,6 +165,8 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const defaultSearchCount = facetedProductSearch.resultCards.length;
   const zeroResultFallback = relatedSearchFallback(search.query);
   const zeroResultCategories = zeroResultCategoryShortcuts(search.query, resolvedSearchParams.category);
+  const savedSearchFilters = savedSearchFiltersFromParams(resolvedSearchParams);
+  const savedSearchRules = buildSavedSearchAlertRules(savedSearchFilters);
 
   function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'origin' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence', string>>) {
     const params = new URLSearchParams();
@@ -230,6 +262,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             <button className="rounded-full bg-violet-800 px-4 py-3 text-sm font-black text-white" type="submit">Apply filters</button>
           </div>
         </form>
+        <SavedSearchAction filters={savedSearchFilters} resultCount={resultCards.length} rules={savedSearchRules} />
         <div className="mt-4 flex flex-wrap gap-2">
           {search.activeFilters.length > 0 ? search.activeFilters.map((filter) => (
             <span className="rounded-full bg-violet-900 px-3 py-1 text-xs font-black text-white" key={filter}>{filter}</span>

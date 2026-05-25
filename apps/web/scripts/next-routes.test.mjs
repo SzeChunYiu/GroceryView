@@ -3422,6 +3422,24 @@ ${seo}`;
     assert.match(products, /filter\.label/);
   });
 
+  it('surfaces saved search subscriptions on product search', async () => {
+    const alertScheduler = await read('src/lib/alert-scheduler.ts');
+    const savedSearchAction = await read('src/components/saved-search-action.tsx');
+    const products = await read('src/app/products/page.tsx');
+
+    assert.match(alertScheduler, /export type SavedSearchFilters/);
+    assert.match(alertScheduler, /export type SavedSearchAlertRule/);
+    assert.match(alertScheduler, /buildSavedSearchAlertRules/);
+    assert.match(alertScheduler, /new_search_match/);
+    assert.match(alertScheduler, /search_price_drop/);
+    assert.match(savedSearchAction, /Save this search/);
+    assert.match(savedSearchAction, /groceryview:saved-search-alert-rules/);
+    assert.match(savedSearchAction, /data-saved-search-action/);
+    assert.match(products, /SavedSearchAction/);
+    assert.match(products, /savedSearchFiltersFromParams/);
+    assert.match(products, /buildSavedSearchAlertRules\(savedSearchFilters\)/);
+  });
+
   it('surfaces account-bound save-to-watchlist hearts on product cards', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const products = await read('src/app/products/page.tsx');

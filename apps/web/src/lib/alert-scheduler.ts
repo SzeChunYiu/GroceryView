@@ -29,6 +29,33 @@ export type PredictiveDropAlert = {
   };
 };
 
+export type SavedSearchFilters = {
+  query: string;
+  categories: string[];
+  labels: string[];
+  dietary: string[];
+  origins: string[];
+  chain: string | null;
+  minPrice: number | null;
+  maxPrice: number | null;
+  inStockOnly: boolean;
+  minConfidence: number | null;
+};
+
+export type SavedSearchAlertRule = {
+  id: string;
+  searchKey: string;
+  type: 'new_match' | 'price_drop';
+  label: string;
+  filters: SavedSearchFilters;
+  enabled: boolean;
+  createdAt: string;
+  trigger: {
+    metric: 'new_search_match' | 'search_price_drop';
+    thresholdPercent?: number;
+  };
+};
+
 type PredictiveDropAlertOptions = {
   now?: Date;
   daysAhead?: number;
@@ -58,6 +85,68 @@ function toSeverity(daysAway: number, savingsPercent: number): PredictiveDropAle
 
 function formatSek(value: number) {
   return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);
+}
+
+function searchKeyFor(filters: SavedSearchFilters) {
+  return [
+    filters.query,
+    filters.categories.join(','),
+    filters.labels.join(','),
+    filters.dietary.join(','),
+    filters.origins.join(','),
+    filters.chain ?? '',
+    filters.minPrice ?? '',
+    filters.maxPrice ?? '',
+    filters.inStockOnly ? 'in-stock' : '',
+    filters.minConfidence ?? ''
+  ].join('|').toLowerCase();
+}
+
+function savedSearchLabel(filters: SavedSearchFilters) {
+  const parts = [
+    filters.query ? `"${filters.query}"` : 'all products',
+    ...filters.categories,
+    ...filters.labels,
+    ...filters.dietary,
+    ...filters.origins,
+    filters.chain,
+    filters.inStockOnly ? 'in stock' : null
+  ].filter((part): part is string => Boolean(part));
+
+  return parts.slice(0, 5).join(' · ');
+}
+
+export function buildSavedSearchAlertRules(filters: SavedSearchFilters, createdAt = new Date().toISOString()): SavedSearchAlertRule[] {
+  const searchKey = searchKeyFor(filters);
+  const label = savedSearchLabel(filters);
+
+  return [
+    {
+      id: `${searchKey}:new-match`,
+      searchKey,
+      type: 'new_match',
+      label,
+      filters,
+      enabled: true,
+      createdAt,
+      trigger: {
+        metric: 'new_search_match'
+      }
+    },
+    {
+      id: `${searchKey}:price-drop`,
+      searchKey,
+      type: 'price_drop',
+      label,
+      filters,
+      enabled: true,
+      createdAt,
+      trigger: {
+        metric: 'search_price_drop',
+        thresholdPercent: 5
+      }
+    }
+  ];
 }
 
 export function buildPredictiveDropAlerts(forecasts: PredictiveDropForecast[], options: PredictiveDropAlertOptions = {}): PredictiveDropAlert[] {
