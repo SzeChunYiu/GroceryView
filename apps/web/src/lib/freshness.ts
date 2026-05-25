@@ -266,24 +266,24 @@ export function buildNewArrivalFeed(
   const windowStartTime = latestObservedTime - windowDays * DAY_IN_MS;
 
   const mappedRows = rows.map((row) => {
-      const category = row.product.category ?? 'grocery';
-      const isFirstSeenInWindow = row.firstSeenTime >= windowStartTime;
-      return {
-        brand: row.product.brand ?? row.product.brands ?? 'Brand not reported',
-        category: options.categoryLabels?.[category] ?? category,
-        firstSeenAt: row.firstSeenAt,
-        freshness: getPriceFreshness(row.lastObservedAt),
-        href: `/products/${row.product.slug}`,
-        isFirstSeenInWindow,
-        lastObservedAt: row.lastObservedAt,
-        name: row.product.name,
-        observationCount: row.product.observationCount ?? row.product.observations?.length ?? 0,
-        slug: row.product.slug,
-        sourceLabel: isFirstSeenInWindow
-          ? `First seen inside the latest ${windowDays}-day ingestion window`
-          : `Latest observation is inside the ingestion window; first seen ${row.firstSeenAt}`
-      } satisfies NewArrivalFeedItem;
-    });
+    const category = row.product.category ?? 'grocery';
+    const isFirstSeenInWindow = row.firstSeenTime >= windowStartTime;
+    return {
+      brand: row.product.brand ?? row.product.brands ?? 'Brand not reported',
+      category: options.categoryLabels?.[category] ?? category,
+      firstSeenAt: row.firstSeenAt,
+      freshness: getPriceFreshness(row.lastObservedAt),
+      href: `/products/${row.product.slug}`,
+      isFirstSeenInWindow,
+      lastObservedAt: row.lastObservedAt,
+      name: row.product.name,
+      observationCount: row.product.observationCount ?? row.product.observations?.length ?? 0,
+      slug: row.product.slug,
+      sourceLabel: isFirstSeenInWindow
+        ? `First seen inside the latest ${windowDays}-day ingestion window`
+        : `Latest observation is inside the ingestion window; first seen ${row.firstSeenAt}`
+    } satisfies NewArrivalFeedItem;
+  });
   const visibleRows = mappedRows.filter((item) => item.isFirstSeenInWindow || item.freshness.level === 'fresh' || item.freshness.level === 'aging');
 
   return (visibleRows.length > 0 ? visibleRows : mappedRows)
@@ -292,5 +292,52 @@ export function buildNewArrivalFeed(
       || right.lastObservedAt.localeCompare(left.lastObservedAt)
       || left.name.localeCompare(right.name, 'sv')
     )
+    .slice(0, limit);
+}
+
+export type ProductArrivalInput = {
+  slug: string;
+  name: string;
+  brand?: string | null;
+  category?: string | null;
+  image?: string | null;
+  price: number;
+  lastObservedAt?: string | null;
+  observationCount?: number;
+};
+
+export type NewProductArrival = ProductArrivalInput & {
+  chainLabel: string;
+  freshnessBadge: string;
+  arrivalScore: number;
+};
+
+function inferArrivalChainLabel(product: ProductArrivalInput): string {
+  const brand = product.brand?.toLowerCase() ?? "";
+  if (brand.includes("garant") || brand.includes("eldorado") || brand.includes("axfood")) return "Axfood feed";
+  if (brand.includes("ica")) return "ICA feed";
+  if (brand.includes("coop")) return "Coop feed";
+  return "OpenPrices feed";
+}
+
+export function buildNewProductArrivals(
+  products: ProductArrivalInput[],
+  limit = 6,
+  now: Date = new Date(),
+): NewProductArrival[] {
+  return products
+    .map((product) => {
+      const freshness = getPriceFreshness(product.lastObservedAt, now);
+      const age = freshness.ageInDays ?? 999;
+      const observationCount = product.observationCount ?? 0;
+      return {
+        ...product,
+        chainLabel: inferArrivalChainLabel(product),
+        freshnessBadge: freshness.label,
+        arrivalScore: age * 10 + Math.min(observationCount, 9),
+      };
+    })
+    .filter((product) => product.lastObservedAt)
+    .sort((left, right) => left.arrivalScore - right.arrivalScore || left.name.localeCompare(right.name))
     .slice(0, limit);
 }
