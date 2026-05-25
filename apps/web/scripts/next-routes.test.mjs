@@ -2395,6 +2395,25 @@ ${seo}`;
     assert.match(intelligence, /No future price forecast/);
   });
 
+  it('adds prediction confidence metadata to price intelligence cards and volatility API rows', async () => {
+    const card = await read('src/components/price-intelligence-card.tsx');
+    const product = await read('src/app/products/[slug]/page.tsx');
+    const intelligence = await read('src/lib/price-intelligence.ts');
+    const route = await read('src/app/api/pricing/volatility/route.ts');
+
+    assert.match(card, /expectedDirectionLabel/);
+    assert.match(card, /confidenceRangeLabel/);
+    assert.match(card, /evidenceCount/);
+    assert.match(card, /freshnessLabel/);
+    assert.match(product, /priceTrendPredictionConfidence/);
+    assert.match(product, /prediction confidence/);
+    assert.match(intelligence, /PriceTrendPredictionConfidence/);
+    assert.match(intelligence, /confidenceLevel/);
+    assert.match(route, /predictionConfidence/);
+    assert.match(route, /trendSlopePct/);
+    assert.match(route, /latestObservedAt/);
+  });
+
 
   it('surfaces a factual price-change event log from consecutive observed prices', async () => {
     const source = await read('src/app/products/[slug]/page.tsx');

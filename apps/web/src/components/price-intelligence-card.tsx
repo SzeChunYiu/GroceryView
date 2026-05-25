@@ -7,6 +7,10 @@ export interface PriceIntelligenceScoreCard {
   windowLabel: string;
   trendSlopeLabel: string;
   volatilityLabel: string;
+  expectedDirectionLabel?: string;
+  confidenceRangeLabel?: string;
+  evidenceCount?: number;
+  freshnessLabel?: string;
   detail: string;
 }
 
@@ -54,6 +58,14 @@ export function PriceIntelligenceCard({
                 <p className="rounded-xl bg-emerald-50 p-3">trend slope: {card.trendSlopeLabel}</p>
                 <p className="rounded-xl bg-slate-50 p-3">volatility: {card.volatilityLabel}</p>
               </div>
+              {card.expectedDirectionLabel || card.confidenceRangeLabel || card.evidenceCount || card.freshnessLabel ? (
+                <div className="mt-3 grid gap-2 text-xs font-bold text-slate-600">
+                  {card.expectedDirectionLabel ? <p className="rounded-xl bg-cyan-50 p-3">{card.expectedDirectionLabel}</p> : null}
+                  {card.confidenceRangeLabel ? <p className="rounded-xl bg-indigo-50 p-3">{card.confidenceRangeLabel}</p> : null}
+                  {card.evidenceCount ? <p className="rounded-xl bg-amber-50 p-3">{card.evidenceCount} evidence point{card.evidenceCount === 1 ? '' : 's'}</p> : null}
+                  {card.freshnessLabel ? <p className="rounded-xl bg-lime-50 p-3">{card.freshnessLabel}</p> : null}
+                </div>
+              ) : null}
               <p className="mt-3 text-xs font-semibold leading-5 text-slate-500">{card.detail}</p>
             </article>
           ))}

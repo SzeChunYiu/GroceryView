@@ -22,6 +22,7 @@ import { PriceIntelligenceCard, type PriceIntelligenceScoreCard } from '@/compon
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
+import { priceTrendPredictionConfidence } from '@/lib/price-intelligence';
 import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { normalizeUnitPriceForPackageText, packageEvidenceFromText } from '@/lib/normalization';
@@ -655,6 +656,12 @@ function bestTimeToBuyCardsFor(product: NonNullable<ReturnType<typeof findProduc
       const belowMedianPercent = medianPrice > 0 ? ((medianPrice - latestPoint.price) / medianPrice) * 100 : 0;
       const score = Math.round(clamp(58 + belowMedianPercent * 2 - Math.max(trendSlopePercent, 0) * 1.2 - volatilityPercent * 0.9, 0, 100));
       const actionLabel = score >= 75 ? 'Buy now' : score >= 55 ? 'Watch closely' : 'Wait';
+      const predictionConfidence = priceTrendPredictionConfidence({
+        trendSlopePercent,
+        volatilityPercent,
+        observationCount: points.length,
+        latestObservedAt: latestPoint.observedAt
+      });
 
       return {
         id: window.id,
@@ -665,7 +672,11 @@ function bestTimeToBuyCardsFor(product: NonNullable<ReturnType<typeof findProduc
         windowLabel: `${window.rangeDays}-day observed window`,
         trendSlopeLabel: formatPct(trendSlopePercent),
         volatilityLabel: formatPct(volatilityPercent),
-        detail: `Latest price ${formatSek(latestPoint.price)} on ${latestPoint.observedAt}; score blends trend slope, median discount, and volatility from ${points.length} dated observations.`
+        expectedDirectionLabel: predictionConfidence.expectedDirectionLabel,
+        confidenceRangeLabel: predictionConfidence.confidenceRangeLabel,
+        evidenceCount: predictionConfidence.evidenceCount,
+        freshnessLabel: predictionConfidence.freshnessLabel,
+        detail: `Latest price ${formatSek(latestPoint.price)} on ${latestPoint.observedAt}; score blends trend slope, median discount, volatility, prediction confidence, and freshness from ${points.length} dated observations.`
       };
     })
     .filter((card): card is PriceIntelligenceScoreCard => card !== null);
@@ -784,6 +795,12 @@ function bestTimeToBuyScoreCardsFor(product: NonNullable<ReturnType<typeof findP
     const score = Math.round(clamp(58 + belowMedianPercent * 2 - Math.max(trendSlopePercent, 0) * 1.2 - volatilityPercent * 0.9, 0, 100));
     const actionLabel = score >= 75 ? 'Buy now' : score >= 55 ? 'Watch closely' : 'Wait';
     const windowLabel = score >= 75 ? 'Likely best window: this week' : score >= 55 ? 'Likely window: next 1–2 weeks' : 'Wait for a better observed dip';
+    const predictionConfidence = priceTrendPredictionConfidence({
+      trendSlopePercent,
+      volatilityPercent,
+      observationCount: windowPoints.length,
+      latestObservedAt: latest.observedAt
+    });
 
     return {
       id: `${rangeDays}-day-window`,
@@ -794,7 +811,11 @@ function bestTimeToBuyScoreCardsFor(product: NonNullable<ReturnType<typeof findP
       windowLabel,
       trendSlopeLabel: `${formatPct(trendSlopePercent)} over ${Math.max(1, windowPoints.length)} observed point(s)`,
       volatilityLabel: `${formatPct(volatilityPercent)} observed volatility`,
-      detail: `Latest price ${formatSek(latest.price)} on ${latest.observedAt}; score combines trend slope, current price versus median ${formatSek(medianPrice)}, and volatility. No forecast is inferred.`
+      expectedDirectionLabel: predictionConfidence.expectedDirectionLabel,
+      confidenceRangeLabel: predictionConfidence.confidenceRangeLabel,
+      evidenceCount: predictionConfidence.evidenceCount,
+      freshnessLabel: predictionConfidence.freshnessLabel,
+      detail: `Latest price ${formatSek(latest.price)} on ${latest.observedAt}; score combines trend slope, current price versus median ${formatSek(medianPrice)}, volatility, evidence count, and timestamp freshness. No forecast is inferred beyond the observed trend confidence label.`
     };
   };
 
