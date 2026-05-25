@@ -64,7 +64,7 @@ function backInStockAvailabilityForProduct(product: NonNullable<ReturnType<typeo
 export default async function ItemPage({ params }: Readonly<{ params: Promise<{ id: string }> }>) {
   const { id } = await params;
   const product = findProduct(id);
-  const renderedProductPage = await ProductPage({ params: Promise.resolve({ slug: id }) });
+  const renderedProductPage = await ProductPage({ params: Promise.resolve({ slug: id }), routeBase: 'items' });
 
   return (
     <>

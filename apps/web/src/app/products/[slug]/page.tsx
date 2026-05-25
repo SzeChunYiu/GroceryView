@@ -19,6 +19,7 @@ import {
 import { predictBestTimeToBuy, type BestTimeToBuyObservation } from '@groceryview/core/src/lib/bestTimeToBuy';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { BestTimeBadge } from '@/components/best-time-badge';
+import { ProductBreadcrumb } from '@/components/Breadcrumbs';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { FamilyPackComparisonPanel } from '@/components/family-pack-comparison';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
@@ -347,14 +348,20 @@ function productJsonLdFor(product: NonNullable<ReturnType<typeof findProduct>>) 
   };
 }
 
-function breadcrumbJsonLdFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+type ProductRouteBase = 'products' | 'items';
+
+function productRouteHref(product: NonNullable<ReturnType<typeof findProduct>>, routeBase: ProductRouteBase) {
+  return `/${routeBase}/${product.slug}`;
+}
+
+function breadcrumbJsonLdFor(product: NonNullable<ReturnType<typeof findProduct>>, routeBase: ProductRouteBase = 'products') {
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Products', item: `${siteUrl}/products` },
+      { '@type': 'ListItem', position: 1, name: 'Home', item: siteUrl },
       { '@type': 'ListItem', position: 2, name: labelFromSlug(product.category), item: `${siteUrl}/categories/${product.category}` },
-      { '@type': 'ListItem', position: 3, name: product.name, item: `${siteUrl}/products/${product.slug}` }
+      { '@type': 'ListItem', position: 3, name: product.name, item: `${siteUrl}${productRouteHref(product, routeBase)}` }
     ]
   };
 }
@@ -1439,19 +1446,20 @@ export function generateStaticParams() {
   return [...axfoodProducts.slice(0, 40), ...pricedProducts.slice(0, 40)].map((product) => ({ slug: product.slug }));
 }
 
-export default async function ProductPage({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
+export default async function ProductPage({ params, routeBase = 'products' }: Readonly<{ params: Promise<{ slug: string }>; routeBase?: ProductRouteBase }>) {
   const { slug } = await params;
   const product = findProduct(slug);
   if (!product) notFound();
   const isChain = 'lowestPrice' in product;
   const primaryEvidenceCount = isChain ? chainPriceRows(product).length : product.observations.length;
   if (primaryEvidenceCount === 0) {
-    const breadcrumbJsonLd = breadcrumbJsonLdFor(product);
+    const breadcrumbJsonLd = breadcrumbJsonLdFor(product, routeBase);
     return (
       <PageShell>
         <FunnelStepBeacon step="product_view" />
         <script dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbJsonLd) }} type="application/ld+json" />
         <Eyebrow>{isChain ? 'Axfood chain product' : 'OpenPrices product'}</Eyebrow>
+        <ProductBreadcrumb categoryLabel={labelFromSlug(product.category)} categorySlug={product.category} productHref={productRouteHref(product, routeBase)} productLabel={product.name} />
         <Card className="mt-6 border-dashed border-slate-300 bg-slate-50 text-center">
           <div aria-hidden="true" className="mx-auto flex size-14 items-center justify-center rounded-full bg-white text-3xl shadow-sm">
             🛒
@@ -1514,13 +1522,14 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
     ? chainSourceAttributionFor(crossChainQuoteRows, freshnessBadge.freshnessLabel)
     : null;
   const productJsonLd = productJsonLdFor(product);
-  const breadcrumbJsonLd = breadcrumbJsonLdFor(product);
+  const breadcrumbJsonLd = breadcrumbJsonLdFor(product, routeBase);
   return (
     <PageShell>
       <FunnelStepBeacon step="product_view" />
       <script dangerouslySetInnerHTML={{ __html: jsonLd(productJsonLd) }} type="application/ld+json" />
       <script dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbJsonLd) }} type="application/ld+json" />
       <Eyebrow>{isChain ? 'Axfood chain product' : 'OpenPrices product'}</Eyebrow>
+      <ProductBreadcrumb categoryLabel={labelFromSlug(product.category)} categorySlug={product.category} productHref={productRouteHref(product, routeBase)} productLabel={product.name} />
       <h1 className="mt-2 max-w-4xl text-4xl font-black tracking-tight">{product.name}</h1>
       <p className="mt-3 text-lg text-slate-700">{isChain ? product.brand : product.brands || 'Brand not reported'} · {isChain ? product.subline : product.quantity || 'Quantity not reported'}</p>
       <div className="mt-6 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
