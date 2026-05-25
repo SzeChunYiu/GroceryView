@@ -107,6 +107,11 @@ export function StoreComparisonTable({
         {basketItemCount > 0 ? (
           <p className="mt-2 text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{basketItemCount} basket item(s)</p>
         ) : null}
+        {basketStores.length > 0 ? (
+          <p className="mt-1 text-xs font-black uppercase tracking-[0.18em] text-emerald-800">
+            {basketStores.length} selected chain{basketStores.length === 1 ? '' : 's'} compared
+          </p>
+        ) : null}
         {loyaltyCards.length > 0 ? (
           <fieldset className="mt-4 flex flex-wrap gap-2">
             <legend className="sr-only">Held loyalty cards</legend>
