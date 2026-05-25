@@ -1,5 +1,4 @@
-import assert from 'node:assert/strict';
-import { describe, it } from 'node:test';
+import { describe, expect, it } from 'vitest';
 import { predictBestTimeToBuy } from '../bestTimeToBuy.js';
 
 describe('predictBestTimeToBuy', () => {
@@ -18,11 +17,11 @@ describe('predictBestTimeToBuy', () => {
       ]
     });
 
-    assert.equal(prediction.status, 'likely_next_week');
-    assert.equal(prediction.headline, 'Likely on sale next week');
-    assert.equal(prediction.nextWindowStart, '2026-05-22');
-    assert.equal(prediction.observedPromotionCount, 3);
-    assert.equal(prediction.confidence, 'high');
+    expect(prediction.status).toBe('likely_next_week');
+    expect(prediction.headline).toBe('Likely on sale next week');
+    expect(prediction.nextWindowStart).toBe('2026-05-22');
+    expect(prediction.observedPromotionCount).toBe(3);
+    expect(prediction.confidence).toBe('high');
   });
 
   it('withholds prediction when history is too sparse', () => {
@@ -33,7 +32,7 @@ describe('predictBestTimeToBuy', () => {
       ]
     });
 
-    assert.equal(prediction.status, 'insufficient_history');
-    assert.match(prediction.detail, /At least four dated prices/);
+    expect(prediction.status).toBe('insufficient_history');
+    expect(prediction.detail).toMatch(/At least four dated prices/);
   });
 });

@@ -1,4 +1,4 @@
-import type { BestTimeToBuyPrediction } from '@groceryview/core';
+import type { BestTimeToBuyPrediction } from '@groceryview/core/src/lib/bestTimeToBuy';
 
 const toneByStatus: Record<BestTimeToBuyPrediction['status'], string> = {
   likely_next_week: 'border-emerald-200 bg-emerald-50 text-emerald-950',

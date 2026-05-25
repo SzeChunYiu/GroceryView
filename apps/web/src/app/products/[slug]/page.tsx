@@ -8,8 +8,6 @@ import {
   scoreBand,
   summarizePriceHistory,
   summarizePriceHistoryConfidence,
-  type BestTimeToBuyObservation,
-  predictBestTimeToBuy,
   type BrandTier
 } from '@groceryview/core';
 import {
@@ -18,6 +16,7 @@ import {
   midsommarSeasonalHoliday,
   type ItemSubstitutionProduct
 } from '@groceryview/analytics';
+import { predictBestTimeToBuy, type BestTimeToBuyObservation } from '@groceryview/core/src/lib/bestTimeToBuy';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { BestTimeBadge } from '@/components/best-time-badge';
 import { ConfidenceBadge } from '@/components/confidence-badge';
