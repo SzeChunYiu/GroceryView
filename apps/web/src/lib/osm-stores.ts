@@ -7,7 +7,26 @@ export type OsmStore = {
   slug: string; name: string; brand: string; format: string; shop: string;
   address: string; city: string; district: string; lat: number; lng: number;
   source: 'osm'; retrievedDate: string;
+  openingHours?: string; opening_hours?: string; holidayHours?: string; holiday_hours?: string;
 };
+
+export function osmStoreOpeningHoursLabel(store: OsmStore): string {
+  return store.openingHours || store.opening_hours || 'Hours not reported by OSM';
+}
+
+function swedishHolidayWarning(date = new Date()): string | null {
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  if ((month === 12 && day >= 23) || (month === 1 && day <= 6)) return 'Holiday hours may differ around Christmas and New Year; confirm before travelling.';
+  if (month === 6 && day >= 20 && day <= 26) return 'Midsommar week can change grocery opening hours; confirm before travelling.';
+  if ((month === 3 && day >= 24) || (month === 4 && day <= 7)) return 'Easter week can change grocery opening hours; confirm before travelling.';
+  return null;
+}
+
+export function osmStoreHolidayWarningLabel(store: OsmStore, date = new Date()): string {
+  const sourceWarning = store.holidayHours || store.holiday_hours;
+  return sourceWarning || swedishHolidayWarning(date) || 'No current holiday closure warning from OSM.';
+}
 
 export type StoreRouteChecklistItem = {
   aisleLabel: string;

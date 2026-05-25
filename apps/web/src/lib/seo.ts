@@ -2,12 +2,13 @@ import type { Metadata } from 'next';
 
 export const siteUrl = 'https://grocery-web-mu.vercel.app';
 export const siteName = 'GroceryView';
-export const publicCatalogueRevalidateSeconds = 900;
-export const publicCatalogueStaleWhileRevalidateSeconds = 3600;
+export const publicCatalogueRevalidateSeconds = 300;
+export const publicCatalogueStaleWhileRevalidateSeconds = publicCatalogueRevalidateSeconds * 3;
 export const publicCatalogueCacheControl = `public, s-maxage=${publicCatalogueRevalidateSeconds}, stale-while-revalidate=${publicCatalogueStaleWhileRevalidateSeconds}`;
 
 const defaultDescription = 'Verified Swedish grocery price intelligence with product tickers, chain comparisons, store coverage, and confidence-labelled savings signals.';
 const localeNegotiatedCurrentRouteCaveat = 'Locale-negotiated current route hreflang alternates share the canonical URL until native route translations exist beyond /sv and /en.';
+const publicCatalogueLandingRoutes = new Set(['/products', '/categories', '/stores']);
 
 type PublicCatalogueCacheSurface = 'category' | 'product' | 'products-index' | 'store' | 'stores-index';
 
@@ -16,6 +17,20 @@ type PublicCatalogueCacheMetadata = {
   cacheControl?: string;
   revalidateSeconds?: number;
 };
+
+export function isPublicCatalogueLandingRoute(path: string) {
+  return publicCatalogueLandingRoutes.has(path.replace(/\/$/, '') || '/');
+}
+
+function publicCatalogueSurfaceForPath(path: string): PublicCatalogueCacheSurface | undefined {
+  const normalizedPath = path.replace(/\/$/, '') || '/';
+  if (normalizedPath === '/products') return 'products-index';
+  if (normalizedPath.startsWith('/products/')) return 'product';
+  if (normalizedPath === '/categories' || normalizedPath.startsWith('/categories/')) return 'category';
+  if (normalizedPath === '/stores') return 'stores-index';
+  if (normalizedPath.startsWith('/stores/')) return 'store';
+  return undefined;
+}
 
 type RouteMetadataConfig = {
   path: string;
@@ -325,12 +340,16 @@ function truncateDescription(description: string) {
   return description.length > 180 ? `${description.slice(0, 177)}...` : description;
 }
 
-function publicCatalogueCacheOther(edgeCache: PublicCatalogueCacheMetadata | undefined) {
-  if (!edgeCache) return {};
+function publicCatalogueCacheOther(edgeCache: PublicCatalogueCacheMetadata | undefined, path: string) {
+  const surface = edgeCache?.surface ?? publicCatalogueSurfaceForPath(path);
+  if (!surface) return {};
+  const cacheControl = edgeCache?.cacheControl ?? publicCatalogueCacheControl;
+  const revalidateSeconds = edgeCache?.revalidateSeconds ?? publicCatalogueRevalidateSeconds;
   return {
-    'x-groceryview-cache-control': edgeCache.cacheControl ?? publicCatalogueCacheControl,
-    'x-groceryview-revalidate-seconds': String(edgeCache.revalidateSeconds ?? publicCatalogueRevalidateSeconds),
-    'x-groceryview-cache-surface': edgeCache.surface
+    'x-groceryview-cache-control': cacheControl,
+    'x-groceryview-edge-cache-control': cacheControl,
+    'x-groceryview-revalidate-seconds': String(revalidateSeconds),
+    'x-groceryview-cache-surface': surface
   };
 }
 
@@ -366,7 +385,7 @@ export function routeMetadata(route: keyof typeof routeMetadataCatalog | RouteMe
     alternates: { canonical: canonical, languages: languageAlternateUrls(config.path) },
     other: {
       'x-groceryview-hreflang-boundary': localeNegotiatedCurrentRouteCaveat,
-      ...publicCatalogueCacheOther(config.edgeCache)
+      ...publicCatalogueCacheOther(config.edgeCache, config.path)
     },
     openGraph: {
       title,
