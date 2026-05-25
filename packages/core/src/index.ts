@@ -4,6 +4,7 @@ export * from './lib/rankers/nearby.js';
 export * from './lib/rankers/premium.js';
 export * from './lib/rankers/myBasket.js';
 export * from './lib/fuelRoute.js';
+export * from './lib/fixtureFactory.js';
 export * from './lib/spendForecast.js';
 export * from './lib/promotionByStore.js';
 export * from './types/chain.js';
