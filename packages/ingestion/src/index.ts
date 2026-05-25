@@ -210,6 +210,7 @@ export * from './store-enumerator.js';
 export * from './unit-price.js';
 export * from './pipeline.js';
 export * from './market-source-registry.js';
+export * from './backfill-replay.js';
 
 export type SourceType =
   | 'official_api'
