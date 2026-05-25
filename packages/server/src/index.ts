@@ -40,6 +40,7 @@ import {
   type PgLikeClient,
   type PostgresIntegrationReadinessReport,
   type QueryExecutor,
+  type ReceiptUploadRecord,
   type RollingAverageDealReport,
   type SourceRunHealthCheckResult,
   type SourceRunHealthReport
@@ -110,6 +111,7 @@ import {
   type ScanUpload,
   type ScanUploadStorage
 } from '@groceryview/scanning';
+import { buildReceiptSpendHistory } from './lib/receiptOCR.js';
 
 export type HttpHandler = (request: Request) => Promise<Response>;
 
@@ -177,6 +179,9 @@ export type AuthOptions = {
   watchlistPriceAlertWriter?: (userId: string, request: WatchlistPriceAlertRequest) => Promise<WatchlistPriceAlertReport>;
   scanProviders?: ScanProviders;
   scanUploadStorage?: ScanUploadStorage;
+  receiptUploadRepository?: {
+    upsertReceiptUpload(upload: ReceiptUploadRecord): Promise<void>;
+  };
 };
 
 export const GROCERYVIEW_API_VERSION = '0.1.0';
@@ -236,6 +241,7 @@ export type RuntimePersistenceRepository = {
   listDueNotificationTasks?(now: string): Promise<PersistedNotificationTask[]>;
   listActiveNotificationSuppressions?(): Promise<NotificationSuppression[]>;
   upsertNotificationTask?(task: PersistedNotificationTask): Promise<void>;
+  upsertReceiptUpload?(upload: ReceiptUploadRecord): Promise<void>;
 };
 
 type RuntimeWatchlistRepository = {
@@ -3209,19 +3215,44 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (method === 'POST') {
           const body = await readJson(request);
           const scanId = requiredString(body.scanId, 'scanId');
+          const uploadedAt = optionalIsoTimestamp(body.uploadedAt, 'uploadedAt') ?? (authOptions.now ?? new Date()).toISOString();
           const result = await processScanUpload({
             upload: {
               kind: requiredScanKind(body.kind),
               payload: requiredString(body.payload, 'payload'),
-              uploadedAt: optionalIsoTimestamp(body.uploadedAt, 'uploadedAt') ?? (authOptions.now ?? new Date()).toISOString()
+              uploadedAt
             },
             providers: authOptions.scanProviders ?? {}
           });
+          const receiptSpendHistory = result.status === 'parsed' && result.kind === 'receipt'
+            ? buildReceiptSpendHistory({
+                userId: user,
+                scanId,
+                payloadUri: requiredString(body.payload, 'payload'),
+                uploadedAt,
+                purchasedAt: optionalIsoTimestamp(body.purchasedAt, 'purchasedAt') ?? uploadedAt,
+                rows: result.rows,
+                totalAmount: result.totalAmount,
+                confidence: result.confidence,
+                ...(typeof body.chain === 'string' ? { chain: body.chain } : {}),
+                ...(typeof body.store === 'string' ? { store: body.store } : {})
+              })
+            : undefined;
+          if (receiptSpendHistory && authOptions.receiptUploadRepository) {
+            await authOptions.receiptUploadRepository.upsertReceiptUpload(receiptSpendHistory.receiptUpload);
+          }
           return jsonResponse({
             userId: user,
             scanId,
             result,
-            reviewWorkItems: planScanReviewWorkItems([{ scanId, result }])
+            reviewWorkItems: planScanReviewWorkItems([{ scanId, result }]),
+            ...(receiptSpendHistory
+              ? {
+                  receipt: receiptSpendHistory.receiptSummary,
+                  purchaseHistory: receiptSpendHistory.purchaseHistory,
+                  purchaseHistoryPersisted: Boolean(authOptions.receiptUploadRepository)
+                }
+              : {})
           });
         }
       }
@@ -3974,6 +4005,13 @@ export function buildRepositoryBackedAuthOptions(
           notificationInboxRepository: {
             listDueNotificationTasks: (now) => repository.listDueNotificationTasks!(now),
             listActiveNotificationSuppressions: () => repository.listActiveNotificationSuppressions!()
+          }
+        }
+      : {}),
+    ...(repository.upsertReceiptUpload
+      ? {
+          receiptUploadRepository: {
+            upsertReceiptUpload: (upload) => repository.upsertReceiptUpload!(upload)
           }
         }
       : {}),
