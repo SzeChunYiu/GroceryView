@@ -1,5 +1,7 @@
 import { siteUrl } from '@/lib/seo';
 import { categoryLabels, pricedProducts, type PricedProduct } from '@/lib/openprices-products';
+import { householdCategoryExposureWeights } from '@/lib/chain-index-data';
+import { buildCategoryInflationTrends } from '@/lib/trends';
 
 export type GroceryIndexTickerWidget = {
   route: '/widgets/grocery-index-ticker';
@@ -18,6 +20,31 @@ export function buildGroceryIndexTickerWidget(sourceConfidence: Record<'high' | 
 }
 
 export const groceryIndexTickerWidget = buildGroceryIndexTickerWidget({ high: 0, medium: 0, low: 0 });
+
+export type CategoryInflationExposureCard = {
+  categoryLabel: string;
+  changePercent: number;
+  exposureLabel: string;
+  monthlyImpactSek: number;
+  pressureLabel: string;
+};
+
+export function buildCategoryInflationExposureCards(limit = 4): CategoryInflationExposureCard[] {
+  return buildCategoryInflationTrends({ limit: limit * 2 }).cards
+    .map((trend) => {
+      const exposure = householdCategoryExposureWeights[trend.categoryLabel] ?? { monthlySpend: 120, sharePercent: 5 };
+      const monthlyImpactSek = Math.round((exposure.monthlySpend * trend.changePercent / 100) * 100) / 100;
+      return {
+        categoryLabel: trend.categoryLabel,
+        changePercent: trend.changePercent,
+        exposureLabel: `${exposure.sharePercent}% household basket exposure`,
+        monthlyImpactSek,
+        pressureLabel: trend.fasterThanBasket ? 'above basket pressure' : 'below basket pressure'
+      };
+    })
+    .sort((left, right) => Math.abs(right.monthlyImpactSek) - Math.abs(left.monthlyImpactSek))
+    .slice(0, limit);
+}
 
 export type CategoryShelfProduct = {
   slug: string;
