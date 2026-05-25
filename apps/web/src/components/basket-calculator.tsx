@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo, useState, useTransition } from 'react';
 import { compareBasketStrategies, summarizeStoreBasketCoverage } from '@groceryview/core';
+import { buildSmartBasketSubstituteSuggestions } from '@/lib/recurring-basket';
 
 export type BasketCalculatorPriceRow = {
   chainId: string;
@@ -96,6 +97,22 @@ export function BasketCalculator({ products, sourceLabel }: Readonly<BasketCalcu
     ...assignment,
     product: selectedProducts.find((product) => product.id === assignment.productId)
   }));
+
+  const smartSubstitutes = useMemo(() => buildSmartBasketSubstituteSuggestions({
+    catalog: products.map((product) => ({
+      productId: product.id,
+      productName: product.name,
+      categoryLabel: product.categoryLabel,
+      prices: product.prices.map((price) => ({ chainName: price.chainName, price: price.price }))
+    })),
+    items: selectedProducts.map((product) => ({
+      productId: product.id,
+      productName: product.name,
+      categoryLabel: product.categoryLabel,
+      prices: product.prices.map((price) => ({ chainName: price.chainName, price: price.price }))
+    })),
+    unavailableChainNames: chains.map((chain) => chain.name)
+  }), [chains, products, selectedProducts]);
 
   function toggleProduct(productId: string) {
     startBasketUpdateTransition(() => {
@@ -211,6 +228,28 @@ export function BasketCalculator({ products, sourceLabel }: Readonly<BasketCalcu
               </Link>
             )) : (
               <p className="rounded-2xl bg-slate-50 p-3 text-sm font-semibold text-slate-600">Select at least one product to calculate the split basket.</p>
+            )}
+          </div>
+        </div>
+
+        <div className="rounded-[1.75rem] border border-violet-200 bg-violet-50 p-5 shadow-sm">
+          <p className="text-xs font-black uppercase tracking-[0.22em] text-violet-800">Smart substitute suggestions</p>
+          <h3 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Actionable swaps</h3>
+          <p className="mt-2 text-sm font-semibold leading-6 text-violet-950">
+            Cheaper equivalent products and chain-available substitutes are suggested without rewriting the basket automatically.
+          </p>
+          <div className="mt-4 space-y-2">
+            {smartSubstitutes.length > 0 ? smartSubstitutes.map((suggestion) => (
+              <div className="rounded-2xl bg-white/80 p-3 text-sm" key={`${suggestion.productId}-${suggestion.substituteProductId}-${suggestion.reason}`}>
+                <p className="font-black text-slate-950">{suggestion.substituteProductName}</p>
+                <p className="mt-1 font-semibold text-slate-600">
+                  Replace {suggestion.productName} at {suggestion.chainName}. {suggestion.reason === 'high_unit_price'
+                    ? `Estimated unit saving ${suggestion.savingsLabel}.`
+                    : 'This chain has the substitute when the selected item is unavailable.'}
+                </p>
+              </div>
+            )) : (
+              <p className="rounded-2xl bg-white/80 p-3 text-sm font-semibold text-slate-600">No cheaper equivalent or chain-available substitute found for the selected basket.</p>
             )}
           </div>
         </div>
