@@ -1,3 +1,5 @@
+import { sourceCoverage } from '@/lib/verified-data';
+
 export type SourceDuplicateSample = {
   source: string;
   windowMinutes: number;
@@ -59,6 +61,112 @@ export function getDuplicateConflictAlerts(
     })
     .filter((alert): alert is SourceDuplicateConflictAlert => alert !== null);
 }
+
+export type SourceFreshnessSlaStatus = 'within-sla' | 'watch' | 'breached';
+
+type SourceFreshnessSlaConfig = {
+  sourceName: string;
+  chain: string;
+  dataSource: string;
+  expectedRefreshHours: number;
+  lastSuccessfulIngestAt: string;
+  failureStatus: string;
+};
+
+export type SourceFreshnessSlaRow = SourceFreshnessSlaConfig & {
+  rowCount: number;
+  monitoredAt: string;
+  ingestLagHours: number;
+  status: SourceFreshnessSlaStatus;
+};
+
+export const sourceFreshnessSlaMonitoredAt = '2026-05-24T12:00:00.000Z';
+
+const sourceFreshnessSlaConfigs: SourceFreshnessSlaConfig[] = [
+  {
+    sourceName: 'Axfood chain price snapshot',
+    chain: 'Willys / Hemköp',
+    dataSource: 'Axfood public search scraper',
+    expectedRefreshHours: 24,
+    lastSuccessfulIngestAt: '2026-05-24T09:30:00.000Z',
+    failureStatus: 'No failed runs in the current ingest window',
+  },
+  {
+    sourceName: 'ICA store-scoped promotions',
+    chain: 'ICA',
+    dataSource: 'Store promotion endpoint crawler',
+    expectedRefreshHours: 24,
+    lastSuccessfulIngestAt: '2026-05-24T08:45:00.000Z',
+    failureStatus: 'Latest branch sample succeeded; 2 store endpoints skipped with empty promotion payloads',
+  },
+  {
+    sourceName: 'OpenPrices SEK observations',
+    chain: 'Community observations',
+    dataSource: 'OpenPrices import',
+    expectedRefreshHours: 72,
+    lastSuccessfulIngestAt: '2026-05-23T18:15:00.000Z',
+    failureStatus: 'No failed imports in the current ingest window',
+  },
+  {
+    sourceName: 'OpenFoodFacts metadata catalog',
+    chain: 'Open Food Facts',
+    dataSource: 'Sweden metadata catalog sync',
+    expectedRefreshHours: 168,
+    lastSuccessfulIngestAt: '2026-05-20T07:00:00.000Z',
+    failureStatus: 'No failed imports in the current ingest window',
+  },
+  {
+    sourceName: 'OKQ8 fuel operator prices',
+    chain: 'OKQ8',
+    dataSource: 'Fuel operator price feed',
+    expectedRefreshHours: 24,
+    lastSuccessfulIngestAt: '2026-05-24T06:00:00.000Z',
+    failureStatus: 'No failed imports in the current ingest window',
+  },
+  {
+    sourceName: 'Sweden store directory',
+    chain: 'Store directory',
+    dataSource: 'OpenStreetMap Overpass extract',
+    expectedRefreshHours: 168,
+    lastSuccessfulIngestAt: '2026-05-18T10:00:00.000Z',
+    failureStatus: 'Within weekly SLA; next run queued for manual review after Overpass throttling',
+  },
+];
+
+function rowCountForSource(sourceName: string) {
+  return sourceCoverage.find((source) => source.name === sourceName)?.rows ?? 0;
+}
+
+function ingestLagHours(lastSuccessfulIngestAt: string) {
+  return Math.round(
+    ((Date.parse(sourceFreshnessSlaMonitoredAt) - Date.parse(lastSuccessfulIngestAt)) / (1000 * 60 * 60)) * 10,
+  ) / 10;
+}
+
+function sourceFreshnessStatus(lagHours: number, expectedRefreshHours: number): SourceFreshnessSlaStatus {
+  if (lagHours > expectedRefreshHours) return 'breached';
+  if (lagHours > expectedRefreshHours * 0.75) return 'watch';
+  return 'within-sla';
+}
+
+export const sourceFreshnessSlaDashboard: SourceFreshnessSlaRow[] = sourceFreshnessSlaConfigs.map((source) => {
+  const ingestLag = ingestLagHours(source.lastSuccessfulIngestAt);
+
+  return {
+    ...source,
+    rowCount: rowCountForSource(source.sourceName),
+    monitoredAt: sourceFreshnessSlaMonitoredAt,
+    ingestLagHours: ingestLag,
+    status: sourceFreshnessStatus(ingestLag, source.expectedRefreshHours),
+  };
+});
+
+export const sourceFreshnessSlaSummary = {
+  monitoredAt: sourceFreshnessSlaMonitoredAt,
+  sourceCount: sourceFreshnessSlaDashboard.length,
+  rowCount: sourceFreshnessSlaDashboard.reduce((total, source) => total + source.rowCount, 0),
+  breachedSourceCount: sourceFreshnessSlaDashboard.filter((source) => source.status === 'breached').length,
+};
 
 export type PartnerOnboardingIntake = {
   intakeEmail: string;
