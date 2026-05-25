@@ -1,8 +1,10 @@
 "use client";
 
 import { useId, useState } from "react";
+import { getStoreStockStatus, type StoreStockStatus } from "../lib/freshness";
 
 type FreshnessVote = "fresh" | "outdated";
+type StockBadgeTone = "green" | "amber" | "red";
 
 export type StoreProductRowProps = {
   productId: string;
@@ -11,10 +13,29 @@ export type StoreProductRowProps = {
   storeName?: string;
   priceLabel?: string;
   shelfLifeDays?: number;
+  isAvailable?: boolean | null;
+  observedAt?: string | number | Date | null;
+  sourceSignals?: string[];
+  sourceStockStatus?: string | null;
+  stockStatus?: StoreStockStatus;
+  stockStatusLabel?: string;
+  stockStatusReason?: string;
+  stockObservedAt?: string | number | Date | null;
   className?: string;
 };
 
 type SubmitState = "idle" | "saving" | "saved" | "error";
+const stockBadgeClasses: Record<StockBadgeTone, string> = {
+  amber: "border-amber-200 bg-amber-50 text-amber-900",
+  green: "border-emerald-200 bg-emerald-50 text-emerald-900",
+  red: "border-rose-200 bg-rose-50 text-rose-900",
+};
+
+const stockStatusCopy: Record<StoreStockStatus, { label: string; tone: StockBadgeTone }> = {
+  likely_in_stock: { label: "Likely in stock", tone: "green" },
+  uncertain: { label: "Stock uncertain", tone: "amber" },
+  unavailable: { label: "Unavailable", tone: "red" },
+};
 
 export function StoreProductRow({
   productId,
@@ -23,6 +44,14 @@ export function StoreProductRow({
   storeName,
   priceLabel,
   shelfLifeDays,
+  isAvailable,
+  observedAt,
+  sourceSignals,
+  sourceStockStatus,
+  stockStatus,
+  stockStatusLabel,
+  stockStatusReason,
+  stockObservedAt,
   className,
 }: StoreProductRowProps) {
   const noteId = useId();
@@ -30,6 +59,19 @@ export function StoreProductRow({
   const [days, setDays] = useState(shelfLifeDays?.toString() ?? "");
   const [note, setNote] = useState("");
   const [status, setStatus] = useState<SubmitState>("idle");
+  const derivedStockStatus = getStoreStockStatus({
+    isAvailable,
+    observedAt: observedAt ?? stockObservedAt,
+    sourceSignals,
+    sourceStockStatus,
+  });
+  const stockBadge = stockStatus ? {
+    ...stockStatusCopy[stockStatus],
+    label: stockStatusLabel ?? stockStatusCopy[stockStatus].label,
+    ageInDays: derivedStockStatus.ageInDays,
+    reason: stockStatusReason ?? derivedStockStatus.reason,
+    status: stockStatus,
+  } : derivedStockStatus;
 
   async function submitFreshness() {
     setStatus("saving");
@@ -61,9 +103,22 @@ export function StoreProductRow({
   return (
     <article className={className} data-product-id={productId} data-store-id={storeId}>
       <div>
-        <h3>{productName}</h3>
+        <div className="flex flex-wrap items-center gap-2">
+          <h3>{productName}</h3>
+          <span
+            aria-label={`${stockBadge.label}. ${stockBadge.reason}`}
+            className={`rounded-full border px-3 py-1 text-xs font-semibold ${stockBadgeClasses[stockBadge.tone]}`}
+            data-stock-status={stockBadge.status}
+            title={stockBadge.reason}
+          >
+            {stockBadge.label}
+          </span>
+        </div>
         {storeName ? <p>{storeName}</p> : null}
         {priceLabel ? <p>{priceLabel}</p> : null}
+        <p className="text-xs font-medium text-slate-600">
+          {stockBadge.ageInDays === null ? "Stock observation age unknown" : `Stock observed ${stockBadge.ageInDays} days ago`}
+        </p>
       </div>
 
       <fieldset>
