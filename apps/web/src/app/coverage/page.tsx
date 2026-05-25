@@ -1,5 +1,5 @@
 import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
-import { formatPct, freshnessLagSummary, perClassFreshnessLagReport } from '@/lib/verified-data';
+import { formatPct, freshnessLagSummary, perClassFreshnessLagReport, retailerTypeCoverage, retailerTypeCoverageSummary } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -61,6 +61,31 @@ export default function CoveragePage() {
       <Card className="mt-6 border-amber-200 bg-amber-50">
         <h2 className="text-2xl font-black tracking-tight text-amber-950">Claim boundary</h2>
         <p className="mt-2 text-sm leading-6 text-amber-950">{freshnessLagSummary.claimBoundary}</p>
+      </Card>
+
+      <Card className="mt-6">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <h2 className="text-2xl font-black tracking-tight">Retailer type coverage</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              Chain catalog rows are typed before they can enter coverage and comparison views. {retailerTypeCoverageSummary.trackedChainCount} seeded chains currently cover {retailerTypeCoverageSummary.trackedTypeCount} of {retailerTypeCoverageSummary.allowedTypeCount} allowed retailer types.
+            </p>
+          </div>
+          <p className="text-sm font-black text-slate-600">Schema-backed chain classification</p>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+          {retailerTypeCoverage.map((row) => (
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4" key={row.retailerType}>
+              <p className="text-sm font-black capitalize text-slate-950">{row.label}</p>
+              <p className="mt-2 text-3xl font-black text-emerald-800">{row.chainCount.toLocaleString('sv-SE')}</p>
+              <p className="text-sm font-semibold text-slate-700">{row.status}</p>
+              <p className="mt-3 text-sm leading-6 text-slate-600">{row.coverageLabel}</p>
+              {row.chainSlugs.length > 0 ? (
+                <p className="mt-2 text-xs font-black uppercase tracking-[0.18em] text-slate-500">{row.chainSlugs.join(' / ')}</p>
+              ) : null}
+            </div>
+          ))}
+        </div>
       </Card>
 
       <div className="mt-6">

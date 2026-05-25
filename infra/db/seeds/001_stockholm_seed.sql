@@ -10,16 +10,17 @@
 
 begin;
 
-insert into chains (slug, name, country_code, website_url) values
-  ('ica', 'ICA', 'SE', 'https://www.ica.se/'),
-  ('willys', 'Willys', 'SE', 'https://www.willys.se/'),
-  ('coop', 'Coop', 'SE', 'https://www.coop.se/'),
-  ('hemkop', 'Hemkop', 'SE', 'https://www.hemkop.se/'),
-  ('lidl', 'Lidl', 'SE', 'https://www.lidl.se/'),
-  ('netto', 'Netto', 'SE', 'https://www.coop.se/'),
-  ('city-gross', 'City Gross', 'SE', 'https://www.citygross.se/')
+insert into chains (slug, name, retailer_type, country_code, website_url) values
+  ('ica', 'ICA', 'grocery', 'SE', 'https://www.ica.se/'),
+  ('willys', 'Willys', 'grocery', 'SE', 'https://www.willys.se/'),
+  ('coop', 'Coop', 'grocery', 'SE', 'https://www.coop.se/'),
+  ('hemkop', 'Hemkop', 'grocery', 'SE', 'https://www.hemkop.se/'),
+  ('lidl', 'Lidl', 'grocery', 'SE', 'https://www.lidl.se/'),
+  ('netto', 'Netto', 'grocery', 'SE', 'https://www.coop.se/'),
+  ('city-gross', 'City Gross', 'grocery', 'SE', 'https://www.citygross.se/')
 on conflict (slug) do update set
   name = excluded.name,
+  retailer_type = excluded.retailer_type,
   country_code = excluded.country_code,
   website_url = excluded.website_url,
   updated_at = now();
