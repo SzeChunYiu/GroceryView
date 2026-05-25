@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { CoreWebVitalsReporter } from '@/components/core-web-vitals-reporter';
 import { PwaInstall } from '@/components/pwa-install';
 import { ConsentManager } from '@/components/consent-manager';
 import { ListToastViewport } from '@/components/Toast';
@@ -90,6 +91,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <Providers>{children}</Providers>
         </div>
         <ConsentManager />
+        <CoreWebVitalsReporter />
         <EngagementReporter />
         <ServiceWorkerRegistrar />
         <PwaInstall />
