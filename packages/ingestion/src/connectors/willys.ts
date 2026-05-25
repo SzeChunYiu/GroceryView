@@ -8,6 +8,9 @@ export type WillysProduct = {
   category: string;
   price: number;
   priceText: string;
+  listPrice: number;
+  memberPrice: number | null;
+  is_member_price: boolean;
   unitPriceText: string;
   unitPriceUnit: string;
   imageUrl: string;
@@ -83,6 +86,7 @@ type WillysSearchProduct = {
   labels?: unknown;
   online?: unknown;
   outOfStock?: unknown;
+  potentialPromotions?: AxfoodCampaignPromotion[];
 };
 
 type WillysSearchResponse = {
@@ -583,11 +587,13 @@ export async function fetchWillysProducts(options: FetchWillysProductsOptions = 
 
       const payload = await response.json() as WillysSearchResponse;
       for (const product of payload.results ?? []) {
-        const row = normalizeWillysProduct(product, sourceUrl, retrievedAt);
-        if (!row || seenCodes.has(row.code)) continue;
-        seenCodes.add(row.code);
-        rows.push(row);
-        if (rows.length >= maxRows) return rows;
+        for (const row of normalizeWillysProductRows(product, sourceUrl, retrievedAt)) {
+          const rowKey = `${row.code}:${row.is_member_price}`;
+          if (seenCodes.has(rowKey)) continue;
+          seenCodes.add(rowKey);
+          rows.push(row);
+          if (rows.length >= maxRows) return rows;
+        }
       }
     }
     return rows;
@@ -620,11 +626,13 @@ export async function fetchWillysProducts(options: FetchWillysProductsOptions = 
       pageCount = responsePageCount && responsePageCount > 0 ? responsePageCount : page + 1;
 
       for (const product of results) {
-        const row = normalizeWillysProduct(product, sourceUrl, retrievedAt);
-        if (!row || seenCodes.has(row.code)) continue;
-        seenCodes.add(row.code);
-        rows.push(row);
-        if (rows.length >= maxRows) return rows;
+        for (const row of normalizeWillysProductRows(product, sourceUrl, retrievedAt)) {
+          const rowKey = `${row.code}:${row.is_member_price}`;
+          if (seenCodes.has(rowKey)) continue;
+          seenCodes.add(rowKey);
+          rows.push(row);
+          if (rows.length >= maxRows) return rows;
+        }
       }
 
       if (results.length === 0) break;
@@ -809,14 +817,23 @@ export function normalizeWillysProduct(
   sourceUrl: string,
   retrievedAt: string
 ): WillysProduct | null {
+  return normalizeWillysProductRows(product, sourceUrl, retrievedAt)[0] ?? null;
+}
+
+export function normalizeWillysProductRows(
+  product: WillysSearchProduct,
+  sourceUrl: string,
+  retrievedAt: string
+): WillysProduct[] {
   const code = text(product.code);
   const name = text(product.name);
   const price = numberOrNull(product.priceValue);
   if (!code || !name || price === null) {
-    return null;
+    return [];
   }
 
-  return {
+  const memberPrice = willysMemberPrice(product.potentialPromotions);
+  const baseRow: WillysProduct = {
     code,
     name,
     brand: text(product.manufacturer),
@@ -824,6 +841,9 @@ export function normalizeWillysProduct(
     category: text(product.googleAnalyticsCategory),
     price,
     priceText: text(product.price),
+    listPrice: price,
+    memberPrice,
+    is_member_price: false,
     unitPriceText: text(product.comparePrice),
     unitPriceUnit: text(product.comparePriceUnit),
     imageUrl: text(product.image?.url),
@@ -833,6 +853,39 @@ export function normalizeWillysProduct(
     sourceUrl,
     retrievedAt
   };
+
+  if (memberPrice === null || memberPrice === price) {
+    return [baseRow];
+  }
+
+  return [baseRow, {
+    ...baseRow,
+    price: memberPrice,
+    priceText: memberPriceText(product.potentialPromotions) || baseRow.priceText,
+    is_member_price: true
+  }];
+}
+
+function willysMemberPrice(promotions: AxfoodCampaignPromotion[] | undefined): number | null {
+  const promotion = (promotions ?? []).find((candidate) => isWillysMemberPricePromotion(candidate) && numberOrNull(candidate.price) !== null);
+  return promotion ? numberOrNull(promotion.price) : null;
+}
+
+function memberPriceText(promotions: AxfoodCampaignPromotion[] | undefined): string {
+  const promotion = (promotions ?? []).find((candidate) => isWillysMemberPricePromotion(candidate) && numberOrNull(candidate.price) !== null);
+  return promotion ? text(promotion.cartLabel) || text(promotion.rewardLabel) : '';
+}
+
+function isWillysMemberPricePromotion(promotion: AxfoodCampaignPromotion): boolean {
+  const haystack = [
+    promotion.campaignType,
+    promotion.promotionType,
+    promotion.cartLabel,
+    promotion.rewardLabel,
+    promotion.conditionLabel
+  ].map(text).join(' ').toLowerCase();
+
+  return /medlemspris|medlem|member/.test(haystack);
 }
 
 export function normalizeWillysWeeklyDiscount(
