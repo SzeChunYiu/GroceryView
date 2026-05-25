@@ -178,6 +178,18 @@ export type AuthOptions = {
   scanUploadStorage?: ScanUploadStorage;
 };
 
+export const GROCERYVIEW_API_VERSION = '0.1.0';
+export const GROCERYVIEW_OPENAPI_VERSION = '3.1.0';
+
+export type ApiVersionReport = {
+  service: 'groceryview-server';
+  apiVersion: typeof GROCERYVIEW_API_VERSION;
+  openApiVersion: typeof GROCERYVIEW_OPENAPI_VERSION;
+  runtime?: {
+    environment: RuntimeConfig['nodeEnv'];
+  };
+};
+
 export type AuthProvider = 'magic_link' | 'passkey' | 'oidc';
 
 export type AuthProviderAssertion = {
@@ -2062,6 +2074,27 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         );
       }
 
+      if (method === 'GET' && path === '/api/version') {
+        const includeRuntime = url.searchParams.get('includeRuntime');
+        if (includeRuntime !== null && includeRuntime !== 'true' && includeRuntime !== 'false') {
+          return errorResponse(400, 'includeRuntime must be true or false.');
+        }
+        const runtimeConfig = authOptions.runtimeConfig;
+        const body: ApiVersionReport = {
+          service: 'groceryview-server',
+          apiVersion: GROCERYVIEW_API_VERSION,
+          openApiVersion: GROCERYVIEW_OPENAPI_VERSION,
+          ...(includeRuntime === 'true'
+            ? {
+                runtime: {
+                  environment: runtimeConfig?.nodeEnv ?? ((process.env.NODE_ENV ?? 'development') as RuntimeConfig['nodeEnv'])
+                }
+              }
+            : {})
+        };
+        return jsonResponse(body);
+      }
+
       if (path === '/api/auth/session') {
         if (method === 'POST') {
           if (!authOptions.authSecret) return errorResponse(503, 'Auth secret is not configured.');
@@ -3293,8 +3326,8 @@ const operationWithJsonResponse = (operation: OpenApiOperation, schemaName: keyo
 
 export function buildOpenApiDocument(): OpenApiDocument {
   return {
-    openapi: '3.1.0',
-    info: { title: 'GroceryView API', version: '0.1.0' },
+    openapi: GROCERYVIEW_OPENAPI_VERSION,
+    info: { title: 'GroceryView API', version: GROCERYVIEW_API_VERSION },
     components: {
       securitySchemes: {
         bearerAuth: { type: 'http', scheme: 'bearer' },
@@ -3307,6 +3340,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
     },
     paths: {
       '/api/health': { get: publicOperation('Get API runtime health without exposing secrets.') },
+      '/api/version': { get: publicOperation('Get API and OpenAPI version metadata without exposing secrets.') },
       '/api/openapi.json': { get: publicOperation('Get the public OpenAPI document for developer price and nutrition API integrations.') },
       '/api/auth/session': { post: publicOperation('Exchange a verified auth provider assertion for a short-lived bearer session.') },
       '/api/fuel': { get: publicOperation('Get per-grade fuel price observations with operator and crowd-source provenance.') },
