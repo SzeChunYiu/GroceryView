@@ -151,7 +151,13 @@ function FriendPriceSightingsPanel({ card }: Readonly<{ card: AdaptiveProductCar
 
   return (
     <div className="mt-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-3">
-      <p className="text-[0.65rem] font-black uppercase tracking-[0.18em] text-emerald-900">Opt-in friend sightings</p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-[0.65rem] font-black uppercase tracking-[0.18em] text-emerald-900">Opt-in friend sightings</p>
+          <p className="mt-1 text-xs font-semibold text-emerald-950">Shown next to verified store price {card.totalPriceLabel}.</p>
+        </div>
+        <span className="rounded-full bg-white px-2.5 py-1 text-[0.65rem] font-black text-emerald-900">{sightings.length} recent</span>
+      </div>
       <ul className="mt-2 space-y-2">
         {sightings.map((sighting) => (
           <li className="rounded-xl bg-white p-2 text-xs text-slate-700" key={sighting.id}>

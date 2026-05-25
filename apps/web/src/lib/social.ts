@@ -141,6 +141,14 @@ export function listFriendPriceSightingsForProduct(productSlug: string) {
   return recentFriendSightings(friendPriceSightings.filter((sighting) => sighting.sharedWithFriends && sighting.productSlug === productSlug));
 }
 
+export function listSharedFriendPriceSightings(filters: Readonly<{ postId?: string; productSlug?: string }> = {}) {
+  return recentFriendSightings(friendPriceSightings.filter((sighting) =>
+    sighting.sharedWithFriends
+    && (!filters.postId || sighting.postId === filters.postId)
+    && (!filters.productSlug || sighting.productSlug === filters.productSlug)
+  ));
+}
+
 export function listFriendPriceSightingsForProductChains(productSlug: string, chainSlugs: readonly string[]) {
   const allowedChains = new Set(chainSlugs.map((chain) => chain.toLowerCase()));
   return recentFriendSightings(friendPriceSightings.filter((sighting) =>
