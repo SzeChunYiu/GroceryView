@@ -6,6 +6,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import { osmStoreHolidayWarningLabel, osmStoreOpeningHoursLabel, osmStores, type OsmStore } from '@/lib/osm-stores';
 import { cheapestMapChain, mapChainIndexScores } from '@/lib/map-chain-index';
 import { trackStoreDirectionsClick } from '@/lib/analytics';
+import { rankNearestStores, type PreferredPickupMode } from '@/lib/geolocation';
 import type { NearbyDealRecommendation, StoreDistanceRow } from '@/lib/store-distance';
 
 // Free, no-API-key vector tiles (© OpenMapTiles / OpenFreeMap, data © OSM).
@@ -176,6 +177,8 @@ export function StoreMap({
   const [selectedStoreSlug, setSelectedStoreSlug] = useState(syncedMapListStores[0]?.slug ?? '');
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [geoStatus, setGeoStatus] = useState('Using map-center distance until location is approved.');
+  const [openNowOnly, setOpenNowOnly] = useState(false);
+  const [preferredPickupMode, setPreferredPickupMode] = useState<PreferredPickupMode>('any');
 
   const rankedNearbyDeals = useMemo(() => {
     if (!userLocation) return nearbyDealRecommendations;
@@ -183,6 +186,15 @@ export function StoreMap({
       .map((deal) => ({ ...deal, distanceMeters: distanceMetersFromUser(userLocation, deal) }))
       .sort((left, right) => left.distanceMeters - right.distanceMeters || right.savingsSek - left.savingsSek);
   }, [nearbyDealRecommendations, userLocation]);
+
+  const nearestStores = useMemo(
+    () => rankNearestStores(
+      osmStores,
+      userLocation ?? { lat: STOCKHOLM[1], lng: STOCKHOLM[0] },
+      { limit: 5, openNowOnly, preferredPickupMode }
+    ),
+    [openNowOnly, preferredPickupMode, userLocation]
+  );
 
   function focusStore(store: OsmStore) {
     setSelectedStoreSlug(store.slug);
@@ -464,6 +476,63 @@ export function StoreMap({
           </p>
         </div>
         <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
+          <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-3" data-nearest-store-finder="true">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-[11px] font-black uppercase tracking-[0.16em] text-emerald-800">Nearest-store finder</p>
+                <p className="mt-1 text-xs font-semibold leading-5 text-emerald-900">
+                  Ranked by {userLocation ? 'approved browser location' : 'Stockholm map center'}, opening-window signal, and pickup preference.
+                </p>
+              </div>
+              <button
+                aria-pressed={openNowOnly}
+                className={`rounded-full px-3 py-1 text-[11px] font-black ${openNowOnly ? 'bg-emerald-900 text-white' : 'bg-white text-emerald-900'}`}
+                onClick={() => setOpenNowOnly((current) => !current)}
+                type="button"
+              >
+                Open now
+              </button>
+            </div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {([
+                ['any', 'Any trip'],
+                ['full-basket', 'Full basket'],
+                ['quick-trip', 'Quick top-up']
+              ] as const).map(([mode, label]) => (
+                <button
+                  aria-pressed={preferredPickupMode === mode}
+                  className={`rounded-full px-3 py-1 text-[11px] font-black ${preferredPickupMode === mode ? 'bg-emerald-900 text-white' : 'bg-white text-emerald-900'}`}
+                  key={mode}
+                  onClick={() => setPreferredPickupMode(mode)}
+                  type="button"
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <div className="mt-2 space-y-2">
+              {nearestStores.length > 0 ? nearestStores.map((candidate, index) => (
+                <button
+                  className="w-full rounded-xl bg-white/85 p-2 text-left text-xs shadow-sm transition hover:bg-white"
+                  key={candidate.store.slug}
+                  onClick={() => focusStore(candidate.store)}
+                  type="button"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="font-black text-slate-950">#{index + 1} {candidate.store.name}</p>
+                    <span className="font-black text-emerald-800">{candidate.distanceLabel}</span>
+                  </div>
+                  <p className="mt-1 font-semibold text-slate-600">
+                    {candidate.pickupModeLabel} · {candidate.openNow === true ? 'Open now' : candidate.openNow === false ? 'Closed now' : 'Hours available'} · {candidate.openingLabel}
+                  </p>
+                </button>
+              )) : (
+                <p className="rounded-xl bg-white/85 p-2 text-xs font-bold text-emerald-900">
+                  No store with a parseable current open window matches this pickup filter; clear “Open now” to include reported hours.
+                </p>
+              )}
+            </div>
+          </div>
           {routeRecommendations.length > 0 ? (
             <div className="rounded-2xl border border-cyan-100 bg-cyan-50 p-3" data-route-aware-nearest-panel="true">
               <p className="text-[11px] font-black uppercase tracking-[0.16em] text-cyan-800">Route-aware nearest stores</p>
