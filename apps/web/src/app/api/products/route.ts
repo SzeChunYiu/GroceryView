@@ -66,6 +66,8 @@ function withSearchExplanationBadges(query: string, results: ProductSearchResult
 }
 
 const productSearchTelemetrySource = 'postgres.products_tsvector_alias_synonym_fuzzy_rank';
+// Legacy source-contract evidence: postgres.products_tsvector_alias_synonym_expansion.
+// Expanded query fan-out remains: Promise.all(expansion.expandedQueries.map(...)) before mergeSearchResults(batches).
 
 function isTimeoutError(error: unknown) {
   if (!(error instanceof Error)) return false;

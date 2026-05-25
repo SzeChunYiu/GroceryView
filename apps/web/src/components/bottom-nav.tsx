@@ -10,7 +10,7 @@ const bottomNavItems = [
   { href: '/', label: 'Markets', icon: Store, exact: true },
   { href: '/products', label: 'Search', icon: Search },
   { href: '/screener', label: 'Deals', icon: Tags },
-  { href: '/scanner?launch=bottom-nav-browser#scan', standaloneHref: '/scanner?launch=bottom-nav-pwa#scan', label: 'Scan', icon: ScanLine, prominent: true, match: 'scanner' },
+  { href: '/scanner#scan', browserHref: '/scanner?launch=bottom-nav-browser#scan', standaloneHref: '/scanner?launch=bottom-nav-pwa#scan', label: 'Scan', icon: ScanLine, prominent: true, match: 'scanner' },
   { href: '/list', label: 'List', icon: ShoppingBasket },
   { href: '/map', label: 'Nearby', icon: Map },
   { href: '/watchlist', label: 'Watchlist', icon: Watch },
@@ -49,7 +49,11 @@ export function BottomNav() {
           const Icon = item.icon;
           const isActive = isBottomNavItemActive(item, pathname);
           const isProminent = 'prominent' in item && item.prominent;
-          const href = isProminent && 'standaloneHref' in item && isStandalone ? item.standaloneHref : item.href;
+          const href = isProminent && 'standaloneHref' in item && isStandalone
+            ? item.standaloneHref
+            : 'browserHref' in item
+              ? item.browserHref
+              : item.href;
 
           return (
             <Link

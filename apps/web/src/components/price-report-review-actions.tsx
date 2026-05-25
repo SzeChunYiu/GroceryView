@@ -246,7 +246,7 @@ export function PriceReportReviewActions() {
               <div className="mt-2 flex flex-wrap gap-2 border-t border-emerald-100 pt-3" aria-label={`Moderation actions for ${review.productName}`}>
                 <button className="rounded-full bg-emerald-700 px-3 py-1.5 text-xs font-black text-white" onClick={() => moderateCommunityReview(review.id, 'approve')} type="button">Approve</button>
                 <button className="rounded-full bg-slate-800 px-3 py-1.5 text-xs font-black text-white" onClick={() => moderateCommunityReview(review.id, 'hide')} type="button">Hide</button>
-                <button className="rounded-full bg-rose-700 px-3 py-1.5 text-xs font-black text-white" onClick={() => moderateCommunityReview(review.id, 'escalate')} type="button">Escalate</button>
+                <button className="rounded-full bg-rose-700 px-3 py-1.5 text-xs font-black text-white" onClick={() => moderateCommunityReview(review.id, 'escalate')} type="button">Request more info</button>
               </div>
             </li>
           ))}
@@ -259,7 +259,7 @@ export function PriceReportReviewActions() {
             <li className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm" key={assignment.id}>
               <p className="font-black text-slate-950">{assignment.subjectType ?? 'community_report'} · {assignment.priority ?? 'priority'}</p>
               <p className="mt-1 text-slate-700">{assignment.reason ?? 'Needs human evidence review.'}</p>
-              <p className="mt-1 text-slate-600">{assignment.id} · due {assignment.dueAt ?? 'unassigned due date'}</p>
+              <p className="mt-1 text-slate-600">{assignment.id} · status {assignment.status ?? 'in_progress'} · due {assignment.dueAt ?? 'unassigned due date'}</p>
             </li>
           ))}
         </ul>

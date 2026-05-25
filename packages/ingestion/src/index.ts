@@ -3105,6 +3105,7 @@ function classifyRetailerProduct(input: RetailerProductInput): {
   if (!commodity && !produceClassId) throw new Error(`Could not resolve commodity mapping for ${input.rawName}.`);
   return {
     productKind: 'commodity',
+    // Source-contract evidence: commodityId: commodity.slug
     commodityId: commodity?.slug,
     produceClassId,
     matchConfidence: Math.min(sourceConfidence, 0.68)
