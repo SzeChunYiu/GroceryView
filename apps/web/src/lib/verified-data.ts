@@ -22,7 +22,8 @@ import {
   dbSiteMatpriskollenSource
 } from './generated/db-site-ingested-overrides';
 import { categoryLabels, pricedProducts } from './openprices-products';
-import { allergenRiskBadgesForText } from './search-filters';
+import { allergenRiskBadgesForText, typoTolerantSearchMatch } from './search-filters';
+import { expandGrocerySearchQuery } from './search-suggest';
 import { osmStores } from './osm-stores';
 import {
   currencyFromObservation,
@@ -696,6 +697,7 @@ function productSearchResultCards(searchResult: typeof rawFacetedProductSearch) 
 
 export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}) {
   const query = firstSearchValue(searchParams.q);
+  const queryExpansion = expandGrocerySearchQuery(query, 6);
   const categories = listSearchValues(searchParams.category);
   const labelFilters = listSearchValues(searchParams.label);
   const originCountries = originSearchValues(searchParams.origin);
@@ -707,10 +709,44 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
   const inStockOnly = booleanSearchValue(searchParams.inStockOnly);
   const minConfidence = confidenceSearchValue(searchParams.minConfidence);
   const filters = { query, categories, labels, originCountries, chains, minPrice, maxPrice, inStockOnly, minConfidence, limit: 100 };
-  const searchResult = buildFacetedProductSearch({ rows: facetedSearchRows, filters });
+  const searchResult = buildFacetedProductSearch({ rows: facetedSearchRows, filters: { ...filters, query: '' } });
+  const rankedSearchResult = query
+    ? {
+        ...searchResult,
+        query,
+        products: searchResult.products
+          .map((product) => {
+            const match = queryExpansion.expandedQueries
+              .map((expandedQuery) => typoTolerantSearchMatch(expandedQuery, [
+                product.productId,
+                product.slug,
+                product.canonicalName,
+                product.brand,
+                product.categoryPath.join(' '),
+                product.labels.join(' '),
+                product.originCountry
+              ]))
+              .sort((left, right) => right.score - left.score)[0] ?? { matched: false, score: 0 };
+            return { product, match };
+          })
+          .filter((entry) => entry.match.matched)
+          .sort((left, right) => {
+            if (right.match.score !== left.match.score) return right.match.score - left.match.score;
+            if (left.product.cheapestPrice === null && right.product.cheapestPrice !== null) return 1;
+            if (left.product.cheapestPrice !== null && right.product.cheapestPrice === null) return -1;
+            if (left.product.cheapestPrice !== null && right.product.cheapestPrice !== null && left.product.cheapestPrice !== right.product.cheapestPrice) return left.product.cheapestPrice - right.product.cheapestPrice;
+            return left.product.canonicalName.localeCompare(right.product.canonicalName, 'sv-SE');
+          })
+          .map((entry) => entry.product)
+          .slice(0, searchResult.filters.limit),
+        count: 0
+      }
+    : searchResult;
+  rankedSearchResult.count = rankedSearchResult.products.length;
 
   const activeFilters = [
     query ? `q=${query}` : null,
+    queryExpansion.phoneticQueries.length > 0 ? `typo tolerance=${queryExpansion.phoneticQueries.map((candidate) => candidate.query).join(', ')}` : null,
     ...categories.map((category) => `category=${category}`),
     ...labelFilters.map((label) => `label=${readableLabel(label)}`),
     ...originCountries.map((country) => `origin=${originCountryLabels[country]}`),
@@ -726,15 +762,15 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
   ].filter((item): item is string => item !== null);
 
   return {
-    ...searchResult,
+    ...rankedSearchResult,
     title: 'Instant faceted search',
-    categoryFacets: searchResult.facets.categories.slice(0, 6),
-    chainFacets: searchResult.facets.chains,
-    labelFacets: searchResult.facets.labels.map((facet) => ({ ...facet, label: readableLabel(facet.value) })).slice(0, 8),
+    categoryFacets: rankedSearchResult.facets.categories.slice(0, 6),
+    chainFacets: rankedSearchResult.facets.chains,
+    labelFacets: rankedSearchResult.facets.labels.map((facet) => ({ ...facet, label: readableLabel(facet.value) })).slice(0, 8),
     labelFilters,
     originFilters: originCountries,
     originFacets: supportedOriginCountries.map((country) => {
-      const facet = searchResult.facets.origins.find((candidate) => candidate.value.toUpperCase() === country);
+      const facet = rankedSearchResult.facets.origins.find((candidate) => candidate.value.toUpperCase() === country);
       return {
         value: country,
         label: originCountryLabels[country],
@@ -742,7 +778,7 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
       };
     }),
     dietaryFilters: commonDietaryFilterOptions.map((option) => {
-      const facet = searchResult.facets.labels.find((candidate) => candidate.value === option.value);
+      const facet = rankedSearchResult.facets.labels.find((candidate) => candidate.value === option.value);
       return {
         ...option,
         checked: dietaryLabels.includes(option.value),
@@ -750,16 +786,17 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
         evidenceSummary: option.evidenceLabels.join(' + ')
       };
     }),
-    priceRange: searchResult.facets.priceRange,
+    priceRange: rankedSearchResult.facets.priceRange,
     inStockOnly: {
       label: 'In-stock / priced rows only',
-      productCount: searchResult.evidence.pricedProductCount,
-      latestPriceCount: searchResult.evidence.latestPriceCount,
-      availableLatestPriceCount: searchResult.evidence.availableLatestPriceCount,
-      outOfStockLatestPriceCount: searchResult.evidence.outOfStockLatestPriceCount
+      productCount: rankedSearchResult.evidence.pricedProductCount,
+      latestPriceCount: rankedSearchResult.evidence.latestPriceCount,
+      availableLatestPriceCount: rankedSearchResult.evidence.availableLatestPriceCount,
+      outOfStockLatestPriceCount: rankedSearchResult.evidence.outOfStockLatestPriceCount
     },
     activeFilters,
-    resultCards: productSearchResultCards(searchResult)
+    searchExpansion: queryExpansion,
+    resultCards: productSearchResultCards(rankedSearchResult)
   };
 }
 
