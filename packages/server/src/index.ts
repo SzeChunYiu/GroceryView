@@ -26,7 +26,7 @@ import {
 } from '@groceryview/api';
 import { apiContractOpenApiComponents } from '@groceryview/api-contracts';
 import { createSessionToken, parseBearerToken, verifySessionToken, type SessionPayload } from '@groceryview/auth';
-import { buildCatalogCoverageReport, type CatalogCoverageInput, type CatalogCoverageReport } from '@groceryview/catalog';
+import { buildCatalogCoverageReport, type CatalogCoverageInput, type CatalogCoverageReport, type MarketCatalogCoverageTarget } from '@groceryview/catalog';
 import {
   checkPostgresIntegrationReadiness,
   checkSourceRunHealth,
@@ -3760,6 +3760,47 @@ function parseCatalogCoverageTargets(value: string | undefined): Omit<CatalogCov
     }
     return fieldValue.map((entry) => String(entry).trim());
   };
+  const readOptionalStringArray = (field: string): string[] | undefined => record[field] === undefined ? undefined : readStringArray(field);
+  const readPositiveInteger = (field: string): number | undefined => {
+    const fieldValue = record[field];
+    if (fieldValue === undefined) return undefined;
+    if (!Number.isInteger(fieldValue) || fieldValue < 1) throw new Error(`CATALOG_COVERAGE_TARGETS_JSON.${field} must be a positive integer.`);
+    return fieldValue;
+  };
+  const parseMarketTarget = (entry: unknown): MarketCatalogCoverageTarget => {
+    if (entry === null || typeof entry !== 'object' || Array.isArray(entry)) throw new Error('CATALOG_COVERAGE_TARGETS_JSON.marketTargets entries must be objects.');
+    const marketRecord = entry as Record<string, unknown>;
+    const market = typeof marketRecord.market === 'string' && marketRecord.market.trim() ? marketRecord.market.trim().toUpperCase() : '';
+    if (!market) throw new Error('CATALOG_COVERAGE_TARGETS_JSON.marketTargets[].market must be a non-empty string.');
+    const marketReadStringArray = (field: string): string[] => {
+      const fieldValue = marketRecord[field];
+      if (!Array.isArray(fieldValue) || fieldValue.length === 0 || !fieldValue.every((value) => typeof value === 'string' && value.trim())) {
+        throw new Error(`CATALOG_COVERAGE_TARGETS_JSON.marketTargets[].${field} must be a non-empty string array.`);
+      }
+      return fieldValue.map((value) => String(value).trim());
+    };
+    const marketReadOptionalStringArray = (field: string): string[] | undefined => marketRecord[field] === undefined ? undefined : marketReadStringArray(field);
+    const marketReadPositiveInteger = (field: string): number | undefined => {
+      const fieldValue = marketRecord[field];
+      if (fieldValue === undefined) return undefined;
+      if (!Number.isInteger(fieldValue) || fieldValue < 1) throw new Error(`CATALOG_COVERAGE_TARGETS_JSON.marketTargets[].${field} must be a positive integer.`);
+      return fieldValue;
+    };
+    return {
+      market,
+      targetProducts: marketReadOptionalStringArray('targetProducts'),
+      targetCategories: marketReadStringArray('targetCategories'),
+      targetChains: marketReadStringArray('targetChains'),
+      targetStores: marketReadStringArray('targetStores'),
+      targetPriceTypes: marketReadOptionalStringArray('targetPriceTypes'),
+      targetCommodities: marketReadOptionalStringArray('targetCommodities'),
+      targetOffers: marketReadOptionalStringArray('targetOffers'),
+      minSourceDiversity: marketReadPositiveInteger('minSourceDiversity'),
+      maxFreshnessHours: marketReadPositiveInteger('maxFreshnessHours'),
+      requireEveryProductInEveryStore: marketRecord.requireEveryProductInEveryStore !== false,
+      requireEveryStorePriceType: marketRecord.requireEveryStorePriceType === true
+    };
+  };
   const targetChains = readStringArray('targetChains');
   const targetPriceTypes = readStringArray('targetPriceTypes');
   if (!targetPriceTypes.includes('online')) {
@@ -3769,12 +3810,19 @@ function parseCatalogCoverageTargets(value: string | undefined): Omit<CatalogCov
   if (missingRequiredChains.length > 0) {
     throw new Error(`CATALOG_COVERAGE_TARGETS_JSON.targetChains is missing required chains: ${missingRequiredChains.join(', ')}.`);
   }
+  const marketTargetsValue = record.marketTargets;
+  const marketTargets = marketTargetsValue === undefined ? undefined : Array.isArray(marketTargetsValue) && marketTargetsValue.length > 0 ? marketTargetsValue.map(parseMarketTarget) : (() => { throw new Error('CATALOG_COVERAGE_TARGETS_JSON.marketTargets must be a non-empty array when provided.'); })();
   return {
     targetProducts: readStringArray('targetProducts'),
     targetCategories: readStringArray('targetCategories'),
     targetChains,
     targetStores: readStringArray('targetStores'),
     targetPriceTypes,
+    targetCommodities: readOptionalStringArray('targetCommodities'),
+    targetOffers: readOptionalStringArray('targetOffers'),
+    minSourceDiversity: readPositiveInteger('minSourceDiversity'),
+    maxFreshnessHours: readPositiveInteger('maxFreshnessHours'),
+    marketTargets,
     requireEveryProductInEveryStore: record.requireEveryProductInEveryStore !== false,
     requireEveryStorePriceType: record.requireEveryStorePriceType === true
   };
