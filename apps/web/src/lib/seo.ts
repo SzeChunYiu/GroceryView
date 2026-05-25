@@ -36,6 +36,16 @@ type StoreSeoInput = {
   district?: string;
 };
 
+type DealSeoInput = {
+  id?: string;
+  slug?: string;
+  title: string;
+  currentPrice: number;
+  originalPrice?: number;
+  currency?: string;
+  imagePath?: string;
+};
+
 export const routeMetadataCatalog = {
   '/': {
     title: 'GroceryView verified grocery snapshot',
@@ -247,6 +257,23 @@ export const routeMetadataCatalog = {
   }
 } satisfies Record<string, Omit<RouteMetadataConfig, 'path'>>;
 
+export function dealSharePath(deal: { dealId?: string; path?: string; title?: string }) {
+  if (deal.path) return deal.path;
+  const slug = (deal.dealId ?? deal.title ?? 'deal')
+    .toLocaleLowerCase('sv-SE')
+    .replace(/[^a-z0-9åäö]+/gi, '-')
+    .replace(/^-|-$/g, '') || 'deal';
+  return `/deals/${encodeURIComponent(slug)}`;
+}
+
+export function dealShareUrl(deal: { dealId?: string; path?: string; title?: string }) {
+  const url = new URL(dealSharePath(deal), siteUrl);
+  url.searchParams.set('utm_source', 'share');
+  url.searchParams.set('utm_medium', 'deal_card');
+  if (deal.dealId) url.searchParams.set('deal_id', deal.dealId);
+  return url.toString();
+}
+
 function absoluteUrl(path: string) {
   return new URL(path, siteUrl).toString();
 }
@@ -321,6 +348,22 @@ export function routeMetadata(route: keyof typeof routeMetadataCatalog | RouteMe
     },
     robots: robots
   };
+}
+
+export function metadataForDeal(deal: DealSeoInput): Metadata {
+  const currency = deal.currency ?? 'SEK';
+  const currentPrice = deal.currentPrice.toLocaleString('sv-SE', { currency, style: 'currency' });
+  const savingsCopy = typeof deal.originalPrice === 'number'
+    ? `, down from ${deal.originalPrice.toLocaleString('sv-SE', { currency, style: 'currency' })}`
+    : '';
+
+  return routeMetadata({
+    path: dealSharePath({ dealId: deal.slug ?? deal.id, title: deal.title }),
+    title: `${deal.title} deal at ${currentPrice} | GroceryView`,
+    description: `Share this verified GroceryView grocery deal for ${deal.title} at ${currentPrice}${savingsCopy}. Referral parameters preserve deal attribution from shared links.`,
+    imagePath: deal.imagePath ?? `/deals/${encodeURIComponent(deal.slug ?? deal.id ?? deal.title)}/opengraph-image`,
+    imageAlt: `${deal.title} GroceryView deal preview`
+  });
 }
 
 export function metadataForProduct(product: ProductSeoInput): Metadata {

@@ -197,3 +197,41 @@ export function storePageViewScript(event: StoreEngagementInput) {
     fetch('${storeEngagementEndpoint}', { body, headers: { 'content-type': 'application/json' }, keepalive: true, method: 'POST' }).catch(() => undefined);
   })();`;
 }
+
+
+export type DealShareChannel = 'copy_link' | 'web_share';
+
+export type DealShareEvent = {
+  channel: DealShareChannel;
+  dealId: string;
+  observedAt: string;
+  referrer?: string;
+  shareUrl: string;
+};
+
+const dealShareEndpoint = '/api/analytics/deal-shares';
+
+export function trackDealShare(event: Omit<DealShareEvent, 'observedAt' | 'referrer'>) {
+  if (typeof window === 'undefined') return;
+
+  const payloadEvent: DealShareEvent = {
+    ...event,
+    observedAt: new Date().toISOString(),
+    referrer: document.referrer || undefined
+  };
+
+  window.dispatchEvent(new CustomEvent('groceryview:deal-share', { detail: payloadEvent }));
+  const payload = JSON.stringify({ event: payloadEvent });
+
+  if (navigator.sendBeacon) {
+    const sent = navigator.sendBeacon(dealShareEndpoint, new Blob([payload], { type: 'application/json' }));
+    if (sent) return;
+  }
+
+  void fetch(dealShareEndpoint, {
+    body: payload,
+    headers: { 'content-type': 'application/json' },
+    keepalive: true,
+    method: 'POST'
+  }).catch(() => undefined);
+}
