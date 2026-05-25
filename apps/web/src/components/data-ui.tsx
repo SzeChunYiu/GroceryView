@@ -47,6 +47,27 @@ export function MetricGrid() {
   );
 }
 
+export function SourceFreshnessStatusBadge({
+  status,
+}: Readonly<{ status: 'within-sla' | 'watch' | 'breached' }>) {
+  const labels = {
+    'within-sla': 'Within SLA',
+    watch: 'Watch',
+    breached: 'SLA breached'
+  };
+  const classNames = {
+    'within-sla': 'bg-emerald-100 text-emerald-950',
+    watch: 'bg-amber-100 text-amber-950',
+    breached: 'bg-rose-100 text-rose-950'
+  };
+
+  return (
+    <span className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.14em] ${classNames[status]}`}>
+      {labels[status]}
+    </span>
+  );
+}
+
 export function SourceCoverage() {
   return (
     <Card>
