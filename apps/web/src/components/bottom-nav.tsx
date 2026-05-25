@@ -1,18 +1,18 @@
 'use client';
 
 import Link from 'next/link';
-import { Map, Newspaper, ScanLine, Search, Store, User, Watch } from 'lucide-react';
+import { Map, ScanLine, Search, ShoppingBasket, Store, Tags, Watch } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useHaptic } from '@/hooks/useHaptic';
 
 const bottomNavItems = [
   { href: '/', label: 'Markets', icon: Store, exact: true },
   { href: '/products', label: 'Search', icon: Search },
-  { href: '/map', label: 'Map', icon: Map },
+  { href: '/screener', label: 'Deals', icon: Tags },
   { href: '/scanner#scan', label: 'Scan', icon: ScanLine, prominent: true, match: 'scanner' },
-  { href: '/stockholm/my-flyer', label: 'My Flyer', icon: Newspaper, match: 'my-flyer' },
-  { href: '/watchlist', label: 'Watchlist', icon: Watch },
-  { href: '/account', label: 'Me', icon: User }
+  { href: '/list', label: 'List', icon: ShoppingBasket },
+  { href: '/map', label: 'Nearby', icon: Map },
+  { href: '/watchlist', label: 'Watchlist', icon: Watch }
 ];
 
 function isBottomNavItemActive(item: (typeof bottomNavItems)[number], pathname: string) {
