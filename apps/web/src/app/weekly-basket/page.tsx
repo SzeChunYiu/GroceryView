@@ -34,6 +34,24 @@ const weeklyBasketConfidence = {
   caveat: 'The optimizer uses visible price rows for favorite stores only; missing store-product prices reduce coverage instead of being estimated.'
 };
 
+type RecipeBasketSearchParams = {
+  recipeBasket?: string | string[];
+};
+
+function firstSearchValue(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] ?? '' : value ?? '';
+}
+
+function parseRecipeBasket(value: string) {
+  try {
+    const parsed = JSON.parse(value) as { source?: string; items?: Array<{ productId?: string; name?: string; quantity?: string; price?: number | null }> };
+    if (parsed.source !== 'recipe-importer' || !Array.isArray(parsed.items)) return null;
+    return parsed.items.filter((item) => typeof item.name === 'string' && typeof item.quantity === 'string').slice(0, 20);
+  } catch {
+    return null;
+  }
+}
+
 function WeeklyBasketEmptyState() {
   return (
     <PageShell>
@@ -47,7 +65,12 @@ function WeeklyBasketEmptyState() {
   );
 }
 
-export default function WeeklyBasketPage() {
+export default async function WeeklyBasketPage({
+  searchParams
+}: Readonly<{ searchParams?: Promise<RecipeBasketSearchParams> }>) {
+  const resolvedSearchParams = await Promise.resolve(searchParams ?? {});
+  const recipeBasketItems = parseRecipeBasket(firstSearchValue(resolvedSearchParams.recipeBasket));
+
   if (weeklyBasketOptimizerInput.items.length === 0) {
     return <WeeklyBasketEmptyState />;
   }
@@ -75,6 +98,19 @@ export default function WeeklyBasketPage() {
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
         This page calls compareBasketStrategies and summarizeStoreBasketCoverage with visible favorite-store price rows, showing split-shop savings and store coverage without estimating missing prices.
       </p>
+      {recipeBasketItems ? (
+        <Card className="mt-6 border-lime-200 bg-lime-50">
+          <h2 className="text-2xl font-black text-lime-950">Saved recipe basket</h2>
+          <p className="mt-2 text-sm font-semibold text-lime-900">Imported from the recipe planner with {recipeBasketItems.length} mapped ingredient rows. Prices remain source-row prices from the importer; missing prices are not estimated.</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {recipeBasketItems.map((item) => (
+              <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-lime-950" key={`${item.productId ?? item.name}-${item.quantity}`}>
+                {item.quantity} {item.name}{typeof item.price === 'number' ? ` · ${formatSek(item.price)}` : ''}
+              </span>
+            ))}
+          </div>
+        </Card>
+      ) : null}
 
       <ExpiringPromotionRail items={expiringPromotions} snapshotLabel={`Snapshot ${promotionSnapshotAt.toISOString().slice(0, 10)}`} />
 
