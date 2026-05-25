@@ -1,8 +1,10 @@
 import { calculateChainPriceIndex } from '@groceryview/core';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { StoreDistanceCard } from '@/components/StoreDistanceCard';
 import { StoreMap } from '@/components/store-map';
 import { buildChainPriceObservations } from '@/lib/chain-index-data';
 import { basketCostHeatmap } from '@/lib/map-basket-cost-heatmap';
+import { buildStoreInventoryConfidence } from '@/lib/osm-stores';
 import { formatPct, storePricePercentileRanks, storeUniverse } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 import { buildStoreDistanceCompare } from '@/lib/store-distance';
@@ -22,6 +24,10 @@ const routeAwareNearestStorePlan = buildStoreDistanceCompare(
   'walk'
 );
 const topRouteAwareStores = routeAwareNearestStorePlan.rows.slice(0, 4);
+const topRouteAwareStoreInventory = topRouteAwareStores.map((store) => {
+  const osmStore = osmStoreForRouteStore(store);
+  return osmStore ? buildStoreInventoryConfidence(osmStore) : null;
+});
 
 function normaliseBrand(brand: string) {
   const lower = brand.toLowerCase();
@@ -33,6 +39,21 @@ function normaliseBrand(brand: string) {
   if (lower.includes('city gross')) return 'city gross';
   if (lower.includes('tempo')) return 'tempo';
   return lower;
+}
+
+function osmStoreForRouteStore(store: { areaLabel: string; chainName: string; storeName: string }) {
+  const brand = normaliseBrand(store.chainName);
+  const area = store.areaLabel.toLowerCase();
+  return storeUniverse.find((candidate) =>
+    normaliseBrand(candidate.brand) === brand &&
+    `${candidate.name} ${candidate.address} ${candidate.city} ${candidate.district}`.toLowerCase().includes(area)
+  ) ?? storeUniverse.find((candidate) => normaliseBrand(candidate.brand) === brand) ?? null;
+}
+
+function inventoryTone(level: 'high' | 'medium' | 'low') {
+  if (level === 'high') return 'bg-emerald-50 text-emerald-950';
+  if (level === 'medium') return 'bg-amber-50 text-amber-950';
+  return 'bg-rose-50 text-rose-950';
 }
 
 function markerTone(index?: number) {
@@ -177,7 +198,9 @@ export default function MapPage() {
           </div>
         </div>
         <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          {topRouteAwareStores.map((store, index) => (
+          {topRouteAwareStores.map((store, index) => {
+            const inventory = topRouteAwareStoreInventory[index];
+            return (
             <div className="rounded-2xl border border-cyan-100 bg-white p-4 shadow-sm" data-route-aware-nearest-store={store.id} key={store.id}>
               <div className="flex items-start justify-between gap-3">
                 <div>
@@ -198,10 +221,28 @@ export default function MapPage() {
                 </div>
               </dl>
               <p className="mt-3 rounded-xl bg-slate-50 p-3 text-xs font-bold leading-5 text-slate-700">{store.openingStatusLabel}</p>
+              {inventory ? (
+                <div className={`mt-3 rounded-xl p-3 text-xs font-bold leading-5 ${inventoryTone(inventory.level)}`}>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p>{inventory.label}</p>
+                    <time dateTime={inventory.lastSeenAt}>{inventory.lastSeenLabel}</time>
+                  </div>
+                  <p className="mt-1">{inventory.detail}</p>
+                </div>
+              ) : null}
               <p className="mt-3 text-xs font-semibold leading-5 text-slate-500">{store.recommendationLabel}</p>
             </div>
-          ))}
+            );
+          })}
         </div>
+        {topRouteAwareStores[0] ? (
+          <StoreDistanceCard
+            fallbackLabel="Use the route-aware list above while location is unavailable, then verify stock before leaving."
+            inventoryConfidence={topRouteAwareStoreInventory[0] ?? undefined}
+            routeHints={topRouteAwareStores[0].routeEstimates}
+            storeName={topRouteAwareStores[0].storeName}
+          />
+        ) : null}
       </Card>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
