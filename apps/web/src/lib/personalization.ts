@@ -32,6 +32,18 @@ export type RecentSearchHistoryEntry = {
   searchedAt: string;
 };
 
+export type BrandLearningInput = {
+  brand?: string | null;
+  name?: string | null;
+};
+
+export type LearnedBrandPreference = {
+  brand: string;
+  preference: 'preferred' | 'disliked';
+  score: number;
+  evidence: string[];
+};
+
 export const householdCategorySignals: HouseholdCategorySignal[] = [
   { householdId: defaultHouseholdId, categorySlug: 'mejeri-ost-agg', clicks: 18, conversions: 7 },
   { householdId: defaultHouseholdId, categorySlug: 'frukt-gront', clicks: 16, conversions: 6 },
@@ -40,6 +52,55 @@ export const householdCategorySignals: HouseholdCategorySignal[] = [
   { householdId: 'new-arrival-demo', categorySlug: 'skafferi', clicks: 14, conversions: 6 },
   { householdId: 'new-arrival-demo', categorySlug: 'frys', clicks: 9, conversions: 3 },
 ];
+
+function normalizeBrand(value: string | null | undefined) {
+  return value?.trim() || '';
+}
+
+function bumpBrandScore(scores: Map<string, { brand: string; score: number; evidence: Set<string> }>, brand: string, points: number, evidence: string) {
+  const normalized = normalizeBrand(brand);
+  if (!normalized) return;
+  const key = normalized.toLocaleLowerCase('sv-SE');
+  const current = scores.get(key) ?? { brand: normalized, score: 0, evidence: new Set<string>() };
+  current.score += points;
+  current.evidence.add(evidence);
+  scores.set(key, current);
+}
+
+export function inferLearnedBrandPreferences(options: {
+  favourites?: readonly BrandLearningInput[];
+  removals?: readonly BrandLearningInput[];
+  searches?: readonly RecentSearchHistoryEntry[];
+  candidateBrands?: readonly string[];
+} = {}): LearnedBrandPreference[] {
+  const scores = new Map<string, { brand: string; score: number; evidence: Set<string> }>();
+  for (const favourite of options.favourites ?? []) {
+    if (favourite.brand) bumpBrandScore(scores, favourite.brand, 3, 'saved as favourite');
+  }
+  for (const removal of options.removals ?? []) {
+    if (removal.brand) bumpBrandScore(scores, removal.brand, -4, 'removed from watchlist');
+  }
+  const brands = (options.candidateBrands ?? [])
+    .map(normalizeBrand)
+    .filter((brand, index, list) => brand && list.findIndex((candidate) => candidate.toLocaleLowerCase('sv-SE') === brand.toLocaleLowerCase('sv-SE')) === index);
+  for (const search of options.searches ?? []) {
+    const query = search.query.toLocaleLowerCase('sv-SE');
+    for (const brand of brands) {
+      if (query.includes(brand.toLocaleLowerCase('sv-SE'))) {
+        bumpBrandScore(scores, brand, 2, 'repeated search');
+      }
+    }
+  }
+  return [...scores.values()]
+    .map((signal) => ({
+      brand: signal.brand,
+      preference: signal.score < 0 ? 'disliked' as const : 'preferred' as const,
+      score: signal.score,
+      evidence: [...signal.evidence]
+    }))
+    .filter((signal) => Math.abs(signal.score) >= 2)
+    .sort((a, b) => Math.abs(b.score) - Math.abs(a.score) || a.brand.localeCompare(b.brand, 'sv'));
+}
 
 export function readRecentSearchHistory(): RecentSearchHistoryEntry[] {
   if (typeof window === 'undefined') return [];

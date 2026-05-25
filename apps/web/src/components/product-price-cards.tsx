@@ -238,7 +238,7 @@ export function ProductPriceCards({
           <div className="relative" key={card.slug}>
             <FavouriteProductToggle
               className="absolute right-3 top-3 z-10"
-              product={{ slug: card.slug, name: card.name, imageUrl: card.imageUrl }}
+              product={{ slug: card.slug, name: card.name, imageUrl: card.imageUrl, brand: card.brand }}
             />
             <LazyItemCard
               className="block rounded-2xl border border-slate-200 bg-slate-50 p-4 motion-safe:transition motion-safe:hover:-translate-y-0.5 hover:border-emerald-700"

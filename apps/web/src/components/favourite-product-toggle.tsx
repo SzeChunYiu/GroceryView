@@ -5,6 +5,7 @@ import {
   FAVOURITES_UPDATED_EVENT,
   isFavouriteProduct,
   readFavouriteProductEntries,
+  rememberFavouriteBrandRemoval,
   saveFavouriteProductEntries,
   toggleFavouriteProduct,
   type FavouriteProductInput
@@ -49,6 +50,9 @@ export function FavouriteProductToggle({
         setIsFavourite(false);
         setIsReady(true);
         return;
+      }
+      if (!next.isFavourite) {
+        rememberFavouriteBrandRemoval(product);
       }
       setIsFavourite(next.isFavourite);
       window.dispatchEvent(new CustomEvent(FAVOURITES_UPDATED_EVENT, { detail: { slug: product.slug, isFavourite: next.isFavourite } }));

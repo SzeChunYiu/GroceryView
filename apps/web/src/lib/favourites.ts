@@ -1,39 +1,60 @@
 export const FAVOURITES_STORAGE_KEY = 'groceryview:favourite-products';
 export const FAVOURITES_UPDATED_EVENT = 'groceryview:favourite-products-updated';
+export const FAVOURITE_BRAND_REMOVALS_STORAGE_KEY = 'groceryview:favourite-brand-removals';
+const maxFavouriteBrandRemovals = 20;
 
 export type FavouriteProductInput = {
   slug: string;
   name: string;
   imageUrl?: string | null;
+  brand?: string | null;
 };
 
 export type FavouriteProductEntry = {
   slug: string;
   name: string;
   imageUrl: string | null;
+  brand: string | null;
   savedAt: string;
+};
+
+export type FavouriteBrandRemovalEntry = {
+  brand: string;
+  slug: string;
+  removedAt: string;
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+function normalizeBrandRemovalEntry(value: unknown): FavouriteBrandRemovalEntry | null {
+  if (!isRecord(value)) return null;
+  const brand = typeof value.brand === 'string' ? value.brand.trim() : '';
+  const slug = typeof value.slug === 'string' ? value.slug.trim() : '';
+  const removedAt = typeof value.removedAt === 'string' ? value.removedAt : '';
+  if (!brand || !slug) return null;
+  return { brand, slug, removedAt };
+}
+
 function normalizeEntry(value: unknown): FavouriteProductEntry | null {
   if (typeof value === 'string') {
     const slug = value.trim();
     if (!slug) return null;
-    return { slug, name: slug, imageUrl: null, savedAt: '' };
+    return { slug, name: slug, imageUrl: null, brand: null, savedAt: '' };
   }
   if (!isRecord(value) || typeof value.slug !== 'string') return null;
   const slug = value.slug.trim();
   if (!slug) return null;
   const rawName = typeof value.name === 'string' ? value.name.trim() : '';
   const rawImage = typeof value.imageUrl === 'string' && value.imageUrl.trim() ? value.imageUrl.trim() : null;
+  const rawBrand = typeof value.brand === 'string' && value.brand.trim() ? value.brand.trim() : null;
   const rawSavedAt = typeof value.savedAt === 'string' ? value.savedAt : '';
   return {
     slug,
     name: rawName || slug,
     imageUrl: rawImage,
+    brand: rawBrand,
     savedAt: rawSavedAt
   };
 }
@@ -60,6 +81,7 @@ export function serializeFavouriteProductEntries(entries: readonly FavouriteProd
     slug: entry.slug,
     name: entry.name,
     imageUrl: entry.imageUrl,
+    brand: entry.brand,
     savedAt: entry.savedAt
   })));
 }
@@ -97,6 +119,51 @@ export function saveFavouriteProductEntries(
   }
 }
 
+export function parseFavouriteBrandRemovalEntries(raw: string | null): FavouriteBrandRemovalEntry[] {
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .map(normalizeBrandRemovalEntry)
+      .filter((entry): entry is FavouriteBrandRemovalEntry => Boolean(entry))
+      .slice(0, maxFavouriteBrandRemovals);
+  } catch {
+    return [];
+  }
+}
+
+export function readFavouriteBrandRemovalEntries(storage: FavouriteProductStorage = getFavouriteProductStorage()): FavouriteBrandRemovalEntry[] {
+  if (!storage) return [];
+  try {
+    return parseFavouriteBrandRemovalEntries(storage.getItem(FAVOURITE_BRAND_REMOVALS_STORAGE_KEY));
+  } catch {
+    return [];
+  }
+}
+
+export function rememberFavouriteBrandRemoval(
+  product: FavouriteProductInput,
+  removedAt = new Date().toISOString(),
+  storage: FavouriteProductStorage = getFavouriteProductStorage()
+): FavouriteBrandRemovalEntry[] {
+  const brand = product.brand?.trim();
+  const slug = product.slug.trim();
+  if (!storage || !brand || !slug) return readFavouriteBrandRemovalEntries(storage);
+  const next = [
+    { brand, slug, removedAt },
+    ...readFavouriteBrandRemovalEntries(storage).filter(
+      (entry) => entry.slug !== slug || entry.brand.toLocaleLowerCase('sv-SE') !== brand.toLocaleLowerCase('sv-SE')
+    )
+  ].slice(0, maxFavouriteBrandRemovals);
+  try {
+    storage.setItem(FAVOURITE_BRAND_REMOVALS_STORAGE_KEY, JSON.stringify(next));
+  } catch {
+    return readFavouriteBrandRemovalEntries(storage);
+  }
+  return next;
+}
+
 export function isFavouriteProduct(entries: readonly FavouriteProductEntry[], slug: string): boolean {
   return entries.some((entry) => entry.slug === slug);
 }
@@ -118,6 +185,7 @@ export function toggleFavouriteProduct(
         slug,
         name: product.name.trim() || slug,
         imageUrl: product.imageUrl ?? null,
+        brand: product.brand?.trim() || null,
         savedAt
       },
       ...entries
