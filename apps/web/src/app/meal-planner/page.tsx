@@ -3,7 +3,7 @@ import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { RecipeImporter } from '@/components/recipe-importer';
 import { dealBasedMealInputs, dealBasedMeals, familyMealPlannerFromDeals, freezerBatchCookPlanner, products, studentDealRecipes } from '@/lib/demo-data';
-import { buildMealPlanShoppingListItems, extractIngredientsFromMealPlans, mealPlanShoppingListHref, suggestBudgetAlternativesFromMealPlans, type MealBudgetPlan } from '@/lib/meal-budgets';
+import { buildMealPlanShoppingListExport, extractIngredientsFromMealPlans, mealPlanShoppingListHref, suggestBudgetAlternativesFromMealPlans, type MealBudgetPlan } from '@/lib/meal-budgets';
 import { mergeMealPlanIngredientsForWeeklyBasket } from '@/lib/unit-normalizer';
 import { dietarySubstitutionAssistantContract } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
@@ -117,8 +117,10 @@ const mealPlanBasketIngredients = mergeMealPlanIngredientsForWeeklyBasket([
 ]);
 
 function MealPlanShoppingListExport({ meal }: Readonly<{ meal: MealBudgetPlan }>) {
-  const exportItems = buildMealPlanShoppingListItems([meal]);
+  const exportPayload = buildMealPlanShoppingListExport([meal], meal.title);
+  const exportItems = exportPayload.items;
   const categories = [...new Set(exportItems.map((item) => item.category))];
+  const lowestChainTotal = exportPayload.chainTotals[0];
 
   return (
     <div className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50 p-4" data-meal-plan-shopping-list-export={meal.title}>
@@ -127,6 +129,11 @@ function MealPlanShoppingListExport({ meal }: Readonly<{ meal: MealBudgetPlan }>
           <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">Shopping-list export</p>
           <p className="mt-1 text-sm font-semibold text-slate-700">
             Converts this recipe into {exportItems.length} categorized item{exportItems.length === 1 ? '' : 's'} with quantities: {categories.join(', ')}.
+          </p>
+          <p className="mt-1 text-xs font-bold text-emerald-900">
+            {lowestChainTotal
+              ? `Lowest estimated chain total: ${lowestChainTotal.chain} · ${formatSek(lowestChainTotal.estimatedTotal)} for ${lowestChainTotal.itemCount} item${lowestChainTotal.itemCount === 1 ? '' : 's'}.`
+              : `Estimated list total: ${formatSek(exportPayload.estimatedTotal)}.`}
           </p>
         </div>
         <Link
@@ -200,6 +207,9 @@ export default async function MealPlannerPage({
       <Eyebrow>{COPY.hero.eyebrow}</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">{COPY.hero.title}</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">{COPY.hero.description}</p>
+      <Link className="mt-4 inline-flex rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white hover:bg-slate-800" href="/cart-assistant?budget=500&diet=vegetarian&household=2&meals=pasta%20lunchboxes,tofu%20bowls,quick%20dinners">
+        Open cart assistant
+      </Link>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr_1fr]">
         <Card>

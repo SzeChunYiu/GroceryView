@@ -251,6 +251,12 @@ export const compareOverlayChart = {
       highPrice,
       provenanceLabel: latestPoint?.provenanceLabel ?? snapshot.openPricesSource,
       markerCount: series.markers.length,
+      points: points.map((point) => ({
+        time: point.time,
+        value: point.value,
+        confidence: point.confidence,
+        provenanceLabel: point.provenanceLabel
+      })),
       sparklinePoints: points.slice(-8)
     };
   }),
