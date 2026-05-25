@@ -30,6 +30,7 @@ describe('daily connectors export script', () => {
       'mathem',
       'matspar',
       'pharmacy',
+      'apoteket',
       'okq8'
     ]);
     assert.deepEqual(connectors.map((connector) => connector.connectorId), [
@@ -45,6 +46,7 @@ describe('daily connectors export script', () => {
       'mathem-public-search',
       'matspar-public-search',
       'pharmacy-public-products',
+      'apoteket-se-public-products',
       'okq8-fuel-prices'
     ]);
     assert.equal(
@@ -69,6 +71,10 @@ describe('daily connectors export script', () => {
     assert.equal(pharmacyConnector.domain, 'pharmacy');
     assert.equal(pharmacyConnector.requireStoreScopedPrices, false);
     assert.deepEqual(pharmacyConnector.stores, []);
+    const apoteketConnector = connectors.find((connector) => connector.connectorId === 'apoteket-se-public-products');
+    assert.equal(apoteketConnector.domain, 'pharmacy');
+    assert.equal(apoteketConnector.requireStoreScopedPrices, false);
+    assert.deepEqual(apoteketConnector.stores, []);
     const coopProductConnector = connectors.find((connector) => connector.connectorId === 'coop-products-all-stores');
     const coopWeeklyConnector = connectors.find((connector) => connector.connectorId === 'coop-weekly-all-stores');
     assert.deepEqual(coopProductConnector.stores.map((store) => store.storeId), ['176110']);
@@ -86,6 +92,7 @@ describe('daily connectors export script', () => {
       'groceryview://daily/mathem/products/public-search',
       'groceryview://daily/matspar/products/public-search',
       'groceryview://daily/pharmacy/products/public',
+      'groceryview://daily/apoteket-se/products/public',
       'https://www.okq8.se/foretag/priser/'
     ]);
     assert.deepEqual(connectors.map((connector) => connector.parserVersion), [
@@ -101,6 +108,7 @@ describe('daily connectors export script', () => {
       'mathem-public-search-v1',
       'matspar-public-search-v1',
       'pharmacy-public-products-v1',
+      'apoteket-se-public-products-v1',
       'okq8-fuel-prices-v1'
     ]);
   });

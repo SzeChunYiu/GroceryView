@@ -58,6 +58,11 @@ import {
   DEFAULT_APOTEK_HJARTAT_SEARCH_URLS
 } from './connectors/apohem.js';
 import {
+  DEFAULT_APOTEKET_SE_SOURCE_URLS,
+  fetchApoteketSeProducts,
+  type ApoteketSeProductRow
+} from './connectors/apoteket-se.js';
+import {
   fetchLidlOffersForAllStores,
   type LidlStoreOffer
 } from './connectors/lidl.js';
@@ -120,6 +125,7 @@ export * from './connectors/matspar.js';
 export * from './connectors/lidl-bulk.js';
 export * from './connectors/willys-bulk.js';
 export * from './connectors/apohem.js';
+export * from './connectors/apoteket-se.js';
 export * from './connectors/okq8-fuel.js';
 export * from './connectors/seven-eleven-se.js';
 export * from './connectors/st1-fuel.js';
@@ -1647,10 +1653,24 @@ type ParsedPackageQuantity = {
 };
 
 function parseNativePackageText(value: string): ParsedPackageQuantity {
-  const match = value.match(/(\d+(?:[,.]\d+)?)\s*(kg|g|gram|l|liter|ml|st|styck|pcs|piece|pack)\b/i);
+  const match = value.match(/(\d+(?:[,.]\d+)?)\s*(kg|g|gram|l|liter|ml|st|styck|pcs|piece|pack|tablett|tabletter|kapsel|kapslar|portion|portioner)\b/i);
   if (!match) return { packageSize: 1, packageUnit: 'piece' };
   const unit = match[2].toLowerCase();
-  const packageUnit = unit === 'st' || unit === 'styck' || unit === 'pack' ? 'piece' : unit === 'liter' ? 'l' : unit === 'gram' ? 'g' : unit;
+  const packageUnit = unit === 'st'
+    || unit === 'styck'
+    || unit === 'pack'
+    || unit === 'tablett'
+    || unit === 'tabletter'
+    || unit === 'kapsel'
+    || unit === 'kapslar'
+    || unit === 'portion'
+    || unit === 'portioner'
+    ? 'piece'
+    : unit === 'liter'
+      ? 'l'
+      : unit === 'gram'
+        ? 'g'
+        : unit;
   return { packageSize: Number(match[1].replace(',', '.')), packageUnit };
 }
 
@@ -2112,6 +2132,27 @@ function pharmacyProductToDailyItem(row: ApohemProduct): RetailerConnectorParsed
   };
 }
 
+function apoteketSeProductToDailyItem(row: ApoteketSeProductRow): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(`${row.product_name} ${row.unit}`);
+  return {
+    sourceType: 'retailer_online_page',
+    observedAt: row.observed_at,
+    chainId: row.chain,
+    storeId: row.store_id,
+    retailerProductId: stableKeyPart(`${row.product_name}-${row.unit}`),
+    rawName: row.product_name,
+    canonicalName: row.product_name,
+    productId: `apoteket-${stableKeyPart(row.product_name)}`,
+    categoryId: 'pharmacy-public',
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price_sek,
+    memberOnly: false,
+    isAvailable: true,
+    sourceUrl: row.source_url
+  };
+}
+
 function dailyNativeSnapshotResult(input: {
   plan: RetailerConnectorRunPlan;
   retrievedAt: string;
@@ -2403,6 +2444,18 @@ export async function fetchDailyConnectorSnapshot(
       retrievedAt
     });
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(pharmacyProductToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_APOTEKET_SE_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_APOTEKET_SE_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchApoteketSeProducts({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      sourceUrls: dailyNativeStringListParam(url, 'sourceUrls') ?? DEFAULT_APOTEKET_SE_SOURCE_URLS,
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      observedAt: retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(apoteketSeProductToDailyItem) });
   }
 
   return await fetchRetailerConnectorSnapshot(plan, options);
@@ -3242,6 +3295,7 @@ export const GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL = 'groceryview://daily/matsp
 export const GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL = OKQ8_FUEL_PRICES_URL;
 export const GROCERYVIEW_DAILY_SEVEN_ELEVEN_SE_CONVENIENCE_PRODUCTS_URL = 'groceryview://daily/seven-eleven-se/convenience-products';
 export const GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL = 'groceryview://daily/pharmacy/products/public';
+export const GROCERYVIEW_DAILY_APOTEKET_SE_PRODUCTS_URL = 'groceryview://daily/apoteket-se/products/public';
 
 const requireForDailyIngestion = createRequire(import.meta.url);
 
