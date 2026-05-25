@@ -140,6 +140,9 @@ export default function CatalogueSavingsPage() {
               currentPrice={product.lowestPrice}
               dealEndsAt={dealEndsAt}
               dealId={product.slug}
+              imageAlt={`${product.name} product image`}
+              imagePriority={product === expiringSavingsRows[0]?.product}
+              imageUrl={product.image}
               key={product.slug}
               originalPrice={product.highestPrice > product.lowestPrice ? product.highestPrice : undefined}
               sharePath={`/products/${product.slug}`}

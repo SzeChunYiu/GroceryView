@@ -1,18 +1,21 @@
 import { createHmac } from 'node:crypto';
 import { NextResponse, type NextRequest } from 'next/server';
 import { normalizePublicListShareItems, publicListSharePath } from '@/lib/list-permissions';
+import { createPublicListSharePreview } from '@/lib/social';
 
 type ShareLinkRequest = {
   expiresAt?: string | null;
   items?: unknown[];
   listId?: string;
+  updatedAt?: string | null;
 };
 
 type ShareTokenPayload = {
   createdAt: string;
   expiresAt: string | null;
-  items: unknown[];
+  items: ReturnType<typeof normalizePublicListShareItems>;
   listId: string;
+  updatedAt: string;
 };
 
 function shareSecret() {
@@ -36,21 +39,25 @@ function normalizedExpiry(value: unknown) {
 
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => ({})) as ShareLinkRequest;
+  const now = new Date().toISOString();
   const defaultExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
   const payload: ShareTokenPayload = {
-    createdAt: new Date().toISOString(),
+    createdAt: now,
     expiresAt: normalizedExpiry(body.expiresAt) ?? defaultExpiresAt,
     items: Array.isArray(body.items) ? normalizePublicListShareItems(body.items) : [],
     listId: body.listId?.trim() || 'local-shopping-list',
+    updatedAt: normalizedExpiry(body.updatedAt) ?? now,
   };
   const encodedPayload = encodeBase64Url(JSON.stringify(payload));
   const token = `${encodedPayload}.${signPayload(encodedPayload)}`;
   const shareUrl = new URL(publicListSharePath(token), request.nextUrl.origin);
+  const preview = createPublicListSharePreview(payload.items, { updatedAt: payload.updatedAt });
 
   return NextResponse.json({
     token,
     shareUrl: shareUrl.toString(),
     expiresAt: payload.expiresAt,
+    preview,
     signature: 'hmac-sha256',
   });
 }

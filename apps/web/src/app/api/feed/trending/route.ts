@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { buildCityPriceDropTrends } from '@/lib/trends';
+import { rankTrendingDealsForHousehold } from '@/lib/personalization';
 
 export const dynamic = 'force-static';
 
@@ -14,6 +15,20 @@ export function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const city = searchParams.get('city') ?? 'stockholm';
   const limit = parseLimit(searchParams.get('limit'));
+  const csv = (name: string) => (searchParams.get(name) ?? '').split(',').map((value) => value.trim()).filter(Boolean);
+  const feed = buildCityPriceDropTrends({ city, limit });
 
-  return NextResponse.json(buildCityPriceDropTrends({ city, limit }));
+  return NextResponse.json({
+    ...feed,
+    cards: rankTrendingDealsForHousehold(feed.cards, {
+      householdId: searchParams.get('householdId') ?? undefined,
+      favoriteBrands: csv('favoriteBrands'),
+      dietaryFilters: csv('dietary'),
+      nearbyChains: csv('nearbyChains'),
+      clickedProductSlugs: csv('clicked'),
+    }),
+    personalization: {
+      signals: ['favoriteBrands', 'dietary', 'nearbyChains', 'clicked', 'household category history'],
+    },
+  });
 }
