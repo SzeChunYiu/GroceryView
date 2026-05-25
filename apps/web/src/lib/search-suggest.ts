@@ -47,6 +47,8 @@ const groceryAliasEntries: Array<{ canonical: string; aliases: WeightedAlias[] }
   { canonical: 'chicken', aliases: [{ value: 'kyck', weight: 1 }, { value: 'kyckling', weight: 1.2 }, { value: 'chix', weight: 0.8 }] },
   { canonical: 'yogurt', aliases: [{ value: 'yoghurt', weight: 1.15 }, { value: 'fil', weight: 0.9 }, { value: 'grekisk yoghurt', weight: 1.2 }] },
   { canonical: 'butter', aliases: [{ value: 'smor', weight: 1.05 }, { value: 'smör', weight: 1.2 }, { value: 'bregott', weight: 1.1 }] },
+  { canonical: 'apples', aliases: [{ value: 'apple', weight: 1.05 }, { value: 'äpple', weight: 1.2 }, { value: 'aple', weight: 0.9 }, { value: 'royal gala', weight: 1.1 }] },
+  { canonical: 'pasta', aliases: [{ value: 'makaroner', weight: 1.15 }, { value: 'spagetti', weight: 1 }, { value: 'spaghetti', weight: 1.05 }] },
   { canonical: 'tomatoes', aliases: [{ value: 'tomat', weight: 1.1 }, { value: 'tomater', weight: 1.2 }] },
   { canonical: 'private label milk', aliases: [{ value: 'garant mjolk', weight: 1.15 }, { value: 'garant mjölk', weight: 1.25 }, { value: 'willys mjolk', weight: 1.15 }, { value: 'willys mjölk', weight: 1.25 }] }
 ];
