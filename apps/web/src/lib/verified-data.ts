@@ -602,6 +602,15 @@ function dietarySearchValues(value: SearchParamValue): CommonDietaryFilterValue[
     .map((option) => option.value);
 }
 
+function isDietaryFacetValue(value: string): boolean {
+  const normalized = value.toLocaleLowerCase('sv-SE');
+  return commonDietaryFilterOptions.some((option) => option.value === normalized);
+}
+
+function isCertificationFacetValue(value: string): boolean {
+  return !isDietaryFacetValue(value);
+}
+
 export const supportedOriginCountries = ['SE', 'NO', 'IS', 'DK', 'FI', 'DE', 'NL', 'ES', 'IT', 'PL', 'IE'] as const;
 
 export type SupportedOriginCountry = (typeof supportedOriginCountries)[number];
@@ -728,9 +737,13 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
   return {
     ...searchResult,
     title: 'Instant faceted search',
-    categoryFacets: searchResult.facets.categories.slice(0, 6),
+    categoryFacets: searchResult.facets.categories.slice(0, 12),
     chainFacets: searchResult.facets.chains,
-    labelFacets: searchResult.facets.labels.map((facet) => ({ ...facet, label: readableLabel(facet.value) })).slice(0, 8),
+    labelFacets: searchResult.facets.labels.map((facet) => ({ ...facet, label: readableLabel(facet.value) })).slice(0, 12),
+    certificationFacets: searchResult.facets.labels
+      .filter((facet) => isCertificationFacetValue(facet.value))
+      .map((facet) => ({ ...facet, label: readableLabel(facet.value) }))
+      .slice(0, 12),
     labelFilters,
     originFilters: originCountries,
     originFacets: supportedOriginCountries.map((country) => {

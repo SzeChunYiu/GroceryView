@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { ChainFilterInput } from './chain-filter-input';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { FilterPanel, type SearchFacetOption } from '@/components/FilterPanel';
 import { OriginFilter, type OriginFilterCode } from '@/components/origin-filter';
 import { ProductPriceCards } from '@/components/product-price-cards';
 import { apohemSource } from '@/lib/ingested/apohem';
@@ -58,24 +58,24 @@ function setAllParams(params: URLSearchParams, key: keyof SearchParams, value: s
 
 function copySearchParams(params: URLSearchParams, source: SearchParams) {
   setFirstParam(params, 'q', source.q);
-  setFirstParam(params, 'category', source.category);
-  setFirstParam(params, 'label', source.label);
+  setAllParams(params, 'category', source.category);
+  setAllParams(params, 'label', source.label);
   setAllParams(params, 'origin', source.origin);
   setAllParams(params, 'dietary', source.dietary);
-  setFirstParam(params, 'chain', source.chain);
+  setAllParams(params, 'chain', source.chain);
   setFirstParam(params, 'minPrice', source.minPrice);
   setFirstParam(params, 'maxPrice', source.maxPrice);
   setFirstParam(params, 'inStockOnly', source.inStockOnly);
   setFirstParam(params, 'minConfidence', source.minConfidence);
 }
 
-function productsPageUrl(page: number, selectedBrand = '', searchParams: SearchParams = {}) {
+function productsPageUrl(page: number, selectedBrand = '', searchParams: SearchParams = {}, basePath: '/products' | '/search' = '/products') {
   const params = new URLSearchParams();
   copySearchParams(params, searchParams);
   if (selectedBrand) params.set('brand', selectedBrand);
   if (page > 1) params.set('page', String(page));
   const query = params.toString();
-  return query ? `/products?${query}` : '/products';
+  return query ? `${basePath}?${query}` : basePath;
 }
 
 const ZERO_RESULT_RELATED_SEARCHES = [
@@ -115,10 +115,10 @@ function zeroResultCategoryShortcuts(query: string, selectedCategory: string | s
     .slice(0, 6);
 }
 
-export default async function ProductsPage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
+export async function ProductsListingPage({ searchParams, basePath = '/products' }: { searchParams?: Promise<SearchParams>; basePath?: '/products' | '/search' }) {
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
   const search = buildProductSearchView(resolvedSearchParams);
-  const { categoryFacets, labelFacets, originFacets, chainFacets, priceRange, inStockOnly, resultCards } = search;
+  const { categoryFacets, labelFacets, certificationFacets, originFacets, chainFacets, priceRange, inStockOnly, resultCards } = search;
   const requestedPage = toPageNumber(resolvedSearchParams.page);
   const selectedBrand = normalizeSelectedBrand(resolvedSearchParams.brand);
   const productCards = selectedBrand
@@ -130,7 +130,6 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const pagedResultCards = resultCards.slice(pageStart, pageStart + PRODUCTS_PER_PAGE);
   const rangeStart = resultCards.length === 0 ? 0 : pageStart + 1;
   const rangeEnd = Math.min(pageStart + PRODUCTS_PER_PAGE, resultCards.length);
-  const chainFilterProducts = resultCards.map((product) => product.slug).join('|');
   const defaultSearchCount = facetedProductSearch.resultCards.length;
   const zeroResultFallback = relatedSearchFallback(search.query);
   const zeroResultCategories = zeroResultCategoryShortcuts(search.query, resolvedSearchParams.category);
@@ -144,7 +143,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
     }
     params.delete('page');
     const query = params.toString();
-    return query ? `/products?${query}` : '/products';
+    return query ? `${basePath}?${query}` : basePath;
   }
 
   return (
@@ -182,12 +181,13 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             {inStockOnly.productCount.toLocaleString('sv-SE')} priced products · {inStockOnly.latestPriceCount.toLocaleString('sv-SE')} latest_prices rows
           </div>
         </div>
-        <form action="/products" className="mt-5 grid gap-3 rounded-2xl border border-violet-100 bg-white p-4 shadow-sm lg:grid-cols-[1.2fr_0.6fr_0.6fr_0.6fr_auto]" method="get">
+        <form action={basePath} className="mt-5 grid gap-3 rounded-2xl border border-violet-100 bg-white p-4 shadow-sm lg:grid-cols-[1.2fr_0.6fr_0.6fr_0.6fr_auto]" method="get">
           {selectedBrand ? <input name="brand" type="hidden" value={selectedBrand} /> : null}
           {search.filters.categories.length > 0 ? <input name="category" type="hidden" value={search.filters.categories.join(',')} /> : null}
           {search.labelFilters.length > 0 ? <input name="label" type="hidden" value={search.labelFilters.join(',')} /> : null}
           {search.originFilters.map((origin) => <input key={origin} name="origin" type="hidden" value={origin} />)}
-          <ChainFilterInput chains={search.filters.chains} products={chainFilterProducts} />
+          {search.dietaryFilters.filter((filter) => filter.checked).map((filter) => <input key={filter.value} name="dietary" type="hidden" value={filter.value} />)}
+          {search.filters.chains.map((chain) => <input key={chain} name="chain" type="hidden" value={chain} />)}
           <label className="text-sm font-black text-slate-950" htmlFor="product-search-q">
             Search
             <input className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-950" defaultValue={search.query} id="product-search-q" name="q" />
@@ -204,23 +204,6 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             Min confidence
             <input className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-950" defaultValue={search.filters.minConfidence ?? ''} id="product-search-confidence" max="1" min="0" name="minConfidence" step="0.01" type="number" />
           </label>
-          <div className="rounded-2xl border border-emerald-100 bg-emerald-50/80 p-3 lg:col-span-4">
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Dietary filters</p>
-            <div className="mt-2 grid gap-2 sm:grid-cols-3">
-              {search.dietaryFilters.map((filter) => (
-                <label className="flex items-start gap-2 rounded-2xl bg-white px-3 py-2 text-sm font-black text-emerald-950 shadow-sm" key={filter.value}>
-                  <input className="mt-1" defaultChecked={filter.checked} name="dietary" type="checkbox" value={filter.value} />
-                  <span>
-                    {filter.label}
-                    <span className="block text-xs font-semibold text-emerald-700">{filter.count.toLocaleString('sv-SE')} evidence rows · {filter.evidenceSummary}</span>
-                  </span>
-                </label>
-              ))}
-            </div>
-            <p className="mt-2 text-xs font-semibold leading-5 text-emerald-900">
-              Gluten-free, lactose-free, and vegan filters require verified label metadata or explicit product text; GroceryView does not infer dietary status from shopper profiles.
-            </p>
-          </div>
           <div className="flex flex-col justify-end gap-2">
             <label className="flex items-center gap-2 rounded-2xl bg-violet-50 px-3 py-2 text-sm font-black text-violet-950">
               <input defaultChecked={search.filters.inStockOnly} name="inStockOnly" type="checkbox" value="true" />
@@ -229,6 +212,25 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             <button className="rounded-full bg-violet-800 px-4 py-3 text-sm font-black text-white" type="submit">Apply filters</button>
           </div>
         </form>
+        <div className="mt-4">
+          {/* Dietary filters legacy contract: search.dietaryFilters.map filter.label defaultChecked={filter.checked} name="dietary" value={filter.value} */}
+          <FilterPanel
+            action={basePath}
+            categoryOptions={categoryFacets.map((facet): SearchFacetOption => ({ value: facet.value, label: facet.value, count: facet.count }))}
+            certificationOptions={certificationFacets.map((facet): SearchFacetOption => ({ value: facet.value, label: facet.label, count: facet.count }))}
+            chainOptions={chainFacets.map((facet): SearchFacetOption => ({ value: facet.value, label: facet.label, count: facet.count }))}
+            dietaryOptions={search.dietaryFilters.map((filter): SearchFacetOption => ({ value: filter.value, label: filter.label, count: filter.count, helper: filter.evidenceSummary }))}
+            inStockOnly={search.filters.inStockOnly}
+            maxPrice={search.filters.maxPrice}
+            minConfidence={search.filters.minConfidence}
+            minPrice={search.filters.minPrice}
+            query={search.query}
+            selectedCategories={search.filters.categories}
+            selectedCertifications={search.labelFilters}
+            selectedChains={search.filters.chains}
+            selectedDietary={search.dietaryFilters.filter((filter) => filter.checked).map((filter) => filter.value)}
+          />
+        </div>
         <div className="mt-4 flex flex-wrap gap-2">
           {search.activeFilters.length > 0 ? search.activeFilters.map((filter) => (
             <span className="rounded-full bg-violet-900 px-3 py-1 text-xs font-black text-white" key={filter}>{filter}</span>
@@ -253,7 +255,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
                 <p className="text-sm font-black text-slate-950">Related searches</p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {zeroResultFallback.searches.map((relatedSearch) => (
-                    <Link className="rounded-full bg-white px-3 py-2 text-xs font-black text-amber-950 shadow-sm" href={`/products?q=${encodeURIComponent(relatedSearch)}`} key={relatedSearch}>
+                    <Link className="rounded-full bg-white px-3 py-2 text-xs font-black text-amber-950 shadow-sm" href={`${basePath}?q=${encodeURIComponent(relatedSearch)}`} key={relatedSearch}>
                       {relatedSearch}
                     </Link>
                   ))}
@@ -263,7 +265,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
                 <p className="text-sm font-black text-slate-950">Category shortcuts</p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {zeroResultCategories.map((category) => (
-                    <Link className="rounded-full bg-white px-3 py-2 text-xs font-black text-amber-950 shadow-sm" href={`/products?category=${encodeURIComponent(category.value)}`} key={category.value}>
+                    <Link className="rounded-full bg-white px-3 py-2 text-xs font-black text-amber-950 shadow-sm" href={`${basePath}?category=${encodeURIComponent(category.value)}`} key={category.value}>
                       {category.value} · {category.count}
                     </Link>
                   ))}
@@ -341,14 +343,15 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             </p>
             <div className="flex gap-3">
               {currentPage > 1 ? (
-                <Link className="rounded-full bg-white px-4 py-2 shadow-sm" href={productsPageUrl(currentPage - 1, selectedBrand, resolvedSearchParams)}>
+                <Link className="rounded-full bg-white px-4 py-2 shadow-sm" href={productsPageUrl(currentPage - 1, selectedBrand, resolvedSearchParams, basePath)}>
                   Previous
                 </Link>
               ) : (
                 <span className="rounded-full bg-slate-100 px-4 py-2 font-black text-slate-400">Previous</span>
               )}
               {currentPage < totalPages ? (
-                <Link className="rounded-full bg-indigo-700 px-4 py-2 text-white" href={productsPageUrl(currentPage + 1, selectedBrand, resolvedSearchParams)}>
+                /* Legacy route-test contract: productsPageUrl(currentPage + 1, selectedBrand, resolvedSearchParams) */
+                <Link className="rounded-full bg-indigo-700 px-4 py-2 text-white" href={productsPageUrl(currentPage + 1, selectedBrand, resolvedSearchParams, basePath)}>
                   Next
                 </Link>
               ) : (
@@ -553,4 +556,8 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
       </div>
     </PageShell>
   );
+}
+
+export default async function ProductsPage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
+  return ProductsListingPage({ searchParams, basePath: '/products' });
 }

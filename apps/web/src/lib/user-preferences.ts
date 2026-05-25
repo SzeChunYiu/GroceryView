@@ -130,3 +130,64 @@ export function sortByHouseholdPricePreferences<T extends PricePreferenceCandida
     householdPricePreferenceScore(right, preferences) - householdPricePreferenceScore(left, preferences)
   ));
 }
+
+export type SearchFacetPreferences = {
+  selectedCategories: string[];
+  selectedDietaryLabels: string[];
+  selectedCertifications: string[];
+  selectedChains: string[];
+  updatedAt: string;
+};
+
+export type SearchFacetPreferenceChoice = Partial<Omit<SearchFacetPreferences, 'updatedAt'>>;
+
+export const SEARCH_FACET_PREFERENCE_STORAGE_KEY = 'groceryview:search-facet-preferences:v1';
+
+export const DEFAULT_SEARCH_FACET_PREFERENCES: SearchFacetPreferences = {
+  selectedCategories: [],
+  selectedDietaryLabels: [],
+  selectedCertifications: [],
+  selectedChains: [],
+  updatedAt: 'static-snapshot'
+};
+
+function normalizeFacetValues(values: (string | null | undefined)[] | undefined) {
+  return uniquePreferenceValues(values ?? []);
+}
+
+export function normalizeSearchFacetPreferences(preferences: Partial<SearchFacetPreferences> | null | undefined): SearchFacetPreferences {
+  return {
+    selectedCategories: normalizeFacetValues(preferences?.selectedCategories),
+    selectedDietaryLabels: normalizeFacetValues(preferences?.selectedDietaryLabels),
+    selectedCertifications: normalizeFacetValues(preferences?.selectedCertifications),
+    selectedChains: normalizeFacetValues(preferences?.selectedChains),
+    updatedAt: preferences?.updatedAt || new Date().toISOString()
+  };
+}
+
+export function loadSearchFacetPreferences(storage: Storage | null = browserStorage()) {
+  if (!storage) return DEFAULT_SEARCH_FACET_PREFERENCES;
+
+  try {
+    const parsed = JSON.parse(storage.getItem(SEARCH_FACET_PREFERENCE_STORAGE_KEY) ?? 'null') as Partial<SearchFacetPreferences> | null;
+
+    return normalizeSearchFacetPreferences(parsed);
+  } catch {
+    return DEFAULT_SEARCH_FACET_PREFERENCES;
+  }
+}
+
+export function saveSearchFacetPreferences(preferences: SearchFacetPreferenceChoice, storage: Storage | null = browserStorage()) {
+  if (!storage) return false;
+
+  try {
+    storage.setItem(SEARCH_FACET_PREFERENCE_STORAGE_KEY, JSON.stringify(normalizeSearchFacetPreferences({
+      ...preferences,
+      updatedAt: new Date().toISOString()
+    })));
+
+    return true;
+  } catch {
+    return false;
+  }
+}
