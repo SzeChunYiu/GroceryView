@@ -17,6 +17,8 @@ import { calculateDealScore, scoreBand, compareBasketStrategies } from '@grocery
 - `./lib/rankers/myBasket.js`
 - `./lib/fuelRoute.js`
 - `./lib/spendForecast.js`
+- `./lib/extractors/loosePacked.js`
+- `./lib/loyaltyROI.js`
 
 The root module also exports the following primary functions and constants:
 
@@ -26,6 +28,7 @@ The root module also exports the following primary functions and constants:
 - Search, alerts, and budget: `searchProducts`, `summarizeCategoryDealLeaders`, `buildWatchlistAlerts`, `summarizeBudget`, `groceryAlertChannelDefaults`, `planGroceryAlertChannelDefault`, `planNotifications`
 - Product matching and substitutions: `classifyProductMatch`, `recommendSmartSwaps`, `planStockoutSubstitutionOptions`, `planDietarySubstitutionAssistant`, `compareCommodityUnitPrices`
 - Human review and receipt workflows: `planHumanReviewQueue`, `planCommunityReportAbuseControls`, `authorizeHumanReviewAction`, `planHumanReviewAssignments`, `summarizeHumanReviewSla`, `applyHumanReviewDecision`, `reviewReceiptScan`
+- Household, pantry, meals, and privacy: `createHouseholdState`, `summarizeHousehold`, `planShareableHouseholdList`, `planPantryReplenishment`, `applyAdPolicy`, `rankOrganicDeals`, `rankNutritionPerKrona`, `suggestDealBasedMeals`, `calculateMealCostBreakdown`, `buildExpiryDealRadar`, `buildPrivacyExport`, `planAccountDeletion`, `planPrivacyRequestFulfillment`, `redactForAdvertisers`, `calculatePersonalGroceryInflation`, `calculateChainPriceIndex`
 
 Types exported from the root include the input/output contracts for those functions, including `DealScoreInput`, `ScoreBand`, `HistoricalDealScoreInput`, `BasketComparisonInput`, `BasketComparisonResult`, `PriceHistoryPoint`, `PriceHistorySummary`, `SearchableProduct`, `WatchlistAlert`, `BudgetSummary`, `ProductMatchInput`, `SmartSwapRecommendation`, `StockoutSubstitutionPlan`, `DietarySubstitutionAssistantPlan`, `HumanReviewQueueItem`, and `ReceiptReview`.
 
@@ -36,6 +39,8 @@ Types exported from the root include the input/output contracts for those functi
 - `src/lib/basketBenchmark.ts` — basket comparison, coverage, trip-cost, stock-up, handoff, and recurring-basket planning.
 - `src/lib/spendForecast.ts` — pure spend forecasting helpers re-exported by the package.
 - `src/lib/fuelRoute.ts` — route/fuel adjustment helpers re-exported by the package.
+- `src/lib/extractors/` — pure product text extractors such as loose-packed produce parsing.
+- `src/lib/loyaltyROI.ts` — loyalty return-on-investment helpers re-exported by the package.
 - `src/__tests__/` and `src/lib/__tests__/` — contract tests that exercise the public logic without network or filesystem dependencies.
 
 ## Usage example
