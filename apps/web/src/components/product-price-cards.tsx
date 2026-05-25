@@ -167,7 +167,7 @@ function SearchExplanationBadges({ badges }: Readonly<{ badges?: SearchExplanati
   if (!badges || badges.length === 0) return null;
 
   return (
-    <div className="mt-3 flex flex-wrap gap-2" data-search-explanation-badges>
+    <div aria-label="Search result match explanations" className="mt-3 flex flex-wrap gap-2" data-search-explanation-badges>
       {badges.slice(0, 4).map((badge) => (
         <span
           className="rounded-full bg-indigo-100 px-2.5 py-1 text-[0.65rem] font-black uppercase tracking-[0.14em] text-indigo-950"
