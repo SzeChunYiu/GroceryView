@@ -338,7 +338,7 @@ export function ProductPriceCards({
             <p className="mt-4 text-3xl font-black text-emerald-800">{primaryLabel(card, compareMode)}</p>
             <p className="mt-1 text-sm font-semibold text-slate-700">{secondaryLabel(card, compareMode)}</p>
             {card.cheapestUnitBadge ? (
-              <p className="mt-2 inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-950">{card.cheapestUnitBadge}</p>
+              <p className="mt-2 inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-950" data-testid="cheapest-per-unit">{card.cheapestUnitBadge}</p>
             ) : null}
             <SearchExplanationBadges badges={(card as ProductCardWithSearchExplanations).searchExplanationBadges} />
             <p className="mt-3 text-sm leading-6 text-slate-600">{card.sourceLabel}</p>
