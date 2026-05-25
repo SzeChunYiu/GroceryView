@@ -4,6 +4,7 @@ import Link from 'next/link';
 import type { LucideIcon } from 'lucide-react';
 import {
   BarChart3,
+  BookOpen,
   ChevronDown,
   Database,
   Flame,
@@ -50,6 +51,7 @@ const navContractLabels = [
     items: [
       { href: '/', label: 'Overview' },
       { href: '/chain-index', label: 'Chain index' },
+      { href: '/index-methodology', label: 'Methodology' },
       { href: '/categories', label: 'Categories' },
       { href: '/heatmap', label: 'Heatmap' },
       { href: '/screener', label: 'Screener' }
@@ -83,6 +85,7 @@ function buildNavGroups(t: AppNavTranslator): NavGroup[] {
       items: [
         { href: '/', label: t('app-nav.items.overview'), icon: BarChart3 },
         { href: '/chain-index', label: t('app-nav.items.chainIndex'), icon: Database },
+        { href: '/index-methodology', label: 'Methodology', icon: BookOpen },
         { href: '/analytics/funnel', label: t('app-nav.items.funnel'), icon: BarChart3 },
         { href: '/categories', label: t('app-nav.items.categories'), icon: Tags },
         { href: '/heatmap', label: t('app-nav.items.heatmap'), icon: Flame },

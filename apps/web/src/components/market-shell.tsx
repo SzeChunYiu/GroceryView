@@ -174,6 +174,9 @@ export function MarketShell({ locale = defaultLocale }: { locale?: SupportedLoca
           <div className="mt-6 flex flex-wrap gap-3">
             <Link className="rounded-full bg-emerald-400 px-5 py-3 text-sm font-black text-emerald-950" href="/compare">Compare chain prices</Link>
             <Link className="rounded-full border border-white/20 px-5 py-3 text-sm font-black text-white" href="/stores">Browse stores</Link>
+            <Link className="rounded-full border border-emerald-300/40 px-5 py-3 text-sm font-black text-emerald-100" data-market-methodology-link="index-methodology" href="/index-methodology">
+              Index methodology
+            </Link>
           </div>
         </div>
         <Card className="flex flex-col justify-between bg-white">

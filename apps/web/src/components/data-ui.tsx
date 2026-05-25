@@ -29,6 +29,9 @@ export function PageShell({ children }: Readonly<{ children: ReactNode }>) {
           <Link className="underline decoration-emerald-300 underline-offset-4" href="/en/privacy">Privacy policy</Link>
           <Link className="underline decoration-emerald-300 underline-offset-4" href="/sv/cookies">Cookiepolicy</Link>
           <Link className="underline decoration-emerald-300 underline-offset-4" href="/en/cookies">Cookie policy</Link>
+          <span className="font-black text-slate-950">Methodology</span>
+          <Link className="underline decoration-emerald-300 underline-offset-4" href="/index-methodology">Index methodology</Link>
+          <Link className="underline decoration-emerald-300 underline-offset-4" href="/methodology-changelog">Methodology changelog</Link>
         </div>
       </footer>
       <BottomNav />

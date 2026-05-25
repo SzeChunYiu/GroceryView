@@ -49,7 +49,7 @@ describe('verified-data UI', () => {
   it('ships the requested grouped desktop navigation without legacy personal-product links', async () => {
     const nav = await read('src/components/app-nav.tsx');
 
-    assert.match(nav, /t\('app-nav\.groups\.markets'\)[\s\S]*label: 'Screener'/);
+    assert.match(nav, /t\('app-nav\.groups\.markets'\)[\s\S]*href: '\/index-methodology'[\s\S]*label: 'Methodology'[\s\S]*label: 'Screener'/);
     assert.match(nav, /t\('app-nav\.groups\.products'\)[\s\S]*t\('app-nav\.items\.browse'\)[\s\S]*t\('app-nav\.items\.compare'\)/);
     assert.match(nav, /t\('app-nav\.groups\.stores'\)[\s\S]*t\('app-nav\.items\.map'\)/);
     assert.match(nav, /t\('app-nav\.groups\.trip'\)[\s\S]*t\('app-nav\.items\.currentList'\)[\s\S]*t\('app-nav\.items\.nearbyDeals'\)[\s\S]*t\('app-nav\.items\.watchlist'\)/);
@@ -59,6 +59,18 @@ describe('verified-data UI', () => {
     assert.match(nav, /group-hover:visible/);
     assert.match(nav, /from 'lucide-react'/);
     assert.doesNotMatch(nav, /label: 'Compare items'|label: 'Alerts'|label: 'Favorites'|label: 'Favourites'|label: 'Shopping list'|label: 'Basket'/);
+  });
+
+  it('links public index methodology from global chrome and the market surface', async () => {
+    const nav = await read('src/components/app-nav.tsx');
+    const dataUi = await read('src/components/data-ui.tsx');
+    const shell = await read('src/components/market-shell.tsx');
+
+    assert.match(nav, /href: '\/index-methodology'[\s\S]*label: 'Methodology'/);
+    assert.match(dataUi, /href="\/index-methodology"[\s\S]*Index methodology/);
+    assert.match(dataUi, /href="\/methodology-changelog"[\s\S]*Methodology changelog/);
+    assert.match(shell, /data-market-methodology-link="index-methodology"/);
+    assert.match(shell, /href="\/index-methodology"/);
   });
 
   it('keeps core routes backed by generated verified datasets', async () => {
