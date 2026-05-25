@@ -25,6 +25,7 @@ import { useEffect, useRef, useState } from 'react';
 import { SearchBar } from './SearchBar';
 import { ThemeToggle } from './ThemeToggle';
 import { LanguagePreferenceSwitcher } from '@/components/language-preference-switcher';
+import { MarketSwitcher } from '@/components/market-switcher';
 import { trackPwaInstallAnalytics } from '@/lib/analytics';
 import { defaultLocale, groceryTranslator, localeCookieName, localeStorageKey, normalizeLocale, type SupportedLocale } from '@/lib/i18n';
 
@@ -280,6 +281,7 @@ export function AppNav() {
         <div className="flex flex-1 flex-col gap-3 lg:items-end">
           <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
             <SearchBar surface="app-nav" />
+            <MarketSwitcher />
             <LanguagePreferenceSwitcher />
             <ThemeToggle
               darkLabel={t('app-nav.theme.dark')}
