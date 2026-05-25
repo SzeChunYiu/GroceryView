@@ -183,6 +183,7 @@ export {
 export * from './store-enumerator.js';
 export * from './store-enumerator.js';
 export * from './unit-price.js';
+export * from './pipeline.js';
 
 export type SourceType =
   | 'official_api'
