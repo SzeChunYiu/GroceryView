@@ -1187,10 +1187,17 @@ describe('verified-data UI', () => {
     assert.match(product, /counterPriceLabelFor\\(row\\)/);
   });
 
+  it('surfaces per-chain source attribution below product price tables', async () => {
+    const product = await read('src/app/products/[slug]/page.tsx');
 
-
-
-
+    assert.match(product, /function chainSourceAttributionFor/);
+    assert.match(product, /Prices observed from:/);
+    assert.match(product, /coverageHref: '\/coverage'/);
+    assert.match(product, /chainSourceAttribution\.summary/);
+    assert.match(product, /chainSourceAttribution\.sourceRows\.map/);
+    assert.match(product, /<ConfidenceBadge/);
+    assert.match(product, /verificationLabel=\{sourceRow\.verificationLabel\}/);
+  });
 
   it('surfaces watchlist alerts and notification planning using verified core outputs', async () => {
     const source = await read('src/app/watchlist/page.tsx');
