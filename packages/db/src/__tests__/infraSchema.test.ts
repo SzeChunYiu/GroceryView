@@ -139,6 +139,18 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(schemaDoc, /`retailer_type` is required and indexed/);
   });
 
+  it('adds first-class market country scope separate from domain', () => {
+    assert.match(allMigrations, /create table if not exists markets/);
+    for (const market of ['SE', 'NO', 'IS']) {
+      assert.match(allMigrations, new RegExp(`'${market}'`), `${market} market seed missing`);
+    }
+    for (const table of ['chains', 'stores', 'products', 'observations', 'latest_prices']) {
+      assert.match(allMigrations, new RegExp(`alter table ${table} add column if not exists market_code char\\(2\\)`), `${table}.market_code migration missing`);
+    }
+    assert.match(allMigrations, /chains_market_domain_idx/);
+    assert.match(allMigrations, /latest_prices_market_chain_idx/);
+  });
+
   it('stores immutable price facts with type, time, confidence, and provenance', () => {
     const observations = tableDefinition('observations');
     for (const column of ['price_type', 'observed_at', 'confidence', 'provenance']) {
