@@ -167,3 +167,50 @@ export function estimateTripCompletion(list: ActiveShoppingList, selectedRouteMo
 }
 
 export const activeShoppingTripEstimates = activeShoppingLists.map((list) => estimateTripCompletion(list, list.routeMode));
+
+export type StoreLayoutChain = 'ica' | 'coop' | 'willys';
+
+export type StoreLayoutDepartment = {
+  id: string;
+  label: string;
+  keywords: string[];
+};
+
+export const storeLayoutDepartments: Record<StoreLayoutChain, StoreLayoutDepartment[]> = {
+  ica: [
+    { id: 'produce', label: 'Produce entrance', keywords: ['apple', 'banana', 'tomato', 'basil', 'salad', 'potato'] },
+    { id: 'dairy', label: 'Dairy chillers', keywords: ['milk', 'yoghurt', 'yogurt', 'cheese', 'cream'] },
+    { id: 'pantry', label: 'Pantry aisles', keywords: ['pasta', 'sauce', 'rice', 'flour', 'soup'] },
+    { id: 'drinks', label: 'Drinks wall', keywords: ['water', 'juice', 'coffee', 'tea', 'soda'] },
+    { id: 'checkout', label: 'Checkout', keywords: [] }
+  ],
+  coop: [
+    { id: 'produce', label: 'Fruit and vegetables', keywords: ['apple', 'banana', 'tomato', 'basil', 'salad', 'potato'] },
+    { id: 'bakery', label: 'Bakery', keywords: ['bread', 'bun', 'roll'] },
+    { id: 'pantry', label: 'Dry goods', keywords: ['pasta', 'sauce', 'rice', 'flour', 'soup'] },
+    { id: 'dairy', label: 'Dairy and cheese', keywords: ['milk', 'yoghurt', 'yogurt', 'cheese', 'cream'] },
+    { id: 'checkout', label: 'Checkout', keywords: [] }
+  ],
+  willys: [
+    { id: 'produce', label: 'Produce deals', keywords: ['apple', 'banana', 'tomato', 'basil', 'salad', 'potato'] },
+    { id: 'pantry', label: 'Value pantry', keywords: ['pasta', 'sauce', 'rice', 'flour', 'soup'] },
+    { id: 'dairy', label: 'Dairy fridges', keywords: ['milk', 'yoghurt', 'yogurt', 'cheese', 'cream'] },
+    { id: 'drinks', label: 'Bulk drinks', keywords: ['water', 'juice', 'coffee', 'tea', 'soda'] },
+    { id: 'checkout', label: 'Checkout', keywords: [] }
+  ]
+};
+
+export function getStoreLayoutDepartment(itemName: string, chain: StoreLayoutChain = 'ica') {
+  const normalized = itemName.toLocaleLowerCase('sv-SE');
+  return storeLayoutDepartments[chain].find((department) => department.keywords.some((keyword) => normalized.includes(keyword))) ?? storeLayoutDepartments[chain][storeLayoutDepartments[chain].length - 1];
+}
+
+export function sortItemsByStoreLayout<TItem extends { name: string }>(items: TItem[], chain: StoreLayoutChain = 'ica') {
+  return [...items].sort((left, right) => {
+    const leftDepartment = getStoreLayoutDepartment(left.name, chain);
+    const rightDepartment = getStoreLayoutDepartment(right.name, chain);
+    const leftIndex = storeLayoutDepartments[chain].findIndex((department) => department.id === leftDepartment.id);
+    const rightIndex = storeLayoutDepartments[chain].findIndex((department) => department.id === rightDepartment.id);
+    return leftIndex - rightIndex || left.name.localeCompare(right.name, 'sv-SE');
+  });
+}
