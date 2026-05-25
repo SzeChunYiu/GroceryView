@@ -14,6 +14,7 @@ export * from './queries/stores.js';
 export * from './queries/retailers.js';
 export * from './queries/users.js';
 export * from './seed/retailers.js';
+export * from './seed/brands.js';
 
 export type Migration = {
   version: string;
