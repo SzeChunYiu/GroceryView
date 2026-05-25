@@ -97,6 +97,10 @@ import {
   type MathemProduct
 } from './connectors/mathem.js';
 import {
+  fetchMathemPrenumerationProducts,
+  type MathemPrenumerationProduct
+} from './connectors/mathem-prenumeration-se.js';
+import {
   fetchMatsparProducts,
   MATSPAR_MINIMUM_ROWS,
   type MatsparProduct
@@ -149,6 +153,7 @@ export * from './connectors/seven-eleven-no.js';
 export * from './connectors/lyfogheilsa-is.js';
 export * from './connectors/mast-recalls-is.js';
 export * from './connectors/mathem.js';
+export * from './connectors/mathem-prenumeration-se.js';
 export * from './connectors/matpriskollen.js';
 export * from './connectors/matspar.js';
 export * from './connectors/meny-flyer-no.js';
@@ -2062,7 +2067,7 @@ function matsparProductToDailyItem(row: MatsparProduct): RetailerConnectorParsed
   };
 }
 
-function mathemCategoryId(row: MathemProduct): string {
+function mathemCategoryId(row: Pick<MathemProduct, 'sourceUrl'>): string {
   try {
     const query = new URL(row.sourceUrl).searchParams.get('q');
     if (query?.trim()) return `mathem-${stableKeyPart(query)}`;
@@ -2072,13 +2077,14 @@ function mathemCategoryId(row: MathemProduct): string {
   return 'mathem-public-search';
 }
 
-function mathemProductToDailyItem(row: MathemProduct): RetailerConnectorParsedProduct {
+function mathemProductToDailyItem(row: MathemProduct | MathemPrenumerationProduct): RetailerConnectorParsedProduct {
   const quantity = parseNativePackageText(row.packageText);
   return {
+    chainId: row.chain,
     retailerProductId: row.code,
     rawName: row.name,
     canonicalName: row.name,
-    productId: `mathem-${stableKeyPart(row.code)}`,
+    productId: `${row.chain}-${stableKeyPart(row.code)}`,
     categoryId: mathemCategoryId(row),
     brand: row.brand || undefined,
     packageSize: quantity.packageSize,
@@ -2466,6 +2472,22 @@ export async function fetchDailyConnectorSnapshot(
     const url = new URL(sourceUrl);
     const retrievedAt = options.retrievedAt ?? new Date().toISOString();
     const rows = await fetchMathemProducts({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      queries: dailyNativeStringListParam(url, 'queries'),
+      pages: dailyNativeNumberListParam(url, 'pages'),
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(mathemProductToDailyItem) });
+  }
+
+  if (
+    sourceUrl === GROCERYVIEW_DAILY_MATHEM_PRENUMERATION_PRODUCTS_URL ||
+    sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_MATHEM_PRENUMERATION_PRODUCTS_URL}?`)
+  ) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchMathemPrenumerationProducts({
       fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
       queries: dailyNativeStringListParam(url, 'queries'),
       pages: dailyNativeNumberListParam(url, 'pages'),
@@ -3516,6 +3538,7 @@ export const GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL = 'groceryview://dail
 export const GROCERYVIEW_DAILY_CITY_GROSS_BULK_PRODUCTS_URL = 'groceryview://daily/city-gross/products/bulk';
 export const GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL = 'groceryview://daily/city-gross/public-products/all-stores';
 export const GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL = 'groceryview://daily/mathem/products/public-search';
+export const GROCERYVIEW_DAILY_MATHEM_PRENUMERATION_PRODUCTS_URL = 'groceryview://daily/mathem-prenumeration/products/public-search';
 export const GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL = 'groceryview://daily/matspar/products/public-search';
 export const GROCERYVIEW_DAILY_SNABBGROSS_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/snabbgross/products/all-stores';
 export const GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL = OKQ8_FUEL_PRICES_URL;

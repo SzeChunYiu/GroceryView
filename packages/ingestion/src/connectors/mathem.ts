@@ -11,6 +11,10 @@ export type MathemProduct = {
   imageUrl: string;
   productUrl: string;
   available: boolean;
+  country: 'SE';
+  currency: 'SEK';
+  chain: 'mathem';
+  mathem_tier: 'spot' | 'subscription';
   channel: 'online';
   is_coupon_price: boolean;
   is_subscription_price: boolean;
@@ -356,6 +360,7 @@ export function normalizeMathemProduct(
 
   const unitPrice = numberFromText(attributes.grossUnitPrice);
   const unit = text(attributes.unitPriceQuantityAbbreviation);
+  const mathemTier = attributes.isSubscriptionPrice === true ? 'subscription' : 'spot';
   return {
     code,
     name,
@@ -369,9 +374,13 @@ export function normalizeMathemProduct(
     imageUrl: text(attributes.images?.[0]?.thumbnail?.url) || text(attributes.images?.[0]?.large?.url),
     productUrl: absoluteMathemUrl(attributes.frontUrl ?? attributes.absoluteUrl),
     available: attributes.availability?.isAvailable === true,
+    country: 'SE',
+    currency: 'SEK',
+    chain: 'mathem',
+    mathem_tier: mathemTier,
     channel: 'online',
     is_coupon_price: isMathemCouponPrice(attributes),
-    is_subscription_price: attributes.isSubscriptionPrice === true,
+    is_subscription_price: mathemTier === 'subscription',
     is_clearance: attributes.isClearance === true || /klipp|utförsäljning|kort datum/i.test(mathemPromotionText(attributes)),
     multi_buy: mathemMultiBuy(attributes),
     sourceUrl,
