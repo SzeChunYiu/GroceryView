@@ -161,6 +161,7 @@ export * from './connectors/matspar.js';
 export * from './connectors/meny-flyer-no.js';
 export * from './connectors/meny-no.js';
 export * from './connectors/normal-se.js';
+export * from './connectors/reklamblad-se.js';
 export {
   LIDL_PLUS_COUPONS_URL,
   fetchLidlPlusCoupons,
