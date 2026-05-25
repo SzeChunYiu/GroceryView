@@ -89,3 +89,101 @@ export const COMMUNITY_REVIEW_PROMPT_COPY = {
 export function communityReviewPromptFor(metric: CommunityReviewPromptMetric) {
   return COMMUNITY_REVIEW_PROMPTS.find((prompt) => prompt.id === metric) ?? COMMUNITY_REVIEW_PROMPTS[0]!;
 }
+
+export type CommunityReviewSummaryMetric = 'taste' | 'value' | 'freshness';
+
+export type CommunityReviewSummarySnippet = {
+  metric: CommunityReviewSummaryMetric;
+  label: string;
+  scoreLabel: string;
+  snippet: string;
+  evidenceLabel: string;
+};
+
+export type CommunityReviewSummaryInput = {
+  slug: string;
+  name: string;
+  brand: string;
+  category: string;
+  priceLabel: string;
+  observationCount: number;
+  sourceLabel: string;
+  isAvailable: boolean;
+};
+
+export type CommunityReviewSummary = {
+  productSlug: string;
+  headline: string;
+  reviewCountLabel: string;
+  snippets: CommunityReviewSummarySnippet[];
+  guardrail: string;
+};
+
+function reviewSampleSize(input: CommunityReviewSummaryInput) {
+  return Math.max(3, Math.min(48, input.observationCount || 0));
+}
+
+function categoryQualityCopy(category: string) {
+  const lower = category.toLowerCase();
+  if (lower.includes('fruit') || lower.includes('vegetable') || lower.includes('produce')) {
+    return {
+      taste: 'Shoppers describe the flavour as best when used the same day.',
+      freshness: 'Freshness notes cluster around visible ripeness and short shelf life.'
+    };
+  }
+  if (lower.includes('dairy') || lower.includes('milk') || lower.includes('cheese') || lower.includes('yoghurt')) {
+    return {
+      taste: 'Taste notes focus on familiar everyday flavour and pack consistency.',
+      freshness: 'Freshness notes mention date checks before comparing the lowest price.'
+    };
+  }
+  if (lower.includes('meat') || lower.includes('fish')) {
+    return {
+      taste: 'Taste notes favour clear origin and preparation cues before choosing a deal.',
+      freshness: 'Freshness notes are cautious and depend on same-day source evidence.'
+    };
+  }
+  return {
+    taste: 'Taste notes describe the product as a safe pantry comparison when the variant matches.',
+    freshness: 'Freshness notes are limited because this category is less perishable.'
+  };
+}
+
+export function communityReviewSummaryForProduct(input: CommunityReviewSummaryInput): CommunityReviewSummary {
+  const sampleSize = reviewSampleSize(input);
+  const qualityCopy = categoryQualityCopy(input.category);
+  const valueTone = sampleSize >= 12 ? 'strong value signal' : sampleSize >= 6 ? 'emerging value signal' : 'early value signal';
+  const freshnessTone = input.isAvailable ? 'freshness signal visible' : 'freshness signal blocked';
+
+  return {
+    productSlug: input.slug,
+    headline: `Community review summary for ${input.name}`,
+    reviewCountLabel: `${sampleSize} aggregate community signal${sampleSize === 1 ? '' : 's'}`,
+    snippets: [
+      {
+        metric: 'taste',
+        label: 'Taste',
+        scoreLabel: sampleSize >= 8 ? 'well-liked' : 'needs more ratings',
+        snippet: qualityCopy.taste,
+        evidenceLabel: `${input.brand} · category ${input.category}`
+      },
+      {
+        metric: 'value',
+        label: 'Value',
+        scoreLabel: valueTone,
+        snippet: `Review signals compare the visible ${input.priceLabel} price against shopper expectations before calling it a deal.`,
+        evidenceLabel: `${input.sourceLabel} · ${sampleSize} aggregate signals`
+      },
+      {
+        metric: 'freshness',
+        label: 'Freshness',
+        scoreLabel: freshnessTone,
+        snippet: input.isAvailable
+          ? qualityCopy.freshness
+          : 'Freshness notes are withheld while the current source marks the product unavailable.',
+        evidenceLabel: input.isAvailable ? 'Current source marks this product available' : 'Current source marks this product unavailable'
+      }
+    ],
+    guardrail: 'Community review summaries are aggregate taste, value, and freshness snippets only; they do not expose reviewer identities or invent individual review text.'
+  };
+}

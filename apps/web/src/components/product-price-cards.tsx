@@ -219,6 +219,20 @@ export function ProductPriceCards({
             <p className="mt-4 text-3xl font-black text-emerald-800">{primaryLabel(card, compareMode)}</p>
             <p className="mt-1 text-sm font-semibold text-slate-700">{secondaryLabel(card, compareMode)}</p>
             <p className="mt-3 text-sm leading-6 text-slate-600">{card.sourceLabel}</p>
+            <div className="mt-3 rounded-2xl border border-emerald-100 bg-white p-3" data-community-review-summary={card.slug}>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-[0.65rem] font-black uppercase tracking-[0.18em] text-emerald-800">Community review summary</p>
+                <p className="text-xs font-black text-slate-600">{card.communityReviewSummary.reviewCountLabel}</p>
+              </div>
+              <div className="mt-3 grid gap-2">
+                {card.communityReviewSummary.snippets.map((snippet) => (
+                  <p className="rounded-xl bg-slate-50 p-2 text-xs font-semibold leading-5 text-slate-700" key={snippet.metric}>
+                    <span className="font-black text-slate-950">{snippet.label}:</span> {snippet.scoreLabel} · {snippet.snippet}
+                  </p>
+                ))}
+              </div>
+              <p className="mt-2 text-xs font-semibold leading-5 text-slate-500">{card.communityReviewSummary.guardrail}</p>
+            </div>
             <PriceHistorySparkline card={card} />
             <p className="mt-2 rounded-xl bg-blue-50 p-3 text-xs font-bold text-blue-950">{card.confidenceLabel}</p>
             <VolatilityMethodologyBadge card={card} />

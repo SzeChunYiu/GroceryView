@@ -24,6 +24,7 @@ import {
 import { categoryLabels, pricedProducts } from './openprices-products';
 import { allergenRiskBadgesForText } from './search-filters';
 import { osmStores } from './osm-stores';
+import { communityReviewSummaryForProduct, type CommunityReviewSummary } from './community-reviews';
 import {
   currencyFromObservation,
   defaultLocale,
@@ -2047,6 +2048,7 @@ export type AdaptiveProductCard = {
   }>;
   sparklineLabel: string;
   isAvailable: boolean;
+  communityReviewSummary: CommunityReviewSummary;
 };
 
 function isOpenPricesProduct(product: ItemComparisonProduct): product is (typeof pricedProducts)[number] {
@@ -2093,11 +2095,13 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
     : [];
   const sparklinePoints = sevenDaySparklinePoints(product);
   const priceDrop = priceDropFromThirtyDayHistory(product);
+  const brand = isChainProduct ? product.brand : product.brands || 'Brand not reported';
+  const sourceLabel = isChainProduct ? `${product.lowestChain} lowest · ${formatPct(product.spreadPct)} spread` : `OpenPrices · ${product.observationCount.toLocaleString('sv-SE')} observations`;
 
   return {
     slug: product.slug,
     name: product.name,
-    brand: isChainProduct ? product.brand : product.brands || 'Brand not reported',
+    brand,
     imageUrl: product.image || null,
     imageAlt: product.image ? `${product.name} product image from ${isChainProduct ? 'Axfood' : 'OpenPrices/OpenFoodFacts'} source data` : null,
     productKind,
@@ -2108,7 +2112,7 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
       unit: normalizedUnit.unitLabel.replace('kr/', '')
     }) : unknownUnitPriceLabel,
     packageLabel: normalizedUnit?.packageLabel || packageText || 'Package size not reported',
-    sourceLabel: isChainProduct ? `${product.lowestChain} lowest · ${formatPct(product.spreadPct)} spread` : `OpenPrices · ${product.observationCount.toLocaleString('sv-SE')} observations`,
+    sourceLabel,
     confidenceLabel: normalizedUnit ? `Derived from observed price + package size (${normalizedUnit.unitLabel})` : 'No synthetic unit prices: package quantity missing',
     totalSortPrice: totalPrice,
     unitSortPrice: normalizedUnit?.unitSortPrice ?? null,
@@ -2123,7 +2127,17 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
     sparklineLabel: sparklinePoints.length >= 2
       ? `${sparklinePoints.length} observed daily points from price_daily/OpenPrices history`
       : '7-day sparkline waits for at least two observed price-history points',
-    isAvailable
+    isAvailable,
+    communityReviewSummary: communityReviewSummaryForProduct({
+      slug: product.slug,
+      name: product.name,
+      brand,
+      category: product.category,
+      priceLabel: formatSek(totalPrice),
+      observationCount: isChainProduct ? Object.values(product.chains).filter((row) => typeof row.price === 'number').length : product.observationCount,
+      sourceLabel,
+      isAvailable
+    })
   };
 });
 export const homepageAdaptiveProductCards = adaptiveProductCards.slice(0, 6);

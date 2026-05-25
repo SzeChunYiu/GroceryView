@@ -21,6 +21,7 @@ import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { PriceIntelligenceCard, type PriceIntelligenceScoreCard } from '@/components/price-intelligence-card';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
 import { axfoodProducts } from '@/lib/axfood-products';
+import { communityReviewSummaryForProduct } from '@/lib/community-reviews';
 import { pricedProducts } from '@/lib/openprices-products';
 import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
@@ -1220,6 +1221,16 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const crossChainHistoryOverlay = crossChainHistoryOverlayFor(product);
   const intraChainBranchSpread = intraChainBranchSpreadFor(product);
   const priceChartTerminal = priceChartTerminalFor(product);
+  const communityReviewSummary = communityReviewSummaryForProduct({
+    slug: product.slug,
+    name: product.name,
+    brand: productBrand(product),
+    category: product.category,
+    priceLabel: formatSek(productCurrentPrice(product)),
+    observationCount: primaryEvidenceCount,
+    sourceLabel: isChain ? 'Willys/Hemköp public search snapshot' : `OpenPrices · ${product.observationCount.toLocaleString('sv-SE')} observations`,
+    isAvailable: productIsInStock(product)
+  });
   const commodityComparison = commodityComparisonForProduct(product.slug);
   const freshnessBadge = dataFreshnessBadges.find((badge) => badge.sourceKind === (isChain ? 'axfood' : 'openprices')) ?? dataFreshnessBadges[0]!;
   const productJsonLd = productJsonLdFor(product);
@@ -1290,6 +1301,29 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           <p className="rounded-2xl bg-white p-4 text-sm font-bold text-slate-700">Coverage: {freshnessBadge.coverageLabel}</p>
           <p className="rounded-2xl bg-white p-4 text-sm font-bold text-slate-700">Confidence: {freshnessBadge.confidenceBadge}</p>
         </div>
+      </Card>
+      <Card className="mt-6 border-teal-200 bg-teal-50/80">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-teal-800">Community review summary</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Taste, value, and freshness snippets</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Shows aggregate taste, value, and freshness review snippets beside the verified price evidence so private-label and perishable comparisons are not price-only.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-teal-900">{communityReviewSummary.reviewCountLabel}</p>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          {communityReviewSummary.snippets.map((snippet) => (
+            <div className="rounded-2xl bg-white/90 p-4 shadow-sm" data-community-review-snippet={snippet.metric} key={snippet.metric}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-teal-800">{snippet.label}</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{snippet.scoreLabel}</h3>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{snippet.snippet}</p>
+              <p className="mt-3 text-xs font-black uppercase tracking-[0.16em] text-slate-500">{snippet.evidenceLabel}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 text-xs font-semibold leading-5 text-slate-600">{communityReviewSummary.guardrail}</p>
       </Card>
       {commodityComparison ? (
         <Card className="mt-6 border-lime-200 bg-lime-50/70">
