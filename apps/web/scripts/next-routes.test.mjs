@@ -2089,6 +2089,12 @@ ${seo}`;
     assert.match(bottomNav, /Markets/);
     assert.match(bottomNav, /Search/);
     assert.match(bottomNav, /Map/);
+    assert.match(bottomNav, /ScanLine/);
+    assert.match(bottomNav, /href: '\/scanner#scan'/);
+    assert.match(bottomNav, /label: 'Scan'/);
+    assert.match(bottomNav, /grid-cols-7/);
+    assert.match(bottomNav, /useHaptic/);
+    assert.match(bottomNav, /impact\(\)/);
     assert.match(bottomNav, /My Flyer/);
     assert.match(bottomNav, /Watchlist/);
     assert.match(bottomNav, /Me/);
@@ -2096,6 +2102,17 @@ ${seo}`;
     assert.match(dataUi, /pb-20/);
     assert.match(dataUi, /lg:pb-6/);
     assert.match(dataUi, /<BottomNav \/>/);
+  });
+
+  it('surfaces scanner quick action copy and target anchor for mobile bottom nav', async () => {
+    const scanner = await read('src/app/scanner/page.tsx');
+    const haptic = await read('src/hooks/useHaptic.ts');
+
+    assert.match(scanner, /Mobile scanner shortcut/);
+    assert.match(scanner, /Bottom nav opens scan controls with haptic feedback/);
+    assert.match(scanner, /id="scan"/);
+    assert.match(scanner, /ScannerUploadActions/);
+    assert.match(haptic, /impact: \(\) => vibrate\(\[10, 18, 10\]\)/);
   });
 
   it('colors map store markers by chain index and highlights the cheapest nearby chain', async () => {

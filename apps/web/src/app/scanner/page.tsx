@@ -104,7 +104,16 @@ export default function ScannerPage() {
           {premiumOcrScanHistory.guardrails.map((guardrail) => <li key={guardrail}>• {guardrail}</li>)}
         </ul>
       </Card>
-      <ScannerUploadActions />
+      <Card className="mt-6 border-indigo-200 bg-white">
+        <p className="text-xs font-black uppercase tracking-[0.22em] text-indigo-800">Mobile scanner shortcut</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Bottom nav opens scan controls with haptic feedback</h2>
+        <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+          The mobile bottom navigation includes a prominent Scan action that links to this scanner workspace and triggers a short impact vibration on supported devices.
+        </p>
+      </Card>
+      <div id="scan" className="scroll-mt-24">
+        <ScannerUploadActions />
+      </div>
       <OcrScanHistoryTimeline />
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
         <TopSpreads limit={5} />
