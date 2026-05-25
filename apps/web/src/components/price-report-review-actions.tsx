@@ -18,6 +18,7 @@ type ReviewStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
 type BrowserSession = { accessToken: string; userId: string };
 type ReviewDecision = 'approve' | 'hide' | 'escalate';
 type ApiReviewDecision = 'approve' | 'reject' | 'needs_more_info';
+type ReviewModerationAction = ReviewDecision;
 type Assignment = { id: string; reviewId?: string; subjectType?: 'product_match' | 'community_report' | 'commodity_mapping' | 'price_report' | 'duplicate_product_report' | 'source_discrepancy_report'; subjectId?: string; priority?: string; reason?: string; assigneeId?: string; dueAt?: string; status?: string };
 type AssignmentResponse = { assignments?: Assignment[]; sla?: { status?: string; overdueAssignments?: number; breachedReviewIds?: string[] } };
 
@@ -109,7 +110,23 @@ export function PriceReportReviewActions() {
       reportCommunityPriceReview(currentReviews, reviewId, 'Community flagged suspicious price evidence or review content.')
     );
     setStatus('ready');
-    setMessage('Suspicious community price report flagged. Moderation status is visible here and in the unified /admin queue.');
+    setMessage('Suspicious community price report flagged. Moderation status is visible here and in the unified /admin/reviews queue.');
+  }
+
+  function moderateCommunityReview(reviewId: string, action: ReviewModerationAction) {
+    setCommunityReviews((currentReviews) => sortCommunityReviewsByTrust(currentReviews.map((review) => {
+      if (review.id !== reviewId) return review;
+      if (action === 'approve') return { ...review, moderationStatus: 'active', lastReportReason: 'Moderator approved this review for shopper-visible trust scoring.' };
+      if (action === 'hide') return { ...review, moderationStatus: 'dismissed', lastReportReason: 'Moderator hid this review from shopper-facing trust scoring.' };
+      return {
+        ...review,
+        moderationStatus: 'under_review',
+        reportCount: Math.max(2, (review.reportCount ?? 0) + 1),
+        lastReportReason: 'Moderator escalated this review for a senior evidence check.'
+      };
+    })));
+    setStatus('ready');
+    setMessage(`${action === 'approve' ? 'Approve' : action === 'hide' ? 'Hide' : 'Escalate'} action staged locally for ${reviewId}; submit the matching human-review decision for the protected writeback.`);
   }
 
   return (
@@ -164,7 +181,7 @@ export function PriceReportReviewActions() {
         </ul>
       </div>
 
-      <div className="mt-6 rounded-3xl border border-violet-200 bg-violet-50/80 p-4" aria-label="Community validation prompts">
+      <div className="mt-6 rounded-3xl border border-violet-200 bg-violet-50/70 p-4" aria-label="Community validation prompt review">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-violet-800">Community validation prompts</p>
         <h3 className="mt-2 text-xl font-black tracking-tight text-slate-950">{COMMUNITY_REVIEW_PROMPT_COPY.title}</h3>
         <p className="mt-2 text-sm leading-6 text-slate-700">{COMMUNITY_REVIEW_PROMPT_COPY.intro}</p>
@@ -224,6 +241,11 @@ export function PriceReportReviewActions() {
                 <button className="rounded-full border border-emerald-300 px-3 py-1.5 text-xs font-black text-emerald-900" onClick={() => voteCommunityReview(review.id, 'upvote')} type="button">Helpful</button>
                 <button className="rounded-full border border-slate-300 px-3 py-1.5 text-xs font-black text-slate-700" onClick={() => voteCommunityReview(review.id, 'downvote')} type="button">Not helpful</button>
                 <button className="rounded-full border border-amber-300 px-3 py-1.5 text-xs font-black text-amber-900" onClick={() => reportSuspiciousReview(review.id)} type="button">Report suspicious</button>
+              </div>
+              <div className="mt-2 flex flex-wrap gap-2 border-t border-emerald-100 pt-3" aria-label={`Moderation actions for ${review.productName}`}>
+                <button className="rounded-full bg-emerald-700 px-3 py-1.5 text-xs font-black text-white" onClick={() => moderateCommunityReview(review.id, 'approve')} type="button">Approve</button>
+                <button className="rounded-full bg-slate-800 px-3 py-1.5 text-xs font-black text-white" onClick={() => moderateCommunityReview(review.id, 'hide')} type="button">Hide</button>
+                <button className="rounded-full bg-rose-700 px-3 py-1.5 text-xs font-black text-white" onClick={() => moderateCommunityReview(review.id, 'escalate')} type="button">Escalate</button>
               </div>
             </li>
           ))}
