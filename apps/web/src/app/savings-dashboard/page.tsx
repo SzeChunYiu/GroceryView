@@ -1,9 +1,11 @@
 import Link from 'next/link';
 import { PiggyBank } from 'lucide-react';
+import { CategoryInflationCard } from '@/components/category-inflation-card';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { elderlyFixedIncomeBudgetTracker, elderlyStaplesStabilityTracker, grocerySpendForecast, personalGroceryInflation, savingsDashboard, studentWeeklyBudgetTracker } from '@/lib/demo-data';
+import { buildCategoryInflationTrends } from '@/lib/trends';
 import { ecoBasketScorecard } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -62,6 +64,7 @@ export default function SavingsDashboardPage() {
     .sort((a, b) => Math.abs(b.changeAmount) - Math.abs(a.changeAmount))
     .slice(0, 5);
   const visibleWatchpoints = savingsDashboard.watchpoints.slice(0, 4);
+  const categoryInflationTrends = buildCategoryInflationTrends({ limit: 4 });
 
   return (
     <PageShell>
@@ -96,6 +99,22 @@ export default function SavingsDashboardPage() {
           </div>
         </Card>
       </div>
+
+      <section className="mt-6">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-700">Category inflation trends</p>
+            <h2 className="mt-2 text-2xl font-black">Month-over-month pressure by aisle</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Latest monthly OpenPrices observations are compared with the prior observed month and flagged when the category is rising faster than the basket average of {formatPercent(categoryInflationTrends.basketAverageChangePercent)}.
+            </p>
+          </div>
+          <p className="text-xs font-bold text-slate-500">Source: {categoryInflationTrends.source}</p>
+        </div>
+        <div className="mt-4 grid gap-4 lg:grid-cols-2">
+          {categoryInflationTrends.cards.map((trend) => <CategoryInflationCard key={trend.category} trend={trend} />)}
+        </div>
+      </section>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
         <div className="flex flex-wrap items-start justify-between gap-4">
