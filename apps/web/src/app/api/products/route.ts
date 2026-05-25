@@ -127,8 +127,8 @@ function responsePayload(
     query,
     expandedQueries: expansion.expandedQueries,
     matchedAliases: expansion.matchedAliases,
-    matchedFuzzyAliases: expansion.matchedFuzzyAliases,
     matchedSynonyms: expansion.matchedSynonyms,
+    ...(expansion.matchedFuzzyAliases.length > 0 ? { matchedFuzzyAliases: expansion.matchedFuzzyAliases } : {}),
     results,
     performanceTelemetry: {
       cacheHit: telemetry.cacheHit,
