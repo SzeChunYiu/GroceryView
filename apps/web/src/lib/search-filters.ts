@@ -1,4 +1,11 @@
+import { semanticSynonymsForQuery } from './search-synonyms';
+
 export type AllergenRiskBadge = {
+  label: string;
+  matchedTerms: string[];
+};
+
+export type SearchSynonymBadge = {
   label: string;
   matchedTerms: string[];
 };
@@ -45,4 +52,11 @@ export function allergenRiskBadgesForText(parts: Array<string | null | undefined
       ? [{ label: `risk: ${matcher.label}`, matchedTerms: [...new Set(matchedTerms)] }]
       : [];
   });
+}
+
+export function searchSynonymBadgesForQuery(query: string): SearchSynonymBadge[] {
+  return semanticSynonymsForQuery(query).map((synonym) => ({
+    label: `synonym: ${synonym.canonical}`,
+    matchedTerms: [synonym.matchedTerm]
+  }));
 }
