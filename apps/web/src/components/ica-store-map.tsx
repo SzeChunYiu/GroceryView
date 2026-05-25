@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import { icaLocatorStores, visibleIcaStores, type OsmStore } from '@/lib/ica-locator-stores';
+import { mapListSyncAnnouncement } from '@/lib/screen-reader-announcements';
 
 // Free, no-API-key vector tiles (© OpenMapTiles / OpenFreeMap, data © OSM).
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/bright';
@@ -63,6 +64,14 @@ export function IcaStoreMap() {
   const mapRef = useRef<maplibregl.Map | null>(null);
   const [selectedStoreSlug, setSelectedStoreSlug] = useState(visibleIcaStores[0]?.slug ?? '');
   const featureCollection = useMemo(() => icaFeatureCollection(), []);
+  const selectedStoreIndex = Math.max(0, visibleIcaStores.findIndex((store) => store.slug === selectedStoreSlug));
+  const selectedStore = visibleIcaStores[selectedStoreIndex] ?? visibleIcaStores[0];
+  const mapSyncAnnouncement = selectedStore ? mapListSyncAnnouncement({
+    selectedStoreName: selectedStore.name,
+    selectedStorePosition: selectedStoreIndex + 1,
+    sourceCaveat: 'OSM location only; no shelf price or stock is inferred.',
+    totalStores: visibleIcaStores.length
+  }) : 'No ICA stores are available in the synced map list.';
 
   function focusStore(store: OsmStore) {
     setSelectedStoreSlug(store.slug);
@@ -190,6 +199,7 @@ export function IcaStoreMap() {
       className="grid h-full min-h-[38rem] overflow-hidden rounded-[2rem] border border-red-100 bg-white shadow-2xl lg:grid-cols-[minmax(0,1fr)_23rem]"
       data-testid="ica-store-map"
     >
+      <p aria-atomic="true" aria-live="polite" className="sr-only" role="status">{mapSyncAnnouncement}</p>
       <div className="relative min-h-[24rem] lg:min-h-0">
         <div ref={containerRef} aria-label="ICA locator MapLibre canvas" className="h-full min-h-[24rem] w-full" data-testid="ica-map-canvas-host" />
         <div className="pointer-events-none absolute left-4 top-4 rounded-2xl border border-white/80 bg-white/95 px-4 py-3 text-sm shadow-xl backdrop-blur">

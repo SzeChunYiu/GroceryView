@@ -19,6 +19,7 @@ import {
 import { buildNoResultCorrectionWorkflow } from '@/lib/search-alias-review';
 import type { SearchExplanationBadge } from '@/lib/search-filters';
 import { authenticatedSavedSearchShortcuts } from '@/lib/saved-searches';
+import { searchAutocompleteAnnouncement } from '@/lib/screen-reader-announcements';
 import { Skeleton } from './ui/skeleton';
 
 type ProductSearchResult = {
@@ -159,6 +160,13 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
     const productResultCount = groupedCount === 0 && status === 'ready' ? results.length : 0;
     return groupedCount + facetChips.length + productResultCount;
   }, [facetChips.length, recentSearches.length, results.length, savedSearches.length, shouldShowRecentSearches, status, suggestGroups]);
+  const searchStatusAnnouncement = searchAutocompleteAnnouncement({
+    hasRecentSearches: shouldShowRecentSearches,
+    optionCount,
+    query: trimmedQuery,
+    resultCount: results.length,
+    status
+  });
 
   useEffect(() => {
     setRecentSearches(readRecentSearchHistory());
@@ -409,6 +417,9 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
           {voiceStatus === 'unsupported' ? 'Voice search is not supported in this browser yet.' : 'Voice search could not start. Try typing your grocery search.'}
         </p>
       ) : null}
+      <p aria-atomic="true" aria-live="polite" className="sr-only" role="status">
+        {searchStatusAnnouncement}
+      </p>
 
       {shouldShowDropdown ? (
         <div

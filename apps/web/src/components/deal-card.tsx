@@ -16,6 +16,7 @@ import {
 import type { ConfidenceLevel } from '@/lib/content-style';
 import { buildDealContext, buildDealExplanationPanel, type DealHistoryPoint } from '@/lib/deal-context';
 import { getPriceFreshness, type FreshnessLevel } from '@/lib/freshness';
+import { dealVerdictAnnouncement } from '@/lib/screen-reader-announcements';
 import { dealShareUrl } from '@/lib/seo';
 import { PriceDropReason } from '@/components/price-drop-reason';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
@@ -256,6 +257,13 @@ export function DealCard({
     rankLabel,
     unitPriceBaselineLabel: unitPriceDropLabel ?? (originalPrice ? `Baseline ${formatPrice(originalPrice, locale, currency)} before this deal` : undefined)
   });
+  const screenReaderVerdict = dealVerdictAnnouncement({
+    currentPriceLabel: formatPrice(currentPrice, locale, currency),
+    evidenceLabel: evidenceLabel ?? priceVerificationLabel,
+    freshnessLabel: priceFreshness.label,
+    title,
+    verdict: dealExplanation.summary
+  });
   const countdownLabel = useMemo(() => {
     if (!dealEndsAt) return null;
     const endsAt = new Date(dealEndsAt).getTime();
@@ -301,6 +309,7 @@ export function DealCard({
       data-organic-ranking-separated={sponsoredPlacement ? String(separatedFromOrganicRankings) : undefined}
       data-sponsored-placement={sponsoredPlacement ? 'true' : undefined}
     >
+      <p className="sr-only">{screenReaderVerdict}</p>
       {sponsoredPlacement ? (
         <div className="mb-3 rounded-2xl border border-amber-300 bg-white p-3 text-xs font-semibold text-amber-950">
           <p className="font-black uppercase tracking-[0.18em] text-amber-800">{sponsoredLabel}</p>

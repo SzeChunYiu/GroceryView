@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 import type { RemovableSearchFilterChip } from '@/lib/search-filters';
 import type { SearchFilterPreset } from '@/lib/search-presets';
+import { filterPanelAnnouncement } from '@/lib/screen-reader-announcements';
 
 const dietaryFilters = [
   { value: 'vegan', label: 'Vegan' },
@@ -327,10 +328,15 @@ export function AdvancedFilterDrawer({
 
 export function FilterPanel({ selectedDietary = [], activeChips = [] }: FilterPanelProps) {
   const selected = new Set(selectedDietary);
+  const filterAnnouncement = filterPanelAnnouncement({
+    activeFilterCount: activeChips.length,
+    selectedDietary
+  });
 
   return (
     <fieldset className="rounded-2xl border border-emerald-100 bg-emerald-50/80 p-3">
       <legend className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Dietary filters</legend>
+      <p aria-atomic="true" aria-live="polite" className="sr-only" role="status">{filterAnnouncement}</p>
       {activeChips.length > 0 ? (
         <div className="mb-3">
           <ActiveFilterChips chips={activeChips} />

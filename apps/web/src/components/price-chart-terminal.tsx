@@ -3,6 +3,7 @@
 import { type KeyboardEvent, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { buildPriceHistorySparklinePath } from '@/lib/price-events';
 import { formatPriceChartTerminalReadout } from '../lib/price-chart-terminal-readout.js';
+import { chartSummaryAnnouncement } from '../lib/screen-reader-announcements.js';
 export { formatPriceChartTerminalReadout, priceChartTerminalLatestPoint } from '../lib/price-chart-terminal-readout.js';
 
 /**
@@ -184,6 +185,15 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
   const visiblePointCount = visibleSeries.reduce((total, series) => total + series.points.length, 0);
   const visibleMarkerCount = visibleSeries.reduce((total, series) => total + series.markers.length, 0);
   const latestReadout = formatPriceChartTerminalReadout(activeWindow);
+  const chartAnnouncement = chartSummaryAnnouncement({
+    chartAvailable: chart.available,
+    latestReadout,
+    markerCount: visibleMarkerCount,
+    pointCount: visiblePointCount,
+    rendererStatus: chartLoadStatus,
+    title: chart.title,
+    windowLabel: activeWindow?.rangeLabel ?? activeWindowLabel
+  });
   const csvDownloadHref = useMemo(() => {
     const csv = priceHistoryCsv(activeWindow, visibleSeries);
     return csv ? `data:text/csv;charset=utf-8,${encodeURIComponent(csv)}` : '#';
@@ -396,6 +406,7 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
         ))}
       </div>
       <p id={chartRendererStatusId} aria-live="polite" className="sr-only" role="status">Chart renderer status: {chartLoadStatus}</p>
+      <p aria-atomic="true" aria-live="polite" className="sr-only" role="status">{chartAnnouncement}</p>
 
       {overlayControlAvailable && activeWindow ? (
         <fieldset className="mt-4 rounded-2xl border border-white/10 bg-white/10 p-4">
