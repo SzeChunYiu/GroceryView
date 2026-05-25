@@ -7,11 +7,12 @@ describe('calculateFixedBasketIndex', () => {
     const index = calculateFixedBasketIndex({
       id: 'stockholm-coffee-index',
       label: 'Stockholm Coffee Index',
+      country: 'SE',
       baseDate: '2026-01-01',
       currentDate: '2026-05-19',
       components: [
-        { productId: 'coffee-a', baseUnitPrice: 100, currentUnitPrice: 90, weight: 1 },
-        { productId: 'coffee-b', baseUnitPrice: 80, currentUnitPrice: 88, weight: 1 }
+        { productId: 'coffee-a', country: 'SE', currency: 'SEK', baseUnitPrice: 100, currentUnitPrice: 90, weight: 1 },
+        { productId: 'coffee-b', country: 'SE', currency: 'SEK', baseUnitPrice: 80, currentUnitPrice: 88, weight: 1 }
       ]
     });
 
