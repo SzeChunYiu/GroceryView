@@ -117,6 +117,7 @@ export * from './connectors/fuel-stations.js';
 export * from './jobs/is-poi-audit.js';
 export * from './connectors/citygross.js';
 export * from './connectors/citygross-bulk.js';
+export * from './connectors/circle-k-se.js';
 export * from './connectors/coop.js';
 export * from './connectors/hemkop.js';
 export * from './connectors/ica.js';
