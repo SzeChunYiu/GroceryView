@@ -56,6 +56,30 @@ export type TargetPriceAlertDraft = {
   thresholdReason: string;
 };
 
+export type PushNotificationPreferenceKey = 'priceDrops' | 'stockChanges' | 'listCollaboration' | 'budgetWarnings';
+
+export type PushNotificationPreferences = Record<PushNotificationPreferenceKey, boolean>;
+
+export type PushNotificationCandidate = {
+  id: string;
+  preferenceKey: PushNotificationPreferenceKey;
+};
+
+export const defaultPushNotificationPreferences: PushNotificationPreferences = {
+  priceDrops: true,
+  stockChanges: true,
+  listCollaboration: true,
+  budgetWarnings: true
+};
+
+export function filterPushNotificationCandidates<TCandidate extends PushNotificationCandidate>(
+  candidates: TCandidate[],
+  preferences: Partial<PushNotificationPreferences> = {}
+): TCandidate[] {
+  const mergedPreferences = { ...defaultPushNotificationPreferences, ...preferences };
+  return candidates.filter((candidate) => mergedPreferences[candidate.preferenceKey]);
+}
+
 type PredictiveDropAlertOptions = {
   now?: Date;
   daysAhead?: number;
