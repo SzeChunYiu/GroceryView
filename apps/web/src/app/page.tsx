@@ -38,6 +38,7 @@ const indexLeader = freshFoodChainIndex.report.chains[0] ?? null;
 const indexRunnerUp = freshFoodChainIndex.report.chains[1] ?? null;
 const terminalMovers = priceDropMoversBoard.slice(0, 3);
 const terminalDeals = categoryDealLeaders.slice(0, 3);
+const todayDealStrip = categoryDealLeaders.slice(0, 6);
 const terminalHeatTiles = marketHeatmapTiles.slice(0, 6);
 const terminalWatchlist = watchlistHeartProducts.slice(0, 3);
 const terminalMarkets = supportedOriginCountries.slice(0, 5).map((country) => ({
@@ -185,10 +186,50 @@ function MarketTerminalHero() {
   );
 }
 
+function TodayBestDealsStrip() {
+  return (
+    <section className="border-b border-slate-200 bg-slate-50" data-home-deal-leaders>
+      <div className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Today&apos;s best deals</p>
+            <h2 className="mt-1 text-2xl font-black tracking-tight text-slate-950">Real category leaders from verified prices</h2>
+          </div>
+          <p className="max-w-2xl text-sm font-semibold leading-6 text-slate-600">
+            Reuses summarizeCategoryDealLeaders output from matched chain prices only, with source confidence and visible cross-chain coverage shown on every row.
+          </p>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {todayDealStrip.map((deal) => (
+            <article className="rounded-lg border border-slate-200 bg-white p-4" data-home-deal-leader={deal.productSlug} key={`${deal.categorySlug}-${deal.productSlug}`}>
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <Link className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800 hover:text-emerald-950" href={`/categories/${deal.categorySlug}`}>
+                    {deal.categoryLabel}
+                  </Link>
+                  <h3 className="mt-2 text-base font-black leading-6 text-slate-950">
+                    <Link className="hover:text-emerald-800" href={`/products/${deal.productSlug}`}>
+                      {deal.productName}
+                    </Link>
+                  </h3>
+                </div>
+                <span className="shrink-0 rounded-lg bg-emerald-50 px-3 py-2 text-sm font-black text-emerald-900">Score {deal.dealScore}</span>
+              </div>
+              <p className="mt-3 text-xl font-black text-emerald-800">{deal.signal}</p>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">{deal.evidenceLabel}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function HomePage() {
   return (
     <>
       <MarketTerminalHero />
+      <TodayBestDealsStrip />
       <PriceDropDiscoveryRail />
       <PersonalizedPriceDropFeed />
       <PersonalizedRecommendations />

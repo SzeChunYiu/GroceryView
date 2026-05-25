@@ -83,32 +83,38 @@ export default async function CategoryPage({ params, searchParams }: Readonly<{ 
       <CategoryBreadcrumb categoryLabel={categoryLabel} slug={slug} />
       <p className="mt-3 text-lg text-slate-700">{chainRows.length} Axfood rows and {openRows.length} OpenPrices rows shown from verified source modules.</p>
       <Card className="mt-6 border-emerald-200 bg-emerald-50/60">
-        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-          <div>
-            <Eyebrow>Category deal leaders</Eyebrow>
-            <h2 className="mt-2 text-2xl font-black tracking-tight">Best trusted deal signals in this category</h2>
-          </div>
-          <p className="max-w-xl text-sm leading-6 text-slate-700">
-            This route calls summarizeCategoryDealLeaders over visible chain-price candidates only; sourceConfidence must clear 60% before a product appears.
-          </p>
-        </div>
-        <div className="mt-5 grid gap-3 md:grid-cols-2">
-          {dealLeaders.map((leader) => (
-            <Link
-              className="rounded-2xl border border-emerald-100 bg-white p-4 hover:border-emerald-700"
-              href={`/products/${leader.productId}`}
-              key={leader.productId}
-            >
-              <p className="font-black text-slate-950">{leader.productName}</p>
-              <p className="mt-2 text-2xl font-black text-emerald-800">{leader.signal}</p>
-              <p className="mt-2 text-sm font-semibold text-slate-700">{leader.storeName} lowest · sourceConfidence {(leader.sourceConfidence * 100).toFixed(0)}%</p>
-            </Link>
-          ))}
-          {dealLeaders.length === 0 ? (
-            <p className="rounded-2xl border border-dashed border-emerald-200 bg-white p-4 text-sm font-semibold text-slate-700">
-              No trusted category deal leader yet; GroceryView will not fabricate a category deal without matched chain prices.
+        <div data-category-deal-leaders>
+          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+            <div>
+              <Eyebrow>Category deal leaders</Eyebrow>
+              <h2 className="mt-2 text-2xl font-black tracking-tight">Best trusted deal signals in this category</h2>
+            </div>
+            <p className="max-w-xl text-sm leading-6 text-slate-700">
+              This route calls summarizeCategoryDealLeaders over visible chain-price candidates only; sourceConfidence must clear 60% before a product appears.
             </p>
-          ) : null}
+          </div>
+          <div className="mt-5 grid gap-3 md:grid-cols-2">
+            {dealLeaders.map((leader) => (
+              <Link
+                className="rounded-2xl border border-emerald-100 bg-white p-4 hover:border-emerald-700"
+                data-category-deal-leader={leader.productId}
+                href={`/products/${leader.productId}`}
+                key={leader.productId}
+              >
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">{categoryLabel}</p>
+                <p className="mt-2 font-black text-slate-950">{leader.productName}</p>
+                <p className="mt-2 text-2xl font-black text-emerald-800">{leader.signal}</p>
+                <p className="mt-2 text-sm font-semibold text-slate-700">
+                  {leader.storeName} lowest chain · sourceConfidence {(leader.sourceConfidence * 100).toFixed(0)}% · visible chain coverage only
+                </p>
+              </Link>
+            ))}
+            {dealLeaders.length === 0 ? (
+              <p className="rounded-2xl border border-dashed border-emerald-200 bg-white p-4 text-sm font-semibold text-slate-700">
+                No trusted category deal leader yet; GroceryView will not fabricate a category deal without matched chain prices.
+              </p>
+            ) : null}
+          </div>
         </div>
       </Card>
       <Card className="mt-6 border-lime-200 bg-lime-50">
