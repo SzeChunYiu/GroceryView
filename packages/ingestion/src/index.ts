@@ -4614,3 +4614,6 @@ if (process.argv[1] && import.meta.url === new URL(process.argv[1], 'file:').hre
       process.exitCode = 1;
     });
 }
+
+export * from './connectors/benchmarks/tlv-medicines.js';
+export * from './connectors/benchmarks/registry.js';
