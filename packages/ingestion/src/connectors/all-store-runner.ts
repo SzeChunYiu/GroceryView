@@ -12,7 +12,8 @@ export type AllStoreTaskFailure = {
 };
 
 export const ALL_STORE_RUNNER_CHAINWIDE_CATALOG_CONNECTORS = [
-  'seven-eleven-se-convenience-products'
+  'seven-eleven-se-convenience-products',
+  'circle-k-se-convenience-products'
 ] as const;
 
 export type AllStoreRunnerChainwideCatalogConnector = typeof ALL_STORE_RUNNER_CHAINWIDE_CATALOG_CONNECTORS[number];
