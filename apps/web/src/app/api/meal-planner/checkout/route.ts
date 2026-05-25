@@ -33,20 +33,19 @@ function parseIngredientJson(value: unknown) {
 function normalizeIngredients(value: unknown): MealBudgetIngredient[] {
   return parseIngredientJson(value)
     .filter((ingredient): ingredient is MealPlannerCheckoutIngredient => ingredient !== null && typeof ingredient === 'object')
-    .map((ingredient) => {
+    .flatMap((ingredient): MealBudgetIngredient[] => {
       const name = cleanString(ingredient.name);
       const category = cleanString(ingredient.category);
-      if (!name || !category) return null;
+      if (!name || !category) return [];
 
-      return {
+      return [{
         category,
         name,
         price: typeof ingredient.price === 'number' && Number.isFinite(ingredient.price) ? Math.max(0, ingredient.price) : 0,
         productId: cleanString(ingredient.productId) || undefined,
         source: cleanString(ingredient.source) || undefined
-      } satisfies MealBudgetIngredient;
-    })
-    .filter((ingredient): ingredient is MealBudgetIngredient => Boolean(ingredient));
+      }];
+    });
 }
 
 async function readCheckoutRequest(request: NextRequest): Promise<MealPlannerCheckoutRequest> {
