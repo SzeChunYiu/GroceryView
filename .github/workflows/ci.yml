@@ -25,7 +25,7 @@ jobs:
         run: npm run build
       - name: Next profile bundle budget
         run: npm run perf:bundle:profile -w @groceryview/web
-      - name: Local Lighthouse smoke budget
+      - name: Lighthouse performance budget
         run: npm run perf:lighthouse:ci -w @groceryview/web
       - name: Typecheck
         run: npm run typecheck

@@ -68,4 +68,4 @@ jobs:
 
       - name: Run Lighthouse CI against Vercel preview
         if: env.LHCI_PREVIEW_URL != ''
-        run: npx lhci autorun --config=./lighthouserc.js
+        run: npm run perf:lighthouse:preview -w @groceryview/web
