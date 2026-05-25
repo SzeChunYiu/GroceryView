@@ -430,3 +430,19 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.doesNotMatch(migrationVerifier, /mapfile/);
   });
 });
+
+describe('produce classes canonical schema', () => {
+  it('creates produce_classes before seed data with hierarchy, segment, depth, sort order, and indexes', () => {
+    const canonicalSchema = readFileSync(join(repoRoot, 'db/schema.sql'), 'utf8').toLowerCase();
+    const produceMigration = readFileSync(join(repoRoot, 'infra/db/migrations/023_produce_classes.sql'), 'utf8').toLowerCase();
+    for (const source of [canonicalSchema, produceMigration]) {
+      assert.match(source, /create table if not exists produce_classes/);
+      assert.match(source, /parent_id text references produce_classes\(id\) on delete cascade/);
+      assert.match(source, /segment text not null/);
+      assert.match(source, /depth integer not null check \(depth >= 0\)/);
+      assert.match(source, /sort_order integer not null default 0/);
+      assert.match(source, /produce_classes_parent_idx/);
+      assert.match(source, /produce_classes_segment_depth_idx/);
+    }
+  });
+});

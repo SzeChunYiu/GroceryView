@@ -46,7 +46,7 @@ export type BestTimeAlertExplanationInput = {
   volatilityScore?: number | null;
 };
 
-export type PushNotificationPreferenceKey = 'priceDrops' | 'stockChanges' | 'listCollaboration' | 'budgetWarnings';
+export type PushNotificationPreferenceKey = 'priceDrops' | 'bestTimeBuys' | 'pantryExpiry' | 'weeklyBasketDigests';
 
 export type PushNotificationPreferences = Record<PushNotificationPreferenceKey, boolean>;
 
@@ -57,9 +57,9 @@ export type PushNotificationCandidate = {
 
 export const defaultPushNotificationPreferences: PushNotificationPreferences = {
   priceDrops: true,
-  stockChanges: true,
-  listCollaboration: true,
-  budgetWarnings: true
+  bestTimeBuys: true,
+  pantryExpiry: true,
+  weeklyBasketDigests: true
 };
 
 export function filterPushNotificationCandidates<TCandidate extends PushNotificationCandidate>(
@@ -281,6 +281,7 @@ const savedSearchFilterLabels: Record<string, string> = {
   category: 'category',
   label: 'label',
   dietary: 'dietary',
+  origin: 'origin',
   chain: 'chain',
   brand: 'brand',
   minPrice: 'min price',

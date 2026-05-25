@@ -10,6 +10,8 @@ export interface PriceIntelligenceScoreCard {
   forecastRangeLabel?: string;
   forecastConfidenceLabel?: string;
   forecastTrendLabel?: string;
+  seasonalContextLabel?: string;
+  holidayLabel?: string;
   detail: string;
 }
 
@@ -90,6 +92,13 @@ export function PriceIntelligenceCard({
                   <p className="mt-1 text-sm font-black">{card.forecastRangeLabel}</p>
                   <p className="mt-1 text-sky-800">{card.forecastConfidenceLabel ?? 'forecast confidence unavailable'}</p>
                   {card.forecastTrendLabel ? <p className="mt-1 text-sky-800">{card.forecastTrendLabel}</p> : null}
+                </div>
+              ) : null}
+              {card.seasonalContextLabel ? (
+                <div className="mt-3 rounded-xl border border-amber-100 bg-amber-50 p-3 text-xs font-bold text-amber-950">
+                  <p className="uppercase tracking-[0.14em] text-amber-700">seasonal deal context</p>
+                  <p className="mt-1 text-sm font-black">{card.seasonalContextLabel}</p>
+                  {card.holidayLabel ? <p className="mt-1 text-amber-800">{card.holidayLabel}</p> : null}
                 </div>
               ) : null}
               <p className="mt-3 text-xs font-semibold leading-5 text-slate-500">{card.detail}</p>

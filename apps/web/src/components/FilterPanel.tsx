@@ -1,5 +1,9 @@
+'use client';
+
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import type { RemovableSearchFilterChip } from '@/lib/search-filters';
+import type { SearchFilterPreset } from '@/lib/search-presets';
 
 const dietaryFilters = [
   { value: 'vegan', label: 'Vegan' },
@@ -38,6 +42,7 @@ type AdvancedFilterDrawerProps = {
   brandOptions: readonly BrandFilterOption[];
   categoryFacets: readonly FacetOption[];
   chainFacets: readonly FacetOption[];
+  currentPreset: SearchFilterPreset;
   dietaryFilters: readonly DietaryFacetOption[];
   inStockOnly?: boolean;
   labelFacets: readonly FacetOption[];
@@ -51,6 +56,80 @@ type AdvancedFilterDrawerProps = {
   selectedLabels?: readonly string[];
 };
 
+const searchPresetStorageKey = 'groceryview:advanced-search-presets';
+
+function readSavedSearchPresets(): SearchFilterPreset[] {
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(searchPresetStorageKey) || '[]') as SearchFilterPreset[];
+    return Array.isArray(parsed)
+      ? parsed.filter((preset) => typeof preset.id === 'string' && typeof preset.href === 'string' && typeof preset.name === 'string').slice(0, 8)
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeSavedSearchPresets(presets: SearchFilterPreset[]) {
+  window.localStorage.setItem(searchPresetStorageKey, JSON.stringify(presets.slice(0, 8)));
+}
+
+function hasSignedInSession() {
+  return Boolean(window.sessionStorage.getItem('groceryview:accessToken') || window.sessionStorage.getItem('groceryview:userId'));
+}
+
+function SavedSearchPresetControls({ currentPreset }: Readonly<{ currentPreset: SearchFilterPreset }>) {
+  const [isSignedIn, setIsSignedIn] = useState(false);
+  const [presets, setPresets] = useState<SearchFilterPreset[]>([]);
+  const hasFilters = currentPreset.summary !== 'No advanced filters selected';
+
+  useEffect(() => {
+    setIsSignedIn(hasSignedInSession());
+    setPresets(readSavedSearchPresets());
+  }, []);
+
+  function saveCurrentPreset() {
+    if (!isSignedIn || !hasFilters) return;
+    const nextPreset = { ...currentPreset, createdAt: new Date().toISOString() };
+    const next = [nextPreset, ...presets.filter((preset) => preset.id !== nextPreset.id)].slice(0, 8);
+    setPresets(next);
+    writeSavedSearchPresets(next);
+  }
+
+  return (
+    <section className="mt-4 rounded-2xl border border-violet-200 bg-white p-4" aria-label="Saved advanced filter presets">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-violet-700">Saved advanced presets</p>
+          <p className="mt-1 text-sm font-semibold leading-6 text-slate-700">
+            Signed-in shoppers can save category, dietary, origin, chain, price, confidence, and brand filters as reusable product-search presets.
+          </p>
+          <p className="mt-2 text-xs font-bold text-violet-900">Current preset: {currentPreset.summary}</p>
+        </div>
+        <button
+          className="rounded-full bg-violet-800 px-4 py-2 text-sm font-black text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+          disabled={!isSignedIn || !hasFilters}
+          onClick={saveCurrentPreset}
+          type="button"
+        >
+          Save current preset
+        </button>
+      </div>
+      {!isSignedIn ? (
+        <p className="mt-3 rounded-xl bg-violet-50 px-3 py-2 text-xs font-bold text-violet-900">Sign in to keep presets on this device.</p>
+      ) : null}
+      {presets.length > 0 ? (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {presets.map((preset) => (
+            <Link className="rounded-full bg-violet-50 px-3 py-2 text-xs font-black text-violet-950 transition hover:bg-violet-100" href={preset.href} key={preset.id}>
+              {preset.name}
+            </Link>
+          ))}
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
 export function ActiveFilterChips({ chips }: ActiveFilterChipsProps) {
   if (chips.length === 0) {
     return (
@@ -61,9 +140,9 @@ export function ActiveFilterChips({ chips }: ActiveFilterChipsProps) {
   }
 
   return (
-    <div aria-label="Saved search filters" className="flex flex-wrap gap-2">
+    <div aria-label="Active removable search filters" className="flex flex-wrap gap-2">
       {chips.map((chip) => (
-        <Link className="rounded-full bg-violet-900 px-3 py-2 text-xs font-black text-white shadow-sm transition hover:bg-violet-700" href={chip.href} key={chip.id}>
+        <Link aria-label={`Remove ${chip.label}`} className="rounded-full bg-violet-900 px-3 py-2 text-xs font-black text-white shadow-sm transition hover:bg-violet-700" href={chip.href} key={chip.id}>
           {chip.label}
           <span aria-hidden="true" className="ml-2">×</span>
           <span className="sr-only">Remove {chip.label}</span>
@@ -82,6 +161,7 @@ export function AdvancedFilterDrawer({
   brandOptions,
   categoryFacets,
   chainFacets,
+  currentPreset,
   dietaryFilters,
   inStockOnly = false,
   labelFacets,
@@ -181,6 +261,7 @@ export function AdvancedFilterDrawer({
           <ActiveFilterChips chips={activeChips} />
         </div>
       ) : null}
+      <SavedSearchPresetControls currentPreset={currentPreset} />
     </details>
   );
 }

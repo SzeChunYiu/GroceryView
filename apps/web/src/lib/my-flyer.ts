@@ -1,5 +1,5 @@
 import { createGroceryViewApi, type FlyerOffer } from '@groceryview/api';
-import { rankOrganicDeals } from '@groceryview/core';
+import { rankMyBasketPromos, rankOrganicDeals } from '@groceryview/core';
 
 export const myFlyerAlgorithms = ['best_savings', 'best_unit_price', 'watchlist_first', 'organic_eco'] as const;
 export const myFlyerCountries = ['se', 'no', 'dk', 'fi'] as const;
@@ -73,8 +73,9 @@ function profileForUser(userId: string) {
   const favoriteStores = hash % 2 === 0 ? new Set(['willys-odenplan', 'lidl-sveavagen']) : new Set(['coop-odenplan']);
   const watchedProducts = hash % 3 === 0 ? new Set(['coffee', 'butter']) : new Set(['milk', 'private-label-milk']);
   const watchedCategories = hash % 5 === 0 ? new Set(['dairy']) : new Set(['coffee']);
+  const recentBasketProducts = hash % 2 === 0 ? new Set(['oat-milk', 'milk']) : new Set(['coffee', 'pasta']);
 
-  return { favoriteStores, watchedProducts, watchedCategories };
+  return { favoriteStores, watchedProducts, watchedCategories, recentBasketProducts };
 }
 
 function startOfIsoWeek(asOf: Date) {
@@ -104,6 +105,12 @@ function unitPriceFor(offer: FlyerOffer) {
   const packageAmount = comparableQuantity(offer);
   if (!packageAmount || packageAmount <= 0) return null;
   return round(offer.offerPrice / packageAmount);
+}
+
+function unitEconomicsEvidence(offer: FlyerOffer, unitPrice: number | null) {
+  if (unitPrice === null) return 'missing package or effective unit-price evidence';
+  if (offer.packageQuantity && offer.packageUnit) return `${offer.packageQuantity}${offer.packageUnit} package evidence`;
+  return `${unitPrice} SEK/${offer.effectiveUnitPriceUnit ?? 'unit'} effective unit price evidence`;
 }
 
 function expiryScoreFor(offer: FlyerOffer, asOfMs: number) {
@@ -161,7 +168,7 @@ function scoreOffer(offer: FlyerOffer, query: MyFlyerQuery, asOfMs: number): Omi
   const explanation = [
     `${query.algorithm} ranker`,
     `${round(savings)} SEK savings`,
-    query.algorithm === 'organic_eco' ? 'organic eco evidence required' : 'standard flyer eligibility',
+    query.algorithm === 'organic_eco' ? 'organic eco evidence required' : unitEconomicsEvidence(offer, unitPrice),
     profile.favoriteStores.has(offer.storeId) ? 'favorite store boost' : 'all-store eligible',
     watchlist > 0 ? 'watchlist or category match' : 'general weekly promotion',
     offer.priceType === 'member_flyer' ? 'member flyer label retained' : 'public flyer price'
@@ -217,7 +224,24 @@ export function buildMyFlyerPayload(query: MyFlyerQuery, asOf = new Date()): MyF
       ? report.offers.filter((offer) => unitPriceFor(offer) !== null)
       : report.offers;
 
-  const rows = sourceOffers
+  const profile = profileForUser(query.userId);
+  const myBasketPromos = rankMyBasketPromos({
+    asOf,
+    promos: sourceOffers.map((offer) => ({
+      ...offer,
+      promoId: offer.offerId,
+      listingId: offer.productId,
+      coveredListingIds: [offer.productId, offer.category],
+      savings: offer.savings
+    })),
+    topN: query.limit,
+    user: {
+      watchlist: [...profile.watchedProducts, ...profile.watchedCategories].map((listingId) => ({ listingId })),
+      recentBasketHistory: [...profile.recentBasketProducts].map((listingId) => ({ listingId, purchasedAt: asOf }))
+    }
+  });
+
+  const rows = myBasketPromos
     .map((offer) => scoreOffer(offer, query, asOfMs))
     .sort((left, right) =>
       query.algorithm === 'organic_eco'
