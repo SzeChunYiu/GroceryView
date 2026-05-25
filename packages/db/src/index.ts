@@ -533,6 +533,8 @@ export type PriceObservationRecord = {
   sourceRunId?: string;
   rawRecordId?: string;
   retailerProductRef?: string;
+  originCountry?: string;
+  certLevel?: string;
   priceType: PriceType;
   price: number;
   regularPrice?: number;
@@ -881,6 +883,8 @@ export type OpenPricesArtifactPriceObservation = {
   parserVersion?: string;
   rawSnapshotRef: string;
   sourceRunId?: string;
+  originCountry?: string;
+  certLevel?: string;
   confidenceScore: number;
   isOnlinePrice?: boolean;
   isInstorePrice?: boolean;
@@ -3247,6 +3251,15 @@ function validateOpenPricesArtifact(artifact: OpenPricesNormalizedArtifact): voi
     }
     if (row.priceObservation.currency !== 'SEK') throw new Error(`${path}.priceObservation.currency must be SEK.`);
     if (Number.isNaN(Date.parse(row.priceObservation.observedAt))) throw new Error(`${path}.priceObservation.observedAt must be an ISO date.`);
+    if (row.priceObservation.originCountry !== undefined && !/^[A-Z]{2}$/.test(row.priceObservation.originCountry)) {
+      throw new Error(`${path}.priceObservation.originCountry must be an ISO-3166 alpha-2 code.`);
+    }
+    if (
+      row.priceObservation.certLevel !== undefined &&
+      !['krav', 'eu_eco', 'free_range', 'asc', 'msc', 'rainforest_alliance', 'fairtrade', 'conventional'].includes(row.priceObservation.certLevel)
+    ) {
+      throw new Error(`${path}.priceObservation.certLevel must be a supported certification level.`);
+    }
     if (!Number.isFinite(row.priceObservation.confidenceScore) || row.priceObservation.confidenceScore < 0 || row.priceObservation.confidenceScore > 1) {
       throw new Error(`${path}.priceObservation.confidenceScore must be between 0 and 1.`);
     }
@@ -3395,6 +3408,8 @@ export async function persistOpenPricesArtifact(
       sourceRunId: sourceRun.sourceRunId,
       rawRecordId: rawRecord.rawRecordId,
       retailerProductRef: priceObservation.retailerProductId,
+      originCountry: priceObservation.originCountry,
+      certLevel: priceObservation.certLevel,
       priceType: mapOpenPricesPriceType(priceObservation.priceType),
       price: priceObservation.price,
       regularPrice: priceObservation.regularPrice,
@@ -4353,6 +4368,8 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            source_run_id,
            raw_record_id,
            retailer_product_ref,
+           origin_country,
+           cert_level,
            price_type,
            price,
            regular_price,
@@ -4372,7 +4389,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            provenance
          ) values (
            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12,
-           $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24::jsonb
+           $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26::jsonb
          )
          on conflict (
            product_id,
@@ -4398,6 +4415,8 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
           observation.sourceRunId ?? null,
           observation.rawRecordId ?? null,
           observation.retailerProductRef ?? null,
+          observation.originCountry ?? null,
+          observation.certLevel ?? null,
           observation.priceType,
           observation.price,
           observation.regularPrice ?? null,
@@ -4485,6 +4504,8 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              source_run_id uuid,
              raw_record_id uuid,
              retailer_product_ref text,
+             origin_country char(2),
+             cert_level text,
              price_type text,
              price numeric(12, 2),
              regular_price numeric(12, 2),
@@ -4554,6 +4575,8 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              source_run_id,
              raw_record_id,
              retailer_product_ref,
+             origin_country,
+             cert_level,
              price_type,
              price,
              regular_price,
@@ -4580,6 +4603,8 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              source_run_id,
              raw_record_id,
              retailer_product_ref,
+             origin_country,
+             cert_level,
              price_type,
              price,
              regular_price,
@@ -4732,6 +4757,8 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
           source_run_id: observation.sourceRunId ?? null,
           raw_record_id: observation.rawRecordId ?? null,
           retailer_product_ref: observation.retailerProductRef ?? null,
+          origin_country: observation.originCountry ?? null,
+          cert_level: observation.certLevel ?? null,
           price_type: observation.priceType,
           price: observation.price,
           regular_price: observation.regularPrice ?? null,

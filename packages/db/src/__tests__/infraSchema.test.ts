@@ -19,6 +19,10 @@ const basketImportReviewsMigration = readFileSync(join(repoRoot, 'infra/db/migra
 const priceAlertsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/011_price_alerts.sql'), 'utf8').toLowerCase();
 const telegramNotificationsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/018_telegram_notifications.sql'), 'utf8').toLowerCase();
 const friendSharedDealSignalsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/025_friend_shared_deal_signals.sql'), 'utf8').toLowerCase();
+const serverPriceObservationOriginCertMigration = readFileSync(
+  join(repoRoot, 'packages/server/migrations/20260525143500_add_origin_cert_to_price_observation.sql'),
+  'utf8'
+).toLowerCase();
 const migrationsDir = join(repoRoot, 'infra/db/migrations');
 const allMigrations = readdirSync(migrationsDir)
   .filter((entry) => entry.endsWith('.sql') && !entry.startsWith('._'))
@@ -125,6 +129,19 @@ describe('infra/db PostgreSQL schema contract', () => {
     }
     assert.match(observations, /price_type text not null check/);
     assert.match(observations, /confidence numeric\(5, 4\) not null check \(confidence between 0 and 1\)/);
+  });
+
+  it('keeps package-local price observations ready for source-backed origin and certification evidence', () => {
+    assert.match(serverPriceObservationOriginCertMigration, /alter table price_observation/);
+    assert.match(serverPriceObservationOriginCertMigration, /add column if not exists origin_country char\(2\)/);
+    assert.match(serverPriceObservationOriginCertMigration, /add column if not exists cert_level text/);
+    assert.match(serverPriceObservationOriginCertMigration, /price_observation_origin_country_check/);
+    assert.match(serverPriceObservationOriginCertMigration, /origin_country is null or origin_country ~ '\^\[a-z\]\{2\}\$'/i);
+    assert.match(serverPriceObservationOriginCertMigration, /price_observation_cert_level_check/);
+    for (const certLevel of ['krav', 'eu_eco', 'free_range', 'asc', 'msc', 'rainforest_alliance', 'fairtrade', 'conventional']) {
+      assert.match(serverPriceObservationOriginCertMigration, new RegExp(`'${certLevel}'`), `${certLevel} missing from server price observation migration`);
+    }
+    assert.match(serverPriceObservationOriginCertMigration, /price_observation_origin_cert_idx/);
   });
 
   it('tracks observed product availability without deleting price facts', () => {

@@ -2933,6 +2933,7 @@ export type RetailerProductInput = {
   variant?: string;
   isOrganic?: boolean;
   originCountry?: string;
+  certLevel?: CertificationLevel;
   soldByWeight?: boolean;
   packageSize: number;
   packageUnit: string;
@@ -2956,6 +2957,8 @@ export type PriceType =
   | 'shelf_photo'
   | 'manual'
   | 'estimated';
+
+export type CertificationLevel = 'krav' | 'eu_eco' | 'free_range' | 'asc' | 'msc' | 'rainforest_alliance' | 'fairtrade' | 'conventional';
 
 export type PriceProvenance = {
   sourceType: SourceType;
@@ -2998,6 +3001,8 @@ export type IngestedPriceObservation = {
   retailerProductId?: string;
   storeId?: string;
   chainId: string;
+  originCountry?: string;
+  certLevel?: CertificationLevel;
   observedAt: string;
   price: number;
   unitPrice: number;
@@ -3057,6 +3062,12 @@ function validateInput(input: RetailerProductInput): void {
   if (input.validFrom !== undefined && Number.isNaN(Date.parse(input.validFrom))) throw new Error('validFrom must be an ISO date.');
   if (input.validUntil !== undefined && Number.isNaN(Date.parse(input.validUntil))) throw new Error('validUntil must be an ISO date.');
   if (input.originCountry !== undefined && !/^[a-z]{2}$/i.test(input.originCountry)) throw new Error('originCountry must be an ISO-3166 alpha-2 code.');
+  if (
+    input.certLevel !== undefined &&
+    !['krav', 'eu_eco', 'free_range', 'asc', 'msc', 'rainforest_alliance', 'fairtrade', 'conventional'].includes(input.certLevel)
+  ) {
+    throw new Error('certLevel must be a supported certification level.');
+  }
 }
 
 function priceTypeForSource(input: RetailerProductInput, hasPromotion: boolean): PriceType {
@@ -3254,6 +3265,8 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
       retailerProductId: input.retailerProductId,
       storeId: input.storeId,
       chainId: input.chainId,
+      originCountry: input.originCountry?.toUpperCase(),
+      certLevel: input.certLevel,
       observedAt: input.observedAt,
       price: input.price,
       unitPrice: normalized.unitPrice,
@@ -4593,6 +4606,8 @@ async function persistDailyConnectorOutput(input: {
         storeId,
         sourceRunId: sourceRun.sourceRunId,
         retailerProductRef: accepted.priceObservation.retailerProductId,
+        originCountry: accepted.priceObservation.originCountry,
+        certLevel: accepted.priceObservation.certLevel,
         priceType: dbPriceTypeForIngested(accepted.priceObservation.priceType),
         price: accepted.priceObservation.price,
         regularPrice: accepted.priceObservation.regularPrice,
