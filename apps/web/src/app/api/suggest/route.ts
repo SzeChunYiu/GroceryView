@@ -22,7 +22,7 @@ type CachedSuggestions = {
   suggestions: Suggestion[];
 };
 
-const SUGGESTION_LIMIT = 12;
+const SUGGESTION_LIMIT = 10;
 const GROUP_ITEM_LIMIT = 4;
 const CACHE_TTL_MS = 60_000;
 const suggestionCache = new Map<string, CachedSuggestions>();

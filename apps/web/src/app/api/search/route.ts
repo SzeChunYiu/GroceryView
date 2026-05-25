@@ -1,5 +1,6 @@
 import { createPgQueryExecutor, searchProductsByText, type ProductSearchResult } from '@groceryview/db';
 import { NextResponse } from 'next/server';
+import { prefetchFrequentSearches, readSearchCache, searchCacheKey, writeSearchCache } from '@/lib/search-cache';
 import { expandGrocerySearchQuery, type GrocerySearchExpansion } from '@/lib/search-suggest';
 
 export const runtime = 'nodejs';
@@ -53,7 +54,7 @@ async function weightedSearchBatch(executor: Awaited<ReturnType<typeof executorF
   }));
 }
 
-function responsePayload(query: string, expansion: GrocerySearchExpansion, results: ProductSearchResult[], error?: string) {
+function responsePayload(query: string, expansion: GrocerySearchExpansion, results: ProductSearchResult[], error?: string, cacheStatus?: 'hit' | 'miss' | 'stored') {
   return {
     query,
     expandedQueries: expansion.expandedQueries,
@@ -64,17 +65,37 @@ function responsePayload(query: string, expansion: GrocerySearchExpansion, resul
     results,
     rankingMode: 'weighted_alias_fuzzy_token_expansion',
     source: 'postgres.products_tsvector_alias_synonym_expansion_weighted_fuzzy',
+    ...(cacheStatus ? { cacheStatus } : {}),
     ...(error ? { error } : {})
   };
+}
+
+async function expandedSearchResults(executor: Awaited<ReturnType<typeof executorForDatabaseUrl>>, expansion: GrocerySearchExpansion) {
+  const batches = await Promise.all(expansion.expandedQueries.map((expandedQuery) => weightedSearchBatch(executor, expandedQuery, expansion.queryWeights[expandedQuery] ?? 1)));
+  return mergeSearchResults(batches);
+}
+
+async function prefetchSearchQuery(executor: Awaited<ReturnType<typeof executorForDatabaseUrl>>, query: string) {
+  const expansion = expandGrocerySearchQuery(query);
+  const key = searchCacheKey(query, expansion.expandedQueries);
+  if (readSearchCache(key)) return;
+  const results = await expandedSearchResults(executor, expansion);
+  writeSearchCache(key, responsePayload(query, expansion, results, undefined, 'stored'));
 }
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const query = (searchParams.get('q') ?? '').trim();
   const expansion = expandGrocerySearchQuery(query);
+  const cacheKey = searchCacheKey(query, expansion.expandedQueries);
 
   if (query.length < 2) {
     return NextResponse.json(responsePayload(query, expansion, []));
+  }
+
+  const cachedPayload = readSearchCache<ReturnType<typeof responsePayload>>(cacheKey);
+  if (cachedPayload) {
+    return NextResponse.json({ ...cachedPayload, cacheStatus: 'hit' });
   }
 
   const databaseUrl = process.env.DATABASE_URL;
@@ -87,8 +108,10 @@ export async function GET(request: Request) {
 
   try {
     const executor = await executorForDatabaseUrl(databaseUrl);
-    const batches = await Promise.all(expansion.expandedQueries.map((expandedQuery) => weightedSearchBatch(executor, expandedQuery, expansion.queryWeights[expandedQuery] ?? 1)));
-    return NextResponse.json(responsePayload(query, expansion, mergeSearchResults(batches)));
+    void prefetchFrequentSearches((prefetchQuery) => prefetchSearchQuery(executor, prefetchQuery));
+    const payload = responsePayload(query, expansion, await expandedSearchResults(executor, expansion), undefined, 'miss');
+    writeSearchCache(cacheKey, { ...payload, cacheStatus: 'stored' });
+    return NextResponse.json(payload);
   } catch (error) {
     console.error('Product search query failed', error instanceof Error ? { name: error.name } : { name: 'unknown' });
     return NextResponse.json(
