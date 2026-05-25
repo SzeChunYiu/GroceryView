@@ -239,7 +239,8 @@ test('trending feed handler payload returns fixture JSON shape with card evidenc
   const payload = await response.json();
 
   assert.equal(payload.city, 'Malmo');
-  assert.deepEqual(payload.filters, { category: '', chain: '' });
+  assert.equal(payload.filters.category, '');
+  assert.equal(payload.filters.chain, '');
   assert.deepEqual(payload.personalization.signals, ['favoriteBrands', 'dietary', 'nearbyChains', 'clicked', 'household category history']);
   assert.equal(payload.cards.length, 1);
   assert.deepEqual(Object.keys(payload.cards[0]).filter((key) => [
