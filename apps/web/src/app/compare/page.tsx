@@ -10,7 +10,7 @@ import { StorePriceMatrix } from '@/components/store-price-matrix';
 import { COMPARE_CHAIN_ORDER, buildBasketStoreComparison, buildChainComparisonTable, parseCompareChainsParam } from '@/lib/chain-compare';
 import { fetchComparePriceSnapshots, type ComparePriceSnapshotStoreRow } from '@/lib/compare-price-snapshots';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
-import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, commodityComparisons, compareOverlayChart, formatPct, formatSek, matchedChainProducts, privateLabelDupeFinder } from '@/lib/verified-data';
+import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, commodityComparisons, compareOverlayChart, formatPct, formatSek, matchedChainProducts, normalizeComparableUnitPrice, privateLabelDupeFinder, snapshot } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 import { buildStoreDistanceCompare } from '@/lib/store-distance';
 
@@ -24,6 +24,25 @@ function formatComparableUnitPrice(value: number | null | undefined, unitLabel: 
     currency: 'SEK',
     unit: unitLabel?.replace(/^kr\//, '') ?? null
   });
+}
+
+function medianPrice(values: number[]) {
+  const sorted = [...values].sort((left, right) => left - right);
+  if (sorted.length === 0) return null;
+  const middle = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 0 ? (sorted[middle - 1]! + sorted[middle]!) / 2 : sorted[middle] ?? null;
+}
+
+function chainDisplayName(chain: string) {
+  if (chain === 'hemkop') return 'Hemköp';
+  if (chain === 'willys') return 'Willys';
+  return chain.toUpperCase();
+}
+
+function chainUnitPriceLabel(price: number, priceUnit: string, packageLabel: string) {
+  if (priceUnit && priceUnit !== 'kr/st') return formatComparableUnitPrice(price, priceUnit);
+  const normalized = normalizeComparableUnitPrice(price, packageLabel);
+  return normalized ? formatComparableUnitPrice(normalized.unitPrice, normalized.unitLabel) : 'Unit price not computable';
 }
 
 type SearchParams = {
@@ -170,6 +189,34 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
   const storeDistance = buildStoreDistanceCompare(productsParam, resolvedSearchParams.routeMode);
   const packagedRows = comparison.products.filter((product) => product.matchType === 'packaged_barcode');
   const commodityRows = comparison.products.filter((product) => product.matchType === 'commodity_alias');
+  const requestedMatchedProductSlugs = new Set(comparison.products.map((product) => product.productSlug));
+  const requestedMatchedProducts = requestedMatchedProductSlugs.size > 0
+    ? matchedChainProducts.filter((product) => requestedMatchedProductSlugs.has(product.slug))
+    : [];
+  const cheapestChainSourceProducts = requestedMatchedProducts.length > 0 ? requestedMatchedProducts : matchedChainProducts;
+  const cheapestChainScopeLabel = requestedMatchedProducts.length > 0 ? 'requested matches' : 'high-spread matches';
+  const cheapestChainRows = [...cheapestChainSourceProducts]
+    .sort((left, right) => right.spreadPct - left.spreadPct)
+    .slice(0, 12)
+    .map((product) => {
+      const chainRows = chainPriceRows(product).sort((left, right) => left.price - right.price);
+      const best = chainRows[0];
+      const prices = chainRows.map((row) => row.price);
+      const median = medianPrice(prices);
+
+      return {
+        product,
+        best,
+        chainRows: chainRows.map((row) => ({
+          ...row,
+          chainName: chainDisplayName(row.chain),
+          deltaVsBest: best ? row.price - best.price : null,
+          deltaVsMedian: median === null ? null : row.price - median,
+          unitPriceLabel: chainUnitPriceLabel(row.price, row.priceUnit, product.subline)
+        })),
+        median
+      };
+    });
   const sampleProductsHref = '/compare?products=makaroner-pasta-101302991-st,havregryn-extra-fylliga-101758934-st';
   const chainSelectorOptions = COMPARE_CHAIN_ORDER.map((chain) => ({
     href: compareHref(
@@ -332,6 +379,75 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
         <p className="mt-3 text-xs font-semibold text-slate-500">
           Source: {comparison.sourceLabel}{comparison.generatedAt ? ` · generated ${comparison.generatedAt}` : ''}.
         </p>
+      </Card>
+      <Card className="mt-6 overflow-hidden border-teal-200 bg-white">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-teal-800">Cheapest chain answer</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Who is cheapest for this matched product right now?</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Exact matched Willys/Hemköp catalogue rows show each chain price, comparable unit price when package text permits it, and deltas against the current best and row median. Missing or unmatched chains are not inferred.
+            </p>
+          </div>
+          <p className="rounded-full bg-teal-50 px-4 py-2 text-sm font-black text-teal-900">{cheapestChainRows.length} {cheapestChainScopeLabel}</p>
+        </div>
+        <div className="mt-5 overflow-x-auto">
+          <table className="min-w-full border-collapse text-left text-sm">
+            <caption className="sr-only">Cheapest chain comparison for matched products</caption>
+            <thead className="bg-slate-950 text-white">
+              <tr>
+                <th className="px-4 py-3 font-black">Product</th>
+                <th className="px-4 py-3 font-black">Current best</th>
+                <th className="px-4 py-3 font-black">Chain prices</th>
+                <th className="px-4 py-3 font-black">Median</th>
+                <th className="px-4 py-3 font-black">Coverage</th>
+              </tr>
+            </thead>
+            <tbody>
+              {cheapestChainRows.map(({ best, chainRows, median, product }) => (
+                <tr className="border-t border-slate-100 align-top" key={product.slug}>
+                  <th className="px-4 py-4">
+                    <Link className="font-black text-slate-950 underline decoration-teal-300 underline-offset-4" href={`/products/${product.slug}`}>
+                      {product.name}
+                    </Link>
+                    <span className="mt-1 block text-xs font-semibold text-slate-500">{product.brand || 'Brand not reported'} · {product.subline}</span>
+                  </th>
+                  <td className="px-4 py-4">
+                    <p className="rounded-2xl bg-teal-50 px-3 py-2 font-black text-teal-950">{best ? chainDisplayName(best.chain) : 'No priced chain'}</p>
+                    <p className="mt-1 text-sm font-black text-slate-950">{best ? formatSek(best.price) : 'No current best'}</p>
+                    <p className="mt-1 text-xs font-semibold text-slate-500">{best ? chainUnitPriceLabel(best.price, best.priceUnit, product.subline) : 'Coverage pending'}</p>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="grid min-w-[20rem] gap-2 md:grid-cols-2">
+                      {chainRows.map((row) => (
+                        <div className={row.deltaVsBest === 0 ? 'rounded-2xl border border-teal-200 bg-teal-50 p-3' : 'rounded-2xl border border-slate-200 bg-slate-50 p-3'} key={`${product.slug}-${row.chain}`}>
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="font-black text-slate-950">{row.chainName}</p>
+                            {row.deltaVsBest === 0 ? <span className="rounded-full bg-white px-2 py-1 text-xs font-black text-teal-900">Cheapest</span> : null}
+                          </div>
+                          <p className="mt-2 text-lg font-black text-slate-950">{formatSek(row.price)}</p>
+                          <p className="mt-1 text-xs font-semibold text-slate-600">{row.unitPriceLabel}</p>
+                          <p className="mt-2 text-xs font-bold text-slate-500">
+                            {row.deltaVsBest === 0 ? 'Current best' : `${formatSek(row.deltaVsBest)} vs best`}
+                            {row.deltaVsMedian !== null ? ` · ${row.deltaVsMedian >= 0 ? '+' : ''}${formatSek(row.deltaVsMedian)} vs median` : ''}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <p className="font-black text-slate-950">{formatSek(median)}</p>
+                    <p className="mt-1 text-xs font-semibold text-slate-500">Current matched-chain median</p>
+                  </td>
+                  <td className="px-4 py-4">
+                    <p className="font-black text-slate-950">{chainRows.length} chain rows</p>
+                    <p className="mt-1 text-xs font-semibold text-slate-500">Spread {formatPct(product.spreadPct)} · {snapshot.axfoodSource}</p>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </Card>
       <div className="mt-6">
         <StoreComparisonTable
