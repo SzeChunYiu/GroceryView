@@ -2,10 +2,13 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "dist-test",
-    "rootDir": "src",
+    "rootDir": ".",
     "noEmit": false,
     "baseUrl": ".",
     "paths": {}
   },
-  "include": ["src/**/*.ts"]
+  "include": [
+    "src/**/*.ts",
+    "__tests__/*.ts"
+  ]
 }
