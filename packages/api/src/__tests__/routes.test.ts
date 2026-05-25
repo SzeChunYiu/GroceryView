@@ -1967,6 +1967,46 @@ describe('createGroceryViewApi', () => {
     assert.equal(api.removeWatchlistItem('user-1', 'coffee').removed, false);
   });
 
+  it('persists only opted-in friend-shared deal signals for suggestion inputs', () => {
+    const api = createGroceryViewApi();
+    const signal = api.createFriendSharedDealSignal('user-1', {
+      signalId: 'friend-share-1',
+      productId: 'coffee',
+      sharedByUserId: 'friend-1',
+      sharedByDisplayName: 'Ada',
+      relationship: 'friend',
+      sharedAt: '2026-05-20T10:30:00.000Z',
+      sourceConfidence: 0.87,
+      optedIn: true,
+      dealScore: 82,
+      createdAt: '2026-05-20T12:00:00.000Z'
+    });
+
+    assert.equal(signal.userId, 'user-1');
+    assert.deepEqual(api.getFriendSharedDealSignals('user-1').signals.map((row) => row.signalId), ['friend-share-1']);
+    assert.match(api.getFriendSharedDealSignals('user-1').guardrails.join('\n'), /Only opted-in/);
+    assert.throws(() => api.createFriendSharedDealSignal('user-1', {
+      signalId: 'friend-share-private',
+      productId: 'coffee',
+      sharedByUserId: 'friend-1',
+      sharedByDisplayName: 'Ada',
+      relationship: 'friend',
+      sharedAt: '2026-05-20T10:30:00.000Z',
+      sourceConfidence: 0.87,
+      optedIn: false as true
+    }), /Only opted-in/);
+    assert.throws(() => api.createFriendSharedDealSignal('', {
+      signalId: 'anonymous-share',
+      productId: 'coffee',
+      sharedByUserId: 'friend-1',
+      sharedByDisplayName: 'Ada',
+      relationship: 'friend',
+      sharedAt: '2026-05-20T10:30:00.000Z',
+      sourceConfidence: 0.87,
+      optedIn: true
+    }), /userId is required/);
+  });
+
   it('rejects invalid mutable route inputs before storing state', () => {
     const api = createGroceryViewApi();
 

@@ -311,6 +311,16 @@ Primary key: `(user_id, review_item_id)`.
 
 Indexes: `basket_import_review_items_open_idx` for account-scoped open queue reads and `basket_import_review_items_retailer_idx` for retailer/capture audits.
 
+### `friend_shared_deal_signals`
+
+Account-scoped opt-in household and friend share signals for `suggestFriendSharedDeals`. Rows survive server restarts and stay tied to `app_users` for privacy export and deletion workflows.
+
+Key columns: `signal_id`, `user_id`, `product_id`, `shared_by_user_id`, `shared_by_display_name`, `relationship`, `shared_at`, `source_confidence`, `opted_in`, `deal_score`, `created_at`.
+
+Primary key: `signal_id`.
+
+Indexes: `friend_shared_deal_signals_user_shared_idx` for account-scoped history reads and `friend_shared_deal_signals_product_idx` for opted-in product suggestion inputs.
+
 ### `human_review_assignments`
 
 Operational queue entries for product-match and community-report review.

@@ -34,6 +34,7 @@ import {
   type BasketFulfillmentSlotInput,
   type BasketTripCostPlan,
   type BasketTripCostTravelMode,
+  type DealShareRelationship,
   type RetailerBasketTransferSession,
   type RetailerHandoffPlan,
   type RetailerHandoffSupport,
@@ -169,6 +170,30 @@ export type BasketImportReviewDecisionRequest = {
   decision: 'accept_as_product' | 'dismiss';
   productId?: string;
   quantity?: number;
+};
+
+export type FriendSharedDealSignal = {
+  signalId: string;
+  userId: string;
+  productId: string;
+  sharedByUserId: string;
+  sharedByDisplayName: string;
+  relationship: DealShareRelationship;
+  sharedAt: string;
+  sourceConfidence: number;
+  optedIn: true;
+  dealScore?: number;
+  createdAt: string;
+};
+
+export type FriendSharedDealSignalInput = Omit<FriendSharedDealSignal, 'userId' | 'createdAt'> & {
+  createdAt?: string;
+};
+
+export type FriendSharedDealSignalList = {
+  userId: string;
+  signals: FriendSharedDealSignal[];
+  guardrails: string[];
 };
 
 export type OcrScanHistoryItem = {
@@ -2337,6 +2362,25 @@ function requireScoreThreshold(value: number | undefined) {
   if (value === undefined) return;
   if (!Number.isFinite(value) || value < 0 || value > 100) {
     throw new Error('alertDealScoreAt must be between 0 and 100');
+  }
+}
+
+function requireDealScore(value: number | undefined) {
+  if (value === undefined) return;
+  if (!Number.isFinite(value) || value < 0 || value > 100) {
+    throw new Error('dealScore must be between 0 and 100');
+  }
+}
+
+function requireSourceConfidence(value: number) {
+  if (!Number.isFinite(value) || value < 0 || value > 1) {
+    throw new Error('sourceConfidence must be between 0 and 1');
+  }
+}
+
+function requireDealShareRelationship(value: DealShareRelationship) {
+  if (value !== 'household' && value !== 'friend') {
+    throw new Error('relationship must be household or friend');
   }
 }
 
@@ -4514,6 +4558,7 @@ export function createGroceryViewApi() {
   const householdPlans = new Map<string, HouseholdPlan>();
   const householdIdByUserId = new Map<string, string>();
   const basketImportReviews = new Map<string, BasketImportReviewItem[]>();
+  const friendSharedDealSignals = new Map<string, FriendSharedDealSignal[]>();
   const ocrScanHistory = new Map<string, OcrScanHistoryItem[]>();
 
   const productSnapshots = () =>
@@ -5104,6 +5149,7 @@ export function createGroceryViewApi() {
       categoryBudgets.delete(userId);
       subscriptionEntitlements.delete(userId);
       basketImportReviews.delete(userId);
+      friendSharedDealSignals.delete(userId);
       const householdId = householdIdByUserId.get(userId);
       if (householdId) {
         householdPlans.delete(householdId);
@@ -5193,6 +5239,49 @@ export function createGroceryViewApi() {
           'Price alerts require a user-defined target price and current eligible price evidence.',
           'Favorite-store and allowed-price-type filters are applied before an alert is emitted.',
           'Estimated prices are excluded unless the watcher explicitly allows estimated price types.'
+        ]
+      };
+    },
+
+    createFriendSharedDealSignal(userId: string, input: FriendSharedDealSignalInput): FriendSharedDealSignal {
+      requireNonEmptyId(userId, 'userId');
+      requireNonEmptyId(input.signalId, 'signalId');
+      requireKnownProduct(input.productId);
+      requireNonEmptyId(input.sharedByUserId, 'sharedByUserId');
+      requireNonEmptyId(input.sharedByDisplayName, 'sharedByDisplayName');
+      requireDealShareRelationship(input.relationship);
+      requireSourceConfidence(input.sourceConfidence);
+      requireDealScore(input.dealScore);
+      if (input.optedIn !== true) throw new Error('Only opted-in friend share signals can be persisted.');
+      if (!Number.isFinite(Date.parse(input.sharedAt))) throw new Error('sharedAt must be an ISO timestamp.');
+      if (input.createdAt !== undefined && !Number.isFinite(Date.parse(input.createdAt))) throw new Error('createdAt must be an ISO timestamp.');
+
+      const signal: FriendSharedDealSignal = {
+        ...input,
+        userId,
+        optedIn: true,
+        createdAt: input.createdAt ?? new Date().toISOString()
+      };
+      friendSharedDealSignals.set(userId, [
+        signal,
+        ...(friendSharedDealSignals.get(userId) ?? []).filter((current) => current.signalId !== signal.signalId)
+      ]);
+      return { ...signal };
+    },
+
+    getFriendSharedDealSignals(userId: string): FriendSharedDealSignalList {
+      requireNonEmptyId(userId, 'userId');
+      const signals = (friendSharedDealSignals.get(userId) ?? [])
+        .filter((signal) => signal.optedIn)
+        .sort((a, b) => b.sharedAt.localeCompare(a.sharedAt) || a.signalId.localeCompare(b.signalId))
+        .map((signal) => ({ ...signal }));
+      return {
+        userId,
+        signals,
+        guardrails: [
+          'Only opted-in household or friend signals are persisted.',
+          'Anonymous shares are rejected before they can feed suggestFriendSharedDeals.',
+          'Signals remain user-scoped for privacy export and deletion workflows.'
         ]
       };
     },

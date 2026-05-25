@@ -279,6 +279,20 @@ export type BasketImportReviewResolution = {
   quantity?: number;
 };
 
+export type FriendSharedDealSignalRecord = {
+  signalId: string;
+  userId: string;
+  productId: string;
+  sharedByUserId: string;
+  sharedByDisplayName: string;
+  relationship: 'household' | 'friend';
+  sharedAt: string;
+  sourceConfidence: number;
+  optedIn: boolean;
+  dealScore?: number;
+  createdAt: string;
+};
+
 export type PantryItemRecord = {
   id: string;
   userId: string;
@@ -1009,6 +1023,8 @@ export type GroceryViewRepository = {
   saveBasketImportReviewItems(userId: string, items: BasketImportReviewRecord[]): Promise<void>;
   listOpenBasketImportReviewItems(userId: string): Promise<BasketImportReviewRecord[]>;
   resolveBasketImportReviewItem(userId: string, reviewItemId: string, resolution: BasketImportReviewResolution): Promise<BasketImportReviewRecord>;
+  upsertFriendSharedDealSignal(signal: FriendSharedDealSignalRecord): Promise<void>;
+  listFriendSharedDealSignals(userId: string): Promise<FriendSharedDealSignalRecord[]>;
   upsertPantryItem(item: PantryItemRecord): Promise<void>;
   listPantryItems(userId: string): Promise<PantryItemRecord[]>;
   upsertReceiptUpload(upload: ReceiptUploadRecord): Promise<void>;
@@ -1265,6 +1281,7 @@ export function createMemoryRepository(): GroceryViewRepository {
   const watchlists = new Map<string, WatchlistRecord[]>();
   const baskets = new Map<string, BasketRecord[]>();
   const basketImportReviewItems = new Map<string, BasketImportReviewRecord[]>();
+  const friendSharedDealSignals = new Map<string, FriendSharedDealSignalRecord>();
   const pantryItems = new Map<string, PantryItemRecord>();
   const receiptUploads = new Map<string, ReceiptUploadRecord>();
   const householdPlans = new Map<string, HouseholdPlanRecord>();
@@ -1288,6 +1305,7 @@ export function createMemoryRepository(): GroceryViewRepository {
       watchlists.delete(userId);
       baskets.delete(userId);
       basketImportReviewItems.delete(userId);
+      for (const [signalId, signal] of friendSharedDealSignals) if (signal.userId === userId) friendSharedDealSignals.delete(signalId);
       for (const [itemId, item] of pantryItems) if (item.userId === userId) pantryItems.delete(itemId);
       for (const [uploadId, upload] of receiptUploads) if (upload.userId === userId) receiptUploads.delete(uploadId);
       for (const [planId, plan] of householdPlans) {
@@ -1380,6 +1398,19 @@ export function createMemoryRepository(): GroceryViewRepository {
       };
       basketImportReviewItems.set(userId, items.map((item, itemIndex) => itemIndex === index ? resolved : item));
       return { ...resolved };
+    },
+
+    async upsertFriendSharedDealSignal(signal) {
+      requireUser(users, signal.userId);
+      friendSharedDealSignals.set(signal.signalId, { ...signal });
+    },
+
+    async listFriendSharedDealSignals(userId) {
+      requireUser(users, userId);
+      return [...friendSharedDealSignals.values()]
+        .filter((signal) => signal.userId === userId)
+        .sort((a, b) => b.sharedAt.localeCompare(a.sharedAt) || a.signalId.localeCompare(b.signalId))
+        .map((signal) => ({ ...signal }));
     },
 
     async upsertPantryItem(item) {
@@ -1844,6 +1875,19 @@ type BasketImportReviewRow = {
   created_at: string | Date;
   resolved_at: string | Date | null;
   resolved_product_id: string | null;
+};
+type FriendSharedDealSignalRow = {
+  signal_id: string;
+  user_id: string;
+  product_id: string;
+  shared_by_user_id: string;
+  shared_by_display_name: string;
+  relationship: FriendSharedDealSignalRecord['relationship'];
+  shared_at: string | Date;
+  source_confidence: string | number;
+  opted_in: boolean;
+  deal_score: string | number | null;
+  created_at: string | Date;
 };
 
 function asIso(value: string | Date): string {
@@ -2353,6 +2397,22 @@ function mapReceiptUpload(row: ReceiptUploadRow, items: ReceiptItemRecord[]): Re
   };
 }
 
+function mapFriendSharedDealSignal(row: FriendSharedDealSignalRow): FriendSharedDealSignalRecord {
+  return {
+    signalId: row.signal_id,
+    userId: row.user_id,
+    productId: row.product_id,
+    sharedByUserId: row.shared_by_user_id,
+    sharedByDisplayName: row.shared_by_display_name,
+    relationship: row.relationship,
+    sharedAt: asIso(row.shared_at),
+    sourceConfidence: Number(row.source_confidence),
+    optedIn: row.opted_in,
+    ...(row.deal_score === null ? {} : { dealScore: Number(row.deal_score) }),
+    createdAt: asIso(row.created_at)
+  };
+}
+
 function mapHouseholdPlan(
   row: HouseholdPlanRow,
   members: HouseholdMemberRecord[],
@@ -2596,6 +2656,68 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
       const row = rows[0];
       if (!row) throw new Error(`Basket import review item not found: ${reviewItemId}`);
       return mapBasketImportReview(row);
+    },
+
+    async upsertFriendSharedDealSignal(signal) {
+      await executor.query(
+        `insert into friend_shared_deal_signals(
+           signal_id,
+           user_id,
+           product_id,
+           shared_by_user_id,
+           shared_by_display_name,
+           relationship,
+           shared_at,
+           source_confidence,
+           opted_in,
+           deal_score,
+           created_at
+         ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+         on conflict (signal_id) do update set
+           user_id = excluded.user_id,
+           product_id = excluded.product_id,
+           shared_by_user_id = excluded.shared_by_user_id,
+           shared_by_display_name = excluded.shared_by_display_name,
+           relationship = excluded.relationship,
+           shared_at = excluded.shared_at,
+           source_confidence = excluded.source_confidence,
+           opted_in = excluded.opted_in,
+           deal_score = excluded.deal_score`,
+        [
+          signal.signalId,
+          signal.userId,
+          signal.productId,
+          signal.sharedByUserId,
+          signal.sharedByDisplayName,
+          signal.relationship,
+          signal.sharedAt,
+          signal.sourceConfidence,
+          signal.optedIn,
+          signal.dealScore ?? null,
+          signal.createdAt
+        ]
+      );
+    },
+
+    async listFriendSharedDealSignals(userId) {
+      const rows = await executor.query<FriendSharedDealSignalRow>(
+        `select signal_id,
+                user_id,
+                product_id,
+                shared_by_user_id,
+                shared_by_display_name,
+                relationship,
+                shared_at,
+                source_confidence,
+                opted_in,
+                deal_score,
+                created_at
+         from friend_shared_deal_signals
+         where user_id = $1
+         order by shared_at desc, signal_id`,
+        [userId]
+      );
+      return rows.map(mapFriendSharedDealSignal);
     },
 
     async upsertPantryItem(item) {
@@ -3664,6 +3786,7 @@ export const POSTGRES_INTEGRATION_REQUIRED_TABLES = [
   'weekly_baskets',
   'basket_items',
   'basket_import_review_items',
+  'friend_shared_deal_signals',
   'human_review_assignments',
   'human_reviewers',
   'community_reporter_trust',
@@ -3700,7 +3823,8 @@ export const POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS = [
   '016_observation_connector_idempotency',
   '017_observation_availability',
   '018_household_collaboration_rls',
-  '019_price_snapshot_unique_index'
+  '019_price_snapshot_unique_index',
+  '025_friend_shared_deal_signals'
 ] as const;
 
 function assertProbe(condition: boolean, message: string): void {

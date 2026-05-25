@@ -37,6 +37,7 @@ import {
   queryRollingAverageDealReport,
   buildUserAccountDeletionQueries,
   type BudgetRecord,
+  type FriendSharedDealSignalRecord,
   type PgLikeClient,
   type PostgresIntegrationReadinessReport,
   type QueryExecutor,
@@ -75,6 +76,7 @@ import {
   type PrivacyRequestStatus,
   type PrivacyRequestType,
   type BasketTripCostTravelMode,
+  type DealShareRelationship,
   type RecurringBasketCadence,
   type WatchlistItem,
   type WatchlistProductSnapshot,
@@ -145,6 +147,10 @@ export type AuthOptions = {
       resolvedProductId?: string;
       quantity?: number;
     }): Promise<BasketImportReviewItem>;
+  };
+  friendSharedDealSignalRepository?: {
+    upsertFriendSharedDealSignal(signal: FriendSharedDealSignalRecord): Promise<void>;
+    listFriendSharedDealSignals(userId: string): Promise<FriendSharedDealSignalRecord[]>;
   };
   notificationWebhookSecret?: string;
   notificationSuppressionSink?: {
@@ -237,6 +243,8 @@ export type RuntimePersistenceRepository = {
     resolvedProductId?: string;
     quantity?: number;
   }): Promise<BasketImportReviewItem>;
+  upsertFriendSharedDealSignal?(signal: FriendSharedDealSignalRecord): Promise<void>;
+  listFriendSharedDealSignals?(userId: string): Promise<FriendSharedDealSignalRecord[]>;
   upsertNotificationSuppression(suppression: NotificationSuppressionMutation): Promise<void>;
   listDueNotificationTasks?(now: string): Promise<PersistedNotificationTask[]>;
   listActiveNotificationSuppressions?(): Promise<NotificationSuppression[]>;
@@ -618,6 +626,11 @@ function requiredTravelMode(value: unknown): BasketTripCostTravelMode {
   throw new Error('travelMode must be walk, bike, transit, car, or delivery.');
 }
 
+function requiredDealShareRelationship(value: unknown): DealShareRelationship {
+  if (value === 'household' || value === 'friend') return value;
+  throw new Error('relationship must be household or friend.');
+}
+
 function optionalQueryNumber(url: URL, name: string): number | undefined {
   const raw = url.searchParams.get(name);
   if (raw === null || raw === '') return undefined;
@@ -713,6 +726,11 @@ function requiredBoolean(value: unknown, field: string): boolean {
   return value;
 }
 
+function optionalBoolean(value: unknown, field: string): boolean | undefined {
+  if (value === undefined) return undefined;
+  return requiredBoolean(value, field);
+}
+
 function optionalHouseholdJoinRole(value: unknown): HouseholdJoinRequest['role'] {
   if (value === undefined) return undefined;
   if (value === 'editor' || value === 'viewer') return value;
@@ -768,6 +786,32 @@ function basketImportReviewDecisionFromBody(body: JsonRecord): BasketImportRevie
     decision,
     ...(body.productId === undefined ? {} : { productId: requiredString(body.productId, 'productId') }),
     ...(body.quantity === undefined ? {} : { quantity: requiredNumber(body.quantity, 'quantity') })
+  };
+}
+
+function friendSharedDealSignalFromBody(userId: string, body: JsonRecord, now: Date): FriendSharedDealSignalRecord {
+  const sourceConfidence = requiredNumber(body.sourceConfidence, 'sourceConfidence');
+  if (!Number.isFinite(sourceConfidence) || sourceConfidence < 0 || sourceConfidence > 1) {
+    throw new Error('sourceConfidence must be between 0 and 1.');
+  }
+  const dealScore = optionalNumber(body.dealScore, 'dealScore');
+  if (dealScore !== undefined && (!Number.isFinite(dealScore) || dealScore < 0 || dealScore > 100)) {
+    throw new Error('dealScore must be between 0 and 100.');
+  }
+  if (body.optedIn !== true) throw new Error('Only opted-in friend share signals can be persisted.');
+
+  return {
+    signalId: requiredString(body.signalId, 'signalId'),
+    userId,
+    productId: requiredString(body.productId, 'productId'),
+    sharedByUserId: requiredString(body.sharedByUserId, 'sharedByUserId'),
+    sharedByDisplayName: requiredString(body.sharedByDisplayName, 'sharedByDisplayName'),
+    relationship: requiredDealShareRelationship(body.relationship),
+    sharedAt: requiredIsoTimestamp(body.sharedAt, 'sharedAt'),
+    sourceConfidence,
+    optedIn: true,
+    ...(dealScore === undefined ? {} : { dealScore }),
+    createdAt: optionalIsoTimestamp(body.createdAt, 'createdAt') ?? now.toISOString()
   };
 }
 
@@ -2011,7 +2055,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
     }, { status: 402 });
   };
 
-  const buildAccountDataExport = (user: string) => {
+  const buildAccountDataExport = async (user: string) => {
     const householdPlan = api.getHouseholdPlan(user);
     const watchlist = api.getWatchlist(user);
     const budgetSummary = api.getBudgetSummary(user);
@@ -2027,7 +2071,13 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
     const preferences = budgetSummary.weeklyBudget > 0 || budgetSummary.monthlyBudget > 0
       ? [{ weeklyBudget: budgetSummary.weeklyBudget, monthlyBudget: budgetSummary.monthlyBudget }]
       : [];
-    const apiWithFriendSignals = api as typeof api & { getFriendSharedDealSignals?: (userId: string) => unknown[] };
+    const apiWithFriendSignals = api as typeof api & { getFriendSharedDealSignals?: (userId: string) => unknown[] | { signals?: unknown[] } };
+    const apiFriendSignals = apiWithFriendSignals.getFriendSharedDealSignals?.(user);
+    const friendSharedDealSignals = authOptions.friendSharedDealSignalRepository
+      ? await authOptions.friendSharedDealSignalRepository.listFriendSharedDealSignals(user)
+      : Array.isArray(apiFriendSignals)
+        ? apiFriendSignals
+        : apiFriendSignals?.signals ?? [];
 
     return buildPrivacyExport(
       {
@@ -2040,7 +2090,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         watchlistProductIds: watchlist.items.map((item) => item.productId),
         receiptIds: [],
         householdIds: householdPlan ? [householdPlan.household.id] : [],
-        friendSharedDealSignals: apiWithFriendSignals.getFriendSharedDealSignals?.(user) ?? []
+        friendSharedDealSignals
       },
       (authOptions.now ?? new Date()).toISOString()
     );
@@ -2269,6 +2319,32 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         };
         if (!authOptions.flyerOffersProvider) return errorResponse(503, 'Discounts provider is not configured.');
         return cachedJsonResponse(authOptions.apiResponseCache, url, apiHotEndpointCacheTtlSeconds[path], () => authOptions.flyerOffersProvider!(query));
+      }
+
+      if (path === '/api/deals/friend-share-signals') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        const repository = authOptions.friendSharedDealSignalRepository;
+        if (!repository) return errorResponse(503, 'Friend share signal repository is not configured.');
+        if (method === 'GET') {
+          return jsonResponse({
+            userId: user,
+            signals: await repository.listFriendSharedDealSignals(user),
+            guardrails: [
+              'Only opted-in household or friend signals are persisted.',
+              'Anonymous shares are rejected before they can feed suggestFriendSharedDeals.',
+              'Signals remain user-scoped for privacy export and deletion workflows.'
+            ]
+          });
+        }
+        if (method === 'POST') {
+          const body = await readJson(request);
+          const signal = friendSharedDealSignalFromBody(user, body, authOptions.now ?? new Date());
+          await repository.upsertFriendSharedDealSignal(signal);
+          return jsonResponse({ accepted: true, persisted: true, signal }, { status: 202 });
+        }
       }
 
       if (method === 'GET' && path === '/api/account/subscription-access') {
@@ -3126,7 +3202,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (user instanceof Response) return user;
         const authError = await authorizeUser(request, user);
         if (authError) return authError;
-        if (method === 'GET') return jsonResponse(buildAccountDataExport(user));
+        if (method === 'GET') return jsonResponse(await buildAccountDataExport(user));
       }
 
       if (path === '/api/settings/account') {
@@ -3398,6 +3474,13 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/deals': { get: publicOperation('Get current items priced below their 30-day rolling average, sorted by discount percentage.') },
       '/api/deals/discounts': { get: publicOperation('Get active weekly discounts by branch, chain, category, or product with source evidence.') },
       '/api/deals/flyer-offers': { get: publicOperation('Get active weekly flyer offers by branch, chain, category, or product with source evidence.') },
+      '/api/deals/friend-share-signals': {
+        get: operationWithJsonResponse(
+          protectedOperation('List opted-in household and friend deal share signals for the signed-in account.'),
+          'FriendSharedDealSignalListResponse'
+        ),
+        post: protectedOperation('Persist an opted-in household or friend deal share signal for future deal suggestions.')
+      },
       '/api/retailers': { get: publicOperation('List supported retailers with logo and website metadata.') },
       '/api/stores': { get: publicOperation('List stores.') },
       '/api/account/subscription-access': { get: protectedOperation('Get subscription access policy for the signed-in account.') },
@@ -3994,6 +4077,14 @@ export function buildRepositoryBackedAuthOptions(
             saveBasketImportReviewItems: (userId, items) => repository.saveBasketImportReviewItems!(userId, items),
             listOpenBasketImportReviewItems: (userId) => repository.listOpenBasketImportReviewItems!(userId),
             resolveBasketImportReviewItem: (userId, reviewItemId, resolution) => repository.resolveBasketImportReviewItem!(userId, reviewItemId, resolution)
+          }
+        }
+      : {}),
+    ...(repository.upsertFriendSharedDealSignal && repository.listFriendSharedDealSignals
+      ? {
+          friendSharedDealSignalRepository: {
+            upsertFriendSharedDealSignal: (signal) => repository.upsertFriendSharedDealSignal!(signal),
+            listFriendSharedDealSignals: (userId) => repository.listFriendSharedDealSignals!(userId)
           }
         }
       : {}),

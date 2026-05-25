@@ -4,6 +4,8 @@ import {
   apiContractOpenApiComponents,
   apiContractSchemas,
   compareResponseSchema,
+  friendSharedDealSignalCreateSchema,
+  friendSharedDealSignalListResponseSchema,
   fuelPriceObservationSchema,
   multiWeekStockUpListResponseSchema,
   multiWeekStockUpUpdateRowSchema,
@@ -141,6 +143,9 @@ describe('api contract schemas', () => {
       'basket',
       'basketItem',
       'compareResponse',
+      'friendSharedDealSignal',
+      'friendSharedDealSignalCreate',
+      'friendSharedDealSignalListResponse',
       'fuelPriceObservation',
       'fuelPriceSource',
       'fuelPricesResponse',
@@ -265,6 +270,32 @@ describe('api contract schemas', () => {
     );
   });
 
+  it('requires opted-in friend share deal signals for social suggestions', () => {
+    const signal = {
+      signalId: 'friend-share-1',
+      productId: 'coffee',
+      sharedByUserId: 'friend-1',
+      sharedByDisplayName: 'Ada',
+      relationship: 'friend',
+      sharedAt: '2026-05-20T10:30:00.000Z',
+      sourceConfidence: 0.87,
+      optedIn: true,
+      dealScore: 82
+    } as const;
+
+    assert.equal(friendSharedDealSignalCreateSchema.parse(signal).optedIn, true);
+    assert.equal(friendSharedDealSignalCreateSchema.safeParse({ ...signal, optedIn: false }).success, false);
+    assert.equal(friendSharedDealSignalCreateSchema.safeParse({ ...signal, sharedByUserId: '' }).success, false);
+    assert.equal(friendSharedDealSignalCreateSchema.safeParse({ ...signal, sourceConfidence: 1.2 }).success, false);
+
+    const listed = friendSharedDealSignalListResponseSchema.parse({
+      userId: 'user-1',
+      signals: [{ ...signal, userId: 'user-1', createdAt: '2026-05-20T12:00:00.000Z' }],
+      guardrails: ['Only opted-in household or friend signals are listed.']
+    });
+    assert.equal(listed.signals[0]?.relationship, 'friend');
+  });
+
   it('requires notification inbox timing fields for API and server contracts', () => {
     const parsed = notificationInboxResponseSchema.parse(validNotificationInbox);
 
@@ -333,5 +364,9 @@ describe('api contract schemas', () => {
       $ref: '#/components/schemas/MultiWeekStockUpRow'
     });
     assert.equal(apiContractOpenApiComponents.MultiWeekStockUpListResponse.properties.evidence.properties.noForecast.enum[0], true);
+    assert.deepEqual(apiContractOpenApiComponents.FriendSharedDealSignal.properties.optedIn.enum, [true]);
+    assert.deepEqual(apiContractOpenApiComponents.FriendSharedDealSignalListResponse.properties.signals.items, {
+      $ref: '#/components/schemas/FriendSharedDealSignal'
+    });
   });
 });
