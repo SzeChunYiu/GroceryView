@@ -210,6 +210,10 @@ export const routeMetadataCatalog = {
     title: 'Data and methodology changelog | GroceryView',
     description: 'Track public changes to GroceryView data sources, matching rules, index methodology, deal scoring, market coverage, confidence, and freshness evidence.'
   },
+  '/methodology': {
+    title: 'Score and confidence methodology | GroceryView',
+    description: 'Inspect how GroceryView computes Deal Score, Buy or Wait timing, nutrition per krona, and confidence labels, including missing-data blockers.'
+  },
   '/login': {
     title: 'Sign in to GroceryView',
     description: 'Authentication is withheld in the static build until a production auth provider can return a verified user session.',

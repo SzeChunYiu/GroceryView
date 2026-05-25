@@ -333,6 +333,7 @@ export function DealCard({
               observedAt={priceFreshnessObservedAt}
               sampleSize={priceHistory ? priceHistory.length + 1 : undefined}
               verificationLabel={priceVerificationLabel}
+              methodologyHref="/methodology#confidence-labels"
             />
           </div>
           {originalPrice ? (
@@ -400,6 +401,9 @@ export function DealCard({
             </div>
           ))}
         </dl>
+        <a className="mt-3 inline-flex text-xs font-black text-emerald-900 underline decoration-emerald-300 underline-offset-4" href="/methodology#deal-score">
+          Deal Score methodology
+        </a>
       </details>
 
       {originalPrice ? (

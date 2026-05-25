@@ -204,6 +204,9 @@ export default async function WatchlistPage({
         <p className="text-sm font-black uppercase tracking-[0.2em] text-cyan-800">Best-time explanation</p>
         <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">{bestTimePanel.headline}</h2>
         <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">{bestTimePanel.guidance}</p>
+        <Link className="mt-3 inline-flex text-sm font-black text-cyan-900 underline decoration-cyan-300 underline-offset-4" href="/methodology#buy-wait">
+          Buy / Wait methodology
+        </Link>
         <div className="mt-4 grid gap-3 lg:grid-cols-3">
           <p className="rounded-2xl bg-white p-4 text-sm font-black text-cyan-950">{bestTimePanel.confidenceLabel}</p>
           <p className="rounded-2xl bg-white p-4 text-sm font-semibold text-slate-700">{bestTimePanel.expectedMovementLabel}</p>

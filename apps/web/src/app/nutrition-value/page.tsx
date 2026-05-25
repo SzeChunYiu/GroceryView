@@ -131,6 +131,7 @@ export default async function NutritionValuePage({ searchParams }: Readonly<{ se
             <ConfidenceBadge
               level={confidenceLevel}
               label={`${nutritionPerKrona.coverage.confidence} confidence`}
+              methodologyHref="/methodology#confidence-labels"
               sampleSize={nutritionRows.length}
             />
           </div>
@@ -198,6 +199,9 @@ export default async function NutritionValuePage({ searchParams }: Readonly<{ se
             <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-blue-950">
               The score is a value metric, not a health diagnosis: protein grams per package divided by the visible price, normalized to grams per 10 SEK. Sugar and salt are shown as caution factors, but GroceryView does not provide medical, allergy, weight-loss, pregnancy, or disease-specific advice.
             </p>
+            <Link className="mt-3 inline-flex text-sm font-black text-blue-900 underline decoration-blue-300 underline-offset-4" href="/methodology#nutrition-per-krona">
+              Nutrition methodology
+            </Link>
           </div>
           <div className="rounded-2xl bg-white p-4 text-sm font-bold text-slate-700 shadow-sm">
             <p className="font-black text-slate-950">Independence disclosure</p>

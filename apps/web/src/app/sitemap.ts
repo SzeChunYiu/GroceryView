@@ -137,6 +137,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     entry('/map', 0.75, 'daily'),
     entry('/cookies', 0.68, 'weekly'),
     entry('/data-sources', 0.65, 'weekly'),
+    entry('/methodology', 0.65, 'weekly'),
     entry('/openprices-depth', 0.65, 'daily'),
     entry('/store-coverage', 0.65, 'weekly'),
     entry('/chain-coverage', 0.65, 'weekly'),
