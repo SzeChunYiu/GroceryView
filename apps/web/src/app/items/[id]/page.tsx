@@ -4,7 +4,8 @@ import ProductPage, {
   generateStaticParams
 } from '../../products/[slug]/page';
 import { ItemDetailListShortcut } from '@/components/item-detail-list-shortcut';
-import { findProduct } from '@/lib/verified-data';
+import { csvDataHref, csvFilenameSegment, exportCsv, type CsvCell } from '@/lib/exportCsv';
+import { chainPriceRows, findProduct } from '@/lib/verified-data';
 
 export { generateStaticParams };
 
@@ -27,14 +28,60 @@ function productQuantity(product: NonNullable<ReturnType<typeof findProduct>>) {
   return 'lowestPrice' in product ? product.subline : product.quantity;
 }
 
+function priceSnapshotRows(product: NonNullable<ReturnType<typeof findProduct>>): CsvCell[][] {
+  if ('lowestPrice' in product) {
+    return chainPriceRows(product).map((row) => [
+      product.slug,
+      product.name,
+      row.chain,
+      row.price,
+      row.priceUnit,
+      row.priceText,
+      row.savings ?? '',
+      'current-chain-snapshot'
+    ]);
+  }
+
+  return product.observations.map((observation) => [
+    product.slug,
+    product.name,
+    '',
+    observation.price,
+    'SEK',
+    observation.price,
+    '',
+    observation.date
+  ]);
+}
+
 export default async function ItemPage({ params }: Readonly<{ params: Promise<{ id: string }> }>) {
   const { id } = await params;
   const product = findProduct(id);
   const renderedProductPage = await ProductPage({ params: Promise.resolve({ slug: id }) });
+  const snapshotRows = product ? priceSnapshotRows(product) : [];
+  const priceSnapshotsCsv = exportCsv([
+    'product_id',
+    'product_name',
+    'chain',
+    'price',
+    'unit',
+    'price_label',
+    'savings',
+    'observed_at'
+  ], snapshotRows);
 
   return (
     <>
       {renderedProductPage}
+      <div className="mx-auto mt-6 max-w-6xl px-4 sm:px-6 lg:px-8">
+        <a
+          className="inline-flex rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white shadow-sm"
+          download={`price-history-${csvFilenameSegment(id)}.csv`}
+          href={csvDataHref(priceSnapshotsCsv)}
+        >
+          Download price snapshots CSV
+        </a>
+      </div>
       <ItemDetailListShortcut
         productId={id}
         productName={product?.name ?? id}

@@ -1,10 +1,11 @@
 export const itemsRoutes = {
   controllerPath: 'items',
   detailAlias: 'items/:id',
+  priceSnapshotsCsv: 'items/:id/price-snapshots.csv',
   seasonalSalePattern: 'items/:id/seasonal-sale-pattern',
   substitutionSuggestions: 'items/:id/substitution-suggestions',
   holidayWindow: 'midsommar',
-  description: 'Item detail, seasonalSalePattern metadata, substitutionSuggestions, and localized product names backed by explicit current price evidence.',
+  description: 'Item detail, priceSnapshotsCsv, seasonalSalePattern metadata, substitutionSuggestions, and localized product names backed by explicit current price evidence.',
   queryParams: ['holiday', 'locale'],
   localeHeader: 'x-groceryview-locale',
   localeCookie: 'NEXT_LOCALE',
@@ -22,6 +23,7 @@ export const itemsRoutes = {
     'trigger',
     'suggestions',
     'currentPrice',
+    'csvDownloadUrl',
     'savingsPercent',
     'guardrail'
   ],
