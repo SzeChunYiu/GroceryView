@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { calculateBrandTierIndices, calculateChainPriceIndex } from '@groceryview/core';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
-import { buildBrandTierPriceObservations, buildChainIndexTrendSeries, buildChainPriceObservations, buildMatchedBasketChainPriceObservations } from '@/lib/chain-index-data';
+import { buildBrandTierPriceObservations, buildChainIndexTrendSeries, buildChainPriceObservations, buildMatchedBasketChainPriceObservations, buildPremiumSpecialtyTrackerRows } from '@/lib/chain-index-data';
 import { buildGroceryIndexTickerWidget } from '@/lib/grocery-index-widget';
 import { categorySummaries, formatPct, formatSek, freshFoodChainIndex, marketHeatmapTiles, matchedChainProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
@@ -13,6 +13,7 @@ export function generateMetadata() {
 
 const brandTierObservations = buildBrandTierPriceObservations();
 const brandTierSummary = calculateBrandTierIndices(brandTierObservations);
+const premiumSpecialtyTrackerRows = buildPremiumSpecialtyTrackerRows();
 const matchedBasketObservations = buildMatchedBasketChainPriceObservations();
 const matchedBasketRefinedIndex = calculateChainPriceIndex([
   ...buildChainPriceObservations(),
@@ -52,6 +53,12 @@ function heatTileTone(value: number) {
   if (value >= 80) return 'border-rose-200 bg-rose-50 text-rose-950';
   if (value >= 55) return 'border-amber-200 bg-amber-50 text-amber-950';
   return 'border-emerald-200 bg-emerald-50 text-emerald-950';
+}
+
+function dealScoreTone(score: number) {
+  if (score >= 75) return 'bg-emerald-100 text-emerald-950';
+  if (score >= 60) return 'bg-amber-100 text-amber-950';
+  return 'bg-slate-100 text-slate-800';
 }
 
 export default function ChainIndexPage() {
@@ -300,8 +307,54 @@ export default function ChainIndexPage() {
         </div>
       </Card>
 
+      <Card className="mt-6 border-fuchsia-200 bg-fuchsia-50">
+        <div className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
+          <div>
+            <Eyebrow>Premium watchlist</Eyebrow>
+            <h2 className="mt-2 text-3xl font-black tracking-tight text-fuchsia-950">Specialty products foodies can track like tickers</h2>
+            <p className="mt-3 text-sm leading-6 text-fuchsia-950">
+              This board filters matched Axfood rows into premium and specialty grocery candidates, then keeps the same watchlist semantics: product ticker, target price, deal score, brand-tier link, and confidence. Historical-low badges only appear when the row has enough dated history; otherwise the badge states that the signal is a matched-chain low.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <ConfidenceBadge level={premiumSpecialtyTrackerRows.length >= 6 ? 'high' : 'medium'} label={`${premiumSpecialtyTrackerRows.length} specialty candidates`} sampleSize={premiumSpecialtyTrackerRows.length} />
+              <Link className="rounded-full bg-white px-3 py-1 text-xs font-black text-fuchsia-950 shadow-sm" href="/chain-index#brand-tier-index">
+                Open brand-tier index
+              </Link>
+            </div>
+          </div>
+          <div className="grid gap-3">
+            {premiumSpecialtyTrackerRows.slice(0, 5).map((row) => (
+              <div className="rounded-2xl bg-white/85 p-4 shadow-sm" key={row.slug}>
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-black uppercase tracking-[0.18em] text-fuchsia-700">{row.ticker}</p>
+                    <Link className="mt-1 block text-lg font-black text-fuchsia-950 hover:underline" href={`/products/${row.slug}`}>
+                      {row.name}
+                    </Link>
+                    <p className="mt-1 text-sm font-semibold text-fuchsia-900">{row.brand} · {row.brandTier.replaceAll('_', ' ')} · {row.specialtyReason}</p>
+                  </div>
+                  <span className={`rounded-full px-3 py-1 text-sm font-black ${dealScoreTone(row.dealScore)}`}>Deal Score {row.dealScore}</span>
+                </div>
+                <div className="mt-3 grid gap-2 text-sm font-bold text-fuchsia-950 sm:grid-cols-3">
+                  <span>Lowest {row.lowestChain}: {formatSek(row.lowestPrice)}</span>
+                  <span>Target {formatSek(row.watchlistTargetPrice)}</span>
+                  <span>{formatPct(row.spreadPercent)} spread</span>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <ConfidenceBadge level={row.confidence} label={row.sourceLabel} />
+                  <span className="rounded-full bg-fuchsia-100 px-3 py-1 text-xs font-black text-fuchsia-950">
+                    {row.historicalLowBadge ?? 'Historical-low badge gated until dated history exists'}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Card>
+
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
         <Card>
+          <span id="brand-tier-index" className="block scroll-mt-24" />
           <h2 className="text-2xl font-black">Brand-tier fixed basket</h2>
           <div className="mt-4 space-y-3">
             {brandTierSummary.indices.map((tier) => (

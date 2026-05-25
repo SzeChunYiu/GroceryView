@@ -4083,6 +4083,26 @@ ${seo}`;
     assert.doesNotMatch(chainData, /const BRAND_TIER_OBSERVATIONS/);
   });
 
+  it('surfaces specialty and premium tier tracking as watchlist-ready ticker rows', async () => {
+    const source = await read('src/app/chain-index/page.tsx');
+    const chainData = await read('src/lib/chain-index-data.ts');
+
+    assert.match(source, /premiumSpecialtyTrackerRows/);
+    assert.match(source, /Premium watchlist/);
+    assert.match(source, /Specialty products foodies can track like tickers/);
+    assert.match(source, /\/products\/\$\{row\.slug\}/);
+    assert.match(source, /\/chain-index#brand-tier-index/);
+    assert.match(source, /Deal Score \{row\.dealScore\}/);
+    assert.match(source, /Historical-low badge gated until dated history exists/);
+    assert.match(chainData, /buildPremiumSpecialtyTrackerRows/);
+    assert.match(chainData, /premiumSpecialtyReason/);
+    assert.match(chainData, /watchlistTargetPrice/);
+    assert.match(chainData, /historicalLowBadge/);
+    assert.match(chainData, /calculateDealScore/);
+    assert.match(chainData, /tickerForProductSlug/);
+    assert.doesNotMatch(source, /@\/lib\/demo-data|@\/components\/sample-data/);
+  });
+
   it('refines the chain index with matched-basket observations on the 100-centred scale', async () => {
     const source = await read('src/app/chain-index/page.tsx');
     assert.match(source, /buildMatchedBasketChainPriceObservations/);

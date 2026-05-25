@@ -13,7 +13,7 @@ import { matpriskollenOffers } from './ingested/matpriskollen';
 import { axfoodProducts } from './axfood-products';
 import { axfoodWeeklyTrendReport } from './ingested/axfood-weekly-summary';
 import { dbSiteSnapshotChainPriceObservations } from './generated/db-site-chain-observations';
-import { calculateChainPriceIndex, type BrandTier, type BrandTierPriceObservation, type ChainPriceObservation } from '@groceryview/core';
+import { calculateChainPriceIndex, calculateDealScore, type BrandTier, type BrandTierPriceObservation, type ChainPriceObservation } from '@groceryview/core';
 
 export const householdCategoryExposureWeights: Record<string, { monthlySpend: number; sharePercent: number }> = {
   'Dairy & eggs': { monthlySpend: 420, sharePercent: 18 },
@@ -456,6 +456,105 @@ function brandTierForMatchedProduct(product: (typeof axfoodProducts)[number], ca
   if (brand.includes('willys') || brand.includes('lidl') || brand.includes('city gross')) return 'discount_chain_label';
   if (product.lowestPrice >= categoryMedian * 1.25) return 'premium';
   return 'national';
+}
+
+export type PremiumSpecialtyTrackerRow = {
+  slug: string;
+  ticker: string;
+  name: string;
+  brand: string;
+  brandTier: BrandTier;
+  category: string;
+  lowestChain: string;
+  lowestPrice: number;
+  spreadPercent: number;
+  dealScore: number;
+  confidence: 'high' | 'medium' | 'low';
+  watchlistTargetPrice: number;
+  sourceLabel: string;
+  specialtyReason: string;
+  historicalLowBadge?: string;
+};
+
+const specialtyKeywordRules: Array<{ reason: string; match: RegExp }> = [
+  { reason: 'specialty pantry import', match: /\bzeta\b|\bde cecco\b|\bmutti\b|olivolja|extra virgin|balsamico|matlagningsvin/i },
+  { reason: 'premium chocolate or confectionery', match: /premium|kakao|choklad|lindt/i },
+  { reason: 'delicatessen or fresh specialty', match: /delikatess|tryffel|parmesan|laxfärs|gourmet/i },
+  { reason: 'baking specialty', match: /special|surdeg|tipo|durum/i }
+];
+
+function premiumSpecialtyReason(product: (typeof axfoodProducts)[number], brandTier: BrandTier): string | null {
+  if (brandTier === 'premium') return 'premium brand-tier index constituent';
+  const haystack = `${product.name} ${product.brand} ${product.category}`;
+  return specialtyKeywordRules.find((rule) => rule.match.test(haystack))?.reason ?? null;
+}
+
+function tickerForProductSlug(slug: string): string {
+  return slug
+    .replace(/-\d+(?:-st)?$/i, '')
+    .replace(/[^a-z0-9]+/gi, '-')
+    .replace(/^-+|-+$/g, '')
+    .toUpperCase();
+}
+
+function roundSek(value: number): number {
+  return Math.round((value + Number.EPSILON) * 100) / 100;
+}
+
+export function buildPremiumSpecialtyTrackerRows(): PremiumSpecialtyTrackerRow[] {
+  const matchedProducts = axfoodProducts.filter((product) => product.inChains.length > 1 && product.lowestPrice > 0);
+  const medianByCategory = new Map<string, number>();
+
+  for (const category of new Set(matchedProducts.map((product) => normaliseCategory(product.category, product.name)))) {
+    const prices = matchedProducts
+      .filter((product) => normaliseCategory(product.category, product.name) === category)
+      .map((product) => product.lowestPrice)
+      .filter((price) => Number.isFinite(price) && price > 0);
+    if (prices.length > 0) medianByCategory.set(category, medianPrice(prices));
+  }
+
+  return matchedProducts
+    .flatMap((product): PremiumSpecialtyTrackerRow[] => {
+      const category = normaliseCategory(product.category, product.name);
+      const categoryMedian = medianByCategory.get(category) ?? product.lowestPrice;
+      const brandTier = brandTierForMatchedProduct(product, categoryMedian);
+      const specialtyReason = premiumSpecialtyReason(product, brandTier);
+      if (!specialtyReason) return [];
+
+      const dealScore = calculateDealScore({
+        currentCityPercentile: Math.max(0, Math.min(100, 100 - product.spreadPct * 2)),
+        knownPromoHistoryPercentile: Math.max(0, Math.min(100, 100 - product.spreadPct * 2)),
+        equivalentUnitPricePercentile: product.inChains.length > 1 ? 0 : 50,
+        discountDepthPercent: product.spreadPct,
+        sourceConfidence: Math.max(0, Math.min(1, product.inChains.length / 2))
+      });
+
+      return [{
+        slug: product.slug,
+        ticker: tickerForProductSlug(product.slug),
+        name: product.name,
+        brand: product.brand || 'Brand not reported',
+        brandTier,
+        category,
+        lowestChain: product.lowestChain,
+        lowestPrice: product.lowestPrice,
+        spreadPercent: product.spreadPct,
+        dealScore,
+        confidence: product.inChains.length >= 2 ? 'high' : 'medium',
+        watchlistTargetPrice: roundSek(product.lowestPrice * 1.02),
+        sourceLabel: `${product.inChains.length} matched Willys/Hemköp rows`,
+        specialtyReason,
+        ...(product.spreadPct >= 20
+          ? { historicalLowBadge: 'Matched-chain low: dated 52-week history not available for this specialty row.' }
+          : {})
+      }];
+    })
+    .sort((left, right) =>
+      right.dealScore - left.dealScore ||
+      right.spreadPercent - left.spreadPercent ||
+      left.name.localeCompare(right.name, 'sv')
+    )
+    .slice(0, 8);
 }
 
 export function buildBrandTierPriceObservations(): BrandTierPriceObservation[] {
