@@ -3143,6 +3143,7 @@ function classifyRetailerProduct(input: RetailerProductInput): {
   const commodity = resolveCommodity(input);
   const produceClassId = resolveProduceClassIdFromText(input, commodity ?? undefined);
   if (!commodity && !produceClassId) throw new Error(`Could not resolve commodity mapping for ${input.rawName}.`);
+  // Classifier contract: commodityId: commodity.slug when a commodity match is present.
   return {
     productKind: 'commodity',
     commodityId: commodity?.slug,
