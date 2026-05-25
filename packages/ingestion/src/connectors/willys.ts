@@ -16,6 +16,7 @@ export type WillysProduct = {
   imageUrl: string;
   labels: string[];
   online: boolean;
+  channel: 'online' | 'store';
   outOfStock: boolean;
   sourceUrl: string;
   retrievedAt: string;
@@ -35,6 +36,12 @@ export type WillysWeeklyDiscount = {
   storeId: string;
   storeName: string;
   city: string;
+  channel: 'store';
+  isMemberPrice: boolean;
+  isCouponPrice: boolean;
+  isSubscriptionPrice: boolean;
+  isClearance: boolean;
+  multiBuy: { qualifyingCount: number; label: string } | null;
   campaignType: string;
   promotionType: string;
   price: number;
@@ -66,6 +73,7 @@ export type WillysStore = {
   longitude: number | null;
   onlineStore: boolean;
   clickAndCollect: boolean;
+  format: 'willys' | 'willys-hemma';
   flyerUrl: string;
   sourceUrl: string;
   retrievedAt: string;
@@ -118,6 +126,7 @@ type AxfoodCampaignPromotion = {
   weightVolume?: unknown;
   conditionLabel?: unknown;
   redeemLimitLabel?: unknown;
+  qualifyingCount?: unknown;
   startDate?: unknown;
   endDate?: unknown;
   validUntil?: unknown;
@@ -806,6 +815,7 @@ export function normalizeWillysStore(
     longitude: numberOrNull(store.geoPoint?.longitude) ?? numberOrNull(store.address?.longitude),
     onlineStore: store.onlineStore === true,
     clickAndCollect: store.clickAndCollect === true,
+    format: name.toLowerCase().includes('hemma') ? 'willys-hemma' : 'willys',
     flyerUrl: text(store.flyerURL),
     sourceUrl,
     retrievedAt
@@ -849,6 +859,7 @@ export function normalizeWillysProductRows(
     imageUrl: text(product.image?.url),
     labels: stringArray(product.labels),
     online: product.online === true,
+    channel: product.online === true ? 'online' : 'store',
     outOfStock: product.outOfStock === true,
     sourceUrl,
     retrievedAt
@@ -903,6 +914,11 @@ export function normalizeWillysWeeklyDiscount(
     return null;
   }
 
+  const campaignType = text(promotion.campaignType);
+  const qualifyingCount = numberOrNull(promotion.qualifyingCount);
+  const conditionText = text(promotion.conditionLabel);
+  const redeemLimitText = text(promotion.redeemLimitLabel);
+
   return {
     code: promotionCode,
     productCode,
@@ -911,7 +927,13 @@ export function normalizeWillysWeeklyDiscount(
     storeId,
     storeName: '',
     city: '',
-    campaignType: text(promotion.campaignType),
+    channel: 'store',
+    isMemberPrice: campaignType === 'LOYALTY' || redeemLimitText.toLowerCase().includes('willys plus'),
+    isCouponPrice: false,
+    isSubscriptionPrice: false,
+    isClearance: false,
+    multiBuy: qualifyingCount && qualifyingCount > 1 ? { qualifyingCount, label: conditionText || text(promotion.cartLabel) || text(promotion.rewardLabel) } : null,
+    campaignType,
     promotionType: text(promotion.promotionType),
     price,
     priceText: text(promotion.cartLabel) || text(promotion.rewardLabel),
@@ -919,8 +941,8 @@ export function normalizeWillysWeeklyDiscount(
     regularPriceText: text(product.priceNoUnit),
     savePriceText: text(promotion.savePrice),
     packageText: text(promotion.weightVolume) || text(product.displayVolume),
-    conditionText: text(promotion.conditionLabel),
-    redeemLimitText: text(promotion.redeemLimitLabel),
+    conditionText,
+    redeemLimitText,
     startDate: text(promotion.startDate),
     endDate: text(promotion.endDate),
     validUntil: epochMillisToIso(promotion.validUntil),

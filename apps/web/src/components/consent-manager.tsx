@@ -25,7 +25,8 @@ const deniedConsentMode = {
   analytics_storage: 'denied',
   ad_storage: 'denied',
   ad_user_data: 'denied',
-  ad_personalization: 'denied'
+  ad_personalization: 'denied',
+  wait_for_update: 500
 } as const;
 
 const categories: Array<{ key: ConsentCategory; label: string; detail: string; locked?: boolean }> = [
@@ -69,6 +70,7 @@ function applyConsentUpdate(consent: ConsentState) {
   if (typeof window === 'undefined') return;
   window.gtag = window.gtag || gtag;
   window.gtag('consent', 'update', consentModeFor(consent));
+  window.gtag('set', 'ads_data_redaction', !consent.ads);
   window.gtag('set', 'allow_ad_personalization_signals', consent.ads && consent.personalisation);
   publishConsentState(consent);
 }
