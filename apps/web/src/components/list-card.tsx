@@ -1,5 +1,6 @@
 "use client";
 
+import type { PublicSharePreview } from "../lib/social";
 import {
   useList,
   type FamilyRole,
@@ -19,6 +20,47 @@ const roleLabels: Record<FamilyRole, string> = {
   teen: "Teen",
   guest: "Guest",
 };
+
+export function PublicSharePreviewCard({
+  preview,
+}: Readonly<{ preview: PublicSharePreview }>) {
+  return (
+    <section
+      aria-labelledby="public-share-preview-title"
+      className="rounded-2xl border border-emerald-200 bg-white p-4 shadow-sm"
+    >
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.22em] text-emerald-800">
+            Public read-only preview
+          </p>
+          <h2
+            id="public-share-preview-title"
+            className="mt-1 text-base font-semibold text-slate-950"
+          >
+            Share-safe basket snapshot
+          </h2>
+          <p className="mt-1 text-sm text-slate-600">{preview.privacyNote}</p>
+        </div>
+        <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-800">
+          {preview.estimatedTotalLabel}
+        </span>
+      </div>
+
+      <ul className="mt-3 space-y-2">
+        {preview.items.map((item) => (
+          <li key={`${item.name}:${item.quantity}`} className="rounded-xl border border-slate-100 p-3">
+            <p className="font-medium text-slate-950">{item.name}</p>
+            <p className="text-sm text-slate-600">{item.quantity}</p>
+            <p className="mt-2 rounded-lg bg-slate-50 px-3 py-2 text-xs font-bold text-slate-700">
+              {item.estimateLabel} · {item.privacySafeStoreRange}
+            </p>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
 
 export function ListCard({ currentRole, items, onConflictPrompt }: ListCardProps) {
   const { conflictPrompts, items: listItems, updateItem } = useList({
