@@ -51,7 +51,7 @@ describe('verified-data UI', () => {
     assert.match(nav, /label: 'Products'[\s\S]*label: 'Browse'[\s\S]*label: 'Compare'/);
     assert.match(nav, /label: 'Stores'[\s\S]*label: 'Map'[\s\S]*label: 'Stores'/);
     assert.match(nav, /label: 'Trip'[\s\S]*label: 'Current list'[\s\S]*label: 'Nearby deals'[\s\S]*label: 'Watchlist'/);
-    assert.match(nav, /label: 'Personal'[\s\S]*label: 'Savings'[\s\S]*label: 'My Flyer'[\s\S]*label: 'Weekly basket'[\s\S]*label: 'Meal planner'/);
+    assert.match(nav, /label: 'Personal'[\s\S]*label: 'Savings'[\s\S]*label: 'My Flyer'[\s\S]*label: 'Weekly basket'[\s\S]*label: 'Meal planner'[\s\S]*href: '\/contact'[\s\S]*label: 'Contact'/);
     assert.match(nav, /aria-haspopup="true"/);
     assert.match(nav, /group-focus-within:visible/);
     assert.match(nav, /group-hover:visible/);
@@ -364,6 +364,33 @@ describe('verified-data UI', () => {
     assert.match(preferences, /avoidedIngredients: string\[\]/);
     assert.match(preferences, /nutritionPriorities: string\[\]/);
     assert.match(preferences, /onboardingCompleted/);
+  });
+
+  it('wires MyFlyer account preferences to the API without local-only persistence', async () => {
+    const page = await read('src/app/[city]/my-flyer/page.tsx');
+    const preferences = await read('src/app/[city]/my-flyer/my-flyer-preferences.tsx');
+    const api = await read('src/app/api/my-flyer/route.ts');
+
+    assert.match(page, /MyFlyerPreferences/);
+    assert.match(preferences, /Country/);
+    assert.match(preferences, /Favorite stores/);
+    assert.match(preferences, /Home location/);
+    assert.match(preferences, /Household size/);
+    assert.match(preferences, /MyFlyer account diet filters/);
+    assert.match(preferences, /Algorithm choice/);
+    assert.match(preferences, /fetch\('\/api\/my-flyer'/);
+    assert.match(preferences, /Authorization: `Bearer \$\{session\.accessToken\}`/);
+    assert.match(preferences, /favorite_stores: splitStores\(favoriteStores\)/);
+    assert.match(preferences, /home_location: homeLocation/);
+    assert.match(preferences, /household_size: householdSize/);
+    assert.match(preferences, /diet_filters: dietFilters/);
+    assert.doesNotMatch(preferences, /localStorage\.setItem|writeStoredDietFilters|writeStoredAlgorithmChoice/);
+    assert.match(api, /export async function PATCH/);
+    assert.match(api, /preferencesSchema/);
+    assert.match(api, /favorite_stores/);
+    assert.match(api, /home_location/);
+    assert.match(api, /household_size/);
+    assert.match(api, /diet_filters/);
   });
 
   it('maps purchase history CSV imports into settings personalization and budget seeds', async () => {
@@ -2159,13 +2186,14 @@ ${seo}`;
     assert.match(bottomNav, /ScanLine/);
     assert.match(bottomNav, /href: '\/scanner#scan'/);
     assert.match(bottomNav, /label: 'Scan'/);
-    assert.match(bottomNav, /grid-cols-7/);
+    assert.match(bottomNav, /grid-cols-8/);
     assert.match(bottomNav, /useHaptic/);
     assert.match(bottomNav, /impact\(\)/);
     assert.match(bottomNav, /Deals/);
     assert.match(bottomNav, /List/);
     assert.match(bottomNav, /Nearby/);
     assert.match(bottomNav, /Watchlist/);
+    assert.match(bottomNav, /href: '\/contact'[\s\S]*label: 'Contact'/);
     assert.match(dataUi, /import \{ BottomNav \} from '\.\/bottom-nav'/);
     assert.match(dataUi, /pb-20/);
     assert.match(dataUi, /lg:pb-6/);

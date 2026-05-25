@@ -49,8 +49,11 @@ function jsonLd(value: unknown) {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="sv">
+    <html lang="sv" suppressHydrationWarning>
       <body>
+        <script
+          dangerouslySetInnerHTML={{ __html: "try{var p=localStorage.getItem('groceryview:theme-preference');if(p==='dark'||(!p&&matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');document.documentElement.style.colorScheme='dark';}}catch(e){}" }}
+        />
         <SkipLink />
         <script
           dangerouslySetInnerHTML={{ __html: jsonLd([organizationJsonLd, websiteJsonLd]) }}
