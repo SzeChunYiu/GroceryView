@@ -14,6 +14,26 @@ export type GrocerySearchExpansionTelemetry = {
   cacheRequests: number;
 };
 
+export type HeaderSuggestGroupKind = 'products' | 'brands' | 'categories' | 'stores';
+
+export type HeaderSuggestMatchRange = [number, number];
+
+export type HeaderSuggestItem = {
+  id: string;
+  group: HeaderSuggestGroupKind;
+  label: string;
+  href: string;
+  detail?: string;
+  score: number;
+  matchRanges: HeaderSuggestMatchRange[];
+};
+
+export type HeaderSuggestGroup = {
+  id: HeaderSuggestGroupKind;
+  label: string;
+  items: HeaderSuggestItem[];
+};
+
 const groceryAliasEntries: Array<{ canonical: string; aliases: string[] }> = [
   { canonical: 'coffee', aliases: ['kaffe', 'kafe', 'java', 'zoegas', 'zogas', 'zoégas'] },
   { canonical: 'Zoégas coffee', aliases: ['zoegas', 'zogas', 'zoégas brygg', 'zoegas brygg'] },
@@ -40,6 +60,54 @@ function normalizeAliasText(value: string): string {
     .replace(/[^a-z0-9]+/g, ' ')
     .trim()
     .replace(/\s+/g, ' ');
+}
+
+export function normalizeSuggestText(value: string): string {
+  return normalizeAliasText(value);
+}
+
+function mergeMatchedIndexes(indexes: number[]): HeaderSuggestMatchRange[] {
+  const sortedIndexes = [...new Set(indexes)].sort((left, right) => left - right);
+  const ranges: HeaderSuggestMatchRange[] = [];
+  for (const index of sortedIndexes) {
+    const lastRange = ranges[ranges.length - 1];
+    if (lastRange && lastRange[1] === index) {
+      lastRange[1] = index + 1;
+    } else {
+      ranges.push([index, index + 1]);
+    }
+  }
+  return ranges;
+}
+
+export function fuzzySuggestMatch(label: string, query: string): Pick<HeaderSuggestItem, 'matchRanges' | 'score'> | null {
+  const normalizedLabel = normalizeSuggestText(label);
+  const normalizedQuery = normalizeSuggestText(query);
+  if (!normalizedLabel || !normalizedQuery) return null;
+
+  const exactIndex = normalizedLabel.indexOf(normalizedQuery);
+  if (exactIndex >= 0) {
+    const startsWord = exactIndex === 0 || normalizedLabel[exactIndex - 1] === ' ';
+    return {
+      matchRanges: [[exactIndex, exactIndex + normalizedQuery.length]],
+      score: (startsWord ? 0 : 20) + exactIndex
+    };
+  }
+
+  let searchFrom = 0;
+  const matchedIndexes: number[] = [];
+  for (const character of normalizedQuery.replace(/\s/g, '')) {
+    const index = normalizedLabel.indexOf(character, searchFrom);
+    if (index < 0) return null;
+    matchedIndexes.push(index);
+    searchFrom = index + 1;
+  }
+
+  const span = matchedIndexes.length > 0 ? matchedIndexes[matchedIndexes.length - 1] - matchedIndexes[0] : 0;
+  return {
+    matchRanges: mergeMatchedIndexes(matchedIndexes),
+    score: 50 + span + normalizedLabel.length / 100
+  };
 }
 
 function addUnique(values: string[], value: string): void {

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Search } from 'lucide-react';
+import type { KeyboardEvent, ReactNode } from 'react';
 import { useEffect, useId, useMemo, useState } from 'react';
 import { trackSearchToSavingsFunnelStep } from '@/lib/analytics';
 import {
@@ -33,8 +34,24 @@ type HeaderSearchFacetChip = {
   count?: number;
 };
 
+type HeaderSuggestItem = {
+  id: string;
+  group: 'products' | 'brands' | 'categories' | 'stores';
+  label: string;
+  href: string;
+  detail?: string;
+  matchRanges?: Array<[number, number]>;
+};
+
+type HeaderSuggestGroup = {
+  id: HeaderSuggestItem['group'];
+  label: string;
+  items: HeaderSuggestItem[];
+};
+
 type HeaderSuggestResponse = {
   facets?: HeaderSearchFacetChip[];
+  groups?: HeaderSuggestGroup[];
 };
 
 type SearchStatus = 'idle' | 'loading' | 'ready' | 'empty' | 'error';
@@ -57,19 +74,42 @@ function zeroResultFallbacks(query: string) {
   return matchedFallback;
 }
 
+function HighlightedMatch({ label, ranges = [] }: Readonly<{ label: string; ranges?: Array<[number, number]> }>) {
+  if (ranges.length === 0) return <>{label}</>;
+
+  const parts: ReactNode[] = [];
+  let cursor = 0;
+  for (const [start, end] of ranges) {
+    if (start > cursor) parts.push(label.slice(cursor, start));
+    parts.push(<mark className="rounded bg-amber-100 px-0.5 text-slate-950" key={`${label}-${start}-${end}`}>{label.slice(start, end)}</mark>);
+    cursor = end;
+  }
+  if (cursor < label.length) parts.push(label.slice(cursor));
+
+  return <>{parts}</>;
+}
+
 export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: string }>) {
   const inputId = useId();
   const listboxId = useId();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<ProductSearchResult[]>([]);
   const [facetChips, setFacetChips] = useState<HeaderSearchFacetChip[]>([]);
+  const [suggestGroups, setSuggestGroups] = useState<HeaderSuggestGroup[]>([]);
   const [recentSearches, setRecentSearches] = useState<RecentSearchHistoryEntry[]>([]);
+  const [activeOptionIndex, setActiveOptionIndex] = useState(-1);
   const [isFocused, setIsFocused] = useState(false);
   const [status, setStatus] = useState<SearchStatus>('idle');
   const trimmedQuery = useMemo(() => query.trim(), [query]);
   const emptyFallback = useMemo(() => zeroResultFallbacks(trimmedQuery), [trimmedQuery]);
   const shouldShowRecentSearches = isFocused && trimmedQuery.length === 0 && recentSearches.length > 0;
   const shouldShowDropdown = (status !== 'idle' && trimmedQuery.length >= MIN_QUERY_LENGTH) || shouldShowRecentSearches;
+  const optionCount = useMemo(() => {
+    if (shouldShowRecentSearches) return recentSearches.length;
+    const groupedCount = suggestGroups.reduce((total, group) => total + group.items.length, 0);
+    const productResultCount = groupedCount === 0 && status === 'ready' ? results.length : 0;
+    return groupedCount + facetChips.length + productResultCount;
+  }, [facetChips.length, recentSearches.length, results.length, shouldShowRecentSearches, status, suggestGroups]);
 
   useEffect(() => {
     setRecentSearches(readRecentSearchHistory());
@@ -79,6 +119,8 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
     if (trimmedQuery.length < MIN_QUERY_LENGTH) {
       setResults([]);
       setFacetChips([]);
+      setSuggestGroups([]);
+      setActiveOptionIndex(-1);
       setStatus('idle');
       return;
     }
@@ -94,12 +136,19 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
           });
           if (suggestResponse.ok) {
             const suggestPayload = await suggestResponse.json() as HeaderSuggestResponse;
-            if (!controller.signal.aborted) setFacetChips(suggestPayload.facets ?? []);
+            if (!controller.signal.aborted) {
+              setFacetChips(suggestPayload.facets ?? []);
+              setSuggestGroups(suggestPayload.groups ?? []);
+            }
           } else if (!controller.signal.aborted) {
             setFacetChips([]);
+            setSuggestGroups([]);
           }
         } catch {
-          if (!controller.signal.aborted) setFacetChips([]);
+          if (!controller.signal.aborted) {
+            setFacetChips([]);
+            setSuggestGroups([]);
+          }
         }
 
         const response = await fetch(`/api/products?q=${encodeURIComponent(trimmedQuery)}`, {
@@ -119,6 +168,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
         console.error('Product search request failed', error instanceof Error ? { name: error.name } : { name: 'unknown' });
         setResults([]);
         setFacetChips([]);
+        setSuggestGroups([]);
         setStatus('error');
       }
     }, 300);
@@ -128,6 +178,51 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
       controller.abort();
     };
   }, [trimmedQuery]);
+
+  useEffect(() => {
+    setActiveOptionIndex(-1);
+  }, [trimmedQuery, shouldShowDropdown]);
+
+  function focusOption(index: number) {
+    if (optionCount === 0) return;
+    const nextIndex = (index + optionCount) % optionCount;
+    setActiveOptionIndex(nextIndex);
+    window.requestAnimationFrame(() => {
+      const option = document.querySelector<HTMLElement>(`[data-search-option-index="${nextIndex}"]`);
+      option?.focus();
+    });
+  }
+
+  function handleSearchKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp' && event.key !== 'Escape') return;
+    if (event.key === 'Escape') {
+      setIsFocused(false);
+      setActiveOptionIndex(-1);
+      return;
+    }
+    if (!shouldShowDropdown || optionCount === 0) return;
+    event.preventDefault();
+    const targetIndex = event.key === 'ArrowDown'
+      ? (activeOptionIndex < 0 ? 0 : activeOptionIndex + 1)
+      : (activeOptionIndex < 0 ? optionCount - 1 : activeOptionIndex - 1);
+    focusOption(targetIndex);
+  }
+
+  function handleOptionKeyDown(event: KeyboardEvent<HTMLElement>, index: number) {
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      focusOption(event.key === 'ArrowDown' ? index + 1 : index - 1);
+    }
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      setIsFocused(false);
+      setActiveOptionIndex(-1);
+      document.getElementById(inputId)?.focus();
+    }
+  }
+
+  let optionIndex = 0;
+  const nextOptionIndex = () => optionIndex++;
 
   return (
     <div className="relative w-full max-w-xl lg:w-[min(36vw,28rem)]" data-search-surface={surface}>
@@ -148,6 +243,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
             setRecentSearches(readRecentSearchHistory());
             setIsFocused(true);
           }}
+          onKeyDown={handleSearchKeyDown}
           placeholder="Search product or brand"
           role="combobox"
           type="search"
@@ -175,38 +271,78 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
                 </button>
               </div>
               <div className="mt-2 grid gap-2">
-                {recentSearches.map((search) => (
-                  <Link
-                    className="rounded-2xl bg-slate-50 px-3 py-2 text-sm font-black text-slate-800 transition hover:bg-emerald-50 hover:text-emerald-900"
-                    href={search.href}
-                    key={`${search.query}-${search.searchedAt}`}
-                    role="option"
-                  >
-                    {search.query}
-                    <span className="ml-2 text-xs font-semibold text-slate-500">{search.resultCount} verified result{search.resultCount === 1 ? '' : 's'}</span>
-                  </Link>
-                ))}
+                {recentSearches.map((search) => {
+                  const index = nextOptionIndex();
+                  return (
+                    <Link
+                      className="rounded-2xl bg-slate-50 px-3 py-2 text-sm font-black text-slate-800 transition hover:bg-emerald-50 hover:text-emerald-900 focus:bg-emerald-50 focus:outline-none"
+                      data-search-option-index={index}
+                      href={search.href}
+                      key={`${search.query}-${search.searchedAt}`}
+                      onFocus={() => setActiveOptionIndex(index)}
+                      onKeyDown={(event) => handleOptionKeyDown(event, index)}
+                      role="option"
+                    >
+                      {search.query}
+                      <span className="ml-2 text-xs font-semibold text-slate-500">{search.resultCount} verified result{search.resultCount === 1 ? '' : 's'}</span>
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           ) : null}
           {status === 'loading' ? (
             <p className="px-4 py-3 text-sm font-bold text-slate-600">Searching verified products…</p>
           ) : null}
+          {suggestGroups.length > 0 ? (
+            <div className="max-h-96 overflow-y-auto border-t border-slate-100">
+              {suggestGroups.map((group) => (
+                <section className="px-4 py-3" key={group.id} aria-label={`${group.label} suggestions`}>
+                  <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{group.label}</p>
+                  <div className="mt-2 grid gap-1">
+                    {group.items.map((item) => {
+                      const index = nextOptionIndex();
+                      return (
+                        <Link
+                          className="rounded-2xl px-3 py-2 text-sm font-black text-slate-900 transition hover:bg-emerald-50 focus:bg-emerald-50 focus:outline-none"
+                          data-search-option-index={index}
+                          href={item.href}
+                          key={item.id}
+                          onFocus={() => setActiveOptionIndex(index)}
+                          onKeyDown={(event) => handleOptionKeyDown(event, index)}
+                          role="option"
+                        >
+                          <span className="block"><HighlightedMatch label={item.label} ranges={item.matchRanges} /></span>
+                          {item.detail ? <span className="mt-0.5 block text-xs font-semibold text-slate-500">{item.detail}</span> : null}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </section>
+              ))}
+            </div>
+          ) : null}
           {facetChips.length > 0 ? (
             <div className="border-t border-slate-100 px-4 py-3">
               <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">Refine search</p>
               <div className="mt-2 flex flex-wrap gap-2">
-                {facetChips.map((facet) => (
-                  <Link
-                    className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-900 transition hover:bg-emerald-100"
-                    href={facet.href}
-                    key={`${facet.kind}-${facet.href}`}
-                    role="option"
-                  >
-                    {facet.label}
-                    {facet.count ? <span className="ml-1 text-emerald-700">({facet.count})</span> : null}
-                  </Link>
-                ))}
+                {facetChips.map((facet) => {
+                  const index = nextOptionIndex();
+                  return (
+                    <Link
+                      className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-900 transition hover:bg-emerald-100 focus:bg-emerald-100 focus:outline-none"
+                      data-search-option-index={index}
+                      href={facet.href}
+                      key={`${facet.kind}-${facet.href}`}
+                      onFocus={() => setActiveOptionIndex(index)}
+                      onKeyDown={(event) => handleOptionKeyDown(event, index)}
+                      role="option"
+                    >
+                      {facet.label}
+                      {facet.count ? <span className="ml-1 text-emerald-700">({facet.count})</span> : null}
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           ) : null}
@@ -234,19 +370,25 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
               </div>
             </div>
           ) : null}
-          {status === 'ready' ? (
+          {status === 'ready' && suggestGroups.length === 0 ? (
             <div className="max-h-96 divide-y divide-slate-100 overflow-y-auto">
-              {results.map((result) => (
-                <Link
-                  className="block px-4 py-3 transition hover:bg-emerald-50 focus:bg-emerald-50 focus:outline-none"
-                  href={`/products/${result.slug}`}
-                  key={result.id}
-                  role="option"
-                >
-                  <span className="block text-sm font-black text-slate-950">{result.name}</span>
-                  <span className="mt-1 block text-xs font-semibold text-slate-600">{result.brand ?? 'Brand not reported'} · PostgreSQL product search</span>
-                </Link>
-              ))}
+              {results.map((result) => {
+                const index = nextOptionIndex();
+                return (
+                  <Link
+                    className="block px-4 py-3 transition hover:bg-emerald-50 focus:bg-emerald-50 focus:outline-none"
+                    data-search-option-index={index}
+                    href={`/products/${result.slug}`}
+                    key={result.id}
+                    onFocus={() => setActiveOptionIndex(index)}
+                    onKeyDown={(event) => handleOptionKeyDown(event, index)}
+                    role="option"
+                  >
+                    <span className="block text-sm font-black text-slate-950">{result.name}</span>
+                    <span className="mt-1 block text-xs font-semibold text-slate-600">{result.brand ?? 'Brand not reported'} · PostgreSQL product search</span>
+                  </Link>
+                );
+              })}
             </div>
           ) : null}
         </div>
