@@ -41,6 +41,8 @@ type DealCardProps = {
   productHref?: string;
   rankLabel?: string;
   categoryLabel?: string;
+  imageAlt?: string;
+  imageUrl?: string | null;
   localityLabel?: string;
   dropPercentLabel?: string;
   unitPriceDropLabel?: string;
@@ -127,6 +129,8 @@ export function DealCard({
   productHref,
   rankLabel,
   categoryLabel,
+  imageAlt,
+  imageUrl,
   localityLabel,
   dropPercentLabel,
   unitPriceDropLabel,
@@ -222,12 +226,18 @@ export function DealCard({
           <p className="mt-1 text-amber-900">Provider: {sponsoredPlacement.provider} · Organic ranking separated: {String(separatedFromOrganicRankings)}</p>
         </div>
       ) : null}
-      {imageUrl ? (
-        <div className="mb-3 flex aspect-[4/3] items-center justify-center rounded-2xl border border-slate-100 bg-white p-3">
-          <ResponsiveProductImage alt={imageAlt ?? `${title} deal image`} height={180} sizes="(min-width: 1024px) 24vw, 90vw" src={imageUrl} width={240} />
-        </div>
-      ) : null}
       <div className="flex items-start justify-between gap-3">
+        {imageUrl ? (
+          <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl bg-white p-2 ring-1 ring-market-ink/10">
+            <ResponsiveProductImage
+              alt={imageAlt ?? ` deal image`}
+              height={96}
+              sizes="(min-width: 768px) 96px, 80px"
+              src={imageUrl}
+              width={96}
+            />
+          </div>
+        ) : null}
         <div>
           {replacementLabel ? (
             <p className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{replacementLabel}</p>

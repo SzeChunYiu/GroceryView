@@ -253,6 +253,8 @@ export function ProductPriceCards({
                 <ResponsiveProductImage
                   alt={card.imageAlt}
                   height={144}
+                  loading="lazy"
+                  placeholder="empty"
                   sizes="(min-width: 1280px) 16vw, (min-width: 768px) 33vw, 80vw"
                   src={card.imageUrl}
                   width={144}
