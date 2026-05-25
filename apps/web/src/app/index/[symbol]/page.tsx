@@ -142,10 +142,13 @@ function fixedBasketFor(definition: CategoryDefinition): { index: FixedBasketInd
     index: calculateFixedBasketIndex({
       id: definition.symbol,
       label: definition.label,
+      country: 'SE',
       baseDate: fixedBasketBaseDate,
       currentDate: fixedBasketCurrentDate,
       components: rows.map((row) => ({
         productId: row.id,
+        country: 'SE',
+        currency: 'SEK',
         baseUnitPrice: row.baseUnitPrice,
         currentUnitPrice: row.currentUnitPrice,
         weight: row.weight
@@ -168,10 +171,13 @@ function fixedBasketForChain(chain: ChainPriceIndex): FixedBasketIndex {
   return calculateFixedBasketIndex({
     id: chainSlug(chain.chainId),
     label: `${chain.chainId} category basket`,
+    country: 'SE',
     baseDate: fixedBasketBaseDate,
     currentDate: fixedBasketCurrentDate,
     components: chain.byCategory.map((row) => ({
       productId: row.category,
+      country: 'SE',
+      currency: 'SEK',
       baseUnitPrice: row.marketReference,
       currentUnitPrice: row.marketReference * (row.index / 100),
       weight: row.observations
