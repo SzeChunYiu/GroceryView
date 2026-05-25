@@ -20,6 +20,7 @@ export type RecurringBasketDuplicate = {
 };
 
 export type RecurringBasketPlan = {
+  forecastSnapshotAt: string;
   id: string;
   templateName: string;
   cadence: 'weekly';
@@ -66,6 +67,7 @@ const purchaseHistoryCatalog = [
 
 export const weeklyRecurringBasketPlan: RecurringBasketPlan = {
   id: 'weekly-family-basics',
+  forecastSnapshotAt: '2026-05-25T00:00:00.000Z',
   templateName: 'Weekly family basics',
   cadence: 'weekly',
   reusableTemplateId: 'template-family-basics-v1',
