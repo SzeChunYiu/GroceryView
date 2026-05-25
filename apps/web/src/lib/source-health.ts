@@ -168,6 +168,81 @@ export const sourceFreshnessSlaSummary = {
   breachedSourceCount: sourceFreshnessSlaDashboard.filter((source) => source.status === 'breached').length,
 };
 
+export type SourceManagementAction = {
+  id: string;
+  sourceName: string;
+  chain: string;
+  dataSource: string;
+  owner: string;
+  runbookUrl: string;
+  state: 'active' | 'paused';
+  note: string;
+  allowedActions: Array<'pause' | 'resume' | 'annotate'>;
+  updatedAt: string;
+};
+
+const sourceOwners: Record<string, { owner: string; runbookUrl: string; state?: SourceManagementAction['state']; note: string }> = {
+  'Axfood chain price snapshot': {
+    owner: 'Data Ops · Axfood',
+    runbookUrl: '/admin/runbooks/axfood-chain-price-snapshot',
+    note: 'Pause before Axfood endpoint incidents or price schema changes.'
+  },
+  'ICA store-scoped promotions': {
+    owner: 'Data Ops · ICA promotions',
+    runbookUrl: '/admin/runbooks/ica-store-promotions',
+    note: 'Annotate skipped store endpoints before resuming branch samples.'
+  },
+  'OpenPrices SEK observations': {
+    owner: 'Community data steward',
+    runbookUrl: '/admin/runbooks/openprices-import',
+    note: 'Resume only after duplicate and unit-normalization QA checks pass.'
+  },
+  'OpenFoodFacts metadata catalog': {
+    owner: 'Catalog enrichment',
+    runbookUrl: '/admin/runbooks/openfoodfacts-metadata',
+    note: 'Pause metadata syncs during allergen taxonomy drift reviews.'
+  },
+  'OKQ8 fuel operator prices': {
+    owner: 'Mobility price ops',
+    runbookUrl: '/admin/runbooks/okq8-fuel-prices',
+    note: 'Annotate public-price page outages with captured HTTP status.'
+  },
+  'Sweden store directory': {
+    owner: 'Store directory ops',
+    runbookUrl: '/admin/runbooks/overpass-store-directory',
+    state: 'paused',
+    note: 'Paused while Overpass throttling is reviewed; resume after quota confirmation.'
+  }
+};
+
+export const sourceManagementActions: SourceManagementAction[] = sourceFreshnessSlaDashboard.map((source) => {
+  const owner = sourceOwners[source.sourceName] ?? {
+    owner: 'Data Ops',
+    runbookUrl: '/admin/runbooks/source-management',
+    note: 'Annotate source ownership before changing connector state.'
+  };
+  const state = owner.state ?? 'active';
+
+  return {
+    id: source.sourceName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+    sourceName: source.sourceName,
+    chain: source.chain,
+    dataSource: source.dataSource,
+    owner: owner.owner,
+    runbookUrl: owner.runbookUrl,
+    state,
+    note: owner.note,
+    allowedActions: state === 'paused' ? ['resume', 'annotate'] : ['pause', 'annotate'],
+    updatedAt: source.monitoredAt
+  };
+});
+
+export const sourceManagementSummary = {
+  actionCount: sourceManagementActions.length,
+  pausedCount: sourceManagementActions.filter((source) => source.state === 'paused').length,
+  ownerCount: new Set(sourceManagementActions.map((source) => source.owner)).size
+};
+
 export type PartnerOnboardingIntake = {
   intakeEmail: string;
   expectedResponseWindow: string;
