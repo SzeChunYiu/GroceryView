@@ -158,8 +158,30 @@ function buildRegionalPriceStatisticsGate() {
   };
 }
 
-export default function MapPage() {
+type MapSearchParams = {
+  area?: string | string[];
+  basket?: string | string[];
+  category?: string | string[];
+  chain?: string | string[];
+  product?: string | string[];
+  selectedStore?: string | string[];
+};
+
+function firstSearchParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+export default function MapPage({ searchParams = {} }: Readonly<{ searchParams?: MapSearchParams }>) {
   const visibleStores = storeUniverse.slice(0, 80);
+  const preservedMapState = [
+    ['area', firstSearchParam(searchParams.area)],
+    ['chain', firstSearchParam(searchParams.chain)],
+    ['category', firstSearchParam(searchParams.category)],
+    ['basket', firstSearchParam(searchParams.basket)],
+    ['product', firstSearchParam(searchParams.product)],
+    ['selectedStore', firstSearchParam(searchParams.selectedStore)]
+  ].filter((entry): entry is [string, string] => Boolean(entry[1]));
+
   return (
     <PageShell>
       <Eyebrow>Map data</Eyebrow>
@@ -175,6 +197,21 @@ export default function MapPage() {
         state={{ overlay: 'chain-index', routeMode: routeAwareNearestStorePlan.mode, sort: 'map-center-distance', view: 'store-map' }}
         surface="map"
       />
+
+      <Card className="mt-6 border-blue-200 bg-blue-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-blue-800">Synced URL state</p>
+        <h2 className="mt-2 text-2xl font-black text-blue-950">Map and list keep the selected price context</h2>
+        <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-blue-900">
+          Area, chain, category, basket, product, and selectedStore filters are preserved in the URL so shoppers can pan the map, open a list card, or share the view without losing context.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {preservedMapState.length > 0 ? preservedMapState.map(([key, value]) => (
+            <span className="rounded-full bg-white px-3 py-2 text-xs font-black text-blue-950 shadow-sm" key={key}>{key}: {value}</span>
+          )) : (
+            <span className="rounded-full bg-white px-3 py-2 text-xs font-black text-blue-950 shadow-sm">No URL filters selected · list-first fallback shows all visible stores</span>
+          )}
+        </div>
+      </Card>
 
       <Card className="mt-6 overflow-hidden border-slate-200 bg-slate-950 p-0 text-white">
         <div className="grid gap-4 p-6 lg:grid-cols-[1fr_auto]">
