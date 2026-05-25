@@ -42,6 +42,9 @@ test('web product search API is backed by PostgreSQL full-text search', async ()
   assert.match(route, /dynamic = 'force-dynamic'/);
   assert.match(route, /DATABASE_URL/);
   assert.match(route, /searchProductsByText/);
+  assert.match(route, /expandGrocerySearchQuery/);
+  assert.match(route, /matchedSynonyms/);
   assert.match(route, /product_search_database_unconfigured/);
-  assert.match(route, /NextResponse\.json\(\{ query, results/);
+  assert.match(route, /NextResponse\.json\(responsePayload/);
+  assert.match(route, /postgres\.products_tsvector_alias_synonym_expansion/);
 });

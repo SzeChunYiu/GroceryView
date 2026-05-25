@@ -1,7 +1,10 @@
+import { semanticSynonymsForQuery } from './search-synonyms';
+
 export type GrocerySearchExpansion = {
   query: string;
   expandedQueries: string[];
   matchedAliases: string[];
+  matchedSynonyms: string[];
 };
 
 const groceryAliasEntries: Array<{ canonical: string; aliases: string[] }> = [
@@ -44,6 +47,7 @@ export function expandGrocerySearchQuery(query: string, maxQueries = 5): Grocery
   const tokens = new Set(normalizedQuery.split(' ').filter(Boolean));
   const expandedQueries: string[] = [];
   const matchedAliases: string[] = [];
+  const matchedSynonyms: string[] = [];
   addUnique(expandedQueries, trimmed);
 
   for (const entry of groceryAliasEntries) {
@@ -58,9 +62,16 @@ export function expandGrocerySearchQuery(query: string, maxQueries = 5): Grocery
     }
   }
 
+  for (const synonym of semanticSynonymsForQuery(trimmed)) {
+    addUnique(matchedSynonyms, synonym.matchedTerm);
+    addUnique(expandedQueries, synonym.canonical);
+    for (const synonymTerm of synonym.terms) addUnique(expandedQueries, synonymTerm);
+  }
+
   return {
     query: trimmed,
     expandedQueries: expandedQueries.slice(0, maxQueries),
-    matchedAliases
+    matchedAliases,
+    matchedSynonyms
   };
 }
