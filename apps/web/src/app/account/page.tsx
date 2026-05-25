@@ -6,7 +6,7 @@ import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { DietaryProfileOnboarding } from '@/components/diet-filter-picker';
 import { listShareRoles, accountListSharePermissions } from '@/lib/list-permissions';
-import { dietaryPreferenceOnboardingContract, demoPreferredBrandControls, groupPreferredBrandControls } from '@/lib/personalization';
+import { dietaryPreferenceOnboardingContract, demoPreferredBrandControls, groupPreferredBrandControls, savedSearchesStorageKey } from '@/lib/personalization';
 import { buildPremiumSavingsForecast } from '@/lib/price-intelligence';
 import { routeMetadata } from '@/lib/seo';
 import { accountSavedShoppingContract, formatSek, savedBasketAutoReorderPlanner } from '@/lib/verified-data';
@@ -212,6 +212,14 @@ export default function AccountPage() {
           Paste loyalty or receipt exports with date, product, store, quantity, and total columns. GroceryView maps rows to known products, summarizes historical spend, and identifies recurring purchases before saving account recommendations.
         </p>
         <BulkImportDialog importMode="purchase-history" />
+      </Card>
+
+      <Card className="mt-6 border-violet-200 bg-violet-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-violet-800">Saved grocery searches</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight">Pinned header searches stay explicit</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+          The header SearchBar stores recent searches locally and lets signed-in shoppers pin weekly grocery checks into <code className="rounded bg-white/80 px-1 py-0.5 text-violet-900">{savedSearchesStorageKey}</code>. Saved searches are user-triggered shortcuts, not inferred browsing profiles.
+        </p>
       </Card>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
