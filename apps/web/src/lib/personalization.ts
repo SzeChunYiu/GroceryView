@@ -13,10 +13,11 @@ export type DietaryPreferenceOption = {
 
 export type DietaryPreferenceOnboardingContract = {
   endpoint: '/api/account/dietary-preferences';
-  fields: Array<'dietaryRestrictions' | 'avoidedIngredients' | 'certificationPreferences'>;
+  fields: Array<'dietaryRestrictions' | 'avoidedIngredients' | 'certificationPreferences' | 'nutritionPriorities'>;
   dietaryRestrictions: DietaryPreferenceOption[];
   avoidedIngredients: DietaryPreferenceOption[];
   certificationPreferences: DietaryPreferenceOption[];
+  nutritionPriorities: DietaryPreferenceOption[];
   personalizationSurfaces: string[];
   guardrails: string[];
 };
@@ -184,7 +185,7 @@ export function clearRecentSearchHistory() {
 
 export const dietaryPreferenceOnboardingContract: DietaryPreferenceOnboardingContract = {
   endpoint: '/api/account/dietary-preferences',
-  fields: ['dietaryRestrictions', 'avoidedIngredients', 'certificationPreferences'],
+  fields: ['dietaryRestrictions', 'avoidedIngredients', 'certificationPreferences', 'nutritionPriorities'],
   dietaryRestrictions: [
     { value: 'vegetarian', label: 'Vegetarian', helper: 'Prefer meat-free recipes, swaps, and basket ideas.' },
     { value: 'vegan', label: 'Vegan', helper: 'Require plant-based alternatives before recommendations are ranked.' },
@@ -202,6 +203,12 @@ export const dietaryPreferenceOnboardingContract: DietaryPreferenceOnboardingCon
     { value: 'kosher', label: 'Kosher', helper: 'Prefer package-label evidence before surfacing product matches.' },
     { value: 'organic', label: 'Organic', helper: 'Promote verified organic labels when price and stock evidence are available.' },
     { value: 'keyhole', label: 'Keyhole', helper: 'Prefer verified Nordic Keyhole labels for health-oriented filters.' }
+  ],
+  nutritionPriorities: [
+    { value: 'lower_sugar', label: 'Lower sugar', helper: 'Rank verified lower-sugar options higher when label data is present.' },
+    { value: 'higher_protein', label: 'Higher protein', helper: 'Prioritize stronger protein-per-krona matches for meals and swaps.' },
+    { value: 'higher_fiber', label: 'Higher fiber', helper: 'Prefer products with fiber evidence for weekly basket suggestions.' },
+    { value: 'lower_salt', label: 'Lower salt', helper: 'Down-rank high-salt substitutions unless explicitly selected.' }
   ],
   personalizationSurfaces: [
     'search filters',
@@ -419,6 +426,67 @@ export function buildPersonalizedRecommendationRail<T extends RecommendationProd
     })
     .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name, 'sv'))
     .slice(0, options.limit ?? 4);
+}
+
+export type PersonalizedTrendingDealInput = {
+  rank: number;
+  productSlug: string;
+  productName: string;
+  brand?: string | null;
+  categoryLabel?: string | null;
+  chainSlug?: string | null;
+  chainName?: string | null;
+};
+
+export type PersonalizedTrendingDeal<T> = T & {
+  rank: number;
+  personalizationScore: number;
+  personalizationReason: string;
+};
+
+export function rankTrendingDealsForHousehold<T extends PersonalizedTrendingDealInput>(
+  deals: readonly T[],
+  options: {
+    householdId?: string;
+    favoriteBrands?: readonly string[];
+    dietaryFilters?: readonly string[];
+    nearbyChains?: readonly string[];
+    clickedProductSlugs?: readonly string[];
+  } = {},
+): PersonalizedTrendingDeal<T>[] {
+  const favoriteBrands = new Set((options.favoriteBrands ?? ['Garant', 'Änglamark']).map((brand) => brand.toLocaleLowerCase('sv-SE')));
+  const dietaryFilters = (options.dietaryFilters ?? []).map((filter) => filter.toLocaleLowerCase('sv-SE'));
+  const nearbyChains = new Set((options.nearbyChains ?? ['ica', 'coop', 'willys']).map((chain) => chain.toLocaleLowerCase('sv-SE')));
+  const clickedProductSlugs = new Set((options.clickedProductSlugs ?? []).map((slug) => slug.toLocaleLowerCase('sv-SE')));
+
+  return deals
+    .map((deal, index) => {
+      const brand = deal.brand?.toLocaleLowerCase('sv-SE') ?? '';
+      const category = deal.categoryLabel?.toLocaleLowerCase('sv-SE') ?? '';
+      const name = deal.productName.toLocaleLowerCase('sv-SE');
+      const chain = deal.chainSlug?.toLocaleLowerCase('sv-SE') ?? deal.chainName?.toLocaleLowerCase('sv-SE') ?? '';
+      const favoriteScore = favoriteBrands.has(brand) ? 30 : 0;
+      const dietaryScore = dietaryFilters.filter((filter) => category.includes(filter) || name.includes(filter)).length * 16;
+      const chainScore = chain && nearbyChains.has(chain) ? 14 : 0;
+      const clickScore = clickedProductSlugs.has(deal.productSlug.toLocaleLowerCase('sv-SE')) ? 22 : 0;
+      const historyScore = getHouseholdCategoryScore(deal.productSlug.split('-').slice(0, 2).join('-'), options.householdId ?? defaultHouseholdId) / 2;
+      const personalizationScore = favoriteScore + dietaryScore + chainScore + clickScore + historyScore + Math.max(0, deals.length - index);
+      const reasons = [
+        favoriteScore > 0 ? 'favorite brand' : '',
+        dietaryScore > 0 ? 'dietary filter match' : '',
+        chainScore > 0 ? 'nearby chain' : '',
+        clickScore > 0 ? 'recent click' : '',
+        historyScore > 0 ? 'household category history' : '',
+      ].filter(Boolean);
+
+      return {
+        ...deal,
+        personalizationScore,
+        personalizationReason: reasons.length > 0 ? reasons.join(', ') : 'price-drop trend strength',
+      };
+    })
+    .sort((left, right) => right.personalizationScore - left.personalizationScore || left.rank - right.rank)
+    .map((deal, index) => ({ ...deal, rank: index + 1 }));
 }
 
 export type BrandTolerance = 'favorite' | 'acceptable' | 'excluded';
