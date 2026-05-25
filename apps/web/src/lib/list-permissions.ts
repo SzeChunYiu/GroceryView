@@ -1,3 +1,5 @@
+import type { SharedListActivityEvent } from './activity-log';
+
 export type ListShareRole = 'view' | 'edit';
 
 export type ListSharePermission = {
@@ -25,6 +27,15 @@ export const listShareRoles: Record<ListShareRole, { label: string; description:
 
 export const accountListSharePermissions: ListSharePermission[] = [
   {
+    id: 'share-local-shopping-list-sam',
+    listId: 'local-shopping-list',
+    listName: 'Today\'s basket',
+    collaboratorName: 'Sam Shopper',
+    collaboratorEmail: 'sam@example.com',
+    role: 'edit',
+    grantedAt: '2026-05-24T18:05:00.000Z',
+  },
+  {
     id: 'share-weekly-roommates',
     listId: 'weekly-staples',
     listName: 'Weekly staples',
@@ -42,6 +53,39 @@ export const accountListSharePermissions: ListSharePermission[] = [
     role: 'view',
     grantedAt: '2026-05-22T16:45:00.000Z',
   },
+];
+
+export const sharedShoppingListActivityFeed: SharedListActivityEvent[] = [
+  {
+    id: 'activity-local-shopping-list-added-oats',
+    listId: 'local-shopping-list',
+    itemId: 'oats',
+    itemName: 'Oats',
+    kind: 'item_added',
+    actor: { id: 'sam-shopper', name: 'Sam Shopper' },
+    timestamp: '2026-05-25T08:10:00.000Z',
+    detail: 'Added before the morning store run.'
+  },
+  {
+    id: 'activity-local-shopping-list-checked-milk',
+    listId: 'local-shopping-list',
+    itemId: 'milk',
+    itemName: 'Milk',
+    kind: 'item_checked',
+    actor: { id: 'mina-parent', name: 'Mina Parent' },
+    timestamp: '2026-05-25T08:24:00.000Z',
+    detail: 'Checked off in store.'
+  },
+  {
+    id: 'activity-local-shopping-list-removed-snacks',
+    listId: 'local-shopping-list',
+    itemId: 'snacks',
+    itemName: 'Extra snacks',
+    kind: 'item_removed',
+    actor: { id: 'alex-roommate', name: 'Alex Roommate' },
+    timestamp: '2026-05-25T08:31:00.000Z',
+    detail: 'Removed duplicate item from the shared list.'
+  }
 ];
 
 export function resolveListShareRole(role: string | null | undefined): ListShareRole {

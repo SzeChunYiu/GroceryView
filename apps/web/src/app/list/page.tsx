@@ -2,12 +2,14 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CheckableListItem } from '@/components/CheckableListItem';
+import { ActivityStream } from '@/components/activity-stream';
 import { AppNav } from '@/components/app-nav';
 import { BottomNav } from '@/components/bottom-nav';
 import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { PullRefreshWrapper } from '@/components/PullRefreshWrapper';
 import { PrintButton } from '@/components/PrintButton';
 import { useList } from '@/hooks/useList';
+import { sharedShoppingListActivityFeed } from '@/lib/list-permissions';
 import { cheapestSourceForProductSlug } from '@/lib/shopping-list-prices';
 
 const OFFLINE_SHOPPING_LIST_CACHE_KEY = 'groceryview:shopping-list:offline-cache:v1';
@@ -160,6 +162,9 @@ export default function ShoppingListPage() {
               ))}
             </ul>
           </section>
+          <div className="mt-6" data-print-hidden="true">
+            <ActivityStream initialEvents={sharedShoppingListActivityFeed} listId="local-shopping-list" />
+          </div>
         </main>
       </PullRefreshWrapper></div>
       <main className="shopping-list-print-page mx-auto hidden w-full max-w-7xl px-4 pb-20 pt-6 print:block sm:px-6 lg:px-8 lg:pb-6">
