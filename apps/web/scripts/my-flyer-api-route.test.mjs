@@ -179,4 +179,16 @@ describe('my-flyer API payload', () => {
     assert.match(route, /'Cache-Control': 'private, max-age=3600'/);
     assert.match(route, /'X-MyFlyer-Cache'/);
   });
+
+  it('wires the MyFlyer page ranker into the API refresh query', () => {
+    const page = readFileSync(new URL('../src/app/[city]/my-flyer/page.tsx', import.meta.url), 'utf8');
+    const pushActions = readFileSync(new URL('../src/components/my-flyer-push-actions.tsx', import.meta.url), 'utf8');
+
+    assert.match(page, /import \{ AlgorithmPicker \} from '@\/components\/algorithm-picker'/);
+    assert.match(page, /<AlgorithmPicker/);
+    assert.match(page, /allowedAlgorithms=\{\['watchlist_first', 'best_savings', 'best_unit_price'\]\}/);
+    assert.match(pushActions, /readStoredAlgorithmChoice/);
+    assert.match(pushActions, /groceryview:user-preferences-changed/);
+    assert.match(pushActions, /buildMyFlyerRefreshUrl\(\{\s*algorithm,/);
+  });
 });
