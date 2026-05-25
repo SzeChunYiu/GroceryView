@@ -111,6 +111,7 @@ describe('City Gross Klubben offer connector', () => {
       unitPriceUnit: 'kg',
       hasDiscount: true,
       hasPromotion: true,
+      is_member_price: true,
       isCurrentWeekDiscount: true,
       isLongTimeDiscount: false,
       isMembersOnlyPrice: true,

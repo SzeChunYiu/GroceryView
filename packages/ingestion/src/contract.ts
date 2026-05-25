@@ -18,6 +18,11 @@ const fuelSourceKinds = ['operator_public_price_page', 'crowd_station_report'] a
 
 const nonEmptyString = z.string().trim().min(1);
 const optionalNonEmptyString = nonEmptyString.optional();
+const optionalBarcodeString = z.preprocess((value) => {
+  if (typeof value !== 'string') return value;
+  const barcode = value.trim();
+  return barcode ? barcode : null;
+}, nonEmptyString.nullable().optional());
 const nonNegativeNumber = z.number().finite().min(0);
 const positiveNumber = z.number().finite().positive();
 
@@ -40,7 +45,7 @@ export const ingestRowSchema = z.object({
   canonicalName: nonEmptyString,
   productId: nonEmptyString,
   categoryId: nonEmptyString,
-  barcode: optionalNonEmptyString,
+  barcode: optionalBarcodeString,
   productKind: z.enum(productKinds).optional(),
   commodityId: optionalNonEmptyString,
   fuelGradeId: optionalNonEmptyString,

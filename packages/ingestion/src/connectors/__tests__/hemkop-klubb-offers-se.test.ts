@@ -19,6 +19,12 @@ function discount(overrides: Partial<HemkopWeeklyDiscount> = {}): HemkopWeeklyDi
     storeId: '4003',
     storeName: 'Hemköp Göteborg Masthuggstorget',
     city: 'Göteborg',
+    channel: 'store',
+    isMemberPrice: true,
+    isCouponPrice: false,
+    isSubscriptionPrice: false,
+    isClearance: false,
+    multiBuy: null,
     campaignType: 'PERSONAL_GENERAL',
     promotionType: 'DISCOUNT',
     price: 49.9,
@@ -38,7 +44,7 @@ function discount(overrides: Partial<HemkopWeeklyDiscount> = {}): HemkopWeeklyDi
     sourceUrl: 'https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=10',
     retrievedAt: RETRIEVED_AT,
     ...overrides
-  };
+  } as HemkopWeeklyDiscount;
 }
 
 describe('Hemkop Klubb offer connector', () => {

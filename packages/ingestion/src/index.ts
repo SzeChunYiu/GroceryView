@@ -2998,7 +2998,7 @@ export type RetailerProductInput = {
   canonicalName: string;
   productId: string;
   categoryId: string;
-  barcode?: string;
+  barcode?: string | null;
   productKind?: 'branded' | 'commodity';
   commodityId?: string;
   fuelGradeId?: FuelGradeId;
@@ -3052,7 +3052,7 @@ export type IngestedProduct = {
   id: string;
   canonicalName: string;
   brand?: string;
-  barcode?: string;
+  barcode?: string | null;
   categoryId: string;
   productKind: 'branded' | 'commodity';
   commodityId?: string;

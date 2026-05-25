@@ -7057,7 +7057,7 @@ describe('daily ingestion runner', () => {
     ]);
   });
 
-  it('keeps daily products with null and empty barcodes on separate slug upsert paths', async () => {
+  it('normalizes daily products with null and blank barcodes onto no-barcode slug upsert paths', async () => {
     const executor = new DailyIngestionExecutor();
     const result = await runDailyIngestion({
       executor,
@@ -7106,6 +7106,7 @@ describe('daily ingestion runner', () => {
     });
 
     assert.equal(result.acceptedCount, 2);
+    assert.equal(result.rejectedCount, 0);
     const productInsert = executor.calls.find((call) => call.sql.includes('jsonb_to_recordset') && call.sql.includes('insert into products'));
     assert.ok(productInsert, 'daily ingestion should batch upsert null-barcode products');
     assert.match(productInsert.sql, /where barcode is not null/);
