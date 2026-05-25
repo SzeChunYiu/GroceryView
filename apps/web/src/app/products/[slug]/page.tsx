@@ -57,6 +57,18 @@ const historyWindowDefinitions = [
 ] as const;
 const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const;
 
+type CounterPriceType = 'shelf' | 'counter_fish' | 'counter_deli';
+
+const counterPriceLabels: Record<CounterPriceType, string> = {
+  shelf: 'Shelf price',
+  counter_fish: 'Fish counter price',
+  counter_deli: 'Deli counter price'
+};
+
+function priceTypeForChainRow(row: { priceType?: string | null; chain: string; priceUnit?: string }) {
+  return row.priceType === 'counter_fish' || row.priceType === 'counter_deli' ? row.priceType : 'shelf';
+}
+
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
@@ -1784,6 +1796,9 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
             {chainRows.map((row) => (
               <div className="rounded-2xl border border-slate-200 p-4" key={row.chain}>
                 <p className="text-lg font-black capitalize">{row.chain}</p>
+                <p className="mt-1 inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-slate-700" data-counter-price-type={priceTypeForChainRow(row)}>
+                  {counterPriceLabels[priceTypeForChainRow(row)]}
+                </p>
                 <p className="mt-1 text-3xl font-black text-emerald-800">{formatSek(row.price)}</p>
                 <p className="text-sm text-slate-600">{row.priceUnit || 'Unit not reported'}{row.savings ? ` · listed saving ${formatSek(row.savings)}` : ''}</p>
               </div>

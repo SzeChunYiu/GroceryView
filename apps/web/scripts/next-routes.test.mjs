@@ -3004,6 +3004,22 @@ ${seo}`;
     assert.doesNotMatch(canonicalProductRoute, /@\/lib\/demo-data|@\/components\/sample-data/);
   });
 
+  it('labels generated shelf and counter price rows distinctly on product pages', async () => {
+    const productRoute = await read('src/app/products/[slug]/page.tsx');
+    const generatedProductPriceRows = [
+      { priceType: 'shelf', visibleLabel: 'Shelf price' },
+      { priceType: 'counter_fish', visibleLabel: 'Fish counter price' },
+      { priceType: 'counter_deli', visibleLabel: 'Deli counter price' }
+    ];
+
+    for (const row of generatedProductPriceRows) {
+      assert.match(productRoute, new RegExp(row.priceType));
+      assert.match(productRoute, new RegExp(row.visibleLabel));
+    }
+    assert.match(productRoute, /data-counter-price-type=\{priceTypeForChainRow\(row\)\}/);
+    assert.match(productRoute, /counterPriceLabels\[priceTypeForChainRow\(row\)\]/);
+  });
+
   it('renders category pages with a DB hierarchy-backed breadcrumb component', async () => {
     const categoryRoute = await read('src/app/categories/[slug]/page.tsx');
     const breadcrumb = await read('src/components/Breadcrumb.tsx');
