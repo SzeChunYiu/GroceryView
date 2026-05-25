@@ -156,6 +156,42 @@ export type ChainIndexTrendReport = {
   series: ChainIndexTrendSeries[];
 };
 
+export type PartnerStoreIssueSeverity = 'clear' | 'watch';
+
+export type PartnerStoreDashboardStore = {
+  chainKey: string;
+  chainName: string;
+  visibleProducts: number;
+  matchedProducts: number;
+  categoriesCovered: number;
+  lowestPriceWins: number;
+  coveragePercent: number;
+  visibilityLabel: string;
+  catalogueCoverageLabel: string;
+  reportedIssueCount: number;
+  reportedIssueSummary: string;
+  issueSeverity: PartnerStoreIssueSeverity;
+  nextAction: string;
+};
+
+export type PartnerStoreIssueSummary = {
+  id: string;
+  label: string;
+  count: number;
+  severity: PartnerStoreIssueSeverity;
+  detail: string;
+};
+
+export type PartnerStoreDashboardSummary = {
+  sourceLabel: string;
+  totalVisibleProducts: number;
+  matchedProducts: number;
+  sharedCategoryCount: number;
+  stores: PartnerStoreDashboardStore[];
+  issues: PartnerStoreIssueSummary[];
+  guardrails: string[];
+};
+
 type WeeklyCampaignDiscount = {
   startDate: string;
   comparePriceText: string;
@@ -246,6 +282,92 @@ export function buildChainIndexTrendSeries(): ChainIndexTrendReport {
   return axfoodWeeklyTrendReport;
 }
 
+const PARTNER_STORE_CHAINS = [
+  { key: 'willys', name: 'Willys' },
+  { key: 'hemkop', name: 'Hemköp' }
+] as const;
+
+function hasPartnerPrice(product: (typeof axfoodProducts)[number], chainKey: string): boolean {
+  const price = product.chains[chainKey]?.price;
+  return typeof price === 'number' && Number.isFinite(price) && price > 0;
+}
+
+export function buildPartnerStoreDashboardSummary(): PartnerStoreDashboardSummary {
+  const visibleProducts = axfoodProducts.filter((product) => PARTNER_STORE_CHAINS.some((chain) => hasPartnerPrice(product, chain.key)));
+  const matchedProducts = visibleProducts.filter((product) => PARTNER_STORE_CHAINS.every((chain) => hasPartnerPrice(product, chain.key)));
+  const unmatchedProducts = visibleProducts.length - matchedProducts.length;
+  const sharedCategoryCount = new Set(matchedProducts.map((product) => normaliseCategory(product.category, product.name, product.brand))).size;
+
+  const stores = PARTNER_STORE_CHAINS.map((chain) => {
+    const chainProducts = visibleProducts.filter((product) => hasPartnerPrice(product, chain.key));
+    const chainMatchedProducts = chainProducts.filter((product) => PARTNER_STORE_CHAINS.every((partner) => hasPartnerPrice(product, partner.key)));
+    const categoriesCovered = new Set(chainProducts.map((product) => normaliseCategory(product.category, product.name, product.brand))).size;
+    const lowestPriceWins = chainProducts.filter((product) => product.lowestChain === chain.key).length;
+    const missingCounterpartCount = chainProducts.length - chainMatchedProducts.length;
+    const coveragePercent = chainProducts.length ? chainMatchedProducts.length / chainProducts.length : 0;
+
+    return {
+      chainKey: chain.key,
+      chainName: chain.name,
+      visibleProducts: chainProducts.length,
+      matchedProducts: chainMatchedProducts.length,
+      categoriesCovered,
+      lowestPriceWins,
+      coveragePercent,
+      visibilityLabel: `${chainProducts.length.toLocaleString('sv-SE')} visible catalogue rows`,
+      catalogueCoverageLabel: `${chainMatchedProducts.length.toLocaleString('sv-SE')} cross-chain matches across ${categoriesCovered} coarse categories`,
+      reportedIssueCount: missingCounterpartCount + 1,
+      reportedIssueSummary:
+        missingCounterpartCount > 0
+          ? `${missingCounterpartCount.toLocaleString('sv-SE')} rows need a partner-chain counterpart; branch inventory is not connected.`
+          : 'No unmatched Axfood rows in this snapshot; branch inventory is still not connected.',
+      issueSeverity: 'watch',
+      nextAction:
+        missingCounterpartCount > 0
+          ? 'Review unmatched catalogue rows before promoting partner coverage.'
+          : 'Confirm branch-level inventory or issue-report integrations before launch.'
+    } satisfies PartnerStoreDashboardStore;
+  });
+
+  return {
+    sourceLabel: 'Axfood chain price snapshot · Willys/Hemköp online catalogue rows',
+    totalVisibleProducts: visibleProducts.length,
+    matchedProducts: matchedProducts.length,
+    sharedCategoryCount,
+    stores,
+    issues: [
+      {
+        id: 'catalogue-counterparts',
+        label: 'Catalogue rows missing partner counterparts',
+        count: unmatchedProducts,
+        severity: unmatchedProducts > 0 ? 'watch' : 'clear',
+        detail:
+          unmatchedProducts > 0
+            ? 'Rows visible in one partner catalogue but not the other stay out of matched comparison coverage.'
+            : 'Every currently visible partner row has a Willys/Hemköp counterpart in the static snapshot.'
+      },
+      {
+        id: 'branch-inventory',
+        label: 'Branch-level inventory feed',
+        count: PARTNER_STORE_CHAINS.length,
+        severity: 'watch',
+        detail: 'The snapshot is chain-wide online catalogue data; partner stores still need branch inventory or availability feeds before store-level claims.'
+      },
+      {
+        id: 'customer-reported-issues',
+        label: 'Customer-reported store issues',
+        count: 0,
+        severity: 'clear',
+        detail: 'No production customer issue-report rows are bundled with this repo snapshot, so the admin shell shows the empty-state explicitly.'
+      }
+    ],
+    guardrails: [
+      'Visibility counts are derived from captured online catalogue prices only.',
+      'Catalogue coverage counts matched Willys/Hemköp products and never estimates missing prices.',
+      'Reported issue totals only include verifiable snapshot gaps or an explicit empty production-report state.'
+    ]
+  };
+}
 
 function medianPrice(values: number[]) {
   const sorted = [...values].sort((a, b) => a - b);
