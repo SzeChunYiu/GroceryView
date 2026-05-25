@@ -3021,6 +3021,23 @@ ${seo}`;
     assert.match(sitemap, /entry\('\/cookies'/);
   });
 
+  it('ships Nordic per-country terms with consumer protection clauses', async () => {
+    const terms = await read('src/app/[country]/terms/page.tsx');
+
+    assert.match(terms, /generateStaticParams/);
+    assert.match(terms, /slug: 'norway'/);
+    assert.match(terms, /slug: 'iceland'/);
+    assert.match(terms, /Forbrukerkjøpsloven/);
+    assert.match(terms, /Forbrukertilsynet/);
+    assert.match(terms, /Forbrukerradet/);
+    assert.match(terms, /Neytendastofa/);
+    assert.match(terms, /Kærunefnd vöru- og þjónustukaupa/);
+    assert.match(terms, /mandatory consumer protection rules/);
+    assert.match(terms, /notFound\(\)/);
+    assert.match(terms, /\/\$\{terms\.slug\}\/terms/);
+    assert.doesNotMatch(terms, /demo-data|sample-data|mock session|TODO|console\./i);
+  });
+
 
   it('wires login to the production auth session exchange without mock accounts', async () => {
     const login = await read('src/app/login/page.tsx');
