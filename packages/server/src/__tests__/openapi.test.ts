@@ -58,6 +58,7 @@ describe('buildOpenApiDocument', () => {
       '/api/nutrition/value',
       '/api/openapi.json',
       '/api/pantry/replenishment',
+      '/api/price-drops',
       '/api/prices/freshness',
       '/api/privacy/deletion-plan',
       '/api/privacy/export',

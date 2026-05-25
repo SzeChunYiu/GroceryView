@@ -34,6 +34,7 @@ import {
   createPostgresCatalogReader,
   createPostgresRepository,
   createPostgresSourceRecordReader,
+  createPostgresWeeklyPriceDropDigestReader,
   queryRollingAverageDealReport,
   buildUserAccountDeletionQueries,
   type BudgetRecord,
@@ -43,7 +44,8 @@ import {
   type ReceiptUploadRecord,
   type RollingAverageDealReport,
   type SourceRunHealthCheckResult,
-  type SourceRunHealthReport
+  type SourceRunHealthReport,
+  type WeeklyPriceDropDigestItem
 } from '@groceryview/db';
 import {
   buildSubscriptionCheckoutPlan,
@@ -174,6 +176,7 @@ export type AuthOptions = {
   scanUploadWriteReadinessProvider?: () => Promise<ScanUploadWriteReadinessReport>;
   flyerOffersProvider?: (query: FlyerOffersProviderQuery) => Promise<FlyerOfferReport>;
   dealsProvider?: (query: DealsProviderQuery) => Promise<RollingAverageDealReport>;
+  priceDropsProvider?: (query: PriceDropsProviderQuery) => Promise<WeeklyPriceDropDigestItem[]>;
   storeFlyerOffersProvider?: (storeId: string, query: StoreFlyerOffersProviderQuery) => Promise<StoreFlyerOfferReport | null>;
   watchlistPriceAlertsProvider?: (userId: string) => Promise<WatchlistPriceAlertReport>;
   watchlistPriceAlertWriter?: (userId: string, request: WatchlistPriceAlertRequest) => Promise<WatchlistPriceAlertReport>;
@@ -276,6 +279,7 @@ export type RuntimeHandlerOptions = {
   scanUploadWriteReadinessProvider?: () => Promise<ScanUploadWriteReadinessReport>;
   flyerOffersProvider?: (query: FlyerOffersProviderQuery) => Promise<FlyerOfferReport>;
   dealsProvider?: (query: DealsProviderQuery) => Promise<RollingAverageDealReport>;
+  priceDropsProvider?: (query: PriceDropsProviderQuery) => Promise<WeeklyPriceDropDigestItem[]>;
   storeFlyerOffersProvider?: (storeId: string, query: StoreFlyerOffersProviderQuery) => Promise<StoreFlyerOfferReport | null>;
   watchlistPriceAlertsProvider?: (userId: string) => Promise<WatchlistPriceAlertReport>;
   watchlistPriceAlertWriter?: (userId: string, request: WatchlistPriceAlertRequest) => Promise<WatchlistPriceAlertReport>;
@@ -296,6 +300,12 @@ export type FlyerOffersProviderQuery = {
 
 export type DealsProviderQuery = {
   category?: string;
+};
+
+export type PriceDropsProviderQuery = {
+  since: string;
+  until: string;
+  limit: number;
 };
 
 export type StoreFlyerOffersProviderQuery = {
@@ -859,6 +869,34 @@ function cursorPaginatedEnvelope<T>(items: T[], params: URLSearchParams) {
       'Search result order remains the API sort order before pagination, so cursors do not fabricate ranking changes.',
       'Missing or invalid cursor tokens fail closed instead of silently returning the first page.'
     ]
+  };
+}
+
+const priceDropsQuerySchema = z.object({
+  since: z.string().datetime().optional(),
+  until: z.string().datetime().optional(),
+  limit: z.coerce.number().int().min(1).max(10).optional()
+}).strict();
+
+function priceDropsQueryFromUrl(url: URL, now: Date): PriceDropsProviderQuery | Response {
+  const allowedParams = new Set(['since', 'until', 'limit']);
+  for (const key of url.searchParams.keys()) {
+    if (!allowedParams.has(key)) return errorResponse(400, `Unsupported price-drops query parameter: ${key}.`);
+  }
+
+  const parsed = priceDropsQuerySchema.safeParse(Object.fromEntries(url.searchParams));
+  if (!parsed.success) {
+    return errorResponse(400, `Invalid price-drops query: ${parsed.error.issues.map((issue) => issue.message).join('; ')}`);
+  }
+
+  const until = parsed.data.until ?? now.toISOString();
+  const since = parsed.data.since ?? new Date(Date.parse(until) - 7 * 24 * 60 * 60 * 1000).toISOString();
+  if (Date.parse(since) >= Date.parse(until)) return errorResponse(400, 'since must be earlier than until.');
+
+  return {
+    since,
+    until,
+    limit: parsed.data.limit ?? 10
   };
 }
 
@@ -2247,6 +2285,25 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         return cachedJsonResponse(authOptions.apiResponseCache, url, apiHotEndpointCacheTtlSeconds[path], () => authOptions.dealsProvider!(query));
       }
 
+      if (method === 'GET' && path === '/api/price-drops') {
+        const query = priceDropsQueryFromUrl(url, authOptions.now ?? new Date());
+        if (query instanceof Response) return query;
+        if (!authOptions.priceDropsProvider) return errorResponse(503, 'Price drops provider is not configured.');
+        const items = await authOptions.priceDropsProvider(query);
+        return jsonResponse({
+          window: {
+            since: query.since,
+            until: query.until
+          },
+          count: items.length,
+          items,
+          guardrails: [
+            'Price drops are sourced from persisted latest_prices rows where regular_price is greater than the current observed price.',
+            'The API returns an empty item list instead of fabricating drops when no source-backed rows match the requested window.'
+          ]
+        });
+      }
+
       if (method === 'GET' && path === '/api/deals/flyer-offers') {
         const query = {
           asOf: url.searchParams.get('asOf') ?? undefined,
@@ -3396,6 +3453,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/categories': { get: publicOperation('List the category tree with product counts for navigation and filter sidebars.') },
       '/api/categories/{category}/market': { get: publicOperation('Get category market report with current price, 1M move, 52-week range, and verified evidence.') },
       '/api/deals': { get: publicOperation('Get current items priced below their 30-day rolling average, sorted by discount percentage.') },
+      '/api/price-drops': { get: publicOperation('Get source-backed latest price drops for a requested observation window.') },
       '/api/deals/discounts': { get: publicOperation('Get active weekly discounts by branch, chain, category, or product with source evidence.') },
       '/api/deals/flyer-offers': { get: publicOperation('Get active weekly flyer offers by branch, chain, category, or product with source evidence.') },
       '/api/retailers': { get: publicOperation('List supported retailers with logo and website metadata.') },
@@ -3944,6 +4002,7 @@ export function buildRuntimeAuthOptions(config: RuntimeConfig, options: RuntimeH
     })),
     flyerOffersProvider: options.flyerOffersProvider,
     dealsProvider: options.dealsProvider,
+    priceDropsProvider: options.priceDropsProvider,
     storeFlyerOffersProvider: options.storeFlyerOffersProvider,
     watchlistPriceAlertsProvider: options.watchlistPriceAlertsProvider,
     watchlistPriceAlertWriter: options.watchlistPriceAlertWriter,
@@ -4033,6 +4092,7 @@ function createRuntimeRepositoryResource(config: RuntimeConfig, options: Runtime
   catalogCoverageProvider?: () => Promise<CatalogCoverageReport>;
   flyerOffersProvider?: (query: FlyerOffersProviderQuery) => Promise<FlyerOfferReport>;
   dealsProvider?: (query: DealsProviderQuery) => Promise<RollingAverageDealReport>;
+  priceDropsProvider?: (query: PriceDropsProviderQuery) => Promise<WeeklyPriceDropDigestItem[]>;
   storeFlyerOffersProvider?: (storeId: string, query: StoreFlyerOffersProviderQuery) => Promise<StoreFlyerOfferReport | null>;
   watchlistPriceAlertsProvider?: (userId: string) => Promise<WatchlistPriceAlertReport>;
   watchlistPriceAlertWriter?: (userId: string, request: WatchlistPriceAlertRequest) => Promise<WatchlistPriceAlertReport>;
@@ -4070,6 +4130,7 @@ function createRuntimeRepositoryResource(config: RuntimeConfig, options: Runtime
       : {}),
     flyerOffersProvider: (query) => queryFlyerOffersFromPostgres(executor, query),
     dealsProvider: (query) => queryDealsFromPostgres(executor, query),
+    priceDropsProvider: (query) => createPostgresWeeklyPriceDropDigestReader(executor).listWeeklyPriceDropDigest(query),
     storeFlyerOffersProvider: (storeId, query) => queryStoreFlyerOffersFromPostgres(executor, storeId, query),
     watchlistPriceAlertsProvider: (userId) => queryWatchlistPriceAlertsFromPostgres(executor, repository, userId),
     watchlistPriceAlertWriter: (userId, request) => upsertWatchlistPriceAlertInPostgres(executor, repository, userId, request),
@@ -4091,6 +4152,7 @@ function createRuntimeHttpServiceFromConfig(config: RuntimeConfig, options: Runt
     scanProviderReadinessProvider: options.scanProviderReadinessProvider,
     flyerOffersProvider: options.flyerOffersProvider ?? resource.flyerOffersProvider,
     dealsProvider: options.dealsProvider ?? resource.dealsProvider,
+    priceDropsProvider: options.priceDropsProvider ?? resource.priceDropsProvider,
     storeFlyerOffersProvider: options.storeFlyerOffersProvider ?? resource.storeFlyerOffersProvider,
     watchlistPriceAlertsProvider: options.watchlistPriceAlertsProvider ?? resource.watchlistPriceAlertsProvider,
     watchlistPriceAlertWriter: options.watchlistPriceAlertWriter ?? resource.watchlistPriceAlertWriter
