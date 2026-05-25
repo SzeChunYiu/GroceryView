@@ -9,7 +9,14 @@ export type DietaryProfilePreferences = {
   updatedAt: string;
 };
 
+export type ProductDiscoverySafetyDecision = {
+  shouldHide: boolean;
+  hiddenReasons: string[];
+  warnings: string[];
+};
+
 export const DIETARY_PROFILE_STORAGE_KEY = 'groceryview:dietary-profile:v1';
+export const DIETARY_PROFILE_CHANGED_EVENT = 'groceryview:dietary-profile-changed';
 
 export const DEFAULT_DIETARY_PROFILE_PREFERENCES: DietaryProfilePreferences = {
   userId: 'local-account',
@@ -54,6 +61,15 @@ const MAX_LEARNED_VALUES = 6;
 
 function normalizedValue(value?: string | null) {
   return value?.trim().toLowerCase() ?? '';
+}
+
+function normalizedSafetyTag(value?: string | null) {
+  const normalized = normalizedValue(value).replace(/[\s_-]+/g, '');
+  if (normalized === 'peanuts' || normalized === 'treenuts' || normalized === 'tree nuts') return 'nuts';
+  if (normalized === 'glutenfree') return 'glutenfree';
+  if (normalized === 'lactosefree' || normalized === 'laktosfree') return 'laktosfree';
+  if (normalized === 'egg') return 'eggs';
+  return normalized;
 }
 
 function uniquePreferenceValues(values: (string | null | undefined)[]) {
@@ -124,11 +140,45 @@ export function saveDietaryProfilePreferences(preferences: Partial<DietaryProfil
       ...preferences,
       updatedAt: new Date().toISOString()
     })));
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent(DIETARY_PROFILE_CHANGED_EVENT));
+    }
 
     return true;
   } catch {
     return false;
   }
+}
+
+export function productDiscoverySafetyDecision(
+  product: {
+    safetyProfile: {
+      allergenTags: readonly string[];
+      dietaryTags: readonly string[];
+    };
+  },
+  preferences: DietaryProfilePreferences = DEFAULT_DIETARY_PROFILE_PREFERENCES
+): ProductDiscoverySafetyDecision {
+  const allergenTags = new Set(product.safetyProfile.allergenTags.map(normalizedSafetyTag));
+  const dietaryTags = new Set(product.safetyProfile.dietaryTags.map(normalizedSafetyTag));
+  const hiddenReasons = preferences.allergies
+    .map(normalizedSafetyTag)
+    .filter((tag) => tag.length > 0 && allergenTags.has(tag))
+    .map((tag) => `Hidden by account allergen exclusion: ${tag}`);
+  const avoidedWarnings = preferences.avoidedIngredients
+    .map(normalizedSafetyTag)
+    .filter((tag) => tag.length > 0 && allergenTags.has(tag))
+    .map((tag) => `Matches avoided ingredient evidence: ${tag}`);
+  const dietWarnings = preferences.diets
+    .map(normalizedSafetyTag)
+    .filter((tag) => tag.length > 0 && !dietaryTags.has(tag))
+    .map((tag) => `Missing account dietary-rule evidence: ${tag}`);
+
+  return {
+    shouldHide: hiddenReasons.length > 0,
+    hiddenReasons,
+    warnings: [...avoidedWarnings, ...dietWarnings]
+  };
 }
 
 export function normalizeHouseholdPricePreferences(preferences: Partial<HouseholdPricePreferences> | null | undefined): HouseholdPricePreferences {

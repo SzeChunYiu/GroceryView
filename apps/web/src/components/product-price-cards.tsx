@@ -10,6 +10,13 @@ import { buildPriceHistorySparklinePath } from '@/lib/price-events';
 import { volatilityBadgeMethodology } from '@/lib/price-intelligence';
 import type { SearchExplanationBadge } from '@/lib/search-filters';
 import { listFriendPriceSightingsForProduct } from '@/lib/social';
+import {
+  DEFAULT_DIETARY_PROFILE_PREFERENCES,
+  DIETARY_PROFILE_CHANGED_EVENT,
+  loadDietaryProfilePreferences,
+  productDiscoverySafetyDecision,
+  type DietaryProfilePreferences
+} from '@/lib/user-preferences';
 import type { AdaptiveProductCard } from '@/lib/verified-data';
 
 type CompareMode = 'adaptive' | 'total' | 'unit';
@@ -63,8 +70,12 @@ function safetyWarnings(card: AdaptiveProductCard, preferences: ProductSafetyPre
   return [...allergenWarnings, ...missingDietaryWarnings];
 }
 
-function SafetyWarningBanner({ card, preferences }: Readonly<{ card: AdaptiveProductCard; preferences: ProductSafetyPreferences }>) {
-  const warnings = safetyWarnings(card, preferences);
+function SafetyWarningBanner({
+  accountWarnings,
+  card,
+  preferences
+}: Readonly<{ accountWarnings: string[]; card: AdaptiveProductCard; preferences: ProductSafetyPreferences }>) {
+  const warnings = [...safetyWarnings(card, preferences), ...accountWarnings];
 
   if (warnings.length === 0) {
     return null;
@@ -194,6 +205,7 @@ export function ProductPriceCards({
 }>) {
   const [compareMode, setCompareMode] = useState<CompareMode>('adaptive');
   const [safetyPreferences, setSafetyPreferences] = useState<ProductSafetyPreferences>(emptySafetyPreferences);
+  const [dietaryProfile, setDietaryProfile] = useState<DietaryProfilePreferences>(DEFAULT_DIETARY_PROFILE_PREFERENCES);
 
   useEffect(() => {
     const stored = window.localStorage.getItem(storageKey);
@@ -201,23 +213,35 @@ export function ProductPriceCards({
       setCompareMode(stored);
     }
     setSafetyPreferences(readStoredSafetyPreferences());
+    setDietaryProfile(loadDietaryProfilePreferences());
 
     function refreshSafetyPreferences() {
       setSafetyPreferences(readStoredSafetyPreferences());
+      setDietaryProfile(loadDietaryProfilePreferences());
     }
 
     window.addEventListener(SAFETY_PREFERENCES_CHANGED_EVENT, refreshSafetyPreferences);
+    window.addEventListener(DIETARY_PROFILE_CHANGED_EVENT, refreshSafetyPreferences);
     window.addEventListener('storage', refreshSafetyPreferences);
     return () => {
       window.removeEventListener(SAFETY_PREFERENCES_CHANGED_EVENT, refreshSafetyPreferences);
+      window.removeEventListener(DIETARY_PROFILE_CHANGED_EVENT, refreshSafetyPreferences);
       window.removeEventListener('storage', refreshSafetyPreferences);
     };
   }, []);
 
-  const sortedCards = useMemo(() => [...cards].sort((left, right) => {
+  const safetyDecisions = useMemo(() => new Map(cards.map((card) => [
+    card.slug,
+    productDiscoverySafetyDecision(card, dietaryProfile)
+  ])), [cards, dietaryProfile]);
+  const hiddenByAccountExclusions = useMemo(
+    () => cards.filter((card) => safetyDecisions.get(card.slug)?.shouldHide).length,
+    [cards, safetyDecisions]
+  );
+  const sortedCards = useMemo(() => cards.filter((card) => !safetyDecisions.get(card.slug)?.shouldHide).sort((left, right) => {
     const delta = sortValue(left, compareMode) - sortValue(right, compareMode);
     return delta === 0 ? left.name.localeCompare(right.name, 'sv') : delta;
-  }), [cards, compareMode]);
+  }), [cards, compareMode, safetyDecisions]);
 
   function chooseMode(value: CompareMode) {
     setCompareMode(value);
@@ -233,6 +257,9 @@ export function ProductPriceCards({
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{intro}</p>
           <p className="mt-2 text-xs font-bold text-amber-800">No synthetic unit prices: unit rows are derived only from observed price plus reported package size.</p>
           <p className="mt-1 text-xs font-bold text-amber-800">No synthetic product images: cards render only source image URLs from Axfood, OpenPrices, or OpenFoodFacts rows.</p>
+          {hiddenByAccountExclusions > 0 ? (
+            <p className="mt-1 text-xs font-bold text-rose-800">{hiddenByAccountExclusions} product{hiddenByAccountExclusions === 1 ? '' : 's'} hidden by account allergen exclusions.</p>
+          ) : null}
         </div>
         <div className="rounded-2xl border border-slate-200 bg-slate-50 p-2">
           <p className="px-2 pb-2 text-xs font-black uppercase tracking-[0.18em] text-slate-500">Compare by:</p>
@@ -311,7 +338,11 @@ export function ProductPriceCards({
             <SearchExplanationBadges badges={(card as ProductCardWithSearchExplanations).searchExplanationBadges} />
             <p className="mt-3 text-sm leading-6 text-slate-600">{card.sourceLabel}</p>
             <FriendPriceSightingsPanel card={card} />
-            <SafetyWarningBanner card={card} preferences={safetyPreferences} />
+            <SafetyWarningBanner
+              accountWarnings={safetyDecisions.get(card.slug)?.warnings ?? []}
+              card={card}
+              preferences={safetyPreferences}
+            />
             <PriceHistorySparkline card={card} />
             <div className="mt-2">
               <ConfidenceBadge

@@ -6,6 +6,7 @@ import { DietaryProfileOnboarding } from '@/components/diet-filter-picker';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { groupPreferredBrandControls, personalizationTransparencySignals } from '@/lib/personalization';
 import { routeMetadata } from '@/lib/seo';
+import { DEFAULT_DIETARY_PROFILE_PREFERENCES } from '@/lib/user-preferences';
 
 export function generateMetadata() {
   return routeMetadata('/settings');
@@ -14,6 +15,11 @@ export function generateMetadata() {
 const settingsValidationErrorAnnouncements = [
   'Email and export request validation errors render in role="alert" live regions.',
   'Screen readers are notified immediately when settings form errors appear.'
+];
+const productDiscoveryExclusionRules = [
+  'Saved allergies hide matching product cards from discovery results.',
+  'Saved dietary rules warn when product labels do not prove the diet match.',
+  'Avoided ingredients warn on matching allergen evidence before meal planning.'
 ];
 
 const dataExportContract = buildPrivacyExport(
@@ -83,6 +89,21 @@ export default function SettingsPage() {
           Save dietary exclusions, certification preferences, and nutrition priorities before recommendations are trusted. The same durable profile can be updated later from settings.
         </p>
         <DietaryProfileOnboarding className="mt-4" />
+      </Card>
+
+      <Card className="mt-6 border-rose-200 bg-rose-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-rose-800">Product discovery exclusions</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Account-level allergen and dietary safety rules</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+          Product cards read the saved dietary profile from <code className="rounded bg-white/80 px-1 py-0.5 text-rose-900">{DEFAULT_DIETARY_PROFILE_PREFERENCES.userId}</code> defaults until a signed-in account syncs preferences.
+        </p>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          {productDiscoveryExclusionRules.map((rule) => (
+            <p className="rounded-2xl bg-white/85 p-4 text-sm font-bold text-rose-950" key={rule}>
+              {rule}
+            </p>
+          ))}
+        </div>
       </Card>
 
       <Card className="mt-6 border-cyan-200 bg-cyan-50">
