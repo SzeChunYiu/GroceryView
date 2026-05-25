@@ -190,12 +190,21 @@ export function ProductPriceCards({
   cards,
   eyebrow = 'Adaptive product cards',
   title = 'Total and comparable unit prices together',
-  intro = 'Every card shows the actual observed pack price plus a comparable unit price when package size evidence exists.'
+  intro = 'Every card shows the actual observed pack price plus a comparable unit price when package size evidence exists.',
+  recommendationItems = []
 }: Readonly<{
   cards: AdaptiveProductCard[];
   eyebrow?: string;
   title?: string;
   intro?: string;
+  recommendationItems?: ReadonlyArray<{
+    slug: string;
+    name: string;
+    brand?: string | null;
+    totalPriceLabel?: string;
+    reason: string;
+    score: number;
+  }>;
 }>) {
   const [compareMode, setCompareMode] = useState<CompareMode>('adaptive');
   const [safetyPreferences, setSafetyPreferences] = useState<ProductSafetyPreferences>(emptySafetyPreferences);
@@ -257,6 +266,21 @@ export function ProductPriceCards({
           </div>
         </div>
       </div>
+      {recommendationItems.length > 0 ? (
+        <div className="mt-5 rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-900">Recommended for you</p>
+          <div className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
+            {recommendationItems.map((item) => (
+              <a className="rounded-2xl bg-white p-3 text-sm shadow-sm hover:ring-2 hover:ring-emerald-300" href={`/products/${item.slug}`} key={item.slug}>
+                <p className="font-black text-slate-950">{item.name}</p>
+                <p className="mt-1 text-xs font-semibold text-slate-600">{item.brand ?? 'Brand not reported'} · {item.totalPriceLabel ?? 'price pending'}</p>
+                <p className="mt-2 rounded-xl bg-emerald-50 p-2 text-xs font-bold text-emerald-950">{item.reason}</p>
+                <p className="mt-1 text-[0.65rem] font-black uppercase tracking-[0.14em] text-emerald-800">score {item.score}</p>
+              </a>
+            ))}
+          </div>
+        </div>
+      ) : null}
       <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {sortedCards.map((card, index) => (
           <div className="relative" key={card.slug}>
