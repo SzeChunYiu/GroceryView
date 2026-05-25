@@ -48,6 +48,12 @@ function resolveLocalModule(fromRelative, specifier) {
   throw new Error(`Unable to resolve ${specifier} from ${fromRelative}`);
 }
 
+function relativeFromRoot(absolutePath) {
+  return normalize(absolutePath.startsWith(rootPath)
+    ? absolutePath.slice(rootPath.endsWith('/') ? rootPath.length : rootPath.length + 1)
+    : absolutePath);
+}
+
 function loadTsModule(relative, mocks = {}) {
   const absolute = normalize(join(rootPath, relative));
   const shouldCache = Object.keys(mocks).length === 0;
@@ -79,8 +85,8 @@ function loadTsModule(relative, mocks = {}) {
       return new Proxy({}, { get: () => Icon });
     }
     if (specifier.startsWith('@/') || specifier.startsWith('.')) {
-      const resolved = resolveLocalModule(normalize(absolute.slice(rootPath.length + 1)), specifier);
-      return loadTsModule(normalize(resolved.slice(rootPath.length + 1)), mocks);
+      const resolved = resolveLocalModule(relativeFromRoot(absolute), specifier);
+      return loadTsModule(relativeFromRoot(resolved), mocks);
     }
     return require(specifier);
   };
@@ -238,8 +244,8 @@ test('trending feed handler payload returns fixture JSON shape with card evidenc
   const payload = await response.json();
 
   assert.equal(payload.city, 'Malmo');
-  assert.deepEqual(payload.filters, { category: '', chain: '' });
-  assert.deepEqual(payload.personalization.signals, ['favoriteBrands', 'dietary', 'nearbyChains', 'clicked', 'household category history']);
+  assert.deepEqual({ ...payload.filters }, { category: '', chain: '' });
+  assert.deepEqual([...payload.personalization.signals], ['favoriteBrands', 'dietary', 'nearbyChains', 'clicked', 'household category history']);
   assert.equal(payload.cards.length, 1);
   assert.deepEqual(Object.keys(payload.cards[0]).filter((key) => [
     'productName',

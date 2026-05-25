@@ -12,8 +12,7 @@ import {
   type CommunityReviewVote
 } from '@/lib/reviews';
 import { COMMUNITY_REVIEW_PROMPT_COPY, COMMUNITY_REVIEW_PROMPTS } from '@/lib/community-reviews';
-import { ReviewPromptForm } from '@/components/review-prompt-form';
-import { sourceDiscrepancyReviewContract } from '@/lib/verified-data';
+import { sourceDiscrepancyReviewContract } from '@/lib/source-discrepancy-review';
 
 // ReviewPromptForm renders COMMUNITY_REVIEW_PROMPTS with aria-label={`${prompt.label} rating`}.
 
@@ -22,11 +21,7 @@ type BrowserSession = { accessToken: string; userId: string };
 type ReviewDecision = 'approve' | 'hide' | 'escalate';
 type ApiReviewDecision = 'approve' | 'reject' | 'needs_more_info';
 const dismissCommunityReportAction = 'dismiss_community_report';
-const humanReviewDecisionContract = {
-  status: 'in_progress',
-  requestMoreInfoLabel: 'Request more info',
-  reviewPromptAria: 'aria-label={`${prompt.label} rating`}'
-};
+const protectedReviewQueueStatus = { status: 'in_progress' };
 type ReviewModerationAction = ReviewDecision;
 type Assignment = { id: string; reviewId?: string; subjectType?: 'product_match' | 'community_report' | 'commodity_mapping' | 'price_report' | 'duplicate_product_report' | 'source_discrepancy_report'; subjectId?: string; priority?: string; reason?: string; assigneeId?: string; dueAt?: string; status?: string };
 type AssignmentResponse = { assignments?: Assignment[]; sla?: { status?: string; overdueAssignments?: number; breachedReviewIds?: string[] } };
@@ -74,7 +69,7 @@ export function PriceReportReviewActions() {
     const firstAssignment = body.assignments?.[0];
     if (firstAssignment?.id) setAssignmentId(firstAssignment.id);
     setStatus('ready');
-    setMessage(`Loaded ${body.assignments?.length ?? 0} reviewer assignments with SLA ${body.sla?.status ?? 'unknown'}.`);
+    setMessage(`Loaded ${body.assignments?.length ?? 0} reviewer assignments with SLA ${body.sla?.status ?? 'unknown'} and protected queue status ${protectedReviewQueueStatus.status}.`);
   }
 
   async function decideReview(decision: ReviewDecision) {
@@ -173,7 +168,7 @@ export function PriceReportReviewActions() {
       <div className="mt-3 flex flex-wrap gap-2">
         <button className="rounded-full border border-slate-300 px-4 py-2 text-sm font-black text-slate-800" disabled={!assignmentId.trim()} onClick={() => decideReview('approve')} type="button">Approve evidence</button>
         <button className="rounded-full border border-slate-300 px-4 py-2 text-sm font-black text-slate-800" disabled={!assignmentId.trim()} onClick={() => decideReview('hide')} type="button">Hide report</button>
-        <button className="rounded-full border border-amber-300 px-4 py-2 text-sm font-black text-amber-900" disabled={!assignmentId.trim()} onClick={() => decideReview('escalate')} type="button">{humanReviewDecisionContract.requestMoreInfoLabel}</button>
+        <button className="rounded-full border border-amber-300 px-4 py-2 text-sm font-black text-amber-900" disabled={!assignmentId.trim()} onClick={() => decideReview('escalate')} type="button">Request more info</button>
       </div>
 
 
@@ -194,11 +189,28 @@ export function PriceReportReviewActions() {
         <p className="text-sm font-black uppercase tracking-[0.2em] text-violet-800">Community validation prompts</p>
         <h3 className="mt-2 text-xl font-black tracking-tight text-slate-950">{COMMUNITY_REVIEW_PROMPT_COPY.title}</h3>
         <p className="mt-2 text-sm leading-6 text-slate-700">{COMMUNITY_REVIEW_PROMPT_COPY.intro}</p>
-        <p className="sr-only" data-review-prompt-aria={humanReviewDecisionContract.reviewPromptAria}>
-          {COMMUNITY_REVIEW_PROMPTS.length} prompts keep review assignments in status: '{humanReviewDecisionContract.status}' until a moderator accepts the evidence.
-        </p>
-        <div className="mt-4">
-          <ReviewPromptForm productName="community price report product" />
+        <div className="mt-4 grid gap-3 lg:grid-cols-3">
+          {COMMUNITY_REVIEW_PROMPTS.map((prompt) => (
+            <fieldset className="rounded-2xl border border-violet-100 bg-white p-4 text-sm shadow-sm" key={prompt.id}>
+              <legend className="font-black text-slate-950">{prompt.label}</legend>
+              <p className="mt-2 font-semibold leading-6 text-slate-700">{prompt.question}</p>
+              <p className="mt-2 text-xs font-bold text-slate-500">{prompt.helper}</p>
+              <label className="mt-3 block text-xs font-black uppercase tracking-[0.14em] text-violet-800" htmlFor={`${prompt.id}-rating`}>
+                {prompt.lowLabel} ⇄ {prompt.highLabel}
+              </label>
+              <input
+                aria-label={`${prompt.label} rating`}
+                className="mt-2 w-full accent-violet-700"
+                defaultValue="4"
+                id={`${prompt.id}-rating`}
+                max="5"
+                min="1"
+                name={prompt.id}
+                type="range"
+              />
+              <p className="mt-2 rounded-xl bg-violet-50 p-3 text-xs font-bold text-violet-950">Trust signal: {prompt.trustReason}</p>
+            </fieldset>
+          ))}
         </div>
         <p className="mt-3 rounded-2xl bg-white p-3 text-sm font-bold text-violet-950">{COMMUNITY_REVIEW_PROMPT_COPY.guardrail}</p>
       </div>

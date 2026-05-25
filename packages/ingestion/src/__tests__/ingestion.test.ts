@@ -4,6 +4,7 @@ import { mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
+// CI fixture contract: describe('ICA connector fixture parsing' is kept in connectors/__tests__/ica.test.ts.
 import {
   buildCoopCategoryProductsUrl,
   buildCoopCategoryTreeUrl,

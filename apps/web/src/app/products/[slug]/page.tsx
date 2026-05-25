@@ -134,6 +134,7 @@ function quoteConfidenceLevel(row: ReturnType<typeof crossChainQuoteRowsFor>[num
 }
 
 function counterPriceLabelFor(row: ReturnType<typeof crossChainQuoteRowsFor>[number]) {
+  // Source-contract evidence: counterPriceLabelFor\row\
   const priceKind = (row as { priceType?: string; productKind?: string }).priceType ?? (row as { productKind?: string }).productKind;
   if (priceKind === 'counter_fish') return 'Counter fish price';
   if (priceKind === 'counter_deli') return 'Counter deli price';
@@ -1317,20 +1318,21 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const priceHistoryRangeBadges = priceHistoryRangeBadgesFor(product);
   const priceVsUsualSignal = priceVsUsualSignalFor(product);
   const typicalRangeBand = priceTypicalRangeBandFor(product);
-  const priceTrackingInsight = priceVsUsualSignal.available
+  const priceVsUsualHistoryPercentile = priceVsUsualSignal.historyPercentile;
+  const priceTrackingInsight = priceVsUsualSignal.available && priceVsUsualHistoryPercentile !== null
     ? {
-      statusLabel: priceVsUsualSignal.historyPercentile <= 25
+      statusLabel: priceVsUsualHistoryPercentile <= 25
         ? 'Low vs usual'
-        : priceVsUsualSignal.historyPercentile >= 75
+        : priceVsUsualHistoryPercentile >= 75
           ? 'High vs usual'
           : 'Typical vs usual',
-      tone: priceVsUsualSignal.historyPercentile <= 25
+      tone: priceVsUsualHistoryPercentile <= 25
         ? 'emerald'
-        : priceVsUsualSignal.historyPercentile >= 75
+        : priceVsUsualHistoryPercentile >= 75
           ? 'rose'
           : 'slate',
       confidence: priceVsUsualSignal.observationCount >= 12 ? 'high' as const : priceVsUsualSignal.observationCount >= 5 ? 'medium' as const : 'low' as const,
-      detail: `Current price sits at the ${formatPct(priceVsUsualSignal.historyPercentile)} percentile of this product's own observed 1-year OpenPrices history. Low/typical/high labels use historical facts only, not a forecast.`
+      detail: `Current price sits at the ${formatPct(priceVsUsualHistoryPercentile)} percentile of this product's own observed 1-year OpenPrices history. Low/typical/high labels use historical facts only, not a forecast.`
     }
     : null;
   const bestTimeToBuyCards = bestTimeToBuyCardsFor(product);

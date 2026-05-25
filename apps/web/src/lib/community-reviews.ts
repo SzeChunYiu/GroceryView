@@ -43,7 +43,7 @@ export function formatModerationThreshold(value: number) {
 }
 
 
-export type CommunityReviewPromptMetric = 'price_accuracy' | 'product_quality' | 'store_experience' | 'taste' | 'freshness' | 'package_size' | 'substitution_quality';
+export type CommunityReviewPromptMetric = 'price_accuracy' | 'product_quality' | 'store_experience';
 
 export type CommunityProductReviewSummary = {
   averageRating: number;
@@ -97,71 +97,35 @@ export const COMMUNITY_REVIEW_PROMPTS: CommunityReviewPrompt[] = [
   {
     id: 'price_accuracy',
     label: 'Price accuracy',
-    question: 'Did the submitted shelf, receipt, or app price match what shoppers can actually pay?',
-    helper: 'Capture whether the price evidence is current, legible, and tied to the same product, store, and unit.',
+    question: 'Did the reported price match the shelf, receipt, or retailer source?',
+    helper: 'Capture mismatched kronor, member-only conditions, deposits, and stale campaign prices.',
     lowLabel: 'Wrong price',
-    highLabel: 'Accurate price',
-    trustReason: 'Price accuracy is the core signal that makes crowdsourced grocery data becomes more trustworthy.'
+    highLabel: 'Price matched',
+    trustReason: 'Keeps crowdsourced grocery data becomes more trustworthy by separating verified price evidence from noisy reports.'
   },
   {
     id: 'product_quality',
     label: 'Product quality',
-    question: 'Did the item quality match what the price report promised?',
-    helper: 'Note damaged packaging, freshness, substitutions, or quality caveats that change the value of the deal.',
+    question: 'Was the product quality consistent with what shoppers should expect?',
+    helper: 'Use this for produce condition, best-before windows, damaged packaging, and misleading product content.',
     lowLabel: 'Poor quality',
     highLabel: 'Great quality',
-    trustReason: 'Product quality keeps cheap but unusable items from looking like reliable grocery savings.'
+    trustReason: 'Keeps quality feedback comparable across products instead of relying only on free-form comments.'
   },
   {
     id: 'store_experience',
     label: 'Store experience',
-    question: 'Was the price easy to find and purchase at the store or online checkout?',
-    helper: 'Rate stock availability, shelf-label clarity, checkout surprises, and staff or pickup friction.',
-    lowLabel: 'Hard to buy',
-    highLabel: 'Easy to buy',
-    trustReason: 'Store experience separates a trustworthy live deal from one that shoppers cannot redeem.'
-  },
-  {
-    id: 'taste',
-    label: 'Taste',
-    question: 'How did the product taste compared with what shoppers should expect?',
-    helper: 'Capture flavor, texture, aftertaste, and whether the review describes the actual product experience.',
-    lowLabel: 'Poor taste',
-    highLabel: 'Great taste',
-    trustReason: 'Makes subjective taste feedback comparable across products instead of relying only on free-form comments.'
-  },
-  {
-    id: 'freshness',
-    label: 'Freshness',
-    question: 'How fresh was the product at purchase or delivery time?',
-    helper: 'Use this for produce condition, best-before window, packaging damage, and shelf-life concerns.',
-    lowLabel: 'Not fresh',
-    highLabel: 'Very fresh',
-    trustReason: 'Separates cheap stale items from trustworthy grocery deals.'
-  },
-  {
-    id: 'package_size',
-    label: 'Package size',
-    question: 'Did the package size and unit match the listing or shelf label?',
-    helper: 'Note mismatched grams, liters, multipacks, shrinkflation, or unclear unit-price comparisons.',
-    lowLabel: 'Size mismatch',
-    highLabel: 'Size matched',
-    trustReason: 'Keeps price-per-unit comparisons grounded in the package shoppers actually bought.'
-  },
-  {
-    id: 'substitution_quality',
-    label: 'Substitution quality',
-    question: 'If the item was substituted, how close was the replacement?',
-    helper: 'Rate brand, size, dietary fit, price, and whether the substitute still satisfied the grocery need.',
-    lowLabel: 'Bad substitute',
-    highLabel: 'Great substitute',
-    trustReason: 'Helps compare retailer substitutions without mixing them into the original product rating.'
+    question: 'Did the store experience support the reported price and product condition?',
+    helper: 'Note shelf availability, checkout price differences, substitution handling, and staff-confirmed corrections.',
+    lowLabel: 'Poor experience',
+    highLabel: 'Great experience',
+    trustReason: 'Connects community reports to branch-level shopping context without inventing price evidence.'
   }
 ];
 
 export const COMMUNITY_REVIEW_PROMPT_COPY = {
   title: 'Review this grocery product',
-  intro: 'Structured taste, freshness, package-size, and substitution prompts make community product reviews comparable alongside free-form notes.',
+  intro: 'Structured price accuracy, product quality, and store experience prompts make community product reviews comparable alongside free-form notes.',
   guardrail: 'Prompts collect shopper experience signals only; they do not fabricate price evidence or replace protected moderation decisions.'
 } as const;
 

@@ -4,9 +4,9 @@ import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { getStoreReliabilityScore } from '@/lib/freshness';
 import { osmStoreHolidayWarningLabel, osmStoreOpeningHoursLabel } from '@/lib/osm-stores';
 import { storeAssortmentOverviewForStore, storeUniverse } from '@/lib/verified-data';
-import { publicCatalogueRevalidateSeconds, routeMetadata } from '@/lib/seo';
+import { routeMetadata } from '@/lib/seo';
 
-export const revalidate = publicCatalogueRevalidateSeconds;
+export const revalidate = 300;
 
 export function generateMetadata() {
   return routeMetadata('/stores');

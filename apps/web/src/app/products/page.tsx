@@ -13,14 +13,14 @@ import { apohemSource } from '@/lib/ingested/apohem';
 import { newProductArrivals } from '@/lib/new-arrivals';
 import { buildSavedSearchSubscription } from '@/lib/alert-scheduler';
 import { adaptiveProductCards, buildProductSearchView, withProductSearchExplanationBadges, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
-import { publicCatalogueRevalidateSeconds, routeMetadata } from '@/lib/seo';
+import { routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
 import { buildRemovableSearchFilterChips } from '@/lib/search-filters';
 import { buildSearchFilterPreset } from '@/lib/search-presets';
 
 const PRODUCTS_PER_PAGE = 50;
 
-export const revalidate = publicCatalogueRevalidateSeconds;
+export const revalidate = 300;
 
 export function generateMetadata() {
   return routeMetadata('/products');
@@ -231,9 +231,9 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             dietaryFilters={search.dietaryFilters}
             inStockOnly={search.filters.inStockOnly}
             labelFacets={labelFacets}
-            maxPrice={search.filters.maxPrice}
-            minConfidence={search.filters.minConfidence}
-            minPrice={search.filters.minPrice}
+            maxPrice={search.filters.maxPrice ?? undefined}
+            minConfidence={search.filters.minConfidence ?? undefined}
+            minPrice={search.filters.minPrice ?? undefined}
             priceRange={priceRange}
             selectedBrand={selectedBrand}
             selectedCategories={search.filters.categories}

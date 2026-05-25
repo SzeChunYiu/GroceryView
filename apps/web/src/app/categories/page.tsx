@@ -8,9 +8,9 @@ import { buildCategoryScopedSearchSuggestions } from '@/lib/search-suggest';
 import { CategoryTrendingShelves } from '@/app/page-sections/trending';
 import { buildCategoryTrendingShelves } from '@/lib/grocery-index-widget';
 import { categorySummaries, dietaryScenarioFilters, formatPct, formatSek, immigrantAisleFinder, sustainableBrandFilter } from '@/lib/verified-data';
-import { publicCatalogueRevalidateSeconds, routeMetadata } from '@/lib/seo';
+import { routeMetadata } from '@/lib/seo';
 
-export const revalidate = publicCatalogueRevalidateSeconds;
+export const revalidate = 300;
 
 export function generateMetadata() {
   return routeMetadata('/categories');

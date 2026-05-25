@@ -35,7 +35,7 @@ function assistantListHref(plan: ReturnType<typeof buildCartAssistantPlan>) {
 export default async function CartAssistantPage({
   searchParams
 }: Readonly<{ searchParams?: Promise<CartAssistantSearchParams> }>) {
-  const resolvedSearchParams = await Promise.resolve(searchParams ?? {});
+  const resolvedSearchParams: CartAssistantSearchParams = searchParams ? await searchParams : {};
   const budget = Number(firstSearchValue(resolvedSearchParams.budget) || 500);
   const householdSize = Number(firstSearchValue(resolvedSearchParams.household) || 2);
   const dietaryTags = (firstSearchValue(resolvedSearchParams.diet) || 'vegetarian').split(',').map((tag) => tag.trim()).filter(Boolean);
