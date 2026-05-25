@@ -56,6 +56,7 @@ type DealCardProps = {
   sourceLabel?: string;
   sponsoredPlacement?: SponsoredDealPlacement;
   dealEndsAt?: string;
+  urgencyRankLabel?: string;
   verificationLabel?: string;
 };
 
@@ -154,6 +155,7 @@ export function DealCard({
   sourceLabel,
   sponsoredPlacement,
   dealEndsAt,
+  urgencyRankLabel,
   verificationLabel
 }: DealCardProps) {
   const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle');
@@ -294,6 +296,9 @@ export function DealCard({
         <div className="flex flex-col items-end gap-2">
           {countdownLabel ? (
             <span className="rounded-full bg-rose-100 px-3 py-1 text-xs font-black text-rose-800">{countdownLabel}</span>
+          ) : null}
+          {urgencyRankLabel ? (
+            <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-black text-orange-900">{urgencyRankLabel}</span>
           ) : null}
           {context.isNewLowestPrice ? (
             <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">New low</span>
