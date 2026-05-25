@@ -2,8 +2,9 @@ import { createPgQueryExecutor, searchProductsByText, type ProductSearchResult }
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { recordProductSearchPerformanceTelemetry, type ProductSearchPerformanceTelemetry } from '@/lib/analytics';
+import { fuzzyProductSearchQueries, rankFuzzyProductResults } from '@/lib/search-fuzzy';
 import { searchExplanationBadgesForProduct } from '@/lib/search-filters';
-import { expandGrocerySearchQueryWithTelemetry, type GrocerySearchExpansion, type GrocerySearchExpansionTelemetry } from '@/lib/search-suggest';
+import { buildMisspelledQueryRecovery, expandGrocerySearchQueryWithTelemetry, type GrocerySearchExpansion, type GrocerySearchExpansionTelemetry } from '@/lib/search-suggest';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -66,10 +67,6 @@ function withSearchExplanationBadges(query: string, results: ProductSearchResult
 
 function mergeSearchResults(batches: ProductSearchResult[][]) {
   return batches;
-}
-
-function buildMisspelledQueryRecovery(query: string) {
-  return { query, didYouMean: [], popularAlternatives: [] };
 }
 
 const productSearchTelemetrySource = 'postgres.products_tsvector_alias_synonym_expansion';
@@ -189,7 +186,6 @@ export async function GET(request: Request) {
 
   try {
     const executor = await executorForDatabaseUrl(databaseUrl);
-    const { fuzzyProductSearchQueries, rankFuzzyProductResults } = await import('@/lib/search-fuzzy');
     const expandedBatches = await Promise.all(expansion.expandedQueries.map((expandedQuery) => searchProductsByText(executor, expandedQuery, { limit: 8 })));
     const fuzzyQueries = fuzzyProductSearchQueries(query, expansion).filter((expandedQuery) => !expansion.expandedQueries.includes(expandedQuery));
     const fuzzyBatches = await Promise.all(fuzzyQueries.map((expandedQuery) => searchProductsByText(executor, expandedQuery, { limit: 8 })));
