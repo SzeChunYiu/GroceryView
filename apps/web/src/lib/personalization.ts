@@ -24,6 +24,7 @@ export type DietaryPreferenceOnboardingContract = {
 
 export const defaultHouseholdId = 'stockholm-family-demo';
 export const recentSearchHistoryStorageKey = 'groceryview:recent-product-searches';
+export const savedSearchesStorageKey = 'groceryview:saved-product-searches';
 export const brandPreferenceStorageKey = 'groceryview:brand-preferences:v1';
 export const disabledPersonalizationSignalsStorageKey = 'groceryview:personalization-disabled-signals:v1';
 const maxRecentSearchHistory = 10;
@@ -74,6 +75,10 @@ export type RecentSearchHistoryEntry = {
   searchedAt: string;
 };
 
+export type SavedSearchEntry = RecentSearchHistoryEntry & {
+  pinnedAt: string;
+};
+
 export const householdCategorySignals: HouseholdCategorySignal[] = [
   { householdId: defaultHouseholdId, categorySlug: 'mejeri-ost-agg', clicks: 18, conversions: 7 },
   { householdId: defaultHouseholdId, categorySlug: 'frukt-gront', clicks: 16, conversions: 6 },
@@ -120,6 +125,29 @@ export function clearRecentSearchHistory() {
   if (typeof window === 'undefined') return [];
   window.localStorage.removeItem(recentSearchHistoryStorageKey);
   return [];
+}
+
+export function readSavedSearches(): SavedSearchEntry[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(savedSearchesStorageKey) || '[]') as SavedSearchEntry[];
+    return Array.isArray(parsed)
+      ? parsed.filter((entry) => typeof entry.query === 'string' && entry.query.trim().length > 0).slice(0, 10)
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+export function pinSavedSearch(entry: RecentSearchHistoryEntry): SavedSearchEntry[] {
+  if (typeof window === 'undefined') return [];
+  const pinned: SavedSearchEntry = { ...entry, pinnedAt: new Date().toISOString() };
+  const next = [
+    pinned,
+    ...readSavedSearches().filter((search) => search.query.toLocaleLowerCase('sv-SE') !== entry.query.toLocaleLowerCase('sv-SE'))
+  ].slice(0, 10);
+  window.localStorage.setItem(savedSearchesStorageKey, JSON.stringify(next));
+  return next;
 }
 
 export const dietaryPreferenceOnboardingContract: DietaryPreferenceOnboardingContract = {
@@ -204,6 +232,20 @@ type RecommendationProductInput = {
   totalPriceLabel?: string;
 };
 
+export type BasketIdeaExplanationInput = {
+  productId: string;
+  name?: string;
+  storeName?: string;
+  unitPrice?: number;
+  dietaryTags?: readonly string[];
+};
+
+export type BasketIdeaExplanationOptions = {
+  cheapestStoreName?: string;
+  dietaryPreferences?: readonly string[];
+  frequentlyBoughtTogetherIds?: readonly string[];
+};
+
 export type PersonalizedRecommendation = RecommendationProductInput & {
   score: number;
   reason: string;
@@ -231,6 +273,31 @@ const demoReorderSignals: ReorderProductSignal[] = [
   { productSlug: 'banana', watchedCount: 8, favoriteSaves: 1, repeatPurchases: 2, lastActionLabel: 'watched for price drops' },
   { productSlug: 'coffee', watchedCount: 4, favoriteSaves: 2, repeatPurchases: 2, lastActionLabel: 'favorite pantry refill' },
 ];
+
+export function basketIdeaRecommendationExplanations(
+  item: BasketIdeaExplanationInput,
+  options: BasketIdeaExplanationOptions = {}
+) {
+  const reasons: string[] = [];
+  const dietaryPreferences = new Set((options.dietaryPreferences ?? []).map((tag) => tag.toLocaleLowerCase('sv-SE')));
+  const itemDietaryTags = item.dietaryTags?.map((tag) => tag.toLocaleLowerCase('sv-SE')) ?? [];
+
+  if (item.storeName && item.storeName === options.cheapestStoreName) {
+    reasons.push(`Cheaper substitute at ${item.storeName} for this basket`);
+  } else if (typeof item.unitPrice === 'number' && Number.isFinite(item.unitPrice)) {
+    reasons.push(`Cheaper substitute candidate from verified unit price ${item.unitPrice.toFixed(2)} SEK`);
+  }
+
+  if (options.frequentlyBoughtTogetherIds?.includes(item.productId)) {
+    reasons.push('Frequently bought together with other student staples');
+  }
+
+  if (itemDietaryTags.some((tag) => dietaryPreferences.has(tag))) {
+    reasons.push('Matches dietary preference filters');
+  }
+
+  return (reasons.length > 0 ? reasons : ['Recommended from verified basket coverage']).slice(0, 3);
+}
 
 function reorderSignalScore(signal: Pick<ReorderProductSignal, 'favoriteSaves' | 'repeatPurchases' | 'watchedCount'>) {
   return (
@@ -360,7 +427,7 @@ export function buildPersonalizedRecommendationRail<T extends RecommendationProd
         ? `Favorite brand signal for ${product.brand}`
         : listHits > 0
           ? `${listHits} recent list signal${listHits === 1 ? '' : 's'} matched`
-          : 'Household history keeps this in the discovery mix';
+          : 'Household favorites, watchlist, dietary preferences, and recent searches keep this in the discovery mix';
       return { ...product, score, reason };
     })
     .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name, 'sv'))

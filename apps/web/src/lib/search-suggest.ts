@@ -1,3 +1,4 @@
+import { isTypoTolerantTokenMatch } from './search-fuzzy';
 import { semanticSynonymsForQuery } from './search-synonyms';
 
 export type GrocerySearchExpansion = {
@@ -126,28 +127,8 @@ function addWeightedQuery(values: string[], weights: Record<string, number>, val
   weights[existingKey] = Math.max(weights[existingKey] ?? 0, weight);
 }
 
-function editDistance(left: string, right: string) {
-  const previous = Array.from({ length: right.length + 1 }, (_, index) => index);
-  for (let leftIndex = 1; leftIndex <= left.length; leftIndex += 1) {
-    let diagonal = previous[0]!;
-    previous[0] = leftIndex;
-    for (let rightIndex = 1; rightIndex <= right.length; rightIndex += 1) {
-      const insert = previous[rightIndex]! + 1;
-      const remove = previous[rightIndex - 1]! + 1;
-      const replace = diagonal + (left[leftIndex - 1] === right[rightIndex - 1] ? 0 : 1);
-      diagonal = previous[rightIndex]!;
-      previous[rightIndex] = Math.min(insert, remove, replace);
-    }
-  }
-  return previous[right.length]!;
-}
-
 function fuzzyTokenMatch(queryToken: string, aliasToken: string) {
-  if (queryToken === aliasToken) return true;
-  if (queryToken.length >= 4 && aliasToken.startsWith(queryToken)) return true;
-  if (aliasToken.length >= 4 && queryToken.startsWith(aliasToken)) return true;
-  if (Math.abs(queryToken.length - aliasToken.length) > 1) return false;
-  return Math.min(queryToken.length, aliasToken.length) >= 4 && editDistance(queryToken, aliasToken) <= 1;
+  return isTypoTolerantTokenMatch(queryToken, aliasToken);
 }
 
 function fuzzyAliasMatch(queryTokens: Set<string>, normalizedAlias: string) {
