@@ -1,12 +1,13 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { parseMealPlanShoppingListExport } from '@/lib/meal-budgets';
 
 export type ShoppingListItem = {
   checked: boolean;
   detail: string;
   id: string;
-  importSource?: 'starter' | 'bulk-clipboard' | 'item-detail';
+  importSource?: 'starter' | 'bulk-clipboard' | 'item-detail' | 'meal-plan';
   matchedProductName?: string;
   matchedProductSlug?: string;
   name: string;
@@ -21,7 +22,11 @@ export type ProductListItemInput = Omit<ShoppingListItem, 'checked' | 'id' | 'im
   productId: string;
 };
 
-type PersistedCustomListItemInput = BulkImportedListItemInput | (Omit<ShoppingListItem, 'checked'> & {
+export type MealPlanListItemInput = Omit<ShoppingListItem, 'checked'> & {
+  importSource: 'meal-plan';
+};
+
+type PersistedCustomListItemInput = BulkImportedListItemInput | MealPlanListItemInput | (Omit<ShoppingListItem, 'checked'> & {
   importSource: 'item-detail';
 });
 
@@ -177,7 +182,7 @@ function listStateFromStorage(value: string | null): Required<PersistedListState
       ? maybeImportedItems.filter((item): item is PersistedCustomListItemInput => (
         item !== null
         && typeof item === 'object'
-        && (item.importSource === 'bulk-clipboard' || item.importSource === 'item-detail')
+        && (item.importSource === 'bulk-clipboard' || item.importSource === 'item-detail' || item.importSource === 'meal-plan')
         && typeof item.id === 'string'
         && typeof item.name === 'string'
         && typeof item.quantity === 'string'
@@ -189,6 +194,21 @@ function listStateFromStorage(value: string | null): Required<PersistedListState
   } catch {
     return empty;
   }
+}
+
+function mealPlanItemsFromSearchParam(value: string): MealPlanListItemInput[] {
+  const mealPlanExport = parseMealPlanShoppingListExport(value);
+  if (!mealPlanExport) return [];
+
+  return mealPlanExport.items.map((item) => ({
+    detail: item.detail,
+    id: item.id,
+    importSource: 'meal-plan',
+    matchedProductName: item.name,
+    matchedProductSlug: item.productId,
+    name: item.name,
+    quantity: item.quantity
+  }));
 }
 
 function withCheckedState(checkedById: Record<string, boolean>, importedItems: PersistedCustomListItemInput[] = []): ShoppingListItem[] {
@@ -246,7 +266,7 @@ async function verifyShareToken(token: string): Promise<ShareLinkState> {
     ? payload.items.filter((item): item is PersistedCustomListItemInput => (
       item !== null
       && typeof item === 'object'
-      && (item.importSource === 'bulk-clipboard' || item.importSource === 'item-detail')
+      && (item.importSource === 'bulk-clipboard' || item.importSource === 'item-detail' || item.importSource === 'meal-plan')
       && typeof item.id === 'string'
       && typeof item.name === 'string'
       && typeof item.quantity === 'string'
@@ -270,6 +290,7 @@ function persistCheckedState(items: ShoppingListItem[]) {
     const importedItems = items
       .filter((item) => item.importSource === 'bulk-clipboard')
       .concat(items.filter((item) => item.importSource === 'item-detail'))
+      .concat(items.filter((item) => item.importSource === 'meal-plan'))
       .map((item) => ({
         detail: item.detail,
         id: item.id,
@@ -345,7 +366,8 @@ export function useList() {
     async function loadBrowserState() {
       try {
         const { checkedById, importedItems } = listStateFromStorage(localStorage.getItem(LIST_STORAGE_KEY));
-        const token = new URLSearchParams(window.location.search).get('share');
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('share');
         if (token) {
           const verifiedShare = await verifyShareToken(token);
           if (!cancelled) setShareLink(verifiedShare);
@@ -355,7 +377,8 @@ export function useList() {
             return;
           }
         }
-        if (!cancelled) setItems(withCheckedState(checkedById, importedItems));
+        const mealPlanItems = mealPlanItemsFromSearchParam(params.get('mealPlan') ?? '');
+        if (!cancelled) setItems(withCheckedState(checkedById, [...importedItems, ...mealPlanItems]));
       } finally {
         if (!cancelled) setHasLoadedBrowserState(true);
       }
