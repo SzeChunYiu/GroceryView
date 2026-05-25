@@ -24,6 +24,7 @@ export type DietaryPreferenceOnboardingContract = {
 
 export const defaultHouseholdId = 'stockholm-family-demo';
 export const recentSearchHistoryStorageKey = 'groceryview:recent-product-searches';
+export const savedSearchesStorageKey = 'groceryview:saved-product-searches';
 export const brandPreferenceStorageKey = 'groceryview:brand-preferences:v1';
 export const disabledPersonalizationSignalsStorageKey = 'groceryview:personalization-disabled-signals:v1';
 const maxRecentSearchHistory = 10;
@@ -74,6 +75,10 @@ export type RecentSearchHistoryEntry = {
   searchedAt: string;
 };
 
+export type SavedSearchEntry = RecentSearchHistoryEntry & {
+  pinnedAt: string;
+};
+
 export const householdCategorySignals: HouseholdCategorySignal[] = [
   { householdId: defaultHouseholdId, categorySlug: 'mejeri-ost-agg', clicks: 18, conversions: 7 },
   { householdId: defaultHouseholdId, categorySlug: 'frukt-gront', clicks: 16, conversions: 6 },
@@ -120,6 +125,29 @@ export function clearRecentSearchHistory() {
   if (typeof window === 'undefined') return [];
   window.localStorage.removeItem(recentSearchHistoryStorageKey);
   return [];
+}
+
+export function readSavedSearches(): SavedSearchEntry[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(savedSearchesStorageKey) || '[]') as SavedSearchEntry[];
+    return Array.isArray(parsed)
+      ? parsed.filter((entry) => typeof entry.query === 'string' && entry.query.trim().length > 0).slice(0, 10)
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+export function pinSavedSearch(entry: RecentSearchHistoryEntry): SavedSearchEntry[] {
+  if (typeof window === 'undefined') return [];
+  const pinned: SavedSearchEntry = { ...entry, pinnedAt: new Date().toISOString() };
+  const next = [
+    pinned,
+    ...readSavedSearches().filter((search) => search.query.toLocaleLowerCase('sv-SE') !== entry.query.toLocaleLowerCase('sv-SE'))
+  ].slice(0, 10);
+  window.localStorage.setItem(savedSearchesStorageKey, JSON.stringify(next));
+  return next;
 }
 
 export const dietaryPreferenceOnboardingContract: DietaryPreferenceOnboardingContract = {
