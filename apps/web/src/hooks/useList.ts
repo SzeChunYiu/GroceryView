@@ -7,11 +7,12 @@ export type ShoppingListItem = {
   checked: boolean;
   detail: string;
   id: string;
-  importSource?: 'starter' | 'bulk-clipboard' | 'item-detail' | 'meal-plan';
+  importSource?: 'starter' | 'bulk-clipboard' | 'item-detail' | 'meal-plan' | 'recipe';
   matchedProductName?: string;
   matchedProductSlug?: string;
   name: string;
   quantity: string;
+  storeComparison?: string;
 };
 
 export type BulkImportedListItemInput = Omit<ShoppingListItem, 'checked'> & {
@@ -26,9 +27,13 @@ export type MealPlanListItemInput = Omit<ShoppingListItem, 'checked'> & {
   importSource: 'meal-plan';
 };
 
+export type RecipeListItemInput = Omit<ShoppingListItem, 'checked'> & {
+  importSource: 'recipe';
+};
+
 type PersistedCustomListItemInput = BulkImportedListItemInput | MealPlanListItemInput | (Omit<ShoppingListItem, 'checked'> & {
   importSource: 'item-detail';
-});
+}) | RecipeListItemInput;
 
 export type ShareLinkState = {
   error: string | null;
@@ -193,7 +198,7 @@ function listStateFromStorage(value: string | null): Required<PersistedListState
       ? maybeImportedItems.filter((item): item is PersistedCustomListItemInput => (
         item !== null
         && typeof item === 'object'
-        && (item.importSource === 'bulk-clipboard' || item.importSource === 'item-detail' || item.importSource === 'meal-plan')
+        && (item.importSource === 'bulk-clipboard' || item.importSource === 'item-detail' || item.importSource === 'meal-plan' || item.importSource === 'recipe')
         && typeof item.id === 'string'
         && typeof item.name === 'string'
         && typeof item.quantity === 'string'
@@ -220,6 +225,30 @@ function mealPlanItemsFromSearchParam(value: string): MealPlanListItemInput[] {
     name: item.name,
     quantity: item.quantity
   }));
+}
+
+function recipeItemsFromSearchParam(value: string): RecipeListItemInput[] {
+  if (!value.trim()) return [];
+
+  try {
+    const parsed = JSON.parse(value) as unknown;
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed
+      .filter((item): item is Record<string, unknown> => item !== null && typeof item === 'object')
+      .map((item) => ({
+        detail: typeof item.detail === 'string' ? item.detail : 'Added from recipe page.',
+        id: typeof item.id === 'string' ? item.id : `recipe-${String(item.productId ?? item.name ?? 'ingredient').toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+        importSource: 'recipe' as const,
+        matchedProductName: typeof item.matchedProductName === 'string' ? item.matchedProductName : typeof item.name === 'string' ? item.name : undefined,
+        matchedProductSlug: typeof item.matchedProductSlug === 'string' ? item.matchedProductSlug : typeof item.productId === 'string' ? item.productId : undefined,
+        name: typeof item.name === 'string' ? item.name : 'Recipe ingredient',
+        quantity: typeof item.quantity === 'string' ? item.quantity : '1 item',
+        storeComparison: typeof item.storeComparison === 'string' ? item.storeComparison : undefined
+      }));
+  } catch {
+    return [];
+  }
 }
 
 function withCheckedState(checkedById: Record<string, boolean>, importedItems: PersistedCustomListItemInput[] = []): ShoppingListItem[] {
@@ -432,7 +461,8 @@ export function useList() {
           }
         }
         const mealPlanItems = mealPlanItemsFromSearchParam(params.get('mealPlan') ?? '');
-        if (!cancelled) setItems(withCheckedState(checkedById, [...importedItems, ...mealPlanItems]));
+        const recipeItems = recipeItemsFromSearchParam(params.get('recipe') ?? '');
+        if (!cancelled) setItems(withCheckedState(checkedById, [...importedItems, ...mealPlanItems, ...recipeItems]));
       } finally {
         if (!cancelled) setHasLoadedBrowserState(true);
       }
@@ -501,6 +531,17 @@ export function useList() {
     return { added: !alreadyOnList, item };
   }, [items]);
 
+  const addRecipeItems = useCallback((recipeItems: RecipeListItemInput[]) => {
+    setItems((currentItems) => {
+      const existingIds = new Set(currentItems.map((item) => item.id));
+      const nextRecipeItems = recipeItems
+        .filter((item) => !existingIds.has(item.id))
+        .map((item) => ({ ...item, importSource: 'recipe' as const, checked: false }));
+
+      return [...currentItems, ...nextRecipeItems];
+    });
+  }, []);
+
   const checkedCount = useMemo(() => items.filter((item) => item.checked).length, [items]);
   const totalCount = items.length;
   const remainingCount = totalCount - checkedCount;
@@ -526,6 +567,7 @@ export function useList() {
 
   return {
     addProductItem,
+    addRecipeItems,
     addImportedItems,
     checkedCount,
     hasLoadedBrowserState,
