@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { dispatchListToast } from '@/components/Toast';
 import { parseMealPlanShoppingListExport } from '@/lib/meal-budgets';
 
 export type ShoppingListItem = {
@@ -460,9 +461,17 @@ export function useList() {
   }, [hasLoadedBrowserState]);
 
   const toggleItemChecked = useCallback((itemId: string) => {
-    setItems((currentItems) => currentItems.map((item) => (
-      item.id === itemId ? { ...item, checked: !item.checked } : item
-    )));
+    setItems((currentItems) => currentItems.map((item) => {
+      if (item.id !== itemId) return item;
+      const checked = !item.checked;
+      dispatchListToast({
+        id: `list-toggle:${item.id}:${checked}`,
+        title: checked ? 'Item removed from active list' : 'Item restored to active list',
+        message: item.name,
+        variant: checked ? 'info' : 'success'
+      });
+      return { ...item, checked };
+    }));
   }, []);
 
   const resetCheckedState = useCallback(() => {
@@ -475,6 +484,15 @@ export function useList() {
       const nextImportedItems = importedItems
         .filter((item) => !existingIds.has(item.id))
         .map((item) => ({ ...item, importSource: 'bulk-clipboard' as const, checked: false }));
+
+      if (nextImportedItems.length > 0) {
+        dispatchListToast({
+          id: `list-import:${Date.now()}`,
+          title: nextImportedItems.length === 1 ? 'Item added to shopping list' : `${nextImportedItems.length} items added to shopping list`,
+          message: nextImportedItems.length === 1 ? nextImportedItems[0]?.name : 'Imported items are ready to review.',
+          variant: 'success'
+        });
+      }
 
       return [...currentItems, ...nextImportedItems];
     });
@@ -497,6 +515,19 @@ export function useList() {
           ? currentItems
           : [...currentItems, { ...item, checked: false }]
       ));
+      dispatchListToast({
+        id: `list-add:${item.id}`,
+        title: 'Item added to shopping list',
+        message: item.name,
+        variant: 'success'
+      });
+    } else {
+      dispatchListToast({
+        id: `list-add-existing:${item.id}`,
+        title: 'Item already on shopping list',
+        message: item.name,
+        variant: 'info'
+      });
     }
     return { added: !alreadyOnList, item };
   }, [items]);
