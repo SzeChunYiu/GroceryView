@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import {
@@ -64,13 +65,16 @@ function screenerOpenGraphCopy(fallbackTitle: string, fallbackDescription: strin
   }
 
   const categoryLabel = primaryScreenerCategory?.categoryLabel ?? primaryScreenerDrop.categoryLabel;
-  const spreadEvidence = primaryScreenerSpread
-    ? ` ${primaryScreenerSpread.name} spans ${formatSek(primaryScreenerSpread.lowestPrice)} to ${formatSek(primaryScreenerSpread.highestPrice)} across ${primaryScreenerSpread.inChains.join(' + ')}.`
-    : '';
+  const chainLabel = primaryScreenerSpread?.inChains.join(' + ') ?? '';
+  const descriptionParts = [
+    primaryScreenerDrop.productName,
+    categoryLabel,
+    chainLabel
+  ].filter(Boolean);
 
   return {
-    title: `${primaryScreenerDrop.productName} ${formatPct(primaryScreenerDrop.changePercent)} | GroceryView screener`,
-    description: `${primaryScreenerDrop.productName}: ${formatSek(primaryScreenerDrop.latestPrice)} now vs ${formatSek(primaryScreenerDrop.previousPrice)} previous from ${primaryScreenerDrop.observedCount} dated points in ${primaryScreenerDrop.categoryLabel}. ${categoryLabel} leads the category filters.${spreadEvidence}`
+    title: `${primaryScreenerDrop.productName} | ${categoryLabel} | GroceryView screener`,
+    description: descriptionParts.join(' · ')
   };
 }
 
@@ -85,7 +89,7 @@ function screenerOpenGraphImages(fallbackImages: NonNullable<ReturnType<typeof r
   }];
 }
 
-export function generateMetadata() {
+export function generateMetadata(): Metadata {
   const metadata = routeMetadata('/screener');
   const openGraph = metadata.openGraph;
   const ogCopy = screenerOpenGraphCopy(String(metadata.title ?? 'Verified deal screener | GroceryView'), metadata.description ?? '');
