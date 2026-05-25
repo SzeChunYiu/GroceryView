@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { buildExpiryDealRadar } from '@groceryview/core';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { rankExpiringDealsByUrgency } from '@/lib/deal-context';
 import { expiryDealRadarReports } from '@/lib/demo-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -20,9 +21,13 @@ const activeItems = radar.stores.flatMap((store) =>
     source: sourceFor(item.id)
   }))
 );
+const rankedActiveItems = rankExpiringDealsByUrgency(activeItems, {
+  preferredCategories: ['dairy', 'produce'],
+  preferredTerms: ['kvarg', 'tomater', 'lax']
+});
 
 const staleReports = expiryDealRadarReports.filter((report) => radar.staleReportIds.includes(report.id));
-const confidenceLevel = activeItems.some((item) => item.verification === 'needs_confirmation') ? 'medium' : 'high';
+const confidenceLevel = rankedActiveItems.some((item) => item.verification === 'needs_confirmation') ? 'medium' : 'high';
 
 export function generateMetadata() {
   return routeMetadata('/expiry-deals');
@@ -73,7 +78,7 @@ export default function ExpiryDealsPage() {
       <div className="mt-6 grid gap-4 lg:grid-cols-4">
         <Card className="p-4">
           <p className="text-sm font-black uppercase tracking-[0.18em] text-slate-500">Active deals</p>
-          <p className="mt-2 text-4xl font-black text-emerald-800">{activeItems.length}</p>
+          <p className="mt-2 text-4xl font-black text-emerald-800">{rankedActiveItems.length}</p>
           <p className="mt-2 text-sm font-semibold text-slate-600">within {maxDistanceKm} km</p>
         </Card>
         <Card className="p-4">
@@ -98,21 +103,21 @@ export default function ExpiryDealsPage() {
           <div>
             <h2 className="text-2xl font-black tracking-tight text-slate-950">Current near-expiry board</h2>
             <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
-              Ranked output from buildExpiryDealRadar combines markdown depth, hours until expiry, freshness, photo evidence, and verification count.
+              Ranked output from buildExpiryDealRadar is re-ordered by an urgency score that combines hours remaining, discount depth, and household relevance signals.
             </p>
           </div>
           <p className="rounded-lg bg-white px-3 py-2 text-sm font-black text-emerald-950">Snapshot {now.slice(0, 10)}</p>
         </div>
 
-        {activeItems.length > 0 ? (
+        {rankedActiveItems.length > 0 ? (
           <div className="mt-5 space-y-3">
-            {activeItems.map((item) => {
+            {rankedActiveItems.map((item) => {
               const confidence = confidenceFor(item);
               return (
                 <Link className="block rounded-lg border border-emerald-100 bg-white p-4 shadow-sm hover:border-emerald-700" href={`/products/${item.productId}`} key={item.id}>
                   <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                     <div>
-                      <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{item.storeName} - {item.category}</p>
+                      <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Urgency #{item.urgencyRank} · {item.storeName} - {item.category}</p>
                       <h3 className="mt-2 text-xl font-black text-slate-950">{item.productName}</h3>
                       <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-600">{item.source}</p>
                       <div className="mt-3">
@@ -123,13 +128,13 @@ export default function ExpiryDealsPage() {
                       <p className="rounded-lg bg-emerald-50 p-3"><span className="block text-xs uppercase text-slate-500">Now</span>{formatSek(item.currentPrice)}</p>
                       <p className="rounded-lg bg-emerald-50 p-3"><span className="block text-xs uppercase text-slate-500">Save</span>{formatSek(item.savings)}</p>
                       <p className="rounded-lg bg-emerald-50 p-3"><span className="block text-xs uppercase text-slate-500">Markdown</span>{item.markdownPercent}%</p>
-                      <p className="rounded-lg bg-emerald-50 p-3"><span className="block text-xs uppercase text-slate-500">Score</span>{item.radarScore}</p>
+                      <p className="rounded-lg bg-emerald-50 p-3"><span className="block text-xs uppercase text-slate-500">Urgency</span>{item.urgencyScore}</p>
                     </div>
                   </div>
                   <div className="mt-4 grid gap-2 text-sm font-semibold text-slate-700 md:grid-cols-3">
                     <p className="rounded-lg bg-slate-50 p-3">Expires in {formatHours(item.hoursUntilExpiry)} hours</p>
                     <p className="rounded-lg bg-slate-50 p-3">{item.urgency.replace('_', ' ')}</p>
-                    <p className="rounded-lg bg-slate-50 p-3">{item.verification.replace('_', ' ')}</p>
+                    <p className="rounded-lg bg-slate-50 p-3">{item.urgencySummary}</p>
                   </div>
                 </Link>
               );
@@ -142,7 +147,7 @@ export default function ExpiryDealsPage() {
               buildExpiryDealRadar returned no activeItems for the current freshness window, so GroceryView is hiding the board instead of implying a deal is available. Radar confidence and the stale evidence audit remain visible for context.
             </p>
             <div className="mt-4 grid gap-2 text-sm font-semibold text-slate-700 md:grid-cols-3">
-              <p className="rounded-lg bg-emerald-50 p-3"><span className="block text-xs uppercase text-slate-500">Active items</span>{activeItems.length}</p>
+              <p className="rounded-lg bg-emerald-50 p-3"><span className="block text-xs uppercase text-slate-500">Active items</span>{rankedActiveItems.length}</p>
               <p className="rounded-lg bg-emerald-50 p-3"><span className="block text-xs uppercase text-slate-500">Stale reports kept</span>{radar.staleReportIds.length}</p>
               <p className="rounded-lg bg-emerald-50 p-3"><span className="block text-xs uppercase text-slate-500">Confidence sample</span>{expiryDealRadarReports.length} reports</p>
             </div>
