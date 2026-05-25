@@ -1,10 +1,16 @@
 import Link from 'next/link';
+import { CategorySuggestionList } from '@/components/category-filter';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { axfoodProducts } from '@/lib/axfood-products';
 import { buildDemoHouseholdCategorySignals, defaultHouseholdId, getHouseholdCategoryScore, rankCategoriesByPurchaseHistory } from '@/lib/personalization';
+import { pricedProducts } from '@/lib/openprices-products';
+import { buildCategoryScopedSearchSuggestions } from '@/lib/search-suggest';
 import { CategoryTrendingShelves } from '@/app/page-sections/trending';
 import { buildCategoryTrendingShelves } from '@/lib/grocery-index-widget';
 import { categorySummaries, dietaryScenarioFilters, formatPct, formatSek, immigrantAisleFinder, sustainableBrandFilter } from '@/lib/verified-data';
-import { routeMetadata } from '@/lib/seo';
+import { publicCatalogueRevalidateSeconds, routeMetadata } from '@/lib/seo';
+
+export const revalidate = publicCatalogueRevalidateSeconds;
 
 export function generateMetadata() {
   return routeMetadata('/categories');
@@ -13,6 +19,14 @@ export function generateMetadata() {
 export default function CategoriesIndexPage() {
   const householdSignals = buildDemoHouseholdCategorySignals(categorySummaries);
   const personalizedCategories = rankCategoriesByPurchaseHistory(categorySummaries, defaultHouseholdId, householdSignals);
+  const categorySuggestionProducts = [
+    ...axfoodProducts.map((product) => ({ name: product.name, brand: product.brand, category: product.category })),
+    ...pricedProducts.map((product) => ({ name: product.name, brand: product.brands, category: product.category }))
+  ];
+  const categorySuggestionGroups = personalizedCategories.slice(0, 4).map((category) => ({
+    category,
+    suggestions: buildCategoryScopedSearchSuggestions(category.slug, categorySuggestionProducts, category.label)
+  }));
   const categoryShelves = buildCategoryTrendingShelves();
 
   return (
@@ -22,6 +36,23 @@ export default function CategoriesIndexPage() {
       <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
         Search categories are ranked for {defaultHouseholdId} using historical conversions and clicks so high-intent aisles appear first.
       </p>
+      <Card className="mt-6 border-sky-200 bg-sky-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-800">Category-scoped autocomplete</p>
+        <h2 className="mt-2 text-2xl font-black">Suggestions stay inside the active category</h2>
+        <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+          Category browsing now seeds autocomplete from products and popular brands in that aisle so shoppers narrow discovery instead of restarting a global search.
+        </p>
+        <div className="mt-4 grid gap-3 lg:grid-cols-2">
+          {categorySuggestionGroups.map(({ category, suggestions }) => (
+            <section className="rounded-2xl bg-white p-4" key={category.slug}>
+              <p className="font-black text-slate-950">{category.label}</p>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{category.openPriceRows + category.chainRows} scoped rows</p>
+              <CategorySuggestionList label="Popular brand and product suggestions" suggestions={suggestions} />
+            </section>
+          ))}
+        </div>
+      </Card>
+
       <CategoryTrendingShelves shelves={categoryShelves} />
       <Card className="mt-6 border-orange-200 bg-orange-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-orange-800">Immigrants / new arrivals</p>

@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import {
   BONUS_IS_STORE_BASE_URL,
+  checkBonusIsConnectorHealth,
   fetchBonusIsProducts,
   parseBonusIsProducts
 } from '../bonus-is.js';
@@ -86,6 +87,38 @@ describe('Bónus IS connector fixture parsing', () => {
     assert.deepEqual(rows.map((row) => row.code), ['Bon17', 'Bon6']);
     assert.equal(rows.every((row) => row.sourceUrl === SOURCE_URL), true);
     assert.equal(rows.every((row) => row.retrievedAt === RETRIEVED_AT), true);
+  });
+
+  it('reports Bónus connector health from a bounded fixture sample', async () => {
+    const health = await checkBonusIsConnectorHealth({
+      fetchImpl: async () => response(RECORDED_BONUS_FIXTURE),
+      sourceUrls: [SOURCE_URL],
+      maxRows: 2,
+      retrievedAt: RETRIEVED_AT
+    });
+
+    assert.deepEqual(health, {
+      chain: 'bonus-is',
+      checkedAt: RETRIEVED_AT,
+      sourceUrls: [SOURCE_URL],
+      requestedMaxRows: 2,
+      rowCount: 2,
+      nonEmptyFields: { name: 2, price: 2, productUrl: 2, imageUrl: 2 },
+      ok: true
+    });
+  });
+
+  it('reports HTTP failures in Bónus connector health checks', async () => {
+    const health = await checkBonusIsConnectorHealth({
+      fetchImpl: async () => response('blocked', 503),
+      sourceUrls: [SOURCE_URL],
+      retrievedAt: RETRIEVED_AT
+    });
+
+    assert.equal(health.ok, false);
+    assert.equal(health.rowCount, 0);
+    assert.deepEqual(health.nonEmptyFields, { name: 0, price: 0, productUrl: 0, imageUrl: 0 });
+    assert.match(health.error ?? '', /Bónus request failed for https:\/\/verslun\.bonus\.is\/: 503/);
   });
 
   it('honours maxRows and propagates non-OK fixture responses', async () => {

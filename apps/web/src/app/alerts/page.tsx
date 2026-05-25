@@ -2,7 +2,7 @@ import { AlertManagementPanel, type AlertProductSummary } from '@/components/Ale
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { SavedSearchSubscriptionsPanel } from '@/components/saved-search-subscriptions';
-import { buildAlertExplanationTimeline, type SavedSearchDealCandidate } from '@/lib/alert-scheduler';
+import { buildAlertExplanationTimeline, buildBestTimeAlertExplanationTimeline, type SavedSearchDealCandidate } from '@/lib/alert-scheduler';
 import { FREE_PRICE_ALERT_LIMIT } from '@/app/api/alerts/store';
 import { formatSek, matchedChainProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
@@ -13,6 +13,15 @@ export function generateMetadata() {
 
 const alertProductSummaries: AlertProductSummary[] = matchedChainProducts.slice(0, 120).map((product) => {
   const lastObservedAt = (product as { lastObservedAt?: string | number | Date }).lastObservedAt;
+  const bestTimeTimeline = buildBestTimeAlertExplanationTimeline({
+    productName: product.name,
+    categoryLabel: product.category,
+    flyerWindowLabel: 'Known flyer windows are evaluated by /api/alerts/best-time when a client supplies upcomingFlyerWindows.',
+    observedPriceCount: product.inChains.length,
+    observedRangeLabel: `${product.inChains.length} chain price source${product.inChains.length === 1 ? '' : 's'} currently matched`,
+    seasonalityLabel: `${product.category} seasonality is kept visible as a timing factor before GroceryView recommends buying now or waiting.`,
+    volatilityScore: null
+  });
 
   return {
     productId: product.slug,
@@ -28,9 +37,19 @@ const alertProductSummaries: AlertProductSummary[] = matchedChainProducts.slice(
       lowestChain: product.lowestChain,
       targetPriceText: formatSek(product.lowestPrice),
       lastObservedAt: lastObservedAt ? new Date(lastObservedAt).toISOString() : undefined,
-      predictionSource: `Prediction inputs withheld unless a forecast alert exists; current explanation uses ${product.inChains.join(' + ')} verified chain rows.`
+      predictionSource: bestTimeTimeline.map((step) => `${step.label}: ${step.detail}`).join(' ')
     })
   };
+});
+
+const bestTimeExplanationPreview = buildBestTimeAlertExplanationTimeline({
+  productName: 'Best-time alert',
+  categoryLabel: 'selected category',
+  flyerWindowLabel: 'Known flyer windows are checked before recommending wait-for-flyer alerts.',
+  observedPriceCount: alertProductSummaries.length,
+  observedRangeLabel: 'verified alert catalogue rows',
+  seasonalityLabel: 'Category seasonality is shown as a decision input instead of hiding timing assumptions.',
+  volatilityScore: null
 });
 
 const savedSearchDealCandidates: SavedSearchDealCandidate[] = matchedChainProducts.slice(0, 80).map((product) => ({
@@ -72,6 +91,22 @@ export default function AlertsPage() {
           <p className="mt-1 text-sm font-semibold text-slate-600">premium unlocks unlimited alerts, priority checks, and earlier deal notifications</p>
         </Card>
       </div>
+
+      <section className="mt-6 rounded-3xl border border-emerald-100 bg-white p-5 shadow-sm" aria-label="Best-time alert explanation inputs">
+        <p className="text-sm font-black uppercase tracking-[0.18em] text-emerald-700">Best-time-to-buy explanations</p>
+        <h2 className="mt-2 text-2xl font-black text-slate-950">Why a timing alert fires</h2>
+        <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+          Best-time alerts expose the seasonal context, observed volatility, and known flyer-window signal that influenced the buy-now, wait, or keep-watching decision.
+        </p>
+        <ol className="mt-4 grid gap-3 md:grid-cols-3">
+          {bestTimeExplanationPreview.map((step) => (
+            <li className="rounded-2xl bg-emerald-50 p-4" key={step.kind}>
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">{step.label}</p>
+              <p className="mt-2 text-sm font-semibold leading-6 text-emerald-950">{step.detail}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
 
       <AlertManagementPanel products={alertProductSummaries} />
       <SavedSearchSubscriptionsPanel candidates={savedSearchDealCandidates} />

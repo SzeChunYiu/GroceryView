@@ -3,6 +3,7 @@ import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/c
 import { OcrScanHistoryTimeline } from '@/components/ocr-scan-history-timeline';
 import { BarcodeScanner } from '@/components/barcode-scanner';
 import { ScannerUploadActions } from '@/components/scanner-upload-actions';
+import { barcodeMissFallbackProducts } from '@/lib/openfoodfacts-catalog';
 import { routeMetadata } from '@/lib/seo';
 import { receiptFedAliasGrowthPlan } from '@/lib/verified-data';
 
@@ -109,10 +110,15 @@ export default function ScannerPage() {
         <p className="text-xs font-black uppercase tracking-[0.22em] text-indigo-800">Mobile scanner shortcut</p>
         <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Bottom nav keeps in-store workflows one tap away</h2>
         <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
-          The mobile bottom navigation now promotes Scan, the current shopping list, nearby deals, and the watchlist so grocery trips can jump between receipt capture, aisle tasks, and price checks without opening menus.
+          The mobile bottom navigation now promotes Scan, the current shopping list, nearby deals, and the watchlist so grocery trips can jump between receipt capture, aisle tasks, and price checks without opening menus. Installed PWA launches use a dedicated scanner URL so analytics can distinguish app-mode scans from browser taps.
         </p>
+        <div className="mt-4 grid gap-2 text-sm font-bold text-indigo-950 sm:grid-cols-2">
+          <p className="rounded-2xl bg-indigo-50 p-3">Browser shortcut: /scanner?launch=bottom-nav-browser#scan</p>
+          <p className="rounded-2xl bg-indigo-50 p-3">Installed shortcut: /scanner?launch=bottom-nav-pwa#scan</p>
+        </div>
         <div className="mt-4 flex flex-wrap gap-2">
           <Link className="rounded-full bg-indigo-900 px-4 py-2 text-sm font-black text-white" href="#scan">Scan receipt</Link>
+          <Link className="rounded-full border border-indigo-200 px-4 py-2 text-sm font-black text-indigo-900" href="#scan-history">Recent scans</Link>
           <Link className="rounded-full border border-indigo-200 px-4 py-2 text-sm font-black text-indigo-900" href="/list">Current list</Link>
           <Link className="rounded-full border border-indigo-200 px-4 py-2 text-sm font-black text-indigo-900" href="/screener">Nearby deals</Link>
           <Link className="rounded-full border border-indigo-200 px-4 py-2 text-sm font-black text-indigo-900" href="/watchlist">Watchlist</Link>
@@ -120,9 +126,11 @@ export default function ScannerPage() {
       </Card>
       <BarcodeScanner />
       <div id="scan" className="scroll-mt-24">
-        <ScannerUploadActions />
+        <ScannerUploadActions fallbackProducts={barcodeMissFallbackProducts} />
       </div>
-      <OcrScanHistoryTimeline />
+      <div id="scan-history" className="scroll-mt-24">
+        <OcrScanHistoryTimeline />
+      </div>
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
         <TopSpreads limit={5} />
         <SourceCoverage />

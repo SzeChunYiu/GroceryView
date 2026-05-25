@@ -14,6 +14,7 @@ import {
 } from '@/lib/verified-data';
 import type { PrivateFeatureRoute } from '@/lib/verified-data';
 import { freshnessCopy, sourceLimitationCopy } from '@/lib/content-style';
+import type { SourceManagementAction } from '@/lib/source-health';
 
 export function PageShell({ children }: Readonly<{ children: ReactNode }>) {
   return (
@@ -33,6 +34,51 @@ export function Card({ children, className = '' }: Readonly<{ children: ReactNod
   return <section className={`rounded-[1.75rem] border border-slate-200 bg-white/88 p-5 shadow-sm ${className}`}>{children}</section>;
 }
 
+export function DashboardHero({
+  actions,
+  children,
+  eyebrow,
+  title
+}: Readonly<{ actions?: ReactNode; children: ReactNode; eyebrow: string; title: string }>) {
+  return (
+    <section className="rounded-[2rem] border border-emerald-200 bg-white/90 p-6 shadow-sm">
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+        <div className="max-w-4xl">
+          <Eyebrow>{eyebrow}</Eyebrow>
+          <h1 className="mt-2 text-4xl font-black tracking-tight text-slate-950 md:text-5xl">{title}</h1>
+          <div className="mt-4 text-lg leading-8 text-slate-700">{children}</div>
+        </div>
+        {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
+      </div>
+    </section>
+  );
+}
+
+export function AdminMetricCard({
+  detail,
+  label,
+  value
+}: Readonly<{ detail: ReactNode; label: string; value: string }>) {
+  return (
+    <Card className="p-4">
+      <p className="text-sm font-semibold text-slate-600">{label}</p>
+      <p className="mt-2 text-3xl font-black tracking-tight text-slate-950">{value}</p>
+      <div className="mt-2 text-sm leading-6 text-slate-600">{detail}</div>
+    </Card>
+  );
+}
+
+export function StatusBadge({ children, tone = 'neutral' }: Readonly<{ children: ReactNode; tone?: 'neutral' | 'success' | 'warning' }>) {
+  const toneClass =
+    tone === 'success'
+      ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
+      : tone === 'warning'
+        ? 'border-amber-200 bg-amber-50 text-amber-950'
+        : 'border-slate-200 bg-slate-50 text-slate-700';
+
+  return <span className={`rounded-full border px-3 py-1 text-xs font-black uppercase tracking-[0.14em] ${toneClass}`}>{children}</span>;
+}
+
 export function MetricGrid() {
   return (
     <div className="grid gap-3 md:grid-cols-4">
@@ -42,6 +88,65 @@ export function MetricGrid() {
           <p className="mt-2 text-3xl font-black tracking-tight text-slate-950">{metric.value}</p>
           <p className="mt-2 text-sm leading-6 text-slate-600">{metric.detail}</p>
         </Card>
+      ))}
+    </div>
+  );
+}
+
+export function SourceFreshnessStatusBadge({
+  status,
+}: Readonly<{ status: 'within-sla' | 'watch' | 'breached' }>) {
+  const labels = {
+    'within-sla': 'Within SLA',
+    watch: 'Watch',
+    breached: 'SLA breached'
+  };
+  const classNames = {
+    'within-sla': 'bg-emerald-100 text-emerald-950',
+    watch: 'bg-amber-100 text-amber-950',
+    breached: 'bg-rose-100 text-rose-950'
+  };
+
+  return (
+    <span className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.14em] ${classNames[status]}`}>
+      {labels[status]}
+    </span>
+  );
+}
+
+export function SourceManagementActionsPanel({
+  actions
+}: Readonly<{ actions: SourceManagementAction[] }>) {
+  return (
+    <div className="mt-5 grid gap-3 lg:grid-cols-2">
+      {actions.map((source) => (
+        <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm" key={source.id}>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">{source.chain}</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{source.dataSource}</h3>
+              <p className="mt-1 text-sm font-semibold text-slate-600">Owner: {source.owner}</p>
+            </div>
+            <span className={source.state === 'paused' ? 'rounded-full bg-amber-100 px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-amber-950' : 'rounded-full bg-emerald-100 px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-emerald-950'}>
+              {source.state}
+            </span>
+          </div>
+          <p className="mt-3 rounded-xl bg-slate-50 p-3 text-sm font-semibold leading-6 text-slate-700">{source.note}</p>
+          <div className="mt-4 flex flex-wrap gap-2" aria-label={`${source.dataSource} management actions`}>
+            <button className="rounded-full bg-rose-50 px-3 py-2 text-xs font-black text-rose-800 disabled:opacity-40" data-source-action="pause" disabled={!source.allowedActions.includes('pause')} type="button">
+              Pause
+            </button>
+            <button className="rounded-full bg-emerald-50 px-3 py-2 text-xs font-black text-emerald-800 disabled:opacity-40" data-source-action="resume" disabled={!source.allowedActions.includes('resume')} type="button">
+              Resume
+            </button>
+            <button className="rounded-full bg-sky-50 px-3 py-2 text-xs font-black text-sky-800" data-source-action="annotate" type="button">
+              Annotate
+            </button>
+            <Link className="rounded-full bg-slate-950 px-3 py-2 text-xs font-black text-white" href={source.runbookUrl}>
+              Runbook
+            </Link>
+          </div>
+        </section>
       ))}
     </div>
   );

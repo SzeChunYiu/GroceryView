@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'GroceryView verified grocery terminal',
     short_name: 'GroceryView',
-    description: 'Install GroceryView for mobile-first Swedish grocery price checks, saved lists, favourites, cached product details, and offline store trips.',
+    description: 'Install GroceryView to your home screen for mobile-first Swedish grocery price checks, saved lists, checked states, last-seen price estimates, and offline store trips.',
     id: '/',
     start_url: '/?utm_source=pwa',
     scope: '/',
@@ -38,7 +38,7 @@ export default function manifest(): MetadataRoute.Manifest {
       {
         name: 'Open shopping list',
         short_name: 'List',
-        description: 'Open the cached shopping list, favourites, and saved product price routes for offline store aisles.',
+        description: 'Open the cached shopping list with offline checked states, last-seen price estimates, favourites, and saved product routes.',
         url: '/list',
         icons: [{ src: '/pwa-icon.svg', sizes: 'any', type: 'image/svg+xml' }]
       },
