@@ -5,9 +5,12 @@ import {
   apiContractSchemas,
   compareResponseSchema,
   fuelPriceObservationSchema,
+  multiWeekStockUpListResponseSchema,
+  multiWeekStockUpUpdateRowSchema,
   notificationInboxResponseSchema,
   priceObservationSchema,
   type CompareResponseDto,
+  type MultiWeekStockUpListResponseDto,
   type NotificationInboxResponseDto,
   type PriceObservationDto
 } from '../index.js';
@@ -67,6 +70,40 @@ const validNotificationInbox: NotificationInboxResponseDto = {
   guardrails: ['Quiet-hours holds wait for the morning digest unless the alert is critical.']
 };
 
+
+const validStockUpList: MultiWeekStockUpListResponseDto = {
+  userId: 'user-1',
+  itemCount: 1,
+  rows: [
+    {
+      rowId: 'coffee-stock-up',
+      userId: 'user-1',
+      productId: 'coffee',
+      productName: 'Zoégas Coffee 450g',
+      storeName: 'Willys Odenplan',
+      planningWeeks: 4,
+      weeklyNeedUnits: 1,
+      packageUnits: 0.45,
+      comparableUnit: 'kg',
+      currentUnitPrice: 110.89,
+      historicalLowUnitPrice: 99.9,
+      typicalUnitPrice: 133.11,
+      confidence: 'high',
+      historyWindowStart: '2026-04-01T00:00:00.000Z',
+      historyWindowEnd: '2026-05-21T00:00:00.000Z',
+      noForecastReason: 'Historical low and typical prices are observed facts only; no future shelf price is predicted.',
+      reviewTrigger: 'Re-check observed prices before restocking.',
+      updatedAt: '2026-05-21T09:00:00.000Z'
+    }
+  ],
+  guardrails: ['Rows are account-owned and signed-in.', 'No forecast is stored.'],
+  evidence: {
+    sourceTables: ['multi_week_stock_up_rows', 'app_users'],
+    noForecast: true,
+    historicalPriceFields: ['historicalLowUnitPrice', 'typicalUnitPrice', 'confidence', 'historyWindowStart', 'historyWindowEnd']
+  }
+};
+
 const validCompareResponse: CompareResponseDto = {
   itemIds: ['coffee', 'milk'],
   stores: {
@@ -108,6 +145,10 @@ describe('api contract schemas', () => {
       'fuelPriceSource',
       'fuelPricesResponse',
       'latestPrice',
+      'multiWeekStockUpCreateRow',
+      'multiWeekStockUpListResponse',
+      'multiWeekStockUpRow',
+      'multiWeekStockUpUpdateRow',
       'notificationInboxResponse',
       'priceObservation',
       'product',
@@ -239,6 +280,25 @@ describe('api contract schemas', () => {
     );
   });
 
+
+  it('models signed-in multi-week stock-up rows as observed historical facts, not forecasts', () => {
+    const parsed = multiWeekStockUpListResponseSchema.parse(validStockUpList);
+
+    assert.equal(parsed.rows[0]?.planningWeeks, 4);
+    assert.equal(parsed.rows[0]?.confidence, 'high');
+    assert.equal(parsed.evidence.noForecast, true);
+    assert.deepEqual(parsed.evidence.sourceTables, ['multi_week_stock_up_rows', 'app_users']);
+    assert.equal(
+      multiWeekStockUpListResponseSchema.safeParse({
+        ...validStockUpList,
+        evidence: { ...validStockUpList.evidence, noForecast: false }
+      }).success,
+      false
+    );
+    assert.equal(multiWeekStockUpUpdateRowSchema.safeParse({}).success, false);
+    assert.equal(multiWeekStockUpUpdateRowSchema.parse({ planningWeeks: 6 }).planningWeeks, 6);
+  });
+
   it('publishes OpenAPI-compatible component metadata for price provenance', () => {
     const price = apiContractOpenApiComponents.PriceObservation;
     const fuel = apiContractOpenApiComponents.FuelPriceObservation;
@@ -269,5 +329,9 @@ describe('api contract schemas', () => {
       'guardrails'
     ]);
     assert.equal(apiContractOpenApiComponents.NotificationInboxQueueItem.properties.sendAt.format, 'date-time');
+    assert.deepEqual(apiContractOpenApiComponents.MultiWeekStockUpListResponse.properties.rows.items, {
+      $ref: '#/components/schemas/MultiWeekStockUpRow'
+    });
+    assert.equal(apiContractOpenApiComponents.MultiWeekStockUpListResponse.properties.evidence.properties.noForecast.enum[0], true);
   });
 });
