@@ -787,6 +787,58 @@ describe('St1 fuel price connector', () => {
     assert.equal(rows[0].observedAt, '2026-05-22T22:01:00.000Z');
     assert.equal(rows[0].source.kind, 'operator');
     assert.equal(rows[0].source.operatorName, 'St1 Sverige AB');
+    assert.deepEqual(
+      rows.map((row) => ({
+        store_id: row.store_id,
+        region: row.region,
+        format: row.format,
+        customer_segment: row.customer_segment,
+        pricing_program: row.pricing_program,
+        price_scope: row.price_scope
+      })),
+      [
+        {
+          store_id: null,
+          region: 'sweden',
+          format: 'st1-stationer',
+          customer_segment: 'business_light_traffic',
+          pricing_program: 'st1_business_kort_listprisavtal',
+          price_scope: 'national_business_list_price'
+        },
+        {
+          store_id: null,
+          region: 'sweden',
+          format: 'st1-stationer',
+          customer_segment: 'business_light_traffic',
+          pricing_program: 'st1_business_kort_listprisavtal',
+          price_scope: 'national_business_list_price'
+        },
+        {
+          store_id: null,
+          region: 'sweden',
+          format: 'st1-stationer',
+          customer_segment: 'business_light_traffic',
+          pricing_program: 'st1_business_kort_listprisavtal',
+          price_scope: 'national_business_list_price'
+        },
+        {
+          store_id: null,
+          region: 'sweden',
+          format: 'st1-stationer',
+          customer_segment: 'business_light_traffic',
+          pricing_program: 'st1_business_kort_listprisavtal',
+          price_scope: 'national_business_list_price'
+        },
+        {
+          store_id: null,
+          region: 'sweden',
+          format: 'st1-stationer',
+          customer_segment: 'business_light_traffic',
+          pricing_program: 'st1_business_kort_listprisavtal',
+          price_scope: 'national_business_list_price'
+        }
+      ]
+    );
     assert.equal(rows[0].provenance.sourceUrl, ST1_FUEL_PRICE_URL);
     assert.equal(rows[0].provenance.parserVersion, 'st1-fuel-listpris-v1');
     assert.match(rows[0].provenance.contentDigest.value, /^[a-f0-9]{64}$/);

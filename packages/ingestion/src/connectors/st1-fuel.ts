@@ -5,6 +5,9 @@ export const ST1_FUEL_PRICE_URL = 'https://st1.se/foretag/listpris';
 export type St1FuelGrade = '95' | '98' | 'diesel' | 'HVO100' | 'E85';
 export type St1FuelObservationDomain = 'fuel';
 export type St1FuelSourceKind = 'operator' | 'crowd';
+export type St1FuelPriceScope = 'national_business_list_price';
+export type St1FuelCustomerSegment = 'business_light_traffic';
+export type St1FuelFormat = 'st1-stationer';
 
 export type St1FuelPriceSource = {
   id: string;
@@ -27,6 +30,12 @@ export type St1FuelPriceObservation = {
   validFrom: string;
   confidence: number;
   source: St1FuelPriceSource;
+  store_id: null;
+  region: 'sweden';
+  format: St1FuelFormat;
+  customer_segment: St1FuelCustomerSegment;
+  pricing_program: 'st1_business_kort_listprisavtal';
+  price_scope: St1FuelPriceScope;
   provenance: {
     sourceRunId: string;
     sourceUrl: string;
@@ -129,6 +138,12 @@ export function parseSt1FuelPriceHtml(
       validFrom,
       confidence: 0.95,
       source,
+      store_id: null,
+      region: 'sweden',
+      format: 'st1-stationer',
+      customer_segment: 'business_light_traffic',
+      pricing_program: 'st1_business_kort_listprisavtal',
+      price_scope: 'national_business_list_price',
       provenance: {
         sourceRunId: context.sourceRunId ?? `st1-fuel-${validFrom.slice(0, 10)}`,
         sourceUrl,
