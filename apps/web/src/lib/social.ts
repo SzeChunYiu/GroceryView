@@ -33,6 +33,33 @@ export type SocialComment = Readonly<{
   postId: string;
 }>;
 
+export type FriendFollowRelationship = Readonly<{
+  acceptedAt: string;
+  followerDisplayName: string;
+  followerUserId: string;
+  followingDisplayName: string;
+  followingUserId: string;
+  id: string;
+  sourceInviteToken: string;
+  status: 'accepted';
+}>;
+
+export type FriendInviteStatus = 'pending' | 'accepted' | 'expired';
+
+export type FriendInviteToken = Readonly<{
+  acceptedAt?: string;
+  acceptedByUserId?: string;
+  createdAt: string;
+  expiresAt: string;
+  id: string;
+  inviteeEmail: string;
+  inviterDisplayName: string;
+  inviterUserId: string;
+  relationshipId?: string;
+  status: FriendInviteStatus;
+  token: string;
+}>;
+
 type PublicSharePreviewInputItem = Readonly<{
   matchedProductSlug?: string;
   name: string;
@@ -127,6 +154,38 @@ let socialComments: SocialComment[] = [
   }
 ];
 
+let friendFollowRelationships: FriendFollowRelationship[] = [
+  {
+    acceptedAt: '2026-05-20T12:00:00.000Z',
+    followerDisplayName: 'Maja',
+    followerUserId: 'friend-maja',
+    followingDisplayName: 'Signed-in shopper',
+    followingUserId: 'signed-in-user',
+    id: 'follow-friend-maja-signed-in-user',
+    sourceInviteToken: 'seeded-friend-follow',
+    status: 'accepted'
+  }
+];
+
+let friendInviteTokens: FriendInviteToken[] = [
+  {
+    createdAt: '2026-05-24T09:00:00.000Z',
+    expiresAt: '2026-05-31T09:00:00.000Z',
+    id: 'friend-invite-linnea',
+    inviteeEmail: 'linnea@example.com',
+    inviterDisplayName: 'Signed-in shopper',
+    inviterUserId: 'signed-in-user',
+    status: 'pending',
+    token: 'friend_invite_seeded_linnea'
+  }
+];
+
+export const friendInviteAcceptanceWorkflow = [
+  'Invite tokens are opaque, one-time credentials and are never derived from email addresses.',
+  'Acceptance creates a follower-to-following relationship only after the invite is still pending and unexpired.',
+  'Friend follows can influence social recommendations, but deal signals still require explicit opt-in before sharing.'
+];
+
 export function extractMentions(body: string) {
   return [...new Set([...body.matchAll(/(^|\s)@([a-zA-Z0-9_-]{2,32})/g)].map((match) => match[2]))];
 }
@@ -153,6 +212,102 @@ export function listSharedFriendPriceSightings(filters: Readonly<{ postId?: stri
     && (!filters.postId || sighting.postId === filters.postId)
     && (!filters.productSlug || sighting.productSlug === filters.productSlug)
   ));
+}
+
+function randomInviteToken() {
+  const randomUuid = globalThis.crypto?.randomUUID?.();
+  if (randomUuid) return `friend_invite_${randomUuid.replace(/-/g, '')}`;
+  return `friend_invite_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 14)}`;
+}
+
+function inviteStatus(invite: FriendInviteToken, now = new Date()) {
+  if (invite.status === 'accepted') return 'accepted';
+  return Date.parse(invite.expiresAt) < now.getTime() ? 'expired' : 'pending';
+}
+
+export function listFriendFollows(userId: string) {
+  return friendFollowRelationships.filter((relationship) => (
+    relationship.followerUserId === userId || relationship.followingUserId === userId
+  ));
+}
+
+export function listFriendInvites(userId: string, now = new Date()) {
+  return friendInviteTokens
+    .filter((invite) => invite.inviterUserId === userId || invite.acceptedByUserId === userId)
+    .map((invite) => ({ ...invite, status: inviteStatus(invite, now) }));
+}
+
+export function createFriendInvite(input: Readonly<{
+  inviteeEmail: string;
+  inviterDisplayName: string;
+  inviterUserId: string;
+  now?: Date;
+}>) {
+  const inviteeEmail = input.inviteeEmail.trim().toLowerCase();
+  const inviterUserId = input.inviterUserId.trim();
+  const inviterDisplayName = input.inviterDisplayName.trim() || 'GroceryView shopper';
+  const now = input.now ?? new Date();
+
+  if (!inviterUserId) throw new Error('inviterUserId is required.');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inviteeEmail)) throw new Error('A valid inviteeEmail is required.');
+
+  const invite: FriendInviteToken = {
+    createdAt: now.toISOString(),
+    expiresAt: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+    id: `friend-invite-${now.getTime().toString(36)}-${friendInviteTokens.length + 1}`,
+    inviteeEmail,
+    inviterDisplayName,
+    inviterUserId,
+    status: 'pending',
+    token: randomInviteToken()
+  };
+  friendInviteTokens = [...friendInviteTokens, invite];
+  return invite;
+}
+
+export function acceptFriendInvite(input: Readonly<{
+  acceptedByDisplayName: string;
+  acceptedByUserId: string;
+  now?: Date;
+  token: string;
+}>) {
+  const token = input.token.trim();
+  const acceptedByUserId = input.acceptedByUserId.trim();
+  const acceptedByDisplayName = input.acceptedByDisplayName.trim() || 'Friend';
+  const now = input.now ?? new Date();
+  const invite = friendInviteTokens.find((candidate) => candidate.token === token);
+
+  if (!token) throw new Error('token is required.');
+  if (!acceptedByUserId) throw new Error('acceptedByUserId is required.');
+  if (!invite) throw new Error('Unknown friend invite token.');
+  if (inviteStatus(invite, now) !== 'pending') throw new Error('Friend invite token is not pending.');
+
+  const relationship: FriendFollowRelationship = {
+    acceptedAt: now.toISOString(),
+    followerDisplayName: acceptedByDisplayName,
+    followerUserId: acceptedByUserId,
+    followingDisplayName: invite.inviterDisplayName,
+    followingUserId: invite.inviterUserId,
+    id: `follow-${acceptedByUserId}-${invite.inviterUserId}`,
+    sourceInviteToken: invite.token,
+    status: 'accepted'
+  };
+
+  friendFollowRelationships = [
+    ...friendFollowRelationships.filter((candidate) => candidate.id !== relationship.id),
+    relationship
+  ];
+  friendInviteTokens = friendInviteTokens.map((candidate) => candidate.token === token
+    ? {
+      ...candidate,
+      acceptedAt: relationship.acceptedAt,
+      acceptedByUserId,
+      relationshipId: relationship.id,
+      status: 'accepted'
+    }
+    : candidate);
+
+  return { invite: friendInviteTokens.find((candidate) => candidate.token === token)!, relationship };
 }
 
 export function listFriendPriceSightingsForProductChains(productSlug: string, chainSlugs: readonly string[]) {

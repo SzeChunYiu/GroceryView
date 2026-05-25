@@ -3006,6 +3006,27 @@ ${seo}`;
     assert.match(badge, /confidenceCopy/);
   });
 
+  it('models friend follows with secure invite tokens and acceptance workflow', async () => {
+    const social = await read('src/lib/social.ts');
+    const friendsPage = await read('src/app/account/friends/page.tsx');
+    const inviteRoute = await read('src/app/api/social/invite/route.ts');
+
+    assert.match(social, /FriendFollowRelationship/);
+    assert.match(social, /FriendInviteToken/);
+    assert.match(social, /randomInviteToken/);
+    assert.match(social, /friendInviteAcceptanceWorkflow/);
+    assert.match(social, /createFriendInvite/);
+    assert.match(social, /acceptFriendInvite/);
+    assert.match(friendsPage, /Friend invites and follow relationships/);
+    assert.match(friendsPage, /\/api\/social\/invite/);
+    assert.match(friendsPage, /Create secure invite/);
+    assert.match(friendsPage, /Accept invite preview/);
+    assert.match(inviteRoute, /listFriendFollows/);
+    assert.match(inviteRoute, /listFriendInvites/);
+    assert.match(inviteRoute, /action === 'accept'/);
+    assert.match(inviteRoute, /NextResponse\.json/);
+  });
+
   it('surfaces reusable data-freshness confidence badges across public routes', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const shell = await read('src/components/market-shell.tsx');
