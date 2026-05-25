@@ -38,7 +38,7 @@ export function formatModerationThreshold(value: number) {
 }
 
 
-export type CommunityReviewPromptMetric = 'price_accuracy' | 'product_quality' | 'store_experience';
+export type CommunityReviewPromptMetric = 'taste' | 'freshness' | 'package_size' | 'substitution_quality';
 
 export type CommunityProductReviewSummary = {
   averageRating: number;
@@ -82,41 +82,62 @@ export type CommunityReviewPrompt = {
   trustReason: string;
 };
 
+export type CommunityReviewPromptResponse = {
+  promptId: CommunityReviewPromptMetric;
+  rating: number;
+  note: string;
+};
+
 export const COMMUNITY_REVIEW_PROMPTS: CommunityReviewPrompt[] = [
   {
-    id: 'price_accuracy',
-    label: 'Price accuracy',
-    question: 'Was the reported shelf price accurate when you checked it?',
-    helper: 'Rate whether the submitted SEK price matched the label, receipt, or app evidence you saw.',
-    lowLabel: 'Price looked wrong',
-    highLabel: 'Price matched exactly',
-    trustReason: 'Confirms crowdsourced grocery prices before they influence cheapest-store and alert surfaces.'
+    id: 'taste',
+    label: 'Taste',
+    question: 'How did the product taste compared with what shoppers should expect?',
+    helper: 'Capture flavor, texture, aftertaste, and whether the review describes the actual product experience.',
+    lowLabel: 'Poor taste',
+    highLabel: 'Great taste',
+    trustReason: 'Makes subjective taste feedback comparable across products instead of relying only on free-form comments.'
   },
   {
-    id: 'product_quality',
-    label: 'Product quality',
-    question: 'Was the product condition and variant quality correctly described?',
-    helper: 'Use this for freshness, size/variant agreement, and whether the item looked shopper-ready.',
-    lowLabel: 'Quality issue',
-    highLabel: 'Quality as reported',
-    trustReason: 'Separates a cheap but poor-quality item from a trustworthy deal candidate.'
+    id: 'freshness',
+    label: 'Freshness',
+    question: 'How fresh was the product at purchase or delivery time?',
+    helper: 'Use this for produce condition, best-before window, packaging damage, and shelf-life concerns.',
+    lowLabel: 'Not fresh',
+    highLabel: 'Very fresh',
+    trustReason: 'Separates cheap stale items from trustworthy grocery deals.'
   },
   {
-    id: 'store_experience',
-    label: 'Store experience',
-    question: 'Was the in-store experience consistent with the report?',
-    helper: 'Consider stock availability, shelf placement, checkout/member-price behavior, and staff correction.',
-    lowLabel: 'Hard to verify',
-    highLabel: 'Easy to verify in store',
-    trustReason: 'Helps community validation identify stores where reports are easy to reproduce.'
+    id: 'package_size',
+    label: 'Package size',
+    question: 'Did the package size and unit match the listing or shelf label?',
+    helper: 'Note mismatched grams, liters, multipacks, shrinkflation, or unclear unit-price comparisons.',
+    lowLabel: 'Size mismatch',
+    highLabel: 'Size matched',
+    trustReason: 'Keeps price-per-unit comparisons grounded in the package shoppers actually bought.'
+  },
+  {
+    id: 'substitution_quality',
+    label: 'Substitution quality',
+    question: 'If the item was substituted, how close was the replacement?',
+    helper: 'Rate brand, size, dietary fit, price, and whether the substitute still satisfied the grocery need.',
+    lowLabel: 'Bad substitute',
+    highLabel: 'Great substitute',
+    trustReason: 'Helps compare retailer substitutions without mixing them into the original product rating.'
   }
 ];
 
 export const COMMUNITY_REVIEW_PROMPT_COPY = {
-  title: 'Review this community price report',
-  intro: 'After submitting or checking a report, rate price accuracy, product quality, and store experience so crowdsourced grocery data becomes more trustworthy.',
-  guardrail: 'Prompts collect validation signals only; they do not publish anonymous moderation decisions or fabricate price evidence.'
+  title: 'Review this grocery product',
+  intro: 'Structured taste, freshness, package-size, and substitution prompts make community product reviews comparable alongside free-form notes.',
+  guardrail: 'Prompts collect shopper experience signals only; they do not fabricate price evidence or replace protected moderation decisions.'
 } as const;
+
+export const DEFAULT_COMMUNITY_REVIEW_PROMPT_RESPONSES: CommunityReviewPromptResponse[] = COMMUNITY_REVIEW_PROMPTS.map((prompt) => ({
+  promptId: prompt.id,
+  rating: 4,
+  note: ''
+}));
 
 export function communityReviewPromptFor(metric: CommunityReviewPromptMetric) {
   return COMMUNITY_REVIEW_PROMPTS.find((prompt) => prompt.id === metric) ?? COMMUNITY_REVIEW_PROMPTS[0]!;
