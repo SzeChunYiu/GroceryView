@@ -4,7 +4,7 @@ import { planSplitTrip } from '../src/lib/trip-planner.ts';
 
 const basket = [
   { id: 'oats', name: 'Oats', prices: { coop: 24, willys: 18 } },
-  { id: 'milk', name: 'Milk', prices: { coop: 12, willys: 16 } },
+  { id: 'milk', name: 'Milk', prices: { coop: 12, willys: 22 } },
   { id: 'coffee', name: 'Coffee', prices: { coop: 58, willys: 46 } }
 ];
 
@@ -28,6 +28,6 @@ test('plans split trips with concrete item assignment, route order, effective to
   const gated = planSplitTrip(basket, stores, { minimumSavings: 8 });
   assert.equal(gated.mode, 'single-store');
   assert.deepEqual(gated.routeLegs, ['willys']);
-  assert.equal(gated.effectiveTotal, 88);
+  assert.equal(gated.effectiveTotal, 90);
   assert.deepEqual(gated.assignments.map((assignment) => assignment.storeId), ['willys', 'willys', 'willys']);
 });
