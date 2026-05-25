@@ -38,7 +38,7 @@ export function formatModerationThreshold(value: number) {
 }
 
 
-export type CommunityReviewPromptMetric = 'taste' | 'freshness' | 'package_size' | 'substitution_quality';
+export type CommunityReviewPromptMetric = 'taste' | 'freshness' | 'package_size' | 'substitution_quality' | 'price_accuracy' | 'product_quality' | 'store_experience';
 
 export type CommunityProductReviewSummary = {
   averageRating: number;
@@ -124,6 +124,33 @@ export const COMMUNITY_REVIEW_PROMPTS: CommunityReviewPrompt[] = [
     lowLabel: 'Bad substitute',
     highLabel: 'Great substitute',
     trustReason: 'Helps compare retailer substitutions without mixing them into the original product rating.'
+  },
+  {
+    id: 'price_accuracy',
+    label: 'Price accuracy',
+    question: 'How accurately did the shelf price match the checkout price?',
+    helper: 'Note any discrepancies between the shelf label, scanner, and receipt price.',
+    lowLabel: 'Price wrong',
+    highLabel: 'Price exact',
+    trustReason: 'crowdsourced grocery data becomes more trustworthy when price accuracy is verified at checkout.'
+  },
+  {
+    id: 'product_quality',
+    label: 'Product quality',
+    question: 'How did the overall product quality compare with expectations?',
+    helper: 'Consider packaging condition, quality for the price paid, and whether the product matched its description.',
+    lowLabel: 'Poor quality',
+    highLabel: 'Great quality',
+    trustReason: 'Product quality signals help separate genuine deals from low-quality discounts.'
+  },
+  {
+    id: 'store_experience',
+    label: 'Store experience',
+    question: 'How easy was it to find and purchase this item in store?',
+    helper: 'Note shelf availability, store layout clarity, and checkout wait time for this product category.',
+    lowLabel: 'Hard to find',
+    highLabel: 'Easy to find',
+    trustReason: 'Store experience data identifies availability gaps across grocery chains.'
   }
 ];
 

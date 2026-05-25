@@ -15,7 +15,7 @@ import { COMMUNITY_REVIEW_PROMPT_COPY } from '@/lib/community-reviews';
 import { ReviewPromptForm } from '@/components/review-prompt-form';
 import { sourceDiscrepancyReviewContract } from '@/lib/verified-data';
 
-type ReviewStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
+type ReviewStatus = 'idle' | 'blocked' | 'loading' | 'in_progress' | 'ready' | 'error';
 type BrowserSession = { accessToken: string; userId: string };
 type ReviewDecision = 'approve' | 'hide' | 'escalate';
 type ApiReviewDecision = 'approve' | 'reject' | 'needs_more_info';
@@ -73,6 +73,7 @@ export function PriceReportReviewActions() {
   async function decideReview(decision: ReviewDecision) {
     const session = requireSession();
     if (!session || !assignmentId.trim()) return;
+    setStatus('in_progress');
     const { accessToken, userId } = session;
     const apiDecision: ApiReviewDecision = decision === 'hide' ? 'reject' : decision === 'escalate' ? 'needs_more_info' : 'approve';
     const response = await fetch(`/api/human-review/assignments/${encodeURIComponent(assignmentId)}/decisions?userId=${encodeURIComponent(userId)}`, {
@@ -166,7 +167,7 @@ export function PriceReportReviewActions() {
       <div className="mt-3 flex flex-wrap gap-2">
         <button className="rounded-full border border-slate-300 px-4 py-2 text-sm font-black text-slate-800" disabled={!assignmentId.trim()} onClick={() => decideReview('approve')} type="button">Approve evidence</button>
         <button className="rounded-full border border-slate-300 px-4 py-2 text-sm font-black text-slate-800" disabled={!assignmentId.trim()} onClick={() => decideReview('hide')} type="button">Hide report</button>
-        <button className="rounded-full border border-amber-300 px-4 py-2 text-sm font-black text-amber-900" disabled={!assignmentId.trim()} onClick={() => decideReview('escalate')} type="button">Escalate</button>
+        <button className="rounded-full border border-amber-300 px-4 py-2 text-sm font-black text-amber-900" disabled={!assignmentId.trim()} onClick={() => decideReview('escalate')} type="button">Request more info</button>
       </div>
 
 

@@ -49,7 +49,9 @@ test('products route validation accepts q-only searches and rejects unexpected q
     query: 'a',
     expandedQueries: ['a'],
     matchedAliases: [],
+    matchedFuzzyAliases: [],
     matchedSynonyms: [],
+    queryRecovery: null,
     performanceTelemetry: {
       cacheHit: false,
       cacheHitRate: 0,
@@ -59,7 +61,7 @@ test('products route validation accepts q-only searches and rejects unexpected q
       timeoutRate: 0
     },
     results: [],
-    source: 'postgres.products_tsvector_alias_synonym_expansion'
+    source: 'postgres.products_tsvector_alias_synonym_fuzzy_rank'
   });
 
   const rejected = await GET(new Request('https://groceryview.test/api/products?q=a&limit=8'));
