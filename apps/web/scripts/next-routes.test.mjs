@@ -3104,6 +3104,23 @@ ${seo}`;
     assert.match(products, /No synthetic prices/);
   });
 
+  it('mounts mobile edge-swipe back navigation with the History API', async () => {
+    const layout = await read('src/app/layout.tsx');
+    const swipe = await read('src/hooks/useSwipe.ts');
+    const globals = await read('src/app/globals.css');
+
+    assert.match(layout, /SwipeBackNavigation/);
+    assert.match(swipe, /'use client'/);
+    assert.match(swipe, /touchstart/);
+    assert.match(swipe, /touchmove/);
+    assert.match(swipe, /window\.history\.back\(\)/);
+    assert.match(swipe, /window\.history\.length > 1/);
+    assert.match(swipe, /clientX <= edgeWidth/);
+    assert.match(swipe, /passive: false/);
+    assert.match(globals, /swipe-back-active/);
+    assert.match(globals, /body::before/);
+  });
+
   it('ships JSON-LD organization, site search, product offer, and breadcrumb metadata', async () => {
     const layout = await read('src/app/layout.tsx');
     const productRoute = await read('src/app/products/[slug]/page.tsx');
