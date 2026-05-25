@@ -2428,6 +2428,74 @@ function carbonScoreForProduct(product: (typeof productUniverse)[number]): Produ
   });
 }
 
+function carbonGradeForScore(score: number): ProductCarbonScore['grade'] {
+  if (score >= 85) return 'A';
+  if (score >= 70) return 'B';
+  if (score >= 55) return 'C';
+  if (score >= 40) return 'D';
+  return 'E';
+}
+
+const weeklyBasketEcoRows = topChainSpreads.slice(0, 12).map((product) => {
+  const carbonScore = carbonScoreForProduct(product);
+  const cheapest = chainPriceRows(product).sort((left, right) => left.price - right.price || left.chain.localeCompare(right.chain, 'sv'))[0];
+  return {
+    productSlug: product.slug,
+    productName: product.name,
+    categoryLabel: labelFromSlug(product.category),
+    chainId: cheapest?.chain ?? product.lowestChain,
+    chainName: chainDisplayNames[cheapest?.chain ?? product.lowestChain] ?? product.lowestChain,
+    price: cheapest?.price ?? product.lowestPrice,
+    priceLabel: formatSek(cheapest?.price ?? product.lowestPrice),
+    carbonScore,
+    evidenceLabel: carbonScore.source === 'openfoodfacts-ecoscore'
+      ? carbonScore.label
+      : `Estimated from category, labels, origin, and frozen evidence: ${carbonScore.reasons.slice(0, 2).join(', ')}`
+  };
+});
+
+export const weeklyBasketEcoScore = {
+  rows: weeklyBasketEcoRows,
+  averageScore: weeklyBasketEcoRows.length
+    ? Math.round(weeklyBasketEcoRows.reduce((sum, row) => sum + row.carbonScore.score, 0) / weeklyBasketEcoRows.length)
+    : 0,
+  totalPrice: weeklyBasketEcoRows.reduce((sum, row) => sum + row.price, 0),
+  knownEcoScoreCount: weeklyBasketEcoRows.filter((row) => row.carbonScore.source === 'openfoodfacts-ecoscore').length,
+  estimatedEcoScoreCount: weeklyBasketEcoRows.filter((row) => row.carbonScore.source === 'origin-transport-heuristic').length,
+  suggestions: weeklyBasketEcoRows.flatMap((row) => {
+    const replacement = topChainSpreads
+      .filter((candidate) => candidate.slug !== row.productSlug && labelFromSlug(candidate.category) === row.categoryLabel)
+      .map((candidate) => ({
+        candidate,
+        carbonScore: carbonScoreForProduct(candidate)
+      }))
+      .filter(({ candidate, carbonScore }) => candidate.lowestPrice <= row.price && carbonScore.score >= row.carbonScore.score + 8)
+      .sort((left, right) => right.carbonScore.score - left.carbonScore.score || left.candidate.lowestPrice - right.candidate.lowestPrice)[0];
+    if (!replacement) return [];
+    return [{
+      fromProductName: row.productName,
+      toProductName: replacement.candidate.name,
+      toProductSlug: replacement.candidate.slug,
+      categoryLabel: row.categoryLabel,
+      currentPriceLabel: row.priceLabel,
+      replacementPriceLabel: formatSek(replacement.candidate.lowestPrice),
+      currentScore: row.carbonScore.score,
+      replacementScore: replacement.carbonScore.score,
+      scoreLift: replacement.carbonScore.score - row.carbonScore.score,
+      priceDelta: replacement.candidate.lowestPrice - row.price,
+      evidenceLabel: replacement.carbonScore.source === 'openfoodfacts-ecoscore'
+        ? replacement.carbonScore.label
+        : `Estimated: ${replacement.carbonScore.reasons.slice(0, 2).join(', ')}`
+    }];
+  }).slice(0, 4),
+  guardrails: [
+    'Basket eco score is an average of item-level carbon scores for the visible verified basket candidates.',
+    'Rows marked estimated use category, origin, frozen, and label heuristics; no kg CO2e value is fabricated.',
+    'Cheaper-plus-greener suggestions require same-category verified catalogue rows with lower or equal current price.'
+  ]
+};
+export const weeklyBasketEcoGrade = carbonGradeForScore(weeklyBasketEcoScore.averageScore);
+
 export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((product) => {
   const isChainProduct = 'lowestPrice' in product;
   const totalPrice = isChainProduct ? product.lowestPrice : product.priceMedian;
