@@ -32,6 +32,7 @@ import {
   checkSourceRunHealth,
   createPgQueryExecutor,
   createPostgresCatalogReader,
+  createPostgresProductAliasRepository,
   createPostgresRepository,
   createPostgresSourceRecordReader,
   queryRollingAverageDealReport,
@@ -42,6 +43,9 @@ import {
   type PostgresIntegrationReadinessReport,
   type QueryExecutor,
   type ReceiptUploadRecord,
+  type ReceiptAliasReviewCandidateWriteback,
+  type ReceiptAliasReviewDecisionWriteback,
+  type ReceiptAliasReviewWritebackResult,
   type RollingAverageDealReport,
   type SourceRunHealthCheckResult,
   type SourceRunHealthReport
@@ -137,6 +141,7 @@ export type AuthOptions = {
     getHumanReviewer(reviewerId: string): Promise<HumanReviewOperator | null>;
     listOpenHumanReviewAssignments(): Promise<HumanReviewAssignment[]>;
     saveHumanReviewAssignment(assignment: HumanReviewAssignment): Promise<void>;
+    applyReceiptAliasReviewDecision?(decision: ReceiptAliasReviewDecisionWriteback): Promise<ReceiptAliasReviewWritebackResult>;
   };
   basketImportReviewRepository?: {
     saveBasketImportReviewItems(userId: string, items: BasketImportReviewItem[]): Promise<void>;
@@ -235,6 +240,7 @@ export type RuntimePersistenceRepository = {
   getHumanReviewer(reviewerId: string): Promise<HumanReviewOperator | null>;
   listOpenHumanReviewAssignments(): Promise<HumanReviewAssignment[]>;
   saveHumanReviewAssignment(assignment: HumanReviewAssignment): Promise<void>;
+  applyReceiptAliasReviewDecision?(decision: ReceiptAliasReviewDecisionWriteback): Promise<ReceiptAliasReviewWritebackResult>;
   saveBasketImportReviewItems?(userId: string, items: BasketImportReviewItem[]): Promise<void>;
   listOpenBasketImportReviewItems?(userId: string): Promise<BasketImportReviewItem[]>;
   resolveBasketImportReviewItem?(userId: string, reviewItemId: string, resolution: {
@@ -676,6 +682,26 @@ function requiredNumber(value: unknown, field: string): number {
   const parsed = optionalNumber(value, field);
   if (parsed === undefined) throw new Error(`${field} is required.`);
   return parsed;
+}
+
+function optionalReceiptAliasReviewCandidate(body: JsonRecord): ReceiptAliasReviewCandidateWriteback | undefined {
+  const nested = body.receiptAliasCandidate ?? body.aliasCandidate;
+  const source = nested ?? (
+    body.productId !== undefined || body.rawAlias !== undefined || body.sourceRef !== undefined || body.matchConfidence !== undefined
+      ? body
+      : undefined
+  );
+  if (source === undefined) return undefined;
+  if (source === null || typeof source !== 'object' || Array.isArray(source)) {
+    throw new Error('receiptAliasCandidate must be an object.');
+  }
+  const record = source as JsonRecord;
+  return {
+    productId: requiredString(record.productId, 'receiptAliasCandidate.productId'),
+    rawAlias: requiredString(record.rawAlias ?? record.alias ?? record.rawName, 'receiptAliasCandidate.rawAlias'),
+    sourceRef: requiredString(record.sourceRef, 'receiptAliasCandidate.sourceRef'),
+    matchConfidence: requiredNumber(record.matchConfidence, 'receiptAliasCandidate.matchConfidence')
+  };
 }
 
 function optionalPositiveNumber(value: unknown, field: string, fallback: number): number {
@@ -2657,6 +2683,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         const body = await readJson(request);
         const decision = requiredHumanReviewDecision(body.decision);
         const decidedAt = optionalString(body.decidedAt, 'decidedAt') ?? (authOptions.now ?? new Date()).toISOString();
+        const receiptAliasCandidate = optionalReceiptAliasReviewCandidate(body);
         const decisionResult = applyHumanReviewDecision({
           item: {
             id: assignment.reviewId,
@@ -2670,13 +2697,25 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
           decidedAt,
           notes: optionalString(body.notes, 'notes')
         });
+        const receiptAliasWriteback = assignment.subjectType === 'commodity_mapping' && repository.applyReceiptAliasReviewDecision && (receiptAliasCandidate || decision !== 'approve')
+          ? await repository.applyReceiptAliasReviewDecision({
+              decision,
+              reviewedAt: decidedAt,
+              reviewerUserId: result.reviewer.id,
+              ...(receiptAliasCandidate ? { candidate: receiptAliasCandidate } : {})
+            })
+          : undefined;
 
         const nextAssignment: HumanReviewAssignment = {
           ...assignment,
           status: decision === 'needs_more_info' ? 'in_progress' : 'completed'
         };
         await repository.saveHumanReviewAssignment(nextAssignment);
-        return jsonResponse({ decision: decisionResult, assignment: nextAssignment }, { status: 202 });
+        return jsonResponse({
+          decision: decisionResult,
+          assignment: nextAssignment,
+          ...(receiptAliasWriteback ? { receiptAliasWriteback } : {})
+        }, { status: 202 });
       }
 
       if (method === 'POST' && path === '/api/notifications/suppression-events') {
@@ -4162,7 +4201,12 @@ export function buildRepositoryBackedAuthOptions(
     humanReviewRepository: {
       getHumanReviewer: (reviewerId) => repository.getHumanReviewer(reviewerId),
       listOpenHumanReviewAssignments: () => repository.listOpenHumanReviewAssignments(),
-      saveHumanReviewAssignment: (assignment) => repository.saveHumanReviewAssignment(assignment)
+      saveHumanReviewAssignment: (assignment) => repository.saveHumanReviewAssignment(assignment),
+      ...(repository.applyReceiptAliasReviewDecision
+        ? {
+            applyReceiptAliasReviewDecision: (decision) => repository.applyReceiptAliasReviewDecision!(decision)
+          }
+        : {})
     },
     ...(repository.saveBasketImportReviewItems && repository.listOpenBasketImportReviewItems && repository.resolveBasketImportReviewItem
       ? {
@@ -4228,7 +4272,11 @@ function createRuntimeRepositoryResource(config: RuntimeConfig, options: Runtime
   const executor: QueryExecutor = createPgQueryExecutor(pool);
   const sourceRecordReader = createPostgresSourceRecordReader(executor);
   const catalogReader = createPostgresCatalogReader(executor);
-  const repository = createPostgresRepository(executor);
+  const productAliasRepository = createPostgresProductAliasRepository(executor);
+  const repository: RuntimePersistenceRepository = {
+    ...createPostgresRepository(executor),
+    applyReceiptAliasReviewDecision: (decision) => productAliasRepository.applyReceiptAliasReviewDecision(decision)
+  };
   return {
     repository,
     executor,

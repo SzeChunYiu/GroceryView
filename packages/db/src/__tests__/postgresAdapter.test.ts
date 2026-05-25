@@ -118,6 +118,7 @@ class RecordingQueryExecutor implements QueryExecutor {
       source_ref: 'receipt-ocr',
       match_confidence: '0.9100',
       reviewed_at: new Date('2026-05-20T07:30:00.000Z'),
+      reviewer_user_id: 'moderator-1',
       created_at: '2026-05-20T07:29:00.000Z'
     }
   ];
@@ -1476,7 +1477,8 @@ describe('createPostgresProductAliasRepository', () => {
         sourceType: 'receipt',
         sourceRef: 'receipt-ocr',
         matchConfidence: 0.91,
-        reviewedAt: '2026-05-20T07:30:00.000Z'
+        reviewedAt: '2026-05-20T07:30:00.000Z',
+        reviewerUserId: 'moderator-1'
       }),
       {
         aliasId: 'alias-1',
@@ -1487,11 +1489,13 @@ describe('createPostgresProductAliasRepository', () => {
         sourceRef: 'receipt-ocr',
         matchConfidence: 0.91,
         reviewedAt: '2026-05-20T07:30:00.000Z',
+        reviewerUserId: 'moderator-1',
         createdAt: '2026-05-20T07:29:00.000Z'
       }
     );
 
     assert.match(executor.calls[0]!.sql, /insert into aliases/);
+    assert.match(executor.calls[0]!.sql, /reviewer_user_id/);
     assert.match(executor.calls[0]!.sql, /on conflict \(normalized_alias, source_type, source_ref\) do update/);
     assert.match(executor.calls[0]!.sql, /returning id/);
     assert.deepEqual(executor.calls[0]!.params, [
@@ -1501,8 +1505,78 @@ describe('createPostgresProductAliasRepository', () => {
       'receipt',
       'receipt-ocr',
       0.91,
-      '2026-05-20T07:30:00.000Z'
+      '2026-05-20T07:30:00.000Z',
+      'moderator-1'
     ]);
+  });
+
+  it('writes approved receipt alias candidates with reviewer identity and preserved receipt evidence', async () => {
+    const executor = new RecordingQueryExecutor();
+    executor.aliasRows = [
+      {
+        ...(executor.aliasRows[0] as Record<string, unknown>),
+        source_ref: 'receipt:scan-1:item-2',
+        match_confidence: '0.8200'
+      }
+    ];
+    const aliases = createPostgresProductAliasRepository(executor);
+
+    assert.deepEqual(
+      await aliases.applyReceiptAliasReviewDecision({
+        decision: 'approve',
+        reviewedAt: '2026-05-20T07:30:00.000Z',
+        reviewerUserId: 'moderator-1',
+        candidate: {
+          productId: 'product-1',
+          rawAlias: 'ZOEGA SKANEROST',
+          sourceRef: 'receipt:scan-1:item-2',
+          matchConfidence: 0.82
+        }
+      }),
+      {
+        status: 'approved',
+        canonicalMappingChanged: false,
+        alias: {
+          aliasId: 'alias-1',
+          productId: 'product-1',
+          alias: 'ZOEGA SKANEROST',
+          normalizedAlias: 'zoega skanerost',
+          sourceType: 'receipt',
+          sourceRef: 'receipt:scan-1:item-2',
+          matchConfidence: 0.82,
+          reviewedAt: '2026-05-20T07:30:00.000Z',
+          reviewerUserId: 'moderator-1',
+          createdAt: '2026-05-20T07:29:00.000Z'
+        }
+      }
+    );
+
+    assert.match(executor.calls[0]!.sql, /insert into aliases/);
+    assert.deepEqual(executor.calls[0]!.params, [
+      'product-1',
+      'ZOEGA SKANEROST',
+      'zoega skanerost',
+      'receipt',
+      'receipt:scan-1:item-2',
+      0.82,
+      '2026-05-20T07:30:00.000Z',
+      'moderator-1'
+    ]);
+  });
+
+  it('does not mutate canonical mappings for rejected receipt alias candidates', async () => {
+    const executor = new RecordingQueryExecutor();
+    const aliases = createPostgresProductAliasRepository(executor);
+
+    assert.deepEqual(
+      await aliases.applyReceiptAliasReviewDecision({
+        decision: 'reject',
+        reviewedAt: '2026-05-20T07:30:00.000Z',
+        reviewerUserId: 'moderator-1'
+      }),
+      { status: 'rejected', canonicalMappingChanged: false }
+    );
+    assert.deepEqual(executor.calls, []);
   });
 
   it('fails closed when an alias upsert does not return a row', async () => {

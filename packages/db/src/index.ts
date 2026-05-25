@@ -494,6 +494,7 @@ export type ProductAliasRecord = {
   sourceRef?: string;
   matchConfidence: number;
   reviewedAt?: string;
+  reviewerUserId?: string;
   createdAt: string;
 };
 
@@ -505,6 +506,7 @@ export type ProductAliasWriteRecord = {
   sourceRef?: string;
   matchConfidence: number;
   reviewedAt?: string;
+  reviewerUserId?: string;
 };
 
 export type ProductAliasLookupFilter = {
@@ -512,6 +514,26 @@ export type ProductAliasLookupFilter = {
   productId?: string;
   sourceType?: ProductAliasSourceType;
   limit?: number;
+};
+
+export type ReceiptAliasReviewCandidateWriteback = {
+  productId: string;
+  rawAlias: string;
+  sourceRef: string;
+  matchConfidence: number;
+};
+
+export type ReceiptAliasReviewDecisionWriteback = {
+  decision: 'approve' | 'reject' | 'needs_more_info';
+  reviewedAt: string;
+  reviewerUserId: string;
+  candidate?: ReceiptAliasReviewCandidateWriteback;
+};
+
+export type ReceiptAliasReviewWritebackResult = {
+  status: 'approved' | 'rejected' | 'needs_more_info';
+  canonicalMappingChanged: false;
+  alias?: ProductAliasRecord;
 };
 
 export type PostgresCatalogReader = {
@@ -525,6 +547,7 @@ export type PostgresCatalogReader = {
 export type PostgresProductAliasRepository = {
   upsertProductAlias(alias: ProductAliasWriteRecord): Promise<ProductAliasRecord>;
   findProductAliases(filter: ProductAliasLookupFilter): Promise<ProductAliasRecord[]>;
+  applyReceiptAliasReviewDecision(decision: ReceiptAliasReviewDecisionWriteback): Promise<ReceiptAliasReviewWritebackResult>;
 };
 
 export type PriceObservationRecord = {
@@ -1870,6 +1893,7 @@ type ProductAliasRow = {
   source_ref: string | null;
   match_confidence: string | number;
   reviewed_at: string | Date | null;
+  reviewer_user_id?: string | null;
   created_at: string | Date;
 };
 type BasketImportReviewRow = {
@@ -2270,6 +2294,7 @@ function mapProductAlias(row: ProductAliasRow): ProductAliasRecord {
     ...(row.source_ref ? { sourceRef: row.source_ref } : {}),
     matchConfidence: Number(row.match_confidence),
     ...(row.reviewed_at ? { reviewedAt: asIso(row.reviewed_at) } : {}),
+    ...(row.reviewer_user_id ? { reviewerUserId: row.reviewer_user_id } : {}),
     createdAt: asIso(row.created_at)
   };
 }
@@ -3219,6 +3244,19 @@ function normalizeAlias(value: string): string {
   return normalized;
 }
 
+function requiredReceiptAliasReviewString(value: string, field: string): string {
+  const trimmed = value.trim();
+  if (!trimmed) throw new Error(`${field} is required for receipt alias review writeback.`);
+  return trimmed;
+}
+
+function validateReceiptAliasReviewConfidence(value: number): number {
+  if (!Number.isFinite(value) || value < 0 || value > 1) {
+    throw new Error('Receipt alias review matchConfidence must be between 0 and 1.');
+  }
+  return value;
+}
+
 
 function mapOpenPricesPriceType(value: string): PriceType {
   if (value === 'online' || value === 'member' || value === 'receipt' || value === 'estimated') return value;
@@ -3660,7 +3698,7 @@ export function createPostgresCatalogReader(executor: QueryExecutor): PostgresCa
 }
 
 export function createPostgresProductAliasRepository(executor: QueryExecutor): PostgresProductAliasRepository {
-  return {
+  const repository: PostgresProductAliasRepository = {
     async upsertProductAlias(alias) {
       const rows = await executor.query<ProductAliasRow>(
         `insert into aliases(
@@ -3670,13 +3708,15 @@ export function createPostgresProductAliasRepository(executor: QueryExecutor): P
            source_type,
            source_ref,
            match_confidence,
-           reviewed_at
-         ) values ($1, $2, $3, $4, $5, $6, $7)
+           reviewed_at,
+           reviewer_user_id
+         ) values ($1, $2, $3, $4, $5, $6, $7, $8)
          on conflict (normalized_alias, source_type, source_ref) do update set
            product_id = excluded.product_id,
            alias = excluded.alias,
            match_confidence = excluded.match_confidence,
-           reviewed_at = excluded.reviewed_at
+           reviewed_at = excluded.reviewed_at,
+           reviewer_user_id = excluded.reviewer_user_id
          returning id,
                    product_id,
                    alias,
@@ -3685,6 +3725,7 @@ export function createPostgresProductAliasRepository(executor: QueryExecutor): P
                    source_ref,
                    match_confidence,
                    reviewed_at,
+                   reviewer_user_id,
                    created_at`,
         [
           alias.productId,
@@ -3693,7 +3734,8 @@ export function createPostgresProductAliasRepository(executor: QueryExecutor): P
           alias.sourceType,
           alias.sourceRef ?? null,
           alias.matchConfidence,
-          alias.reviewedAt ?? null
+          alias.reviewedAt ?? null,
+          alias.reviewerUserId ?? null
         ]
       );
       const row = rows[0];
@@ -3712,6 +3754,7 @@ export function createPostgresProductAliasRepository(executor: QueryExecutor): P
                 source_ref,
                 match_confidence,
                 reviewed_at,
+                reviewer_user_id,
                 created_at
          from aliases
          where ($1::text is null or normalized_alias = $1)
@@ -3722,8 +3765,45 @@ export function createPostgresProductAliasRepository(executor: QueryExecutor): P
         [filter.normalizedAlias ?? null, filter.productId ?? null, filter.sourceType ?? null, limit]
       );
       return rows.map(mapProductAlias);
+    },
+
+    async applyReceiptAliasReviewDecision(decision) {
+      if (decision.decision !== 'approve') {
+        return {
+          status: decision.decision === 'reject' ? 'rejected' : 'needs_more_info',
+          canonicalMappingChanged: false
+        };
+      }
+
+      const candidate = decision.candidate;
+      if (!candidate) throw new Error('Receipt alias candidate is required for approval writeback.');
+      const reviewedAt = requiredReceiptAliasReviewString(decision.reviewedAt, 'reviewedAt');
+      if (Number.isNaN(Date.parse(reviewedAt))) throw new Error('reviewedAt must be an ISO timestamp for receipt alias review writeback.');
+      const reviewerUserId = requiredReceiptAliasReviewString(decision.reviewerUserId, 'reviewerUserId');
+      const rawAlias = requiredReceiptAliasReviewString(candidate.rawAlias, 'rawAlias');
+      const productId = requiredReceiptAliasReviewString(candidate.productId, 'productId');
+      const sourceRef = requiredReceiptAliasReviewString(candidate.sourceRef, 'sourceRef');
+      const matchConfidence = validateReceiptAliasReviewConfidence(candidate.matchConfidence);
+
+      const alias = await repository.upsertProductAlias({
+        productId,
+        alias: rawAlias,
+        normalizedAlias: normalizeAlias(rawAlias),
+        sourceType: 'receipt',
+        sourceRef,
+        matchConfidence,
+        reviewedAt,
+        reviewerUserId
+      });
+
+      return {
+        status: 'approved',
+        canonicalMappingChanged: false,
+        alias
+      };
     }
   };
+  return repository;
 }
 
 export type PostgresIntegrationProbe = {
