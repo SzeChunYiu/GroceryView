@@ -2,6 +2,8 @@ import { publicApiCatalog, publicApiDisclaimers, publicApiRateLimit, publicApiSm
 
 const examples = publicApiSmokeExamples();
 
+// Read resources: products, current-prices, price-history, nutrition, allergens-labels, stores, comparisons.
+
 export default function DevelopersApiPage() {
   return (
     <main className="mx-auto max-w-5xl px-6 py-10">
