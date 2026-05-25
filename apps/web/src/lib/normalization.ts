@@ -5,9 +5,11 @@ export type PackageEvidence = {
   packageUnit: 'g' | 'ml' | 'piece';
 };
 
+export type UnitNormalizationOutlierBucket = 'kg' | 'l' | 'piece';
+
 export type NormalizedUnitPrice = PackageEvidence & {
   value: number;
-  comparableUnit: 'kg' | 'l' | 'piece';
+  comparableUnit: UnitNormalizationOutlierBucket;
 };
 
 export type RecipeProductCandidate = {
@@ -51,12 +53,14 @@ export type UnitNormalizationQaIssue = {
   productName: string;
   packageText: string;
   detail: string;
+  outlierBucket?: UnitNormalizationOutlierBucket;
 };
 
 export type UnitNormalizationQaReport = {
   issueCount: number;
   missingUnitCount: number;
   suspiciousPackSizeCount: number;
+  suspiciousPackSizeBuckets: Record<UnitNormalizationOutlierBucket, number>;
   inconsistentUnitPriceCount: number;
   issues: UnitNormalizationQaIssue[];
   guardrails: string[];
@@ -84,21 +88,22 @@ function normalizePackageAmount(amount: number, unit: string): PackageEvidence |
   if (!Number.isFinite(amount) || amount <= 0) return null;
   if (unit === 'kg') return { packageSize: amount * 1000, packageUnit: 'g' };
   if (unit === 'l') return { packageSize: amount * 1000, packageUnit: 'ml' };
-  if (unit === 'st' || unit === 'piece') return { packageSize: amount, packageUnit: 'piece' };
+  if (['st', 'pc', 'pcs', 'piece', 'pieces', 'each'].includes(unit)) return { packageSize: amount, packageUnit: 'piece' };
   if (unit === 'g' || unit === 'ml') return { packageSize: amount, packageUnit: unit };
   return null;
 }
 
 export function packageEvidenceFromText(text: string): PackageEvidence | null {
   const normalized = text.toLowerCase().replace(/,/g, '.');
-  const multipackMatch = normalized.match(/(\d+(?:\.\d+)?)\s*(?:x|×)\s*(\d+(?:\.\d+)?)\s*(kg|g|l|ml|st|piece)\b/);
+  const packageUnitPattern = 'kg|g|l|ml|st|pc|pcs|piece|pieces|each';
+  const multipackMatch = normalized.match(new RegExp(`(\\d+(?:\\.\\d+)?)\\s*(?:x|×)\\s*(\\d+(?:\\.\\d+)?)\\s*(${packageUnitPattern})\\b`));
   if (multipackMatch) {
     const packCount = Number(multipackMatch[1]);
     const packAmount = Number(multipackMatch[2]);
     return normalizePackageAmount(packCount * packAmount, multipackMatch[3]!);
   }
 
-  const match = normalized.match(/(\d+(?:\.\d+)?)\s*(kg|g|l|ml|st|piece)\b/);
+  const match = normalized.match(new RegExp(`(\\d+(?:\\.\\d+)?)\\s*(${packageUnitPattern})\\b`));
   if (!match) return null;
   return normalizePackageAmount(Number(match[1]), match[2]!);
 }
@@ -222,7 +227,8 @@ export function suggestRecipeProductMatches(
 function qaIssue(
   kind: UnitNormalizationQaIssueKind,
   product: UnitNormalizationQaProductInput,
-  detail: string
+  detail: string,
+  outlierBucket?: UnitNormalizationOutlierBucket
 ): UnitNormalizationQaIssue {
   return {
     kind,
@@ -230,8 +236,15 @@ function qaIssue(
     productId: product.productId,
     productName: product.productName,
     packageText: product.packageText || 'Package text missing',
-    detail
+    detail,
+    ...(outlierBucket ? { outlierBucket } : {})
   };
+}
+
+function packageOutlierBucket(evidence: PackageEvidence): UnitNormalizationOutlierBucket {
+  if (evidence.packageUnit === 'g') return 'kg';
+  if (evidence.packageUnit === 'ml') return 'l';
+  return 'piece';
 }
 
 export function unitNormalizationQaIssuesForProduct(product: UnitNormalizationQaProductInput): UnitNormalizationQaIssue[] {
@@ -249,7 +262,12 @@ export function unitNormalizationQaIssuesForProduct(product: UnitNormalizationQa
     || (evidence.packageUnit === 'piece' && (evidence.packageSize < 1 || evidence.packageSize > 100));
 
   if (suspiciousPackSize) {
-    issues.push(qaIssue('suspicious_pack_size', product, `Parsed ${evidence.packageSize} ${evidence.packageUnit}, which is outside the expected grocery package range.`));
+    issues.push(qaIssue(
+      'suspicious_pack_size',
+      product,
+      `Parsed ${evidence.packageSize} ${evidence.packageUnit}, which is outside the expected grocery package range.`,
+      packageOutlierBucket(evidence)
+    ));
   }
 
   if (!normalized || normalized.value <= 0 || normalized.value > 10000) {
@@ -266,10 +284,17 @@ export function unitNormalizationQaIssuesForProduct(product: UnitNormalizationQa
 
 export function buildUnitNormalizationQaReport(products: UnitNormalizationQaProductInput[]): UnitNormalizationQaReport {
   const issues = products.flatMap(unitNormalizationQaIssuesForProduct);
+  const suspiciousPackSizeIssues = issues.filter((issue) => issue.kind === 'suspicious_pack_size');
+  const suspiciousPackSizeBuckets: Record<UnitNormalizationOutlierBucket, number> = { kg: 0, l: 0, piece: 0 };
+  for (const issue of suspiciousPackSizeIssues) {
+    if (issue.outlierBucket) suspiciousPackSizeBuckets[issue.outlierBucket] += 1;
+  }
+
   return {
     issueCount: issues.length,
     missingUnitCount: issues.filter((issue) => issue.kind === 'missing_unit').length,
-    suspiciousPackSizeCount: issues.filter((issue) => issue.kind === 'suspicious_pack_size').length,
+    suspiciousPackSizeCount: suspiciousPackSizeIssues.length,
+    suspiciousPackSizeBuckets,
     inconsistentUnitPriceCount: issues.filter((issue) => issue.kind === 'inconsistent_unit_price').length,
     issues: issues.slice(0, 12),
     guardrails: [
