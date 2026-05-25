@@ -81,7 +81,7 @@ function productsPageUrl(page: number, selectedBrand = '', searchParams: SearchP
   if (selectedBrand) params.set('brand', selectedBrand);
   if (page > 1) params.set('page', String(page));
   const query = params.toString();
-  return query ? `/products?` : '/products';
+  return query ? `/products?${query}` : '/products';
 }
 
 const ZERO_RESULT_RELATED_SEARCHES = [
