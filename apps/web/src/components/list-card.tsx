@@ -239,7 +239,7 @@ export function ListCard({ currentRole, items, onConflictPrompt, publicShareHref
               ) : null}
 
               <div className="mt-3 rounded-lg bg-slate-50 p-3">
-                <p className="text-sm font-semibold text-slate-800">Item comments</p>
+                <p className="text-sm font-semibold text-slate-800">Item comments for substitutions, quantities, or store notes</p>
                 {comments.length > 0 ? (
                   <ul className="mt-2 space-y-2">
                     {comments.map((comment) => (

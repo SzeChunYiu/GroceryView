@@ -25,6 +25,14 @@ export type StoreBasketSubstitutionExplanation = {
   reason: string;
 };
 
+export type StoreBasketComparisonLine = {
+  productId: string;
+  productName: string;
+  status: 'priced' | 'missing';
+  priceText: string;
+  unitLabel: string;
+};
+
 export type StoreBasketComparisonStore = {
   storeId: string;
   storeName: string;
@@ -35,9 +43,11 @@ export type StoreBasketComparisonStore = {
   highlightLabels?: string[];
   availableCount: number;
   missingCount: number;
+  substitutionCount: number;
   coverageLabel: string;
   missingProductNames: string[];
   substitutions: StoreBasketSubstitutionExplanation[];
+  lines: StoreBasketComparisonLine[];
 };
 
 type StoreComparisonTableProps = {
@@ -65,6 +75,15 @@ export function StoreComparisonTable({
     }
     return [...cards.entries()].map(([id, label]) => ({ id, label }));
   }, [items]);
+  const basketLineMatrix = useMemo(() => {
+    const products = new Map<string, { productId: string; productName: string }>();
+    for (const store of basketStores) {
+      for (const line of store.lines) {
+        products.set(line.productId, { productId: line.productId, productName: line.productName });
+      }
+    }
+    return [...products.values()];
+  }, [basketStores]);
 
   function toggleCard(cardId: string) {
     setHeldCards((current) => {
@@ -83,7 +102,7 @@ export function StoreComparisonTable({
       <div className="border-b border-emerald-100 bg-emerald-50 px-5 py-4 print:bg-white">
         <h2 className="text-2xl font-black text-emerald-950">Store comparison</h2>
         <p className="mt-2 text-sm font-semibold leading-6 text-emerald-900">
-          Compare whole-basket store totals side-by-side. Missing items remain visible, and substitution notes point to the cheapest observed store row instead of estimating unavailable prices.
+          Compare whole-basket chain totals side-by-side. Missing items remain visible, and substitution notes point to the cheapest observed store row instead of estimating unavailable prices.
         </p>
         {basketItemCount > 0 ? (
           <p className="mt-2 text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{basketItemCount} basket item(s)</p>
@@ -134,6 +153,7 @@ export function StoreComparisonTable({
                   <p>{store.coverageLabel}</p>
                   {store.distanceText ? <p>{store.distanceText}</p> : null}
                   {store.stockLabel ? <p>{store.stockLabel}</p> : null}
+                  <p>{store.substitutionCount} substitution hint(s)</p>
                 </div>
                 {store.missingProductNames.length > 0 ? (
                   <p className="mt-3 text-xs font-semibold leading-5 text-amber-950">
@@ -146,7 +166,7 @@ export function StoreComparisonTable({
 
           <div className="overflow-x-auto rounded-[1.5rem] border border-slate-200 bg-white">
             <table className="min-w-full border-collapse text-left text-sm">
-              <caption className="sr-only">Side-by-side basket totals, missing items, and substitution explanations by store</caption>
+              <caption className="sr-only">Side-by-side basket totals, missing items, and substitution explanations by chain</caption>
               <thead className="bg-slate-950 text-white">
                 <tr>
                   <th className="px-4 py-3 font-black">Store</th>
@@ -194,6 +214,44 @@ export function StoreComparisonTable({
               </tbody>
             </table>
           </div>
+          {basketLineMatrix.length > 0 ? (
+            <div className="overflow-x-auto rounded-[1.5rem] border border-emerald-100 bg-white">
+              <table className="min-w-full border-collapse text-left text-sm">
+                <caption className="sr-only">Basket item matrix across stores with missing and substitution states highlighted</caption>
+                <thead className="bg-emerald-950 text-white">
+                  <tr>
+                    <th className="px-4 py-3 font-black">Basket item</th>
+                    {basketStores.map((store) => (
+                      <th className="px-4 py-3 font-black" key={`${store.storeId}-matrix-head`}>{store.storeName}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {basketLineMatrix.map((product) => (
+                    <tr className="border-t border-emerald-100 align-top" key={product.productId}>
+                      <th className="px-4 py-4 font-black text-slate-950">{product.productName}</th>
+                      {basketStores.map((store) => {
+                        const line = store.lines.find((candidate) => candidate.productId === product.productId);
+                        const substitution = store.substitutions.find((candidate) => candidate.productName === product.productName);
+                        const isMissing = line?.status === 'missing';
+                        return (
+                          <td className={isMissing ? 'bg-amber-50 px-4 py-4' : 'px-4 py-4'} key={`${store.storeId}-${product.productId}-matrix-cell`}>
+                            <p className={isMissing ? 'font-black text-amber-950' : 'font-black text-emerald-900'}>{line?.priceText ?? 'Not requested'}</p>
+                            <p className="mt-1 text-xs font-semibold text-slate-500">{line?.unitLabel ?? 'No basket line'}</p>
+                            {substitution ? (
+                              <p className="mt-2 rounded-xl bg-white p-2 text-xs font-bold leading-5 text-emerald-950">
+                                Substitute: {substitution.storeName} · {substitution.priceText}
+                              </p>
+                            ) : null}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : null}
           {basketSourceLabel ? <p className="text-xs font-semibold text-slate-500">Source: {basketSourceLabel}</p> : null}
         </div>
       ) : null}

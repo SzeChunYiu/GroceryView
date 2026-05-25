@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     listName: String(body.listName ?? 'Shared list'),
     collaboratorName: String(body.collaboratorName ?? 'Collaborator'),
     collaboratorEmail: String(body.collaboratorEmail ?? ''),
-    role: typeof body.role === 'string' ? body.role : 'view',
+    role: typeof body.role === 'string' ? body.role : 'viewer',
   });
   const invitationUrl = new URL(`/list?invite=${encodeURIComponent(permission.id)}`, request.nextUrl.origin);
 

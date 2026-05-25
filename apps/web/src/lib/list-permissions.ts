@@ -84,6 +84,29 @@ export function resolveListShareRole(role: string | null | undefined): ListShare
   return 'viewer';
 }
 
+export function canListShareRoleCommentOnItems(role: ListShareRole) {
+  return role === 'editor' || role === 'owner';
+}
+
+export type ListItemCommentIntent = 'substitution' | 'quantity' | 'store_note';
+
+export function buildListItemCommentDraft(input: {
+  body: string;
+  itemId: string;
+  role: ListShareRole;
+  intent?: ListItemCommentIntent;
+}) {
+  const body = input.body.trim().slice(0, 160);
+
+  return {
+    body,
+    canComment: body.length > 0 && canListShareRoleCommentOnItems(input.role),
+    itemId: input.itemId,
+    intent: input.intent ?? 'store_note',
+    role: input.role
+  } as const;
+}
+
 export function createListSharePermission(input: {
   listId: string;
   listName: string;
