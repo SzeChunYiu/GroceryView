@@ -17,26 +17,32 @@ afterEach(() => {
   window.localStorage.clear();
 });
 
-test('SearchBar highlights autocomplete options with arrow keys and dismisses with Escape', async () => {
+test('SearchBar highlights autocomplete options with arrow keys and opens the active option with Enter', async () => {
   seedRecentSearches();
-  render(<SearchBar />);
+  render(<SearchBar surface="keyboard-test" />);
   const user = userEvent.setup();
   const input = screen.getByRole('combobox', { name: 'Search products' });
 
   await user.click(input);
   const milk = await screen.findByRole('option', { name: /milk/i });
   const bread = screen.getByRole('option', { name: /bread/i });
+  let selected = false;
+  bread.addEventListener('click', (event) => {
+    event.preventDefault();
+    selected = true;
+  });
 
   await user.keyboard('{ArrowDown}');
-  await waitFor(() => assert.equal(document.activeElement, milk));
-  assert.equal(input.getAttribute('aria-activedescendant'), milk.id);
-  assert.match(milk.className, /emerald-50|ring/);
+  await waitFor(() => assert.equal(input.getAttribute('aria-activedescendant'), milk.id));
+  assert.equal(document.activeElement, input);
+  assert.equal(milk.getAttribute('aria-selected'), 'true');
+  assert.equal(milk.getAttribute('data-active-option'), 'true');
 
   await user.keyboard('{ArrowDown}');
-  await waitFor(() => assert.equal(document.activeElement, bread));
-  assert.equal(input.getAttribute('aria-activedescendant'), bread.id);
-  assert.match(bread.className, /emerald-50|ring/);
+  await waitFor(() => assert.equal(input.getAttribute('aria-activedescendant'), bread.id));
+  assert.equal(document.activeElement, input);
+  assert.equal(bread.getAttribute('aria-selected'), 'true');
 
-  await user.keyboard('{Escape}');
-  await waitFor(() => assert.equal(screen.queryByRole('listbox'), null));
+  await user.keyboard('{Enter}');
+  assert.equal(selected, true);
 });
