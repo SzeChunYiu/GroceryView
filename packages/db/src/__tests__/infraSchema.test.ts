@@ -110,7 +110,24 @@ describe('infra/db PostgreSQL schema contract', () => {
   it('classifies every chain with indexed retailer_type metadata', () => {
     const chains = tableDefinition('chains');
     assert.match(chains, /retailer_type text not null default 'grocery' check/);
-    for (const retailerType of ['grocery', 'pharmacy', 'fuel', 'convenience', 'variety', 'cosmetics', 'household', 'online_marketplace']) {
+    for (const retailerType of [
+      'grocery',
+      'pharmacy',
+      'fuel',
+      'convenience',
+      'variety',
+      'cosmetics',
+      'household',
+      'online_marketplace',
+      'ethnic_asian',
+      'ethnic_polish_eastern_european',
+      'ethnic_middle_eastern',
+      'ethnic_indian_south_asian',
+      'ethnic_latin',
+      'ethnic_african',
+      'health_food',
+      'kosher_halal'
+    ]) {
       assert.match(chains, new RegExp(`'${retailerType}'`), `${retailerType} missing from chains retailer_type check`);
       assert.match(allMigrations, new RegExp(`'${retailerType}'`), `${retailerType} missing from retailer_type migrations`);
     }

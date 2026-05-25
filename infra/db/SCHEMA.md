@@ -57,7 +57,7 @@ Retail banners such as ICA, Willys, Coop, Lidl, Hemkop, Netto, and City Gross.
 
 Key columns: `slug`, `name`, `retailer_type`, `domain`, `country_code`, `website_url`.
 
-`retailer_type` is required and indexed for coverage/readiness filtering. Allowed values are `grocery`, `pharmacy`, `fuel`, `convenience`, `variety`, `cosmetics`, `household`, and `online_marketplace`; all Stockholm launch chains are backfilled as `grocery`.
+`retailer_type` is required and indexed for coverage/readiness filtering. Allowed values are `grocery`, `pharmacy`, `fuel`, `convenience`, `variety`, `cosmetics`, `household`, `online_marketplace`, `ethnic_asian`, `ethnic_polish_eastern_european`, `ethnic_middle_eastern`, `ethnic_indian_south_asian`, `ethnic_latin`, `ethnic_african`, `health_food`, and `kosher_halal`; all Stockholm launch chains are backfilled as `grocery`.
 
 ### `stores`
 
