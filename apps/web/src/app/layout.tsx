@@ -4,6 +4,7 @@ import { SkipLink } from '@/components/SkipLink';
 import { ServiceWorkerRegistrar } from '@/lib/swRegister';
 import { Providers } from './providers';
 import './globals.css';
+import '@/styles/print.css';
 import '../styles/a11y.css';
 
 const siteUrl = 'https://grocery-web-mu.vercel.app';
