@@ -105,6 +105,31 @@ describe('my-flyer API payload', () => {
       assert.ok(payload.rows[0].personalizedScore >= payload.rows[1].personalizedScore);
       assert.match(payload.rows[0].explanation.join(' '), /watchlist_first ranker/);
       assert.ok(payload.rows.every((row) => row.offer.sourceUrl && row.offer.sourceRunId));
+      assert.ok(payload.rows.every((row) => row.offer.packageQuantity && row.offer.packageUnit));
+    } finally {
+      cleanup();
+    }
+  });
+
+
+  it('uses API-provided unit economics for best-unit-price ranking without productId hints', () => {
+    const source = readFileSync(new URL('../src/lib/my-flyer.ts', import.meta.url), 'utf8');
+    assert.doesNotMatch(source, /unitHints/);
+    assert.doesNotMatch(source, /coffee:\s*0\.45/);
+
+    const { cleanup, module } = loadMyFlyerModule();
+    try {
+      const payload = module.buildMyFlyerPayload({
+        userId: 'user-1',
+        algorithm: 'best_unit_price',
+        country: 'se',
+        limit: 4
+      }, new Date('2026-05-20T12:00:00.000Z'));
+
+      assert.equal(payload.rows.length, 4);
+      assert.ok(payload.rows.every((row) => typeof row.scoreBreakdown.unitPrice === 'number' && row.scoreBreakdown.unitPrice > 0));
+      assert.ok(payload.rows.every((row) => row.offer.effectiveUnitPrice === row.scoreBreakdown.unitPrice));
+      assert.match(payload.source.guardrails.join(' '), /excludes flyer rows that lack package quantity/i);
     } finally {
       cleanup();
     }
