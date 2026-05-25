@@ -131,6 +131,8 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
+      - name: Generated DB/API types are current
+        run: npm run codegen:types:check
       - name: Typecheck
         run: npm run typecheck
       - name: Summarize typecheck result

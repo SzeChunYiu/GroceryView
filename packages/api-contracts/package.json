@@ -5,6 +5,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "codegen": "node ../../scripts/codegen/generate-contract-types.mjs",
+    "check:generated": "node ../../scripts/codegen/generate-contract-types.mjs --check",
     "build": "tsc -p tsconfig.build.json",
     "test": "tsc -p tsconfig.test.json && node --test dist-test/__tests__/*.test.js"
   },

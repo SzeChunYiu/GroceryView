@@ -1,4 +1,5 @@
 import { createPgQueryExecutor, searchProductsByText, type ProductSearchResult } from '@groceryview/db';
+import type { GeneratedDatabaseRows } from '@groceryview/api-contracts';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { recordProductSearchPerformanceTelemetry, type ProductSearchPerformanceTelemetry } from '@/lib/analytics';
@@ -20,6 +21,9 @@ type PgPoolLike = {
 type PgModuleLike = {
   Pool: new (config: { connectionString: string; max: number }) => PgPoolLike;
 };
+
+const productSearchDbTable = 'products' satisfies keyof GeneratedDatabaseRows;
+void productSearchDbTable;
 
 let cachedDatabaseUrl: string | null = null;
 let cachedPool: PgPoolLike | null = null;

@@ -90,6 +90,10 @@ import {
   type SubscriptionPlan,
   type UserTier
 } from '@groceryview/monetization';
+import type { GeneratedApiContractDtoNames, GeneratedDatabaseRows } from '@groceryview/api-contracts';
+
+export type ApiGeneratedContractDtoNames = GeneratedApiContractDtoNames;
+export type ApiProductDbRow = GeneratedDatabaseRows['products'];
 
 export type Store = {
   id: string;

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+export * from './generated.js';
 
 export const idSchema = z.string().trim().min(1);
 export const isoDateTimeSchema = z.string().datetime({ offset: true });
