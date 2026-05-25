@@ -11,6 +11,7 @@ export function FriendPriceCard({ sighting }: FriendPriceCardProps) {
       <h3 className="mt-2 text-lg font-black text-slate-950">{sighting.storeName}</h3>
       <p className="mt-2 text-3xl font-black text-emerald-800">{sighting.priceLabel}</p>
       <p className="mt-2 text-sm font-semibold text-slate-600">Observed {sighting.observedAt.slice(0, 10)} · {sighting.confidence} confidence</p>
+      {sighting.note ? <p className="mt-3 rounded-xl bg-fuchsia-50 p-3 text-sm font-semibold leading-6 text-fuchsia-950">{sighting.note}</p> : null}
       <p className="mt-3 text-xs font-semibold leading-5 text-slate-500">
         Shared with permission by an anonymized friend or household member for this product and chain.
       </p>

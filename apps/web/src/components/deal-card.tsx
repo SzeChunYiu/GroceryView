@@ -14,9 +14,11 @@ import {
   trackSponsoredPlacementImpression
 } from '@/lib/analytics';
 import type { ConfidenceLevel } from '@/lib/content-style';
-import { buildDealContext, type DealHistoryPoint } from '@/lib/deal-context';
+import { buildDealContext, buildDealExplanationPanel, type DealHistoryPoint } from '@/lib/deal-context';
 import { getPriceFreshness, type FreshnessLevel } from '@/lib/freshness';
 import { dealShareUrl } from '@/lib/seo';
+import { PriceDropReason } from '@/components/price-drop-reason';
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 
 export type SponsoredDealPlacement = {
   disclosure?: string;
@@ -58,6 +60,7 @@ type DealCardProps = {
   sourceLabel?: string;
   sponsoredPlacement?: SponsoredDealPlacement;
   dealEndsAt?: string;
+  imagePriority?: boolean;
   verificationLabel?: string;
 };
 
@@ -127,6 +130,44 @@ function OutboundAffiliateLink({
   );
 }
 
+function LazyDealImage({
+  alt,
+  priority = false,
+  src
+}: Readonly<{
+  alt: string;
+  priority?: boolean;
+  src: string;
+}>) {
+  const { isIntersecting, ref } = useIntersectionObserver<HTMLDivElement>({
+    freezeOnceVisible: true,
+    rootMargin: '240px'
+  });
+  const shouldLoad = priority || isIntersecting;
+
+  return (
+    <div
+      className="relative mb-4 aspect-[4/3] overflow-hidden rounded-2xl border border-market-ink/10 bg-gradient-to-br from-slate-100 to-emerald-50"
+      ref={ref}
+    >
+      {shouldLoad ? (
+        <Image
+          alt={alt}
+          className="object-cover"
+          fill
+          fetchPriority={priority ? 'high' : 'auto'}
+          loading={priority ? 'eager' : 'lazy'}
+          placeholder="empty"
+          sizes="(min-width: 1280px) 22vw, (min-width: 768px) 44vw, 92vw"
+          src={src}
+        />
+      ) : (
+        <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-slate-100 via-white to-slate-100" aria-hidden="true" />
+      )}
+    </div>
+  );
+}
+
 export function DealCard({
   title,
   currentPrice,
@@ -158,6 +199,7 @@ export function DealCard({
   sourceLabel,
   sponsoredPlacement,
   dealEndsAt,
+  imagePriority = false,
   verificationLabel
 }: DealCardProps) {
   const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle');
@@ -198,6 +240,14 @@ export function DealCard({
   const priceFreshness = getPriceFreshness(priceFreshnessObservedAt);
   const priceVerificationLabel = verificationLabel
     ?? (sourceLabel ? `Source: ${sourceLabel}` : retailerName !== 'the retailer' ? `Source: ${retailerName}` : 'Source evidence pending');
+  const dealExplanation = buildDealExplanationPanel({
+    chainSpreadLabel: dropPercentLabel,
+    confidenceLabel: priceVerificationLabel,
+    evidenceLabel,
+    freshnessLabel: `${priceFreshness.label}. ${priceFreshness.refreshHint}`,
+    rankLabel,
+    unitPriceBaselineLabel: unitPriceDropLabel ?? (originalPrice ? `Baseline ${formatPrice(originalPrice, locale, currency)} before this deal` : undefined)
+  });
   const countdownLabel = useMemo(() => {
     if (!dealEndsAt) return null;
     const endsAt = new Date(dealEndsAt).getTime();
@@ -250,21 +300,8 @@ export function DealCard({
           <p className="mt-1 text-amber-900">Provider: {sponsoredPlacement.provider} · Organic ranking separated: {String(separatedFromOrganicRankings)}</p>
         </div>
       ) : null}
+      {imageUrl ? <LazyDealImage alt={imageAlt ?? `${title} deal image`} priority={imagePriority} src={imageUrl} /> : null}
       <div className="flex items-start justify-between gap-3">
-        {imageUrl ? (
-          <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl bg-white p-2 ring-1 ring-market-ink/10">
-            <Image
-              alt={imageAlt ?? `${title} deal image`}
-              className="max-h-full max-w-full object-contain"
-              height={96}
-              loading="lazy"
-              placeholder="empty"
-              sizes="(min-width: 768px) 96px, 80px"
-              src={imageUrl}
-              width={96}
-            />
-          </div>
-        ) : null}
         <div>
           {replacementLabel ? (
             <p className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{replacementLabel}</p>
@@ -337,6 +374,33 @@ export function DealCard({
         <p className="mt-3 rounded-2xl bg-slate-50 px-3 py-2 text-xs font-semibold leading-5 text-market-ink/70">
           {evidenceLabel}
         </p>
+      ) : null}
+
+      <details className="mt-3 rounded-2xl border border-emerald-100 bg-emerald-50 p-3 text-sm text-emerald-950">
+        <summary className="cursor-pointer text-xs font-black uppercase tracking-[0.18em] text-emerald-800">
+          {dealExplanation.summary}
+        </summary>
+        <dl className="mt-3 grid gap-2">
+          {dealExplanation.factors.map((factor) => (
+            <div className="rounded-xl bg-white/70 px-3 py-2" key={factor.label}>
+              <dt className="text-xs font-black uppercase tracking-[0.14em] text-emerald-900">{factor.label}</dt>
+              <dd className="mt-1 text-xs font-semibold leading-5 text-emerald-950">{factor.detail}</dd>
+            </div>
+          ))}
+        </dl>
+      </details>
+
+      {originalPrice ? (
+        <PriceDropReason
+          asDisclosure
+          className="mt-3"
+          currentPrice={currentPrice}
+          maxReasons={3}
+          previousPrice={originalPrice}
+          productName={title}
+          source={sourceLabel ?? retailerName}
+          summaryLabel="Price-drop clues"
+        />
       ) : null}
 
       {dealLinkMetadata || storeLinkMetadata ? (
