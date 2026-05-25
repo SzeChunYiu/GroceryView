@@ -21,6 +21,7 @@ import {
   dbSiteMatpriskollenOffers,
   dbSiteMatpriskollenSource
 } from './generated/db-site-ingested-overrides';
+import { dbSiteHomepageTrendingPriceChanges } from './generated/db-site-trending-price-changes';
 import { categoryLabels, pricedProducts } from './openprices-products';
 import { allergenRiskBadgesForText } from './search-filters';
 import { osmStores } from './osm-stores';
@@ -457,12 +458,16 @@ const openPricesTrendingPoints: TrendingPriceChangePoint[] = pricedProducts.flat
   }))
 ));
 
-export const homepageTrendingPriceChanges = summarizeTrendingProductPriceChanges({
+const openPricesHomepageTrendingPriceChanges = summarizeTrendingProductPriceChanges({
   points: openPricesTrendingPoints,
   asOf: `${openPricesTrendingAsOfDate}T23:59:59.999Z`,
   windowDays: 7,
   limit: 10
 });
+
+export const homepageTrendingPriceChanges = dbSiteHomepageTrendingPriceChanges.length > 0
+  ? dbSiteHomepageTrendingPriceChanges
+  : openPricesHomepageTrendingPriceChanges;
 
 const chainDisplayNames: Record<string, string> = {
   willys: 'Willys',
