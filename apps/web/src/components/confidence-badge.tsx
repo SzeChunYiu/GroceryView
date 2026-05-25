@@ -1,3 +1,22 @@
+/**
+ * Displays GroceryView's source-confidence state for a price row or aggregate.
+ *
+ * Accessibility: the visible badge text is backed by an `aria-label` that
+ * expands sample size, freshness, verification, and color-vision indicator
+ * details so confidence is not communicated by color alone. Optional review
+ * actions render as real buttons and are disabled when the badge represents
+ * empty data.
+ *
+ * Dependencies: confidence copy comes from content-style rules, the glyph and
+ * meaning come from the color-vision palette, freshness labels come from the
+ * freshness helper, and supporting copy is localized through the grocery
+ * translator.
+ *
+ * Edge cases: missing labels fall back to confidence copy, missing sample sizes
+ * are omitted from the visible badge, empty detail arrays render only the
+ * badge unless an action is supplied, and provided verification text is trimmed
+ * before display.
+ */
 'use client';
 
 import { confidenceCopy, type ConfidenceLevel } from '@/lib/content-style';
