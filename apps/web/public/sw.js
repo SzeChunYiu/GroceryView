@@ -16,7 +16,7 @@ function isShoppingListRequest(request) {
 
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return false;
-  if (!/^\/(list|favourites|favorites)\/?$/.test(url.pathname)) return false;
+  if (!/^\/list\/?$/.test(url.pathname) && !/^\/favou?rites\/?$/.test(url.pathname)) return false;
 
   const acceptsHtml = request.headers.get('accept')?.includes('text/html');
   return request.mode === 'navigate' || acceptsHtml;

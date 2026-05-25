@@ -4,19 +4,30 @@ import { useMemo, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { AppNav } from '@/components/app-nav';
 import { BottomNav } from '@/components/bottom-nav';
-import { buildExpiryReminder, type PantryExpiryUrgency } from '@/lib/pantry';
+import {
+  buildExpiryReminder,
+  buildPantryShoppingSuggestions,
+  buildPantryStockItems,
+  type PantryExpiryUrgency,
+  type PantryShoppingDeal,
+  type PantryShoppingSuggestionPriority
+} from '@/lib/pantry';
 
 type PantryStatus = 'stocked' | 'consumed' | 'low' | 'replenished';
 
 type PantryInventoryItem = {
   aisle: string;
   id: string;
+  isStaple: boolean;
+  minimumQuantity: number;
   name: string;
   quantity: string;
+  remainingQuantity: number;
   daysUntilExpiry: number | null;
   recipeHref: string;
   replacementHref: string;
   status: PantryStatus;
+  unit: string;
 };
 
 const statusLabels: Record<PantryStatus, string> = {
@@ -40,15 +51,31 @@ const expiryStyles: Record<PantryExpiryUrgency, string> = {
   unknown: 'bg-slate-100 text-slate-700'
 };
 
+const suggestionStyles: Record<PantryShoppingSuggestionPriority, string> = {
+  high: 'bg-rose-100 text-rose-900',
+  medium: 'bg-amber-100 text-amber-900',
+  low: 'bg-emerald-100 text-emerald-900'
+};
+
 const initialPantryItems: PantryInventoryItem[] = [
-  { id: 'coffee', name: 'Coffee', aisle: 'Breakfast', quantity: '1 package', daysUntilExpiry: 45, recipeHref: '/meal-planner?ingredient=coffee', replacementHref: '/deals?replace=coffee', status: 'stocked' },
-  { id: 'oats', name: 'Oats', aisle: 'Breakfast', quantity: '1 bag', daysUntilExpiry: 6, recipeHref: '/meal-planner?ingredient=oats', replacementHref: '/deals?replace=oats', status: 'low' },
-  { id: 'milk', name: 'Milk or fil', aisle: 'Dairy', quantity: '2 cartons', daysUntilExpiry: 2, recipeHref: '/meal-planner?ingredient=milk', replacementHref: '/deals?replace=milk', status: 'consumed' },
-  { id: 'frozen-veg', name: 'Frozen vegetables', aisle: 'Freezer', quantity: '1 bag', daysUntilExpiry: null, recipeHref: '/meal-planner?ingredient=frozen-veg', replacementHref: '/deals?replace=frozen-veg', status: 'stocked' }
+  { id: 'coffee', name: 'Coffee', aisle: 'Breakfast', quantity: '1 package', remainingQuantity: 1, minimumQuantity: 1, unit: 'package', daysUntilExpiry: 45, isStaple: true, recipeHref: '/meal-planner?ingredient=coffee', replacementHref: '/deals?replace=coffee', status: 'stocked' },
+  { id: 'oats', name: 'Oats', aisle: 'Breakfast', quantity: '1 bag', remainingQuantity: 0.5, minimumQuantity: 1, unit: 'bag', daysUntilExpiry: 6, isStaple: true, recipeHref: '/meal-planner?ingredient=oats', replacementHref: '/deals?replace=oats', status: 'low' },
+  { id: 'milk', name: 'Milk or fil', aisle: 'Dairy', quantity: '0 cartons', remainingQuantity: 0, minimumQuantity: 1, unit: 'carton', daysUntilExpiry: 2, isStaple: true, recipeHref: '/meal-planner?ingredient=milk', replacementHref: '/deals?replace=milk', status: 'consumed' },
+  { id: 'frozen-veg', name: 'Frozen vegetables', aisle: 'Freezer', quantity: '1 bag', remainingQuantity: 1, minimumQuantity: 1, unit: 'bag', daysUntilExpiry: null, isStaple: false, recipeHref: '/meal-planner?ingredient=frozen-veg', replacementHref: '/deals?replace=frozen-veg', status: 'stocked' }
+];
+
+const currentPantryDeals: PantryShoppingDeal[] = [
+  { productId: 'coffee', storeName: 'Willys Odenplan', price: 49.9, dealScore: 86 },
+  { productId: 'oats', storeName: 'Hemköp Torsplan', price: 18.9, dealScore: 82 },
+  { productId: 'milk', storeName: 'ICA Kvantum', price: 14.9, dealScore: 74 }
 ];
 
 function Card({ children, className = '' }: Readonly<{ children: ReactNode; className?: string }>) {
   return <section className={`rounded-[1.75rem] border border-slate-200 bg-white/88 p-5 shadow-sm ${className}`}>{children}</section>;
+}
+
+function formatSek(value: number) {
+  return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);
 }
 
 export default function PantryInventoryPage() {
@@ -57,6 +84,16 @@ export default function PantryInventoryPage() {
     ...item,
     expiryReminder: buildExpiryReminder({ daysUntilExpiry: item.daysUntilExpiry })
   })), [items]);
+  const pantryStock = useMemo(() => buildPantryStockItems(items.map((item) => ({
+    productId: item.id,
+    name: item.name,
+    unit: item.unit,
+    remainingQuantity: item.status === 'consumed' ? 0 : item.remainingQuantity,
+    minimumQuantity: item.minimumQuantity,
+    daysUntilExpiry: item.daysUntilExpiry,
+    isStaple: item.isStaple
+  }))), [items]);
+  const shoppingSuggestions = useMemo(() => buildPantryShoppingSuggestions(pantryStock, currentPantryDeals), [pantryStock]);
   const statusCounts = useMemo(() => items.reduce<Record<PantryStatus, number>>((counts, item) => {
     counts[item.status] += 1;
     return counts;
@@ -76,7 +113,7 @@ export default function PantryInventoryPage() {
         <p className="text-xs font-bold uppercase tracking-[0.24em] text-emerald-800">Pantry inventory</p>
         <h1 className="mt-2 text-4xl font-black tracking-tight">Reconcile what changed at home</h1>
         <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
-          Mark pantry staples as consumed, low stock, or replenished after each shopping cycle while expiry reminders highlight food to use soon before buying replacements.
+          Mark pantry staples as consumed, low stock, or replenished after each shopping cycle while expiry-driven suggestions turn depleted staples and current deals into a next-list queue.
         </p>
 
         <div className="mt-6 grid gap-4 md:grid-cols-5">
@@ -91,6 +128,41 @@ export default function PantryInventoryPage() {
             <p className="mt-2 text-4xl font-black text-amber-800">{useSoonCount}</p>
           </Card>
         </div>
+
+        <Card className="mt-6">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 className="text-2xl font-black">Expiry-driven shopping suggestions</h2>
+              <p className="mt-1 text-sm font-semibold leading-6 text-slate-700">Prioritized from use-soon dates, depleted staple status, household minimums, and visible replacement deals.</p>
+            </div>
+            <p className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-black uppercase tracking-[0.18em] text-emerald-900">{shoppingSuggestions.length} suggested adds</p>
+          </div>
+
+          <div className="mt-5 grid gap-3 lg:grid-cols-3">
+            {shoppingSuggestions.slice(0, 6).map((suggestion) => (
+              <Link className="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:border-emerald-700" href={suggestion.bestDeal ? `/deals?replace=${suggestion.productId}` : `/products/${suggestion.productId}`} key={suggestion.productId}>
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-lg font-black text-slate-950">{suggestion.name}</p>
+                    <p className="mt-1 text-sm font-semibold leading-6 text-slate-700">{suggestion.reason}</p>
+                  </div>
+                  <span className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.16em] ${suggestionStyles[suggestion.priority]}`}>{suggestion.priority}</span>
+                </div>
+                <p className="mt-3 text-xs font-black uppercase tracking-[0.16em] text-slate-500">{suggestion.quantityLabel}</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {suggestion.signals.map((signal) => (
+                    <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-slate-700" key={signal}>{signal}</span>
+                  ))}
+                </div>
+                {suggestion.bestDeal ? (
+                  <p className="mt-3 rounded-2xl bg-emerald-100 p-3 text-sm font-black text-emerald-950">
+                    {formatSek(suggestion.bestDeal.price)} at {suggestion.bestDeal.storeName} · deal score {suggestion.bestDeal.dealScore ?? 'n/a'}
+                  </p>
+                ) : null}
+              </Link>
+            ))}
+          </div>
+        </Card>
 
         <Card className="mt-6">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">

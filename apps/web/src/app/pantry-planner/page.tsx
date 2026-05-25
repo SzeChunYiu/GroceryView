@@ -31,7 +31,11 @@ export default function PantryPlannerPage() {
   };
   const alreadyInBasketCount = replenishment.filter((item) => item.alreadyInBasket).length;
   const dealBackedRestocks = replenishment.filter((item) => item.bestDeal).length;
-  const stockItems = buildPantryStockItems(plan.statuses);
+  const stapleProductIds = new Set(pantryReplenishmentInput.pantry.filter((item) => item.category === 'pantry').map((item) => item.productId));
+  const stockItems = buildPantryStockItems(plan.statuses.map((item) => ({
+    ...item,
+    isStaple: stapleProductIds.has(item.productId)
+  })));
 
   return (
     <PageShell>
@@ -101,7 +105,7 @@ export default function PantryPlannerPage() {
         </Card>
 
         <Card>
-          <PantryTracker items={stockItems} />
+          <PantryTracker deals={pantryReplenishmentInput.deals} items={stockItems} />
         </Card>
 
         <Card>

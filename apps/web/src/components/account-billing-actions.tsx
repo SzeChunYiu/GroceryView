@@ -120,7 +120,7 @@ export function AccountBillingActions() {
 
   const enforcementReasons = subscriptionAccess?.enforcementReasons ?? ['missing_signed_in_subscription_context'];
   const accountActions = subscriptionAccess?.accountActions ?? ['load_subscription_access', 'start_checkout', 'manage_subscription'];
-  const forecastUnlocked = Boolean(subscriptionAccess?.premiumFeaturesEnabled);
+  const savingsProjectionUnlocked = Boolean(subscriptionAccess?.premiumFeaturesEnabled);
 
   return (
     <section className="mt-6 rounded-3xl border border-violet-200 bg-white p-5 shadow-sm" aria-label="Account billing controls">
@@ -160,12 +160,12 @@ export function AccountBillingActions() {
       <div className="mt-4 rounded-2xl border border-violet-200 bg-violet-50 p-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="text-sm font-black text-violet-950">Premium savings forecast</p>
+            <p className="text-sm font-black text-violet-950">Premium savings projection</p>
             <p className="mt-2 text-sm font-semibold leading-6 text-violet-950">
               Forecasted monthly savings stay premium-only and combine observed alerts, historical swaps, and basket-planning source rows after subscription access is loaded.
             </p>
           </div>
-          <p className="rounded-full bg-white px-3 py-1 text-sm font-black text-violet-800">{forecastUnlocked ? 'Unlocked' : 'Locked'}</p>
+          <p className="rounded-full bg-white px-3 py-1 text-sm font-black text-violet-800">{savingsProjectionUnlocked ? 'Unlocked' : 'Locked'}</p>
         </div>
         <div className="mt-3 grid gap-3 md:grid-cols-3">
           {premiumSavingsForecast.map((driver) => (
