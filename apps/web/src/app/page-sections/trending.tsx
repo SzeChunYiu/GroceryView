@@ -39,6 +39,17 @@ const discoveryRailItems = buildPriceDropDiscoveryRail(pricedProducts.map((produ
   observations: product.observations
 })), 6);
 
+export function SponsoredPlacementSafeguardNotice() {
+  return (
+    <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold leading-6 text-amber-950" data-sponsored-placement-safeguards>
+      <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-800">Sponsored placement safeguards</p>
+      <p className="mt-2">
+        Paid discovery cards are capped at one per feed, must match the products or categories already trending, and stay visually separated from organic rankings.
+      </p>
+    </div>
+  );
+}
+
 export function PriceDropDiscoveryRail() {
   if (discoveryRailItems.length === 0) return null;
 

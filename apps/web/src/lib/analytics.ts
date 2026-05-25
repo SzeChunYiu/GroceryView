@@ -411,6 +411,74 @@ export type SponsoredPlacementImpression = {
   surface: string;
 };
 
+export type SponsoredDiscoveryPlacement = {
+  categoryLabel: string;
+  disclosure: string;
+  href: string;
+  keywords: string[];
+  label: string;
+  placementId: string;
+  provider: string;
+  relevanceCategories: string[];
+  surface: string;
+  title: string;
+};
+
+export type SponsoredDiscoveryPlacementDecision = SponsoredDiscoveryPlacement & {
+  relevanceScore: number;
+  separatedFromOrganicRankings: true;
+};
+
+type SponsoredDiscoveryPlacementContext = {
+  organicCategoryLabels: string[];
+  organicProductNames: string[];
+};
+
+type SponsoredDiscoveryPlacementOptions = {
+  maxPlacements?: number;
+  minRelevanceScore?: number;
+};
+
+function normalizedDiscoveryTerms(values: string[]) {
+  return values
+    .map((value) => value.trim().toLocaleLowerCase('sv-SE'))
+    .filter(Boolean);
+}
+
+export function sponsoredDiscoveryPlacementRelevanceScore(
+  placement: Pick<SponsoredDiscoveryPlacement, 'keywords' | 'relevanceCategories'>,
+  context: SponsoredDiscoveryPlacementContext
+) {
+  const organicNames = normalizedDiscoveryTerms(context.organicProductNames);
+  const organicCategories = new Set(normalizedDiscoveryTerms(context.organicCategoryLabels));
+  const keywordMatches = normalizedDiscoveryTerms(placement.keywords).filter((keyword) =>
+    organicNames.some((name) => name.includes(keyword))
+  ).length;
+  const categoryMatches = normalizedDiscoveryTerms(placement.relevanceCategories).filter((category) =>
+    organicCategories.has(category)
+  ).length;
+
+  return keywordMatches + categoryMatches;
+}
+
+export function selectSponsoredDiscoveryPlacements(
+  placements: SponsoredDiscoveryPlacement[],
+  context: SponsoredDiscoveryPlacementContext,
+  { maxPlacements = 1, minRelevanceScore = 1 }: SponsoredDiscoveryPlacementOptions = {}
+): SponsoredDiscoveryPlacementDecision[] {
+  if (maxPlacements <= 0) return [];
+
+  return placements
+    .map((placement) => ({
+      ...placement,
+      relevanceScore: sponsoredDiscoveryPlacementRelevanceScore(placement, context),
+      separatedFromOrganicRankings: true as const
+    }))
+    .filter((placement) => placement.relevanceScore >= minRelevanceScore)
+    .sort((a, b) => b.relevanceScore - a.relevanceScore || a.placementId.localeCompare(b.placementId))
+    .slice(0, maxPlacements);
+}
+
 const sponsoredPlacementImpressionEndpoint = '/api/analytics/sponsored-placement-impressions';
 
 export function trackSponsoredPlacementImpression(event: Omit<SponsoredPlacementImpression, 'observedAt'>) {

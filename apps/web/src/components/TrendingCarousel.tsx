@@ -2,7 +2,8 @@ import Link from 'next/link';
 import { ArrowDownRight, ArrowUpRight, History } from 'lucide-react';
 import type { TrendingProductPriceChange } from '@groceryview/db';
 import { buildBrandLeaderboardTrends, buildCitySearchTrends } from '@/lib/trends';
-import { BrandLeaderboardModule, TrendingSearchModule } from '@/app/page-sections/trending';
+import { BrandLeaderboardModule, SponsoredPlacementSafeguardNotice, TrendingSearchModule } from '@/app/page-sections/trending';
+import { selectSponsoredDiscoveryPlacements, type SponsoredDiscoveryPlacement } from '@/lib/analytics';
 
 function formatMoney(value: number, currency: string) {
   return new Intl.NumberFormat('sv-SE', {
@@ -16,9 +17,28 @@ function formatPercent(value: number) {
   return `${value > 0 ? '+' : ''}${new Intl.NumberFormat('sv-SE', { maximumFractionDigits: 1 }).format(value)}%`;
 }
 
+const sponsoredDiscoveryPlacements: SponsoredDiscoveryPlacement[] = [
+  {
+    categoryLabel: 'Pantry staples',
+    disclosure: 'Paid retailer placement. It is selected only when it matches the current trend context and never changes organic ranking order.',
+    href: '/products?q=pantry%20staples',
+    keywords: ['kaffe', 'coffee', 'mjölk', 'milk', 'pasta', 'bröd', 'bread'],
+    label: 'Sponsored',
+    placementId: 'trend-feed-pantry-partner',
+    provider: 'Retail partner',
+    relevanceCategories: ['grocery', 'pantry', 'dairy', 'coffee'],
+    surface: 'trending_products_feed',
+    title: 'Compare partner prices on everyday staples'
+  }
+];
+
 export function TrendingCarousel({ items }: Readonly<{ items: TrendingProductPriceChange[] }>) {
   const searchFeed = buildCitySearchTrends({ city: 'stockholm', limit: 6 });
   const brandFeed = buildBrandLeaderboardTrends({ city: 'stockholm', limit: 5 });
+  const sponsoredPlacements = selectSponsoredDiscoveryPlacements(sponsoredDiscoveryPlacements, {
+    organicCategoryLabels: items.map((item) => item.categoryLabel ?? 'Grocery'),
+    organicProductNames: items.map((item) => item.productName)
+  });
 
   if (items.length === 0) {
     return (
@@ -86,6 +106,38 @@ export function TrendingCarousel({ items }: Readonly<{ items: TrendingProductPri
           })}
         </div>
       </section>
+      {sponsoredPlacements.length ? (
+        <section
+          className="mt-3 rounded-[1.75rem] border border-amber-300 bg-amber-50/80 p-5 shadow-sm"
+          aria-label="Sponsored discovery placement separated from organic trending products"
+          data-sponsored-discovery-feed
+          data-sponsored-max-items={sponsoredPlacements.length}
+        >
+          <div className="grid gap-4 lg:grid-cols-[0.75fr_1.25fr] lg:items-stretch">
+            <SponsoredPlacementSafeguardNotice />
+            <div className="grid gap-3 sm:grid-cols-2">
+              {sponsoredPlacements.map((placement) => (
+                <Link
+                  className="rounded-2xl border border-amber-300 bg-white p-4 transition hover:-translate-y-0.5 hover:border-amber-700"
+                  data-organic-ranking-separated={String(placement.separatedFromOrganicRankings)}
+                  data-sponsored-placement="true"
+                  data-sponsored-placement-id={placement.placementId}
+                  data-sponsored-relevance-score={placement.relevanceScore}
+                  href={placement.href}
+                  key={placement.placementId}
+                >
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-800">{placement.label} · {placement.categoryLabel}</p>
+                  <h3 className="mt-2 text-lg font-black leading-6 text-slate-950">{placement.title}</h3>
+                  <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{placement.disclosure}</p>
+                  <p className="mt-3 text-xs font-bold text-amber-900">
+                    Provider: {placement.provider} · relevance score {placement.relevanceScore}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
       <BrandLeaderboardModule feed={brandFeed} />
       <TrendingSearchModule feed={searchFeed} />
     </>
