@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import { LazyItemCard } from './LazyItemCard';
 import { FavouriteProductToggle } from './favourite-product-toggle';
+import { readStoredSafetyPreferences, SAFETY_PREFERENCES_CHANGED_EVENT, type ProductSafetyPreferences } from './cert-filter';
 import { volatilityBadgeMethodology } from '@/lib/price-intelligence';
 import type { AdaptiveProductCard } from '@/lib/verified-data';
 
@@ -15,6 +16,10 @@ const compareModes: Array<{ label: string; value: CompareMode; help: string }> =
   { label: 'Total', value: 'total', help: 'Sort and lead every card by the observed pack price.' },
   { label: 'Per kg / l / st / 100 g', value: 'unit', help: 'Sort and lead every card by comparable jämförpris when package size is known.' }
 ];
+const emptySafetyPreferences: ProductSafetyPreferences = {
+  requiredDietaryTags: [],
+  avoidedAllergenTags: []
+};
 
 function resolvedMode(card: AdaptiveProductCard, compareMode: CompareMode): 'total' | 'unit' {
   if (compareMode === 'adaptive') return card.defaultCompareMode;
@@ -38,6 +43,35 @@ function secondaryLabel(card: AdaptiveProductCard, compareMode: CompareMode) {
     ? card.totalPriceLabel
     : card.unitPriceLabel;
   return `${alternatePrice} · ${card.packageLabel}`;
+}
+
+function safetyWarnings(card: AdaptiveProductCard, preferences: ProductSafetyPreferences) {
+  const allergenWarnings = preferences.avoidedAllergenTags
+    .filter((tag) => card.safetyProfile.allergenTags.includes(tag))
+    .map((tag) => `Contains ${tag} evidence`);
+  const missingDietaryWarnings = preferences.requiredDietaryTags
+    .filter((tag) => !card.safetyProfile.dietaryTags.includes(tag))
+    .map((tag) => `Missing ${tag} evidence`);
+
+  return [...allergenWarnings, ...missingDietaryWarnings];
+}
+
+function SafetyWarningBanner({ card, preferences }: Readonly<{ card: AdaptiveProductCard; preferences: ProductSafetyPreferences }>) {
+  const warnings = safetyWarnings(card, preferences);
+
+  if (warnings.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="mt-3 rounded-xl border border-rose-300 bg-rose-50 p-3 text-xs font-bold text-rose-950" role="alert">
+      <p className="font-black uppercase tracking-[0.14em]">Safety preference warning</p>
+      <ul className="mt-2 space-y-1">
+        {warnings.map((warning) => <li key={warning}>{warning}</li>)}
+      </ul>
+      <p className="mt-2 text-rose-900">{card.safetyEvidenceLabel}</p>
+    </div>
+  );
 }
 
 function sparklinePath(points: AdaptiveProductCard['sparklinePoints'], width = 160, height = 44) {
@@ -118,12 +152,25 @@ export function ProductPriceCards({
   intro?: string;
 }>) {
   const [compareMode, setCompareMode] = useState<CompareMode>('adaptive');
+  const [safetyPreferences, setSafetyPreferences] = useState<ProductSafetyPreferences>(emptySafetyPreferences);
 
   useEffect(() => {
     const stored = window.localStorage.getItem(storageKey);
     if (stored === 'adaptive' || stored === 'total' || stored === 'unit') {
       setCompareMode(stored);
     }
+    setSafetyPreferences(readStoredSafetyPreferences());
+
+    function refreshSafetyPreferences() {
+      setSafetyPreferences(readStoredSafetyPreferences());
+    }
+
+    window.addEventListener(SAFETY_PREFERENCES_CHANGED_EVENT, refreshSafetyPreferences);
+    window.addEventListener('storage', refreshSafetyPreferences);
+    return () => {
+      window.removeEventListener(SAFETY_PREFERENCES_CHANGED_EVENT, refreshSafetyPreferences);
+      window.removeEventListener('storage', refreshSafetyPreferences);
+    };
   }, []);
 
   const sortedCards = useMemo(() => [...cards].sort((left, right) => {
@@ -219,6 +266,7 @@ export function ProductPriceCards({
             <p className="mt-4 text-3xl font-black text-emerald-800">{primaryLabel(card, compareMode)}</p>
             <p className="mt-1 text-sm font-semibold text-slate-700">{secondaryLabel(card, compareMode)}</p>
             <p className="mt-3 text-sm leading-6 text-slate-600">{card.sourceLabel}</p>
+            <SafetyWarningBanner card={card} preferences={safetyPreferences} />
             <PriceHistorySparkline card={card} />
             <p className="mt-2 rounded-xl bg-blue-50 p-3 text-xs font-bold text-blue-950">{card.confidenceLabel}</p>
             <VolatilityMethodologyBadge card={card} />
