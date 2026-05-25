@@ -6,7 +6,7 @@ import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { DietaryProfileOnboarding } from '@/components/diet-filter-picker';
 import { listShareRoles, accountListSharePermissions } from '@/lib/list-permissions';
-import { dietaryPreferenceOnboardingContract, demoPreferredBrandControls, groupPreferredBrandControls, savedSearchesStorageKey } from '@/lib/personalization';
+import { defaultDietaryPreferenceProfile, dietaryPreferenceOnboardingContract, demoPreferredBrandControls, groupPreferredBrandControls, savedSearchesStorageKey } from '@/lib/personalization';
 import { buildPremiumSavingsForecast } from '@/lib/price-intelligence';
 import { routeMetadata } from '@/lib/seo';
 import { accountSavedShoppingContract, formatSek, savedBasketAutoReorderPlanner } from '@/lib/verified-data';
@@ -304,6 +304,19 @@ export default function AccountPage() {
             <p className="mt-3 text-xs font-bold uppercase tracking-[0.16em] text-lime-900">
               Used by {dietaryPreferenceOnboardingContract.personalizationSurfaces.join(', ')}
             </p>
+            <div className="mt-4 rounded-2xl border border-lime-100 bg-lime-50 p-3">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-lime-900">Default filters applied</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {[
+                  ...defaultDietaryPreferenceProfile.dietaryRestrictions,
+                  ...defaultDietaryPreferenceProfile.certificationPreferences
+                ].map((preference) => (
+                  <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-lime-950" key={preference}>
+                    {preference.replace(/_/g, ' ')}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
         <DietaryProfileOnboarding className="mt-4 border-lime-100" />

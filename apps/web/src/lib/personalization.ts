@@ -22,6 +22,16 @@ export type DietaryPreferenceOnboardingContract = {
   guardrails: string[];
 };
 
+export type DietaryPreferenceDefaults = {
+  source: 'account_dietary_profile';
+  dietaryRestrictions: string[];
+  avoidedIngredients: string[];
+  certificationPreferences: string[];
+  nutritionPriorities: string[];
+  productSearchDietaryFilters: string[];
+  recommendationDietaryFilters: string[];
+};
+
 export const defaultHouseholdId = 'stockholm-family-demo';
 export const recentSearchHistoryStorageKey = 'groceryview:recent-product-searches';
 export const savedSearchesStorageKey = 'groceryview:saved-product-searches';
@@ -190,6 +200,34 @@ export const dietaryPreferenceOnboardingContract: DietaryPreferenceOnboardingCon
   ]
 };
 
+export const defaultDietaryPreferenceProfile: DietaryPreferenceDefaults = {
+  source: 'account_dietary_profile',
+  dietaryRestrictions: ['vegan', 'gluten_free', 'lactose_free'],
+  avoidedIngredients: ['peanuts', 'tree_nuts', 'shellfish', 'pork'],
+  certificationPreferences: ['halal', 'organic', 'keyhole'],
+  nutritionPriorities: ['higher_fiber', 'lower_sugar'],
+  productSearchDietaryFilters: ['vegan', 'glutenfree', 'laktosfree'],
+  recommendationDietaryFilters: ['vegan', 'gluten-free', 'lactose-free', 'halal', 'organic', 'keyhole']
+};
+
+export function withDefaultDietarySearchFilters<T extends { dietary?: string | string[] }>(
+  searchParams: T,
+  profile: DietaryPreferenceDefaults = defaultDietaryPreferenceProfile
+): T {
+  const requestedDietaryFilters = Array.isArray(searchParams.dietary)
+    ? searchParams.dietary.filter((filter) => filter.trim().length > 0)
+    : searchParams.dietary?.trim()
+      ? [searchParams.dietary.trim()]
+      : [];
+
+  if (requestedDietaryFilters.length > 0) return searchParams;
+
+  return {
+    ...searchParams,
+    dietary: profile.productSearchDietaryFilters
+  };
+}
+
 type CategoryRankInput = {
   slug: string;
 };
@@ -279,7 +317,7 @@ export function basketIdeaRecommendationExplanations(
   options: BasketIdeaExplanationOptions = {}
 ) {
   const reasons: string[] = [];
-  const dietaryPreferences = new Set((options.dietaryPreferences ?? []).map((tag) => tag.toLocaleLowerCase('sv-SE')));
+  const dietaryPreferences = new Set((options.dietaryPreferences ?? defaultDietaryPreferenceProfile.recommendationDietaryFilters).map((tag) => tag.toLocaleLowerCase('sv-SE')));
   const itemDietaryTags = item.dietaryTags?.map((tag) => tag.toLocaleLowerCase('sv-SE')) ?? [];
 
   if (item.storeName && item.storeName === options.cheapestStoreName) {
@@ -478,7 +516,7 @@ export function rankTrendingDealsForHousehold<T extends PersonalizedTrendingDeal
   } = {},
 ): PersonalizedTrendingDeal<T>[] {
   const favoriteBrands = new Set((options.favoriteBrands ?? ['Garant', 'Änglamark']).map((brand) => brand.toLocaleLowerCase('sv-SE')));
-  const dietaryFilters = (options.dietaryFilters ?? []).map((filter) => filter.toLocaleLowerCase('sv-SE'));
+  const dietaryFilters = (options.dietaryFilters ?? defaultDietaryPreferenceProfile.recommendationDietaryFilters).map((filter) => filter.toLocaleLowerCase('sv-SE'));
   const nearbyChains = new Set((options.nearbyChains ?? ['ica', 'coop', 'willys']).map((chain) => chain.toLocaleLowerCase('sv-SE')));
   const clickedProductSlugs = new Set((options.clickedProductSlugs ?? []).map((slug) => slug.toLocaleLowerCase('sv-SE')));
 

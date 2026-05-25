@@ -17,6 +17,7 @@ import { routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
 import { allergenRiskBadgesForText, buildRemovableSearchFilterChips } from '@/lib/search-filters';
 import { buildSearchFilterPreset } from '@/lib/search-presets';
+import { withDefaultDietarySearchFilters } from '@/lib/personalization';
 
 const PRODUCTS_PER_PAGE = 50;
 
@@ -134,7 +135,8 @@ function zeroResultCategoryShortcuts(query: string, selectedCategory: string | s
 
 export default async function ProductsPage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
-  const search = buildProductSearchView(resolvedSearchParams);
+  const effectiveSearchParams = withDefaultDietarySearchFilters(resolvedSearchParams);
+  const search = buildProductSearchView(effectiveSearchParams);
   const { categoryFacets, labelFacets, originFacets, chainFacets, priceRange, inStockOnly, resultCards } = search;
   const drawerPriceRange = {
     min: priceRange.min ?? 0,
@@ -144,8 +146,8 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
     ...card,
     isAvailable: card.isAvailable ?? undefined
   }));
-  const requestedPage = toPageNumber(resolvedSearchParams.page);
-  const selectedBrand = normalizeSelectedBrand(resolvedSearchParams.brand);
+  const requestedPage = toPageNumber(effectiveSearchParams.page);
+  const selectedBrand = normalizeSelectedBrand(effectiveSearchParams.brand);
   const avoidAllergens = search.allergenAvoidance.checked;
   const baseProductCards = selectedBrand
     ? adaptiveProductCards.filter((card) => card.brand === selectedBrand)
@@ -168,9 +170,9 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const virtualizedResultLabel = `Virtualized product results, ${resultCards.length.toLocaleString('sv-SE')} matches`;
   const defaultSearchCount = facetedProductSearch.resultCards.length;
   const zeroResultFallback = relatedSearchFallback(search.query);
-  const zeroResultCategories = zeroResultCategoryShortcuts(search.query, resolvedSearchParams.category);
-  const savedSearchSubscription = buildSavedSearchSubscription({ searchParams: resolvedSearchParams, path: '/products' });
-  const activeFilterChips = buildRemovableSearchFilterChips(resolvedSearchParams, {
+  const zeroResultCategories = zeroResultCategoryShortcuts(search.query, effectiveSearchParams.category);
+  const savedSearchSubscription = buildSavedSearchSubscription({ searchParams: effectiveSearchParams, path: '/products' });
+  const activeFilterChips = buildRemovableSearchFilterChips(effectiveSearchParams, {
     basePath: '/products',
     labels: {
       chain: Object.fromEntries(search.chainFacets.map((facet) => [facet.value, facet.label])),
@@ -179,7 +181,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
       brand: Object.fromEntries(productBrandFilterOptions.map((brand) => [brand.value, brand.label]))
     }
   });
-  const currentSearchPreset = buildSearchFilterPreset(resolvedSearchParams);
+  const currentSearchPreset = buildSearchFilterPreset(effectiveSearchParams);
   const volatilityBadgeCounts = resultCards.reduce<Record<string, number>>((counts, product) => {
     const status = product.volatilityBadge?.status ?? 'insufficient';
     counts[status] = (counts[status] ?? 0) + 1;
@@ -188,7 +190,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
 
   function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'origin' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'avoidAllergens' | 'inStockOnly' | 'minConfidence', string>>) {
     const params = new URLSearchParams();
-    copySearchParams(params, resolvedSearchParams);
+    copySearchParams(params, effectiveSearchParams);
     for (const [key, value] of Object.entries(overrides)) {
       if (value?.trim()) params.set(key, value.trim());
       else params.delete(key);
@@ -236,6 +238,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
         </div>
         <form action="/products" className="mt-5 grid gap-3 rounded-2xl border border-violet-100 bg-white p-4 shadow-sm lg:grid-cols-[1.2fr_180px_auto]" method="get">
           {search.originFilters.map((origin) => <input key={origin} name="origin" type="hidden" value={origin} />)}
+          {search.dietaryFilters.filter((filter) => filter.checked).map((filter) => <input key={filter.value} name="dietary" type="hidden" value={filter.value} />)}
           {search.sort !== 'relevance' ? <input name="sort" type="hidden" value={search.sort} /> : null}
           {search.filters.inStockOnly ? <input name="inStockOnly" type="hidden" value="true" /> : null}
           <label className="text-sm font-black text-slate-950" htmlFor="product-search-q">
@@ -244,7 +247,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           </label>
           <label className="text-sm font-black text-slate-950" htmlFor="product-min-carbon-score">
             Min eco score
-            <input className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-950" defaultValue={resolvedSearchParams.minCarbonScore ?? ''} id="product-min-carbon-score" inputMode="numeric" max={100} min={0} name="minCarbonScore" placeholder="0–100" type="number" />
+            <input className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-950" defaultValue={effectiveSearchParams.minCarbonScore ?? ''} id="product-min-carbon-score" inputMode="numeric" max={100} min={0} name="minCarbonScore" placeholder="0–100" type="number" />
           </label>
           <div className="flex flex-col justify-end gap-2">
             <button className="rounded-full bg-violet-800 px-4 py-3 text-sm font-black text-white" type="submit">Apply filters</button>
@@ -290,7 +293,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           counts={Object.fromEntries(originFacets.map((facet) => [facet.value, facet.count])) as Partial<Record<OriginFilterCode, number>>}
           selected={search.originFilters}
         />
-        <ProductSortSelect searchParams={{ ...resolvedSearchParams, brand: selectedBrand }} selectedSort={search.sort} />
+        <ProductSortSelect searchParams={{ ...effectiveSearchParams, brand: selectedBrand }} selectedSort={search.sort} />
         {resultCards.length === 0 ? (
           <div className="mt-5 rounded-3xl border border-amber-200 bg-amber-50 p-5">
             <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-800">No exact matches</p>
@@ -368,14 +371,14 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             </p>
             <div className="flex gap-3">
               {currentPage > 1 ? (
-                <Link className="rounded-full bg-white px-4 py-2 shadow-sm" href={productsPageUrl(currentPage - 1, selectedBrand, resolvedSearchParams)}>
+                <Link className="rounded-full bg-white px-4 py-2 shadow-sm" href={productsPageUrl(currentPage - 1, selectedBrand, effectiveSearchParams)}>
                   Previous
                 </Link>
               ) : (
                 <span className="rounded-full bg-slate-100 px-4 py-2 font-black text-slate-400">Previous</span>
               )}
               {currentPage < totalPages ? (
-                <Link className="rounded-full bg-indigo-700 px-4 py-2 text-white" href={productsPageUrl(currentPage + 1, selectedBrand, resolvedSearchParams)}>
+                <Link className="rounded-full bg-indigo-700 px-4 py-2 text-white" href={productsPageUrl(currentPage + 1, selectedBrand, effectiveSearchParams)}>
                   Next
                 </Link>
               ) : (
