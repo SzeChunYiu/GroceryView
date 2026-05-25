@@ -124,9 +124,10 @@ const summaries = [];
 const failures = [];
 
 for (const dataset of DATASETS) {
-  const text = await readFile(new URL(dataset.file, INGESTED_DIR), 'utf8');
-  const rows = extractJsonExport(text, dataset.rows);
-  const source = extractJsonExport(text, dataset.source);
+  const fileUrl = new URL(dataset.file, INGESTED_DIR);
+  const text = await readFile(fileUrl, 'utf8');
+  const rows = await extractJsonExport(text, dataset.rows, fileUrl);
+  const source = await extractJsonExport(text, dataset.source, fileUrl);
   const sourceRowCount = rowCount(source, dataset.sourceRowCount);
   const label = `${dataset.file}:${dataset.rows}`;
   const duplicateKeys = countDuplicates(rows.map((row) => rowKey(row, dataset.key)));
@@ -204,7 +205,7 @@ if (failures.length > 0) {
   console.log(JSON.stringify({ status: 'ok', summaries }, null, 2));
 }
 
-function extractJsonExport(text, exportName) {
+async function extractJsonExport(text, exportName, fileUrl) {
   const marker = `export const ${exportName}`;
   const markerIndex = text.indexOf(marker);
   if (markerIndex < 0) {
@@ -216,7 +217,42 @@ function extractJsonExport(text, exportName) {
   if (start < 0) {
     throw new Error(`Missing JSON value for export ${exportName}`);
   }
-  return JSON.parse(text.slice(start, matchingJsonEnd(text, start) + 1));
+  const valueText = text.slice(start, matchingJsonEnd(text, start) + 1);
+  try {
+    return JSON.parse(valueText);
+  } catch (error) {
+    const spreadNames = arraySpreadNames(valueText);
+    if (spreadNames.length === 0 || !fileUrl) throw error;
+    const chunks = [];
+    for (const spreadName of spreadNames) {
+      const chunkUrl = resolveNamedImport(text, spreadName, fileUrl);
+      const chunkText = await readFile(chunkUrl, 'utf8');
+      chunks.push(...await extractJsonExport(chunkText, spreadName, chunkUrl));
+    }
+    return chunks;
+  }
+}
+
+function arraySpreadNames(valueText) {
+  const trimmed = valueText.trim();
+  if (!trimmed.startsWith('[') || !trimmed.endsWith(']')) return [];
+  const body = trimmed.slice(1, -1).trim();
+  if (!body) return [];
+  const names = [];
+  for (const part of body.split(',')) {
+    const match = part.trim().match(/^\.\.\.([A-Za-z_$][\w$]*)$/);
+    if (!match) return [];
+    names.push(match[1]);
+  }
+  return names;
+}
+
+function resolveNamedImport(text, importName, fileUrl) {
+  const pattern = new RegExp(`import\\s+\\{\\s*${importName}\\s*\\}\\s+from\\s+['"]([^'"]+)['"]`);
+  const match = text.match(pattern);
+  if (!match) throw new Error(`Missing import for spread export ${importName}`);
+  const specifier = match[1].endsWith('.ts') ? match[1] : `${match[1]}.ts`;
+  return new URL(specifier, fileUrl);
 }
 
 function firstJsonStart(text, fromIndex) {
