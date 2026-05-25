@@ -126,6 +126,7 @@ export * from './connectors/meny-no.js';
 export * from './connectors/lidl-bulk.js';
 export * from './connectors/willys-bulk.js';
 export * from './connectors/apohem.js';
+export * from './connectors/bonus-is.js';
 export * from './connectors/apoteket-se.js';
 export * from './connectors/okq8-fuel.js';
 export * from './connectors/seven-eleven-se.js';
