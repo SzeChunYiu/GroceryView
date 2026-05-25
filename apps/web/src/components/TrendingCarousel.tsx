@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { ArrowDownRight, ArrowUpRight, History } from 'lucide-react';
 import type { TrendingProductPriceChange } from '@groceryview/db';
-import { buildCitySearchTrends } from '@/lib/trends';
-import { TrendingSearchModule } from '@/app/page-sections/trending';
+import { buildBrandLeaderboardTrends, buildCitySearchTrends } from '@/lib/trends';
+import { BrandLeaderboardModule, TrendingSearchModule } from '@/app/page-sections/trending';
 
 function formatMoney(value: number, currency: string) {
   return new Intl.NumberFormat('sv-SE', {
@@ -18,8 +18,16 @@ function formatPercent(value: number) {
 
 export function TrendingCarousel({ items }: Readonly<{ items: TrendingProductPriceChange[] }>) {
   const searchFeed = buildCitySearchTrends({ city: 'stockholm', limit: 6 });
+  const brandFeed = buildBrandLeaderboardTrends({ city: 'stockholm', limit: 5 });
 
-  if (items.length === 0) return <TrendingSearchModule feed={searchFeed} />;
+  if (items.length === 0) {
+    return (
+      <>
+        <BrandLeaderboardModule feed={brandFeed} />
+        <TrendingSearchModule feed={searchFeed} />
+      </>
+    );
+  }
 
   return (
     <>
@@ -78,6 +86,7 @@ export function TrendingCarousel({ items }: Readonly<{ items: TrendingProductPri
           })}
         </div>
       </section>
+      <BrandLeaderboardModule feed={brandFeed} />
       <TrendingSearchModule feed={searchFeed} />
     </>
   );
