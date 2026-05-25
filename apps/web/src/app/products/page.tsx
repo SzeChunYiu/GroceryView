@@ -320,7 +320,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           Rendering {rangeStart.toLocaleString('sv-SE')}–{rangeEnd.toLocaleString('sv-SE')} of {resultCards.length.toLocaleString('sv-SE')} matching products through an accessible virtualized result list.
         </p>
         {/* product.isAvailable === false is rendered inside VirtualizedProductGrid for measured virtual rows. */}
-        <VirtualizedProductGrid products={resultCards} resultLabel={virtualizedResultLabel} />
+        <VirtualizedProductGrid products={pagedResultCards} resultLabel={virtualizedResultLabel} />
         {resultCards.length > PRODUCTS_PER_PAGE ? (
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3 text-sm">
             <p className="font-black text-slate-700">

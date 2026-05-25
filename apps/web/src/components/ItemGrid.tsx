@@ -86,12 +86,12 @@ export function ItemGrid({ rows, basePath, query, sort, page, pageSize = 12 }: I
         <p>Sorted by {sortOptions.find((option) => option.value === sort)?.label ?? 'Name A-Z'}</p>
       </div>
 
-      <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3" role="list" aria-label={`Product results ${visibleRows.length} of ${ranked.length}`}>
         {visibleRows.map((row) => {
           const reviewSummary = communityReviewSummaryForProduct(row.name);
 
           return (
-            <Link className="group rounded-3xl border border-slate-200 bg-slate-50 p-4 transition hover:-translate-y-0.5 hover:border-emerald-700 hover:bg-white" href={row.href} key={row.id}>
+            <Link role="listitem" className="group rounded-3xl border border-slate-200 bg-slate-50 p-4 transition hover:-translate-y-0.5 hover:border-emerald-700 hover:bg-white" href={row.href} key={row.id}>
               {row.image ? <img alt="" className="mb-4 aspect-square w-full rounded-2xl bg-white object-contain p-3" loading="lazy" src={row.image} /> : null}
               <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{row.source}</p>
               <h3 className="mt-2 text-lg font-black text-slate-950 group-hover:text-emerald-800">{row.name}</h3>
