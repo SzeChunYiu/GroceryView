@@ -7,7 +7,7 @@ export type CatalogProductCoverage = {
   observedStorePriceTypes?: string[];
 };
 
-export { COMMODITIES, STAPLE_BASKET, findCommodity, type Commodity, type ComparableUnit } from './commodities.js';
+export { COMMODITIES, STAPLE_BASKET, findCommodity, inferBonusIsGroceryCategory, type Commodity, type ComparableUnit, type GroceryCategoryInference } from './commodities.js';
 export { SUPPORTED_PRICE_DOMAINS, findPriceDomain, type PriceDomain, type PriceDomainItem, type PriceDomainSlug } from './domains.js';
 
 export type CatalogCoverageInput = {

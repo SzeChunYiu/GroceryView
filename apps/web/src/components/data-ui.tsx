@@ -21,6 +21,15 @@ export function PageShell({ children }: Readonly<{ children: ReactNode }>) {
     <div className="min-h-screen bg-[#f5f1e8] text-slate-950">
       <AppNav />
       <main className="mx-auto w-full max-w-7xl px-4 pb-20 pt-6 sm:px-6 lg:px-8 lg:pb-6">{children}</main>
+      <footer className="mx-auto w-full max-w-7xl px-4 pb-28 pt-2 text-sm font-bold text-slate-600 sm:px-6 lg:px-8 lg:pb-8">
+        <div className="flex flex-wrap gap-3 rounded-2xl border border-slate-200 bg-white/70 p-4">
+          <span className="font-black text-slate-950">Legal</span>
+          <Link className="underline decoration-emerald-300 underline-offset-4" href="/sv/privacy">Integritetspolicy</Link>
+          <Link className="underline decoration-emerald-300 underline-offset-4" href="/en/privacy">Privacy policy</Link>
+          <Link className="underline decoration-emerald-300 underline-offset-4" href="/sv/cookies">Cookiepolicy</Link>
+          <Link className="underline decoration-emerald-300 underline-offset-4" href="/en/cookies">Cookie policy</Link>
+        </div>
+      </footer>
       <BottomNav />
     </div>
   );

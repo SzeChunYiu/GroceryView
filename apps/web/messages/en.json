@@ -21,6 +21,12 @@
     "persisted": "The language preference is stored locally and in the NEXT_LOCALE cookie.",
     "guardrail": "Arabic and Somali stay blocked until reviewed translations are available."
   },
+  "confidence-badge": {
+    "sampleSize": "Sample size {sampleSize}.",
+    "freshness": "Freshness {label}. {refreshHint}",
+    "verification": "Verification {verificationLabel}.",
+    "indicator": "{meaning}. Indicator {indicator}."
+  },
   "app-nav": {
     "tagline": "Verified grocery intelligence",
     "groups": {

@@ -220,13 +220,14 @@ function extractJsonExport(text, exportName, fileUrl) {
   }
   const rawValue = text.slice(start, matchingJsonEnd(text, start) + 1);
   try {
-    return JSON.parse(rawValue);
+    return JSON.parse(sanitizeJsonValue(rawValue));
   } catch (error) {
     const spreadArray = extractSpreadArrayExport(text, rawValue, fileUrl);
     if (spreadArray) return spreadArray;
     throw error;
   }
 }
+
 
 function extractSpreadArrayExport(text, rawValue, fileUrl) {
   if (!rawValue.trimStart().startsWith('[') || !rawValue.includes('...')) return null;
@@ -247,6 +248,14 @@ function extractSpreadArrayExport(text, rawValue, fileUrl) {
   }
 
   return rows;
+}
+
+function sanitizeJsonValue(valueText) {
+  let sanitized = valueText;
+  while (/,\s*,/.test(sanitized)) {
+    sanitized = sanitized.replace(/,\s*,/g, ',');
+  }
+  return sanitized;
 }
 
 function firstJsonStart(text, fromIndex) {

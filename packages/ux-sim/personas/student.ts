@@ -24,7 +24,12 @@ export const studentPersona = {
       'Deals require a car trip or a large bulk purchase',
       'Hidden member requirements at checkout'
     ]
-  }
+  },
+  simulatorAssertions: [
+    'Student sessions start from Lund-scoped savings or a route that preserves the Lund city filter.',
+    'Deal rankings expose absolute SEK saved before percentage discounts.',
+    'Late opening hours, bikeability, or public-transport viability stay visible before a deal is accepted.'
+  ]
 } as const;
 
 export type StudentPersona = typeof studentPersona;

@@ -22,7 +22,7 @@ function parseLimit(value: string | null) {
   return Math.max(1, Math.min(parsed, 12));
 }
 
-export function GET(request: Request) {
+function buildTrendingFeedPayload(request: Request) {
   const { searchParams } = new URL(request.url);
   const city = searchParams.get('city') ?? 'stockholm';
   const limit = parseLimit(searchParams.get('limit'));
@@ -43,12 +43,16 @@ export function GET(request: Request) {
     clickedProductSlugs: csv('clicked'),
   }).slice(0, limit).map((card, index) => ({ ...card, rank: index + 1 }));
 
-  return NextResponse.json({
+  return {
     ...feed,
     filters,
     cards,
     personalization: {
       signals: ['favoriteBrands', 'dietary', 'nearbyChains', 'clicked', 'household category history'],
     },
-  });
+  };
+}
+
+export function GET(request: Request) {
+  return NextResponse.json(buildTrendingFeedPayload(request));
 }
