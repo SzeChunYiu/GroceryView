@@ -3,7 +3,8 @@
 // Real prices replace these as packages/ingestion connectors come online.
 
 import { buildExpiryDealRadar, buildPriceChartSeries, buildWatchlistAlerts, calculateMealCostBreakdown, calculatePersonalGroceryInflation, compareBasketStrategies, forecastGrocerySpend, planGroceryAlertChannelDefault, planMultiWeekStockUpList, planNotifications, planPantryReplenishment, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeBudget, summarizeCategoryDealLeaders, summarizePriceHistory, summarizeStoreBasketCoverage, type BasketComparisonInput, type HouseholdSnapshot, type PantryDeal, type PantryInventoryItem, type PriceChartObservation, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
-import { pricedProducts } from './openprices-products';
+import { pricedProducts, type PricedProduct } from './openprices-products';
+import { normalizeComparableUnitPrice } from './verified-data';
 
 export const products = [
   {
@@ -2093,9 +2094,31 @@ export const mealPrepBulkBuyOptimizer = {
   }
 };
 
+function stockUpUnitPlanFor(product: PricedProduct, price: number) {
+  const normalized = normalizeComparableUnitPrice(price, product.quantity);
+  if (!normalized) {
+    return {
+      packageUnits: 1,
+      comparableUnit: 'pack',
+      currentUnitPrice: price,
+      hasParsedQuantity: false,
+      packageLabel: product.quantity || 'Package quantity not reported'
+    };
+  }
+
+  return {
+    packageUnits: normalized.packageUnits,
+    comparableUnit: normalized.comparableUnit,
+    currentUnitPrice: normalized.unitPrice,
+    hasParsedQuantity: true,
+    packageLabel: normalized.packageLabel
+  };
+}
+
 const openPricesStockUpProducts = [
-  { slug: 'orientaliskt-r-gbr-d-7340083492464', weeklyNeedUnits: 2, storageLimitWeeks: 3 },
-  { slug: 'havredryck-choklad-7340083494406', weeklyNeedUnits: 3, storageLimitWeeks: 2 },
+  { slug: 'nutella-59032823', weeklyNeedUnits: 0.63, storageLimitWeeks: 3 },
+  { slug: 'oddlygood-barista-vanilla-6408430102358', weeklyNeedUnits: 2, storageLimitWeeks: 2 },
+  { slug: 'potatisbullar-7340083453502', weeklyNeedUnits: 16, storageLimitWeeks: 2 },
   { slug: 'hummus-original-7331217012993', weeklyNeedUnits: 2, storageLimitWeeks: 3 }
 ].map((candidate) => {
   const product = pricedProducts.find((row) => row.slug === candidate.slug);
@@ -2105,16 +2128,18 @@ const openPricesStockUpProducts = [
     .sort((left, right) => left.date.localeCompare(right.date));
   const latestObservation = datedObservations.at(-1);
   if (!latestObservation) throw new Error(`Missing OpenPrices observations for ${candidate.slug}`);
+  const unitPlan = stockUpUnitPlanFor(product, latestObservation.price);
   return {
     product,
     latestObservation,
+    unitPlan,
     weeklyNeedUnits: candidate.weeklyNeedUnits,
     storageLimitWeeks: candidate.storageLimitWeeks,
     history: datedObservations.map((observation) => ({
       observedAt: `${observation.date}T00:00:00.000Z`,
-      unitPrice: observation.price,
+      unitPrice: normalizeComparableUnitPrice(observation.price, product.quantity)?.unitPrice ?? observation.price,
       sourceType: 'online' as const,
-      confidence: product.observationCount >= 8 ? 0.78 : 0.66
+      confidence: unitPlan.hasParsedQuantity ? (product.observationCount >= 8 ? 0.78 : 0.66) : 0.45
     }))
   };
 });
@@ -2128,12 +2153,12 @@ const plannedMultiWeekStockUpList = planMultiWeekStockUpList({
     productName: row.product.name,
     storeName: 'OpenPrices SEK observations',
     weeklyNeedUnits: row.weeklyNeedUnits,
-    packageUnits: 1,
-    comparableUnit: 'pack',
-    currentUnitPrice: row.latestObservation.price,
+    packageUnits: row.unitPlan.packageUnits,
+    comparableUnit: row.unitPlan.comparableUnit,
+    currentUnitPrice: row.unitPlan.currentUnitPrice,
     history: row.history,
     storageLimitWeeks: row.storageLimitWeeks,
-    seasonalityNote: `OpenPrices dated SEK observations for barcode ${row.product.code}; no seasonality or future shelf-price projection.`
+    seasonalityNote: `OpenPrices dated SEK observations for barcode ${row.product.code}; package ${row.unitPlan.packageLabel} maps to ${row.unitPlan.comparableUnit} when parseable, otherwise the row stays pack-labelled with low confidence.`
   }))
 });
 
@@ -2146,11 +2171,11 @@ export const multiWeekStockUpList = {
     observedHistoryWindow: row.observedHistoryWindow,
     reviewTrigger: row.reviewTrigger
   })),
-  noForecastReason: 'No price forecast: the list combines current OpenPrices observed pack prices with factual observed low/typical context and spreads today’s budget impact across the planning horizon.',
+  noForecastReason: 'No price forecast: the list combines current OpenPrices observed package prices normalized from verified quantity metadata when parseable, with factual observed low/typical context and budget impact spread across the planning horizon.',
   coverageGuardrails: [
     'No price forecast is displayed; every row is a present-tense stock-up plan from generated OpenPrices dated observations.',
     'PlanningWeeks is a household usage horizon, not a price outlook.',
-    'Historical low and typical prices are computed from observed pack-price rows and labelled with coverage.',
+    'Historical low and typical prices are computed from observed quantity-normalized rows; unparseable products stay pack-labelled with low confidence.',
     'Rows stay advisory until account-owned pantry, freezer, and expiry data confirm the storage limits.'
   ]
 };
