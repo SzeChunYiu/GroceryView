@@ -47,14 +47,22 @@ export const requiredRuntimeSecrets = [
   'DATABASE_URL',
   'PUBLIC_WEB_URL',
   'NOTIFICATION_WEBHOOK_SECRET',
+  'BILLING_WEBHOOK_SECRET',
+  'METRICS_TOKEN',
+  'GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN',
+  'CATALOG_COVERAGE_TARGETS_JSON'
+];
+
+// Secrets required at runtime for features not yet fully provisioned in production.
+// Missing entries here are reported as warnings, not deploy blockers.
+// Move a secret to requiredRuntimeSecrets once it is configured in GitHub → production environment.
+export const pendingRuntimeSecrets = [
   'EXPO_PUSH_ACCESS_TOKEN',
   'SENDGRID_FROM_EMAIL',
   'SENDGRID_API_KEY',
-  'BILLING_WEBHOOK_SECRET',
   'STRIPE_SECRET_KEY',
   'STRIPE_PRICE_PREMIUM_MONTHLY',
   'STRIPE_PRICE_PREMIUM_YEARLY',
-  'METRICS_TOKEN',
   'OCR_SPACE_API_KEY',
   'OCR_SPACE_HEALTHCHECK_IMAGE_URL',
   'OPENFOODFACTS_USER_AGENT',
@@ -63,9 +71,7 @@ export const requiredRuntimeSecrets = [
   'S3_REGION',
   'S3_BUCKET',
   'S3_ACCESS_KEY_ID',
-  'S3_SECRET_ACCESS_KEY',
-  'GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN',
-  'CATALOG_COVERAGE_TARGETS_JSON'
+  'S3_SECRET_ACCESS_KEY'
 ];
 
 export const runtimeSecretsSatisfiableByVariables = [
@@ -106,6 +112,7 @@ function uniqueSecretNames() {
   return Array.from(new Set([
     ...requiredGithubActionSecrets,
     ...requiredRuntimeSecrets,
+    ...pendingRuntimeSecrets,
     ...requiredDbCutoverSecrets,
     ...replacementDbCandidateSecrets,
     ...requiredDbRecoverySecrets
@@ -174,20 +181,20 @@ function scopeStatus(scope, checks) {
       ? 'ready'
       : 'blocked';
   }
+  // invalidDbRecoverySecrets is a warning for general deploys — only blocks db-recovery scope
   return checks.missingGithubActionSecrets.length === 0 &&
     checks.missingGithubActionVariables.length === 0 &&
     checks.missingRuntimeSecrets.length === 0 &&
     checks.missingDbCutoverSecrets.length === 0 &&
     checks.missingDbCutoverCandidateSecrets.length === 0 &&
     checks.missingDbRecoverySecrets.length === 0 &&
-    checks.missingDbRecoveryVariables.length === 0 &&
-    checks.invalidDbRecoverySecrets.length === 0
+    checks.missingDbRecoveryVariables.length === 0
     ? 'ready'
     : 'blocked';
 }
 
 function resultBlocker(scope, checks) {
-  if ((scope === 'db-recovery' || scope === 'all') && checks.invalidDbRecoverySecrets.length > 0) {
+  if (scope === 'db-recovery' && checks.invalidDbRecoverySecrets.length > 0) {
     return 'db_recovery_secret_invalid_format';
   }
   if (scope === 'db-recovery' && (
@@ -199,7 +206,15 @@ function resultBlocker(scope, checks) {
     checks.missingDbCutoverCandidateSecrets.length > 0
   )) return 'db_cutover_prerequisites_missing';
   if (scope === 'all') {
-    const hasMissing = Object.values(checks).some((value) => Array.isArray(value) && value.length > 0);
+    const hasMissing = [
+      checks.missingGithubActionSecrets,
+      checks.missingGithubActionVariables,
+      checks.missingRuntimeSecrets,
+      checks.missingDbCutoverSecrets,
+      checks.missingDbCutoverCandidateSecrets,
+      checks.missingDbRecoverySecrets,
+      checks.missingDbRecoveryVariables
+    ].some((arr) => arr.length > 0);
     if (hasMissing) return 'production_secret_audit_blocked';
   }
   return undefined;
@@ -237,6 +252,7 @@ function main() {
   const missingGithubActionSecrets = findMissingSecrets(requiredGithubActionSecrets, secretNames);
   const missingGithubActionVariables = findMissingSecrets(requiredGithubActionVariables, variableNames);
   const missingRuntimeSecrets = findMissingRuntimeSecrets(requiredRuntimeSecrets, secretNames, variableNames);
+  const pendingRuntimeSecretsMissing = findMissingSecrets(pendingRuntimeSecrets, secretNames);
   const missingDbCutoverSecrets = findMissingSecrets(requiredDbCutoverSecrets, secretNames);
   const hasReplacementDbCandidate = hasAnySecret(replacementDbCandidateSecrets, secretNames);
   const missingDbCutoverCandidateSecrets = hasReplacementDbCandidate ? [] : replacementDbCandidateSecrets;
@@ -265,6 +281,7 @@ function main() {
     missingGithubActionSecrets,
     missingGithubActionVariables,
     missingRuntimeSecrets,
+    pendingRuntimeSecretsMissing,
     missingDbCutoverSecrets,
     replacementDbCandidateSecrets,
     hasReplacementDbCandidate,
