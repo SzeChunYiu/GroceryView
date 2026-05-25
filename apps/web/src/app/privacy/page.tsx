@@ -1,4 +1,5 @@
 import { buildPrivacyExport } from '@groceryview/core';
+import Link from 'next/link';
 import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { PrivacyRequestActions } from '@/components/privacy-request-actions';
@@ -46,6 +47,10 @@ export default function FeaturePage() {
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
         GroceryView keeps private grocery data account-bound. Export my data, Delete my account, and ad-data opt-out requests require a signed-in session and never run as anonymous public actions.
       </p>
+      <div className="mt-4 flex flex-wrap gap-3 text-sm font-black text-emerald-800">
+        <Link className="rounded-full bg-white px-4 py-2 shadow-sm underline decoration-emerald-300 underline-offset-4" href="/sv/privacy">Svensk integritetspolicy</Link>
+        <Link className="rounded-full bg-white px-4 py-2 shadow-sm underline decoration-emerald-300 underline-offset-4" href="/en/privacy">English privacy policy</Link>
+      </div>
 
       <NoVerifiedData route={route} title={`${titles[route]} has no private production records in this static snapshot`} />
 
