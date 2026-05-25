@@ -1,11 +1,11 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { trackItemCardImpression } from '@/lib/analytics';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { PriceBadge } from './price-badge';
+import { ProductImage } from './product-image';
 import type { RecentPriceVarianceBadge } from '@/lib/price-intelligence';
 import { dataGridVirtualStatusClass } from '@/components/data-grid';
 
@@ -178,7 +178,7 @@ export function VirtualizedProductGrid({ products, resultLabel = 'Virtualized pr
               else productRefs.current.delete(index);
             }} listId="products-grid" listIndex={productIndex}>
               <div className="flex gap-3">
-                {product.imageUrl ? <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-white p-2 ring-1 ring-violet-100"><Image alt={`${product.name} product image`} className="max-h-full max-w-full object-contain transition group-hover:scale-105" height={80} loading="lazy" placeholder="empty" sizes="80px" src={product.imageUrl} width={80} /></div> : null}
+                {product.imageUrl ? <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-white p-2 ring-1 ring-violet-100"><ProductImage alt={`${product.name} product image`} className="max-h-full max-w-full object-contain transition group-hover:scale-105" height={80} sizes="80px" src={product.imageUrl} width={80} /></div> : null}
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">{product.brand}</p>
