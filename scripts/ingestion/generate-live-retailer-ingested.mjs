@@ -65,7 +65,7 @@ const requestedSources = new Set((process.env.GROCERYVIEW_INGEST_SOURCES ?? '')
   .map((source) => source.trim().toLowerCase())
   .filter(Boolean));
 const shouldRun = (source) => requestedSources.size === 0 || requestedSources.has(source);
-const dbSiteOverrideSources = ['citygross', 'willys', 'hemkop', 'lidl'];
+const dbSiteOverrideSources = ['citygross', 'coop', 'willys', 'hemkop', 'lidl', 'ica-reklamblad'];
 const shouldWriteDbSiteOverrides = requestedSources.size === 0
   || dbSiteOverrideSources.every((source) => requestedSources.has(source));
 
@@ -90,11 +90,14 @@ await mkdir(GENERATED_DIR, { recursive: true });
 
 const summary = { retrievedAt };
 let cityGrossProducts = [];
+let coopProducts = [];
+let coopWeeklyDiscounts = [];
 let willysProducts = [];
 let willysWeeklyDiscounts = [];
 let hemkopProducts = [];
 let hemkopWeeklyDiscounts = [];
 let lidlStoreOffers = [];
+let icaReklambladOffers = [];
 
 if (shouldRun('citygross')) {
   cityGrossProducts = await fetchCityGrossProductsForAllStores({
@@ -109,13 +112,13 @@ if (shouldRun('citygross')) {
 }
 
 if (shouldRun('coop')) {
-  const coopProducts = await fetchCoopProductsForAllStores({
+  coopProducts = await fetchCoopProductsForAllStores({
     queries: COOP_QUERIES,
     maxStores: 18,
     maxRowsPerStore: 360,
     retrievedAt
   });
-  const coopWeeklyDiscounts = await fetchCoopWeeklyDiscountsForAllStores({
+  coopWeeklyDiscounts = await fetchCoopWeeklyDiscountsForAllStores({
     productQueries: COOP_WEEKLY_QUERIES,
     maxStores: 230,
     maxRows: 6200,
@@ -226,7 +229,7 @@ if (shouldRun('bonus-is')) {
 }
 
 if (shouldRun('ica-reklamblad')) {
-  const icaReklambladOffers = await fetchIcaReklambladOffers({
+  icaReklambladOffers = await fetchIcaReklambladOffers({
     sourceUrls: DEFAULT_ICA_REKLAMBLAD_OFFER_PAGE_URLS,
     maxRows: DEFAULT_ICA_REKLAMBLAD_MAX_ROWS,
     retrievedAt
@@ -285,6 +288,19 @@ if (shouldWriteDbSiteOverrides) {
       chainId: 'city_gross',
       productRows: cityGrossProducts,
       pickupRows: cityGrossProducts
+    }),
+    buildCompareStoreCapability({
+      chainId: 'ica',
+      couponRows: icaReklambladOffers,
+      deliveryRows: icaReklambladOffers.filter((row) => row.availableOnline === true),
+      pickupRows: icaReklambladOffers.filter((row) => row.availableInStore === true)
+    }),
+    buildCompareStoreCapability({
+      chainId: 'coop',
+      productRows: coopProducts,
+      couponRows: coopWeeklyDiscounts,
+      deliveryRows: coopProducts.filter((row) => row.availableOnline === true),
+      pickupRows: coopWeeklyDiscounts
     }),
     buildCompareStoreCapability({
       chainId: 'willys',
