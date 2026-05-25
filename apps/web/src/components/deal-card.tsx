@@ -29,6 +29,12 @@ export type SponsoredDealPlacement = {
   surface?: string;
 };
 
+const dealCardImagePolicy = {
+  loading: 'lazy',
+  placeholder: 'empty',
+  sizes: '(min-width: 1280px) 22vw, (min-width: 768px) 44vw, 92vw'
+} as const;
+
 type DealCardProps = {
   title: string;
   currentPrice: number;
@@ -157,9 +163,9 @@ function LazyDealImage({
           className="object-cover"
           fill
           fetchPriority={priority ? 'high' : 'auto'}
-          loading={priority ? 'eager' : 'lazy'}
-          placeholder="empty"
-          sizes="(min-width: 1280px) 22vw, (min-width: 768px) 44vw, 92vw"
+          loading={priority ? 'eager' : dealCardImagePolicy.loading}
+          placeholder={dealCardImagePolicy.placeholder}
+          sizes={dealCardImagePolicy.sizes}
           src={src}
         />
       ) : (
