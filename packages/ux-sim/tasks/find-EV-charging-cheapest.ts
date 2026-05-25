@@ -1,8 +1,9 @@
 import { allergySuffererPersona } from '../personas/allergy-sufferer.js';
 import ecoConsciousPersona from '../personas/eco-conscious.js';
+import { restaurantOwnerPersona } from '../personas/restaurant-owner.js';
 import { studentPersona } from '../personas/student.js';
 
-const personas = [studentPersona, allergySuffererPersona, ecoConsciousPersona] as const;
+const personas = [studentPersona, allergySuffererPersona, ecoConsciousPersona, restaurantOwnerPersona] as const;
 
 type Persona = (typeof personas)[number];
 
