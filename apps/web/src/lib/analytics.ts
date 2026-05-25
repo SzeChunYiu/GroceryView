@@ -451,6 +451,8 @@ export function trackSponsoredPlacementImpression(event: Omit<SponsoredPlacement
   }).catch(() => undefined);
 }
 
+export type AffiliateDisclosureKind = 'affiliate' | 'outbound' | 'sponsored';
+
 export type AffiliateLinkMetadata = {
   placement: 'deal_card' | 'store_link' | 'source_link';
   surface: string;
@@ -459,11 +461,13 @@ export type AffiliateLinkMetadata = {
   productId?: string;
   dealId?: string;
   campaignId?: string;
+  disclosureKind?: AffiliateDisclosureKind;
   sponsored?: boolean;
 };
 
 export type AffiliateOutboundClickEvent = AffiliateLinkMetadata & {
   consentGranted: boolean;
+  disclosureKind: AffiliateDisclosureKind;
   disclosureLabel: string;
   observedAt: string;
 };
@@ -471,18 +475,32 @@ export type AffiliateOutboundClickEvent = AffiliateLinkMetadata & {
 const affiliateOutboundEndpoint = '/api/analytics/affiliate-outbound-clicks';
 const groceryViewAffiliateSource = 'groceryview';
 
-export function affiliateDisclosureLabel(metadata: Pick<AffiliateLinkMetadata, 'retailerName' | 'sponsored'>) {
-  const prefix = metadata.sponsored === false ? 'Outbound store link' : 'Affiliate link';
+export function affiliateDisclosureKind(metadata: Pick<AffiliateLinkMetadata, 'disclosureKind' | 'sponsored'>): AffiliateDisclosureKind {
+  if (metadata.disclosureKind) return metadata.disclosureKind;
+  if (metadata.sponsored === false) return 'outbound';
+  if (metadata.sponsored) return 'sponsored';
+  return 'affiliate';
+}
+
+export function affiliateDisclosureLabel(metadata: Pick<AffiliateLinkMetadata, 'disclosureKind' | 'retailerName' | 'sponsored'>) {
+  const disclosureKind = affiliateDisclosureKind(metadata);
+  const prefix = disclosureKind === 'outbound'
+    ? 'Outbound store link'
+    : disclosureKind === 'sponsored'
+      ? 'Sponsored deal link'
+      : 'Affiliate link';
   return `${prefix}: GroceryView may earn a commission from ${metadata.retailerName}; deal ranking and savings math stay independent.`;
 }
 
 export function buildAffiliateOutboundUrl(metadata: AffiliateLinkMetadata) {
   try {
     const url = new URL(metadata.destinationUrl);
+    const disclosureKind = affiliateDisclosureKind(metadata);
     url.searchParams.set('utm_source', groceryViewAffiliateSource);
-    url.searchParams.set('utm_medium', metadata.sponsored === false ? 'outbound_store' : 'affiliate');
+    url.searchParams.set('utm_medium', disclosureKind === 'outbound' ? 'outbound_store' : disclosureKind);
     url.searchParams.set('utm_campaign', metadata.campaignId ?? metadata.surface);
-    url.searchParams.set('gv_affiliate_disclosure', metadata.sponsored === false ? 'outbound' : 'affiliate');
+    url.searchParams.set('gv_affiliate_disclosure', disclosureKind);
+    url.searchParams.set('gv_sponsored_link', String(disclosureKind === 'sponsored'));
     if (metadata.productId) url.searchParams.set('gv_product_id', metadata.productId);
     if (metadata.dealId) url.searchParams.set('gv_deal_id', metadata.dealId);
     return url.toString();
@@ -523,6 +541,7 @@ export function trackAffiliateOutboundClick(metadata: AffiliateLinkMetadata) {
   sendAffiliateOutboundClick({
     ...metadata,
     consentGranted: hasAnalyticsConsent(),
+    disclosureKind: affiliateDisclosureKind(metadata),
     disclosureLabel: affiliateDisclosureLabel(metadata),
     observedAt: new Date().toISOString()
   });
@@ -531,6 +550,7 @@ export function trackAffiliateOutboundClick(metadata: AffiliateLinkMetadata) {
 export function affiliateOutboundClickScript(metadata: AffiliateLinkMetadata) {
   const payload = JSON.stringify({
     ...metadata,
+    disclosureKind: affiliateDisclosureKind(metadata),
     disclosureLabel: affiliateDisclosureLabel(metadata)
   }).replace(/</g, '\\u003c');
 
