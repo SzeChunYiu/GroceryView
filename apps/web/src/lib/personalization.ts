@@ -24,6 +24,7 @@ export type DietaryPreferenceOnboardingContract = {
 
 export const defaultHouseholdId = 'stockholm-family-demo';
 export const recentSearchHistoryStorageKey = 'groceryview:recent-product-searches';
+export const savedSearchesStorageKey = 'groceryview:saved-product-searches';
 export const brandPreferenceStorageKey = 'groceryview:brand-preferences:v1';
 export const disabledPersonalizationSignalsStorageKey = 'groceryview:personalization-disabled-signals:v1';
 const maxRecentSearchHistory = 10;
@@ -74,6 +75,10 @@ export type RecentSearchHistoryEntry = {
   searchedAt: string;
 };
 
+export type SavedSearchEntry = RecentSearchHistoryEntry & {
+  pinnedAt: string;
+};
+
 export const householdCategorySignals: HouseholdCategorySignal[] = [
   { householdId: defaultHouseholdId, categorySlug: 'mejeri-ost-agg', clicks: 18, conversions: 7 },
   { householdId: defaultHouseholdId, categorySlug: 'frukt-gront', clicks: 16, conversions: 6 },
@@ -120,6 +125,29 @@ export function clearRecentSearchHistory() {
   if (typeof window === 'undefined') return [];
   window.localStorage.removeItem(recentSearchHistoryStorageKey);
   return [];
+}
+
+export function readSavedSearches(): SavedSearchEntry[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(savedSearchesStorageKey) || '[]') as SavedSearchEntry[];
+    return Array.isArray(parsed)
+      ? parsed.filter((entry) => typeof entry.query === 'string' && entry.query.trim().length > 0).slice(0, 10)
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+export function pinSavedSearch(entry: RecentSearchHistoryEntry): SavedSearchEntry[] {
+  if (typeof window === 'undefined') return [];
+  const pinned: SavedSearchEntry = { ...entry, pinnedAt: new Date().toISOString() };
+  const next = [
+    pinned,
+    ...readSavedSearches().filter((search) => search.query.toLocaleLowerCase('sv-SE') !== entry.query.toLocaleLowerCase('sv-SE'))
+  ].slice(0, 10);
+  window.localStorage.setItem(savedSearchesStorageKey, JSON.stringify(next));
+  return next;
 }
 
 export const dietaryPreferenceOnboardingContract: DietaryPreferenceOnboardingContract = {
@@ -360,11 +388,72 @@ export function buildPersonalizedRecommendationRail<T extends RecommendationProd
         ? `Favorite brand signal for ${product.brand}`
         : listHits > 0
           ? `${listHits} recent list signal${listHits === 1 ? '' : 's'} matched`
-          : 'Household history keeps this in the discovery mix';
+          : 'Household favorites, watchlist, dietary preferences, and recent searches keep this in the discovery mix';
       return { ...product, score, reason };
     })
     .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name, 'sv'))
     .slice(0, options.limit ?? 4);
+}
+
+export type PersonalizedTrendingDealInput = {
+  rank: number;
+  productSlug: string;
+  productName: string;
+  brand?: string | null;
+  categoryLabel?: string | null;
+  chainSlug?: string | null;
+  chainName?: string | null;
+};
+
+export type PersonalizedTrendingDeal<T> = T & {
+  rank: number;
+  personalizationScore: number;
+  personalizationReason: string;
+};
+
+export function rankTrendingDealsForHousehold<T extends PersonalizedTrendingDealInput>(
+  deals: readonly T[],
+  options: {
+    householdId?: string;
+    favoriteBrands?: readonly string[];
+    dietaryFilters?: readonly string[];
+    nearbyChains?: readonly string[];
+    clickedProductSlugs?: readonly string[];
+  } = {},
+): PersonalizedTrendingDeal<T>[] {
+  const favoriteBrands = new Set((options.favoriteBrands ?? ['Garant', 'Änglamark']).map((brand) => brand.toLocaleLowerCase('sv-SE')));
+  const dietaryFilters = (options.dietaryFilters ?? []).map((filter) => filter.toLocaleLowerCase('sv-SE'));
+  const nearbyChains = new Set((options.nearbyChains ?? ['ica', 'coop', 'willys']).map((chain) => chain.toLocaleLowerCase('sv-SE')));
+  const clickedProductSlugs = new Set((options.clickedProductSlugs ?? []).map((slug) => slug.toLocaleLowerCase('sv-SE')));
+
+  return deals
+    .map((deal, index) => {
+      const brand = deal.brand?.toLocaleLowerCase('sv-SE') ?? '';
+      const category = deal.categoryLabel?.toLocaleLowerCase('sv-SE') ?? '';
+      const name = deal.productName.toLocaleLowerCase('sv-SE');
+      const chain = deal.chainSlug?.toLocaleLowerCase('sv-SE') ?? deal.chainName?.toLocaleLowerCase('sv-SE') ?? '';
+      const favoriteScore = favoriteBrands.has(brand) ? 30 : 0;
+      const dietaryScore = dietaryFilters.filter((filter) => category.includes(filter) || name.includes(filter)).length * 16;
+      const chainScore = chain && nearbyChains.has(chain) ? 14 : 0;
+      const clickScore = clickedProductSlugs.has(deal.productSlug.toLocaleLowerCase('sv-SE')) ? 22 : 0;
+      const historyScore = getHouseholdCategoryScore(deal.productSlug.split('-').slice(0, 2).join('-'), options.householdId ?? defaultHouseholdId) / 2;
+      const personalizationScore = favoriteScore + dietaryScore + chainScore + clickScore + historyScore + Math.max(0, deals.length - index);
+      const reasons = [
+        favoriteScore > 0 ? 'favorite brand' : '',
+        dietaryScore > 0 ? 'dietary filter match' : '',
+        chainScore > 0 ? 'nearby chain' : '',
+        clickScore > 0 ? 'recent click' : '',
+        historyScore > 0 ? 'household category history' : '',
+      ].filter(Boolean);
+
+      return {
+        ...deal,
+        personalizationScore,
+        personalizationReason: reasons.length > 0 ? reasons.join(', ') : 'price-drop trend strength',
+      };
+    })
+    .sort((left, right) => right.personalizationScore - left.personalizationScore || left.rank - right.rank)
+    .map((deal, index) => ({ ...deal, rank: index + 1 }));
 }
 
 export type BrandTolerance = 'favorite' | 'acceptable' | 'excluded';

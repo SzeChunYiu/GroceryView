@@ -12,6 +12,7 @@ const carouselProductImageSizes = '(min-width: 768px) 96px, 80px';
 type TrendingCarouselProduct = TrendingProductPriceChange & {
   imageAlt?: string | null;
   imageUrl?: string | null;
+  personalizationReason?: string;
 };
 
 function formatMoney(value: number, currency: string) {
@@ -184,6 +185,11 @@ export function TrendingCarousel({ items, reorderItems = [] }: Readonly<{
                   <History aria-hidden="true" size={16} />
                   {item.changeCount} changes · {item.observationCount} observations
                 </p>
+                {item.personalizationReason ? (
+                  <p className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-cyan-800">
+                    Ranked for you: {item.personalizationReason}
+                  </p>
+                ) : null}
                 <p className="mt-2 text-xs font-semibold leading-5 text-slate-500">
                   {formatPercent(item.changePercent)} from {formatMoney(item.previousPrice, item.currency)} · latest {item.latestObservedAt.slice(0, 10)}
                 </p>

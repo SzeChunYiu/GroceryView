@@ -19,7 +19,11 @@ export function useIntersectionObserver<TElement extends Element>({
 
   useEffect(() => {
     const target = targetNode;
-    if (!target || frozen || typeof IntersectionObserver === 'undefined') return undefined;
+    if (!target || frozen) return undefined;
+    if (typeof IntersectionObserver === 'undefined') {
+      setEntry({ isIntersecting: true, target } as IntersectionObserverEntry);
+      return undefined;
+    }
 
     const observer = new IntersectionObserver(([nextEntry]) => {
       if (nextEntry) setEntry(nextEntry);
