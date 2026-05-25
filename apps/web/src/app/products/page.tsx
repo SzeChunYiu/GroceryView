@@ -91,6 +91,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const rangeStart = resultCards.length === 0 ? 0 : pageStart + 1;
   const rangeEnd = Math.min(pageStart + PRODUCTS_PER_PAGE, resultCards.length);
   const defaultSearchCount = facetedProductSearch.resultCards.length;
+  const outOfStockProductCount = productCards.filter((product) => product.isAvailable === false).length;
 
   function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence', string>>) {
     const params = new URLSearchParams();
@@ -432,6 +433,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             {selectedBrand
               ? `Showing ${productCards.length.toLocaleString('sv-SE')} verified product card${productCards.length === 1 ? '' : 's'} for ${selectedBrand}.`
               : 'Brand options are reused from the shared verified product option set so homepage and catalogue filters stay consistent.'}
+            {outOfStockProductCount > 0 ? ` Out of stock: ${outOfStockProductCount.toLocaleString('sv-SE')} product cards are marked from latest_prices availability.` : ''}
           </p>
         </Card>
         <ProductPriceCards
