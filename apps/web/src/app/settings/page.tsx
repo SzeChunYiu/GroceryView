@@ -86,6 +86,7 @@ export default function SettingsPage() {
           <Link className="rounded-full bg-white px-4 py-2 shadow-sm underline decoration-emerald-300 underline-offset-4" href="/en/privacy">Privacy policy</Link>
           <Link className="rounded-full bg-white px-4 py-2 shadow-sm underline decoration-emerald-300 underline-offset-4" href="/sv/cookies">Cookiepolicy</Link>
           <Link className="rounded-full bg-white px-4 py-2 shadow-sm underline decoration-emerald-300 underline-offset-4" href="/en/cookies">Cookie policy</Link>
+          <Link className="rounded-full bg-white px-4 py-2 shadow-sm underline decoration-emerald-300 underline-offset-4" href="/settings/hidden">Hidden products and stores</Link>
         </div>
       </Card>
 
