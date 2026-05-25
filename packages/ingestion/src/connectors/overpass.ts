@@ -57,21 +57,25 @@ type OverpassResponse = {
 
 export const OVERPASS_INTERPRETER_URL = 'https://overpass-api.de/api/interpreter';
 
+export const SWEDISH_GROCERY_SHOP_VALUES = ['supermarket', 'convenience', 'grocery', 'greengrocer'] as const;
+
+const SWEDISH_GROCERY_SHOP_REGEX = `^(${SWEDISH_GROCERY_SHOP_VALUES.join('|')})$`;
+
 export const STOCKHOLM_GROCERY_OVERPASS_QUERY = `[out:json][timeout:25];
 area["ISO3166-2"="SE-AB"][admin_level=4]->.searchArea;
 (
-  node["shop"~"^(supermarket|convenience|grocery)$"](area.searchArea);
-  way["shop"~"^(supermarket|convenience|grocery)$"](area.searchArea);
-  relation["shop"~"^(supermarket|convenience|grocery)$"](area.searchArea);
+  node["shop"~"${SWEDISH_GROCERY_SHOP_REGEX}"](area.searchArea);
+  way["shop"~"${SWEDISH_GROCERY_SHOP_REGEX}"](area.searchArea);
+  relation["shop"~"${SWEDISH_GROCERY_SHOP_REGEX}"](area.searchArea);
 );
 out center tags 120;`;
 
 export const SWEDEN_GROCERY_OVERPASS_QUERY = `[out:json][timeout:180];
 area["ISO3166-1"="SE"][admin_level=2]->.searchArea;
 (
-  node["shop"~"^(supermarket|convenience|grocery)$"](area.searchArea);
-  way["shop"~"^(supermarket|convenience|grocery)$"](area.searchArea);
-  relation["shop"~"^(supermarket|convenience|grocery)$"](area.searchArea);
+  node["shop"~"${SWEDISH_GROCERY_SHOP_REGEX}"](area.searchArea);
+  way["shop"~"${SWEDISH_GROCERY_SHOP_REGEX}"](area.searchArea);
+  relation["shop"~"${SWEDISH_GROCERY_SHOP_REGEX}"](area.searchArea);
 );
 out center tags;`;
 
@@ -99,15 +103,13 @@ export const SWEDISH_COUNTY_ISO3166_2_CODES = [
   'SE-N', 'SE-O', 'SE-S', 'SE-T', 'SE-U', 'SE-W', 'SE-X', 'SE-Y', 'SE-Z'
 ] as const;
 
-export const SWEDISH_GROCERY_SHOP_VALUES = ['supermarket', 'convenience', 'grocery'] as const;
-
 export function buildSwedishCountyGroceryOverpassQuery(iso31662: typeof SWEDISH_COUNTY_ISO3166_2_CODES[number]): string {
   return `[out:json][timeout:90];
 area["ISO3166-2"="${iso31662}"][admin_level=4]->.searchArea;
 (
-  node["shop"~"^(supermarket|convenience|grocery)$"](area.searchArea);
-  way["shop"~"^(supermarket|convenience|grocery)$"](area.searchArea);
-  relation["shop"~"^(supermarket|convenience|grocery)$"](area.searchArea);
+  node["shop"~"${SWEDISH_GROCERY_SHOP_REGEX}"](area.searchArea);
+  way["shop"~"${SWEDISH_GROCERY_SHOP_REGEX}"](area.searchArea);
+  relation["shop"~"${SWEDISH_GROCERY_SHOP_REGEX}"](area.searchArea);
 );
 out center tags;`;
 }

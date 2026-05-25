@@ -28,6 +28,8 @@ import {
   buildLidlOfferPageUrl,
   buildLidlStoreDetailPayloadUrl,
   buildLidlStoresUrl,
+  buildLocalFoodNodesNodesUrl,
+  buildLocalFoodNodesProductsUrl,
   buildSevenElevenNoStoresUrl,
   buildMatpriskollenStoreOffersUrl,
   buildMatpriskollenStoresUrl,
@@ -58,6 +60,7 @@ import {
   fetchOkq8FuelPrices,
   fetchOpenFoodFactsRetailerEnrichments,
   fetchBrandedSwedishFuelStations,
+  fetchApoteketSeProducts,
   fetchOverpassFuelStations,
   fetchOverpassGroceryStores,
   fetchSevenElevenSeConvenienceProducts,
@@ -90,6 +93,7 @@ import {
   fetchLidlOffers,
   fetchLidlOffersForAllStores,
   fetchLidlStores,
+  fetchLocalFoodNodesProductsForAllNodes,
   fetchSevenElevenNoStores,
   fetchMathemProducts,
   fetchMatpriskollenOffers,
@@ -100,8 +104,11 @@ import {
   fetchWillysWeeklyDiscounts,
   fetchWillysWeeklyDiscountsForAllStores,
   findPharmacyEanMatches,
+  parseApoteketSeProducts,
   parseApohemProducts,
   parseApotekHjartatProducts,
+  fetchLyfOgHeilsaProducts,
+  parseLyfOgHeilsaProducts,
   parseIcaReklambladOffers,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
@@ -112,9 +119,12 @@ import {
   GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL,
   GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL,
   GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL,
+  GROCERYVIEW_DAILY_LOCALFOODNODES_SE_PRODUCTS_URL,
+  GROCERYVIEW_DAILY_LYF_OG_HEILSA_IS_PRODUCTS_URL,
   GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL,
   GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL,
   GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL,
+  GROCERYVIEW_DAILY_APOTEKET_SE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL,
@@ -1939,7 +1949,7 @@ describe('fetchOverpassGroceryStores', () => {
   it('ships a Sweden-wide query for the nationwide OSM store refresh', () => {
     assert.match(SWEDEN_GROCERY_OVERPASS_QUERY, /ISO3166-1"="SE/);
     assert.match(SWEDEN_GROCERY_OVERPASS_QUERY, /admin_level=2/);
-    assert.match(SWEDEN_GROCERY_OVERPASS_QUERY, /shop"~"\^\(supermarket\|convenience\|grocery\)\$/);
+    assert.match(SWEDEN_GROCERY_OVERPASS_QUERY, /shop"~"\^\(supermarket\|convenience\|grocery\|greengrocer\)\$/);
     assert.doesNotMatch(SWEDEN_GROCERY_OVERPASS_QUERY, /ISO3166-2"="SE-AB/);
     assert.match(STOCKHOLM_GROCERY_OVERPASS_QUERY, /ISO3166-2"="SE-AB/);
     assert.equal(SWEDISH_COUNTY_ISO3166_2_CODES.length, 21);
@@ -7168,6 +7178,142 @@ describe('daily ingestion runner', () => {
     });
   });
 
+  it('parses Lyf og heilsa Gatsby page-data fixtures and fetches public IS pharmacy products', async () => {
+    const retrievedAt = '2026-05-24T10:15:00.000Z';
+    const sourceUrl = 'https://www.lyfogheilsa.is/page-data/gamla-apot/page-data.json';
+    const pageData = JSON.stringify({
+      result: {
+        data: {
+          prismicBrandPage: {
+            data: {
+              body: [{
+                items: [{
+                  productGroup: {
+                    productGroupId: '2076',
+                    title: 'GAMLA APÓTEKIÐ Sárakrem 50ml',
+                    fullPrice: 1699,
+                    discountPrice: 1299,
+                    discountPercent: 24,
+                    category: { slug: 'hudvorur' },
+                    images: [{ largeUrl: 'https://cdn.lyfogheilsa.is/sarakrem.jpg' }]
+                  }
+                }, {
+                  productGroup: {
+                    productGroupId: '3001',
+                    title: 'NOW D-Vítamín 100 töflur',
+                    fullPrice: '2.499',
+                    discountPrice: '2.499',
+                    discountPercent: 0,
+                    category: { slug: 'vitamin-og-baetiefni' },
+                    images: []
+                  }
+                }]
+              }]
+            }
+          }
+        }
+      }
+    });
+
+    const rows = parseLyfOgHeilsaProducts(pageData, sourceUrl, retrievedAt);
+    assert.equal(rows.length, 2);
+    assert.deepEqual(rows[0], {
+      chain: 'lyf-og-heilsa-is',
+      code: '2076',
+      name: 'GAMLA APÓTEKIÐ Sárakrem 50ml',
+      category: 'otc',
+      categorySlug: 'hudvorur',
+      price: 1299,
+      priceText: '1299 ISK',
+      originalPrice: 1699,
+      originalPriceText: '1699 ISK',
+      discountPercent: 24,
+      productUrl: 'https://www.lyfogheilsa.is/gamla-apot#product-2076',
+      imageUrl: 'https://cdn.lyfogheilsa.is/sarakrem.jpg',
+      sourceUrl,
+      retrievedAt
+    });
+    assert.equal(rows[1].category, 'supplement');
+
+    const requestedUrls: string[] = [];
+    const fetched = await fetchLyfOgHeilsaProducts({
+      sourcePaths: ['/page-data/gamla-apot/page-data.json'],
+      retrievedAt,
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return new Response(pageData, { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+    assert.deepEqual(requestedUrls, [sourceUrl]);
+    assert.equal(fetched.length, 2);
+    assert.equal(fetched[0].code, '2076');
+  });
+
+  it('materializes Lyf og heilsa public page-data products as IS pharmacy observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const endpointUrl = `${GROCERYVIEW_DAILY_LYF_OG_HEILSA_IS_PRODUCTS_URL}?sourcePaths=/page-data/gamla-apot/page-data.json`;
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-24T10:15:00.000Z',
+      connectors: [{
+        connectorId: 'lyf-og-heilsa-is-public-products',
+        chainId: 'lyf-og-heilsa-is',
+        domain: 'pharmacy',
+        sourceType: 'retailer_online_page',
+        endpointUrl,
+        parserVersion: 'lyf-og-heilsa-is-page-data-v1',
+        robotsTxtStatus: 'allow',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: false,
+        requireStoreScopedPrices: false,
+        stores: []
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return new Response(JSON.stringify({
+          result: {
+            data: {
+              prismicBrandPage: {
+                data: {
+                  body: [{
+                    items: [{
+                      productGroup: {
+                        productGroupId: '2076',
+                        title: 'GAMLA APÓTEKIÐ Sárakrem 50ml',
+                        fullPrice: 1699,
+                        discountPrice: 1299,
+                        discountPercent: 24,
+                        category: { slug: 'hudvorur' },
+                        images: [{ largeUrl: 'https://cdn.lyfogheilsa.is/sarakrem.jpg' }]
+                      }
+                    }]
+                  }]
+                }
+              }
+            }
+          }
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.deepEqual(requestedUrls, ['https://www.lyfogheilsa.is/page-data/gamla-apot/page-data.json']);
+    const chainInsert = executor.calls.find((call) => call.sql.includes('insert into chains'));
+    assert.deepEqual(chainInsert?.params, ['lyf-og-heilsa-is', 'lyf-og-heilsa-is', 'pharmacy']);
+    const product = firstBatchProduct(executor);
+    assert.equal(product.domain, 'pharmacy');
+    assert.equal(product.category_id, 'pharmacy-otc');
+    assert.equal(product.package_size, 50);
+    assert.equal(product.package_unit, 'ml');
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.domain, 'pharmacy');
+    assert.equal(observation.store_id, null);
+    assert.equal(observation.price, 1299);
+    assert.equal(observation.regular_price, 1699);
+  });
+
   it('materializes public pharmacy products as domain=pharmacy observations without prescription rows', async () => {
     const executor = new DailyIngestionExecutor();
     const requestedUrls: string[] = [];
@@ -7238,6 +7384,64 @@ describe('daily ingestion runner', () => {
     assert.equal(observation.store_id, null);
     assert.equal(observation.price, 49);
     assert.equal(observation.regular_price, 59);
+  });
+
+  it('dispatches Apoteket SE public product rows through the daily native connector', async () => {
+    const executor = new DailyIngestionExecutor();
+    const sourceUrl = 'https://www.apoteket.se/sok/?q=vitamin';
+    const endpointUrl = `${GROCERYVIEW_DAILY_APOTEKET_SE_PRODUCTS_URL}?sourceUrls=${encodeURIComponent(sourceUrl)}`;
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-23T08:40:34.000Z',
+      connectors: [{
+        connectorId: 'apoteket-se-public-products',
+        chainId: 'apoteket',
+        domain: 'pharmacy',
+        sourceType: 'retailer_online_page',
+        endpointUrl,
+        parserVersion: 'apoteket-se-public-products-v1',
+        robotsTxtStatus: 'allow',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: false,
+        requireStoreScopedPrices: false,
+        stores: []
+      }],
+      fetchImpl: async (url) => {
+        assert.equal(String(url), sourceUrl);
+        return new Response(`
+          <script type="application/json">{
+            "products": [
+              {
+                "productName": "Apoteket D-vitamin 100 tabletter",
+                "price": { "amount": "79,90", "currency": "SEK" },
+                "packageSize": "100 tabletter",
+                "url": "/produkt/apoteket-d-vitamin-100-tabletter/",
+                "isPrescriptionProduct": false
+              },
+              {
+                "productName": "Receptbelagd vara",
+                "price": { "amount": 199, "currency": "SEK" },
+                "packageSize": "10 tabletter",
+                "isPrescriptionProduct": true
+              }
+            ]
+          }</script>
+        `, { status: 200, headers: { 'content-type': 'text/html' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    const product = firstBatchProduct(executor);
+    assert.equal(product.domain, 'pharmacy');
+    assert.equal(product.category_id, 'pharmacy-public');
+    assert.equal(product.package_size, 100);
+    assert.equal(product.package_unit, 'piece');
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.chain_id, 'chain-db-1');
+    assert.equal(observation.domain, 'pharmacy');
+    assert.equal(observation.store_id, null);
+    assert.equal(observation.price, 79.9);
   });
 
   it('parses Apohem and Apotek Hjartat page fixtures with public EAN provenance only', () => {
@@ -7354,6 +7558,59 @@ describe('daily ingestion runner', () => {
       apohemSourceUrl,
       apotekHjartatSourceUrl
     ]);
+  });
+
+  it('parses Apoteket SE fixtures into public pharmacy price-list rows', async () => {
+    const sourceUrl = 'https://www.apoteket.se/sok/?q=vitamin';
+    const observedAt = '2026-05-23T08:40:34.000Z';
+    const html = `
+      <script>self.__next_f.push([1, "payload:{\\"products\\":[{\\"name\\":\\"Apoteket C-vitamin 20 brustabletter\\",\\"price\\":{\\"amount\\":\\"42,50\\",\\"currency\\":\\"SEK\\"},\\"unit\\":\\"20 tabletter\\",\\"href\\":\\"/produkt/c-vitamin/\\"},{\\"name\\":\\"Rx only\\",\\"price\\":99,\\"requiresPrescription\\":true}]}"])</script>
+      <script type="application/json">{
+        "items": [{
+          "product_name": "Apoteket Tandkräm Fluor 125 ml",
+          "price_sek": 29.9,
+          "unit": "125 ml",
+          "source_url": "https://www.apoteket.se/produkt/tandkram/"
+        }]
+      }</script>
+    `;
+
+    const rows = parseApoteketSeProducts(html, sourceUrl, observedAt);
+
+    assert.deepEqual(rows, [
+      {
+        country: 'SE',
+        currency: 'SEK',
+        chain: 'apoteket',
+        product_name: 'Apoteket C-vitamin 20 brustabletter',
+        price_sek: 42.5,
+        unit: '20 tabletter',
+        observed_at: observedAt,
+        source_url: 'https://www.apoteket.se/produkt/c-vitamin/'
+      },
+      {
+        country: 'SE',
+        currency: 'SEK',
+        chain: 'apoteket',
+        product_name: 'Apoteket Tandkräm Fluor 125 ml',
+        price_sek: 29.9,
+        unit: '125 ml',
+        observed_at: observedAt,
+        source_url: 'https://www.apoteket.se/produkt/tandkram/'
+      }
+    ]);
+
+    const requestedUrls: string[] = [];
+    const fetched = await fetchApoteketSeProducts({
+      sourceUrls: [sourceUrl],
+      observedAt,
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return new Response(html, { status: 200, headers: { 'content-type': 'text/html' } });
+      }
+    });
+    assert.deepEqual(requestedUrls, [sourceUrl]);
+    assert.equal(fetched.length, 2);
   });
 
   it('materializes native Lidl all-store public offer prices into daily database observations', async () => {
@@ -7551,6 +7808,137 @@ describe('daily ingestion runner', () => {
     assert.equal(result.status, 'blocked');
     assert.deepEqual(result.blockers, ['willys:missing_configured_store_observations:willys-skanstull']);
     assert.equal(executor.calls.length, 0);
+  });
+
+  it('fetches LocalFoodNodes SE products across nodes with all-store runner semantics', async () => {
+    const requestedUrls: string[] = [];
+    const retrievedAt = '2026-05-25T09:00:00.000Z';
+    const fetchImpl: typeof fetch = async (url) => {
+      const requestUrl = String(url);
+      requestedUrls.push(requestUrl);
+      if (requestUrl === buildLocalFoodNodesNodesUrl()) {
+        return Response.json({
+          nodes: [{
+            id: 'se-gothenburg-node',
+            name: 'Göteborg REKO-ring',
+            city: 'Göteborg',
+            country: 'SE',
+            url: '/nodes/se-gothenburg-node'
+          }]
+        });
+      }
+      if (requestUrl === buildLocalFoodNodesProductsUrl({ nodeId: 'se-gothenburg-node' })) {
+        return Response.json({
+          products: [{
+            id: 'lfn-carrot-1kg',
+            name: 'Morötter 1 kg',
+            producer: { name: 'Björkbacka gård' },
+            category: 'Grönsaker',
+            unit: '1 kg',
+            price: 35,
+            currency: 'SEK',
+            available: true,
+            url: '/products/lfn-carrot-1kg',
+            images: [{ url: '/images/carrot.jpg' }]
+          }]
+        });
+      }
+      return new Response('not found', { status: 404 });
+    };
+
+    const rows = await fetchLocalFoodNodesProductsForAllNodes({
+      fetchImpl,
+      maxNodes: 1,
+      maxRowsPerNode: 1,
+      retrievedAt
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildLocalFoodNodesNodesUrl(),
+      buildLocalFoodNodesProductsUrl({ nodeId: 'se-gothenburg-node' })
+    ]);
+    assert.equal(rows.length, 1);
+    const row = rows[0];
+    assert.ok(row);
+    assert.deepEqual(row, {
+      country: 'SE',
+      currency: 'SEK',
+      chain: 'localfoodnodes',
+      code: 'lfn-carrot-1kg',
+      name: 'Morötter 1 kg',
+      brand: 'Björkbacka gård',
+      category: 'Grönsaker',
+      packageText: '1 kg',
+      price: 35,
+      priceText: '35 SEK',
+      unitPrice: null,
+      unitPriceUnit: '1 kg',
+      storeId: 'se-gothenburg-node',
+      storeName: 'Göteborg REKO-ring',
+      nodeId: 'se-gothenburg-node',
+      nodeName: 'Göteborg REKO-ring',
+      producer: 'Björkbacka gård',
+      available: true,
+      productUrl: 'https://localfoodnodes.com/products/lfn-carrot-1kg',
+      imageUrl: 'https://localfoodnodes.com/images/carrot.jpg',
+      sourceUrl: 'https://localfoodnodes.com/api/nodes/se-gothenburg-node/products',
+      retrievedAt
+    });
+  });
+
+  it('materializes native LocalFoodNodes SE products into daily database observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-25T09:00:00.000Z',
+      connectors: [{
+        connectorId: 'localfoodnodes-se-products',
+        chainId: 'localfoodnodes',
+        sourceType: 'official_api',
+        endpointUrl: `${GROCERYVIEW_DAILY_LOCALFOODNODES_SE_PRODUCTS_URL}?maxNodes=1&maxRowsPerNode=1`,
+        parserVersion: 'native-localfoodnodes-se-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{
+          storeId: 'se-gothenburg-node',
+          name: 'Göteborg REKO-ring',
+          address: 'Göteborg',
+          city: 'Göteborg'
+        }]
+      }],
+      fetchImpl: async (url) => {
+        const requestUrl = String(url);
+        if (requestUrl === buildLocalFoodNodesNodesUrl()) {
+          return Response.json({
+            nodes: [{ id: 'se-gothenburg-node', name: 'Göteborg REKO-ring', city: 'Göteborg', country: 'SE' }]
+          });
+        }
+        if (requestUrl === buildLocalFoodNodesProductsUrl({ nodeId: 'se-gothenburg-node' })) {
+          return Response.json({
+            products: [{
+              id: 'lfn-potato-2kg',
+              name: 'Potatis 2 kg',
+              producer: { name: 'Västkustens gård' },
+              category: 'Rotfrukter',
+              unit: '2 kg',
+              price: '49 SEK',
+              currency: 'SEK',
+              available: true,
+              url: '/products/lfn-potato-2kg'
+            }]
+          });
+        }
+        return new Response('not found', { status: 404 });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.equal(result.rejectedCount, 0);
+    const observationInsert = executor.calls.find((call) => call.sql.includes('insert into observations'));
+    assert.ok(observationInsert, 'LocalFoodNodes connector should persist observations');
+    assert.match(JSON.stringify(observationInsert.params), /lfn-potato-2kg/);
   });
 
   it('marks the source run failed when daily observation persistence aborts after run creation', async () => {

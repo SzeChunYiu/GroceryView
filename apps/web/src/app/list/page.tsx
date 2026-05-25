@@ -6,6 +6,7 @@ import { AppNav } from '@/components/app-nav';
 import { BottomNav } from '@/components/bottom-nav';
 import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { PullRefreshWrapper } from '@/components/PullRefreshWrapper';
+import { PrintButton } from '@/components/PrintButton';
 import { useList } from '@/hooks/useList';
 
 export default function ShoppingListPage() {
@@ -23,11 +24,11 @@ export default function ShoppingListPage() {
 
   return (
     <div className="min-h-screen bg-[#f5f1e8] text-slate-950">
-      <AppNav />
-      <PullRefreshWrapper onRefresh={refreshLatestPrices}>
+      <div data-print-hidden="true"><AppNav /></div>
+      <div data-print-hidden="true"><PullRefreshWrapper onRefresh={refreshLatestPrices}>
         <main className="mx-auto w-full max-w-7xl px-4 pb-20 pt-6 sm:px-6 lg:px-8 lg:pb-6">
           <p className="text-xs font-bold uppercase tracking-[0.24em] text-emerald-800">Local shopping trip</p>
-          <div className="mt-2 grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div className="shopping-list-print-header mt-2 grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
             <div>
               <h1 className="text-4xl font-black tracking-tight text-slate-950">Shopping list</h1>
               <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
@@ -41,9 +42,14 @@ export default function ShoppingListPage() {
             </div>
           </div>
 
-          <BulkImportDialog onImportItems={addImportedItems} />
+          <div className="mt-5 flex flex-wrap items-center gap-3" data-print-hidden="true">
+            <PrintButton />
+            <p className="text-sm font-semibold text-slate-600">Print view uses A4 spacing and hides navigation, import controls, and mobile chrome.</p>
+          </div>
 
-          <section className="mt-6 rounded-[1.75rem] border border-emerald-200 bg-white/95 p-5 shadow-sm">
+          <div data-print-hidden="true"><BulkImportDialog onImportItems={addImportedItems} /></div>
+
+          <section className="shopping-list-print-card mt-6 rounded-[1.75rem] border border-emerald-200 bg-white/95 p-5 shadow-sm">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h2 className="text-2xl font-black tracking-tight text-slate-950">Today&apos;s basket</h2>
@@ -52,6 +58,7 @@ export default function ShoppingListPage() {
                 </p>
               </div>
               <button
+                data-print-hidden="true"
                 className="inline-flex items-center justify-center rounded-full border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 transition hover:border-emerald-700 hover:text-emerald-900"
                 onClick={resetCheckedState}
                 type="button"
@@ -71,15 +78,32 @@ export default function ShoppingListPage() {
               <div className="h-full rounded-full bg-emerald-700 transition-all" style={{ width: `${progress}%` }} />
             </div>
 
-            <ul className="mt-5 space-y-3">
+            <ul className="shopping-list-print-items mt-5 space-y-3">
               {items.map((item) => (
                 <CheckableListItem item={item} key={item.id} onToggle={toggleItemChecked} />
               ))}
             </ul>
           </section>
         </main>
-      </PullRefreshWrapper>
-      <BottomNav />
+      </PullRefreshWrapper></div>
+      <main className="shopping-list-print-page mx-auto hidden w-full max-w-7xl px-4 pb-20 pt-6 print:block sm:px-6 lg:px-8 lg:pb-6">
+        <section className="shopping-list-print-card rounded-[1.75rem] border border-emerald-200 bg-white/95 p-5 shadow-sm">
+          <div className="shopping-list-print-header flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.24em] text-emerald-800">GroceryView shopping list</p>
+              <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950">Today&apos;s basket</h1>
+              <p className="mt-2 text-sm font-semibold text-slate-700">{checkedCount}/{totalCount} complete · {remainingCount} left to collect</p>
+            </div>
+            <p className="text-right text-xs font-bold uppercase tracking-[0.18em] text-slate-500">A4 print view</p>
+          </div>
+          <ul className="shopping-list-print-items mt-5 space-y-3">
+            {items.map((item) => (
+              <CheckableListItem item={item} key={`print-${item.id}`} onToggle={toggleItemChecked} />
+            ))}
+          </ul>
+        </section>
+      </main>
+      <div data-print-hidden="true"><BottomNav /></div>
     </div>
   );
 }

@@ -40,6 +40,24 @@ export type RollingAverageDeal = {
   observedAt: string;
 };
 
+export type RollingAverageDealReport = {
+  asOf: string;
+  filters: { category?: string };
+  dealCount: number;
+  sortedBy: 'discount_percentage_desc';
+  windowDays: 30;
+  deals: RollingAverageDeal[];
+};
+
+export type RollingAverageDealsReportOptions = {
+  asOf?: string;
+  category?: string;
+};
+
+export type RollingAverageDealsQueryExecutor = {
+  query<T>(sql: string, params?: unknown[]): Promise<T[]>;
+};
+
 function iso(value: string | Date): string {
   return value instanceof Date ? value.toISOString() : value;
 }
@@ -122,4 +140,31 @@ export function mapRollingAverageDealRow(row: RollingAverageDealRow): RollingAve
     currency: row.currency,
     observedAt: iso(row.observed_at)
   };
+}
+
+export function buildRollingAverageDealReport(
+  asOf: string,
+  deals: RollingAverageDeal[],
+  options: { category?: string } = {}
+): RollingAverageDealReport {
+  return {
+    asOf,
+    filters: {
+      ...(options.category?.trim() ? { category: options.category.trim() } : {})
+    },
+    dealCount: deals.length,
+    sortedBy: 'discount_percentage_desc',
+    windowDays: 30,
+    deals
+  };
+}
+
+export async function queryRollingAverageDealReport(
+  executor: RollingAverageDealsQueryExecutor,
+  options: RollingAverageDealsReportOptions = {}
+): Promise<RollingAverageDealReport> {
+  const asOf = options.asOf ?? new Date().toISOString();
+  const dealQuery = buildRollingAverageDealsQuery(asOf, options.category);
+  const rows = await executor.query<RollingAverageDealRow>(dealQuery.sql, dealQuery.values);
+  return buildRollingAverageDealReport(asOf, rows.map(mapRollingAverageDealRow), options);
 }

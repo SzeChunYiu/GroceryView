@@ -146,6 +146,7 @@ for a future iteration per operator directive 2026-05-21**.
 ### B2 · Hemköp (Axfood) ✅
 - `GET https://www.hemkop.se/search?q=<query>&page=0&size=20` → same shape as Willys
 - No per-branch pricing
+- Connector details: [`docs/connectors/hemkop.md`](connectors/hemkop.md) covers source URLs, extracted fields, known quirks, edge cases, and last verification evidence.
 
 ### B3 · Tempo (Axfood?) ❌ no e-commerce backend
 - Static site (Sitevision); no JSON product API; only PDF flyers

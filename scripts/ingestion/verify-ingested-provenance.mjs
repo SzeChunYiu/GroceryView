@@ -101,6 +101,12 @@ const DATASETS = [
     key: ['sourceUrl', 'osmType', 'osmId']
   },
   {
+    file: 'seven-eleven-se.ts',
+    rows: 'sevenElevenSeProducts',
+    source: 'sevenElevenSeSource',
+    key: ['sourceUrl', 'pdfUrl', 'productId', 'priceText']
+  },
+  {
     file: 'willys.ts',
     rows: 'willysProducts',
     source: 'willysSource',

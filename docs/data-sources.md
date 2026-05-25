@@ -43,6 +43,7 @@ GroceryView ingestion layer pulls from (or could pull from). Each entry lists
 ## 2. Products + chain-level prices
 
 ### 2.1 Axfood Search (Willys, Hemköp) ✅ shipped (PR #531)
+- **Connector detail:** [Hemköp connector notes](connectors/hemkop.md) document the Hemköp sources, fields, quirks, edge cases, and last checked-in verification date.
 - **Endpoint:** `https://www.willys.se/search?q={query}&page={n}&size={n}` and identical pattern at `https://www.hemkop.se/search`.
 - **Method:** GET. **Headers:** browser-y `User-Agent`, `Accept: application/json`. No auth, no cookies needed for read-only search.
 - **Returns:** `{ results: [...] }` JSON with `code` (EAN), `name`, `manufacturer`/`brand`, `productLine2` (subline), `price`/`priceNoUnit`/`priceUnit`, `image.url`, `labels` (`swedish_flag`, `from_sweden`, `organic`, …), `googleAnalyticsCategory` (hierarchy string).

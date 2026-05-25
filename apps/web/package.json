@@ -3,14 +3,15 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "build": "NODE_OPTIONS=--max-old-space-size=6144 next build --webpack",
+    "build": "npm run build:deps && NODE_OPTIONS=--max-old-space-size=6144 next build --webpack",
     "dev": "next dev",
     "perf:bundle:profile": "NODE_OPTIONS=--max-old-space-size=6144 next build --profile --webpack && size-limit --config ./size-limit.config.cjs",
     "perf:lighthouse:ci": "lhci autorun --config=./lighthouserc.cjs",
     "perf:lighthouse:preview": "lhci autorun --config=./lighthouserc.preview.cjs",
     "start": "next start",
     "test": "node --test scripts/*.test.mjs",
-    "e2e": "playwright test --config playwright.config.ts"
+    "e2e": "playwright test --config playwright.config.ts",
+    "build:deps": "npm run build -w @groceryview/core && npm run build -w @groceryview/analytics && npm run build -w @groceryview/api && npm run build -w @groceryview/catalog && npm run build -w @groceryview/db && npm run build -w @groceryview/ops && npm run build -w @groceryview/scanning"
   },
   "dependencies": {
     "@groceryview/analytics": "0.1.0",
