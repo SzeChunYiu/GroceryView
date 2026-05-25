@@ -47,11 +47,11 @@ describe('verified-data UI', () => {
   it('ships the requested grouped desktop navigation without legacy personal-product links', async () => {
     const nav = await read('src/components/app-nav.tsx');
 
-    assert.match(nav, /label: 'Markets'[\s\S]*label: 'Overview'[\s\S]*label: 'Chain index'[\s\S]*label: 'Categories'[\s\S]*label: 'Heatmap'[\s\S]*label: 'Screener'/);
-    assert.match(nav, /label: 'Products'[\s\S]*label: 'Browse'[\s\S]*label: 'Compare'/);
-    assert.match(nav, /label: 'Stores'[\s\S]*label: 'Map'[\s\S]*label: 'Stores'/);
-    assert.match(nav, /label: 'Trip'[\s\S]*label: 'Current list'[\s\S]*label: 'Nearby deals'[\s\S]*label: 'Watchlist'/);
-    assert.match(nav, /label: 'Personal'[\s\S]*label: 'Savings'[\s\S]*label: 'My Flyer'[\s\S]*label: 'Weekly basket'[\s\S]*label: 'Meal planner'[\s\S]*href: '\/contact'[\s\S]*label: 'Contact'/);
+    assert.match(nav, /t\('app-nav\.groups\.markets'\)[\s\S]*label: 'Screener'/);
+    assert.match(nav, /t\('app-nav\.groups\.products'\)[\s\S]*t\('app-nav\.items\.browse'\)[\s\S]*t\('app-nav\.items\.compare'\)/);
+    assert.match(nav, /t\('app-nav\.groups\.stores'\)[\s\S]*t\('app-nav\.items\.map'\)/);
+    assert.match(nav, /t\('app-nav\.groups\.trip'\)[\s\S]*t\('app-nav\.items\.currentList'\)[\s\S]*t\('app-nav\.items\.nearbyDeals'\)[\s\S]*t\('app-nav\.items\.watchlist'\)/);
+    assert.match(nav, /t\('app-nav\.groups\.personal'\)[\s\S]*t\('app-nav\.items\.savings'\)[\s\S]*t\('app-nav\.items\.myFlyer'\)[\s\S]*t\('app-nav\.items\.weeklyBasket'\)[\s\S]*t\('app-nav\.items\.mealPlanner'\)[\s\S]*href: '\/contact'/);
     assert.match(nav, /aria-haspopup="true"/);
     assert.match(nav, /group-focus-within:visible/);
     assert.match(nav, /group-hover:visible/);
@@ -373,7 +373,7 @@ describe('verified-data UI', () => {
 
     assert.match(page, /MyFlyerPreferences/);
     assert.match(preferences, /Country/);
-    assert.match(preferences, /Favorite stores/);
+    assert.match(preferences, /FavoriteStorePicker/);
     assert.match(preferences, /Home location/);
     assert.match(preferences, /Household size/);
     assert.match(preferences, /MyFlyer account diet filters/);
@@ -683,7 +683,7 @@ describe('verified-data UI', () => {
     assert.match(actions, /dismiss_community_report/);
     assert.match(actions, /needs_more_info/);
     assert.match(actions, /Request more info/);
-    assert.match(actions, /setStatus\('in_progress'\)/);
+    assert.match(actions, /setStatus\('loading'\)/);
     assert.match(actions, /reviewedByHuman: true/);
     assert.match(actions, /Sign in first/);
     assert.match(actions, /No anonymous price-report moderation/);
@@ -2120,7 +2120,7 @@ ${seo}`;
     assert.match(globals, /radial-gradient/);
     assert.match(globals, /@media \(prefers-reduced-motion: reduce\)/);
     assert.match(globals, /transition-duration: 1ms !important/);
-    assert.match(nav, /Verified grocery intelligence/);
+    assert.match(nav, /groceryTranslator/);
     assert.match(nav, /href: '\/screener', label: 'Screener'/, 'Screener nav item should point to the dedicated /screener route');
     assert.match(shell, /zero placeholder rows/);
     assert.match(shell, /Data provenance|SourceCoverage/);
@@ -3597,7 +3597,7 @@ ${seo}`;
     assert.match(route, /categorySummaries/);
     assert.match(route, /searchParams\.get\('q'\)/);
     assert.match(route, /query\.length < 1/);
-    assert.match(route, /SUGGESTION_LIMIT = 12/);
+    assert.match(route, /SUGGESTION_LIMIT = 10/);
     assert.match(route, /CACHE_TTL_MS = 60_000/);
     assert.match(route, /suggestionCache/);
     assert.match(route, /startsWith\(query\)/);

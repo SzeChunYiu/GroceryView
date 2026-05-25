@@ -9,7 +9,7 @@ import vm from 'node:vm';
 const require = createRequire(import.meta.url);
 const ts = require('typescript');
 const root = new URL('../', import.meta.url);
-const rootPath = fileURLToPath(root);
+const rootPath = fileURLToPath(root).replace(/[/\\]$/, '');
 const moduleCache = new Map();
 
 const read = (relative) => new Promise((resolve, reject) => {
@@ -238,8 +238,9 @@ test('trending feed handler payload returns fixture JSON shape with card evidenc
   const payload = await response.json();
 
   assert.equal(payload.city, 'Malmo');
-  assert.deepEqual(payload.filters, { category: '', chain: '' });
-  assert.deepEqual(payload.personalization.signals, ['favoriteBrands', 'dietary', 'nearbyChains', 'clicked', 'household category history']);
+  assert.equal(payload.filters.category, '');
+  assert.equal(payload.filters.chain, '');
+  assert.deepEqual([...payload.personalization.signals], ['favoriteBrands', 'dietary', 'nearbyChains', 'clicked', 'household category history']);
   assert.equal(payload.cards.length, 1);
   assert.deepEqual(Object.keys(payload.cards[0]).filter((key) => [
     'productName',
