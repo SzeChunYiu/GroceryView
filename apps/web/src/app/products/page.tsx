@@ -9,6 +9,7 @@ import { ProductPriceCards } from '@/components/product-price-cards';
 import { NewArrivalsCarousel } from '@/components/TrendingCarousel';
 import { SavedSearchActions } from '@/components/saved-search-actions';
 import { ProductGrid } from '@/components/product-grid';
+import { ChainLogo } from '@/components/chain-logo';
 import { apohemSource } from '@/lib/ingested/apohem';
 import { newProductArrivals } from '@/lib/new-arrivals';
 import { buildSavedSearchSubscription } from '@/lib/alert-scheduler';
@@ -345,7 +346,10 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">Chain facets</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {chainFacets.map((facet) => (
-                <Link className="rounded-full bg-sky-50 px-3 py-1 text-xs font-black text-sky-900" href={searchFacetUrl({ chain: facet.value })} key={facet.value}>{facet.label} · {facet.count}</Link>
+                <Link className="inline-flex items-center gap-2 rounded-full bg-sky-50 px-3 py-1 text-xs font-black text-sky-900" href={searchFacetUrl({ chain: facet.value })} key={facet.value}>
+                  <ChainLogo chain={facet.label} />
+                  {facet.label} · {facet.count}
+                </Link>
               ))}
             </div>
           </div>

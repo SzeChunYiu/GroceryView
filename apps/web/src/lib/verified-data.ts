@@ -2264,6 +2264,7 @@ export type AdaptiveProductCard = {
   brand: string;
   imageUrl: string | null;
   imageAlt: string | null;
+  lowestChain: string | null;
   productKind: 'branded' | 'commodity';
   totalPriceLabel: string;
   unitPriceLabel: string;
@@ -2549,6 +2550,7 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
     brand: isChainProduct ? product.brand : product.brands || 'Brand not reported',
     imageUrl: product.image || null,
     imageAlt: product.image ? `${product.name} product image from ${isChainProduct ? 'Axfood' : 'OpenPrices/OpenFoodFacts'} source data` : null,
+    lowestChain: isChainProduct ? product.lowestChain : null,
     productKind,
     totalPriceLabel: formatSek(totalPrice),
     unitPriceLabel: normalizedUnit ? formatLocalizedUnitPrice(normalizedUnit.unitPrice, {

@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ConfidenceBadge } from './confidence-badge';
 import { EcoBadge } from './eco-badge';
 import { LazyItemCard } from './LazyItemCard';
+import { ChainLogo } from './chain-logo';
 import { FavouriteProductToggle } from './favourite-product-toggle';
 import { readStoredSafetyPreferences, SAFETY_PREFERENCES_CHANGED_EVENT, type ProductSafetyPreferences } from './cert-filter';
 import { buildPriceHistorySparklinePath } from '@/lib/price-events';
@@ -396,6 +397,12 @@ export function ProductPriceCards({
             </div>
             <p className="mt-4 text-3xl font-black text-emerald-800">{primaryLabel(card, compareMode)}</p>
             <p className="mt-1 text-sm font-semibold text-slate-700">{secondaryLabel(card, compareMode)}</p>
+            {card.lowestChain ? (
+              <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-white px-3 py-2 text-xs font-black text-slate-700 shadow-sm">
+                <ChainLogo chain={card.lowestChain} />
+                {card.lowestChain} lowest observed chain
+              </p>
+            ) : null}
             {/* cheapest-per-unit */}
             <div className="mt-3">
               <EcoBadge score={card.carbonScore} />
