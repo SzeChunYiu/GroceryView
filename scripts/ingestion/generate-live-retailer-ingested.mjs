@@ -458,6 +458,7 @@ async function writeCoop(products, weeklyDiscounts) {
 }
 
 async function writeWillys(products, weeklyDiscounts) {
+  const productsWithOriginCountry = withAxfoodOriginCountry(products);
   const productSourceUrls = unique(products.map((row) => row.sourceUrl));
   const weeklySourceUrls = unique(weeklyDiscounts.map((row) => row.sourceUrl));
   const weeklyStoreIds = unique(weeklyDiscounts.map((row) => row.storeId));
@@ -487,6 +488,7 @@ async function writeWillys(products, weeklyDiscounts) {
     '  unitPriceUnit: string;',
     '  imageUrl: string;',
     '  labels: string[];',
+    '  originCountry: string | null;',
     '  online: boolean;',
     '  outOfStock: boolean;',
     '  sourceUrl: string;',
@@ -530,7 +532,7 @@ async function writeWillys(products, weeklyDiscounts) {
       sourceUrls: productSourceUrls
     })} as const;`,
     '',
-    `export const willysProducts: WillysIngestedProduct[] = ${literal(products)};`,
+    `export const willysProducts: WillysIngestedProduct[] = ${literal(productsWithOriginCountry)};`,
     '',
     `export const willysWeeklyDiscountSource = ${literal({
       source: 'willys.se public Axfood campaign JSON',
@@ -548,6 +550,7 @@ async function writeWillys(products, weeklyDiscounts) {
 }
 
 async function writeHemkop(products, weeklyDiscounts) {
+  const productsWithOriginCountry = withAxfoodOriginCountry(products);
   const productSourceUrls = unique(products.map((row) => row.sourceUrl));
   const weeklySourceUrls = unique(weeklyDiscounts.map((row) => row.sourceUrl));
   const weeklyStoreIds = unique(weeklyDiscounts.map((row) => row.storeId));
@@ -577,6 +580,7 @@ async function writeHemkop(products, weeklyDiscounts) {
     '  unitPriceUnit: string;',
     '  imageUrl: string;',
     '  labels: string[];',
+    '  originCountry: string | null;',
     '  online: boolean;',
     '  outOfStock: boolean;',
     '  sourceUrl: string;',
@@ -620,7 +624,7 @@ async function writeHemkop(products, weeklyDiscounts) {
       sourceUrls: productSourceUrls
     })} as const;`,
     '',
-    `export const hemkopProducts: HemkopIngestedProduct[] = ${literal(products)};`,
+    `export const hemkopProducts: HemkopIngestedProduct[] = ${literal(productsWithOriginCountry)};`,
     '',
     `export const hemkopWeeklyDiscountSource = ${literal({
       source: 'hemkop.se public Axfood campaign JSON',
@@ -1435,6 +1439,22 @@ function latestRetrievedAt(rows) {
     .filter(Boolean)
     .sort()
     .at(-1) ?? null;
+}
+
+function normalizeOriginCountry(value) {
+  if (typeof value !== 'string') return null;
+  const normalized = value.trim().toUpperCase();
+  return /^[A-Z]{2}$/.test(normalized) ? normalized : null;
+}
+
+function inferAxfoodOriginCountry(row) {
+  const labels = Array.isArray(row.labels) ? row.labels : [];
+  if (labels.some((label) => /swedish|from_sweden|milk_from_sweden|meat_from_sweden/i.test(label))) return 'SE';
+  return normalizeOriginCountry(row.originCountry);
+}
+
+function withAxfoodOriginCountry(rows) {
+  return rows.map((row) => ({ ...row, originCountry: inferAxfoodOriginCountry(row) }));
 }
 
 function unique(values) {
