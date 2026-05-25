@@ -5,6 +5,7 @@ import { Mic, Search } from 'lucide-react';
 import type { KeyboardEvent, ReactNode } from 'react';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { trackSearchToSavingsFunnelStep, trackVoiceSearchInput } from '@/lib/analytics';
+import { SearchSuggestionSkeleton } from '@/components/ui/skeleton';
 import {
   clearRecentSearchHistory,
   readRecentSearchHistory,
@@ -142,6 +143,17 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
     const productResultCount = groupedCount === 0 && status === 'ready' ? results.length : 0;
     return groupedCount + facetChips.length + productResultCount;
   }, [facetChips.length, recentSearches.length, results.length, shouldShowRecentSearches, status, suggestGroups]);
+  const keyboardOptions = useMemo(() => {
+    if (shouldShowRecentSearches) return recentSearches.map((search) => ({ href: search.href }));
+    const groupedOptions = suggestGroups.flatMap((group) => group.items.map((item) => ({ href: item.href })));
+    const facetOptions = facetChips.map((facet) => ({ href: facet.href }));
+    const resultOptions = groupedOptions.length === 0 && status === 'ready'
+      ? results.map((result) => ({ href: `/products/${result.slug}` }))
+      : [];
+
+    return [...groupedOptions, ...facetOptions, ...resultOptions];
+  }, [facetChips, recentSearches, results, shouldShowRecentSearches, status, suggestGroups]);
+  const activeDescendantId = activeOptionIndex >= 0 ? `${listboxId}-option-${activeOptionIndex}` : undefined;
 
   useEffect(() => {
     setRecentSearches(readRecentSearchHistory());
@@ -275,14 +287,10 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
     if (optionCount === 0) return;
     const nextIndex = (index + optionCount) % optionCount;
     setActiveOptionIndex(nextIndex);
-    window.requestAnimationFrame(() => {
-      const option = document.querySelector<HTMLElement>(`[data-search-option-index="${nextIndex}"]`);
-      option?.focus();
-    });
   }
 
   function handleSearchKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp' && event.key !== 'Escape') return;
+    if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp' && event.key !== 'Enter' && event.key !== 'Escape') return;
     if (event.key === 'Escape') {
       setIsFocused(false);
       setActiveOptionIndex(-1);
@@ -290,6 +298,11 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
     }
     if (!shouldShowDropdown || optionCount === 0) return;
     event.preventDefault();
+    if (event.key === 'Enter') {
+      const activeOption = keyboardOptions[activeOptionIndex];
+      if (activeOption) window.location.assign(activeOption.href);
+      return;
+    }
     const targetIndex = event.key === 'ArrowDown'
       ? (activeOptionIndex < 0 ? 0 : activeOptionIndex + 1)
       : (activeOptionIndex < 0 ? optionCount - 1 : activeOptionIndex - 1);
@@ -319,6 +332,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
         <Search className="h-4 w-4 text-slate-500" aria-hidden="true" />
         <input
           aria-autocomplete="list"
+          aria-activedescendant={activeDescendantId}
           aria-controls={listboxId}
           aria-expanded={shouldShowDropdown}
           aria-label="Search products"
@@ -382,10 +396,13 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
                       className="rounded-2xl bg-slate-50 px-3 py-2 text-sm font-black text-slate-800 transition hover:bg-emerald-50 hover:text-emerald-900 focus:bg-emerald-50 focus:outline-none"
                       data-search-option-index={index}
                       href={search.href}
+                      id={`${listboxId}-option-${index}`}
                       key={`${search.query}-${search.searchedAt}`}
                       onFocus={() => setActiveOptionIndex(index)}
                       onKeyDown={(event) => handleOptionKeyDown(event, index)}
+                      onMouseEnter={() => setActiveOptionIndex(index)}
                       role="option"
+                      aria-selected={activeOptionIndex === index}
                     >
                       {search.query}
                       <span className="ml-2 text-xs font-semibold text-slate-500">{search.resultCount} verified result{search.resultCount === 1 ? '' : 's'}</span>
@@ -396,7 +413,9 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
             </div>
           ) : null}
           {status === 'loading' ? (
-            <p className="px-4 py-3 text-sm font-bold text-slate-600">Searching verified products…</p>
+            <div role="status" aria-label="Searching verified products">
+              <SearchSuggestionSkeleton />
+            </div>
           ) : null}
           {suggestGroups.length > 0 ? (
             <div className="max-h-96 overflow-y-auto border-t border-slate-100">
@@ -411,10 +430,13 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
                           className="rounded-2xl px-3 py-2 text-sm font-black text-slate-900 transition hover:bg-emerald-50 focus:bg-emerald-50 focus:outline-none"
                           data-search-option-index={index}
                           href={item.href}
+                          id={`${listboxId}-option-${index}`}
                           key={item.id}
                           onFocus={() => setActiveOptionIndex(index)}
                           onKeyDown={(event) => handleOptionKeyDown(event, index)}
+                          onMouseEnter={() => setActiveOptionIndex(index)}
                           role="option"
+                          aria-selected={activeOptionIndex === index}
                         >
                           <span className="block"><HighlightedMatch label={item.label} ranges={item.matchRanges} /></span>
                           {item.detail ? <span className="mt-0.5 block text-xs font-semibold text-slate-500">{item.detail}</span> : null}
@@ -437,10 +459,13 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
                       className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-900 transition hover:bg-emerald-100 focus:bg-emerald-100 focus:outline-none"
                       data-search-option-index={index}
                       href={facet.href}
+                      id={`${listboxId}-option-${index}`}
                       key={`${facet.kind}-${facet.href}`}
                       onFocus={() => setActiveOptionIndex(index)}
                       onKeyDown={(event) => handleOptionKeyDown(event, index)}
+                      onMouseEnter={() => setActiveOptionIndex(index)}
                       role="option"
+                      aria-selected={activeOptionIndex === index}
                     >
                       {facet.label}
                       {facet.count ? <span className="ml-1 text-emerald-700">({facet.count})</span> : null}
@@ -483,10 +508,13 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
                     className="block px-4 py-3 transition hover:bg-emerald-50 focus:bg-emerald-50 focus:outline-none"
                     data-search-option-index={index}
                     href={`/products/${result.slug}`}
+                    id={`${listboxId}-option-${index}`}
                     key={result.id}
                     onFocus={() => setActiveOptionIndex(index)}
                     onKeyDown={(event) => handleOptionKeyDown(event, index)}
+                    onMouseEnter={() => setActiveOptionIndex(index)}
                     role="option"
+                    aria-selected={activeOptionIndex === index}
                   >
                     <span className="block text-sm font-black text-slate-950">{result.name}</span>
                     <span className="mt-1 block text-xs font-semibold text-slate-600">{result.brand ?? 'Brand not reported'} · PostgreSQL product search</span>
