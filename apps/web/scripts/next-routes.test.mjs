@@ -70,6 +70,22 @@ describe('verified-data UI', () => {
     assert.match(verified, /sourceCoverage/);
   });
 
+  it('ships an immutable build-time version endpoint', async () => {
+    const route = await read('src/app/api/version/route.ts');
+
+    assert.match(route, /export const runtime = 'nodejs'/);
+    assert.match(route, /export const dynamic = 'force-static'/);
+    assert.match(route, /const versionPayload = \{/);
+    assert.match(route, /process\.env\.VERCEL_GIT_COMMIT_SHA/);
+    assert.match(route, /process\.env\.GROCERYVIEW_BUILT_AT/);
+    assert.match(route, /process\.env\.VERCEL_ENV/);
+    assert.match(route, /commit:/);
+    assert.match(route, /builtAt:/);
+    assert.match(route, /env:/);
+    assert.match(route, /NextResponse\.json\(versionPayload/);
+    assert.match(route, /Cache-Control': 'public, max-age=31536000, immutable'/);
+  });
+
 
   it('renders the authenticated MyFlyer route from a server digest snapshot', async () => {
     const route = await read('src/app/my-flyer/page.tsx');
