@@ -15,6 +15,7 @@ import {
   type SavedSearchEntry
 } from '@/lib/personalization';
 import type { SearchExplanationBadge } from '@/lib/search-filters';
+import { authenticatedSavedSearchShortcuts } from '@/lib/saved-searches';
 
 type ProductSearchResult = {
   id: string;
@@ -548,40 +549,76 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
 
 export function RecentSearchReplayPills() {
   const [recentSearches, setRecentSearches] = useState<RecentSearchHistoryEntry[]>([]);
+  const [savedSearches, setSavedSearches] = useState<SavedSearchEntry[]>([]);
 
   useEffect(() => {
     setRecentSearches(readRecentSearchHistory());
+    setSavedSearches(readSavedSearches());
   }, []);
 
-  if (recentSearches.length === 0) return null;
+  if (recentSearches.length === 0 && savedSearches.length === 0 && authenticatedSavedSearchShortcuts.length === 0) return null;
 
   return (
     <section className="mx-auto mb-4 w-full max-w-5xl rounded-3xl border border-emerald-100 bg-white p-4 shadow-sm" data-search-history-replay>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">Recent searches</p>
-          <p className="mt-1 text-sm font-semibold text-slate-600">Replay successful grocery searches saved on this device.</p>
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">Recent and saved searches</p>
+          <p className="mt-1 text-sm font-semibold text-slate-600">Replay successful grocery searches and signed-in shortcuts saved for repeat missions.</p>
         </div>
-        <button
-          className="rounded-full border border-slate-200 px-3 py-1.5 text-xs font-black text-slate-700 hover:border-rose-200 hover:text-rose-700"
-          onClick={() => setRecentSearches(clearRecentSearchHistory())}
-          type="button"
-        >
-          Clear all
-        </button>
-      </div>
-      <div className="mt-3 flex flex-wrap gap-2">
-        {recentSearches.map((search) => (
-          <Link
-            className="rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-black text-emerald-950 hover:bg-emerald-100"
-            href={search.href}
-            key={`${search.query}-${search.searchedAt}`}
+        {recentSearches.length > 0 ? (
+          <button
+            className="rounded-full border border-slate-200 px-3 py-1.5 text-xs font-black text-slate-700 hover:border-rose-200 hover:text-rose-700"
+            onClick={() => setRecentSearches(clearRecentSearchHistory())}
+            type="button"
           >
-            {search.query}
-            <span className="ml-2 text-xs font-semibold text-emerald-800">{search.resultCount}</span>
+            Clear recent
+          </button>
+        ) : null}
+      </div>
+
+      {savedSearches.length > 0 ? (
+        <div className="mt-3 flex flex-wrap gap-2" aria-label="Pinned saved searches">
+          {savedSearches.map((search) => (
+            <Link
+              className="rounded-full bg-violet-50 px-3 py-1.5 text-sm font-black text-violet-950 hover:bg-violet-100"
+              href={search.href}
+              key={`saved-${search.query}-${search.pinnedAt}`}
+            >
+              ★ {search.query}
+              <span className="ml-2 text-xs font-semibold text-violet-800">saved</span>
+            </Link>
+          ))}
+        </div>
+      ) : null}
+
+      <div className="mt-3 flex flex-wrap gap-2" aria-label="Authenticated saved search shortcuts">
+        {authenticatedSavedSearchShortcuts.map((shortcut) => (
+          <Link
+            className="rounded-full bg-indigo-50 px-3 py-1.5 text-sm font-black text-indigo-950 hover:bg-indigo-100"
+            href={shortcut.href}
+            key={shortcut.id}
+            title={shortcut.helper}
+          >
+            {shortcut.label}
+            <span className="ml-2 text-xs font-semibold text-indigo-800">{shortcut.query}</span>
           </Link>
         ))}
       </div>
+
+      {recentSearches.length > 0 ? (
+        <div className="mt-3 flex flex-wrap gap-2" aria-label="Recent searches">
+          {recentSearches.map((search) => (
+            <Link
+              className="rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-black text-emerald-950 hover:bg-emerald-100"
+              href={search.href}
+              key={`${search.query}-${search.searchedAt}`}
+            >
+              {search.query}
+              <span className="ml-2 text-xs font-semibold text-emerald-800">{search.resultCount}</span>
+            </Link>
+          ))}
+        </div>
+      ) : null}
     </section>
   );
 }
