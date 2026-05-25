@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { DealCard } from '@/components/deal-card';
+import { SavedViewActions } from '@/components/saved-view-actions';
 import { categoryLabels, pricedProducts } from '@/lib/openprices-products';
 import { buildNewProductArrivals } from '@/lib/freshness';
 import { buildPantryReplacementFilter, pantryReplacementMatches } from '@/lib/pantry';
@@ -177,6 +178,7 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
   const visibleLocalDropFeed = localDropFeed
     .filter((item) => !requestedCategory || slugFromLabel(item.category) === requestedCategory)
     .filter(() => !requestedChain || requestedChain === 'openprices');
+  const currentDealsHref = filterHref({});
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8 text-slate-950 sm:px-6 lg:px-8">
@@ -198,6 +200,15 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
           <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{snapshot.axfoodSource}</p>
         </div>
       </div>
+
+      <SavedViewActions
+        allowAlert
+        href={currentDealsHref}
+        label={replacementFilter ? `Replacement deals for ${replacementFilter.label}` : 'Verified deals view'}
+        resultLabel={`${visibleDeals.length} deal cards · ${visibleLocalDropFeed.length} local drop rows · observed rows only`}
+        state={{ category: requestedCategory, chain: requestedChain, replace: replacementParam, sort: 'observed-savings' }}
+        surface="deals"
+      />
 
       <section className="mt-6 rounded-[2rem] border border-sky-200 bg-sky-50/70 p-5 shadow-sm" aria-label="Deal feed filters by chain and category">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">

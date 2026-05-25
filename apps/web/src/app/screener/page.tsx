@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
 import { ConfidenceBadge } from '@/components/confidence-badge';
+import { SavedViewActions } from '@/components/saved-view-actions';
 import {
   categoryDealLeaders,
   formatPct,
@@ -278,6 +279,15 @@ export default async function ScreenerPage({ searchParams }: Readonly<{ searchPa
           <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{snapshot.axfoodSource}</p>
         </Card>
       </div>
+
+      <SavedViewActions
+        allowAlert
+        href={screenerSortHref(mode, category, minDiscount)}
+        label="Verified deal screener view"
+        resultLabel={`${visibleRows.length} visible rows · sorted by ${sortOptions.find((option) => option.mode === mode)?.label ?? mode} · confidence labels visible`}
+        state={{ category, minDiscount, sort: mode, view: 'deal-screener' }}
+        surface="screener"
+      />
 
       <Card className="mt-6">
         <div className="grid gap-4 lg:grid-cols-[1fr_0.8fr_0.7fr]">
