@@ -4,6 +4,7 @@ import { AdDisclosureActions } from '@/components/ad-disclosure-actions';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { listShareRoles, accountListSharePermissions } from '@/lib/list-permissions';
+import { dietaryPreferenceOnboardingContract } from '@/lib/personalization';
 import { routeMetadata } from '@/lib/seo';
 import { accountSavedShoppingContract, formatSek, savedBasketAutoReorderPlanner } from '@/lib/verified-data';
 import { planAccountDeletion } from '@groceryview/core';
@@ -235,18 +236,32 @@ export default function AccountPage() {
             <p className="mt-3 text-sm leading-6 text-slate-700">
               New account setup now includes vegetarian, vegan, halal, and allergen preferences before search, recommendations, alerts, and weekly basket suggestions are personalized. The profile step keeps these preferences explicit so downstream features can filter products without inferring dietary needs from shopping history.
             </p>
+            <ul className="mt-3 grid gap-2 text-sm font-semibold text-slate-700 sm:grid-cols-2">
+              {dietaryPreferenceOnboardingContract.guardrails.map((guardrail) => (
+                <li className="rounded-2xl bg-white/80 p-3" key={guardrail}>{guardrail}</li>
+              ))}
+            </ul>
           </div>
           <div className="rounded-[1.5rem] border border-lime-100 bg-white p-4 shadow-sm">
             <p className="text-sm font-black text-slate-950">Profile preferences captured during onboarding</p>
             <div className="mt-3 grid gap-2 text-sm font-semibold text-slate-700 sm:grid-cols-2">
-              {['Vegetarian', 'Vegan', 'Halal', 'Peanut allergy', 'Tree nut allergy', 'Gluten allergy'].map((preference) => (
-                <label className="flex items-center gap-2 rounded-2xl bg-lime-50 p-3" key={preference}>
-                  <input aria-label={preference} className="h-4 w-4 accent-lime-700" type="checkbox" />
-                  <span>{preference}</span>
+              {[
+                ...dietaryPreferenceOnboardingContract.dietaryRestrictions,
+                ...dietaryPreferenceOnboardingContract.avoidedIngredients,
+                ...dietaryPreferenceOnboardingContract.certificationPreferences
+              ].map((preference) => (
+                <label className="flex items-start gap-2 rounded-2xl bg-lime-50 p-3" key={preference.value}>
+                  <input aria-label={preference.label} className="mt-1 h-4 w-4 accent-lime-700" type="checkbox" />
+                  <span>
+                    <span className="block font-black text-slate-950">{preference.label}</span>
+                    <span className="mt-1 block text-xs leading-5 text-slate-600">{preference.helper}</span>
+                  </span>
                 </label>
               ))}
             </div>
-            <p className="mt-3 text-xs font-bold uppercase tracking-[0.16em] text-lime-900">Used by search filters, recommendation ranking, price alerts, and basket warnings</p>
+            <p className="mt-3 text-xs font-bold uppercase tracking-[0.16em] text-lime-900">
+              Used by {dietaryPreferenceOnboardingContract.personalizationSurfaces.join(', ')}
+            </p>
           </div>
         </div>
       </Card>
