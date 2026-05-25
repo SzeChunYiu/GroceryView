@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { DealCard } from '@/components/deal-card';
 import { categoryLabels, pricedProducts } from '@/lib/openprices-products';
+import { buildNewProductArrivals } from '@/lib/freshness';
 import { buildPantryReplacementFilter, pantryReplacementMatches } from '@/lib/pantry';
 import { buildLocalPriceDropFeed } from '@/lib/price-events';
 import { routeMetadata } from '@/lib/seo';
@@ -86,6 +87,17 @@ const localDropFeed = buildLocalPriceDropFeed(pricedProducts.map((product) => ({
   observations: product.observations
 })), 8, 'Stockholm area');
 
+const newProductArrivals = buildNewProductArrivals(pricedProducts.map((product) => ({
+  slug: product.slug,
+  name: product.name,
+  brand: product.brands,
+  category: categoryLabels[product.category] ?? product.category,
+  image: product.image,
+  price: product.priceMedian,
+  lastObservedAt: product.lastObservedAt,
+  observationCount: product.observationCount
+})), 4);
+
 export default async function DealsPage({ searchParams }: Readonly<{ searchParams?: Promise<SearchParams> }>) {
   const params = (await searchParams) ?? {};
   const replacementFilter = buildPantryReplacementFilter(paramValue(params.replace));
@@ -154,6 +166,38 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
             No week-over-week local price drops are available from the current dated observation snapshot.
           </div>
         )}
+      </section>
+
+      <section className="mt-6 rounded-[2rem] border border-sky-200 bg-sky-50/60 p-5 shadow-sm" aria-label="New product arrivals from retailer feeds" data-new-product-arrivals>
+        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-sky-800">New arrivals</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Freshly observed products</h2>
+          </div>
+          <p className="max-w-xl text-sm font-semibold leading-6 text-slate-600">Products newly appearing in observed retailer feeds, ranked by latest observation with chain and freshness badges.</p>
+        </div>
+        <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {newProductArrivals.map((item, index) => (
+            <DealCard
+              categoryLabel={item.category ?? 'New product'}
+              chainBadgeLabel={item.chainLabel}
+              currentPrice={item.price}
+              dealId={'new-arrival-' + item.slug}
+              freshnessBadgeLabel={item.freshnessBadge}
+              freshnessObservedAt={item.lastObservedAt}
+              imageAlt={item.name + ' product image'}
+              imageUrl={item.image}
+              key={item.slug}
+              productHref={'/products/' + item.slug}
+              productId={item.slug}
+              rankLabel={'Arrival #' + (index + 1)}
+              retailerName={item.chainLabel}
+              sharePath={'/products/' + item.slug}
+              sourceLabel={(item.observationCount ?? 0) + ' observed price rows'}
+              title={item.name}
+            />
+          ))}
+        </div>
       </section>
 
       {replacementFilter ? (

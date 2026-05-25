@@ -144,3 +144,50 @@ export function getStoreReliabilityScore({
     tone,
   };
 }
+
+export type ProductArrivalInput = {
+  slug: string;
+  name: string;
+  brand?: string | null;
+  category?: string | null;
+  image?: string | null;
+  price: number;
+  lastObservedAt?: string | null;
+  observationCount?: number;
+};
+
+export type NewProductArrival = ProductArrivalInput & {
+  chainLabel: string;
+  freshnessBadge: string;
+  arrivalScore: number;
+};
+
+function inferArrivalChainLabel(product: ProductArrivalInput): string {
+  const brand = product.brand?.toLowerCase() ?? "";
+  if (brand.includes("garant") || brand.includes("eldorado") || brand.includes("axfood")) return "Axfood feed";
+  if (brand.includes("ica")) return "ICA feed";
+  if (brand.includes("coop")) return "Coop feed";
+  return "OpenPrices feed";
+}
+
+export function buildNewProductArrivals(
+  products: ProductArrivalInput[],
+  limit = 6,
+  now: Date = new Date(),
+): NewProductArrival[] {
+  return products
+    .map((product) => {
+      const freshness = getPriceFreshness(product.lastObservedAt, now);
+      const age = freshness.ageInDays ?? 999;
+      const observationCount = product.observationCount ?? 0;
+      return {
+        ...product,
+        chainLabel: inferArrivalChainLabel(product),
+        freshnessBadge: freshness.label,
+        arrivalScore: age * 10 + Math.min(observationCount, 9),
+      };
+    })
+    .filter((product) => product.lastObservedAt)
+    .sort((left, right) => left.arrivalScore - right.arrivalScore || left.name.localeCompare(right.name))
+    .slice(0, limit);
+}
