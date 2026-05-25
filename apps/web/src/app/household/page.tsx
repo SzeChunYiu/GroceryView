@@ -1,6 +1,7 @@
 import { Card, Eyebrow, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { ActivityStream } from '@/components/activity-stream';
 import { HouseholdPlanActions } from '@/components/household-plan-actions';
+import { ListCard } from '@/components/list-card';
 import { buildSharedListActivityEvent } from '@/lib/activity-log';
 import { DEFAULT_HOUSEHOLD_PRICE_PREFERENCES, HOUSEHOLD_PRICE_PREFERENCE_STORAGE_KEY, sortByHouseholdPricePreferences } from '@/lib/user-preferences';
 import { formatPct, formatSek, shareableHouseholdListContract, sourceCoverage, topChainSpreads } from '@/lib/verified-data';
@@ -105,6 +106,37 @@ const householdActivityTimeline = [
   })
 ];
 
+const householdListCommentPreview = [
+  {
+    id: 'milk-preview',
+    name: topChainSpreads[0]?.name ?? 'Milk',
+    quantity: '2 st',
+    ownerRole: 'guardian' as const,
+    comments: [
+      {
+        id: 'milk-preview-comment-1',
+        body: 'Choose the longer expiry date if prices match.',
+        role: 'partner' as const,
+        createdAt: '2026-05-20T11:10:00.000Z'
+      }
+    ]
+  },
+  {
+    id: 'bread-preview',
+    name: topChainSpreads[1]?.name ?? 'Bread',
+    quantity: '1 loaf',
+    ownerRole: 'teen' as const,
+    comments: [
+      {
+        id: 'bread-preview-comment-1',
+        body: 'Rye is fine as a substitution.',
+        role: 'guardian' as const,
+        createdAt: '2026-05-20T12:35:00.000Z'
+      }
+    ]
+  }
+];
+
 export default function FeaturePage() {
   const route = 'household';
   const householdPricePreferences = DEFAULT_HOUSEHOLD_PRICE_PREFERENCES;
@@ -117,6 +149,10 @@ export default function FeaturePage() {
 
       <div className="mt-6">
         <ActivityStream initialEvents={householdActivityTimeline} listId="static-household-preview" />
+      </div>
+
+      <div className="mt-6">
+        <ListCard currentRole="partner" items={householdListCommentPreview} />
       </div>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">

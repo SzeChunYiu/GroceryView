@@ -118,7 +118,14 @@ export function PantryTracker({ items }: PantryTrackerProps) {
             {item.expiryReminder.urgency === 'expired' || item.expiryReminder.urgency === 'use-soon' ? (
               <div className="mt-3 flex flex-wrap gap-2 rounded-2xl border border-amber-200 bg-amber-50 p-3">
                 <span className="text-sm font-black text-amber-950">Use-soon actions</span>
-                <Link className="rounded-full bg-white px-3 py-1 text-xs font-black text-emerald-900 hover:text-emerald-700" href={`/meal-planner?ingredient=${item.productId}`}>Find recipes</Link>
+                <Link
+                  className="rounded-full bg-white px-3 py-1 text-xs font-black text-emerald-900 hover:text-emerald-700"
+                  data-use-soon-recipe-link={item.productId}
+                  href={`/meal-planner?ingredient=${encodeURIComponent(item.productId)}`}
+                  title={`Find recipes that use ${item.name}`}
+                >
+                  Find recipes
+                </Link>
                 <Link className="rounded-full bg-white px-3 py-1 text-xs font-black text-emerald-900 hover:text-emerald-700" href={`/deals?replace=${item.productId}`}>Replacement deals</Link>
               </div>
             ) : null}

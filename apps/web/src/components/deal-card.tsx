@@ -1,9 +1,26 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { trackDealShare } from '@/lib/analytics';
+import type { ReactNode } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import {
+  affiliateDisclosureLabel,
+  buildAffiliateOutboundUrl,
+  trackAffiliateOutboundClick,
+  type AffiliateLinkMetadata,
+  trackDealShare,
+  trackSponsoredPlacementImpression
+} from '@/lib/analytics';
 import { buildDealContext, type DealHistoryPoint } from '@/lib/deal-context';
 import { dealShareUrl } from '@/lib/seo';
+
+export type SponsoredDealPlacement = {
+  disclosure?: string;
+  label?: string;
+  placementId?: string;
+  provider: string;
+  separatedFromOrganicRankings?: boolean;
+  surface?: string;
+};
 
 type DealCardProps = {
   title: string;
@@ -13,12 +30,70 @@ type DealCardProps = {
   priceHistory?: DealHistoryPoint[];
   currency?: string;
   locale?: string;
+  retailerName?: string;
+  productId?: string;
   dealId?: string;
+  outboundDealUrl?: string;
+  outboundStoreUrl?: string;
+  affiliateCampaignId?: string;
   sharePath?: string;
+  sponsoredPlacement?: SponsoredDealPlacement;
 };
 
 function formatPrice(value: number, locale: string, currency: string) {
   return new Intl.NumberFormat(locale, { currency, style: 'currency' }).format(value);
+}
+
+function outboundMetadata({
+  campaignId,
+  dealId,
+  destinationUrl,
+  placement,
+  productId,
+  retailerName,
+  sponsored,
+  surface
+}: AffiliateLinkMetadata) {
+  return {
+    campaignId,
+    dealId,
+    destinationUrl,
+    placement,
+    productId,
+    retailerName,
+    sponsored,
+    surface
+  } satisfies AffiliateLinkMetadata;
+}
+
+function OutboundAffiliateLink({
+  children,
+  metadata
+}: Readonly<{
+  children: ReactNode;
+  metadata: AffiliateLinkMetadata;
+}>) {
+  const disclosureKind = metadata.sponsored === false ? 'outbound' : 'affiliate';
+  return (
+    <div className="min-w-44 flex-1">
+      <a
+        className="inline-flex w-full items-center justify-center rounded-full bg-market-mint px-4 py-2 text-sm font-black text-market-ink transition hover:bg-emerald-300"
+        data-affiliate-campaign={metadata.campaignId ?? metadata.surface}
+        data-affiliate-disclosure={disclosureKind}
+        data-affiliate-placement={metadata.placement}
+        data-affiliate-retailer={metadata.retailerName}
+        href={buildAffiliateOutboundUrl(metadata)}
+        onClick={() => trackAffiliateOutboundClick(metadata)}
+        rel="sponsored noopener noreferrer"
+        target="_blank"
+      >
+        {children}
+      </a>
+      <span className="mt-2 block rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold leading-5 text-amber-950" data-affiliate-disclosure={disclosureKind}>
+        {affiliateDisclosureLabel(metadata)}
+      </span>
+    </div>
+  );
 }
 
 export function DealCard({
@@ -29,15 +104,57 @@ export function DealCard({
   priceHistory,
   currency = 'SEK',
   locale = 'sv-SE',
+  retailerName = 'the retailer',
+  productId,
   dealId,
-  sharePath
+  outboundDealUrl,
+  outboundStoreUrl,
+  affiliateCampaignId,
+  sharePath,
+  sponsoredPlacement
 }: DealCardProps) {
   const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle');
   const context = buildDealContext({ currentPrice, discountStartedAt, priceHistory, currency, locale });
+  const dealLinkMetadata = outboundDealUrl ? outboundMetadata({
+    campaignId: affiliateCampaignId,
+    dealId,
+    destinationUrl: outboundDealUrl,
+    placement: 'deal_card',
+    productId,
+    retailerName,
+    sponsored: true,
+    surface: 'deal-card-primary'
+  }) : null;
+  const storeLinkMetadata = outboundStoreUrl ? outboundMetadata({
+    campaignId: affiliateCampaignId,
+    dealId,
+    destinationUrl: outboundStoreUrl,
+    placement: 'store_link',
+    productId,
+    retailerName,
+    sponsored: false,
+    surface: 'deal-card-store'
+  }) : null;
   const shareUrl = useMemo(() => dealShareUrl({ dealId, path: sharePath, title }), [dealId, sharePath, title]);
   const encodedShareUrl = encodeURIComponent(shareUrl);
   const encodedShareText = encodeURIComponent(`${title} is ${formatPrice(currentPrice, locale, currency)} on GroceryView`);
   const analyticsDealId = dealId ?? sharePath ?? title;
+  const sponsoredLabel = sponsoredPlacement?.label ?? 'Sponsored';
+  const sponsoredProvider = sponsoredPlacement?.provider;
+  const sponsoredSurface = sponsoredPlacement?.surface ?? 'discovery_rail';
+  const sponsoredPlacementId = sponsoredPlacement?.placementId ?? analyticsDealId;
+  const separatedFromOrganicRankings = true;
+
+  useEffect(() => {
+    if (!sponsoredProvider) return;
+    trackSponsoredPlacementImpression({
+      label: sponsoredLabel,
+      placementId: sponsoredPlacementId,
+      provider: sponsoredProvider,
+      separatedFromOrganicRankings,
+      surface: sponsoredSurface
+    });
+  }, [separatedFromOrganicRankings, sponsoredLabel, sponsoredPlacementId, sponsoredProvider, sponsoredSurface]);
 
   async function copyShareLink() {
     trackDealShare({ dealId: analyticsDealId, shareUrl, channel: 'copy_link' });
@@ -56,7 +173,19 @@ export function DealCard({
   }
 
   return (
-    <article className="rounded-2xl border border-market-ink/10 bg-white p-4 shadow-sm">
+    <article
+      aria-label={sponsoredPlacement ? `${sponsoredLabel} deal placement separate from organic rankings` : undefined}
+      className={`rounded-2xl border p-4 shadow-sm ${sponsoredPlacement ? 'border-amber-300 bg-amber-50/70' : 'border-market-ink/10 bg-white'}`}
+      data-organic-ranking-separated={sponsoredPlacement ? String(separatedFromOrganicRankings) : undefined}
+      data-sponsored-placement={sponsoredPlacement ? 'true' : undefined}
+    >
+      {sponsoredPlacement ? (
+        <div className="mb-3 rounded-2xl border border-amber-300 bg-white p-3 text-xs font-semibold text-amber-950">
+          <p className="font-black uppercase tracking-[0.18em] text-amber-800">{sponsoredLabel}</p>
+          <p className="mt-1">{sponsoredPlacement.disclosure ?? 'Paid placement shown in a separate sponsored slot. It does not affect organic deal rankings.'}</p>
+          <p className="mt-1 text-amber-900">Provider: {sponsoredPlacement.provider} · Organic ranking separated: {String(separatedFromOrganicRankings)}</p>
+        </div>
+      ) : null}
       <div className="flex items-start justify-between gap-3">
         <div>
           <h3 className="text-base font-semibold text-market-ink">{title}</h3>
@@ -84,6 +213,13 @@ export function DealCard({
           </span>
         ) : null}
       </div>
+
+      {dealLinkMetadata || storeLinkMetadata ? (
+        <div className="mt-4 flex flex-wrap gap-3" aria-label="Outbound store and deal links with affiliate disclosure">
+          {dealLinkMetadata ? <OutboundAffiliateLink metadata={dealLinkMetadata}>Open deal at {retailerName}</OutboundAffiliateLink> : null}
+          {storeLinkMetadata ? <OutboundAffiliateLink metadata={storeLinkMetadata}>Visit {retailerName} store</OutboundAffiliateLink> : null}
+        </div>
+      ) : null}
 
       <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-market-ink/10 pt-4" aria-label="Share this deal">
         <button

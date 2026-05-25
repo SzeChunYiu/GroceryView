@@ -10,13 +10,18 @@ const ITEM_PAGE_PATTERNS = [
   /^\/prisjamforelse\/[^/]+\/?$/,
   /^\/[^/]+\/billigaste\/[^/]+\/?$/
 ];
+const SHOPPING_LIST_PATTERNS = [
+  /^\/list\/?$/,
+  /^\/favourites\/?$/,
+  /^\/favorites\/?$/
+];
 
 function isShoppingListRequest(request) {
   if (request.method !== 'GET') return false;
 
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return false;
-  if (!/^\/list\/?$/.test(url.pathname)) return false;
+  if (!SHOPPING_LIST_PATTERNS.some((pattern) => pattern.test(url.pathname))) return false;
 
   const acceptsHtml = request.headers.get('accept')?.includes('text/html');
   return request.mode === 'navigate' || acceptsHtml;
@@ -78,7 +83,7 @@ async function shoppingListNetworkFirst(request) {
     const cached = await cache.match(request, { ignoreSearch: true });
     if (cached) return cached;
 
-    return new Response('Offline: the shopping list app shell has not been cached yet.', {
+    return new Response('Offline: the saved-list app shell has not been cached yet.', {
       headers: { 'content-type': 'text/plain; charset=utf-8' },
       status: 503,
       statusText: 'Offline'
