@@ -1,3 +1,5 @@
+import { parsePackageSize } from "./unit-normalizer"
+
 export type ProductRecord = {
   id: string
   name: string
@@ -124,4 +126,58 @@ export function findDuplicateProducts(products: ProductRecord[], threshold = 0.5
   }
 
   return candidates.sort((left, right) => right.confidence - left.confidence)
+}
+
+export type SubstitutionSavingsProduct = ProductRecord & {
+  price: number
+}
+
+export type SubstitutionSavingsSuggestion = {
+  product: SubstitutionSavingsProduct
+  unitPrice: number
+  savings: number
+  savingsPercent: number
+  normalizedSizeLabel: string
+  reason: string
+}
+
+function normalizedUnitPriceFor(product: SubstitutionSavingsProduct) {
+  const parsedSize = parsePackageSize(product.size)
+  if (!parsedSize || parsedSize.quantity <= 0 || !Number.isFinite(product.price)) return null
+
+  return {
+    unitPrice: product.price / parsedSize.quantity,
+    normalizedSizeLabel: parsedSize.label,
+    unit: parsedSize.unit,
+  }
+}
+
+export function findSubstitutionSavings(
+  target: SubstitutionSavingsProduct,
+  products: SubstitutionSavingsProduct[],
+): SubstitutionSavingsSuggestion[] {
+  const targetUnitPrice = normalizedUnitPriceFor(target)
+  if (!target.category || !targetUnitPrice) return []
+
+  return products
+    .filter((product) => product.id !== target.id && sameText(product.category, target.category))
+    .map((product) => {
+      const candidateUnitPrice = normalizedUnitPriceFor(product)
+      if (!candidateUnitPrice || candidateUnitPrice.unit !== targetUnitPrice.unit) return null
+
+      const savings = targetUnitPrice.unitPrice - candidateUnitPrice.unitPrice
+      if (savings <= 0) return null
+
+      return {
+        product,
+        unitPrice: Number(candidateUnitPrice.unitPrice.toFixed(2)),
+        savings: Number(savings.toFixed(2)),
+        savingsPercent: Number(((savings / targetUnitPrice.unitPrice) * 100).toFixed(0)),
+        normalizedSizeLabel: candidateUnitPrice.normalizedSizeLabel,
+        reason: `Same ${target.category} category, normalized to ${candidateUnitPrice.normalizedSizeLabel}`,
+      }
+    })
+    .filter((suggestion): suggestion is SubstitutionSavingsSuggestion => Boolean(suggestion))
+    .sort((left, right) => right.savings - left.savings)
+    .slice(0, 3)
 }
