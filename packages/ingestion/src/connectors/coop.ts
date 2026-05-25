@@ -1352,7 +1352,11 @@ export async function extractCoopDrPdfText(input: ArrayBuffer): Promise<string> 
     const page = await document.getPage(pageNumber);
     const content = await page.getTextContent();
     const lines = content.items
-      .map((item: { str?: unknown }) => typeof item.str === 'string' ? text(item.str) : '')
+      .map((item: unknown) => (
+        typeof item === 'object' && item !== null && 'str' in item && typeof item.str === 'string'
+          ? text(item.str)
+          : ''
+      ))
       .filter(Boolean);
     pages.push(lines.join('\n'));
   }

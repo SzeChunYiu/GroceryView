@@ -115,7 +115,11 @@ export async function extractSevenElevenSePdfText(input: ArrayBuffer): Promise<s
     const page = await document.getPage(pageNumber);
     const content = await page.getTextContent();
     pages.push(content.items
-      .map((item: { str?: unknown }) => typeof item.str === 'string' ? item.str.trim() : '')
+      .map((item: unknown) => (
+        typeof item === 'object' && item !== null && 'str' in item && typeof item.str === 'string'
+          ? item.str.trim()
+          : ''
+      ))
       .filter(Boolean)
       .join('\n'));
   }
