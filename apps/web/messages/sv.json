@@ -21,6 +21,21 @@
     "persisted": "Språkvalet sparas lokalt och i NEXT_LOCALE-kakan.",
     "guardrail": "Arabiska och somaliska öppnas först efter granskade översättningar."
   },
+  "personalized-rail": {
+    "eyebrow": "Personligt för {householdId}",
+    "title": "Nästa troliga matbehov",
+    "body": "Rankat från demohushållets signaler, favoritvarumärken och senaste listaktivitet. Raden länkar bara till verifierade produktsidor.",
+    "score": "Poäng {score}",
+    "brandNotReported": "Varumärke saknas",
+    "pricePending": "pris inväntas"
+  },
+  "blocked-locale": {
+    "title": "Översättning med modersmålskvalitet krävs",
+    "body": "GroceryView visar bara svensk och engelsk offentlig copy idag. Arabiska och somaliska syns som expansionsrutter, men de spärras tills modersmålsgranskare har godkänt varje navigations-, policy- och källbevistext.",
+    "guardrailNoMachineTranslation": "Inga maskinöversatta priser",
+    "guardrailEvidenceUnchanged": "SEK-belopp och källbevis ändras inte",
+    "guardrailNativeReview": "Översättningar med modersmålskvalitet måste granskas före lansering"
+  },
   "empty-state": {
     "eyebrow": "Fail-closed UI",
     "title": "Inga verifierade poster för funktionen än",
