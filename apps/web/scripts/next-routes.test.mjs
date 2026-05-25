@@ -3666,6 +3666,7 @@ ${seo}`;
     const products = await read('src/app/products/page.tsx');
     const shell = await read('src/components/market-shell.tsx');
     const cards = await read('src/components/product-price-cards.tsx');
+    const compareModeRoute = await read('src/app/api/account/price-compare-mode/route.ts');
 
     assert.match(verified, /export const adaptiveProductCards/);
     assert.match(verified, /export const productBrandFilterOptions/);
@@ -3704,12 +3705,19 @@ ${seo}`;
     assert.match(cards, /7-day price history/);
     assert.match(cards, /Compare by:/);
     assert.match(cards, /localStorage/);
+    assert.match(cards, /window\.sessionStorage\.getItem\('groceryview:accessToken'\)/);
+    assert.match(cards, /\/api\/account\/price-compare-mode/);
+    assert.match(cards, /groceryview:product-card-compare-mode-changed/);
     assert.match(cards, /unitSortPrice/);
     assert.match(cards, /totalSortPrice/);
-    assert.match(cards, /cheapest-per-unit/);
+    assert.match(cards, /card\.cheapestUnitBadge/);
     assert.match(cards, /Out of stock/);
     assert.match(cards, /No synthetic product images/);
     assert.match(cards, /No synthetic unit prices/);
+    assert.match(compareModeRoute, /export async function PATCH/);
+    assert.match(compareModeRoute, /export function GET/);
+    assert.match(compareModeRoute, /accountCompareModePreferences/);
+    assert.match(compareModeRoute, /Signed-in bearer token required/);
   });
 
   it('surfaces verified source coverage on the data sources route', async () => {
