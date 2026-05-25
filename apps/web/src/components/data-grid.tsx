@@ -2,10 +2,19 @@ import type { ComponentPropsWithoutRef } from 'react';
 
 export const dataGridRowStripingClass = '[&_tbody_tr:nth-child(even)]:bg-slate-50 [&_[role=row]:nth-child(even)]:bg-slate-50';
 export const dataGridActionClass = 'rounded-full border border-slate-300 px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-slate-700';
+export const dataGridVirtualStatusClass = 'rounded-2xl border border-violet-100 bg-white px-4 py-3 text-sm font-black text-slate-700 shadow-sm';
 
 type DataGridProps = ComponentPropsWithoutRef<'div'> & {
   striped?: boolean;
   dense?: boolean;
+};
+
+type DataGridProductCellProps = {
+  brand?: string | null;
+  imageUrl?: string | null;
+  name: string;
+  sourceUrl?: string | null;
+  unitLabel?: string | null;
 };
 
 export function DataGrid({ className = '', striped = true, dense = false, ...props }: Readonly<DataGridProps>) {
@@ -21,5 +30,29 @@ export function DataGrid({ className = '', striped = true, dense = false, ...pro
         className
       ].filter(Boolean).join(' ')}
     />
+  );
+}
+
+export function DataGridProductCell({ brand, imageUrl, name, sourceUrl, unitLabel }: Readonly<DataGridProductCellProps>) {
+  return (
+    <div className="flex min-w-64 gap-3">
+      {imageUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img alt="" className="h-14 w-14 rounded-2xl border border-slate-200 bg-white object-contain" loading="lazy" src={imageUrl} />
+      ) : (
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 text-xs font-black text-slate-400">No image</div>
+      )}
+      <div>
+        <p className="font-black text-slate-950">{name}</p>
+        <p className="text-xs text-slate-500">{brand || 'Unknown brand'} · {unitLabel || 'unit missing'}</p>
+        {sourceUrl ? (
+          <a className="mt-1 inline-flex text-xs font-black text-sky-800 underline decoration-sky-300 underline-offset-4" href={sourceUrl}>
+            Source URL
+          </a>
+        ) : (
+          <p className="mt-1 text-xs font-semibold text-slate-400">Source URL missing</p>
+        )}
+      </div>
+    </div>
   );
 }

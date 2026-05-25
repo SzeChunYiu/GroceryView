@@ -2,6 +2,7 @@
 
 import { useGeolocation } from '@/hooks/useGeolocation';
 import type { StoreReliabilityScore } from '@/lib/freshness';
+import type { StoreInventoryConfidence } from '@/lib/osm-stores';
 
 type RouteHint = {
   label: string;
@@ -11,6 +12,7 @@ type RouteHint = {
 
 type StoreDistanceCardProps = {
   fallbackLabel?: string;
+  inventoryConfidence?: StoreInventoryConfidence;
   reliability?: StoreReliabilityScore;
   routeHints?: RouteHint[];
   storeName?: string;
@@ -24,6 +26,7 @@ const defaultRouteHints: RouteHint[] = [
 
 export function StoreDistanceCard({
   fallbackLabel = 'Search by city or choose a store manually.',
+  inventoryConfidence,
   reliability,
   routeHints = defaultRouteHints,
   storeName = 'nearby store'
@@ -60,6 +63,20 @@ export function StoreDistanceCard({
           <p className="font-black">{error?.message}</p>
           <p className="mt-1">{retryGuidance}</p>
           <p className="mt-1">{fallbackLabel}</p>
+        </div>
+      ) : null}
+      {inventoryConfidence ? (
+        <div className="mt-4 rounded-2xl border border-cyan-200 bg-cyan-50 p-3 text-sm font-semibold text-cyan-950">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-700">Inventory confidence</p>
+          <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+            <p className="font-black">{inventoryConfidence.label}</p>
+            <time className="rounded-full bg-white px-3 py-1 text-xs font-black text-cyan-900" dateTime={inventoryConfidence.lastSeenAt}>
+              {inventoryConfidence.lastSeenLabel}
+            </time>
+          </div>
+          <p className="mt-2 text-xs font-bold leading-5 text-cyan-900">
+            {inventoryConfidence.detail} Source: {inventoryConfidence.sourceLabel}.
+          </p>
         </div>
       ) : null}
       {reliability ? (
