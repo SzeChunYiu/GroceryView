@@ -24,7 +24,7 @@ import {
 import { dbSiteHomepageTrendingPriceChanges } from './generated/db-site-trending-price-changes';
 import { categoryLabels, pricedProducts } from './openprices-products';
 import { classifyRecentPriceVariance } from './price-intelligence';
-import { allergenRiskBadgesForText } from './search-filters';
+import { allergenRiskBadgesForText, searchExplanationBadgesForProduct, type SearchExplanationBadge } from './search-filters';
 import { osmStores } from './osm-stores';
 import {
   currencyFromObservation,
@@ -2251,6 +2251,21 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
       : 'No verified allergen or dietary label evidence found'
   };
 });
+export function withProductSearchExplanationBadges<T extends AdaptiveProductCard>(cards: T[], query: string): Array<T & { searchExplanationBadges?: SearchExplanationBadge[] }> {
+  const trimmedQuery = query.trim();
+  if (!trimmedQuery) return cards;
+
+  return cards.map((card) => ({
+    ...card,
+    searchExplanationBadges: searchExplanationBadgesForProduct({
+      name: card.name,
+      brand: card.brand,
+      category: card.productKind,
+      query: trimmedQuery
+    })
+  }));
+}
+
 export const homepageAdaptiveProductCards = adaptiveProductCards.slice(0, 6);
 export const productBrandFilterOptions = [...new Set(
   adaptiveProductCards
