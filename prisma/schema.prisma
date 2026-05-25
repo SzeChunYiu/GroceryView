@@ -58,6 +58,25 @@ model UserStoreLoyaltyCard {
   @@map("user_store_loyalty_cards")
 }
 
+model Store {
+  id            String   @id
+  chainId       String   @map("chain_id")
+  name          String
+  address       String
+  city          String
+  district      String?
+  domain        String   @default("grocery")
+  latitude      Decimal? @db.Decimal(9, 6)
+  longitude     Decimal? @db.Decimal(9, 6)
+  storeType     String?  @map("store_type")
+  openingHours  Json?    @map("opening_hours")
+  onlineStoreId String?  @map("online_store_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([latitude, longitude])
+  @@map("stores")
+}
+
 model PantryItem {
   id              String    @id
   userId          String    @map("user_id")
