@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ListCard } from '@/components/list-card';
+import { ListCard, type MealPlanListImportSummary } from '@/components/list-card';
 import { ListSharePreview } from '@/components/list-share-preview';
 import { createPublicListShareToken, publicListSharePath, type PublicListShareItem } from '@/lib/list-permissions';
+import { parseMealPlanShoppingListExport, type MealPlanShoppingListExport } from '@/lib/meal-budgets';
 import { storeLayoutDepartments, storeLayoutDepartmentsForOrder, type StoreLayoutChain, type StoreLayoutGroupOrder } from '@/lib/trip-planner';
 import { metadataForShoppingListShare } from '@/lib/seo';
 import { OFFLINE_LIST_EDIT_RECONCILIATION_STEPS, offlineListSyncStatusCopy } from '@/lib/offline-sync';
@@ -27,6 +28,7 @@ const publicDemoShareItems: PublicListShareItem[] = demoItems.map((item) => ({
 type ListPageSearchParams = {
   chain?: string | string[];
   groupOrder?: string | string[];
+  mealPlan?: string | string[];
   share?: string | string[];
 };
 
@@ -42,6 +44,28 @@ function normalizeGroupOrder(groupOrder: string | string[] | undefined): StoreLa
   return requested === 'reverse-layout' ? 'reverse-layout' : 'store-layout';
 }
 
+function formatSek(value: number) {
+  return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);
+}
+
+function mealPlanExportFromParam(value: string | string[] | undefined): MealPlanShoppingListExport | null {
+  const raw = Array.isArray(value) ? value[0] : value;
+  return raw ? parseMealPlanShoppingListExport(raw) : null;
+}
+
+function mealPlanImportSummary(exportPayload: MealPlanShoppingListExport): MealPlanListImportSummary {
+  return {
+    chainTotals: exportPayload.chainTotals.map((chain) => ({
+      chain: chain.chain,
+      estimatedTotalLabel: formatSek(chain.estimatedTotal),
+      itemCount: chain.itemCount
+    })),
+    estimatedTotalLabel: formatSek(exportPayload.estimatedTotal),
+    itemCount: exportPayload.items.length,
+    mealTitle: exportPayload.mealTitle
+  };
+}
+
 export async function generateMetadata({ searchParams }: { searchParams?: Promise<ListPageSearchParams> }): Promise<Metadata> {
   const resolvedSearchParams = await (searchParams ?? Promise.resolve({}));
   return metadataForShoppingListShare(resolvedSearchParams.share);
@@ -52,6 +76,14 @@ export default async function ShoppingListPage({ searchParams }: { searchParams?
   const selectedChain = normalizeChain(resolvedSearchParams.chain);
   const groupOrder = normalizeGroupOrder(resolvedSearchParams.groupOrder);
   const shareToken = Array.isArray(resolvedSearchParams.share) ? resolvedSearchParams.share[0] : resolvedSearchParams.share;
+  const mealPlanExport = mealPlanExportFromParam(resolvedSearchParams.mealPlan);
+  const mealPlanItems = mealPlanExport?.items.map((item) => ({
+    id: item.id,
+    name: item.name,
+    ownerRole: 'guardian' as const,
+    quantity: item.quantity
+  })) ?? [];
+  const listItems = [...mealPlanItems, ...demoItems.filter((item) => !mealPlanItems.some((mealItem) => mealItem.id === item.id))];
   const publicShareToken = shareToken ?? createPublicListShareToken({
     expiresAt: '2026-06-30T23:59:59.000Z',
     items: publicDemoShareItems,
@@ -116,7 +148,14 @@ export default async function ShoppingListPage({ searchParams }: { searchParams?
           Approximate route: {storeLayoutDepartmentsForOrder(selectedChain, groupOrder).map((department) => department.label).join(' → ')}.
         </p>
       </section>
-      <ListCard currentRole="guardian" groupOrder={groupOrder} items={demoItems} publicShareHref={publicShareHref} selectedChain={selectedChain} />
+      <ListCard
+        currentRole="guardian"
+        groupOrder={groupOrder}
+        items={listItems}
+        mealPlanImport={mealPlanExport ? mealPlanImportSummary(mealPlanExport) : undefined}
+        publicShareHref={publicShareHref}
+        selectedChain={selectedChain}
+      />
     </div>
   );
 }

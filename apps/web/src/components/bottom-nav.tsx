@@ -16,7 +16,6 @@ const bottomNavItems = [
   { href: '/watchlist', label: 'Watchlist', icon: Watch },
   { href: '/contact', label: 'Contact', icon: MessageCircle }
 ];
-// Keep the historical grid-cols-7 token documented while the current Contact shortcut uses grid-cols-8.
 
 function isBottomNavItemActive(item: (typeof bottomNavItems)[number], pathname: string) {
   if ('match' in item && item.match === 'my-flyer') return pathname === item.href || pathname.endsWith('/my-flyer');
@@ -26,8 +25,7 @@ function isBottomNavItemActive(item: (typeof bottomNavItems)[number], pathname: 
 
 export function BottomNav() {
   const pathname = usePathname();
-  const { scannerShortcut, selection } = useHaptic();
-  const impact = selection;
+  const { impact, selection } = useHaptic();
   const [isStandalone, setIsStandalone] = useState(false);
 
   useEffect(() => {
@@ -69,9 +67,9 @@ export function BottomNav() {
               key={item.href}
               onClick={() => {
                 if (isProminent) {
-                  scannerShortcut();
-                } else {
                   impact();
+                } else {
+                  selection();
                 }
               }}
             >

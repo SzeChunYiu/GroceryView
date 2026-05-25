@@ -102,9 +102,19 @@ export async function generateMetadata({ params }: Readonly<{ params: Promise<{ 
   if (!category && !chain) notFound();
 
   const label = category?.label ?? `${chain?.chainId ?? symbol} chain index`;
+  const title = `${label} | GroceryView`;
+  const description = 'Observed GroceryView price index page with fixed-basket and chain-price index calculations.';
+  const images = ['/pwa-icon.svg'];
+
   return {
-    title: `${label} | GroceryView`,
-    description: 'Observed GroceryView price index page with fixed-basket and chain-price index calculations.'
+    title,
+    description,
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images
+    }
   };
 }
 
@@ -146,10 +156,13 @@ function fixedBasketFor(definition: CategoryDefinition): { index: FixedBasketInd
     index: calculateFixedBasketIndex({
       id: definition.symbol,
       label: definition.label,
+      country: 'SE',
       baseDate: fixedBasketBaseDate,
       currentDate: fixedBasketCurrentDate,
       components: rows.map((row) => ({
         productId: row.id,
+        country: 'SE',
+        currency: 'SEK',
         baseUnitPrice: row.baseUnitPrice,
         currentUnitPrice: row.currentUnitPrice,
         weight: row.weight
@@ -172,10 +185,13 @@ function fixedBasketForChain(chain: ChainPriceIndex): FixedBasketIndex {
   return calculateFixedBasketIndex({
     id: chainSlug(chain.chainId),
     label: `${chain.chainId} category basket`,
+    country: 'SE',
     baseDate: fixedBasketBaseDate,
     currentDate: fixedBasketCurrentDate,
     components: chain.byCategory.map((row) => ({
       productId: row.category,
+      country: 'SE',
+      currency: 'SEK',
       baseUnitPrice: row.marketReference,
       currentUnitPrice: row.marketReference * (row.index / 100),
       weight: row.observations

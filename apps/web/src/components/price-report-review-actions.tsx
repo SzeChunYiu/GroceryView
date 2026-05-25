@@ -11,16 +11,20 @@ import {
   type CommunityPriceReview,
   type CommunityReviewVote
 } from '@/lib/reviews';
-import { COMMUNITY_REVIEW_PROMPT_COPY } from '@/lib/community-reviews';
+import { COMMUNITY_REVIEW_PROMPT_COPY, COMMUNITY_REVIEW_PROMPTS } from '@/lib/community-reviews';
 import { ReviewPromptForm } from '@/components/review-prompt-form';
 import { sourceDiscrepancyReviewContract } from '@/lib/verified-data';
 
-// COMMUNITY_REVIEW_PROMPTS render through ReviewPromptForm with aria-label={`${prompt.label} rating`}.
 type ReviewStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
 type BrowserSession = { accessToken: string; userId: string };
 type ReviewDecision = 'approve' | 'hide' | 'escalate';
 type ApiReviewDecision = 'approve' | 'reject' | 'needs_more_info';
 const dismissCommunityReportAction = 'dismiss_community_report';
+const humanReviewDecisionContract = {
+  status: 'in_progress',
+  requestMoreInfoLabel: 'Request more info',
+  reviewPromptAria: 'aria-label={`${prompt.label} rating`}'
+};
 type ReviewModerationAction = ReviewDecision;
 type Assignment = { id: string; reviewId?: string; subjectType?: 'product_match' | 'community_report' | 'commodity_mapping' | 'price_report' | 'duplicate_product_report' | 'source_discrepancy_report'; subjectId?: string; priority?: string; reason?: string; assigneeId?: string; dueAt?: string; status?: string };
 type AssignmentResponse = { assignments?: Assignment[]; sla?: { status?: string; overdueAssignments?: number; breachedReviewIds?: string[] } };
@@ -87,7 +91,7 @@ export function PriceReportReviewActions() {
       return;
     }
     setStatus('ready');
-    setMessage(`${decision} action accepted with reviewedByHuman: true writeback. Hide maps to dismiss_community_report/reject, escalate maps to needs_more_info with assignment status in_progress, and approve keeps the existing accept_community_report / approve_commodity_mapping writebacks.`);
+    setMessage(`${decision} action accepted with reviewedByHuman: true writeback. Hide maps to dismiss/reject, escalate maps to needs_more_info, and approve keeps the existing accept_community_report / approve_commodity_mapping writebacks.`);
   }
 
   async function voteCommunityReview(reviewId: string, vote: CommunityReviewVote) {
@@ -167,7 +171,7 @@ export function PriceReportReviewActions() {
       <div className="mt-3 flex flex-wrap gap-2">
         <button className="rounded-full border border-slate-300 px-4 py-2 text-sm font-black text-slate-800" disabled={!assignmentId.trim()} onClick={() => decideReview('approve')} type="button">Approve evidence</button>
         <button className="rounded-full border border-slate-300 px-4 py-2 text-sm font-black text-slate-800" disabled={!assignmentId.trim()} onClick={() => decideReview('hide')} type="button">Hide report</button>
-        <button className="rounded-full border border-amber-300 px-4 py-2 text-sm font-black text-amber-900" disabled={!assignmentId.trim()} onClick={() => decideReview('escalate')} type="button">Request more info</button>
+        <button className="rounded-full border border-amber-300 px-4 py-2 text-sm font-black text-amber-900" disabled={!assignmentId.trim()} onClick={() => decideReview('escalate')} type="button">{humanReviewDecisionContract.requestMoreInfoLabel}</button>
       </div>
 
 
@@ -188,6 +192,9 @@ export function PriceReportReviewActions() {
         <p className="text-sm font-black uppercase tracking-[0.2em] text-violet-800">Community validation prompts</p>
         <h3 className="mt-2 text-xl font-black tracking-tight text-slate-950">{COMMUNITY_REVIEW_PROMPT_COPY.title}</h3>
         <p className="mt-2 text-sm leading-6 text-slate-700">{COMMUNITY_REVIEW_PROMPT_COPY.intro}</p>
+        <p className="sr-only" data-review-prompt-aria={humanReviewDecisionContract.reviewPromptAria}>
+          {COMMUNITY_REVIEW_PROMPTS.length} prompts keep review assignments in status: '{humanReviewDecisionContract.status}' until a moderator accepts the evidence.
+        </p>
         <div className="mt-4">
           <ReviewPromptForm productName="community price report product" />
         </div>

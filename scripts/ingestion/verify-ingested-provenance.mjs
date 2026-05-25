@@ -1,4 +1,5 @@
 import { readFile } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 
 const INGESTED_DIR = new URL('../../apps/web/src/lib/ingested/', import.meta.url);
 
@@ -124,9 +125,10 @@ const summaries = [];
 const failures = [];
 
 for (const dataset of DATASETS) {
-  const text = await readFile(new URL(dataset.file, INGESTED_DIR), 'utf8');
-  const rows = await extractJsonExport(text, dataset.rows, dataset.file);
-  const source = await extractJsonExport(text, dataset.source, dataset.file);
+  const fileUrl = new URL(dataset.file, INGESTED_DIR);
+  const text = await readFile(fileUrl, 'utf8');
+  const rows = extractJsonExport(text, dataset.rows, fileUrl);
+  const source = extractJsonExport(text, dataset.source, fileUrl);
   const sourceRowCount = rowCount(source, dataset.sourceRowCount);
   const label = `${dataset.file}:${dataset.rows}`;
   const duplicateKeys = countDuplicates(rows.map((row) => rowKey(row, dataset.key)));
@@ -204,7 +206,7 @@ if (failures.length > 0) {
   console.log(JSON.stringify({ status: 'ok', summaries }, null, 2));
 }
 
-async function extractJsonExport(text, exportName, file) {
+function extractJsonExport(text, exportName, fileUrl) {
   const marker = `export const ${exportName}`;
   const markerIndex = text.indexOf(marker);
   if (markerIndex < 0) {
@@ -216,14 +218,12 @@ async function extractJsonExport(text, exportName, file) {
   if (start < 0) {
     throw new Error(`Missing JSON value for export ${exportName}`);
   }
-  const end = matchingJsonEnd(text, start);
-  const jsonLike = text.slice(start, end + 1);
+  const rawValue = text.slice(start, matchingJsonEnd(text, start) + 1);
   try {
-    return JSON.parse(normalizeJsonLikeArray(jsonLike));
+    return JSON.parse(normalizeJsonLikeArray(rawValue));
   } catch (error) {
-    if (jsonLike.startsWith('[') && jsonLike.includes('...')) {
-      return extractSpreadArrayExport(text, jsonLike, file, exportName);
-    }
+    const spreadArray = extractSpreadArrayExport(text, rawValue, fileUrl);
+    if (spreadArray) return spreadArray;
     throw error;
   }
 }
@@ -232,21 +232,24 @@ function normalizeJsonLikeArray(jsonLike) {
   return jsonLike.replace(/,\s*,/g, ',');
 }
 
-async function extractSpreadArrayExport(text, jsonLike, file, exportName) {
-  const imports = new Map();
-  for (const match of text.matchAll(/import \{ ([A-Za-z0-9_]+) \} from '([^']+)'/g)) {
-    imports.set(match[1], match[2]);
-  }
+function extractSpreadArrayExport(text, rawValue, fileUrl) {
+  if (!rawValue.trimStart().startsWith('[') || !rawValue.includes('...')) return null;
 
   const rows = [];
-  for (const match of jsonLike.matchAll(/\.\.\.([A-Za-z0-9_]+)/g)) {
-    const binding = match[1];
-    const importPath = imports.get(binding);
-    if (!importPath) throw new Error(`Missing import for spread ${binding} in ${exportName}`);
-    const chunkPath = importPath.endsWith('.ts') ? importPath : `${importPath}.ts`;
-    const chunkText = await readFile(new URL(chunkPath, new URL(file, INGESTED_DIR)), 'utf8');
-    rows.push(...await extractJsonExport(chunkText, binding, chunkPath));
+  const spreadIdentifiers = [...rawValue.matchAll(/\.\.\.([A-Za-z_$][\w$]*)/g)].map((match) => match[1]);
+  if (spreadIdentifiers.length === 0) return null;
+
+  for (const identifier of spreadIdentifiers) {
+    const importMatch = text.match(new RegExp(`import \\{\\s*${identifier}\\s*\\} from ['"]([^'"]+)['"];`));
+    if (!importMatch) return null;
+    const importPath = importMatch[1].endsWith('.ts') ? importMatch[1] : `${importMatch[1]}.ts`;
+    const importedUrl = new URL(importPath, fileUrl);
+    const importedText = readFileSync(importedUrl, 'utf8');
+    const chunkRows = extractJsonExport(importedText, identifier, importedUrl);
+    if (!Array.isArray(chunkRows)) return null;
+    rows.push(...chunkRows);
   }
+
   return rows;
 }
 
