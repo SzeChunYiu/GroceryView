@@ -11,6 +11,7 @@ type ReplacementDeal = {
   categorySlug: string;
   currentPrice: number;
   dealId: string;
+  imageUrl?: string | null;
   originalPrice?: number;
   productName: string;
   productSlug: string;
@@ -34,6 +35,7 @@ const spreadDeals: ReplacementDeal[] = topChainSpreads.map((product) => ({
   categorySlug: product.category,
   currentPrice: product.lowestPrice,
   dealId: `spread-${product.slug}`,
+  imageUrl: product.image,
   originalPrice: product.highestPrice > product.lowestPrice ? product.highestPrice : undefined,
   productName: product.name,
   productSlug: product.slug,
@@ -45,6 +47,7 @@ const priceDropDeals: ReplacementDeal[] = priceDropMoversBoard.map((mover) => ({
   categorySlug: slugFromLabel(mover.categoryLabel),
   currentPrice: mover.latestPrice,
   dealId: `drop-${mover.productSlug}`,
+  imageUrl: mover.imageUrl,
   originalPrice: mover.previousPrice > mover.latestPrice ? mover.previousPrice : undefined,
   productName: mover.productName,
   productSlug: mover.productSlug,
@@ -106,6 +109,8 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
             categoryLabel={deal.categoryLabel}
             currentPrice={deal.currentPrice}
             dealId={deal.dealId}
+            imageAlt={`${deal.productName} deal image`}
+            imageUrl={deal.imageUrl}
             key={deal.dealId}
             originalPrice={deal.originalPrice}
             replacementLabel={replacementFilter ? `Replacement for ${replacementFilter.label}` : undefined}
