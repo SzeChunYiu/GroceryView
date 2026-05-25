@@ -75,6 +75,15 @@ export default function SettingsPage() {
 
       <SettingsDataExportActions />
 
+      <Card className="mt-6 border-slate-200 bg-white">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Developer access</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">API key management</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+          Advanced users can generate and revoke hashed API keys for programmatic access. Raw secrets are shown once and the settings API only lists key metadata afterwards.
+        </p>
+        <Link className="mt-4 inline-flex rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white" href="/settings/api-keys">Manage API keys</Link>
+      </Card>
+
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Legal policies</p>
         <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Privacy and cookie policy links</h2>

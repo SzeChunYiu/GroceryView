@@ -1,4 +1,5 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { createHash, randomBytes } from 'node:crypto';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PostgresQueryExecutorService } from '../database/postgres-query-executor.service.js';
 
 export const allowedPreferenceCurrencies = ['SEK', 'EUR', 'NOK', 'DKK'] as const;
@@ -11,6 +12,46 @@ export type UserPreferencePatch = {
   notificationChannels?: Array<(typeof allowedNotificationChannels)[number]>;
   algorithm_choice?: (typeof allowedMyFlyerAlgorithmChoices)[number];
 };
+
+
+type ApiKeyRow = {
+  id: string;
+  name: string;
+  key_prefix: string;
+  key_last4: string;
+  scopes: string[] | null;
+  created_at: string | Date;
+  last_used_at: string | Date | null;
+  revoked_at: string | Date | null;
+};
+
+function iso(value: string | Date | null): string | null {
+  if (value === null) return null;
+  return value instanceof Date ? value.toISOString() : value;
+}
+
+function mapApiKey(row: ApiKeyRow) {
+  return {
+    id: row.id,
+    name: row.name,
+    prefix: row.key_prefix,
+    last4: row.key_last4,
+    scopes: row.scopes ?? [],
+    createdAt: iso(row.created_at),
+    lastUsedAt: iso(row.last_used_at),
+    revokedAt: iso(row.revoked_at)
+  };
+}
+
+function apiKeyHash(secret: string): string {
+  return createHash('sha256').update(secret).digest('hex');
+}
+
+function normalizeApiKeyName(value: string | undefined): string {
+  const name = value?.trim() || 'GroceryView API key';
+  if (name.length > 80) throw new BadRequestException('API key name must be 80 characters or fewer.');
+  return name;
+}
 
 type PreferenceRow = {
   preferred_currency: string;
@@ -71,6 +112,46 @@ export class SettingsService {
     }
 
     return this.fetchPreferences(userId);
+  }
+
+
+  async listApiKeys(userId: string) {
+    const rows = await this.executor.query<ApiKeyRow>(
+      `select id::text, name, key_prefix, key_last4, scopes, created_at, last_used_at, revoked_at
+       from api_keys
+       where user_id = $1
+       order by revoked_at nulls first, created_at desc`,
+      [userId]
+    );
+    return { userId, keys: rows.map(mapApiKey), secretShownOnce: true };
+  }
+
+  async createApiKey(userId: string, name?: string) {
+    await this.executor.query(
+      `insert into app_users(id) values ($1)
+       on conflict (id) do update set updated_at = now()`,
+      [userId]
+    );
+    const secret = `gv_${randomBytes(24).toString('base64url')}`;
+    const rows = await this.executor.query<ApiKeyRow>(
+      `insert into api_keys(user_id, name, key_hash, key_prefix, key_last4, scopes)
+       values ($1, $2, $3, $4, $5, array['read:prices']::text[])
+       returning id::text, name, key_prefix, key_last4, scopes, created_at, last_used_at, revoked_at`,
+      [userId, normalizeApiKeyName(name), apiKeyHash(secret), secret.slice(0, 7), secret.slice(-4)]
+    );
+    return { userId, key: mapApiKey(rows[0]!), secret, secretShownOnce: true };
+  }
+
+  async revokeApiKey(userId: string, keyId: string) {
+    const rows = await this.executor.query<ApiKeyRow>(
+      `update api_keys
+       set revoked_at = coalesce(revoked_at, now()), updated_at = now()
+       where user_id = $1 and id::text = $2
+       returning id::text, name, key_prefix, key_last4, scopes, created_at, last_used_at, revoked_at`,
+      [userId, keyId]
+    );
+    if (rows.length === 0) throw new NotFoundException('API key not found.');
+    return { userId, key: mapApiKey(rows[0]!), revoked: true };
   }
 
   private async fetchPreferences(userId: string) {
