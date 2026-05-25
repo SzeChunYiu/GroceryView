@@ -954,6 +954,18 @@ export type NotificationTaskRecord = {
   status: 'queued' | 'delivered' | 'dead_lettered' | 'suppressed';
 };
 
+export type NotificationSubscriptionRecord = {
+  id: string;
+  userId: string;
+  channel: 'push' | 'email' | 'telegram';
+  recipient: string;
+  chatId?: string;
+  productId?: string;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type NotificationTaskAcknowledgement =
   | {
       taskId: string;
@@ -1048,7 +1060,9 @@ export type GroceryViewRepository = {
   upsertCommunityReporterTrust(trust: CommunityReporterTrustRecord): Promise<void>;
   getCommunityReporterTrust(reporterId: string): Promise<CommunityReporterTrustRecord | null>;
   upsertNotificationTask(task: NotificationTaskRecord): Promise<void>;
+  insertNotificationTaskIfAbsent(task: NotificationTaskRecord): Promise<boolean>;
   listDueNotificationTasks(now: string): Promise<NotificationTaskRecord[]>;
+  listActiveTelegramNotificationSubscriptions(): Promise<NotificationSubscriptionRecord[]>;
   upsertNotificationSuppression(suppression: NotificationSuppressionRecord): Promise<void>;
   listActiveNotificationSuppressions(): Promise<NotificationSuppressionRecord[]>;
   upsertAlertRule(rule: AlertRuleRecord): Promise<void>;
@@ -1300,6 +1314,7 @@ export function createMemoryRepository(): GroceryViewRepository {
   const humanReviewers = new Map<string, HumanReviewerRecord>();
   const communityReporterTrust = new Map<string, CommunityReporterTrustRecord>();
   const notificationTasks = new Map<string, NotificationTaskRecord>();
+  const notificationSubscriptions = new Map<string, NotificationSubscriptionRecord>();
   const notificationSuppressions = new Map<string, NotificationSuppressionRecord>();
   const alertRules = new Map<string, AlertRuleRecord>();
   const humanReviewAssignments = new Map<string, HumanReviewAssignmentRecord>();
@@ -1512,11 +1527,24 @@ export function createMemoryRepository(): GroceryViewRepository {
       notificationTasks.set(task.id, { ...task });
     },
 
+    async insertNotificationTaskIfAbsent(task) {
+      if (notificationTasks.has(task.id)) return false;
+      notificationTasks.set(task.id, { ...task });
+      return true;
+    },
+
     async listDueNotificationTasks(now) {
       return [...notificationTasks.values()]
         .filter((task) => task.status === 'queued' && task.sendAt <= now)
         .sort((a, b) => a.sendAt.localeCompare(b.sendAt) || a.id.localeCompare(b.id))
         .map((task) => ({ ...task }));
+    },
+
+    async listActiveTelegramNotificationSubscriptions() {
+      return [...notificationSubscriptions.values()]
+        .filter((subscription) => subscription.active && subscription.channel === 'telegram' && subscription.chatId?.trim())
+        .sort((a, b) => a.userId.localeCompare(b.userId) || (a.productId ?? '').localeCompare(b.productId ?? '') || a.id.localeCompare(b.id))
+        .map((subscription) => ({ ...subscription }));
     },
 
     async upsertNotificationSuppression(suppression) {
@@ -1647,6 +1675,17 @@ type NotificationTaskRow = {
   attempt_count: string | number;
   max_attempts: string | number;
   status: NotificationTaskRecord['status'];
+};
+type NotificationSubscriptionRow = {
+  id: string;
+  user_id: string;
+  channel: NotificationSubscriptionRecord['channel'];
+  recipient: string;
+  chat_id: string | null;
+  product_id: string | null;
+  active: boolean;
+  created_at: string | Date;
+  updated_at: string | Date;
 };
 type NotificationSuppressionRow = {
   id: string;
@@ -2350,6 +2389,20 @@ function mapNotificationTask(row: NotificationTaskRow): NotificationTaskRecord {
     attemptCount: Number(row.attempt_count),
     maxAttempts: Number(row.max_attempts),
     status: row.status
+  };
+}
+
+function mapNotificationSubscription(row: NotificationSubscriptionRow): NotificationSubscriptionRecord {
+  return {
+    id: row.id,
+    userId: row.user_id,
+    channel: row.channel,
+    recipient: row.recipient,
+    ...(row.chat_id ? { chatId: row.chat_id } : {}),
+    ...(row.product_id ? { productId: row.product_id } : {}),
+    active: row.active,
+    createdAt: asIso(row.created_at),
+    updatedAt: asIso(row.updated_at)
   };
 }
 
@@ -3109,6 +3162,30 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
       );
     },
 
+    async insertNotificationTaskIfAbsent(task) {
+      const rows = await executor.query<IdRow>(
+        `insert into notification_tasks(
+           id, channel, type, title, body, priority, send_at, recipient, attempt_count, max_attempts, status
+         ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+         on conflict (id) do nothing
+         returning id`,
+        [
+          task.id,
+          task.channel,
+          task.type,
+          task.title,
+          task.body,
+          task.priority,
+          task.sendAt,
+          task.recipient,
+          task.attemptCount,
+          task.maxAttempts,
+          task.status
+        ]
+      );
+      return rows.length > 0;
+    },
+
     async listDueNotificationTasks(now) {
       const rows = await executor.query<NotificationTaskRow>(
         `select id, channel, type, title, body, priority, send_at, recipient, attempt_count, max_attempts, status
@@ -3118,6 +3195,18 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
         [now]
       );
       return rows.map(mapNotificationTask);
+    },
+
+    async listActiveTelegramNotificationSubscriptions() {
+      const rows = await executor.query<NotificationSubscriptionRow>(
+        `select id, user_id, channel, recipient, chat_id, product_id, active, created_at, updated_at
+         from notification_subscriptions
+         where active = true
+           and channel = 'telegram'
+           and nullif(btrim(chat_id), '') is not null
+         order by user_id, coalesce(product_id, ''), id`
+      );
+      return rows.map(mapNotificationSubscription);
     },
 
     async upsertNotificationSuppression(suppression) {
