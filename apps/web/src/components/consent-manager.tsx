@@ -32,7 +32,7 @@ const categories: Array<{ key: ConsentCategory; label: string; detail: string; l
   { key: 'necessary', label: 'Necessary', detail: 'Required for security, consent proof, and core website navigation.', locked: true },
   { key: 'analytics', label: 'Analytics', detail: 'Optional aggregated measurement for product and source coverage improvements.' },
   { key: 'ads', label: 'Ads', detail: 'Optional ad storage. AdSense stays non-personalised until this is granted.' },
-  { key: 'personalisation', label: 'Personalisation', detail: 'Optional personalised recommendations and ad-personalisation signals.' }
+  { key: 'personalisation', label: 'Personalization', detail: 'Optional personalised recommendations and ad-personalisation signals.' }
 ];
 
 function gtag(...args: unknown[]) {
@@ -123,7 +123,20 @@ export function ConsentManager() {
     setManageOpen(false);
   }
 
-  if (!visible) return null;
+  if (!visible) {
+    return (
+      <button
+        className="fixed bottom-3 left-3 z-50 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-black text-slate-700 shadow-lg"
+        onClick={() => {
+          setVisible(true);
+          setManageOpen(true);
+        }}
+        type="button"
+      >
+        Cookie settings
+      </button>
+    );
+  }
 
   return (
     <section className="fixed inset-x-3 bottom-3 z-50 mx-auto max-w-5xl rounded-[1.5rem] border border-slate-200 bg-white p-4 shadow-2xl" aria-label="Cookie consent banner">
@@ -134,6 +147,7 @@ export function ConsentManager() {
           <p className="mt-2 text-sm leading-6 text-slate-700">
             We default analytics, ads, ad user data, and ad personalisation to denied. AdSense remains non-personalised until optional consent is granted.
             Your proof is stored locally with policyVersion and timestamp; a new policy version asks again.
+            You can change choices any time via Cookie settings; optional trackers stay blocked until their category is granted.
           </p>
           <div className="mt-2 flex flex-wrap gap-3 text-sm font-black text-emerald-800">
             <Link className="underline decoration-emerald-300 underline-offset-4" href="/privacy">
