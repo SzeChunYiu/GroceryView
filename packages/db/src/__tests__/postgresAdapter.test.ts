@@ -2457,7 +2457,7 @@ describe('createPostgresPriceReader', () => {
     assert.deepEqual(
       await reader.listPriceObservationHistory({
         productId: 'product-1',
-        chainId: 'chain-1',
+        chainIds: ['chain-1', 'chain-2'],
         storeId: 'store-1',
         priceType: 'promotion',
         observedFrom: '2026-05-01T00:00:00.000Z',
@@ -2514,15 +2514,19 @@ describe('createPostgresPriceReader', () => {
     assert.match(executor.calls[0]!.sql, /\$2::uuid is null or chain_id = \$2::uuid/);
     assert.match(executor.calls[0]!.sql, /\$3::uuid is null or store_id = \$3::uuid/);
     assert.match(executor.calls[0]!.sql, /\$4::text is null or price_type = \$4/);
+    assert.match(executor.calls[0]!.sql, /cardinality\(\$8::uuid\[\]\) = 0 or chain_id = any\(\$8::uuid\[\]\)/);
+    assert.match(executor.calls[0]!.sql, /cardinality\(\$9::uuid\[\]\) = 0 or store_id = any\(\$9::uuid\[\]\)/);
     assert.match(executor.calls[0]!.sql, /order by observed_at desc, chain_id, store_id, price_type, id/);
     assert.deepEqual(executor.calls[0]!.params, [
       'product-1',
-      'chain-1',
+      null,
       'store-1',
       'promotion',
       '2026-05-01T00:00:00.000Z',
       '2026-05-31T23:59:59.000Z',
-      20
+      20,
+      ['chain-1', 'chain-2'],
+      []
     ]);
   });
 
@@ -2533,7 +2537,7 @@ describe('createPostgresPriceReader', () => {
     await reader.listPriceObservationHistory({ productId: 'product-1', limit: 5000 });
     await reader.listPriceObservationHistory({ productId: 'product-1', limit: 0 });
 
-    assert.deepEqual(executor.calls[0]!.params, ['product-1', null, null, null, null, null, 1000]);
-    assert.deepEqual(executor.calls[1]!.params, ['product-1', null, null, null, null, null, 1]);
+    assert.deepEqual(executor.calls[0]!.params, ['product-1', null, null, null, null, null, 1000, [], []]);
+    assert.deepEqual(executor.calls[1]!.params, ['product-1', null, null, null, null, null, 1, [], []]);
   });
 });

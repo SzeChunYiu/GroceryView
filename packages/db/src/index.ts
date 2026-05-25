@@ -580,7 +580,9 @@ export type PriceObservationHistoryRecord = PriceObservationRecord & {
 export type PriceObservationHistoryFilter = {
   productId: string;
   chainId?: string;
+  chainIds?: string[];
   storeId?: string;
+  storeIds?: string[];
   priceType?: PriceType;
   observedFrom?: string;
   observedTo?: string;
@@ -5071,6 +5073,8 @@ export function createPostgresPriceReader(executor: QueryExecutor): PostgresPric
            and ($4::text is null or price_type = $4)
            and ($5::timestamptz is null or observed_at >= $5::timestamptz)
            and ($6::timestamptz is null or observed_at <= $6::timestamptz)
+           and (cardinality($8::uuid[]) = 0 or chain_id = any($8::uuid[]))
+           and (cardinality($9::uuid[]) = 0 or store_id = any($9::uuid[]))
          order by observed_at desc, chain_id, store_id, price_type, id
          limit $7`,
         [
@@ -5080,7 +5084,9 @@ export function createPostgresPriceReader(executor: QueryExecutor): PostgresPric
           filter.priceType ?? null,
           filter.observedFrom ?? null,
           filter.observedTo ?? null,
-          limit
+          limit,
+          filter.chainIds ?? [],
+          filter.storeIds ?? []
         ]
       );
       return rows.map(mapPriceObservationHistory);
