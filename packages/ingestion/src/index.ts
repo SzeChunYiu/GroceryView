@@ -137,6 +137,7 @@ export * from './connectors/lidl-bulk.js';
 export * from './connectors/willys-bulk.js';
 export * from './connectors/apohem.js';
 export * from './connectors/bonus-is.js';
+export * from './connectors/atlantsolia-is.js';
 export * from './connectors/apoteket-se.js';
 export * from './connectors/lloyds-apotek-se.js';
 export * from './connectors/okq8-fuel.js';
