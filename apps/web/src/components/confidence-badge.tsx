@@ -7,6 +7,10 @@ export type ConfidenceBadgeProps = {
   label?: string;
   observedAt?: string | number | Date | null;
   sampleSize?: number;
+  details?: Array<{
+    label: string;
+    value: string;
+  }>;
   verificationLabel?: string;
 };
 
@@ -16,7 +20,7 @@ const levelClasses: Record<ConfidenceBadgeProps["level"], string> = {
   low: "border-amber-200 bg-amber-50 text-amber-900",
 };
 
-export function ConfidenceBadge({ level, label, observedAt, sampleSize, verificationLabel }: ConfidenceBadgeProps) {
+export function ConfidenceBadge({ level, label, observedAt, sampleSize, details, verificationLabel }: ConfidenceBadgeProps) {
   const displayLabel = label ?? confidenceCopy(level, sampleSize);
   const token = confidenceStateToken(level);
   const sampleCopy = sampleSize !== undefined ? `Sample size ${sampleSize}.` : '';
@@ -28,8 +32,7 @@ export function ConfidenceBadge({ level, label, observedAt, sampleSize, verifica
     verificationCopy ? `Verification ${verificationCopy}.` : '',
     `${token.meaning}. Indicator ${token.indicator}.`
   ].filter(Boolean).join(' ');
-
-  return (
+  const badge = (
     <span
       aria-label={`${displayLabel}. ${detailCopy}`}
       className={`inline-flex items-center gap-2 rounded-lg border px-3 py-1 text-xs font-semibold uppercase tracking-wide ${levelClasses[level]}`}
@@ -42,5 +45,21 @@ export function ConfidenceBadge({ level, label, observedAt, sampleSize, verifica
       {freshness ? <span className="normal-case tracking-normal">{freshness.label}</span> : null}
       {verificationCopy ? <span className="normal-case tracking-normal">{verificationCopy}</span> : null}
     </span>
+  );
+
+  if (!details?.length) return badge;
+
+  return (
+    <div className="inline-block rounded-xl border border-slate-200 bg-white p-2 text-left shadow-sm">
+      {badge}
+      <dl className="mt-2 grid gap-2 text-xs normal-case tracking-normal text-slate-700">
+        {details.map((detail) => (
+          <div key={detail.label}>
+            <dt className="font-black text-slate-950">{detail.label}</dt>
+            <dd>{detail.value}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
   );
 }

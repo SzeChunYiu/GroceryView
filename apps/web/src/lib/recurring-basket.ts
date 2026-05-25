@@ -77,6 +77,16 @@ export type PurchaseHistoryImportPreview = {
   totalSpend: number;
 };
 
+export type PastPurchaseShortcut = {
+  productId: string;
+  productName: string;
+  categoryLabel: string;
+  purchaseCount: number;
+  suggestedQuantity: number;
+  lastPurchasedAt: string;
+  shortcutLabel: string;
+};
+
 function normalizedSuggestionTokens(value: string) {
   return new Set(
     value
@@ -309,3 +319,39 @@ export function buildPurchaseHistoryImportPreview(rows: readonly PurchaseHistory
     totalSpend: rows.reduce((sum, row) => sum + row.totalSpend, 0)
   };
 }
+
+export function buildPastPurchaseShortcuts(rows: readonly PurchaseHistoryImportRow[]): PastPurchaseShortcut[] {
+  const rowsByProduct = new Map<string, PurchaseHistoryImportRow[]>();
+  for (const row of rows) {
+    const productId = row.productMatch?.productId ?? row.productName.toLocaleLowerCase('sv-SE').replace(/[^a-z0-9]+/g, '-');
+    rowsByProduct.set(productId, [...(rowsByProduct.get(productId) ?? []), row]);
+  }
+
+  return [...rowsByProduct.entries()]
+    .map(([productId, productRows]) => {
+      const sortedRows = [...productRows].sort((left, right) => right.purchasedAt.localeCompare(left.purchasedAt));
+      const latest = sortedRows[0]!;
+      const suggestedQuantity = Math.max(1, Math.round(productRows.reduce((sum, row) => sum + row.quantity, 0) / productRows.length));
+      return {
+        productId,
+        productName: latest.productMatch?.productName ?? latest.productName,
+        categoryLabel: latest.productMatch ? 'Recurring staple' : 'Purchase history',
+        purchaseCount: productRows.length,
+        suggestedQuantity,
+        lastPurchasedAt: latest.purchasedAt,
+        shortcutLabel: `${productRows.length} past purchase${productRows.length === 1 ? '' : 's'} · add ${suggestedQuantity}`
+      };
+    })
+    .sort((left, right) => right.purchaseCount - left.purchaseCount || left.productName.localeCompare(right.productName, 'sv'))
+    .slice(0, 5);
+}
+
+export const homePastPurchaseShortcuts = buildPastPurchaseShortcuts(parsePurchaseHistoryCsv(`date,product,store,quantity,total
+2026-05-18,Milk 1L,Willys,4,58
+2026-05-11,Milk 1L,Willys,4,58
+2026-05-18,Eggs 12-pack,Hemköp,1,39
+2026-05-04,Eggs 12-pack,Hemköp,1,39
+2026-05-18,Sourdough bread,Willys,2,64
+2026-05-11,Sourdough bread,Willys,2,64
+2026-05-18,Havregryn Extra Fylliga,Willys,1,25
+2026-05-11,Kaffe,Willys,1,49`));
