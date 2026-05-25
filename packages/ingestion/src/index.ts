@@ -124,6 +124,7 @@ export * from './connectors/lidl.js';
 export * from './connectors/localfoodnodes-se.js';
 export * from './connectors/seven-eleven-no.js';
 export * from './connectors/lyfogheilsa-is.js';
+export * from './connectors/mac-se.js';
 export * from './connectors/mathem.js';
 export * from './connectors/matpriskollen.js';
 export * from './connectors/matspar.js';
