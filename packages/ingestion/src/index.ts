@@ -4753,6 +4753,49 @@ function normalizeDailyRunnerInteger(value: number | undefined, fallback: number
   return Math.max(0, Math.floor(value));
 }
 
+export type DailyIngestionConnectionUsageSnapshot = {
+  checkoutCount: number;
+  activeCheckoutCount: number;
+  maxActiveCheckoutCount: number;
+};
+
+export type DailyIngestionConnectionUsageMonitor = {
+  beforeCheckout(): void;
+  afterCheckout(): void;
+  snapshot(): DailyIngestionConnectionUsageSnapshot;
+  assertNoLeaks(options?: { maxCheckoutCount?: number }): DailyIngestionConnectionUsageSnapshot;
+};
+
+export function createDailyIngestionConnectionUsageMonitor(): DailyIngestionConnectionUsageMonitor {
+  let checkoutCount = 0;
+  let activeCheckoutCount = 0;
+  let maxActiveCheckoutCount = 0;
+
+  return {
+    beforeCheckout() {
+      checkoutCount += 1;
+      activeCheckoutCount += 1;
+      maxActiveCheckoutCount = Math.max(maxActiveCheckoutCount, activeCheckoutCount);
+    },
+    afterCheckout() {
+      activeCheckoutCount = Math.max(0, activeCheckoutCount - 1);
+    },
+    snapshot() {
+      return { checkoutCount, activeCheckoutCount, maxActiveCheckoutCount };
+    },
+    assertNoLeaks(options = {}) {
+      const current = this.snapshot();
+      if (current.activeCheckoutCount > 0) {
+        throw new Error(`Daily ingestion Postgres client leak detected: ${current.activeCheckoutCount} checkout(s) still active.`);
+      }
+      if (options.maxCheckoutCount !== undefined && current.checkoutCount > options.maxCheckoutCount) {
+        throw new Error(`Daily ingestion Postgres checkout count ${current.checkoutCount} exceeded expected maximum ${options.maxCheckoutCount}.`);
+      }
+      return current;
+    }
+  };
+}
+
 async function waitForDailyRunnerDelay(delayMs: number): Promise<void> {
   if (delayMs <= 0) return;
   await new Promise((resolve) => setTimeout(resolve, delayMs));
@@ -4837,24 +4880,29 @@ function clearZeroRowConnectorState(config: DailyIngestionConnectorConfig, state
 
 export function createDailyIngestionQueryExecutor(
   client: PgLikeClient,
-  options: { retryAttempts?: number; retryBaseDelayMs?: number } = {}
+  options: { retryAttempts?: number; retryBaseDelayMs?: number; connectionUsageMonitor?: DailyIngestionConnectionUsageMonitor } = {}
 ): QueryExecutor {
   const retryAttempts = normalizeDailyRunnerInteger(options.retryAttempts, 8);
   const retryBaseDelayMs = normalizeDailyRunnerInteger(options.retryBaseDelayMs, 2000);
   return {
     async query<T>(sql: string, params: unknown[] = []): Promise<T[]> {
-      for (let attempt = 0; attempt <= retryAttempts; attempt += 1) {
-        try {
-          const result = await client.query(sql, params);
-          return result.rows as T[];
-        } catch (error) {
-          if (attempt >= retryAttempts || !isTransientDailyDatabaseError(error)) throw error;
-          process.stderr.write(`[daily-ingestion] retrying database query attempt=${attempt + 2}/${retryAttempts + 1}: ${error instanceof Error ? error.message : String(error)}
+      options.connectionUsageMonitor?.beforeCheckout();
+      try {
+        for (let attempt = 0; attempt <= retryAttempts; attempt += 1) {
+          try {
+            const result = await client.query(sql, params);
+            return result.rows as T[];
+          } catch (error) {
+            if (attempt >= retryAttempts || !isTransientDailyDatabaseError(error)) throw error;
+            process.stderr.write(`[daily-ingestion] retrying database query attempt=${attempt + 2}/${retryAttempts + 1}: ${error instanceof Error ? error.message : String(error)}
 `);
-          await waitForDailyRunnerDelay(retryBaseDelayMs * (attempt + 1));
+            await waitForDailyRunnerDelay(retryBaseDelayMs * (attempt + 1));
+          }
         }
+        throw new Error('Daily ingestion database query retry loop exhausted.');
+      } finally {
+        options.connectionUsageMonitor?.afterCheckout();
       }
-      throw new Error('Daily ingestion database query retry loop exhausted.');
     }
   };
 }

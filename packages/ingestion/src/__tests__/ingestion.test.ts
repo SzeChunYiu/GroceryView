@@ -16,6 +16,7 @@ import {
   buildDailyConnectorConfigsFromEnv,
   buildDailyIngestionPostgresPoolConfig,
   CITY_GROSS_BULK_MINIMUM_ROWS,
+  createDailyIngestionConnectionUsageMonitor,
   createDailyIngestionQueryExecutor,
   DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_IDS,
   DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_IDS,
@@ -6374,6 +6375,34 @@ describe('daily ingestion runner', () => {
 
     assert.deepEqual(rows, [{ id: 'row-1' }]);
     assert.equal(calls.length, 2);
+  });
+
+  it('detects excessive daily ingestion Postgres checkouts without leaking clients', async () => {
+    const monitor = createDailyIngestionConnectionUsageMonitor();
+    const client = {
+      async query() {
+        return { rows: [{ id: 'row-1' }] };
+      }
+    };
+
+    const executor = createDailyIngestionQueryExecutor(client, {
+      retryAttempts: 0,
+      retryBaseDelayMs: 0,
+      connectionUsageMonitor: monitor
+    });
+
+    await executor.query<{ id: string }>('select id from products where id = $1', ['product-1']);
+    await executor.query<{ id: string }>('select id from products where id = $1', ['product-2']);
+
+    assert.deepEqual(monitor.snapshot(), {
+      checkoutCount: 2,
+      activeCheckoutCount: 0,
+      maxActiveCheckoutCount: 1
+    });
+    assert.throws(
+      () => monitor.assertNoLeaks({ maxCheckoutCount: 1 }),
+      /checkout count 2 exceeded expected maximum 1/i
+    );
   });
 
   it('treats pooler handler exits as retryable daily ingestion DB errors', async () => {
