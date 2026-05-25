@@ -131,6 +131,26 @@ export function normalizePublicListShareItems(items: unknown[]): PublicListShare
     .slice(0, 50);
 }
 
+export function createPublicListShareToken(input: {
+  createdAt?: string;
+  expiresAt?: string | null;
+  items: PublicListShareItem[];
+  listId: string;
+}) {
+  const payload = {
+    createdAt: input.createdAt ?? new Date().toISOString(),
+    expiresAt: input.expiresAt ?? null,
+    items: normalizePublicListShareItems(input.items),
+    listId: input.listId
+  };
+  const encodedPayload = Buffer.from(JSON.stringify(payload), 'utf8').toString('base64url');
+  const signature = createHmac('sha256', process.env.LIST_SHARE_SECRET || process.env.NEXT_PUBLIC_LIST_SHARE_SECRET || 'local-list-share-development-secret')
+    .update(encodedPayload)
+    .digest('base64url');
+
+  return `${encodedPayload}.${signature}`;
+}
+
 function decodeSharePayload(shareId: string) {
   const [encodedPayload, signature, extra] = shareId.split('.');
   if (!encodedPayload || !signature || extra !== undefined) return null;

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { BasketComparisonPrint } from '@/components/basket-comparison-print';
 import { ChainSelector } from '@/components/chain-selector';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
@@ -94,7 +95,7 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
               Add ?products=product-slug-1,product-slug-2 to render DB-backed comparison rows. Missing product ids: {comparison.missingProductIds.join(', ') || 'none yet'}.
             </p>
           ) : null}
-          <StorePriceMatrix chains={COMPARE_CHAIN_ORDER} products={comparison.products} />
+          <StorePriceMatrix chains={COMPARE_CHAIN_ORDER} products={comparison.products} sourceGeneratedAt={comparison.generatedAt} sourceLabel={comparison.sourceLabel} />
           {rowSections.map((section) => (
             <div className="overflow-hidden rounded-3xl border border-emerald-100 bg-white shadow-sm" key={section.id}>
               <div className="border-b border-emerald-100 bg-emerald-50 px-4 py-3">
@@ -187,6 +188,8 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
           </Card>
         </div>
       </div>
+      <BasketComparisonPrint chains={COMPARE_CHAIN_ORDER} products={comparison.products} sourceLabel={comparison.sourceLabel} />
+
       <Card className="mt-6 border-cyan-200 bg-cyan-50/70">
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
