@@ -2364,17 +2364,19 @@ function cheaperThanPct(value: number, values: number[]) {
 
 const lidlStoreOfferSummaries = lidlOfferGroupsByStore
   .map((group) => {
-    const regularPriceRatios = group.offers
+    const offers = Array.isArray(group.offers) ? group.offers : [];
+    const regularPriceRatios = offers
       .filter((offer) => typeof offer.regularPrice === 'number' && offer.regularPrice > 0)
       .map((offer) => (offer.price / offer.regularPrice!) * 100);
     const averageRelativeIndex = average(regularPriceRatios);
     if (averageRelativeIndex === null) return null;
-    const averageOfferPrice = average(group.offers.map((offer) => offer.price)) ?? 0;
-    const averageRegularPrice = average(group.offers
+    const averageOfferPrice = average(offers.map((offer) => offer.price)) ?? 0;
+    const averageRegularPrice = average(offers
       .filter((offer) => typeof offer.regularPrice === 'number' && offer.regularPrice > 0)
       .map((offer) => offer.regularPrice!));
     return {
       ...group,
+      offers,
       matchedStore: matchingOsmStoreForLidlGroup(group),
       averageOfferPrice: roundSek(averageOfferPrice),
       averageRegularPrice: averageRegularPrice === null ? null : roundSek(averageRegularPrice),
