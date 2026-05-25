@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { trackDealShare } from '@/lib/analytics';
+import { trackAffiliateOutboundClick, trackDealShare } from '@/lib/analytics';
 import { buildDealContext, type DealHistoryPoint } from '@/lib/deal-context';
 import { dealShareUrl } from '@/lib/seo';
 
@@ -15,6 +15,8 @@ type DealCardProps = {
   locale?: string;
   dealId?: string;
   sharePath?: string;
+  retailerName?: string;
+  retailerUrl?: string;
 };
 
 function formatPrice(value: number, locale: string, currency: string) {
@@ -30,7 +32,9 @@ export function DealCard({
   currency = 'SEK',
   locale = 'sv-SE',
   dealId,
-  sharePath
+  sharePath,
+  retailerName = 'retailer',
+  retailerUrl
 }: DealCardProps) {
   const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle');
   const context = buildDealContext({ currentPrice, discountStartedAt, priceHistory, currency, locale });
@@ -38,6 +42,20 @@ export function DealCard({
   const encodedShareUrl = encodeURIComponent(shareUrl);
   const encodedShareText = encodeURIComponent(`${title} is ${formatPrice(currentPrice, locale, currency)} on GroceryView`);
   const analyticsDealId = dealId ?? sharePath ?? title;
+  const affiliateCampaign = 'groceryview-deal-card';
+  const affiliateUrl = useMemo(() => {
+    if (!retailerUrl) return null;
+    try {
+      const url = new URL(retailerUrl);
+      url.searchParams.set('utm_source', 'groceryview');
+      url.searchParams.set('utm_medium', 'affiliate');
+      url.searchParams.set('utm_campaign', affiliateCampaign);
+      url.searchParams.set('gv_deal_id', analyticsDealId);
+      return url.toString();
+    } catch {
+      return retailerUrl;
+    }
+  }, [analyticsDealId, retailerUrl]);
 
   async function copyShareLink() {
     trackDealShare({ dealId: analyticsDealId, shareUrl, channel: 'copy_link' });
@@ -53,6 +71,11 @@ export function DealCard({
 
   function trackNativeShare() {
     trackDealShare({ dealId: analyticsDealId, shareUrl, channel: 'web_share' });
+  }
+
+  function trackRetailerClick() {
+    if (!affiliateUrl) return;
+    trackAffiliateOutboundClick({ campaign: affiliateCampaign, dealId: analyticsDealId, href: affiliateUrl, retailerName });
   }
 
   return (
@@ -100,7 +123,23 @@ export function DealCard({
         >
           Share deal
         </a>
+        {affiliateUrl ? (
+          <a
+            className="rounded-full border border-amber-300 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-950 transition hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-market-mint"
+            href={affiliateUrl}
+            onClick={trackRetailerClick}
+            rel="nofollow sponsored noopener noreferrer"
+            target="_blank"
+          >
+            View at {retailerName} <span className="sr-only">(sponsored affiliate link)</span>
+          </a>
+        ) : null}
       </div>
+      {affiliateUrl ? (
+        <p className="mt-3 text-xs font-semibold leading-5 text-market-ink/70">
+          Affiliate disclosure: GroceryView may earn a commission from this retailer link. Click analytics are sent only after analytics consent.
+        </p>
+      ) : null}
     </article>
   );
 }

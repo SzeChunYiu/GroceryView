@@ -303,6 +303,14 @@ export function storePageViewScript(event: StoreEngagementInput) {
 
 
 export type DealShareChannel = 'copy_link' | 'web_share';
+export type AffiliateOutboundClickEvent = {
+  campaign: string;
+  consentGranted: boolean;
+  dealId: string;
+  href: string;
+  observedAt: string;
+  retailerName: string;
+};
 
 export type DealShareEvent = {
   channel: DealShareChannel;
@@ -313,6 +321,7 @@ export type DealShareEvent = {
 };
 
 const dealShareEndpoint = '/api/analytics/deal-shares';
+const affiliateOutboundEndpoint = '/api/analytics/affiliate-outbound-clicks';
 
 export function trackDealShare(event: Omit<DealShareEvent, 'observedAt' | 'referrer'>) {
   if (typeof window === 'undefined') return;
@@ -332,6 +341,40 @@ export function trackDealShare(event: Omit<DealShareEvent, 'observedAt' | 'refer
   }
 
   void fetch(dealShareEndpoint, {
+    body: payload,
+    headers: { 'content-type': 'application/json' },
+    keepalive: true,
+    method: 'POST'
+  }).catch(() => undefined);
+}
+
+function hasAnalyticsConsent() {
+  try {
+    return window.localStorage.getItem('groceryview:analytics-consent') === 'granted';
+  } catch {
+    return false;
+  }
+}
+
+export function trackAffiliateOutboundClick(event: Omit<AffiliateOutboundClickEvent, 'consentGranted' | 'observedAt'>) {
+  if (typeof window === 'undefined') return;
+
+  const payloadEvent: AffiliateOutboundClickEvent = {
+    ...event,
+    consentGranted: hasAnalyticsConsent(),
+    observedAt: new Date().toISOString()
+  };
+
+  window.dispatchEvent(new CustomEvent('groceryview:affiliate-outbound-click', { detail: payloadEvent }));
+  if (!payloadEvent.consentGranted) return;
+
+  const payload = JSON.stringify({ event: payloadEvent });
+  if (navigator.sendBeacon) {
+    const sent = navigator.sendBeacon(affiliateOutboundEndpoint, new Blob([payload], { type: 'application/json' }));
+    if (sent) return;
+  }
+
+  void fetch(affiliateOutboundEndpoint, {
     body: payload,
     headers: { 'content-type': 'application/json' },
     keepalive: true,
