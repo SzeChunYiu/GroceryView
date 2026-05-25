@@ -3616,12 +3616,24 @@ ${seo}`;
 
   it('surfaces verified OSM coverage on the store coverage route', async () => {
     const route = await read('src/app/store-coverage/page.tsx');
+    const verified = await read('src/lib/verified-data.ts');
+    const osmStores = await read('src/lib/osm-stores.ts');
+    const storeMap = await read('src/components/StoreMap.tsx');
 
     assert.match(route, /storeBrandLedger\.map/);
     assert.match(route, /storeFormatCoverage\.map/);
+    assert.match(route, /storeServiceFilterCoverage\.map/);
     assert.match(route, /SourceCoverage/);
     assert.match(route, /OSM store coverage without inferred prices/);
     assert.match(route, /without turning coordinates into branch-level price claims/);
+    assert.match(route, /Pickup, delivery, pharmacy, parking, and opening hours filters/);
+    assert.match(route, /source gap in the current OSM extract/);
+    assert.match(verified, /storeServiceFilterCoverage/);
+    assert.match(verified, /storeHasSourceBackedService/);
+    assert.match(osmStores, /osmStoreServiceFilters/);
+    assert.match(osmStores, /'pickup'[\s\S]*'delivery'[\s\S]*'pharmacy'[\s\S]*'parking'[\s\S]*'opening_hours'/);
+    assert.match(storeMap, /serviceBadges/);
+    assert.match(storeMap, /source gap/);
     assert.doesNotMatch(route, /@\/lib\/demo-data/);
   });
 

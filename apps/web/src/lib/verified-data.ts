@@ -23,7 +23,7 @@ import {
 } from './generated/db-site-ingested-overrides';
 import { categoryLabels, pricedProducts } from './openprices-products';
 import { allergenRiskBadgesForText } from './search-filters';
-import { osmStores } from './osm-stores';
+import { osmStoreServiceFilters, osmStores, type OsmStoreServiceKey } from './osm-stores';
 import {
   currencyFromObservation,
   defaultLocale,
@@ -2710,6 +2710,32 @@ export const storeFormatCoverage = Object.values(
   }))
   .sort((a, b) => b.stores - a.stores || a.format.localeCompare(b.format, 'sv'))
   .slice(0, 6);
+
+export function storeHasSourceBackedService(store: (typeof osmStores)[number], key: OsmStoreServiceKey) {
+  if (key === 'pickup') return store.services?.pickup === true;
+  if (key === 'delivery') return store.services?.delivery === true;
+  if (key === 'pharmacy') return store.shop === 'pharmacy' || store.services?.pharmacy === true;
+  if (key === 'parking') return store.hasParking === true || store.services?.parking === true;
+  return typeof store.openingHours === 'string' && store.openingHours.trim().length > 0;
+}
+
+export const storeServiceFilterCoverage = osmStoreServiceFilters.map((filter) => {
+  const matchedStores = osmStores.filter((store) => storeHasSourceBackedService(store, filter.key));
+  const matchedStore = matchedStores[0] ?? null;
+  return {
+    key: filter.key,
+    label: filter.label,
+    sourceField: filter.sourceField,
+    detail: filter.detail,
+    stores: matchedStores.length,
+    coveragePct: osmStores.length ? (matchedStores.length / osmStores.length) * 100 : 0,
+    sampleSlug: matchedStore?.slug ?? null,
+    sourceSupported: matchedStores.length > 0,
+    statusLabel: matchedStores.length > 0
+      ? `${matchedStores.length.toLocaleString('sv-SE')} source-backed stores`
+      : 'Source gap in current OSM extract'
+  };
+});
 
 export const categorySummaries = Object.entries(categoryLabels)
   .map(([slug, label]) => {

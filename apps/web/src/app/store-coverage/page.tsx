@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
-import { formatPct, sourceCoverage, storeBrandLedger, storeFormatCoverage } from '@/lib/verified-data';
+import { formatPct, sourceCoverage, storeBrandLedger, storeFormatCoverage, storeServiceFilterCoverage } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -90,6 +90,39 @@ export default function StoreCoveragePage() {
           </div>
         </Card>
       </div>
+
+      <Card className="mt-6">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <h2 className="text-2xl font-black tracking-tight">Service filters</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
+              Pickup, delivery, pharmacy, parking, and opening hours filters are listed only from source-backed store fields. Unsupported filters stay visible as a source gap in the current OSM extract.
+            </p>
+          </div>
+          <p className="rounded-full bg-slate-100 px-3 py-2 text-sm font-black text-slate-700">
+            No inferred trip constraints
+          </p>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+          {storeServiceFilterCoverage.map((filter) => (
+            <div
+              className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+              key={filter.key}
+            >
+              <p className="text-sm font-black text-slate-950">{filter.label}</p>
+              <p className="mt-2 text-2xl font-black text-emerald-800">{filter.stores.toLocaleString('sv-SE')}</p>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{formatPct(filter.coveragePct)} of stores</p>
+              <p className="mt-3 text-sm leading-6 text-slate-700">{filter.statusLabel}</p>
+              <p className="mt-2 text-xs font-bold text-slate-500">Source field: {filter.sourceField}</p>
+              {filter.sampleSlug ? (
+                <Link className="mt-3 inline-flex text-sm font-black text-emerald-800 underline decoration-emerald-300 underline-offset-4" href={`/stores/${filter.sampleSlug}`}>
+                  Review sample
+                </Link>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      </Card>
 
       <div className="mt-6">
         <SourceCoverage />

@@ -6,8 +6,51 @@
 export type OsmStore = {
   slug: string; name: string; brand: string; format: string; shop: string;
   address: string; city: string; district: string; lat: number; lng: number;
+  services?: Partial<Record<OsmStoreServiceKey, boolean>>;
+  openingHours?: string;
+  hasParking?: boolean;
   source: 'osm'; retrievedDate: string;
 };
+
+export type OsmStoreServiceKey = 'pickup' | 'delivery' | 'pharmacy' | 'parking' | 'opening_hours';
+
+export const osmStoreServiceFilters: {
+  key: OsmStoreServiceKey;
+  label: string;
+  sourceField: string;
+  detail: string;
+}[] = [
+  {
+    key: 'pickup',
+    label: 'Pickup',
+    sourceField: 'services.pickup',
+    detail: 'Only enabled when a store source row reports pickup availability.'
+  },
+  {
+    key: 'delivery',
+    label: 'Delivery',
+    sourceField: 'services.delivery',
+    detail: 'Only enabled when a store source row reports delivery availability.'
+  },
+  {
+    key: 'pharmacy',
+    label: 'Pharmacy',
+    sourceField: 'shop=pharmacy or services.pharmacy',
+    detail: 'Matches pharmacy-format source rows instead of inferring from brand names.'
+  },
+  {
+    key: 'parking',
+    label: 'Parking',
+    sourceField: 'hasParking or services.parking',
+    detail: 'Only enabled when parking is reported by the store source.'
+  },
+  {
+    key: 'opening_hours',
+    label: 'Opening hours',
+    sourceField: 'openingHours',
+    detail: 'Only enabled when an opening-hours value is present in the store source row.'
+  }
+];
 
 export const osmStores: OsmStore[] = [
   {

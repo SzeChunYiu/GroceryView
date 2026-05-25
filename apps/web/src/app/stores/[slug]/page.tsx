@@ -6,9 +6,11 @@ import { osmStores } from '@/lib/osm-stores';
 import {
   findStore,
   storeAssortmentOverviewForStore,
+  storeHasSourceBackedService,
   storeOpeningHoursLabel,
   storePricePercentileRankForStore,
   storePricePercentileRanks,
+  storeServiceFilterCoverage,
   storeUniverse
 } from '@/lib/verified-data';
 import { storePageViewScript } from '@/lib/analytics';
@@ -144,6 +146,11 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
   const pricePercentileRank = storePricePercentileRankFor(store);
   const openingHoursLabel = storeOpeningHoursLabel(store);
   const assortmentOverview = storeAssortmentOverviewForStore(store);
+  const serviceBadges = storeServiceFilterCoverage.map((filter) => ({
+    key: filter.key,
+    label: filter.label,
+    available: storeHasSourceBackedService(store, filter.key)
+  }));
   const storeViewAnalyticsScript = storePageViewScript({
     brand: store.brand,
     storeName: store.name,
@@ -187,7 +194,10 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
             Embedded Google Maps uses the verified OSM latitude/longitude for this store and links out to turn-by-turn directions.
           </p>
           <div className="mt-4">
-            <StoreMap store={{ name: store.name, address: store.address, lat: store.lat, lng: store.lng }} />
+            <StoreMap
+              serviceBadges={serviceBadges}
+              store={{ name: store.name, address: store.address, lat: store.lat, lng: store.lng }}
+            />
           </div>
         </Card>
         <Card>
