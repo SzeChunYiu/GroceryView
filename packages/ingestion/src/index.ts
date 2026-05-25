@@ -169,6 +169,7 @@ export * from './connectors/apotek-gardabaer-is.js';
 export * from './connectors/apoteket-se.js';
 export * from './connectors/okq8-fuel.js';
 export * from './connectors/ob-is.js';
+export * from './connectors/orkan-is.js';
 export * from './connectors/seven-eleven-se.js';
 export * from './connectors/skeljungur-is.js';
 export * from './connectors/st1-fuel.js';
