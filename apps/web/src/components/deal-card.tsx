@@ -38,6 +38,7 @@ type DealCardProps = {
   affiliateCampaignId?: string;
   sharePath?: string;
   sponsoredPlacement?: SponsoredDealPlacement;
+  dealEndsAt?: string;
 };
 
 function formatPrice(value: number, locale: string, currency: string) {
@@ -111,7 +112,8 @@ export function DealCard({
   outboundStoreUrl,
   affiliateCampaignId,
   sharePath,
-  sponsoredPlacement
+  sponsoredPlacement,
+  dealEndsAt
 }: DealCardProps) {
   const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle');
   const context = buildDealContext({ currentPrice, discountStartedAt, priceHistory, currency, locale });
@@ -144,6 +146,16 @@ export function DealCard({
   const sponsoredSurface = sponsoredPlacement?.surface ?? 'discovery_rail';
   const sponsoredPlacementId = sponsoredPlacement?.placementId ?? analyticsDealId;
   const separatedFromOrganicRankings = true;
+  const countdownLabel = useMemo(() => {
+    if (!dealEndsAt) return null;
+    const endsAt = new Date(dealEndsAt).getTime();
+    if (!Number.isFinite(endsAt)) return null;
+    const hoursRemaining = Math.ceil((endsAt - Date.now()) / (60 * 60 * 1000));
+    if (hoursRemaining <= 0) return 'Ends today';
+    if (hoursRemaining <= 24) return `Ends in ${hoursRemaining}h`;
+    const daysRemaining = Math.ceil(hoursRemaining / 24);
+    return daysRemaining <= 7 ? `Ends in ${daysRemaining}d` : null;
+  }, [dealEndsAt]);
 
   useEffect(() => {
     if (!sponsoredProvider) return;
@@ -196,9 +208,14 @@ export function DealCard({
             </p>
           ) : null}
         </div>
-        {context.isNewLowestPrice ? (
-          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">New low</span>
-        ) : null}
+        <div className="flex flex-col items-end gap-2">
+          {countdownLabel ? (
+            <span className="rounded-full bg-rose-100 px-3 py-1 text-xs font-black text-rose-800">{countdownLabel}</span>
+          ) : null}
+          {context.isNewLowestPrice ? (
+            <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">New low</span>
+          ) : null}
+        </div>
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2" aria-label="Deal history context">
