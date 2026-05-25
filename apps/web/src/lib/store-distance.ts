@@ -1,13 +1,41 @@
+import { coopWeeklyDiscounts, type CoopIngestedWeeklyDiscount } from '@/lib/ingested/coop';
+import { osmStores, type OsmStore } from '@/lib/osm-stores';
+
 export type StoreTravelMode = 'walk' | 'drive' | 'transit';
 export type StoreOpeningStatus = 'open_now' | 'closing_soon' | 'closed' | 'unknown';
 
 type ProductParam = string | string[] | undefined;
+
+export type GeoPoint = { lat: number; lng: number };
 
 export type StoreRouteEstimate = {
   mode: StoreTravelMode;
   label: string;
   minutes: number;
   distanceLabel: string;
+};
+
+export type NearbyDealRecommendation = {
+  id: string;
+  storeSlug: string;
+  storeName: string;
+  chainName: string;
+  areaLabel: string;
+  mapLat: number;
+  mapLng: number;
+  distanceMeters: number;
+  dealName: string;
+  dealBrand: string;
+  packageText: string;
+  ordinaryPrice: number;
+  offerPrice: number;
+  savingsSek: number;
+  savingsPercent: number;
+  offerMechanicText: string;
+  validTo: string;
+  medMeraRequired: boolean;
+  sourceStoreName: string;
+  recommendationLabel: string;
 };
 
 export type StoreDistanceRow = {
@@ -32,7 +60,94 @@ export type StoreDistanceRow = {
   coverageLabel: string;
   recommendationLabel: string;
   routeRankInputs: string[];
+  bestDealName: string;
+  bestDealSavingsSek: number;
+  bestDealLabel: string;
 };
+
+const DEFAULT_USER_LOCATION: GeoPoint = { lat: 59.3293, lng: 18.0686 };
+
+function distanceMetersBetween(from: GeoPoint, to: GeoPoint): number {
+  const earthRadiusMeters = 6371000;
+  const toRad = (degrees: number) => (degrees * Math.PI) / 180;
+  const dLat = toRad(to.lat - from.lat);
+  const dLng = toRad(to.lng - from.lng);
+  const lat1 = toRad(from.lat);
+  const lat2 = toRad(to.lat);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.sin(dLng / 2) ** 2 * Math.cos(lat1) * Math.cos(lat2);
+  return Math.round(2 * earthRadiusMeters * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+}
+
+function discountSavings(discount: CoopIngestedWeeklyDiscount) {
+  const savingsSek = Math.max(0, Number((discount.ordinaryPrice - discount.offerPrice).toFixed(2)));
+  const savingsPercent = discount.ordinaryPrice > 0 ? Number(((savingsSek / discount.ordinaryPrice) * 100).toFixed(1)) : 0;
+  return { savingsSek, savingsPercent };
+}
+
+function activeHighSavingsDeals(now = new Date()) {
+  const active = coopWeeklyDiscounts
+    .filter((discount) => discount.ordinaryPrice > discount.offerPrice && new Date(discount.validTo).getTime() >= now.getTime())
+    .map((discount) => ({ ...discount, ...discountSavings(discount) }))
+    .filter((discount) => discount.savingsSek > 0)
+    .sort((left, right) => right.savingsSek - left.savingsSek || right.savingsPercent - left.savingsPercent);
+
+  if (active.length > 0) return active;
+
+  return coopWeeklyDiscounts
+    .filter((discount) => discount.ordinaryPrice > discount.offerPrice)
+    .map((discount) => ({ ...discount, ...discountSavings(discount) }))
+    .filter((discount) => discount.savingsSek > 0)
+    .sort((left, right) => right.savingsSek - left.savingsSek || right.savingsPercent - left.savingsPercent);
+}
+
+function isCoopStore(store: OsmStore): boolean {
+  return /coop|x:?tra/i.test(`${store.name} ${store.brand}`);
+}
+
+export function buildNearbyDealRecommendations(userLocation: GeoPoint = DEFAULT_USER_LOCATION, limit = 4): NearbyDealRecommendation[] {
+  const deals = activeHighSavingsDeals();
+  if (deals.length === 0) return [];
+
+  return osmStores
+    .filter((store) => Number.isFinite(store.lat) && Number.isFinite(store.lng) && isCoopStore(store))
+    .map((store) => ({
+      store,
+      distanceMeters: distanceMetersBetween(userLocation, { lat: store.lat, lng: store.lng })
+    }))
+    .sort((left, right) => left.distanceMeters - right.distanceMeters)
+    .slice(0, limit)
+    .map(({ store, distanceMeters }, index) => {
+      const deal = deals[index % deals.length];
+      return {
+        id: `${store.slug}-${deal.code || deal.promotionId}`,
+        storeSlug: store.slug,
+        storeName: store.name,
+        chainName: store.brand || 'Coop',
+        areaLabel: store.district || store.city || 'Nearby map area',
+        mapLat: store.lat,
+        mapLng: store.lng,
+        distanceMeters,
+        dealName: deal.name,
+        dealBrand: deal.brand,
+        packageText: deal.packageText,
+        ordinaryPrice: deal.ordinaryPrice,
+        offerPrice: deal.offerPrice,
+        savingsSek: deal.savingsSek,
+        savingsPercent: deal.savingsPercent,
+        offerMechanicText: deal.offerMechanicText,
+        validTo: deal.validTo,
+        medMeraRequired: deal.medMeraRequired,
+        sourceStoreName: deal.storeName,
+        recommendationLabel: `${deal.name}: save ${deal.savingsSek.toFixed(2)} SEK (${deal.savingsPercent.toFixed(0)}%) near ${store.district || store.city || store.name}`
+      };
+    });
+}
+
+function bestDealForIndex(index: number) {
+  return activeHighSavingsDeals()[index] ?? null;
+}
 
 const storeRouteSeeds = [
   {
@@ -152,12 +267,13 @@ export function buildStoreDistanceCompare(products: ProductParam, mode: ProductP
   const pricedProductCount = Math.max(selectedProductIds.length, 3);
 
   const rows: StoreDistanceRow[] = storeRouteSeeds
-    .map((store) => {
+    .map((store, index) => {
       const routeMinutes = routeMinutesFor(store, travelMode);
       const openingPenalty = openingPenaltyMinutes(store.openingStatus);
       const basketTotalSek = Number((store.basketBaseSek + pricedProductCount * store.basketPerProductSek).toFixed(2));
       const tripCostSek = travelCostSek(store.distanceMeters, routeMinutes, travelMode);
       const routeEstimates = routeEstimatesFor(store);
+      const bestDeal = bestDealForIndex(index);
       const routeAwareTotalSek = Number((basketTotalSek + tripCostSek).toFixed(2));
       const totalMinutes = routeMinutes + pickupMinutes + openingPenalty;
       const routeScore = Number((routeAwareTotalSek + totalMinutes * 1.35 + openingPenalty * 1.8).toFixed(2));
@@ -173,6 +289,11 @@ export function buildStoreDistanceCompare(products: ProductParam, mode: ProductP
         openingPenaltyMinutes: openingPenalty,
         coverageLabel: `${productLabel} · route-aware sort combines distance, basket cost, and opening status`,
         recommendationLabel: '',
+        bestDealName: bestDeal?.name ?? 'No current flyer deal',
+        bestDealSavingsSek: bestDeal?.savingsSek ?? 0,
+        bestDealLabel: bestDeal
+          ? `${bestDeal.name} saves ${bestDeal.savingsSek.toFixed(2)} SEK (${bestDeal.savingsPercent.toFixed(0)}%)`
+          : 'No current flyer deal attached',
         routeRankInputs: [
           `${travelMode} route ${routeMinutes} min`,
           `walk ${store.walkMinutes} min · drive ${store.driveMinutes} min · transit ${store.transitMinutes} min`,
