@@ -1,5 +1,6 @@
 import { googleMapsDirectionsUrl, googleMapsEmbedUrl, type StoreMapLocation } from '@/lib/mapsConfig';
 import type { StoreDistanceRow, StoreRouteEstimate } from '@/lib/store-distance';
+import { ConsentSafeThirdPartyFrame } from './consent-safe-third-party-frame';
 
 type RouteMapRecommendation = Pick<
   StoreDistanceRow,
@@ -20,13 +21,13 @@ export function StoreMap({ store, routeRecommendation }: Readonly<StoreMapProps>
 
   return (
     <div className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-sm">
-      <iframe
+      <ConsentSafeThirdPartyFrame
         allowFullScreen
         className="h-80 w-full border-0"
-        loading="lazy"
-        referrerPolicy="no-referrer-when-downgrade"
+        consentCategory="personalisation"
         src={embedUrl}
         title={`Google Maps location for ${store.name}`}
+        vendorId="google-maps-embed"
       />
       <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm font-semibold text-slate-700">
