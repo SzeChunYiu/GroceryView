@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { premiumEntitlementCatalog } from '@/lib/entitlements';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -76,6 +77,31 @@ export default function PricingPage() {
         <ul className="mt-4 space-y-2 text-sm font-semibold leading-6 text-emerald-950">
           {premiumGuardrails.map((guardrail) => <li key={guardrail}>• {guardrail}</li>)}
         </ul>
+      </Card>
+
+      <Card className="mt-6 border-indigo-200 bg-indigo-50/70">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-indigo-800">Entitlement gates</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Premium features fail closed until subscription access is active</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+              The entitlement catalog defines the server gate and UI copy for OCR history, advanced forecasts, unlimited alerts, and export features before paid plans launch.
+            </p>
+          </div>
+          <Link className="rounded-full bg-indigo-900 px-5 py-3 text-sm font-black text-white shadow-sm" href="/account">
+            Check account access
+          </Link>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          {premiumEntitlementCatalog.map((gate) => (
+            <div className="rounded-2xl bg-white p-4 shadow-sm" key={gate.feature}>
+              <p className="text-sm font-black text-slate-950">{gate.label}</p>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">Free: {gate.freeLimit}</p>
+              <p className="mt-2 rounded-xl bg-indigo-50 p-3 text-sm font-bold leading-6 text-indigo-950">Premium: {gate.premiumAccess}</p>
+              <p className="mt-2 font-mono text-xs font-bold text-slate-500">{gate.enforcementReason}</p>
+            </div>
+          ))}
+        </div>
       </Card>
 
       <Card className="mt-6 border-violet-200 bg-violet-50/80">

@@ -1,7 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { affiliateDisclosureLabel, buildAffiliateOutboundUrl, type AffiliateLinkMetadata } from '@/lib/analytics';
+import {
+  affiliateDisclosureKind,
+  affiliateDisclosureLabel,
+  buildAffiliateOutboundUrl,
+  type AffiliateDisclosureKind,
+  type AffiliateLinkMetadata
+} from '@/lib/analytics';
 
 type DisclosureStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
 type BrowserSession = { accessToken: string; userId: string };
@@ -36,10 +42,42 @@ const defaultSponsoredPlacementSlots: AdPlacementSlot[] = [
   }
 ];
 
+const disclosurePreviewLinks: Record<AffiliateDisclosureKind, AffiliateLinkMetadata> = {
+  affiliate: {
+    campaignId: 'spring-grocery-affiliate',
+    dealId: 'preview-affiliate-deal',
+    destinationUrl: 'https://example.com/deals/affiliate',
+    disclosureKind: 'affiliate',
+    placement: 'deal_card',
+    productId: 'preview-product',
+    retailerName: 'Example Market',
+    surface: 'deal-card-primary'
+  },
+  outbound: {
+    destinationUrl: 'https://example.com/store',
+    disclosureKind: 'outbound',
+    placement: 'store_link',
+    retailerName: 'Example Market',
+    sponsored: false,
+    surface: 'deal-card-store'
+  },
+  sponsored: {
+    campaignId: 'sponsored-slot-preview',
+    dealId: 'preview-sponsored-deal',
+    destinationUrl: 'https://example.com/sponsored',
+    disclosureKind: 'sponsored',
+    placement: 'deal_card',
+    productId: 'preview-product',
+    retailerName: 'Example Market',
+    sponsored: true,
+    surface: 'sponsored-discovery-rail'
+  }
+};
+
 export function AffiliateDisclosureNotice({ metadata }: Readonly<{ metadata: AffiliateLinkMetadata }>) {
   const label = affiliateDisclosureLabel(metadata);
   return (
-    <span className="mt-2 block rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold leading-5 text-amber-950" data-affiliate-disclosure={metadata.sponsored === false ? 'outbound' : 'affiliate'}>
+    <span className="mt-2 block rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold leading-5 text-amber-950" data-affiliate-disclosure={affiliateDisclosureKind(metadata)}>
       {label}
     </span>
   );
@@ -59,6 +97,7 @@ export function AdDisclosureActions() {
   const [status, setStatus] = useState<DisclosureStatus>('idle');
   const [message, setMessage] = useState('No anonymous ad disclosure. Sign in first to load account-scoped sponsored placement rules.');
   const [disclosure, setDisclosure] = useState<AdDisclosureReport | null>(null);
+  const [previewDisclosureKind, setPreviewDisclosureKind] = useState<AffiliateDisclosureKind>('affiliate');
 
   function requireSession(): BrowserSession | null {
     const session = readSession();
@@ -96,6 +135,7 @@ export function AdDisclosureActions() {
   const slots = disclosure?.placementPlan?.slots ?? [];
   const sponsoredSlotPreview = slots.length ? slots : defaultSponsoredPlacementSlots;
   const guardrails = disclosure?.guardrails ?? ['Sponsored placements cannot change Deal Score, basket totals, or store ordering.'];
+  const previewMetadata = disclosurePreviewLinks[previewDisclosureKind];
 
   return (
     <section className="mt-6 rounded-3xl border border-sky-200 bg-white p-5 shadow-sm" aria-label="Ad disclosure controls">
@@ -112,6 +152,26 @@ export function AdDisclosureActions() {
         <p className="text-sm font-black text-amber-950">Outbound link disclosure contract</p>
         <p className="mt-2 text-sm font-semibold leading-6 text-amber-950">
           Store and deal links must carry affiliate metadata, open with sponsored/noopener rel attributes, and show a nearby disclosure that commissions never affect Deal Score, basket totals, or ranking.
+        </p>
+      </div>
+
+      <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4" aria-label="Affiliate disclosure preview controls">
+        <p className="text-sm font-black text-slate-950">Deal-card disclosure preview</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {(['affiliate', 'sponsored', 'outbound'] as const).map((kind) => (
+            <button
+              className={`rounded-full px-3 py-1.5 text-xs font-black ${previewDisclosureKind === kind ? 'bg-slate-950 text-white' : 'bg-white text-slate-700'}`}
+              key={kind}
+              onClick={() => setPreviewDisclosureKind(kind)}
+              type="button"
+            >
+              {kind}
+            </button>
+          ))}
+        </div>
+        <AffiliateDisclosureNotice metadata={previewMetadata} />
+        <p className="mt-2 break-all rounded-xl bg-white px-3 py-2 text-xs font-bold text-slate-700">
+          Tracked href: {affiliateTrackedHref(previewMetadata)}
         </p>
       </div>
 
