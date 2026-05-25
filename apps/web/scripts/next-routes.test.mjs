@@ -893,6 +893,8 @@ describe('verified-data UI', () => {
     assert.match(brandedFuelConnector, /amenity"="fuel/);
     assert.match(brandedFuelConnector, /Circle K/);
     assert.match(brandedFuelConnector, /OKQ8/);
+    assert.match(brandedFuelConnector, /supportedFuelGradeIdsFromTags/);
+    assert.match(brandedFuelConnector, /fuel:adblue/);
     assert.match(verified, /export const fuelStationSourceCoverage/);
     assert.match(verified, /fetchOverpassFuelStations/);
     assert.match(verified, /amenity=fuel/);
@@ -900,9 +902,11 @@ describe('verified-data UI', () => {
     assert.match(fuelArtifact, /fetched with curl from Overpass/);
     assert.match(fuelArtifact, /"latitude"/);
     assert.match(fuelArtifact, /"longitude"/);
+    assert.match(fuelArtifact, /supportedGradeIds/);
     assert.match(fuelRoute, /fuelStationSourceCoverage/);
     assert.match(fuelRoute, /fuelStations\.map/);
     assert.match(fuelRoute, /fuelStationPosition/);
+    assert.match(fuelRoute, /stationSupportedGrades/);
     assert.match(fuelRoute, /fuelStationSource\.chainCounts/);
     assert.match(fuelRoute, /OSM fuel station source/);
     assert.match(fuelRoute, /amenity=fuel/);

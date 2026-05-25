@@ -367,7 +367,7 @@ describe('api contract schemas', () => {
     assert.ok(price.required.includes('sourceType'));
     assert.ok(price.required.includes('provenance'));
     assert.deepEqual(price.properties.priceType.enum, ['shelf', 'member', 'promotion', 'estimated']);
-    assert.deepEqual(apiContractOpenApiComponents.FuelPriceObservation.properties.fuelGrade.enum, ['95', '98', 'diesel', 'hvo100', 'e85']);
+    assert.deepEqual(apiContractOpenApiComponents.FuelPriceObservation.properties.fuelGrade.enum, ['95', '98', 'diesel', 'hvo100', 'e85', 'adblue']);
     assert.deepEqual(apiContractOpenApiComponents.NotificationInboxResponse.properties.queue.items, {
       $ref: '#/components/schemas/NotificationInboxQueueItem'
     });
