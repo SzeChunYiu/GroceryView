@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { OcrScanHistoryTimeline } from '@/components/ocr-scan-history-timeline';
 import { ScannerUploadActions } from '@/components/scanner-upload-actions';
+import { barcodeMissFallbackProducts } from '@/lib/openfoodfacts-catalog';
 import { routeMetadata } from '@/lib/seo';
 import { receiptFedAliasGrowthPlan } from '@/lib/verified-data';
 
@@ -119,7 +120,7 @@ export default function ScannerPage() {
         </div>
       </Card>
       <div id="scan" className="scroll-mt-24">
-        <ScannerUploadActions />
+        <ScannerUploadActions fallbackProducts={barcodeMissFallbackProducts} />
       </div>
       <div id="scan-history" className="scroll-mt-24">
         <OcrScanHistoryTimeline />
