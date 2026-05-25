@@ -48,6 +48,10 @@ function stationAddress(station: (typeof fuelStations)[number]) {
   return [station.street, station.houseNumber, station.postcode, station.city].filter(Boolean).join(', ');
 }
 
+function stationSupportedGrades(station: (typeof fuelStations)[number]) {
+  return station.supportedGradeIds?.length ? station.supportedGradeIds.join(', ') : 'Grade support not tagged';
+}
+
 type FuelGrade = VerifiedFuelPriceObservation['grade'];
 type FuelTerminalRow = {
   id: string;
@@ -478,16 +482,17 @@ export default async function FuelPage({ searchParams }: Readonly<{ searchParams
         </div>
 
         <div className="mt-5 overflow-hidden rounded-lg border border-sky-100 bg-white">
-          <div className="hidden grid-cols-[1fr_0.6fr_1fr_0.7fr_0.7fr] gap-3 border-b border-slate-100 px-4 py-3 text-xs font-black uppercase tracking-[0.16em] text-slate-500 md:grid">
+          <div className="hidden grid-cols-[1fr_0.5fr_1fr_0.9fr_0.6fr_0.6fr] gap-3 border-b border-slate-100 px-4 py-3 text-xs font-black uppercase tracking-[0.16em] text-slate-500 md:grid">
             <span>Station</span>
             <span>Chain</span>
             <span>Address</span>
+            <span>Supported grades</span>
             <span>Latitude</span>
             <span className="text-right">Longitude</span>
           </div>
           {fuelStations.slice(0, 120).map((station) => (
             <div
-              className="grid gap-2 border-b border-slate-100 px-4 py-3 text-sm last:border-b-0 md:grid-cols-[1fr_0.6fr_1fr_0.7fr_0.7fr]"
+              className="grid gap-2 border-b border-slate-100 px-4 py-3 text-sm last:border-b-0 md:grid-cols-[1fr_0.5fr_1fr_0.9fr_0.6fr_0.6fr]"
               key={`${station.osmType}-${station.osmId}-row`}
             >
               <span className="min-w-0">
@@ -496,6 +501,7 @@ export default async function FuelPage({ searchParams }: Readonly<{ searchParams
               </span>
               <span className="font-semibold text-slate-700">{station.chain}</span>
               <span className="truncate text-slate-600">{stationAddress(station) || 'Address not tagged'}</span>
+              <span className="text-xs font-semibold leading-5 text-slate-600">{stationSupportedGrades(station)}</span>
               <span className="tabular-nums text-slate-700">{station.latitude.toFixed(5)}</span>
               <span className="tabular-nums text-slate-700 md:text-right">{station.longitude.toFixed(5)}</span>
             </div>

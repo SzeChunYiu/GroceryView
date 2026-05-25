@@ -7,7 +7,7 @@ export const priceTypeSchema = z.enum(['shelf', 'member', 'promotion', 'estimate
 export const confidenceSchema = z.enum(['high', 'medium', 'low', 'unverified']);
 export const sourceTypeSchema = z.enum(['retailer_api', 'retailer_page', 'receipt_scan', 'manual_review', 'seed_stub']);
 export const priceDomainSchema = z.enum(['grocery', 'fuel', 'pharmacy']);
-export const fuelGradeSchema = z.enum(['95', '98', 'diesel', 'hvo100', 'e85']);
+export const fuelGradeSchema = z.enum(['95', '98', 'diesel', 'hvo100', 'e85', 'adblue']);
 export const fuelPriceSourceSchema = z.discriminatedUnion('kind', [
   z.object({
     kind: z.literal('operator_public_price_page'),

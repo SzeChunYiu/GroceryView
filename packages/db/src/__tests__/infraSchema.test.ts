@@ -294,7 +294,7 @@ describe('infra/db PostgreSQL schema contract', () => {
       assert.match(schemaDoc, new RegExp(`### \`${table}\``), `${table} missing from SCHEMA.md`);
       assert.match(migrationVerifier, new RegExp(`\\b${table}\\b`), `${table} missing from migration verifier`);
     }
-    for (const grade of ['fuel-95-e10', 'fuel-98', 'fuel-diesel', 'fuel-hvo100', 'fuel-e85']) {
+    for (const grade of ['fuel-95-e10', 'fuel-98', 'fuel-diesel', 'fuel-hvo100', 'fuel-e85', 'fuel-adblue']) {
       assert.match(allMigrations, new RegExp(grade), `${grade} missing from fuel grade catalog`);
     }
     assert.match(allMigrations, /operator_public_price_page/);
@@ -302,7 +302,10 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(allMigrations, /original_price_text text not null/);
     assert.match(allMigrations, /alter table products add column if not exists fuel_grade_id/);
     assert.match(allMigrations, /products_fuel_grade_domain_check/);
+    assert.match(allMigrations, /supported_fuel_grade_ids text\[\]/);
+    assert.match(allMigrations, /stores_supported_fuel_grade_ids_check/);
     assert.match(schemaDoc, /fuel prices are always price per litre/);
+    assert.match(schemaDoc, /supported_fuel_grade_ids/);
     assert.match(schemaDoc, /community_reporter_trust/);
   });
 
