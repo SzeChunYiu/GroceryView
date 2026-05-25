@@ -1446,6 +1446,7 @@ describe('fetchCoopProducts', () => {
       promotionText: 'Arvid Nordquist 2 för 130-2 för 130:-',
       promotionPrice: 130,
       medMeraRequired: false,
+      is_member_price: false,
       availableOnline: true,
       sourceUrl: buildCoopSearchUrl(),
       productUrl: 'https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-mellanrost-7310760012896/',
@@ -4073,6 +4074,37 @@ describe('fetchCoopProductsForAllStores', () => {
 });
 
 describe('fetchWillysProductsForAllStores', () => {
+  it('emits separate Willys list and member price rows when medlemspris is present', async () => {
+    const fetchImpl: typeof fetch = async () => new Response(JSON.stringify({
+      results: [{
+        code: 'willys-member-price-coffee',
+        name: 'Willys medlemspris kaffe',
+        manufacturer: 'Garant',
+        productLine2: '450 g',
+        priceValue: 42.9,
+        price: '42,90 kr',
+        potentialPromotions: [{
+          code: 'member-coffee',
+          mainProductCode: 'willys-member-price-coffee',
+          promotionType: 'MEDLEMSPRIS',
+          cartLabel: 'Medlemspris 35,90 kr',
+          price: 35.9
+        }]
+      }]
+    }), { status: 200, headers: { 'content-type': 'application/json' } });
+
+    const rows = await fetchWillysProducts({
+      fetchImpl,
+      queries: ['kaffe'],
+      retrievedAt: '2026-05-25T12:55:00.000Z'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.is_member_price, row.price, row.listPrice, row.memberPrice, row.priceText]), [
+      [false, 42.9, 42.9, 35.9, '42,90 kr'],
+      [true, 35.9, 42.9, 35.9, 'Medlemspris 35,90 kr']
+    ]);
+  });
+
   it('fans Willys branch product prices across the live store catalog using the store search parameter', async () => {
     const requestedUrls: string[] = [];
     const fetchImpl: typeof fetch = async (url) => {
@@ -5834,10 +5866,13 @@ function dailyConnectorFixture(chainId: string) {
   };
 }
 
-function firstBatchObservation(executor: DailyIngestionExecutor) {
+function batchObservations(executor: DailyIngestionExecutor) {
   const observationInsert = executor.calls.find((call) => call.sql.includes('insert into observations'));
-  const observations = JSON.parse(String(observationInsert?.params[0])) as Array<Record<string, unknown>>;
-  return observations[0] ?? {};
+  return JSON.parse(String(observationInsert?.params[0])) as Array<Record<string, unknown>>;
+}
+
+function firstBatchObservation(executor: DailyIngestionExecutor) {
+  return batchObservations(executor)[0] ?? {};
 }
 
 function firstBatchProduct(executor: DailyIngestionExecutor) {
@@ -7071,22 +7106,25 @@ describe('daily ingestion runner', () => {
           manufacturerName: 'Coop',
           packageSizeInformation: '100-pack',
           availableOnline: false,
-          salesPriceData: { b2cPrice: 19.5 }
+          salesPriceData: { b2cPrice: 19.5 },
+          onlinePromotions: [{ message: 'Medlemspris', priceData: { b2cPrice: 15 }, medMeraRequired: true }]
         }] } }), { status: 200, headers: { 'content-type': 'application/json' } });
       }
     });
 
     assert.equal(result.status, 'succeeded');
-    assert.equal(result.acceptedCount, 1);
+    assert.equal(result.acceptedCount, 2);
     assert.deepEqual(requestedUrls.filter((url) => !url.includes('handla')), [
       buildCoopStoresUrl(),
       buildCoopStoreInfoUrl('251300'),
       buildCoopSearchUrl('251300')
     ]);
-    const observation = firstBatchObservation(executor);
-    assert.equal(observation.store_id, 'store-db-2');
-    assert.equal(observation.price, 19.5);
-    assert.equal(observation.is_available, false);
+    const observations = batchObservations(executor);
+    assert.deepEqual(observations.map((observation) => [observation.store_id, observation.price, observation.member_required, observation.regular_price]), [
+      ['store-db-2', 19.5, false, undefined],
+      ['store-db-2', 15, true, 19.5]
+    ]);
+    assert.equal(observations[0]?.is_available, false);
   });
 
 
