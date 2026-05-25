@@ -153,7 +153,8 @@ create table if not exists user_preferences (
   dietary_preferences jsonb not null default '{}'::jsonb,
   notification_preferences jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  constraint user_preferences_favorite_stores_count_check check (cardinality(favorite_stores) <= 5)
 );
 
 create table if not exists favorite_stores (

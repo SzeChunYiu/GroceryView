@@ -1615,6 +1615,54 @@ describe('createHttpHandler', () => {
     assert.equal((await handle(new Request('http://localhost/api/deals/friend-share-signals', { method: 'POST', body: '{}' }))).status, 400);
   });
 
+  it('persists ordered preferred stores for signed-in settings preferences', async () => {
+    const token = await createSessionToken({ userId: 'settings-user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'secret');
+    const otherToken = await createSessionToken({ userId: 'settings-user-2', expiresAt: '2099-01-01T00:00:00.000Z' }, 'secret');
+    const handle = createHttpHandler(undefined, { authSecret: 'secret', now: new Date('2026-05-20T12:00:00.000Z') });
+
+    const unauthenticated = await handle(new Request('http://localhost/api/settings?userId=settings-user-1'));
+    assert.equal(unauthenticated.status, 401);
+
+    const forbidden = await handle(new Request('http://localhost/api/settings?userId=settings-user-1', {
+      method: 'PATCH',
+      headers: { authorization: `Bearer ${otherToken}` },
+      body: JSON.stringify({ preferredStores: ['willys-odenplan'] })
+    }));
+    assert.equal(forbidden.status, 403);
+
+    const saved = await handle(new Request('http://localhost/api/settings?userId=settings-user-1', {
+      method: 'PATCH',
+      headers: { authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        currency: 'EUR',
+        preferredStores: ['willys-odenplan', 'lidl-sveavagen', 'coop-odenplan'],
+        notificationChannels: ['push'],
+        algorithm_choice: 'watchlist_first'
+      })
+    }));
+    assert.equal(saved.status, 200);
+    assert.deepEqual(await json(saved), {
+      userId: 'settings-user-1',
+      currency: 'EUR',
+      preferredStores: ['willys-odenplan', 'lidl-sveavagen', 'coop-odenplan'],
+      notificationChannels: ['push'],
+      algorithm_choice: 'watchlist_first'
+    });
+
+    const readBack = await handle(new Request('http://localhost/api/settings?userId=settings-user-1', {
+      headers: { authorization: `Bearer ${token}` }
+    }));
+    assert.equal(readBack.status, 200);
+    assert.deepEqual((await json(readBack) as { preferredStores: string[] }).preferredStores, ['willys-odenplan', 'lidl-sveavagen', 'coop-odenplan']);
+
+    const tooMany = await handle(new Request('http://localhost/api/settings?userId=settings-user-1', {
+      method: 'PATCH',
+      headers: { authorization: `Bearer ${token}` },
+      body: JSON.stringify({ preferredStores: ['one', 'two', 'three', 'four', 'five', 'six'] })
+    }));
+    assert.equal(tooMany.status, 400);
+  });
+
   it('deletes signed-in settings account data after explicit confirmation', async () => {
     const api = createGroceryViewApi();
     api.addFavoriteStore('user-1', 'willys-odenplan');
