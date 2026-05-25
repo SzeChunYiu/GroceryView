@@ -3,7 +3,8 @@ import { describe, it } from 'node:test';
 import {
   buildCoopSearchUrl,
   fetchCoopProducts,
-  normalizeCoopProduct
+  normalizeCoopProduct,
+  normalizeCoopProductPriceRows
 } from '../coop.js';
 
 const RETRIEVED_AT = '2026-05-25T11:30:00.000Z';
@@ -95,7 +96,7 @@ describe('Coop connector fixture parsing', () => {
       resultsOptions: { skip: 0, take: 10, sortBy: [], facets: [] },
       relatedResultsOptions: { skip: 0, take: 16 }
     });
-    assert.equal(rows.length, 2);
+    assert.equal(rows.length, 3);
     assert.deepEqual(rows[0], {
       code: '7340011455014',
       ean: '7340011455014',
@@ -110,15 +111,26 @@ describe('Coop connector fixture parsing', () => {
       unitPriceUnit: 'kr/l',
       promotionText: 'Medlemspris',
       promotionPrice: 15.9,
-      medMeraRequired: true,
+      medMeraRequired: false,
+      is_member_price: false,
       availableOnline: true,
       sourceUrl: SOURCE_URL,
       productUrl: 'https://www.coop.se/handla/varor/mejeri/mjolk/arla-ko-mellanmjolk-1-5-1-l-7340011455014/',
       imageUrl: 'https://assets.coop.se/mellanmjolk.jpg',
       retrievedAt: RETRIEVED_AT
     });
-    assert.equal(rows[1]?.soldByWeight, true);
-    assert.deepEqual(rows.map((row) => row.code), ['7340011455014', '2365029200001']);
+    assert.deepEqual(rows[1], {
+      ...rows[0]!,
+      code: '7340011455014:member',
+      price: 15.9,
+      priceText: '15.90 SEK',
+      promotionPrice: 15.9,
+      medMeraRequired: true,
+      is_member_price: true,
+      listPrice: 17.9
+    });
+    assert.equal(rows[2]?.soldByWeight, true);
+    assert.deepEqual(rows.map((row) => row.code), ['7340011455014', '7340011455014:member', '2365029200001']);
   });
 
   it('normalizes edge cases without emitting malformed product rows', () => {
@@ -127,6 +139,18 @@ describe('Coop connector fixture parsing', () => {
     assert.equal(
       normalizeCoopProduct({ id: 'string-price', name: 'String price', salesPriceData: { b2cPrice: '12.50' } }, SOURCE_URL, RETRIEVED_AT)?.price,
       12.5
+    );
+    assert.deepEqual(
+      normalizeCoopProductPriceRows({
+        id: 'member-cheese',
+        name: 'Member cheese',
+        salesPriceData: { b2cPrice: 79 },
+        onlinePromotions: [{ message: 'Medlemspris', priceData: { b2cPrice: 59 }, medMeraRequired: true }]
+      }, SOURCE_URL, RETRIEVED_AT).map((row) => ({ code: row.code, price: row.price, is_member_price: row.is_member_price, memberOnly: row.medMeraRequired })),
+      [
+        { code: 'member-cheese', price: 79, is_member_price: false, memberOnly: false },
+        { code: 'member-cheese:member', price: 59, is_member_price: true, memberOnly: true }
+      ]
     );
   });
 
