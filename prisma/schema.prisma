@@ -47,6 +47,20 @@ model Product {
   @@map("products")
 }
 
+model User {
+  id                         String    @id
+  email                      String?   @unique
+  passwordHash               String?   @map("password_hash")
+  emailVerifiedAt            DateTime? @map("email_verified_at") @db.Timestamptz(6)
+  emailVerificationTokenHash String?   @map("email_verification_token_hash")
+  emailVerificationSentAt    DateTime? @map("email_verification_sent_at") @db.Timestamptz(6)
+  createdAt                  DateTime  @default(now()) @map("created_at")
+  updatedAt                  DateTime  @updatedAt @map("updated_at")
+
+  @@index([emailVerifiedAt])
+  @@map("app_users")
+}
+
 model UserStoreLoyaltyCard {
   id        String   @id @default(uuid()) @db.Uuid
   userId    String   @map("user_id")

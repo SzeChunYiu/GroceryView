@@ -33,6 +33,32 @@ export type CheapestThisWeekDigestEmailInput = {
   generatedAt: string;
 };
 
+export type EmailVerificationEmailInput = {
+  recipientEmail: string;
+  verificationUrl: string;
+  expiresAt: string;
+};
+
+export function buildEmailVerificationEmail(input: EmailVerificationEmailInput): TransactionalEmailMessage {
+  return {
+    to: input.recipientEmail,
+    subject: 'Verify your GroceryView email',
+    text: [
+      'Welcome to GroceryView.',
+      '',
+      'Verify your email address before creating price alerts or saving account lists:',
+      input.verificationUrl,
+      '',
+      `This verification link expires at ${input.expiresAt}.`,
+      'If you did not create a GroceryView account, you can ignore this email.'
+    ].join('\n'),
+    metadata: {
+      type: 'email_verification',
+      expiresAt: input.expiresAt
+    }
+  };
+}
+
 export function buildCheapestThisWeekDigestEmail(input: CheapestThisWeekDigestEmailInput): TransactionalEmailMessage {
   const topDeals = input.deals.slice(0, 10);
   const subject = topDeals.length === 0
