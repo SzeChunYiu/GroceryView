@@ -5,7 +5,7 @@ import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { StoreComparisonTable } from '@/components/StoreComparisonTable';
 import { StorePriceMatrix } from '@/components/store-price-matrix';
-import { COMPARE_CHAIN_ORDER, buildBasketStoreComparison, buildChainComparisonTable } from '@/lib/chain-compare';
+import { COMPARE_CHAIN_ORDER, buildBasketStoreComparison, buildChainComparisonTable, parseCompareChainsParam } from '@/lib/chain-compare';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, commodityComparisons, compareOverlayChart, formatPct, formatSek, matchedChainProducts, privateLabelDupeFinder } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
@@ -24,15 +24,26 @@ function formatComparableUnitPrice(value: number | null | undefined, unitLabel: 
 }
 
 type SearchParams = {
+  chains?: string | string[];
   products?: string | string[];
   routeMode?: string | string[];
 };
+
+function compareHref(productsParam: string | string[] | undefined, selectedChainIds: string[]) {
+  const params = new URLSearchParams();
+  const products = Array.isArray(productsParam) ? productsParam[0] : productsParam;
+  if (products) params.set('products', products);
+  if (selectedChainIds.length < COMPARE_CHAIN_ORDER.length) params.set('chains', selectedChainIds.join(','));
+  const query = params.toString();
+  return `/compare${query ? `?${query}` : ''}`;
+}
 
 export default async function ComparePage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
   const productsParam = resolvedSearchParams.products;
   const comparison = buildChainComparisonTable(productsParam);
-  const basketStoreComparison = buildBasketStoreComparison(productsParam);
+  const selectedChainIds = parseCompareChainsParam(resolvedSearchParams.chains);
+  const basketStoreComparison = buildBasketStoreComparison(productsParam, resolvedSearchParams.chains);
   const cheapestBasketStore = basketStoreComparison.stores.find((store) => store.highlightLabels.includes('Cheapest'));
   const closestBasketStore = basketStoreComparison.stores.find((store) => store.highlightLabels.includes('Closest'));
   const bestStockedBasketStore = basketStoreComparison.stores.find((store) => store.highlightLabels.includes('Best stocked'));
@@ -41,10 +52,20 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
   const commodityRows = comparison.products.filter((product) => product.matchType === 'commodity_alias');
   const sampleProductsHref = '/compare?products=makaroner-pasta-101302991-st,havregryn-extra-fylliga-101758934-st';
   const chainSelectorOptions = COMPARE_CHAIN_ORDER.map((chain) => ({
+    href: compareHref(
+      productsParam,
+      selectedChainIds.includes(chain.id)
+        ? selectedChainIds.length === 1
+          ? selectedChainIds
+          : selectedChainIds.filter((chainId) => chainId !== chain.id)
+        : [...selectedChainIds, chain.id]
+    ),
     id: chain.id,
     label: chain.label,
-    description: 'Shown as a side-by-side comparison column.',
-    selected: true
+    description: selectedChainIds.includes(chain.id)
+      ? 'Shown in the side-by-side basket comparison.'
+      : 'Add this chain to the side-by-side basket comparison.',
+    selected: selectedChainIds.includes(chain.id)
   }));
   const rowSections = [
     {
