@@ -2,7 +2,7 @@ import { PersonalizedPriceDropFeed, PriceDropDiscoveryRail } from '@/app/page-se
 import { BasketBuilder, type BasketBuilderProduct } from '@/components/basket-builder';
 import { PersonalizedRecommendations } from '@/components/personalized-recommendations';
 import { MarketShell } from '@/components/market-shell';
-import { PwaInstall, PwaInstallEducationCard } from '@/components/pwa-install';
+import { PwaInstallEducationCard } from '@/components/pwa-install';
 import { homePastPurchaseShortcuts } from '@/lib/recurring-basket';
 import { routeMetadata } from '@/lib/seo';
 
@@ -38,7 +38,6 @@ export default function HomePage() {
       </section>
       <PwaInstallEducationCard />
       <MarketShell />
-      <PwaInstall />
     </>
   );
 }
