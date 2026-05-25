@@ -1,4 +1,5 @@
 import type { PantryItemRecord } from '@groceryview/db';
+import type { PantryDeal } from '@groceryview/core';
 
 export type PantryStockStatus = 'healthy' | 'low' | 'depleted';
 
@@ -38,6 +39,14 @@ export type PantryStatusRow = {
   minimumQuantity: number;
   daysUntilExpiry?: number | null;
   expiresAt?: string | null;
+};
+
+export type PantryDealEvidence = {
+  productId: string;
+  storeName: string;
+  price: number;
+  dealScore: number | null;
+  href: string;
 };
 
 function roundQuantity(value: number) {
@@ -124,4 +133,40 @@ export function applyPantryConsumptionEvents(items: PantryStockItem[], events: P
       status: getStockStatus(ownedQuantity, item.minimumQuantity)
     };
   });
+}
+
+export function buildPantryDealEvidence(
+  deals: readonly PantryDeal[],
+  productId: string,
+  href = `/deals?replace=${encodeURIComponent(productId)}`
+): PantryDealEvidence | null {
+  const bestDeal = deals
+    .filter((deal) => deal.productId === productId && deal.storeName.trim().length > 0 && Number.isFinite(deal.price))
+    .sort((left, right) => {
+      const scoreDelta = (right.dealScore ?? 0) - (left.dealScore ?? 0);
+      return scoreDelta === 0 ? left.price - right.price : scoreDelta;
+    })[0];
+
+  if (!bestDeal) {
+    return null;
+  }
+
+  return {
+    productId,
+    storeName: bestDeal.storeName,
+    price: bestDeal.price,
+    dealScore: bestDeal.dealScore ?? null,
+    href
+  };
+}
+
+export function buildPantryDealEvidenceMap(
+  deals: readonly PantryDeal[],
+  productHrefs: Readonly<Record<string, string>>
+) {
+  return Object.fromEntries(
+    Object.entries(productHrefs)
+      .map(([productId, href]) => [productId, buildPantryDealEvidence(deals, productId, href)] as const)
+      .filter((entry): entry is readonly [string, PantryDealEvidence] => entry[1] !== null)
+  );
 }
