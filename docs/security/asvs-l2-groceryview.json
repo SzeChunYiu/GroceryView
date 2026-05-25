@@ -1,0 +1,376 @@
+{
+  "schemaVersion": 1,
+  "standard": {
+    "name": "OWASP Application Security Verification Standard",
+    "version": "5.0.0",
+    "source": "https://owasp.org/www-project-application-security-verification-standard/",
+    "referenceFormat": "v5.0.0-<requirement_id>"
+  },
+  "scope": {
+    "application": "GroceryView",
+    "verificationLevel": "L2",
+    "flows": [
+      {
+        "id": "web",
+        "description": "Next.js web routes, browser security headers, route handlers, and user-facing account surfaces."
+      },
+      {
+        "id": "api",
+        "description": "Nest/HTTP APIs, public API routes, OpenAPI contracts, webhook endpoints, and service middleware."
+      },
+      {
+        "id": "auth",
+        "description": "Bearer sessions, authentication exchange, authorization middleware, and session lifecycle controls."
+      },
+      {
+        "id": "data",
+        "description": "Account preferences, privacy export/deletion, receipts/scans, notification data, and logged personal data."
+      }
+    ]
+  },
+  "changedAreaPolicy": [
+    {
+      "id": "auth",
+      "description": "Authentication/session/token implementation or tests changed.",
+      "pathPatterns": [
+        "^packages/auth/",
+        "^packages/server/src/__tests__/auth-http\\.test\\.ts$",
+        "^packages/server/src/index\\.ts$",
+        "^apps/api/src/middleware/auth\\.ts$",
+        "^apps/web/src/app/api/auth/",
+        "^apps/web/src/app/login/"
+      ],
+      "requiredControlIds": [
+        "asvs-v6-authentication-documentation",
+        "asvs-v7-session-lifecycle",
+        "asvs-v9-token-validation"
+      ]
+    },
+    {
+      "id": "api",
+      "description": "API, OpenAPI, webhook, middleware, or public route behavior changed.",
+      "pathPatterns": [
+        "^apps/api/src/",
+        "^apps/api/docs/openapi\\.yaml$",
+        "^packages/server/src/",
+        "^packages/server/__tests__/",
+        "^apps/web/src/app/api/"
+      ],
+      "requiredControlIds": [
+        "asvs-v1-injection-prevention",
+        "asvs-v2-anti-automation",
+        "asvs-v4-web-service-security",
+        "asvs-v8-authorization",
+        "asvs-v16-security-logging"
+      ]
+    },
+    {
+      "id": "user-data",
+      "description": "Account, privacy, receipts, scans, notifications, favorites, household, or preference data changed.",
+      "pathPatterns": [
+        "^apps/api/src/(account|privacy|receipts|users|settings|favorites|households|alerts|notifications)/",
+        "^apps/web/src/app/(account|settings|favorites|favourites|household|scanner|watchlist|privacy)/",
+        "^apps/web/src/app/api/(account|alerts|export|my-flyer|notification|notifications|privacy|saved-searches)/",
+        "^apps/mobile/src/(offlineMutations|queryCache|appSession|index)\\.ts$",
+        "^docs/PRIVACY\\.md$"
+      ],
+      "requiredControlIds": [
+        "asvs-v8-authorization",
+        "asvs-v14-sensitive-data-inventory",
+        "asvs-v14-sensitive-data-caching",
+        "asvs-v16-sensitive-log-protection"
+      ]
+    },
+    {
+      "id": "web-frontend",
+      "description": "Browser security, middleware, user-generated content, or upload UI changed.",
+      "pathPatterns": [
+        "^apps/web/src/middleware\\.ts$",
+        "^apps/web/src/app/global-error\\.tsx$",
+        "^apps/web/src/components/(barcode-scanner|scanner-upload-actions)\\.tsx$",
+        "^apps/web/src/app/api/social/",
+        "^apps/web/src/app/scanner/"
+      ],
+      "requiredControlIds": [
+        "asvs-v1-output-encoding",
+        "asvs-v3-browser-security-headers",
+        "asvs-v5-file-upload-contract",
+        "asvs-v16-security-logging"
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "asvs-v1-output-encoding",
+      "asvs": {
+        "requirementId": "V1.1.2",
+        "reference": "v5.0.0-V1.1.2",
+        "chapter": "V1 Encoding and Sanitization",
+        "section": "V1.1 Encoding and Sanitization Architecture",
+        "level": "L2"
+      },
+      "status": "mapped",
+      "evidence": [
+        {
+          "type": "test",
+          "path": "apps/web/scripts/product-safety-warnings.test.mjs",
+          "summary": "Static route checks cover warning copy escaping and avoid direct HTML injection paths."
+        },
+        {
+          "type": "code",
+          "path": "apps/web/src/app/global-error.tsx",
+          "summary": "Global error UI renders structured React text rather than raw HTML."
+        }
+      ]
+    },
+    {
+      "id": "asvs-v1-injection-prevention",
+      "asvs": {
+        "requirementId": "V1.2.5",
+        "reference": "v5.0.0-V1.2.5",
+        "chapter": "V1 Encoding and Sanitization",
+        "section": "V1.2 Injection Prevention",
+        "level": "L2"
+      },
+      "status": "mapped",
+      "evidence": [
+        {
+          "type": "code",
+          "path": "apps/api/src/database/postgres-query-executor.service.ts",
+          "summary": "Database executor receives parameter arrays instead of interpolating request strings directly."
+        },
+        {
+          "type": "test",
+          "path": "packages/server/__tests__/api-products.test.ts",
+          "summary": "Server API product tests exercise query parsing and bounded product lookups."
+        }
+      ]
+    },
+    {
+      "id": "asvs-v2-anti-automation",
+      "asvs": {
+        "requirementId": "V2.4.1",
+        "reference": "v5.0.0-V2.4.1",
+        "chapter": "V2 Validation and Business Logic",
+        "section": "V2.4 Anti-automation",
+        "level": "L2"
+      },
+      "status": "mapped",
+      "evidence": [
+        {
+          "type": "code",
+          "path": "packages/server/src/index.ts",
+          "summary": "Public history and API endpoints include rate-limit response metadata and bounded limits."
+        },
+        {
+          "type": "test",
+          "path": "packages/server/src/__tests__/http.test.ts",
+          "summary": "HTTP route tests cover request validation and bounded responses."
+        }
+      ]
+    },
+    {
+      "id": "asvs-v3-browser-security-headers",
+      "asvs": {
+        "requirementId": "V3.4.5",
+        "reference": "v5.0.0-V3.4.5",
+        "chapter": "V3 Web Frontend Security",
+        "section": "V3.4 Browser Security Mechanism Headers",
+        "level": "L2"
+      },
+      "status": "unknown",
+      "blocker": true,
+      "blockerReason": "Referrer-policy and related browser security headers are not yet mapped to a stable middleware/header smoke test."
+    },
+    {
+      "id": "asvs-v4-web-service-security",
+      "asvs": {
+        "requirementId": "V4.1.3",
+        "reference": "v5.0.0-V4.1.3",
+        "chapter": "V4 API and Web Service",
+        "section": "V4.1 Generic Web Service Security",
+        "level": "L2"
+      },
+      "status": "mapped",
+      "evidence": [
+        {
+          "type": "code",
+          "path": "apps/api/src/middleware/validate.ts",
+          "summary": "API middleware applies request validation before controller handling."
+        },
+        {
+          "type": "test",
+          "path": "packages/server/src/__tests__/openapi.test.ts",
+          "summary": "OpenAPI tests assert documented route security contracts."
+        }
+      ]
+    },
+    {
+      "id": "asvs-v5-file-upload-contract",
+      "asvs": {
+        "requirementId": "V5.1.1",
+        "reference": "v5.0.0-V5.1.1",
+        "chapter": "V5 File Handling",
+        "section": "V5.1 File Handling Documentation",
+        "level": "L2"
+      },
+      "status": "unknown",
+      "blocker": true,
+      "blockerReason": "Scanner upload size, type, and decompression limits are not yet captured in one executable contract."
+    },
+    {
+      "id": "asvs-v6-authentication-documentation",
+      "asvs": {
+        "requirementId": "V6.1.2",
+        "reference": "v5.0.0-V6.1.2",
+        "chapter": "V6 Authentication",
+        "section": "V6.1 Authentication Documentation",
+        "level": "L2"
+      },
+      "status": "mapped",
+      "evidence": [
+        {
+          "type": "code",
+          "path": "packages/auth/src/index.ts",
+          "summary": "Auth package centralizes bearer parsing, session policy planning, and authentication decisions."
+        },
+        {
+          "type": "test",
+          "path": "packages/auth/src/__tests__/auth.test.ts",
+          "summary": "Auth tests cover bearer token parsing and session policy actions."
+        }
+      ]
+    },
+    {
+      "id": "asvs-v7-session-lifecycle",
+      "asvs": {
+        "requirementId": "V7.1.1",
+        "reference": "v5.0.0-V7.1.1",
+        "chapter": "V7 Session Management",
+        "section": "V7.1 Session Management Documentation",
+        "level": "L2"
+      },
+      "status": "mapped",
+      "evidence": [
+        {
+          "type": "code",
+          "path": "packages/auth/src/index.ts",
+          "summary": "Session policy exposes reauthentication and refresh actions based on session state."
+        },
+        {
+          "type": "test",
+          "path": "packages/server/src/__tests__/auth-http.test.ts",
+          "summary": "Server auth HTTP tests validate protected route session behavior."
+        }
+      ]
+    },
+    {
+      "id": "asvs-v8-authorization",
+      "asvs": {
+        "requirementId": "V8.2.3",
+        "reference": "v5.0.0-V8.2.3",
+        "chapter": "V8 Authorization",
+        "section": "V8.2 General Authorization Design",
+        "level": "L2"
+      },
+      "status": "mapped",
+      "evidence": [
+        {
+          "type": "code",
+          "path": "apps/api/src/middleware/auth.ts",
+          "summary": "API auth middleware enforces bearer authentication before protected route handling."
+        },
+        {
+          "type": "test",
+          "path": "packages/server/src/__tests__/human-review-http.test.ts",
+          "summary": "Human-review HTTP tests cover protected action authorization behavior."
+        }
+      ]
+    },
+    {
+      "id": "asvs-v9-token-validation",
+      "asvs": {
+        "requirementId": "V9.2.2",
+        "reference": "v5.0.0-V9.2.2",
+        "chapter": "V9 Self-contained Tokens",
+        "section": "V9.2 Token content",
+        "level": "L2"
+      },
+      "status": "unknown",
+      "blocker": true,
+      "blockerReason": "Audience, purpose, and issuer validation for self-contained tokens is not yet evidenced across every auth entry point."
+    },
+    {
+      "id": "asvs-v14-sensitive-data-inventory",
+      "asvs": {
+        "requirementId": "V14.1.1",
+        "reference": "v5.0.0-V14.1.1",
+        "chapter": "V14 Data Protection",
+        "section": "V14.1 Data Protection Documentation",
+        "level": "L2"
+      },
+      "status": "mapped",
+      "evidence": [
+        {
+          "type": "documentation",
+          "path": "docs/PRIVACY.md",
+          "summary": "Privacy policy documents user data collection, retention, and sensitive free-text constraints."
+        },
+        {
+          "type": "code",
+          "path": "apps/mobile/src/queryCache.ts",
+          "summary": "Mobile cache policy identifies receipt images, auth tokens, and precise location as redacted-before-persist data."
+        }
+      ]
+    },
+    {
+      "id": "asvs-v14-sensitive-data-caching",
+      "asvs": {
+        "requirementId": "V14.2.2",
+        "reference": "v5.0.0-V14.2.2",
+        "chapter": "V14 Data Protection",
+        "section": "V14.2 General Data Protection",
+        "level": "L2"
+      },
+      "status": "unknown",
+      "blocker": true,
+      "blockerReason": "Sensitive-data cache prevention is partially represented in route code, but no single L2 evidence contract covers web, API, and mobile caches."
+    },
+    {
+      "id": "asvs-v16-security-logging",
+      "asvs": {
+        "requirementId": "V16.2.1",
+        "reference": "v5.0.0-V16.2.1",
+        "chapter": "V16 Security Logging and Error Handling",
+        "section": "V16.2 General Logging",
+        "level": "L2"
+      },
+      "status": "mapped",
+      "evidence": [
+        {
+          "type": "code",
+          "path": "apps/api/src/middleware/logger.ts",
+          "summary": "API request logger emits route and request metadata for operational investigation."
+        },
+        {
+          "type": "test",
+          "path": "apps/api/test/request-logging.e2e-spec.ts",
+          "summary": "Request logging tests cover the API logger contract."
+        }
+      ]
+    },
+    {
+      "id": "asvs-v16-sensitive-log-protection",
+      "asvs": {
+        "requirementId": "V16.2.5",
+        "reference": "v5.0.0-V16.2.5",
+        "chapter": "V16 Security Logging and Error Handling",
+        "section": "V16.2 General Logging",
+        "level": "L2"
+      },
+      "status": "unknown",
+      "blocker": true,
+      "blockerReason": "Sensitive-field redaction before application logging is not yet mapped to one shared logger contract."
+    }
+  ]
+}
