@@ -144,6 +144,29 @@ function counterPriceLabelFor(row: ReturnType<typeof crossChainQuoteRowsFor>[num
   return 'Shelf price';
 }
 
+function chainSourceAttributionFor(rows: ReturnType<typeof crossChainQuoteRowsFor>, lastObservedLabel: string) {
+  const sourceRows = rows.map((row) => {
+    const chainLabel = labelFromSlug(row.chain);
+    return {
+      chainLabel,
+      level: quoteConfidenceLevel(row, rows.length),
+      label: `${chainLabel} source`,
+      verificationLabel: row.isAvailable === false ? 'availability caveat' : counterPriceLabelFor(row),
+      details: [
+        { label: 'Observed price', value: formatSek(row.price) },
+        { label: 'Source row', value: row.priceText ? `${row.priceText} · ${row.priceUnit}` : row.priceUnit },
+        { label: 'Observed from', value: lastObservedLabel }
+      ]
+    };
+  });
+
+  return {
+    summary: `Prices observed from: ${sourceRows.map((row) => row.chainLabel).join(', ')}, last ${lastObservedLabel}.`,
+    coverageHref: '/coverage',
+    sourceRows
+  };
+}
+
 function quantileFor(values: number[], quantile: number) {
   const sorted = [...values].filter((value) => Number.isFinite(value)).sort((a, b) => a - b);
   if (sorted.length === 0) return null;
@@ -1366,6 +1389,9 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const commodityComparison = commodityComparisonForProduct(product.slug);
   const localPriceStatistics = localPriceStatisticsForProduct({ slug: product.slug, name: product.name });
   const freshnessBadge = dataFreshnessBadges.find((badge) => badge.sourceKind === (isChain ? 'axfood' : 'openprices')) ?? dataFreshnessBadges[0]!;
+  const chainSourceAttribution = crossChainQuoteRows.length > 0
+    ? chainSourceAttributionFor(crossChainQuoteRows, freshnessBadge.freshnessLabel)
+    : null;
   const productJsonLd = productJsonLdFor(product);
   const breadcrumbJsonLd = breadcrumbJsonLdFor(product);
   return (
@@ -1469,6 +1495,28 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
               </tbody>
             </table>
           </div>
+          {chainSourceAttribution ? (
+            <div className="mt-5 rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm">
+              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <p className="text-sm font-black text-slate-900">{chainSourceAttribution.summary}</p>
+                <Link className="text-sm font-black text-emerald-800 underline decoration-emerald-300 underline-offset-4" href={chainSourceAttribution.coverageHref}>
+                  View coverage
+                </Link>
+              </div>
+              <div className="mt-4 flex flex-wrap gap-3">
+                {chainSourceAttribution.sourceRows.map((sourceRow) => (
+                  <ConfidenceBadge
+                    details={sourceRow.details}
+                    key={sourceRow.chainLabel}
+                    label={sourceRow.label}
+                    level={sourceRow.level}
+                    sampleSize={1}
+                    verificationLabel={sourceRow.verificationLabel}
+                  />
+                ))}
+              </div>
+            </div>
+          ) : null}
         </Card>
       ) : null}
       <Card className="mt-6 border-slate-200 bg-slate-50">
