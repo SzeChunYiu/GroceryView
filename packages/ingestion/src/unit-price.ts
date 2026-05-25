@@ -34,7 +34,7 @@ function parseQuantityString(quantityStr: string): ParsedQuantity {
   if (!normalized) throw new Error('quantityStr must not be empty.');
   if (/(^|[\sx×])-+\s*\d/u.test(normalized)) throw new Error('quantity must be positive.');
 
-  const diaperPackage = /\b(?:blojor|diapers?|strl|storlek|size|comfort)\b/u.test(normalized)
+  const diaperPackage = /\b(?:blojor|diapers?|strl|storlek|size|comfort\d*)\b/u.test(normalized)
     ? parseDiaperPackageClass(normalized)
     : null;
   if (diaperPackage) {
@@ -52,6 +52,11 @@ function parseQuantityString(quantityStr: string): ParsedQuantity {
   const packMatch = normalized.match(/^(\d+(?:[.,]\d+)?)\s*(?:-|\s)?(?:pack|pk|st|styck|pcs|pieces?|rullar?|blöjor?)\b/u);
   if (packMatch) {
     return quantityFromUnit(parseDecimal(packMatch[1]!), 'piece');
+  }
+
+  const perPackageMatch = normalized.match(/^(\d+(?:[.,]\d+)?)\s*(?:per|\/)\s*(?:frp|forp|forpackning|pack|paket)\b/u);
+  if (perPackageMatch) {
+    return quantityFromUnit(parseDecimal(perPackageMatch[1]!), 'piece');
   }
 
   const quantityMatch = normalized.match(/(\d+(?:[.,]\d+)?)\s*([a-zåäö]+)\b/u);
@@ -132,7 +137,7 @@ function quantityFromUnit(value: number, rawUnit: string): ParsedQuantity {
   if (unit === 'cl') return { size: value / 100, unit: 'l' };
   if (unit === 'dl') return { size: value / 10, unit: 'l' };
   if (unit === 'l' || unit === 'liter' || unit === 'litre' || unit === 'liters' || unit === 'litres') return { size: value, unit: 'l' };
-  if (unit === 'piece' || unit === 'pack' || unit === 'pk' || unit === 'st' || unit === 'styck' || unit === 'pcs') {
+  if (unit === 'piece' || unit === 'pack' || unit === 'pk' || unit === 'st' || unit === 'styck' || unit === 'pcs' || unit === 'p' || unit === 'per') {
     return { size: value, unit: 'piece' };
   }
   throw new Error(`Unsupported quantity unit: ${rawUnit}`);

@@ -173,7 +173,7 @@ function lyfjaCategory(value: string): LyfjaIsProductCategory {
   if (matchesAny(normalized, ['gjafabréf', 'gjafapoki'])) return 'gift';
   if (matchesAny(normalized, ['verk', 'hiti', 'kvef', 'ofnæmi', 'melting', 'lyf', 'nefúði', 'mg ', 'mcg'])) return 'otc';
   if (matchesAny(normalized, ['vítamín', 'vitamin', 'bætiefni', 'fæðubót', 'omega', 'steinefni'])) return 'supplement';
-  if (matchesAny(normalized, ['húð', 'snyrti', 'krem', 'serum', 'andlit', 'sól', 'hár', 'spf'])) return 'beauty';
+  if (matchesAny(normalized, ['húð', 'snyrti', 'krem', 'cream', 'serum', 'andlit', 'sól', 'hár', 'spf'])) return 'beauty';
   return 'care';
 }
 

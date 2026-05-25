@@ -2707,9 +2707,10 @@ function requiredString(record: Record<string, unknown>, key: string, path: stri
 
 function optionalString(record: Record<string, unknown>, key: string, path: string): string | undefined {
   const value = record[key];
-  if (value === undefined || value === null || value === '') return undefined;
+  if (value === undefined || value === null) return undefined;
   if (typeof value !== 'string') throw new Error(`${path}.${key} must be a string.`);
-  return value.trim();
+  const trimmed = value.trim();
+  return trimmed ? trimmed : undefined;
 }
 
 function requiredNumber(record: Record<string, unknown>, key: string, path: string): number {
@@ -2982,6 +2983,7 @@ export function normalizeUnitPrice(input: UnitInput): UnitPrice {
   if (unit === 'kg') return { unitPrice: round4(input.price / input.packageSize), comparableUnit: 'kg' };
   if (unit === 'ml') return { unitPrice: round4(input.price / (input.packageSize / 1000)), comparableUnit: 'l' };
   if (unit === 'l' || unit === 'liter') return { unitPrice: round4(input.price / input.packageSize), comparableUnit: 'l' };
+  if (unit === 'st' || unit === 'styck') return { unitPrice: round4(input.price / input.packageSize), comparableUnit: 'piece' };
   if (unit === 'piece' || unit === 'pcs' || unit === 'roll' || unit === 'diaper') return { unitPrice: round4(input.price / input.packageSize), comparableUnit: unit };
   throw new Error(`Unsupported package unit: ${input.packageUnit}`);
 }
@@ -3169,6 +3171,12 @@ const normalizeSearchText = (value: string): string => value
   .replace(/[^a-z0-9]+/g, ' ')
   .trim();
 
+const containsNormalizedTerm = (sourceText: string, term: string): boolean => {
+  const normalizedTerm = normalizeSearchText(term);
+  if (!normalizedTerm) return false;
+  return ` ${sourceText} `.includes(` ${normalizedTerm} `) || (normalizedTerm.length >= 5 && sourceText.includes(normalizedTerm));
+};
+
 const retailerOriginCountryCodes = new Map<string, string>([
   ['danmark', 'DK'],
   ['egypten', 'EG'],
@@ -3247,11 +3255,12 @@ function isProduceCommodity(input: RetailerProductInput, commodity?: Commodity):
 
 function resolveProduceClassIdFromText(input: RetailerProductInput, commodity?: Commodity): string | undefined {
   if (!isProduceCommodity(input, commodity)) return undefined;
-  const haystack = normalizeSearchText(`${input.rawName} ${input.canonicalName} ${input.categoryId} ${commodity?.slug ?? ''} ${commodity?.nameSv ?? ''} ${commodity?.nameEn ?? ''}`);
-  return produceClassRules.find((rule) =>
-    (commodity ? rule.commodityIds.includes(commodity.slug) : false) ||
-    rule.terms.some((term) => haystack.includes(normalizeSearchText(term)))
-  )?.produceClassId;
+  const sourceText = normalizeSearchText(`${input.rawName} ${input.canonicalName} ${input.categoryId}`);
+  const textMatch = produceClassRules.find((rule) =>
+    rule.terms.some((term) => containsNormalizedTerm(sourceText, term))
+  );
+  if (textMatch) return textMatch.produceClassId;
+  return produceClassRules.find((rule) => commodity ? rule.commodityIds.includes(commodity.slug) : false)?.produceClassId;
 }
 
 function resolveCommodity(input: RetailerProductInput): Commodity | null {
@@ -3263,7 +3272,7 @@ function resolveCommodity(input: RetailerProductInput): Commodity | null {
 
   const haystack = normalizeSearchText(`${input.rawName} ${input.canonicalName} ${input.categoryId}`);
   return COMMODITIES.find((commodity) => {
-    const hasNameMatch = commodityTerms(commodity).some((term) => term.length > 0 && haystack.includes(term));
+    const hasNameMatch = commodityTerms(commodity).some((term) => containsNormalizedTerm(haystack, term));
     return hasNameMatch && (categoryHintsMatch(input, commodity) || input.soldByWeight === true || input.productKind === 'commodity');
   }) ?? null;
 }

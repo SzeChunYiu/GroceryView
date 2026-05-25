@@ -74,7 +74,8 @@ export function parseGoodstoreSeProductHtml(
 ): GoodstoreSePriceRow[] {
   const text = htmlToText(html);
   const name = productName(html, text);
-  const price = money(text.match(PRICE_RE)?.[1]);
+  const priceMatches = [...text.matchAll(new RegExp(PRICE_RE.source, 'gi'))];
+  const price = money(priceMatches.at(-1)?.[1]);
   if (!name || price === null) return [];
   const storeOnly = /Endast i butik|Endast i butiken på Åsögatan 116/i.test(text);
   const code = text.match(ARTICLE_RE)?.[1] ?? slugFromUrl(productUrl);

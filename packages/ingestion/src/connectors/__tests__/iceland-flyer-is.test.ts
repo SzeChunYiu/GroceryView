@@ -5,9 +5,9 @@ import { buildIcelandFlyerIsOffersUrl, fetchIcelandFlyerIsPromotions, parseIcela
 const RETRIEVED_AT = '2026-05-25T14:10:00.000Z';
 const SOURCE_URL = 'https://www.samkaup.is/velduverslun/';
 const FIXTURE = `<!doctype html><main>
-  <article class="vara tilboð" data-sku="ice-1" data-category="frozen" data-valid-from="2026-05-22" data-valid-to="2026-05-28">
+  <article class="product vara" data-sku="ice-1" data-category="frozen" data-valid-from="2026-05-22" data-valid-to="2026-05-28">
     <a href="/tilbod/iceland-pizza"><img src="/img/pizza.jpg" /></a>
-    <h2>Iceland pizza 400 g</h2><span class="verð">1.299 kr.</span><span class="einingarverð">3.248 kr/kg</span>
+    <h2>Iceland pizza 400 g</h2><span class="price">1.299 kr.</span><span class="einingarverd">3.248 kr/kg</span>
   </article>
   <article class="campaign product netto" data-product-id="netto-2" data-category="produce">
     <a href="https://netto.is/vara/eplar"><h3>Nettó epli</h3></a><span class="price">399 kr</span>

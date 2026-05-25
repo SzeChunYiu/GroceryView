@@ -44,7 +44,7 @@ type JsonStatDataset = Readonly<{
   id: readonly string[];
   size: readonly number[];
   dimension: Record<string, JsonStatDimension>;
-  value?: Array<number | null>;
+  value?: readonly (number | null)[];
 }>;
 
 export function buildSsbCpiNoRequestBody(months = 24, ecoicopCodes: readonly string[] = SSB_CPI_NO_FOOD_ECOICOP_CODES) {

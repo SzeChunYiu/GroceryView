@@ -2281,6 +2281,7 @@ describe('fetchBrandedSwedishFuelStations', () => {
       openingHours: '',
       website: 'https://www.circlek.se/station/circle-k-vallentuna',
       phone: '',
+      supportedGradeIds: [],
       sourceUrl: BRANDED_FUEL_STATIONS_OVERPASS_URL,
       retrievedAt: '2026-05-23T12:00:00.000Z'
     }]);
@@ -2845,7 +2846,11 @@ describe('fetchIcaProducts', () => {
 
     assert.equal(requestedUrls[0], buildIcaStorePromotionsUrl('1004599', '6ae1c52a-99a8-4b19-9464-dd01274df39d', 1));
     assert.deepEqual(rows, [{
+      chain: 'ica',
+      ica_format: 'kvantum',
       code: '2077461',
+      format: 'kvantum',
+      channel: 'packaged',
       productId: 'ff3ce59d-323e-42ae-b433-26953b77c7e7',
       retailerProductId: '2077461',
       name: 'Babyplommontomater 500g Klass 1 ICA',
@@ -3021,7 +3026,7 @@ describe('fetchIcaProducts', () => {
     }, {
       code: 'counter-cheese',
       format: 'kvantum',
-      channel: 'counter',
+      channel: 'packaged',
       is_member_price: undefined,
       multi_buy: undefined
     }]);
@@ -3478,7 +3483,7 @@ describe('fetchMatpriskollenOffers', () => {
       brand: '',
       store: 'Willys Falkenberg',
       storeKey: 'd20e31b2-2c0e-4e87-8f8e-280d41b1bb16',
-      storeId: '47',
+      storeId: '47:malmo',
       category: 'Frukt & bär',
       priceText: '29,90/frp',
       comparePriceText: '59,80/kg',
@@ -3488,6 +3493,11 @@ describe('fetchMatpriskollenOffers', () => {
       origin: 'Egypten/Italien/Spanien',
       requiresMembershipCard: false,
       requiresCoupon: true,
+      channel: 'store',
+      is_member_price: false,
+      is_coupon_price: true,
+      format: 'willys',
+      multi_buy: '',
       validFrom: '2026-05-17T22:00:00.000Z',
       validTo: '2026-05-24T21:59:59.000Z',
       sourceUrl: buildMatpriskollenStoreOffersUrl('d20e31b2-2c0e-4e87-8f8e-280d41b1bb16'),
@@ -3608,6 +3618,7 @@ describe('fetchCityGrossProducts', () => {
       regularPrice: 39.9,
       unitPrice: 136.96,
       unitPriceUnit: 'KGM',
+      is_member_price: false,
       priceText: '31.50 SEK',
       hasPromotion: false,
       hasDiscount: true,
@@ -3920,6 +3931,12 @@ describe('fetchLidlOffers', () => {
       unitPriceText: '/kg',
       promotionText: 'Superpris',
       memberOnly: false,
+      channel: 'store',
+      is_member_price: false,
+      is_coupon_price: false,
+      is_subscription_price: false,
+      is_clearance: false,
+      multi_buy: '',
       regions: ['1', '2', '3'],
       validFrom: '2026-05-05T11:22:50.499Z',
       validTo: '2026-05-24T21:59:59Z',
@@ -4638,6 +4655,7 @@ describe('fetchWillysProducts', () => {
       longitude: 12.5333,
       onlineStore: true,
       clickAndCollect: true,
+      format: 'willys',
       flyerUrl: 'https://viewer.ipaper.io/willys/2149',
       sourceUrl: buildWillysStoresUrl({ online: true }),
       retrievedAt: '2026-05-22T10:45:00.000Z'
@@ -4682,11 +4700,15 @@ describe('fetchWillysProducts', () => {
       category: 'skafferi|pasta',
       price: 12.2,
       priceText: '12,20 kr',
+      listPrice: 12.2,
+      memberPrice: null,
+      is_member_price: false,
       unitPriceText: '16,27 kr',
       unitPriceUnit: 'kg',
       imageUrl: 'https://assets.axfood.se/image/upload/f_auto,t_200/07310130003547_C1R1_s03',
       labels: ['keyhole'],
       online: true,
+      channel: 'online',
       outOfStock: false,
       sourceUrl: buildWillysSearchUrl('makaroner'),
       retrievedAt: '2026-05-21T00:00:00.000Z'
@@ -4773,6 +4795,12 @@ describe('fetchWillysWeeklyDiscounts', () => {
       storeId: '2110',
       storeName: '',
       city: '',
+      channel: 'store',
+      isMemberPrice: true,
+      isCouponPrice: false,
+      isSubscriptionPrice: false,
+      isClearance: false,
+      multiBuy: null,
       campaignType: 'LOYALTY',
       promotionType: 'MixMatchPricePromotion',
       price: 29.9,
@@ -5242,7 +5270,7 @@ describe('planIngestionBatch', () => {
 
     assert.equal(plan.accepted.length, 1);
     assert.equal(plan.rejected.length, 1);
-    assert.match(plan.rejected[0].reason, /rawName is required/);
+    assert.match(plan.rejected[0].reason, /rawName: String must contain at least 1 character/);
   });
 });
 
@@ -6362,7 +6390,10 @@ describe('daily ingestion runner', () => {
       connectorStartDelayMs: 0,
       connectorRetryAttempts: 0,
       connectorRetryBaseDelayMs: 250,
-      blockerLogPath: 'codex-tasks/ingestion-blockers.txt'
+      blockerLogPath: 'codex-tasks/ingestion-blockers.txt',
+      zeroRowAlertLogPath: '/tmp/ingest-alerts.jsonl',
+      zeroRowAlertStatePath: '/tmp/ingest-zero-row-state.json',
+      zeroRowAlertWebhookUrl: ''
     });
   });
 
@@ -6418,7 +6449,10 @@ describe('daily ingestion runner', () => {
       connectorStartDelayMs: 125,
       connectorRetryAttempts: 2,
       connectorRetryBaseDelayMs: 500,
-      blockerLogPath: '/tmp/groceryview-ingestion-blockers.txt'
+      blockerLogPath: '/tmp/groceryview-ingestion-blockers.txt',
+      zeroRowAlertLogPath: '/tmp/ingest-alerts.jsonl',
+      zeroRowAlertStatePath: '/tmp/ingest-zero-row-state.json',
+      zeroRowAlertWebhookUrl: ''
     });
     assert.equal(configs.connectors[0]?.storeConcurrency, 6);
     assert.equal(configs.connectors[0]?.storeStartDelayMs, 75);
@@ -6846,7 +6880,7 @@ describe('daily ingestion runner', () => {
       observation.promotion_text
     ]), [
       ['store-db-2', 'sg-idealmakaroner-5kg-arsta', 79.9, 99.9, 'Storpackskampanj'],
-      ['store-db-3', 'sg-rapsolja-10l-goteborg', 189, undefined, undefined]
+      ['store-db-3', 'sg-rapsolja-10l-goteborg', 189, null, null]
     ]);
   });
 
@@ -7614,7 +7648,7 @@ describe('daily ingestion runner', () => {
     ]);
     const observations = batchObservations(executor);
     assert.deepEqual(observations.map((observation) => [observation.store_id, observation.price, observation.member_required, observation.regular_price]), [
-      ['store-db-2', 19.5, false, undefined],
+      ['store-db-2', 19.5, false, null],
       ['store-db-2', 15, true, 19.5]
     ]);
     assert.equal(observations[0]?.is_available, false);
@@ -8319,6 +8353,7 @@ describe('daily ingestion runner', () => {
       productUrl: 'https://www.apohem.se/vark-feber/varktabletter/alvedon-tabletter-500-mg-paracetamol-20-st',
       imageUrl: 'https://www.apohem.se/globalassets/alvedon.png',
       isOtc: true,
+      channel: 'online',
       sourceUrl: apohemSourceUrl,
       retrievedAt
     });
@@ -8837,13 +8872,25 @@ describe('daily ingestion runner', () => {
       productId: 'seven-eleven-se-croissantfralla-ost-skinka',
       chainId: 'seven_eleven_se',
       chainName: '7-Eleven Sweden',
+      country: 'SE',
       name: 'CROISSANTFRALLA OST & SKINKA',
       category: 'breakfast',
       priceMin: 34,
       priceMax: 39,
       priceText: '34-39:-',
       currency: 'SEK',
+      channel: 'b2b',
+      customerSegment: 'business',
+      format: 'seven_eleven',
+      store_id: 'se:national-seven-eleven-b2b',
+      region: 'se-national',
       depositIncluded: false,
+      is_member_price: false,
+      is_subscription_price: false,
+      is_coupon_price: false,
+      is_clearance: false,
+      multi_buy: null,
+      out_of_scope_for_consumer_connector: true,
       dietaryTags: [],
       sourceUrl,
       pdfUrl: SEVEN_ELEVEN_SE_ASSORTMENT_PDF_URL,

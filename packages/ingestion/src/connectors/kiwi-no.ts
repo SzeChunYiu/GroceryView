@@ -146,8 +146,10 @@ export function parseKiwiNoPriceCheckObservations(
 function priceCheckLines(text: string): string[] {
   const tableStart = text.search(/VARETEKST\s+GAMMEL UTPRIS\s+NY UTPRIS/i);
   const tableText = tableStart >= 0 ? text.slice(tableStart) : text;
-  return tableText
-    .split(/\n|(?=[A-ZÆØÅ0-9][A-ZÆØÅ0-9!&'.%/\- ]+\s+\d+(?:[,.]\d{1,2})?(?:\s+\d+(?:[,.]\d{1,2})?){0,2}(?:\s|$))/g)
+  const sourceLines = tableText.includes('\n')
+    ? tableText.split(/\n/g)
+    : tableText.split(/(?=[A-ZÆØÅ0-9][A-ZÆØÅ0-9!&'.%/\- ]+\s+\d+(?:[,.]\d{1,2})?(?:\s+\d+(?:[,.]\d{1,2})?){0,2}(?:\s|$))/g);
+  return sourceLines
     .map((line) => line.replace(/^VARETEKST\s+GAMMEL UTPRIS\s+NY UTPRIS\s+LAVESTE PRIS SISTE 30 DAGENE\s*/i, '').trim())
     .filter(Boolean);
 }

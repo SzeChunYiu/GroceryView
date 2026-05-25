@@ -118,8 +118,12 @@ function decodeHtml(value: string) {
 function parseIcelandicPrice(value: string | number | undefined) {
   if (typeof value === 'number') return value;
   if (!value) return undefined;
-  const match = value.replace(/\./g, '').match(/(\d+(?:,\d+)?(?:\.\d+)?)/);
-  return match ? Number(match[1]!.replace(',', '.')) : undefined;
+  const match = value.match(/(\d+(?:[.,]\d+)?)/);
+  if (!match) return undefined;
+  const normalized = match[1]!.includes(',')
+    ? match[1]!.replace(/\./g, '').replace(',', '.')
+    : match[1]!;
+  return Number(normalized);
 }
 
 function fuelSpecFor(itemName: string) {

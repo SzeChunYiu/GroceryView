@@ -53,8 +53,15 @@ export function parsePressbyranSeMagazineProductHtml(
   let match: RegExpExecArray | null;
 
   while ((match = optionPattern.exec(optionBlock)) !== null) {
-    const label = cleanWhitespace(match[1]);
-    const price = money(match[2]);
+    let label = cleanWhitespace(match[1]);
+    let price = money(match[2]);
+    if (/^Lösnummer/i.test(label) && (price ?? 0) > 10000) {
+      const issueMatch = match[0].match(/^(Lösnummer\s*#.*?)\s+(\d+(?:[,.]\d{1,2}))\s*kr/i);
+      if (issueMatch?.[1] && issueMatch[2]) {
+        label = cleanWhitespace(issueMatch[1]);
+        price = money(issueMatch[2]);
+      }
+    }
     if (price === null) continue;
     const isSubscription = !/^Lösnummer/i.test(label);
     rows.push(baseRow({
