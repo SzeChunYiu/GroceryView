@@ -195,6 +195,11 @@ for a future iteration per operator directive 2026-05-21**.
 ### B14 · Apohem ⏳ pending
 - Online pharmacy with some grocery (kosttillskott, baby); has clear product API
 
+### B15 · Apoteket.se ✅ public pharmacy foundation
+- Search and category pages expose public product payloads for non-prescription pharmacy products.
+- No branch-level price claim by default; prescription-only rows are explicitly excluded.
+- Connector details: [`docs/connectors/apoteket-se.md`](connectors/apoteket-se.md) covers source URLs, extracted fields, known quirks, edge cases, and last verification evidence.
+
 ---
 
 ## C · Methodology workflow (one iteration per worker)
