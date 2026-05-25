@@ -485,6 +485,9 @@ export default function DataSourcesPage() {
           <Link className="text-sm font-black text-emerald-800 underline decoration-emerald-300 underline-offset-4" href="/products">
             Browse rendered products
           </Link>
+          <Link className="text-sm font-black text-emerald-800 underline decoration-emerald-300 underline-offset-4" href="/methodology-changelog">
+            Methodology changelog
+          </Link>
         </div>
         <div className="mt-5 grid gap-3 lg:grid-cols-3">
           {sourceCoverage.map((source) => (

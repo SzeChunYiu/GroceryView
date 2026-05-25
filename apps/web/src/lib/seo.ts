@@ -206,6 +206,10 @@ export const routeMetadataCatalog = {
     title: 'Personalized grocery index shortcuts | GroceryView',
     description: 'Browse household-ranked grocery index shortcuts with verified category medians, OpenPrices row counts, and cross-chain spread context.'
   },
+  '/methodology-changelog': {
+    title: 'Data and methodology changelog | GroceryView',
+    description: 'Track public changes to GroceryView data sources, matching rules, index methodology, deal scoring, market coverage, confidence, and freshness evidence.'
+  },
   '/login': {
     title: 'Sign in to GroceryView',
     description: 'Authentication is withheld in the static build until a production auth provider can return a verified user session.',
