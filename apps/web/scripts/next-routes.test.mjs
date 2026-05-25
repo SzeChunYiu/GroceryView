@@ -3046,6 +3046,16 @@ ${seo}`;
     assert.doesNotMatch(sitemap, /osmStores\.slice\(0,\s*80\)/);
   });
 
+  it('emits sitemap entries for Nordic country terms URLs', async () => {
+    const sitemap = await read('src/app/sitemap.ts');
+
+    assert.match(sitemap, /countryTermsRoutes/);
+    for (const country of ['sweden', 'norway', 'denmark', 'finland', 'iceland']) {
+      assert.match(sitemap, new RegExp(`'${country}'`));
+    }
+    assert.match(sitemap, /entry\(`\/\$\{country\}\/terms`, 0\.52, 'monthly'\)/);
+  });
+
   it('keeps public item and search entry points in sitemap and canonical metadata coverage', async () => {
     const seo = await read('src/lib/seo.ts');
     const sitemap = await read('src/app/sitemap.ts');
@@ -3163,6 +3173,26 @@ ${seo}`;
     assert.match(localeHome, /\/sv/);
     assert.match(localeHome, /\/en/);
     assert.doesNotMatch(seo, /NoVerifiedData/);
+  });
+
+  it('keeps programmatic city/product SEO pages canonicalized behind coverage guards', async () => {
+    const seo = await read('src/lib/seo.ts');
+    const landing = await read('src/lib/seo-landing-pages.ts');
+
+    assert.match(seo, /canonicalPath\?: string/);
+    assert.match(seo, /const alternatePath = config\.canonicalPath \?\? config\.path/);
+    assert.match(seo, /canonical: canonical, languages: languageAlternateUrls\(alternatePath\)/);
+    assert.match(seo, /follow: config\.noIndexFollow \?\? false/);
+
+    assert.match(landing, /programmaticSeoIndexingGuard/);
+    assert.match(landing, /minimumVerifiedChainRows: 2/);
+    assert.match(landing, /minimumCityVerifiedChainRows: 3/);
+    assert.match(landing, /hasCitySpecificAvailability: false/);
+    assert.match(landing, /cityCheapestLandingSeoDecision/);
+    assert.match(landing, /canonicalPath: indexable \? cityPath : fallbackCanonicalPath/);
+    assert.match(landing, /noIndex: !indexable/);
+    assert.match(landing, /metadataForCityCheapestLanding/);
+    assert.match(landing, /noIndexFollow: seoDecision\.noIndexFollow/);
   });
 
   it('ships an installable PWA-first web manifest for mobile grocery checks', async () => {

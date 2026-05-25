@@ -98,71 +98,18 @@ export const DEFAULT_MATSPAR_SEARCH_QUERIES = [
   'diskmedel',
   'nudlar',
   'falukorv',
-  'havredryck',
-  'filmjolk',
-  'leverpastej',
-  'kaviar',
-  'sill',
-  'bulgur',
-  'couscous',
-  'linser',
-  'bonor',
-  'dryck',
-  'mineralvatten',
-  'cola',
-  'saft',
-  'te',
-  'kakor',
-  'chips',
-  'popcorn',
-  'risgryn',
-  'salt',
-  'peppar',
-  'vitlok',
-  'ingefara',
-  'citron',
-  'avokado',
-  'champinjoner',
-  'spenat',
-  'sallad',
-  'halloumi',
-  'tofu',
-  'vegofars',
-  'bar',
-  'mango',
-  'ananas',
-  'melon',
-  'flaskfile',
-  'kotletter',
-  'hamburgare',
-  'pizza',
-  'pyttipanna',
-  'lingonsylt',
-  'apotek',
-  'grill',
-  'blandfars',
-  'kycklingfile',
-  'snabbkaffe',
-  'kaffefilter',
-  'valling',
-  'juicekoncentrat',
-  'pesto',
-  'kokt skinka',
-  'oliver',
-  'kapris',
-  'kikartor',
-  'kokosmjolk',
-  'barnmat',
-  'blojor'
+  'havredryck'
 ] as const;
-export const DEFAULT_MATSPAR_SEARCH_PAGES = [1, 2, 3, 4, 5, 6] as const;
-export const DEFAULT_MATSPAR_MAX_ROWS = 14000;
+export const DEFAULT_MATSPAR_SEARCH_PAGES = [1, 2] as const;
+export const DEFAULT_MATSPAR_MAX_ROWS = 4000;
+export const MATSPAR_MINIMUM_ROWS = 100;
 
 export type FetchMatsparProductsOptions = {
   fetchImpl?: typeof fetch;
   queries?: readonly string[];
   pages?: readonly number[];
   maxRows?: number;
+  minRows?: number;
   retrievedAt?: string;
 };
 
@@ -178,6 +125,7 @@ export async function fetchMatsparProducts(options: FetchMatsparProductsOptions 
   const queries = options.queries ?? DEFAULT_MATSPAR_SEARCH_QUERIES;
   const pages = options.pages ?? DEFAULT_MATSPAR_SEARCH_PAGES;
   const maxRows = options.maxRows ?? DEFAULT_MATSPAR_MAX_ROWS;
+  const minRows = options.minRows ?? 0;
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const rows: MatsparProduct[] = [];
   const seenCodes = new Set<string>();
@@ -204,10 +152,17 @@ export async function fetchMatsparProducts(options: FetchMatsparProductsOptions 
         seenCodes.add(row.code);
         rows.push(row);
         if (rows.length >= maxRows) {
+          if (rows.length < minRows) {
+            throw new Error(`Matspar fetch returned only ${rows.length} rows; minimum required is ${minRows}`);
+          }
           return rows;
         }
       }
     }
+  }
+
+  if (rows.length < minRows) {
+    throw new Error(`Matspar fetch returned only ${rows.length} rows; minimum required is ${minRows}`);
   }
 
   return rows;
