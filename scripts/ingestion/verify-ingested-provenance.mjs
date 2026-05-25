@@ -219,7 +219,7 @@ async function extractJsonExport(text, exportName, fileUrl) {
   }
   const valueText = text.slice(start, matchingJsonEnd(text, start) + 1);
   try {
-    return JSON.parse(valueText);
+    return JSON.parse(sanitizeJsonValue(valueText));
   } catch (error) {
     const spreadNames = arraySpreadNames(valueText);
     if (spreadNames.length === 0 || !fileUrl) throw error;
@@ -231,6 +231,17 @@ async function extractJsonExport(text, exportName, fileUrl) {
     }
     return chunks;
   }
+}
+
+function sanitizeJsonValue(valueText) {
+  // Generated TypeScript arrays may contain sparse-array elisions (`,,`), which
+  // are valid JavaScript but invalid JSON. The provenance verifier only needs
+  // concrete rows, so collapse elisions before JSON parsing.
+  let sanitized = valueText;
+  while (/,\s*,/.test(sanitized)) {
+    sanitized = sanitized.replace(/,\s*,/g, ',');
+  }
+  return sanitized;
 }
 
 function arraySpreadNames(valueText) {
