@@ -1,5 +1,5 @@
 // AUTO-GENERATED from live retailer ingestion by scripts/ingestion/generate-live-retailer-ingested.mjs.
-// Generated at: 2026-05-25T05:37:53.937Z
+// Generated at: 2026-05-25T08:05:40.816Z
 // Compare store capability row count: 4
 import type { IcaReklambladIngestedOffer } from '../ingested/ica-reklamblad';
 import type { LidlIngestedStoreOffer } from '../ingested/lidl';
@@ -15,7 +15,7 @@ export type DbSiteCompareStoreCapability = {
   evidenceUpdatedAt: string | null;
 };
 
-export const dbSiteIngestedOverridesGeneratedAt = "2026-05-25T05:37:53.937Z";
+export const dbSiteIngestedOverridesGeneratedAt = "2026-05-25T08:05:40.816Z";
 
 export const dbSiteMatpriskollenOffers: MatpriskollenIngestedOffer[] = [];
 export const dbSiteLidlStoreOffers: LidlIngestedStoreOffer[] = [];
@@ -35,16 +35,16 @@ export const dbSiteCompareStoreCapabilities: DbSiteCompareStoreCapability[] = [
     "coupon": true,
     "delivery": true,
     "pickup": true,
-    "evidenceLabel": "11278 product rows · 46905 coupon/offer rows · 11278 online rows · 46905 store rows",
-    "evidenceUpdatedAt": "2026-05-25T05:37:53.937Z"
+    "evidenceLabel": "11200 product rows · 46905 coupon/offer rows · 11200 online rows · 46905 store rows",
+    "evidenceUpdatedAt": "2026-05-25T08:05:40.816Z"
   },
   {
     "chainId": "hemkop",
     "coupon": true,
     "delivery": true,
     "pickup": true,
-    "evidenceLabel": "11802 product rows · 55034 coupon/offer rows · 11802 online rows · 55034 store rows",
-    "evidenceUpdatedAt": "2026-05-25T05:37:53.937Z"
+    "evidenceLabel": "11802 product rows · 54842 coupon/offer rows · 11802 online rows · 54842 store rows",
+    "evidenceUpdatedAt": "2026-05-25T08:05:40.816Z"
   },
   {
     "chainId": "lidl",
