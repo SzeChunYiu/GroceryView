@@ -1,4 +1,5 @@
 import { sourceCoverage } from '@/lib/verified-data';
+import { buildIngestionPipelineMonitorRows, type IngestionPipelineRun } from './ingest/transform';
 
 export type SourceDuplicateSample = {
   source: string;
@@ -166,6 +167,40 @@ export const sourceFreshnessSlaSummary = {
   sourceCount: sourceFreshnessSlaDashboard.length,
   rowCount: sourceFreshnessSlaDashboard.reduce((total, source) => total + source.rowCount, 0),
   breachedSourceCount: sourceFreshnessSlaDashboard.filter((source) => source.status === 'breached').length,
+};
+
+const ingestionPipelineRuntimeBySource: Record<string, Pick<IngestionPipelineRun, 'failureCount' | 'latencyMs' | 'latestStatus'>> = {
+  'Axfood chain price snapshot': { failureCount: 0, latencyMs: 18300, latestStatus: 'succeeded' },
+  'ICA store-scoped promotions': { failureCount: 2, latencyMs: 42100, latestStatus: 'warning' },
+  'OpenPrices SEK observations': { failureCount: 0, latencyMs: 27500, latestStatus: 'succeeded' },
+  'OpenFoodFacts metadata catalog': { failureCount: 0, latencyMs: 63900, latestStatus: 'succeeded' },
+  'OKQ8 fuel operator prices': { failureCount: 0, latencyMs: 9100, latestStatus: 'succeeded' },
+  'Sweden store directory': { failureCount: 1, latencyMs: 118000, latestStatus: 'warning' }
+};
+
+function runtimeForSource(source: SourceFreshnessSlaRow): Pick<IngestionPipelineRun, 'failureCount' | 'latencyMs' | 'latestStatus'> {
+  return ingestionPipelineRuntimeBySource[source.sourceName] ?? {
+    failureCount: source.failureStatus.toLowerCase().startsWith('no failed') ? 0 : 1,
+    latencyMs: Math.max(1000, source.ingestLagHours * 1000),
+    latestStatus: source.status === 'breached' ? 'failed' : source.status === 'watch' ? 'warning' : 'succeeded'
+  };
+}
+
+export const ingestionPipelineMonitorRows = buildIngestionPipelineMonitorRows(sourceFreshnessSlaDashboard.map((source) => ({
+  chain: source.chain,
+  dataSource: source.dataSource,
+  lastFinishedAt: source.lastSuccessfulIngestAt,
+  rowCount: source.rowCount,
+  sourceName: source.sourceName,
+  ...runtimeForSource(source)
+})));
+
+export const ingestionPipelineMonitorSummary = {
+  failedSourceCount: ingestionPipelineMonitorRows.filter((source) => source.latestStatus === 'failed').length,
+  monitoredAt: sourceFreshnessSlaMonitoredAt,
+  sourceCount: ingestionPipelineMonitorRows.length,
+  totalFailures: ingestionPipelineMonitorRows.reduce((total, source) => total + source.failureCount, 0),
+  totalRows: ingestionPipelineMonitorRows.reduce((total, source) => total + source.rowCount, 0)
 };
 
 export type SourceManagementAction = {

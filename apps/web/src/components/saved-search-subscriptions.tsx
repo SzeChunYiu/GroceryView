@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import {
   buildSavedSearchDealMatches,
+  defaultSavedSearchAlertRules,
   type SavedSearchDealCandidate,
   type SavedSearchSubscription
 } from '@/lib/alert-scheduler';
@@ -27,6 +28,7 @@ function writeSubscriptions(subscriptions: SavedSearchSubscription[]): void {
 
 export function SaveSearchSubscriptionButton({ subscription }: Readonly<{ subscription: SavedSearchSubscription }>) {
   const hasFilters = Object.keys(subscription.filters).length > 0;
+  const alertRules = subscription.alertRules?.length ? subscription.alertRules : defaultSavedSearchAlertRules;
   const [status, setStatus] = useState<'idle' | 'saved' | 'updated' | 'blocked'>('idle');
 
   function saveSubscription() {
@@ -51,7 +53,7 @@ export function SaveSearchSubscriptionButton({ subscription }: Readonly<{ subscr
           </div>
           <div className="flex flex-wrap gap-2">
             <button className="rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white disabled:bg-slate-300" disabled={!hasFilters} onClick={saveSubscription} type="button">
-              Save search alert
+              Save this search
             </button>
             <Link className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-black text-emerald-900" href="/alerts">
               View alerts
@@ -64,6 +66,13 @@ export function SaveSearchSubscriptionButton({ subscription }: Readonly<{ subscr
           {status === 'blocked' ? 'Choose a query, category, dietary, chain, or price filter before saving.' : null}
           {status === 'idle' ? subscription.alertReason : null}
         </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {alertRules.map((rule) => (
+            <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-emerald-900 shadow-sm" key={rule.type} title={rule.description}>
+              {rule.label}
+            </span>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -139,6 +148,9 @@ export function SavedSearchSubscriptionsPanel({ candidates }: Readonly<{ candida
               <h3 className="mt-2 text-lg font-black text-slate-950">{match.name}</h3>
               <p className="mt-1 text-sm font-bold text-slate-700">{match.currentPriceText} · {match.chain}</p>
               <p className="mt-2 text-xs font-semibold text-indigo-900">{match.matchedFilters.join(' · ') || match.dealSummary}</p>
+              <p className="mt-2 text-xs font-black text-emerald-800">
+                {match.alertRuleTypes.includes('price_drop') && match.priceDropText ? match.priceDropText : 'New-match alert rule active'}
+              </p>
             </Link>
           ))}
         </div>

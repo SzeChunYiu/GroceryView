@@ -62,9 +62,17 @@ export function PublicSharePreviewCard({
           </h2>
           <p className="mt-1 text-sm text-slate-600">{preview.privacyNote}</p>
         </div>
-        <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-800">
-          {preview.estimatedTotalLabel}
-        </span>
+        <div className="grid gap-2 text-xs font-black text-slate-700 sm:min-w-60">
+          <span className="rounded-full bg-emerald-50 px-3 py-1 text-emerald-800">
+            {preview.estimatedTotalLabel}
+          </span>
+          <span className="rounded-full bg-sky-50 px-3 py-1 text-sky-800">
+            {preview.cheapestChainLabel}
+          </span>
+          <span className="rounded-full bg-slate-50 px-3 py-1 text-slate-700">
+            {preview.lastUpdatedLabel}
+          </span>
+        </div>
       </div>
 
       <ul className="mt-3 space-y-2">
@@ -189,7 +197,7 @@ export function ListCard({ currentRole, items, onConflictPrompt, publicShareHref
               ) : null}
 
               <div className="mt-3 rounded-lg bg-slate-50 p-3">
-                <p className="text-sm font-semibold text-slate-800">Item comments</p>
+                <p className="text-sm font-semibold text-slate-800">Item comments for substitutions, quantities, or store notes</p>
                 {comments.length > 0 ? (
                   <ul className="mt-2 space-y-2">
                     {comments.map((comment) => (
