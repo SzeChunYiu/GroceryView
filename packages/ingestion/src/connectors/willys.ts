@@ -8,11 +8,15 @@ export type WillysProduct = {
   category: string;
   price: number;
   priceText: string;
+  listPrice: number;
+  memberPrice: number | null;
+  is_member_price: boolean;
   unitPriceText: string;
   unitPriceUnit: string;
   imageUrl: string;
   labels: string[];
   online: boolean;
+  channel: 'online' | 'store';
   outOfStock: boolean;
   sourceUrl: string;
   retrievedAt: string;
@@ -32,6 +36,12 @@ export type WillysWeeklyDiscount = {
   storeId: string;
   storeName: string;
   city: string;
+  channel: 'store';
+  isMemberPrice: boolean;
+  isCouponPrice: boolean;
+  isSubscriptionPrice: boolean;
+  isClearance: boolean;
+  multiBuy: { qualifyingCount: number; label: string } | null;
   campaignType: string;
   promotionType: string;
   price: number;
@@ -63,6 +73,7 @@ export type WillysStore = {
   longitude: number | null;
   onlineStore: boolean;
   clickAndCollect: boolean;
+  format: 'willys' | 'willys-hemma';
   flyerUrl: string;
   sourceUrl: string;
   retrievedAt: string;
@@ -83,6 +94,7 @@ type WillysSearchProduct = {
   labels?: unknown;
   online?: unknown;
   outOfStock?: unknown;
+  potentialPromotions?: AxfoodCampaignPromotion[];
 };
 
 type WillysSearchResponse = {
@@ -114,6 +126,7 @@ type AxfoodCampaignPromotion = {
   weightVolume?: unknown;
   conditionLabel?: unknown;
   redeemLimitLabel?: unknown;
+  qualifyingCount?: unknown;
   startDate?: unknown;
   endDate?: unknown;
   validUntil?: unknown;
@@ -583,11 +596,13 @@ export async function fetchWillysProducts(options: FetchWillysProductsOptions = 
 
       const payload = await response.json() as WillysSearchResponse;
       for (const product of payload.results ?? []) {
-        const row = normalizeWillysProduct(product, sourceUrl, retrievedAt);
-        if (!row || seenCodes.has(row.code)) continue;
-        seenCodes.add(row.code);
-        rows.push(row);
-        if (rows.length >= maxRows) return rows;
+        for (const row of normalizeWillysProductRows(product, sourceUrl, retrievedAt)) {
+          const rowKey = `${row.code}:${row.is_member_price}`;
+          if (seenCodes.has(rowKey)) continue;
+          seenCodes.add(rowKey);
+          rows.push(row);
+          if (rows.length >= maxRows) return rows;
+        }
       }
     }
     return rows;
@@ -620,11 +635,13 @@ export async function fetchWillysProducts(options: FetchWillysProductsOptions = 
       pageCount = responsePageCount && responsePageCount > 0 ? responsePageCount : page + 1;
 
       for (const product of results) {
-        const row = normalizeWillysProduct(product, sourceUrl, retrievedAt);
-        if (!row || seenCodes.has(row.code)) continue;
-        seenCodes.add(row.code);
-        rows.push(row);
-        if (rows.length >= maxRows) return rows;
+        for (const row of normalizeWillysProductRows(product, sourceUrl, retrievedAt)) {
+          const rowKey = `${row.code}:${row.is_member_price}`;
+          if (seenCodes.has(rowKey)) continue;
+          seenCodes.add(rowKey);
+          rows.push(row);
+          if (rows.length >= maxRows) return rows;
+        }
       }
 
       if (results.length === 0) break;
@@ -798,6 +815,7 @@ export function normalizeWillysStore(
     longitude: numberOrNull(store.geoPoint?.longitude) ?? numberOrNull(store.address?.longitude),
     onlineStore: store.onlineStore === true,
     clickAndCollect: store.clickAndCollect === true,
+    format: name.toLowerCase().includes('hemma') ? 'willys-hemma' : 'willys',
     flyerUrl: text(store.flyerURL),
     sourceUrl,
     retrievedAt
@@ -809,14 +827,23 @@ export function normalizeWillysProduct(
   sourceUrl: string,
   retrievedAt: string
 ): WillysProduct | null {
+  return normalizeWillysProductRows(product, sourceUrl, retrievedAt)[0] ?? null;
+}
+
+export function normalizeWillysProductRows(
+  product: WillysSearchProduct,
+  sourceUrl: string,
+  retrievedAt: string
+): WillysProduct[] {
   const code = text(product.code);
   const name = text(product.name);
   const price = numberOrNull(product.priceValue);
   if (!code || !name || price === null) {
-    return null;
+    return [];
   }
 
-  return {
+  const memberPrice = willysMemberPrice(product.potentialPromotions);
+  const baseRow: WillysProduct = {
     code,
     name,
     brand: text(product.manufacturer),
@@ -824,15 +851,52 @@ export function normalizeWillysProduct(
     category: text(product.googleAnalyticsCategory),
     price,
     priceText: text(product.price),
+    listPrice: price,
+    memberPrice,
+    is_member_price: false,
     unitPriceText: text(product.comparePrice),
     unitPriceUnit: text(product.comparePriceUnit),
     imageUrl: text(product.image?.url),
     labels: stringArray(product.labels),
     online: product.online === true,
+    channel: product.online === true ? 'online' : 'store',
     outOfStock: product.outOfStock === true,
     sourceUrl,
     retrievedAt
   };
+
+  if (memberPrice === null || memberPrice === price) {
+    return [baseRow];
+  }
+
+  return [baseRow, {
+    ...baseRow,
+    price: memberPrice,
+    priceText: memberPriceText(product.potentialPromotions) || baseRow.priceText,
+    is_member_price: true
+  }];
+}
+
+function willysMemberPrice(promotions: AxfoodCampaignPromotion[] | undefined): number | null {
+  const promotion = (promotions ?? []).find((candidate) => isWillysMemberPricePromotion(candidate) && numberOrNull(candidate.price) !== null);
+  return promotion ? numberOrNull(promotion.price) : null;
+}
+
+function memberPriceText(promotions: AxfoodCampaignPromotion[] | undefined): string {
+  const promotion = (promotions ?? []).find((candidate) => isWillysMemberPricePromotion(candidate) && numberOrNull(candidate.price) !== null);
+  return promotion ? text(promotion.cartLabel) || text(promotion.rewardLabel) : '';
+}
+
+function isWillysMemberPricePromotion(promotion: AxfoodCampaignPromotion): boolean {
+  const haystack = [
+    promotion.campaignType,
+    promotion.promotionType,
+    promotion.cartLabel,
+    promotion.rewardLabel,
+    promotion.conditionLabel
+  ].map(text).join(' ').toLowerCase();
+
+  return /medlemspris|medlem|member/.test(haystack);
 }
 
 export function normalizeWillysWeeklyDiscount(
@@ -850,6 +914,11 @@ export function normalizeWillysWeeklyDiscount(
     return null;
   }
 
+  const campaignType = text(promotion.campaignType);
+  const qualifyingCount = numberOrNull(promotion.qualifyingCount);
+  const conditionText = text(promotion.conditionLabel);
+  const redeemLimitText = text(promotion.redeemLimitLabel);
+
   return {
     code: promotionCode,
     productCode,
@@ -858,7 +927,13 @@ export function normalizeWillysWeeklyDiscount(
     storeId,
     storeName: '',
     city: '',
-    campaignType: text(promotion.campaignType),
+    channel: 'store',
+    isMemberPrice: campaignType === 'LOYALTY' || redeemLimitText.toLowerCase().includes('willys plus'),
+    isCouponPrice: false,
+    isSubscriptionPrice: false,
+    isClearance: false,
+    multiBuy: qualifyingCount && qualifyingCount > 1 ? { qualifyingCount, label: conditionText || text(promotion.cartLabel) || text(promotion.rewardLabel) } : null,
+    campaignType,
     promotionType: text(promotion.promotionType),
     price,
     priceText: text(promotion.cartLabel) || text(promotion.rewardLabel),
@@ -866,8 +941,8 @@ export function normalizeWillysWeeklyDiscount(
     regularPriceText: text(product.priceNoUnit),
     savePriceText: text(promotion.savePrice),
     packageText: text(promotion.weightVolume) || text(product.displayVolume),
-    conditionText: text(promotion.conditionLabel),
-    redeemLimitText: text(promotion.redeemLimitLabel),
+    conditionText,
+    redeemLimitText,
     startDate: text(promotion.startDate),
     endDate: text(promotion.endDate),
     validUntil: epochMillisToIso(promotion.validUntil),

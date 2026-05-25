@@ -1,6 +1,10 @@
 import { runAllStoreTasks, type AllStoreTaskRunnerControls } from './all-store-runner.js';
 
+export type IcaFormat = 'maxi' | 'kvantum' | 'supermarket' | 'nara';
+
 export type IcaProduct = {
+  chain: 'ica';
+  ica_format: IcaFormat;
   code: string;
   productId: string;
   retailerProductId: string;
@@ -40,6 +44,7 @@ export type IcaStoreConfig = {
   storeAccountId: string;
   storeName: string;
   regionId: string;
+  icaFormat?: IcaFormat;
 };
 
 export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
@@ -1680,6 +1685,7 @@ export type FetchIcaProductsOptions = {
   storeAccountId?: string;
   storeName?: string;
   regionId?: string;
+  icaFormat?: IcaFormat;
   maxRows?: number;
   maxPageSize?: number;
   retrievedAt?: string;
@@ -1732,6 +1738,7 @@ export async function fetchIcaProducts(options: FetchIcaProductsOptions = {}): P
     storeAccountId,
     storeName,
     regionId,
+    icaFormat: options.icaFormat,
     maxRows
   });
 }
@@ -1760,7 +1767,8 @@ export async function fetchIcaDefaultStoreProducts(
         ...options,
         storeAccountId: store.storeAccountId,
         storeName: store.storeName,
-        regionId: store.regionId
+        regionId: store.regionId,
+        icaFormat: store.icaFormat
       });
       if (rows.length === 0) throw new Error('no ICA products returned');
       return rows;
@@ -1790,8 +1798,20 @@ export type ParseIcaStorePromotionsOptions = {
   storeAccountId: string;
   storeName: string;
   regionId: string;
+  icaFormat?: IcaFormat;
   maxRows?: number;
 };
+
+export function deriveIcaFormat(storeName: string): IcaFormat {
+  const normalized = storeName
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+  if (normalized.includes('maxi')) return 'maxi';
+  if (normalized.includes('kvantum')) return 'kvantum';
+  if (normalized.includes('nara')) return 'nara';
+  return 'supermarket';
+}
 
 export function parseIcaStorePromotions(payload: unknown, options: ParseIcaStorePromotionsOptions): IcaProduct[] {
   if (!isRecord(payload)) {
@@ -1800,6 +1820,7 @@ export function parseIcaStorePromotions(payload: unknown, options: ParseIcaStore
   const rows: IcaProduct[] = [];
   const seen = new Set<string>();
   const productGroups = arrayOfRecords(payload.productGroups);
+  const icaFormat = options.icaFormat ?? deriveIcaFormat(options.storeName);
 
   for (const group of productGroups) {
     const groupType = text(group.type);
@@ -1827,6 +1848,8 @@ export function parseIcaStorePromotions(payload: unknown, options: ParseIcaStore
       });
 
       rows.push({
+        chain: 'ica',
+        ica_format: icaFormat,
         code: retailerProductId,
         productId,
         retailerProductId,
