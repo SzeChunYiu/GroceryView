@@ -190,6 +190,16 @@ export function headerSearchFacetChips({
 
 export type SearchFilterParamValue = string | string[] | undefined;
 
+export type AccountAllergenSearchPreference = {
+  avoidAllergensByDefault: boolean;
+  avoidedAllergenTags: string[];
+};
+
+export const signedInAccountAllergenSearchPreference: AccountAllergenSearchPreference = {
+  avoidAllergensByDefault: true,
+  avoidedAllergenTags: ['milk', 'lactose', 'gluten', 'wheat']
+};
+
 export type RemovableSearchFilterChip = {
   id: string;
   label: string;
@@ -210,6 +220,31 @@ const multiValueChipKeys = new Set<SearchFilterChipKey>(['category', 'chain', 'd
 function searchParamValues(value: SearchFilterParamValue): string[] {
   const rawValues = Array.isArray(value) ? value : value ? [value] : [];
   return rawValues.flatMap((item) => item.split(',')).map((item) => item.trim()).filter(Boolean);
+}
+
+export function hasSearchFilterOverride(value: SearchFilterParamValue): boolean {
+  return searchParamValues(value).length > 0;
+}
+
+export function booleanSearchFilterValue(value: SearchFilterParamValue): boolean {
+  return searchParamValues(value).some((candidate) => ['1', 'true', 'yes', 'on'].includes(candidate.toLocaleLowerCase('sv-SE')));
+}
+
+export function resolveAvoidAllergensSearchDefault(
+  value: SearchFilterParamValue,
+  accountPreference: AccountAllergenSearchPreference | null | undefined
+) {
+  if (hasSearchFilterOverride(value)) {
+    return {
+      checked: booleanSearchFilterValue(value),
+      source: 'url_override' as const
+    };
+  }
+
+  return {
+    checked: accountPreference?.avoidAllergensByDefault ?? false,
+    source: accountPreference ? 'account_preference' as const : 'query_default' as const
+  };
 }
 
 function appendOriginalSearchParam(params: URLSearchParams, key: string, value: SearchFilterParamValue) {

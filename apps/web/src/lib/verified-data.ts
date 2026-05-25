@@ -916,7 +916,7 @@ function productSearchResultCards(searchResult: typeof rawFacetedProductSearch, 
   });
 }
 
-export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}) {
+export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}, options: { accountAvoidAllergensDefault?: boolean } = {}) {
   const query = firstSearchValue(searchParams.q);
   const categories = listSearchValues(searchParams.category);
   const labelFilters = listSearchValues(searchParams.label);
@@ -927,7 +927,9 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
   const minPrice = numericSearchValue(searchParams.minPrice);
   const maxPrice = numericSearchValue(searchParams.maxPrice);
   const inStockOnly = booleanSearchValue(searchParams.inStockOnly);
-  const avoidAllergens = booleanSearchValue(searchParams.avoidAllergens);
+  const avoidAllergens = firstSearchValue(searchParams.avoidAllergens)
+    ? booleanSearchValue(searchParams.avoidAllergens)
+    : options.accountAvoidAllergensDefault ?? false;
   const minConfidence = confidenceSearchValue(searchParams.minConfidence);
   const minCarbonScore = numericSearchValue(searchParams.minCarbonScore);
   const sort = productSearchSortValue(searchParams.sort);

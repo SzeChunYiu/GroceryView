@@ -15,7 +15,7 @@ import { buildSavedSearchSubscription } from '@/lib/alert-scheduler';
 import { adaptiveProductCards, buildProductSearchView, withProductSearchExplanationBadges, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
-import { allergenRiskBadgesForText, buildRemovableSearchFilterChips } from '@/lib/search-filters';
+import { allergenRiskBadgesForText, buildRemovableSearchFilterChips, resolveAvoidAllergensSearchDefault, signedInAccountAllergenSearchPreference } from '@/lib/search-filters';
 import { buildSearchFilterPreset } from '@/lib/search-presets';
 
 const PRODUCTS_PER_PAGE = 50;
@@ -134,7 +134,8 @@ function zeroResultCategoryShortcuts(query: string, selectedCategory: string | s
 
 export default async function ProductsPage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
-  const search = buildProductSearchView(resolvedSearchParams);
+  const allergenDefault = resolveAvoidAllergensSearchDefault(resolvedSearchParams.avoidAllergens, signedInAccountAllergenSearchPreference);
+  const search = buildProductSearchView(resolvedSearchParams, { accountAvoidAllergensDefault: allergenDefault.checked });
   const { categoryFacets, labelFacets, originFacets, chainFacets, priceRange, inStockOnly, resultCards } = search;
   const drawerPriceRange = {
     min: priceRange.min ?? 0,
@@ -251,7 +252,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           </div>
           <label className="flex items-center gap-2 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-black text-rose-950">
             <input defaultChecked={avoidAllergens} name="avoidAllergens" type="checkbox" value="true" />
-            Exclude allergen-risk items
+            Exclude allergen-risk items ({allergenDefault.source === 'account_preference' ? 'account default' : 'URL override'})
           </label>
           <AdvancedFilterDrawer
             activeChips={activeFilterChips}
