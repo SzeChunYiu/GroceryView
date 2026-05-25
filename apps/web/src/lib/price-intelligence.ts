@@ -2,6 +2,22 @@ export type ObservedPricePoint = {
   price: number;
 };
 
+export type PriceVolatilityBadgeKind = 'stable' | 'rising' | 'falling' | 'volatile';
+
+export type PriceVolatilityObservation = {
+  price: number;
+  observedAt?: string | number | Date | null;
+};
+
+export type PriceVolatilityBadge = {
+  kind: PriceVolatilityBadgeKind;
+  label: 'Stable' | 'Rising' | 'Falling' | 'Volatile';
+  observationCount: number;
+  changePercent: number;
+  volatilityPercent: number;
+  description: string;
+};
+
 export type VolatilityBadgeMethodology = {
   score: number;
   observationCount: number;
@@ -79,6 +95,92 @@ function standardDeviation(values: number[]) {
   const mean = finite.reduce((sum, value) => sum + value, 0) / finite.length;
   const variance = finite.reduce((sum, value) => sum + (value - mean) ** 2, 0) / finite.length;
   return Math.sqrt(variance);
+}
+
+function observationTime(observation: PriceVolatilityObservation, index: number) {
+  if (!observation.observedAt) return index;
+  const time = observation.observedAt instanceof Date
+    ? observation.observedAt.getTime()
+    : typeof observation.observedAt === 'number'
+      ? observation.observedAt
+      : Date.parse(observation.observedAt);
+  return Number.isFinite(time) ? time : index;
+}
+
+export function classifyPriceVolatilityBadge(observations: ReadonlyArray<PriceVolatilityObservation>): PriceVolatilityBadge {
+  const recent = observations
+    .map((observation, index) => ({
+      price: observation.price,
+      observedTime: observationTime(observation, index)
+    }))
+    .filter((observation) => Number.isFinite(observation.price) && observation.price > 0)
+    .sort((left, right) => left.observedTime - right.observedTime)
+    .slice(-6);
+  const observationCount = recent.length;
+
+  if (observationCount < 2) {
+    return {
+      kind: 'stable',
+      label: 'Stable',
+      observationCount,
+      changePercent: 0,
+      volatilityPercent: 0,
+      description: 'Needs more recent observations; no rising, falling, or volatile signal yet.'
+    };
+  }
+
+  const prices = recent.map((observation) => observation.price);
+  const first = prices[0]!;
+  const latest = prices.at(-1)!;
+  const average = prices.reduce((sum, price) => sum + price, 0) / prices.length;
+  const low = Math.min(...prices);
+  const high = Math.max(...prices);
+  const changePercent = ((latest - first) / first) * 100;
+  const volatilityPercent = average > 0 ? ((high - low) / average) * 100 : 0;
+  const roundedChange = Math.round(changePercent);
+  const roundedVolatility = Math.round(volatilityPercent);
+
+  if (volatilityPercent >= 18) {
+    return {
+      kind: 'volatile',
+      label: 'Volatile',
+      observationCount,
+      changePercent: roundedChange,
+      volatilityPercent: roundedVolatility,
+      description: `Recent observed prices span ${roundedVolatility}% from low to high.`
+    };
+  }
+
+  if (changePercent >= 5) {
+    return {
+      kind: 'rising',
+      label: 'Rising',
+      observationCount,
+      changePercent: roundedChange,
+      volatilityPercent: roundedVolatility,
+      description: `Latest observed price is ${roundedChange}% above the first recent point.`
+    };
+  }
+
+  if (changePercent <= -5) {
+    return {
+      kind: 'falling',
+      label: 'Falling',
+      observationCount,
+      changePercent: roundedChange,
+      volatilityPercent: roundedVolatility,
+      description: `Latest observed price is ${Math.abs(roundedChange)}% below the first recent point.`
+    };
+  }
+
+  return {
+    kind: 'stable',
+    label: 'Stable',
+    observationCount,
+    changePercent: roundedChange,
+    volatilityPercent: roundedVolatility,
+    description: `Recent observed prices stayed within a ${roundedVolatility}% range.`
+  };
 }
 
 export function buildShortTermPriceForecast({

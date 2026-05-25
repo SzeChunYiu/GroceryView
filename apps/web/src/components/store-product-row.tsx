@@ -3,6 +3,7 @@
 import { useId, useState } from "react";
 
 import { communityReviewSummaryForProduct } from "@/lib/community-reviews";
+import { classifyPriceVolatilityBadge, type PriceVolatilityObservation } from "@/lib/price-intelligence";
 
 type FreshnessVote = "fresh" | "outdated";
 
@@ -12,6 +13,7 @@ export type StoreProductRowProps = {
   productName: string;
   storeName?: string;
   priceLabel?: string;
+  recentPriceObservations?: ReadonlyArray<PriceVolatilityObservation>;
   shelfLifeDays?: number;
   className?: string;
 };
@@ -24,6 +26,7 @@ export function StoreProductRow({
   productName,
   storeName,
   priceLabel,
+  recentPriceObservations = [],
   shelfLifeDays,
   className,
 }: StoreProductRowProps) {
@@ -33,6 +36,7 @@ export function StoreProductRow({
   const [note, setNote] = useState("");
   const [status, setStatus] = useState<SubmitState>("idle");
   const reviewSummary = communityReviewSummaryForProduct(productName);
+  const volatilityBadge = recentPriceObservations.length > 0 ? classifyPriceVolatilityBadge(recentPriceObservations) : null;
 
   async function submitFreshness() {
     setStatus("saving");
@@ -67,6 +71,11 @@ export function StoreProductRow({
         <h3>{productName}</h3>
         {storeName ? <p>{storeName}</p> : null}
         {priceLabel ? <p>{priceLabel}</p> : null}
+        {volatilityBadge ? (
+          <p title={volatilityBadge.description}>
+            Price trend: {volatilityBadge.label}
+          </p>
+        ) : null}
       </div>
 
       {reviewSummary ? (

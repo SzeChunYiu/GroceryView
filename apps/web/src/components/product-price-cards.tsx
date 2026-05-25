@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { LazyItemCard } from './LazyItemCard';
 import { FavouriteProductToggle } from './favourite-product-toggle';
 import { readStoredSafetyPreferences, SAFETY_PREFERENCES_CHANGED_EVENT, type ProductSafetyPreferences } from './cert-filter';
-import { volatilityBadgeMethodology } from '@/lib/price-intelligence';
+import { classifyPriceVolatilityBadge, volatilityBadgeMethodology } from '@/lib/price-intelligence';
 import type { AdaptiveProductCard } from '@/lib/verified-data';
 
 type CompareMode = 'adaptive' | 'total' | 'unit';
@@ -122,6 +122,7 @@ function PriceHistorySparkline({ card }: Readonly<{ card: AdaptiveProductCard }>
 
 function VolatilityMethodologyBadge({ card }: Readonly<{ card: AdaptiveProductCard }>) {
   const methodology = volatilityBadgeMethodology(card.sparklinePoints);
+  const badge = classifyPriceVolatilityBadge(card.sparklinePoints);
 
   return (
     <details className="mt-2 rounded-xl border border-violet-200 bg-violet-50 p-3 text-xs text-violet-950">
@@ -129,9 +130,10 @@ function VolatilityMethodologyBadge({ card }: Readonly<{ card: AdaptiveProductCa
         aria-label={`${card.name} volatility score methodology`}
         className="cursor-pointer font-black"
       >
-        Volatility score {methodology.score}/100 · {methodology.observationCount} historical observations
+        {badge.label} · Volatility score {methodology.score}/100 · {methodology.observationCount} historical observations
       </summary>
       <div className="mt-2 space-y-1 font-semibold leading-5">
+        <p>{badge.description}</p>
         <p>{methodology.rangeLabel}</p>
         <p>{methodology.summary}</p>
         <p>{methodology.forecastBoundary}</p>

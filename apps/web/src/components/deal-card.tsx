@@ -10,6 +10,7 @@ import {
   trackDealShare
 } from '@/lib/analytics';
 import { buildDealContext, type DealHistoryPoint } from '@/lib/deal-context';
+import { classifyPriceVolatilityBadge } from '@/lib/price-intelligence';
 import { dealShareUrl } from '@/lib/seo';
 
 type DealCardProps = {
@@ -103,6 +104,10 @@ export function DealCard({
 }: DealCardProps) {
   const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle');
   const context = buildDealContext({ currentPrice, discountStartedAt, priceHistory, currency, locale });
+  const volatilityBadge = classifyPriceVolatilityBadge([
+    ...(priceHistory ?? []),
+    { price: currentPrice, observedAt: '9999-12-31T00:00:00.000Z' }
+  ]);
   const dealLinkMetadata = outboundDealUrl ? outboundMetadata({
     campaignId: affiliateCampaignId,
     dealId,
@@ -159,6 +164,9 @@ export function DealCard({
         {context.isNewLowestPrice ? (
           <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">New low</span>
         ) : null}
+        <span className="rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-900" title={volatilityBadge.description}>
+          {volatilityBadge.label}
+        </span>
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2" aria-label="Deal history context">
