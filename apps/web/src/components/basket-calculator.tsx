@@ -85,6 +85,11 @@ export function BasketCalculator({ products, sourceLabel, weeklyBudgetSek }: Rea
     plannedTotal: comparison.cheapestByProduct.total,
     weeklyBudget
   }), [comparison.cheapestByProduct.total, weeklyBudget]);
+  const categoryBreakdown = useMemo(() => summarizeBudgetCategoryBreakdown(selectedProducts.map((product) => ({
+    category: product.categoryLabel,
+    currentPrice: cheapestProductPrice(product)
+  }))), [selectedProducts]);
+
   const budgetAlternatives = useMemo(() => suggestCheaperBasketAlternatives(
     selectedProducts.map((product) => ({
       id: product.id,
@@ -261,6 +266,14 @@ export function BasketCalculator({ products, sourceLabel, weeklyBudgetSek }: Rea
             />
           </div>
           <p className="mt-3 text-sm font-semibold leading-6 text-amber-950">{weeklyBudgetProgress.warning}</p>
+          <div className="mt-4 grid gap-2 sm:grid-cols-2">
+            {categoryBreakdown.slice(0, 4).map((row) => (
+              <div className="rounded-2xl bg-white/80 p-3" key={row.category}>
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-800">{row.category}</p>
+                <p className="mt-1 text-lg font-black text-slate-950">{formatSek(row.total)} · {row.sharePct.toFixed(0)}%</p>
+              </div>
+            ))}
+          </div>
           <div className="mt-4 space-y-2">
             {budgetAlternatives.length > 0 ? budgetAlternatives.map((alternative) => (
               <Link

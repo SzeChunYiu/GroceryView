@@ -282,3 +282,21 @@ export function parseMealPlanShoppingListExport(value: string): MealPlanShopping
     return null;
   }
 }
+
+export type BudgetCategoryBreakdownRow = {
+  category: string;
+  total: number;
+  sharePct: number;
+};
+
+export function summarizeBudgetCategoryBreakdown(items: Array<{ category: string; currentPrice: number }>): BudgetCategoryBreakdownRow[] {
+  const totals = new Map<string, number>();
+  for (const item of items) {
+    const price = Number.isFinite(item.currentPrice) ? Math.max(0, item.currentPrice) : 0;
+    totals.set(item.category, (totals.get(item.category) ?? 0) + price);
+  }
+  const grandTotal = [...totals.values()].reduce((sum, value) => sum + value, 0);
+  return [...totals.entries()]
+    .map(([category, total]) => ({ category, total, sharePct: grandTotal > 0 ? (total / grandTotal) * 100 : 0 }))
+    .sort((left, right) => right.total - left.total || left.category.localeCompare(right.category, 'sv-SE'));
+}
