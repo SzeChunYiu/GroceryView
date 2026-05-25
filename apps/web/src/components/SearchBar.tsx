@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { Search } from 'lucide-react';
 import { useEffect, useId, useMemo, useState } from 'react';
-import { readRecentProductSearches, rememberRecentProductSearch, trackSearchToSavingsFunnelStep, type RecentProductSearch } from '@/lib/analytics';
+import { trackSearchToSavingsFunnelStep } from '@/lib/analytics';
+import { readRecentProductSearches, rememberRecentProductSearch, type RecentProductSearch } from '@/lib/recent-searches';
 
 type ProductSearchResult = {
   id: string;

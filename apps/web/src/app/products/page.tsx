@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ChainFilterInput } from './chain-filter-input';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { PriceReportReviewActions } from '@/components/price-report-review-actions';
+import { RecentProductSearchesPanel } from '@/components/recent-product-searches-panel';
 import { OriginFilter, type OriginFilterCode } from '@/components/origin-filter';
 import { ProductPriceCards } from '@/components/product-price-cards';
 import { apohemSource } from '@/lib/ingested/apohem';
@@ -237,6 +238,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-violet-900 shadow-sm">No active URL filters</span>
           )}
         </div>
+        <RecentProductSearchesPanel />
         <OriginFilter
           className="mt-5"
           counts={Object.fromEntries(originFacets.map((facet) => [facet.value, facet.count])) as Partial<Record<OriginFilterCode, number>>}
