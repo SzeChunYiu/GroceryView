@@ -120,13 +120,13 @@ export function AccountBillingActions() {
       <p className="text-sm font-black uppercase tracking-[0.2em] text-violet-800">Signed-in billing actions</p>
       <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Checkout and subscription management</h2>
       <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
-        These controls call the protected subscription, Stripe checkout, and Stripe billing portal endpoints with the sessionStorage bearer token. They fail closed without a production session so public visitors cannot create anonymous billing sessions.
+        These controls call the protected subscription, Stripe checkout, and Stripe billing portal endpoints with the sessionStorage bearer token. They fail closed without a production session so public visitors cannot create anonymous billing sessions. Premium removes the free active price alert limit and unlocks priority deal monitoring.
       </p>
 
       <div className="mt-4 flex flex-wrap gap-2">
         <button className="rounded-full bg-violet-700 px-4 py-2 text-sm font-black text-white" onClick={loadSubscriptionAccess} type="button">Load subscription status</button>
-        <button className="rounded-full border border-violet-300 px-4 py-2 text-sm font-black text-violet-900" onClick={() => startCheckout('premium_monthly')} type="button">Start monthly checkout</button>
-        <button className="rounded-full border border-violet-300 px-4 py-2 text-sm font-black text-violet-900" onClick={() => startCheckout('premium_yearly')} type="button">Start yearly checkout</button>
+        <button className="rounded-full border border-violet-300 px-4 py-2 text-sm font-black text-violet-900" onClick={() => startCheckout('premium_monthly')} type="button">Upgrade monthly for unlimited alerts</button>
+        <button className="rounded-full border border-violet-300 px-4 py-2 text-sm font-black text-violet-900" onClick={() => startCheckout('premium_yearly')} type="button">Upgrade yearly for unlimited alerts</button>
         <button className="rounded-full border border-slate-300 px-4 py-2 text-sm font-black text-slate-800" onClick={manageSubscription} type="button">Manage subscription</button>
       </div>
 
