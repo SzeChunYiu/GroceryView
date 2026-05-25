@@ -1,1 +1,13 @@
 @import url("../../[country]/my-flyer/print.css") print;
+
+.my-flyer-print-only {
+  display: none;
+}
+
+@media print {
+  .my-flyer-diet-print-summary {
+    break-inside: avoid;
+    display: block;
+    margin-top: 0.25rem;
+  }
+}
