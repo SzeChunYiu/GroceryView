@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { dirname } from 'node:path';
+import { dirname, join } from 'node:path';
 import {
   createPgQueryExecutor,
   createPostgresPriceObservationWriter,
@@ -15,9 +15,15 @@ import {
 } from '@groceryview/db';
 import { COMMODITIES, findCommodity, type Commodity } from '@groceryview/catalog';
 import {
+  cacheAndRewriteProductImages,
+  type ImageCacheOptions as ProductImageCacheOptions,
+  type ImageCacheProduct
+} from '@groceryview/image-cache';
+import {
   fetchCityGrossProductsForAllStores,
   type CityGrossProduct
 } from './connectors/citygross.js';
+import { fetchCityGrossBulkProducts } from './connectors/citygross-bulk.js';
 import type { AllStoreTaskRunnerControls } from './connectors/all-store-runner.js';
 import {
   fetchCoopProductsForAllStores,
@@ -63,29 +69,51 @@ import {
   type FuelPriceObservation
 } from './connectors/okq8-fuel.js';
 import {
+  fetchSevenElevenSeConvenienceProducts,
+  type SevenElevenSeProduct
+} from './connectors/seven-eleven-se.js';
+import {
+  fetchMathemProducts,
+  type MathemProduct
+} from './connectors/mathem.js';
+import {
+  fetchMatsparProducts,
+  MATSPAR_MINIMUM_ROWS,
+  type MatsparProduct
+} from './connectors/matspar.js';
+import {
   fetchWillysProductsForAllStores,
   fetchWillysWeeklyDiscountsForAllStores,
+  type WillysProduct,
   type WillysStoreProduct,
   type WillysWeeklyDiscount
 } from './connectors/willys.js';
+import { fetchWillysBulkProducts } from './connectors/willys-bulk.js';
 
 export * from './connectors/openfoodfacts.js';
 export * from './connectors/all-store-runner.js';
 export * from './connectors/overpass.js';
 export * from './connectors/fuel-stations.js';
 export * from './connectors/citygross.js';
+export * from './connectors/citygross-bulk.js';
 export * from './connectors/coop.js';
 export * from './connectors/hemkop.js';
 export * from './connectors/ica.js';
+export * from './connectors/ica-bulk.js';
 export * from './connectors/ica-reklamblad.js';
 export * from './connectors/lidl.js';
+export * from './connectors/seven-eleven-no.js';
 export * from './connectors/mathem.js';
 export * from './connectors/matpriskollen.js';
 export * from './connectors/matspar.js';
+export * from './connectors/lidl-bulk.js';
+export * from './connectors/willys-bulk.js';
 export * from './connectors/apohem.js';
 export * from './connectors/okq8-fuel.js';
+export * from './connectors/seven-eleven-se.js';
 export * from './connectors/st1-fuel.js';
 export * from './connectors/willys.js';
+export * from './store-enumerator.js';
 export * from './store-enumerator.js';
 export * from './unit-price.js';
 
@@ -1636,6 +1664,16 @@ function dailyNativeStringListParam(url: URL, name: string): string[] | undefine
   return value.split(',').map((part) => part.trim()).filter(Boolean);
 }
 
+function dailyNativeNumberListParam(url: URL, name: string): number[] | undefined {
+  const values = dailyNativeStringListParam(url, name);
+  if (!values) return undefined;
+  return values.map((value) => {
+    const parsed = Number(value);
+    if (!Number.isInteger(parsed) || parsed < 1) throw new Error(`${name} must be a comma-separated list of positive integers.`);
+    return parsed;
+  });
+}
+
 function validDailyBarcode(value: string | undefined): string | undefined {
   const barcode = value?.trim();
   return barcode && /^\d{8,14}$/.test(barcode) ? barcode : undefined;
@@ -1666,7 +1704,8 @@ function willysWeeklyDiscountToDailyItem(row: WillysWeeklyDiscount): RetailerCon
     promoText: row.conditionText || row.priceText || undefined,
     memberOnly: false,
     observedAt: row.retrievedAt,
-    sourceUrl: row.sourceUrl
+    sourceUrl: row.sourceUrl,
+    imageUrl: row.imageUrl || undefined
   };
 }
 
@@ -1687,7 +1726,29 @@ function willysStoreProductToDailyItem(row: WillysStoreProduct): RetailerConnect
     price: row.price,
     memberOnly: false,
     observedAt: row.retrievedAt,
-    sourceUrl: row.sourceUrl
+    sourceUrl: row.sourceUrl,
+    imageUrl: row.imageUrl || undefined
+  };
+}
+
+function willysBulkProductToDailyItem(row: WillysProduct): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageText);
+  const barcode = validDailyBarcode(extractOpenFoodFactsBarcodeFromAxfoodImageUrl(row.imageUrl));
+  return {
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: dailyProductIdForBarcode('willys', row.code, barcode),
+    categoryId: stableKeyPart(row.category || 'willys-bulk-products'),
+    barcode,
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price,
+    memberOnly: false,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.sourceUrl,
+    imageUrl: row.imageUrl || undefined
   };
 }
 
@@ -1709,7 +1770,8 @@ function hemkopStoreProductToDailyItem(row: HemkopStoreProduct): RetailerConnect
     price: row.price,
     memberOnly: false,
     observedAt: row.retrievedAt,
-    sourceUrl: row.sourceUrl
+    sourceUrl: row.sourceUrl,
+    imageUrl: row.imageUrl || undefined
   };
 }
 
@@ -1733,7 +1795,8 @@ function hemkopWeeklyDiscountToDailyItem(row: HemkopWeeklyDiscount): RetailerCon
     promoText: row.conditionText || row.priceText || undefined,
     memberOnly: false,
     observedAt: row.retrievedAt,
-    sourceUrl: row.sourceUrl
+    sourceUrl: row.sourceUrl,
+    imageUrl: row.imageUrl || undefined
   };
 }
 
@@ -1758,7 +1821,8 @@ function icaProductToDailyItem(row: IcaProduct): RetailerConnectorParsedProduct 
     promoText: row.promotionDescription || undefined,
     memberOnly: false,
     observedAt: row.retrievedAt,
-    sourceUrl: row.sourceUrl
+    sourceUrl: row.sourceUrl,
+    imageUrl: row.imageUrl || undefined
   };
 }
 
@@ -1805,8 +1869,10 @@ function coopStoreProductToDailyItem(row: CoopStoreProduct): RetailerConnectorPa
     regularPrice: row.promotionPrice !== null && row.price > row.promotionPrice ? row.price : undefined,
     promoText: row.promotionText || undefined,
     memberOnly: row.medMeraRequired,
+    isAvailable: row.availableOnline,
     observedAt: row.retrievedAt,
-    sourceUrl: row.sourceUrl
+    sourceUrl: row.sourceUrl,
+    imageUrl: row.imageUrl || undefined
   };
 }
 
@@ -1827,7 +1893,8 @@ function lidlStoreOfferToDailyItem(row: LidlStoreOffer): RetailerConnectorParsed
     promoText: row.promotionText || undefined,
     memberOnly: row.memberOnly,
     observedAt: row.retrievedAt,
-    sourceUrl: row.sourceUrl
+    sourceUrl: row.sourceUrl,
+    imageUrl: row.imageUrl || undefined
   };
 }
 
@@ -1850,7 +1917,67 @@ function cityGrossProductToDailyItem(row: CityGrossProduct): RetailerConnectorPa
     promoText: row.regularPrice !== null && row.regularPrice > row.price ? 'City Gross discounted public price' : undefined,
     memberOnly: false,
     observedAt: row.retrievedAt,
-    sourceUrl: row.sourceUrl
+    sourceUrl: row.sourceUrl,
+    imageUrl: row.imageUrl || undefined
+  };
+}
+
+function matsparCategoryId(row: MatsparProduct): string {
+  try {
+    const query = new URL(row.sourceUrl).searchParams.get('q');
+    if (query?.trim()) return `matspar-${stableKeyPart(query)}`;
+  } catch {
+    // Keep a stable category even if a captured row has a malformed source URL.
+  }
+  return 'matspar-public-search';
+}
+
+function matsparProductToDailyItem(row: MatsparProduct): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageText);
+  return {
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: `matspar-${stableKeyPart(row.code)}`,
+    categoryId: matsparCategoryId(row),
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price,
+    memberOnly: false,
+    isAvailable: true,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.productUrl || row.sourceUrl
+  };
+}
+
+function mathemCategoryId(row: MathemProduct): string {
+  try {
+    const query = new URL(row.sourceUrl).searchParams.get('q');
+    if (query?.trim()) return `mathem-${stableKeyPart(query)}`;
+  } catch {
+    // Keep a stable category even if a captured row has a malformed source URL.
+  }
+  return 'mathem-public-search';
+}
+
+function mathemProductToDailyItem(row: MathemProduct): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageText);
+  return {
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: `mathem-${stableKeyPart(row.code)}`,
+    categoryId: mathemCategoryId(row),
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price,
+    memberOnly: false,
+    isAvailable: row.available,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.productUrl || row.sourceUrl,
+    imageUrl: row.imageUrl || undefined
   };
 }
 
@@ -1881,6 +2008,28 @@ function okq8FuelPriceToDailyItem(row: FuelPriceObservation): RetailerConnectorP
   };
 }
 
+function sevenElevenSeProductToDailyItem(row: SevenElevenSeProduct): RetailerConnectorParsedProduct {
+  return {
+    sourceType: 'retailer_online_page',
+    observedAt: row.retrievedAt,
+    chainId: row.chainId,
+    retailerProductId: row.productId,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: row.productId,
+    categoryId: `convenience-${row.category}`,
+    brand: row.chainName,
+    packageSize: 1,
+    packageUnit: 'each',
+    price: row.priceMin,
+    regularPrice: row.priceMax > row.priceMin ? row.priceMax : undefined,
+    promoText: row.priceMax > row.priceMin ? `7-Eleven Sweden B2B range ${row.priceText}` : undefined,
+    memberOnly: false,
+    isAvailable: true,
+    sourceUrl: row.pdfUrl
+  };
+}
+
 function pharmacyProductToDailyItem(row: ApohemProduct): RetailerConnectorParsedProduct {
   const quantity = parseNativePackageText(row.name);
   const barcode = validDailyBarcode(row.ean);
@@ -1899,8 +2048,10 @@ function pharmacyProductToDailyItem(row: ApohemProduct): RetailerConnectorParsed
     regularPrice: row.originalPrice !== null && row.originalPrice > row.price ? row.originalPrice : undefined,
     promoText: row.originalPrice !== null && row.originalPrice > row.price ? 'Public pharmacy discounted price' : undefined,
     memberOnly: false,
+    isAvailable: availabilityFromStockStatus(row.stockStatus) ?? true,
     observedAt: row.retrievedAt,
-    sourceUrl: row.sourceUrl
+    sourceUrl: row.sourceUrl,
+    imageUrl: row.imageUrl || undefined
   };
 }
 
@@ -1947,6 +2098,20 @@ export async function fetchDailyConnectorSnapshot(
       retrievedAt
     });
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(willysWeeklyDiscountToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_WILLYS_BULK_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_WILLYS_BULK_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchWillysBulkProducts({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      minRows: dailyNativeNumberParam(url, 'minRows'),
+      queries: dailyNativeStringListParam(url, 'queries'),
+      categoryPaths: dailyNativeStringListParam(url, 'categoryPaths'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(willysBulkProductToDailyItem) });
   }
 
   if (sourceUrl === GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL}?`)) {
@@ -2063,6 +2228,22 @@ export async function fetchDailyConnectorSnapshot(
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(lidlStoreOfferToDailyItem) });
   }
 
+  if (sourceUrl === GROCERYVIEW_DAILY_CITY_GROSS_BULK_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_CITY_GROSS_BULK_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchCityGrossBulkProducts({
+      ...runnerControlsFromUrl(url),
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxStores: dailyNativeNumberParam(url, 'maxStores'),
+      maxRowsPerStore: dailyNativeNumberParam(url, 'maxRowsPerStore'),
+      minRows: dailyNativeNumberParam(url, 'minRows'),
+      pageSize: dailyNativeNumberParam(url, 'pageSize'),
+      queries: dailyNativeStringListParam(url, 'queries'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(cityGrossProductToDailyItem) });
+  }
+
   if (sourceUrl === GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL}?`)) {
     const url = new URL(sourceUrl);
     const retrievedAt = options.retrievedAt ?? new Date().toISOString();
@@ -2078,6 +2259,33 @@ export async function fetchDailyConnectorSnapshot(
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(cityGrossProductToDailyItem) });
   }
 
+  if (sourceUrl === GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchMathemProducts({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      queries: dailyNativeStringListParam(url, 'queries'),
+      pages: dailyNativeNumberListParam(url, 'pages'),
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(mathemProductToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchMatsparProducts({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      queries: dailyNativeStringListParam(url, 'queries'),
+      pages: dailyNativeNumberListParam(url, 'pages'),
+      minRows: dailyNativeNumberParam(url, 'minRows') ?? MATSPAR_MINIMUM_ROWS,
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(matsparProductToDailyItem) });
+  }
+
   if (sourceUrl === GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL}?`)) {
     const retrievedAt = options.retrievedAt ?? new Date().toISOString();
     const rows = await fetchOkq8FuelPrices({
@@ -2086,6 +2294,18 @@ export async function fetchDailyConnectorSnapshot(
       sourceUrl: OKQ8_FUEL_PRICES_URL
     });
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(okq8FuelPriceToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_SEVEN_ELEVEN_SE_CONVENIENCE_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_SEVEN_ELEVEN_SE_CONVENIENCE_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchSevenElevenSeConvenienceProducts({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      pdfUrl: url.searchParams.get('pdfUrl') ?? undefined,
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(sevenElevenSeProductToDailyItem) });
   }
 
   if (sourceUrl === GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL}?`)) {
@@ -2205,6 +2425,52 @@ function optionalBoolean(record: Record<string, unknown>, key: string, path: str
   throw new Error(`${path}.${key} must be a boolean.`);
 }
 
+function availabilityFromStockStatus(value: unknown): boolean | undefined {
+  if (typeof value !== 'string') return undefined;
+  const normalized = value.trim().toLowerCase().replace(/[\s-]+/g, '_');
+  if (!normalized) return undefined;
+  if (
+    normalized.includes('out_of_stock') ||
+    normalized.includes('sold_out') ||
+    normalized.includes('unavailable') ||
+    normalized.includes('not_available') ||
+    normalized.includes('not_found') ||
+    normalized.includes('http_404') ||
+    normalized.includes('404') ||
+    normalized.includes('empty_stock')
+  ) {
+    return false;
+  }
+  if (
+    normalized.includes('in_stock') ||
+    normalized.includes('buyable') ||
+    normalized === 'available' ||
+    normalized === 'i_lager'
+  ) {
+    return true;
+  }
+  return undefined;
+}
+
+function optionalAvailability(record: Record<string, unknown>, path: string): boolean | undefined {
+  const explicit = optionalBoolean(record, 'isAvailable', path);
+  if (explicit !== undefined) return explicit;
+  const available = record.available;
+  if (typeof available === 'boolean') return available;
+  if (typeof available === 'string' && ['true', 'false'].includes(available.toLowerCase())) return available.toLowerCase() === 'true';
+  const fromAvailableStatus = availabilityFromStockStatus(available);
+  if (fromAvailableStatus !== undefined) return fromAvailableStatus;
+  const fromStatus = availabilityFromStockStatus(record.stockStatus ?? record.availabilityStatus ?? record.stock);
+  if (fromStatus !== undefined) return fromStatus;
+  const availability = record.availability;
+  if (availability && typeof availability === 'object' && !Array.isArray(availability)) {
+    const availabilityRecord = availability as Record<string, unknown>;
+    return optionalBoolean(availabilityRecord, 'isAvailable', `${path}.availability`) ??
+      availabilityFromStockStatus(availabilityRecord.status ?? availabilityRecord.stockStatus);
+  }
+  return undefined;
+}
+
 function optionalFuelSource(record: Record<string, unknown>, path: string): RetailerProductInput['fuelSource'] {
   const value = record.fuelSource;
   if (value === undefined || value === null) return undefined;
@@ -2253,10 +2519,12 @@ export function parseRetailerProductJsonSnapshot(snapshot: RetailerConnectorSnap
       regularPrice: optionalNumber(record, 'regularPrice', path),
       promoText: optionalString(record, 'promoText', path),
       memberOnly: optionalBoolean(record, 'memberOnly', path),
+      isAvailable: optionalAvailability(record, path),
       validFrom: optionalString(record, 'validFrom', path),
       validUntil: optionalString(record, 'validUntil', path),
       observedAt: optionalString(record, 'observedAt', path),
-      sourceUrl: optionalString(record, 'sourceUrl', path)
+      sourceUrl: optionalString(record, 'sourceUrl', path),
+      imageUrl: optionalString(record, 'imageUrl', path)
     };
   });
 }
@@ -2442,9 +2710,11 @@ export type RetailerProductInput = {
   regularPrice?: number;
   promoText?: string;
   memberOnly?: boolean;
+  isAvailable?: boolean;
   validFrom?: string;
   validUntil?: string;
   sourceUrl?: string;
+  imageUrl?: string;
 };
 
 export type PriceType =
@@ -2481,6 +2751,7 @@ export type IngestedProduct = {
   packageSize: number;
   packageUnit: string;
   comparableUnit: string;
+  imageUrl?: string;
 };
 
 export type IngestedAlias = {
@@ -2516,6 +2787,7 @@ export type IngestedPriceObservation = {
   confidenceScore: number;
   isOnlinePrice: boolean;
   isInstorePrice: boolean;
+  isAvailable: boolean;
   fuelSource?: RetailerProductInput['fuelSource'];
 };
 
@@ -2654,7 +2926,8 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
       originCountry: input.originCountry?.toUpperCase(),
       packageSize: input.packageSize,
       packageUnit: input.packageUnit,
-      comparableUnit: normalized.comparableUnit
+      comparableUnit: normalized.comparableUnit,
+      imageUrl: input.imageUrl?.trim() || undefined
     },
     alias: {
       rawName: input.rawName,
@@ -2687,6 +2960,7 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
       confidenceScore: confidence,
       isOnlinePrice: input.sourceType === 'official_api' || input.sourceType === 'retailer_online_page',
       isInstorePrice: input.sourceType === 'receipt_scan' || input.sourceType === 'shelf_photo' || input.sourceType === 'manual_user_report',
+      isAvailable: input.isAvailable ?? true,
       fuelSource: input.fuelSource
     },
     promotionObservation: hasPromotion
@@ -2765,7 +3039,10 @@ export type DailyIngestionEnv = Partial<Record<
   | 'GROCERYVIEW_DAILY_STORE_CONCURRENCY'
   | 'GROCERYVIEW_DAILY_STORE_START_DELAY_MS'
   | 'GROCERYVIEW_DAILY_STORE_RETRY_ATTEMPTS'
-  | 'GROCERYVIEW_DAILY_STORE_RETRY_BASE_DELAY_MS',
+  | 'GROCERYVIEW_DAILY_STORE_RETRY_BASE_DELAY_MS'
+  | 'GROCERYVIEW_IMAGE_CACHE_ENABLED'
+  | 'GROCERYVIEW_IMAGE_CACHE_PUBLIC_DIR'
+  | 'GROCERYVIEW_IMAGE_CACHE_MAX_BYTES',
   string
 >>;
 
@@ -2786,6 +3063,8 @@ export type DailyIngestionEnvConfig = {
   };
 };
 
+export type DailyIngestionImageCacheOptions = ProductImageCacheOptions & { enabled?: boolean };
+
 export type DailyIngestionRunInput = {
   executor: QueryExecutor;
   requestedAt: string;
@@ -2801,6 +3080,8 @@ export type DailyIngestionRunInput = {
   connectorRetryBaseDelayMs?: number;
   /** File path for durable blocker diagnostics when a country-wide run is partial or blocked. */
   blockerLogPath?: string;
+  /** Optional product image cache that downloads external product images and rewrites products.image_url at ingest time. */
+  imageCache?: false | DailyIngestionImageCacheOptions;
 };
 
 export type DailyIngestionConnectorSummary = {
@@ -2861,14 +3142,19 @@ export const requiredDailyIngestionChainIds = [
 
 export const GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/willys/weekly-offers/all-stores';
 export const GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/willys/products/all-stores';
+export const GROCERYVIEW_DAILY_WILLYS_BULK_PRODUCTS_URL = 'groceryview://daily/willys/products/bulk';
 export const GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/hemkop/products/all-stores';
 export const GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/hemkop/weekly-offers/all-stores';
 export const GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL = 'groceryview://daily/ica/store-promotions/default-stores';
 export const GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL = 'groceryview://daily/lidl/public-offers/all-stores';
 export const GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/coop/weekly-offers/all-stores';
 export const GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/coop/products/all-stores';
+export const GROCERYVIEW_DAILY_CITY_GROSS_BULK_PRODUCTS_URL = 'groceryview://daily/city-gross/products/bulk';
 export const GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL = 'groceryview://daily/city-gross/public-products/all-stores';
+export const GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL = 'groceryview://daily/mathem/products/public-search';
+export const GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL = 'groceryview://daily/matspar/products/public-search';
 export const GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL = OKQ8_FUEL_PRICES_URL;
+export const GROCERYVIEW_DAILY_SEVEN_ELEVEN_SE_CONVENIENCE_PRODUCTS_URL = 'groceryview://daily/seven-eleven-se/convenience-products';
 export const GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL = 'groceryview://daily/pharmacy/products/public';
 
 const requireForDailyIngestion = createRequire(import.meta.url);
@@ -2963,6 +3249,19 @@ function dailyRunnerIntegerFromEnv(value: string | undefined, fallback?: number)
   const parsed = Number(trimmed);
   if (!Number.isFinite(parsed)) return fallback;
   return Math.max(0, Math.floor(parsed));
+}
+
+function dailyEnvFlagEnabled(value: string | undefined): boolean {
+  return /^(1|true|yes|on)$/i.test(value?.trim() ?? '');
+}
+
+function buildDailyImageCacheOptionsFromEnv(env: DailyIngestionEnv): false | DailyIngestionImageCacheOptions {
+  if (!dailyEnvFlagEnabled(env.GROCERYVIEW_IMAGE_CACHE_ENABLED)) return false;
+  return {
+    enabled: true,
+    publicDir: env.GROCERYVIEW_IMAGE_CACHE_PUBLIC_DIR?.trim() || join(process.cwd(), 'apps/web/public'),
+    maxBytes: dailyRunnerIntegerFromEnv(env.GROCERYVIEW_IMAGE_CACHE_MAX_BYTES)
+  };
 }
 
 function definedAllStoreRunnerControls(input: AllStoreTaskRunnerControls): AllStoreTaskRunnerControls {
@@ -3068,19 +3367,6 @@ function normalizeDailyExactMatchKey(value: string | undefined | null): string |
 type BatchRawRecordIdRow = { ordinal: number; id: string };
 type FuelPriceSourceIdRow = { id: string };
 type BatchProductIdRow = { slug: string; id: string };
-type DailyProductBatchRow = {
-  inputSlug: string;
-  targetSlug: string;
-  canonicalName: string;
-  brand: string | null;
-  barcode: string | null;
-  categoryId: string | null;
-  packageSize: number | null;
-  packageUnit: string | null;
-  comparableUnit: IngestedProduct['comparableUnit'];
-  domain: DailyIngestionDomain;
-  fuelGradeId: string | null;
-};
 
 function chunkDailyRows<T>(rows: T[], size = 250): T[][] {
   const chunks: T[][] = [];
@@ -3183,30 +3469,63 @@ function validateConfiguredStoreObservationCoverage(config: DailyIngestionConnec
 
 async function upsertDailyProduct(executor: QueryExecutor, product: IngestedProduct, domain?: DailyIngestionDomain): Promise<string> {
   const rows = await executor.query<IdRow>(
-    `insert into products(
-       slug,
-       canonical_name,
-       brand,
-       barcode,
-       category_path,
-       package_size,
-       package_unit,
-       comparable_unit,
-       domain,
-       fuel_grade_id
-     ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-     on conflict (slug) do update set
-       canonical_name = excluded.canonical_name,
-       brand = excluded.brand,
-       barcode = excluded.barcode,
-       category_path = excluded.category_path,
-       package_size = excluded.package_size,
-       package_unit = excluded.package_unit,
-       comparable_unit = excluded.comparable_unit,
-       domain = excluded.domain,
-       fuel_grade_id = excluded.fuel_grade_id,
-       updated_at = now()
-     returning id`,
+    `with input as (
+       select
+         $1::text as slug,
+         $2::text as canonical_name,
+         $3::text as brand,
+         $4::text as barcode,
+         $5::text[] as category_path,
+         $6::numeric as package_size,
+         $7::text as package_unit,
+         $8::text as comparable_unit,
+         $9::text as domain,
+         $10::text as fuel_grade_id
+     ),
+     matched as (
+       select input.*, coalesce(existing.slug, input.slug) as target_slug
+       from input
+       left join products existing on existing.barcode = input.barcode and input.barcode is not null
+     ),
+     upserted as (
+       insert into products(
+         slug,
+         canonical_name,
+         brand,
+         barcode,
+         category_path,
+         package_size,
+         package_unit,
+         comparable_unit,
+         domain,
+         fuel_grade_id
+       )
+       select
+         target_slug,
+         canonical_name,
+         brand,
+         barcode,
+         category_path,
+         package_size,
+         package_unit,
+         comparable_unit,
+         domain,
+         fuel_grade_id
+       from matched
+       on conflict (slug) do update set
+         canonical_name = excluded.canonical_name,
+         brand = excluded.brand,
+         barcode = excluded.barcode,
+         category_path = excluded.category_path,
+         package_size = excluded.package_size,
+         package_unit = excluded.package_unit,
+         comparable_unit = excluded.comparable_unit,
+         domain = excluded.domain,
+         fuel_grade_id = excluded.fuel_grade_id,
+         updated_at = now()
+       returning id
+     )
+     select id from upserted`,
     [
       normalizeDailySlug(product.id),
       product.canonicalName,
@@ -3228,24 +3547,7 @@ async function upsertDailyProduct(executor: QueryExecutor, product: IngestedProd
 
 async function upsertDailyProductBatch(executor: QueryExecutor, products: IngestedProduct[], domain?: DailyIngestionDomain): Promise<Map<string, string>> {
   if (products.length === 0) return new Map();
-  const productRows = products.map<DailyProductBatchRow>((product) => {
-    const inputSlug = normalizeDailySlug(product.id);
-    const barcode = normalizeDailyExactMatchKey(product.barcode);
-    return {
-      inputSlug,
-      targetSlug: barcode ? normalizeDailySlug(`ean-${barcode}`) : inputSlug,
-      canonicalName: product.canonicalName,
-      brand: product.brand ?? null,
-      barcode,
-      categoryId: product.categoryId ?? null,
-      packageSize: product.packageSize ?? null,
-      packageUnit: product.packageUnit ?? null,
-      comparableUnit: product.comparableUnit,
-      domain: normalizeDailyDomain(domain),
-      fuelGradeId: product.fuelGradeId ?? null
-    };
-  });
-  const uniqueProducts = [...new Map(productRows.map((product) => [product.targetSlug, product])).values()];
+  const uniqueProducts = [...new Map(products.map((product) => [normalizeDailySlug(product.id), product])).values()];
   const ids = new Map<string, string>();
   for (const chunk of chunkDailyRows(uniqueProducts)) {
     const rows = await executor.query<BatchProductIdRow>(
@@ -3253,8 +3555,6 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
          select *
          from jsonb_to_recordset($1::jsonb) as x(
            slug text,
-           input_slug text,
-           batch_slug text,
            canonical_name text,
            brand text,
            barcode text,
@@ -3267,32 +3567,31 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
          )
        ),
        batch_barcodes as (
-         select barcode, min(batch_slug) as batch_slug
+         select barcode, min(slug) as batch_slug
          from input
          where barcode is not null
          group by barcode
        ),
-       resolved as (
-         select
-           input.slug as input_slug,
-           coalesce(existing.slug, batch_barcodes.batch_slug, input.slug) as target_slug,
-           input.canonical_name,
-           input.brand,
-           input.barcode,
-           input.category_id,
-           input.package_size,
-           input.package_unit,
-           input.comparable_unit,
-           input.domain,
-           input.fuel_grade_id
+       matched as (
+         select input.*, coalesce(existing.slug, batch_barcodes.batch_slug, input.slug) as target_slug
          from input
-         left join products existing on existing.barcode = input.barcode
+         left join products existing on existing.barcode = input.barcode and input.barcode is not null
          left join batch_barcodes on batch_barcodes.barcode = input.barcode
        ),
-       deduped as (
-         select distinct on (target_slug) *
-         from resolved
-         order by target_slug, input_slug
+       deduplicated as (
+         select distinct on (target_slug)
+           target_slug,
+           canonical_name,
+           brand,
+           barcode,
+           category_id,
+           package_size,
+           package_unit,
+           comparable_unit,
+           domain,
+           fuel_grade_id
+         from matched
+         order by target_slug, slug
        ),
        upserted as (
          insert into products(
@@ -3318,7 +3617,7 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
            comparable_unit,
            domain,
            fuel_grade_id
-         from deduped
+         from deduplicated
          on conflict (slug) do update set
            canonical_name = excluded.canonical_name,
            brand = excluded.brand,
@@ -3330,29 +3629,26 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
            domain = excluded.domain,
            fuel_grade_id = excluded.fuel_grade_id,
            updated_at = now()
-         returning slug as target_slug, id
+         returning slug, id
        )
-       select target_slug as slug, id from upserted`,
+       select matched.slug, upserted.id
+       from matched
+       join upserted on upserted.slug = matched.target_slug
+       order by matched.slug`,
       [JSON.stringify(chunk.map((product) => ({
-        slug: product.targetSlug,
-        input_slug: product.inputSlug,
-        batch_slug: product.targetSlug,
+        slug: normalizeDailySlug(product.id),
         canonical_name: product.canonicalName,
-        brand: product.brand,
-        barcode: product.barcode,
-        category_id: product.categoryId,
-        package_size: product.packageSize,
-        package_unit: product.packageUnit,
+        brand: product.brand ?? null,
+        barcode: normalizeDailyExactMatchKey(product.barcode),
+        category_id: product.categoryId ?? null,
+        package_size: product.packageSize ?? null,
+        package_unit: product.packageUnit ?? null,
         comparable_unit: product.comparableUnit,
-        domain: product.domain,
-        fuel_grade_id: product.fuelGradeId
+        domain: normalizeDailyDomain(domain),
+        fuel_grade_id: product.fuelGradeId ?? null
       })))]
     );
-    const idsByTargetSlug = new Map(rows.map((row) => [row.slug, row.id]));
-    for (const product of productRows) {
-      const id = idsByTargetSlug.get(product.targetSlug);
-      if (id) ids.set(product.inputSlug, id);
-    }
+    for (const row of rows) ids.set(row.slug, row.id);
   }
   return ids;
 }
@@ -3425,20 +3721,7 @@ function openFoodFactsProductToMetadataRow(row: OpenFoodFactsProduct): OpenFoodF
     quantity: row.quantity,
     categories: row.categories,
     labels: row.labels,
-    allergens: row.allergens,
-    traces: row.traces,
-    additives: row.additives,
-    countries: row.countries,
-    stores: row.stores,
-    origins: row.origins,
-    manufacturingPlaces: row.manufacturingPlaces,
-    packaging: row.packaging,
-    ingredientsText: row.ingredientsText,
-    servingSize: row.servingSize,
     nutriscoreGrade: row.nutriscoreGrade,
-    novaGroup: row.novaGroup,
-    ecoscoreGrade: row.ecoscoreGrade,
-    dataQualityTags: row.dataQualityTags,
     nutritionPer100g: row.nutritionPer100g,
     imageUrl: row.imageUrl,
     productUrl: row.productUrl,
@@ -3687,7 +3970,7 @@ async function persistDailyConnectorOutput(input: {
   executor: QueryExecutor;
   config: DailyIngestionConnectorConfig;
   result: RetailerConnectorRunResult;
-}): Promise<Pick<DailyIngestionRunResult, 'sourceRunIds' | 'rawRecordIds' | 'observationIds' | 'acceptedCount' | 'rejectedCount'>> {
+}): Promise<Pick<DailyIngestionRunResult, 'sourceRunIds' | 'rawRecordIds' | 'observationIds' | 'acceptedCount' | 'rejectedCount'> & { imageCacheProducts: ImageCacheProduct[] }> {
   const { executor, config, result } = input;
   const domain = normalizeDailyDomain(config.domain);
   await executor.query('set default_transaction_read_only=off');
@@ -3889,6 +4172,7 @@ async function persistDailyConnectorOutput(input: {
     }
 
     const productIdsBySlug = await upsertDailyProductBatch(executor, result.ingestion.accepted.map((accepted) => accepted.product), domain);
+    const imageCacheProducts: ImageCacheProduct[] = [];
     const aliasesToUpsert: Parameters<typeof upsertDailyAliasBatch>[1] = [];
     for (const accepted of result.ingestion.accepted) {
       const productId = productIdsBySlug.get(normalizeDailySlug(accepted.product.id));
@@ -3900,6 +4184,9 @@ async function persistDailyConnectorOutput(input: {
         sourceRef: result.plan.runKey,
         matchConfidence: accepted.alias.matchConfidence
       });
+      if (accepted.product.imageUrl?.trim()) {
+        imageCacheProducts.push({ productId, imageUrl: accepted.product.imageUrl });
+      }
     }
     await upsertDailyAliasBatch(executor, aliasesToUpsert);
 
@@ -3919,10 +4206,12 @@ async function persistDailyConnectorOutput(input: {
         storeId: accepted.priceObservation.storeId,
         priceType: accepted.priceObservation.priceType,
         price: accepted.priceObservation.price,
+        isAvailable: accepted.priceObservation.isAvailable,
         observedAt: accepted.priceObservation.observedAt
       };
       const rawProvenance = {
         sourceType: accepted.priceObservation.provenance.sourceType,
+        sourceUrl: accepted.priceObservation.provenance.sourceUrl,
         parserVersion: accepted.priceObservation.provenance.parserVersion,
         rawSnapshotRef: accepted.priceObservation.provenance.rawSnapshotRef,
         chainId: config.chainId,
@@ -3943,7 +4232,8 @@ async function persistDailyConnectorOutput(input: {
           retailerProductId: accepted.priceObservation.retailerProductId ?? null,
           storeId: accepted.priceObservation.storeId ?? null,
           observedAt: accepted.priceObservation.observedAt,
-          price: accepted.priceObservation.price
+          price: accepted.priceObservation.price,
+          isAvailable: accepted.priceObservation.isAvailable
         }),
         provenance: rawProvenance
       });
@@ -3964,6 +4254,7 @@ async function persistDailyConnectorOutput(input: {
         promotionStartsOn: accepted.promotionObservation?.validFrom?.slice(0, 10),
         promotionEndsOn: accepted.promotionObservation?.validUntil?.slice(0, 10),
         memberRequired: accepted.promotionObservation?.memberOnly ?? false,
+        isAvailable: accepted.priceObservation.isAvailable,
         observedAt: accepted.priceObservation.observedAt,
         validFrom: accepted.priceObservation.validFrom,
         validUntil: accepted.priceObservation.validUntil,
@@ -4008,7 +4299,8 @@ async function persistDailyConnectorOutput(input: {
       rawRecordIds,
       observationIds,
       acceptedCount: result.acceptedCount,
-      rejectedCount: result.rejectedCount
+      rejectedCount: result.rejectedCount,
+      imageCacheProducts
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
@@ -4025,6 +4317,7 @@ async function persistDailyConnectorOutput(input: {
 type DailyConnectorRunPersistenceResult = Pick<DailyIngestionRunResult, 'sourceRunIds' | 'rawRecordIds' | 'observationIds' | 'acceptedCount' | 'rejectedCount'> & {
   blockers: string[];
   persistedRuns: number;
+  imageCacheProducts?: ImageCacheProduct[];
 };
 
 function writeDailyIngestionBlockerLog(path: string, result: DailyIngestionRunResult, requestedAt: string): void {
@@ -4262,6 +4555,7 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
   const rawRecordIds: string[] = [];
   const observationIds: string[] = [];
   const chainSummaries: DailyIngestionConnectorSummary[] = [];
+  const imageCacheProducts: ImageCacheProduct[] = [];
   let persistedRuns = 0;
   let acceptedCount = 0;
   let rejectedCount = 0;
@@ -4277,6 +4571,7 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
     sourceRunIds.push(...result.sourceRunIds);
     rawRecordIds.push(...result.rawRecordIds);
     observationIds.push(...result.observationIds);
+    imageCacheProducts.push(...(result.imageCacheProducts ?? []));
     chainSummaries.push({
       connectorId: config.connectorId,
       chainId: config.chainId,
@@ -4289,6 +4584,20 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
       rawRecordIds: [...result.rawRecordIds],
       observationIds: [...result.observationIds]
     });
+  }
+
+  if (input.imageCache && input.imageCache.enabled !== false && imageCacheProducts.length > 0) {
+    try {
+      const imageCacheResult = await cacheAndRewriteProductImages(input.executor, imageCacheProducts, {
+        fetchImpl: input.fetchImpl,
+        ...input.imageCache
+      });
+      process.stderr.write(`[daily-ingestion] cached product images: cached=${imageCacheResult.cachedImages.length} updated=${imageCacheResult.updatedProductIds.length} skipped=${imageCacheResult.skippedProductIds.length}\n`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      blockers.push(`image_cache_failed:${message}`);
+      process.stderr.write(`[daily-ingestion] image cache failed: ${message}\n`);
+    }
   }
 
   const runResult: DailyIngestionRunResult = {
@@ -4328,6 +4637,7 @@ export async function runDailyIngestionFromEnv(env: DailyIngestionEnv = process.
       executor,
       requestedAt: new Date().toISOString(),
       connectors,
+      imageCache: buildDailyImageCacheOptionsFromEnv(env),
       ...runtimeOptions
     });
   } finally {
@@ -4346,3 +4656,6 @@ if (process.argv[1] && import.meta.url === new URL(process.argv[1], 'file:').hre
       process.exitCode = 1;
     });
 }
+
+export * from './connectors/benchmarks/tlv-medicines.js';
+export * from './connectors/benchmarks/registry.js';
