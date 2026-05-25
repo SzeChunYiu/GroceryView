@@ -4,9 +4,9 @@ import Image from 'next/image';
 import type { ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { ConfidenceBadge } from '@/components/confidence-badge';
+import { AffiliateDisclosureNotice } from '@/components/ad-disclosure-actions';
 import {
   affiliateDisclosureKind,
-  affiliateDisclosureLabel,
   buildAffiliateOutboundUrl,
   trackAffiliateOutboundClick,
   type AffiliateLinkMetadata,
@@ -123,9 +123,7 @@ function OutboundAffiliateLink({
       >
         {children}
       </a>
-      <span className="mt-2 block rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold leading-5 text-amber-950" data-affiliate-disclosure={disclosureKind}>
-        {affiliateDisclosureLabel(metadata)}
-      </span>
+      <AffiliateDisclosureNotice metadata={metadata} />
     </div>
   );
 }

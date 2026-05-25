@@ -31,6 +31,17 @@ export type DealExplanationPanel = {
   factors: DealExplanationFactor[];
 };
 
+export type DealMonetizationDisclosureInput = {
+  kind: 'affiliate' | 'outbound' | 'sponsored';
+  retailerName: string;
+};
+
+export type DealMonetizationDisclosure = {
+  partnerLabel: string;
+  actionLabel: string;
+  complianceNote: string;
+};
+
 export type DealExplanationInput = {
   chainSpreadLabel?: string;
   confidenceLabel?: string;
@@ -229,6 +240,23 @@ export function buildDealExplanationPanel({
       ? `Why ranked: ${factors.slice(0, 3).map((factor) => factor.label.toLocaleLowerCase('sv-SE')).join(', ')}`
       : 'Why ranked: price and availability signals',
     factors: factors.length > 0 ? factors : [{ label: 'Deal ranking', detail: 'Ranked from the current observed price and available retailer evidence.' }]
+  };
+}
+
+export function buildDealMonetizationDisclosure({
+  kind,
+  retailerName
+}: DealMonetizationDisclosureInput): DealMonetizationDisclosure {
+  const partnerLabel = kind === 'sponsored'
+    ? 'Sponsored partner'
+    : kind === 'affiliate'
+      ? 'Affiliate partner'
+      : 'Retailer outbound link';
+
+  return {
+    partnerLabel,
+    actionLabel: 'Why this disclosure is shown',
+    complianceNote: `${partnerLabel}: GroceryView may receive value from ${retailerName}, but Deal Score, basket totals, and ranking stay independent.`
   };
 }
 
