@@ -1480,6 +1480,19 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('ships a retryable error boundary for the near-expiry radar route', async () => {
+    const source = await read('src/app/expiry-deals/error.tsx');
+
+    assert.match(source, /'use client'/);
+    assert.match(source, /PageShell/);
+    assert.match(source, /Card/);
+    assert.match(source, /Expiry deal radar/);
+    assert.match(source, /Near-expiry radar could not load/);
+    assert.match(source, /Retry expiry radar/);
+    assert.match(source, /onClick=\{reset\}/);
+    assert.match(source, /error\.digest/);
+  });
+
   it('surfaces replacement deal radar filters on the deals route', async () => {
     const route = await read('src/app/deals/page.tsx');
 
