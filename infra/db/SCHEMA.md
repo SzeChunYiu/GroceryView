@@ -272,9 +272,9 @@ Primary key: `(user_id, store_id)`.
 
 ### `user_preferences`
 
-App repository budget and authenticated settings preferences.
+App repository budget, authenticated settings, and MyFlyer preference rows. Authenticated users are keyed by `user_id`; anonymous shoppers are keyed by a cookie-backed `session_id`.
 
-Key columns: `user_id`, `weekly_budget`, `monthly_budget`, `preferred_currency`, `notification_channels`, `updated_at`.
+Key columns: `id`, `user_id`, `session_id`, `country`, `favorite_stores`, `home_lat`, `home_lng`, `household_size`, `diet_filters`, `algorithm_choice`, `weekly_budget`, `monthly_budget`, `preferred_currency`, `notification_channels`, `created_at`, `updated_at`.
 
 ### `watchlist_items`
 
