@@ -31,7 +31,15 @@ const premiumGuardrails = [
   'Advanced corrections update only the shopper-owned scan review queue after explicit confirmation.'
 ];
 
+const premiumSavingsForecast = [
+  { driver: 'Price-drop alerts', monthly: '42 kr', detail: 'wait for watched staples before checkout' },
+  { driver: 'Store swaps', monthly: '58 kr', detail: 'switch eligible basket rows to the lowest verified chain' },
+  { driver: 'Basket planning', monthly: '33 kr', detail: 'avoid duplicate pantry buys and split bulky trips' }
+];
+
 export default function PricingPage() {
+  const forecastTotal = '133 kr';
+
   return (
     <PageShell>
       <Eyebrow>Premium</Eyebrow>
@@ -68,6 +76,35 @@ export default function PricingPage() {
         <ul className="mt-4 space-y-2 text-sm font-semibold leading-6 text-emerald-950">
           {premiumGuardrails.map((guardrail) => <li key={guardrail}>• {guardrail}</li>)}
         </ul>
+      </Card>
+
+      <Card className="mt-6 border-violet-200 bg-violet-50/80">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-violet-800">Premium savings forecast</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Forecast monthly savings before you upgrade</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+              Premium combines alert timing, store swaps, and basket-planning signals into a signed-in savings forecast so shoppers can see the subscription value before opening checkout.
+            </p>
+          </div>
+          <div className="rounded-3xl bg-white px-5 py-4 text-center shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Forecast</p>
+            <p className="mt-1 text-4xl font-black text-violet-800">{forecastTotal}</p>
+            <p className="text-xs font-bold text-slate-600">per month</p>
+          </div>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          {premiumSavingsForecast.map((row) => (
+            <div className="rounded-2xl bg-white p-4" key={row.driver}>
+              <p className="text-sm font-black text-slate-950">{row.driver}</p>
+              <p className="mt-2 text-3xl font-black text-violet-800">{row.monthly}</p>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">{row.detail}</p>
+            </div>
+          ))}
+        </div>
+        <Link className="mt-4 inline-flex rounded-full bg-violet-700 px-5 py-3 text-sm font-black text-white shadow-sm" href="/account">
+          Unlock forecast in account
+        </Link>
       </Card>
     </PageShell>
   );

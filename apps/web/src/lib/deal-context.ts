@@ -113,7 +113,8 @@ export function buildDealContext({
 
 function peakMonthsFor(row: SeasonalProduceInput) {
   if (typeof row.bestBuyMonthIndex !== 'number') return [row.bestBuyMonth];
-  return [-1, 0, 1].map((offset) => seasonalMonthLabels[(row.bestBuyMonthIndex + offset + 12) % 12]!);
+  const idx = row.bestBuyMonthIndex;
+  return [-1, 0, 1].map((offset) => seasonalMonthLabels[(idx + offset + 12) % 12]!);
 }
 
 function typicalPriceRangeLabel(row: SeasonalProduceInput) {

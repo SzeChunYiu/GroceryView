@@ -53,6 +53,21 @@ export type PriceChartTerminalSeries = {
   }>;
 };
 
+export type PriceChartTerminalForecast = {
+  available: boolean;
+  title: string;
+  horizonLabel: string;
+  summary: string;
+  caveat: string;
+  points: Array<{
+    time: string;
+    value: number;
+    lowerBound: number;
+    upperBound: number;
+    confidence: number;
+  }>;
+};
+
 export type PriceChartTerminalWindow = {
   label: '1W' | '1M' | '3M' | '1Y' | 'ALL';
   rangeLabel: string;
@@ -65,6 +80,7 @@ export type PriceChartTerminalWindow = {
   lowValueLabel: string;
   highValueLabel: string;
   series: PriceChartTerminalSeries[];
+  forecast?: PriceChartTerminalForecast;
 };
 
 export type PriceChartTerminalModel = {
@@ -207,6 +223,60 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
           })));
         });
 
+        if (activeWindow.forecast?.available && activeWindow.forecast.points.length > 0) {
+          const forecastBandColor = 'rgba(245, 158, 11, 0.42)';
+          const latestHistoricalPoint = activeWindow.series
+            .flatMap((series) => series.points)
+            .sort((a, b) => a.time.localeCompare(b.time))
+            .at(-1);
+          const forecastPoints = latestHistoricalPoint
+            ? [
+              {
+                time: latestHistoricalPoint.time,
+                value: latestHistoricalPoint.value,
+                lowerBound: latestHistoricalPoint.value,
+                upperBound: latestHistoricalPoint.value
+              },
+              ...activeWindow.forecast.points
+            ]
+            : activeWindow.forecast.points;
+          const forecastLowerBand = chartApi.addSeries(LineSeries, {
+            color: forecastBandColor,
+            lineWidth: 2,
+            lineStyle: LineStyle.Dotted,
+            lastValueVisible: false,
+            priceLineVisible: false
+          });
+          forecastLowerBand.setData(forecastPoints.map((point) => ({
+            time: point.time.slice(0, 10),
+            value: point.lowerBound
+          })));
+
+          const forecastLine = chartApi.addSeries(LineSeries, {
+            color: '#f59e0b',
+            lineWidth: 3,
+            lineStyle: LineStyle.Dashed,
+            lastValueVisible: true,
+            priceLineVisible: true
+          });
+          forecastLine.setData(forecastPoints.map((point) => ({
+            time: point.time.slice(0, 10),
+            value: point.value
+          })));
+
+          const forecastUpperBand = chartApi.addSeries(LineSeries, {
+            color: forecastBandColor,
+            lineWidth: 2,
+            lineStyle: LineStyle.Dotted,
+            lastValueVisible: false,
+            priceLineVisible: false
+          });
+          forecastUpperBand.setData(forecastPoints.map((point) => ({
+            time: point.time.slice(0, 10),
+            value: point.upperBound
+          })));
+        }
+
         chartApi.timeScale().fitContent();
         removeChart = () => chartApi.remove();
         setChartLoadStatus('ready');
@@ -270,7 +340,7 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
 
       {chart.available && activeWindow && activeWindow.pointCount > 0 ? (
         <>
-          <div className="mt-5 grid gap-3 md:grid-cols-4">
+          <div className="mt-5 grid gap-3 md:grid-cols-5">
             <p className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm font-bold text-slate-200">
               Window: <span className="text-white">{activeWindow.rangeLabel}</span>
             </p>
@@ -282,6 +352,9 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
             </p>
             <p className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm font-bold text-slate-200">
               Points/markers: <span className="text-white">{activeWindow.pointCount}/{activeWindow.markerCount}</span>
+            </p>
+            <p className="rounded-2xl border border-amber-300/30 bg-amber-300/10 p-4 text-sm font-bold text-amber-100">
+              Forecast: <span className="text-white">{activeWindow.forecast?.available ? activeWindow.forecast.horizonLabel : 'withheld'}</span>
             </p>
           </div>
           <div
@@ -302,6 +375,13 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
             </p>
           ) : null}
           <div className="mt-4 grid gap-3 md:grid-cols-2">
+            {activeWindow.forecast?.available ? (
+              <div className="rounded-2xl border border-amber-300/30 bg-amber-300/10 p-4 md:col-span-2">
+                <p className="text-sm font-black text-amber-100">{activeWindow.forecast.title}</p>
+                <p className="mt-2 text-xs font-bold text-amber-50">{activeWindow.forecast.summary}</p>
+                <p className="mt-2 text-xs font-semibold text-amber-100/80">{activeWindow.forecast.caveat}</p>
+              </div>
+            ) : null}
             {activeWindow.series.map((series) => (
               <div className="rounded-2xl border border-white/10 bg-white/10 p-4" key={series.id}>
                 <p className="text-sm font-black text-white">{series.storeName} · {series.sourceType}</p>
