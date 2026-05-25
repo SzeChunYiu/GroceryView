@@ -247,8 +247,8 @@ export const DEFAULT_MATHEM_SEARCH_QUERIES = [
   'sojasas',
   'sesamolja'
 ] as const;
-export const DEFAULT_MATHEM_SEARCH_PAGES = [1, 2, 3] as const;
-export const DEFAULT_MATHEM_MAX_ROWS = 15000;
+export const DEFAULT_MATHEM_SEARCH_PAGES = [1, 2, 3, 4, 5] as const;
+export const DEFAULT_MATHEM_MAX_ROWS = 18000;
 const MATHEM_REQUEST_TIMEOUT_MS = 45_000;
 
 export type FetchMathemProductsOptions = {
