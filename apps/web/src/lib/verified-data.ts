@@ -7,7 +7,7 @@ import { axfoodProducts } from './axfood-products';
 import { icaStorePromotionSourceSummary } from './ingested/ica-source-summary';
 import { icaReklambladOffers as staticIcaReklambladOffers, icaReklambladSource as staticIcaReklambladSource } from './ingested/ica-reklamblad';
 import { mathemProducts as staticMathemProducts, mathemSource as staticMathemSource } from './ingested/mathem';
-import { openFoodFactsCatalog } from './openfoodfacts-catalog';
+import { openFoodFactsCatalog, openFoodFactsSafetyProfile, type AllergenSafetyPreference, type DietarySafetyPreference, type OpenFoodFactsSafetyProfile } from './openfoodfacts-catalog';
 import { lidlStoreOffers as staticLidlStoreOffers, lidlSource as staticLidlSource } from './ingested/lidl';
 import { matpriskollenOffers as staticMatpriskollenOffers } from './ingested/matpriskollen';
 import { verifiedFuelPriceObservations, verifiedFuelPriceSource } from './fuel-prices';
@@ -2047,10 +2047,69 @@ export type AdaptiveProductCard = {
   }>;
   sparklineLabel: string;
   isAvailable: boolean;
+  safetyProfile: OpenFoodFactsSafetyProfile;
+  safetyEvidenceLabel: string;
 };
 
 function isOpenPricesProduct(product: ItemComparisonProduct): product is (typeof pricedProducts)[number] {
   return 'observations' in product;
+}
+
+const emptySafetyProfile: OpenFoodFactsSafetyProfile = {
+  dietaryTags: [],
+  allergenTags: [],
+  evidenceLabels: []
+};
+
+const openFoodFactsSafetyByCode = new Map(
+  openFoodFactsCatalog.map((product) => [product.code, openFoodFactsSafetyProfile(product)])
+);
+
+const dietarySafetyFromAxfoodLabels: Partial<Record<string, DietarySafetyPreference>> = {
+  crossed_ax: 'glutenfree',
+  glutenfree: 'glutenfree',
+  laktosfree: 'laktosfree',
+  vegan: 'vegan',
+  vegetarian: 'vegetarian'
+};
+
+const allergenSafetyNeedles: Array<{ tag: AllergenSafetyPreference; needles: string[]; safeNeedles: string[] }> = [
+  { tag: 'milk', needles: ['mjölk', 'milk', 'laktos', 'lactose', 'ost', 'cheese', 'grädde'], safeNeedles: ['laktosfri', 'laktosfree', 'mjölkfri', 'milk-free', 'vegan'] },
+  { tag: 'gluten', needles: ['gluten', 'vete', 'wheat', 'råg', 'rye', 'korn', 'barley'], safeNeedles: ['glutenfri', 'glutenfree', 'gluten-free', 'crossed_ax'] },
+  { tag: 'nuts', needles: ['nöt', 'nötter', 'nuts', 'almond', 'mandel', 'peanut', 'jordnöt'], safeNeedles: [] },
+  { tag: 'eggs', needles: ['ägg', 'egg'], safeNeedles: [] },
+  { tag: 'soy', needles: ['soja', 'soy'], safeNeedles: [] },
+  { tag: 'sesame', needles: ['sesam', 'sesame'], safeNeedles: [] }
+];
+
+function safetyProfileForProduct(product: (typeof productUniverse)[number]): OpenFoodFactsSafetyProfile {
+  if (isOpenPricesProduct(product)) {
+    return openFoodFactsSafetyByCode.get(product.code) ?? emptySafetyProfile;
+  }
+
+  const labels = product.labels.map((label) => label.toLocaleLowerCase('sv-SE'));
+  const text = [
+    product.name,
+    product.brand,
+    product.subline,
+    product.category,
+    ...labels
+  ].join(' ').toLocaleLowerCase('sv-SE');
+  const dietaryTags = labels
+    .map((label) => dietarySafetyFromAxfoodLabels[label])
+    .filter((tag): tag is DietarySafetyPreference => Boolean(tag));
+  const allergenTags = allergenSafetyNeedles
+    .filter((evidence) => (
+      evidence.needles.some((needle) => text.includes(needle))
+      && evidence.safeNeedles.every((safeNeedle) => !text.includes(safeNeedle))
+    ))
+    .map((evidence) => evidence.tag);
+
+  return {
+    dietaryTags: [...new Set(dietaryTags)],
+    allergenTags: [...new Set(allergenTags)],
+    evidenceLabels: product.labels
+  };
 }
 
 function sevenDaySparklinePoints(product: (typeof productUniverse)[number]): AdaptiveProductCard['sparklinePoints'] {
@@ -2093,6 +2152,7 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
     : [];
   const sparklinePoints = sevenDaySparklinePoints(product);
   const priceDrop = priceDropFromThirtyDayHistory(product);
+  const safetyProfile = safetyProfileForProduct(product);
 
   return {
     slug: product.slug,
@@ -2123,7 +2183,11 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
     sparklineLabel: sparklinePoints.length >= 2
       ? `${sparklinePoints.length} observed daily points from price_daily/OpenPrices history`
       : '7-day sparkline waits for at least two observed price-history points',
-    isAvailable
+    isAvailable,
+    safetyProfile,
+    safetyEvidenceLabel: safetyProfile.evidenceLabels.length > 0
+      ? `OpenFoodFacts/Axfood label evidence: ${safetyProfile.evidenceLabels.slice(0, 3).join(', ')}`
+      : 'No verified allergen or dietary label evidence found'
   };
 });
 export const homepageAdaptiveProductCards = adaptiveProductCards.slice(0, 6);
