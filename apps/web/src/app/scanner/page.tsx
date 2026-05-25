@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { OcrScanHistoryTimeline } from '@/components/ocr-scan-history-timeline';
+import { BarcodeScanner } from '@/components/barcode-scanner';
 import { ScannerUploadActions } from '@/components/scanner-upload-actions';
 import { routeMetadata } from '@/lib/seo';
 import { receiptFedAliasGrowthPlan } from '@/lib/verified-data';
@@ -117,6 +118,7 @@ export default function ScannerPage() {
           <Link className="rounded-full border border-indigo-200 px-4 py-2 text-sm font-black text-indigo-900" href="/watchlist">Watchlist</Link>
         </div>
       </Card>
+      <BarcodeScanner />
       <div id="scan" className="scroll-mt-24">
         <ScannerUploadActions />
       </div>
