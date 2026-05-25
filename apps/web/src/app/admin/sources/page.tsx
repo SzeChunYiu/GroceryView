@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getDuplicateConflictAlerts } from "../../../lib/source-health";
 
 const severityStyles = {
@@ -21,6 +22,12 @@ export default function AdminSourcesPage() {
         source during a short scrape window, so catalogue regressions can be
         paused before bad matches spread.
       </p>
+      <Link
+        className="mt-5 inline-flex rounded-full border border-slate-300 px-4 py-2 text-sm font-bold text-slate-800 hover:border-emerald-700 hover:text-emerald-900"
+        href="/admin/ingestion-runs"
+      >
+        View ingestion runs
+      </Link>
 
       <section className="mt-8 grid gap-4" aria-label="Duplicate conflict alerts">
         {alerts.map((alert) => (
