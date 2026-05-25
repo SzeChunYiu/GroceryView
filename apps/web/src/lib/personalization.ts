@@ -75,6 +75,19 @@ type LandingShortcutInput = {
   categorySlug?: string;
 };
 
+type RecommendationProductInput = {
+  slug: string;
+  name: string;
+  brand?: string | null;
+  sourceLabel?: string;
+  totalPriceLabel?: string;
+};
+
+export type PersonalizedRecommendation = RecommendationProductInput & {
+  score: number;
+  reason: string;
+};
+
 const conversionWeight = 4;
 const demoHistoryWeights = [
   { clicks: 12, conversions: 4 },
@@ -134,6 +147,38 @@ export function rankLandingShortcuts<T extends LandingShortcutInput>(
     })
     .sort((a, b) => b.score - a.score || a.index - b.index)
     .map(({ shortcut }) => shortcut);
+}
+
+export function buildPersonalizedRecommendationRail<T extends RecommendationProductInput>(
+  products: readonly T[],
+  options: {
+    householdId?: string;
+    favoriteBrands?: readonly string[];
+    recentListActivity?: readonly string[];
+    limit?: number;
+  } = {},
+): PersonalizedRecommendation[] {
+  const favoriteBrands = new Set((options.favoriteBrands ?? ['Garant', 'Änglamark', 'Kaffe']).map((brand) => brand.toLocaleLowerCase('sv-SE')));
+  const recentWords = (options.recentListActivity ?? ['milk', 'bread', 'coffee', 'fruit'])
+    .flatMap((item) => item.toLocaleLowerCase('sv-SE').split(/\s+/))
+    .filter((word) => word.length > 2);
+
+  return products
+    .map((product, index) => {
+      const haystack = `${product.name} ${product.brand ?? ''}`.toLocaleLowerCase('sv-SE');
+      const favoriteHit = product.brand ? favoriteBrands.has(product.brand.toLocaleLowerCase('sv-SE')) : false;
+      const listHits = recentWords.filter((word) => haystack.includes(word)).length;
+      const historyScore = getHouseholdCategoryScore(product.slug.split('-').slice(0, 2).join('-'), options.householdId ?? defaultHouseholdId);
+      const score = historyScore + listHits * 18 + (favoriteHit ? 24 : 0) + Math.max(0, 8 - index);
+      const reason = favoriteHit
+        ? `Favorite brand signal for ${product.brand}`
+        : listHits > 0
+          ? `${listHits} recent list signal${listHits === 1 ? '' : 's'} matched`
+          : 'Household history keeps this in the discovery mix';
+      return { ...product, score, reason };
+    })
+    .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name, 'sv'))
+    .slice(0, options.limit ?? 4);
 }
 
 export type BrandTolerance = 'favorite' | 'acceptable' | 'excluded';
