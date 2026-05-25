@@ -2,6 +2,65 @@ import { categoryLabels, pricedProducts, type PricedProduct, type PriceObservati
 
 export type TrendConfidenceLabel = 'high' | 'medium' | 'low';
 
+export type SeasonalProduceDrilldownMonth = {
+  monthLabel: string;
+  averageLabel: string;
+  observationCount: number;
+  rangeLabel: string;
+};
+
+export type SeasonalProduceDrilldownCard = {
+  slug: string;
+  productName: string;
+  brand: string;
+  bestBuyMonth: string;
+  expectedPriceBehavior: string;
+  recommendedChains: string[];
+  monthlyDrilldown: SeasonalProduceDrilldownMonth[];
+  savingsVsTypicalLabel: string;
+  confidenceLabel: string;
+  evidenceLabel: string;
+};
+
+type SeasonalProduceSourceRow = {
+  slug: string;
+  productName: string;
+  brand: string;
+  bestBuyMonth: string;
+  typicalMonthlyAverageLabel: string;
+  savingsVsTypicalLabel: string;
+  confidenceLabel: string;
+  evidenceLabel: string;
+  monthlyAverages: Array<{
+    monthLabel: string;
+    historicalMonthlyAverageLabel: string;
+    observationCount: number;
+    lowPriceLabel: string;
+    highPriceLabel: string;
+  }>;
+};
+
+export function buildSeasonalProduceDrilldownCards(rows: SeasonalProduceSourceRow[], limit = 6): SeasonalProduceDrilldownCard[] {
+  return rows.slice(0, Math.max(1, Math.min(limit, 12))).map((row) => ({
+    slug: row.slug,
+    productName: row.productName,
+    brand: row.brand,
+    bestBuyMonth: row.bestBuyMonth,
+    expectedPriceBehavior: `${row.bestBuyMonth} has the lowest observed monthly average for this product; compare against the typical ${row.typicalMonthlyAverageLabel} before stocking up.`,
+    recommendedChains: ['Willys', 'Hemköp'],
+    monthlyDrilldown: row.monthlyAverages.map((month) => ({
+      monthLabel: month.monthLabel,
+      averageLabel: month.historicalMonthlyAverageLabel,
+      observationCount: month.observationCount,
+      rangeLabel: `${month.lowPriceLabel}–${month.highPriceLabel}`
+    })),
+    savingsVsTypicalLabel: row.savingsVsTypicalLabel,
+    confidenceLabel: row.confidenceLabel,
+    evidenceLabel: row.evidenceLabel
+  }));
+}
+
+
 export type CityPriceDropTrend = {
   rank: number;
   city: string;

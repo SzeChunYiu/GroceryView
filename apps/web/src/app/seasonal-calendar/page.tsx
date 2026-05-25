@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { SeasonalProductCard } from '@/components/seasonal-product-card';
 import { buildSeasonalProduceDiscoveryCards } from '@/lib/deal-context';
 import { buildCategorySeasonalDiscoveryModules } from '@/lib/price-intelligence';
+import { buildSeasonalProduceDrilldownCards } from '@/lib/trends';
 import { categoryDealLeaders, localSeasonalPicks, seasonalProduceCalendar } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -18,6 +20,7 @@ export default function SeasonalCalendarPage() {
     categorySlug: 'produce',
     seasonalRows: seasonalProduceCalendar.produceSeasonalityRows
   });
+  const monthlyDrilldownCards = buildSeasonalProduceDrilldownCards(seasonalProduceCalendar.topBestBuys, 6);
 
   return (
     <PageShell>
@@ -71,6 +74,22 @@ export default function SeasonalCalendarPage() {
               </div>
             </Link>
           ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50/70">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Monthly drill-down cards</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Seasonal products with chain comparison prompts</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Each card lists observed monthly averages, expected price behavior, and recommended chains to compare before shopping. These are historical observations, not forecasts.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-emerald-900 shadow-sm">{monthlyDrilldownCards.length} drill-downs</p>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {monthlyDrilldownCards.map((card) => <SeasonalProductCard card={card} key={card.slug} />)}
         </div>
       </Card>
 
