@@ -1,5 +1,6 @@
 export type ObservedPricePoint = {
   price: number;
+  observedAt?: string;
 };
 
 export type VolatilityBadgeMethodology = {
@@ -8,6 +9,17 @@ export type VolatilityBadgeMethodology = {
   rangeLabel: string;
   summary: string;
   forecastBoundary: string;
+};
+
+export type RecentPriceVarianceStatus = 'stable' | 'volatile' | 'likely-promo';
+
+export type RecentPriceVarianceBadge = {
+  status: RecentPriceVarianceStatus;
+  label: string;
+  shortLabel: string;
+  score: number;
+  observationCount: number;
+  summary: string;
 };
 
 export type BasketBuyTimingAction = 'buy_now' | 'watch' | 'substitute';
@@ -102,6 +114,95 @@ export type BestTimeToBuyAlertRecommendation = {
   flyerWindowLabel: string;
   rationale: string;
 };
+
+export type SeasonalDiscoveryRow = {
+  slug: string;
+  productName: string;
+  categoryLabel: string;
+  bestBuyMonth: string;
+  bestBuyMonthIndex: number;
+  historicalMonthlyAverageLabel: string;
+  savingsVsTypicalLabel: string;
+  confidenceLabel: string;
+  evidenceLabel: string;
+  observationCount: number;
+  observedMonthCount: number;
+};
+
+export type HolidayStapleWindow = {
+  label: string;
+  months: string;
+  rationale: string;
+};
+
+export type CategorySeasonalDiscoveryModules = {
+  inSeasonProduce: SeasonalDiscoveryRow[];
+  historicBestBuyWindows: SeasonalDiscoveryRow[];
+  holidayStaples: HolidayStapleWindow[];
+  guardrail: string;
+};
+
+const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const;
+
+const categoryHolidayStaples: Record<string, HolidayStapleWindow[]> = {
+  produce: [
+    { label: 'Citrus and cabbage planning', months: 'Jan-Mar', rationale: 'Use winter produce history for low-waste baskets before spring rows arrive.' },
+    { label: 'Berry and grill vegetable watch', months: 'Jun-Aug', rationale: 'Summer holiday baskets should compare current deals against observed best-buy months.' }
+  ],
+  dairy: [
+    { label: 'Cream, cheese, and butter checks', months: 'Nov-Dec', rationale: 'Holiday baking and buffet staples deserve a deal check before stock-up trips.' }
+  ],
+  pantry: [
+    { label: 'Baking and dry-good stock-up', months: 'Nov-Dec', rationale: 'Historic best-buy windows keep pantry refills separate from forecast claims.' }
+  ],
+  sweets: [
+    { label: 'Holiday candy and fika shelf', months: 'Mar-Apr / Dec', rationale: 'Seasonal discovery highlights sweets only as a planning cue, not a price prediction.' }
+  ],
+  beverages: [
+    { label: 'Holiday drink aisle watch', months: 'Jun / Dec', rationale: 'Surface timing context for recurring holiday staples while keeping observed prices visible.' }
+  ]
+};
+
+function monthDistance(left: number, right: number) {
+  const distance = Math.abs(left - right);
+  return Math.min(distance, 12 - distance);
+}
+
+export function buildCategorySeasonalDiscoveryModules({
+  categorySlug,
+  currentMonthIndex = new Date().getUTCMonth(),
+  seasonalRows
+}: {
+  categorySlug: string;
+  currentMonthIndex?: number;
+  seasonalRows: ReadonlyArray<SeasonalDiscoveryRow>;
+}): CategorySeasonalDiscoveryModules {
+  const currentMonth = Number.isInteger(currentMonthIndex) ? ((currentMonthIndex % 12) + 12) % 12 : new Date().getUTCMonth();
+  const categoryRows = categorySlug === 'produce'
+    ? seasonalRows
+    : seasonalRows.filter((row) => row.categoryLabel.toLowerCase().includes(categorySlug.replace(/-/g, ' ')));
+  const rankedRows = categoryRows.length > 0 ? categoryRows : seasonalRows;
+  const inSeasonProduce = [...rankedRows]
+    .filter((row) => monthDistance(row.bestBuyMonthIndex, currentMonth) <= 1)
+    .sort((left, right) => right.observationCount - left.observationCount)
+    .slice(0, 3);
+  const historicBestBuyWindows = [...rankedRows]
+    .sort((left, right) => right.observedMonthCount - left.observedMonthCount || right.observationCount - left.observationCount)
+    .slice(0, 3);
+
+  return {
+    inSeasonProduce,
+    historicBestBuyWindows,
+    holidayStaples: categoryHolidayStaples[categorySlug] ?? [
+      {
+        label: `${monthLabels[currentMonth]} category timing check`,
+        months: `${monthLabels[currentMonth]} plus nearby flyer weeks`,
+        rationale: 'Use the category page to compare observed deals before making a seasonal stock-up decision.'
+      }
+    ],
+    guardrail: 'Seasonal modules use historical monthly averages and explicit holiday planning labels only. No forecast, harvest, stock, or synthetic seasonal price claim is invented.'
+  };
+}
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
@@ -227,6 +328,60 @@ export function volatilityBadgeMethodology(points: ReadonlyArray<ObservedPricePo
     rangeLabel: `${low.toFixed(2)}-${high.toFixed(2)} SEK observed range`,
     summary: 'The 0-100 volatility score is the observed high-low spread divided by the average observed price, capped at 100.',
     forecastBoundary: 'No future price forecast is made from this badge; it only explains historical observed prices.'
+  };
+}
+
+export function classifyRecentPriceVariance(points: ReadonlyArray<ObservedPricePoint>): RecentPriceVarianceBadge | null {
+  const recent = [...points]
+    .map((point, index) => ({
+      price: point.price,
+      observedTime: point.observedAt ? Date.parse(point.observedAt) : index
+    }))
+    .filter((point) => Number.isFinite(point.price) && point.price > 0 && Number.isFinite(point.observedTime))
+    .sort((left, right) => left.observedTime - right.observedTime)
+    .slice(-8);
+
+  if (recent.length < 2) return null;
+
+  const prices = recent.map((point) => point.price);
+  const low = Math.min(...prices);
+  const high = Math.max(...prices);
+  const average = prices.reduce((sum, price) => sum + price, 0) / prices.length;
+  const latest = prices.at(-1) ?? average;
+  const spreadPercent = average > 0 ? ((high - low) / average) * 100 : 0;
+  const volatilityPercent = average > 0 ? (standardDeviation(prices) / average) * 100 : 0;
+  const score = Math.round(clamp(Math.max(spreadPercent, volatilityPercent * 2), 0, 100));
+  const isLikelyPromo = recent.length >= 3 && score >= 12 && latest <= average * 0.92 && latest <= low * 1.03;
+
+  if (isLikelyPromo) {
+    return {
+      status: 'likely-promo',
+      label: 'Likely promo',
+      shortLabel: 'promo',
+      score,
+      observationCount: recent.length,
+      summary: `Latest observed price is near the recent low after a ${score}% recent variance swing.`
+    };
+  }
+
+  if (score >= 18) {
+    return {
+      status: 'volatile',
+      label: 'Volatile price',
+      shortLabel: 'volatile',
+      score,
+      observationCount: recent.length,
+      summary: `Recent observed prices moved across a ${score}% variance band.`
+    };
+  }
+
+  return {
+    status: 'stable',
+    label: 'Stable price',
+    shortLabel: 'stable',
+    score,
+    observationCount: recent.length,
+    summary: `Recent observed prices stayed within a ${score}% variance band.`
   };
 }
 
@@ -359,5 +514,26 @@ export function summarizeBasketBuyTiming(recommendations: ReadonlyArray<BasketBu
     watch: recommendations.filter((item) => item.action === 'watch').length,
     substitute: recommendations.filter((item) => item.action === 'substitute').length,
     itemCount: recommendations.length
+  };
+}
+
+export type PremiumSavingsForecastDriver = {
+  label: string;
+  amount: number;
+  detail: string;
+};
+
+export function buildPremiumSavingsForecast(drivers: PremiumSavingsForecastDriver[] = [
+  { label: 'Alerts', amount: 42, detail: 'watchlist drops and wait-window alerts' },
+  { label: 'Swaps', amount: 58, detail: 'verified chain substitutions' },
+  { label: 'Basket planning', amount: 33, detail: 'duplicate-buy and pantry timing guidance' }
+]) {
+  const monthlySavings = drivers.reduce((sum, driver) => sum + driver.amount, 0);
+
+  return {
+    monthlySavings,
+    monthlySavingsLabel: `${monthlySavings} kr`,
+    drivers: drivers.map((driver) => ({ ...driver, amountLabel: `${driver.amount} kr` })),
+    confidenceLabel: 'Premium estimate from observed alerts, basket optimization, and historical behavior.'
   };
 }

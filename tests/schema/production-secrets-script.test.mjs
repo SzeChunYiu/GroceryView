@@ -105,7 +105,7 @@ describe('production secret audit script', () => {
       'WEEKLY_DIGEST_FROM_EMAIL',
       'GROCERYVIEW_SCANNER_BEARER_TOKEN'
     ]);
-    assert.ok(output.missingRuntimeSecrets.includes('STRIPE_SECRET_KEY'));
+    assert.ok(output.pendingRuntimeSecretsMissing.includes('STRIPE_SECRET_KEY'));
     assert.deepEqual(output.replacementDbCandidateSecrets, ['REPLACEMENT_DATABASE_URL', 'CANDIDATE_DATABASE_URL']);
     assert.equal(output.hasReplacementDbCandidate, false);
     assert.deepEqual(output.missingDbCutoverCandidateSecrets, ['REPLACEMENT_DATABASE_URL', 'CANDIDATE_DATABASE_URL']);

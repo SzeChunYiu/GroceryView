@@ -2,14 +2,20 @@
 
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
+import { ConfidenceBadge } from './confidence-badge';
 import { LazyItemCard } from './LazyItemCard';
 import { FavouriteProductToggle } from './favourite-product-toggle';
 import { readStoredSafetyPreferences, SAFETY_PREFERENCES_CHANGED_EVENT, type ProductSafetyPreferences } from './cert-filter';
+import { buildPriceHistorySparklinePath } from '@/lib/price-events';
 import { volatilityBadgeMethodology } from '@/lib/price-intelligence';
+import type { SearchExplanationBadge } from '@/lib/search-filters';
 import { listFriendPriceSightingsForProduct } from '@/lib/social';
 import type { AdaptiveProductCard } from '@/lib/verified-data';
 
 type CompareMode = 'adaptive' | 'total' | 'unit';
+type ProductCardWithSearchExplanations = AdaptiveProductCard & {
+  searchExplanationBadges?: SearchExplanationBadge[];
+};
 
 const storageKey = 'groceryview:product-card-compare-mode';
 const compareModes: Array<{ label: string; value: CompareMode; help: string }> = [
@@ -76,18 +82,7 @@ function SafetyWarningBanner({ card, preferences }: Readonly<{ card: AdaptivePro
 }
 
 function sparklinePath(points: AdaptiveProductCard['sparklinePoints'], width = 160, height = 44) {
-  if (points.length < 2) return null;
-  const prices = points.map((point) => point.price);
-  const min = Math.min(...prices);
-  const max = Math.max(...prices);
-  const range = max - min || 1;
-  return points
-    .map((point, index) => {
-      const x = (index / (points.length - 1)) * width;
-      const y = height - ((point.price - min) / range) * height;
-      return `${index === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`;
-    })
-    .join(' ');
+  return buildPriceHistorySparklinePath(points, width, height);
 }
 
 function PriceHistorySparkline({ card }: Readonly<{ card: AdaptiveProductCard }>) {
@@ -158,6 +153,24 @@ function FriendPriceSightingsPanel({ card }: Readonly<{ card: AdaptiveProductCar
           </li>
         ))}
       </ul>
+    </div>
+  );
+}
+
+function SearchExplanationBadges({ badges }: Readonly<{ badges?: SearchExplanationBadge[] }>) {
+  if (!badges || badges.length === 0) return null;
+
+  return (
+    <div className="mt-3 flex flex-wrap gap-2" data-search-explanation-badges>
+      {badges.slice(0, 4).map((badge) => (
+        <span
+          className="rounded-full bg-indigo-100 px-2.5 py-1 text-[0.65rem] font-black uppercase tracking-[0.14em] text-indigo-950"
+          key={`${badge.kind}-${badge.label}`}
+          title={`Matched: ${badge.matchedTerms.join(', ')}`}
+        >
+          {badge.label}
+        </span>
+      ))}
     </div>
   );
 }
@@ -255,6 +268,8 @@ export function ProductPriceCards({
                   alt={card.imageAlt}
                   className="max-h-full max-w-full object-contain"
                   height={144}
+                  loading="lazy"
+                  placeholder="empty"
                   sizes="(min-width: 1280px) 16vw, (min-width: 768px) 33vw, 80vw"
                   src={card.imageUrl}
                   width={144}
@@ -287,10 +302,19 @@ export function ProductPriceCards({
             </div>
             <p className="mt-4 text-3xl font-black text-emerald-800">{primaryLabel(card, compareMode)}</p>
             <p className="mt-1 text-sm font-semibold text-slate-700">{secondaryLabel(card, compareMode)}</p>
+            <SearchExplanationBadges badges={(card as ProductCardWithSearchExplanations).searchExplanationBadges} />
             <p className="mt-3 text-sm leading-6 text-slate-600">{card.sourceLabel}</p>
             <FriendPriceSightingsPanel card={card} />
             <SafetyWarningBanner card={card} preferences={safetyPreferences} />
             <PriceHistorySparkline card={card} />
+            <div className="mt-2">
+              <ConfidenceBadge
+                details={card.confidenceDrilldown.rows}
+                label="Price confidence"
+                level={card.confidenceLevel}
+                sampleSize={card.confidenceDrilldown.sourceCount}
+              />
+            </div>
             <p className="mt-2 rounded-xl bg-blue-50 p-3 text-xs font-bold text-blue-950">{card.confidenceLabel}</p>
             <VolatilityMethodologyBadge card={card} />
             {card.cheapestUnitBadge ? (

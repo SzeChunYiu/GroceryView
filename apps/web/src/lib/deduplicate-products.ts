@@ -1,11 +1,17 @@
 import { parsePackageSize } from "./unit-normalizer"
+import { duplicateProductMatchKey, normalizeDuplicateProductText, type DuplicateProductMatchKey } from "./normalization"
 
 export type ProductRecord = {
   id: string
   name: string
   brand?: string | null
   category?: string | null
+  imageUrl?: string | null
+  sourceUrl?: string | null
   size?: string | null
+  unitLabel?: string | null
+  unit?: string | null
+  ean?: string | null
   upc?: string | null
 }
 
@@ -16,6 +22,7 @@ export type DuplicateCandidate = {
   confidence: number
   signals: string[]
   preview: ProductRecord
+  matchKey: DuplicateProductMatchKey
 }
 
 export type DuplicateReviewAction = "merge" | "ignore" | "confidence"
@@ -23,6 +30,20 @@ export type DuplicateReviewAction = "merge" | "ignore" | "confidence"
 export type DuplicateReviewRow = DuplicateCandidate & {
   confidenceLabel: "High" | "Medium" | "Needs review"
   recommendedAction: DuplicateReviewAction
+}
+
+export type DuplicateReviewGroup = {
+  id: string
+  matchKey: DuplicateProductMatchKey
+  products: ProductRecord[]
+  candidates: DuplicateReviewRow[]
+  signals: string[]
+  recommendedAction: DuplicateReviewAction
+}
+
+export type DuplicateMergeQueueItem = DuplicateReviewGroup & {
+  canonicalProduct: ProductRecord
+  mergeNote: string
 }
 
 const stopWords = new Set(["and", "the", "a", "an", "of", "for"])
@@ -64,16 +85,28 @@ function sameText(left?: string | null, right?: string | null) {
 
 function confidenceFor(left: ProductRecord, right: ProductRecord) {
   const signals: string[] = []
+  const leftKey = duplicateProductMatchKey(left)
+  const rightKey = duplicateProductMatchKey(right)
   let score = tokenSimilarity(left.name, right.name) * 0.45
 
-  if (sameText(left.brand, right.brand)) {
+  if (leftKey.ean && leftKey.ean === rightKey.ean) {
+    score += 0.65
+    signals.push("same EAN")
+  }
+
+  if (leftKey.normalizedBrand && leftKey.normalizedBrand === rightKey.normalizedBrand) {
     score += 0.2
     signals.push("same brand")
   }
 
-  if (sameText(left.size, right.size)) {
+  if (leftKey.normalizedSize && leftKey.normalizedSize === rightKey.normalizedSize) {
     score += 0.15
     signals.push("same size")
+  }
+
+  if (leftKey.normalizedUnit && leftKey.normalizedUnit === rightKey.normalizedUnit) {
+    score += 0.05
+    signals.push("same unit")
   }
 
   if (sameText(left.category, right.category)) {
@@ -81,13 +114,10 @@ function confidenceFor(left: ProductRecord, right: ProductRecord) {
     signals.push("same category")
   }
 
-  if (sameText(left.upc, right.upc)) {
-    score += 0.35
-    signals.push("same UPC")
-  }
-
   const nameScore = tokenSimilarity(left.name, right.name)
-  if (nameScore >= 0.75) {
+  if (leftKey.normalizedName && leftKey.normalizedName === rightKey.normalizedName) {
+    signals.push("same normalized name")
+  } else if (nameScore >= 0.75) {
     signals.push("very similar names")
   } else if (nameScore >= 0.5) {
     signals.push("similar names")
@@ -106,6 +136,8 @@ export function mergeProductRecords(primary: ProductRecord, duplicate: ProductRe
     brand: primary.brand || duplicate.brand,
     category: primary.category || duplicate.category,
     size: primary.size || duplicate.size,
+    unit: primary.unit || duplicate.unit,
+    ean: primary.ean || duplicate.ean,
     upc: primary.upc || duplicate.upc,
   }
 }
@@ -118,6 +150,7 @@ export function findDuplicateProducts(products: ProductRecord[], threshold = 0.5
       const source = products[leftIndex]
       const match = products[rightIndex]
       const result = confidenceFor(source, match)
+      const matchKey = duplicateProductMatchKey(source)
 
       if (result.confidence >= threshold) {
         candidates.push({
@@ -127,6 +160,7 @@ export function findDuplicateProducts(products: ProductRecord[], threshold = 0.5
           confidence: result.confidence,
           signals: result.signals,
           preview: mergeProductRecords(source, match),
+          matchKey,
         })
       }
     }
@@ -158,6 +192,59 @@ export function buildDuplicateReviewRows(products: ProductRecord[], threshold = 
           : "Needs review",
     recommendedAction: getDuplicateReviewAction(candidate),
   }))
+}
+
+function groupIdForCandidate(candidate: DuplicateReviewRow) {
+  const sourceKey = duplicateProductMatchKey(candidate.source)
+  const matchKey = duplicateProductMatchKey(candidate.match)
+  if (sourceKey.ean && sourceKey.ean === matchKey.ean) return `ean:${sourceKey.ean}`
+
+  const keyParts = [
+    sourceKey.normalizedBrand,
+    sourceKey.normalizedName,
+    sourceKey.normalizedSize,
+    sourceKey.normalizedUnit
+  ].filter(Boolean)
+
+  return `normalized:${keyParts.join(":") || normalizeDuplicateProductText(candidate.id)}`
+}
+
+function addUniqueProduct(products: ProductRecord[], product: ProductRecord) {
+  if (!products.some((item) => item.id === product.id)) products.push(product)
+}
+
+function higherPriorityAction(left: DuplicateReviewAction, right: DuplicateReviewAction): DuplicateReviewAction {
+  const priority: Record<DuplicateReviewAction, number> = { merge: 3, confidence: 2, ignore: 1 }
+  return priority[left] >= priority[right] ? left : right
+}
+
+export function buildDuplicateReviewGroups(products: ProductRecord[], threshold = 0.55): DuplicateReviewGroup[] {
+  const groups = new Map<string, DuplicateReviewGroup>()
+
+  for (const candidate of buildDuplicateReviewRows(products, threshold)) {
+    const id = groupIdForCandidate(candidate)
+    const group = groups.get(id) ?? {
+      id,
+      matchKey: candidate.matchKey,
+      products: [],
+      candidates: [],
+      signals: [],
+      recommendedAction: candidate.recommendedAction
+    }
+
+    addUniqueProduct(group.products, candidate.source)
+    addUniqueProduct(group.products, candidate.match)
+    group.candidates.push(candidate)
+    group.signals = [...new Set([...group.signals, ...candidate.signals])]
+    group.recommendedAction = higherPriorityAction(group.recommendedAction, candidate.recommendedAction)
+    groups.set(id, group)
+  }
+
+  return [...groups.values()].sort((left, right) => {
+    const leftConfidence = Math.max(...left.candidates.map((candidate) => candidate.confidence))
+    const rightConfidence = Math.max(...right.candidates.map((candidate) => candidate.confidence))
+    return rightConfidence - leftConfidence || right.products.length - left.products.length
+  })
 }
 
 export type SubstitutionSavingsProduct = ProductRecord & {
@@ -212,4 +299,42 @@ export function findSubstitutionSavings(
     .filter((suggestion): suggestion is SubstitutionSavingsSuggestion => Boolean(suggestion))
     .sort((left, right) => right.savings - left.savings)
     .slice(0, 3)
+}
+
+function canonicalScore(product: ProductRecord) {
+  return [product.ean, product.upc].filter(Boolean).length * 3
+    + [product.brand, product.category, product.size, product.unit].filter(Boolean).length
+}
+
+export function chooseCanonicalProduct(products: ProductRecord[]): ProductRecord {
+  const sorted = [...products].sort((left, right) => {
+    const scoreDelta = canonicalScore(right) - canonicalScore(left)
+    if (scoreDelta !== 0) return scoreDelta
+    return left.id.localeCompare(right.id)
+  })
+
+  const canonicalProduct = sorted[0]
+  if (!canonicalProduct) throw new Error("Duplicate merge groups require at least one product")
+  return canonicalProduct
+}
+
+function mergeNoteForGroup(group: DuplicateReviewGroup, canonicalProduct: ProductRecord) {
+  const mergedIds = group.products
+    .filter((product) => product.id !== canonicalProduct.id)
+    .map((product) => product.id)
+    .join(", ")
+  const signals = group.signals.length > 0 ? group.signals.join(", ") : "similar product text"
+
+  return `Keep ${canonicalProduct.id} as canonical; attach ${mergedIds || "no secondary records"} as aliases so continuous price history is preserved. Signals: ${signals}.`
+}
+
+export function buildDuplicateMergeQueue(products: ProductRecord[], threshold = 0.55): DuplicateMergeQueueItem[] {
+  return buildDuplicateReviewGroups(products, threshold).map((group) => {
+    const canonicalProduct = chooseCanonicalProduct(group.products)
+    return {
+      ...group,
+      canonicalProduct,
+      mergeNote: mergeNoteForGroup(group, canonicalProduct)
+    }
+  })
 }

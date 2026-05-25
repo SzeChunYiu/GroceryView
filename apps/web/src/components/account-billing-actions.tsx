@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { resolvePremiumEntitlementGates, type AccountEntitlement } from '@/lib/entitlements';
+import { buildPremiumSavingsForecast } from '@/lib/price-intelligence';
 
 type BillingStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'redirecting' | 'error';
 type BrowserSession = { accessToken: string; userId: string };
@@ -16,11 +18,16 @@ type SubscriptionAccessResponse = {
 type CheckoutSessionResponse = { checkoutUrl?: string; plan?: string };
 type PortalSessionResponse = { portalUrl?: string };
 
-const premiumSavingsForecast = [
-  { label: 'Alerts', amount: '42 kr', detail: 'watchlist drops and wait-window alerts' },
-  { label: 'Swaps', amount: '58 kr', detail: 'verified chain substitutions' },
-  { label: 'Basket planning', amount: '33 kr', detail: 'duplicate-buy and pantry timing guidance' }
-];
+const premiumSavingsForecast = buildPremiumSavingsForecast();
+
+function entitlementFromResponse(entitlement: SubscriptionAccessResponse['entitlement']): AccountEntitlement | null {
+  const tier = entitlement?.tier === 'premium' ? 'premium' : entitlement?.tier === 'free' ? 'free' : null;
+  const status = entitlement?.status === 'active' || entitlement?.status === 'trialing' || entitlement?.status === 'past_due' || entitlement?.status === 'canceled'
+    ? entitlement.status
+    : null;
+
+  return tier && status ? { tier, status } : null;
+}
 
 function readSession(): BrowserSession {
   const accessToken = sessionStorage.getItem('groceryview:accessToken') || '';
@@ -121,6 +128,7 @@ export function AccountBillingActions() {
   const enforcementReasons = subscriptionAccess?.enforcementReasons ?? ['missing_signed_in_subscription_context'];
   const accountActions = subscriptionAccess?.accountActions ?? ['load_subscription_access', 'start_checkout', 'manage_subscription'];
   const forecastUnlocked = Boolean(subscriptionAccess?.premiumFeaturesEnabled);
+  const entitlementGates = resolvePremiumEntitlementGates(entitlementFromResponse(subscriptionAccess?.entitlement));
 
   return (
     <section className="mt-6 rounded-3xl border border-violet-200 bg-white p-5 shadow-sm" aria-label="Account billing controls">
@@ -136,6 +144,9 @@ export function AccountBillingActions() {
         <button className="rounded-full border border-violet-300 px-4 py-2 text-sm font-black text-violet-900" onClick={() => startCheckout('premium_yearly')} type="button">Upgrade yearly for unlimited alerts</button>
         <button className="rounded-full border border-slate-300 px-4 py-2 text-sm font-black text-slate-800" onClick={manageSubscription} type="button">Manage subscription</button>
       </div>
+      <p className="mt-3 rounded-2xl bg-violet-50 p-3 text-sm font-bold text-violet-950">
+        Premium power-user feature: export product price history from charts and comparison pages as CSV for research and budget planning.
+      </p>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-3">
         <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
@@ -157,21 +168,41 @@ export function AccountBillingActions() {
         </div>
       </div>
 
+      <div className="mt-4 rounded-2xl border border-indigo-200 bg-indigo-50 p-4">
+        <p className="text-sm font-black text-indigo-950">Server entitlement gates</p>
+        <p className="mt-2 text-sm font-semibold leading-6 text-indigo-950">
+          The production subscription response is checked before premium OCR history, advanced forecasts, unlimited alerts, or exports are shown as available.
+        </p>
+        <div className="mt-3 grid gap-3 md:grid-cols-2">
+          {entitlementGates.map((gate) => (
+            <div className="rounded-2xl bg-white p-3" key={gate.feature}>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm font-black text-slate-950">{gate.label}</p>
+                <p className={gate.allowed ? 'rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-950' : 'rounded-full bg-amber-100 px-3 py-1 text-xs font-black text-amber-950'}>
+                  {gate.allowed ? 'Allowed' : 'Locked'}
+                </p>
+              </div>
+              <p className="mt-2 text-xs font-semibold leading-5 text-slate-600">{gate.allowed ? gate.premiumAccess : gate.freeLimit}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="mt-4 rounded-2xl border border-violet-200 bg-violet-50 p-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-sm font-black text-violet-950">Premium savings forecast</p>
             <p className="mt-2 text-sm font-semibold leading-6 text-violet-950">
-              Forecasted monthly savings stay premium-only and combine observed alerts, historical swaps, and basket-planning source rows after subscription access is loaded.
+              Forecasted monthly savings of {premiumSavingsForecast.monthlySavingsLabel} stay premium-only and combine observed alerts, historical swaps, and basket-planning source rows after subscription access is loaded.
             </p>
           </div>
           <p className="rounded-full bg-white px-3 py-1 text-sm font-black text-violet-800">{forecastUnlocked ? 'Unlocked' : 'Locked'}</p>
         </div>
         <div className="mt-3 grid gap-3 md:grid-cols-3">
-          {premiumSavingsForecast.map((driver) => (
+          {premiumSavingsForecast.drivers.map((driver) => (
             <div className="rounded-2xl bg-white p-3" key={driver.label}>
               <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{driver.label}</p>
-              <p className="mt-1 text-2xl font-black text-violet-800">{driver.amount}</p>
+              <p className="mt-1 text-2xl font-black text-violet-800">{driver.amountLabel}</p>
               <p className="mt-1 text-xs font-semibold leading-5 text-slate-600">{driver.detail}</p>
             </div>
           ))}

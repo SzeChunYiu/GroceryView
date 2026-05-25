@@ -16,6 +16,7 @@ const productNameCollator = new Intl.Collator('sv-SE', { sensitivity: 'base' });
 const favoriteItems = watchlistHeartProducts.map((product) => ({
   ...product,
   favoriteId: product.sourceProductSlug,
+  brandPreferenceLabel: product.brand.toLocaleLowerCase('sv-SE').includes('ica') ? 'preferred brand candidate' : 'not marked',
   cheapestPrice: product.currentPrice,
   cheapestPriceLabel: formatSek(product.currentPrice),
   cheapestStoreName: product.bestStoreLabel,
@@ -93,6 +94,11 @@ export default async function FavoritesPage({ searchParams }: { searchParams?: P
           <p className="mt-2 text-xl font-black text-slate-950">No anonymous favorites</p>
           <p className="mt-1 text-sm font-semibold text-slate-600">signed-in account id is the persistence boundary.</p>
         </Card>
+        <Card className="p-4">
+          <p className="text-sm font-black text-slate-600">Brand preference actions</p>
+          <p className="mt-2 text-xl font-black text-slate-950">Prefer or avoid brands</p>
+          <p className="mt-1 text-sm font-semibold text-slate-600">Each favorite row exposes preferred and avoided brand actions for personalization explanations.</p>
+        </Card>
       </div>
 
       <Card className="mt-6 overflow-hidden">
@@ -115,6 +121,7 @@ export default async function FavoritesPage({ searchParams }: { searchParams?: P
                   <th className="px-4 py-3 font-black">Item</th>
                   <th className="px-4 py-3 font-black">Current cheapest price</th>
                   <th className="px-4 py-3 font-black">Cheapest store</th>
+                  <th className="px-4 py-3 font-black">Brand preference</th>
                   <th className="px-4 py-3 font-black">Evidence</th>
                 </tr>
               </thead>
@@ -142,6 +149,13 @@ export default async function FavoritesPage({ searchParams }: { searchParams?: P
                     <td className="px-4 py-4">
                       <p className="font-black text-slate-950">{product.cheapestStoreName}</p>
                       <p className="mt-1 text-xs font-semibold text-slate-500">cheapestStoreName from verified chain rows</p>
+                    </td>
+                    <td className="px-4 py-4">
+                      <p className="rounded-full bg-violet-50 px-3 py-1 text-xs font-black text-violet-900">{product.brandPreferenceLabel}</p>
+                      <div className="mt-2 flex flex-wrap gap-2" aria-label={`Brand preference actions for ${product.brand}`}>
+                        <button className="rounded-full bg-emerald-50 px-3 py-2 text-xs font-black text-emerald-800" data-brand-preference-action="preferred" type="button">Prefer brand</button>
+                        <button className="rounded-full bg-rose-50 px-3 py-2 text-xs font-black text-rose-800" data-brand-preference-action="avoided" type="button">Avoid brand</button>
+                      </div>
                     </td>
                     <td className="px-4 py-4">
                       <p className="rounded-2xl bg-slate-50 p-3 text-xs font-semibold leading-5 text-slate-700">{product.sourceLabel}</p>

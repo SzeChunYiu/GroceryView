@@ -1,6 +1,8 @@
 export const FAVOURITES_STORAGE_KEY = 'groceryview:favourite-products';
+export const FAVOURITE_BRANDS_STORAGE_KEY = 'groceryview:favourite-brand-preferences';
 export const FAVOURITES_UPDATED_EVENT = 'groceryview:favourite-products-updated';
 export const FAVOURITE_BRAND_REMOVALS_STORAGE_KEY = 'groceryview:favourite-brand-removals';
+export const FAVOURITE_BRANDS_UPDATED_EVENT = 'groceryview:favourite-brand-preferences-updated';
 const maxFavouriteBrandRemovals = 20;
 
 export type FavouriteProductInput = {
@@ -22,6 +24,14 @@ export type FavouriteBrandRemovalEntry = {
   brand: string;
   slug: string;
   removedAt: string;
+};
+
+export type FavouriteBrandPreference = 'preferred' | 'avoided';
+
+export type FavouriteBrandPreferenceEntry = {
+  brand: string;
+  preference: FavouriteBrandPreference;
+  updatedAt: string;
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -59,6 +69,19 @@ function normalizeEntry(value: unknown): FavouriteProductEntry | null {
   };
 }
 
+function normalizeBrandPreference(value: unknown): FavouriteBrandPreferenceEntry | null {
+  if (!isRecord(value) || typeof value.brand !== 'string') return null;
+  const brand = value.brand.trim();
+  if (!brand) return null;
+  const preference = value.preference === 'avoided' ? 'avoided' : value.preference === 'preferred' ? 'preferred' : null;
+  if (!preference) return null;
+  return {
+    brand,
+    preference,
+    updatedAt: typeof value.updatedAt === 'string' ? value.updatedAt : ''
+  };
+}
+
 export function parseFavouriteProductEntries(raw: string | null): FavouriteProductEntry[] {
   if (!raw) return [];
   try {
@@ -86,6 +109,31 @@ export function serializeFavouriteProductEntries(entries: readonly FavouriteProd
   })));
 }
 
+export function parseFavouriteBrandPreferenceEntries(raw: string | null): FavouriteBrandPreferenceEntry[] {
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [];
+    const byBrand = new Map<string, FavouriteBrandPreferenceEntry>();
+    for (const value of parsed) {
+      const entry = normalizeBrandPreference(value);
+      if (!entry) continue;
+      byBrand.set(entry.brand.toLocaleLowerCase('sv-SE'), entry);
+    }
+    return [...byBrand.values()];
+  } catch {
+    return [];
+  }
+}
+
+export function serializeFavouriteBrandPreferenceEntries(entries: readonly FavouriteBrandPreferenceEntry[]): string {
+  return JSON.stringify(entries.map((entry) => ({
+    brand: entry.brand,
+    preference: entry.preference,
+    updatedAt: entry.updatedAt
+  })));
+}
+
 type FavouriteProductStorage = Pick<Storage, 'getItem' | 'setItem'> | null | undefined;
 
 function getFavouriteProductStorage(): FavouriteProductStorage {
@@ -101,6 +149,15 @@ export function readFavouriteProductEntries(storage: FavouriteProductStorage = g
   if (!storage) return [];
   try {
     return parseFavouriteProductEntries(storage.getItem(FAVOURITES_STORAGE_KEY));
+  } catch {
+    return [];
+  }
+}
+
+export function readFavouriteBrandPreferenceEntries(storage: FavouriteProductStorage = getFavouriteProductStorage()): FavouriteBrandPreferenceEntry[] {
+  if (!storage) return [];
+  try {
+    return parseFavouriteBrandPreferenceEntries(storage.getItem(FAVOURITE_BRANDS_STORAGE_KEY));
   } catch {
     return [];
   }
@@ -164,6 +221,19 @@ export function rememberFavouriteBrandRemoval(
   return next;
 }
 
+export function saveFavouriteBrandPreferenceEntries(
+  entries: readonly FavouriteBrandPreferenceEntry[],
+  storage: FavouriteProductStorage = getFavouriteProductStorage()
+): boolean {
+  if (!storage) return false;
+  try {
+    storage.setItem(FAVOURITE_BRANDS_STORAGE_KEY, serializeFavouriteBrandPreferenceEntries(entries));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function isFavouriteProduct(entries: readonly FavouriteProductEntry[], slug: string): boolean {
   return entries.some((entry) => entry.slug === slug);
 }
@@ -192,4 +262,16 @@ export function toggleFavouriteProduct(
     ],
     isFavourite: true
   };
+}
+
+export function setFavouriteBrandPreference(
+  entries: readonly FavouriteBrandPreferenceEntry[],
+  brand: string,
+  preference: FavouriteBrandPreference,
+  updatedAt = new Date().toISOString()
+): FavouriteBrandPreferenceEntry[] {
+  const normalizedBrand = brand.trim();
+  if (!normalizedBrand) return [...entries];
+  const withoutBrand = entries.filter((entry) => entry.brand.toLocaleLowerCase('sv-SE') !== normalizedBrand.toLocaleLowerCase('sv-SE'));
+  return [{ brand: normalizedBrand, preference, updatedAt }, ...withoutBrand];
 }

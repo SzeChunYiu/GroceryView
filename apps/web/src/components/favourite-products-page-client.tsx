@@ -5,8 +5,14 @@ import Link from 'next/link';
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { FavouriteProductToggle } from '@/components/favourite-product-toggle';
 import {
+  FAVOURITE_BRANDS_UPDATED_EVENT,
   FAVOURITES_UPDATED_EVENT,
+  readFavouriteBrandPreferenceEntries,
   readFavouriteProductEntries,
+  saveFavouriteBrandPreferenceEntries,
+  setFavouriteBrandPreference,
+  type FavouriteBrandPreference,
+  type FavouriteBrandPreferenceEntry,
   type FavouriteProductEntry
 } from '@/lib/favourites';
 
@@ -41,24 +47,29 @@ function readSavedProducts(): FavouriteProductEntry[] {
 
 export function FavouriteProductsPageClient({ productCatalogue }: Readonly<{ productCatalogue: FavouriteProductCatalogItem[] }>) {
   const [savedProducts, setSavedProducts] = useState<FavouriteProductEntry[]>([]);
+  const [brandPreferences, setBrandPreferences] = useState<FavouriteBrandPreferenceEntry[]>([]);
   const [hasLoaded, setHasLoaded] = useState(false);
 
   useEffect(() => {
     function syncSavedProducts() {
       setSavedProducts(readSavedProducts());
+      setBrandPreferences(readFavouriteBrandPreferenceEntries());
       setHasLoaded(true);
     }
 
     syncSavedProducts();
     window.addEventListener('storage', syncSavedProducts);
     window.addEventListener(FAVOURITES_UPDATED_EVENT, syncSavedProducts);
+    window.addEventListener(FAVOURITE_BRANDS_UPDATED_EVENT, syncSavedProducts);
     return () => {
       window.removeEventListener('storage', syncSavedProducts);
       window.removeEventListener(FAVOURITES_UPDATED_EVENT, syncSavedProducts);
+      window.removeEventListener(FAVOURITE_BRANDS_UPDATED_EVENT, syncSavedProducts);
     };
   }, []);
 
   const savedProductsBySlug = useMemo(() => new Map(savedProducts.map((product, index) => [product.slug, { product, index }])), [savedProducts]);
+  const brandPreferencesByBrand = useMemo(() => new Map(brandPreferences.map((entry) => [entry.brand.toLocaleLowerCase('sv-SE'), entry])), [brandPreferences]);
   const productSlugs = useMemo(() => new Set(productCatalogue.map((product) => product.slug)), [productCatalogue]);
   const visibleProducts = useMemo(() => productCatalogue.filter((liveProduct) => savedProductsBySlug.has(liveProduct.slug))
     .map((liveProduct) => {
@@ -68,6 +79,16 @@ export function FavouriteProductsPageClient({ productCatalogue }: Readonly<{ pro
     .sort((left, right) => left.savedIndex - right.savedIndex), [productCatalogue, savedProductsBySlug]);
   const staleSavedProducts = savedProducts.filter((savedProduct) => !productSlugs.has(savedProduct.slug));
   const cheapestSavedProduct = [...visibleProducts].sort((left, right) => left.liveProduct.totalSortPrice - right.liveProduct.totalSortPrice)[0]?.liveProduct;
+  const preferredBrandCount = brandPreferences.filter((entry) => entry.preference === 'preferred').length;
+  const avoidedBrandCount = brandPreferences.filter((entry) => entry.preference === 'avoided').length;
+
+  function markBrand(brand: string, preference: FavouriteBrandPreference) {
+    const nextPreferences = setFavouriteBrandPreference(brandPreferences, brand, preference);
+    if (saveFavouriteBrandPreferenceEntries(nextPreferences)) {
+      setBrandPreferences(nextPreferences);
+      window.dispatchEvent(new Event(FAVOURITE_BRANDS_UPDATED_EVENT));
+    }
+  }
 
   return (
     <div>
@@ -103,6 +124,11 @@ export function FavouriteProductsPageClient({ productCatalogue }: Readonly<{ pro
           <p className="mt-2 text-xl font-black text-slate-950">No account write</p>
           <p className="mt-1 text-sm font-semibold leading-6 text-slate-600">This local favourite list never calls network APIs and never syncs to a backend account.</p>
         </Card>
+        <Card className="p-4">
+          <p className="text-sm font-black text-slate-600">Brand preferences</p>
+          <p className="mt-2 text-xl font-black text-slate-950">{preferredBrandCount} preferred · {avoidedBrandCount} avoided</p>
+          <p className="mt-1 text-sm font-semibold leading-6 text-slate-600">Mark brands directly from saved favourites so recommendation explanations can respect explicit likes and avoids.</p>
+        </Card>
       </div>
 
       {!hasLoaded ? (
@@ -113,6 +139,10 @@ export function FavouriteProductsPageClient({ productCatalogue }: Readonly<{ pro
         <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {visibleProducts.map(({ savedProduct, liveProduct }) => (
             <Card className="relative overflow-hidden border-rose-100 bg-white p-4" key={liveProduct.slug}>
+              {(() => {
+                const brandPreference = brandPreferencesByBrand.get(liveProduct.brand.toLocaleLowerCase('sv-SE'))?.preference;
+                return (
+                  <>
               <div className="absolute right-3 top-3 z-10">
                 <FavouriteProductToggle product={{ slug: liveProduct.slug, name: liveProduct.name, imageUrl: liveProduct.imageUrl, brand: liveProduct.brand }} />
               </div>
@@ -135,9 +165,21 @@ export function FavouriteProductsPageClient({ productCatalogue }: Readonly<{ pro
                 {liveProduct.isAvailable === false ? <span className="rounded-full bg-rose-100 px-3 py-1 text-xs font-black text-rose-900">Out of stock</span> : null}
                 {liveProduct.priceDropBadge ? <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-950">{liveProduct.priceDropBadge}</span> : null}
                 <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700">saved {savedProduct.savedAt ? savedProduct.savedAt.slice(0, 10) : 'locally'}</span>
+                {brandPreference ? <span className="rounded-full bg-violet-100 px-3 py-1 text-xs font-black text-violet-900">brand {brandPreference}</span> : null}
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2" aria-label={`Brand preference actions for ${liveProduct.brand}`}>
+                <button className="rounded-full bg-emerald-100 px-3 py-2 text-xs font-black text-emerald-900" onClick={() => markBrand(liveProduct.brand, 'preferred')} type="button">
+                  Prefer {liveProduct.brand}
+                </button>
+                <button className="rounded-full bg-rose-100 px-3 py-2 text-xs font-black text-rose-900" onClick={() => markBrand(liveProduct.brand, 'avoided')} type="button">
+                  Avoid {liveProduct.brand}
+                </button>
               </div>
               <p className="mt-3 rounded-2xl bg-slate-50 p-3 text-xs font-semibold leading-5 text-slate-700">{liveProduct.sourceLabel}</p>
               <p className="mt-2 rounded-2xl bg-emerald-50 p-3 text-xs font-black leading-5 text-emerald-950">{liveProduct.confidenceLabel}</p>
+                  </>
+                );
+              })()}
             </Card>
           ))}
         </div>
