@@ -3,7 +3,9 @@ import assert from 'node:assert/strict';
 import {
   buildRema1000NoSearchUrl,
   fetchRema1000NoProducts,
-  parseRema1000NoProducts
+  parseRema1000NoProducts,
+  REMA_1000_NO_ACCESS_POLICY,
+  REMA_1000_NO_PARSER_VERSION
 } from '../rema-1000-no.js';
 
 const RETRIEVED_AT = '2026-05-25T12:30:00.000Z';
@@ -42,6 +44,8 @@ describe('REMA 1000 Norway connector fixture parsing', () => {
 
     assert.equal(url.origin + url.pathname, 'https://www.rema.no/search');
     assert.equal(url.searchParams.get('search'), 'kaffe filter');
+    assert.deepEqual(REMA_1000_NO_ACCESS_POLICY.blockedSurfaces, ['/search.php?search=', '/oppskrifter/?search=', '/butikker/?q=']);
+    assert.equal(REMA_1000_NO_ACCESS_POLICY.allowedSurface, '/search?search={query}');
   });
 
   it('parses recorded Next-data product rows, skips malformed rows, and de-duplicates by code', async () => {
@@ -103,6 +107,8 @@ describe('REMA 1000 Norway connector fixture parsing', () => {
       country: 'NO',
       currency: 'NOK',
       chain: 'rema-1000-no',
+      storeId: null,
+      storeName: null,
       code: '7035620056789',
       name: 'Kjeldsberg Filtermalt Kaffe',
       brand: 'Kjeldsberg',
@@ -115,7 +121,18 @@ describe('REMA 1000 Norway connector fixture parsing', () => {
       productUrl: 'https://www.rema.no/produkter/drikke/kaffe/kjeldsberg-filtermalt-7035620056789',
       imageUrl: 'https://www.rema.no/globalassets/produktbilder/7035620056789.jpg',
       sourceUrl: buildRema1000NoSearchUrl('kaffe'),
-      retrievedAt: RETRIEVED_AT
+      retrievedAt: RETRIEVED_AT,
+      sourceFreshness: {
+        retrievedAt: RETRIEVED_AT,
+        sourceUrl: buildRema1000NoSearchUrl('kaffe'),
+        parserVersion: REMA_1000_NO_PARSER_VERSION,
+        sourceKind: 'public_search_fixture'
+      },
+      provenance: {
+        source: 'rema_no_search',
+        parserVersion: REMA_1000_NO_PARSER_VERSION,
+        accessPolicy: 'public_read_only_search'
+      }
     });
   });
 
@@ -160,6 +177,13 @@ describe('REMA 1000 Norway connector fixture parsing', () => {
     await assert.rejects(
       fetchRema1000NoProducts({ fetchImpl, queries: ['melk'], retrievedAt: RETRIEVED_AT }),
       /REMA 1000 Norway search request failed for melk: 503/
+    );
+  });
+
+  it('fails closed when the public search fixture is a blocked page', () => {
+    assert.throws(
+      () => parseRema1000NoProducts('<html><title>Access denied</title></html>', buildRema1000NoSearchUrl('kaffe'), RETRIEVED_AT),
+      /blocked\/login page/
     );
   });
 });
