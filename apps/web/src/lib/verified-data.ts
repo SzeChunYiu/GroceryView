@@ -23,6 +23,7 @@ import {
 } from './generated/db-site-ingested-overrides';
 import { dbSiteHomepageTrendingPriceChanges } from './generated/db-site-trending-price-changes';
 import { categoryLabels, pricedProducts } from './openprices-products';
+import { classifyRecentPriceVariance } from './price-intelligence';
 import { allergenRiskBadgesForText } from './search-filters';
 import { osmStores } from './osm-stores';
 import {
@@ -673,6 +674,7 @@ function booleanSearchValue(value: SearchParamValue): boolean {
 function productSearchResultCards(searchResult: typeof rawFacetedProductSearch) {
   return searchResult.products.map((product) => {
     const cheapest = product.currentPrices[0] ?? null;
+    const volatilityBadge = classifyRecentPriceVariance(product.currentPrices);
     return {
       slug: product.slug,
       name: product.canonicalName,
@@ -688,6 +690,7 @@ function productSearchResultCards(searchResult: typeof rawFacetedProductSearch) 
       }) : unknownUnitPriceLabel,
       isAvailable: product.isAvailable,
       chainLabel: cheapest ? `${cheapest.chainName} · ${cheapest.priceType}` : 'Awaiting latest_prices row',
+      volatilityBadge,
       sourceTables: searchResult.evidence.sourceTables,
       allergenRiskBadges: allergenRiskBadgesForText([
         product.canonicalName,
@@ -4614,6 +4617,37 @@ export const sourceDiscrepancyReportOptions = [
   { id: 'wrong_unit', label: 'Wrong unit', reviewerHint: 'Check package text, normalized unit, and unit-price conversion.' },
   { id: 'missing_image', label: 'Missing image', reviewerHint: 'Confirm the source image URL is absent or broken before requesting a refresh.' },
   { id: 'unavailable_product', label: 'Unavailable product', reviewerHint: 'Verify store availability or stale catalogue rows before hiding the item.' }
+] as const;
+
+export const storeProductStockFreshnessExamples = [
+  {
+    productId: 'demo-live-stock',
+    storeId: 'willys',
+    availability: 'live',
+    observedAt: '2026-05-25T08:00:00.000Z',
+    source: 'retailer store feed'
+  },
+  {
+    productId: 'demo-stale-stock',
+    storeId: 'hemkop',
+    availability: 'stale',
+    observedAt: '2026-05-12T08:00:00.000Z',
+    source: 'retailer store feed'
+  },
+  {
+    productId: 'demo-inferred-stock',
+    storeId: 'willys',
+    availability: 'inferred',
+    observedAt: null,
+    source: 'priced row without stock field'
+  },
+  {
+    productId: 'demo-unavailable-stock',
+    storeId: 'hemkop',
+    availability: 'unavailable',
+    observedAt: '2026-05-25T08:00:00.000Z',
+    source: 'retailer store feed'
+  }
 ] as const;
 
 export const sourceDiscrepancyReviewContract = {
