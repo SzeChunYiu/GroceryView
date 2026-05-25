@@ -1,5 +1,8 @@
+const CORE_SHELL_CACHE_NAME = 'groceryview-core-shell-v1';
 const ITEM_PAGE_CACHE_NAME = 'groceryview-item-pages-v1';
 const SHOPPING_LIST_CACHE_NAME = 'groceryview-shopping-list-route-v1';
+const CORE_SHELL_ROUTES = ['/', '/products', '/search', '/list'];
+const CORE_SHELL_ASSETS = ['/manifest.webmanifest', '/pwa-icon.svg', '/pwa-maskable-icon.svg'];
 const MAX_ITEM_PAGE_CACHE_ENTRIES = 50;
 const ITEM_PAGE_PATTERNS = [
   /^\/items\/[^/]+\/?$/,
@@ -15,6 +18,56 @@ const SHOPPING_LIST_PATTERNS = [
   /^\/favourites\/?$/,
   /^\/favorites\/?$/
 ];
+
+function coreShellCacheRequest(request) {
+  const url = new URL(request.url);
+  url.search = '';
+  url.hash = '';
+  return new Request(url.toString(), {
+    credentials: request.credentials,
+    headers: request.headers,
+    method: 'GET',
+    mode: 'same-origin',
+    redirect: 'follow'
+  });
+}
+
+function isCoreShellRequest(request) {
+  if (request.method !== 'GET') return false;
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return false;
+  if (CORE_SHELL_ASSETS.includes(url.pathname)) return true;
+
+  const acceptsHtml = request.headers.get('accept')?.includes('text/html');
+  if (request.mode !== 'navigate' && !acceptsHtml) return false;
+  return CORE_SHELL_ROUTES.includes(url.pathname.replace(/\/$/, '') || '/');
+}
+
+async function cacheCoreShellResponse(request, response) {
+  if (!response || !response.ok || response.type === 'opaque') return response;
+
+  const cache = await caches.open(CORE_SHELL_CACHE_NAME);
+  await cache.put(coreShellCacheRequest(request), response.clone());
+  return response;
+}
+
+async function coreShellNetworkFirst(request) {
+  const cache = await caches.open(CORE_SHELL_CACHE_NAME);
+
+  try {
+    const response = await fetch(request);
+    return await cacheCoreShellResponse(request, response);
+  } catch (error) {
+    const cached = await cache.match(request, { ignoreSearch: true });
+    if (cached) return cached;
+
+    return new Response('Offline: the GroceryView shell has not been cached yet.', {
+      headers: { 'content-type': 'text/plain; charset=utf-8' },
+      status: 503,
+      statusText: 'Offline'
+    });
+  }
+}
 
 function isShoppingListRequest(request) {
   if (request.method !== 'GET') return false;
@@ -128,8 +181,13 @@ async function itemPageNetworkFirst(request) {
   }
 }
 
-self.addEventListener('install', () => {
-  self.skipWaiting();
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CORE_SHELL_CACHE_NAME)
+      .then((cache) => cache.addAll([...CORE_SHELL_ROUTES, ...CORE_SHELL_ASSETS]))
+      .catch(() => undefined)
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener('activate', (event) => {
@@ -137,7 +195,8 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => Promise.all(
       cacheNames
         .filter((cacheName) => (
-          (cacheName.startsWith('groceryview-item-pages-') && cacheName !== ITEM_PAGE_CACHE_NAME)
+          (cacheName.startsWith('groceryview-core-shell-') && cacheName !== CORE_SHELL_CACHE_NAME)
+          || (cacheName.startsWith('groceryview-item-pages-') && cacheName !== ITEM_PAGE_CACHE_NAME)
           || (cacheName.startsWith('groceryview-shopping-list-route-') && cacheName !== SHOPPING_LIST_CACHE_NAME)
         ))
         .map((cacheName) => caches.delete(cacheName))
@@ -146,6 +205,11 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  if (isCoreShellRequest(event.request)) {
+    event.respondWith(coreShellNetworkFirst(event.request));
+    return;
+  }
+
   if (isShoppingListRequest(event.request)) {
     event.respondWith(shoppingListNetworkFirst(event.request));
     return;
