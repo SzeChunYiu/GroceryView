@@ -103,6 +103,95 @@ export type BestTimeToBuyAlertRecommendation = {
   rationale: string;
 };
 
+export type SeasonalDiscoveryRow = {
+  slug: string;
+  productName: string;
+  categoryLabel: string;
+  bestBuyMonth: string;
+  bestBuyMonthIndex: number;
+  historicalMonthlyAverageLabel: string;
+  savingsVsTypicalLabel: string;
+  confidenceLabel: string;
+  evidenceLabel: string;
+  observationCount: number;
+  observedMonthCount: number;
+};
+
+export type HolidayStapleWindow = {
+  label: string;
+  months: string;
+  rationale: string;
+};
+
+export type CategorySeasonalDiscoveryModules = {
+  inSeasonProduce: SeasonalDiscoveryRow[];
+  historicBestBuyWindows: SeasonalDiscoveryRow[];
+  holidayStaples: HolidayStapleWindow[];
+  guardrail: string;
+};
+
+const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const;
+
+const categoryHolidayStaples: Record<string, HolidayStapleWindow[]> = {
+  produce: [
+    { label: 'Citrus and cabbage planning', months: 'Jan-Mar', rationale: 'Use winter produce history for low-waste baskets before spring rows arrive.' },
+    { label: 'Berry and grill vegetable watch', months: 'Jun-Aug', rationale: 'Summer holiday baskets should compare current deals against observed best-buy months.' }
+  ],
+  dairy: [
+    { label: 'Cream, cheese, and butter checks', months: 'Nov-Dec', rationale: 'Holiday baking and buffet staples deserve a deal check before stock-up trips.' }
+  ],
+  pantry: [
+    { label: 'Baking and dry-good stock-up', months: 'Nov-Dec', rationale: 'Historic best-buy windows keep pantry refills separate from forecast claims.' }
+  ],
+  sweets: [
+    { label: 'Holiday candy and fika shelf', months: 'Mar-Apr / Dec', rationale: 'Seasonal discovery highlights sweets only as a planning cue, not a price prediction.' }
+  ],
+  beverages: [
+    { label: 'Holiday drink aisle watch', months: 'Jun / Dec', rationale: 'Surface timing context for recurring holiday staples while keeping observed prices visible.' }
+  ]
+};
+
+function monthDistance(left: number, right: number) {
+  const distance = Math.abs(left - right);
+  return Math.min(distance, 12 - distance);
+}
+
+export function buildCategorySeasonalDiscoveryModules({
+  categorySlug,
+  currentMonthIndex = new Date().getUTCMonth(),
+  seasonalRows
+}: {
+  categorySlug: string;
+  currentMonthIndex?: number;
+  seasonalRows: ReadonlyArray<SeasonalDiscoveryRow>;
+}): CategorySeasonalDiscoveryModules {
+  const currentMonth = Number.isInteger(currentMonthIndex) ? ((currentMonthIndex % 12) + 12) % 12 : new Date().getUTCMonth();
+  const categoryRows = categorySlug === 'produce'
+    ? seasonalRows
+    : seasonalRows.filter((row) => row.categoryLabel.toLowerCase().includes(categorySlug.replace(/-/g, ' ')));
+  const rankedRows = categoryRows.length > 0 ? categoryRows : seasonalRows;
+  const inSeasonProduce = [...rankedRows]
+    .filter((row) => monthDistance(row.bestBuyMonthIndex, currentMonth) <= 1)
+    .sort((left, right) => right.observationCount - left.observationCount)
+    .slice(0, 3);
+  const historicBestBuyWindows = [...rankedRows]
+    .sort((left, right) => right.observedMonthCount - left.observedMonthCount || right.observationCount - left.observationCount)
+    .slice(0, 3);
+
+  return {
+    inSeasonProduce,
+    historicBestBuyWindows,
+    holidayStaples: categoryHolidayStaples[categorySlug] ?? [
+      {
+        label: `${monthLabels[currentMonth]} category timing check`,
+        months: `${monthLabels[currentMonth]} plus nearby flyer weeks`,
+        rationale: 'Use the category page to compare observed deals before making a seasonal stock-up decision.'
+      }
+    ],
+    guardrail: 'Seasonal modules use historical monthly averages and explicit holiday planning labels only. No forecast, harvest, stock, or synthetic seasonal price claim is invented.'
+  };
+}
+
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }

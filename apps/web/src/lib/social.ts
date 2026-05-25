@@ -10,6 +10,7 @@ export type SocialFeedPost = Readonly<{
 
 export type FriendPriceSighting = Readonly<{
   action: 'reported' | 'saved';
+  chainSlug: string;
   confidence: 'high' | 'medium' | 'low';
   id: string;
   note?: string;
@@ -73,6 +74,7 @@ export const socialFeedPosts: SocialFeedPost[] = [
 export const friendPriceSightings: FriendPriceSighting[] = [
   {
     action: 'reported',
+    chainSlug: 'hemkop',
     confidence: 'medium',
     id: 'friend-sighting-oats-hemkop',
     note: 'Friend reported the shelf tag before the official feed refreshed.',
@@ -88,6 +90,7 @@ export const friendPriceSightings: FriendPriceSighting[] = [
   },
   {
     action: 'reported',
+    chainSlug: 'willys',
     confidence: 'low',
     id: 'friend-sighting-basil-willys',
     note: 'Household member flagged local stock while shopping.',
@@ -103,6 +106,7 @@ export const friendPriceSightings: FriendPriceSighting[] = [
   },
   {
     action: 'saved',
+    chainSlug: 'willys',
     confidence: 'high',
     id: 'friend-sighting-fiberhavregryn-willys',
     note: 'Saved by a household member as a cheaper local option.',
@@ -152,6 +156,13 @@ export function listFriendPriceSightingsForProduct(productSlug: string) {
 export function friendPriceSightingSummary(sighting: FriendPriceSighting) {
   const relationship = sighting.relationship === 'household' ? 'household member' : 'friend';
   return `${sighting.reporter} ${sighting.action} by ${relationship}`;
+}
+
+export function listFriendPriceSightingsForProductChains(productSlug: string, chainSlugs: readonly string[]) {
+  const allowedChains = new Set(chainSlugs.map((chain) => chain.toLowerCase()));
+  return recentFriendSightings(friendPriceSightings.filter((sighting) =>
+    sighting.sharedWithFriends && sighting.productSlug === productSlug && allowedChains.has(sighting.chainSlug)
+  ));
 }
 
 function priceFromLabel(priceLabel: string) {
