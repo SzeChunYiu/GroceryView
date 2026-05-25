@@ -275,9 +275,14 @@ export function SourceCoverage() {
           <Eyebrow>Data provenance</Eyebrow>
           <h2 className="mt-2 text-2xl font-black tracking-tight">Only verified snapshot data is rendered</h2>
         </div>
-        <Link className="text-sm font-bold text-emerald-800 underline decoration-emerald-300 underline-offset-4" href="/data-sources">
-          Data source notes live in docs/data-sources.md
-        </Link>
+        <div className="flex flex-wrap gap-3 text-sm font-bold text-emerald-800">
+          <Link className="underline decoration-emerald-300 underline-offset-4" href="/data-sources">
+            Data source notes live in docs/data-sources.md
+          </Link>
+          <Link className="underline decoration-emerald-300 underline-offset-4" href="/index-methodology">
+            Index methodology
+          </Link>
+        </div>
       </div>
       <div className="mt-5 grid gap-3 lg:grid-cols-3">
         {sourceCoverage.map((source) => (
