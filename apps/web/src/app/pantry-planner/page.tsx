@@ -27,7 +27,7 @@ export default function PantryPlannerPage() {
   const coverage = {
     ...pantryReplenishmentPlan.coverage,
     confidence: 'medium' as const,
-    caveat: 'Uses visible pantry fixtures, household basket rows, usage events, and current deal rows only; missing authenticated inventory remains excluded.'
+    caveat: 'Uses visible pantry fixtures, household basket rows, usage events, and current deal rows only; account pantry expiry dates are read from expiresAt when present; missing authenticated inventory remains excluded.'
   };
   const alreadyInBasketCount = replenishment.filter((item) => item.alreadyInBasket).length;
   const dealBackedRestocks = replenishment.filter((item) => item.bestDeal).length;

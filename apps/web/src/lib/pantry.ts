@@ -1,3 +1,5 @@
+import type { PantryItemRecord } from '@groceryview/db';
+
 export type PantryStockStatus = 'healthy' | 'low' | 'depleted';
 
 export type PantryExpiryUrgency = 'expired' | 'use-soon' | 'planned' | 'unknown';
@@ -36,7 +38,14 @@ export type PantryConsumptionEvent = {
   occurredAt: string;
 };
 
-type PantryStatusRow = {
+export type PantryReplacementFilter = {
+  replacementId: string;
+  label: string;
+  categorySlug: string;
+  keywords: string[];
+};
+
+export type PantryStatusRow = {
   productId: string;
   name: string;
   unit: string;
@@ -45,6 +54,77 @@ type PantryStatusRow = {
   daysUntilExpiry?: number | null;
   expiresAt?: string | null;
 };
+
+const pantryReplacementFilters: Record<string, Omit<PantryReplacementFilter, 'replacementId'>> = {
+  coffee: {
+    label: 'Coffee',
+    categorySlug: 'coffee-tea',
+    keywords: ['coffee', 'kaffe']
+  },
+  oats: {
+    label: 'Oats',
+    categorySlug: 'breakfast',
+    keywords: ['oats', 'havre', 'havregryn']
+  },
+  milk: {
+    label: 'Milk or fil',
+    categorySlug: 'dairy',
+    keywords: ['milk', 'mjolk', 'fil', 'yoghurt']
+  },
+  'frozen-veg': {
+    label: 'Frozen vegetables',
+    categorySlug: 'frozen',
+    keywords: ['frozen', 'vegetable', 'vegetables', 'gronsak', 'wokmix']
+  }
+};
+
+function normalizeReplacementText(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/å/g, 'a')
+    .replace(/ä/g, 'a')
+    .replace(/ö/g, 'o')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+function labelFromReplacementToken(token: string) {
+  return token.split('-').filter(Boolean).map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(' ');
+}
+
+export function buildPantryReplacementFilter(value: string | string[] | undefined): PantryReplacementFilter | null {
+  const rawValue = Array.isArray(value) ? value[0] : value;
+  const replacementId = rawValue ? normalizeReplacementText(rawValue) : '';
+  if (!replacementId) return null;
+
+  const knownFilter = pantryReplacementFilters[replacementId];
+  if (knownFilter) {
+    return { replacementId, ...knownFilter };
+  }
+
+  return {
+    replacementId,
+    label: labelFromReplacementToken(replacementId),
+    categorySlug: replacementId,
+    keywords: replacementId.split('-').filter(Boolean)
+  };
+}
+
+export function pantryReplacementMatches(
+  filter: PantryReplacementFilter,
+  row: { productName: string; productSlug: string; categoryLabel?: string; categorySlug?: string }
+) {
+  if (row.categorySlug === filter.categorySlug) return true;
+
+  const searchableText = [
+    row.productName,
+    row.productSlug,
+    row.categoryLabel,
+    row.categorySlug
+  ].filter(Boolean).map((part) => normalizeReplacementText(String(part))).join(' ');
+
+  return filter.keywords.some((keyword) => searchableText.includes(normalizeReplacementText(keyword)));
+}
 
 function roundQuantity(value: number) {
   return Math.round(Math.max(0, value) * 100) / 100;
@@ -62,10 +142,10 @@ export function estimateDepletionDays(ownedQuantity: number, estimatedDailyUse: 
 }
 
 export function buildExpiryReminder(row: Pick<PantryStatusRow, 'daysUntilExpiry' | 'expiresAt'>): PantryExpiryReminder {
-  const daysUntilExpiry = typeof row.daysUntilExpiry === 'number'
-    ? Math.ceil(row.daysUntilExpiry)
-    : row.expiresAt
-      ? Math.ceil((new Date(row.expiresAt).getTime() - Date.now()) / 86_400_000)
+  const daysUntilExpiry = row.expiresAt
+    ? Math.ceil((new Date(row.expiresAt).getTime() - Date.now()) / 86_400_000)
+    : typeof row.daysUntilExpiry === 'number'
+      ? Math.ceil(row.daysUntilExpiry)
       : null;
 
   if (daysUntilExpiry === null || !Number.isFinite(daysUntilExpiry)) {
@@ -111,6 +191,17 @@ function getStockStatus(ownedQuantity: number, minimumQuantity: number): PantryS
   if (ownedQuantity <= 0) return 'depleted';
   if (ownedQuantity <= minimumQuantity) return 'low';
   return 'healthy';
+}
+
+export function pantryStatusRowsFromAccountInventory(items: PantryItemRecord[]): PantryStatusRow[] {
+  return items.map((item) => ({
+    productId: item.productId,
+    name: item.name,
+    unit: item.unit,
+    remainingQuantity: item.quantity,
+    minimumQuantity: item.minimumQuantity,
+    expiresAt: item.expiresOn ?? null
+  }));
 }
 
 export function buildPantryStockItems(rows: PantryStatusRow[]): PantryStockItem[] {

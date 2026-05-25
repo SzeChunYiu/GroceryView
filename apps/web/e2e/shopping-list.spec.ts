@@ -37,3 +37,38 @@ test.describe('shopping list e2e', () => {
     await expect(page.getByText('Invalid read-only list link signature.')).toBeVisible();
   });
 });
+
+test('keeps the shopping list app shell and local snapshot available offline', async ({ context, page }) => {
+  await page.goto('/list');
+  await page.evaluate(() => localStorage.clear());
+  await page.reload();
+
+  await page.getByLabel('Plain-text list, one item per line').fill(fiveItemList);
+  await page.getByRole('button', { name: 'Import matched items' }).click();
+  await expect(page.getByText('Imported 5 line(s), 5 matched to the product catalog.')).toBeVisible();
+
+  await page.waitForFunction(() => navigator.serviceWorker.controller || navigator.serviceWorker.ready);
+  await page.waitForFunction(() => {
+    const raw = localStorage.getItem('groceryview:shopping-list:offline-cache:v1');
+    if (!raw) return false;
+    const snapshot = JSON.parse(raw) as { totalCount?: number; items?: unknown[]; lastKnownPrices?: unknown[] };
+    return snapshot.totalCount === 5 && Array.isArray(snapshot.items) && snapshot.items.length === 5 && Array.isArray(snapshot.lastKnownPrices);
+  });
+
+  await page.goto('/list', { waitUntil: 'networkidle' });
+  await context.setOffline(true);
+  try {
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await expect(page.getByRole('heading', { name: 'Shopping list' })).toBeVisible();
+    await expect(page.getByText('Offline copy saved with 5 last known prices.')).toBeVisible();
+
+    const offlineSnapshot = await page.evaluate(() => {
+      const raw = localStorage.getItem('groceryview:shopping-list:offline-cache:v1');
+      return raw ? JSON.parse(raw) as { totalCount?: number; items?: unknown[] } : null;
+    });
+    expect(offlineSnapshot?.totalCount).toBe(5);
+    expect(offlineSnapshot?.items).toHaveLength(5);
+  } finally {
+    await context.setOffline(false);
+  }
+});

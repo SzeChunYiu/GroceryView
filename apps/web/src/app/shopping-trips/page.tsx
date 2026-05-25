@@ -1,4 +1,5 @@
 import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { defaultStoreRouteChecklist, osmStores } from '@/lib/osm-stores';
 import { basketTripCostContract, budgetCheapestStoreRoutingPlanner, deliveryVsInStoreComparison, elderlyNearestDeliveryPlanner, formatSek, fulfillmentSlotsContract } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 import { activeShoppingTripEstimates } from '@/lib/trip-planner';
@@ -24,6 +25,17 @@ const titles: Record<string, string> = {
   'shopping-trips': 'Shopping trips',
   privacy: 'Privacy controls'
 };
+
+const routeChecklistStore = osmStores.find((store) => store.slug === defaultStoreRouteChecklist.selectedStoreSlug);
+const routeChecklistGroups = defaultStoreRouteChecklist.stopOrder
+  .map((department) => ({
+    department,
+    items: defaultStoreRouteChecklist.items.filter((item) => item.department === department)
+  }))
+  .filter((group) => group.items.length > 0);
+const routeChecklistCheckedCount = defaultStoreRouteChecklist.items.filter((item) => item.checked).length;
+const routeChecklistTotalCount = defaultStoreRouteChecklist.items.length;
+const routeChecklistProgress = routeChecklistTotalCount > 0 ? Math.round((routeChecklistCheckedCount / routeChecklistTotalCount) * 100) : 0;
 
 export default function FeaturePage() {
   const route = 'shopping-trips';
@@ -67,6 +79,53 @@ export default function FeaturePage() {
               </ul>
             </div>
           ))}
+        </div>
+      </Card>
+      <Card className="mt-6 border-emerald-200 bg-emerald-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Store route checklist</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight">Grouped by selected-store aisle and department</h2>
+        <p className="mt-3 text-sm leading-6 text-slate-700">
+          The current trip is routed through {routeChecklistStore?.name ?? 'the selected store'} ({routeChecklistStore?.brand ?? 'verified store'})
+          {routeChecklistStore?.address ? ` at ${routeChecklistStore.address}` : ''}. Items are grouped in walking order so shoppers can clear each department before moving to the next stop.
+        </p>
+        <div className="mt-4 rounded-2xl bg-white p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Trip progress</p>
+              <p className="mt-1 text-2xl font-black text-slate-950">{defaultStoreRouteChecklist.progressLabel}</p>
+            </div>
+            <p className="rounded-full bg-emerald-100 px-4 py-2 text-sm font-black text-emerald-950">{routeChecklistProgress}% complete</p>
+          </div>
+          <div
+            aria-label={`${routeChecklistProgress}% complete`}
+            aria-valuemax={100}
+            aria-valuemin={0}
+            aria-valuenow={routeChecklistProgress}
+            className="mt-4 h-3 overflow-hidden rounded-full bg-slate-100"
+            role="progressbar"
+          >
+            <div className="h-full rounded-full bg-emerald-700" style={{ width: `${routeChecklistProgress}%` }} />
+          </div>
+        </div>
+        <div className="mt-4 grid gap-4 lg:grid-cols-5">
+          {routeChecklistGroups.map((group) => {
+            const completeItems = group.items.filter((item) => item.checked).length;
+
+            return (
+              <section className="rounded-2xl bg-white p-4" key={group.department}>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{completeItems}/{group.items.length} picked</p>
+                <h3 className="mt-1 text-lg font-black text-slate-950">{group.department}</h3>
+                <ul className="mt-3 space-y-3">
+                  {group.items.map((item) => (
+                    <li className="rounded-xl border border-emerald-100 bg-emerald-50/60 p-3" key={item.id}>
+                      <p className={`font-black ${item.checked ? 'text-emerald-950 line-through decoration-2' : 'text-slate-950'}`}>{item.name}</p>
+                      <p className="mt-1 text-xs font-semibold text-slate-600">{item.quantity} · {item.aisleLabel}</p>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            );
+          })}
         </div>
       </Card>
       <Card className="mt-6 border-sky-200 bg-sky-50">

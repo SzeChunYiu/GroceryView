@@ -13,7 +13,7 @@ type PantryInventoryItem = {
   id: string;
   name: string;
   quantity: string;
-  daysUntilExpiry: number | null;
+  expiresAt: string | null;
   recipeHref: string;
   replacementHref: string;
   status: PantryStatus;
@@ -41,10 +41,10 @@ const expiryStyles: Record<PantryExpiryUrgency, string> = {
 };
 
 const initialPantryItems: PantryInventoryItem[] = [
-  { id: 'coffee', name: 'Coffee', aisle: 'Breakfast', quantity: '1 package', daysUntilExpiry: 45, recipeHref: '/meal-planner?ingredient=coffee', replacementHref: '/deals?replace=coffee', status: 'stocked' },
-  { id: 'oats', name: 'Oats', aisle: 'Breakfast', quantity: '1 bag', daysUntilExpiry: 6, recipeHref: '/meal-planner?ingredient=oats', replacementHref: '/deals?replace=oats', status: 'low' },
-  { id: 'milk', name: 'Milk or fil', aisle: 'Dairy', quantity: '2 cartons', daysUntilExpiry: 2, recipeHref: '/meal-planner?ingredient=milk', replacementHref: '/deals?replace=milk', status: 'consumed' },
-  { id: 'frozen-veg', name: 'Frozen vegetables', aisle: 'Freezer', quantity: '1 bag', daysUntilExpiry: null, recipeHref: '/meal-planner?ingredient=frozen-veg', replacementHref: '/deals?replace=frozen-veg', status: 'stocked' }
+  { id: 'coffee', name: 'Coffee', aisle: 'Breakfast', quantity: '1 package', expiresAt: '2026-07-09', recipeHref: '/meal-planner?ingredient=coffee', replacementHref: '/deals?replace=coffee', status: 'stocked' },
+  { id: 'oats', name: 'Oats', aisle: 'Breakfast', quantity: '1 bag', expiresAt: '2026-05-31', recipeHref: '/meal-planner?ingredient=oats', replacementHref: '/deals?replace=oats', status: 'low' },
+  { id: 'milk', name: 'Milk or fil', aisle: 'Dairy', quantity: '2 cartons', expiresAt: '2026-05-27', recipeHref: '/meal-planner?ingredient=milk', replacementHref: '/deals?replace=milk', status: 'consumed' },
+  { id: 'frozen-veg', name: 'Frozen vegetables', aisle: 'Freezer', quantity: '1 bag', expiresAt: null, recipeHref: '/meal-planner?ingredient=frozen-veg', replacementHref: '/deals?replace=frozen-veg', status: 'stocked' }
 ];
 
 function Card({ children, className = '' }: Readonly<{ children: ReactNode; className?: string }>) {
@@ -54,7 +54,7 @@ function Card({ children, className = '' }: Readonly<{ children: ReactNode; clas
 export default function PantryInventoryPage() {
   const [items, setItems] = useState(initialPantryItems);
   const itemsWithExpiry = useMemo(() => items.map((item) => {
-    const expiryReminder = buildExpiryReminder({ daysUntilExpiry: item.daysUntilExpiry });
+    const expiryReminder = buildExpiryReminder({ expiresAt: item.expiresAt });
 
     return {
       ...item,
@@ -108,7 +108,7 @@ export default function PantryInventoryPage() {
               onClick={() => setItems(initialPantryItems)}
               type="button"
             >
-              Reset demo state
+              Reset account sample
             </button>
           </div>
 

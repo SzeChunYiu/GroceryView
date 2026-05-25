@@ -8,9 +8,22 @@ export interface PriceFreshness {
   isStale: boolean;
 }
 
+export interface StoreReliabilityScore {
+  feedFreshness: PriceFreshness;
+  priceObservationCount: number;
+  priceObservationLabel: string;
+  expectedCategories: string[];
+  observedCategories: string[];
+  missingCategories: string[];
+  missingCategoryWarning: string;
+  scoreLabel: string;
+  tone: "strong" | "limited" | "blocked";
+}
+
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
 const AGING_AFTER_DAYS = 2;
 const STALE_AFTER_DAYS = 7;
+const DEFAULT_STORE_RELIABILITY_CATEGORIES = ["branch price feed"];
 
 export function getScrapeAgeInDays(
   scrapedAt: string | number | Date | null | undefined,
@@ -87,5 +100,47 @@ export function getPriceFreshness(
     ageInDays,
     refreshHint: "Recently refreshed price.",
     isStale: false,
+  };
+}
+
+export function getStoreReliabilityScore({
+  feedRetrievedAt,
+  now = new Date(),
+  observedCategories = [],
+  priceObservationCount,
+  expectedCategories = DEFAULT_STORE_RELIABILITY_CATEGORIES,
+}: {
+  feedRetrievedAt: string | number | Date | null | undefined;
+  now?: Date;
+  observedCategories?: string[];
+  priceObservationCount: number;
+  expectedCategories?: string[];
+}): StoreReliabilityScore {
+  const feedFreshness = getPriceFreshness(feedRetrievedAt, now);
+  const observedCategorySet = new Set(observedCategories.map((category) => category.toLowerCase()));
+  const missingCategories = expectedCategories.filter((category) => !observedCategorySet.has(category.toLowerCase()));
+  const hasObservations = priceObservationCount > 0;
+  const tone: StoreReliabilityScore["tone"] = feedFreshness.isStale || !hasObservations
+    ? "blocked"
+    : missingCategories.length > 0
+      ? "limited"
+      : "strong";
+
+  return {
+    feedFreshness,
+    priceObservationCount,
+    priceObservationLabel: `${priceObservationCount.toLocaleString("sv-SE")} price observations`,
+    expectedCategories,
+    observedCategories,
+    missingCategories,
+    missingCategoryWarning: missingCategories.length > 0
+      ? `Missing categories: ${missingCategories.join(", ")}`
+      : "No missing category warnings",
+    scoreLabel: tone === "strong"
+      ? "Trustworthy store comparison"
+      : tone === "limited"
+        ? "Limited category coverage"
+        : "Store comparison blocked",
+    tone,
   };
 }
