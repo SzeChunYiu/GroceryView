@@ -5,6 +5,8 @@ import { axfoodProducts } from '@/lib/axfood-products';
 import { buildDemoHouseholdCategorySignals, defaultHouseholdId, getHouseholdCategoryScore, rankCategoriesByPurchaseHistory } from '@/lib/personalization';
 import { pricedProducts } from '@/lib/openprices-products';
 import { buildCategoryScopedSearchSuggestions } from '@/lib/search-suggest';
+import { CategoryTrendingShelves } from '@/app/page-sections/trending';
+import { buildCategoryTrendingShelves } from '@/lib/grocery-index-widget';
 import { categorySummaries, dietaryScenarioFilters, formatPct, formatSek, immigrantAisleFinder, sustainableBrandFilter } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -23,6 +25,7 @@ export default function CategoriesIndexPage() {
     category,
     suggestions: buildCategoryScopedSearchSuggestions(category.slug, categorySuggestionProducts, category.label)
   }));
+  const categoryShelves = buildCategoryTrendingShelves();
 
   return (
     <PageShell>
@@ -48,6 +51,7 @@ export default function CategoriesIndexPage() {
         </div>
       </Card>
 
+      <CategoryTrendingShelves shelves={categoryShelves} />
       <Card className="mt-6 border-orange-200 bg-orange-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-orange-800">Immigrants / new arrivals</p>
         <h2 className="mt-2 text-2xl font-black">Halal, kosher & ethnic aisle finder</h2>

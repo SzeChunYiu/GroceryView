@@ -16,9 +16,10 @@ const levelClasses: Record<ConfidenceBadgeProps["level"], string> = {
 export function ConfidenceBadge({ level, label, sampleSize }: ConfidenceBadgeProps) {
   const displayLabel = label ?? confidenceCopy(level, sampleSize);
   const token = confidenceStateToken(level);
+  const sampleCopy = sampleSize !== undefined ? ` Sample size ${sampleSize}.` : '';
   return (
     <span
-      aria-label={`${displayLabel}. ${token.meaning}. Indicator ${token.indicator}.`}
+      aria-label={`${displayLabel}.${sampleCopy} ${token.meaning}. Indicator ${token.indicator}.`}
       className={`inline-flex items-center gap-2 rounded-lg border px-3 py-1 text-xs font-semibold uppercase tracking-wide ${levelClasses[level]}`}
     >
       <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full border border-current px-1 font-black leading-none" aria-hidden="true">
