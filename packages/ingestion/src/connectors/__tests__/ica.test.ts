@@ -4,6 +4,7 @@ import {
   DEFAULT_ICA_REGION_ID,
   buildIcaStoreProductUrl,
   buildIcaStorePromotionsUrl,
+  deriveIcaFormat,
   fetchIcaProducts,
   parseIcaStorePromotions
 } from '../ica.js';
@@ -84,6 +85,13 @@ function jsonResponse(payload: unknown, status = 200): Response {
 }
 
 describe('ICA connector fixture parsing', () => {
+  it('derives ICA sub-brand formats from store metadata', () => {
+    assert.equal(deriveIcaFormat('Maxi ICA Stormarknad Solna'), 'maxi');
+    assert.equal(deriveIcaFormat('ICA Kvantum Kungsholmen'), 'kvantum');
+    assert.equal(deriveIcaFormat('ICA Supermarket Fältöversten'), 'supermarket');
+    assert.equal(deriveIcaFormat('ICA Nära Annedal'), 'nara');
+  });
+
   it('builds store promotion and product-detail URLs with store, region, and page-size context', () => {
     const url = new URL(buildIcaStorePromotionsUrl(STORE_ACCOUNT_ID, DEFAULT_ICA_REGION_ID, 42));
 
@@ -127,6 +135,8 @@ describe('ICA connector fixture parsing', () => {
     }]);
     assert.equal(rows.length, 2);
     assert.deepEqual(rows[0], {
+      chain: 'ica',
+      ica_format: 'kvantum',
       code: '2033470',
       productId: 'prd-ica-yogurt-1kg',
       retailerProductId: '2033470',
@@ -176,6 +186,8 @@ describe('ICA connector fixture parsing', () => {
     const allRows = parseIcaStorePromotions(recordedIcaPromotionsFixture, options);
     assert.deepEqual(allRows.map((row) => row.retailerProductId), ['2033470', '1500812']);
     assert.deepEqual(allRows[1], {
+      chain: 'ica',
+      ica_format: 'kvantum',
       code: '1500812',
       productId: 'prd-ica-loose-salmon',
       retailerProductId: '1500812',
