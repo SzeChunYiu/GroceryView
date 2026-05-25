@@ -7,9 +7,12 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { trackSearchToSavingsFunnelStep, trackVoiceSearchInput } from '@/lib/analytics';
 import {
   clearRecentSearchHistory,
+  pinSavedSearch,
   readRecentSearchHistory,
+  readSavedSearches,
   rememberRecentSearchHistory,
-  type RecentSearchHistoryEntry
+  type RecentSearchHistoryEntry,
+  type SavedSearchEntry
 } from '@/lib/personalization';
 import type { SearchExplanationBadge } from '@/lib/search-filters';
 
@@ -127,6 +130,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
   const [facetChips, setFacetChips] = useState<HeaderSearchFacetChip[]>([]);
   const [suggestGroups, setSuggestGroups] = useState<HeaderSuggestGroup[]>([]);
   const [recentSearches, setRecentSearches] = useState<RecentSearchHistoryEntry[]>([]);
+  const [savedSearches, setSavedSearches] = useState<SavedSearchEntry[]>([]);
   const [activeOptionIndex, setActiveOptionIndex] = useState(-1);
   const [isFocused, setIsFocused] = useState(false);
   const [status, setStatus] = useState<SearchStatus>('idle');
@@ -134,17 +138,18 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
   const voiceRecognitionRef = useRef<GrocerySpeechRecognition | null>(null);
   const trimmedQuery = useMemo(() => query.trim(), [query]);
   const emptyFallback = useMemo(() => zeroResultFallbacks(trimmedQuery), [trimmedQuery]);
-  const shouldShowRecentSearches = isFocused && trimmedQuery.length === 0 && recentSearches.length > 0;
+  const shouldShowRecentSearches = isFocused && trimmedQuery.length === 0 && (recentSearches.length > 0 || savedSearches.length > 0);
   const shouldShowDropdown = (status !== 'idle' && trimmedQuery.length >= MIN_QUERY_LENGTH) || shouldShowRecentSearches;
   const optionCount = useMemo(() => {
-    if (shouldShowRecentSearches) return recentSearches.length;
+    if (shouldShowRecentSearches) return recentSearches.length + savedSearches.length;
     const groupedCount = suggestGroups.reduce((total, group) => total + group.items.length, 0);
     const productResultCount = groupedCount === 0 && status === 'ready' ? results.length : 0;
     return groupedCount + facetChips.length + productResultCount;
-  }, [facetChips.length, recentSearches.length, results.length, shouldShowRecentSearches, status, suggestGroups]);
+  }, [facetChips.length, recentSearches.length, results.length, savedSearches.length, shouldShowRecentSearches, status, suggestGroups]);
 
   useEffect(() => {
     setRecentSearches(readRecentSearchHistory());
+    setSavedSearches(readSavedSearches());
   }, []);
 
   useEffect(() => () => {
@@ -337,6 +342,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
           onChange={(event) => setQuery(event.target.value)}
           onFocus={() => {
             setRecentSearches(readRecentSearchHistory());
+            setSavedSearches(readSavedSearches());
             setIsFocused(true);
           }}
           onKeyDown={handleSearchKeyDown}
@@ -383,21 +389,47 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
                 </button>
               </div>
               <div className="mt-2 grid gap-2">
-                {recentSearches.map((search) => {
+                {savedSearches.map((search) => {
                   const index = nextOptionIndex();
                   return (
                     <Link
-                      className="rounded-2xl bg-slate-50 px-3 py-2 text-sm font-black text-slate-800 transition hover:bg-emerald-50 hover:text-emerald-900 focus:bg-emerald-50 focus:outline-none"
+                      className="rounded-2xl bg-violet-50 px-3 py-2 text-sm font-black text-violet-950 transition hover:bg-violet-100 focus:bg-violet-100 focus:outline-none"
                       data-search-option-index={index}
                       href={search.href}
-                      key={`${search.query}-${search.searchedAt}`}
+                      key={`saved-${search.query}-${search.pinnedAt}`}
                       onFocus={() => setActiveOptionIndex(index)}
                       onKeyDown={(event) => handleOptionKeyDown(event, index)}
                       role="option"
                     >
-                      {search.query}
-                      <span className="ml-2 text-xs font-semibold text-slate-500">{search.resultCount} verified result{search.resultCount === 1 ? '' : 's'}</span>
+                      ★ {search.query}
+                      <span className="ml-2 text-xs font-semibold text-violet-700">saved search</span>
                     </Link>
+                  );
+                })}
+                {recentSearches.map((search) => {
+                  const index = nextOptionIndex();
+                  return (
+                    <div className="flex items-center gap-2 rounded-2xl bg-slate-50 px-3 py-2" key={`${search.query}-${search.searchedAt}`}>
+                      <Link
+                        className="flex-1 text-sm font-black text-slate-800 transition hover:text-emerald-900 focus:outline-none"
+                        data-search-option-index={index}
+                        href={search.href}
+                        onFocus={() => setActiveOptionIndex(index)}
+                        onKeyDown={(event) => handleOptionKeyDown(event, index)}
+                        role="option"
+                      >
+                        {search.query}
+                        <span className="ml-2 text-xs font-semibold text-slate-500">{search.resultCount} verified result{search.resultCount === 1 ? '' : 's'}</span>
+                      </Link>
+                      <button
+                        className="rounded-full bg-white px-2 py-1 text-xs font-black text-violet-800"
+                        onClick={() => setSavedSearches(pinSavedSearch(search))}
+                        onMouseDown={(event) => event.preventDefault()}
+                        type="button"
+                      >
+                        Pin
+                      </button>
+                    </div>
                   );
                 })}
               </div>

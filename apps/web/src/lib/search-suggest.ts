@@ -253,6 +253,34 @@ export function expandGrocerySearchQuery(query: string, maxQueries = 5): Grocery
   return expandGrocerySearchQueryWithTelemetry(query, maxQueries).expansion;
 }
 
+export type MisspelledQueryRecovery = {
+  query: string;
+  didYouMean: string[];
+  popularAlternatives: string[];
+};
+
+const popularRecoveryQueries = ['mjölk', 'kaffe', 'havregryn', 'ägg', 'yoghurt', 'pasta'];
+
+export function buildMisspelledQueryRecovery(query: string, maxSuggestions = 4): MisspelledQueryRecovery {
+  const normalizedQuery = normalizeAliasText(query);
+  const aliasCandidates = groceryAliasEntries.flatMap((entry) => [entry.canonical, ...entry.aliases.map((alias) => alias.value)]);
+  const didYouMean = aliasCandidates
+    .map((candidate) => ({ candidate, distance: editDistance(normalizeAliasText(candidate), normalizedQuery) }))
+    .filter((row) => normalizedQuery.length >= 3 && row.distance <= Math.max(2, Math.floor(normalizedQuery.length / 3)))
+    .sort((left, right) => left.distance - right.distance || left.candidate.localeCompare(right.candidate, 'sv'))
+    .map((row) => row.candidate)
+    .filter((candidate, index, values) => values.findIndex((value) => normalizeAliasText(value) === normalizeAliasText(candidate)) === index)
+    .slice(0, maxSuggestions);
+
+  const expansion = expandGrocerySearchQuery(query, maxSuggestions);
+  const popularAlternatives = [...expansion.expandedQueries, ...popularRecoveryQueries]
+    .filter((candidate) => normalizeAliasText(candidate) !== normalizedQuery)
+    .filter((candidate, index, values) => values.findIndex((value) => normalizeAliasText(value) === normalizeAliasText(candidate)) === index)
+    .slice(0, maxSuggestions);
+
+  return { query, didYouMean, popularAlternatives };
+}
+
 export type CategorySearchProduct = {
   name: string;
   brand?: string | null;
