@@ -45,6 +45,25 @@ describe('honest price intelligence content style', () => {
     assert.match(catalogueSavings, /listedSavingsBoundaryCopy/);
   });
 
+  it('localizes rendered honest price terminology on locale entry pages', async () => {
+    const style = await read('src/lib/content-style.ts');
+    const i18n = await read('src/lib/i18n.ts');
+    const localeHome = await read('src/components/locale-home-page.tsx');
+    const marketShell = await read('src/components/market-shell.tsx');
+    const englishPage = await read('src/app/en/page.tsx');
+    const swedishPage = await read('src/app/sv/page.tsx');
+
+    assert.match(style, /priceIntelligenceTerminologyForLocale/);
+    assert.match(i18n, /localizedPriceIntelligenceTerminology/);
+    assert.match(localeHome, /<MarketShell locale=\{locale\}/);
+    assert.match(englishPage, /<LocaleHomePage locale="en"/);
+    assert.match(swedishPage, /<LocaleHomePage locale="sv"/);
+    for (const term of ['terminology.confidence', 'terminology.freshness', 'terminology.savings']) {
+      assert.match(marketShell, new RegExp(term.replace('.', '\\.')), `${term} should render in the locale shell`);
+    }
+  });
+
+
   it('keeps forecast-like language tied to observed or historical source context', async () => {
     const files = await collectFiles(sourceRoot.pathname);
     const risky = /\b(forecast|predict(?:ion|ed|s)?|will drop|about to drop|expected price)\b/i;

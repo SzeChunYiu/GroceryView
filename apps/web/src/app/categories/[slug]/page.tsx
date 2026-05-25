@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { summarizeCategoryDealLeaders } from '@groceryview/core';
 import { CategoryBreadcrumb } from '@/components/Breadcrumb';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { ItemGrid, type ItemGridRow } from '@/components/ItemGrid';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { categoryLabels, pricedProducts } from '@/lib/openprices-products';
 import { categoryDealLeaderCandidates, categorySummaries, dataFreshnessBadges, formatPct, formatSek } from '@/lib/verified-data';
@@ -24,14 +25,51 @@ function categoryDealLeadersFor(slug: string) {
   });
 }
 
-export default async function CategoryPage({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
+type CategorySearchParams = Readonly<{ q?: string; sort?: string; page?: string }>;
+
+function searchValue(value: string | undefined) { return value?.trim() ?? ''; }
+function pageValue(value: string | undefined) { const parsed = Number(value); return Number.isInteger(parsed) && parsed > 0 ? parsed : 1; }
+
+export default async function CategoryPage({ params, searchParams }: Readonly<{ params: Promise<{ slug: string }>; searchParams?: Promise<CategorySearchParams> }>) {
   const { slug } = await params;
+  const resolvedSearchParams = await searchParams;
   const categoryLabel = categoryLabels[slug];
   if (!categoryLabel) notFound();
-  const chainRows = axfoodProducts.filter((product) => product.category === slug).slice(0, 24);
-  const openRows = pricedProducts.filter((product) => product.category === slug).slice(0, 24);
+
+  const query = searchValue(resolvedSearchParams?.q);
+  const sort = searchValue(resolvedSearchParams?.sort) || 'name';
+  const page = pageValue(resolvedSearchParams?.page);
+  const chainRows = axfoodProducts.filter((product) => product.category === slug);
+  const openRows = pricedProducts.filter((product) => product.category === slug);
+  const itemGridRows: ItemGridRow[] = [
+    ...chainRows.map((product) => ({
+      id: `axfood-${product.slug}`,
+      name: product.name,
+      brand: product.brand,
+      href: `/products/${product.slug}`,
+      source: 'Axfood' as const,
+      price: product.lowestPrice,
+      priceLabel: formatSek(product.lowestPrice),
+      category: product.category,
+      observationLabel: `${product.inChains.length} chains`,
+      image: product.image
+    })),
+    ...openRows.map((product) => ({
+      id: `openprices-${product.slug}`,
+      name: product.name,
+      brand: product.brands || 'Brand not reported',
+      href: `/products/${product.slug}`,
+      source: 'OpenPrices' as const,
+      price: product.priceMedian,
+      priceLabel: formatSek(product.priceMedian),
+      category: product.category,
+      observationLabel: `${product.observationCount} obs.`,
+      image: product.image
+    }))
+  ];
   const categoryFreshnessBadges = dataFreshnessBadges.filter((badge) => badge.sourceKind === 'axfood' || badge.sourceKind === 'openprices');
   const dealLeaders = categoryDealLeadersFor(slug);
+
   return (
     <PageShell>
       <Eyebrow>Category</Eyebrow>
@@ -88,9 +126,10 @@ export default async function CategoryPage({ params }: Readonly<{ params: Promis
           ))}
         </div>
       </Card>
+      <ItemGrid basePath={`/categories/${slug}`} page={page} query={query} rows={itemGridRows} sort={sort} />
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        <Card><h2 className="text-2xl font-black">Chain spread rows</h2><div className="mt-4 space-y-3">{chainRows.map((product) => <Link className="block rounded-2xl border border-slate-200 p-4 hover:border-emerald-700" href={`/products/${product.slug}`} key={product.slug}><p className="font-black">{product.name}</p><p className="text-sm text-slate-600">{formatSek(product.lowestPrice)} · {formatPct(product.spreadPct)} spread</p></Link>)}</div></Card>
-        <Card><h2 className="text-2xl font-black">OpenPrices rows</h2><div className="mt-4 space-y-3">{openRows.map((product) => <Link className="block rounded-2xl border border-slate-200 p-4 hover:border-emerald-700" href={`/products/${product.slug}`} key={product.slug}><p className="font-black">{product.name}</p><p className="text-sm text-slate-600">{formatSek(product.priceMedian)} · {product.observationCount} obs. · {product.lastObservedAt}</p></Link>)}</div></Card>
+        <Card><h2 className="text-2xl font-black">Chain spread rows</h2><div className="mt-4 space-y-3">{chainRows.slice(0, 24).map((product) => <Link className="block rounded-2xl border border-slate-200 p-4 hover:border-emerald-700" href={`/products/${product.slug}`} key={product.slug}><p className="font-black">{product.name}</p><p className="text-sm text-slate-600">{formatSek(product.lowestPrice)} · {formatPct(product.spreadPct)} spread</p></Link>)}</div></Card>
+        <Card><h2 className="text-2xl font-black">OpenPrices rows</h2><div className="mt-4 space-y-3">{openRows.slice(0, 24).map((product) => <Link className="block rounded-2xl border border-slate-200 p-4 hover:border-emerald-700" href={`/products/${product.slug}`} key={product.slug}><p className="font-black">{product.name}</p><p className="text-sm text-slate-600">{formatSek(product.priceMedian)} · {product.observationCount} obs. · {product.lastObservedAt}</p></Link>)}</div></Card>
       </div>
     </PageShell>
   );
