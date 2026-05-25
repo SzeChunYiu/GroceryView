@@ -758,11 +758,19 @@ describe('verified-data UI', () => {
 
   it('links admin source health to ingestion runs without public nav clutter', async () => {
     const sources = await read('src/app/admin/sources/page.tsx');
+    const deadLetters = await read('src/app/admin/sources/dead-letters/page.tsx');
     const nav = await read('src/components/app-nav.tsx');
 
     assert.match(sources, /href="\/admin\/ingestion-runs"/);
     assert.match(sources, /View ingestion runs/);
+    assert.match(sources, /href="\/admin\/sources\/dead-letters"/);
+    assert.match(sources, /Review dead letters/);
+    assert.match(deadLetters, /record_type parser_failure/);
+    assert.match(deadLetters, /sourceRunId/);
+    assert.match(deadLetters, /samplePayloadPointer/);
+    assert.match(deadLetters, /rawSnapshotRef/);
     assert.doesNotMatch(nav, /\/admin\/ingestion-runs/);
+    assert.doesNotMatch(nav, /\/admin\/sources\/dead-letters/);
   });
 
 
