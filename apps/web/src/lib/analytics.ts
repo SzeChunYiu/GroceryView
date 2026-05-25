@@ -85,6 +85,20 @@ export type RecentProductSearch = {
   searchedAt: string;
 };
 
+export type VoiceSearchInputEvent = {
+  query?: string;
+  status: 'started' | 'submitted' | 'unsupported' | 'error';
+  surface: string;
+  observedAt: string;
+};
+
+export function trackVoiceSearchInput(event: Omit<VoiceSearchInputEvent, 'observedAt'>) {
+  publishConsentAwareAnalyticsEvent('groceryview_voice_search_input', {
+    ...event,
+    observedAt: new Date().toISOString()
+  });
+}
+
 export type ProductSearchPerformanceTelemetry = {
   cacheHit: boolean;
   cacheHitRate: number;
