@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { resolvePremiumEntitlementGates, type AccountEntitlement } from '@/lib/entitlements';
 import { buildPremiumSavingsForecast } from '@/lib/price-intelligence';
 
 type BillingStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'redirecting' | 'error';
@@ -18,6 +19,15 @@ type CheckoutSessionResponse = { checkoutUrl?: string; plan?: string };
 type PortalSessionResponse = { portalUrl?: string };
 
 const premiumSavingsForecast = buildPremiumSavingsForecast();
+
+function entitlementFromResponse(entitlement: SubscriptionAccessResponse['entitlement']): AccountEntitlement | null {
+  const tier = entitlement?.tier === 'premium' ? 'premium' : entitlement?.tier === 'free' ? 'free' : null;
+  const status = entitlement?.status === 'active' || entitlement?.status === 'trialing' || entitlement?.status === 'past_due' || entitlement?.status === 'canceled'
+    ? entitlement.status
+    : null;
+
+  return tier && status ? { tier, status } : null;
+}
 
 function readSession(): BrowserSession {
   const accessToken = sessionStorage.getItem('groceryview:accessToken') || '';
@@ -118,6 +128,7 @@ export function AccountBillingActions() {
   const enforcementReasons = subscriptionAccess?.enforcementReasons ?? ['missing_signed_in_subscription_context'];
   const accountActions = subscriptionAccess?.accountActions ?? ['load_subscription_access', 'start_checkout', 'manage_subscription'];
   const forecastUnlocked = Boolean(subscriptionAccess?.premiumFeaturesEnabled);
+  const entitlementGates = resolvePremiumEntitlementGates(entitlementFromResponse(subscriptionAccess?.entitlement));
 
   return (
     <section className="mt-6 rounded-3xl border border-violet-200 bg-white p-5 shadow-sm" aria-label="Account billing controls">
@@ -151,6 +162,26 @@ export function AccountBillingActions() {
             {subscriptionAccess?.entitlement?.tier ?? 'signed-in account required'} · {subscriptionAccess?.entitlement?.status ?? 'not loaded'}
           </p>
           <p className="mt-2 text-sm leading-6 text-slate-600">The billing portal button requires an existing Stripe-compatible customer on the signed-in account.</p>
+        </div>
+      </div>
+
+      <div className="mt-4 rounded-2xl border border-indigo-200 bg-indigo-50 p-4">
+        <p className="text-sm font-black text-indigo-950">Server entitlement gates</p>
+        <p className="mt-2 text-sm font-semibold leading-6 text-indigo-950">
+          The production subscription response is checked before premium OCR history, advanced forecasts, unlimited alerts, or exports are shown as available.
+        </p>
+        <div className="mt-3 grid gap-3 md:grid-cols-2">
+          {entitlementGates.map((gate) => (
+            <div className="rounded-2xl bg-white p-3" key={gate.feature}>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm font-black text-slate-950">{gate.label}</p>
+                <p className={gate.allowed ? 'rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-950' : 'rounded-full bg-amber-100 px-3 py-1 text-xs font-black text-amber-950'}>
+                  {gate.allowed ? 'Allowed' : 'Locked'}
+                </p>
+              </div>
+              <p className="mt-2 text-xs font-semibold leading-5 text-slate-600">{gate.allowed ? gate.premiumAccess : gate.freeLimit}</p>
+            </div>
+          ))}
         </div>
       </div>
 
