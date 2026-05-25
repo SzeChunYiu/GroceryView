@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { buildSeasonalDiscoveryCards } from '@/lib/trends';
 import { localSeasonalPicks, seasonalProduceCalendar } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -8,6 +9,8 @@ export function generateMetadata() {
 }
 
 export default function SeasonalCalendarPage() {
+  const seasonalDiscoveryCards = buildSeasonalDiscoveryCards({ limit: 6 });
+
   return (
     <PageShell>
       <Eyebrow>feat(calendar) · historical price seasonality</Eyebrow>
@@ -61,6 +64,41 @@ export default function SeasonalCalendarPage() {
             </Link>
           ))}
         </div>
+      </Card>
+
+      <Card className="mt-6 border-cyan-200 bg-cyan-50">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-cyan-800">Seasonal discovery cards</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">In-season produce, holiday staples, and price windows</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Cards are ranked from dated OpenPrices monthly averages. Expected movement compares the target month with each product&apos;s own historical average; it is not a future-price forecast.
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white px-4 py-3 text-sm font-black text-cyan-900 shadow-sm">
+            {seasonalDiscoveryCards.cards.length} cards · {seasonalDiscoveryCards.source}
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {seasonalDiscoveryCards.cards.map((card) => (
+            <Link className="rounded-2xl border border-cyan-200 bg-white p-4 shadow-sm hover:border-cyan-700" data-seasonal-discovery-card={card.rank} href={`/products/${card.productSlug}`} key={`${card.productSlug}-${card.cardType}`}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">{card.cardType} · {card.monthLabel}</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{card.productName}</h3>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{card.brand} · {card.categoryLabel}</p>
+              <div className="mt-3 grid gap-2 text-sm text-slate-700">
+                <p className="rounded-2xl bg-cyan-100 p-3 font-black text-cyan-950">{card.windowLabel}</p>
+                <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Target month avg {card.historicalMonthlyAverageLabel} · typical {card.typicalMonthlyAverageLabel}</p>
+                <p className="rounded-2xl bg-slate-50 p-3 font-semibold">{card.expectedPriceMovementLabel}</p>
+                <p className="rounded-2xl bg-slate-50 p-3 text-xs font-semibold leading-5">{card.evidenceLabel}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+        <ul className="mt-5 grid gap-3 text-sm font-semibold leading-6 text-cyan-950 md:grid-cols-3">
+          {seasonalDiscoveryCards.guardrails.map((guardrail) => (
+            <li className="rounded-2xl bg-white p-4" key={guardrail}>• {guardrail}</li>
+          ))}
+        </ul>
       </Card>
 
       <Card className="mt-6 border-lime-200 bg-lime-50">

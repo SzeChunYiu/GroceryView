@@ -8,6 +8,7 @@ import { buildChainIndexTrendSeries } from '@/lib/chain-index-data';
 import { defaultLocale, localeReadiness, localeTranslationGuardrails, localizedPriceIntelligenceTerminology, localizedShellCopy, type SupportedLocale } from '@/lib/i18n';
 import { basketCostHeatmap } from '@/lib/map-basket-cost-heatmap';
 import { mapChainIndexScores } from '@/lib/map-chain-index';
+import { buildSeasonalDiscoveryCards } from '@/lib/trends';
 import {
   allStoreDailyRunnerReadiness,
   apiPerformanceReadiness,
@@ -64,6 +65,7 @@ const homepageMarketHeatmap = marketHeatmapTiles.slice(0, 6);
 const homepageChainIndexTrend = buildChainIndexTrendSeries().series.slice(0, 2);
 const homepageBasketCostHeatmap = basketCostHeatmap.rows.slice(0, 3);
 const homepagePharmacyOtcEvidence = pharmacyOtcEvidenceBoard.rows.slice(0, 3);
+const homepageSeasonalDiscovery = buildSeasonalDiscoveryCards({ limit: 3 });
 const homepageCommodityMappingReview = {
   queue: commodityMappingReviewPlan.queue.slice(0, 2),
   controls: commodityMappingReviewPlan.reporterControls.slice(0, 1),
@@ -193,6 +195,41 @@ export function MarketShell({ locale = defaultLocale }: { locale?: SupportedLoca
       <TrendingCarousel items={homepageTrendingPriceChanges} />
 
       <TrendingPriceDropCards city="stockholm" />
+
+      <Card className="mt-6 border-cyan-200 bg-cyan-50">
+        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <Eyebrow>Seasonal discovery</Eyebrow>
+            <h2 className="mt-2 text-3xl font-black tracking-tight">In-season produce and holiday staples</h2>
+            <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-cyan-950">
+              Homepage cards reuse OpenPrices monthly history to promote produce, holiday staples, and expected price windows without forecasting future shelf prices.
+            </p>
+          </div>
+          <Link className="rounded-full bg-cyan-700 px-5 py-3 text-center text-sm font-black text-white" href="/seasonal-calendar">
+            Open calendar
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          {homepageSeasonalDiscovery.cards.map((card) => (
+            <Link
+              className="rounded-2xl border border-cyan-100 bg-white p-4 shadow-sm hover:border-cyan-700"
+              data-home-seasonal-discovery-card={card.rank}
+              href={`/products/${card.productSlug}`}
+              key={`${card.productSlug}-${card.cardType}`}
+            >
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">{card.cardType} · {card.monthLabel}</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{card.productName}</h3>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{card.windowLabel} · {card.historicalMonthlyAverageLabel}</p>
+              <p className="mt-3 rounded-2xl bg-cyan-50 p-3 text-xs font-bold leading-5 text-cyan-950">{card.expectedPriceMovementLabel}</p>
+            </Link>
+          ))}
+        </div>
+        <div className="mt-4 grid gap-2 md:grid-cols-3">
+          {homepageSeasonalDiscovery.guardrails.map((guardrail) => (
+            <p className="rounded-2xl bg-white/80 p-3 text-xs font-bold leading-5 text-cyan-950" key={guardrail}>{guardrail}</p>
+          ))}
+        </div>
+      </Card>
 
       <Card className="mt-6 border-red-200 bg-red-50">
         <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-start">

@@ -30,11 +30,43 @@ export type CityPriceDropTrendFeed = {
   cards: CityPriceDropTrend[];
 };
 
+export type SeasonalDiscoveryCard = {
+  rank: number;
+  productSlug: string;
+  productName: string;
+  brand: string;
+  categoryLabel: string;
+  cardType: 'in-season produce' | 'holiday staple' | 'price movement window';
+  monthLabel: string;
+  windowLabel: string;
+  historicalMonthlyAverage: number;
+  historicalMonthlyAverageLabel: string;
+  typicalMonthlyAverage: number;
+  typicalMonthlyAverageLabel: string;
+  expectedPriceMovementLabel: string;
+  evidenceLabel: string;
+  sourceLabel: string;
+};
+
+export type SeasonalDiscoveryFeed = {
+  generatedAt: string;
+  cards: SeasonalDiscoveryCard[];
+  guardrails: string[];
+  source: string;
+};
+
 type BuildCityPriceDropTrendsOptions = {
   city?: string | null;
   limit?: number;
   products?: PricedProduct[];
   generatedAt?: string;
+};
+
+type BuildSeasonalDiscoveryCardsOptions = {
+  generatedAt?: string;
+  limit?: number;
+  now?: Date;
+  products?: PricedProduct[];
 };
 
 const cityAliases: Record<string, string> = {
@@ -44,6 +76,13 @@ const cityAliases: Record<string, string> = {
   malmo: 'Malmo',
   uppsala: 'Uppsala'
 };
+const seasonalMonthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const;
+const holidayStapleRules = [
+  { monthIndex: 5, label: 'Midsommar', pattern: /jordgubb|strawberr|potatis|potato|gräddfil|sill|herring/i },
+  { monthIndex: 7, label: 'Late-summer grilling', pattern: /majs|corn|tomat|tomato|paprika|grill|halloumi/i },
+  { monthIndex: 11, label: 'Jul pantry', pattern: /risgryn|jul|saffran|skinka|must|pepparkak|cinnamon|potatis/i }
+];
+const seasonalProducePattern = /äpple|apple|banan|banana|bär|berry|gurka|cucumber|kål|cabbage|morot|carrot|paprika|pepper|potatis|potato|sallad|lettuce|spenat|spinach|tomat|tomato/i;
 
 function normalizeCity(city: string | null | undefined) {
   const normalized = (city ?? 'stockholm').trim().toLowerCase();
@@ -97,6 +136,58 @@ function urgencyForDrop(deltaPercent: number, latestObservedAt: string) {
   if (Math.abs(deltaPercent) >= 20 && recencyDays <= 14) return 'Act soon';
   if (Math.abs(deltaPercent) >= 10) return 'Watch this week';
   return 'Notable drop';
+}
+
+function formatSek(value: number | null) {
+  if (value === null || !Number.isFinite(value)) return 'Not reported';
+  return new Intl.NumberFormat('sv-SE', { currency: 'SEK', maximumFractionDigits: 2, style: 'currency' }).format(value);
+}
+
+function monthDistance(fromMonth: number, toMonth: number) {
+  return (toMonth - fromMonth + 12) % 12;
+}
+
+function nextHolidayWindow(currentMonth: number) {
+  return [...holidayStapleRules].sort((left, right) => monthDistance(currentMonth, left.monthIndex) - monthDistance(currentMonth, right.monthIndex))[0]!;
+}
+
+function seasonalMonthlyAverages(product: PricedProduct) {
+  const buckets = product.observations.reduce<Map<number, number[]>>((acc, observation) => {
+    const observedAt = Date.parse(`${observation.date}T00:00:00.000Z`);
+    if (!Number.isFinite(observedAt) || !Number.isFinite(observation.price) || observation.price <= 0) return acc;
+    const monthIndex = new Date(observedAt).getUTCMonth();
+    const prices = acc.get(monthIndex) ?? [];
+    prices.push(observation.price);
+    acc.set(monthIndex, prices);
+    return acc;
+  }, new Map<number, number[]>());
+
+  return [...buckets.entries()].map(([monthIndex, prices]) => ({
+    monthIndex,
+    average: Math.round((prices.reduce((sum, price) => sum + price, 0) / prices.length) * 100) / 100,
+    observationCount: prices.length
+  }));
+}
+
+function seasonalCandidateType(product: PricedProduct, targetMonth: number, holidayWindow: (typeof holidayStapleRules)[number]) {
+  const haystack = `${product.category} ${product.categories.join(' ')} ${product.name}`;
+  const isProduce = product.category === 'produce'
+    || /fruits-and-vegetables|vegetables|fruits|fresh-foods/i.test(haystack)
+    || seasonalProducePattern.test(product.name);
+  const isHolidayStaple = holidayWindow.pattern.test(product.name);
+
+  if (isHolidayStaple) return { cardType: 'holiday staple' as const, monthIndex: holidayWindow.monthIndex, windowLabel: holidayWindow.label };
+  if (isProduce) return { cardType: 'in-season produce' as const, monthIndex: targetMonth, windowLabel: `${seasonalMonthLabels[targetMonth]} produce planning` };
+  return { cardType: 'price movement window' as const, monthIndex: targetMonth, windowLabel: `${seasonalMonthLabels[targetMonth]} price window` };
+}
+
+function expectedMovementLabel(monthAverage: number, typicalAverage: number) {
+  if (typicalAverage <= 0) return 'Historical movement unavailable';
+  const percent = ((monthAverage - typicalAverage) / typicalAverage) * 100;
+  const formatted = `${Math.abs(percent).toFixed(1)}%`;
+  if (percent <= -5) return `Historically ${formatted} below the product average`;
+  if (percent >= 5) return `Historically ${formatted} above the product average`;
+  return 'Historically close to the product average';
 }
 
 export function buildCityPriceDropTrends({
@@ -153,5 +244,70 @@ export function buildCityPriceDropTrends({
     generatedAt,
     source: 'openprices-products.observations',
     cards
+  };
+}
+
+export function buildSeasonalDiscoveryCards({
+  generatedAt = new Date().toISOString(),
+  limit = 6,
+  now = new Date(),
+  products = pricedProducts
+}: BuildSeasonalDiscoveryCardsOptions = {}): SeasonalDiscoveryFeed {
+  const targetMonth = now.getUTCMonth();
+  const holidayWindow = nextHolidayWindow(targetMonth);
+
+  const cards = products
+    .flatMap((product) => {
+      const monthlyAverages = seasonalMonthlyAverages(product);
+      if (monthlyAverages.length < 2) return [];
+
+      const candidate = seasonalCandidateType(product, targetMonth, holidayWindow);
+      const targetAverage = monthlyAverages.find((row) => row.monthIndex === candidate.monthIndex);
+      if (!targetAverage) return [];
+
+      const typicalMonthlyAverage = Math.round((monthlyAverages.reduce((sum, row) => sum + row.average, 0) / monthlyAverages.length) * 100) / 100;
+      const monthObservationCount = targetAverage.observationCount;
+      const score = (
+        (candidate.cardType === 'holiday staple' ? 40 : candidate.cardType === 'in-season produce' ? 28 : 10)
+        + Math.min(24, monthlyAverages.length * 3)
+        + Math.min(20, monthObservationCount * 4)
+        + Math.max(0, typicalMonthlyAverage - targetAverage.average)
+      );
+
+      return [{
+        rank: 0,
+        productSlug: product.slug,
+        productName: product.name,
+        brand: product.brands || 'Brand not reported',
+        categoryLabel: categoryLabels[product.category] ?? 'Grocery',
+        cardType: candidate.cardType,
+        monthLabel: seasonalMonthLabels[candidate.monthIndex]!,
+        windowLabel: candidate.windowLabel,
+        historicalMonthlyAverage: targetAverage.average,
+        historicalMonthlyAverageLabel: formatSek(targetAverage.average),
+        typicalMonthlyAverage,
+        typicalMonthlyAverageLabel: formatSek(typicalMonthlyAverage),
+        expectedPriceMovementLabel: expectedMovementLabel(targetAverage.average, typicalMonthlyAverage),
+        evidenceLabel: `${monthObservationCount} dated observations in ${seasonalMonthLabels[candidate.monthIndex]} across ${monthlyAverages.length} observed month buckets.`,
+        sourceLabel: 'OpenPrices dated SEK observations',
+        score
+      }];
+    })
+    .sort((left, right) => (
+      right.score - left.score
+      || left.productName.localeCompare(right.productName, 'sv')
+    ))
+    .slice(0, Math.max(1, Math.min(limit, 12)))
+    .map(({ score: _score, ...card }, index) => ({ ...card, rank: index + 1 }));
+
+  return {
+    generatedAt,
+    cards,
+    source: 'openprices-products.observations',
+    guardrails: [
+      'Seasonal discovery cards use historical monthly averages only; they are not forecasts.',
+      'Holiday staples are promoted only when product names match an explicit seasonal rule and have dated price rows for that month.',
+      'Expected movement describes the product history versus its own average, not a guaranteed future shelf price.'
+    ]
   };
 }

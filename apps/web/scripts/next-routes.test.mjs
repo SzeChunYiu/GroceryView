@@ -1757,6 +1757,7 @@ describe('verified-data UI', () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/seasonal-calendar/page.tsx');
     const shell = await read('src/components/market-shell.tsx');
+    const trends = await read('src/lib/trends.ts');
     const seo = await read('src/lib/seo.ts');
     const sitemap = await read('src/app/sitemap.ts');
 
@@ -1766,9 +1767,15 @@ describe('verified-data UI', () => {
     assert.match(verified, /bestBuyMonth/);
     assert.match(verified, /No forecast or synthetic seasonal prediction/);
     assert.match(verified, /ecoSeasonalGuidance/);
+    assert.match(trends, /export function buildSeasonalDiscoveryCards/);
+    assert.match(trends, /holidayStapleRules/);
+    assert.match(trends, /expectedPriceMovementLabel/);
 
     assert.match(route, /seasonalProduceCalendar/);
+    assert.match(route, /buildSeasonalDiscoveryCards/);
     assert.match(route, /Seasonal best time to buy produce calendar/);
+    assert.match(route, /Seasonal discovery cards/);
+    assert.match(route, /data-seasonal-discovery-card/);
     assert.match(route, /historical monthly averages/);
     assert.match(route, /Best time to buy/);
     assert.match(route, /No forecast or synthetic seasonal prediction/);
@@ -1776,6 +1783,8 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(route, /@\/lib\/demo-data|@\/components\/sample-data/);
 
     assert.match(shell, /seasonalProduceCalendar/);
+    assert.match(shell, /homepageSeasonalDiscovery/);
+    assert.match(shell, /data-home-seasonal-discovery-card/);
     assert.match(shell, /\/seasonal-calendar/);
     assert.match(seo, /'\/seasonal-calendar'/);
     assert.match(sitemap, /entry\('\/seasonal-calendar'/);
