@@ -148,3 +148,51 @@ export function confidenceForProduct(productId: string, board = watchlistAlertBo
   if (rows >= 2) return 'high';
   return 'medium';
 }
+
+
+export type PriceDropReason = {
+  detail: string;
+  kind: 'promotion' | 'competitor_sync' | 'temporary_stock_event';
+  label: string;
+};
+
+export function priceDropReasonForProduct(
+  productId: string,
+  triggerMetric = 'price',
+  source = priceSource(productId),
+  board = watchlistAlertBoard,
+): PriceDropReason {
+  const product = productForAlert(productId, board);
+  const priceTypes = new Set(product?.prices?.map((price) => price.priceType) ?? []);
+  const storeCount = new Set(product?.prices?.map((price) => price.storeName) ?? []).size;
+  const sourceLabel = source.toLowerCase();
+  const metric = triggerMetric.toLowerCase();
+
+  if (priceTypes.has('promotion') || metric.includes('promotion') || sourceLabel.includes('saving')) {
+    return {
+      kind: 'promotion',
+      label: 'Promotion',
+      detail: 'The alert is tied to a visible promotional price row rather than an unexplained shelf-price move.'
+    };
+  }
+
+  if (storeCount > 1 || sourceLabel.includes('+')) {
+    return {
+      kind: 'competitor_sync',
+      label: 'Competitor sync',
+      detail: 'Multiple chain rows moved into range, so this looks like a matched market response.'
+    };
+  }
+
+  return {
+    kind: 'temporary_stock_event',
+    label: 'Temporary stock event',
+    detail: product?.isNew52WeekLow
+      ? 'The product is flagged as a new low, which can happen during temporary stock clearing.'
+      : 'The drop is isolated to the current visible row and should be rechecked before a large stock-up.'
+  };
+}
+
+export function priceDropReasonForAlert(alert: Pick<WatchlistAlert, 'productId' | 'trigger'>, board = watchlistAlertBoard) {
+  return priceDropReasonForProduct(alert.productId, alert.trigger.metric, priceSource(alert.productId, board), board);
+}
