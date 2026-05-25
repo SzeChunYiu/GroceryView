@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { ArrowDownRight, BadgeCheck, BarChart3, Clock3, ListPlus, MapPin, Search, TrendingUp } from 'lucide-react';
 import { buildPriceDropDiscoveryRail, buildTrendingItemDetailCards } from '@/lib/price-events';
-import { buildCityPriceDropTrends, type BrandLeaderboardTrendFeed, type CityPriceDropTrend, type CitySearchTrendFeed } from '@/lib/trends';
+import { buildCityPriceDropTrends, type BrandLeaderboardTrendFeed, type CityPriceDropTrend, type CityPriceDropTrendFeed, type CitySearchTrendFeed } from '@/lib/trends';
 import { categoryLabels, pricedProducts } from '@/lib/openprices-products';
 import { rankPersonalizedPriceDrops } from '@/lib/personalization';
 import type { CategoryTrendingShelf } from '@/lib/grocery-index-widget';
@@ -30,6 +30,15 @@ function confidenceClass(card: CityPriceDropTrend) {
   if (card.confidenceLabel === 'high') return 'bg-emerald-100 text-emerald-900';
   if (card.confidenceLabel === 'medium') return 'bg-cyan-100 text-cyan-950';
   return 'bg-amber-100 text-amber-950';
+}
+
+export function trendingPriceDropCardText(card: CityPriceDropTrend) {
+  return {
+    deltaAmount: formatSek(card.deltaAmount),
+    deltaPercent: `${formatPercent(card.deltaPercent)} from ${formatSek(card.previousPrice)}`,
+    confidence: `${card.confidenceLabel} · ${card.confidenceScore.toFixed(2)}`,
+    urgency: card.urgencyLabel
+  };
 }
 
 const priceEventProducts = pricedProducts.map((product) => ({
@@ -305,8 +314,8 @@ export function BrandLeaderboardModule({ feed }: Readonly<{ feed: BrandLeaderboa
   );
 }
 
-export function TrendingPriceDropCards({ city = 'stockholm' }: Readonly<{ city?: string }>) {
-  const feed = buildCityPriceDropTrends({ city, limit: 4 });
+export function TrendingPriceDropCards({ city = 'stockholm', feed: providedFeed }: Readonly<{ city?: string; feed?: CityPriceDropTrendFeed }>) {
+  const feed = providedFeed ?? buildCityPriceDropTrends({ city, limit: 4 });
   if (feed.cards.length === 0) return null;
 
   return (
@@ -321,49 +330,53 @@ export function TrendingPriceDropCards({ city = 'stockholm' }: Readonly<{ city?:
         </p>
       </div>
       <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        {feed.cards.map((card) => (
-          <Link
-            className="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:-translate-y-0.5 hover:border-emerald-700"
-            data-trending-price-drop-card={card.rank}
-            href={`/products/${card.productSlug}`}
-            key={card.productSlug}
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">#{card.rank} · {card.categoryLabel}</p>
-                <h3 className="mt-2 line-clamp-2 text-lg font-black leading-6 text-slate-950">{card.productName}</h3>
-                <p className="mt-1 line-clamp-1 text-sm font-semibold text-slate-600">{card.brand}</p>
+        {feed.cards.map((card) => {
+          const cardText = trendingPriceDropCardText(card);
+
+          return (
+            <Link
+              className="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:-translate-y-0.5 hover:border-emerald-700"
+              data-trending-price-drop-card={card.rank}
+              href={`/products/${card.productSlug}`}
+              key={card.productSlug}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">#{card.rank} · {card.categoryLabel}</p>
+                  <h3 className="mt-2 line-clamp-2 text-lg font-black leading-6 text-slate-950">{card.productName}</h3>
+                  <p className="mt-1 line-clamp-1 text-sm font-semibold text-slate-600">{card.brand}</p>
+                </div>
+                <span className="rounded-full bg-emerald-100 p-2 text-emerald-800" aria-label="Price dropped">
+                  <ArrowDownRight aria-hidden="true" size={20} strokeWidth={3} />
+                </span>
               </div>
-              <span className="rounded-full bg-emerald-100 p-2 text-emerald-800" aria-label="Price dropped">
-                <ArrowDownRight aria-hidden="true" size={20} strokeWidth={3} />
-              </span>
-            </div>
-            <div className="mt-4 grid grid-cols-2 gap-2">
-              <div className="rounded-xl bg-white p-3">
-                <p className="text-xs font-bold text-slate-500">Now</p>
-                <p className="mt-1 text-lg font-black text-slate-950">{formatSek(card.latestPrice)}</p>
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <div className="rounded-xl bg-white p-3">
+                  <p className="text-xs font-bold text-slate-500">Now</p>
+                  <p className="mt-1 text-lg font-black text-slate-950">{formatSek(card.latestPrice)}</p>
+                </div>
+                <div className="rounded-xl bg-white p-3">
+                  <p className="text-xs font-bold text-slate-500">Drop</p>
+                  <p className="mt-1 text-lg font-black text-emerald-800">{cardText.deltaAmount}</p>
+                </div>
               </div>
-              <div className="rounded-xl bg-white p-3">
-                <p className="text-xs font-bold text-slate-500">Drop</p>
-                <p className="mt-1 text-lg font-black text-emerald-800">{formatSek(card.deltaAmount)}</p>
+              <p className="mt-3 text-sm font-black text-emerald-800">{cardText.deltaPercent}</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-black ${confidenceClass(card)}`}>
+                  <BadgeCheck aria-hidden="true" size={14} />
+                  {cardText.confidence}
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-xs font-black text-slate-700">
+                  <Clock3 aria-hidden="true" size={14} />
+                  {cardText.urgency}
+                </span>
               </div>
-            </div>
-            <p className="mt-3 text-sm font-black text-emerald-800">{formatPercent(card.deltaPercent)} from {formatSek(card.previousPrice)}</p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-black ${confidenceClass(card)}`}>
-                <BadgeCheck aria-hidden="true" size={14} />
-                {card.confidenceLabel} · {card.confidenceScore.toFixed(2)}
-              </span>
-              <span className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-xs font-black text-slate-700">
-                <Clock3 aria-hidden="true" size={14} />
-                {card.urgencyLabel}
-              </span>
-            </div>
-            <p className="mt-3 text-xs font-semibold leading-5 text-slate-500">
-              {card.confidenceDetail}; source {card.sourceLabel}.
-            </p>
-          </Link>
-        ))}
+              <p className="mt-3 text-xs font-semibold leading-5 text-slate-500">
+                {card.confidenceDetail}; source {card.sourceLabel}.
+              </p>
+            </Link>
+          );
+        })}
       </div>
     </section>
   );
