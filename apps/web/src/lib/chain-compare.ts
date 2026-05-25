@@ -3,6 +3,7 @@ import { buildCompareNoChainState as buildCompareNoChainStateModel } from './cha
 import { dbSiteSnapshotGeneratedAt } from './generated/db-site-products';
 import { dbSiteCompareStoreCapabilities, type DbSiteCompareStoreCapability } from './generated/db-site-ingested-overrides';
 import { commodityComparisonForProduct } from './verified-data';
+import { basketCostWinner, sortStoresByTotalBasketCost } from './basketOptimizer';
 
 export const COMPARE_CHAIN_ORDER = [
   { id: 'ica', label: 'ICA' },
@@ -464,17 +465,12 @@ export function buildBasketStoreComparison(
   }
 
   const itemCount = comparison.products.length + comparison.missingProductIds.length;
-  const rankedStores = [...rows.values()]
+  const rankedStores = sortStoresByTotalBasketCost([...rows.values()]
     .map((store) => ({
       ...store,
       total: store.availableCount > 0 ? Number((store.total ?? 0).toFixed(2)) : null
-    }))
-    .sort((left, right) => {
-      if (left.missingCount !== right.missingCount) return left.missingCount - right.missingCount;
-      if ((left.total ?? Number.POSITIVE_INFINITY) !== (right.total ?? Number.POSITIVE_INFINITY)) return (left.total ?? Number.POSITIVE_INFINITY) - (right.total ?? Number.POSITIVE_INFINITY);
-      return left.storeName.localeCompare(right.storeName, 'sv');
-    });
-  const cheapestTotal = Math.min(...rankedStores.map((store) => store.total ?? Number.POSITIVE_INFINITY));
+    })));
+  const cheapestTotal = basketCostWinner(rankedStores)?.total ?? Number.POSITIVE_INFINITY;
   const closestDistance = Math.min(...rankedStores.map((store) => store.distanceKm));
   const bestAvailableCount = Math.max(...rankedStores.map((store) => store.availableCount));
   const bestStockScore = Math.max(...rankedStores.filter((store) => store.availableCount === bestAvailableCount).map((store) => store.stockScore));
@@ -510,7 +506,7 @@ export function buildBasketStoreComparison(
     stores,
     sourceLabel: comparison.sourceLabel,
     summary: bestStore && itemCount > 0
-      ? `${bestStore.storeName} is cheapest at ${bestStore.totalText}; ${closestStore?.storeName ?? 'the nearest matched store'} is closest at ${closestStore?.distanceText ?? 'distance not reported'}; ${bestStockedStore?.storeName ?? 'the best-stocked matched store'} has ${bestStockedStore?.coverageLabel ?? 'stock coverage not reported'}. Missing rows stay visible and substitutions point to the cheapest observed chain row.`
+      ? `${bestStore.storeName} is ranked first by total basket cost at ${bestStore.totalText}; ${closestStore?.storeName ?? 'the nearest matched store'} is closest at ${closestStore?.distanceText ?? 'distance not reported'}; ${bestStockedStore?.storeName ?? 'the best-stocked matched store'} has ${bestStockedStore?.coverageLabel ?? 'stock coverage not reported'}. Missing rows stay visible and substitutions point to the cheapest observed chain row.`
       : 'Add product ids to compare full basket totals across selected chains.'
   };
 }

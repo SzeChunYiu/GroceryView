@@ -11,5 +11,7 @@ export const compareRoutes = {
   storePrices: 'storePrices',
   loyaltyCards: 'loyaltyCards',
   loyaltyPriceFields: ['loyaltyCardId', 'loyaltyCardLabel', 'loyaltyPrice'],
-  trendPoints: 'trendPoints'
+  trendPoints: 'trendPoints',
+  basketStoreSort: 'total_basket_cost',
+  basketWinnerHighlight: 'Cheapest'
 } as const;
