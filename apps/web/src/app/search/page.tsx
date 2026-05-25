@@ -3,18 +3,19 @@ import { SearchRecoveryPanel } from '@/components/data-ui';
 import { RecentSearchReplayPills } from '@/components/SearchBar';
 import { SaveSearchSubscriptionButton } from '@/components/saved-search-subscriptions';
 import { buildSavedSearchSubscription } from '@/lib/alert-scheduler';
-import { routeMetadata } from '@/lib/seo';
+import { hasAppliedCanonicalFilters, metadataForSearch, routeMetadata } from '@/lib/seo';
 import { buildNoResultCorrectionWorkflow } from '@/lib/search-alias-review';
 import { authenticatedSavedSearchShortcuts } from '@/lib/saved-searches';
 import { buildMisspelledQueryRecovery } from '@/lib/search-suggest';
 import { phoneticSearchBadgesForQuery } from '@/lib/search-filters';
 import { buildProductSearchView } from '@/lib/verified-data';
 
-export function generateMetadata() {
-  return routeMetadata('/search');
-}
-
 type SearchPageParams = Record<string, string | string[] | undefined>;
+
+export async function generateMetadata({ searchParams }: { searchParams?: Promise<SearchPageParams> }) {
+  const resolvedSearchParams = await (searchParams ?? Promise.resolve({}));
+  return hasAppliedCanonicalFilters(resolvedSearchParams) ? metadataForSearch(resolvedSearchParams) : routeMetadata('/search');
+}
 
 export default async function SearchPage({ searchParams }: { searchParams?: Promise<SearchPageParams> }) {
   const resolvedSearchParams = await (searchParams ?? Promise.resolve({}));

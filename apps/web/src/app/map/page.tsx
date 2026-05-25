@@ -173,7 +173,7 @@ export default function MapPage() {
             <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-300">Synced map + list</p>
             <h2 className="mt-2 text-3xl font-black">Interactive store map with linked list selection</h2>
             <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-200">
-              The map ↔ list sync uses verified OSM coordinates and chain-index proxy colors. Cluster and marker popovers expose map-center distance plus source-provided hours status without inventing branch-level basket prices.
+              The map ↔ list sync uses verified OSM coordinates and chain-index proxy colors. Cluster and marker popovers expose map-center distance plus source-provided hours status without inventing branch-level basket prices; the nearest-store finder can rank by approved browser location, open-window signal, and pickup preference.
             </p>
           </div>
           <div className="rounded-2xl bg-white/10 p-4 text-right">
