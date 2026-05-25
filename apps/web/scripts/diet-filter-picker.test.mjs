@@ -22,3 +22,16 @@ test('DietFilterPicker persists the full MyFlyer diet option set for rankers', a
   assert.match(source, /role="group" aria-label="MyFlyer diet filters"/);
   assert.doesNotMatch(source, /console\./);
 });
+
+test('DietFilterPicker behavior covers hydration, toggles, clearing, controlled usage, and event detail', async () => {
+  const source = await readFile(componentUrl, 'utf8');
+
+  assert.match(source, /useState<DietFilterValue\[\]>\(\(\) =>\s*\n\s*isControlled \? normalizeDietFilters\(selected\) : \[\]/);
+  assert.match(source, /setInternalSelected\(readStoredDietFilters\(storageKey\)\)/);
+  assert.match(source, /setInternalSelected\(normalizedSelected\)/);
+  assert.match(source, /onChange\?\.\(normalizedSelected\)/);
+  assert.match(source, /function clearSelected\(\) {\s*\n\s*setSelected\(\[\]\);/);
+  assert.match(source, /detail: \{ selected: normalizeDietFilters\(selected\), storageKey \}/);
+  assert.match(source, /data-diet-filter-storage-key=\{storageKey\}/);
+  assert.match(source, /data-diet-filter-option=\{option\.value\}/);
+});
