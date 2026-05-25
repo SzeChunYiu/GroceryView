@@ -6,9 +6,11 @@ import { PriceReportReviewActions } from '@/components/price-report-review-actio
 import { OriginFilter, type OriginFilterCode } from '@/components/origin-filter';
 import { ProductSortSelect } from '@/components/product-sort-select';
 import { ProductPriceCards } from '@/components/product-price-cards';
+import { NewArrivalsCarousel } from '@/components/TrendingCarousel';
 import { SavedSearchAction } from '@/components/saved-search-action';
 import { VirtualizedProductGrid } from '@/components/LazyItemCard';
 import { apohemSource } from '@/lib/ingested/apohem';
+import { newProductArrivals } from '@/lib/new-arrivals';
 import { buildSavedSearchSubscription } from '@/lib/alert-scheduler';
 import { adaptiveProductCards, buildProductSearchView, withProductSearchExplanationBadges, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
 import { publicCatalogueRevalidateSeconds, routeMetadata } from '@/lib/seo';
@@ -179,6 +181,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
       <Eyebrow>Products</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Verified product catalogue</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">Products are shown only when present in the Axfood chain snapshot or OpenPrices SEK observations. No synthetic prices or filler products are rendered.</p>
+      <NewArrivalsCarousel items={newProductArrivals} />
       <Card className="mt-8 border-indigo-200 bg-indigo-50/70">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div>
@@ -239,7 +242,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           />
         </form>
         <div className="mt-4">
-          <p className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-violet-800">Saved filter chips</p>
+          <p className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-violet-800">Removable filter chips</p>
           <ActiveFilterChips chips={activeFilterChips} />
           {search.activeFilters.length > 0 ? (
             <p className="mt-2 text-xs font-semibold text-violet-900">Active URL filters: {search.activeFilters.join(' · ')}</p>
