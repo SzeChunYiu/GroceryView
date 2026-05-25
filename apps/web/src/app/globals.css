@@ -4,8 +4,26 @@
 
 :root {
   color-scheme: light;
-  background: #f5f1e8;
-  color: #0f172a;
+  --gv-color-canvas: #f3f6ef;
+  --gv-color-surface: #ffffff;
+  --gv-color-surface-raised: #f8faf4;
+  --gv-color-terminal: #101817;
+  --gv-color-terminal-soft: #172322;
+  --gv-color-ink: #101617;
+  --gv-color-muted: #52605d;
+  --gv-color-border: #cbd8cf;
+  --gv-color-grid: rgba(16, 24, 23, 0.08);
+  --gv-color-accent: #12805f;
+  --gv-color-buy: #0f7a55;
+  --gv-color-sell: #c2412f;
+  --gv-color-wait: #b7791f;
+  --gv-font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --gv-font-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --gv-radius-control: 0.5rem;
+  --gv-radius-panel: 0.75rem;
+  --gv-radius-sheet: 1rem;
+  background: var(--gv-color-canvas);
+  color: var(--gv-color-ink);
 }
 
 * { box-sizing: border-box; }
@@ -14,16 +32,17 @@ body {
   margin: 0;
   min-width: 320px;
   background:
-    radial-gradient(circle at 15% 8%, rgba(16, 185, 129, 0.16), transparent 28rem),
-    radial-gradient(circle at 86% 14%, rgba(245, 158, 11, 0.18), transparent 24rem),
-    #f5f1e8;
-  color: #0f172a;
-  font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+    linear-gradient(90deg, rgba(16, 24, 23, 0.035) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(16, 24, 23, 0.035) 1px, transparent 1px),
+    var(--gv-color-canvas);
+  background-size: 28px 28px;
+  color: var(--gv-color-ink);
+  font-family: var(--gv-font-sans);
 }
 
 a { color: inherit; text-decoration: none; }
 button, input, select, textarea { font: inherit; }
-::selection { background: #064e3b; color: white; }
+::selection { background: var(--gv-color-accent); color: white; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -41,16 +60,30 @@ button, input, select, textarea { font: inherit; }
 
 :root.dark {
   color-scheme: dark;
-  background: #020617;
-  color: #e2e8f0;
+  --gv-color-canvas: #07110f;
+  --gv-color-surface: #101817;
+  --gv-color-surface-raised: #172322;
+  --gv-color-terminal: #050807;
+  --gv-color-terminal-soft: #0d1715;
+  --gv-color-ink: #ecfdf5;
+  --gv-color-muted: #9fb2ad;
+  --gv-color-border: #2c403a;
+  --gv-color-grid: rgba(159, 178, 173, 0.14);
+  --gv-color-accent: #39d39f;
+  --gv-color-buy: #58d89e;
+  --gv-color-sell: #ff806d;
+  --gv-color-wait: #f4c15d;
+  background: var(--gv-color-canvas);
+  color: var(--gv-color-ink);
 }
 
 .dark body {
   background:
-    radial-gradient(circle at 15% 8%, rgba(16, 185, 129, 0.12), transparent 28rem),
-    radial-gradient(circle at 86% 14%, rgba(245, 158, 11, 0.1), transparent 24rem),
-    #020617;
-  color: #e2e8f0;
+    linear-gradient(90deg, rgba(159, 178, 173, 0.06) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(159, 178, 173, 0.06) 1px, transparent 1px),
+    var(--gv-color-canvas);
+  background-size: 28px 28px;
+  color: var(--gv-color-ink);
 }
 
 .dark :where(.bg-white, .bg-white\/70, .bg-white\/80, .bg-white\/85, .bg-white\/88) {

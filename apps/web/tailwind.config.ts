@@ -7,12 +7,26 @@ const config: Config = {
     extend: {
       colors: {
         market: {
-          ink: '#101617',
-          paper: '#f7f4ec',
-          mint: '#18a77b',
-          tomato: '#d94f3d',
-          oat: '#eadfc7'
+          ink: 'var(--gv-color-ink)',
+          paper: 'var(--gv-color-canvas)',
+          surface: 'var(--gv-color-surface)',
+          raised: 'var(--gv-color-surface-raised)',
+          terminal: 'var(--gv-color-terminal)',
+          grid: 'var(--gv-color-grid)',
+          mint: 'var(--gv-color-accent)',
+          buy: 'var(--gv-color-buy)',
+          sell: 'var(--gv-color-sell)',
+          wait: 'var(--gv-color-wait)'
         }
+      },
+      borderRadius: {
+        control: 'var(--gv-radius-control)',
+        panel: 'var(--gv-radius-panel)',
+        sheet: 'var(--gv-radius-sheet)'
+      },
+      fontFamily: {
+        sans: 'var(--gv-font-sans)',
+        mono: 'var(--gv-font-mono)'
       }
     }
   },

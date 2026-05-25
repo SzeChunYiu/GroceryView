@@ -1,6 +1,7 @@
 'use client';
 
 import { type KeyboardEvent, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { marketTerminalChartTokens } from '@/lib/market-terminal-tokens';
 import { buildPriceHistorySparklinePath } from '@/lib/price-events';
 import { formatPriceChartTerminalReadout } from '../lib/price-chart-terminal-readout.js';
 export { formatPriceChartTerminalReadout, priceChartTerminalLatestPoint } from '../lib/price-chart-terminal-readout.js';
@@ -101,11 +102,11 @@ function lineStyleFor(lineStyle: LineStyleName, lineStyles: LightweightChartsVal
 }
 
 function chartColorFor(index: number) {
-  return ['#047857', '#0f766e', '#2563eb', '#7c3aed'][index % 4]!;
+  return marketTerminalChartTokens.series[index % marketTerminalChartTokens.series.length]!;
 }
 
 function bandColorFor(index: number) {
-  return ['rgba(4, 120, 87, 0.38)', 'rgba(15, 118, 110, 0.38)', 'rgba(37, 99, 235, 0.34)', 'rgba(124, 58, 237, 0.34)'][index % 4]!;
+  return marketTerminalChartTokens.band[index % marketTerminalChartTokens.band.length]!;
 }
 
 function volatilityBandForPoint(point: PriceChartTerminalSeries['points'][number]) {
@@ -226,11 +227,11 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
           height: 280,
           layout: {
             background: { type: ColorType.Solid, color: 'transparent' },
-            textColor: '#334155'
+            textColor: marketTerminalChartTokens.axisText
           },
           grid: {
-            vertLines: { color: 'rgba(148, 163, 184, 0.16)' },
-            horzLines: { color: 'rgba(148, 163, 184, 0.18)' }
+            vertLines: { color: marketTerminalChartTokens.gridLine },
+            horzLines: { color: marketTerminalChartTokens.gridLine }
           },
           rightPriceScale: { borderColor: 'rgba(15, 23, 42, 0.12)' },
           timeScale: {
@@ -238,8 +239,8 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
             timeVisible: true
           },
           crosshair: {
-            vertLine: { color: '#0f766e', style: LineStyle.Dashed },
-            horzLine: { color: '#0f766e', style: LineStyle.Dashed }
+            vertLine: { color: marketTerminalChartTokens.crosshair, style: LineStyle.Dashed },
+            horzLine: { color: marketTerminalChartTokens.crosshair, style: LineStyle.Dashed }
           }
         });
 
@@ -283,7 +284,7 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
         });
 
         if (activeWindow.forecast?.available && activeWindow.forecast.points.length > 0) {
-          const forecastBandColor = 'rgba(245, 158, 11, 0.42)';
+          const forecastBandColor = marketTerminalChartTokens.forecastBand;
           const latestHistoricalPoint = visibleSeries
             .flatMap((series) => series.points)
             .sort((a, b) => a.time.localeCompare(b.time))
@@ -312,7 +313,7 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
           })));
 
           const forecastLine = chartApi.addSeries(LineSeries, {
-            color: '#f59e0b',
+            color: marketTerminalChartTokens.forecast,
             lineWidth: 3,
             lineStyle: LineStyle.Dashed,
             lastValueVisible: true,
