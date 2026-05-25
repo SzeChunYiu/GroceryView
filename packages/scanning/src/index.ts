@@ -92,6 +92,7 @@ export type ScanPipelineResult =
       kind: 'receipt';
       totalAmount: number;
       confidence: number;
+      rows: ReceiptOcrRow[];
       needsHumanReview: boolean;
       lowConfidenceRows: string[];
     }
@@ -479,6 +480,7 @@ export async function processScanUpload(input: { upload: ScanUpload; providers: 
     kind: 'receipt',
     totalAmount: parsed.totalAmount,
     confidence: parsed.confidence,
+    rows: parsed.rows,
     needsHumanReview: parsed.confidence < 0.8 || lowConfidenceRows.length > 0,
     lowConfidenceRows
   };
