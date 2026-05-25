@@ -112,6 +112,7 @@ import {
   fetchLyfOgHeilsaProducts,
   parseLyfOgHeilsaProducts,
   parseIcaReklambladOffers,
+  parseIcaStorePromotions,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
   GROCERYVIEW_DAILY_CITY_GROSS_BULK_PRODUCTS_URL,
@@ -179,7 +180,9 @@ import {
   buildCoopStoreMapUrl,
   fetchStoreEnumeratorStores,
   mergeStoreEnumerations,
+  normalizeAxfoodCertificationLabels,
   normalizeAxfoodStore,
+  normalizeRetailerOriginCountry,
   normalizeLidlStoreFromUrl,
   normalizeOsmSupermarket,
   parseCityGrossStores,
@@ -2805,6 +2808,52 @@ describe('fetchIcaProducts', () => {
     }]);
   });
 
+  it('preserves expanded ICA countryOfOrigin labels for source-backed origin normalization', () => {
+    const rows = parseIcaStorePromotions({
+      productGroups: [{
+        type: 'Frukt',
+        decoratedProducts: [
+          {
+            productId: 'ica-orange-es',
+            retailerProductId: 'ica-orange-es',
+            name: 'Apelsin Spanien',
+            brand: 'ICA',
+            packSizeDescription: '1kg',
+            countryOfOrigin: 'Spanien',
+            price: { amount: 24.9, currency: 'SEK' }
+          },
+          {
+            productId: 'ica-pear-nl',
+            retailerProductId: 'ica-pear-nl',
+            name: 'Päron Nederländerna',
+            brand: 'ICA',
+            packSizeDescription: '1kg',
+            originCountry: 'Nederländerna',
+            price: { amount: 29.9, currency: 'SEK' }
+          },
+          {
+            productId: 'ica-grapes-it',
+            retailerProductId: 'ica-grapes-it',
+            name: 'Druvor Italien',
+            brand: 'ICA',
+            packSizeDescription: '500g',
+            country: 'Italien',
+            price: { amount: 34.9, currency: 'SEK' }
+          }
+        ]
+      }]
+    }, {
+      sourceUrl: buildIcaStorePromotionsUrl('1004599', '6ae1c52a-99a8-4b19-9464-dd01274df39d', 3),
+      retrievedAt: '2026-05-22T08:28:14.000Z',
+      storeAccountId: '1004599',
+      storeName: 'ICA Kvantum Kungsholmen',
+      regionId: '6ae1c52a-99a8-4b19-9464-dd01274df39d'
+    });
+
+    assert.deepEqual(rows.map((row) => row.countryOfOrigin), ['Spanien', 'Nederländerna', 'Italien']);
+    assert.deepEqual(rows.map((row) => normalizeRetailerOriginCountry(row.countryOfOrigin)), ['ES', 'NL', 'IT']);
+  });
+
   it('flags only source-backed ICA counter-price promotion rows as sold by weight', async () => {
     const fetchImpl: typeof fetch = async () => Response.json({
       productGroups: [{
@@ -4448,6 +4497,14 @@ describe('fetchWillysProducts', () => {
       sourceUrl: buildWillysSearchUrl('makaroner'),
       retrievedAt: '2026-05-21T00:00:00.000Z'
     }]);
+  });
+
+  it('normalizes explicit Axfood certification labels only when source labels are present', () => {
+    assert.deepEqual(
+      normalizeAxfoodCertificationLabels(['KRAV', 'Fairtrade', 'MSC/ASC', 'Från Sverige']),
+      ['ASC', 'Fairtrade', 'KRAV', 'MSC']
+    );
+    assert.deepEqual(normalizeAxfoodCertificationLabels(['Ekologisk', 'Nyhet']), []);
   });
 
   it('deduplicates products across Willys search queries', async () => {
