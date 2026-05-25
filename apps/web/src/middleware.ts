@@ -17,6 +17,14 @@ export function middleware(request: NextRequest) {
   const blockedLocaleRoute = blockedLocaleFromPathname(request.nextUrl.pathname);
   const cookieLocale = normalizeLocale(request.cookies.get(nextLocaleCookieName)?.value);
   const resolvedLocale = routeLocale ?? cookieLocale ?? resolveLocaleFromAcceptLanguage(request.headers.get('accept-language')) ?? defaultLocale;
+  if (blockedLocaleRoute && blockedLocaleRoutes.includes(blockedLocaleRoute)) {
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = `${localeRoutePrefix(defaultLocale)}${request.nextUrl.pathname.replace(/^\/(?:ar|so)(?=\/|$)/, '') || '/'}`;
+    const localeRedirectResponse = NextResponse.redirect(redirectUrl);
+    localeRedirectResponse.headers.set('x-groceryview-locale-blocked', localeRoutePrefix(blockedLocaleRoute));
+    return localeRedirectResponse;
+  }
+
   const response = NextResponse.next({
     request: {
       headers: request.headers
@@ -25,8 +33,8 @@ export function middleware(request: NextRequest) {
 
   response.headers.set('x-groceryview-locale', resolvedLocale);
   response.headers.set('x-groceryview-locale-route', routeLocale ? localeRoutePrefix(routeLocale) : 'unrouted');
-  if (blockedLocaleRoute && blockedLocaleRoutes.includes(blockedLocaleRoute)) {
-    response.headers.set('x-groceryview-locale-blocked', localeRoutePrefix(blockedLocaleRoute));
+  if (routeLocale) {
+    response.cookies.set(nextLocaleCookieName, routeLocale, { sameSite: 'lax', path: '/', maxAge: 60 * 60 * 24 * 365 });
   }
   const cachePolicy = edgeCachePolicyForPath(request.nextUrl.pathname);
   if (cachePolicy) {
