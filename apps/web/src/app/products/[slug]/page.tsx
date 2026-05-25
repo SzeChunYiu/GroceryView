@@ -87,9 +87,9 @@ const timeframeWindows = [
   { label: 'ALL', rangeDays: undefined, rangeLabel: 'all observed points' }
 ] as const;
 const historyWindowDefinitions = [
-  { label: '30-day', rangeDays: 30, title: 'Observed 30-day low/high' },
-  { label: '90-day', rangeDays: 90, title: 'Observed 90-day low/high' },
-  { label: '365-day', rangeDays: 365, title: 'Observed 365-day low/high' }
+  { label: '30-day', chartLabel: '1M', rangeDays: 30, title: 'Observed 30-day low/high' },
+  { label: '90-day', chartLabel: '3M', rangeDays: 90, title: 'Observed 90-day low/high' },
+  { label: '365-day', chartLabel: '1Y', rangeDays: 365, title: 'Observed 365-day low/high' }
 ] as const;
 const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const;
 const chainRetailerTypes = {
@@ -538,6 +538,9 @@ function priceHistoryRangeBadgesFor(product: NonNullable<ReturnType<typeof findP
     observationCount: 0,
     lowValueLabel: 'Not reported',
     highValueLabel: 'Not reported',
+    volatilityBandLowerLabel: 'Not reported',
+    volatilityBandUpperLabel: 'Not reported',
+    volatilityBandCopy: 'No chart band is available without dated observations.',
     lowObservedAt: null as string | null,
     highObservedAt: null as string | null,
     canClaimLowestInWindow: false,
@@ -564,10 +567,30 @@ function priceHistoryRangeBadgesFor(product: NonNullable<ReturnType<typeof findP
     }))
     .filter((observation) => Number.isFinite(observation.observedTime))
     .sort((a, b) => a.observedTime - b.observedTime);
+  const sourceConfidence = clamp(product.observationCount / 30, 0, 1);
+  const chartObservations = observations.map((observation) => ({
+    observedAt: `${observation.observedAt}T00:00:00.000Z`,
+    price: observation.price,
+    storeId: 'openprices-community',
+    storeName: 'OpenPrices community',
+    sourceType: 'online' as const,
+    confidence: sourceConfidence
+  }));
 
   const windows = historyWindowDefinitions.map((window) => {
     const windowStart = latestTime - window.rangeDays * 24 * 60 * 60 * 1000;
     const windowPoints = observations.filter((observation) => observation.observedTime >= windowStart && observation.observedTime <= latestTime);
+    const chartResult = buildPriceChartSeries({
+      observations: chartObservations,
+      asOf: `${latestObservedAt}T00:00:00.000Z`,
+      rangeDays: window.rangeDays,
+      markerLimitPerSeries: 0
+    });
+    const latestChartPoint = chartResult.series
+      .flatMap((series) => series.points)
+      .sort((a, b) => a.time.localeCompare(b.time))
+      .at(-1);
+    const chartBand = latestChartPoint ? observedChartBandForPoint(latestChartPoint) : null;
 
     if (windowPoints.length === 0) {
       return {
@@ -575,6 +598,9 @@ function priceHistoryRangeBadgesFor(product: NonNullable<ReturnType<typeof findP
         observationCount: 0,
         lowValueLabel: 'Not reported',
         highValueLabel: 'Not reported',
+        volatilityBandLowerLabel: 'Not reported',
+        volatilityBandUpperLabel: 'Not reported',
+        volatilityBandCopy: 'No dated OpenPrices observations fall inside this chart window, so no observed chart band is shown.',
         lowObservedAt: null,
         highObservedAt: null,
         canClaimLowestInWindow: false,
@@ -601,6 +627,11 @@ function priceHistoryRangeBadgesFor(product: NonNullable<ReturnType<typeof findP
       observationCount: windowPoints.length,
       lowValueLabel: formatSek(lowPoint.price),
       highValueLabel: formatSek(highPoint.price),
+      volatilityBandLowerLabel: chartBand ? formatSek(chartBand.lower) : 'Not reported',
+      volatilityBandUpperLabel: chartBand ? formatSek(chartBand.upper) : 'Not reported',
+      volatilityBandCopy: chartBand
+        ? `Observed chart band around the latest ${window.chartLabel} point from buildPriceChartSeries; this lower/upper range is not a forecast.`
+        : 'No chart point is available for an observed lower/upper band.',
       lowObservedAt: lowPoint.observedAt,
       highObservedAt: highPoint.observedAt,
       canClaimLowestInWindow: disclosure.canClaimLowestInWindow,
@@ -613,6 +644,15 @@ function priceHistoryRangeBadgesFor(product: NonNullable<ReturnType<typeof findP
     available: windows.some((window) => window.observationCount > 0),
     caveat: 'Every low/high badge is calculated only from dated OpenPrices observations. Missing shelf, flyer, and member prices keep claims labelled as observed ranges.',
     windows
+  };
+}
+
+function observedChartBandForPoint(point: { value: number; confidence: number }) {
+  const confidence = clamp(point.confidence, 0, 1);
+  const margin = Math.max(0.03, (1 - confidence) * 0.18);
+  return {
+    lower: Math.max(0, Math.round((point.value * (1 - margin) + Number.EPSILON) * 100) / 100),
+    upper: Math.round((point.value * (1 + margin) + Number.EPSILON) * 100) / 100
   };
 }
 
@@ -2073,11 +2113,20 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
                     High: <span className="text-lg font-black text-rose-800">{window.highValueLabel}</span>
                     {window.highObservedAt ? ` · ${window.highObservedAt}` : ''}
                   </p>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <p className="rounded-xl bg-sky-50 p-3 text-xs font-black uppercase tracking-[0.14em] text-sky-900">
+                      Band lower <span className="block text-base text-slate-950">{window.volatilityBandLowerLabel}</span>
+                    </p>
+                    <p className="rounded-xl bg-sky-50 p-3 text-xs font-black uppercase tracking-[0.14em] text-sky-900">
+                      Band upper <span className="block text-base text-slate-950">{window.volatilityBandUpperLabel}</span>
+                    </p>
+                  </div>
                   <p className="rounded-xl bg-indigo-50 p-3 text-xs font-black uppercase tracking-[0.14em] text-indigo-900">
                     {window.observationCount} points · canClaimLowestInWindow {String(window.canClaimLowestInWindow)}
                   </p>
                 </div>
                 <p className="mt-3 text-xs font-semibold leading-5 text-slate-600">{window.claimLabel} · {window.detailCopy}</p>
+                <p className="mt-2 text-xs font-semibold leading-5 text-slate-600">{window.volatilityBandCopy}</p>
               </div>
             ))}
           </div>
