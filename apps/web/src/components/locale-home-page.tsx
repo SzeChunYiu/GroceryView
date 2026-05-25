@@ -57,7 +57,7 @@ export function blockedLocaleMetadata(locale: BlockedLocaleRoute): Metadata {
 }
 
 export function LocaleHomePage({ locale }: { locale: SupportedLocale }) {
-  return <MarketShell />;
+  return <MarketShell locale={locale} />;
 }
 
 export function BlockedLocalePage({ locale }: { locale: BlockedLocaleRoute }) {

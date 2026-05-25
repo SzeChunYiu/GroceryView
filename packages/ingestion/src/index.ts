@@ -69,6 +69,10 @@ import {
   type FuelPriceObservation
 } from './connectors/okq8-fuel.js';
 import {
+  fetchSevenElevenSeConvenienceProducts,
+  type SevenElevenSeProduct
+} from './connectors/seven-eleven-se.js';
+import {
   fetchMathemProducts,
   type MathemProduct
 } from './connectors/mathem.js';
@@ -105,6 +109,7 @@ export * from './connectors/lidl-bulk.js';
 export * from './connectors/willys-bulk.js';
 export * from './connectors/apohem.js';
 export * from './connectors/okq8-fuel.js';
+export * from './connectors/seven-eleven-se.js';
 export * from './connectors/st1-fuel.js';
 export * from './connectors/willys.js';
 export * from './store-enumerator.js';
@@ -2001,6 +2006,28 @@ function okq8FuelPriceToDailyItem(row: FuelPriceObservation): RetailerConnectorP
   };
 }
 
+function sevenElevenSeProductToDailyItem(row: SevenElevenSeProduct): RetailerConnectorParsedProduct {
+  return {
+    sourceType: 'retailer_online_page',
+    observedAt: row.retrievedAt,
+    chainId: row.chainId,
+    retailerProductId: row.productId,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: row.productId,
+    categoryId: `convenience-${row.category}`,
+    brand: row.chainName,
+    packageSize: 1,
+    packageUnit: 'each',
+    price: row.priceMin,
+    regularPrice: row.priceMax > row.priceMin ? row.priceMax : undefined,
+    promoText: row.priceMax > row.priceMin ? `7-Eleven Sweden B2B range ${row.priceText}` : undefined,
+    memberOnly: false,
+    isAvailable: true,
+    sourceUrl: row.pdfUrl
+  };
+}
+
 function pharmacyProductToDailyItem(row: ApohemProduct): RetailerConnectorParsedProduct {
   const quantity = parseNativePackageText(row.name);
   const barcode = validDailyBarcode(row.ean);
@@ -2265,6 +2292,18 @@ export async function fetchDailyConnectorSnapshot(
       sourceUrl: OKQ8_FUEL_PRICES_URL
     });
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(okq8FuelPriceToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_SEVEN_ELEVEN_SE_CONVENIENCE_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_SEVEN_ELEVEN_SE_CONVENIENCE_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchSevenElevenSeConvenienceProducts({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      pdfUrl: url.searchParams.get('pdfUrl') ?? undefined,
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(sevenElevenSeProductToDailyItem) });
   }
 
   if (sourceUrl === GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL}?`)) {
@@ -3113,6 +3152,7 @@ export const GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL = 'groceryview://d
 export const GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL = 'groceryview://daily/mathem/products/public-search';
 export const GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL = 'groceryview://daily/matspar/products/public-search';
 export const GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL = OKQ8_FUEL_PRICES_URL;
+export const GROCERYVIEW_DAILY_SEVEN_ELEVEN_SE_CONVENIENCE_PRODUCTS_URL = 'groceryview://daily/seven-eleven-se/convenience-products';
 export const GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL = 'groceryview://daily/pharmacy/products/public';
 
 const requireForDailyIngestion = createRequire(import.meta.url);
@@ -4614,3 +4654,6 @@ if (process.argv[1] && import.meta.url === new URL(process.argv[1], 'file:').hre
       process.exitCode = 1;
     });
 }
+
+export * from './connectors/benchmarks/tlv-medicines.js';
+export * from './connectors/benchmarks/registry.js';

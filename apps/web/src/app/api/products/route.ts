@@ -1,5 +1,6 @@
 import { createPgQueryExecutor, searchProductsByText, type ProductSearchResult } from '@groceryview/db';
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -15,6 +16,19 @@ type PgModuleLike = {
 
 let cachedDatabaseUrl: string | null = null;
 let cachedPool: PgPoolLike | null = null;
+
+const productSearchQuerySchema = z.object({
+  q: z.string().trim().max(120).default('')
+}).strict();
+
+function parseProductSearchQuery(request: Request) {
+  const searchParams = new URL(request.url).searchParams;
+  const rawQuery = Object.fromEntries(searchParams.entries()) as Record<string, unknown>;
+  const qValues = searchParams.getAll('q');
+  if (qValues.length > 1) rawQuery.q = qValues;
+
+  return productSearchQuerySchema.safeParse(rawQuery);
+}
 
 async function importPgModule(): Promise<PgModuleLike> {
   const loadModule = new Function('specifier', 'return import(specifier)') as (specifier: string) => Promise<unknown>;
@@ -43,8 +57,22 @@ function responsePayload(query: string, results: ProductSearchResult[], error?: 
 }
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const query = (searchParams.get('q') ?? '').trim();
+  const parsedQuery = parseProductSearchQuery(request);
+  if (!parsedQuery.success) {
+    return NextResponse.json(
+      {
+        error: 'invalid_product_search_params',
+        issues: parsedQuery.error.issues.map((issue) => ({
+          path: issue.path.join('.'),
+          code: issue.code,
+          message: issue.message
+        }))
+      },
+      { status: 400 }
+    );
+  }
+
+  const { q: query } = parsedQuery.data;
 
   if (query.length < 2) {
     return NextResponse.json({ query, results: [], source: 'postgres.products_tsvector' });
