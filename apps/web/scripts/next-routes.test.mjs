@@ -4246,6 +4246,22 @@ ${seo}`;
     assert.match(fixtures, /setViewportSize/);
   });
 
+  it('ships the group-buy coordinator E2E flow with create, invite, unlock, and error coverage', async () => {
+    const page = await read('src/app/[country]/group-buys/page.tsx');
+    const coordinator = await read('src/app/[country]/group-buys/group-buy-coordinator.tsx');
+    const spec = await read('e2e/group-buy-coordinator.spec.ts');
+
+    assert.match(page, /GroupBuyCoordinator/);
+    assert.match(coordinator, /Create group buy/);
+    assert.match(coordinator, /Anna household/);
+    assert.match(coordinator, /Khan household/);
+    assert.match(coordinator, /bulk tier unlocked/);
+    assert.match(coordinator, /Create a group buy before inviting households/);
+    assert.match(spec, /creates a group buy, invites two households, and unlocks the bulk-tier price/);
+    assert.match(spec, /invite before creating/i);
+    assert.match(spec, /group-buy-coordinator-final\.png/);
+  });
+
   it('ships a country consumer complaint helper with authority templates from observed prices', async () => {
     const helper = await read('src/app/[country]/complaint-helper/page.tsx');
 
