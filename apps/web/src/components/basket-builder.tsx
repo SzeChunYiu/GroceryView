@@ -16,7 +16,7 @@
  */
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
   buildBasketCouponStackOptimizer,
@@ -29,6 +29,7 @@ export type BasketBuilderProduct = {
   name: string;
   chainPrices?: BasketChainPrice[];
   dealStackOffers?: BasketStackOffer[];
+  dietaryTags?: readonly string[];
 };
 
 export function addBasketBuilderProduct<T extends BasketBuilderProduct>(
@@ -44,12 +45,38 @@ export function addBasketBuilderProduct<T extends BasketBuilderProduct>(
 
 export type BasketBuilderProps<T extends BasketBuilderProduct> = {
   products: readonly T[];
+  selectedDietaryFilters?: readonly string[];
+  onSelectedDietaryFiltersChange?: (filters: string[]) => void;
 };
 
 export function BasketBuilder<T extends BasketBuilderProduct>({
   products,
+  selectedDietaryFilters,
+  onSelectedDietaryFiltersChange,
 }: BasketBuilderProps<T>) {
   const [basketProducts, setBasketProducts] = useState<T[]>([]);
+  const [localDietaryFilters, setLocalDietaryFilters] = useState<string[]>([]);
+  const availableDietaryTags = useMemo(
+    () =>
+      Array.from(new Set(products.flatMap((product) => product.dietaryTags ?? []))).sort(
+        (first, second) => first.localeCompare(second),
+      ),
+    [products],
+  );
+  const activeDietaryFilters = selectedDietaryFilters ?? localDietaryFilters;
+  const activeDietaryFilterSet = useMemo(
+    () => new Set(activeDietaryFilters),
+    [activeDietaryFilters],
+  );
+  const filteredProducts = useMemo(
+    () =>
+      activeDietaryFilters.length === 0
+        ? products
+        : products.filter((product) =>
+            activeDietaryFilters.every((tag) => product.dietaryTags?.includes(tag)),
+          ),
+    [activeDietaryFilters, products],
+  );
   const chainStacks = buildBasketCouponStackOptimizer({
     items: basketProducts,
     offers: basketProducts.flatMap((product) => product.dealStackOffers ?? []),
@@ -60,10 +87,42 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
     setBasketProducts((current) => addBasketBuilderProduct(current, product));
   }
 
+  function toggleDietaryFilter(tag: string) {
+    const nextFilters = activeDietaryFilterSet.has(tag)
+      ? activeDietaryFilters.filter((filter) => filter !== tag)
+      : [...activeDietaryFilters, tag];
+
+    if (selectedDietaryFilters === undefined) {
+      setLocalDietaryFilters(nextFilters);
+    }
+
+    onSelectedDietaryFiltersChange?.(nextFilters);
+  }
+
   return (
     <section aria-label="Basket builder">
+      {availableDietaryTags.length > 0 ? (
+        <fieldset aria-label="Dietary filters">
+          <legend>Dietary filters</legend>
+          <div>
+            {availableDietaryTags.map((tag) => (
+              <label key={tag}>
+                <input
+                  checked={activeDietaryFilterSet.has(tag)}
+                  name="basketDietaryFilters"
+                  onChange={() => toggleDietaryFilter(tag)}
+                  type="checkbox"
+                  value={tag}
+                />
+                {tag}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      ) : null}
+
       <ul>
-        {products.map((product) => (
+        {filteredProducts.map((product) => (
           <li key={product.id}>
             <span>{product.name}</span>
             <button type="button" onClick={() => add(product)}>
@@ -72,6 +131,9 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
           </li>
         ))}
       </ul>
+      {filteredProducts.length === 0 ? (
+        <p>No products match the selected dietary filters.</p>
+      ) : null}
 
       <h2>Basket</h2>
       <ul>

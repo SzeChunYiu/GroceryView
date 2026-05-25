@@ -148,7 +148,7 @@ export type RemovableSearchFilterChip = {
   href: string;
 };
 
-type SearchFilterChipKey = 'category' | 'chain' | 'dietary' | 'minPrice' | 'maxPrice';
+type SearchFilterChipKey = 'brand' | 'category' | 'chain' | 'dietary' | 'inStockOnly' | 'label' | 'minConfidence' | 'minPrice' | 'maxPrice';
 
 type SearchFilterChipOptions = {
   basePath?: string;
@@ -157,7 +157,7 @@ type SearchFilterChipOptions = {
 
 type SearchFilterParams = Record<string, SearchFilterParamValue>;
 
-const multiValueChipKeys = new Set<SearchFilterChipKey>(['category', 'chain', 'dietary']);
+const multiValueChipKeys = new Set<SearchFilterChipKey>(['category', 'chain', 'dietary', 'label']);
 
 function searchParamValues(value: SearchFilterParamValue): string[] {
   const rawValues = Array.isArray(value) ? value : value ? [value] : [];
@@ -218,11 +218,27 @@ export function buildRemovableSearchFilterChips(searchParams: SearchFilterParams
     });
   }
 
+  for (const brand of searchParamValues(searchParams.brand)) {
+    chips.push({
+      id: `brand:${brand}`,
+      label: `Brand: ${displayChipValue(brand, options.labels?.brand)}`,
+      href: chipRemovalHref(searchParams, 'brand', brand, basePath)
+    });
+  }
+
   for (const dietary of searchParamValues(searchParams.dietary)) {
     chips.push({
       id: `dietary:${dietary}`,
       label: `Dietary: ${displayChipValue(dietary, options.labels?.dietary)}`,
       href: chipRemovalHref(searchParams, 'dietary', dietary, basePath)
+    });
+  }
+
+  for (const label of searchParamValues(searchParams.label)) {
+    chips.push({
+      id: `label:${label}`,
+      label: `Certification: ${displayChipValue(label, options.labels?.label)}`,
+      href: chipRemovalHref(searchParams, 'label', label, basePath)
     });
   }
 
@@ -241,6 +257,24 @@ export function buildRemovableSearchFilterChips(searchParams: SearchFilterParams
       id: `maxPrice:${maxPrice}`,
       label: `Max unit price: ${maxPrice} SEK`,
       href: chipRemovalHref(searchParams, 'maxPrice', maxPrice, basePath)
+    });
+  }
+
+  const minConfidence = searchParamValues(searchParams.minConfidence)[0];
+  if (minConfidence) {
+    chips.push({
+      id: `minConfidence:${minConfidence}`,
+      label: `Min confidence: ${minConfidence}`,
+      href: chipRemovalHref(searchParams, 'minConfidence', minConfidence, basePath)
+    });
+  }
+
+  const inStockOnly = searchParamValues(searchParams.inStockOnly)[0];
+  if (inStockOnly === 'true' || inStockOnly === '1' || inStockOnly === 'on') {
+    chips.push({
+      id: 'inStockOnly:true',
+      label: 'Availability: in stock only',
+      href: chipRemovalHref(searchParams, 'inStockOnly', inStockOnly, basePath)
     });
   }
 
