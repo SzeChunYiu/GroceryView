@@ -1,10 +1,30 @@
+import { createRequire } from 'node:module';
+
 import { createPostgresCatalogReader, createPgQueryExecutor } from '@groceryview/db';
 import { NextResponse } from 'next/server';
-import { Pool, type PoolClient } from 'pg';
 
 export const runtime = 'nodejs';
 
-let pgPool: Pool | undefined;
+type PgClient = {
+  query(text: string, values: unknown[]): Promise<{ rows: unknown[] }>;
+  release(): void;
+};
+
+type PgPool = {
+  connect(): Promise<PgClient>;
+};
+
+const require = createRequire(import.meta.url);
+let pgPool: PgPool | undefined;
+
+function getPgPool(connectionString: string): PgPool {
+  if (!pgPool) {
+    const { Pool } = require('pg') as { Pool: new (options: { connectionString: string; max: number }) => PgPool };
+    pgPool = new Pool({ connectionString, max: 4 });
+  }
+
+  return pgPool;
+}
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -14,7 +34,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Missing required query parameter: ean' }, { status: 400 });
   }
 
-  let client: PoolClient | null = null;
+  let client: PgClient | null = null;
 
   try {
     const databaseUrl = process.env.DATABASE_URL;
@@ -22,11 +42,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'DATABASE_URL is not configured' }, { status: 500 });
     }
 
-    if (!pgPool) {
-      pgPool = new Pool({ connectionString: databaseUrl, max: 4 });
-    }
-
-    client = await pgPool.connect();
+    client = await getPgPool(databaseUrl).connect();
     const catalogReader = createPostgresCatalogReader(createPgQueryExecutor(client));
     const products = await catalogReader.listProducts({ search: ean, limit: 100 });
     const matchingProducts = products.filter((product) => product.barcode === ean);
