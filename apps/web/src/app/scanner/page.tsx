@@ -124,6 +124,13 @@ export default function ScannerPage() {
           <Link className="rounded-full border border-indigo-200 px-4 py-2 text-sm font-black text-indigo-900" href="/watchlist">Watchlist</Link>
         </div>
       </Card>
+      <Card className="mt-6 border-emerald-200 bg-emerald-50/70">
+        <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-800">EAN resolver</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Barcode scans now resolve direct product links</h2>
+        <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-emerald-950">
+          Manual EAN entry and camera-detected barcodes call the local catalogue resolver first, then open the matching product detail page when GroceryView has a code match.
+        </p>
+      </Card>
       <BarcodeScanner />
       <div id="scan" className="scroll-mt-24">
         <ScannerUploadActions fallbackProducts={barcodeMissFallbackProducts} />

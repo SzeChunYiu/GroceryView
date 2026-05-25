@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { FormEvent, useRef, useState } from 'react';
 import type { BarcodeMissFallbackProduct } from '@/lib/openfoodfacts-catalog';
 
@@ -22,6 +23,9 @@ type ReceiptPurchaseHistoryItem = {
   quantity?: number;
   totalAmount?: number;
 };
+
+type BarcodeLookupProduct = { href: string; name: string; brand: string; quantity: string; source: string };
+type BarcodeLookupResponse = { status: 'matched' | 'miss'; product: BarcodeLookupProduct | null };
 
 type ScanProcessResponse = {
   result?: {
@@ -54,6 +58,7 @@ export function ScannerUploadActions({ fallbackProducts = [] }: Readonly<{ fallb
   const [barcodeFallbackActive, setBarcodeFallbackActive] = useState(false);
   const [manualProductName, setManualProductName] = useState('');
   const [manualStoreHint, setManualStoreHint] = useState('');
+  const [barcodeMatch, setBarcodeMatch] = useState<BarcodeLookupProduct | null>(null);
   const [receiptHistory, setReceiptHistory] = useState<ReceiptPurchaseHistoryItem[]>([]);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -207,10 +212,34 @@ export function ScannerUploadActions({ fallbackProducts = [] }: Readonly<{ fallb
     setMessage('Receipt camera stopped. No anonymous scan uploads were sent.');
   }
 
+  async function lookupCatalogBarcode() {
+    if (normalizedBarcode.length < 8) {
+      setBarcodeMatch(null);
+      setStatus('error');
+      setMessage('Enter at least 8 barcode digits before looking up a catalogue product.');
+      return null;
+    }
+    const response = await fetch(`/api/barcode?ean=${encodeURIComponent(normalizedBarcode)}`);
+    if (!response.ok) {
+      setBarcodeMatch(null);
+      setBarcodeFallbackActive(true);
+      setStatus('error');
+      setMessage(`No local catalogue product matched barcode ${normalizedBarcode}.`);
+      return null;
+    }
+    const body = (await response.json()) as BarcodeLookupResponse;
+    setBarcodeMatch(body.product);
+    setBarcodeFallbackActive(false);
+    setStatus('ready');
+    setMessage(body.product ? `Barcode ${normalizedBarcode} matched ${body.product.name}; open the product detail link below.` : `No local catalogue product matched barcode ${normalizedBarcode}.`);
+    return body.product;
+  }
+
   async function processBarcode(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const session = requireSession();
     if (!session) return;
+    const catalogMatch = await lookupCatalogBarcode();
     const { accessToken, userId } = session;
     const scanId = newScanId('barcode');
     const response = await fetch(`/api/scans/process?userId=${encodeURIComponent(userId)}`, {
@@ -236,7 +265,9 @@ export function ScannerUploadActions({ fallbackProducts = [] }: Readonly<{ fallb
 
     setBarcodeFallbackActive(false);
     setStatus('ready');
-    setMessage(`Barcode processed for ${scanId}; review work items are returned when matching needs human review.`);
+    setMessage(catalogMatch
+      ? `Barcode processed for ${scanId} and matched ${catalogMatch.name}; open the product detail link below.`
+      : `Barcode processed for ${scanId}; review work items are returned when matching needs human review.`);
   }
 
   function reportMissingProduct() {
@@ -311,10 +342,20 @@ export function ScannerUploadActions({ fallbackProducts = [] }: Readonly<{ fallb
             onChange={(event) => {
               setBarcode(event.target.value);
               setBarcodeFallbackActive(false);
+              setBarcodeMatch(null);
             }}
             value={barcode}
           />
-          <button className="mt-3 rounded-full bg-slate-950 px-4 py-2 text-sm font-black text-white" disabled={!barcode.trim()} type="submit">Process barcode scan</button>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button className="rounded-full bg-slate-950 px-4 py-2 text-sm font-black text-white" disabled={!barcode.trim()} type="submit">Process barcode scan</button>
+            <button className="rounded-full border border-indigo-300 px-4 py-2 text-sm font-black text-indigo-900" disabled={!barcode.trim()} onClick={lookupCatalogBarcode} type="button">Lookup catalogue link</button>
+          </div>
+          {barcodeMatch ? (
+            <div className="mt-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-sm font-bold text-emerald-950">
+              Matched {barcodeMatch.name} · {barcodeMatch.brand} · {barcodeMatch.quantity}
+              <Link className="ml-2 underline" href={barcodeMatch.href}>Open product detail</Link>
+            </div>
+          ) : null}
         </form>
       </div>
       {barcodeFallbackActive ? (
