@@ -2108,6 +2108,17 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(verified, /Math\.random/);
   });
 
+  it('sets Twitter card metadata for the heatmap route from OpenGraph fields', async () => {
+    const source = await read('src/app/heatmap/page.tsx');
+
+    assert.match(source, /const openGraph = metadata\.openGraph/);
+    assert.match(source, /twitter:\s*\{/);
+    assert.match(source, /card:\s*'summary_large_image'/);
+    assert.match(source, /title:\s*openGraph\?\.title/);
+    assert.match(source, /description:\s*openGraph\?\.description/);
+    assert.match(source, /images:\s*openGraph\?\.images/);
+  });
+
   it('surfaces a chain price index trend chart from dated campaign tape on homepage and chain-index', async () => {
     const chainData = await read('src/lib/chain-index-data.ts');
     const shell = await read('src/components/market-shell.tsx');

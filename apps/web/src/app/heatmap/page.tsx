@@ -92,14 +92,30 @@ const primaryHeatmapChain = groceryIndex.chains[0]?.chainId ?? 'grocery chain';
 export function generateMetadata() {
   const title = `${primaryHeatmapCategory} x ${primaryHeatmapChain} heatmap | GroceryView`;
   const description = `${categorySummaries.length} verified categories, ${groceryIndex.chains.length} chains, and ${coveredCellCount}/${totalCellCount} covered category-chain index cells.`;
-
-  return routeMetadata({
+  const metadata = routeMetadata({
     path: '/heatmap',
     title,
     description,
     imagePath: '/pwa-icon.svg',
     imageAlt: `${primaryHeatmapCategory} and ${primaryHeatmapChain} price-index heatmap preview`
   });
+  const openGraph = metadata.openGraph;
+
+  return {
+    ...metadata,
+    openGraph: {
+      ...(openGraph ?? {}),
+      title,
+      description,
+      images: openGraph?.images
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: openGraph?.title ?? title,
+      description: openGraph?.description ?? description,
+      images: openGraph?.images
+    }
+  };
 }
 
 export default function HeatmapPage() {
