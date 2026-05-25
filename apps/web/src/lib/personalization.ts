@@ -353,7 +353,7 @@ export function buildPersonalizedRecommendationRail<T extends RecommendationProd
         ? `Favorite brand signal for ${product.brand}`
         : listHits > 0
           ? `${listHits} recent list signal${listHits === 1 ? '' : 's'} matched`
-          : 'Household history keeps this in the discovery mix';
+          : 'Household favorites, watchlist, dietary preferences, and recent searches keep this in the discovery mix';
       return { ...product, score, reason };
     })
     .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name, 'sv'))
