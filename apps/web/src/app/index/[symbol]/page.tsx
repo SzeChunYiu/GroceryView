@@ -313,7 +313,7 @@ function CategoryIndexPage({ definition, index, rows }: Readonly<{ definition: C
         <div className="rounded-[1.75rem] border border-emerald-200 bg-white p-5 shadow-sm">
           <p className="text-sm font-black uppercase tracking-[0.18em] text-emerald-800">Index value</p>
           <p className={`mt-2 text-6xl font-black tracking-tight ${indexTone(index.value)}`}>{index.value.toFixed(1)}</p>
-          <div className="mt-3"><ConfidenceBadge level={index.confidence} label={confidenceLabel(index.confidence)} sampleSize={rows.length} /></div>
+          <div className="mt-3"><ConfidenceBadge level={index.confidence} label={confidenceLabel(index.confidence)} sampleSize={rows.length} verificationLabel="matched chain constituents" /></div>
         </div>
       </div>
 
@@ -399,7 +399,7 @@ function ChainIndexPage({ chain }: Readonly<{ chain: ChainPriceIndex }>) {
         <div className="rounded-[1.75rem] border border-emerald-200 bg-white p-5 shadow-sm">
           <p className="text-sm font-black uppercase tracking-[0.18em] text-emerald-800">Index value</p>
           <p className={`mt-2 text-6xl font-black tracking-tight ${indexTone(chain.overallIndex)}`}>{chain.overallIndex.toFixed(1)}</p>
-          <div className="mt-3"><ConfidenceBadge level={chain.confidence} label={confidenceLabel(chain.confidence)} sampleSize={chain.observations} /></div>
+          <div className="mt-3"><ConfidenceBadge level={chain.confidence} label={confidenceLabel(chain.confidence)} sampleSize={chain.observations} verificationLabel="normalized chain observations" /></div>
         </div>
       </div>
 
@@ -448,7 +448,7 @@ function ChainIndexPage({ chain }: Readonly<{ chain: ChainPriceIndex }>) {
                   <td className="py-3 pr-4 font-bold text-slate-700">{formatSek(row.marketReference)}</td>
                   <td className="py-3 pr-4 font-bold text-slate-700">{row.observations}</td>
                   <td className="py-3 pr-4">
-                    <ConfidenceBadge level={row.confidence} label={row.estimated ? 'estimated cell' : confidenceLabel(row.confidence)} sampleSize={row.observations} />
+                    <ConfidenceBadge level={row.confidence} label={row.estimated ? 'estimated cell' : confidenceLabel(row.confidence)} sampleSize={row.observations} verificationLabel={row.estimated ? 'market reference estimate' : 'real category rows'} />
                   </td>
                 </tr>
               ))}
