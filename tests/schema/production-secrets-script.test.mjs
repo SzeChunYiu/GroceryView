@@ -91,8 +91,7 @@ describe('production secret audit script', () => {
     assert.deepEqual(output.checkedVariableNames, []);
     assert.deepEqual(output.missingGithubActionVariables, [
       'GROCERYVIEW_PRODUCTION_URL',
-      'GROCERYVIEW_TERMINAL_PRODUCT_ID',
-      'GROCERYVIEW_SCANNER_USER_ID'
+      'GROCERYVIEW_TERMINAL_PRODUCT_ID'
     ]);
     assert.deepEqual(output.missingGithubActionSecrets, [
       'GROCERYVIEW_SERVER_URL',

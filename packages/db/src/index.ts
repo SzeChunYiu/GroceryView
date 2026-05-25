@@ -694,6 +694,8 @@ export type SiteLatestPriceSnapshotRow = LatestPriceRecord & {
   validFrom?: string;
   validUntil?: string;
   retailerProductRef?: string;
+  originCountry?: string;
+  certLevel?: string;
 };
 
 export type SiteLatestPriceSnapshotFilter = {
@@ -1683,6 +1685,8 @@ type SiteLatestPriceSnapshotRowSql = LatestPriceRow & {
   valid_from: string | Date | null;
   valid_until: string | Date | null;
   retailer_product_ref: string | null;
+  origin_country: string | null;
+  cert_level: string | null;
 };
 type WeeklyPriceDropDigestRow = {
   product_id: string;
@@ -1929,7 +1933,9 @@ function mapSiteLatestPriceSnapshotRow(row: SiteLatestPriceSnapshotRowSql): Site
     memberRequired: row.member_required,
     ...(row.valid_from ? { validFrom: asIso(row.valid_from) } : {}),
     ...(row.valid_until ? { validUntil: asIso(row.valid_until) } : {}),
-    ...(row.retailer_product_ref ? { retailerProductRef: row.retailer_product_ref } : {})
+    ...(row.retailer_product_ref ? { retailerProductRef: row.retailer_product_ref } : {}),
+    ...(row.origin_country ? { originCountry: row.origin_country } : {}),
+    ...(row.cert_level ? { certLevel: row.cert_level } : {})
   };
 }
 
@@ -4670,6 +4676,8 @@ export function createPostgresSiteSnapshotReader(executor: QueryExecutor): Postg
                 observations.valid_from,
                 observations.valid_until,
                 observations.retailer_product_ref,
+                observations.origin_country,
+                observations.cert_level,
                 coalesce(observations.provenance, latest_prices.provenance) as provenance
          from latest_prices
          join observations on observations.id = latest_prices.observation_id
