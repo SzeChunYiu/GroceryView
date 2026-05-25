@@ -53,6 +53,7 @@ async function warmOfflineShoppingListRoute() {
 
   try {
     const cache = await caches.open(SHOPPING_LIST_ROUTE_CACHE_NAME);
+    await cache.add('/list');
     await Promise.allSettled(offlineSavedListWarmRoutes().map((route) => cache.add(route)));
   } catch {
     // Offline route warming is opportunistic; registration should remain silent.

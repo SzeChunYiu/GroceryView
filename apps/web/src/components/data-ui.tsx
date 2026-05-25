@@ -13,6 +13,7 @@ import {
 } from '@/lib/verified-data';
 import type { PrivateFeatureRoute } from '@/lib/verified-data';
 import { freshnessCopy, sourceLimitationCopy } from '@/lib/content-style';
+import type { RetailerFreshnessBannerRow } from '@/lib/source-health';
 
 export function PageShell({ children }: Readonly<{ children: ReactNode }>) {
   return (
@@ -30,6 +31,51 @@ export function Eyebrow({ children }: Readonly<{ children: ReactNode }>) {
 
 export function Card({ children, className = '' }: Readonly<{ children: ReactNode; className?: string }>) {
   return <section className={`rounded-[1.75rem] border border-slate-200 bg-white/88 p-5 shadow-sm ${className}`}>{children}</section>;
+}
+
+function freshnessBannerTone(status: RetailerFreshnessBannerRow['status']) {
+  if (status === 'stale') return 'border-amber-300 bg-amber-50 text-amber-950';
+  if (status === 'unknown') return 'border-slate-300 bg-slate-50 text-slate-950';
+  return 'border-emerald-300 bg-emerald-50 text-emerald-950';
+}
+
+export function DataFreshnessBanner({ rows }: Readonly<{ rows: RetailerFreshnessBannerRow[] }>) {
+  const staleRows = rows.filter((row) => row.status === 'stale');
+  const unknownRows = rows.filter((row) => row.status === 'unknown');
+  const affectedChainNames = [...new Set([...staleRows, ...unknownRows].flatMap((row) => row.affectedChains))];
+  const statusLabel = staleRows.length > 0 ? 'Stale retailer data warning' : unknownRows.length > 0 ? 'Freshness evidence incomplete' : 'Retailer data freshness current';
+
+  return (
+    <Card className="mt-6 border-slate-300 bg-slate-950 text-white" data-retailer-freshness-banner="true">
+      <div className="grid gap-4 lg:grid-cols-[1fr_auto]">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.24em] text-amber-200">Data freshness banners</p>
+          <h2 className="mt-2 text-2xl font-black tracking-tight">{statusLabel}</h2>
+          <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-200">
+            Source-heavy retailer pages show the last successful ingest time, stale warnings, and affected chain names before shoppers compare prices.
+          </p>
+        </div>
+        <div className="rounded-2xl bg-white/10 p-4 text-right">
+          <p className="text-sm font-black uppercase tracking-[0.18em] text-slate-300">Affected chains</p>
+          <p className="mt-2 text-xl font-black">{affectedChainNames.length ? affectedChainNames.join(', ') : 'None stale'}</p>
+        </div>
+      </div>
+      <div className="mt-5 grid gap-3 lg:grid-cols-3">
+        {rows.map((row) => (
+          <section className={`rounded-2xl border p-4 ${freshnessBannerTone(row.status)}`} data-source-freshness-status={row.status} key={row.name}>
+            <p className="text-xs font-black uppercase tracking-[0.18em] opacity-70">{row.status}</p>
+            <h3 className="mt-2 text-lg font-black">{row.name}</h3>
+            <p className="mt-2 text-sm font-semibold leading-6">Last successful ingest: {row.lastSuccessfulIngestLabel}</p>
+            <p className="mt-1 text-sm font-semibold leading-6">
+              {row.ageHours == null ? 'Age not available' : `${row.ageHours} hours old`} · stale after {row.staleAfterHours} hours
+            </p>
+            <p className="mt-2 text-xs font-black uppercase tracking-[0.14em]">Affected: {row.affectedChains.join(', ')}</p>
+            <p className="mt-3 rounded-xl bg-white/75 p-3 text-xs font-bold leading-5">{row.warning}</p>
+          </section>
+        ))}
+      </div>
+    </Card>
+  );
 }
 
 export function MetricGrid() {

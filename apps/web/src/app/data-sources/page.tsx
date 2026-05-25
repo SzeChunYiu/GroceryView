@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { Card, DataFreshnessBanner, Eyebrow, PageShell } from '@/components/data-ui';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { buildUnitNormalizationQaReport } from '@/lib/normalization';
 import { pricedProducts } from '@/lib/openprices-products';
@@ -22,7 +22,7 @@ import {
   timescaleDbEvaluation
 } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
-import { partnerOnboardingIntake } from '@/lib/source-health';
+import { buildRetailerFreshnessBanners, partnerOnboardingIntake } from '@/lib/source-health';
 
 const unitNormalizationQaReport = buildUnitNormalizationQaReport([
   ...axfoodProducts.map((product) => ({
@@ -38,6 +38,7 @@ const unitNormalizationQaReport = buildUnitNormalizationQaReport([
     price: product.priceMedian
   }))
 ]);
+const retailerFreshnessBanners = buildRetailerFreshnessBanners(sourceCoverage);
 
 export function generateMetadata() {
   return routeMetadata('/data-sources');
@@ -59,6 +60,8 @@ export default function DataSourcesPage() {
         <Metric label="Source groups" value={sourceCoverage.length.toLocaleString('sv-SE')} />
         <Metric label="Brand ledgers" value={storeBrandLedger.length.toLocaleString('sv-SE')} />
       </div>
+
+      <DataFreshnessBanner rows={retailerFreshnessBanners} />
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50/70">
         <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
