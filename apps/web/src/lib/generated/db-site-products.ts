@@ -2,5 +2,5 @@
 // Production deploys overwrite this module from postgres.latest_prices/observations before Next builds.
 import type { AxfoodProduct } from '../axfood-products';
 
-export const dbSiteSnapshotGeneratedAt = null;
+export const dbSiteSnapshotGeneratedAt: string | null = null;
 export const dbSiteAxfoodProducts: AxfoodProduct[] = [];

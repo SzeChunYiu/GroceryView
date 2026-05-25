@@ -5,6 +5,7 @@ export type ProductRecord = {
   category?: string | null
   size?: string | null
   upc?: string | null
+  sourceLabels?: string[] | null
 }
 
 export type DuplicateCandidate = {
@@ -13,6 +14,7 @@ export type DuplicateCandidate = {
   match: ProductRecord
   confidence: number
   signals: string[]
+  sourceOverlap: string[]
   preview: ProductRecord
 }
 
@@ -53,9 +55,20 @@ function sameText(left?: string | null, right?: string | null) {
   return Boolean(normalizedLeft && normalizedLeft === normalizedRight)
 }
 
+function normalizedSourceLabels(product: ProductRecord) {
+  return [...new Set((product.sourceLabels ?? []).map((source) => source.trim()).filter(Boolean))]
+}
+
+function sourceOverlapFor(left: ProductRecord, right: ProductRecord) {
+  const rightSources = new Set(normalizedSourceLabels(right).map((source) => source.toLowerCase()))
+
+  return normalizedSourceLabels(left).filter((source) => rightSources.has(source.toLowerCase()))
+}
+
 function confidenceFor(left: ProductRecord, right: ProductRecord) {
   const signals: string[] = []
   let score = tokenSimilarity(left.name, right.name) * 0.45
+  const sourceOverlap = sourceOverlapFor(left, right)
 
   if (sameText(left.brand, right.brand)) {
     score += 0.2
@@ -77,6 +90,11 @@ function confidenceFor(left: ProductRecord, right: ProductRecord) {
     signals.push("same UPC")
   }
 
+  if (sourceOverlap.length > 0) {
+    score += 0.1
+    signals.push("source overlap")
+  }
+
   const nameScore = tokenSimilarity(left.name, right.name)
   if (nameScore >= 0.75) {
     signals.push("very similar names")
@@ -87,6 +105,7 @@ function confidenceFor(left: ProductRecord, right: ProductRecord) {
   return {
     confidence: Math.min(1, Number(score.toFixed(2))),
     signals,
+    sourceOverlap,
   }
 }
 
@@ -117,6 +136,7 @@ export function findDuplicateProducts(products: ProductRecord[], threshold = 0.5
           match,
           confidence: result.confidence,
           signals: result.signals,
+          sourceOverlap: result.sourceOverlap,
           preview: mergeProductRecords(source, match),
         })
       }

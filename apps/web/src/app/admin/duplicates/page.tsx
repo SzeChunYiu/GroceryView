@@ -2,13 +2,15 @@
 
 import { useMemo, useState } from "react"
 
+import { axfoodProducts, type AxfoodProduct } from "../../../lib/axfood-products"
 import {
   findDuplicateProducts,
   type DuplicateCandidate,
   type ProductRecord,
 } from "../../../lib/deduplicate-products"
+import { dbSiteSnapshotGeneratedAt } from "../../../lib/generated/db-site-products"
 
-const products: ProductRecord[] = [
+const reviewSeedProducts: ProductRecord[] = [
   {
     id: "p-1001",
     name: "Organic Whole Milk 1 gal",
@@ -16,6 +18,7 @@ const products: ProductRecord[] = [
     category: "Dairy",
     size: "1 gal",
     upc: "000111222333",
+    sourceLabels: ["catalog import", "receipt OCR"],
   },
   {
     id: "p-1002",
@@ -24,6 +27,7 @@ const products: ProductRecord[] = [
     category: "Dairy",
     size: "1 gal",
     upc: "000111222333",
+    sourceLabels: ["catalog import", "online shelf"],
   },
   {
     id: "p-2030",
@@ -31,6 +35,7 @@ const products: ProductRecord[] = [
     brand: "Morning Mill",
     category: "Breakfast",
     size: "12 oz",
+    sourceLabels: ["open prices"],
   },
   {
     id: "p-2031",
@@ -38,6 +43,7 @@ const products: ProductRecord[] = [
     brand: "Morning Mill",
     category: "Breakfast",
     size: "12 oz",
+    sourceLabels: ["open prices", "online shelf"],
   },
   {
     id: "p-4100",
@@ -45,8 +51,26 @@ const products: ProductRecord[] = [
     brand: "Clear Spring",
     category: "Beverages",
     size: "8 pack",
+    sourceLabels: ["catalog import"],
   },
 ]
+
+const catalogReviewProducts = axfoodProducts.slice(0, 120).map(toProductRecord)
+const products = [...reviewSeedProducts, ...catalogReviewProducts]
+const sourceLabel = dbSiteSnapshotGeneratedAt
+  ? `DB site snapshot generated ${dbSiteSnapshotGeneratedAt}`
+  : "Static Axfood fallback plus admin review seeds"
+
+function toProductRecord(product: AxfoodProduct): ProductRecord {
+  return {
+    id: product.code || product.slug,
+    name: product.name,
+    brand: product.brand,
+    category: product.category,
+    size: product.subline,
+    sourceLabels: product.inChains.length > 0 ? product.inChains.map((chain) => `Axfood ${chain}`) : ["Axfood"],
+  }
+}
 
 function confidenceLabel(confidence: number) {
   if (confidence >= 0.85) {
@@ -81,6 +105,10 @@ function ProductSummary({ product }: { product: ProductRecord }) {
         <div>
           <dt className="font-medium text-slate-500">UPC</dt>
           <dd>{product.upc || "—"}</dd>
+        </div>
+        <div className="col-span-2">
+          <dt className="font-medium text-slate-500">Sources</dt>
+          <dd>{product.sourceLabels?.length ? product.sourceLabels.join(" · ") : "—"}</dd>
         </div>
       </dl>
     </div>
@@ -123,6 +151,10 @@ function CandidateCard({
           Keep <span className="font-medium text-slate-900">{candidate.preview.name}</span> as the catalog record
           and preserve the strongest brand, size, category, and UPC values.
         </p>
+        <div className="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-700">
+          <span className="font-semibold text-slate-900">Source overlap:</span>{" "}
+          {candidate.sourceOverlap.length > 0 ? candidate.sourceOverlap.join(" · ") : "No shared source label"}
+        </div>
       </div>
 
       <div className="mt-5 flex flex-wrap gap-3">
@@ -170,6 +202,7 @@ export default function DuplicateReviewPage() {
             Review likely duplicate products, compare the confidence signals, and merge matching records into a
             cleaner catalog entry.
           </p>
+          <p className="mt-2 text-sm text-slate-400">{sourceLabel}</p>
           <div className="mt-6 grid gap-3 sm:grid-cols-3">
             <div className="rounded-xl bg-white/10 p-4">
               <div className="text-2xl font-bold">{candidates.length}</div>
