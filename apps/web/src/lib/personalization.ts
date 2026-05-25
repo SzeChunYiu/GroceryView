@@ -462,6 +462,11 @@ export type PersonalizedTrendingDeal<T> = T & {
   personalizationReason: string;
 };
 
+export type PersonalizedPriceDropInput = PersonalizedTrendingDealInput & {
+  dropAmount?: number;
+  dropPercent?: number;
+};
+
 export function rankTrendingDealsForHousehold<T extends PersonalizedTrendingDealInput>(
   deals: readonly T[],
   options: {
@@ -505,6 +510,25 @@ export function rankTrendingDealsForHousehold<T extends PersonalizedTrendingDeal
     })
     .sort((left, right) => right.personalizationScore - left.personalizationScore || left.rank - right.rank)
     .map((deal, index) => ({ ...deal, rank: index + 1 }));
+}
+
+export function rankPersonalizedPriceDrops<T extends PersonalizedPriceDropInput>(
+  drops: readonly T[],
+  options: {
+    householdId?: string;
+    favoriteBrands?: readonly string[];
+    dietaryFilters?: readonly string[];
+    nearbyChains?: readonly string[];
+    clickedProductSlugs?: readonly string[];
+  } = {},
+) {
+  return rankTrendingDealsForHousehold(drops, options)
+    .map((drop) => ({
+      ...drop,
+      personalizationScore: drop.personalizationScore + Math.round((drop.dropPercent ?? 0) * 100) + Math.round(drop.dropAmount ?? 0),
+    }))
+    .sort((left, right) => right.personalizationScore - left.personalizationScore || left.rank - right.rank)
+    .map((drop, index) => ({ ...drop, rank: index + 1 }));
 }
 
 export type BrandTolerance = 'favorite' | 'acceptable' | 'excluded';
