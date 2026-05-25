@@ -150,6 +150,7 @@ export * from './connectors/mathem.js';
 export * from './connectors/matpriskollen.js';
 export * from './connectors/matspar.js';
 export * from './connectors/meny-no.js';
+export * from './connectors/musti-se.js';
 export {
   LIDL_PLUS_COUPONS_URL,
   fetchLidlPlusCoupons,
