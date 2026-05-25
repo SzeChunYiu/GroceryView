@@ -1,6 +1,7 @@
 import { Card, Eyebrow, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { ActivityStream } from '@/components/activity-stream';
 import { HouseholdPlanActions } from '@/components/household-plan-actions';
+import { ListCard } from '@/components/list-card';
 import { buildSharedListActivityEvent } from '@/lib/activity-log';
 import { DEFAULT_HOUSEHOLD_PRICE_PREFERENCES, HOUSEHOLD_PRICE_PREFERENCE_STORAGE_KEY, sortByHouseholdPricePreferences } from '@/lib/user-preferences';
 import { formatPct, formatSek, shareableHouseholdListContract, sourceCoverage, topChainSpreads } from '@/lib/verified-data';
@@ -77,7 +78,23 @@ const householdActivityTimeline = [
     itemName: topChainSpreads[1]?.name ?? 'Bread',
     actor: { id: 'shopper-preview', name: 'Store shopper' },
     timestamp: '2026-05-20T17:45:00.000Z',
-    detail: 'Marked complete in store so the household sees the latest state.'
+    detail: 'Checked in store so the household sees the latest state.'
+  }),
+  buildSharedListActivityEvent('price_alert_changed', {
+    listId: 'static-household-preview',
+    itemId: topChainSpreads[1]?.slug ?? 'bread-preview',
+    itemName: topChainSpreads[1]?.name ?? 'Bread',
+    actor: { id: 'member-preview', name: 'Household member' },
+    timestamp: '2026-05-20T17:55:00.000Z',
+    detail: 'Lowered the price alert threshold after comparing the verified unit price.'
+  }),
+  buildSharedListActivityEvent('item_completed', {
+    listId: 'static-household-preview',
+    itemId: topChainSpreads[1]?.slug ?? 'bread-preview',
+    itemName: topChainSpreads[1]?.name ?? 'Bread',
+    actor: { id: 'shopper-preview', name: 'Store shopper' },
+    timestamp: '2026-05-20T18:00:00.000Z',
+    detail: 'Marked completed after adding it to the cart.'
   }),
   buildSharedListActivityEvent('item_removed', {
     listId: 'static-household-preview',
@@ -87,6 +104,37 @@ const householdActivityTimeline = [
     timestamp: '2026-05-20T18:05:00.000Z',
     detail: 'Removed after a collaborator found a duplicate list item.'
   })
+];
+
+const householdListCommentPreview = [
+  {
+    id: 'milk-preview',
+    name: topChainSpreads[0]?.name ?? 'Milk',
+    quantity: '2 st',
+    ownerRole: 'guardian' as const,
+    comments: [
+      {
+        id: 'milk-preview-comment-1',
+        body: 'Choose the longer expiry date if prices match.',
+        role: 'partner' as const,
+        createdAt: '2026-05-20T11:10:00.000Z'
+      }
+    ]
+  },
+  {
+    id: 'bread-preview',
+    name: topChainSpreads[1]?.name ?? 'Bread',
+    quantity: '1 loaf',
+    ownerRole: 'teen' as const,
+    comments: [
+      {
+        id: 'bread-preview-comment-1',
+        body: 'Rye is fine as a substitution.',
+        role: 'guardian' as const,
+        createdAt: '2026-05-20T12:35:00.000Z'
+      }
+    ]
+  }
 ];
 
 export default function FeaturePage() {
@@ -101,6 +149,10 @@ export default function FeaturePage() {
 
       <div className="mt-6">
         <ActivityStream initialEvents={householdActivityTimeline} listId="static-household-preview" />
+      </div>
+
+      <div className="mt-6">
+        <ListCard currentRole="partner" items={householdListCommentPreview} />
       </div>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">

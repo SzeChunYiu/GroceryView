@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { dealBasedMeals, familyMealPlannerFromDeals, freezerBatchCookPlanner, studentDealRecipes } from '@/lib/demo-data';
+import { RecipeImporter } from '@/components/recipe-importer';
+import { dealBasedMealInputs, dealBasedMeals, familyMealPlannerFromDeals, freezerBatchCookPlanner, products, studentDealRecipes } from '@/lib/demo-data';
 import { extractIngredientsFromMealPlans, suggestBudgetAlternativesFromMealPlans } from '@/lib/meal-budgets';
 import { dietarySubstitutionAssistantContract } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
@@ -72,6 +73,14 @@ const COPY = {
   },
 } as const;
 
+type MealPlannerSearchParams = {
+  ingredient?: string | string[];
+};
+
+type MealWithIngredients = {
+  ingredients: Array<{ productId: string; name: string } | null | undefined>;
+};
+
 export function generateMetadata() {
   return routeMetadata('/meal-planner');
 }
@@ -84,7 +93,42 @@ function confidenceLevel(value: string): 'high' | 'medium' | 'low' {
   return value === 'high' || value === 'medium' || value === 'low' ? value : 'low';
 }
 
-export default function MealPlannerPage() {
+function firstSearchValue(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] ?? '' : value ?? '';
+}
+
+function mealUsesIngredient(meal: MealWithIngredients, productId: string) {
+  return productId.length > 0 && meal.ingredients.some((ingredient) => ingredient?.productId === productId);
+}
+
+function mealCardClass(meal: MealWithIngredients, productId: string, defaultClasses: string) {
+  return mealUsesIngredient(meal, productId)
+    ? `${defaultClasses} border-amber-400 bg-amber-50 shadow-sm`
+    : defaultClasses;
+}
+
+const recipeProductCandidates = [
+  ...dealBasedMealInputs.map((product) => ({
+    productId: product.productId,
+    name: product.name,
+    price: product.price,
+    source: product.source
+  })),
+  ...products.map((product) => ({
+    productId: product.slug,
+    name: product.name,
+    price: product.price,
+    unitPrice: product.unitPrice,
+    store: product.store,
+    source: product.source
+  }))
+];
+
+export default async function MealPlannerPage({
+  searchParams
+}: Readonly<{ searchParams?: Promise<MealPlannerSearchParams> }>) {
+  const resolvedSearchParams = await Promise.resolve(searchParams ?? {});
+  const selectedIngredientId = firstSearchValue(resolvedSearchParams.ingredient).trim();
   const dealMealConfidenceLevel = confidenceLevel(dealBasedMeals.coverage.confidence);
   const mealBudgetPlans = [
     ...dealBasedMeals.suggestions,
@@ -94,6 +138,10 @@ export default function MealPlannerPage() {
   ];
   const extractedMealIngredients = extractIngredientsFromMealPlans(mealBudgetPlans);
   const budgetAlternatives = suggestBudgetAlternativesFromMealPlans(mealBudgetPlans);
+  const selectedIngredient = dealBasedMealInputs.find((ingredient) => ingredient.productId === selectedIngredientId);
+  const selectedIngredientMatchCount = selectedIngredientId.length > 0
+    ? mealBudgetPlans.filter((meal) => mealUsesIngredient(meal, selectedIngredientId)).length
+    : 0;
 
   if (dealBasedMeals.suggestions.length === 0) {
     return (
@@ -137,15 +185,45 @@ export default function MealPlannerPage() {
         </Card>
       </div>
 
+      <RecipeImporter candidates={recipeProductCandidates} />
+
+      {selectedIngredientId.length > 0 ? (
+        <Card className="mt-6 border-amber-200 bg-amber-50">
+          <div data-use-soon-meal-filter>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-800">Use-soon pantry match</p>
+            {selectedIngredient ? (
+              <>
+                <h2 className="mt-2 text-2xl font-black text-slate-950">Recipes using {selectedIngredient.name}</h2>
+                <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+                  Pantry reminder links highlight {selectedIngredientMatchCount} deal-backed recipe view{selectedIngredientMatchCount === 1 ? '' : 's'} that consume this expiring item before suggesting replacement shopping.
+                </p>
+              </>
+            ) : (
+              <>
+                <h2 className="mt-2 text-2xl font-black text-slate-950">No matching deal recipe yet</h2>
+                <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+                  The selected pantry item is not in the visible meal-deal fixtures, so the planner keeps the route filtered without inventing unavailable recipe evidence.
+                </p>
+              </>
+            )}
+          </div>
+        </Card>
+      ) : null}
+
       <Card className="mt-6">
         <h2 className="text-2xl font-black">{COPY.suggestedMeals.title}</h2>
         <div className="mt-4 space-y-4">
           {dealBasedMeals.suggestions.map((meal) => (
-            <div className="rounded-3xl border border-slate-200 p-5" key={meal.title}>
+            <div
+              className={mealCardClass(meal, selectedIngredientId, 'rounded-3xl border border-slate-200 p-5')}
+              data-use-soon-meal-match={mealUsesIngredient(meal, selectedIngredientId) ? selectedIngredientId : undefined}
+              key={meal.title}
+            >
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <p className="text-2xl font-black text-slate-950">{meal.title}</p>
                   <p className="mt-1 text-sm font-semibold text-slate-700">{meal.reason}</p>
+                  {mealUsesIngredient(meal, selectedIngredientId) ? <p className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-amber-800">Uses use-soon pantry item</p> : null}
                 </div>
                 <div className="text-right">
                   <p className="text-3xl font-black text-emerald-800">{formatSek(meal.estimatedCost)}</p>
@@ -192,11 +270,16 @@ export default function MealPlannerPage() {
         <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">{COPY.student.description}</p>
         <div className="mt-4 grid gap-4 lg:grid-cols-2">
           {studentDealRecipes.recipes.map((recipe) => (
-            <div className="rounded-3xl border border-emerald-200 bg-white p-5" key={recipe.title}>
+            <div
+              className={mealCardClass(recipe, selectedIngredientId, 'rounded-3xl border border-emerald-200 bg-white p-5')}
+              data-use-soon-meal-match={mealUsesIngredient(recipe, selectedIngredientId) ? selectedIngredientId : undefined}
+              key={recipe.title}
+            >
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <p className="text-2xl font-black text-slate-950">{recipe.title}</p>
                   <p className="mt-1 text-sm font-semibold text-slate-700">{recipe.reason}</p>
+                  {mealUsesIngredient(recipe, selectedIngredientId) ? <p className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-amber-800">Uses use-soon pantry item</p> : null}
                 </div>
                 <div className="text-right">
                   <p className="text-3xl font-black text-emerald-800">{formatSek(recipe.estimatedCost)}</p>
@@ -227,12 +310,17 @@ export default function MealPlannerPage() {
         <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">{COPY.family.description}</p>
         <div className="mt-4 space-y-4">
           {familyMealPlannerFromDeals.meals.map((meal) => (
-            <div className="rounded-3xl border border-blue-200 bg-white p-5" key={meal.weeknightSlot}>
+            <div
+              className={mealCardClass(meal, selectedIngredientId, 'rounded-3xl border border-blue-200 bg-white p-5')}
+              data-use-soon-meal-match={mealUsesIngredient(meal, selectedIngredientId) ? selectedIngredientId : undefined}
+              key={meal.weeknightSlot}
+            >
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <p className="text-sm font-black uppercase tracking-[0.16em] text-blue-800">{meal.weeknightSlot}</p>
                   <p className="mt-1 text-2xl font-black text-slate-950">{meal.title}</p>
                   <p className="mt-1 text-sm font-semibold text-slate-700">{meal.reason}</p>
+                  {mealUsesIngredient(meal, selectedIngredientId) ? <p className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-amber-800">Uses use-soon pantry item</p> : null}
                 </div>
                 <div className="text-right">
                   <p className="text-3xl font-black text-blue-800">{formatSek(meal.estimatedCost)}</p>
@@ -260,11 +348,16 @@ export default function MealPlannerPage() {
         <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">{COPY.freezer.description}</p>
         <div className="mt-4 space-y-4">
           {freezerBatchCookPlanner.meals.map((meal) => (
-            <div className="rounded-3xl border border-cyan-200 bg-white p-5" key={meal.title}>
+            <div
+              className={mealCardClass(meal, selectedIngredientId, 'rounded-3xl border border-cyan-200 bg-white p-5')}
+              data-use-soon-meal-match={mealUsesIngredient(meal, selectedIngredientId) ? selectedIngredientId : undefined}
+              key={meal.title}
+            >
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <p className="text-2xl font-black text-slate-950">{meal.title}</p>
                   <p className="mt-1 text-sm font-semibold text-slate-700">{meal.reason}</p>
+                  {mealUsesIngredient(meal, selectedIngredientId) ? <p className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-amber-800">Uses use-soon pantry item</p> : null}
                 </div>
                 <div className="text-right">
                   <p className="text-3xl font-black text-cyan-800">{formatSek(meal.estimatedCost)}</p>

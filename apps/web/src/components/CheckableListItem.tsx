@@ -9,9 +9,36 @@ type CheckableListItemProps = {
   onToggle: (itemId: string) => void;
 };
 
+type RouteHint = {
+  aisleLabel: string;
+  department: string;
+};
+
+const routeHintsByItemId: Record<string, RouteHint> = {
+  'coffee-weekly-top-up': { department: 'Pantry', aisleLabel: 'Aisle 6' },
+  'oats-breakfast-staple': { department: 'Breakfast', aisleLabel: 'Aisle 2' },
+  'milk-dairy-run': { department: 'Dairy', aisleLabel: 'Aisle 4 cold case' },
+  'frozen-vegetables': { department: 'Frozen', aisleLabel: 'Freezer wall' },
+  'fresh-fruit': { department: 'Produce', aisleLabel: 'Entrance produce bay' }
+};
+
+function routeHintForItem(item: ShoppingListItem): RouteHint {
+  const storedHint = routeHintsByItemId[item.id];
+  if (storedHint) return storedHint;
+
+  const routeText = `${item.name} ${item.detail}`.toLowerCase();
+  if (routeText.includes('dairy') || routeText.includes('milk')) return { department: 'Dairy', aisleLabel: 'Aisle 4 cold case' };
+  if (routeText.includes('frozen')) return { department: 'Frozen', aisleLabel: 'Freezer wall' };
+  if (routeText.includes('fruit') || routeText.includes('produce')) return { department: 'Produce', aisleLabel: 'Entrance produce bay' };
+  if (routeText.includes('breakfast') || routeText.includes('oats')) return { department: 'Breakfast', aisleLabel: 'Aisle 2' };
+
+  return { department: 'Pantry', aisleLabel: 'Aisle 6' };
+}
+
 export function CheckableListItem({ item, onToggle }: Readonly<CheckableListItemProps>) {
   const { selection } = useHaptic();
   const cheapestSource = cheapestSourceForProductSlug(item.matchedProductSlug);
+  const routeHint = routeHintForItem(item);
 
   function toggleItem() {
     if (!item.checked) selection();
@@ -45,6 +72,9 @@ export function CheckableListItem({ item, onToggle }: Readonly<CheckableListItem
             }`}
           >
             {item.quantity} · {item.detail}
+          </span>
+          <span className="mt-2 inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-950">
+            Route stop: {routeHint.aisleLabel} · {routeHint.department}
           </span>
         </span>
       </label>

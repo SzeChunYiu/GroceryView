@@ -53,6 +53,27 @@ export type SeasonalDealInput = {
   storeName?: string;
 };
 
+export type ExpiringPromotionInput = {
+  currentPrice: number;
+  expiresAt: string;
+  id: string;
+  markdownPercent: number;
+  originalPrice: number;
+  productId: string;
+  productName: string;
+  reportedAt: string;
+  storeName: string;
+  verificationCount?: number;
+};
+
+export type ExpiringPromotionRailItem = ExpiringPromotionInput & {
+  currentPriceLabel: string;
+  evidenceLabel: string;
+  hoursRemaining: number;
+  originalPriceLabel: string;
+  urgencyLabel: string;
+};
+
 export type SeasonalProduceDiscoveryCard = {
   slug: string;
   productName: string;
@@ -71,6 +92,51 @@ export type SeasonalProduceDiscoveryCard = {
     priceLabel?: string;
     evidenceLabel?: string;
   }>;
+};
+
+export type BasketChainPrice = {
+  chain: string;
+  price: number;
+};
+
+export type BasketStackItem = {
+  id: string;
+  name?: string;
+  chainPrices?: BasketChainPrice[];
+};
+
+export type BasketStackOffer = {
+  id?: string;
+  productId: string;
+  chain: string;
+  type: 'coupon' | 'loyalty' | 'promotion';
+  amount: number;
+  label?: string;
+  combinable?: boolean;
+  isActive?: boolean;
+  isClipped?: boolean;
+  requiresAction?: boolean;
+  requiresMembership?: boolean;
+  membershipEligible?: boolean;
+};
+
+export type BasketItemStack = {
+  itemId: string;
+  itemName?: string;
+  basePrice: number;
+  finalPrice: number;
+  savings: number;
+  appliedOffers: BasketStackOffer[];
+};
+
+export type BasketChainStack = {
+  chain: string;
+  subtotal: number;
+  total: number;
+  savings: number;
+  totalLabel: string;
+  savingsLabel: string;
+  items: BasketItemStack[];
 };
 
 const dayInMs = 24 * 60 * 60 * 1000;
@@ -113,7 +179,8 @@ export function buildDealContext({
 
 function peakMonthsFor(row: SeasonalProduceInput) {
   if (typeof row.bestBuyMonthIndex !== 'number') return [row.bestBuyMonth];
-  return [-1, 0, 1].map((offset) => seasonalMonthLabels[(row.bestBuyMonthIndex + offset + 12) % 12]!);
+  const idx = row.bestBuyMonthIndex;
+  return [-1, 0, 1].map((offset) => seasonalMonthLabels[(idx + offset + 12) % 12]!);
 }
 
 function typicalPriceRangeLabel(row: SeasonalProduceInput) {
@@ -150,6 +217,49 @@ function isLinkedSeasonalDeal(row: SeasonalProduceInput, deal: SeasonalDealInput
   return [...rowTokens].some((token) => dealTokens.has(token));
 }
 
+export function buildExpiringPromotionRail({
+  basketProductIds,
+  limit = 4,
+  promotions,
+  windowHours = 36,
+  now = new Date()
+}: {
+  basketProductIds: readonly string[];
+  limit?: number;
+  now?: Date;
+  promotions: ExpiringPromotionInput[];
+  windowHours?: number;
+}): ExpiringPromotionRailItem[] {
+  const basketIds = new Set(basketProductIds);
+  const windowMs = windowHours * 60 * 60 * 1000;
+  const nowMs = now.getTime();
+
+  return promotions
+    .map((promotion) => {
+      const expiresMs = Date.parse(promotion.expiresAt);
+      return { expiresMs, promotion };
+    })
+    .filter(({ expiresMs, promotion }) => (
+      basketIds.has(promotion.productId)
+      && Number.isFinite(expiresMs)
+      && expiresMs > nowMs
+      && expiresMs - nowMs <= windowMs
+    ))
+    .sort((left, right) => left.expiresMs - right.expiresMs || right.promotion.markdownPercent - left.promotion.markdownPercent)
+    .slice(0, limit)
+    .map(({ expiresMs, promotion }) => {
+      const hoursRemaining = Math.max(1, Math.ceil((expiresMs - nowMs) / (60 * 60 * 1000)));
+      return {
+        ...promotion,
+        currentPriceLabel: formatPrice(promotion.currentPrice, 'sv-SE', 'SEK'),
+        evidenceLabel: `${promotion.verificationCount ?? 0} community checks · reported ${promotion.reportedAt.slice(0, 10)}`,
+        hoursRemaining,
+        originalPriceLabel: formatPrice(promotion.originalPrice, 'sv-SE', 'SEK'),
+        urgencyLabel: hoursRemaining <= 12 ? 'expires today' : `expires in ${hoursRemaining}h`
+      };
+    });
+}
+
 export function buildSeasonalProduceDiscoveryCards({
   deals,
   limit = 6,
@@ -181,4 +291,76 @@ export function buildSeasonalProduceDiscoveryCards({
         evidenceLabel: deal.evidenceLabel
       }))
   }));
+}
+
+function isValidStackOffer(offer: BasketStackOffer) {
+  if (offer.isActive === false) return false;
+  if (offer.requiresAction && !offer.isClipped) return false;
+  if (offer.requiresMembership && !offer.membershipEligible) return false;
+  return offer.amount > 0;
+}
+
+function bestItemStack(item: BasketStackItem, chainPrice: BasketChainPrice, offers: BasketStackOffer[]): BasketItemStack {
+  const matchingOffers = offers.filter(
+    (offer) => offer.productId === item.id && offer.chain === chainPrice.chain && isValidStackOffer(offer)
+  );
+  const combinableOffers = matchingOffers.filter((offer) => offer.combinable !== false);
+  const exclusiveOffers = matchingOffers.filter((offer) => offer.combinable === false);
+  const stackCandidates = [
+    combinableOffers,
+    ...exclusiveOffers.map((offer) => [offer])
+  ];
+
+  const bestOffers = stackCandidates.reduce<BasketStackOffer[]>((best, candidate) => {
+    const bestSavings = best.reduce((sum, offer) => sum + offer.amount, 0);
+    const candidateSavings = candidate.reduce((sum, offer) => sum + offer.amount, 0);
+    return candidateSavings > bestSavings ? candidate : best;
+  }, []);
+  const savings = Math.min(chainPrice.price, bestOffers.reduce((sum, offer) => sum + offer.amount, 0));
+
+  return {
+    itemId: item.id,
+    itemName: item.name,
+    basePrice: chainPrice.price,
+    finalPrice: Math.max(0, chainPrice.price - savings),
+    savings,
+    appliedOffers: bestOffers
+  };
+}
+
+export function buildBasketCouponStackOptimizer({
+  currency = 'SEK',
+  items,
+  locale = 'sv-SE',
+  offers = []
+}: {
+  currency?: string;
+  items: BasketStackItem[];
+  locale?: string;
+  offers?: BasketStackOffer[];
+}): BasketChainStack[] {
+  const chains = [...new Set(items.flatMap((item) => item.chainPrices?.map((price) => price.chain) ?? []))];
+
+  return chains
+    .map((chain) => {
+      const stackedItems = items.flatMap((item) => {
+        const chainPrice = item.chainPrices?.find((price) => price.chain === chain);
+        return chainPrice ? [bestItemStack(item, chainPrice, offers)] : [];
+      });
+      const subtotal = stackedItems.reduce((sum, item) => sum + item.basePrice, 0);
+      const total = stackedItems.reduce((sum, item) => sum + item.finalPrice, 0);
+      const savings = subtotal - total;
+
+      return {
+        chain,
+        subtotal,
+        total,
+        savings,
+        totalLabel: formatPrice(total, locale, currency),
+        savingsLabel: formatPrice(savings, locale, currency),
+        items: stackedItems
+      };
+    })
+    .filter((stack) => stack.items.length === items.length)
+    .sort((a, b) => a.total - b.total || b.savings - a.savings || a.chain.localeCompare(b.chain));
 }

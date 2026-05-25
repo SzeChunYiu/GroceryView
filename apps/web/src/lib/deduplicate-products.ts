@@ -1,3 +1,5 @@
+import { parsePackageSize } from "./unit-normalizer"
+
 export type ProductRecord = {
   id: string
   name: string
@@ -14,6 +16,13 @@ export type DuplicateCandidate = {
   confidence: number
   signals: string[]
   preview: ProductRecord
+}
+
+export type DuplicateReviewAction = "merge" | "ignore" | "confidence"
+
+export type DuplicateReviewRow = DuplicateCandidate & {
+  confidenceLabel: "High" | "Medium" | "Needs review"
+  recommendedAction: DuplicateReviewAction
 }
 
 const stopWords = new Set(["and", "the", "a", "an", "of", "for"])
@@ -124,4 +133,83 @@ export function findDuplicateProducts(products: ProductRecord[], threshold = 0.5
   }
 
   return candidates.sort((left, right) => right.confidence - left.confidence)
+}
+
+export function getDuplicateReviewAction(candidate: DuplicateCandidate): DuplicateReviewAction {
+  if (candidate.confidence >= 0.85) {
+    return "merge"
+  }
+
+  if (candidate.confidence < 0.65) {
+    return "ignore"
+  }
+
+  return "confidence"
+}
+
+export function buildDuplicateReviewRows(products: ProductRecord[], threshold = 0.55): DuplicateReviewRow[] {
+  return findDuplicateProducts(products, threshold).map((candidate) => ({
+    ...candidate,
+    confidenceLabel:
+      candidate.confidence >= 0.85
+        ? "High"
+        : candidate.confidence >= 0.7
+          ? "Medium"
+          : "Needs review",
+    recommendedAction: getDuplicateReviewAction(candidate),
+  }))
+}
+
+export type SubstitutionSavingsProduct = ProductRecord & {
+  price: number
+}
+
+export type SubstitutionSavingsSuggestion = {
+  product: SubstitutionSavingsProduct
+  unitPrice: number
+  savings: number
+  savingsPercent: number
+  normalizedSizeLabel: string
+  reason: string
+}
+
+function normalizedUnitPriceFor(product: SubstitutionSavingsProduct) {
+  const parsedSize = parsePackageSize(product.size)
+  if (!parsedSize || parsedSize.quantity <= 0 || !Number.isFinite(product.price)) return null
+
+  return {
+    unitPrice: product.price / parsedSize.quantity,
+    normalizedSizeLabel: parsedSize.label,
+    unit: parsedSize.unit,
+  }
+}
+
+export function findSubstitutionSavings(
+  target: SubstitutionSavingsProduct,
+  products: SubstitutionSavingsProduct[],
+): SubstitutionSavingsSuggestion[] {
+  const targetUnitPrice = normalizedUnitPriceFor(target)
+  if (!target.category || !targetUnitPrice) return []
+
+  return products
+    .filter((product) => product.id !== target.id && sameText(product.category, target.category))
+    .map((product) => {
+      const candidateUnitPrice = normalizedUnitPriceFor(product)
+      if (!candidateUnitPrice || candidateUnitPrice.unit !== targetUnitPrice.unit) return null
+
+      const savings = targetUnitPrice.unitPrice - candidateUnitPrice.unitPrice
+      if (savings <= 0) return null
+
+      return {
+        product,
+        unitPrice: Number(candidateUnitPrice.unitPrice.toFixed(2)),
+        savings: Number(savings.toFixed(2)),
+        savingsPercent: Number(((savings / targetUnitPrice.unitPrice) * 100).toFixed(0)),
+        normalizedSizeLabel: candidateUnitPrice.normalizedSizeLabel,
+        reason: `Same ${target.category} category, normalized to ${candidateUnitPrice.normalizedSizeLabel}`,
+      }
+    })
+    .filter((suggestion): suggestion is SubstitutionSavingsSuggestion => Boolean(suggestion))
+    .sort((left, right) => right.savings - left.savings)
+    .slice(0, 3)
 }

@@ -1,7 +1,9 @@
 import { buildPrivacyExport } from '@groceryview/core';
 import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { SettingsDataExportActions } from '@/components/settings-data-export-actions';
+import { DietaryProfileOnboarding } from '@/components/diet-filter-picker';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { groupPreferredBrandControls } from '@/lib/personalization';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -29,6 +31,8 @@ const dataExportContract = buildPrivacyExport(
 );
 
 export default function SettingsPage() {
+  const brandControls = groupPreferredBrandControls();
+
   return (
     <PageShell>
       <Eyebrow>Account settings</Eyebrow>
@@ -38,6 +42,43 @@ export default function SettingsPage() {
       </p>
 
       <SettingsDataExportActions />
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Personalization setup</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Dietary profile for onboarding and settings edits</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+          Save allergies, diets, and avoided ingredients before recommendations are trusted. The same durable profile can be updated later from settings.
+        </p>
+        <DietaryProfileOnboarding className="mt-4" />
+      </Card>
+
+      <Card className="mt-6 border-cyan-200 bg-cyan-50">
+        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-cyan-800">Brand substitution controls</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Favorite, acceptable, and excluded brands</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+              Savings recommendations can rank favorite brands first, keep acceptable brands as fallback substitutions, and suppress excluded brands from automatic swaps.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-cyan-900">{brandControls.favorite.length} favorites</p>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          {Object.entries(brandControls).map(([tolerance, controls]) => (
+            <div className="rounded-2xl border border-cyan-100 bg-white/85 p-4" key={tolerance}>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-cyan-700">{tolerance}</p>
+              <ul className="mt-3 space-y-3">
+                {controls.map((control) => (
+                  <li className="text-sm font-semibold leading-5 text-slate-700" key={control.brand}>
+                    <span className="block font-black text-slate-950">{control.brand}</span>
+                    {control.note}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </Card>
 
       <Card className="mt-6 border-sky-200 bg-sky-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-800">Cold-start personalization</p>

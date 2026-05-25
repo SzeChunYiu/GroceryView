@@ -5,6 +5,8 @@ import {
   applyCommunityReviewVote,
   communityReviewTrustScore,
   defaultCommunityPriceReviews,
+  moderationStatusLabel,
+  reportCommunityPriceReview,
   sortCommunityReviewsByTrust,
   type CommunityPriceReview,
   type CommunityReviewVote
@@ -14,7 +16,7 @@ import { COMMUNITY_REVIEW_PROMPT_COPY, COMMUNITY_REVIEW_PROMPTS } from '@/lib/co
 type ReviewStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
 type BrowserSession = { accessToken: string; userId: string };
 type ReviewDecision = 'approve' | 'reject' | 'needs_more_info';
-type Assignment = { id: string; reviewId?: string; subjectType?: 'product_match' | 'community_report' | 'commodity_mapping'; subjectId?: string; priority?: string; reason?: string; assigneeId?: string; dueAt?: string; status?: string };
+type Assignment = { id: string; reviewId?: string; subjectType?: 'product_match' | 'community_report' | 'commodity_mapping' | 'price_report' | 'duplicate_product_report'; subjectId?: string; priority?: string; reason?: string; assigneeId?: string; dueAt?: string; status?: string };
 type AssignmentResponse = { assignments?: Assignment[]; sla?: { status?: string; overdueAssignments?: number; breachedReviewIds?: string[] } };
 
 function readSession(): BrowserSession {
@@ -78,7 +80,7 @@ export function PriceReportReviewActions() {
       return;
     }
     setStatus('ready');
-    setMessage(`${decision} decision accepted with reviewedByHuman: true writeback. needs_more_info leaves assignment status in_progress; community_report approvals map to accept_community_report and rejections map to dismiss_community_report; commodity_mapping approvals map to approve_commodity_mapping and rejections map to reject_commodity_mapping.`);
+    setMessage(`${decision} decision accepted with reviewedByHuman: true writeback. needs_more_info leaves assignment status in_progress; community_report and price_report approvals map to accept_community_report and rejections map to dismiss_community_report; duplicate_product_report decisions route to catalog merge review; commodity_mapping approvals map to approve_commodity_mapping and rejections map to reject_commodity_mapping.`);
   }
 
   async function voteCommunityReview(reviewId: string, vote: CommunityReviewVote) {
@@ -99,12 +101,20 @@ export function PriceReportReviewActions() {
     setMessage(`${vote === 'upvote' ? 'Helpful' : 'Not helpful'} vote saved. Most trusted community price reviews are sorted first.`);
   }
 
+  function reportSuspiciousReview(reviewId: string) {
+    setCommunityReviews((currentReviews) =>
+      reportCommunityPriceReview(currentReviews, reviewId, 'Community flagged suspicious price evidence or review content.')
+    );
+    setStatus('ready');
+    setMessage('Suspicious community price report flagged. Moderation status is visible here and in the unified /admin queue.');
+  }
+
   return (
     <section className="mt-6 rounded-3xl border border-sky-200 bg-white p-5 shadow-sm" aria-label="Price report human review controls">
       <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-800">Signed-in reviewer actions</p>
       <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Community price-report review queue</h2>
       <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
-        These controls use the sessionStorage bearer token to load protected human-review assignments and submit moderator decisions. The public page stays fail-closed; only registered reviewers can approve product matches, community reports, or commodity_mapping tasks.
+        These controls use the sessionStorage bearer token to load protected human-review assignments and submit moderator decisions. The public page stays fail-closed; only registered reviewers can approve product matches, community reports, price reports, duplicate product reports, or commodity_mapping tasks.
       </p>
       <div className="mt-4 flex flex-wrap gap-2">
         <button className="rounded-full bg-sky-800 px-4 py-2 text-sm font-black text-white" onClick={loadAssignments} type="button">Load signed-in review queue</button>
@@ -182,13 +192,22 @@ export function PriceReportReviewActions() {
                   <p className="font-black text-slate-950">{review.productName}</p>
                   <p className="mt-1 font-semibold text-slate-700">{review.priceLabel} · {review.storeName}</p>
                 </div>
-                <p className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-900">Trust {communityReviewTrustScore(review)}</p>
+                <div className="text-right">
+                  <p className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-900">Trust {communityReviewTrustScore(review)}</p>
+                  <p className="mt-2 rounded-full bg-amber-100 px-3 py-1 text-xs font-black text-amber-900">{moderationStatusLabel(review.moderationStatus)}</p>
+                </div>
               </div>
               <p className="mt-3 text-slate-700">{review.body}</p>
+              {review.lastReportReason ? (
+                <p className="mt-2 rounded-xl bg-amber-50 p-3 text-xs font-bold text-amber-950">
+                  Report reason: {review.lastReportReason}
+                </p>
+              ) : null}
               <p className="mt-2 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">{review.reviewerLabel} · {review.upvotes} up · {review.downvotes} down</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 <button className="rounded-full border border-emerald-300 px-3 py-1.5 text-xs font-black text-emerald-900" onClick={() => voteCommunityReview(review.id, 'upvote')} type="button">Helpful</button>
                 <button className="rounded-full border border-slate-300 px-3 py-1.5 text-xs font-black text-slate-700" onClick={() => voteCommunityReview(review.id, 'downvote')} type="button">Not helpful</button>
+                <button className="rounded-full border border-amber-300 px-3 py-1.5 text-xs font-black text-amber-900" onClick={() => reportSuspiciousReview(review.id)} type="button">Report suspicious</button>
               </div>
             </li>
           ))}

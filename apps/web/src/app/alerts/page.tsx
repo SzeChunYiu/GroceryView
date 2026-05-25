@@ -2,7 +2,8 @@ import { AlertManagementPanel, type AlertProductSummary } from '@/components/Ale
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { SavedSearchSubscriptionsPanel } from '@/components/saved-search-subscriptions';
-import type { SavedSearchDealCandidate } from '@/lib/alert-scheduler';
+import { buildAlertExplanationTimeline, type SavedSearchDealCandidate } from '@/lib/alert-scheduler';
+import { FREE_PRICE_ALERT_LIMIT } from '@/app/api/alerts/store';
 import { formatSek, matchedChainProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -20,7 +21,15 @@ const alertProductSummaries: AlertProductSummary[] = matchedChainProducts.slice(
     currentPriceText: formatSek(product.lowestPrice),
     lastObservedAt: lastObservedAt ? new Date(lastObservedAt).toISOString() : undefined,
     lowestChain: product.lowestChain,
-    productHref: `/products/${product.slug}`
+    productHref: `/products/${product.slug}`,
+    explanationTimeline: buildAlertExplanationTimeline({
+      productName: product.name,
+      currentPriceText: formatSek(product.lowestPrice),
+      lowestChain: product.lowestChain,
+      targetPriceText: formatSek(product.lowestPrice),
+      lastObservedAt: lastObservedAt ? new Date(lastObservedAt).toISOString() : undefined,
+      predictionSource: `Prediction inputs withheld unless a forecast alert exists; current explanation uses ${product.inChains.join(' + ')} verified chain rows.`
+    })
   };
 });
 
@@ -43,6 +52,7 @@ export default function AlertsPage() {
       <h1 className="mt-2 text-4xl font-black tracking-tight">Manage active price alerts</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
         Load the alerts tied to your email, compare each target with the current verified lowest chain price when GroceryView has a matching product row, and delete alerts you no longer need.
+        No synthetic prices are used for alert context.
       </p>
 
       <div className="mt-6 grid gap-4 md:grid-cols-3">
@@ -57,9 +67,9 @@ export default function AlertsPage() {
           <p className="mt-1 text-sm font-semibold text-slate-600">lists and deletes only rows for the supplied email</p>
         </Card>
         <Card className="p-4">
-          <p className="text-sm font-black text-slate-600">Guardrail</p>
-          <p className="mt-2 text-xl font-black text-slate-950">No synthetic prices</p>
-          <p className="mt-1 text-sm font-semibold text-slate-600">missing current prices stay labelled unavailable</p>
+          <p className="text-sm font-black text-slate-600">Free alert limit</p>
+          <p className="mt-2 text-xl font-black text-slate-950">{FREE_PRICE_ALERT_LIMIT} active alerts</p>
+          <p className="mt-1 text-sm font-semibold text-slate-600">premium unlocks unlimited alerts, priority checks, and earlier deal notifications</p>
         </Card>
       </div>
 

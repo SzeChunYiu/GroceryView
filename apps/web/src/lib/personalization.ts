@@ -22,6 +22,15 @@ export type DietaryPreferenceOnboardingContract = {
 };
 
 export const defaultHouseholdId = 'stockholm-family-demo';
+export const recentSearchHistoryStorageKey = 'groceryview:recent-product-searches';
+const maxRecentSearchHistory = 10;
+
+export type RecentSearchHistoryEntry = {
+  query: string;
+  href: string;
+  resultCount: number;
+  searchedAt: string;
+};
 
 export const householdCategorySignals: HouseholdCategorySignal[] = [
   { householdId: defaultHouseholdId, categorySlug: 'mejeri-ost-agg', clicks: 18, conversions: 7 },
@@ -31,6 +40,45 @@ export const householdCategorySignals: HouseholdCategorySignal[] = [
   { householdId: 'new-arrival-demo', categorySlug: 'skafferi', clicks: 14, conversions: 6 },
   { householdId: 'new-arrival-demo', categorySlug: 'frys', clicks: 9, conversions: 3 },
 ];
+
+export function readRecentSearchHistory(): RecentSearchHistoryEntry[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(recentSearchHistoryStorageKey) || '[]') as RecentSearchHistoryEntry[];
+    return Array.isArray(parsed)
+      ? parsed
+        .filter((entry) => typeof entry.query === 'string' && entry.query.trim().length > 0)
+        .slice(0, maxRecentSearchHistory)
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+export function rememberRecentSearchHistory(query: string, resultCount: number, basePath = '/search') {
+  if (typeof window === 'undefined') return [];
+  const trimmedQuery = query.trim();
+  if (!trimmedQuery || resultCount <= 0) return readRecentSearchHistory();
+
+  const next = [
+    {
+      query: trimmedQuery,
+      href: `${basePath}?q=${encodeURIComponent(trimmedQuery)}`,
+      resultCount,
+      searchedAt: new Date().toISOString()
+    },
+    ...readRecentSearchHistory().filter((entry) => entry.query.toLocaleLowerCase('sv-SE') !== trimmedQuery.toLocaleLowerCase('sv-SE'))
+  ].slice(0, maxRecentSearchHistory);
+
+  window.localStorage.setItem(recentSearchHistoryStorageKey, JSON.stringify(next));
+  return next;
+}
+
+export function clearRecentSearchHistory() {
+  if (typeof window === 'undefined') return [];
+  window.localStorage.removeItem(recentSearchHistoryStorageKey);
+  return [];
+}
 
 export const dietaryPreferenceOnboardingContract: DietaryPreferenceOnboardingContract = {
   endpoint: '/api/account/dietary-preferences',
@@ -73,6 +121,19 @@ type CategoryRankInput = {
 type LandingShortcutInput = {
   href: string;
   categorySlug?: string;
+};
+
+type RecommendationProductInput = {
+  slug: string;
+  name: string;
+  brand?: string | null;
+  sourceLabel?: string;
+  totalPriceLabel?: string;
+};
+
+export type PersonalizedRecommendation = RecommendationProductInput & {
+  score: number;
+  reason: string;
 };
 
 const conversionWeight = 4;
@@ -134,4 +195,68 @@ export function rankLandingShortcuts<T extends LandingShortcutInput>(
     })
     .sort((a, b) => b.score - a.score || a.index - b.index)
     .map(({ shortcut }) => shortcut);
+}
+
+export function buildPersonalizedRecommendationRail<T extends RecommendationProductInput>(
+  products: readonly T[],
+  options: {
+    householdId?: string;
+    favoriteBrands?: readonly string[];
+    recentListActivity?: readonly string[];
+    limit?: number;
+  } = {},
+): PersonalizedRecommendation[] {
+  const favoriteBrands = new Set((options.favoriteBrands ?? ['Garant', 'Änglamark', 'Kaffe']).map((brand) => brand.toLocaleLowerCase('sv-SE')));
+  const recentWords = (options.recentListActivity ?? ['milk', 'bread', 'coffee', 'fruit'])
+    .flatMap((item) => item.toLocaleLowerCase('sv-SE').split(/\s+/))
+    .filter((word) => word.length > 2);
+
+  return products
+    .map((product, index) => {
+      const haystack = `${product.name} ${product.brand ?? ''}`.toLocaleLowerCase('sv-SE');
+      const favoriteHit = product.brand ? favoriteBrands.has(product.brand.toLocaleLowerCase('sv-SE')) : false;
+      const listHits = recentWords.filter((word) => haystack.includes(word)).length;
+      const historyScore = getHouseholdCategoryScore(product.slug.split('-').slice(0, 2).join('-'), options.householdId ?? defaultHouseholdId);
+      const score = historyScore + listHits * 18 + (favoriteHit ? 24 : 0) + Math.max(0, 8 - index);
+      const reason = favoriteHit
+        ? `Favorite brand signal for ${product.brand}`
+        : listHits > 0
+          ? `${listHits} recent list signal${listHits === 1 ? '' : 's'} matched`
+          : 'Household history keeps this in the discovery mix';
+      return { ...product, score, reason };
+    })
+    .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name, 'sv'))
+    .slice(0, options.limit ?? 4);
+}
+
+export type BrandTolerance = 'favorite' | 'acceptable' | 'excluded';
+
+export type PreferredBrandControl = {
+  brand: string;
+  tolerance: BrandTolerance;
+  note: string;
+};
+
+export const demoPreferredBrandControls: PreferredBrandControl[] = [
+  { brand: 'Garant', tolerance: 'favorite', note: 'Prioritize for pantry staples and dairy swaps.' },
+  { brand: 'Änglamark', tolerance: 'favorite', note: 'Prefer when organic substitutes are available.' },
+  { brand: 'ICA Basic', tolerance: 'acceptable', note: 'Show when savings are meaningful and ratings stay strong.' },
+  { brand: 'Unknown private label', tolerance: 'excluded', note: 'Hide from automatic substitutions until reviewed.' },
+];
+
+export function groupPreferredBrandControls(controls: readonly PreferredBrandControl[] = demoPreferredBrandControls) {
+  return {
+    favorite: controls.filter((control) => control.tolerance === 'favorite'),
+    acceptable: controls.filter((control) => control.tolerance === 'acceptable'),
+    excluded: controls.filter((control) => control.tolerance === 'excluded'),
+  };
+}
+
+export function scoreBrandTolerance(brand: string | null | undefined, controls: readonly PreferredBrandControl[] = demoPreferredBrandControls) {
+  const normalizedBrand = (brand ?? '').trim().toLocaleLowerCase('sv-SE');
+  const match = controls.find((control) => control.brand.trim().toLocaleLowerCase('sv-SE') === normalizedBrand);
+  if (!match) return { tolerance: 'acceptable' as BrandTolerance, score: 0 };
+  if (match.tolerance === 'favorite') return { tolerance: match.tolerance, score: 30 };
+  if (match.tolerance === 'excluded') return { tolerance: match.tolerance, score: -100 };
+  return { tolerance: match.tolerance, score: 5 };
 }
