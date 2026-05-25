@@ -18,6 +18,7 @@
     "ops:catalog-coverage-targets": "node scripts/ops/print-catalog-coverage-targets.mjs",
     "ops:apply-db-migrations": "npm run build -w @groceryview/db && node scripts/ops/apply-db-migrations.mjs",
     "ops:check-production-secrets": "node scripts/ops/check-production-secrets.mjs",
+    "security:check-webhook-hardening": "node scripts/security/check-webhook-hardening.mjs",
     "ops:check-daily-db-connectivity": "node scripts/ops/check-daily-db-connectivity.mjs",
     "ops:db-io-hotspots": "node scripts/ops/check-daily-db-connectivity.mjs --pg-stat-statements-io",
     "ops:compare-db-io-hotspots": "node scripts/ops/compare-db-io-hotspots.mjs",
