@@ -117,6 +117,18 @@ export default function ScannerPage() {
           <Link className="rounded-full border border-indigo-200 px-4 py-2 text-sm font-black text-indigo-900" href="/watchlist">Watchlist</Link>
         </div>
       </Card>
+      <Card className="mt-6 border-sky-200 bg-sky-50/80">
+        <p className="text-xs font-black uppercase tracking-[0.22em] text-sky-800">Mobile scan haptics</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Tactile confirmation for barcode scan states</h2>
+        <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+          Scanner actions now trigger subtle vibration patterns for successful scans, duplicate barcode submissions, and blocked or failed scan requests when the browser exposes the mobile Vibration API.
+        </p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          {['success confirmation', 'duplicate item nudge', 'scan error alert'].map((state) => (
+            <p className="rounded-2xl bg-white/80 p-3 text-sm font-black capitalize text-sky-950" key={state}>{state}</p>
+          ))}
+        </div>
+      </Card>
       <div id="scan" className="scroll-mt-24">
         <ScannerUploadActions />
       </div>

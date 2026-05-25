@@ -15,6 +15,8 @@ export function useHaptic() {
   }, []);
 
   return {
+    duplicate: () => vibrate([8, 24, 8]),
+    error: () => vibrate([28, 32, 28]),
     impact: () => vibrate([10, 18, 10]),
     selection: () => vibrate(12),
     success: () => vibrate([16, 24, 16]),

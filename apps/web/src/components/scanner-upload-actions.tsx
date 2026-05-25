@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useRef, useState } from 'react';
+import { useHaptic } from '@/hooks/useHaptic';
 
 type ScannerStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
 type BrowserSession = { accessToken: string; userId: string };
@@ -43,6 +44,7 @@ function newScanId(prefix: 'receipt' | 'barcode') {
 }
 
 export function ScannerUploadActions() {
+  const haptic = useHaptic();
   const [barcode, setBarcode] = useState('0735000123456');
   const [byteLength, setByteLength] = useState('123456');
   const [contentType, setContentType] = useState('image/jpeg');
@@ -50,12 +52,20 @@ export function ScannerUploadActions() {
   const [message, setMessage] = useState('No anonymous scan uploads. Sign in first to request private upload tickets or process barcode scans.');
   const [cameraReady, setCameraReady] = useState(false);
   const [receiptHistory, setReceiptHistory] = useState<ReceiptPurchaseHistoryItem[]>([]);
+  const lastBarcodeRef = useRef('');
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+
+  function setScanError(errorMessage: string) {
+    haptic.error();
+    setStatus('error');
+    setMessage(errorMessage);
+  }
 
   function requireSession(): BrowserSession | null {
     const session = readSession();
     if (!session.accessToken || !session.userId) {
+      haptic.error();
       setStatus('blocked');
       setMessage('Sign in first. No anonymous scan uploads are sent to protected scanner endpoints.');
       return null;
@@ -66,10 +76,10 @@ export function ScannerUploadActions() {
 
   async function handleResponse(response: Response, successMessage: string) {
     if (!response.ok) {
-      setStatus('error');
-      setMessage('Scanner request was rejected by the production API.');
+      setScanError('Scanner request was rejected by the production API.');
       return;
     }
+    haptic.success();
     setStatus('ready');
     setMessage(successMessage);
   }
@@ -106,16 +116,14 @@ export function ScannerUploadActions() {
     const session = requireSession();
     if (!session) return;
     if (!cameraReady) {
-      setStatus('error');
-      setMessage('Start the receipt camera before submitting a receipt image. No upload was sent.');
+      setScanError('Start the receipt camera before submitting a receipt image. No upload was sent.');
       return;
     }
 
     const captureContentType = contentType.startsWith('image/') ? contentType : 'image/jpeg';
     const blob = await captureReceiptFrame(captureContentType);
     if (!blob) {
-      setStatus('error');
-      setMessage('Receipt frame could not be captured. No upload ticket was requested.');
+      setScanError('Receipt frame could not be captured. No upload ticket was requested.');
       return;
     }
 
@@ -127,15 +135,13 @@ export function ScannerUploadActions() {
       body: JSON.stringify({ scanId, kind: 'receipt', contentType: blob.type || captureContentType, byteLength: blob.size })
     });
     if (!ticketResponse.ok) {
-      setStatus('error');
-      setMessage('Receipt upload ticket was rejected by the production API.');
+      setScanError('Receipt upload ticket was rejected by the production API.');
       return;
     }
 
     const ticketBody = (await ticketResponse.json()) as ScanUploadTicketResponse;
     if (ticketBody.result.status !== 'ready') {
-      setStatus('error');
-      setMessage(`Receipt upload is blocked: ${ticketBody.result.reason}`);
+      setScanError(`Receipt upload is blocked: ${ticketBody.result.reason}`);
       return;
     }
 
@@ -146,8 +152,7 @@ export function ScannerUploadActions() {
       body: blob
     });
     if (!uploadResponse.ok) {
-      setStatus('error');
-      setMessage('Receipt image upload failed. Scan processing was not started.');
+      setScanError('Receipt image upload failed. Scan processing was not started.');
       return;
     }
 
@@ -157,12 +162,12 @@ export function ScannerUploadActions() {
       body: JSON.stringify({ scanId, kind: 'receipt', payload: ticket.payloadUri, uploadedAt: new Date().toISOString() })
     });
     if (!processResponse.ok) {
-      setStatus('error');
-      setMessage('Scanner request was rejected by the production API.');
+      setScanError('Scanner request was rejected by the production API.');
       return;
     }
     const processBody = (await processResponse.json()) as ScanProcessResponse;
     setReceiptHistory(processBody.purchaseHistory ?? []);
+    haptic.success();
     setStatus('ready');
     setMessage(`Receipt image submitted for ${scanId}; OCR parsed the receipt and matched canonical products for purchase history.`);
   }
@@ -171,8 +176,7 @@ export function ScannerUploadActions() {
     const session = requireSession();
     if (!session) return;
     if (!navigator.mediaDevices?.getUserMedia) {
-      setStatus('error');
-      setMessage('Receipt camera is not available in this browser. No scan upload was started.');
+      setScanError('Receipt camera is not available in this browser. No scan upload was started.');
       return;
     }
     try {
@@ -185,8 +189,7 @@ export function ScannerUploadActions() {
       setStatus('ready');
       setMessage('Camera access stays local until a signed-in user requests a private upload ticket and submits a receipt image.');
     } catch {
-      setStatus('error');
-      setMessage('Camera permission was denied or unavailable. No receipt image was uploaded.');
+      setScanError('Camera permission was denied or unavailable. No receipt image was uploaded.');
     }
   }
 
@@ -206,12 +209,20 @@ export function ScannerUploadActions() {
     const session = requireSession();
     if (!session) return;
     const { accessToken, userId } = session;
+    const normalizedBarcode = barcode.trim();
+    if (normalizedBarcode && normalizedBarcode === lastBarcodeRef.current) {
+      haptic.duplicate();
+      setStatus('ready');
+      setMessage(`Duplicate barcode ${normalizedBarcode} ignored; this scan was already processed in the current session.`);
+      return;
+    }
     const scanId = newScanId('barcode');
     const response = await fetch(`/api/scans/process?userId=${encodeURIComponent(userId)}`, {
       method: 'POST',
       headers: { 'content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
-      body: JSON.stringify({ scanId, kind: 'barcode', payload: barcode })
+      body: JSON.stringify({ scanId, kind: 'barcode', payload: normalizedBarcode })
     });
+    if (response.ok) lastBarcodeRef.current = normalizedBarcode;
     await handleResponse(response, `Barcode processed for ${scanId}; review work items are returned when matching needs human review.`);
   }
 
