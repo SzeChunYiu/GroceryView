@@ -3,6 +3,7 @@ import { ConsentManager } from '@/components/consent-manager';
 import { SkipLink } from '@/components/SkipLink';
 import { ServiceWorkerRegistrar } from '@/lib/swRegister';
 import { Providers } from './providers';
+import 'maplibre-gl/dist/maplibre-gl.css';
 import './globals.css';
 import '@/styles/print.css';
 import '../styles/a11y.css';

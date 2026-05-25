@@ -3,6 +3,8 @@ export type DietaryProfilePreferences = {
   allergies: string[];
   diets: string[];
   avoidedIngredients: string[];
+  householdSize: number;
+  nutritionPriorities: string[];
   onboardingCompleted: boolean;
   updatedAt: string;
 };
@@ -14,6 +16,8 @@ export const DEFAULT_DIETARY_PROFILE_PREFERENCES: DietaryProfilePreferences = {
   allergies: [],
   diets: [],
   avoidedIngredients: [],
+  householdSize: 1,
+  nutritionPriorities: [],
   onboardingCompleted: false,
   updatedAt: 'static-snapshot'
 };
@@ -21,6 +25,7 @@ export const DEFAULT_DIETARY_PROFILE_PREFERENCES: DietaryProfilePreferences = {
 export type HouseholdPricePreferences = {
   householdId: string;
   preferredBrands: string[];
+  avoidedBrands: string[];
   preferredStores: string[];
   updatedAt: string;
 };
@@ -55,6 +60,7 @@ export const PREFERRED_STORE_SETTINGS_STORAGE_KEY = 'groceryview:preferred-store
 export const DEFAULT_HOUSEHOLD_PRICE_PREFERENCES: HouseholdPricePreferences = {
   householdId: 'local-household',
   preferredBrands: ['Garant', 'ICA Basic'],
+  avoidedBrands: ['Unknown private label'],
   preferredStores: ['Willys', 'Hemköp'],
   updatedAt: 'static-snapshot'
 };
@@ -104,12 +110,21 @@ function normalizePreferenceList(values: readonly (string | null | undefined)[])
   return uniquePreferenceValues(values);
 }
 
+function normalizeHouseholdSize(value: unknown) {
+  const numericValue = typeof value === 'number' ? value : Number(value);
+  if (!Number.isFinite(numericValue)) return DEFAULT_DIETARY_PROFILE_PREFERENCES.householdSize;
+
+  return Math.min(12, Math.max(1, Math.round(numericValue)));
+}
+
 export function normalizeDietaryProfilePreferences(preferences: Partial<DietaryProfilePreferences> | null | undefined): DietaryProfilePreferences {
   return {
     userId: preferences?.userId?.trim() || DEFAULT_DIETARY_PROFILE_PREFERENCES.userId,
     allergies: normalizePreferenceList(preferences?.allergies ?? DEFAULT_DIETARY_PROFILE_PREFERENCES.allergies),
     diets: normalizePreferenceList(preferences?.diets ?? DEFAULT_DIETARY_PROFILE_PREFERENCES.diets),
     avoidedIngredients: normalizePreferenceList(preferences?.avoidedIngredients ?? DEFAULT_DIETARY_PROFILE_PREFERENCES.avoidedIngredients),
+    householdSize: normalizeHouseholdSize(preferences?.householdSize),
+    nutritionPriorities: normalizePreferenceList(preferences?.nutritionPriorities ?? DEFAULT_DIETARY_PROFILE_PREFERENCES.nutritionPriorities),
     onboardingCompleted: Boolean(preferences?.onboardingCompleted),
     updatedAt: preferences?.updatedAt || new Date().toISOString()
   };
@@ -143,9 +158,14 @@ export function saveDietaryProfilePreferences(preferences: Partial<DietaryProfil
 }
 
 export function normalizeHouseholdPricePreferences(preferences: Partial<HouseholdPricePreferences> | null | undefined): HouseholdPricePreferences {
+  const avoidedBrands = uniquePreferenceValues(preferences?.avoidedBrands ?? DEFAULT_HOUSEHOLD_PRICE_PREFERENCES.avoidedBrands);
+  const avoidedBrandSet = new Set(avoidedBrands.map(normalizedValue));
+
   return {
     householdId: preferences?.householdId?.trim() || DEFAULT_HOUSEHOLD_PRICE_PREFERENCES.householdId,
-    preferredBrands: uniquePreferenceValues(preferences?.preferredBrands ?? DEFAULT_HOUSEHOLD_PRICE_PREFERENCES.preferredBrands),
+    preferredBrands: uniquePreferenceValues(preferences?.preferredBrands ?? DEFAULT_HOUSEHOLD_PRICE_PREFERENCES.preferredBrands)
+      .filter((brand) => !avoidedBrandSet.has(normalizedValue(brand))),
+    avoidedBrands,
     preferredStores: uniquePreferenceValues(preferences?.preferredStores ?? DEFAULT_HOUSEHOLD_PRICE_PREFERENCES.preferredStores),
     updatedAt: preferences?.updatedAt || new Date().toISOString()
   };
@@ -261,11 +281,13 @@ export function householdPricePreferenceScore(
   preferences: HouseholdPricePreferences = DEFAULT_HOUSEHOLD_PRICE_PREFERENCES
 ) {
   const preferredBrands = new Set(preferences.preferredBrands.map(normalizedValue));
+  const avoidedBrands = new Set(preferences.avoidedBrands.map(normalizedValue));
   const preferredStores = new Set(preferences.preferredStores.map(normalizedValue));
   const candidateStores = [candidate.store, candidate.storeName, candidate.chain].map(normalizedValue);
   let score = 0;
 
   if (preferredBrands.has(normalizedValue(candidate.brand))) score += 1;
+  if (avoidedBrands.has(normalizedValue(candidate.brand))) score -= 4;
   if (candidateStores.some((store) => preferredStores.has(store))) score += 2;
 
   return score;

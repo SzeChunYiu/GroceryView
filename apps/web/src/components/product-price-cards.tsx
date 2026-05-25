@@ -6,10 +6,14 @@ import { LazyItemCard } from './LazyItemCard';
 import { FavouriteProductToggle } from './favourite-product-toggle';
 import { readStoredSafetyPreferences, SAFETY_PREFERENCES_CHANGED_EVENT, type ProductSafetyPreferences } from './cert-filter';
 import { volatilityBadgeMethodology } from '@/lib/price-intelligence';
+import type { SearchExplanationBadge } from '@/lib/search-filters';
 import { listFriendPriceSightingsForProduct } from '@/lib/social';
 import type { AdaptiveProductCard } from '@/lib/verified-data';
 
 type CompareMode = 'adaptive' | 'total' | 'unit';
+type ProductCardWithSearchExplanations = AdaptiveProductCard & {
+  searchExplanationBadges?: SearchExplanationBadge[];
+};
 
 const storageKey = 'groceryview:product-card-compare-mode';
 const compareModes: Array<{ label: string; value: CompareMode; help: string }> = [
@@ -162,6 +166,24 @@ function FriendPriceSightingsPanel({ card }: Readonly<{ card: AdaptiveProductCar
   );
 }
 
+function SearchExplanationBadges({ badges }: Readonly<{ badges?: SearchExplanationBadge[] }>) {
+  if (!badges || badges.length === 0) return null;
+
+  return (
+    <div className="mt-3 flex flex-wrap gap-2" data-search-explanation-badges>
+      {badges.slice(0, 4).map((badge) => (
+        <span
+          className="rounded-full bg-indigo-100 px-2.5 py-1 text-[0.65rem] font-black uppercase tracking-[0.14em] text-indigo-950"
+          key={`${badge.kind}-${badge.label}`}
+          title={`Matched: ${badge.matchedTerms.join(', ')}`}
+        >
+          {badge.label}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 export function ProductPriceCards({
   cards,
   eyebrow = 'Adaptive product cards',
@@ -289,6 +311,7 @@ export function ProductPriceCards({
             </div>
             <p className="mt-4 text-3xl font-black text-emerald-800">{primaryLabel(card, compareMode)}</p>
             <p className="mt-1 text-sm font-semibold text-slate-700">{secondaryLabel(card, compareMode)}</p>
+            <SearchExplanationBadges badges={(card as ProductCardWithSearchExplanations).searchExplanationBadges} />
             <p className="mt-3 text-sm leading-6 text-slate-600">{card.sourceLabel}</p>
             <FriendPriceSightingsPanel card={card} />
             <SafetyWarningBanner card={card} preferences={safetyPreferences} />
