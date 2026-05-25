@@ -39,6 +39,7 @@ model Product {
   isGlutenFree   Boolean  @default(false) @map("is_gluten_free")
   isLactoseFree  Boolean  @default(false) @map("is_lactose_free")
   deletedAt      DateTime? @map("deleted_at") @db.Timestamptz(6)
+  marketCode     String   @default("SE") @map("market_code") @db.Char(2)
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
 
@@ -47,6 +48,7 @@ model Product {
   @@index([isVegan])
   @@index([isGlutenFree])
   @@index([isLactoseFree])
+  @@index([marketCode])
   @@map("products")
 }
 
@@ -83,6 +85,8 @@ model Store {
   city          String
   district      String?
   domain        String   @default("grocery")
+  countryCode   String   @default("SE") @map("country_code") @db.Char(2)
+  marketCode    String   @default("SE") @map("market_code") @db.Char(2)
   latitude      Decimal? @db.Decimal(9, 6)
   longitude     Decimal? @db.Decimal(9, 6)
   storeType     String?  @map("store_type")
@@ -91,6 +95,7 @@ model Store {
   createdAt     DateTime @default(now()) @map("created_at")
 
   @@index([latitude, longitude])
+  @@index([marketCode, domain])
   @@map("stores")
 }
 
