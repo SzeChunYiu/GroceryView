@@ -722,6 +722,41 @@ describe('summarizeStoreBasketCoverage', () => {
     ]);
   });
 
+  it('does not let mixed-country or mixed-currency rows inflate same-store coverage', () => {
+    const summary = summarizeStoreBasketCoverage({
+      favoriteStoreIds: ['willys-central'],
+      country: 'SE',
+      currency: 'SEK',
+      items: [
+        {
+          productId: 'coffee',
+          quantity: 1,
+          prices: [
+            { storeId: 'willys-central', storeName: 'Willys Central NO feed', price: 29, country: 'NO', currency: 'NOK' },
+            { storeId: 'willys-central', storeName: 'Willys Central', price: 49, country: 'SE', currency: 'SEK' }
+          ]
+        },
+        {
+          productId: 'milk',
+          quantity: 2,
+          prices: [
+            { storeId: 'willys-central', storeName: 'Willys Central NO feed', price: 12, country: 'NO', currency: 'NOK' }
+          ]
+        }
+      ]
+    });
+
+    assert.deepEqual(summary.bestCoverage, {
+      storeId: 'willys-central',
+      storeName: 'Willys Central',
+      knownTotal: 49,
+      availableProductIds: ['coffee'],
+      missingProductIds: ['milk'],
+      coveragePercent: 50
+    });
+    assert.deepEqual(summary.fullCoverageStoreIds, []);
+  });
+
   it('handles an empty basket as full coverage for favorite stores', () => {
     assert.deepEqual(summarizeStoreBasketCoverage({
       favoriteStoreIds: ['willys-odenplan'],
