@@ -144,6 +144,9 @@ export function AccountBillingActions() {
         <button className="rounded-full border border-violet-300 px-4 py-2 text-sm font-black text-violet-900" onClick={() => startCheckout('premium_yearly')} type="button">Upgrade yearly for unlimited alerts</button>
         <button className="rounded-full border border-slate-300 px-4 py-2 text-sm font-black text-slate-800" onClick={manageSubscription} type="button">Manage subscription</button>
       </div>
+      <p className="mt-3 rounded-2xl bg-violet-50 p-3 text-sm font-bold text-violet-950">
+        Premium power-user feature: export product price history from charts and comparison pages as CSV for research and budget planning.
+      </p>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-3">
         <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
