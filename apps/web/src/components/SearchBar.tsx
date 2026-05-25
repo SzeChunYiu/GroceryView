@@ -10,6 +10,7 @@ import {
   rememberRecentSearchHistory,
   type RecentSearchHistoryEntry
 } from '@/lib/personalization';
+import type { SearchExplanationBadge } from '@/lib/search-filters';
 
 type ProductSearchResult = {
   id: string;
@@ -18,6 +19,7 @@ type ProductSearchResult = {
   brand: string | null;
   imageUrl: string | null;
   searchRank: number;
+  searchExplanationBadges?: SearchExplanationBadge[];
 };
 
 type ProductSearchResponse = {
@@ -347,6 +349,19 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
                 >
                   <span className="block text-sm font-black text-slate-950">{result.name}</span>
                   <span className="mt-1 block text-xs font-semibold text-slate-600">{result.brand ?? 'Brand not reported'} · PostgreSQL product search</span>
+                  {result.searchExplanationBadges && result.searchExplanationBadges.length > 0 ? (
+                    <span className="mt-2 flex flex-wrap gap-1.5" data-search-explanation-badges>
+                      {result.searchExplanationBadges.slice(0, 3).map((badge) => (
+                        <span
+                          className="rounded-full bg-indigo-50 px-2 py-0.5 text-[0.65rem] font-black uppercase tracking-[0.12em] text-indigo-900"
+                          key={`${result.id}-${badge.kind}-${badge.label}`}
+                          title={`Matched: ${badge.matchedTerms.join(', ')}`}
+                        >
+                          {badge.label}
+                        </span>
+                      ))}
+                    </span>
+                  ) : null}
                 </Link>
               ))}
             </div>
