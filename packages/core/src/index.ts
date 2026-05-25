@@ -1,3 +1,4 @@
+export * from './lib/shrinkflation.js';
 export * from './lib/rankers/nearby.js';
 export type DealScoreInput = {
   currentCityPercentile: number;
