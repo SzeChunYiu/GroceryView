@@ -27,7 +27,7 @@ import { useEffect, useRef, useState } from 'react';
 import { SearchBar } from './SearchBar';
 import { LanguagePreferenceSwitcher } from '@/components/language-preference-switcher';
 import { trackPwaInstallAnalytics } from '@/lib/analytics';
-import { defaultLocale, localeCookieName, localeStorageKey, normalizeLocale, type SupportedLocale } from '@/lib/i18n';
+import { defaultLocale, groceryTranslator, localeCookieName, localeStorageKey, normalizeLocale, type SupportedLocale } from '@/lib/i18n';
 
 type NavItem = {
   href: string;
@@ -42,61 +42,64 @@ type NavGroup = {
   label: string;
 };
 
-const navGroups: NavGroup[] = [
-  {
-    label: 'Markets',
-    icon: BarChart3,
-    items: [
-      { href: '/', label: 'Overview', icon: BarChart3 },
-      { href: '/chain-index', label: 'Chain index', icon: Database },
-      { href: '/analytics/funnel', label: 'Funnel', icon: BarChart3 },
-      { href: '/categories', label: 'Categories', icon: Tags },
-      { href: '/heatmap', label: 'Heatmap', icon: Flame },
-      { href: '/screener', label: 'Screener', icon: Search }
-    ]
-  },
-  {
-    label: 'Products',
-    icon: PackageSearch,
-    items: [
-      { href: '/products', label: 'Browse', icon: PackageSearch },
-      { href: '/new-arrivals', label: 'New arrivals', icon: PackageSearch },
-      { href: '/compare', label: 'Compare', icon: Tags }
-    ]
-  },
-  {
-    label: 'Stores',
-    icon: Store,
-    items: [
-      { href: '/map', label: 'Map', icon: Map },
-      { href: '/stores', label: 'Stores', icon: Store }
-    ]
-  },
-  {
-    label: 'Trip',
-    icon: ScanLine,
-    items: [
-      { href: '/scanner', label: 'Scanner', icon: ScanLine },
-      { href: '/list', label: 'Current list', icon: ShoppingBasket },
-      { href: '/screener', label: 'Nearby deals', icon: Tags },
-      { href: '/watchlist', label: 'Watchlist', icon: Heart }
-    ]
-  },
-  {
-    label: 'Personal',
-    icon: Heart,
-    items: [
-      { href: '/savings-dashboard', label: 'Savings', icon: PiggyBank },
-      { href: '/stockholm/my-flyer', label: 'My Flyer', icon: Newspaper, match: 'my-flyer' },
-      { href: '/weekly-basket', label: 'Weekly basket', icon: ShoppingBasket },
-      { href: '/meal-planner', label: 'Meal planner', icon: Utensils },
-      { href: '/pantry-inventory', label: 'Pantry inventory', icon: ShoppingBasket },
-      { href: '/contact', label: 'Contact', icon: MessageCircle }
-    ]
-  }
-];
+type AppNavTranslator = ReturnType<typeof groceryTranslator>;
 
-const mobileNavItems = navGroups.flatMap((group) => group.items);
+function buildNavGroups(t: AppNavTranslator): NavGroup[] {
+  return [
+    {
+      label: t('app-nav.groups.markets'),
+      icon: BarChart3,
+      items: [
+        { href: '/', label: t('app-nav.items.overview'), icon: BarChart3 },
+        { href: '/chain-index', label: t('app-nav.items.chainIndex'), icon: Database },
+        { href: '/analytics/funnel', label: t('app-nav.items.funnel'), icon: BarChart3 },
+        { href: '/categories', label: t('app-nav.items.categories'), icon: Tags },
+        { href: '/heatmap', label: t('app-nav.items.heatmap'), icon: Flame },
+        { href: '/screener', label: t('app-nav.items.screener'), icon: Search }
+      ]
+    },
+    {
+      label: t('app-nav.groups.products'),
+      icon: PackageSearch,
+      items: [
+        { href: '/products', label: t('app-nav.items.browse'), icon: PackageSearch },
+        { href: '/new-arrivals', label: t('app-nav.items.newArrivals'), icon: PackageSearch },
+        { href: '/compare', label: t('app-nav.items.compare'), icon: Tags }
+      ]
+    },
+    {
+      label: t('app-nav.groups.stores'),
+      icon: Store,
+      items: [
+        { href: '/map', label: t('app-nav.items.map'), icon: Map },
+        { href: '/stores', label: t('app-nav.items.stores'), icon: Store }
+      ]
+    },
+    {
+      label: t('app-nav.groups.trip'),
+      icon: ScanLine,
+      items: [
+        { href: '/scanner', label: t('app-nav.items.scanner'), icon: ScanLine },
+        { href: '/list', label: t('app-nav.items.currentList'), icon: ShoppingBasket },
+        { href: '/screener', label: t('app-nav.items.nearbyDeals'), icon: Tags },
+        { href: '/watchlist', label: t('app-nav.items.watchlist'), icon: Heart }
+      ]
+    },
+    {
+      label: t('app-nav.groups.personal'),
+      icon: Heart,
+      items: [
+        { href: '/savings-dashboard', label: t('app-nav.items.savings'), icon: PiggyBank },
+        { href: '/stockholm/my-flyer', label: t('app-nav.items.myFlyer'), icon: Newspaper, match: 'my-flyer' },
+        { href: '/weekly-basket', label: t('app-nav.items.weeklyBasket'), icon: ShoppingBasket },
+        { href: '/meal-planner', label: t('app-nav.items.mealPlanner'), icon: Utensils },
+        { href: '/pantry-inventory', label: t('app-nav.items.pantryInventory'), icon: ShoppingBasket },
+        { href: '/contact', label: t('app-nav.items.contact'), icon: MessageCircle }
+      ]
+    }
+  ];
+}
+
 const installBannerDismissedKey = "groceryview:install-banner-dismissed";
 const themePreferenceStorageKey = 'groceryview:theme-preference';
 
@@ -162,7 +165,7 @@ function navItemClassName(isActive: boolean, surface: 'mobile' | 'menu') {
   }`;
 }
 
-function InstallBanner() {
+function InstallBanner({ t }: { t: AppNavTranslator }) {
   const [isVisible, setIsVisible] = useState(false);
   const trackedViewRef = useRef(false);
 
@@ -195,20 +198,20 @@ function InstallBanner() {
   }
 
   return (
-    <aside aria-label="Install GroceryView" className="mx-auto w-full max-w-7xl px-4 pb-4 sm:px-6 lg:px-8">
+    <aside aria-label={t('app-nav.install.label')} className="mx-auto w-full max-w-7xl px-4 pb-4 sm:px-6 lg:px-8">
       <div className="flex flex-col gap-3 rounded-2xl border border-emerald-200 bg-white/88 dark:border-emerald-900 dark:bg-slate-900/90 p-4 text-sm shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="font-black text-emerald-950">Add GroceryView to your home screen</p>
+          <p className="font-black text-emerald-950">{t('app-nav.install.title')}</p>
           <p className="mt-1 font-semibold leading-6 text-slate-700 dark:text-slate-200">
-            iOS: tap Share, then Add to Home Screen. Android: open Chrome menu, then Install app.
+            {t('app-nav.install.instructions')}
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <a className="rounded-full bg-emerald-700 px-4 py-2 font-black text-white" href="/manifest.webmanifest">
-            PWA ready
+            {t('app-nav.install.cta')}
           </a>
           <button
-            aria-label="Dismiss install banner"
+            aria-label={t('app-nav.install.dismiss')}
             className="rounded-full border border-slate-200 px-3 py-2 font-black text-slate-600 dark:text-slate-300 transition hover:border-emerald-700 hover:text-emerald-900"
             onClick={dismissBanner}
             type="button"
@@ -224,6 +227,10 @@ function InstallBanner() {
 export function AppNav() {
   const pathname = usePathname();
   const [themePreference, setThemePreference] = useState<ThemePreference>('light');
+  const [locale, setLocale] = useState<SupportedLocale>(defaultLocale);
+  const t = groceryTranslator(locale);
+  const navGroups = buildNavGroups(t);
+  const mobileNavItems = navGroups.flatMap((group) => group.items);
 
   useEffect(() => {
     const initialPreference = preferredTheme();
@@ -251,11 +258,16 @@ export function AppNav() {
 
 
   useEffect(() => {
-    document.documentElement.lang = readPersistedLocale();
+    const initialLocale = readPersistedLocale();
+    setLocale(initialLocale);
+    document.documentElement.lang = initialLocale;
 
     function handleLocaleChanged(event: Event) {
       const nextLocale = normalizeLocale((event as CustomEvent<{ locale?: string }>).detail?.locale);
-      if (nextLocale) document.documentElement.lang = nextLocale;
+      if (nextLocale) {
+        setLocale(nextLocale);
+        document.documentElement.lang = nextLocale;
+      }
     }
 
     window.addEventListener("groceryview:locale-changed", handleLocaleChanged);
@@ -269,7 +281,7 @@ export function AppNav() {
           <span className="grid h-11 w-11 place-items-center rounded-2xl bg-emerald-800 text-lg font-black text-white shadow-sm">GV</span>
           <span>
             <span className="block text-lg font-black tracking-tight text-slate-950 dark:text-slate-50">GroceryView</span>
-            <span className="block text-xs font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Verified grocery intelligence</span>
+            <span className="block text-xs font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">{t('app-nav.tagline')}</span>
           </span>
         </Link>
         <div className="flex flex-1 flex-col gap-3 lg:items-end">
@@ -277,13 +289,13 @@ export function AppNav() {
             <SearchBar surface="app-nav" />
             <LanguagePreferenceSwitcher />
             <button
-              aria-label={themePreference === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              aria-label={themePreference === "dark" ? t('app-nav.theme.switchToLight') : t('app-nav.theme.switchToDark')}
               className="inline-flex h-10 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 text-sm font-black text-slate-700 shadow-sm transition hover:border-emerald-700 hover:text-emerald-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-emerald-400 dark:hover:text-emerald-200"
               onClick={toggleThemePreference}
               type="button"
             >
               {themePreference === "dark" ? <Sun className="h-4 w-4" aria-hidden="true" /> : <Moon className="h-4 w-4" aria-hidden="true" />}
-              <span>{themePreference === "dark" ? "Light" : "Dark"}</span>
+              <span>{themePreference === "dark" ? t('app-nav.theme.light') : t('app-nav.theme.dark')}</span>
             </button>
           </div>
           <div className="flex gap-2 overflow-x-auto pb-1 lg:hidden">
@@ -340,7 +352,7 @@ export function AppNav() {
           </div>
         </div>
       </nav>
-      <InstallBanner />
+      <InstallBanner t={t} />
     </header>
   );
 }
