@@ -26,6 +26,17 @@ type ProductSearchResponse = {
   error?: string;
 };
 
+type HeaderSearchFacetChip = {
+  kind: 'category' | 'chain' | 'diet' | 'price-range';
+  label: string;
+  href: string;
+  count?: number;
+};
+
+type HeaderSuggestResponse = {
+  facets?: HeaderSearchFacetChip[];
+};
+
 type SearchStatus = 'idle' | 'loading' | 'ready' | 'empty' | 'error';
 
 const MIN_QUERY_LENGTH = 2;
@@ -51,6 +62,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
   const listboxId = useId();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<ProductSearchResult[]>([]);
+  const [facetChips, setFacetChips] = useState<HeaderSearchFacetChip[]>([]);
   const [recentSearches, setRecentSearches] = useState<RecentSearchHistoryEntry[]>([]);
   const [isFocused, setIsFocused] = useState(false);
   const [status, setStatus] = useState<SearchStatus>('idle');
@@ -66,6 +78,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
   useEffect(() => {
     if (trimmedQuery.length < MIN_QUERY_LENGTH) {
       setResults([]);
+      setFacetChips([]);
       setStatus('idle');
       return;
     }
@@ -74,6 +87,21 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
     const timeout = window.setTimeout(async () => {
       setStatus('loading');
       try {
+        try {
+          const suggestResponse = await fetch(`/api/suggest?q=${encodeURIComponent(trimmedQuery)}`, {
+            signal: controller.signal,
+            headers: { Accept: 'application/json' }
+          });
+          if (suggestResponse.ok) {
+            const suggestPayload = await suggestResponse.json() as HeaderSuggestResponse;
+            if (!controller.signal.aborted) setFacetChips(suggestPayload.facets ?? []);
+          } else if (!controller.signal.aborted) {
+            setFacetChips([]);
+          }
+        } catch {
+          if (!controller.signal.aborted) setFacetChips([]);
+        }
+
         const response = await fetch(`/api/products?q=${encodeURIComponent(trimmedQuery)}`, {
           signal: controller.signal,
           headers: { Accept: 'application/json' }
@@ -90,6 +118,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
         if (controller.signal.aborted) return;
         console.error('Product search request failed', error instanceof Error ? { name: error.name } : { name: 'unknown' });
         setResults([]);
+        setFacetChips([]);
         setStatus('error');
       }
     }, 300);
@@ -162,6 +191,24 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
           ) : null}
           {status === 'loading' ? (
             <p className="px-4 py-3 text-sm font-bold text-slate-600">Searching verified products…</p>
+          ) : null}
+          {facetChips.length > 0 ? (
+            <div className="border-t border-slate-100 px-4 py-3">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">Refine search</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {facetChips.map((facet) => (
+                  <Link
+                    className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-900 transition hover:bg-emerald-100"
+                    href={facet.href}
+                    key={`${facet.kind}-${facet.href}`}
+                    role="option"
+                  >
+                    {facet.label}
+                    {facet.count ? <span className="ml-1 text-emerald-700">({facet.count})</span> : null}
+                  </Link>
+                ))}
+              </div>
+            </div>
           ) : null}
           {status === 'error' ? (
             <p className="px-4 py-3 text-sm font-bold text-rose-800">Product search is temporarily unavailable.</p>
