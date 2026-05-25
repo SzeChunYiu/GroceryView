@@ -1,17 +1,27 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   affiliateDisclosureLabel,
   buildAffiliateOutboundUrl,
   trackAffiliateOutboundClick,
   type AffiliateLinkMetadata,
-  trackDealShare
+  trackDealShare,
+  trackSponsoredPlacementImpression
 } from '@/lib/analytics';
 import { buildDealContext, type DealHistoryPoint } from '@/lib/deal-context';
 import { classifyPriceVolatilityBadge } from '@/lib/price-intelligence';
 import { dealShareUrl } from '@/lib/seo';
+
+export type SponsoredDealPlacement = {
+  disclosure?: string;
+  label?: string;
+  placementId?: string;
+  provider: string;
+  separatedFromOrganicRankings?: boolean;
+  surface?: string;
+};
 
 type DealCardProps = {
   title: string;
@@ -28,6 +38,10 @@ type DealCardProps = {
   outboundStoreUrl?: string;
   affiliateCampaignId?: string;
   sharePath?: string;
+  categoryLabel?: string;
+  replacementLabel?: string;
+  sourceLabel?: string;
+  sponsoredPlacement?: SponsoredDealPlacement;
 };
 
 function formatPrice(value: number, locale: string, currency: string) {
@@ -100,7 +114,11 @@ export function DealCard({
   outboundDealUrl,
   outboundStoreUrl,
   affiliateCampaignId,
-  sharePath
+  sharePath,
+  categoryLabel,
+  replacementLabel,
+  sourceLabel,
+  sponsoredPlacement
 }: DealCardProps) {
   const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle');
   const context = buildDealContext({ currentPrice, discountStartedAt, priceHistory, currency, locale });
@@ -132,6 +150,22 @@ export function DealCard({
   const encodedShareUrl = encodeURIComponent(shareUrl);
   const encodedShareText = encodeURIComponent(`${title} is ${formatPrice(currentPrice, locale, currency)} on GroceryView`);
   const analyticsDealId = dealId ?? sharePath ?? title;
+  const sponsoredLabel = sponsoredPlacement?.label ?? 'Sponsored';
+  const sponsoredProvider = sponsoredPlacement?.provider;
+  const sponsoredSurface = sponsoredPlacement?.surface ?? 'discovery_rail';
+  const sponsoredPlacementId = sponsoredPlacement?.placementId ?? analyticsDealId;
+  const separatedFromOrganicRankings = true;
+
+  useEffect(() => {
+    if (!sponsoredProvider) return;
+    trackSponsoredPlacementImpression({
+      label: sponsoredLabel,
+      placementId: sponsoredPlacementId,
+      provider: sponsoredProvider,
+      separatedFromOrganicRankings,
+      surface: sponsoredSurface
+    });
+  }, [separatedFromOrganicRankings, sponsoredLabel, sponsoredPlacementId, sponsoredProvider, sponsoredSurface]);
 
   async function copyShareLink() {
     trackDealShare({ dealId: analyticsDealId, shareUrl, channel: 'copy_link' });
@@ -150,10 +184,26 @@ export function DealCard({
   }
 
   return (
-    <article className="rounded-2xl border border-market-ink/10 bg-white p-4 shadow-sm">
+    <article
+      aria-label={sponsoredPlacement ? `${sponsoredLabel} deal placement separate from organic rankings` : undefined}
+      className={`rounded-2xl border p-4 shadow-sm ${sponsoredPlacement ? 'border-amber-300 bg-amber-50/70' : 'border-market-ink/10 bg-white'}`}
+      data-organic-ranking-separated={sponsoredPlacement ? String(separatedFromOrganicRankings) : undefined}
+      data-sponsored-placement={sponsoredPlacement ? 'true' : undefined}
+    >
+      {sponsoredPlacement ? (
+        <div className="mb-3 rounded-2xl border border-amber-300 bg-white p-3 text-xs font-semibold text-amber-950">
+          <p className="font-black uppercase tracking-[0.18em] text-amber-800">{sponsoredLabel}</p>
+          <p className="mt-1">{sponsoredPlacement.disclosure ?? 'Paid placement shown in a separate sponsored slot. It does not affect organic deal rankings.'}</p>
+          <p className="mt-1 text-amber-900">Provider: {sponsoredPlacement.provider} · Organic ranking separated: {String(separatedFromOrganicRankings)}</p>
+        </div>
+      ) : null}
       <div className="flex items-start justify-between gap-3">
         <div>
+          {replacementLabel ? (
+            <p className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{replacementLabel}</p>
+          ) : null}
           <h3 className="text-base font-semibold text-market-ink">{title}</h3>
+          {categoryLabel ? <p className="mt-1 text-xs font-bold uppercase tracking-[0.14em] text-market-ink/55">{categoryLabel}</p> : null}
           <p className="mt-2 text-2xl font-bold text-market-ink">{formatPrice(currentPrice, locale, currency)}</p>
           {originalPrice ? (
             <p className="text-sm text-market-ink/60">
@@ -170,6 +220,11 @@ export function DealCard({
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2" aria-label="Deal history context">
+        {sourceLabel ? (
+          <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-900">
+            {sourceLabel}
+          </span>
+        ) : null}
         {context.streakLabel ? (
           <span className="rounded-full bg-market-mint/15 px-3 py-1 text-xs font-semibold text-market-ink">
             {context.streakLabel}

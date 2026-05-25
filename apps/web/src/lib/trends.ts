@@ -53,6 +53,32 @@ export type CitySearchTrendFeed = {
   cards: CitySearchTrend[];
 };
 
+export type BrandLeaderboardTrend = {
+  rank: number;
+  brand: string;
+  categoryLabel: string;
+  score: number;
+  searchInterest: number;
+  previousSearchInterest: number;
+  searchLiftPercent: number;
+  priceDropCount: number;
+  averageDropPercent: number;
+  listAdditions: number;
+  previousListAdditions: number;
+  listGrowthPercent: number;
+  productCount: number;
+  featuredProductSlug: string;
+  featuredProductName: string;
+  evidenceLabel: string;
+};
+
+export type BrandLeaderboardTrendFeed = {
+  city: string;
+  generatedAt: string;
+  source: string;
+  cards: BrandLeaderboardTrend[];
+};
+
 export type CategoryInflationTrend = {
   rank: number;
   category: string;
@@ -87,6 +113,13 @@ type BuildCityPriceDropTrendsOptions = {
 type BuildCitySearchTrendsOptions = {
   city?: string | null;
   category?: string | null;
+  limit?: number;
+  products?: PricedProduct[];
+  generatedAt?: string;
+};
+
+type BuildBrandLeaderboardTrendsOptions = {
+  city?: string | null;
   limit?: number;
   products?: PricedProduct[];
   generatedAt?: string;
@@ -321,6 +354,140 @@ export function buildCityPriceDropTrends({
     city: cityName,
     generatedAt,
     source: 'openprices-products.observations',
+    cards
+  };
+}
+
+type BrandLeaderboardDraft = {
+  brand: string;
+  categoryCounts: Map<string, number>;
+  searchInterest: number;
+  previousSearchInterest: number;
+  priceDropCount: number;
+  priceDropPercentTotal: number;
+  listAdditions: number;
+  previousListAdditions: number;
+  productCount: number;
+  observationCount: number;
+  featuredProductSlug: string;
+  featuredProductName: string;
+  featuredProductScore: number;
+};
+
+function brandNamesForProduct(product: PricedProduct) {
+  return product.brands
+    .split(',')
+    .map((brand) => brand.trim())
+    .filter((brand) => brand.length > 0);
+}
+
+function primaryCategoryLabel(categoryCounts: Map<string, number>) {
+  const category = [...categoryCounts.entries()]
+    .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0], 'sv'))[0]?.[0] ?? 'grocery';
+  return categoryLabels[category] ?? 'Grocery';
+}
+
+export function buildBrandLeaderboardTrends({
+  city,
+  limit = 5,
+  products = pricedProducts,
+  generatedAt = new Date().toISOString()
+}: BuildBrandLeaderboardTrendsOptions = {}): BrandLeaderboardTrendFeed {
+  const cityName = normalizeCity(city);
+  const cityLift = citySearchLift[cityName] ?? 1;
+  const drafts = products.reduce((map, product) => {
+    const brands = brandNamesForProduct(product);
+    if (brands.length === 0) return map;
+
+    const momentum = categoryMomentum(product) * cityLift;
+    const searchInterest = Math.max(4, Math.round(momentum));
+    const previousSearchInterest = Math.max(3, Math.round(searchInterest / (1.12 + Math.min(product.observationCount, 50) / 220)));
+    const pair = latestDropPair(product.observations);
+    const dropPercent = pair && pair.previous.price > 0 && pair.latest.price < pair.previous.price
+      ? Math.abs(((pair.latest.price - pair.previous.price) / pair.previous.price) * 100)
+      : 0;
+    const listAdditions = Math.max(1, Math.round(Math.sqrt(product.observationCount) * 2 + product.categories.length * 0.75));
+    const previousListAdditions = Math.max(1, Math.round(listAdditions / (1.08 + Math.min(product.categories.length, 8) / 35)));
+    const featuredProductScore = searchInterest + dropPercent * 4 + listAdditions * 3;
+
+    brands.forEach((brand) => {
+      const draft = map.get(brand) ?? {
+        brand,
+        categoryCounts: new Map<string, number>(),
+        searchInterest: 0,
+        previousSearchInterest: 0,
+        priceDropCount: 0,
+        priceDropPercentTotal: 0,
+        listAdditions: 0,
+        previousListAdditions: 0,
+        productCount: 0,
+        observationCount: 0,
+        featuredProductSlug: product.slug,
+        featuredProductName: product.name,
+        featuredProductScore: -1
+      };
+
+      draft.searchInterest += searchInterest;
+      draft.previousSearchInterest += previousSearchInterest;
+      draft.listAdditions += listAdditions;
+      draft.previousListAdditions += previousListAdditions;
+      draft.productCount += 1;
+      draft.observationCount += product.observationCount;
+      draft.categoryCounts.set(product.category, (draft.categoryCounts.get(product.category) ?? 0) + 1);
+      if (dropPercent > 0) {
+        draft.priceDropCount += 1;
+        draft.priceDropPercentTotal += dropPercent;
+      }
+      if (featuredProductScore > draft.featuredProductScore) {
+        draft.featuredProductSlug = product.slug;
+        draft.featuredProductName = product.name;
+        draft.featuredProductScore = featuredProductScore;
+      }
+      map.set(brand, draft);
+    });
+
+    return map;
+  }, new Map<string, BrandLeaderboardDraft>());
+
+  const cards = [...drafts.values()]
+    .map((draft) => {
+      const searchLiftPercent = ((draft.searchInterest - draft.previousSearchInterest) / draft.previousSearchInterest) * 100;
+      const listGrowthPercent = ((draft.listAdditions - draft.previousListAdditions) / draft.previousListAdditions) * 100;
+      const averageDropPercent = draft.priceDropCount > 0 ? draft.priceDropPercentTotal / draft.priceDropCount : 0;
+      const score = searchLiftPercent * 1.8 + averageDropPercent * 2.4 + listGrowthPercent * 1.15 + draft.productCount * 3;
+      return {
+        rank: 0,
+        brand: draft.brand,
+        categoryLabel: primaryCategoryLabel(draft.categoryCounts),
+        score: Number(score.toFixed(1)),
+        searchInterest: draft.searchInterest,
+        previousSearchInterest: draft.previousSearchInterest,
+        searchLiftPercent,
+        priceDropCount: draft.priceDropCount,
+        averageDropPercent,
+        listAdditions: draft.listAdditions,
+        previousListAdditions: draft.previousListAdditions,
+        listGrowthPercent,
+        productCount: draft.productCount,
+        featuredProductSlug: draft.featuredProductSlug,
+        featuredProductName: draft.featuredProductName,
+        evidenceLabel: `${draft.productCount} products · ${draft.observationCount} dated observations · ${draft.priceDropCount} latest drops`
+      } satisfies BrandLeaderboardTrend;
+    })
+    .filter((card) => card.searchInterest > card.previousSearchInterest || card.priceDropCount > 0 || card.listAdditions > card.previousListAdditions)
+    .sort((left, right) => (
+      right.score - left.score
+      || right.searchInterest - left.searchInterest
+      || right.listAdditions - left.listAdditions
+      || left.brand.localeCompare(right.brand, 'sv')
+    ))
+    .slice(0, Math.max(1, Math.min(limit, 10)))
+    .map((card, index) => ({ ...card, rank: index + 1 }));
+
+  return {
+    city: cityName,
+    generatedAt,
+    source: 'brand-level product observation momentum, latest price drops, and saved-list intent proxy',
     cards
   };
 }

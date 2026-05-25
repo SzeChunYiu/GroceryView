@@ -1,9 +1,13 @@
 import { googleMapsDirectionsUrl, googleMapsEmbedUrl, type StoreMapLocation } from '@/lib/mapsConfig';
-import type { StoreDistanceRow } from '@/lib/store-distance';
+import type { StoreDistanceRow, StoreRouteEstimate } from '@/lib/store-distance';
+
+type RouteMapRecommendation = Pick<StoreDistanceRow, 'basketTotalSek' | 'openingStatusLabel' | 'recommendationLabel' | 'routeScore' | 'totalMinutes' | 'travelCostSek'> & {
+  routeEstimates?: StoreRouteEstimate[];
+};
 
 type StoreMapProps = {
   store: StoreMapLocation;
-  routeRecommendation?: Pick<StoreDistanceRow, 'basketTotalSek' | 'openingStatusLabel' | 'recommendationLabel' | 'routeScore' | 'totalMinutes' | 'travelCostSek'>;
+  routeRecommendation?: RouteMapRecommendation;
 };
 
 export function StoreMap({ store, routeRecommendation }: Readonly<StoreMapProps>) {
@@ -42,6 +46,17 @@ export function StoreMap({ store, routeRecommendation }: Readonly<StoreMapProps>
             and opening status ({routeRecommendation.openingStatusLabel}).
           </p>
           <p className="mt-1 text-xs font-semibold text-cyan-900">{routeRecommendation.recommendationLabel}</p>
+          {routeRecommendation.routeEstimates?.length ? (
+            <div className="mt-3 grid gap-2 sm:grid-cols-3" aria-label="Walking driving and transit route hints">
+              {routeRecommendation.routeEstimates.map((estimate) => (
+                <div className="rounded-2xl bg-white/80 p-3" key={estimate.mode}>
+                  <p className="text-[11px] font-black uppercase tracking-[0.16em] text-cyan-700">{estimate.label}</p>
+                  <p className="mt-1 text-lg font-black text-cyan-950">{estimate.minutes} min</p>
+                  <p className="mt-1 text-xs font-semibold text-cyan-900">{estimate.distanceLabel} estimate</p>
+                </div>
+              ))}
+            </div>
+          ) : null}
         </div>
       ) : null}
     </div>

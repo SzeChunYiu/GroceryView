@@ -6,6 +6,7 @@ import { LazyItemCard } from './LazyItemCard';
 import { FavouriteProductToggle } from './favourite-product-toggle';
 import { readStoredSafetyPreferences, SAFETY_PREFERENCES_CHANGED_EVENT, type ProductSafetyPreferences } from './cert-filter';
 import { classifyPriceVolatilityBadge, volatilityBadgeMethodology } from '@/lib/price-intelligence';
+import { listFriendPriceSightingsForProduct } from '@/lib/social';
 import type { AdaptiveProductCard } from '@/lib/verified-data';
 
 type CompareMode = 'adaptive' | 'total' | 'unit';
@@ -142,6 +143,27 @@ function VolatilityMethodologyBadge({ card }: Readonly<{ card: AdaptiveProductCa
   );
 }
 
+function FriendPriceSightingsPanel({ card }: Readonly<{ card: AdaptiveProductCard }>) {
+  const sightings = listFriendPriceSightingsForProduct(card.slug).slice(0, 2);
+  if (sightings.length === 0) return null;
+
+  return (
+    <div className="mt-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-3">
+      <p className="text-[0.65rem] font-black uppercase tracking-[0.18em] text-emerald-900">Opt-in friend sightings</p>
+      <ul className="mt-2 space-y-2">
+        {sightings.map((sighting) => (
+          <li className="rounded-xl bg-white p-2 text-xs text-slate-700" key={sighting.id}>
+            <p className="font-black text-slate-950">{sighting.priceLabel} · {sighting.storeName}</p>
+            <p className="mt-1 font-semibold">
+              {sighting.reporter} · {new Date(sighting.observedAt).toLocaleDateString('sv-SE')} · {sighting.confidence} confidence
+            </p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export function ProductPriceCards({
   cards,
   eyebrow = 'Adaptive product cards',
@@ -268,6 +290,7 @@ export function ProductPriceCards({
             <p className="mt-4 text-3xl font-black text-emerald-800">{primaryLabel(card, compareMode)}</p>
             <p className="mt-1 text-sm font-semibold text-slate-700">{secondaryLabel(card, compareMode)}</p>
             <p className="mt-3 text-sm leading-6 text-slate-600">{card.sourceLabel}</p>
+            <FriendPriceSightingsPanel card={card} />
             <SafetyWarningBanner card={card} preferences={safetyPreferences} />
             <PriceHistorySparkline card={card} />
             <p className="mt-2 rounded-xl bg-blue-50 p-3 text-xs font-bold text-blue-950">{card.confidenceLabel}</p>

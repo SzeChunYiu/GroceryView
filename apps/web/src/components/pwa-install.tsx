@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { trackPwaInstallAnalytics } from '@/lib/analytics';
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -25,7 +26,7 @@ function isStandalone() {
 }
 
 function stepsFor(platform: Platform, canInstall: boolean) {
-  if (canInstall) return 'Install GroceryView for one-tap access when comparing grocery prices.';
+  if (canInstall) return 'Install GroceryView for one-tap access, offline list check-off, and cached product details.';
   if (platform === 'ios') return 'On iPhone or iPad: tap Share, then Add to Home Screen.';
   if (platform === 'android') return 'On Android: open the browser menu, then tap Install app or Add to Home screen.';
   return 'On desktop: use your browser install button or menu to add GroceryView as an app.';
@@ -35,12 +36,18 @@ export function PwaInstall() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [dismissed, setDismissed] = useState(true);
   const [platform, setPlatform] = useState<Platform>('desktop');
+  const [ready, setReady] = useState(false);
   const [standalone, setStandalone] = useState(true);
+  const impressionKeyRef = useRef<string | null>(null);
+  const standaloneLaunchTrackedRef = useRef(false);
+
+  const canInstall = deferredPrompt !== null;
 
   useEffect(() => {
     setPlatform(getPlatform(window.navigator.userAgent));
     setStandalone(isStandalone());
     setDismissed(window.localStorage.getItem(dismissedKey) === 'true');
+    setReady(true);
 
     function handleBeforeInstallPrompt(event: Event) {
       event.preventDefault();
@@ -53,6 +60,12 @@ export function PwaInstall() {
       setDeferredPrompt(null);
       setStandalone(true);
       window.localStorage.setItem(dismissedKey, 'true');
+      trackPwaInstallAnalytics({
+        action: 'app_installed',
+        canInstall: false,
+        platform: getPlatform(window.navigator.userAgent),
+        source: 'appinstalled'
+      });
     }
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -64,9 +77,36 @@ export function PwaInstall() {
     };
   }, []);
 
-  if (standalone || dismissed) return null;
+  useEffect(() => {
+    if (!ready) return;
 
-  const canInstall = deferredPrompt !== null;
+    if (standalone) {
+      if (standaloneLaunchTrackedRef.current) return;
+      standaloneLaunchTrackedRef.current = true;
+      trackPwaInstallAnalytics({
+        action: 'standalone_launch',
+        canInstall,
+        launchSource: new URLSearchParams(window.location.search).get('utm_source') ?? undefined,
+        platform,
+        source: 'standalone_display'
+      });
+      return;
+    }
+
+    if (dismissed) return;
+
+    const impressionKey = `${platform}:${canInstall ? 'installable' : 'instructions'}`;
+    if (impressionKeyRef.current === impressionKey) return;
+    impressionKeyRef.current = impressionKey;
+    trackPwaInstallAnalytics({
+      action: 'prompt_impression',
+      canInstall,
+      platform,
+      source: canInstall ? 'beforeinstallprompt' : 'install_banner'
+    });
+  }, [canInstall, dismissed, platform, ready, standalone]);
+
+  if (standalone || dismissed) return null;
 
   async function handleInstall() {
     if (!deferredPrompt) return;
@@ -76,11 +116,23 @@ export function PwaInstall() {
     if (choice.outcome === 'dismissed') {
       window.localStorage.setItem(dismissedKey, 'true');
     }
+    trackPwaInstallAnalytics({
+      action: choice.outcome === 'accepted' ? 'install_prompt_accepted' : 'install_prompt_dismissed',
+      canInstall: true,
+      platform,
+      source: 'beforeinstallprompt'
+    });
     setDismissed(true);
   }
 
   function handleDismiss() {
     window.localStorage.setItem(dismissedKey, 'true');
+    trackPwaInstallAnalytics({
+      action: 'banner_dismissed',
+      canInstall,
+      platform,
+      source: 'install_banner'
+    });
     setDismissed(true);
   }
 
@@ -105,7 +157,7 @@ export function PwaInstall() {
     >
       <div style={{ display: 'flex', gap: '12px', justifyContent: 'space-between' }}>
         <div>
-          <strong style={{ display: 'block', fontSize: '0.95rem' }}>Add GroceryView to your home screen</strong>
+          <strong style={{ display: 'block', fontSize: '0.95rem' }}>Add GroceryView for offline shopping</strong>
           <span style={{ display: 'block', fontSize: '0.875rem', lineHeight: 1.45, marginTop: '4px' }}>
             {stepsFor(platform, canInstall)}
           </span>
