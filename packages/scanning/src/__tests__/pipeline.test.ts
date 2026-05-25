@@ -347,8 +347,11 @@ describe('planReceiptAliasGrowth', () => {
           scanId: 'receipt-commodity-1',
           chainLabel: 'Willys Odenplan',
           observedAt: '2026-05-22T10:00:00.000Z',
+          reporterId: 'reporter-produce-1',
+          sourceTrust: 0.82,
+          evidenceImageUri: 'private-upload://receipt-commodity-1',
           rows: [
-            { rawName: 'Banan 0,82 kg', itemTotal: 19.35, confidence: 0.86 },
+            { rawName: 'Banan 0,82 kg', itemTotal: 19.35, confidence: 0.86, evidenceText: 'Banan 0,82 kg 19,35' },
             { rawName: 'Gurka 1 st', itemTotal: 12.9, confidence: 0.74 },
             { rawName: 'SMUDGED ROW', itemTotal: 8, confidence: 0.42 }
           ]
@@ -364,7 +367,13 @@ describe('planReceiptAliasGrowth', () => {
       comparableUnit: candidate.comparableUnit,
       quantity: candidate.quantity,
       unitPrice: candidate.unitPrice,
+      confidence: candidate.confidence,
+      sourceTrust: candidate.sourceTrust,
+      reporterId: candidate.reporterId,
+      evidenceText: candidate.evidenceText,
+      evidenceImageUri: candidate.evidenceImageUri,
       priority: candidate.priority,
+      reviewQueue: candidate.reviewQueue,
       reviewAction: candidate.reviewAction
     })), [
       {
@@ -374,7 +383,13 @@ describe('planReceiptAliasGrowth', () => {
         comparableUnit: 'kg',
         quantity: 0.82,
         unitPrice: 23.6,
+        confidence: 0.82,
+        sourceTrust: 0.82,
+        reporterId: 'reporter-produce-1',
+        evidenceText: 'Banan 0,82 kg 19,35',
+        evidenceImageUri: 'private-upload://receipt-commodity-1',
         priority: 'medium',
+        reviewQueue: 'community_review_queue',
         reviewAction: 'create_commodity_alias_candidate'
       },
       {
@@ -384,9 +399,26 @@ describe('planReceiptAliasGrowth', () => {
         comparableUnit: 'st',
         quantity: 1,
         unitPrice: 12.9,
+        confidence: 0.74,
+        sourceTrust: 0.82,
+        reporterId: 'reporter-produce-1',
+        evidenceText: 'Gurka 1 st',
+        evidenceImageUri: 'private-upload://receipt-commodity-1',
         priority: 'high',
+        reviewQueue: 'community_review_queue',
         reviewAction: 'create_commodity_alias_candidate'
       }
+    ]);
+    assert.deepEqual(plan.candidates[0]?.evidence, [
+      'chain_label:Willys Odenplan',
+      'item_total_sek:19.35',
+      'quantity:0.82 kg',
+      'source:receipt_ocr',
+      'source_trust:0.82',
+      'confidence:0.82',
+      'reporter:reporter-produce-1',
+      'evidence_text:Banan 0,82 kg 19,35',
+      'evidence_image:private-upload://receipt-commodity-1'
     ]);
     assert.deepEqual(plan.rejectedRows, [
       { scanId: 'receipt-commodity-1', rawName: 'SMUDGED ROW', reason: 'receipt_row_confidence_below_threshold' }
@@ -413,6 +445,24 @@ describe('planReceiptAliasGrowth', () => {
     assert.deepEqual(plan.rejectedRows, [
       { scanId: 'receipt-commodity-2', rawName: 'Tomat', reason: 'chain_label_required' }
     ]);
+  });
+
+  it('rejects invalid receipt source trust instead of producing alias candidates', () => {
+    assert.throws(
+      () =>
+        planReceiptAliasGrowth({
+          receipts: [
+            {
+              scanId: 'receipt-commodity-3',
+              chainLabel: 'Coop',
+              observedAt: '2026-05-22T10:00:00.000Z',
+              sourceTrust: 1.5,
+              rows: [{ rawName: 'Äpple 0,5 kg', itemTotal: 14.5, confidence: 0.9 }]
+            }
+          ]
+        }),
+      /receipt source trust must be a number between 0 and 1/
+    );
   });
 });
 

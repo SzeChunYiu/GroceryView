@@ -256,12 +256,16 @@ export function planScanReviewWorkItems(scans: ScanReviewWorkItemInput[]): ScanR
 
 export type ReceiptAliasGrowthRow = ReceiptOcrRow & {
   quantityText?: string;
+  evidenceText?: string;
 };
 
 export type ReceiptAliasGrowthReceipt = {
   scanId: string;
   chainLabel: string;
   observedAt: string;
+  reporterId?: string;
+  sourceTrust?: number;
+  evidenceImageUri?: string;
   rows: ReceiptAliasGrowthRow[];
 };
 
@@ -288,8 +292,13 @@ export type ReceiptAliasGrowthCandidate = {
   comparableUnit: 'kg' | 'l' | 'st';
   unitPrice: number;
   confidence: number;
+  sourceTrust: number;
+  reporterId: string | null;
+  evidenceText: string | null;
+  evidenceImageUri: string | null;
   priority: ScanReviewPriority;
   observedAt: string;
+  reviewQueue: 'community_review_queue';
   reviewAction: 'create_commodity_alias_candidate';
   evidence: string[];
 };
@@ -342,6 +351,10 @@ function rejectReceiptAliasRow(rejectedRows: ReceiptAliasGrowthRejectedRow[], sc
   rejectedRows.push({ scanId, rawName, reason });
 }
 
+function trustAdjustedAliasConfidence(rowConfidence: number, sourceTrust: number): number {
+  return Math.min(rowConfidence, sourceTrust);
+}
+
 export function planReceiptAliasGrowth(input: { receipts: ReceiptAliasGrowthReceipt[]; minimumConfidence?: number }): ReceiptAliasGrowthPlan {
   const minimumConfidence = input.minimumConfidence ?? 0.55;
   const candidates: ReceiptAliasGrowthCandidate[] = [];
@@ -351,6 +364,10 @@ export function planReceiptAliasGrowth(input: { receipts: ReceiptAliasGrowthRece
     if (!receipt.scanId.trim()) throw new Error('scanId is required.');
     const chainLabel = receipt.chainLabel.trim();
     const observedAtIsValid = !Number.isNaN(Date.parse(receipt.observedAt));
+    const sourceTrust = receipt.sourceTrust ?? 0.5;
+    validateScanConfidence(sourceTrust, 'receipt source trust');
+    const reporterId = receipt.reporterId?.trim() || null;
+    const evidenceImageUri = receipt.evidenceImageUri?.trim() || null;
 
     for (const row of receipt.rows) {
       const rawName = row.rawName.trim();
@@ -381,6 +398,19 @@ export function planReceiptAliasGrowth(input: { receipts: ReceiptAliasGrowthRece
         rejectReceiptAliasRow(rejectedRows, receipt.scanId, rawName, 'alias_required');
         continue;
       }
+      const evidenceText = row.evidenceText?.trim() || rawName;
+      const adjustedConfidence = trustAdjustedAliasConfidence(row.confidence, sourceTrust);
+      const evidence = [
+        `chain_label:${chainLabel}`,
+        `item_total_sek:${roundScanMoney(row.itemTotal)}`,
+        `quantity:${quantity.evidenceValue}`,
+        `source:receipt_ocr`,
+        `source_trust:${sourceTrust}`,
+        `confidence:${adjustedConfidence}`
+      ];
+      if (reporterId) evidence.push(`reporter:${reporterId}`);
+      if (evidenceText) evidence.push(`evidence_text:${evidenceText}`);
+      if (evidenceImageUri) evidence.push(`evidence_image:${evidenceImageUri}`);
 
       candidates.push({
         id: aliasCandidateId(receipt.scanId, normalizedAlias),
@@ -392,16 +422,16 @@ export function planReceiptAliasGrowth(input: { receipts: ReceiptAliasGrowthRece
         quantity: quantity.quantity,
         comparableUnit: quantity.comparableUnit,
         unitPrice: roundScanMoney(row.itemTotal / quantity.quantity),
-        confidence: row.confidence,
-        priority: row.confidence < 0.8 ? 'high' : 'medium',
+        confidence: adjustedConfidence,
+        sourceTrust,
+        reporterId,
+        evidenceText,
+        evidenceImageUri,
+        priority: adjustedConfidence < 0.8 ? 'high' : 'medium',
         observedAt: receipt.observedAt,
+        reviewQueue: 'community_review_queue',
         reviewAction: 'create_commodity_alias_candidate',
-        evidence: [
-          `chain_label:${chainLabel}`,
-          `item_total_sek:${roundScanMoney(row.itemTotal)}`,
-          `quantity:${quantity.evidenceValue}`,
-          `source:receipt_ocr`
-        ]
+        evidence
       });
     }
   }
@@ -418,7 +448,8 @@ export function planReceiptAliasGrowth(input: { receipts: ReceiptAliasGrowthRece
     guardrails: [
       'Receipt-fed aliases are review candidates only; they do not update product_aliases or commodity mappings automatically.',
       'Every candidate requires chain label + kr + weight evidence before human review.',
-      'Private receipt images stay out of this plan; only normalized OCR metadata is used.'
+      'Reporter trust caps candidate confidence until a community reviewer accepts the alias.',
+      'Receipt image references are carried only when provided as private evidence URIs for review; public scanner surfaces show text metadata only.'
     ],
     summary: `${candidates.length} alias candidates require human review; ${rejectedRows.length} receipt rows were rejected.`
   };
