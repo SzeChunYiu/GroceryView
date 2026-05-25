@@ -69,14 +69,14 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="sv" suppressHydrationWarning>
       <body>
         <SkipLink />
-        <script
-          dangerouslySetInnerHTML={{ __html: "try{var p=localStorage.getItem('groceryview:theme-preference');if(p==='dark'||(!p&&matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');document.documentElement.style.colorScheme='dark';}}catch(e){}" }}
-        />
-        <script
-          dangerouslySetInnerHTML={{ __html: jsonLd([organizationJsonLd, websiteJsonLd]) }}
-          type="application/ld+json"
-        />
         <div id="main-content" tabIndex={-1}>
+          <script
+            dangerouslySetInnerHTML={{ __html: "try{var p=localStorage.getItem('groceryview:theme-preference');if(p==='dark'||(!p&&matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');document.documentElement.style.colorScheme='dark';}}catch(e){}" }}
+          />
+          <script
+            dangerouslySetInnerHTML={{ __html: jsonLd([organizationJsonLd, websiteJsonLd]) }}
+            type="application/ld+json"
+          />
           <Providers>{children}</Providers>
         </div>
         <ConsentManager />

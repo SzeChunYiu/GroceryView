@@ -12,7 +12,7 @@ async function loadProductsRoute() {
     .replace("import { recordProductSearchPerformanceTelemetry, type ProductSearchPerformanceTelemetry } from '@/lib/analytics';", 'const recordProductSearchPerformanceTelemetry = (telemetry) => ({ ...telemetry, latencyMs: 0, cacheHitRate: telemetry.cacheHit ? 1 : 0, timeoutRate: telemetry.timedOut ? 1 : 0 });')
     .replace("import { fuzzyProductSearchQueries, rankFuzzyProductResults } from '@/lib/search-fuzzy';", 'const fuzzyProductSearchQueries = (query, expansion) => expansion.expandedQueries ?? [query]; const rankFuzzyProductResults = (_query, batches) => batches.flat();')
     .replace("import { searchExplanationBadgesForProduct } from '@/lib/search-filters';", 'const searchExplanationBadgesForProduct = () => [];')
-    .replace("import { buildMisspelledQueryRecovery, expandGrocerySearchQueryWithTelemetry, type GrocerySearchExpansion, type GrocerySearchExpansionTelemetry } from '@/lib/search-suggest';", 'const buildMisspelledQueryRecovery = () => null; const expandGrocerySearchQueryWithTelemetry = (query) => ({ expansion: { query, expandedQueries: query ? [query] : [], matchedAliases: [], matchedFuzzyAliases: [], matchedSynonyms: [] }, telemetry: { cacheHit: false } });')
+    .replace("import { buildMisspelledQueryRecovery, expandGrocerySearchQueryWithTelemetry, type GrocerySearchExpansion, type GrocerySearchExpansionTelemetry } from '@/lib/search-suggest';", 'const buildMisspelledQueryRecovery = (query) => ({ query, didYouMean: [], popularAlternatives: [] }); const expandGrocerySearchQueryWithTelemetry = (query) => ({ expansion: { query, expandedQueries: query ? [query] : [], matchedAliases: [], matchedFuzzyAliases: [], matchedSynonyms: [] }, telemetry: { cacheHit: false } });')
     .replace(/type PgPoolLike = \{[\s\S]*?\};\n\n/, '')
     .replace(/type PgModuleLike = \{[\s\S]*?\};\n\n/, '')
     .replace(/let cachedDatabaseUrl: string \| null = null;/, 'let cachedDatabaseUrl = null;')
@@ -51,6 +51,11 @@ test('products route validation accepts q-only searches and rejects unexpected q
     expandedQueries: ['a'],
     matchedAliases: [],
     matchedSynonyms: [],
+    queryRecovery: {
+      query: 'a',
+      didYouMean: [],
+      popularAlternatives: []
+    },
     performanceTelemetry: {
       cacheHit: false,
       cacheHitRate: 0,

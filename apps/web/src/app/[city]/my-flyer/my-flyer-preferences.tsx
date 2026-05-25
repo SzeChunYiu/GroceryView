@@ -103,6 +103,7 @@ export function MyFlyerPreferences({ defaultCountry, defaultAlgorithm }: MyFlyer
           <input className="mt-1 w-full rounded-2xl border border-emerald-200 bg-white px-3 py-2" min={1} max={12} onChange={(event) => setHouseholdSize(Number(event.target.value))} type="number" value={householdSize} />
         </label>
         <div className="md:col-span-2">
+          <p className="sr-only">Favorite stores</p>
           <FavoriteStorePicker selectedStoreSlugs={splitStores(favoriteStores)} onChange={(stores) => setFavoriteStores(stores.join(', '))} />
         </div>
         <label className="text-sm font-black text-slate-700">Algorithm choice

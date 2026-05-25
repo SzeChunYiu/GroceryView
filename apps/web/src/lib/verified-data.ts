@@ -1,7 +1,6 @@
 import { buildFacetedProductSearch, type RealCatalogSearchPriceRow } from '@groceryview/api';
 import { COMMODITIES, STAPLE_BASKET, SUPPORTED_PRICE_DOMAINS, type Commodity, type ComparableUnit } from '@groceryview/catalog';
 import { buildPriceChartSeries, buildWatchlistAlerts, calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, suggestFriendSharedDeals, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type PriceChartObservation, type ProductMatchInput, type WatchlistItem, type WatchlistPriceType, type WatchlistProductSnapshot } from '@groceryview/core';
-import { majorSwedishGroceryRetailerTypeCoverage, retailerTypes, summarizeTrendingProductPriceChanges, type TrendingPriceChangePoint } from '@groceryview/db';
 import { planReceiptAliasGrowth } from '@groceryview/scanning';
 import { calculateCarbonScore, type ProductCarbonScore } from '../../../../packages/core/src/lib/carbonScore';
 import { axfoodProducts } from './axfood-products';
@@ -37,6 +36,142 @@ import {
   supportedCurrencies,
   unknownUnitPriceLabel
 } from './i18n';
+
+type TrendingPriceChangePoint = {
+  productId: string;
+  productSlug: string;
+  productName: string;
+  brand?: string;
+  categoryLabel?: string;
+  price: number;
+  currency: string;
+  observedAt: string;
+  chainSlug?: string;
+  chainName?: string;
+  storeSlug?: string;
+  storeName?: string;
+};
+
+type TrendingProductPriceChange = {
+  rank: number;
+  productId: string;
+  productSlug: string;
+  productName: string;
+  brand?: string;
+  categoryLabel?: string;
+  changeCount: number;
+  observationCount: number;
+  latestPrice: number;
+  previousPrice: number;
+  changeAmount: number;
+  changePercent: number;
+  currency: string;
+  latestObservedAt: string;
+  chainSlug?: string;
+  chainName?: string;
+  storeSlug?: string;
+  storeName?: string;
+};
+
+const retailerTypes = [
+  'grocery',
+  'pharmacy',
+  'fuel',
+  'convenience',
+  'variety',
+  'cosmetics',
+  'household',
+  'online_marketplace'
+] as const;
+
+const majorSwedishGroceryRetailerTypeCoverage = retailerTypes.map((retailerType) => {
+  const chainSlugs = retailerType === 'grocery' ? ['ica', 'coop', 'willys', 'hemkop', 'lidl', 'netto'] : [];
+  return {
+    retailerType,
+    chainCount: chainSlugs.length,
+    chainSlugs
+  };
+});
+
+function sortTrendingPriceChangePoints(left: TrendingPriceChangePoint, right: TrendingPriceChangePoint): number {
+  const dateDelta = Date.parse(left.observedAt) - Date.parse(right.observedAt);
+  if (dateDelta !== 0) return dateDelta;
+  const productDelta = left.productId.localeCompare(right.productId);
+  if (productDelta !== 0) return productDelta;
+  return `${left.chainSlug ?? ''}:${left.storeSlug ?? ''}`.localeCompare(`${right.chainSlug ?? ''}:${right.storeSlug ?? ''}`);
+}
+
+function summarizeTrendingProductPriceChanges(input: {
+  points: TrendingPriceChangePoint[];
+  asOf: string;
+  windowDays?: number;
+  limit?: number;
+}): TrendingProductPriceChange[] {
+  const limit = Math.min(Math.max(input.limit ?? 10, 1), 10);
+  const windowDays = Math.min(Math.max(input.windowDays ?? 7, 1), 31);
+  const untilMs = Date.parse(input.asOf);
+  if (Number.isNaN(untilMs)) return [];
+  const sinceMs = untilMs - windowDays * 24 * 60 * 60 * 1000;
+  const byProduct = new Map<string, TrendingPriceChangePoint[]>();
+
+  for (const point of input.points) {
+    const observedMs = Date.parse(point.observedAt);
+    if (!Number.isFinite(point.price) || Number.isNaN(observedMs) || observedMs > untilMs) continue;
+    byProduct.set(point.productId, [...(byProduct.get(point.productId) ?? []), point]);
+  }
+
+  const ranked: Omit<TrendingProductPriceChange, 'rank'>[] = [];
+  for (const points of byProduct.values()) {
+    const sorted = [...points].sort(sortTrendingPriceChangePoints);
+    let previous: TrendingPriceChangePoint | undefined;
+    const windowChanges: Array<{ previous: TrendingPriceChangePoint; latest: TrendingPriceChangePoint }> = [];
+    let windowObservationCount = 0;
+
+    for (const point of sorted) {
+      const observedMs = Date.parse(point.observedAt);
+      if (observedMs >= sinceMs && observedMs <= untilMs) {
+        windowObservationCount += 1;
+        if (previous && Math.abs(previous.price - point.price) >= 0.000001) windowChanges.push({ previous, latest: point });
+      }
+      previous = point;
+    }
+
+    const latestChange = windowChanges.at(-1);
+    if (!latestChange) continue;
+    const latestPoint = latestChange.latest;
+    const previousPoint = latestChange.previous;
+    const changeAmount = latestPoint.price - previousPoint.price;
+    ranked.push({
+      productId: latestPoint.productId,
+      productSlug: latestPoint.productSlug,
+      productName: latestPoint.productName,
+      ...(latestPoint.brand ? { brand: latestPoint.brand } : {}),
+      ...(latestPoint.categoryLabel ? { categoryLabel: latestPoint.categoryLabel } : {}),
+      changeCount: windowChanges.length,
+      observationCount: windowObservationCount,
+      latestPrice: latestPoint.price,
+      previousPrice: previousPoint.price,
+      changeAmount,
+      changePercent: previousPoint.price > 0 ? (changeAmount / previousPoint.price) * 100 : 0,
+      currency: latestPoint.currency,
+      latestObservedAt: latestPoint.observedAt,
+      ...(latestPoint.chainSlug ? { chainSlug: latestPoint.chainSlug } : {}),
+      ...(latestPoint.chainName ? { chainName: latestPoint.chainName } : {}),
+      ...(latestPoint.storeSlug ? { storeSlug: latestPoint.storeSlug } : {}),
+      ...(latestPoint.storeName ? { storeName: latestPoint.storeName } : {})
+    });
+  }
+
+  return ranked
+    .sort((left, right) => (
+      right.changeCount - left.changeCount
+      || right.observationCount - left.observationCount
+      || Math.abs(right.changeAmount) - Math.abs(left.changeAmount)
+      || left.productName.localeCompare(right.productName, 'sv')
+    ))
+    .slice(0, limit)
+    .map((item, index) => ({ rank: index + 1, ...item }));
+}
 
 const icaReklambladOffers = dbSiteIcaReklambladOffers.length > 0 ? dbSiteIcaReklambladOffers : staticIcaReklambladOffers;
 const icaReklambladSource = dbSiteIcaReklambladOffers.length > 0 ? dbSiteIcaReklambladSource : staticIcaReklambladSource;

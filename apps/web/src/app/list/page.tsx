@@ -68,12 +68,12 @@ function mealPlanImportSummary(exportPayload: MealPlanShoppingListExport): MealP
 }
 
 export async function generateMetadata({ searchParams }: { searchParams?: Promise<ListPageSearchParams> }): Promise<Metadata> {
-  const resolvedSearchParams = await (searchParams ?? Promise.resolve({}));
+  const resolvedSearchParams: ListPageSearchParams = searchParams ? await searchParams : {};
   return metadataForShoppingListShare(resolvedSearchParams.share);
 }
 
 export default async function ShoppingListPage({ searchParams }: { searchParams?: Promise<ListPageSearchParams> }) {
-  const resolvedSearchParams = await (searchParams ?? Promise.resolve({}));
+  const resolvedSearchParams: ListPageSearchParams = searchParams ? await searchParams : {};
   const selectedChain = normalizeChain(resolvedSearchParams.chain);
   const groupOrder = normalizeGroupOrder(resolvedSearchParams.groupOrder);
   const shareToken = Array.isArray(resolvedSearchParams.share) ? resolvedSearchParams.share[0] : resolvedSearchParams.share;

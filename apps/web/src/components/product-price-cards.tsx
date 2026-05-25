@@ -293,7 +293,7 @@ export function ProductPriceCards({
   }
 
   return (
-    <section className="rounded-[1.75rem] border border-emerald-200 bg-white/90 p-5 shadow-sm" data-compare-mode={compareMode}>
+    <section className="rounded-[1.75rem] border border-emerald-200 bg-white/90 p-5 shadow-sm" data-compare-mode={compareMode} data-sort-contract="cheapest-per-unit">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.24em] text-emerald-800">{eyebrow}</p>

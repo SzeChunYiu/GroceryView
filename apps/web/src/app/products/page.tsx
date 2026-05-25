@@ -13,14 +13,14 @@ import { apohemSource } from '@/lib/ingested/apohem';
 import { newProductArrivals } from '@/lib/new-arrivals';
 import { buildSavedSearchSubscription } from '@/lib/alert-scheduler';
 import { adaptiveProductCards, buildProductSearchView, withProductSearchExplanationBadges, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
-import { publicCatalogueRevalidateSeconds, routeMetadata } from '@/lib/seo';
+import { routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
 import { buildRemovableSearchFilterChips } from '@/lib/search-filters';
 import { buildSearchFilterPreset } from '@/lib/search-presets';
 
 const PRODUCTS_PER_PAGE = 50;
 
-export const revalidate = publicCatalogueRevalidateSeconds;
+export const revalidate = 300;
 
 export function generateMetadata() {
   return routeMetadata('/products');
@@ -134,6 +134,14 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
   const search = buildProductSearchView(resolvedSearchParams);
   const { categoryFacets, labelFacets, originFacets, chainFacets, priceRange, inStockOnly, resultCards } = search;
+  const drawerPriceRange = {
+    min: priceRange.min ?? 0,
+    max: priceRange.max ?? 0
+  };
+  const virtualizedResultCards = resultCards.map((card) => ({
+    ...card,
+    isAvailable: card.isAvailable ?? undefined
+  }));
   const requestedPage = toPageNumber(resolvedSearchParams.page);
   const selectedBrand = normalizeSelectedBrand(resolvedSearchParams.brand);
   const baseProductCards = selectedBrand
@@ -237,10 +245,10 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             dietaryFilters={search.dietaryFilters}
             inStockOnly={search.filters.inStockOnly}
             labelFacets={labelFacets}
-            maxPrice={search.filters.maxPrice}
-            minConfidence={search.filters.minConfidence}
-            minPrice={search.filters.minPrice}
-            priceRange={priceRange}
+            maxPrice={search.filters.maxPrice ?? undefined}
+            minConfidence={search.filters.minConfidence ?? undefined}
+            minPrice={search.filters.minPrice ?? undefined}
+            priceRange={drawerPriceRange}
             selectedBrand={selectedBrand}
             selectedCategories={search.filters.categories}
             selectedChains={search.filters.chains}
@@ -319,7 +327,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           </div>
           <div className="rounded-2xl border border-violet-100 bg-white p-4 shadow-sm">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">Price range + stock</p>
-            <p className="mt-3 text-2xl font-black text-slate-950">{formatSek(priceRange.min)} – {formatSek(priceRange.max)}</p>
+            <p className="mt-3 text-2xl font-black text-slate-950">{formatSek(drawerPriceRange.min)} – {formatSek(drawerPriceRange.max)}</p>
             <p className="mt-2 text-xs font-bold text-slate-600">Comparable unit filters cover kr/kg, kr/l, and per-unit rows. {inStockOnly.label} keeps unpriced catalog rows out of instant results.</p>
             <p className="mt-2 text-xs font-bold text-slate-600">
               Variance badges: {(volatilityBadgeCounts.stable ?? 0).toLocaleString('sv-SE')} stable · {(volatilityBadgeCounts.volatile ?? 0).toLocaleString('sv-SE')} volatile · {(volatilityBadgeCounts['likely-promo'] ?? 0).toLocaleString('sv-SE')} likely promo.
@@ -330,7 +338,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           Rendering {rangeStart.toLocaleString('sv-SE')}–{rangeEnd.toLocaleString('sv-SE')} of {resultCards.length.toLocaleString('sv-SE')} matching products through an accessible virtualized result list.
         </p>
         {/* product.isAvailable === false is rendered inside VirtualizedProductGrid for measured virtual rows. */}
-        <VirtualizedProductGrid products={resultCards} resultLabel={virtualizedResultLabel} />
+        <VirtualizedProductGrid products={virtualizedResultCards} resultLabel={virtualizedResultLabel} />
         {resultCards.length > PRODUCTS_PER_PAGE ? (
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3 text-sm">
             <p className="font-black text-slate-700">

@@ -74,6 +74,8 @@ void navContractLabels;
 void navProvenanceCopy;
 
 function buildNavGroups(t: AppNavTranslator): NavGroup[] {
+  void navContractLabels;
+  void navProvenanceCopy;
   return [
     {
       label: t('app-nav.groups.markets'),

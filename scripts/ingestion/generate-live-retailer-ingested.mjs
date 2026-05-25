@@ -65,7 +65,7 @@ const requestedSources = new Set((process.env.GROCERYVIEW_INGEST_SOURCES ?? '')
   .map((source) => source.trim().toLowerCase())
   .filter(Boolean));
 const shouldRun = (source) => requestedSources.size === 0 || requestedSources.has(source);
-const dbSiteOverrideSources = ['citygross', 'coop', 'willys', 'hemkop', 'lidl', 'ica-reklamblad'];
+const dbSiteOverrideSources = ['citygross', 'willys', 'hemkop', 'lidl'];
 const shouldWriteDbSiteOverrides = requestedSources.size === 0
   || dbSiteOverrideSources.every((source) => requestedSources.has(source));
 
