@@ -1,5 +1,31 @@
 export type CommunityReviewVote = 'upvote' | 'downvote';
 export type CommunityReportModerationStatus = 'active' | 'reported' | 'under_review' | 'dismissed';
+export type ModerationQueueType = 'flagged_review' | 'price_report' | 'duplicate_product_report';
+
+export type CommunityModerationQueueItem = {
+  actionLabel: string;
+  detail: string;
+  id: string;
+  priority: 'high' | 'medium' | 'low';
+  reportCount: number;
+  status: CommunityReportModerationStatus;
+  submittedAt: string;
+  submittedBy: string;
+  title: string;
+  type: ModerationQueueType;
+};
+
+export function moderationQueueTypeLabel(type: ModerationQueueType): string {
+  if (type === 'flagged_review') return 'Flagged review';
+  if (type === 'duplicate_product_report') return 'Duplicate product report';
+  return 'Price report';
+}
+
+export function moderationPriorityLabel(priority: CommunityModerationQueueItem['priority']): string {
+  if (priority === 'high') return 'High priority';
+  if (priority === 'medium') return 'Medium priority';
+  return 'Low priority';
+}
 
 export type CommunityPriceReview = {
   body: string;
@@ -109,3 +135,42 @@ export function moderationStatusLabel(status: CommunityReportModerationStatus | 
 export const suspiciousCommunityPriceReports = defaultCommunityPriceReviews.filter((review) =>
   (review.moderationStatus === 'reported' || review.moderationStatus === 'under_review') || (review.reportCount ?? 0) > 0
 );
+
+export const communityModerationQueue: CommunityModerationQueueItem[] = [
+  ...suspiciousCommunityPriceReports.map((review): CommunityModerationQueueItem => ({
+    actionLabel: 'Review community evidence',
+    detail: review.lastReportReason ?? review.body,
+    id: `queue-${review.id}`,
+    priority: review.moderationStatus === 'under_review' ? 'high' : 'medium',
+    reportCount: review.reportCount ?? 1,
+    status: review.moderationStatus ?? 'reported',
+    submittedAt: review.submittedAt,
+    submittedBy: review.reviewerLabel,
+    title: `${review.productName} · ${review.priceLabel}`,
+    type: 'flagged_review'
+  })),
+  {
+    actionLabel: 'Validate price evidence',
+    detail: 'Receipt photo and shelf tag disagree on Milk 1L at Lidl Sveavägen before it can update shopper-facing prices.',
+    id: 'queue-price-report-milk-lidl',
+    priority: 'high',
+    reportCount: 3,
+    status: 'under_review',
+    submittedAt: '2026-05-20T08:10:00.000Z',
+    submittedBy: 'Trusted price reporter',
+    title: 'Milk 1L · 13.90 SEK',
+    type: 'price_report'
+  },
+  {
+    actionLabel: 'Compare duplicate records',
+    detail: 'Two Green Valley organic whole milk records share UPC and package size; keep separate or merge before catalog search ranks both.',
+    id: 'queue-duplicate-green-valley-milk',
+    priority: 'medium',
+    reportCount: 1,
+    status: 'reported',
+    submittedAt: '2026-05-20T09:25:00.000Z',
+    submittedBy: 'Catalog dedupe monitor',
+    title: 'Organic Whole Milk 1 gal duplicate pair',
+    type: 'duplicate_product_report'
+  }
+];
