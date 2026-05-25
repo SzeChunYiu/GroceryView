@@ -21,6 +21,21 @@
     "persisted": "The language preference is stored locally and in the NEXT_LOCALE cookie.",
     "guardrail": "Arabic and Somali stay blocked until reviewed translations are available."
   },
+  "personalized-rail": {
+    "eyebrow": "Personalized for {householdId}",
+    "title": "Next likely grocery needs",
+    "body": "Ranked from demo household signals, favorite brands, and recent list activity. The rail only links to verified product pages.",
+    "score": "Score {score}",
+    "brandNotReported": "Brand not reported",
+    "pricePending": "price pending"
+  },
+  "blocked-locale": {
+    "title": "Native-quality translation review required",
+    "body": "GroceryView only routes Swedish and English public copy today. Arabic and Somali remain visible as expansion routes, but they stay blocked until native reviewers approve every navigation, policy, and source-evidence string.",
+    "guardrailNoMachineTranslation": "No machine-translated prices",
+    "guardrailEvidenceUnchanged": "SEK amounts and source evidence stay unchanged",
+    "guardrailNativeReview": "Native-quality translations must pass review before launch"
+  },
   "empty-state": {
     "eyebrow": "Fail-closed UI",
     "title": "No verified records for this feature yet",
