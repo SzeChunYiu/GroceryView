@@ -289,6 +289,9 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(migration, /products_name_trgm_idx on products using gin \(canonical_name gin_trgm_ops\)/);
     assert.match(migration, /products_slug_trgm_idx on products using gin \(slug gin_trgm_ops\)/);
     assert.match(migration, /aliases_normalized_trgm_idx on aliases using gin \(normalized_alias gin_trgm_ops\)/);
+    assert.match(allMigrations, /products_search_suggest_trgm_idx/);
+    assert.match(allMigrations, /products_search_suggest_name_sv_trgm_idx/);
+    assert.match(allMigrations, /products_search_suggest_name_en_trgm_idx/);
   });
 
   it('migrates every table used by the PostgreSQL repository adapter', () => {
