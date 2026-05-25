@@ -25,7 +25,7 @@ function isStandalone() {
 }
 
 function stepsFor(platform: Platform, canInstall: boolean) {
-  if (canInstall) return 'Install GroceryView for one-tap access when comparing grocery prices.';
+  if (canInstall) return 'Install GroceryView for one-tap access, offline list check-off, and cached product details.';
   if (platform === 'ios') return 'On iPhone or iPad: tap Share, then Add to Home Screen.';
   if (platform === 'android') return 'On Android: open the browser menu, then tap Install app or Add to Home screen.';
   return 'On desktop: use your browser install button or menu to add GroceryView as an app.';
@@ -105,7 +105,7 @@ export function PwaInstall() {
     >
       <div style={{ display: 'flex', gap: '12px', justifyContent: 'space-between' }}>
         <div>
-          <strong style={{ display: 'block', fontSize: '0.95rem' }}>Add GroceryView to your home screen</strong>
+          <strong style={{ display: 'block', fontSize: '0.95rem' }}>Add GroceryView for offline shopping</strong>
           <span style={{ display: 'block', fontSize: '0.875rem', lineHeight: 1.45, marginTop: '4px' }}>
             {stepsFor(platform, canInstall)}
           </span>
