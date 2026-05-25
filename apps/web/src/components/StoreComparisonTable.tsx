@@ -102,7 +102,7 @@ export function StoreComparisonTable({
       <div className="border-b border-emerald-100 bg-emerald-50 px-5 py-4 print:bg-white">
         <h2 className="text-2xl font-black text-emerald-950">Store comparison</h2>
         <p className="mt-2 text-sm font-semibold leading-6 text-emerald-900">
-          Compare whole-basket store totals side-by-side. Missing items remain visible, and substitution notes point to the cheapest observed store row instead of estimating unavailable prices.
+          Compare whole-basket chain totals side-by-side. Missing items remain visible, and substitution notes point to the cheapest observed store row instead of estimating unavailable prices.
         </p>
         {basketItemCount > 0 ? (
           <p className="mt-2 text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{basketItemCount} basket item(s)</p>
@@ -166,7 +166,7 @@ export function StoreComparisonTable({
 
           <div className="overflow-x-auto rounded-[1.5rem] border border-slate-200 bg-white">
             <table className="min-w-full border-collapse text-left text-sm">
-              <caption className="sr-only">Side-by-side basket totals, missing items, and substitution explanations by store</caption>
+              <caption className="sr-only">Side-by-side basket totals, missing items, and substitution explanations by chain</caption>
               <thead className="bg-slate-950 text-white">
                 <tr>
                   <th className="px-4 py-3 font-black">Store</th>

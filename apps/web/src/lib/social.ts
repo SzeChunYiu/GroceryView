@@ -46,8 +46,10 @@ export type PublicSharePreviewItem = Readonly<{
 }>;
 
 export type PublicSharePreview = Readonly<{
+  cheapestChainLabel: string;
   estimatedTotalLabel: string;
   items: PublicSharePreviewItem[];
+  lastUpdatedLabel: string;
   privacyNote: string;
 }>;
 
@@ -177,13 +179,35 @@ function publicPreviewSlugForItem(item: PublicSharePreviewInputItem) {
   return item.matchedProductSlug || publicPreviewFallbackSlugs[item.name.trim().toLowerCase()];
 }
 
-export function createPublicListSharePreview(items: PublicSharePreviewInputItem[]): PublicSharePreview {
+function formatSharePreviewUpdatedAt(updatedAt: string | null | undefined) {
+  const parsed = updatedAt ? Date.parse(updatedAt) : Number.NaN;
+  const date = Number.isFinite(parsed) ? new Date(parsed) : new Date();
+
+  return `Last updated ${new Intl.DateTimeFormat('sv-SE', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+    timeZone: 'Europe/Stockholm'
+  }).format(date)}`;
+}
+
+export function createPublicListSharePreview(
+  items: PublicSharePreviewInputItem[],
+  options: Readonly<{ updatedAt?: string | null }> = {}
+): PublicSharePreview {
   let matchedEstimateTotal = 0;
+  const chainMatches = new Map<string, { itemCount: number; total: number }>();
 
   const previewItems = items.map((item) => {
     const cheapestSource = cheapestSourceForProductSlug(publicPreviewSlugForItem(item));
     const price = cheapestSource ? priceFromLabel(cheapestSource.priceLabel) : null;
-    if (price !== null) matchedEstimateTotal += price;
+    if (price !== null && cheapestSource) {
+      matchedEstimateTotal += price;
+      const current = chainMatches.get(cheapestSource.chainLabel) ?? { itemCount: 0, total: 0 };
+      chainMatches.set(cheapestSource.chainLabel, {
+        itemCount: current.itemCount + 1,
+        total: current.total + price
+      });
+    }
 
     const rangeCeiling = price !== null && cheapestSource
       ? price * (1 + Math.max(cheapestSource.spreadPercent, 0) / 100)
@@ -198,10 +222,17 @@ export function createPublicListSharePreview(items: PublicSharePreviewInputItem[
       quantity: item.quantity?.trim() || 'Quantity not shared'
     };
   });
+  const cheapestChain = [...chainMatches.entries()].sort(
+    ([, left], [, right]) => right.itemCount - left.itemCount || left.total - right.total
+  )[0];
 
   return {
+    cheapestChainLabel: cheapestChain
+      ? `${cheapestChain[0]} leads ${cheapestChain[1].itemCount} matched item${cheapestChain[1].itemCount === 1 ? '' : 's'}`
+      : 'No cheapest chain from public matches yet',
     estimatedTotalLabel: matchedEstimateTotal > 0 ? `About ${formatSekEstimate(matchedEstimateTotal)} from matched items` : 'No matched-item total yet',
     items: previewItems,
+    lastUpdatedLabel: formatSharePreviewUpdatedAt(options.updatedAt),
     privacyNote: 'Public previews show item names, quantities, catalog estimates, and chain-level price bands only — never account, household, or exact store data.'
   };
 }

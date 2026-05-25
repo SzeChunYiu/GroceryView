@@ -20,10 +20,12 @@ export const CERTIFICATION_FILTER_OPTIONS = [
 export type CertificationFilterOption = (typeof CERTIFICATION_FILTER_OPTIONS)[number];
 export type SafetyDietaryPreference = 'vegan' | 'vegetarian' | 'glutenfree' | 'laktosfree';
 export type SafetyAllergenPreference = 'milk' | 'gluten' | 'nuts' | 'eggs' | 'soy' | 'sesame';
+export type SafetyNutritionPriority = 'lower-sugar' | 'higher-protein' | 'high-fiber' | 'lower-salt';
 
 export type ProductSafetyPreferences = {
   requiredDietaryTags: SafetyDietaryPreference[];
   avoidedAllergenTags: SafetyAllergenPreference[];
+  nutritionPriorityTags: SafetyNutritionPriority[];
 };
 
 const SAFETY_DIETARY_OPTIONS: Array<{ value: SafetyDietaryPreference; label: string }> = [
@@ -42,9 +44,17 @@ const SAFETY_ALLERGEN_OPTIONS: Array<{ value: SafetyAllergenPreference; label: s
   { value: 'sesame', label: 'Sesame' }
 ];
 
+const SAFETY_NUTRITION_OPTIONS: Array<{ value: SafetyNutritionPriority; label: string }> = [
+  { value: 'lower-sugar', label: 'Lower sugar' },
+  { value: 'higher-protein', label: 'Higher protein' },
+  { value: 'high-fiber', label: 'High fiber' },
+  { value: 'lower-salt', label: 'Lower salt' }
+];
+
 const emptySafetyPreferences: ProductSafetyPreferences = {
   requiredDietaryTags: [],
-  avoidedAllergenTags: []
+  avoidedAllergenTags: [],
+  nutritionPriorityTags: []
 };
 
 type CertFilterProps = Readonly<{
@@ -74,12 +84,15 @@ function normaliseSafetyPreferences(value: unknown): ProductSafetyPreferences {
   const candidate = value as Partial<Record<keyof ProductSafetyPreferences, unknown>>;
   const dietaryValues = Array.isArray(candidate.requiredDietaryTags) ? candidate.requiredDietaryTags : [];
   const allergenValues = Array.isArray(candidate.avoidedAllergenTags) ? candidate.avoidedAllergenTags : [];
+  const nutritionValues = Array.isArray(candidate.nutritionPriorityTags) ? candidate.nutritionPriorityTags : [];
   const dietarySet = new Set(SAFETY_DIETARY_OPTIONS.map((option) => option.value));
   const allergenSet = new Set(SAFETY_ALLERGEN_OPTIONS.map((option) => option.value));
+  const nutritionSet = new Set(SAFETY_NUTRITION_OPTIONS.map((option) => option.value));
 
   return {
     requiredDietaryTags: dietaryValues.filter((item): item is SafetyDietaryPreference => typeof item === 'string' && dietarySet.has(item as SafetyDietaryPreference)),
-    avoidedAllergenTags: allergenValues.filter((item): item is SafetyAllergenPreference => typeof item === 'string' && allergenSet.has(item as SafetyAllergenPreference))
+    avoidedAllergenTags: allergenValues.filter((item): item is SafetyAllergenPreference => typeof item === 'string' && allergenSet.has(item as SafetyAllergenPreference)),
+    nutritionPriorityTags: nutritionValues.filter((item): item is SafetyNutritionPriority => typeof item === 'string' && nutritionSet.has(item as SafetyNutritionPriority))
   };
 }
 
@@ -193,6 +206,15 @@ export function CertFilter({ selected, onChange, storageKey = STORAGE_KEY, class
     });
   }
 
+  function toggleNutritionPriority(option: SafetyNutritionPriority) {
+    updateSafetyPreferences({
+      ...safetyPreferences,
+      nutritionPriorityTags: safetyPreferences.nutritionPriorityTags.includes(option)
+        ? safetyPreferences.nutritionPriorityTags.filter((tag) => tag !== option)
+        : [...safetyPreferences.nutritionPriorityTags, option]
+    });
+  }
+
   return (
     <section className={`rounded-3xl border border-emerald-100 bg-white p-4 shadow-sm ${className}`} aria-labelledby="cert-filter-heading">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -230,7 +252,7 @@ export function CertFilter({ selected, onChange, storageKey = STORAGE_KEY, class
         })}
       </div>
 
-      <div className="mt-5 grid gap-4 border-t border-slate-100 pt-4 md:grid-cols-2">
+      <div className="mt-5 grid gap-4 border-t border-slate-100 pt-4 md:grid-cols-3">
         <div>
           <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-800">Diet requirements</p>
           <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="Dietary safety preferences">
@@ -261,6 +283,25 @@ export function CertFilter({ selected, onChange, storageKey = STORAGE_KEY, class
                   className={`rounded-full border px-3 py-2 text-sm font-black transition ${active ? 'border-rose-800 bg-rose-800 text-white shadow-sm' : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-rose-300 hover:bg-rose-50 hover:text-rose-950'}`}
                   key={option.value}
                   onClick={() => toggleAllergenPreference(option.value)}
+                  type="button"
+                >
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-sky-800">Nutrition priorities</p>
+          <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="Nutrition priority preferences">
+            {SAFETY_NUTRITION_OPTIONS.map((option) => {
+              const active = safetyPreferences.nutritionPriorityTags.includes(option.value);
+              return (
+                <button
+                  aria-pressed={active}
+                  className={`rounded-full border px-3 py-2 text-sm font-black transition ${active ? 'border-sky-800 bg-sky-800 text-white shadow-sm' : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-sky-300 hover:bg-sky-50 hover:text-sky-950'}`}
+                  key={option.value}
+                  onClick={() => toggleNutritionPriority(option.value)}
                   type="button"
                 >
                   {option.label}

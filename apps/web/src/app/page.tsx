@@ -1,6 +1,6 @@
 import { PriceDropDiscoveryRail } from '@/app/page-sections/trending';
 import { BasketBuilder, type BasketBuilderProduct } from '@/components/basket-builder';
-import { PersonalizedRecommendationRail } from '@/components/locale-home-page';
+import { PersonalizedRecommendations } from '@/components/personalized-recommendations';
 import { MarketShell } from '@/components/market-shell';
 import { PwaInstall, PwaInstallEducationCard } from '@/components/pwa-install';
 import { homePastPurchaseShortcuts } from '@/lib/recurring-basket';
@@ -24,7 +24,7 @@ export default function HomePage() {
   return (
     <>
       <PriceDropDiscoveryRail />
-      <PersonalizedRecommendationRail />
+      <PersonalizedRecommendations />
       <section className="mx-auto my-6 w-full max-w-6xl rounded-3xl border border-emerald-100 bg-emerald-50/70 p-5">
         <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-800">Returning shopper shortcuts</p>
         <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Add your recurring staples in one tap</h2>

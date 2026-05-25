@@ -2,9 +2,11 @@ import { calculateChainPriceIndex } from '@groceryview/core';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { buildChainPriceObservations, buildMatchedBasketChainPriceObservations } from '@/lib/chain-index-data';
-import { coopSource } from '@/lib/ingested/coop';
+import { axfoodProducts } from '@/lib/axfood-products';
+import { coopProducts, coopSource } from '@/lib/ingested/coop';
 import { hemkopSourceSummary, willysSourceSummary } from '@/lib/ingested/axfood-weekly-summary';
-import { matpriskollenSource } from '@/lib/ingested/matpriskollen';
+import { matpriskollenOffers, matpriskollenSource } from '@/lib/ingested/matpriskollen';
+import { buildUnitNormalizationAuditRows, type UnitNormalizationAuditInput } from '@/lib/normalization';
 import { routeMetadata } from '@/lib/seo';
 
 type ConfidenceLevel = 'high' | 'medium' | 'low';
@@ -56,6 +58,41 @@ const activeSources = [
   }
 ];
 
+const unitPriceFragmentPattern = /(-?\d+(?:[,.]\d+)?)\s*(?:kr|sek)?\s*\/\s*([^\s,;]+)/i;
+
+function unitPriceFromText(text: string): Pick<UnitNormalizationAuditInput, 'unitPrice' | 'unitPriceUnit'> {
+  const match = text.match(unitPriceFragmentPattern);
+  if (!match) return { unitPrice: null, unitPriceUnit: null };
+  const value = Number(match[1]!.replace(',', '.'));
+  return {
+    unitPrice: Number.isFinite(value) ? value : null,
+    unitPriceUnit: match[2] ?? null
+  };
+}
+
+const unitNormalizationAuditRows = buildUnitNormalizationAuditRows([
+  ...coopProducts.map((product) => ({
+    sourceName: 'Coop product search',
+    productId: product.code,
+    productName: product.name,
+    unitPrice: product.unitPrice,
+    unitPriceUnit: product.unitPriceUnit
+  })),
+  ...matpriskollenOffers.map((offer) => ({
+    sourceName: 'Matpriskollen public offers',
+    productId: offer.code,
+    productName: offer.name,
+    ...unitPriceFromText(offer.comparePriceText)
+  })),
+  ...axfoodProducts.flatMap((product) => Object.entries(product.chains).map(([chain, price]) => ({
+    sourceName: 'Axfood matched product scrape',
+    productId: `${chain}:${product.code}`,
+    productName: `${product.name} (${chain})`,
+    unitPrice: price.price,
+    unitPriceUnit: price.priceUnit
+  })))
+]);
+
 const latestSourceDate = activeSources
   .map((source) => new Date(source.retrievedAt))
   .sort((a, b) => b.getTime() - a.getTime())[0];
@@ -94,6 +131,7 @@ const chainConfidenceCounts = methodologyIndex.chains.reduce(
 );
 
 const totalSourceRows = activeSources.reduce((sum, source) => sum + source.rows, 0);
+const totalUnresolvedUnitConversions = unitNormalizationAuditRows.reduce((sum, row) => sum + row.unresolvedConversionCount, 0);
 
 function formatDate(value: Date | string) {
   return new Intl.DateTimeFormat('sv-SE', {
@@ -179,6 +217,41 @@ export default function IndexMethodologyPage() {
               </div>
             ))}
           </div>
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-purple-200 bg-purple-50">
+        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <Eyebrow>Unit normalization audit</Eyebrow>
+            <h2 className="mt-2 text-3xl font-black tracking-tight text-purple-950">Unresolved conversions are counted before price-per-unit claims ship</h2>
+            <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-purple-950">
+              Each methodology source is audited with the ingest normalizer so unsupported unit labels stay visible with confidence levels and affected product counts.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-purple-900 shadow-sm">
+            {formatNumber(totalUnresolvedUnitConversions)} unresolved conversions
+          </p>
+        </div>
+        <div className="mt-5 overflow-hidden rounded-2xl border border-purple-200 bg-white">
+          <div className="grid grid-cols-[1fr_8rem_7rem_7rem_1.3fr] gap-3 border-b border-purple-100 bg-purple-100 px-4 py-3 text-xs font-black uppercase tracking-[0.16em] text-purple-950">
+            <span>Source</span>
+            <span>Confidence</span>
+            <span>Unresolved</span>
+            <span>Affected</span>
+            <span>Examples</span>
+          </div>
+          {unitNormalizationAuditRows.map((row) => (
+            <div className="grid grid-cols-[1fr_8rem_7rem_7rem_1.3fr] gap-3 border-b border-purple-100 px-4 py-3 text-sm last:border-b-0" key={row.sourceName}>
+              <p className="font-black text-purple-950">{row.sourceName}</p>
+              <ConfidenceBadge level={row.confidence} label={row.confidence} sampleSize={row.totalProductCount} />
+              <p className="font-black text-purple-950">{formatNumber(row.unresolvedConversionCount)}</p>
+              <p className="font-black text-purple-950">{formatNumber(row.affectedProductCount)}</p>
+              <p className="text-xs font-semibold leading-5 text-purple-800">
+                {row.examples.length > 0 ? row.examples.join(' · ') : 'No unresolved unit conversions in the audited rows.'}
+              </p>
+            </div>
+          ))}
         </div>
       </Card>
 
