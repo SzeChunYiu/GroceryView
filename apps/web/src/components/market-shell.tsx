@@ -4,7 +4,7 @@ import { ProductPriceCards } from './product-price-cards';
 import { TrendingCarousel } from './TrendingCarousel';
 import { TrendingPriceDropCards } from '@/app/page-sections/trending';
 import { buildChainIndexTrendSeries } from '@/lib/chain-index-data';
-import { defaultLocale, localeReadiness, localeTranslationGuardrails, localizedShellCopy } from '@/lib/i18n';
+import { defaultLocale, localeReadiness, localeTranslationGuardrails, localizedPriceIntelligenceTerminology, localizedShellCopy, type SupportedLocale } from '@/lib/i18n';
 import { basketCostHeatmap } from '@/lib/map-basket-cost-heatmap';
 import { mapChainIndexScores } from '@/lib/map-chain-index';
 import {
@@ -136,7 +136,8 @@ function heatmapTileClass(heatScore: number) {
   return 'border-emerald-300 bg-emerald-50 text-emerald-950';
 }
 
-export function MarketShell() {
+export function MarketShell({ locale = defaultLocale }: { locale?: SupportedLocale } = {}) {
+  const terminology = localizedPriceIntelligenceTerminology(locale);
   return (
     <PageShell>
       <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-stretch">
@@ -170,6 +171,20 @@ export function MarketShell() {
           </div>
         </Card>
       </section>
+
+      <Card className="mt-6 border-cyan-200 bg-cyan-50">
+        <Eyebrow>{locale.toUpperCase()} price intelligence terminology</Eyebrow>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Honest price labels use locale-reviewed seeds</h2>
+        <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-cyan-950">
+          Confidence, freshness, and savings copy is rendered from the shared terminology seeds for this locale. These labels describe source evidence only; they do not fabricate prices, coverage rows, live stock, or guaranteed basket savings.
+        </p>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          <p className="rounded-2xl bg-white p-4 text-sm font-black text-cyan-950">{terminology.confidence}</p>
+          <p className="rounded-2xl bg-white p-4 text-sm font-black text-cyan-950">{terminology.freshness}</p>
+          <p className="rounded-2xl bg-white p-4 text-sm font-black text-cyan-950">{terminology.savings}</p>
+        </div>
+      </Card>
+
 
       <div className="mt-6"><MetricGrid /></div>
 
