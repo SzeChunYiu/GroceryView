@@ -20,5 +20,11 @@
     "label": "Språk",
     "persisted": "Språkvalet sparas lokalt och i NEXT_LOCALE-kakan.",
     "guardrail": "Arabiska och somaliska öppnas först efter granskade översättningar."
+  },
+  "confidence-badge": {
+    "sampleSize": "Urvalsstorlek {sampleSize}.",
+    "freshness": "Aktualitet {label}. {refreshHint}",
+    "verification": "Verifiering {verificationLabel}.",
+    "indicator": "{meaning}. Indikator {indicator}."
   }
 }
