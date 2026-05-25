@@ -7,6 +7,13 @@ export type GroceryIndexTickerWidget = {
   embedCode: string;
 };
 
+export type GroceryIndexMarketComparison = {
+  window: 'last-month' | 'last-quarter';
+  label: string;
+  marketIndexChangePercent: number;
+  source: 'grocery-index-observed-chain-basket';
+};
+
 export function buildGroceryIndexTickerWidget(sourceConfidence: Record<'high' | 'medium' | 'low', number>): GroceryIndexTickerWidget {
   return {
     route: '/widgets/grocery-index-ticker',
@@ -17,3 +24,8 @@ export function buildGroceryIndexTickerWidget(sourceConfidence: Record<'high' | 
 }
 
 export const groceryIndexTickerWidget = buildGroceryIndexTickerWidget({ high: 0, medium: 0, low: 0 });
+
+export const groceryIndexMarketComparisons: GroceryIndexMarketComparison[] = [
+  { window: 'last-month', label: 'Grocery Index last month', marketIndexChangePercent: 1.7, source: 'grocery-index-observed-chain-basket' },
+  { window: 'last-quarter', label: 'Grocery Index last quarter', marketIndexChangePercent: 4.8, source: 'grocery-index-observed-chain-basket' }
+];

@@ -5,6 +5,7 @@ import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { elderlyFixedIncomeBudgetTracker, elderlyStaplesStabilityTracker, grocerySpendForecast, personalGroceryInflation, savingsDashboard, studentWeeklyBudgetTracker } from '@/lib/demo-data';
+import { recurringBasketInflationTracker } from '@/lib/recurring-basket';
 import { buildCategoryInflationTrends } from '@/lib/trends';
 import { ecoBasketScorecard } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
@@ -108,6 +109,43 @@ export default function SavingsDashboardPage() {
           </div>
         </Card>
       </div>
+
+      <Card className="mt-6 border-cyan-200 bg-cyan-50">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-cyan-800">Recurring basket inflation tracker</p>
+            <h2 className="mt-2 text-2xl font-black">Personal staples versus the Grocery Index</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              {recurringBasketInflationTracker.basketName} compares the current saved basket for {recurringBasketInflationTracker.currentWindow.label} against last month, last quarter, and observed market-index movement.
+            </p>
+          </div>
+          <div className="rounded-3xl bg-white px-5 py-4 text-center shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Recurring lines</p>
+            <p className="mt-1 text-4xl font-black text-cyan-900">{recurringBasketInflationTracker.recurringLineCount}</p>
+          </div>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          {recurringBasketInflationTracker.comparisons.map((comparison) => (
+            <div className="rounded-2xl bg-white p-4" key={comparison.window}>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">{comparison.label}</p>
+                  <p className="mt-2 text-3xl font-black text-slate-950">{formatPercent(comparison.basketChangePercent)}</p>
+                </div>
+                <p className="rounded-full bg-cyan-100 px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-cyan-950">{comparison.verdict}</p>
+              </div>
+              <div className="mt-3 grid gap-2 text-sm font-semibold text-slate-700">
+                <p>Saved basket: {formatSek(comparison.baselineCost)} → {formatSek(comparison.currentCost)}</p>
+                <p>Market index: {formatPercent(comparison.marketIndexChangePercent)}</p>
+                <p>Personal versus market: {formatPercent(comparison.deltaVsMarketPercent)}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <ul className="mt-4 list-disc space-y-1 pl-5 text-sm font-semibold text-slate-700">
+          {recurringBasketInflationTracker.guardrails.map((guardrail) => <li key={guardrail}>{guardrail}</li>)}
+        </ul>
+      </Card>
 
       <section className="mt-6">
         <div className="flex flex-wrap items-end justify-between gap-3">

@@ -1,3 +1,5 @@
+import { groceryIndexMarketComparisons, type GroceryIndexMarketComparison } from './grocery-index-widget';
+
 export type RecurringBasketLine = {
   productId: string;
   productName: string;
@@ -48,6 +50,26 @@ export type PurchaseHistoryImportPreview = {
   totalSpend: number;
 };
 
+export type RecurringBasketInflationComparison = {
+  window: GroceryIndexMarketComparison['window'];
+  label: string;
+  currentCost: number;
+  baselineCost: number;
+  basketChangePercent: number;
+  marketIndexChangePercent: number;
+  deltaVsMarketPercent: number;
+  verdict: 'personal-rising-faster' | 'tracking-market' | 'personal-rising-slower';
+};
+
+export type RecurringBasketInflationTracker = {
+  basketName: string;
+  currentWindow: RecurringBasketWindow;
+  recurringLineCount: number;
+  comparisons: RecurringBasketInflationComparison[];
+  source: 'recurring-basket-observed-costs';
+  guardrails: string[];
+};
+
 const nextWeeklyWindow: RecurringBasketWindow = { startsOn: '2026-05-25', endsOn: '2026-05-31', label: 'Week 22 grocery window' };
 const followingWeeklyWindow: RecurringBasketWindow = { startsOn: '2026-06-01', endsOn: '2026-06-07', label: 'Week 23 grocery window' };
 const twoWeeksAheadWindow: RecurringBasketWindow = { startsOn: '2026-06-08', endsOn: '2026-06-14', label: 'Week 24 grocery window' };
@@ -73,6 +95,75 @@ export const weeklyRecurringBasketPlan: RecurringBasketPlan = {
     'Expected windows stay visible so shoppers can review pickup timing before saving.'
   ]
 };
+
+function percentChange(currentCost: number, baselineCost: number) {
+  if (baselineCost <= 0) return 0;
+  return Math.round(((currentCost - baselineCost) / baselineCost) * 1000) / 10;
+}
+
+function comparisonVerdict(deltaVsMarketPercent: number): RecurringBasketInflationComparison['verdict'] {
+  if (deltaVsMarketPercent > 1) return 'personal-rising-faster';
+  if (deltaVsMarketPercent < -1) return 'personal-rising-slower';
+  return 'tracking-market';
+}
+
+export function buildRecurringBasketInflationTracker({
+  basketName,
+  currentCost,
+  lastMonthCost,
+  lastQuarterCost,
+  marketComparisons = groceryIndexMarketComparisons,
+  plan = weeklyRecurringBasketPlan
+}: {
+  basketName: string;
+  currentCost: number;
+  lastMonthCost: number;
+  lastQuarterCost: number;
+  marketComparisons?: GroceryIndexMarketComparison[];
+  plan?: RecurringBasketPlan;
+}): RecurringBasketInflationTracker {
+  const baselines: Record<GroceryIndexMarketComparison['window'], number> = {
+    'last-month': lastMonthCost,
+    'last-quarter': lastQuarterCost
+  };
+
+  const comparisons = marketComparisons.map((market) => {
+    const baselineCost = baselines[market.window];
+    const basketChangePercent = percentChange(currentCost, baselineCost);
+    const deltaVsMarketPercent = Math.round((basketChangePercent - market.marketIndexChangePercent) * 10) / 10;
+
+    return {
+      window: market.window,
+      label: market.label,
+      currentCost,
+      baselineCost,
+      basketChangePercent,
+      marketIndexChangePercent: market.marketIndexChangePercent,
+      deltaVsMarketPercent,
+      verdict: comparisonVerdict(deltaVsMarketPercent)
+    };
+  });
+
+  return {
+    basketName,
+    currentWindow: plan.nextWindow,
+    recurringLineCount: plan.lines.length,
+    comparisons,
+    source: 'recurring-basket-observed-costs',
+    guardrails: [
+      'Uses saved recurring basket costs only; no missing household trips are estimated.',
+      'Market comparisons use observed Grocery Index chain-basket movement.',
+      'Verdicts compare percentage movement, not total household spend.'
+    ]
+  };
+}
+
+export const recurringBasketInflationTracker = buildRecurringBasketInflationTracker({
+  basketName: weeklyRecurringBasketPlan.templateName,
+  currentCost: 704.2,
+  lastMonthCost: 681.4,
+  lastQuarterCost: 646.8
+});
 
 export function createRecurringBasketDuplicate(plan: RecurringBasketPlan, targetWindow?: RecurringBasketWindow) {
   const duplicateWindow = targetWindow ?? plan.duplicateControls[0]?.targetWindow ?? plan.nextWindow;
