@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { comparePriceSnapshotOverlayOptions, type ComparePriceSnapshotStoreRow } from '@/lib/compare-price-snapshots';
 import type { buildItemComparisonView } from '@/lib/verified-data';
 
 type ItemComparisonView = ReturnType<typeof buildItemComparisonView>;
@@ -44,6 +45,39 @@ function StorePriceCell({ item }: { item: ItemComparisonItem }) {
           <p className="text-xs font-semibold text-slate-500">{price.unitLabel}</p>
         </div>
       ))}
+    </div>
+  );
+}
+
+function OverlayCueCell({ item }: { item: ItemComparisonItem }) {
+  const overlayOptions = comparePriceSnapshotOverlayOptions(item.storePrices.map((price): ComparePriceSnapshotStoreRow => ({
+    itemId: item.slug,
+    itemName: item.name,
+    storeName: price.storeName,
+    price: price.price,
+    priceLabel: price.priceLabel,
+    unitLabel: price.unitLabel,
+    chainName: price.storeName,
+    packSizeLabel: item.nutrition.quantity
+  })));
+
+  if (overlayOptions.length < 2) {
+    return (
+      <p className="rounded-2xl bg-slate-50 p-3 text-xs font-bold leading-5 text-slate-500">
+        Add one more verified chain or pack-size price row to enable a two-series overlay.
+      </p>
+    );
+  }
+
+  return (
+    <div className="grid gap-2 text-sm">
+      <p className="text-xs font-black uppercase tracking-[0.14em] text-emerald-700">Ready for chart overlay</p>
+      {overlayOptions.map((option) => (
+        <p className="rounded-2xl bg-emerald-50 p-3 font-bold text-emerald-950" key={option.key}>
+          {option.label}: <span className="font-black">{option.priceLabel}</span>
+        </p>
+      ))}
+      <p className="text-xs font-semibold text-slate-500">Use these two verified rows as the chain/pack-size comparison pair; missing rows stay blocked.</p>
     </div>
   );
 }
@@ -108,6 +142,10 @@ export function ItemComparisonTable({ activeFulfillmentFilterLabels, fulfillment
               <tr className="border-t border-slate-100 align-top">
                 <th className="px-4 py-4 text-sm font-black text-slate-950">Price across stores</th>
                 {items.map((item) => <td className="px-4 py-4" key={`${item.slug}-prices`}><StorePriceCell item={item} /></td>)}
+              </tr>
+              <tr className="border-t border-slate-100 align-top">
+                <th className="px-4 py-4 text-sm font-black text-slate-950">Overlay pair</th>
+                {items.map((item) => <td className="px-4 py-4" key={`${item.slug}-overlay`}><OverlayCueCell item={item} /></td>)}
               </tr>
               <tr className="border-t border-slate-100 align-top">
                 <th className="px-4 py-4 text-sm font-black text-slate-950">Trend charts</th>

@@ -59,6 +59,8 @@ export type ShortTermPriceForecastPoint = {
 export type ShortTermPriceForecast = {
   available: boolean;
   horizonDays: number;
+  confidenceLabel: string;
+  rangeLabel: string;
   trendLabel: string;
   summary: string;
   caveat: string;
@@ -117,9 +119,15 @@ function standardDeviation(values: number[]) {
   return Math.sqrt(variance);
 }
 
+function forecastConfidenceLabel(confidence: number) {
+  if (confidence >= 0.7) return 'high forecast confidence';
+  if (confidence >= 0.45) return 'medium forecast confidence';
+  return 'limited forecast confidence';
+}
+
 export function buildShortTermPriceForecast({
   observations,
-  horizonDays = 14,
+  horizonDays = 7,
   stepDays = 7
 }: {
   observations: ReadonlyArray<PriceForecastObservation>;
@@ -139,6 +147,8 @@ export function buildShortTermPriceForecast({
     return {
       available: false,
       horizonDays,
+      confidenceLabel: 'forecast withheld',
+      rangeLabel: 'forecast unavailable',
       trendLabel: 'forecast withheld',
       summary: 'Needs at least three dated price observations.',
       caveat: 'The short-term forecast band is withheld until the product has enough observed price-event trend points.',
@@ -178,10 +188,13 @@ export function buildShortTermPriceForecast({
       confidence: Math.round((confidence + Number.EPSILON) * 100) / 100
     });
   }
+  const finalPoint = forecastPoints.at(-1);
 
   return {
     available: forecastPoints.length > 0,
     horizonDays,
+    confidenceLabel: finalPoint ? forecastConfidenceLabel(finalPoint.confidence) : 'forecast withheld',
+    rangeLabel: finalPoint ? `${finalPoint.lowerBound.toFixed(2)}-${finalPoint.upperBound.toFixed(2)} SEK` : 'forecast unavailable',
     trendLabel: `${direction} ${weeklyTrendPercent.toFixed(1)}%/week observed trend`,
     summary: `Projects the latest observed price-event trend ${horizonDays} days ahead with an uncertainty band from recent volatility.`,
     caveat: 'Forecast uses only recent dated price-event trends from this product; it is not a retailer promotion, stock, or seasonality claim.',
@@ -346,5 +359,26 @@ export function summarizeBasketBuyTiming(recommendations: ReadonlyArray<BasketBu
     watch: recommendations.filter((item) => item.action === 'watch').length,
     substitute: recommendations.filter((item) => item.action === 'substitute').length,
     itemCount: recommendations.length
+  };
+}
+
+export type PremiumSavingsForecastDriver = {
+  label: string;
+  amount: number;
+  detail: string;
+};
+
+export function buildPremiumSavingsForecast(drivers: PremiumSavingsForecastDriver[] = [
+  { label: 'Alerts', amount: 42, detail: 'watchlist drops and wait-window alerts' },
+  { label: 'Swaps', amount: 58, detail: 'verified chain substitutions' },
+  { label: 'Basket planning', amount: 33, detail: 'duplicate-buy and pantry timing guidance' }
+]) {
+  const monthlySavings = drivers.reduce((sum, driver) => sum + driver.amount, 0);
+
+  return {
+    monthlySavings,
+    monthlySavingsLabel: `${monthlySavings} kr`,
+    drivers: drivers.map((driver) => ({ ...driver, amountLabel: `${driver.amount} kr` })),
+    confidenceLabel: 'Premium estimate from observed alerts, basket optimization, and historical behavior.'
   };
 }

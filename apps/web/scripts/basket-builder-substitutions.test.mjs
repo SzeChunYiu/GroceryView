@@ -44,6 +44,9 @@ function installBasketRuntime() {
   let hookIndex = 0;
 
   const fakeReact = {
+    useMemo(factory) {
+      return factory();
+    },
     useState(initialValue) {
       const index = hookIndex;
       hookIndex += 1;

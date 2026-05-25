@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
+import { CoverageGapSummary } from '@/components/StoreComparisonTable';
+import { buildChainCategoryCoverageGaps } from '@/lib/chain-index-data';
 import {
   chainCategoryCoverage,
   formatPct,
@@ -24,6 +26,7 @@ const averageMatchedSpread = matchedChainProducts.length
 const willysLowest = matchedChainProducts.filter((product) => product.lowestChain === 'willys').length;
 const hemkopLowest = matchedChainProducts.filter((product) => product.lowestChain === 'hemkop').length;
 const maxCoverageScore = Math.max(...chainCategoryCoverage.map((category) => category.coverageScore), 1);
+const coverageGaps = buildChainCategoryCoverageGaps();
 
 export default function ChainCoveragePage() {
   return (
@@ -40,6 +43,14 @@ export default function ChainCoveragePage() {
         <Metric label="Average spread" value={formatPct(averageMatchedSpread)} />
         <Metric label="Lowest-price wins" value={`W ${willysLowest} / H ${hemkopLowest}`} />
       </div>
+
+      <Card className="mt-6 border-amber-200 bg-amber-50">
+        <h2 className="text-2xl font-black tracking-tight text-amber-950">Catalog coverage gap report</h2>
+        <p className="mt-2 text-sm leading-6 text-amber-950">Missing or thin categories are ranked by retailer chain against target row thresholds so ingestion work can focus on the biggest gaps first.</p>
+        <div className="mt-4">
+          <CoverageGapSummary gaps={coverageGaps} />
+        </div>
+      </Card>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[1fr_0.9fr]">
         <Card>

@@ -10,6 +10,22 @@ export type SearchSynonymBadge = {
   matchedTerms: string[];
 };
 
+export type HeaderSearchFacetChip = {
+  kind: 'category' | 'chain' | 'diet' | 'price-range';
+  label: string;
+  href: string;
+  count?: number;
+};
+
+type HeaderSearchFacetSource = {
+  query: string;
+  categoryFacets: Array<{ value: string; count: number; label?: string }>;
+  chainFacets: Array<{ value: string; count: number; label?: string }>;
+  dietaryFilters: Array<{ value: string; label: string; count: number }>;
+  priceRange: { min: number | null; max: number | null };
+  formatPrice: (value: number) => string;
+};
+
 type AllergenRiskMatcher = {
   label: string;
   riskTerms: string[];
@@ -61,6 +77,69 @@ export function searchSynonymBadgesForQuery(query: string): SearchSynonymBadge[]
   }));
 }
 
+function productsHref(query: string, params: Record<string, string>) {
+  const searchParams = new URLSearchParams();
+  if (query.trim()) searchParams.set('q', query.trim());
+  for (const [key, value] of Object.entries(params)) {
+    if (value.trim()) searchParams.set(key, value.trim());
+  }
+  return `/products?${searchParams.toString()}`;
+}
+
+export function headerSearchFacetChips({
+  query,
+  categoryFacets,
+  chainFacets,
+  dietaryFilters,
+  priceRange,
+  formatPrice
+}: HeaderSearchFacetSource): HeaderSearchFacetChip[] {
+  const categoryChips = categoryFacets.slice(0, 2).map((facet) => ({
+    kind: 'category' as const,
+    label: facet.label ?? facet.value,
+    href: productsHref(query, { category: facet.value }),
+    count: facet.count
+  }));
+
+  const chainChips = chainFacets.slice(0, 2).map((facet) => ({
+    kind: 'chain' as const,
+    label: facet.label ?? facet.value,
+    href: productsHref(query, { chain: facet.value }),
+    count: facet.count
+  }));
+
+  const dietChips = dietaryFilters
+    .filter((filter) => filter.count > 0)
+    .slice(0, 2)
+    .map((filter) => ({
+      kind: 'diet' as const,
+      label: filter.label,
+      href: productsHref(query, { dietary: filter.value }),
+      count: filter.count
+    }));
+
+  const priceChips: HeaderSearchFacetChip[] = [];
+  if (typeof priceRange.min === 'number' && typeof priceRange.max === 'number') {
+    const midpoint = Math.round(((priceRange.min + priceRange.max) / 2) * 100) / 100;
+    if (priceRange.min < midpoint) {
+      priceChips.push({
+        kind: 'price-range',
+        label: `≤ ${formatPrice(midpoint)}/unit`,
+        href: productsHref(query, { maxPrice: String(midpoint) })
+      });
+    }
+    if (midpoint < priceRange.max) {
+      priceChips.push({
+        kind: 'price-range',
+        label: `≥ ${formatPrice(midpoint)}/unit`,
+        href: productsHref(query, { minPrice: String(midpoint) })
+      });
+    }
+  }
+
+  return [...categoryChips, ...chainChips, ...dietChips, ...priceChips].slice(0, 8);
+}
+
 export type SearchFilterParamValue = string | string[] | undefined;
 
 export type RemovableSearchFilterChip = {
@@ -69,7 +148,7 @@ export type RemovableSearchFilterChip = {
   href: string;
 };
 
-type SearchFilterChipKey = 'category' | 'chain' | 'dietary' | 'minPrice' | 'maxPrice';
+type SearchFilterChipKey = 'brand' | 'category' | 'chain' | 'dietary' | 'inStockOnly' | 'label' | 'minConfidence' | 'minPrice' | 'maxPrice';
 
 type SearchFilterChipOptions = {
   basePath?: string;
@@ -78,7 +157,7 @@ type SearchFilterChipOptions = {
 
 type SearchFilterParams = Record<string, SearchFilterParamValue>;
 
-const multiValueChipKeys = new Set<SearchFilterChipKey>(['category', 'chain', 'dietary']);
+const multiValueChipKeys = new Set<SearchFilterChipKey>(['category', 'chain', 'dietary', 'label']);
 
 function searchParamValues(value: SearchFilterParamValue): string[] {
   const rawValues = Array.isArray(value) ? value : value ? [value] : [];
@@ -139,11 +218,27 @@ export function buildRemovableSearchFilterChips(searchParams: SearchFilterParams
     });
   }
 
+  for (const brand of searchParamValues(searchParams.brand)) {
+    chips.push({
+      id: `brand:${brand}`,
+      label: `Brand: ${displayChipValue(brand, options.labels?.brand)}`,
+      href: chipRemovalHref(searchParams, 'brand', brand, basePath)
+    });
+  }
+
   for (const dietary of searchParamValues(searchParams.dietary)) {
     chips.push({
       id: `dietary:${dietary}`,
       label: `Dietary: ${displayChipValue(dietary, options.labels?.dietary)}`,
       href: chipRemovalHref(searchParams, 'dietary', dietary, basePath)
+    });
+  }
+
+  for (const label of searchParamValues(searchParams.label)) {
+    chips.push({
+      id: `label:${label}`,
+      label: `Certification: ${displayChipValue(label, options.labels?.label)}`,
+      href: chipRemovalHref(searchParams, 'label', label, basePath)
     });
   }
 
@@ -162,6 +257,24 @@ export function buildRemovableSearchFilterChips(searchParams: SearchFilterParams
       id: `maxPrice:${maxPrice}`,
       label: `Max unit price: ${maxPrice} SEK`,
       href: chipRemovalHref(searchParams, 'maxPrice', maxPrice, basePath)
+    });
+  }
+
+  const minConfidence = searchParamValues(searchParams.minConfidence)[0];
+  if (minConfidence) {
+    chips.push({
+      id: `minConfidence:${minConfidence}`,
+      label: `Min confidence: ${minConfidence}`,
+      href: chipRemovalHref(searchParams, 'minConfidence', minConfidence, basePath)
+    });
+  }
+
+  const inStockOnly = searchParamValues(searchParams.inStockOnly)[0];
+  if (inStockOnly === 'true' || inStockOnly === '1' || inStockOnly === 'on') {
+    chips.push({
+      id: 'inStockOnly:true',
+      label: 'Availability: in stock only',
+      href: chipRemovalHref(searchParams, 'inStockOnly', inStockOnly, basePath)
     });
   }
 
