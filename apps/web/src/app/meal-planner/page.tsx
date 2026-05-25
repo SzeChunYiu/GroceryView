@@ -94,7 +94,18 @@ type MealWithIngredients = {
 };
 
 export function generateMetadata() {
-  return routeMetadata('/meal-planner');
+  const metadata = routeMetadata('/meal-planner');
+  const openGraph = metadata.openGraph;
+
+  return {
+    ...metadata,
+    twitter: {
+      card: 'summary_large_image',
+      title: openGraph?.title ?? metadata.title,
+      description: openGraph?.description ?? metadata.description,
+      images: openGraph?.images
+    }
+  };
 }
 
 function formatSek(value: number) {
