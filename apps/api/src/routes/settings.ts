@@ -1,8 +1,8 @@
 export const settingsRoutes = {
   settings: 'api/settings',
   demoUserSettings: 'users/demo/settings',
-  preferencesReadDescription: 'Read authenticated user preferences for currency, preferred stores, and notification channels',
-  preferencesDescription: 'Save authenticated user preferences for currency, preferred stores, and notification channels',
+  preferencesReadDescription: 'Read authenticated user preferences for currency, preferred stores, notification channels, and MyFlyer algorithm_choice',
+  preferencesDescription: 'Save authenticated user preferences for currency, preferred stores, notification channels, and MyFlyer algorithm_choice',
   account: 'account',
   dataExport: 'data-export',
   accountDeletionDescription: 'Delete my account confirmation contract for lists, alerts, preferences, and account profile rows',
