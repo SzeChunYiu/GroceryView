@@ -10,13 +10,18 @@ const ITEM_PAGE_PATTERNS = [
   /^\/prisjamforelse\/[^/]+\/?$/,
   /^\/[^/]+\/billigaste\/[^/]+\/?$/
 ];
+const SHOPPING_LIST_PATTERNS = [
+  /^\/list\/?$/,
+  /^\/favourites\/?$/,
+  /^\/favorites\/?$/
+];
 
 function isShoppingListRequest(request) {
   if (request.method !== 'GET') return false;
 
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return false;
-  if (!/^\/(list|favourites|favorites)\/?$/.test(url.pathname)) return false;
+  if (!SHOPPING_LIST_PATTERNS.some((pattern) => pattern.test(url.pathname))) return false;
 
   const acceptsHtml = request.headers.get('accept')?.includes('text/html');
   return request.mode === 'navigate' || acceptsHtml;

@@ -1,13 +1,15 @@
 'use client';
 
 import { useGeolocation } from '@/hooks/useGeolocation';
+import type { StoreReliabilityScore } from '@/lib/freshness';
 
 type StoreDistanceCardProps = {
   fallbackLabel?: string;
+  reliability?: StoreReliabilityScore;
   storeName?: string;
 };
 
-export function StoreDistanceCard({ fallbackLabel = 'Search by city or choose a store manually.', storeName = 'nearby store' }: StoreDistanceCardProps) {
+export function StoreDistanceCard({ fallbackLabel = 'Search by city or choose a store manually.', reliability, storeName = 'nearby store' }: StoreDistanceCardProps) {
   const { attempts, error, isLoading, position, requestLocation, retryGuidance } = useGeolocation();
   const showFallback = Boolean(error && attempts > 0);
 
@@ -31,6 +33,27 @@ export function StoreDistanceCard({ fallbackLabel = 'Search by city or choose a 
           <p className="font-black">{error?.message}</p>
           <p className="mt-1">{retryGuidance}</p>
           <p className="mt-1">{fallbackLabel}</p>
+        </div>
+      ) : null}
+      {reliability ? (
+        <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-3 text-sm font-semibold text-slate-700">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Price reliability</p>
+          <dl className="mt-2 grid gap-2">
+            <div className="flex justify-between gap-3">
+              <dt>Feed freshness</dt>
+              <dd className="font-black text-slate-950">{reliability.feedFreshness.label}</dd>
+            </div>
+            <div className="flex justify-between gap-3">
+              <dt>Price observations</dt>
+              <dd className="font-black text-slate-950">{reliability.priceObservationCount.toLocaleString('sv-SE')}</dd>
+            </div>
+            <div>
+              <dt>Missing-category warnings</dt>
+              <dd className={reliability.missingCategories.length > 0 ? 'font-black text-amber-800' : 'font-black text-emerald-800'}>
+                {reliability.missingCategoryWarning}
+              </dd>
+            </div>
+          </dl>
         </div>
       ) : null}
     </section>
