@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { PwaInstall } from '@/components/pwa-install';
 import { ConsentManager } from '@/components/consent-manager';
 import { SkipLink } from '@/components/SkipLink';
+import { EngagementReporter } from '@/lib/engagement';
 import { ServiceWorkerRegistrar } from '@/lib/swRegister';
 import { Providers } from './providers';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -66,7 +67,7 @@ function jsonLd(value: unknown) {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="sv" suppressHydrationWarning>
-      <body data-offline-cache="core-shell-list-product">
+      <body>
         <SkipLink />
         <script
           dangerouslySetInnerHTML={{ __html: "try{var p=localStorage.getItem('groceryview:theme-preference');if(p==='dark'||(!p&&matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');document.documentElement.style.colorScheme='dark';}}catch(e){}" }}
@@ -79,6 +80,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <Providers>{children}</Providers>
         </div>
         <ConsentManager />
+        <EngagementReporter />
         <ServiceWorkerRegistrar />
         <PwaInstall />
       </body>
