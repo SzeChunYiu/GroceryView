@@ -37,10 +37,10 @@ const cadenceOptions = new Set<AlertPreferenceCadence>(['immediate', 'daily_dige
 const channelOptions = new Set<AlertPreferenceChannel>(['email', 'push', 'in_app_digest']);
 const sensitivityOptions = new Set<AlertPreferenceSensitivity>(['low', 'standard', 'high']);
 
-const defaultProfile = {
-  cadence: 'daily_digest' satisfies AlertPreferenceCadence,
-  channels: ['email', 'in_app_digest'] satisfies AlertPreferenceChannel[],
-  sensitivity: 'standard' satisfies AlertPreferenceSensitivity
+const defaultProfile: Pick<StoredAlertPreferencesProfile, 'cadence' | 'channels' | 'sensitivity'> = {
+  cadence: 'daily_digest',
+  channels: ['email', 'in_app_digest'],
+  sensitivity: 'standard'
 };
 
 function cleanText(value: unknown) {
