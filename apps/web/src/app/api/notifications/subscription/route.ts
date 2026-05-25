@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 type NotificationPermissionState = 'default' | 'denied' | 'granted' | 'unsupported';
+type PushPreferenceChannel = 'price-drops' | 'list-changes' | 'expiring-deals' | 'pantry-reminders';
+type PushPreferenceMap = Record<PushPreferenceChannel, boolean>;
 
 type NotificationSubscription = {
   endpoint: string;
@@ -13,6 +15,7 @@ type NotificationSubscription = {
 
 type StoredNotificationSubscription = {
   accountId: string;
+  channelPreferences: PushPreferenceMap;
   channels: string[];
   deliveryEnabled: boolean;
   permission: NotificationPermissionState;
@@ -31,6 +34,8 @@ export const dynamic = 'force-dynamic';
 const subscriptions = globalThis.groceryViewNotificationSubscriptions ?? new Map<string, StoredNotificationSubscription>();
 globalThis.groceryViewNotificationSubscriptions = subscriptions;
 
+const pushPreferenceChannels: PushPreferenceChannel[] = ['price-drops', 'list-changes', 'expiring-deals', 'pantry-reminders'];
+
 function cleanString(value: unknown) {
   return typeof value === 'string' ? value.trim() : '';
 }
@@ -38,6 +43,33 @@ function cleanString(value: unknown) {
 function normalizeChannels(value: unknown) {
   if (!Array.isArray(value)) return [];
   return value.map(cleanString).filter(Boolean).slice(0, 8);
+}
+
+function emptyPushPreferenceMap(): PushPreferenceMap {
+  return {
+    'price-drops': false,
+    'list-changes': false,
+    'expiring-deals': false,
+    'pantry-reminders': false
+  };
+}
+
+function normalizeChannelPreferences(value: unknown, enabledChannels: string[]) {
+  const preferences = emptyPushPreferenceMap();
+  if (value && typeof value === 'object') {
+    const candidate = value as Partial<Record<PushPreferenceChannel, unknown>>;
+    for (const channel of pushPreferenceChannels) {
+      preferences[channel] = candidate[channel] === true;
+    }
+  }
+
+  for (const channel of enabledChannels) {
+    if (pushPreferenceChannels.includes(channel as PushPreferenceChannel)) {
+      preferences[channel as PushPreferenceChannel] = true;
+    }
+  }
+
+  return preferences;
 }
 
 function normalizePermission(value: unknown): NotificationPermissionState | null {
@@ -83,7 +115,8 @@ export async function POST(request: NextRequest) {
   const permission = normalizePermission(body.permission);
   const subscription = normalizeSubscription(body.subscription);
   const channels = normalizeChannels(body.channels);
-  const deliveryEnabled = Boolean(body.deliveryEnabled && permission === 'granted' && subscription);
+  const channelPreferences = normalizeChannelPreferences(body.channelPreferences, channels);
+  const deliveryEnabled = Boolean(body.deliveryEnabled && permission === 'granted' && subscription && channels.length > 0);
 
   if (!accountId) {
     return NextResponse.json({ error: 'accountId is required to save push notification consent.' }, { status: 400 });
@@ -96,6 +129,7 @@ export async function POST(request: NextRequest) {
   const tokenId = subscription ? makeTokenId(subscription.endpoint) : null;
   const record: StoredNotificationSubscription = {
     accountId,
+    channelPreferences,
     channels,
     deliveryEnabled,
     permission,
@@ -109,6 +143,7 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({
     accountId,
+    channelPreferences,
     channels,
     deliveryEnabled,
     permission,

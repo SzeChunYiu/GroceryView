@@ -2,6 +2,7 @@ import { buildPrivacyExport } from '@groceryview/core';
 import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { SettingsDataExportActions } from '@/components/settings-data-export-actions';
 import { DietaryProfileOnboarding } from '@/components/diet-filter-picker';
+import { PushNotificationPreferences } from '@/components/notification-inbox-actions';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { groupPreferredBrandControls } from '@/lib/personalization';
 import { routeMetadata } from '@/lib/seo';
@@ -42,6 +43,8 @@ export default function SettingsPage() {
       </p>
 
       <SettingsDataExportActions />
+
+      <PushNotificationPreferences />
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Personalization setup</p>

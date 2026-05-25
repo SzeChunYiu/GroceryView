@@ -50,11 +50,124 @@ const BEST_TIME_CATEGORIES = [
   { id: 'fresh_produce', label: 'Fresh produce' }
 ] as const;
 
+type PushPreferenceStatus = 'idle' | 'blocked' | 'saving' | 'saved' | 'error';
+type PushPreferenceChannelId = 'price-drops' | 'list-changes' | 'expiring-deals' | 'pantry-reminders';
+type PushPreferenceState = Record<PushPreferenceChannelId, boolean>;
+
+const PUSH_NOTIFICATION_PREFERENCE_CHANNELS: { id: PushPreferenceChannelId; label: string; description: string }[] = [
+  { id: 'price-drops', label: 'Price drops', description: 'Notify me when watched items or saved basket staples drop below my target price.' },
+  { id: 'list-changes', label: 'List changes', description: 'Notify me when household collaborators add, remove, or reserve grocery list items.' },
+  { id: 'expiring-deals', label: 'Expiring deals', description: 'Notify me before verified offers and clipped deals expire.' },
+  { id: 'pantry-reminders', label: 'Pantry reminders', description: 'Notify me before pantry items reach their use-soon window.' }
+];
+
+function defaultPushPreferenceState(): PushPreferenceState {
+  return {
+    'price-drops': true,
+    'list-changes': false,
+    'expiring-deals': true,
+    'pantry-reminders': false
+  };
+}
+
+function enabledPushPreferenceChannels(preferences: PushPreferenceState) {
+  return PUSH_NOTIFICATION_PREFERENCE_CHANNELS
+    .filter((channelOption) => preferences[channelOption.id])
+    .map((channelOption) => channelOption.id);
+}
+
 function readSession(): BrowserSession {
   if (typeof window === 'undefined') return { accessToken: '', userId: '' };
   const accessToken = sessionStorage.getItem('groceryview:accessToken') || '';
   const userId = sessionStorage.getItem('groceryview:userId') || '';
   return { accessToken, userId };
+}
+
+export function PushNotificationPreferences() {
+  const [preferences, setPreferences] = useState<PushPreferenceState>(defaultPushPreferenceState);
+  const [status, setStatus] = useState<PushPreferenceStatus>('idle');
+  const [message, setMessage] = useState('Pick which push notifications should be allowed before saving account preferences.');
+  const enabledChannels = enabledPushPreferenceChannels(preferences);
+
+  function togglePreference(channelId: PushPreferenceChannelId) {
+    setPreferences((current) => ({ ...current, [channelId]: !current[channelId] }));
+  }
+
+  async function savePushPreferences(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const { accessToken, userId } = readSession();
+    if (!accessToken || !userId) {
+      setStatus('blocked');
+      setMessage('Sign in first. Push notification preferences are account-bound and are not saved anonymously.');
+      return;
+    }
+
+    const permission = typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'unsupported';
+    setStatus('saving');
+    const response = await fetch('/api/notifications/subscription', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        accountId: userId,
+        channelPreferences: preferences,
+        channels: enabledChannels,
+        deliveryEnabled: false,
+        permission,
+        subscription: null
+      })
+    });
+
+    const body = (await response.json()) as { error?: string; channels?: string[] };
+    if (!response.ok || body.error) {
+      setStatus('error');
+      setMessage(body.error ?? 'The notification subscription API rejected these push preferences.');
+      return;
+    }
+
+    const savedChannelCount = body.channels?.length ?? enabledChannels.length;
+    setStatus('saved');
+    setMessage(`Saved ${savedChannelCount} push preference channel${savedChannelCount === 1 ? '' : 's'} for this account.`);
+  }
+
+  return (
+    <section className="mt-6 rounded-3xl border border-indigo-200 bg-indigo-50 p-5" aria-label="Push notification preferences">
+      <p className="text-sm font-black uppercase tracking-[0.2em] text-indigo-800">Push notification preferences</p>
+      <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Choose only the alerts that should buzz this device</h2>
+      <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+        Save granular opt-ins for price drops, list changes, expiring deals, and pantry reminders before any browser token is used for delivery. This keeps noisy categories off while preserving account-bound consent.
+      </p>
+      <form className="mt-5 grid gap-4" onSubmit={savePushPreferences}>
+        <fieldset className="grid gap-3 md:grid-cols-2">
+          <legend className="sr-only">Push notification categories</legend>
+          {PUSH_NOTIFICATION_PREFERENCE_CHANNELS.map((channelOption) => (
+            <label className="rounded-2xl border border-indigo-100 bg-white p-4 shadow-sm" key={channelOption.id}>
+              <span className="flex items-start gap-3">
+                <input
+                  checked={preferences[channelOption.id]}
+                  className="mt-1 h-5 w-5 accent-indigo-700"
+                  name="push-preference-channel"
+                  onChange={() => togglePreference(channelOption.id)}
+                  type="checkbox"
+                  value={channelOption.id}
+                />
+                <span>
+                  <span className="block font-black text-slate-950">{channelOption.label}</span>
+                  <span className="mt-1 block text-sm font-semibold leading-6 text-slate-600">{channelOption.description}</span>
+                </span>
+              </span>
+            </label>
+          ))}
+        </fieldset>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <button className="rounded-full bg-indigo-900 px-5 py-3 text-sm font-black text-white shadow-sm" type="submit">Save push preferences</button>
+          <p className="rounded-2xl bg-white px-4 py-3 text-sm font-bold text-indigo-950" data-status={status}>{message}</p>
+        </div>
+      </form>
+    </section>
+  );
 }
 
 export function NotificationInboxActions() {
