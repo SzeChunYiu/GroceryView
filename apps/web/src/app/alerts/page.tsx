@@ -1,6 +1,8 @@
 import { AlertManagementPanel, type AlertProductSummary } from '@/components/AlertListItem';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
+import { SavedSearchSubscriptionsPanel } from '@/components/saved-search-subscriptions';
+import type { SavedSearchDealCandidate } from '@/lib/alert-scheduler';
 import { formatSek, matchedChainProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -21,6 +23,17 @@ const alertProductSummaries: AlertProductSummary[] = matchedChainProducts.slice(
     productHref: `/products/${product.slug}`
   };
 });
+
+const savedSearchDealCandidates: SavedSearchDealCandidate[] = matchedChainProducts.slice(0, 80).map((product) => ({
+  id: product.slug,
+  name: product.name,
+  href: `/products/${product.slug}`,
+  category: product.category,
+  chain: product.lowestChain,
+  labels: product.labels,
+  currentPriceText: formatSek(product.lowestPrice),
+  dealSummary: `${product.lowestChain} currently has the lowest verified chain price for this product.`
+}));
 
 export default function AlertsPage() {
   return (
@@ -51,6 +64,7 @@ export default function AlertsPage() {
       </div>
 
       <AlertManagementPanel products={alertProductSummaries} />
+      <SavedSearchSubscriptionsPanel candidates={savedSearchDealCandidates} />
     </PageShell>
   );
 }
