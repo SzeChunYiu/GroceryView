@@ -24,6 +24,7 @@ import {
   DEFAULT_OPENFOODFACTS_SWEDEN_CATALOG_MAX_PAGES,
   DEFAULT_ICA_REKLAMBLAD_OFFER_PAGE_URLS,
   DEFAULT_ICA_REKLAMBLAD_MAX_ROWS,
+  DEFAULT_ICA_STORE_CONFIGS,
   SWEDISH_COUNTY_ISO3166_2_CODES,
   SWEDISH_GROCERY_SHOP_VALUES,
   DEFAULT_WILLYS_SEARCH_QUERIES,
@@ -42,6 +43,7 @@ import {
   fetchMatsparProducts,
   fetchOpenFoodFactsSwedenCatalog,
   buildOpenFoodFactsSwedenSearchUrl,
+  fetchIcaDefaultStoreProducts,
   fetchIcaReklambladOffers,
   fetchOkq8FuelPrices,
   fetchOverpassGroceryStores,
@@ -217,6 +219,16 @@ if (shouldRun('ica-reklamblad')) {
   });
   await writeIcaReklamblad(icaReklambladOffers);
   summary.icaReklambladOffers = icaReklambladOffers.length;
+}
+
+if (shouldRun('ica')) {
+  const icaProducts = await fetchIcaDefaultStoreProducts({
+    maxRows: 270,
+    maxPageSize: 270,
+    retrievedAt
+  });
+  await writeIca(icaProducts);
+  summary.icaProducts = icaProducts.length;
 }
 
 if (shouldRun('overpass')) {
@@ -1318,6 +1330,114 @@ async function writeIcaReklamblad(rows) {
     })} as const;`,
     '',
     `export const icaReklambladOffers: IcaReklambladIngestedOffer[] = ${literal(rows)};`,
+    ''
+  ]);
+}
+
+async function writeIca(rows) {
+  const sourceUrls = unique(rows.map((row) => row.sourceUrl));
+  const sources = [...rows.reduce((byStore, row) => {
+    const existing = byStore.get(row.storeAccountId);
+    if (existing) {
+      existing.rowCount += 1;
+      return byStore;
+    }
+    byStore.set(row.storeAccountId, {
+      retrievedAt: row.retrievedAt,
+      rowCount: 1,
+      storeAccountId: row.storeAccountId,
+      storeName: row.storeName,
+      regionId: row.regionId,
+      sourceUrl: row.sourceUrl
+    });
+    return byStore;
+  }, new Map()).values()];
+  const visibleStoreIds = ['1003390', '1003829', '1003822', '1004599', '1004247', '1003714', '1004228'];
+  const visibleSources = [
+    ...visibleStoreIds.map((storeId) => sources.find((source) => source.storeAccountId === storeId)).filter(Boolean),
+    ...sources
+  ].filter((source, index, all) => all.findIndex((candidate) => candidate.storeAccountId === source.storeAccountId) === index);
+  const latestSources = visibleSources.slice(0, 7);
+
+  await writeGeneratedFile('ica.ts', [
+    '// AUTO-GENERATED from public ICA store-scoped promotions JSON.',
+    `// sourceUrl: ${sourceUrls[0] ?? 'https://handlaprivatkund.ica.se/stores/{storeAccountId}/api/product-listing-pages/v1/pages/promotions'}`,
+    `// retrievedAt: ${retrievedAt}`,
+    '// Source metadata: icaSources below records sourceUrl, retrievedAt, and rowCount for every store endpoint.',
+    '// Latest added sources:',
+    ...latestSources.map((source) => `// - ${source.sourceUrl} (store ${source.storeAccountId} ${source.storeName}, retrieved ${source.retrievedAt}, rows ${source.rowCount})`),
+    `// Row count: ${rows.length} real product rows fetched from handlaprivatkund.ica.se across ${sources.length} store endpoints.`,
+    '',
+    'export type IcaIngestedProduct = {',
+    '  code: string;',
+    '  productId: string;',
+    '  retailerProductId: string;',
+    '  name: string;',
+    '  brand: string;',
+    '  categories: string[];',
+    '  imageUrl: string;',
+    '  productUrl: string;',
+    '  packageSize: string;',
+    '  countryOfOrigin: string;',
+    '  price: number | null;',
+    '  priceCurrency: string;',
+    '  unitPrice: number | null;',
+    '  unitPriceCurrency: string;',
+    '  unitPriceUnit: string;',
+    '  promoPrice: number | null;',
+    '  promoPriceCurrency: string;',
+    '  promoUnitPrice: number | null;',
+    '  promoUnitPriceCurrency: string;',
+    '  promoUnitPriceUnit: string;',
+    '  promotionDescription: string;',
+    '  soldByWeight?: boolean;',
+    '  storeAccountId: string;',
+    '  storeName: string;',
+    '  regionId: string;',
+    '  sourceUrl: string;',
+    '  retrievedAt: string;',
+    '};',
+    '',
+    `export const icaSource = ${literal({
+      source: 'handlaprivatkund.ica.se public store-scoped promotions JSON',
+      retrievedAt,
+      rowCount: rows.length,
+      storeCount: sources.length,
+      configuredStoreCount: DEFAULT_ICA_STORE_CONFIGS.length,
+      sourceUrls
+    })} as const;`,
+    '',
+    `export const icaSources = ${JSON.stringify(sources)} as const;`,
+    '',
+    `export const icaProducts: IcaIngestedProduct[] = ${JSON.stringify(rows)};`,
+    ''
+  ]);
+  await writeGeneratedFile('ica-source-summary.ts', [
+    '// AUTO-GENERATED summary from public ICA store-scoped promotions JSON.',
+    '// Derived from apps/web/src/lib/ingested/ica.ts so visible routes can reference',
+    `// source metadata without bundling the ${Math.round(rows.length / 1000)}k-row product fixture into every page.`,
+    'export type IcaStorePromotionSourceSummary = {',
+    '  sourceLabel: string;',
+    '  generatedFrom: string;',
+    '  totalRowCount: number;',
+    '  storeEndpointCount: number;',
+    '  latestStores: {',
+    '    retrievedAt: string;',
+    '    rowCount: number;',
+    '    storeAccountId: string;',
+    '    storeName: string;',
+    '    regionId: string;',
+    '    sourceUrl: string;',
+    '  }[];',
+    '};',
+    '',
+    `export const icaStorePromotionSourceSummary: IcaStorePromotionSourceSummary = ${literal({
+      sourceLabel: 'ICA handlaprivatkund store-scoped promotions endpoints',
+      generatedFrom: 'apps/web/src/lib/ingested/ica.ts',
+      totalRowCount: rows.length,
+      storeEndpointCount: sources.length,
+      latestStores: latestSources
+    })};`,
     ''
   ]);
 }

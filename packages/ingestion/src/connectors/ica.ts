@@ -49,6 +49,21 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     regionId: DEFAULT_ICA_REGION_ID
   },
   {
+    storeAccountId: '1003390',
+    storeName: 'ICA Kvantum Jätten',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003829',
+    storeName: 'ICA Kvantum Tranås',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003822',
+    storeName: 'ICA Supermarket Toria',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
     storeAccountId: '1004247',
     storeName: 'ICA Focus',
     regionId: DEFAULT_ICA_REGION_ID
@@ -1526,16 +1541,6 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
   {
     storeAccountId: '1003816',
     storeName: 'ICA Tor Center',
-    regionId: DEFAULT_ICA_REGION_ID
-  },
-  {
-    storeAccountId: '1003822',
-    storeName: 'ICA Supermarket Toria',
-    regionId: DEFAULT_ICA_REGION_ID
-  },
-  {
-    storeAccountId: '1003829',
-    storeName: 'ICA Kvantum Tranås',
     regionId: DEFAULT_ICA_REGION_ID
   },
   {
