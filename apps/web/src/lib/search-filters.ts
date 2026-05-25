@@ -294,7 +294,7 @@ export function buildRemovableSearchFilterChips(searchParams: SearchFilterParams
   if (minPrice) {
     chips.push({
       id: `minPrice:${minPrice}`,
-      label: `Min unit price: ${minPrice} SEK`,
+      label: `Unit-price range: ≥ ${minPrice} SEK`,
       href: chipRemovalHref(searchParams, 'minPrice', minPrice, basePath)
     });
   }
@@ -303,7 +303,7 @@ export function buildRemovableSearchFilterChips(searchParams: SearchFilterParams
   if (maxPrice) {
     chips.push({
       id: `maxPrice:${maxPrice}`,
-      label: `Max unit price: ${maxPrice} SEK`,
+      label: `Unit-price range: ≤ ${maxPrice} SEK`,
       href: chipRemovalHref(searchParams, 'maxPrice', maxPrice, basePath)
     });
   }
