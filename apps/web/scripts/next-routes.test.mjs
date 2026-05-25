@@ -3924,6 +3924,16 @@ ${seo}`;
     assert.doesNotMatch(route, /@\/components\/sample-data/);
   });
 
+  it('emits source-backed ItemList JSON-LD on category index pages', async () => {
+    const source = await read('src/app/index/[symbol]/page.tsx');
+
+    assert.match(source, /type="application\/ld\+json"/);
+    assert.match(source, /'@type': 'ItemList'/);
+    assert.match(source, /categoryItemListJsonLd\(definition, rows\)/);
+    assert.match(source, /priceCurrency: 'SEK'/);
+    assert.doesNotMatch(source, /location|PostalAddress/);
+  });
+
   it('surfaces brand-tier indices on the chain index route using the real core brand-tier output', async () => {
     const source = await read('src/app/chain-index/page.tsx');
     const chainData = await read('src/lib/chain-index-data.ts');
