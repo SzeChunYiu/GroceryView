@@ -92,6 +92,6 @@ export function buildBasketForecastSummary(input: BasketComparisonInput, snapsho
     forecastWindowLabel: 'Next weekly basket',
     chains,
     bestChain: chains[0] ?? null,
-    guardrail: 'Forecast uses only visible favorite-store prices, cross-store volatility, and explicit member/promotion price rows; missing lines are counted, not estimated.'
+    guardrail: 'Observed forecast uses only visible favorite-store prices, cross-store volatility, and explicit member/promotion price rows; missing lines are counted, not estimated.'
   };
 }
