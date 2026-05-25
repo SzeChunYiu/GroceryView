@@ -1,5 +1,6 @@
 export type ObservedPricePoint = {
   price: number;
+  observedAt?: string;
 };
 
 export type VolatilityBadgeMethodology = {
@@ -8,6 +9,17 @@ export type VolatilityBadgeMethodology = {
   rangeLabel: string;
   summary: string;
   forecastBoundary: string;
+};
+
+export type RecentPriceVarianceStatus = 'stable' | 'volatile' | 'likely-promo';
+
+export type RecentPriceVarianceBadge = {
+  status: RecentPriceVarianceStatus;
+  label: string;
+  shortLabel: string;
+  score: number;
+  observationCount: number;
+  summary: string;
 };
 
 export type BasketBuyTimingAction = 'buy_now' | 'watch' | 'substitute';
@@ -316,6 +328,60 @@ export function volatilityBadgeMethodology(points: ReadonlyArray<ObservedPricePo
     rangeLabel: `${low.toFixed(2)}-${high.toFixed(2)} SEK observed range`,
     summary: 'The 0-100 volatility score is the observed high-low spread divided by the average observed price, capped at 100.',
     forecastBoundary: 'No future price forecast is made from this badge; it only explains historical observed prices.'
+  };
+}
+
+export function classifyRecentPriceVariance(points: ReadonlyArray<ObservedPricePoint>): RecentPriceVarianceBadge | null {
+  const recent = [...points]
+    .map((point, index) => ({
+      price: point.price,
+      observedTime: point.observedAt ? Date.parse(point.observedAt) : index
+    }))
+    .filter((point) => Number.isFinite(point.price) && point.price > 0 && Number.isFinite(point.observedTime))
+    .sort((left, right) => left.observedTime - right.observedTime)
+    .slice(-8);
+
+  if (recent.length < 2) return null;
+
+  const prices = recent.map((point) => point.price);
+  const low = Math.min(...prices);
+  const high = Math.max(...prices);
+  const average = prices.reduce((sum, price) => sum + price, 0) / prices.length;
+  const latest = prices.at(-1) ?? average;
+  const spreadPercent = average > 0 ? ((high - low) / average) * 100 : 0;
+  const volatilityPercent = average > 0 ? (standardDeviation(prices) / average) * 100 : 0;
+  const score = Math.round(clamp(Math.max(spreadPercent, volatilityPercent * 2), 0, 100));
+  const isLikelyPromo = recent.length >= 3 && score >= 12 && latest <= average * 0.92 && latest <= low * 1.03;
+
+  if (isLikelyPromo) {
+    return {
+      status: 'likely-promo',
+      label: 'Likely promo',
+      shortLabel: 'promo',
+      score,
+      observationCount: recent.length,
+      summary: `Latest observed price is near the recent low after a ${score}% recent variance swing.`
+    };
+  }
+
+  if (score >= 18) {
+    return {
+      status: 'volatile',
+      label: 'Volatile price',
+      shortLabel: 'volatile',
+      score,
+      observationCount: recent.length,
+      summary: `Recent observed prices moved across a ${score}% variance band.`
+    };
+  }
+
+  return {
+    status: 'stable',
+    label: 'Stable price',
+    shortLabel: 'stable',
+    score,
+    observationCount: recent.length,
+    summary: `Recent observed prices stayed within a ${score}% variance band.`
   };
 }
 

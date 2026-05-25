@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { PriceReportReviewActions } from '@/components/price-report-review-actions';
 import { routeMetadata } from '@/lib/seo';
@@ -125,6 +126,18 @@ export default function FeaturePage() {
             ))}
           </ul>
           <p className="mt-3 text-sm font-bold text-amber-950">Next runtime step: {commodityMappingReviewPlan.nextRuntimeStep}</p>
+        </div>
+      </Card>
+      <Card className="mt-6 border-rose-200 bg-rose-50/80">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-rose-800">Admin moderation</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Unified review queue</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Flagged reviews, duplicate product reports, and freshness votes now roll up into an admin-only queue with approve, hide, and escalate actions.
+            </p>
+          </div>
+          <Link className="inline-flex rounded-full bg-rose-800 px-4 py-2 text-sm font-black text-white" href="/admin/reviews">Open admin reviews</Link>
         </div>
       </Card>
       <PriceReportReviewActions />
