@@ -112,6 +112,7 @@ import {
   fetchLyfOgHeilsaProducts,
   parseLyfOgHeilsaProducts,
   parseIcaReklambladOffers,
+  parseIcaReklambladStructuredPromotion,
   parseIcaStorePromotions,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
@@ -3128,8 +3129,37 @@ describe('fetchIcaReklambladOffers', () => {
       flyerUrl: 'https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1',
       flyerPdfUrl: buildEmaginPdfUrl('https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1'),
       imageUrl: 'https://assets.icanet.se/7310401000374.jpg',
-      retrievedAt: '2026-05-21T01:45:00.000Z'
+      retrievedAt: '2026-05-21T01:45:00.000Z',
+      structuredPromotion: {
+        kind: 'multi_buy',
+        memberOnly: false,
+        price: 40,
+        quantity: 3,
+        sourceText: '3 för 40 kr'
+      }
     }]);
+  });
+
+  it('structures ICA flyer x-for-y, percent-off, and member-price mechanics', () => {
+    assert.deepEqual(parseIcaReklambladStructuredPromotion('3 för 40 kr'), {
+      kind: 'multi_buy',
+      memberOnly: false,
+      price: 40,
+      quantity: 3,
+      sourceText: '3 för 40 kr'
+    });
+    assert.deepEqual(parseIcaReklambladStructuredPromotion('25% rabatt'), {
+      kind: 'percent_off',
+      memberOnly: false,
+      percentOff: 25,
+      sourceText: '25% rabatt'
+    });
+    assert.deepEqual(parseIcaReklambladStructuredPromotion('Medlemspris 39,90 kr/st'), {
+      kind: 'member_price',
+      memberOnly: true,
+      price: 39.9,
+      sourceText: 'Medlemspris 39,90 kr/st'
+    });
   });
 
   it('fetches ICA reklamblad offer rows from the public store offer page', async () => {
