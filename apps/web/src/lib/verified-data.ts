@@ -3540,16 +3540,22 @@ export const sourceCoverage = [
   }
 ];
 
-export const retailerTypeCoverage = majorSwedishGroceryRetailerTypeCoverage.map((row) => ({
-  retailerType: row.retailerType,
-  label: row.retailerType.replace(/_/g, ' '),
-  status: row.chainCount > 0 ? 'tracked' : 'schema-ready',
-  chainCount: row.chainCount,
-  chainSlugs: row.chainSlugs,
-  coverageLabel: row.chainCount > 0
-    ? `${row.chainCount} seeded ${row.retailerType.replace(/_/g, ' ')} chain${row.chainCount === 1 ? '' : 's'}`
-    : 'No seeded chains yet'
-}));
+export const retailerTypeCoverage = majorSwedishGroceryRetailerTypeCoverage.map((row) => {
+  const label = row.retailerType.replace(/_/g, ' ');
+  return {
+    retailerType: row.retailerType,
+    label,
+    status: row.chainCount > 0 ? 'tracked' : 'schema-ready',
+    chainCount: row.chainCount,
+    chainSlugs: row.chainSlugs,
+    freshnessLabel: row.chainCount > 0
+      ? `Latest priced grocery freshness: ${freshnessLagSummary.asOf}`
+      : 'Freshness pending until a chain is seeded for this retailer type',
+    coverageLabel: row.chainCount > 0
+      ? `${row.chainCount} seeded ${label} chain${row.chainCount === 1 ? '' : 's'}`
+      : 'No seeded chains yet'
+  };
+});
 
 export const retailerTypeCoverageSummary = {
   allowedTypeCount: retailerTypes.length,

@@ -7,14 +7,6 @@ import { priceStateToken } from '@/lib/color-vision-palette';
 import { categorySummaries } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
-export function generateMetadata() {
-  return routeMetadata({
-    path: '/heatmap',
-    title: 'Grocery chain price heatmap | GroceryView',
-    description: 'Scan category-by-chain grocery index cells built from verified chain price observations and confidence-labelled index coverage.'
-  });
-}
-
 const groceryIndex = calculateChainPriceIndex([
   ...buildChainPriceObservations(),
   ...buildMatchedBasketChainPriceObservations()
@@ -94,6 +86,21 @@ const matrixRows = categorySummaries.map((category) => ({
 
 const coveredCellCount = matrixRows.reduce((sum, row) => sum + row.cells.filter(({ cell }) => cell !== null).length, 0);
 const totalCellCount = matrixRows.length * groceryIndex.chains.length;
+const primaryHeatmapCategory = matrixRows.find((row) => row.cells.some(({ cell }) => cell !== null))?.label ?? categorySummaries[0]?.label ?? 'grocery category';
+const primaryHeatmapChain = groceryIndex.chains[0]?.chainId ?? 'grocery chain';
+
+export function generateMetadata() {
+  const title = `${primaryHeatmapCategory} x ${primaryHeatmapChain} heatmap | GroceryView`;
+  const description = `${categorySummaries.length} verified categories, ${groceryIndex.chains.length} chains, and ${coveredCellCount}/${totalCellCount} covered category-chain index cells.`;
+
+  return routeMetadata({
+    path: '/heatmap',
+    title,
+    description,
+    imagePath: '/pwa-icon.svg',
+    imageAlt: `${primaryHeatmapCategory} and ${primaryHeatmapChain} price-index heatmap preview`
+  });
+}
 
 export default function HeatmapPage() {
   return (

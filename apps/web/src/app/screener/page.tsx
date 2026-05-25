@@ -54,17 +54,56 @@ type ScreenerRow = {
 
 const sortOptions = SCREENER_SORT_OPTIONS;
 
+const primaryScreenerDrop = priceDropMoversBoard[0];
+const primaryScreenerSpread = topChainSpreads[0];
+const primaryScreenerCategory = categoryDealLeaders[0];
+
+function screenerOpenGraphCopy(fallbackTitle: string, fallbackDescription: string) {
+  if (!primaryScreenerDrop) {
+    return { title: fallbackTitle, description: fallbackDescription };
+  }
+
+  const categoryLabel = primaryScreenerCategory?.categoryLabel ?? primaryScreenerDrop.categoryLabel;
+  const spreadEvidence = primaryScreenerSpread
+    ? ` ${primaryScreenerSpread.name} spans ${formatSek(primaryScreenerSpread.lowestPrice)} to ${formatSek(primaryScreenerSpread.highestPrice)} across ${primaryScreenerSpread.inChains.join(' + ')}.`
+    : '';
+
+  return {
+    title: `${primaryScreenerDrop.productName} ${formatPct(primaryScreenerDrop.changePercent)} | GroceryView screener`,
+    description: `${primaryScreenerDrop.productName}: ${formatSek(primaryScreenerDrop.latestPrice)} now vs ${formatSek(primaryScreenerDrop.previousPrice)} previous from ${primaryScreenerDrop.observedCount} dated points in ${primaryScreenerDrop.categoryLabel}. ${categoryLabel} leads the category filters.${spreadEvidence}`
+  };
+}
+
+function screenerOpenGraphImages(fallbackImages: NonNullable<ReturnType<typeof routeMetadata>['openGraph']>['images']) {
+  if (!primaryScreenerSpread?.image) return fallbackImages;
+
+  return [{
+    url: primaryScreenerSpread.image,
+    width: 1200,
+    height: 630,
+    alt: `${primaryScreenerSpread.name} ${labelFromSlug(primaryScreenerSpread.category)} source product image`
+  }];
+}
+
 export function generateMetadata() {
   const metadata = routeMetadata('/screener');
   const openGraph = metadata.openGraph;
+  const ogCopy = screenerOpenGraphCopy(String(metadata.title ?? 'Verified deal screener | GroceryView'), metadata.description ?? '');
+  const ogImages = screenerOpenGraphImages(openGraph?.images);
 
   return {
     ...metadata,
+    openGraph: {
+      ...(openGraph ?? {}),
+      title: ogCopy.title,
+      description: ogCopy.description,
+      ...(ogImages ? { images: ogImages } : {})
+    },
     twitter: {
       card: 'summary_large_image',
-      title: openGraph?.title ?? metadata.title,
-      description: openGraph?.description ?? metadata.description,
-      images: openGraph?.images
+      title: ogCopy.title,
+      description: ogCopy.description,
+      images: ogImages
     }
   };
 }
