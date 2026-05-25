@@ -13,6 +13,7 @@ export type FriendPriceSighting = Readonly<{
   confidence: 'high' | 'medium' | 'low';
   id: string;
   observedAt: string;
+  note?: string;
   postId: string;
   priceLabel: string;
   productName: string;
@@ -75,6 +76,7 @@ export const friendPriceSightings: FriendPriceSighting[] = [
     chainSlug: 'hemkop',
     confidence: 'medium',
     id: 'friend-sighting-oats-hemkop',
+    note: 'Shelf tag matched the app price, but the promo end date was not posted.',
     observedAt: '2026-05-24T08:42:00.000Z',
     postId: 'weekly-oats-swap',
     priceLabel: '21,90 kr',
@@ -88,6 +90,7 @@ export const friendPriceSightings: FriendPriceSighting[] = [
     chainSlug: 'willys',
     confidence: 'low',
     id: 'friend-sighting-basil-willys',
+    note: 'Only a few pots left in the herb display.',
     observedAt: '2026-05-24T10:12:00.000Z',
     postId: 'basil-stock-note',
     priceLabel: '18,90 kr',
@@ -101,6 +104,7 @@ export const friendPriceSightings: FriendPriceSighting[] = [
     chainSlug: 'willys',
     confidence: 'high',
     id: 'friend-sighting-fiberhavregryn-willys',
+    note: 'Friend attached a receipt photo in the private household thread.',
     observedAt: '2026-05-24T11:20:00.000Z',
     postId: 'weekly-oats-swap',
     priceLabel: '20,90 kr',
