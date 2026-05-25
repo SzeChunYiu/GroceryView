@@ -2022,8 +2022,10 @@ function cityGrossProductToDailyItem(row: CityGrossProduct): RetailerConnectorPa
     packageUnit: quantity.packageUnit,
     price: row.price,
     regularPrice: row.regularPrice !== null && row.regularPrice > row.price ? row.regularPrice : undefined,
-    promoText: row.regularPrice !== null && row.regularPrice > row.price ? 'City Gross discounted public price' : undefined,
-    memberOnly: false,
+    promoText: row.is_member_price
+      ? 'City Gross member price'
+      : row.regularPrice !== null && row.regularPrice > row.price ? 'City Gross discounted public price' : undefined,
+    memberOnly: row.is_member_price,
     observedAt: row.retrievedAt,
     sourceUrl: row.sourceUrl,
     imageUrl: row.imageUrl || undefined
