@@ -76,6 +76,12 @@ const validNotificationInbox: NotificationInboxResponseDto = {
 const validStockUpList: MultiWeekStockUpListResponseDto = {
   userId: 'user-1',
   itemCount: 1,
+  asOf: '2026-05-21T09:00:00.000Z',
+  planningWeeks: 4,
+  weeklyBudget: 800,
+  totalUpfrontCost: 443.56,
+  weeklyEquivalentCost: 110.89,
+  weeklyBudgetSharePercent: 13.86,
   rows: [
     {
       rowId: 'coffee-stock-up',
@@ -90,14 +96,31 @@ const validStockUpList: MultiWeekStockUpListResponseDto = {
       currentUnitPrice: 110.89,
       historicalLowUnitPrice: 99.9,
       typicalUnitPrice: 133.11,
+      currentVsTypicalPercent: -16.69,
+      currentVsHistoricalLowPercent: 11,
+      plannedUnits: 4,
+      packagesNeeded: 9,
+      upfrontCost: 443.56,
+      weeklyEquivalentCost: 110.89,
+      weeklyBudgetSharePercent: 13.86,
+      observationCount: 4,
+      observedHistoryWindow: '2026-04-01T00:00:00.000Z to 2026-05-21T00:00:00.000Z',
       confidence: 'high',
       historyWindowStart: '2026-04-01T00:00:00.000Z',
       historyWindowEnd: '2026-05-21T00:00:00.000Z',
+      contextLabel: '4 observed unit-price points; typical and low are historical facts, not a forecast.',
       noForecastReason: 'Historical low and typical prices are observed facts only; no future shelf price is predicted.',
       reviewTrigger: 'Re-check observed prices before restocking.',
       updatedAt: '2026-05-21T09:00:00.000Z'
     }
   ],
+  coverage: {
+    confidence: 'high',
+    observedItemCount: 1,
+    totalItemCount: 1,
+    missingHistoryProductIds: [],
+    caveat: 'Historical low and typical prices use observed unit-price rows only; missing history lowers confidence and no future price is predicted.'
+  },
   guardrails: ['Rows are account-owned and signed-in.', 'No forecast is stored.'],
   evidence: {
     sourceTables: ['multi_week_stock_up_rows', 'app_users'],
@@ -317,6 +340,8 @@ describe('api contract schemas', () => {
 
     assert.equal(parsed.rows[0]?.planningWeeks, 4);
     assert.equal(parsed.rows[0]?.confidence, 'high');
+    assert.equal(parsed.rows[0]?.weeklyBudgetSharePercent, 13.86);
+    assert.equal(parsed.coverage?.observedItemCount, 1);
     assert.equal(parsed.evidence.noForecast, true);
     assert.deepEqual(parsed.evidence.sourceTables, ['multi_week_stock_up_rows', 'app_users']);
     assert.equal(

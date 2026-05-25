@@ -59,6 +59,8 @@ describe('authenticated HTTP routes', () => {
     assert.equal(unauthenticatedPantry.status, 401);
     const unauthenticatedLocalOffers = await handle(new Request('http://localhost/api/basket/local-offers?userId=user-1'));
     assert.equal(unauthenticatedLocalOffers.status, 401);
+    const unauthenticatedStockUp = await handle(new Request('http://localhost/api/basket/stock-up-list?userId=user-1'));
+    assert.equal(unauthenticatedStockUp.status, 401);
     const unauthenticatedMealPlans = await handle(new Request('http://localhost/api/meal-plans/suggestions?userId=user-1'));
     assert.equal(unauthenticatedMealPlans.status, 401);
     const unauthenticatedExpiryRadar = await handle(new Request('http://localhost/api/expiry-deals/radar?userId=user-1'));
@@ -134,6 +136,10 @@ describe('authenticated HTTP routes', () => {
       headers: { authorization: `Bearer ${wrongUserToken}` }
     }));
     assert.equal(forbiddenLocalOffers.status, 403);
+    const forbiddenStockUp = await handle(new Request('http://localhost/api/basket/stock-up-list?userId=user-1', {
+      headers: { authorization: `Bearer ${wrongUserToken}` }
+    }));
+    assert.equal(forbiddenStockUp.status, 403);
     const forbiddenMealPlans = await handle(new Request('http://localhost/api/meal-plans/suggestions?userId=user-1', {
       headers: { authorization: `Bearer ${wrongUserToken}` }
     }));
@@ -200,6 +206,10 @@ describe('authenticated HTTP routes', () => {
       headers: { authorization: `Bearer ${token}` }
     }));
     assert.equal(authorizedLocalOffers.status, 200);
+    const authorizedStockUp = await handle(new Request('http://localhost/api/basket/stock-up-list?userId=user-1', {
+      headers: { authorization: `Bearer ${token}` }
+    }));
+    assert.equal(authorizedStockUp.status, 200);
     const authorizedMealPlans = await handle(new Request('http://localhost/api/meal-plans/suggestions?userId=user-1', {
       headers: { authorization: `Bearer ${token}` }
     }));

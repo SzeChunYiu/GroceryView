@@ -171,10 +171,21 @@ export const multiWeekStockUpRowSchema = z.object({
   currentUnitPrice: z.number().nonnegative(),
   historicalLowUnitPrice: z.number().nonnegative(),
   typicalUnitPrice: z.number().nonnegative(),
+  currentVsTypicalPercent: z.number().optional(),
+  currentVsHistoricalLowPercent: z.number().optional(),
+  plannedUnits: z.number().nonnegative().optional(),
+  packagesNeeded: z.number().int().nonnegative().optional(),
+  upfrontCost: z.number().nonnegative().optional(),
+  weeklyEquivalentCost: z.number().nonnegative().optional(),
+  weeklyBudgetSharePercent: z.number().nonnegative().optional(),
+  observationCount: z.number().int().nonnegative().optional(),
+  observedHistoryWindow: idSchema.optional(),
   confidence: multiWeekStockUpConfidenceSchema,
   historyWindowStart: isoDateTimeSchema,
   historyWindowEnd: isoDateTimeSchema,
   storageLimitWeeks: z.number().int().positive().max(26).optional(),
+  contextLabel: idSchema.optional(),
+  seasonalityNote: idSchema.optional(),
   noForecastReason: idSchema,
   reviewTrigger: idSchema,
   updatedAt: isoDateTimeSchema
@@ -191,7 +202,20 @@ export const multiWeekStockUpUpdateRowSchema = multiWeekStockUpCreateRowSchema.p
 export const multiWeekStockUpListResponseSchema = z.object({
   userId: idSchema,
   itemCount: z.number().int().nonnegative(),
+  asOf: isoDateTimeSchema.optional(),
+  planningWeeks: z.number().int().positive().max(26).optional(),
+  weeklyBudget: z.number().positive().optional(),
+  totalUpfrontCost: z.number().nonnegative().optional(),
+  weeklyEquivalentCost: z.number().nonnegative().optional(),
+  weeklyBudgetSharePercent: z.number().nonnegative().optional(),
   rows: z.array(multiWeekStockUpRowSchema),
+  coverage: z.object({
+    confidence: multiWeekStockUpConfidenceSchema,
+    observedItemCount: z.number().int().nonnegative(),
+    totalItemCount: z.number().int().nonnegative(),
+    missingHistoryProductIds: z.array(idSchema).optional(),
+    caveat: idSchema
+  }).optional(),
   guardrails: z.array(idSchema),
   evidence: z.object({
     sourceTables: z.array(idSchema),
@@ -424,10 +448,21 @@ export const apiContractOpenApiComponents = {
       currentUnitPrice: { type: 'number', minimum: 0 },
       historicalLowUnitPrice: { type: 'number', minimum: 0 },
       typicalUnitPrice: { type: 'number', minimum: 0 },
+      currentVsTypicalPercent: { type: 'number' },
+      currentVsHistoricalLowPercent: { type: 'number' },
+      plannedUnits: { type: 'number', minimum: 0 },
+      packagesNeeded: { type: 'integer', minimum: 0 },
+      upfrontCost: { type: 'number', minimum: 0 },
+      weeklyEquivalentCost: { type: 'number', minimum: 0 },
+      weeklyBudgetSharePercent: { type: 'number', minimum: 0 },
+      observationCount: { type: 'integer', minimum: 0 },
+      observedHistoryWindow: { type: 'string' },
       confidence: { type: 'string', enum: multiWeekStockUpConfidenceSchema.options },
       historyWindowStart: { type: 'string', format: 'date-time' },
       historyWindowEnd: { type: 'string', format: 'date-time' },
       storageLimitWeeks: { type: 'integer', minimum: 1, maximum: 26 },
+      contextLabel: { type: 'string' },
+      seasonalityNote: { type: 'string' },
       noForecastReason: { type: 'string' },
       reviewTrigger: { type: 'string' },
       updatedAt: { type: 'string', format: 'date-time' }
@@ -439,9 +474,29 @@ export const apiContractOpenApiComponents = {
     properties: {
       userId: { type: 'string' },
       itemCount: { type: 'integer', minimum: 0 },
+      asOf: { type: 'string', format: 'date-time' },
+      planningWeeks: { type: 'integer', minimum: 1, maximum: 26 },
+      weeklyBudget: { type: 'number', minimum: 0 },
+      totalUpfrontCost: { type: 'number', minimum: 0 },
+      weeklyEquivalentCost: { type: 'number', minimum: 0 },
+      weeklyBudgetSharePercent: { type: 'number', minimum: 0 },
       rows: {
         type: 'array',
         items: { $ref: '#/components/schemas/MultiWeekStockUpRow' }
+      },
+      coverage: {
+        type: 'object',
+        required: ['confidence', 'observedItemCount', 'totalItemCount', 'caveat'],
+        properties: {
+          confidence: { type: 'string', enum: multiWeekStockUpConfidenceSchema.options },
+          observedItemCount: { type: 'integer', minimum: 0 },
+          totalItemCount: { type: 'integer', minimum: 0 },
+          missingHistoryProductIds: {
+            type: 'array',
+            items: { type: 'string' }
+          },
+          caveat: { type: 'string' }
+        }
       },
       guardrails: {
         type: 'array',
