@@ -160,6 +160,7 @@ export * from './connectors/matpriskollen.js';
 export * from './connectors/matspar.js';
 export * from './connectors/meny-flyer-no.js';
 export * from './connectors/meny-no.js';
+export * from './connectors/narvesen-no.js';
 export * from './connectors/normal-se.js';
 export * from './connectors/reklamblad-se.js';
 export {
