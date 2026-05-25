@@ -45,7 +45,21 @@ type SignedSharePayload = {
   listId?: string;
 };
 
+export type OfflineSavedListSnapshot = {
+  checkedCount: number;
+  items: ShoppingListItem[];
+  remainingCount: number;
+  routes: string[];
+  savedAt: string;
+  totalCount: number;
+};
+
 export const LIST_STORAGE_KEY = 'groceryview:shopping-list:checked:v1';
+export const OFFLINE_SAVED_LIST_STORAGE_KEY = 'groceryview:offline-saved-list:v1';
+export const OFFLINE_SAVED_LIST_UPDATED_EVENT = 'groceryview:offline-saved-list-updated';
+const OFFLINE_SAVED_LIST_ROUTE_CACHE_NAME = 'groceryview-shopping-list-route-v1';
+const OFFLINE_SAVED_LIST_BASE_ROUTES = ['/list', '/favourites'];
+const OFFLINE_SAVED_LIST_MAX_ROUTES = 16;
 const LIST_SHARE_PUBLIC_SECRET = process.env.NEXT_PUBLIC_LIST_SHARE_SECRET || 'local-list-share-development-secret';
 
 export const BUDGET_HISTORY_STORAGE_KEY = 'groceryview:shopping-list:budget-history:v1';
@@ -275,6 +289,51 @@ function productListItemId(productId: string): string {
   return `product:${productId.trim().toLowerCase()}`;
 }
 
+function productRouteForOffline(slug: string) {
+  const trimmedSlug = slug.trim();
+  return trimmedSlug ? `/products/${encodeURIComponent(trimmedSlug)}` : null;
+}
+
+export function offlineSavedListRoutesForItems(items: ShoppingListItem[]) {
+  const routes = new Set(OFFLINE_SAVED_LIST_BASE_ROUTES);
+  for (const item of items) {
+    const route = item.matchedProductSlug ? productRouteForOffline(item.matchedProductSlug) : null;
+    if (route) routes.add(route);
+  }
+
+  return [...routes].slice(0, OFFLINE_SAVED_LIST_MAX_ROUTES);
+}
+
+function persistOfflineSavedListSnapshot(items: ShoppingListItem[]) {
+  const checkedCount = items.filter((item) => item.checked).length;
+  const snapshot: OfflineSavedListSnapshot = {
+    checkedCount,
+    items,
+    remainingCount: items.length - checkedCount,
+    routes: offlineSavedListRoutesForItems(items),
+    savedAt: new Date().toISOString(),
+    totalCount: items.length
+  };
+
+  try {
+    localStorage.setItem(OFFLINE_SAVED_LIST_STORAGE_KEY, JSON.stringify(snapshot));
+    window.dispatchEvent(new CustomEvent(OFFLINE_SAVED_LIST_UPDATED_EVENT, { detail: snapshot }));
+  } catch {
+    // Offline snapshots are a progressive enhancement; checked-item persistence remains authoritative.
+  }
+}
+
+async function warmOfflineSavedListCompanions(items: ShoppingListItem[]) {
+  if (typeof window === 'undefined' || !('caches' in window) || !navigator.onLine) return;
+
+  try {
+    const cache = await caches.open(OFFLINE_SAVED_LIST_ROUTE_CACHE_NAME);
+    await Promise.allSettled(offlineSavedListRoutesForItems(items).map((route) => cache.add(route)));
+  } catch {
+    // Keep list interactions responsive even when Cache Storage is unavailable.
+  }
+}
+
 export function useList() {
   const [items, setItems] = useState<ShoppingListItem[]>(() => withCheckedState({}));
   const [hasLoadedBrowserState, setHasLoadedBrowserState] = useState(false);
@@ -312,6 +371,8 @@ export function useList() {
   useEffect(() => {
     if (!hasLoadedBrowserState || shareLink?.isValid) return;
     persistCheckedState(items);
+    persistOfflineSavedListSnapshot(items);
+    void warmOfflineSavedListCompanions(items);
   }, [hasLoadedBrowserState, items, shareLink?.isValid]);
 
   const toggleItemChecked = useCallback((itemId: string) => {

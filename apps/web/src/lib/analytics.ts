@@ -1,3 +1,66 @@
+export type PwaInstallAnalyticsAction =
+  | 'prompt_impression'
+  | 'banner_dismissed'
+  | 'install_prompt_accepted'
+  | 'install_prompt_dismissed'
+  | 'app_installed'
+  | 'standalone_launch';
+
+export type PwaInstallAnalyticsEvent = {
+  action: PwaInstallAnalyticsAction;
+  platform: 'android' | 'desktop' | 'ios';
+  canInstall: boolean;
+  source: 'beforeinstallprompt' | 'install_banner' | 'appinstalled' | 'standalone_display';
+  observedAt: string;
+  launchSource?: string;
+};
+
+const consentPolicyVersion = '2026-05-22-consent-v1';
+const consentStorageKey = 'groceryview:consent:state';
+
+type ConsentCategories = Record<'necessary' | 'analytics' | 'ads' | 'personalisation', boolean>;
+
+type ConsentSnapshot = {
+  policyVersion?: string;
+  categories?: Partial<ConsentCategories>;
+};
+
+function analyticsConsentGranted() {
+  if (typeof window === 'undefined') return false;
+
+  const runtimeConsent = (window as Window & { groceryviewConsent?: ConsentSnapshot }).groceryviewConsent;
+  if (runtimeConsent?.policyVersion === consentPolicyVersion) {
+    return runtimeConsent.categories?.analytics === true;
+  }
+
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(consentStorageKey) || 'null') as ConsentSnapshot | null;
+    return stored?.policyVersion === consentPolicyVersion && stored.categories?.analytics === true;
+  } catch {
+    return false;
+  }
+}
+
+function publishConsentAwareAnalyticsEvent(eventName: string, payload: Record<string, unknown>) {
+  if (typeof window === 'undefined' || !analyticsConsentGranted()) return;
+
+  window.dispatchEvent(new CustomEvent(eventName, { detail: payload }));
+  const analyticsWindow = window as Window & {
+    dataLayer?: unknown[];
+    gtag?: (...args: unknown[]) => void;
+  };
+  analyticsWindow.dataLayer = analyticsWindow.dataLayer || [];
+  analyticsWindow.dataLayer.push({ event: eventName, ...payload });
+  analyticsWindow.gtag?.('event', eventName, payload);
+}
+
+export function trackPwaInstallAnalytics(event: Omit<PwaInstallAnalyticsEvent, 'observedAt'>) {
+  publishConsentAwareAnalyticsEvent('groceryview_pwa_install', {
+    ...event,
+    observedAt: new Date().toISOString()
+  });
+}
+
 export type ItemCardImpression = {
   itemId: string;
   itemName: string;
@@ -22,6 +85,26 @@ export type RecentProductSearch = {
   searchedAt: string;
 };
 
+export type ProductSearchPerformanceTelemetry = {
+  cacheHit: boolean;
+  cacheHitRate: number;
+  latencyMs: number;
+  observedAt: string;
+  query: string;
+  resultCount: number;
+  source: string;
+  timedOut: boolean;
+  timeoutRate: number;
+};
+
+export type ProductSearchPerformanceSummary = {
+  averageLatencyMs: number;
+  averageResultCount: number;
+  cacheHitRate: number;
+  sampleSize: number;
+  timeoutRate: number;
+};
+
 type FunnelDeviceSegment = 'desktop' | 'mobile' | 'tablet' | 'unknown';
 type FunnelAccountSegment = 'guest' | 'account' | 'unknown';
 
@@ -31,9 +114,50 @@ export const recentProductSearchesStorageKey = 'groceryview:recent-product-searc
 const maxBatchSize = 20;
 const flushDelayMs = 1200;
 const maxRecentSearches = 10;
+const maxProductSearchTelemetrySamples = 100;
 
 let pendingImpressions: ItemCardImpression[] = [];
 let flushTimer: ReturnType<typeof setTimeout> | null = null;
+const recentProductSearchPerformanceTelemetry: ProductSearchPerformanceTelemetry[] = [];
+
+function rate(count: number, total: number) {
+  return total === 0 ? 0 : count / total;
+}
+
+export function summarizeProductSearchPerformanceTelemetry(): ProductSearchPerformanceSummary {
+  const sampleSize = recentProductSearchPerformanceTelemetry.length;
+  const totalLatencyMs = recentProductSearchPerformanceTelemetry.reduce((sum, event) => sum + event.latencyMs, 0);
+  const totalResultCount = recentProductSearchPerformanceTelemetry.reduce((sum, event) => sum + event.resultCount, 0);
+
+  return {
+    averageLatencyMs: sampleSize === 0 ? 0 : Math.round(totalLatencyMs / sampleSize),
+    averageResultCount: sampleSize === 0 ? 0 : Number((totalResultCount / sampleSize).toFixed(2)),
+    cacheHitRate: rate(recentProductSearchPerformanceTelemetry.filter((event) => event.cacheHit).length, sampleSize),
+    sampleSize,
+    timeoutRate: rate(recentProductSearchPerformanceTelemetry.filter((event) => event.timedOut).length, sampleSize)
+  };
+}
+
+export function recordProductSearchPerformanceTelemetry(
+  event: Omit<ProductSearchPerformanceTelemetry, 'cacheHitRate' | 'observedAt' | 'timeoutRate'>
+) {
+  const telemetry: ProductSearchPerformanceTelemetry = {
+    ...event,
+    cacheHitRate: 0,
+    observedAt: new Date().toISOString(),
+    timeoutRate: 0
+  };
+
+  recentProductSearchPerformanceTelemetry.push(telemetry);
+  if (recentProductSearchPerformanceTelemetry.length > maxProductSearchTelemetrySamples) {
+    recentProductSearchPerformanceTelemetry.shift();
+  }
+
+  const summary = summarizeProductSearchPerformanceTelemetry();
+  telemetry.cacheHitRate = summary.cacheHitRate;
+  telemetry.timeoutRate = summary.timeoutRate;
+  return telemetry;
+}
 
 function clearFlushTimer() {
   if (flushTimer) {
@@ -276,4 +400,133 @@ export function trackDealShare(event: Omit<DealShareEvent, 'observedAt' | 'refer
     keepalive: true,
     method: 'POST'
   }).catch(() => undefined);
+}
+
+export type SponsoredPlacementImpression = {
+  label: string;
+  observedAt: string;
+  placementId: string;
+  provider: string;
+  separatedFromOrganicRankings: boolean;
+  surface: string;
+};
+
+const sponsoredPlacementImpressionEndpoint = '/api/analytics/sponsored-placement-impressions';
+
+export function trackSponsoredPlacementImpression(event: Omit<SponsoredPlacementImpression, 'observedAt'>) {
+  if (typeof window === 'undefined') return;
+
+  const payloadEvent: SponsoredPlacementImpression = {
+    ...event,
+    observedAt: new Date().toISOString()
+  };
+
+  window.dispatchEvent(new CustomEvent('groceryview:sponsored-placement-impression', { detail: payloadEvent }));
+  const payload = JSON.stringify({ event: payloadEvent });
+
+  if (navigator.sendBeacon) {
+    const sent = navigator.sendBeacon(sponsoredPlacementImpressionEndpoint, new Blob([payload], { type: 'application/json' }));
+    if (sent) return;
+  }
+
+  void fetch(sponsoredPlacementImpressionEndpoint, {
+    body: payload,
+    headers: { 'content-type': 'application/json' },
+    keepalive: true,
+    method: 'POST'
+  }).catch(() => undefined);
+}
+
+export type AffiliateLinkMetadata = {
+  placement: 'deal_card' | 'store_link' | 'source_link';
+  surface: string;
+  retailerName: string;
+  destinationUrl: string;
+  productId?: string;
+  dealId?: string;
+  campaignId?: string;
+  sponsored?: boolean;
+};
+
+export type AffiliateOutboundClickEvent = AffiliateLinkMetadata & {
+  consentGranted: boolean;
+  disclosureLabel: string;
+  observedAt: string;
+};
+
+const affiliateOutboundEndpoint = '/api/analytics/affiliate-outbound-clicks';
+const groceryViewAffiliateSource = 'groceryview';
+
+export function affiliateDisclosureLabel(metadata: Pick<AffiliateLinkMetadata, 'retailerName' | 'sponsored'>) {
+  const prefix = metadata.sponsored === false ? 'Outbound store link' : 'Affiliate link';
+  return `${prefix}: GroceryView may earn a commission from ${metadata.retailerName}; deal ranking and savings math stay independent.`;
+}
+
+export function buildAffiliateOutboundUrl(metadata: AffiliateLinkMetadata) {
+  try {
+    const url = new URL(metadata.destinationUrl);
+    url.searchParams.set('utm_source', groceryViewAffiliateSource);
+    url.searchParams.set('utm_medium', metadata.sponsored === false ? 'outbound_store' : 'affiliate');
+    url.searchParams.set('utm_campaign', metadata.campaignId ?? metadata.surface);
+    url.searchParams.set('gv_affiliate_disclosure', metadata.sponsored === false ? 'outbound' : 'affiliate');
+    if (metadata.productId) url.searchParams.set('gv_product_id', metadata.productId);
+    if (metadata.dealId) url.searchParams.set('gv_deal_id', metadata.dealId);
+    return url.toString();
+  } catch {
+    return metadata.destinationUrl;
+  }
+}
+
+function hasAnalyticsConsent() {
+  try {
+    return window.localStorage.getItem('groceryview:analytics-consent') === 'granted';
+  } catch {
+    return false;
+  }
+}
+
+function sendAffiliateOutboundClick(event: AffiliateOutboundClickEvent) {
+  if (typeof window === 'undefined') return;
+
+  window.dispatchEvent(new CustomEvent('groceryview:affiliate-outbound-click', { detail: event }));
+  if (!event.consentGranted) return;
+
+  const payload = JSON.stringify({ event });
+  if (navigator.sendBeacon) {
+    const sent = navigator.sendBeacon(affiliateOutboundEndpoint, new Blob([payload], { type: 'application/json' }));
+    if (sent) return;
+  }
+
+  void fetch(affiliateOutboundEndpoint, {
+    body: payload,
+    headers: { 'content-type': 'application/json' },
+    keepalive: true,
+    method: 'POST'
+  }).catch(() => undefined);
+}
+
+export function trackAffiliateOutboundClick(metadata: AffiliateLinkMetadata) {
+  sendAffiliateOutboundClick({
+    ...metadata,
+    consentGranted: hasAnalyticsConsent(),
+    disclosureLabel: affiliateDisclosureLabel(metadata),
+    observedAt: new Date().toISOString()
+  });
+}
+
+export function affiliateOutboundClickScript(metadata: AffiliateLinkMetadata) {
+  const payload = JSON.stringify({
+    ...metadata,
+    disclosureLabel: affiliateDisclosureLabel(metadata)
+  }).replace(/</g, '\\u003c');
+
+  return `(() => {
+    const consentGranted = (() => { try { return window.localStorage.getItem('groceryview:analytics-consent') === 'granted'; } catch { return false; } })();
+    const event = { ...${payload}, consentGranted, observedAt: new Date().toISOString() };
+    window.dispatchEvent(new CustomEvent('groceryview:affiliate-outbound-click', { detail: event }));
+    if (!consentGranted) return;
+    const body = JSON.stringify({ event });
+    if (navigator.sendBeacon && navigator.sendBeacon('${affiliateOutboundEndpoint}', new Blob([body], { type: 'application/json' }))) return;
+    fetch('${affiliateOutboundEndpoint}', { body, headers: { 'content-type': 'application/json' }, keepalive: true, method: 'POST' }).catch(() => undefined);
+  })();`;
 }

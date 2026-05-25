@@ -327,6 +327,27 @@ describe('verified-data UI', () => {
     assert.match(server, /\/api\/settings\/account/);
   });
 
+  it('persists dietary profile onboarding from settings for personalization', async () => {
+    const settings = await read('src/app/settings/page.tsx');
+    const picker = await read('src/components/diet-filter-picker.tsx');
+    const preferences = await read('src/lib/user-preferences.ts');
+
+    assert.match(settings, /DietaryProfileOnboarding/);
+    assert.match(settings, /Dietary profile for onboarding and settings edits/);
+    assert.match(settings, /Save allergies, diets, and avoided ingredients/);
+    assert.match(picker, /export function DietaryProfileOnboarding/);
+    assert.match(picker, /Allergy preferences/);
+    assert.match(picker, /Diet preferences/);
+    assert.match(picker, /Avoided ingredients/);
+    assert.match(picker, /saveDietaryProfilePreferences/);
+    assert.match(preferences, /DIETARY_PROFILE_STORAGE_KEY/);
+    assert.match(preferences, /DietaryProfilePreferences/);
+    assert.match(preferences, /allergies: string\[\]/);
+    assert.match(preferences, /diets: string\[\]/);
+    assert.match(preferences, /avoidedIngredients: string\[\]/);
+    assert.match(preferences, /onboardingCompleted/);
+  });
+
   it('maps purchase history CSV imports into settings personalization and budget seeds', async () => {
     const settings = await read('src/app/settings/page.tsx');
     const bulkImport = await read('src/components/BulkImportDialog.tsx');
@@ -3346,7 +3367,8 @@ ${seo}`;
     assert.match(worker, /\\\/list\\\/\?\$/);
     assert.match(worker, /shoppingListNetworkFirst/);
     assert.match(registrar, /SHOPPING_LIST_ROUTE_CACHE_NAME = 'groceryview-shopping-list-route-v1'/);
-    assert.match(registrar, /cache\.add\('\/list'\)/);
+    assert.match(registrar, /OFFLINE_SAVED_LIST_BASE_ROUTES = \['\/list'/);
+    assert.match(registrar, /cache\.add\(route\)/);
     assert.doesNotMatch(registrar, /console\./);
     assert.match(shoppingListPage, /OFFLINE_SHOPPING_LIST_CACHE_KEY = 'groceryview:shopping-list:offline-cache:v1'/);
     assert.match(shoppingListPage, /cheapestSourceForProductSlug/);

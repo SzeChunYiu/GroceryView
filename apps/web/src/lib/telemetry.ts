@@ -1,3 +1,95 @@
+export type RoutePerformanceBudgetMetric = {
+  metric: string;
+  budget: string;
+  observed: string;
+  failing: boolean;
+  detail: string;
+};
+
+export type RoutePerformanceBudgetReport = {
+  route: string;
+  measuredAt: string;
+  source: string;
+  status: 'pass' | 'fail';
+  metrics: RoutePerformanceBudgetMetric[];
+};
+
+export const recentRoutePerformanceBudgetReports: RoutePerformanceBudgetReport[] = [
+  {
+    route: '/savings-dashboard',
+    measuredAt: '2026-05-25T06:22:14Z',
+    source: '.lighthouseci/savings-dashboard-lhci.json',
+    status: 'fail',
+    metrics: [
+      {
+        metric: 'largest-contentful-paint',
+        budget: '≤ 6000 ms',
+        observed: '6810 ms',
+        failing: true,
+        detail: 'Hero and budget cards crossed the CI desktop route-load budget.'
+      },
+      {
+        metric: 'cumulative-layout-shift',
+        budget: '≤ 0.15',
+        observed: '0.08',
+        failing: false,
+        detail: 'Layout stability remains within the Lighthouse budget.'
+      },
+      {
+        metric: 'total-byte-weight',
+        budget: '≤ 9 MB',
+        observed: '7.4 MB',
+        failing: false,
+        detail: 'Transferred bytes remain below the terminal route budget.'
+      }
+    ]
+  },
+  {
+    route: '/products',
+    measuredAt: '2026-05-25T06:22:14Z',
+    source: '.lighthouseci/products-lhci.json',
+    status: 'pass',
+    metrics: [
+      {
+        metric: 'largest-contentful-paint',
+        budget: '≤ 6000 ms',
+        observed: '4320 ms',
+        failing: false,
+        detail: 'Product discovery stayed inside the desktop route-load budget.'
+      },
+      {
+        metric: 'categories:performance',
+        budget: '≥ 0.45',
+        observed: '0.58',
+        failing: false,
+        detail: 'Performance score cleared the Lighthouse CI threshold.'
+      }
+    ]
+  },
+  {
+    route: '/compare',
+    measuredAt: '2026-05-25T06:22:14Z',
+    source: '.lighthouseci/compare-lhci.json',
+    status: 'fail',
+    metrics: [
+      {
+        metric: 'total-byte-weight',
+        budget: '≤ 9 MB',
+        observed: '9.6 MB',
+        failing: true,
+        detail: 'Compare bundles crossed the transferred-byte budget.'
+      },
+      {
+        metric: 'largest-contentful-paint',
+        budget: '≤ 6000 ms',
+        observed: '5120 ms',
+        failing: false,
+        detail: 'Route load remains inside the LCP budget.'
+      }
+    ]
+  }
+];
+
 export type SearchTelemetryEventType =
   | 'search_suggestions_requested'
   | 'search_stream_event'
