@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { buildBestTimeAlertExplanationTimeline } from '@/lib/alert-scheduler';
 import { buildBestTimeToBuyAlert, type FlyerWindow, type PriceForecastObservation } from '@/lib/price-intelligence';
 
 type BestTimeAlertPayload = {
@@ -90,6 +91,15 @@ export async function POST(request: Request) {
       priceHistory: parsePriceHistory(body.priceHistory),
       upcomingFlyerWindows: parseFlyerWindows(body.upcomingFlyerWindows)
     });
+    const explanationTimeline = buildBestTimeAlertExplanationTimeline({
+      productName: recommendation.productName,
+      categoryLabel: categories.join(', '),
+      decisionLabel: recommendation.decisionLabel,
+      flyerWindowLabel: recommendation.upcomingFlyerWindow ? recommendation.flyerWindowLabel : undefined,
+      observedPriceCount: recommendation.observedPriceCount,
+      observedRangeLabel: recommendation.observedRangeLabel,
+      volatilityScore: recommendation.volatilityScore
+    });
 
     if (targetStores.length === 0 || categories.length === 0) {
       return NextResponse.json({ error: 'targetStores and categories are required to create a best-time-to-buy alert rule.' }, { status: 400 });
@@ -105,7 +115,10 @@ export async function POST(request: Request) {
           notifyWhen: 'buy-now-or-wait-decision',
           status: 'active'
         },
-        recommendation
+        recommendation: {
+          ...recommendation,
+          explanationTimeline
+        }
       },
       { status: 201 }
     );
@@ -122,6 +135,14 @@ export function GET() {
     requiredInputs: ['productId', 'productName', 'currentPrice', 'currentStoreName', 'priceHistory', 'upcomingFlyerWindows', 'targetStores', 'categories', 'confidenceThreshold'],
     confidenceThreshold: { min: 0.5, max: 0.99, default: 0.75 },
     notifyWhen: 'buy-now-or-wait-decision',
-    decisionInputs: ['historical volatility', 'current price vs historical average', 'upcoming flyer windows']
+    decisionInputs: ['seasonality', 'historical volatility', 'current price vs historical average', 'upcoming flyer windows'],
+    explanationTimeline: buildBestTimeAlertExplanationTimeline({
+      productName: 'Best-time alert',
+      categoryLabel: 'requested categories',
+      flyerWindowLabel: 'Known upcoming flyer windows are evaluated when supplied.',
+      observedRangeLabel: 'historical price range from provided priceHistory',
+      seasonalityLabel: 'Requested categories are preserved so clients can show the seasonal context behind the alert.',
+      volatilityScore: null
+    })
   });
 }
