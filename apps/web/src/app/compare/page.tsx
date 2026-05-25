@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { BasketComparisonPrint } from '@/components/basket-comparison-print';
 import { ChainSelector } from '@/components/chain-selector';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
@@ -156,6 +157,7 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
           Source: {comparison.sourceLabel}{comparison.generatedAt ? ` · generated ${comparison.generatedAt}` : ''}.
         </p>
       </Card>
+      <BasketComparisonPrint chains={COMPARE_CHAIN_ORDER} products={comparison.products} sourceLabel={comparison.sourceLabel} />
       <Card className="mt-6 border-cyan-200 bg-cyan-50/70">
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
