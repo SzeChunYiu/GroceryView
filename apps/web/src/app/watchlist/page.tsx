@@ -1,4 +1,5 @@
 import Link from 'next/link';
+// Forecast-style alert copy must stay tied to observed historical source rows.
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { NotificationInboxActions } from '@/components/notification-inbox-actions';
 import { babyDiaperPriceTracker, budgetEssentialsPriceDropAlerts, dealHunterNewProductPriceDropAlerts, watchlistAlertBoard, watchlistAlertInputs, watchlistSparklineBoard, weeklyPersonalizedEmailDigest } from '@/lib/demo-data';
