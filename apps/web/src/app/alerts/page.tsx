@@ -36,11 +36,13 @@ const alertProductSummaries: AlertProductSummary[] = matchedChainProducts.slice(
 const savedSearchDealCandidates: SavedSearchDealCandidate[] = matchedChainProducts.slice(0, 80).map((product) => ({
   id: product.slug,
   name: product.name,
+  brand: product.brand,
   href: `/products/${product.slug}`,
   category: product.category,
   chain: product.lowestChain,
   labels: product.labels,
   currentPriceText: formatSek(product.lowestPrice),
+  priceDropText: product.spreadPct > 0 ? `${Math.round(product.spreadPct)}% cross-chain price gap can trigger a saved-search price-drop review.` : null,
   dealSummary: `${product.lowestChain} currently has the lowest verified chain price for this product.`
 }));
 

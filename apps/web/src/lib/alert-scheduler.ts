@@ -183,22 +183,32 @@ export type SavedSearchSubscription = {
   filters: Record<string, string[]>;
   createdAt: string;
   alertReason: string;
+  alertRules: SavedSearchAlertRule[];
+};
+
+export type SavedSearchAlertRule = {
+  type: 'new_match' | 'price_drop';
+  label: string;
+  description: string;
 };
 
 export type SavedSearchDealCandidate = {
   id: string;
   name: string;
+  brand?: string;
   href: string;
   category: string;
   chain: string;
   labels: string[];
   currentPriceText: string;
+  priceDropText?: string | null;
   dealSummary: string;
 };
 
 export type SavedSearchDealMatch = SavedSearchDealCandidate & {
   subscriptionId: string;
   matchedFilters: string[];
+  alertRuleTypes: SavedSearchAlertRule['type'][];
 };
 
 const savedSearchFilterLabels: Record<string, string> = {
@@ -207,11 +217,25 @@ const savedSearchFilterLabels: Record<string, string> = {
   label: 'label',
   dietary: 'dietary',
   chain: 'chain',
+  brand: 'brand',
   minPrice: 'min price',
   maxPrice: 'max price',
   inStockOnly: 'stock',
   minConfidence: 'confidence'
 };
+
+export const defaultSavedSearchAlertRules: SavedSearchAlertRule[] = [
+  {
+    type: 'new_match',
+    label: 'New matching products',
+    description: 'Create an alert when a newly verified product row starts matching these query filters.'
+  },
+  {
+    type: 'price_drop',
+    label: 'Verified price drops',
+    description: 'Create an alert when a matching product gets a lower observed price than the saved-search baseline.'
+  }
+];
 
 function normalize(value: string): string {
   return value.trim().toLocaleLowerCase('sv-SE');
@@ -239,6 +263,7 @@ export function buildSavedSearchSubscription(input: {
 }): SavedSearchSubscription {
   const filters = Object.fromEntries(
     Object.entries(input.searchParams)
+      .filter(([key]) => key in savedSearchFilterLabels)
       .map(([key, value]) => [key, listFilterValues(value)] as const)
       .filter(([, values]) => values.length > 0)
   );
@@ -255,7 +280,8 @@ export function buildSavedSearchSubscription(input: {
     href: `${input.path ?? '/search'}${query ? `?${query}` : ''}`,
     filters,
     createdAt: input.createdAt ?? new Date().toISOString(),
-    alertReason: 'Notify when newly matching verified deals appear for these saved filters.'
+    alertReason: 'Notify when newly matching verified products appear or an existing match posts a verified price drop.',
+    alertRules: defaultSavedSearchAlertRules
   };
 }
 
@@ -266,16 +292,19 @@ export function buildSavedSearchDealMatches(
 ): SavedSearchDealMatch[] {
   return subscriptions.flatMap((subscription) => {
     const filterEntries = Object.entries(subscription.filters);
+    const alertRules = subscription.alertRules?.length ? subscription.alertRules : defaultSavedSearchAlertRules;
     return candidates
       .map((candidate) => {
-        const text = normalize([candidate.name, candidate.category, candidate.chain, ...candidate.labels].join(' '));
+        const text = normalize([candidate.name, candidate.brand, candidate.category, candidate.chain, ...candidate.labels].filter(Boolean).join(' '));
         const matchedFilters = filterEntries.flatMap(([key, values]) => {
           if (key === 'minPrice' || key === 'maxPrice' || key === 'inStockOnly' || key === 'minConfidence') return [];
           return values.filter((value) => text.includes(normalize(value))).map((value) => `${savedSearchFilterLabels[key] ?? key}: ${value}`);
         });
         const textFilters = filterEntries.filter(([key]) => !['minPrice', 'maxPrice', 'inStockOnly', 'minConfidence'].includes(key));
         const matched = textFilters.length === 0 || matchedFilters.length > 0;
-        return matched ? { ...candidate, subscriptionId: subscription.id, matchedFilters } : null;
+        return matched
+          ? { ...candidate, subscriptionId: subscription.id, matchedFilters, alertRuleTypes: alertRules.map((rule) => rule.type) }
+          : null;
       })
       .filter((candidate): candidate is SavedSearchDealMatch => candidate !== null)
       .slice(0, limitPerSubscription);
