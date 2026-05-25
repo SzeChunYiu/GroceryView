@@ -27,6 +27,12 @@ export type SponsoredDealPlacement = {
   surface?: string;
 };
 
+const dealCardImagePolicy = {
+  loading: 'lazy',
+  placeholder: 'empty',
+  sizes: '(min-width: 768px) 96px, 80px'
+} as const;
+
 type DealCardProps = {
   title: string;
   currentPrice: number;
@@ -253,9 +259,9 @@ export function DealCard({
               alt={imageAlt ?? `${title} deal image`}
               className="max-h-full max-w-full object-contain"
               height={96}
-              loading="lazy"
-              placeholder="empty"
-              sizes="(min-width: 768px) 96px, 80px"
+              loading={dealCardImagePolicy.loading}
+              placeholder={dealCardImagePolicy.placeholder}
+              sizes={dealCardImagePolicy.sizes}
               src={imageUrl}
               width={96}
             />
