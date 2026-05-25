@@ -3,7 +3,7 @@
 // Real prices replace these as packages/ingestion connectors come online.
 
 import { buildExpiryDealRadar, buildPriceChartSeries, buildWatchlistAlerts, calculateMealCostBreakdown, calculatePersonalGroceryInflation, compareBasketStrategies, forecastGrocerySpend, planGroceryAlertChannelDefault, planMultiWeekStockUpList, planNotifications, planPantryReplenishment, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeBudget, summarizeCategoryDealLeaders, summarizePriceHistory, summarizeStoreBasketCoverage, type BasketComparisonInput, type HouseholdSnapshot, type PantryDeal, type PantryInventoryItem, type PriceChartObservation, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
-import { pricedProducts } from './openprices-products';
+import { parseVerifiedProductQuantity, pricedProducts, type VerifiedQuantityMetadata } from './openprices-products';
 
 export const products = [
   {
@@ -2093,13 +2093,24 @@ export const mealPrepBulkBuyOptimizer = {
   }
 };
 
+function stockUpUnitPrice(price: number, quantity: VerifiedQuantityMetadata | null) {
+  return quantity ? price / quantity.amount : price;
+}
+
+function stockUpConfidence(productObservationCount: number, quantity: VerifiedQuantityMetadata | null) {
+  if (!quantity) return 0.45;
+  return productObservationCount >= 8 ? 0.78 : 0.66;
+}
+
 const openPricesStockUpProducts = [
-  { slug: 'orientaliskt-r-gbr-d-7340083492464', weeklyNeedUnits: 2, storageLimitWeeks: 3 },
-  { slug: 'havredryck-choklad-7340083494406', weeklyNeedUnits: 3, storageLimitWeeks: 2 },
-  { slug: 'hummus-original-7331217012993', weeklyNeedUnits: 2, storageLimitWeeks: 3 }
+  { slug: 'havregryn-7310130321085', weeklyNeedPackages: 2, storageLimitWeeks: 3 },
+  { slug: 'oddlygood-barista-vanilla-6408430102358', weeklyNeedPackages: 3, storageLimitWeeks: 2 },
+  { slug: 'havredryck-choklad-7340083494406', weeklyNeedPackages: 3, storageLimitWeeks: 2 },
+  { slug: 'hummus-original-7331217012993', weeklyNeedPackages: 2, storageLimitWeeks: 3 }
 ].map((candidate) => {
   const product = pricedProducts.find((row) => row.slug === candidate.slug);
   if (!product) throw new Error(`Missing OpenPrices stock-up product ${candidate.slug}`);
+  const quantity = parseVerifiedProductQuantity(product.quantity);
   const datedObservations = product.observations
     .filter((observation) => observation.date && Number.isFinite(observation.price))
     .sort((left, right) => left.date.localeCompare(right.date));
@@ -2107,14 +2118,15 @@ const openPricesStockUpProducts = [
   if (!latestObservation) throw new Error(`Missing OpenPrices observations for ${candidate.slug}`);
   return {
     product,
+    quantity,
     latestObservation,
-    weeklyNeedUnits: candidate.weeklyNeedUnits,
+    weeklyNeedUnits: quantity ? candidate.weeklyNeedPackages * quantity.amount : candidate.weeklyNeedPackages,
     storageLimitWeeks: candidate.storageLimitWeeks,
     history: datedObservations.map((observation) => ({
       observedAt: `${observation.date}T00:00:00.000Z`,
-      unitPrice: observation.price,
+      unitPrice: stockUpUnitPrice(observation.price, quantity),
       sourceType: 'online' as const,
-      confidence: product.observationCount >= 8 ? 0.78 : 0.66
+      confidence: stockUpConfidence(product.observationCount, quantity)
     }))
   };
 });
@@ -2128,12 +2140,14 @@ const plannedMultiWeekStockUpList = planMultiWeekStockUpList({
     productName: row.product.name,
     storeName: 'OpenPrices SEK observations',
     weeklyNeedUnits: row.weeklyNeedUnits,
-    packageUnits: 1,
-    comparableUnit: 'pack',
-    currentUnitPrice: row.latestObservation.price,
+    packageUnits: row.quantity?.amount ?? 1,
+    comparableUnit: row.quantity?.unit ?? 'pack',
+    currentUnitPrice: stockUpUnitPrice(row.latestObservation.price, row.quantity),
     history: row.history,
     storageLimitWeeks: row.storageLimitWeeks,
-    seasonalityNote: `OpenPrices dated SEK observations for barcode ${row.product.code}; no seasonality or future shelf-price projection.`
+    seasonalityNote: row.quantity
+      ? `OpenPrices dated SEK observations for barcode ${row.product.code}; package quantity ${row.quantity.packageLabel} is used only for factual kr/${row.quantity.unit} normalization.`
+      : `OpenPrices dated SEK observations for barcode ${row.product.code}; quantity metadata is missing or unparsable, so this stays pack-labelled with low confidence.`
   }))
 });
 
