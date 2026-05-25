@@ -22,6 +22,22 @@ export default function NutritionValuePage() {
   const confidenceLevel = ['high', 'medium', 'low'].includes(nutritionPerKrona.coverage.confidence)
     ? nutritionPerKrona.coverage.confidence as 'high' | 'medium' | 'low'
     : 'low';
+  const independentAlternatives = nutritionRows.flatMap((row) => {
+    const alternative = nutritionRows.find((candidate) => (
+      candidate.productId !== row.productId
+      && candidate.price <= row.price
+      && candidate.valuePer10Sek >= row.valuePer10Sek * 0.65
+      && candidate.sugarPerPackage <= Math.max(row.sugarPerPackage, 2)
+      && !candidate.saltWarning
+    ));
+    if (!alternative) return [];
+
+    return [{
+      from: row,
+      to: alternative,
+      reason: `${alternative.name} is backed by the same price + package-nutrition inputs, costs ${formatSek(alternative.price)} vs ${formatSek(row.price)}, and avoids the salt-warning flag while preserving protein value.`
+    }];
+  }).slice(0, 3);
 
   if (nutritionRows.length === 0) {
     return (
@@ -73,6 +89,22 @@ export default function NutritionValuePage() {
         </Card>
       </div>
 
+      <Card className="mt-6 border-blue-200 bg-blue-50/70">
+        <div className="grid gap-4 lg:grid-cols-[1fr_0.9fr]">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-blue-800">Score explainer</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">How nutrition value is scored</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-blue-950">
+              The score is a value metric, not a health diagnosis: protein grams per package divided by the visible price, normalized to grams per 10 SEK. Sugar and salt are shown as caution factors, but GroceryView does not provide medical, allergy, weight-loss, pregnancy, or disease-specific advice.
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white p-4 text-sm font-bold text-slate-700 shadow-sm">
+            <p className="font-black text-slate-950">Independence disclosure</p>
+            <p className="mt-2 leading-6">Recommendations are ranked from GroceryView source rows only. Retailers and brands cannot buy placement, override score factors, or hide a lower-priced alternative.</p>
+          </div>
+        </div>
+      </Card>
+
       <Card className="mt-6">
         <h2 className="text-2xl font-black">Protein value leaderboard</h2>
         <div className="mt-4 space-y-3">
@@ -94,7 +126,28 @@ export default function NutritionValuePage() {
                 <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Sugar: {row.sugarPerPackage}g</p>
                 <p className={`rounded-2xl p-3 font-semibold ${row.saltWarning ? 'bg-amber-50 text-amber-950' : 'bg-emerald-50 text-emerald-950'}`}>{row.saltWarning ? 'Salt warning' : 'No salt warning'}</p>
               </div>
+              <p className="mt-3 rounded-2xl bg-blue-50 p-3 text-xs font-bold leading-5 text-blue-950">
+                Score factors: protein {row.nutritionPerPackage.proteinGrams}g ÷ price {formatSek(row.price)} × 10 SEK = {row.valuePer10Sek.toFixed(2)}g. Limitations: package label fixtures and visible price rows only; sugar/salt cautions do not replace medical advice.
+              </p>
             </Link>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-violet-200 bg-violet-50/70">
+        <h2 className="text-2xl font-black text-violet-950">Independent better alternatives</h2>
+        <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-violet-900">
+          Alternatives appear only when both products have price and package-nutrition evidence. If no backed alternative clears the gates, GroceryView withholds the recommendation.
+        </p>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          {independentAlternatives.map((recommendation) => (
+            <div className="rounded-2xl bg-white p-4 shadow-sm" key={`${recommendation.from.productId}-${recommendation.to.productId}`}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-800">Instead of {recommendation.from.name}</p>
+              <Link className="mt-2 block text-lg font-black text-slate-950 underline decoration-violet-300 underline-offset-4" href={`/products/${recommendation.to.productId}`}>
+                {recommendation.to.name}
+              </Link>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{recommendation.reason}</p>
+            </div>
           ))}
         </div>
       </Card>
