@@ -1,6 +1,11 @@
 "use client";
 
 import { useId, useState } from "react";
+import {
+  formatReviewSummary,
+  reviewSummaryForProduct,
+  type ProductReviewSummary,
+} from "../lib/community-reviews";
 
 type FreshnessVote = "fresh" | "outdated";
 
@@ -11,6 +16,7 @@ export type StoreProductRowProps = {
   storeName?: string;
   priceLabel?: string;
   shelfLifeDays?: number;
+  reviewSummary?: ProductReviewSummary | null;
   className?: string;
 };
 
@@ -23,6 +29,7 @@ export function StoreProductRow({
   storeName,
   priceLabel,
   shelfLifeDays,
+  reviewSummary,
   className,
 }: StoreProductRowProps) {
   const noteId = useId();
@@ -30,6 +37,7 @@ export function StoreProductRow({
   const [days, setDays] = useState(shelfLifeDays?.toString() ?? "");
   const [note, setNote] = useState("");
   const [status, setStatus] = useState<SubmitState>("idle");
+  const resolvedReviewSummary = reviewSummary ?? reviewSummaryForProduct(productId, productName);
 
   async function submitFreshness() {
     setStatus("saving");
@@ -65,6 +73,16 @@ export function StoreProductRow({
         {storeName ? <p>{storeName}</p> : null}
         {priceLabel ? <p>{priceLabel}</p> : null}
       </div>
+
+      {resolvedReviewSummary ? (
+        <section aria-label={`${productName} community review summary`} data-community-review-summary>
+          <p>{formatReviewSummary(resolvedReviewSummary)}</p>
+          <p>{resolvedReviewSummary.sourceLabel}</p>
+          <p>
+            Top freshness complaint: {resolvedReviewSummary.topFreshnessComplaint ?? "No recurring freshness complaint"}
+          </p>
+        </section>
+      ) : null}
 
       <fieldset>
         <legend>Freshness signal</legend>

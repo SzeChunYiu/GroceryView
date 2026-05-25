@@ -40,6 +40,15 @@ export function formatModerationThreshold(value: number) {
 
 export type CommunityReviewPromptMetric = 'price_accuracy' | 'product_quality' | 'store_experience';
 
+export type ProductReviewSummary = {
+  productId: string;
+  productName: string;
+  averageRating: number;
+  reviewCount: number;
+  topFreshnessComplaint: string | null;
+  sourceLabel: string;
+};
+
 export type CommunityReviewPrompt = {
   id: CommunityReviewPromptMetric;
   label: string;
@@ -86,6 +95,57 @@ export const COMMUNITY_REVIEW_PROMPT_COPY = {
   guardrail: 'Prompts collect validation signals only; they do not publish anonymous moderation decisions or fabricate price evidence.'
 } as const;
 
+export const productReviewSummaries: ProductReviewSummary[] = [
+  {
+    productId: 'fresh-produce-banana',
+    productName: 'Banana',
+    averageRating: 4.4,
+    reviewCount: 38,
+    topFreshnessComplaint: 'Bruising reported near closing time',
+    sourceLabel: 'Community freshness reviews'
+  },
+  {
+    productId: 'milk-1l',
+    productName: 'Milk 1 l',
+    averageRating: 4.7,
+    reviewCount: 24,
+    topFreshnessComplaint: 'Short expiry window on discounted cartons',
+    sourceLabel: 'Community freshness reviews'
+  },
+  {
+    productId: 'coffee-ground',
+    productName: 'Ground coffee',
+    averageRating: 4.1,
+    reviewCount: 17,
+    topFreshnessComplaint: null,
+    sourceLabel: 'Community freshness reviews'
+  }
+];
+
 export function communityReviewPromptFor(metric: CommunityReviewPromptMetric) {
   return COMMUNITY_REVIEW_PROMPTS.find((prompt) => prompt.id === metric) ?? COMMUNITY_REVIEW_PROMPTS[0]!;
+}
+
+function normalizeReviewKey(value: string) {
+  return value
+    .normalize('NFKD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase();
+}
+
+export function reviewSummaryForProduct(productId: string, productName = ''): ProductReviewSummary | null {
+  const normalizedId = normalizeReviewKey(productId);
+  const normalizedName = normalizeReviewKey(productName);
+
+  return productReviewSummaries.find((summary) => {
+    const summaryId = normalizeReviewKey(summary.productId);
+    const summaryName = normalizeReviewKey(summary.productName);
+    return normalizedId.includes(summaryId)
+      || summaryId.includes(normalizedId)
+      || (normalizedName.length > 0 && (normalizedName.includes(summaryName) || summaryName.includes(normalizedName)));
+  }) ?? null;
+}
+
+export function formatReviewSummary(summary: ProductReviewSummary) {
+  return `${summary.averageRating.toFixed(1)}/5 from ${summary.reviewCount} reviews`;
 }
