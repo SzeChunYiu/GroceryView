@@ -226,6 +226,12 @@ export default function HomePage() {
           <BasketBuilder products={pastPurchaseProducts} pastPurchaseShortcuts={pastPurchaseProducts} />
         </div>
       </section>
+      <section className="mx-auto my-6 w-full max-w-6xl rounded-3xl border border-emerald-100 bg-white p-5">
+        <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-800">Student staples</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Find the cheapest basics this week</h2>
+        <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">Compare milk, pasta, rice, eggs, coffee, oats, and produce across selected stores with budget impact and partial-coverage confidence.</p>
+        <Link className="mt-4 inline-flex rounded-full bg-emerald-900 px-4 py-2 text-sm font-black text-white" href="/student-staples">Open staples board</Link>
+      </section>
       <PwaInstallEducationCard />
       <MarketShell />
     </>
