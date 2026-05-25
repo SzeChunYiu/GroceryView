@@ -37,6 +37,7 @@ const weeklyBasketConfidence = {
 type RecipeBasketSearchParams = {
   recipeBasket?: string | string[];
 };
+const emptyRecipeBasketSearchParams: RecipeBasketSearchParams = {};
 
 function firstSearchValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] ?? '' : value ?? '';
@@ -68,7 +69,7 @@ function WeeklyBasketEmptyState() {
 export default async function WeeklyBasketPage({
   searchParams
 }: Readonly<{ searchParams?: Promise<RecipeBasketSearchParams> }>) {
-  const resolvedSearchParams = await Promise.resolve(searchParams ?? {});
+  const resolvedSearchParams = await (searchParams ?? Promise.resolve(emptyRecipeBasketSearchParams));
   const recipeBasketItems = parseRecipeBasket(firstSearchValue(resolvedSearchParams.recipeBasket));
 
   if (weeklyBasketOptimizerInput.items.length === 0) {

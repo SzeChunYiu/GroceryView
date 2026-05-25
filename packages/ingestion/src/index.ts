@@ -116,7 +116,15 @@ export * from './connectors/overpass.js';
 export * from './connectors/fuel-stations.js';
 export * from './jobs/is-poi-audit.js';
 export * from './connectors/citygross.js';
-export * from './connectors/citygross-klubben-offers-se.js';
+export {
+  CITY_GROSS_KLUBBEN_OFFERS_URL,
+  cityGrossKlubbenOfferFromProduct,
+  fetchCityGrossKlubbenOffers,
+  promotionRouter as cityGrossKlubbenPromotionRouter,
+  type CityGrossKlubbenOffer,
+  type CityGrossKlubbenStructuredPromotion,
+  type FetchCityGrossKlubbenOffersOptions
+} from './connectors/citygross-klubben-offers-se.js';
 export * from './connectors/citygross-bulk.js';
 export * from './connectors/circle-k-se.js';
 export * from './connectors/coop.js';
@@ -124,7 +132,15 @@ export * from './connectors/hemkop.js';
 export * from './connectors/ica.js';
 export * from './connectors/ica-bulk.js';
 export * from './connectors/ica-reklamblad.js';
-export * from './connectors/ica-stammis-offers-se.js';
+export {
+  ICA_STAMMIS_OFFERS_URL,
+  fetchIcaStammisOffers,
+  icaStammisOfferFromProduct,
+  promotionRouter as icaStammisPromotionRouter,
+  type FetchIcaStammisOffersOptions,
+  type IcaStammisOffer,
+  type IcaStammisStructuredPromotion
+} from './connectors/ica-stammis-offers-se.js';
 export * from './connectors/lidl.js';
 export * from './connectors/localfoodnodes-se.js';
 export * from './connectors/seven-eleven-no.js';
@@ -134,7 +150,15 @@ export * from './connectors/mathem.js';
 export * from './connectors/matpriskollen.js';
 export * from './connectors/matspar.js';
 export * from './connectors/meny-no.js';
-export * from './connectors/lidl-plus-coupons-se.js';
+export {
+  LIDL_PLUS_COUPONS_URL,
+  fetchLidlPlusCoupons,
+  lidlPlusCouponFromOffer,
+  promotionRouter as lidlPlusPromotionRouter,
+  type FetchLidlPlusCouponsOptions,
+  type LidlPlusCoupon,
+  type LidlPlusStructuredPromotion
+} from './connectors/lidl-plus-coupons-se.js';
 export * from './connectors/lidl-bulk.js';
 export * from './connectors/willys-bulk.js';
 export * from './connectors/apohem.js';
@@ -147,7 +171,15 @@ export * from './connectors/ob-is.js';
 export * from './connectors/seven-eleven-se.js';
 export * from './connectors/st1-fuel.js';
 export * from './connectors/willys.js';
-export * from './connectors/willys-plus-offers-se.js';
+export {
+  WILLYS_PLUS_OFFERS_URL,
+  fetchWillysPlusOffers,
+  promotionRouter as willysPlusPromotionRouter,
+  willysPlusOfferFromDiscount,
+  type FetchWillysPlusOffersOptions,
+  type WillysPlusOffer,
+  type WillysPlusStructuredPromotion
+} from './connectors/willys-plus-offers-se.js';
 export * from './store-enumerator.js';
 export * from './store-enumerator.js';
 export * from './unit-price.js';

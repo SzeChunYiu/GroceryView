@@ -22,6 +22,7 @@ function formatSek(value: number) {
 type RecipeBasketSearchParams = {
   recipeBasket?: string | string[];
 };
+const emptyRecipeBasketSearchParams: RecipeBasketSearchParams = {};
 
 function firstSearchValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] ?? '' : value ?? '';
@@ -40,7 +41,7 @@ function parseRecipeWatchlist(value: string) {
 export default async function WatchlistPage({
   searchParams
 }: Readonly<{ searchParams?: Promise<RecipeBasketSearchParams> }>) {
-  const resolvedSearchParams = await Promise.resolve(searchParams ?? {});
+  const resolvedSearchParams = await (searchParams ?? Promise.resolve(emptyRecipeBasketSearchParams));
   const recipeWatchlistItems = parseRecipeWatchlist(firstSearchValue(resolvedSearchParams.recipeBasket));
   const { watchlistAlerts, plannedNotifications, watchedProducts, eligiblePriceRows, coverageConfidence } = watchlistAlertBoard;
   const bestTimeAlertSetups = watchlistAlertBoard.inputs.products.slice(0, 3).map((product, index) => {
@@ -150,7 +151,7 @@ export default async function WatchlistPage({
                 <WatchlistRow
                   name={alert.productName}
                   price={String(alert.trigger.value)}
-                  store={alert.trigger.storeName}
+                  store={alert.trigger.storeName ?? 'Any matched store'}
                   volatilityLabel={volatilityForProduct(alert.productId)?.label}
                   volatilityDetail={volatilityForProduct(alert.productId)?.detail}
                   bestTimeWindowLabel={bestTimeByProductId.get(alert.productId)?.buyWindowLabel}
@@ -160,7 +161,7 @@ export default async function WatchlistPage({
               </div>
               <div className="mt-3 grid gap-2 text-sm text-slate-700 sm:grid-cols-4">
                 <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Metric: {alert.trigger.metric}</p>
-                <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Store: {alert.trigger.storeName}</p>
+                <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Store: {alert.trigger.storeName ?? 'Any matched store'}</p>
                 <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Value: {String(alert.trigger.value)}</p>
                 <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Target: {watchlistItemForAlert(alert.productId)?.targetPrice ? formatSek(watchlistItemForAlert(alert.productId)!.targetPrice!) : 'No target'}</p>
                 <p className="rounded-2xl bg-amber-50 p-3 font-semibold text-amber-950 sm:col-span-4">
