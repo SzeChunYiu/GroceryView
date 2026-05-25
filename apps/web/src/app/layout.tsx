@@ -1,6 +1,8 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
+import { PwaInstall } from '@/components/pwa-install';
 import { ConsentManager } from '@/components/consent-manager';
 import { SkipLink } from '@/components/SkipLink';
+import { EngagementReporter } from '@/lib/engagement';
 import { ServiceWorkerRegistrar } from '@/lib/swRegister';
 import { Providers } from './providers';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -33,14 +35,29 @@ export const metadata: Metadata = {
   title: 'GroceryView',
   description: 'Sweden grocery price intelligence for products, stores, and weekly baskets.',
   manifest: '/manifest.webmanifest',
+  applicationName: 'GroceryView',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
     title: 'GroceryView'
   },
   other: {
-    'mobile-web-app-capable': 'yes'
+    'mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'default',
+    'msapplication-TileColor': '#064e3b'
   }
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  colorScheme: 'light dark',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f5f1e8' },
+    { media: '(prefers-color-scheme: dark)', color: '#020617' }
+  ]
 };
 
 function jsonLd(value: unknown) {
@@ -63,7 +80,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <Providers>{children}</Providers>
         </div>
         <ConsentManager />
+        <EngagementReporter />
         <ServiceWorkerRegistrar />
+        <PwaInstall />
       </body>
     </html>
   );

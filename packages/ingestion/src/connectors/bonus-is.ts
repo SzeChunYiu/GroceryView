@@ -1,9 +1,16 @@
+import { inferBonusIsGroceryCategory, type GroceryCategoryInference } from '@groceryview/catalog';
+
 export type BonusIsChain = 'bonus-is';
 
 export type BonusIsProduct = {
   chain: BonusIsChain;
   code: string;
   name: string;
+  categoryPath: string[];
+  categorySlug: string;
+  categoryConfidence: GroceryCategoryInference['confidence'];
+  categoryMatchedKeyword: string;
+  categorySource: GroceryCategoryInference['source'];
   price: number;
   priceText: string;
   productUrl: string;
@@ -116,11 +123,17 @@ export function normalizeBonusIsProduct(block: string, sourceUrl: string, retrie
     || stableCode(name);
   const imageUrl = absoluteUrl(firstMatch(block, /<img\b[^>]*(?:data-src|src)=["']([^"']+)["']/i), sourceUrl);
   const outOfStock = /outofstock|out of stock|ekki\s+til\s+á\s+lager/i.test(block);
+  const category = inferBonusIsGroceryCategory({ name, productUrl });
 
   return {
     chain: 'bonus-is',
     code,
     name,
+    categoryPath: category.categoryPath,
+    categorySlug: category.categorySlug,
+    categoryConfidence: category.confidence,
+    categoryMatchedKeyword: category.matchedKeyword,
+    categorySource: category.source,
     price,
     priceText,
     productUrl,

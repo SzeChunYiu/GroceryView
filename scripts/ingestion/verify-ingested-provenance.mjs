@@ -228,6 +228,7 @@ function extractJsonExport(text, exportName, fileUrl) {
   }
 }
 
+
 function extractSpreadArrayExport(text, rawValue, fileUrl) {
   if (!rawValue.trimStart().startsWith('[') || !rawValue.includes('...')) return null;
 
