@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { OcrScanHistoryTimeline } from '@/components/ocr-scan-history-timeline';
+import { BarcodeScanner } from '@/components/barcode-scanner';
 import { ScannerUploadActions } from '@/components/scanner-upload-actions';
 import { barcodeMissFallbackProducts, lookupOpenFoodFactsBarcode } from '@/lib/openfoodfacts-catalog';
 import { routeMetadata } from '@/lib/seo';
@@ -163,6 +164,7 @@ export default async function ScannerPage({ searchParams }: Readonly<{ searchPar
           <Link className="rounded-full border border-indigo-200 px-4 py-2 text-sm font-black text-indigo-900" href="/watchlist">Watchlist</Link>
         </div>
       </Card>
+      <BarcodeScanner />
       <div id="scan" className="scroll-mt-24">
         <ScannerUploadActions fallbackProducts={barcodeMissFallbackProducts} />
       </div>
