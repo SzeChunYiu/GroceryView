@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { StoreMap } from '@/components/StoreMap';
@@ -126,11 +127,31 @@ function StoreDetailEmptyState() {
   );
 }
 
-export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
+export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>): Promise<Metadata> {
   const { slug } = await params;
   const store = findStore(slug);
   if (!store) notFound();
-  return metadataForStore(store);
+  const metadata = metadataForStore(store);
+  const place = store.city || store.district ? ` in ${[store.district, store.city].filter(Boolean).join(', ')}` : '';
+  const title = `${store.name} store record | GroceryView`;
+  const description = `Verified OpenStreetMap grocery store record for ${store.name}, ${store.brand}${place}. Prices are not inferred from store location.`;
+
+  return {
+    ...metadata,
+    openGraph: {
+      ...metadata.openGraph,
+      title,
+      description,
+      images: [
+        {
+          url: `/stores/${store.slug}/opengraph-image`,
+          width: 1200,
+          height: 630,
+          alt: `${store.name} ${store.brand}`
+        }
+      ]
+    }
+  };
 }
 
 export function generateStaticParams() {

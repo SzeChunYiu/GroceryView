@@ -22,6 +22,20 @@ export type Commodity = {
   isStaple?: boolean;
 };
 
+export type GroceryCategoryInference = {
+  categoryPath: string[];
+  categorySlug: string;
+  confidence: 'high' | 'medium' | 'low';
+  matchedKeyword: string;
+  source: 'name' | 'url' | 'fallback';
+};
+
+type GroceryCategoryRule = {
+  categoryPath: string[];
+  confidence: GroceryCategoryInference['confidence'];
+  keywords: readonly string[];
+};
+
 export const COMMODITIES: readonly Commodity[] = [
   // ── Vegetables ──────────────────────────────────────────────────────────
   { slug: 'tomato', nameSv: 'Tomat', nameEn: 'Tomato', categoryPath: ['frukt-gront', 'gront'], comparableUnit: 'kg', variants: ['vine', 'cherry', 'plum', 'beef'], isStaple: true },
@@ -96,4 +110,154 @@ export const STAPLE_BASKET: readonly Commodity[] = COMMODITIES.filter((c) => c.i
 /** Look up a commodity by its stable slug. */
 export function findCommodity(slug: string): Commodity | undefined {
   return COMMODITIES.find((c) => c.slug === slug);
+}
+
+const BONUS_IS_CATEGORY_FALLBACK: GroceryCategoryInference = {
+  categoryPath: ['annat'],
+  categorySlug: 'annat',
+  confidence: 'low',
+  matchedKeyword: '',
+  source: 'fallback'
+};
+
+const BONUS_IS_CATEGORY_RULES: readonly GroceryCategoryRule[] = [
+  {
+    categoryPath: ['mejeri', 'agg'],
+    confidence: 'high',
+    keywords: ['egg', 'eggs', 'eggja', 'eggj']
+  },
+  {
+    categoryPath: ['mejeri'],
+    confidence: 'high',
+    keywords: ['mjolk', 'milk', 'skyr', 'jogurt', 'yogurt', 'ostur', 'ost', 'smjor', 'rjomi']
+  },
+  {
+    categoryPath: ['brod-kakor'],
+    confidence: 'high',
+    keywords: ['braud', 'bread', 'rugbraud', 'flatkaka', 'bollur', 'bolla', 'baguette']
+  },
+  {
+    categoryPath: ['frukt-gront', 'frukt'],
+    confidence: 'high',
+    keywords: ['banani', 'banana', 'epli', 'apple', 'appelsina', 'orange', 'pera', 'pear', 'vinber', 'grapes', 'sitrona', 'lemon', 'lime', 'avokado', 'melon']
+  },
+  {
+    categoryPath: ['frukt-gront', 'gront'],
+    confidence: 'high',
+    keywords: ['kartafla', 'kartoflur', 'potato', 'tomatur', 'tomato', 'gurka', 'cucumber', 'laukur', 'gulrot', 'carrot', 'paprika', 'sveppir', 'mushroom', 'hvitlaukur', 'salat', 'brokkoli']
+  },
+  {
+    categoryPath: ['kott-chark', 'fagel'],
+    confidence: 'high',
+    keywords: ['kjuklingur', 'chicken']
+  },
+  {
+    categoryPath: ['kott-chark', 'kott'],
+    confidence: 'high',
+    keywords: ['naut', 'beef', 'lamb', 'svin', 'pork', 'hakk', 'kjot']
+  },
+  {
+    categoryPath: ['kott-chark', 'chark'],
+    confidence: 'medium',
+    keywords: ['beikon', 'bacon', 'pylsa', 'sausage', 'skinka', 'ham']
+  },
+  {
+    categoryPath: ['fisk-skaldjur'],
+    confidence: 'high',
+    keywords: ['fiskur', 'fisk', 'fish', 'lax', 'salmon', 'thorskur', 'cod', 'raekja', 'shrimp']
+  },
+  {
+    categoryPath: ['skafferi', 'kaffe-te'],
+    confidence: 'high',
+    keywords: ['kaffi', 'coffee', 'te', 'tea']
+  },
+  {
+    categoryPath: ['skafferi', 'ris-pasta'],
+    confidence: 'high',
+    keywords: ['hrisgrjon', 'rice', 'pasta', 'nudlur', 'noodles']
+  },
+  {
+    categoryPath: ['skafferi', 'baking'],
+    confidence: 'high',
+    keywords: ['hveiti', 'flour', 'sykur', 'sugar', 'ger', 'yeast']
+  },
+  {
+    categoryPath: ['skafferi', 'frukost'],
+    confidence: 'medium',
+    keywords: ['hafrar', 'havregryn', 'oats', 'morgunkorn', 'cereal']
+  },
+  {
+    categoryPath: ['dryck'],
+    confidence: 'medium',
+    keywords: ['brusi', 'gos', 'soda', 'safi', 'juice', 'vatn', 'water', 'white cap']
+  },
+  {
+    categoryPath: ['godis-snacks'],
+    confidence: 'medium',
+    keywords: ['sukkuladi', 'chocolate', 'nammi', 'kex', 'snakk', 'chips', 'popp']
+  },
+  {
+    categoryPath: ['fryst'],
+    confidence: 'medium',
+    keywords: ['fryst', 'frosinn', 'frosin', 'frozen']
+  },
+  {
+    categoryPath: ['hushall'],
+    confidence: 'medium',
+    keywords: ['pappir', 'paper', 'serviettur', 'soap', 'sap', 'hreinsiefni']
+  }
+];
+
+/**
+ * Infer a normalized GroceryView category for Bónus Iceland rows from the
+ * storefront product name first, then the WooCommerce product URL slug.
+ */
+export function inferBonusIsGroceryCategory(input: { name: string; productUrl?: string }): GroceryCategoryInference {
+  const nameText = normalizeCategoryText(input.name);
+  const nameMatch = matchBonusIsCategory(nameText);
+  if (nameMatch) return { ...nameMatch, source: 'name' };
+
+  const urlText = normalizeCategoryText(input.productUrl ?? '');
+  const urlMatch = matchBonusIsCategory(urlText);
+  if (urlMatch) return { ...urlMatch, source: 'url' };
+
+  return { ...BONUS_IS_CATEGORY_FALLBACK };
+}
+
+function matchBonusIsCategory(normalizedText: string): Omit<GroceryCategoryInference, 'source'> | null {
+  if (!normalizedText) return null;
+  for (const rule of BONUS_IS_CATEGORY_RULES) {
+    const matchedKeyword = rule.keywords.find((keyword) => containsCategoryKeyword(normalizedText, keyword));
+    if (!matchedKeyword) continue;
+    return {
+      categoryPath: [...rule.categoryPath],
+      categorySlug: rule.categoryPath.join('/'),
+      confidence: rule.confidence,
+      matchedKeyword: normalizeCategoryText(matchedKeyword)
+    };
+  }
+  return null;
+}
+
+function containsCategoryKeyword(normalizedText: string, keyword: string): boolean {
+  const normalizedKeyword = normalizeCategoryText(keyword);
+  if (!normalizedKeyword) return false;
+  return new RegExp(`(?:^| )${escapeRegExp(normalizedKeyword)}(?: |$)`).test(normalizedText);
+}
+
+function normalizeCategoryText(value: string): string {
+  return value
+    .toLocaleLowerCase('is-IS')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/þ/g, 'th')
+    .replace(/ð/g, 'd')
+    .replace(/æ/g, 'ae')
+    .replace(/ö/g, 'o')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
