@@ -68,12 +68,31 @@ jobs:
 
       - name: Run Lighthouse CI against Vercel preview
         if: env.LHCI_PREVIEW_URL != ''
-        run: npm run perf:lighthouse:preview -w @groceryview/web
+        env:
+          LHCI_ROUTES: >-
+            /
+            /products
+            /compare
+            /deals
+            /items
+            /categories
+            /map
+            /basket
+            /favorites
+            /data-sources
+        run: |
+          set -euo pipefail
+          base="${LHCI_PREVIEW_URL%/}"
+          url_args=()
+          for route in ${LHCI_ROUTES}; do
+            url_args+=("--collect.url=${base}${route}")
+          done
+          ./node_modules/.bin/lhci autorun --config=.lighthouserc.json "${url_args[@]}"
 
       - name: Upload Lighthouse preview artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: lighthouse-preview
-          path: apps/web/.lighthouseci-preview
+          path: .lighthouseci-preview
           if-no-files-found: ignore
