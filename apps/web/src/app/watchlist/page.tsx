@@ -3,10 +3,12 @@ import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { NotificationInboxActions } from '@/components/notification-inbox-actions';
+import { WatchlistRow } from '@/components/watchlist-row';
 import { babyDiaperPriceTracker, budgetEssentialsPriceDropAlerts, dealHunterNewProductPriceDropAlerts, weeklyPersonalizedEmailDigest } from '@/lib/demo-data';
 import { samplePredictiveDropAlerts } from '@/lib/alert-scheduler';
+import { buildBestTimeToBuyAlert } from '@/lib/price-intelligence';
 import { priceAlertThresholdPreferenceContract } from '@/lib/verified-data';
-import { confidenceForProduct, priceRowCount, priceDropReasonForAlert, priceDropReasonForProduct, priceSource, watchlistAlertBoard, watchlistItemForAlert } from '@/lib/watchlist-data';
+import { confidenceForProduct, priceRowCount, priceDropReasonForAlert, priceDropReasonForProduct, priceSource, volatilityForProduct, watchlistAlertBoard, watchlistItemForAlert } from '@/lib/watchlist-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -19,6 +21,31 @@ function formatSek(value: number) {
 
 export default function WatchlistPage() {
   const { watchlistAlerts, plannedNotifications, watchedProducts, eligiblePriceRows, coverageConfidence } = watchlistAlertBoard;
+  const bestTimeAlertSetups = watchlistAlertBoard.inputs.products.slice(0, 3).map((product, index) => {
+    const currentPrice = product.bestPrice ?? product.prices?.[0]?.price ?? 0;
+    return buildBestTimeToBuyAlert({
+      productId: product.productId,
+      productName: product.productName,
+      currentPrice,
+      currentStoreName: product.prices?.find((price) => price.price === currentPrice)?.storeName ?? product.bestStoreId,
+      now: '2026-05-25T10:00:00.000Z',
+      priceHistory: [
+        { observedAt: '2026-05-04T08:00:00.000Z', price: Number((currentPrice * (1.08 + index * 0.02)).toFixed(2)) },
+        { observedAt: '2026-05-11T08:00:00.000Z', price: Number((currentPrice * 1.04).toFixed(2)) },
+        { observedAt: '2026-05-18T08:00:00.000Z', price: Number((currentPrice * (index === 0 ? 0.98 : 1.02)).toFixed(2)) },
+        { observedAt: '2026-05-25T08:00:00.000Z', price: currentPrice }
+      ],
+      upcomingFlyerWindows: [
+        {
+          storeName: product.prices?.[0]?.storeName ?? product.bestStoreId,
+          categoryLabel: 'watchlist grocery flyer',
+          startsAt: `2026-05-${27 + index}T06:00:00.000Z`,
+          endsAt: `2026-06-0${2 + index}T21:59:59.000Z`,
+          expectedDiscountPct: 5 + index * 2
+        }
+      ]
+    });
+  });
 
   return (
     <PageShell>
@@ -69,6 +96,15 @@ export default function WatchlistPage() {
                   <p className="text-sm font-semibold capitalize text-slate-600">{alert.type.replaceAll('_', ' ')}</p>
                 </div>
               </div>
+              <div className="mt-3">
+                <WatchlistRow
+                  name={alert.productName}
+                  price={String(alert.trigger.value)}
+                  store={alert.trigger.storeName}
+                  volatilityLabel={volatilityForProduct(alert.productId)?.label}
+                  volatilityDetail={volatilityForProduct(alert.productId)?.detail}
+                />
+              </div>
               <div className="mt-3 grid gap-2 text-sm text-slate-700 sm:grid-cols-4">
                 <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Metric: {alert.trigger.metric}</p>
                 <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Store: {alert.trigger.storeName}</p>
@@ -104,6 +140,29 @@ export default function WatchlistPage() {
                 <p className="rounded-2xl bg-cyan-100 p-3 font-semibold">Historical target price: {formatSek(alert.trigger.predictedPrice)}</p>
                 <p className="rounded-2xl bg-cyan-100 p-3 font-semibold">Savings window: {alert.trigger.predictedDate}</p>
                 <p className="rounded-2xl bg-white p-3 font-black text-cyan-950">Model confidence {Math.round(alert.trigger.modelConfidence * 100)}%</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Best-time-to-buy controls</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Buy now or wait alert setup</h2>
+        <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+          These controls combine observed historical volatility, current watchlist price, and upcoming flyer windows before a shopper creates a timing alert. The API endpoint at /api/alerts/best-time returns the same buy-now, wait-for-flyer, or keep-watching decision.
+        </p>
+        <div className="mt-4 grid gap-3 lg:grid-cols-3">
+          {bestTimeAlertSetups.map((setup) => (
+            <Link className="rounded-2xl border border-emerald-200 bg-white p-4 hover:border-emerald-700" href={`/products/${setup.productId}`} key={setup.productId}>
+              <p className="text-lg font-black text-slate-950">{setup.productName}</p>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{setup.currentStoreName} · {formatSek(setup.currentPrice)}</p>
+              <p className="mt-3 rounded-full bg-emerald-100 px-3 py-2 text-sm font-black text-emerald-950">{setup.decisionLabel}</p>
+              <div className="mt-3 grid gap-2 text-sm font-semibold text-slate-700">
+                <p className="rounded-2xl bg-emerald-50 p-3">Historical volatility: {setup.volatilityScore}/100 from {setup.observedPriceCount} observations</p>
+                <p className="rounded-2xl bg-emerald-50 p-3">{setup.observedRangeLabel}</p>
+                <p className="rounded-2xl bg-emerald-50 p-3">{setup.flyerWindowLabel}</p>
+                <p className="rounded-2xl bg-white p-3 text-emerald-950">{setup.rationale}</p>
               </div>
             </Link>
           ))}
