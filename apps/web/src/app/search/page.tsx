@@ -17,6 +17,12 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
   return (
     <>
       <SaveSearchSubscriptionButton subscription={subscription} />
+      <section className="mx-auto mb-4 w-full max-w-5xl rounded-3xl border border-emerald-100 bg-emerald-50/80 p-4 shadow-sm" data-voice-search-help>
+        <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">Mobile voice search</p>
+        <p className="mt-1 text-sm font-semibold leading-6 text-emerald-950">
+          Tap the microphone in the header search bar on supported mobile browsers to dictate grocery terms like "lactosefri mjölk" or "havregryn". Voice entries submit into the same verified product results as typed searches.
+        </p>
+      </section>
       <RecentSearchReplayPills />
       <ProductsPage searchParams={Promise.resolve(resolvedSearchParams)} />
     </>

@@ -287,11 +287,13 @@ export function buildPersonalizedRecommendationRail<T extends RecommendationProd
   options: {
     householdId?: string;
     favoriteBrands?: readonly string[];
+    avoidedBrands?: readonly string[];
     recentListActivity?: readonly string[];
     limit?: number;
   } = {},
 ): PersonalizedRecommendation[] {
   const favoriteBrands = new Set((options.favoriteBrands ?? ['Garant', 'Änglamark', 'Kaffe']).map((brand) => brand.toLocaleLowerCase('sv-SE')));
+  const avoidedBrands = new Set((options.avoidedBrands ?? ['Unknown private label']).map((brand) => brand.toLocaleLowerCase('sv-SE')));
   const recentWords = (options.recentListActivity ?? ['milk', 'bread', 'coffee', 'fruit'])
     .flatMap((item) => item.toLocaleLowerCase('sv-SE').split(/\s+/))
     .filter((word) => word.length > 2);
@@ -300,10 +302,13 @@ export function buildPersonalizedRecommendationRail<T extends RecommendationProd
     .map((product, index) => {
       const haystack = `${product.name} ${product.brand ?? ''}`.toLocaleLowerCase('sv-SE');
       const favoriteHit = product.brand ? favoriteBrands.has(product.brand.toLocaleLowerCase('sv-SE')) : false;
+      const avoidedHit = product.brand ? avoidedBrands.has(product.brand.toLocaleLowerCase('sv-SE')) : false;
       const listHits = recentWords.filter((word) => haystack.includes(word)).length;
       const historyScore = getHouseholdCategoryScore(product.slug.split('-').slice(0, 2).join('-'), options.householdId ?? defaultHouseholdId);
-      const score = historyScore + listHits * 18 + (favoriteHit ? 24 : 0) + Math.max(0, 8 - index);
-      const reason = favoriteHit
+      const score = historyScore + listHits * 18 + (favoriteHit ? 24 : 0) - (avoidedHit ? 120 : 0) + Math.max(0, 8 - index);
+      const reason = avoidedHit
+        ? `Avoided brand control lowers ${product.brand} for recommendations and substitutions`
+        : favoriteHit
         ? `Favorite brand signal for ${product.brand}`
         : listHits > 0
           ? `${listHits} recent list signal${listHits === 1 ? '' : 's'} matched`

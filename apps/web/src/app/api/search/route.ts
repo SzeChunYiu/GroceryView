@@ -1,6 +1,6 @@
 import { createPgQueryExecutor, searchProductsByText, type ProductSearchResult } from '@groceryview/db';
 import { NextResponse } from 'next/server';
-import { expandGrocerySearchQuery } from '@/lib/search-suggest';
+import { expandGrocerySearchQuery, type GrocerySearchExpansion } from '@/lib/search-suggest';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -45,14 +45,25 @@ function mergeSearchResults(batches: ProductSearchResult[][]): ProductSearchResu
   return [...byId.values()].sort((a, b) => b.searchRank - a.searchRank || a.name.localeCompare(b.name)).slice(0, 8);
 }
 
-function responsePayload(query: string, expandedQueries: string[], matchedAliases: string[], matchedSynonyms: string[], results: ProductSearchResult[], error?: string) {
+async function weightedSearchBatch(executor: Awaited<ReturnType<typeof executorForDatabaseUrl>>, expandedQuery: string, weight: number) {
+  const results = await searchProductsByText(executor, expandedQuery, { limit: 8 });
+  return results.map((result) => ({
+    ...result,
+    searchRank: result.searchRank * weight
+  }));
+}
+
+function responsePayload(query: string, expansion: GrocerySearchExpansion, results: ProductSearchResult[], error?: string) {
   return {
     query,
-    expandedQueries,
-    matchedAliases,
-    matchedSynonyms,
+    expandedQueries: expansion.expandedQueries,
+    matchedAliases: expansion.matchedAliases,
+    matchedFuzzyAliases: expansion.matchedFuzzyAliases,
+    matchedSynonyms: expansion.matchedSynonyms,
+    queryWeights: expansion.queryWeights,
     results,
-    source: 'postgres.products_tsvector_alias_synonym_expansion',
+    rankingMode: 'weighted_alias_fuzzy_token_expansion',
+    source: 'postgres.products_tsvector_alias_synonym_expansion_weighted_fuzzy',
     ...(error ? { error } : {})
   };
 }
@@ -63,25 +74,25 @@ export async function GET(request: Request) {
   const expansion = expandGrocerySearchQuery(query);
 
   if (query.length < 2) {
-    return NextResponse.json(responsePayload(query, expansion.expandedQueries, expansion.matchedAliases, expansion.matchedSynonyms, []));
+    return NextResponse.json(responsePayload(query, expansion, []));
   }
 
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) {
     return NextResponse.json(
-      responsePayload(query, expansion.expandedQueries, expansion.matchedAliases, expansion.matchedSynonyms, [], 'product_search_database_unconfigured'),
+      responsePayload(query, expansion, [], 'product_search_database_unconfigured'),
       { status: 503 }
     );
   }
 
   try {
     const executor = await executorForDatabaseUrl(databaseUrl);
-    const batches = await Promise.all(expansion.expandedQueries.map((expandedQuery) => searchProductsByText(executor, expandedQuery, { limit: 8 })));
-    return NextResponse.json(responsePayload(query, expansion.expandedQueries, expansion.matchedAliases, expansion.matchedSynonyms, mergeSearchResults(batches)));
+    const batches = await Promise.all(expansion.expandedQueries.map((expandedQuery) => weightedSearchBatch(executor, expandedQuery, expansion.queryWeights[expandedQuery] ?? 1)));
+    return NextResponse.json(responsePayload(query, expansion, mergeSearchResults(batches)));
   } catch (error) {
     console.error('Product search query failed', error instanceof Error ? { name: error.name } : { name: 'unknown' });
     return NextResponse.json(
-      responsePayload(query, expansion.expandedQueries, expansion.matchedAliases, expansion.matchedSynonyms, [], 'product_search_query_failed'),
+      responsePayload(query, expansion, [], 'product_search_query_failed'),
       { status: 500 }
     );
   }
