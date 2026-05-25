@@ -1,9 +1,11 @@
 import { BasketCalculator, type BasketCalculatorProduct } from '@/components/basket-calculator';
+import { BasketBuyTiming } from '@/components/basket-buy-timing';
 import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { dbSiteSnapshotGeneratedAt } from '@/lib/generated/db-site-products';
+import { assessBasketBuyTiming } from '@/lib/price-intelligence';
 import { routeMetadata } from '@/lib/seo';
-import { chainPriceRows, formatPct, labelFromSlug, matchedChainProducts, topChainSpreads } from '@/lib/verified-data';
+import { chainPriceRows, formatPct, formatSek, labelFromSlug, matchedChainProducts, topChainSpreads } from '@/lib/verified-data';
 
 export function generateMetadata() {
   return routeMetadata('/basket');
@@ -35,6 +37,37 @@ const basketProducts: BasketCalculatorProduct[] = topChainSpreads.slice(0, 12).m
     savings: row.savings
   }))
 }));
+
+const basketBuyTimingRecommendations = topChainSpreads.slice(0, 12).map((product) => {
+  const pricedRows = chainPriceRows(product).sort((left, right) => left.price - right.price || left.chain.localeCompare(right.chain, 'sv'));
+  const cheapest = pricedRows[0]!;
+  const highest = pricedRows[pricedRows.length - 1] ?? cheapest;
+  const averagePrice = pricedRows.reduce((sum, row) => sum + row.price, 0) / pricedRows.length;
+  const substituteProduct = topChainSpreads.find((candidate) =>
+    candidate.slug !== product.slug
+    && candidate.category === product.category
+    && candidate.lowestPrice > 0
+    && candidate.lowestPrice < product.lowestPrice
+  );
+
+  return assessBasketBuyTiming({
+    id: product.slug,
+    productName: product.name,
+    categoryLabel: labelFromSlug(product.category),
+    currentPrice: cheapest.price,
+    currentPriceLabel: cheapest.priceText,
+    currentStoreName: chainName(cheapest.chain),
+    typicalPrice: averagePrice,
+    previousPrice: highest.price,
+    sourceConfidence: Math.min(1, product.inChains.length / 3),
+    substitute: substituteProduct ? {
+      productName: substituteProduct.name,
+      price: substituteProduct.lowestPrice,
+      priceLabel: formatSek(substituteProduct.lowestPrice),
+      storeName: chainName(substituteProduct.lowestChain)
+    } : null
+  });
+});
 
 const sourceLabel = dbSiteSnapshotGeneratedAt
   ? `postgres.latest_prices/observations site snapshot generated ${dbSiteSnapshotGeneratedAt}`
@@ -83,6 +116,8 @@ export default function BasketPage() {
           <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">No login, persistence, retailer checkout, or shopping-list write is triggered.</p>
         </Card>
       </div>
+
+      <BasketBuyTiming recommendations={basketBuyTimingRecommendations} />
 
       <BasketCalculator products={basketProducts} sourceLabel={sourceLabel} />
 
