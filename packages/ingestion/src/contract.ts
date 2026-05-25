@@ -77,7 +77,8 @@ export const ingestRowSchema = z.object({
   }
 });
 
-export type IngestRow = z.infer<typeof ingestRowSchema>;
+export const IngestRow = ingestRowSchema;
+export type IngestRow = z.infer<typeof IngestRow>;
 
 export function formatIngestRowZodIssues(issues: readonly z.ZodIssue[]): string {
   return issues
