@@ -1387,10 +1387,18 @@ describe('verified-data UI', () => {
 
   it('surfaces deal-based meals on the meal planner route using the real core meal output', async () => {
     const source = await read('src/app/meal-planner/page.tsx');
+    const estimator = await read('src/lib/meal-cost-estimator.ts');
     assert.match(source, /dealBasedMeals/);
     assert.match(source, /suggestDealBasedMeals/);
+    assert.match(source, /applyAdaptiveMealBudgetGuardrails/);
+    assert.match(source, /Adaptive budget guardrails/);
+    assert.match(source, /hidden from recommendations/);
     assert.match(source, /ConfidenceBadge/);
     assert.match(source, /estimatedCostPerServing/);
+    assert.match(estimator, /weeklyBudgetEnvelope/);
+    assert.match(estimator, /recommendedMeals/);
+    assert.match(estimator, /demotedMeals/);
+    assert.match(estimator, /hiddenMeals/);
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
