@@ -8,8 +8,9 @@ async function read(relative) {
 
 describe('shopping list route', () => {
   it('ships the requested route, checkable row component, and localStorage-backed hook', async () => {
-    const [page, row, hook, shareRoute, bulkImport, searchRoute] = await Promise.all([
+    const [page, listSharePreview, row, hook, shareRoute, bulkImport, searchRoute] = await Promise.all([
       read('src/app/list/page.tsx'),
+      read('src/components/list-share-preview.tsx'),
       read('src/components/CheckableListItem.tsx'),
       read('src/hooks/useList.ts'),
       read('src/app/api/list/share/route.ts'),
@@ -17,11 +18,13 @@ describe('shopping list route', () => {
       read('../../apps/api/src/routes/search.ts')
     ]);
 
-    assert.match(page, /useList/);
-    assert.match(page, /CheckableListItem/);
-    assert.match(page, /BulkImportDialog/);
-    assert.match(page, /addImportedItems/);
-    assert.match(page, /Shopping list/);
+    assert.match(page, /ListSharePreview/);
+    assert.match(page, /metadataForShoppingListShare/);
+    assert.match(listSharePreview, /useList/);
+    assert.match(listSharePreview, /CheckableListItem/);
+    assert.match(listSharePreview, /BulkImportDialog/);
+    assert.match(listSharePreview, /addImportedItems/);
+    assert.match(listSharePreview, /Shopping list/);
 
     assert.match(row, /'use client'/);
     assert.match(row, /type="checkbox"/);

@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { AddressSearch } from '@/components/AddressSearch';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
-import { storeUniverse } from '@/lib/verified-data';
+import { getStoreReliabilityScore } from '@/lib/freshness';
+import { storeAssortmentOverviewForStore, storeUniverse } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -12,6 +13,16 @@ export default function StoresIndexPage() {
   const brandCounts = [...storeUniverse.reduce((map, store) => map.set(store.brand, (map.get(store.brand) ?? 0) + 1), new Map<string, number>())]
     .sort((a, b) => b[1] - a[1]);
   const hasIcaBrandCoverage = brandCounts.some(([brand]) => brand.toLowerCase().includes('ica'));
+  const reliabilityRows = storeUniverse.slice(0, 60).map((store) => {
+    const assortment = storeAssortmentOverviewForStore(store);
+    const reliability = getStoreReliabilityScore({
+      feedRetrievedAt: store.retrievedDate,
+      observedCategories: assortment.itemCount > 0 ? ['branch price feed'] : [],
+      priceObservationCount: assortment.itemCount
+    });
+
+    return { reliability, store };
+  });
 
   return (
     <PageShell>
@@ -33,7 +44,7 @@ export default function StoresIndexPage() {
             </Link>
           </Card>
         ) : null}
-        <Card><h2 className="text-2xl font-black">Stores with coordinates</h2><div className="mt-4 grid gap-3 md:grid-cols-2">{storeUniverse.slice(0, 60).map((store) => <Link className="rounded-2xl border border-slate-200 p-4 hover:border-emerald-700" href={`/stores/${store.slug}`} key={store.slug}><p className="font-black">{store.name}</p><p className="text-sm text-slate-600">{store.brand} · {store.city || store.district || 'City not reported'}</p></Link>)}</div></Card>
+        <Card><h2 className="text-2xl font-black">Stores with coordinates</h2><div className="mt-4 grid gap-3 md:grid-cols-2">{reliabilityRows.map(({ reliability, store }) => <Link className="rounded-2xl border border-slate-200 p-4 hover:border-emerald-700" href={`/stores/${store.slug}`} key={store.slug}><p className="font-black">{store.name}</p><p className="text-sm text-slate-600">{store.brand} · {store.city || store.district || 'City not reported'}</p><div className="mt-3 grid gap-2 rounded-2xl bg-slate-50 p-3 text-xs font-bold text-slate-700"><p>Feed freshness: {reliability.feedFreshness.label}</p><p>Price observations: {reliability.priceObservationCount.toLocaleString('sv-SE')}</p><p className={reliability.missingCategories.length > 0 ? 'text-amber-800' : 'text-emerald-800'}>{reliability.missingCategoryWarning}</p><p className="font-black uppercase tracking-[0.14em] text-slate-500">{reliability.scoreLabel}</p></div></Link>)}</div></Card>
       </div>
     </PageShell>
   );

@@ -106,10 +106,16 @@ export default function ScannerPage() {
       </Card>
       <Card className="mt-6 border-indigo-200 bg-white">
         <p className="text-xs font-black uppercase tracking-[0.22em] text-indigo-800">Mobile scanner shortcut</p>
-        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Bottom nav opens scan controls with haptic feedback</h2>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Bottom nav keeps in-store workflows one tap away</h2>
         <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
-          The mobile bottom navigation includes a prominent Scan action that links to this scanner workspace and triggers a short impact vibration on supported devices.
+          The mobile bottom navigation now promotes Scan, the current shopping list, nearby deals, and the watchlist so grocery trips can jump between receipt capture, aisle tasks, and price checks without opening menus.
         </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Link className="rounded-full bg-indigo-900 px-4 py-2 text-sm font-black text-white" href="#scan">Scan receipt</Link>
+          <Link className="rounded-full border border-indigo-200 px-4 py-2 text-sm font-black text-indigo-900" href="/list">Current list</Link>
+          <Link className="rounded-full border border-indigo-200 px-4 py-2 text-sm font-black text-indigo-900" href="/screener">Nearby deals</Link>
+          <Link className="rounded-full border border-indigo-200 px-4 py-2 text-sm font-black text-indigo-900" href="/watchlist">Watchlist</Link>
+        </div>
       </Card>
       <div id="scan" className="scroll-mt-24">
         <ScannerUploadActions />

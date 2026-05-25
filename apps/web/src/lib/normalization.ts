@@ -5,9 +5,11 @@ export type PackageEvidence = {
   packageUnit: 'g' | 'ml' | 'piece';
 };
 
+export type UnitNormalizationOutlierBucket = 'kg' | 'l' | 'piece';
+
 export type NormalizedUnitPrice = PackageEvidence & {
   value: number;
-  comparableUnit: 'kg' | 'l' | 'piece';
+  comparableUnit: UnitNormalizationOutlierBucket;
 };
 
 export type RecipeProductCandidate = {
@@ -36,6 +38,20 @@ export type RecipeProductMatch = ParsedRecipeIngredient & {
   matchScore: number;
 };
 
+export type PurchaseHistoryProductCandidate = {
+  productId?: string;
+  slug?: string;
+  name: string;
+  aliases?: string[];
+};
+
+export type PurchaseHistoryProductMatch = {
+  productId: string;
+  productName: string;
+  matchScore: number;
+  normalizedQuery: string;
+};
+
 export type UnitNormalizationQaProductInput = {
   productId: string;
   productName: string;
@@ -51,12 +67,14 @@ export type UnitNormalizationQaIssue = {
   productName: string;
   packageText: string;
   detail: string;
+  outlierBucket?: UnitNormalizationOutlierBucket;
 };
 
 export type UnitNormalizationQaReport = {
   issueCount: number;
   missingUnitCount: number;
   suspiciousPackSizeCount: number;
+  suspiciousPackSizeBuckets: Record<UnitNormalizationOutlierBucket, number>;
   inconsistentUnitPriceCount: number;
   issues: UnitNormalizationQaIssue[];
   guardrails: string[];
@@ -84,21 +102,22 @@ function normalizePackageAmount(amount: number, unit: string): PackageEvidence |
   if (!Number.isFinite(amount) || amount <= 0) return null;
   if (unit === 'kg') return { packageSize: amount * 1000, packageUnit: 'g' };
   if (unit === 'l') return { packageSize: amount * 1000, packageUnit: 'ml' };
-  if (unit === 'st' || unit === 'piece') return { packageSize: amount, packageUnit: 'piece' };
+  if (['st', 'pc', 'pcs', 'piece', 'pieces', 'each'].includes(unit)) return { packageSize: amount, packageUnit: 'piece' };
   if (unit === 'g' || unit === 'ml') return { packageSize: amount, packageUnit: unit };
   return null;
 }
 
 export function packageEvidenceFromText(text: string): PackageEvidence | null {
   const normalized = text.toLowerCase().replace(/,/g, '.');
-  const multipackMatch = normalized.match(/(\d+(?:\.\d+)?)\s*(?:x|×)\s*(\d+(?:\.\d+)?)\s*(kg|g|l|ml|st|piece)\b/);
+  const packageUnitPattern = 'kg|g|l|ml|st|pc|pcs|piece|pieces|each';
+  const multipackMatch = normalized.match(new RegExp(`(\\d+(?:\\.\\d+)?)\\s*(?:x|×)\\s*(\\d+(?:\\.\\d+)?)\\s*(${packageUnitPattern})\\b`));
   if (multipackMatch) {
     const packCount = Number(multipackMatch[1]);
     const packAmount = Number(multipackMatch[2]);
     return normalizePackageAmount(packCount * packAmount, multipackMatch[3]!);
   }
 
-  const match = normalized.match(/(\d+(?:\.\d+)?)\s*(kg|g|l|ml|st|piece)\b/);
+  const match = normalized.match(new RegExp(`(\\d+(?:\\.\\d+)?)\\s*(${packageUnitPattern})\\b`));
   if (!match) return null;
   return normalizePackageAmount(Number(match[1]), match[2]!);
 }
@@ -182,6 +201,35 @@ export function parseRecipeIngredients(input: string): ParsedRecipeIngredient[] 
   return parsed.length > 0 ? parsed : ingredientHintsFromUrl(input).map((hint) => ({ rawText: hint, quantityText: '', normalizedName: hint }));
 }
 
+export function normalizePurchaseHistoryProductName(value: string) {
+  return wordsFromText(value).join(' ');
+}
+
+export function matchPurchaseHistoryRowToProduct(productName: string, candidates: readonly PurchaseHistoryProductCandidate[]): PurchaseHistoryProductMatch | null {
+  const normalizedQuery = normalizePurchaseHistoryProductName(productName);
+  if (!normalizedQuery) return null;
+  const queryWords = normalizedQuery.split(' ').filter(Boolean);
+  const ranked = candidates
+    .map((candidate, index) => {
+      const candidateWords = wordsFromText([candidate.name, ...(candidate.aliases ?? [])].join(' '));
+      const candidateKey = candidateWords.join(' ');
+      const overlap = queryWords.filter((word) => candidateWords.some((candidateWord) => candidateWord.includes(word) || word.includes(candidateWord))).length;
+      const directHit = candidateKey.includes(normalizedQuery) || normalizedQuery.includes(candidateKey) ? 5 : 0;
+      return { candidate, index, score: overlap * 10 + directHit };
+    })
+    .filter((entry) => entry.score > 0)
+    .sort((a, b) => b.score - a.score || a.index - b.index);
+
+  const best = ranked[0];
+  if (!best) return null;
+  return {
+    productId: best.candidate.productId ?? best.candidate.slug ?? normalizedQuery.replace(/\s+/g, '-'),
+    productName: best.candidate.name,
+    matchScore: best.score,
+    normalizedQuery
+  };
+}
+
 function priceLabelFor(candidate: RecipeProductCandidate) {
   if (typeof candidate.price === 'number') {
     return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(candidate.price);
@@ -222,7 +270,8 @@ export function suggestRecipeProductMatches(
 function qaIssue(
   kind: UnitNormalizationQaIssueKind,
   product: UnitNormalizationQaProductInput,
-  detail: string
+  detail: string,
+  outlierBucket?: UnitNormalizationOutlierBucket
 ): UnitNormalizationQaIssue {
   return {
     kind,
@@ -230,8 +279,15 @@ function qaIssue(
     productId: product.productId,
     productName: product.productName,
     packageText: product.packageText || 'Package text missing',
-    detail
+    detail,
+    ...(outlierBucket ? { outlierBucket } : {})
   };
+}
+
+function packageOutlierBucket(evidence: PackageEvidence): UnitNormalizationOutlierBucket {
+  if (evidence.packageUnit === 'g') return 'kg';
+  if (evidence.packageUnit === 'ml') return 'l';
+  return 'piece';
 }
 
 export function unitNormalizationQaIssuesForProduct(product: UnitNormalizationQaProductInput): UnitNormalizationQaIssue[] {
@@ -249,7 +305,12 @@ export function unitNormalizationQaIssuesForProduct(product: UnitNormalizationQa
     || (evidence.packageUnit === 'piece' && (evidence.packageSize < 1 || evidence.packageSize > 100));
 
   if (suspiciousPackSize) {
-    issues.push(qaIssue('suspicious_pack_size', product, `Parsed ${evidence.packageSize} ${evidence.packageUnit}, which is outside the expected grocery package range.`));
+    issues.push(qaIssue(
+      'suspicious_pack_size',
+      product,
+      `Parsed ${evidence.packageSize} ${evidence.packageUnit}, which is outside the expected grocery package range.`,
+      packageOutlierBucket(evidence)
+    ));
   }
 
   if (!normalized || normalized.value <= 0 || normalized.value > 10000) {
@@ -266,10 +327,17 @@ export function unitNormalizationQaIssuesForProduct(product: UnitNormalizationQa
 
 export function buildUnitNormalizationQaReport(products: UnitNormalizationQaProductInput[]): UnitNormalizationQaReport {
   const issues = products.flatMap(unitNormalizationQaIssuesForProduct);
+  const suspiciousPackSizeIssues = issues.filter((issue) => issue.kind === 'suspicious_pack_size');
+  const suspiciousPackSizeBuckets: Record<UnitNormalizationOutlierBucket, number> = { kg: 0, l: 0, piece: 0 };
+  for (const issue of suspiciousPackSizeIssues) {
+    if (issue.outlierBucket) suspiciousPackSizeBuckets[issue.outlierBucket] += 1;
+  }
+
   return {
     issueCount: issues.length,
     missingUnitCount: issues.filter((issue) => issue.kind === 'missing_unit').length,
-    suspiciousPackSizeCount: issues.filter((issue) => issue.kind === 'suspicious_pack_size').length,
+    suspiciousPackSizeCount: suspiciousPackSizeIssues.length,
+    suspiciousPackSizeBuckets,
     inconsistentUnitPriceCount: issues.filter((issue) => issue.kind === 'inconsistent_unit_price').length,
     issues: issues.slice(0, 12),
     guardrails: [
