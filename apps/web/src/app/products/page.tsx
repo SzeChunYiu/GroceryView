@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ChainFilterInput } from './chain-filter-input';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { ChainLogo } from '@/components/chain-logo';
 import { OriginFilter, type OriginFilterCode } from '@/components/origin-filter';
 import { ProductPriceCards } from '@/components/product-price-cards';
 import { apohemSource } from '@/lib/ingested/apohem';
@@ -293,7 +294,10 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">Chain facets</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {chainFacets.map((facet) => (
-                <Link className="rounded-full bg-sky-50 px-3 py-1 text-xs font-black text-sky-900" href={searchFacetUrl({ chain: facet.value })} key={facet.value}>{facet.label} · {facet.count}</Link>
+                <Link className="inline-flex items-center gap-2 rounded-full bg-sky-50 px-3 py-1 text-xs font-black text-sky-900" href={searchFacetUrl({ chain: facet.value })} key={facet.value}>
+                  <ChainLogo chain={facet.value} className="h-5 w-10 object-contain" />
+                  <span>{facet.label} · {facet.count}</span>
+                </Link>
               ))}
             </div>
           </div>
@@ -328,7 +332,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
               </div>
               <div className="mt-4 grid gap-2 text-xs font-black text-slate-700">
                 <p>{product.cheapestPriceLabel} · {product.unitPriceLabel}</p>
-                <p>{product.chainLabel}</p>
+                <p className="flex items-center gap-2"><ChainLogo chain={product.chainSlug ?? ''} className="h-5 w-10 object-contain" />{product.chainLabel}</p>
                 <p className="text-violet-800">sourceTables: {product.sourceTables.join(' · ')}</p>
               </div>
             </Link>

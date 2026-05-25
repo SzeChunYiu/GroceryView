@@ -3467,6 +3467,28 @@ ${seo}`;
     assert.match(cards, /No synthetic unit prices/);
   });
 
+  it('maps chain logo SVG assets into product cards and chain filters', async () => {
+    const products = await read('src/app/products/page.tsx');
+    const cards = await read('src/components/product-price-cards.tsx');
+    const chainLogo = await read('src/components/chain-logo.tsx');
+    const packageChainLogo = await read('../../packages/ui/src/ChainLogo.tsx');
+    const verified = await read('src/lib/verified-data.ts');
+
+    for (const logo of ['ica', 'coop', 'willys', 'hemkop', 'netto', 'lidl']) {
+      assert.equal(await fileExists(`public/logos/${logo}.svg`), true, `${logo} logo should exist`);
+      assert.match(packageChainLogo, new RegExp(`/logos/${logo}\\.svg`));
+    }
+
+    assert.match(chainLogo, /packages\/ui\/src\/ChainLogo/);
+    assert.match(packageChainLogo, /normalizeChainLogoSlug/);
+    assert.match(packageChainLogo, /export function ChainLogo/);
+    assert.match(verified, /chainSlug: cheapest\?\.chainSlug/);
+    assert.match(verified, /lowestChain: isChainProduct \? product\.lowestChain/);
+    assert.match(products, /<ChainLogo chain=\{facet\.value\}/);
+    assert.match(products, /<ChainLogo chain=\{product\.chainSlug \?\? ''\}/);
+    assert.match(cards, /<ChainLogo chain=\{card\.lowestChain\}/);
+  });
+
   it('surfaces verified source coverage on the data sources route', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/data-sources/page.tsx');

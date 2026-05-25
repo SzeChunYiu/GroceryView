@@ -681,6 +681,7 @@ function productSearchResultCards(searchResult: typeof rawFacetedProductSearch) 
         currency: cheapest.currency,
         unit: product.comparableUnit
       }) : unknownUnitPriceLabel,
+      chainSlug: cheapest?.chainSlug ?? null,
       isAvailable: product.isAvailable,
       chainLabel: cheapest ? `${cheapest.chainName} · ${cheapest.priceType}` : 'Awaiting latest_prices row',
       sourceTables: searchResult.evidence.sourceTables,
@@ -2023,6 +2024,7 @@ export type AdaptiveProductCard = {
   slug: string;
   name: string;
   brand: string;
+  lowestChain: string;
   imageUrl: string | null;
   imageAlt: string | null;
   productKind: 'branded' | 'commodity';
@@ -2098,6 +2100,7 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
     slug: product.slug,
     name: product.name,
     brand: isChainProduct ? product.brand : product.brands || 'Brand not reported',
+    lowestChain: isChainProduct ? product.lowestChain : 'openprices',
     imageUrl: product.image || null,
     imageAlt: product.image ? `${product.name} product image from ${isChainProduct ? 'Axfood' : 'OpenPrices/OpenFoodFacts'} source data` : null,
     productKind,

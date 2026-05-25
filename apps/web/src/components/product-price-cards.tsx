@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import { LazyItemCard } from './LazyItemCard';
 import { FavouriteProductToggle } from './favourite-product-toggle';
+import { ChainLogo } from './chain-logo';
 import { volatilityBadgeMethodology } from '@/lib/price-intelligence';
 import type { AdaptiveProductCard } from '@/lib/verified-data';
 
@@ -218,7 +219,10 @@ export function ProductPriceCards({
             </div>
             <p className="mt-4 text-3xl font-black text-emerald-800">{primaryLabel(card, compareMode)}</p>
             <p className="mt-1 text-sm font-semibold text-slate-700">{secondaryLabel(card, compareMode)}</p>
-            <p className="mt-3 text-sm leading-6 text-slate-600">{card.sourceLabel}</p>
+            <div className="mt-3 flex items-center gap-2 text-sm leading-6 text-slate-600">
+              <ChainLogo chain={card.lowestChain} className="h-7 w-16 rounded-md object-contain" />
+              <p>{card.sourceLabel}</p>
+            </div>
             <PriceHistorySparkline card={card} />
             <p className="mt-2 rounded-xl bg-blue-50 p-3 text-xs font-bold text-blue-950">{card.confidenceLabel}</p>
             <VolatilityMethodologyBadge card={card} />
