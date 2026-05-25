@@ -2,9 +2,10 @@ import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceFreshnessStatusBadge, SourceManagementActionsPanel } from '@/components/data-ui';
 import { DataGrid, dataGridActionClass } from '@/components/data-grid';
 import { axfoodProducts } from '@/lib/axfood-products';
-import { buildDuplicateReviewRows, type ProductRecord } from '@/lib/deduplicate-products';
+import { buildDuplicateMergeQueue, type ProductRecord } from '@/lib/deduplicate-products';
 import { buildUnitNormalizationQaReport } from '@/lib/normalization';
 import { pricedProducts } from '@/lib/openprices-products';
+import { dbSiteAxfoodProducts, dbSiteSnapshotGeneratedAt } from '@/lib/generated/db-site-products';
 import {
   allStoreDailyRunnerReadiness,
   apiPerformanceReadiness,
@@ -41,8 +42,10 @@ const unitNormalizationQaReport = buildUnitNormalizationQaReport([
   }))
 ]);
 
+const duplicateReviewSourceProducts = dbSiteAxfoodProducts.length > 0 ? dbSiteAxfoodProducts : axfoodProducts;
+
 const duplicateReviewProducts: ProductRecord[] = [
-  ...axfoodProducts.slice(0, 120).map((product) => ({
+  ...duplicateReviewSourceProducts.slice(0, 120).map((product) => ({
     id: `axfood:${product.code}`,
     name: product.name,
     brand: product.brand,
@@ -60,7 +63,7 @@ const duplicateReviewProducts: ProductRecord[] = [
   }))
 ];
 
-const duplicateReviewRows = buildDuplicateReviewRows(duplicateReviewProducts, 0.45).slice(0, 8);
+const duplicateMergeQueue = buildDuplicateMergeQueue(duplicateReviewProducts, 0.45).slice(0, 8);
 
 const duplicateReviewActionLabels = {
   merge: 'Merge',
@@ -170,47 +173,54 @@ export default function DataSourcesPage() {
             </p>
           </div>
           <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-sky-900 shadow-sm">
-            {duplicateReviewRows.length.toLocaleString('sv-SE')} clusters queued
+            {duplicateMergeQueue.length.toLocaleString('sv-SE')} clusters queued
           </p>
         </div>
         <DataGrid className="mt-5 overflow-x-auto bg-white" dense>
           <table>
             <thead>
               <tr className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">
-                <th>Source record</th>
-                <th>Possible duplicate</th>
+                <th>Merge cluster</th>
+                <th>Canonical record</th>
                 <th>Confidence</th>
-                <th>Signals</th>
+                <th>Merge note</th>
                 <th>Review actions</th>
               </tr>
             </thead>
             <tbody className="text-sm font-semibold text-slate-700">
-              {duplicateReviewRows.map((candidate) => (
-                <tr key={candidate.id}>
-                  <td>
-                    <p className="font-black text-slate-950">{candidate.source.name}</p>
-                    <p className="text-xs text-slate-500">{candidate.source.brand || 'Unknown brand'} · {candidate.source.size || 'size missing'}</p>
-                  </td>
-                  <td>
-                    <p className="font-black text-slate-950">{candidate.match.name}</p>
-                    <p className="text-xs text-slate-500">{candidate.match.brand || 'Unknown brand'} · {candidate.match.size || 'size missing'}</p>
-                  </td>
-                  <td>
-                    <p className="font-black text-sky-900">{Math.round(candidate.confidence * 100)}%</p>
-                    <p className="text-xs text-slate-500">{candidate.confidenceLabel}</p>
-                  </td>
-                  <td>{candidate.signals.join(', ') || 'similar names'}</td>
-                  <td>
-                    <div className="flex flex-wrap gap-2">
-                      <button className={`${dataGridActionClass} bg-emerald-50 text-emerald-800`} type="button">Merge</button>
-                      <button className={`${dataGridActionClass} bg-white`} type="button">Ignore</button>
-                      <button className={`${dataGridActionClass} bg-amber-50 text-amber-800`} type="button">
-                        {duplicateReviewActionLabels[candidate.recommendedAction]}
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {duplicateMergeQueue.map((group) => {
+                const topCandidate = group.candidates[0];
+
+                return (
+                  <tr key={group.id}>
+                    <td>
+                      <p className="font-black text-slate-950">{group.products.map((product) => product.name).join(' + ')}</p>
+                      <p className="text-xs text-slate-500">{group.products.length} records · {group.signals.join(', ') || 'similar names'}</p>
+                    </td>
+                    <td>
+                      <p className="font-black text-slate-950">{group.canonicalProduct.name}</p>
+                      <p className="text-xs text-slate-500">{group.canonicalProduct.brand || 'Unknown brand'} · {group.canonicalProduct.size || 'size missing'}</p>
+                    </td>
+                    <td>
+                      <p className="font-black text-sky-900">{Math.round((topCandidate?.confidence ?? 0) * 100)}%</p>
+                      <p className="text-xs text-slate-500">{topCandidate?.confidenceLabel ?? 'Needs review'}</p>
+                    </td>
+                    <td>
+                      <p>{group.mergeNote}</p>
+                      <p className="mt-1 text-xs text-slate-500">Snapshot: {dbSiteSnapshotGeneratedAt ?? 'static fallback'}</p>
+                    </td>
+                    <td>
+                      <div className="flex flex-wrap gap-2">
+                        <button className={`${dataGridActionClass} bg-emerald-50 text-emerald-800`} type="button">Merge into canonical</button>
+                        <button className={`${dataGridActionClass} bg-white`} type="button">Ignore</button>
+                        <button className={`${dataGridActionClass} bg-amber-50 text-amber-800`} type="button">
+                          {duplicateReviewActionLabels[group.recommendedAction]}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </DataGrid>
