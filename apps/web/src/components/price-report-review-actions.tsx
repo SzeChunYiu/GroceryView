@@ -85,7 +85,7 @@ export function PriceReportReviewActions() {
       return;
     }
     setStatus('ready');
-    setMessage(`${decision} action accepted with reviewedByHuman: true writeback. Hide maps to dismiss/reject, escalate maps to needs_more_info, and approve keeps the existing accept_community_report / approve_commodity_mapping writebacks.`);
+    setMessage(`${decision} action accepted with reviewedByHuman: true writeback. Hide maps to dismiss_community_report/reject, escalate maps to needs_more_info with assignment status in_progress, and approve keeps the existing accept_community_report / approve_commodity_mapping writebacks.`);
   }
 
   async function voteCommunityReview(reviewId: string, vote: CommunityReviewVote) {
@@ -165,7 +165,7 @@ export function PriceReportReviewActions() {
       <div className="mt-3 flex flex-wrap gap-2">
         <button className="rounded-full border border-slate-300 px-4 py-2 text-sm font-black text-slate-800" disabled={!assignmentId.trim()} onClick={() => decideReview('approve')} type="button">Approve evidence</button>
         <button className="rounded-full border border-slate-300 px-4 py-2 text-sm font-black text-slate-800" disabled={!assignmentId.trim()} onClick={() => decideReview('hide')} type="button">Hide report</button>
-        <button className="rounded-full border border-amber-300 px-4 py-2 text-sm font-black text-amber-900" disabled={!assignmentId.trim()} onClick={() => decideReview('escalate')} type="button">Escalate</button>
+        <button className="rounded-full border border-amber-300 px-4 py-2 text-sm font-black text-amber-900" disabled={!assignmentId.trim()} onClick={() => decideReview('escalate')} type="button">Request more info</button>
       </div>
 
 

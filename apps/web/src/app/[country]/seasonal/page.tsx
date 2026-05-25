@@ -27,7 +27,7 @@ export default async function SeasonalCountryPage({ params }: SeasonalCountryPag
       <Eyebrow>{country.toUpperCase()} seasonal produce</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Nordic seasonal-produce calendar</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
-        Educational month-by-month produce timing with expected price behavior and chains to compare. This is planning guidance, not a live price claim.
+        Educational month-by-month produce timing with observed seasonal price behavior and chains to compare. This is planning guidance from historical source rows, not a live price claim.
       </p>
       <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {activeMonths.map((month) => (

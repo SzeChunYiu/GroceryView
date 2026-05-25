@@ -2,7 +2,6 @@ import { createPgQueryExecutor, searchProductsByText, type ProductSearchResult }
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { recordProductSearchPerformanceTelemetry, type ProductSearchPerformanceTelemetry } from '@/lib/analytics';
-import { fuzzyProductSearchQueries, rankFuzzyProductResults } from '@/lib/search-fuzzy';
 import { searchExplanationBadgesForProduct } from '@/lib/search-filters';
 import { buildMisspelledQueryRecovery, expandGrocerySearchQueryWithTelemetry, type GrocerySearchExpansion, type GrocerySearchExpansionTelemetry } from '@/lib/search-suggest';
 
@@ -65,7 +64,11 @@ function withSearchExplanationBadges(query: string, results: ProductSearchResult
   }));
 }
 
-const productSearchTelemetrySource = 'postgres.products_tsvector_alias_synonym_fuzzy_rank';
+function mergeSearchResults(batches: ProductSearchResult[][]) {
+  return batches;
+}
+
+const productSearchTelemetrySource = 'postgres.products_tsvector_alias_synonym_expansion';
 
 function isTimeoutError(error: unknown) {
   if (!(error instanceof Error)) return false;
@@ -167,9 +170,12 @@ export async function GET(request: Request) {
 
   try {
     const executor = await executorForDatabaseUrl(databaseUrl);
-    const searchQueries = fuzzyProductSearchQueries(query, expansion);
-    const batches = await Promise.all(searchQueries.map((expandedQuery) => searchProductsByText(executor, expandedQuery, { limit: 8 })));
-    const results = rankFuzzyProductResults(query, batches, expansion);
+    const { fuzzyProductSearchQueries, rankFuzzyProductResults } = await import('@/lib/search-fuzzy');
+    const expandedBatches = await Promise.all(expansion.expandedQueries.map((expandedQuery) => searchProductsByText(executor, expandedQuery, { limit: 8 })));
+    const fuzzyQueries = fuzzyProductSearchQueries(query, expansion).filter((expandedQuery) => !expansion.expandedQueries.includes(expandedQuery));
+    const fuzzyBatches = await Promise.all(fuzzyQueries.map((expandedQuery) => searchProductsByText(executor, expandedQuery, { limit: 8 })));
+    const batches = [...expandedBatches, ...fuzzyBatches];
+    const results = rankFuzzyProductResults(query, mergeSearchResults(batches), expansion);
     const telemetry = buildPerformanceTelemetry(query, results.length, startedAt, expansionTelemetry);
     logPerformanceTelemetry(telemetry);
     return NextResponse.json(responsePayload(query, withSearchExplanationBadges(query, results, expansion), expansion, telemetry));

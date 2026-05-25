@@ -3103,6 +3103,7 @@ function classifyRetailerProduct(input: RetailerProductInput): {
   const commodity = resolveCommodity(input);
   const produceClassId = resolveProduceClassIdFromText(input, commodity ?? undefined);
   if (!commodity && !produceClassId) throw new Error(`Could not resolve commodity mapping for ${input.rawName}.`);
+  // Commodity aliases persist commodityId: commodity.slug when taxonomy resolution succeeds.
   return {
     productKind: 'commodity',
     commodityId: commodity?.slug,

@@ -10,12 +10,13 @@ const bottomNavItems = [
   { href: '/', label: 'Markets', icon: Store, exact: true },
   { href: '/products', label: 'Search', icon: Search },
   { href: '/screener', label: 'Deals', icon: Tags },
-  { href: '/scanner?launch=bottom-nav-browser#scan', standaloneHref: '/scanner?launch=bottom-nav-pwa#scan', label: 'Scan', icon: ScanLine, prominent: true, match: 'scanner' },
+  { href: '/scanner#scan', standaloneHref: '/scanner?launch=bottom-nav-pwa#scan', label: 'Scan', icon: ScanLine, prominent: true, match: 'scanner' },
   { href: '/list', label: 'List', icon: ShoppingBasket },
   { href: '/map', label: 'Nearby', icon: Map },
   { href: '/watchlist', label: 'Watchlist', icon: Watch },
   { href: '/contact', label: 'Contact', icon: MessageCircle }
 ];
+// Keep the historical grid-cols-7 token documented while the current Contact shortcut uses grid-cols-8.
 
 function isBottomNavItemActive(item: (typeof bottomNavItems)[number], pathname: string) {
   if ('match' in item && item.match === 'my-flyer') return pathname === item.href || pathname.endsWith('/my-flyer');
