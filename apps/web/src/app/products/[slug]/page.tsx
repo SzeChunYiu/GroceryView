@@ -92,6 +92,61 @@ const historyWindowDefinitions = [
   { label: '365-day', rangeDays: 365, title: 'Observed 365-day low/high' }
 ] as const;
 const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const;
+const chainRetailerTypes = {
+  willys: 'grocery',
+  hemkop: 'grocery',
+  ica: 'grocery',
+  coop: 'grocery',
+  lidl: 'grocery',
+  netto: 'grocery',
+  '7-eleven-se': 'convenience',
+  seven_eleven_se: 'convenience',
+  apohem: 'pharmacy',
+  'apotek-hjartat': 'pharmacy',
+  apoteket: 'pharmacy',
+  normal: 'cosmetics',
+  'normal-se': 'cosmetics',
+  'normal-no': 'cosmetics',
+  rusta: 'variety',
+  'rusta-no': 'variety',
+  dollarstore: 'variety',
+  'dollarstore-se': 'variety',
+  biltema: 'household',
+  'biltema-se': 'household',
+  'biltema-no': 'household',
+  kartamart: 'ethnic_asian',
+  'asia-supermarket-gbg': 'ethnic_asian',
+  'tian-tian': 'ethnic_asian',
+  'asia-mart-no': 'ethnic_asian',
+  'polski-sklep': 'ethnic_polish_eastern_european',
+  hala: 'ethnic_polish_eastern_european',
+  'mlyn-no': 'ethnic_polish_eastern_european',
+  antep: 'ethnic_middle_eastern',
+  'middle-eastern-no': 'ethnic_middle_eastern',
+  afroshop: 'ethnic_african',
+  'afroshop-no': 'ethnic_african',
+  'halal-center': 'kosher_halal',
+  'kosher-deli': 'kosher_halal',
+  hemmavid: 'health_food',
+  naturkraft: 'health_food',
+  helios: 'health_food',
+  'helios-no': 'health_food',
+  sunkost: 'health_food',
+  'sunkost-no': 'health_food',
+  life: 'health_food',
+  'life-se': 'health_food'
+} as const;
+const retailerTypeLabels: Record<string, string> = {
+  ethnic_asian: 'Ethnic Asian',
+  ethnic_polish_eastern_european: 'Polish / Eastern European',
+  ethnic_middle_eastern: 'Middle Eastern',
+  ethnic_indian_south_asian: 'Indian / South Asian',
+  ethnic_latin: 'Latin',
+  ethnic_african: 'African',
+  health_food: 'Health food',
+  kosher_halal: 'Kosher / halal',
+  online_marketplace: 'Online marketplace'
+};
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
@@ -117,8 +172,28 @@ function formatSignedPct(value: number | null | undefined) {
   return `${value > 0 ? '+' : ''}${formatPct(value)}`;
 }
 
+function retailerTypeForChain(chain: string) {
+  return chainRetailerTypes[chain as keyof typeof chainRetailerTypes] ?? 'grocery';
+}
+
+function retailerTypeLabel(retailerType: string) {
+  return retailerTypeLabels[retailerType] ?? retailerType.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toLocaleUpperCase('sv-SE'));
+}
+
 function crossChainQuoteRowsFor(product: (typeof axfoodProducts)[number]) {
-  const rows = chainPriceRows(product).sort((left, right) => left.price - right.price || left.chain.localeCompare(right.chain));
+  const rows = chainPriceRows(product)
+    .map((row) => {
+      const normalizedUnitPrice = normalizeUnitPriceForPackageText(row.price, product.subline);
+      const retailerType = retailerTypeForChain(row.chain);
+      return {
+        ...row,
+        retailerType,
+        retailerTypeLabel: retailerTypeLabel(retailerType),
+        effectiveUnitPrice: normalizedUnitPrice?.value ?? row.price,
+        effectiveUnit: normalizedUnitPrice?.comparableUnit ?? null
+      };
+    })
+    .sort((left, right) => left.effectiveUnitPrice - right.effectiveUnitPrice || left.chain.localeCompare(right.chain));
   const basketMedianPrice = medianFor(rows.map((row) => row.price));
   const cheapestPrice = rows[0]?.price ?? null;
 
@@ -154,6 +229,7 @@ function chainSourceAttributionFor(rows: ReturnType<typeof crossChainQuoteRowsFo
       verificationLabel: row.isAvailable === false ? 'availability caveat' : counterPriceLabelFor(row),
       details: [
         { label: 'Observed price', value: formatSek(row.price) },
+        { label: 'Retailer type', value: row.retailerTypeLabel },
         { label: 'Source row', value: row.priceText ? `${row.priceText} · ${row.priceUnit}` : row.priceUnit },
         { label: 'Observed from', value: lastObservedLabel }
       ]
@@ -1452,7 +1528,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
               <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-800">Cross-chain quote table</p>
               <h2 className="mt-2 text-2xl font-black text-slate-950">Current prices by chain</h2>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
-                Uses the real chainPriceRows / matchedChainProducts snapshot for this matched item. Delta compares each current quote with the median of the displayed chain basket; unavailable or missing prices are not fabricated.
+                Uses the real chainPriceRows / matchedChainProducts snapshot for this matched item. Rows include grocery, pharmacy, variety, cosmetics, ethnic-specialty, and health-food retailer types when the same SKU is present. Delta compares each current quote with the median of the displayed chain basket; unavailable or missing prices are not fabricated.
               </p>
             </div>
             <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-emerald-900 shadow-sm">
@@ -1475,10 +1551,14 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
                   <tr className={row.isCheapest ? 'bg-emerald-50' : 'bg-white'} key={row.chain}>
                     <td className="px-4 py-3 font-black text-slate-950">
                       {row.chain}
+                      <span className="ml-2 rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-700">{row.retailerTypeLabel}</span>
                       {row.isCheapest ? <span className="ml-2 rounded-full bg-emerald-800 px-2 py-1 text-xs text-white">cheapest</span> : null}
                     </td>
                     <td className="px-4 py-3 font-black text-emerald-900">{formatSek(row.price)}</td>
-                    <td className="px-4 py-3 font-semibold text-slate-700">{row.priceText} · {row.priceUnit}<span className="ml-2 rounded-full bg-slate-100 px-2 py-1 text-xs font-black text-slate-600">{counterPriceLabelFor(row)}</span></td>
+                    <td className="px-4 py-3 font-semibold text-slate-700">
+                      {row.effectiveUnit ? formatComparableUnitPrice(row.effectiveUnitPrice, row.effectiveUnit) : `${row.priceText} · ${row.priceUnit}`}
+                      <span className="ml-2 rounded-full bg-slate-100 px-2 py-1 text-xs font-black text-slate-600">{counterPriceLabelFor(row)}</span>
+                    </td>
                     <td className={`px-4 py-3 font-black ${row.deltaVsMedian && row.deltaVsMedian > 0 ? 'text-rose-800' : 'text-emerald-800'}`}>
                       {formatSignedPct(row.deltaVsMedian)}
                     </td>
