@@ -545,7 +545,9 @@ export default async function WeeklyBasketPage({
               <div className="mt-3 grid gap-2 text-sm text-slate-700">
                 <p className="rounded-2xl bg-blue-50 p-3 font-semibold">Bulk {formatSek(row.bulkUnitPrice)} / {row.comparableUnit.replace('SEK/', '')}</p>
                 <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Standard {formatSek(row.standardUnitPrice)} / {row.comparableUnit.replace('SEK/', '')}</p>
-                <p className="rounded-2xl bg-emerald-50 p-3 font-black text-emerald-900">{row.unitSavingsPercent}% unit savings</p>
+                <p className={`rounded-2xl p-3 font-black ${row.bulkUnitPrice < row.standardUnitPrice ? 'bg-emerald-50 text-emerald-900' : 'bg-rose-50 text-rose-950'}`}>
+                  {row.bulkUnitPrice < row.standardUnitPrice ? `${row.unitSavingsPercent}% unit savings` : 'Larger pack is not the best unit price'}
+                </p>
               </div>
               <p className="mt-3 text-xs font-semibold text-slate-600">{row.source}</p>
             </Link>
@@ -569,8 +571,11 @@ export default async function WeeklyBasketPage({
                   <p className="mt-1 text-sm font-semibold text-slate-600">{row.familyPack} · {row.storeName}</p>
                   <div className="mt-3 grid gap-2 text-sm text-slate-700">
                     <p className="rounded-2xl bg-fuchsia-50 p-3 font-semibold">bulkUnitPrice {formatSek(row.bulkUnitPrice)} / {row.comparableUnit.replace('SEK/', '')}</p>
+                    <p className="rounded-2xl bg-white p-3 font-semibold">standardUnitPrice {formatSek(row.standardUnitPrice)} / {row.comparableUnit.replace('SEK/', '')}</p>
                     <p className="rounded-2xl bg-white p-3 font-semibold">freezerPortions {row.freezerPortions} · paybackMeals {row.paybackMeals}</p>
-                    <p className="rounded-2xl bg-emerald-50 p-3 font-black text-emerald-900">{row.unitSavingsPercent}% unit savings</p>
+                    <p className={`rounded-2xl p-3 font-black ${row.bulkUnitPrice < row.standardUnitPrice ? 'bg-emerald-50 text-emerald-900' : 'bg-rose-50 text-rose-950'}`}>
+                      {row.bulkUnitPrice < row.standardUnitPrice ? `${row.unitSavingsPercent}% unit savings` : 'Larger pack is not the best unit price'}
+                    </p>
                   </div>
                   <p className="mt-3 text-sm font-black text-fuchsia-950">stockUpDecision: {row.stockUpDecision}</p>
                   <p className="mt-2 text-xs font-semibold leading-5 text-slate-600">{row.coverageEvidence}</p>

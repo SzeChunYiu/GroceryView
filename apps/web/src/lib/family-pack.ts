@@ -3,7 +3,7 @@ import { defaultLocale, formatLocalizedUnitPrice } from './i18n';
 import { packageEvidenceFromText, type PackageEvidence } from './normalization';
 
 export type FamilyPackStorageFit = 'freezer_ready' | 'shelf_stable' | 'fridge_plan' | 'short_life' | 'check_storage';
-export type FamilyPackVerdict = 'bulk_cheaper' | 'larger_spend';
+export type FamilyPackVerdict = 'bulk_cheaper' | 'standard_cheaper';
 
 export type FamilyPackComparison = {
   baseline: FamilyPackProductSummary;
@@ -13,6 +13,7 @@ export type FamilyPackComparison = {
   sourceLabel: string;
   storageDetail: string;
   storageFit: FamilyPackStorageFit;
+  largerPackWarningLabel: string | null;
   storageLabel: string;
   totalSpendDeltaLabel: string;
   unitPriceDeltaPercent: number;
@@ -141,7 +142,7 @@ function withPackageEvidence(products: readonly AxfoodProduct[]) {
 function comparisonFor(baseline: ProductWithEvidence, bulk: ProductWithEvidence, categoryLabel: string): FamilyPackComparison {
   const unitDeltaPercent = ((bulk.unitPrice - baseline.unitPrice) / baseline.unitPrice) * 100;
   const totalSpendDelta = bulk.product.lowestPrice - baseline.product.lowestPrice;
-  const verdict: FamilyPackVerdict = unitDeltaPercent < 0 ? 'bulk_cheaper' : 'larger_spend';
+  const verdict: FamilyPackVerdict = unitDeltaPercent < 0 ? 'bulk_cheaper' : 'standard_cheaper';
   const storage = storageFitFor(bulk.product);
 
   return {
@@ -153,11 +154,14 @@ function comparisonFor(baseline: ProductWithEvidence, bulk: ProductWithEvidence,
       : 'Partial confidence: package size parsed, but chain coverage is limited.',
     sourceLabel: 'Axfood chain price snapshot plus parsed package-size evidence; no live stock or household consumption rate is inferred.',
     ...storage,
+    largerPackWarningLabel: verdict === 'standard_cheaper'
+      ? 'Larger pack is not the best unit price; keep the smaller benchmark unless storage or meal-plan needs override the spend.'
+      : null,
     totalSpendDeltaLabel: `${totalSpendDelta >= 0 ? '+' : ''}${formatSek(totalSpendDelta)} total spend`,
     unitPriceDeltaPercent: unitDeltaPercent,
     unitPriceDeltaLabel: `${unitDeltaPercent > 0 ? '+' : ''}${unitDeltaPercent.toFixed(1)}% unit price`,
     verdict,
-    verdictLabel: verdict === 'bulk_cheaper' ? 'Bulk is cheaper per unit' : 'Larger spend, not cheaper'
+    verdictLabel: verdict === 'bulk_cheaper' ? 'Bulk is cheaper per unit' : 'Larger pack not best unit price'
   };
 }
 
