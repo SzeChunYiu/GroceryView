@@ -24,6 +24,10 @@ test('search bar debounces product search API calls and renders a dropdown', asy
   assert.match(searchBar, /\/api\/products\?q=/);
   assert.match(searchBar, /role="combobox"/);
   assert.match(searchBar, /role="listbox"/);
+  assert.match(searchBar, /aria-activedescendant=\{activeOptionId\}/);
+  assert.match(searchBar, /aria-selected/);
+  assert.match(searchBar, /data-active-option/);
+  assert.match(searchBar, /scrollIntoView\?\.\(\{ block: 'nearest' \}\)/);
   assert.match(searchBar, /href=\{`\/products\/\$\{result\.slug\}`\}/);
 });
 

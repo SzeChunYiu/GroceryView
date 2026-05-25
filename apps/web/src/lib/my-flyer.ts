@@ -1,6 +1,7 @@
 import { createGroceryViewApi, type FlyerOffer } from '@groceryview/api';
+import { rankMyBasketPromos, rankOrganicDeals } from '@groceryview/core';
 
-export const myFlyerAlgorithms = ['best_savings', 'best_unit_price', 'watchlist_first'] as const;
+export const myFlyerAlgorithms = ['best_savings', 'best_unit_price', 'watchlist_first', 'organic_eco'] as const;
 export const myFlyerCountries = ['se', 'no', 'dk', 'fi'] as const;
 
 export type MyFlyerAlgorithm = (typeof myFlyerAlgorithms)[number];
@@ -51,6 +52,8 @@ export type MyFlyerPayload = {
 const api = createGroceryViewApi();
 const myFlyerCache = new Map<string, { expiresAt: number; payload: MyFlyerPayload }>();
 const ttlSeconds = 60 * 60;
+const organicEcoEvidenceTerms = ['ecological', 'eu_ecological', 'krav', 'organic', 'eko', 'ekologisk'];
+type FlyerOfferWithOrganicEvidence = FlyerOffer & { labels?: string[]; tags?: string[] };
 
 function round(value: number, digits = 2) {
   const factor = 10 ** digits;
@@ -70,8 +73,9 @@ function profileForUser(userId: string) {
   const favoriteStores = hash % 2 === 0 ? new Set(['willys-odenplan', 'lidl-sveavagen']) : new Set(['coop-odenplan']);
   const watchedProducts = hash % 3 === 0 ? new Set(['coffee', 'butter']) : new Set(['milk', 'private-label-milk']);
   const watchedCategories = hash % 5 === 0 ? new Set(['dairy']) : new Set(['coffee']);
+  const recentBasketProducts = hash % 2 === 0 ? new Set(['oat-milk', 'milk']) : new Set(['coffee', 'pasta']);
 
-  return { favoriteStores, watchedProducts, watchedCategories };
+  return { favoriteStores, watchedProducts, watchedCategories, recentBasketProducts };
 }
 
 function startOfIsoWeek(asOf: Date) {
@@ -103,11 +107,46 @@ function unitPriceFor(offer: FlyerOffer) {
   return round(offer.offerPrice / packageAmount);
 }
 
+function unitEconomicsEvidence(offer: FlyerOffer, unitPrice: number | null) {
+  if (unitPrice === null) return 'missing package or effective unit-price evidence';
+  if (offer.packageQuantity && offer.packageUnit) return `${offer.packageQuantity}${offer.packageUnit} package evidence`;
+  return `${unitPrice} SEK/${offer.effectiveUnitPriceUnit ?? 'unit'} effective unit price evidence`;
+}
+
 function expiryScoreFor(offer: FlyerOffer, asOfMs: number) {
   const validThroughMs = Date.parse(offer.validThrough);
   if (!Number.isFinite(validThroughMs)) return 0;
   const hoursRemaining = Math.max(0, (validThroughMs - asOfMs) / (60 * 60 * 1000));
   return round(Math.max(0, 12 - Math.min(hoursRemaining, 72) / 6), 1);
+}
+
+function organicEcoEvidenceFor(offer: FlyerOffer) {
+  const candidate = offer as FlyerOfferWithOrganicEvidence;
+  return [
+    ...(candidate.labels ?? []),
+    ...(candidate.tags ?? [])
+  ].map((value) => value.toLocaleLowerCase('sv-SE'));
+}
+
+function hasOrganicEcoEvidence(offer: FlyerOffer) {
+  const evidence = organicEcoEvidenceFor(offer);
+  return evidence.some((value) => organicEcoEvidenceTerms.some((term) => value.includes(term)));
+}
+
+export function rankOrganicEcoListings(offers: FlyerOffer[]): FlyerOffer[] {
+  const sourceBacked = offers.filter((offer) => offer.sourceUrl && offer.sourceRunId && offer.savings > 0 && hasOrganicEcoEvidence(offer));
+  const rankByProductId = new Map(rankOrganicDeals(sourceBacked.map((offer) => ({
+    productId: offer.productId,
+    dealScore: offer.savings,
+    sponsored: false
+  }))).map((ranked, index) => [ranked.productId, index]));
+
+  return [...sourceBacked].sort((left, right) =>
+    (rankByProductId.get(left.productId) ?? Number.MAX_SAFE_INTEGER) - (rankByProductId.get(right.productId) ?? Number.MAX_SAFE_INTEGER) ||
+    right.savings - left.savings ||
+    right.confidence - left.confidence ||
+    left.productName.localeCompare(right.productName)
+  );
 }
 
 function scoreOffer(offer: FlyerOffer, query: MyFlyerQuery, asOfMs: number): Omit<MyFlyerRow, 'rank'> {
@@ -122,12 +161,14 @@ function scoreOffer(offer: FlyerOffer, query: MyFlyerQuery, asOfMs: number): Omi
   const algorithmScore = {
     best_savings: savings * 3 + confidence + favoriteStore / 2 + watchlist / 3,
     best_unit_price: unitPriceScore * 3 + savings + confidence + favoriteStore / 2 + watchlist / 3,
-    watchlist_first: watchlist * 3 + favoriteStore + savings * 1.5 + confidence + expiry
+    watchlist_first: watchlist * 3 + favoriteStore + savings * 1.5 + confidence + expiry,
+    organic_eco: savings * 3 + confidence + expiry
   }[query.algorithm];
 
   const explanation = [
     `${query.algorithm} ranker`,
     `${round(savings)} SEK savings`,
+    query.algorithm === 'organic_eco' ? 'organic eco evidence required' : unitEconomicsEvidence(offer, unitPrice),
     profile.favoriteStores.has(offer.storeId) ? 'favorite store boost' : 'all-store eligible',
     watchlist > 0 ? 'watchlist or category match' : 'general weekly promotion',
     offer.priceType === 'member_flyer' ? 'member flyer label retained' : 'public flyer price'
@@ -177,20 +218,49 @@ export function buildMyFlyerPayload(query: MyFlyerQuery, asOf = new Date()): MyF
 
   const report = api.getFlyerOffers({ asOf: generatedAt });
   const asOfMs = asOf.getTime();
-  const sourceOffers = query.algorithm === 'best_unit_price'
-    ? report.offers.filter((offer) => unitPriceFor(offer) !== null)
-    : report.offers;
+  const sourceOffers = query.algorithm === 'organic_eco'
+    ? rankOrganicEcoListings(report.offers)
+    : query.algorithm === 'best_unit_price'
+      ? report.offers.filter((offer) => unitPriceFor(offer) !== null)
+      : report.offers;
 
-  const rows = sourceOffers
+  const profile = profileForUser(query.userId);
+  const myBasketPromos = rankMyBasketPromos({
+    asOf,
+    promos: sourceOffers.map((offer) => ({
+      ...offer,
+      promoId: offer.offerId,
+      listingId: offer.productId,
+      coveredListingIds: [offer.productId, offer.category],
+      savings: offer.savings
+    })),
+    topN: query.limit,
+    user: {
+      watchlist: [...profile.watchedProducts, ...profile.watchedCategories].map((listingId) => ({ listingId })),
+      recentBasketHistory: [...profile.recentBasketProducts].map((listingId) => ({ listingId, purchasedAt: asOf }))
+    }
+  });
+
+  const rankedOffers = [
+    ...myBasketPromos,
+    ...sourceOffers.filter((offer) => !myBasketPromos.some((ranked) => ranked.offerId === offer.offerId))
+  ];
+
+  const rows = rankedOffers
     .map((offer) => scoreOffer(offer, query, asOfMs))
     .sort((left, right) =>
-      right.personalizedScore - left.personalizedScore ||
-      right.offer.confidence - left.offer.confidence ||
-      Date.parse(left.offer.validThrough) - Date.parse(right.offer.validThrough) ||
-      left.offer.chain.localeCompare(right.offer.chain) ||
-      left.offer.storeName.localeCompare(right.offer.storeName) ||
-      left.offer.productName.localeCompare(right.offer.productName) ||
-      left.offer.offerId.localeCompare(right.offer.offerId)
+      query.algorithm === 'organic_eco'
+        ? right.offer.savings - left.offer.savings ||
+          right.offer.confidence - left.offer.confidence ||
+          left.offer.productName.localeCompare(right.offer.productName) ||
+          left.offer.offerId.localeCompare(right.offer.offerId)
+        : right.personalizedScore - left.personalizedScore ||
+          right.offer.confidence - left.offer.confidence ||
+          Date.parse(left.offer.validThrough) - Date.parse(right.offer.validThrough) ||
+          left.offer.chain.localeCompare(right.offer.chain) ||
+          left.offer.storeName.localeCompare(right.offer.storeName) ||
+          left.offer.productName.localeCompare(right.offer.productName) ||
+          left.offer.offerId.localeCompare(right.offer.offerId)
     )
     .slice(0, query.limit)
     .map((row, index) => ({ ...row, rank: index + 1 }));
@@ -209,8 +279,9 @@ export function buildMyFlyerPayload(query: MyFlyerQuery, asOf = new Date()): MyF
       offerCount: report.offerCount,
       guardrails: [
         ...report.guardrails,
+        query.algorithm === 'organic_eco' ? 'Organic eco ranking excludes flyer rows without source-backed organic labels or tags and sorts remaining rows by savings.' : null,
         'Best unit price ranking excludes flyer rows that lack package quantity, package unit, or effective unit-price evidence.'
-      ]
+      ].filter((guardrail): guardrail is string => Boolean(guardrail))
     },
     rows
   };
