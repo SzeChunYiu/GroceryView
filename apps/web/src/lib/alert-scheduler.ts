@@ -134,3 +134,109 @@ export const samplePredictiveDropForecasts: PredictiveDropForecast[] = [
 ];
 
 export const samplePredictiveDropAlerts = buildPredictiveDropAlerts(samplePredictiveDropForecasts, { now: new Date('2026-05-24T00:00:00Z') });
+
+export type SavedSearchSubscription = {
+  id: string;
+  label: string;
+  href: string;
+  filters: Record<string, string[]>;
+  createdAt: string;
+  alertReason: string;
+};
+
+export type SavedSearchDealCandidate = {
+  id: string;
+  name: string;
+  href: string;
+  category: string;
+  chain: string;
+  labels: string[];
+  currentPriceText: string;
+  dealSummary: string;
+};
+
+export type SavedSearchDealMatch = SavedSearchDealCandidate & {
+  subscriptionId: string;
+  matchedFilters: string[];
+};
+
+const savedSearchFilterLabels: Record<string, string> = {
+  q: 'query',
+  category: 'category',
+  label: 'label',
+  dietary: 'dietary',
+  chain: 'chain',
+  minPrice: 'min price',
+  maxPrice: 'max price',
+  inStockOnly: 'stock',
+  minConfidence: 'confidence'
+};
+
+function normalize(value: string): string {
+  return value.trim().toLocaleLowerCase('sv-SE');
+}
+
+function listFilterValues(value: string | string[] | undefined): string[] {
+  const values = Array.isArray(value) ? value : value ? [value] : [];
+  return [...new Set(values.flatMap((item) => item.split(',')).map((item) => item.trim()).filter(Boolean))];
+}
+
+function subscriptionIdFromFilters(filters: Record<string, string[]>): string {
+  const suffix = Object.entries(filters)
+    .sort(([left], [right]) => left.localeCompare(right))
+    .flatMap(([key, values]) => values.map((value) => `${key}:${normalize(value).replace(/[^a-z0-9]+/g, '-')}`))
+    .join('__')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 96);
+  return suffix ? `saved-search:${suffix}` : 'saved-search:all-products';
+}
+
+export function buildSavedSearchSubscription(input: {
+  searchParams: Record<string, string | string[] | undefined>;
+  path?: string;
+  createdAt?: string;
+}): SavedSearchSubscription {
+  const filters = Object.fromEntries(
+    Object.entries(input.searchParams)
+      .map(([key, value]) => [key, listFilterValues(value)] as const)
+      .filter(([, values]) => values.length > 0)
+  );
+  const params = new URLSearchParams();
+  for (const [key, values] of Object.entries(filters)) {
+    for (const value of values) params.append(key, value);
+  }
+  const query = params.toString();
+  const labelParts = Object.entries(filters).map(([key, values]) => `${savedSearchFilterLabels[key] ?? key}: ${values.join(', ')}`);
+
+  return {
+    id: subscriptionIdFromFilters(filters),
+    label: labelParts.length > 0 ? labelParts.join(' · ') : 'All verified products',
+    href: `${input.path ?? '/search'}${query ? `?${query}` : ''}`,
+    filters,
+    createdAt: input.createdAt ?? new Date().toISOString(),
+    alertReason: 'Notify when newly matching verified deals appear for these saved filters.'
+  };
+}
+
+export function buildSavedSearchDealMatches(
+  subscriptions: SavedSearchSubscription[],
+  candidates: SavedSearchDealCandidate[],
+  limitPerSubscription = 3
+): SavedSearchDealMatch[] {
+  return subscriptions.flatMap((subscription) => {
+    const filterEntries = Object.entries(subscription.filters);
+    return candidates
+      .map((candidate) => {
+        const text = normalize([candidate.name, candidate.category, candidate.chain, ...candidate.labels].join(' '));
+        const matchedFilters = filterEntries.flatMap(([key, values]) => {
+          if (key === 'minPrice' || key === 'maxPrice' || key === 'inStockOnly' || key === 'minConfidence') return [];
+          return values.filter((value) => text.includes(normalize(value))).map((value) => `${savedSearchFilterLabels[key] ?? key}: ${value}`);
+        });
+        const textFilters = filterEntries.filter(([key]) => !['minPrice', 'maxPrice', 'inStockOnly', 'minConfidence'].includes(key));
+        const matched = textFilters.length === 0 || matchedFilters.length > 0;
+        return matched ? { ...candidate, subscriptionId: subscription.id, matchedFilters } : null;
+      })
+      .filter((candidate): candidate is SavedSearchDealMatch => candidate !== null)
+      .slice(0, limitPerSubscription);
+  });
+}

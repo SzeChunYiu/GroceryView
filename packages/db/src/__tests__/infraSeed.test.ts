@@ -58,7 +58,15 @@ describe('infra/db Stockholm seed contract', () => {
       ['lidl', 'https://www.lidl.se/'],
       ['netto', 'https://www.coop.se/']
     ]) {
-      assert.match(stockholmSeed, new RegExp(`'${slug}',\\s*'[^']+',\\s*'se',\\s*'${website.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}'`, 'i'));
+      assert.match(stockholmSeed, new RegExp(`'${slug}',\\s*'[^']+',\\s*'grocery',\\s*'se',\\s*'${website.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}'`, 'i'));
+    }
+  });
+
+  it('backfills all Stockholm chain seeds with required retailer_type metadata', () => {
+    assert.match(stockholmSeed, /insert into chains \(slug, name, retailer_type, country_code, website_url\)/);
+    assert.match(stockholmSeed, /retailer_type = excluded\.retailer_type/);
+    for (const chain of requiredChains) {
+      assert.match(stockholmSeed, new RegExp(`'${chain}',\\s*'[^']+',\\s*'grocery'`, 'i'), `${chain} retailer_type seed missing`);
     }
   });
 

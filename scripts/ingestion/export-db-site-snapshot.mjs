@@ -60,7 +60,7 @@ function normalizeCoverageSlug(value) {
     .replace(/^-+|-+$/g, '');
 }
 
-export function buildDbSiteSnapshotArtifact({ generatedAt = new Date().toISOString(), rows, requiredChains = DEFAULT_REQUIRED_SNAPSHOT_CHAINS, requiredStoreExternalRefs = [], requiredProductSlugs = [], requiredPriceTypes = [], requiredCategorySlugs = [], maxObservedAgeHours }) {
+export function buildDbSiteSnapshotArtifact({ generatedAt = new Date().toISOString(), rows, trendingPriceChanges = [], requiredChains = DEFAULT_REQUIRED_SNAPSHOT_CHAINS, requiredStoreExternalRefs = [], requiredProductSlugs = [], requiredPriceTypes = [], requiredCategorySlugs = [], maxObservedAgeHours }) {
   if (!Array.isArray(rows) || rows.length === 0) throw new Error('No latest price rows available for DB-to-site snapshot export.');
 
   const priceRows = rows.map((row) => ({
@@ -182,7 +182,8 @@ export function buildDbSiteSnapshotArtifact({ generatedAt = new Date().toISOStri
         staleObservationIds
       })
     },
-    priceRows
+    priceRows,
+    trendingPriceChanges
   };
 }
 
@@ -609,6 +610,19 @@ export function renderDbSiteIngestedOverridesModule({ generatedAt, rows }) {
   ].join('\n');
 }
 
+export function renderDbSiteTrendingPriceChangesModule({ generatedAt, trendingPriceChanges = [] }) {
+  return [
+    '// AUTO-GENERATED from postgres.trending_price_changes by scripts/ingestion/export-db-site-snapshot.mjs.',
+    `// Generated at: ${generatedAt}`,
+    `// Trending price-change row count: ${trendingPriceChanges.length}`,
+    "import type { TrendingProductPriceChange } from '@groceryview/db';",
+    '',
+    `export const dbSiteTrendingPriceChangesGeneratedAt = ${JSON.stringify(generatedAt)};`,
+    `export const dbSiteHomepageTrendingPriceChanges: TrendingProductPriceChange[] = ${JSON.stringify(trendingPriceChanges, null, 2)};`,
+    ''
+  ].join('\n');
+}
+
 function writeTextFile(path, text) {
   mkdirSync(dirname(path), { recursive: true });
   writeFileSync(path, text);
@@ -643,6 +657,7 @@ export function validateDbSiteSnapshotCacheArtifact({ artifact, cacheTtlSeconds,
   if (!artifact || typeof artifact !== 'object' || Array.isArray(artifact)) return false;
   if (artifact.status !== 'passed') return false;
   if (!Array.isArray(artifact.priceRows) || artifact.priceRows.length === 0) return false;
+  if (artifact.trendingPriceChanges !== undefined && !Array.isArray(artifact.trendingPriceChanges)) return false;
   const coverage = artifact.coverage;
   if (!coverage || typeof coverage !== 'object' || Array.isArray(coverage)) return false;
   if (typeof coverage.observations !== 'number' || coverage.observations < 1) return false;
@@ -667,19 +682,26 @@ export function validateDbSiteSnapshotCacheArtifact({ artifact, cacheTtlSeconds,
   return true;
 }
 
-export function readFreshDbSiteSnapshotCache({ outputPath, modulePath, chainObservationsModulePath, ingestedOverridesModulePath, cacheTtlSeconds, maxObservedAgeHours }) {
+export function readFreshDbSiteSnapshotCache({ outputPath, modulePath, chainObservationsModulePath, ingestedOverridesModulePath, trendingPriceChangesModulePath, cacheTtlSeconds, maxObservedAgeHours }) {
   if (cacheTtlSeconds === undefined || !outputPath) return undefined;
-  const requestedOutputPaths = [outputPath, modulePath, chainObservationsModulePath, ingestedOverridesModulePath].filter(Boolean);
+  const requestedOutputPaths = [outputPath, modulePath, chainObservationsModulePath, ingestedOverridesModulePath, trendingPriceChangesModulePath].filter(Boolean);
   if (requestedOutputPaths.some((path) => !pathExists(path))) return undefined;
   const artifact = JSON.parse(readFileSync(outputPath, 'utf8'));
   return validateDbSiteSnapshotCacheArtifact({ artifact, cacheTtlSeconds, maxObservedAgeHours }) ? artifact : undefined;
 }
 
-function writeDbSiteSnapshotOutputs({ artifact, outputPath, modulePath, chainObservationsModulePath, ingestedOverridesModulePath }) {
+function writeDbSiteSnapshotOutputs({ artifact, outputPath, modulePath, chainObservationsModulePath, ingestedOverridesModulePath, trendingPriceChangesModulePath }) {
   if (outputPath) writeTextFile(outputPath, `${JSON.stringify(artifact, null, 2)}\n`);
   if (modulePath) writeTextFile(modulePath, renderDbSiteProductsModule({ generatedAt: artifact.generatedAt, rows: artifact.priceRows }));
   if (chainObservationsModulePath) writeTextFile(chainObservationsModulePath, renderDbSiteChainObservationsModule({ generatedAt: artifact.generatedAt, rows: artifact.priceRows }));
   if (ingestedOverridesModulePath) writeTextFile(ingestedOverridesModulePath, renderDbSiteIngestedOverridesModule({ generatedAt: artifact.generatedAt, rows: artifact.priceRows }));
+  if (trendingPriceChangesModulePath) writeTextFile(trendingPriceChangesModulePath, renderDbSiteTrendingPriceChangesModule({ generatedAt: artifact.generatedAt, trendingPriceChanges: artifact.trendingPriceChanges ?? [] }));
+}
+
+function isoDaysBefore(value, days) {
+  const ms = Date.parse(value);
+  if (!Number.isFinite(ms)) throw new Error(`Invalid timestamp for DB-to-site snapshot export: ${value}`);
+  return new Date(ms - days * 24 * 60 * 60 * 1000).toISOString();
 }
 
 async function exportDbSiteSnapshotFromEnv(env = process.env) {
@@ -689,7 +711,8 @@ async function exportDbSiteSnapshotFromEnv(env = process.env) {
   const modulePath = env.GROCERYVIEW_DB_SITE_SNAPSHOT_MODULE_PATH?.trim();
   const chainObservationsModulePath = env.GROCERYVIEW_DB_SITE_SNAPSHOT_CHAIN_OBSERVATIONS_MODULE_PATH?.trim();
   const ingestedOverridesModulePath = env.GROCERYVIEW_DB_SITE_SNAPSHOT_INGESTED_OVERRIDES_MODULE_PATH?.trim();
-  if (!outputPath && !modulePath && !chainObservationsModulePath && !ingestedOverridesModulePath) throw new Error('GROCERYVIEW_DB_SITE_SNAPSHOT_PATH, GROCERYVIEW_DB_SITE_SNAPSHOT_MODULE_PATH, GROCERYVIEW_DB_SITE_SNAPSHOT_CHAIN_OBSERVATIONS_MODULE_PATH, or GROCERYVIEW_DB_SITE_SNAPSHOT_INGESTED_OVERRIDES_MODULE_PATH is required for DB-to-site snapshot export.');
+  const trendingPriceChangesModulePath = env.GROCERYVIEW_DB_SITE_SNAPSHOT_TRENDING_MODULE_PATH?.trim();
+  if (!outputPath && !modulePath && !chainObservationsModulePath && !ingestedOverridesModulePath && !trendingPriceChangesModulePath) throw new Error('GROCERYVIEW_DB_SITE_SNAPSHOT_PATH, GROCERYVIEW_DB_SITE_SNAPSHOT_MODULE_PATH, GROCERYVIEW_DB_SITE_SNAPSHOT_CHAIN_OBSERVATIONS_MODULE_PATH, GROCERYVIEW_DB_SITE_SNAPSHOT_INGESTED_OVERRIDES_MODULE_PATH, or GROCERYVIEW_DB_SITE_SNAPSHOT_TRENDING_MODULE_PATH is required for DB-to-site snapshot export.');
   const minConfidence = env.GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE ? Number(env.GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE) : undefined;
   const limit = env.GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT ? Number(env.GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT) : undefined;
   if (minConfidence !== undefined && !Number.isFinite(minConfidence)) throw new Error('GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE must be a number.');
@@ -705,22 +728,28 @@ async function exportDbSiteSnapshotFromEnv(env = process.env) {
   const requiredPriceTypes = parseRequiredPriceTypesFromCatalogTargets(requiredStoreTargetsJson);
   const requiredCategorySlugs = parseRequiredCategorySlugsFromCatalogTargets(requiredStoreTargetsJson);
 
-  const cachedArtifact = readFreshDbSiteSnapshotCache({ outputPath, modulePath, chainObservationsModulePath, ingestedOverridesModulePath, cacheTtlSeconds, maxObservedAgeHours });
+  const cachedArtifact = readFreshDbSiteSnapshotCache({ outputPath, modulePath, chainObservationsModulePath, ingestedOverridesModulePath, trendingPriceChangesModulePath, cacheTtlSeconds, maxObservedAgeHours });
   if (cachedArtifact) {
-    writeDbSiteSnapshotOutputs({ artifact: cachedArtifact, outputPath, modulePath, chainObservationsModulePath, ingestedOverridesModulePath });
+    writeDbSiteSnapshotOutputs({ artifact: cachedArtifact, outputPath, modulePath, chainObservationsModulePath, ingestedOverridesModulePath, trendingPriceChangesModulePath });
     return cachedArtifact;
   }
 
-  const [{ createPgQueryExecutor, createPostgresSiteSnapshotReader }, pg] = await Promise.all([
+  const [{ createPgQueryExecutor, createPostgresSiteSnapshotReader, createPostgresTrendingPriceChangeReader }, pg] = await Promise.all([
     import('@groceryview/db'),
     import('pg')
   ]);
   const pool = new pg.Pool({ connectionString: databaseUrl, max: 1 });
   try {
-    const reader = createPostgresSiteSnapshotReader(createPgQueryExecutor(pool));
-    const rows = await reader.listLatestPriceSnapshotRows({ minConfidence, limit });
-    const artifact = buildDbSiteSnapshotArtifact({ rows, requiredChains, requiredStoreExternalRefs, requiredProductSlugs, requiredPriceTypes, requiredCategorySlugs, maxObservedAgeHours });
-    writeDbSiteSnapshotOutputs({ artifact, outputPath, modulePath, chainObservationsModulePath, ingestedOverridesModulePath });
+    const generatedAt = new Date().toISOString();
+    const executor = createPgQueryExecutor(pool);
+    const reader = createPostgresSiteSnapshotReader(executor);
+    const trendingReader = createPostgresTrendingPriceChangeReader(executor);
+    const [rows, trendingPriceChanges] = await Promise.all([
+      reader.listLatestPriceSnapshotRows({ minConfidence, limit }),
+      trendingReader.listTrendingPriceChanges({ since: isoDaysBefore(generatedAt, 7), until: generatedAt, limit: 10 })
+    ]);
+    const artifact = buildDbSiteSnapshotArtifact({ generatedAt, rows, trendingPriceChanges, requiredChains, requiredStoreExternalRefs, requiredProductSlugs, requiredPriceTypes, requiredCategorySlugs, maxObservedAgeHours });
+    writeDbSiteSnapshotOutputs({ artifact, outputPath, modulePath, chainObservationsModulePath, ingestedOverridesModulePath, trendingPriceChangesModulePath });
     return artifact;
   } finally {
     await pool.end();
@@ -736,7 +765,8 @@ if (import.meta.url === new URL(process.argv[1], 'file:').href) {
         outputPath: process.env.GROCERYVIEW_DB_SITE_SNAPSHOT_PATH,
         modulePath: process.env.GROCERYVIEW_DB_SITE_SNAPSHOT_MODULE_PATH,
         chainObservationsModulePath: process.env.GROCERYVIEW_DB_SITE_SNAPSHOT_CHAIN_OBSERVATIONS_MODULE_PATH,
-        ingestedOverridesModulePath: process.env.GROCERYVIEW_DB_SITE_SNAPSHOT_INGESTED_OVERRIDES_MODULE_PATH
+        ingestedOverridesModulePath: process.env.GROCERYVIEW_DB_SITE_SNAPSHOT_INGESTED_OVERRIDES_MODULE_PATH,
+        trendingPriceChangesModulePath: process.env.GROCERYVIEW_DB_SITE_SNAPSHOT_TRENDING_MODULE_PATH
       }, null, 2)}\n`);
     })
     .catch((error) => {

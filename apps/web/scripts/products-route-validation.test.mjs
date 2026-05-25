@@ -9,6 +9,7 @@ async function loadProductsRoute() {
     .replace("import { createPgQueryExecutor, searchProductsByText, type ProductSearchResult } from '@groceryview/db';", 'const createPgQueryExecutor = () => ({}); const searchProductsByText = async () => [];')
     .replace("import { NextResponse } from 'next/server';", 'const NextResponse = { json: (body, init) => Response.json(body, init) };')
     .replace("import { z } from 'zod';", '')
+    .replace("import { expandGrocerySearchQuery } from '@/lib/search-suggest';", 'const expandGrocerySearchQuery = (query) => ({ query, expandedQueries: query ? [query] : [], matchedAliases: [], matchedSynonyms: [] });')
     .replace(/type PgPoolLike = \{[\s\S]*?\};\n\n/, '')
     .replace(/type PgModuleLike = \{[\s\S]*?\};\n\n/, '')
     .replace(/let cachedDatabaseUrl: string \| null = null;/, 'let cachedDatabaseUrl = null;')
@@ -19,7 +20,10 @@ async function loadProductsRoute() {
     .replace(/ as \(specifier: string\) => Promise<unknown>/g, '')
     .replace(/ as Partial<PgModuleLike>/g, '')
     .replace(/ as Record<string, unknown>/g, '')
-    .replace(/function responsePayload\(query: string, results: ProductSearchResult\[], error\?: string\)/, 'function responsePayload(query, results, error)')
+    .replace(/new Map<string, ProductSearchResult>\(\)/g, 'new Map()')
+    .replace(/: ProductSearchResult\[\]\[\]/g, '')
+    .replace(/: ProductSearchResult\[\]/g, '')
+    .replace(/function responsePayload\(query: string, results, expansion = expandGrocerySearchQuery\(query\), error\?: string\)/, 'function responsePayload(query, results, expansion = expandGrocerySearchQuery(query), error)')
     .replace('export async function GET(request)', 'async function GET(request)')
     .replace(/export const /g, 'const ');
 
@@ -33,8 +37,11 @@ test('products route validation accepts q-only searches and rejects unexpected q
   assert.equal(accepted.status, 200);
   assert.deepEqual(await accepted.json(), {
     query: 'a',
+    expandedQueries: ['a'],
+    matchedAliases: [],
+    matchedSynonyms: [],
     results: [],
-    source: 'postgres.products_tsvector'
+    source: 'postgres.products_tsvector_alias_synonym_expansion'
   });
 
   const rejected = await GET(new Request('https://groceryview.test/api/products?q=a&limit=8'));

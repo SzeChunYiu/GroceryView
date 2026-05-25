@@ -122,6 +122,35 @@ describe('buildPriceChartSeries', () => {
     ]);
     assert.equal(result.series[0].markers[0].sourceType, 'receipt');
   });
+
+  it('emits explicit price-change markers for factual move notes', () => {
+    const result = buildPriceChartSeries({
+      observations: [
+        {
+          storeId: 'openprices-community',
+          storeName: 'OpenPrices community',
+          observedAt: '2026-05-01T00:00:00.000Z',
+          price: 22,
+          sourceType: 'online',
+          confidence: 0.9,
+          provenanceLabel: 'OpenPrices observation'
+        },
+        {
+          storeId: 'openprices-community',
+          storeName: 'OpenPrices community',
+          observedAt: '2026-05-02T00:00:00.000Z',
+          price: 19,
+          sourceType: 'online',
+          confidence: 0.9,
+          markerType: 'price_change',
+          markerLabel: 'Move 13.6%',
+          provenanceLabel: 'OpenPrices observation · chartMarkerKey openprices-community:2026-05-02'
+        }
+      ]
+    });
+
+    assert.ok(result.series[0].markers.some((marker) => marker.type === 'price_change' && marker.text === 'Move 13.6%'));
+  });
 });
 
 describe('priceChartLineStyle', () => {

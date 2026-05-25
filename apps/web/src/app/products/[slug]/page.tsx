@@ -22,6 +22,7 @@ import { PriceIntelligenceCard, type PriceIntelligenceScoreCard } from '@/compon
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
+import { buildShortTermPriceForecast } from '@/lib/price-intelligence';
 import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { normalizeUnitPriceForPackageText, packageEvidenceFromText } from '@/lib/normalization';
@@ -718,6 +719,8 @@ function priceChangeEventLogFor(product: NonNullable<ReturnType<typeof findProdu
         toPriceLabel: formatSek(point.price),
         changeValueLabel: formatSek(absoluteDelta),
         changePercentLabel: formatPct(changePercent),
+        chartMarkerKey: `openprices-community:${point.observedAt}`,
+        chartMarkerLabel: `Move ${formatPct(changePercent)}`,
         sentence: `Price ${direction} ${formatPct(changePercent)} on ${point.observedAt} from ${formatSek(previous.price)} to ${formatSek(point.price)}.`
       };
     })
@@ -837,10 +840,12 @@ function priceMoveNotesFor(product: NonNullable<ReturnType<typeof findProduct>>)
   const priceMoveNotes = priceChangeLog.priceChangeEvents.slice(0, 4).map((event) => ({
     eventKey: `${event.previousObservedAt}-${event.observedAt}-${event.toPriceLabel}`,
     headline: `Why this price moved: observed ${event.direction} ${event.changePercentLabel}`,
+    chartMarkerKey: event.chartMarkerKey,
+    chartMarkerLabel: event.chartMarkerLabel,
     sourceProvenance,
     confidenceLabel,
     guardrail,
-    note: `Consecutive OpenPrices rows moved from ${event.fromPriceLabel} on ${event.previousObservedAt} to ${event.toPriceLabel} on ${event.observedAt}. This explains only the observed delta; no promotion or seasonality claim is made without explicit source evidence.`
+    note: `Consecutive OpenPrices rows moved from ${event.fromPriceLabel} on ${event.previousObservedAt} to ${event.toPriceLabel} on ${event.observedAt}. This note is linked to the ${event.chartMarkerLabel} chart marker for ${event.observedAt}; no promotion or seasonality claim is made without explicit source evidence.`
   }));
 
   return {
@@ -1126,15 +1131,43 @@ function priceChartTerminalFor(product: NonNullable<ReturnType<typeof findProduc
   const sampleNormalizedPrice = normalizeUnitPriceForPackageText(product.priceMedian, packageText);
   const comparableUnit = sampleNormalizedPrice?.comparableUnit;
   const formatTrendValue = (value: number) => comparableUnit ? formatComparableUnitPrice(value, comparableUnit) : formatSek(value);
-  const observations = product.observations.map((observation) => ({
-    observedAt: `${observation.date}T00:00:00.000Z`,
-    price: normalizeUnitPriceForPackageText(observation.price, packageText)?.value ?? observation.price,
-    storeId: 'openprices-community',
-    storeName: 'OpenPrices community',
-    sourceType: 'online' as const,
-    confidence: sourceConfidence,
-    provenanceLabel: `${product.observationCount} OpenPrices observations · ${product.code}${comparableUnit ? ` · normalized to ${comparableUnit}` : ''}`
-  }));
+  const priceChangeLog = priceChangeEventLogFor(product);
+  const priceChangeMarkersByDate = new Map(
+    priceChangeLog.priceChangeEvents.map((event) => [event.observedAt, event])
+  );
+  const observations = product.observations.map((observation) => {
+    const priceChangeMarker = priceChangeMarkersByDate.get(observation.date);
+    return {
+      observedAt: `${observation.date}T00:00:00.000Z`,
+      price: normalizeUnitPriceForPackageText(observation.price, packageText)?.value ?? observation.price,
+      storeId: 'openprices-community',
+      storeName: 'OpenPrices community',
+      sourceType: 'online' as const,
+      confidence: sourceConfidence,
+      provenanceLabel: `${product.observationCount} OpenPrices observations · ${product.code}${comparableUnit ? ` · normalized to ${comparableUnit}` : ''}${priceChangeMarker ? ` · chartMarkerKey ${priceChangeMarker.chartMarkerKey}` : ''}`,
+      ...(priceChangeMarker ? {
+        markerType: 'price_change' as const,
+        markerLabel: priceChangeMarker.chartMarkerLabel
+      } : {})
+    };
+  });
+  const shortTermForecast = buildShortTermPriceForecast({
+    observations: observations.map((observation) => ({
+      observedAt: observation.observedAt,
+      price: observation.price
+    })),
+    horizonDays: 14
+  });
+  const forecastTerminalModel = {
+    available: shortTermForecast.available,
+    title: 'Short-term price forecast band',
+    horizonLabel: shortTermForecast.available ? `next ${shortTermForecast.horizonDays} days` : 'forecast withheld',
+    summary: shortTermForecast.available && shortTermForecast.points.length > 0
+      ? `${shortTermForecast.trendLabel}; projected band ${formatTrendValue(shortTermForecast.points.at(-1)!.lowerBound)}–${formatTrendValue(shortTermForecast.points.at(-1)!.upperBound)}.`
+      : shortTermForecast.summary,
+    caveat: shortTermForecast.caveat,
+    points: shortTermForecast.points
+  };
 
   const windows = timeframeWindows.map((window): PriceChartTerminalWindow => {
     const result = buildPriceChartSeries({
@@ -1158,7 +1191,8 @@ function priceChartTerminalFor(product: NonNullable<ReturnType<typeof findProduc
       latestObservedAt: latestPoint?.time,
       lowValueLabel: values.length ? formatTrendValue(Math.min(...values)) : 'Not reported',
       highValueLabel: values.length ? formatTrendValue(Math.max(...values)) : 'Not reported',
-      series: result.series
+      series: result.series,
+      forecast: forecastTerminalModel
     };
   });
 
@@ -1168,8 +1202,8 @@ function priceChartTerminalFor(product: NonNullable<ReturnType<typeof findProduc
     sourceLabel: comparableUnit ? `buildPriceChartSeries · OpenPrices community observations · normalized unit price per ${comparableUnit}` : 'buildPriceChartSeries · OpenPrices community observations',
     confidenceLabel: `${formatPct(sourceConfidence * 100)} chart confidence`,
     caveat: comparableUnit
-      ? `Every plotted point comes from dated OpenPrices observations normalized by package size (${packageText}) to a unit price per ${comparableUnit}; missing shelf, flyer, and member prices are disclosed instead of inferred.`
-      : 'Every plotted point comes from dated OpenPrices observations; missing shelf, flyer, and member prices are disclosed instead of inferred.',
+      ? `Every plotted point comes from dated OpenPrices observations normalized by package size (${packageText}) to a unit price per ${comparableUnit}; missing shelf, flyer, and member prices are disclosed instead of inferred. The forecast band uses only recent observed price-event trends.`
+      : 'Every plotted point comes from dated OpenPrices observations; missing shelf, flyer, and member prices are disclosed instead of inferred. The forecast band uses only recent observed price-event trends.',
     defaultWindow: windows.find((window) => window.label === '1Y' && window.pointCount > 0)?.label ?? 'ALL',
     windows
   };
@@ -1575,6 +1609,9 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-800">{note.confidenceLabel}</p>
                 <h3 className="mt-2 text-lg font-black text-slate-950">{note.headline}</h3>
                 <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{note.note}</p>
+                <p className="mt-3 rounded-xl bg-rose-50 p-3 text-xs font-black uppercase tracking-[0.16em] text-rose-900" data-price-move-chart-marker={note.chartMarkerKey}>
+                  linked chart marker {note.chartMarkerLabel} · {note.chartMarkerKey}
+                </p>
                 <p className="mt-3 text-xs font-black uppercase tracking-[0.16em] text-slate-500">sourceProvenance {note.sourceProvenance}</p>
                 <p className="mt-2 text-xs font-semibold text-slate-500">{note.guardrail}</p>
               </div>

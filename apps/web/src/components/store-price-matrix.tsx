@@ -1,4 +1,15 @@
+'use client';
+
 import Link from 'next/link';
+import { useState } from 'react';
+import type { ChainPriceComparisonMode, ChainPriceModeQuote } from '@/lib/chain-compare';
+
+const chainPriceMatrixModes: Array<{ id: ChainPriceComparisonMode; label: string; guardrail: string }> = [
+  { id: 'regular', label: 'Regular', guardrail: 'Public shelf/catalogue price.' },
+  { id: 'member', label: 'Member', guardrail: 'Requires signed-in loyalty eligibility before a member price can be counted.' },
+  { id: 'coupon', label: 'Coupon', guardrail: 'Requires an account-bound clipped coupon before savings can be counted.' },
+  { id: 'stacked', label: 'Stacked', guardrail: 'Requires both eligible member price and clipped coupon evidence.' }
+];
 
 export type StorePriceMatrixChain = {
   id: string;
@@ -8,6 +19,7 @@ export type StorePriceMatrixChain = {
 type StorePriceMatrixCell = {
   chainId: string;
   priceText?: string;
+  priceModes?: ChainPriceModeQuote[];
   productName?: string | null;
   productSlug?: string | null;
   status: string;
@@ -35,7 +47,12 @@ function formatStoreUnit(cell: StorePriceMatrixCell | undefined) {
   return cell.unitLabel || 'Unit not reported';
 }
 
+function selectedQuote(cell: StorePriceMatrixCell | undefined, mode: ChainPriceComparisonMode) {
+  return cell?.priceModes?.find((quote) => quote.mode === mode) ?? null;
+}
+
 export function StorePriceMatrix({ chains, products }: StorePriceMatrixProps) {
+  const [comparisonMode, setComparisonMode] = useState<ChainPriceComparisonMode>('regular');
   if (products.length === 0) {
     return null;
   }
@@ -48,6 +65,20 @@ export function StorePriceMatrix({ chains, products }: StorePriceMatrixProps) {
         <p className="mt-1 text-xs font-semibold leading-5 text-slate-600">
           Prices are shown side by side with the comparable unit label so shoppers can compare normalized store prices without opening each store detail page.
         </p>
+        <div className="mt-3 flex flex-wrap gap-2" aria-label="Chain price comparison mode">
+          {chainPriceMatrixModes.map((mode) => (
+            <button
+              aria-pressed={comparisonMode === mode.id}
+              className={`rounded-full px-3 py-2 text-xs font-black ${comparisonMode === mode.id ? 'bg-emerald-900 text-white' : 'bg-emerald-50 text-emerald-900 hover:bg-emerald-100'}`}
+              key={mode.id}
+              onClick={() => setComparisonMode(mode.id)}
+              title={mode.guardrail}
+              type="button"
+            >
+              {mode.label}
+            </button>
+          ))}
+        </div>
       </div>
       <div className="overflow-x-auto">
         <table className="min-w-full border-collapse text-left text-sm">
@@ -69,10 +100,15 @@ export function StorePriceMatrix({ chains, products }: StorePriceMatrixProps) {
                 </th>
                 {chains.map((chain) => {
                   const cell = product.cells.find((item) => item.chainId === chain.id);
+                  const quote = selectedQuote(cell, comparisonMode);
+                  const cellStatus = quote?.status ?? cell?.status;
                   return (
                     <td className="min-w-48 px-4 py-4" key={`${product.productSlug}-${chain.id}`}>
-                      <p className={cell?.status === 'priced' ? 'font-black text-emerald-900' : 'font-black text-slate-400'}>{cell?.priceText ?? 'Missing'}</p>
+                      <p className={cellStatus === 'priced' ? 'font-black text-emerald-900' : cellStatus === 'account_required' ? 'font-black text-amber-900' : 'font-black text-slate-400'}>{quote?.priceText ?? cell?.priceText ?? 'Missing'}</p>
                       <p className="mt-1 text-xs font-semibold text-slate-500">{formatStoreUnit(cell)}</p>
+                      {quote?.guardrail ? (
+                        <p className="mt-1 text-xs font-semibold leading-5 text-slate-500">{quote.guardrail}</p>
+                      ) : null}
                       {cell?.productSlug ? (
                         <Link className="mt-2 block text-xs font-black text-emerald-800 underline decoration-emerald-300 underline-offset-4" href={`/products/${cell.productSlug}`}>
                           {cell.productName ?? cell.productSlug}

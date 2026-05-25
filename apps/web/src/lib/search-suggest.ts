@@ -1,7 +1,17 @@
+import { semanticSynonymsForQuery } from './search-synonyms';
+
 export type GrocerySearchExpansion = {
   query: string;
   expandedQueries: string[];
   matchedAliases: string[];
+  matchedSynonyms: string[];
+};
+
+export type GrocerySearchExpansionTelemetry = {
+  cacheHit: boolean;
+  cacheHitRate: number;
+  cacheHits: number;
+  cacheRequests: number;
 };
 
 const groceryAliasEntries: Array<{ canonical: string; aliases: string[] }> = [
@@ -38,12 +48,35 @@ function addUnique(values: string[], value: string): void {
   if (!values.some((existing) => normalizeAliasText(existing) === normalized)) values.push(value);
 }
 
-export function expandGrocerySearchQuery(query: string, maxQueries = 5): GrocerySearchExpansion {
+const expansionCache = new Map<string, GrocerySearchExpansion>();
+let expansionCacheRequests = 0;
+let expansionCacheHits = 0;
+
+function cloneExpansion(expansion: GrocerySearchExpansion): GrocerySearchExpansion {
+  return {
+    query: expansion.query,
+    expandedQueries: [...expansion.expandedQueries],
+    matchedAliases: [...expansion.matchedAliases],
+    matchedSynonyms: [...expansion.matchedSynonyms]
+  };
+}
+
+function expansionTelemetry(cacheHit: boolean): GrocerySearchExpansionTelemetry {
+  return {
+    cacheHit,
+    cacheHitRate: expansionCacheRequests === 0 ? 0 : expansionCacheHits / expansionCacheRequests,
+    cacheHits: expansionCacheHits,
+    cacheRequests: expansionCacheRequests
+  };
+}
+
+function buildGrocerySearchExpansion(query: string, maxQueries: number): GrocerySearchExpansion {
   const trimmed = query.trim().replace(/\s+/g, ' ');
   const normalizedQuery = normalizeAliasText(trimmed);
   const tokens = new Set(normalizedQuery.split(' ').filter(Boolean));
   const expandedQueries: string[] = [];
   const matchedAliases: string[] = [];
+  const matchedSynonyms: string[] = [];
   addUnique(expandedQueries, trimmed);
 
   for (const entry of groceryAliasEntries) {
@@ -58,9 +91,41 @@ export function expandGrocerySearchQuery(query: string, maxQueries = 5): Grocery
     }
   }
 
+  for (const synonym of semanticSynonymsForQuery(trimmed)) {
+    addUnique(matchedSynonyms, synonym.matchedTerm);
+    addUnique(expandedQueries, synonym.canonical);
+    for (const synonymTerm of synonym.terms) addUnique(expandedQueries, synonymTerm);
+  }
+
   return {
     query: trimmed,
     expandedQueries: expandedQueries.slice(0, maxQueries),
-    matchedAliases
+    matchedAliases,
+    matchedSynonyms
   };
+}
+
+export function expandGrocerySearchQueryWithTelemetry(query: string, maxQueries = 5) {
+  expansionCacheRequests += 1;
+  const cacheKey = `${maxQueries}:${query.trim().replace(/\s+/g, ' ')}`;
+  const cached = expansionCache.get(cacheKey);
+  if (cached) {
+    expansionCacheHits += 1;
+    return {
+      expansion: cloneExpansion(cached),
+      telemetry: expansionTelemetry(true)
+    };
+  }
+
+  const expansion = buildGrocerySearchExpansion(query, maxQueries);
+  expansionCache.set(cacheKey, cloneExpansion(expansion));
+
+  return {
+    expansion,
+    telemetry: expansionTelemetry(false)
+  };
+}
+
+export function expandGrocerySearchQuery(query: string, maxQueries = 5): GrocerySearchExpansion {
+  return expandGrocerySearchQueryWithTelemetry(query, maxQueries).expansion;
 }

@@ -9,6 +9,22 @@ export type OsmStore = {
   source: 'osm'; retrievedDate: string;
 };
 
+export type StoreRouteChecklistItem = {
+  aisleLabel: string;
+  checked: boolean;
+  department: string;
+  id: string;
+  name: string;
+  quantity: string;
+};
+
+export type StoreRouteChecklist = {
+  progressLabel: string;
+  selectedStoreSlug: string;
+  stopOrder: string[];
+  items: StoreRouteChecklistItem[];
+};
+
 export const osmStores: OsmStore[] = [
   {
     "slug": "0024-narlivs-sweden-543923929",
@@ -71593,3 +71609,17 @@ export const osmStores: OsmStore[] = [
     "retrievedDate": "2026-05-22"
   }
 ];
+
+export const defaultStoreRouteChecklist: StoreRouteChecklist = {
+  selectedStoreSlug: 'coop-centralen-stockholm-2633893659',
+  progressLabel: '3 of 6 collected',
+  stopOrder: ['Produce', 'Breakfast', 'Dairy', 'Pantry', 'Frozen'],
+  items: [
+    { id: 'fresh-fruit', name: 'Fresh fruit', quantity: '1 basket', department: 'Produce', aisleLabel: 'Entrance produce bay', checked: true },
+    { id: 'oats-breakfast-staple', name: 'Oats', quantity: '1 bag', department: 'Breakfast', aisleLabel: 'Aisle 2', checked: true },
+    { id: 'milk-dairy-run', name: 'Milk or fil', quantity: '2 cartons', department: 'Dairy', aisleLabel: 'Aisle 4 cold case', checked: false },
+    { id: 'coffee-weekly-top-up', name: 'Coffee', quantity: '1 package', department: 'Pantry', aisleLabel: 'Aisle 6', checked: true },
+    { id: 'pasta-sauce', name: 'Pasta sauce', quantity: '1 jar', department: 'Pantry', aisleLabel: 'Aisle 6', checked: false },
+    { id: 'frozen-vegetables', name: 'Frozen vegetables', quantity: '1 bag', department: 'Frozen', aisleLabel: 'Freezer wall', checked: false }
+  ]
+};
