@@ -1798,6 +1798,16 @@ export const crowdPriceSubmissionContract = {
     'Require manual review when a reporter has more than 5 unresolved reports.',
     'Suspend reporting when rejected-report volume is high and acceptance ratio is below 20%.'
   ],
+  scoringPipeline: [
+    'Validate account-bound reporterId against the authenticated user header before accepting the report.',
+    'Require image photoEvidence, observedAt, store evidence, and exact SEK reportedPrice before scoring.',
+    'Run planCommunityReportAbuseControls and price outlier checks before enqueuing human_review_assignments.'
+  ],
+  outlierChecks: [
+    'Reports with fewer than two verified comparable prices stay in manual review.',
+    'Reports more than 50% away from comparable median prices are flagged as outliers.',
+    'Accepted reports can improve commodity coverage only after accept_community_report review writeback.'
+  ],
   guardrails: [
     'No anonymous price reports: shopper session and userId are required before any community report is accepted.',
     'Community price reports enter manual review before they can affect verified prices or loose commodity coverage.',
@@ -1805,7 +1815,7 @@ export const crowdPriceSubmissionContract = {
     'community_reporter_trust throttles, suspends, or requires manual review for risky reporters.'
   ],
   reviewWritebacks: ['accept_community_report', 'dismiss_community_report'],
-  nextRuntimeStep: 'Wire the protected runtime endpoint to persist community_report raw_records and enqueue human_review_assignments.'
+  nextRuntimeStep: 'Persist accepted /api/community-price-reports payloads to community_report raw_records and durable human_review_assignments.'
 };
 
 const tomatoCommodity = COMMODITIES.find((commodity) => commodity.slug === 'tomato') ?? COMMODITIES[0]!;

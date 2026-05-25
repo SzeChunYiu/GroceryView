@@ -79,6 +79,24 @@ export default function FeaturePage() {
               <li key={policy}>• {policy}</li>
             ))}
           </ul>
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
+            <div className="rounded-2xl bg-emerald-50 p-3">
+              <p className="font-black text-emerald-950">Scoring pipeline</p>
+              <ul className="mt-2 space-y-1">
+                {crowdPriceSubmissionContract.scoringPipeline.map((step) => (
+                  <li key={step}>• {step}</li>
+                ))}
+              </ul>
+            </div>
+            <div className="rounded-2xl bg-amber-50 p-3">
+              <p className="font-black text-amber-950">Outlier checks</p>
+              <ul className="mt-2 space-y-1">
+                {crowdPriceSubmissionContract.outlierChecks.map((check) => (
+                  <li key={check}>• {check}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
           <p className="mt-3 font-semibold text-slate-800">Next runtime step: {crowdPriceSubmissionContract.nextRuntimeStep}</p>
         </div>
       </Card>
