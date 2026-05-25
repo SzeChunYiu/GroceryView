@@ -13,21 +13,31 @@ import { routeMetadata } from '@/lib/seo';
 import { recentRoutePerformanceBudgetReports } from '@/lib/telemetry';
 
 export function generateMetadata() {
+  const pricedLineCount = personalGroceryInflation.itemContributions.length;
+  const inflationLabel = formatPercent(personalGroceryInflation.inflationPercent);
+  const title = `Savings dashboard: ${inflationLabel} basket inflation | GroceryView`;
+  const description = `Track ${pricedLineCount} priced basket lines from ${personalGroceryInflation.baseDate} to ${personalGroceryInflation.currentDate}, with ${personalGroceryInflation.confidence} confidence and real grocery budget drivers.`;
   const metadata = routeMetadata({
     path: '/savings-dashboard',
-    title: 'Personal grocery inflation dashboard | GroceryView',
-    description: 'Track grocery inflation, fixed-income budgets, weekly student budgets, and staples price stability from real core summaries.',
+    title,
+    description,
     imagePath: '/pwa-icon.svg',
-    imageAlt: 'GroceryView savings dashboard preview'
+    imageAlt: `Savings dashboard preview: ${inflationLabel} inflation across ${pricedLineCount} priced lines`
   });
   const openGraph = metadata.openGraph;
 
   return {
     ...metadata,
+    openGraph: {
+      ...(openGraph ?? {}),
+      title,
+      description,
+      images: openGraph?.images
+    },
     twitter: {
       card: 'summary_large_image',
-      title: openGraph?.title ?? metadata.title,
-      description: openGraph?.description ?? metadata.description,
+      title,
+      description,
       images: openGraph?.images
     }
   };
