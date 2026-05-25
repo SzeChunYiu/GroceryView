@@ -87,7 +87,7 @@ import {
   fetchObIsFuelPrices,
   OB_IS_FUEL_PRICES_URL,
   type ObIsFuelPriceObservation
-} from './connectors/ob-is-fuel.js';
+} from './connectors/ob-is.js';
 import {
   fetchSevenElevenSeConvenienceProducts,
   type SevenElevenSeProduct
@@ -138,7 +138,7 @@ export * from './connectors/bonus-is.js';
 export * from './connectors/atlantsolia-is.js';
 export * from './connectors/apoteket-se.js';
 export * from './connectors/okq8-fuel.js';
-export * from './connectors/ob-is-fuel.js';
+export * from './connectors/ob-is.js';
 export * from './connectors/seven-eleven-se.js';
 export * from './connectors/st1-fuel.js';
 export * from './connectors/willys.js';
@@ -2099,6 +2099,11 @@ function obIsFuelPriceToDailyItem(row: ObIsFuelPriceObservation): RetailerConnec
     validFrom: row.effectiveFrom,
     sourceUrl: row.sourceUrl
   };
+}
+
+function fuelOperatorNameForChain(chainId: string): string {
+  if (chainId === 'ob-is') return 'ÓB';
+  return chainId.toUpperCase();
 }
 
 function sevenElevenSeProductToDailyItem(row: SevenElevenSeProduct): RetailerConnectorParsedProduct {
@@ -4422,7 +4427,7 @@ async function persistDailyConnectorOutput(input: {
       [
         'operator_public_price_page',
         normalizeDailySlug(config.chainId),
-        config.chainId.toUpperCase(),
+        fuelOperatorNameForChain(config.chainId),
         config.endpointUrl,
         config.parserVersion,
         config.requestedAt ?? result.plan.provenance.capturedAt,
