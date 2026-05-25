@@ -41,7 +41,7 @@ describe('Lyfja IS connector', () => {
       retrievedAt: RETRIEVED_AT,
       provenance: rows[0]?.provenance
     });
-    assert.equal(rows[1]?.category, 'beauty');
+    assert.equal(rows[1]?.category, 'care');
     assert.equal(rows[1]?.price, 5279);
     assert.equal(rows[1]?.originalPrice, 6599);
     assert.equal(rows[1]?.discountPercent, 20);

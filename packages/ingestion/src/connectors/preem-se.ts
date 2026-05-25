@@ -132,7 +132,8 @@ export function parsePreemSeBusinessListPrices(input: {
   const digest = contentDigest(input.html);
   const rows: PreemSeFuelObservation[] = [];
   for (const section of SECTION_PATTERNS) {
-    const scoped = sectionText(text, section.title, section.stop);
+    const scoped = sectionText(text, section.title, section.stop)
+      .replace(/\b(?:Diesel|Bensin|Alternativa drivmedel|Övrigt|Etanol|Eldningsolja|Laddningstyp)\s+Pris\s+(?:inkl|exkl)\. moms\s+Gäller fr\.om\s+/gi, ' ');
     const rowPattern = /(?:Diesel|Bensin|Alternativa drivmedel|Övrigt|Etanol|Eldningsolja|Laddningstyp)\s+(.+?)\s+Pris\s+(inkl|exkl)\. moms\s+([0-9][0-9\s]*(?:[,.][0-9]{1,2})?)\s+(kr\/(?:l|kg|m3|Nm3|kWh))\s+Gäller fr\.om\s+(\d{4}-\d{2}-\d{2})/gi;
     for (const match of scoped.matchAll(rowPattern)) {
       const productName = match[1]!.trim();

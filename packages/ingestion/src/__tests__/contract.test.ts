@@ -31,7 +31,7 @@ describe('ingest row contract', () => {
   });
 
   it('uses the parsed IngestRow shape at the ingestion boundary', () => {
-    const plan = planIngestionBatch([{ ...validRow, originCountry: 'se' }]);
+    const plan = planIngestionBatch([{ ...validRow, originCountry: 'se' } as RetailerProductInput]);
 
     assert.equal(plan.rejected.length, 0);
     assert.equal(plan.accepted[0]?.product.originCountry, 'SE');

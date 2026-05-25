@@ -78,7 +78,7 @@ export function parseCircleKNoRows(input: {
   const fuelText = textFromHtml(input.fuelPricesHtml);
   const foodText = textFromHtml(input.foodHtml);
   const drinkText = textFromHtml(input.drinkHtml);
-  if (/captcha|access denied|cloudflare|logg inn/i.test(`${fuelText} ${foodText} ${drinkText}`)) {
+  if (/captcha|access denied|cloudflare/i.test(`${fuelText} ${foodText} ${drinkText}`)) {
     throw new Error('Circle K NO source returned a blocked/login page.');
   }
 

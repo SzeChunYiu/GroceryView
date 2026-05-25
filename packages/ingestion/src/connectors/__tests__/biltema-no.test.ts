@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
 import { parseBiltemaNoProducts } from '../biltema-no.js';
 
 describe('Biltema NO connector', () => {
@@ -26,8 +27,19 @@ describe('Biltema NO connector', () => {
       </script>
     `, 'https://www.biltema.no/hjem/', '2026-05-25T00:00:00.000Z');
 
-    expect(rows).toHaveLength(2);
-    expect(rows[0]).toMatchObject({
+    assert.equal(rows.length, 2);
+    assert.deepEqual({
+      country: rows[0]?.country,
+      currency: rows[0]?.currency,
+      chain: rows[0]?.chain,
+      code: rows[0]?.code,
+      name: rows[0]?.name,
+      category: rows[0]?.category,
+      price: rows[0]?.price,
+      priceText: rows[0]?.priceText,
+      previousPrice: rows[0]?.previousPrice,
+      previousPriceText: rows[0]?.previousPriceText
+    }, {
       country: 'NO',
       currency: 'NOK',
       chain: 'biltema-no',
@@ -39,7 +51,12 @@ describe('Biltema NO connector', () => {
       previousPrice: 59.9,
       previousPriceText: '59,90 kr'
     });
-    expect(rows[0]?.productUrl).toBe('https://www.biltema.no/hjem/rengjoring-hjem/fuktslukere/refillposer-original-til-fuktsluker-trepakning-2000055266');
-    expect(rows[1]).toMatchObject({ code: '28661', price: 29.9, previousPrice: 0, previousPriceText: '' });
+    assert.equal(rows[0]?.productUrl, 'https://www.biltema.no/hjem/rengjoring-hjem/fuktslukere/refillposer-original-til-fuktsluker-trepakning-2000055266');
+    assert.deepEqual({
+      code: rows[1]?.code,
+      price: rows[1]?.price,
+      previousPrice: rows[1]?.previousPrice,
+      previousPriceText: rows[1]?.previousPriceText
+    }, { code: '28661', price: 29.9, previousPrice: 0, previousPriceText: '' });
   });
 });

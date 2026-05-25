@@ -49,7 +49,7 @@ export function parsePressbyranSeMagazineProductHtml(
   const optionBlock = text.match(/Välj prenumeration eller lösnummer:\s*([\s\S]*?)(?:Lägg i varukorgen|Alla priser)/i)?.[1] ?? '';
   const shippingFeeFromSek = money(text.match(/(?:börjar på|Lösnummer från)\s*(\d+(?:[\s,.]\d{1,2})?)\s*kr/i)?.[1]);
   const rows: PressbyranSePriceRow[] = [];
-  const optionPattern = /(Tillsvidareprenumeration|Helår\s*\([^)]*\)|Halvår\s*\([^)]*\)|Kvartal\s*\([^)]*\)|Lösnummer\s*#[^\n\r]*?)(\d[\d\s]*(?:[,.]\d{1,2})?)\s*kr/gi;
+  const optionPattern = /(Tillsvidareprenumeration|Helår\s*\([^)]*\)|Halvår\s*\([^)]*\)|Kvartal\s*\([^)]*\)|Lösnummer\s*#\d+,\s*\d{4})\s*(\d[\d\s]*(?:[,.]\d{1,2})?)\s*kr/gi;
   let match: RegExpExecArray | null;
 
   while ((match = optionPattern.exec(optionBlock)) !== null) {
