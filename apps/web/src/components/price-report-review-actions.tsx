@@ -13,7 +13,7 @@ import {
 } from '@/lib/reviews';
 import { COMMUNITY_REVIEW_PROMPT_COPY, COMMUNITY_REVIEW_PROMPTS } from '@/lib/community-reviews';
 import { ReviewPromptForm } from '@/components/review-prompt-form';
-import { sourceDiscrepancyReviewContract } from '@/lib/verified-data';
+import { sourceDiscrepancyReviewContract } from '@/lib/review-contracts';
 
 // ReviewPromptForm renders COMMUNITY_REVIEW_PROMPTS with aria-label={`${prompt.label} rating`}.
 
