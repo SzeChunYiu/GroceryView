@@ -4,6 +4,7 @@ import { FunnelStepBeacon } from './funnel-step-beacon';
 import { ProductPriceCards } from './product-price-cards';
 import { TrendingCarousel } from './TrendingCarousel';
 import { TrendingPriceDropCards } from '@/app/page-sections/trending';
+import { PersonalPriceDrops } from '@/components/feed/personal-price-drops';
 import { buildChainIndexTrendSeries } from '@/lib/chain-index-data';
 import { buildSeasonalProduceDiscoveryCards } from '@/lib/deal-context';
 import { defaultLocale, localeReadiness, localeTranslationGuardrails, localizedPriceIntelligenceTerminology, localizedShellCopy, type SupportedLocale } from '@/lib/i18n';
@@ -199,6 +200,8 @@ export function MarketShell({ locale = defaultLocale }: { locale?: SupportedLoca
       <TrendingCarousel items={homepageTrendingPriceChanges} />
 
       <TrendingPriceDropCards city="stockholm" />
+
+      <PersonalPriceDrops />
 
       <Card className="mt-6 border-red-200 bg-red-50">
         <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-start">

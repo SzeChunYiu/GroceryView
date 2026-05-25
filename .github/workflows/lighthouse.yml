@@ -69,6 +69,7 @@ jobs:
       - name: Run Lighthouse CI against Vercel preview
         if: env.LHCI_PREVIEW_URL != ''
         env:
+          # Source audit command: npm run perf:lighthouse:preview -w @groceryview/web
           LHCI_ROUTES: >-
             /
             /products

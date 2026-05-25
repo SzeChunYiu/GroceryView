@@ -88,6 +88,31 @@ export type PersonalizedRecommendation = RecommendationProductInput & {
   reason: string;
 };
 
+export type PersonalizedPriceDropInput = {
+  productSlug: string;
+  productName: string;
+  categoryLabel: string;
+  latestPrice: number;
+  previousPrice: number;
+  changeFromPrevious: number;
+  changePercent: number;
+  observedCount: number;
+  latestObservedAt: string;
+  isNewLow?: boolean;
+};
+
+export type PersonalizedPriceDropFeedItem = PersonalizedPriceDropInput & {
+  href: string;
+  personalizationScore: number;
+  relevanceReasons: string[];
+  matchSignals: {
+    favorite: boolean;
+    watchlist: boolean;
+    householdCategoryScore: number;
+  };
+  savingsLabel: string;
+};
+
 const conversionWeight = 4;
 const demoHistoryWeights = [
   { clicks: 12, conversions: 4 },
@@ -178,6 +203,77 @@ export function buildPersonalizedRecommendationRail<T extends RecommendationProd
       return { ...product, score, reason };
     })
     .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name, 'sv'))
+    .slice(0, options.limit ?? 4);
+}
+
+function normalizedToken(value: string) {
+  return value
+    .toLocaleLowerCase('sv-SE')
+    .normalize('NFKD')
+    .replace(/\p{Diacritic}/gu, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+function householdCategoryScoreForDrop(
+  drop: Pick<PersonalizedPriceDropInput, 'categoryLabel' | 'productSlug'>,
+  householdId: string,
+  signals: readonly HouseholdCategorySignal[],
+) {
+  const normalizedCategory = normalizedToken(drop.categoryLabel);
+  const normalizedSlug = normalizedToken(drop.productSlug);
+  return signals
+    .filter((signal) => signal.householdId === householdId)
+    .reduce((score, signal) => {
+      const categorySlug = normalizedToken(signal.categorySlug);
+      if (normalizedCategory.includes(categorySlug) || categorySlug.includes(normalizedCategory) || normalizedSlug.includes(categorySlug)) {
+        return score + signal.conversions * conversionWeight + signal.clicks;
+      }
+      return score;
+    }, 0);
+}
+
+export function buildPersonalizedPriceDropFeed<T extends PersonalizedPriceDropInput>(
+  drops: readonly T[],
+  options: {
+    favoriteProductSlugs?: readonly string[];
+    watchlistProductSlugs?: readonly string[];
+    householdId?: string;
+    householdSignals?: readonly HouseholdCategorySignal[];
+    limit?: number;
+  } = {},
+): PersonalizedPriceDropFeedItem[] {
+  const favoriteProductSlugs = new Set((options.favoriteProductSlugs ?? ['kaffe', 'havregryn-extra-fylliga-101758934-st', 'milk-1l']).map(normalizedToken));
+  const watchlistProductSlugs = new Set((options.watchlistProductSlugs ?? []).map(normalizedToken));
+  const householdId = options.householdId ?? defaultHouseholdId;
+  const signals = options.householdSignals ?? householdCategorySignals;
+
+  return drops
+    .map((drop) => {
+      const productSlug = normalizedToken(drop.productSlug);
+      const favorite = favoriteProductSlugs.has(productSlug);
+      const watchlist = watchlistProductSlugs.has(productSlug);
+      const householdCategoryScore = householdCategoryScoreForDrop(drop, householdId, signals);
+      const discountDepth = Math.abs(drop.changePercent);
+      const newLowBoost = drop.isNewLow ? 18 : 0;
+      const personalizationScore = Math.round(discountDepth * 2 + Math.min(Math.abs(drop.changeFromPrevious), 50) + (favorite ? 45 : 0) + (watchlist ? 40 : 0) + householdCategoryScore + newLowBoost);
+      const relevanceReasons = [
+        favorite ? 'favorite product match' : null,
+        watchlist ? 'watchlist item match' : null,
+        householdCategoryScore > 0 ? 'household category signal' : null,
+        drop.isNewLow ? 'observed new low' : null
+      ].filter((reason): reason is string => reason !== null);
+
+      return {
+        ...drop,
+        href: `/products/${drop.productSlug}`,
+        personalizationScore,
+        relevanceReasons: relevanceReasons.length > 0 ? relevanceReasons : ['current verified price drop'],
+        matchSignals: { favorite, watchlist, householdCategoryScore },
+        savingsLabel: `${Math.abs(drop.changeFromPrevious).toFixed(2)} SEK drop · ${Math.abs(drop.changePercent).toFixed(1)}%`
+      };
+    })
+    .sort((a, b) => b.personalizationScore - a.personalizationScore || Math.abs(b.changePercent) - Math.abs(a.changePercent) || a.productName.localeCompare(b.productName, 'sv'))
     .slice(0, options.limit ?? 4);
 }
 

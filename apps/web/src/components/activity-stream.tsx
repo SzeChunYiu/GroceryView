@@ -63,7 +63,7 @@ export function ActivityStream({ listId, initialEvents = emptyActivityEvents }: 
       <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Activity stream</p>
       <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Shared-list changes</h2>
       <p className="mt-2 text-sm leading-6 text-slate-600">
-        Collaborator additions, removals, price alert changes, and completed items include the actor and timestamp so asynchronous shopping-list edits stay transparent.
+        Collaborator additions, removals, price alert changes, and completed items include the actor and timestamp so asynchronous shopping-list edits stay transparent. The stream covers added, checked, edited, and removed events.
       </p>
 
       {events.length === 0 ? (
