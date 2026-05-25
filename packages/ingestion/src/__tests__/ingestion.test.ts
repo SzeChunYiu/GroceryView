@@ -58,6 +58,7 @@ import {
   fetchOpenFoodFactsProducts,
   fetchOpenFoodFactsSwedenCatalog,
   fetchOkq8FuelPrices,
+  fetchObIsFuelPrices,
   fetchOpenFoodFactsRetailerEnrichments,
   fetchBrandedSwedishFuelStations,
   fetchApoteketSeProducts,
@@ -123,6 +124,7 @@ import {
   GROCERYVIEW_DAILY_LYF_OG_HEILSA_IS_PRODUCTS_URL,
   GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL,
   GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL,
+  GROCERYVIEW_DAILY_OB_IS_FUEL_PRICES_URL,
   GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL,
   GROCERYVIEW_DAILY_APOTEKET_SE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL,
@@ -148,6 +150,7 @@ import {
   parseOsmChainStores,
   parseOpenPricesSnapshot,
   parseOkq8FuelPricePage,
+  parseObIsFuelPricePage,
   parseBrandedSwedishFuelStations,
   parseSevenElevenSeConvenienceProducts,
   parseCoopDrPdfTextOffers,
@@ -636,6 +639,111 @@ describe('OKQ8 fuel price connector', () => {
     ]);
     assert.equal(parsed.items.every((row) => row.sourceType === 'retailer_online_page'), true);
     assert.equal(parsed.items.every((row) => row.storeId === undefined), true);
+  });
+});
+
+describe('OB IS fuel price connector', () => {
+  const obIsFuelHtml = `
+    <table>
+      <tr><th>Stöð</th><th>Bensín</th><th>Dísel</th><th>Dísel lituð</th></tr>
+      <tr><td>ÓB Reykjavík</td><td>309,7 kr.</td><td>312,4 kr.</td><td>298,1 kr.</td></tr>
+      <tr><td>ÓB Akureyri</td><td>307,5 kr.</td><td>311,9 kr.</td><td>297,8 kr.</td></tr>
+    </table>`;
+
+  it('parses official OB IS station table prices into chain-level fuel observations', () => {
+    const rows = parseObIsFuelPricePage({
+      body: obIsFuelHtml,
+      capturedAt: '2026-05-24T09:00:00.000Z',
+      sourceUrl: GROCERYVIEW_DAILY_OB_IS_FUEL_PRICES_URL
+    });
+
+    assert.deepEqual(rows.map((row) => [row.chainId, row.productId, row.pricePerLitre, row.currency, row.provenance.originalStationName]), [
+      ['ob-is', 'fuel-95-e10', 307.5, 'ISK', 'ÓB Akureyri'],
+      ['ob-is', 'fuel-diesel', 311.9, 'ISK', 'ÓB Akureyri']
+    ]);
+    assert.equal(rows.every((row) => row.sourceKind === 'operator_public_price_page'), true);
+  });
+
+  it('adapts OB IS fuel rows into daily litre-priced fuel observations', async () => {
+    const snapshot = await fetchDailyConnectorSnapshot({
+      status: 'ready',
+      connectorId: 'ob-is-fuel-prices',
+      chainId: 'ob-is',
+      sourceType: 'retailer_online_page',
+      runKey: 'ob-is:retailer-online-page:ob-is-fuel-prices:2026-05-24',
+      sourceRunId: 'source-run:ob-is:retailer-online-page:ob-is-fuel-prices:2026-05-24',
+      provenance: {
+        sourceType: 'retailer_online_page',
+        sourceUrl: GROCERYVIEW_DAILY_OB_IS_FUEL_PRICES_URL,
+        capturedAt: '2026-05-24T09:00:00.000Z',
+        parserVersion: 'ob-is-fuel-prices-v1'
+      },
+      requiredActions: []
+    }, {
+      retrievedAt: '2026-05-24T09:00:00.000Z',
+      fetchImpl: async () => new Response(obIsFuelHtml, { status: 200, headers: { 'content-type': 'text/html' } })
+    });
+
+    const parsed = JSON.parse(snapshot.body) as { items: Array<{ chainId: string; productId: string; packageSize: number; packageUnit: string; price: number; sourceType: string; storeId?: string }> };
+    assert.deepEqual(parsed.items.map((row) => [row.chainId, row.productId, row.packageSize, row.packageUnit, row.price]), [
+      ['ob-is', 'fuel-95-e10', 1, 'l', 307.5],
+      ['ob-is', 'fuel-diesel', 1, 'l', 311.9]
+    ]);
+    assert.equal(parsed.items.every((row) => row.sourceType === 'retailer_online_page'), true);
+    assert.equal(parsed.items.every((row) => row.storeId === undefined), true);
+
+    const rows = await fetchObIsFuelPrices({
+      capturedAt: '2026-05-24T09:00:00.000Z',
+      fetchImpl: async () => new Response(obIsFuelHtml, { status: 200, headers: { 'content-type': 'text/html' } })
+    });
+    assert.equal(rows.length, 2);
+  });
+
+  it('materializes native OB IS fuel prices into domain=fuel daily observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-24T09:00:00.000Z',
+      connectors: [{
+        connectorId: 'ob-is-fuel-prices',
+        chainId: 'ob-is',
+        domain: 'fuel',
+        sourceType: 'retailer_online_page',
+        endpointUrl: GROCERYVIEW_DAILY_OB_IS_FUEL_PRICES_URL,
+        parserVersion: 'ob-is-fuel-prices-v1',
+        robotsTxtStatus: 'allow',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: false,
+        requireStoreScopedPrices: false,
+        stores: []
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return new Response(obIsFuelHtml, { status: 200, headers: { 'content-type': 'text/html' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 2);
+    assert.deepEqual(requestedUrls, [GROCERYVIEW_DAILY_OB_IS_FUEL_PRICES_URL]);
+    assert.equal(executor.calls.some((call) => call.sql.includes('insert into stores')), false);
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.domain, 'fuel');
+    assert.equal(observation.store_id, null);
+    assert.equal(observation.price, 307.5);
+    assert.equal(observation.unit_price, 307.5);
+    assert.equal(observation.quantity, 1);
+    assert.equal(observation.quantity_unit, 'l');
+    assert.equal(firstBatchProduct(executor).fuel_grade_id, 'fuel-95-e10');
+    const fuelSourceInsert = executor.calls.find((call) => call.sql.includes('insert into fuel_price_sources'));
+    assert.deepEqual(fuelSourceInsert?.params.slice(0, 5), [
+      'operator_public_price_page',
+      'ob-is',
+      'ÓB',
+      GROCERYVIEW_DAILY_OB_IS_FUEL_PRICES_URL,
+      'ob-is-fuel-prices-v1'
+    ]);
   });
 });
 

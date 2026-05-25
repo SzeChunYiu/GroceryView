@@ -158,6 +158,19 @@ const CONNECTOR_TEMPLATES = [
     hasDataAgreement: false,
     requireStoreScopedPrices: false,
     stores: []
+  },
+  {
+    connectorId: 'ob-is-fuel-prices',
+    chainId: 'ob-is',
+    domain: 'fuel',
+    sourceType: 'retailer_online_page',
+    endpointUrl: 'https://olis.ob.is/eldsneytisverd',
+    parserVersion: 'ob-is-fuel-prices-v1',
+    robotsTxtStatus: 'allow',
+    legalReviewStatus: 'approved',
+    hasDataAgreement: false,
+    requireStoreScopedPrices: false,
+    stores: []
   }
 ];
 
