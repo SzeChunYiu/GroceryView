@@ -70,6 +70,17 @@ describe('verified-data UI', () => {
     assert.match(verified, /sourceCoverage/);
   });
 
+  it('ships an opt-in bundle analyzer script without normal production impact', async () => {
+    const packageJson = await read('package.json');
+    const nextConfig = await read('next.config.mjs');
+
+    assert.match(packageJson, /"analyze": "ANALYZE=1 npm run build"/);
+    assert.match(packageJson, /"@next\/bundle-analyzer"/);
+    assert.match(nextConfig, /from '@next\/bundle-analyzer'/);
+    assert.match(nextConfig, /enabled: process\.env\.ANALYZE === '1'/);
+    assert.match(nextConfig, /export default withBundleAnalyzer\(nextConfig\)/);
+  });
+
 
   it('renders the authenticated MyFlyer route from a server digest snapshot', async () => {
     const route = await read('src/app/my-flyer/page.tsx');

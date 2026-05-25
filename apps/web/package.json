@@ -5,6 +5,7 @@
   "scripts": {
     "build": "npm run build:deps && NODE_OPTIONS=--max-old-space-size=6144 next build --webpack",
     "dev": "next dev",
+    "analyze": "ANALYZE=1 npm run build",
     "perf:bundle:profile": "NODE_OPTIONS=--max-old-space-size=6144 next build --profile --webpack && size-limit --config ./size-limit.config.cjs",
     "perf:bundle:budget": "node ../../scripts/ops/print-catalog-coverage-targets.mjs --bundle-budget-report",
     "perf:lighthouse:ci": "lhci autorun --config=./lighthouserc.cjs",
@@ -38,6 +39,8 @@
   },
   "devDependencies": {
     "@lhci/cli": "^0.15.1",
+    "@next/bundle-analyzer": "^16.2.6",
+    "@playwright/test": "^1.51.1",
     "@size-limit/file": "^12.1.0",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
@@ -48,7 +51,6 @@
     "axe-core": "^4.11.4",
     "postcss": "^8.5.6",
     "size-limit": "^12.1.0",
-    "tailwindcss": "^3.4.19",
-    "@playwright/test": "^1.51.1"
+    "tailwindcss": "^3.4.19"
   }
 }
