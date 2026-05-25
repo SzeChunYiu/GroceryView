@@ -36,8 +36,8 @@ export function generateMetadata() {
     },
     twitter: {
       card: 'summary_large_image',
-      title,
-      description,
+      title: openGraph?.title ?? title,
+      description: openGraph?.description ?? description,
       images: openGraph?.images
     }
   };
