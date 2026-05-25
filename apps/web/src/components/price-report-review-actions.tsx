@@ -20,6 +20,7 @@ type BrowserSession = { accessToken: string; userId: string };
 type ReviewDecision = 'approve' | 'hide' | 'escalate';
 type ApiReviewDecision = 'approve' | 'reject' | 'needs_more_info';
 const dismissCommunityReportAction = 'dismiss_community_report';
+const requestMoreInfoLabel = 'Request more info';
 type ReviewModerationAction = ReviewDecision;
 type Assignment = { id: string; reviewId?: string; subjectType?: 'product_match' | 'community_report' | 'commodity_mapping' | 'price_report' | 'duplicate_product_report' | 'source_discrepancy_report'; subjectId?: string; priority?: string; reason?: string; assigneeId?: string; dueAt?: string; status?: string };
 type AssignmentResponse = { assignments?: Assignment[]; sla?: { status?: string; overdueAssignments?: number; breachedReviewIds?: string[] } };

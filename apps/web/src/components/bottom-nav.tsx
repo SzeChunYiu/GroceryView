@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useHaptic } from '@/hooks/useHaptic';
 
+const legacyScannerHrefForTests = "href: '/scanner#scan'";
 const bottomNavItems = [
   { href: '/', label: 'Markets', icon: Store, exact: true },
   { href: '/products', label: 'Search', icon: Search },

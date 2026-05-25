@@ -146,3 +146,5 @@ export function communityReviewPromptFor(metric: CommunityReviewPromptMetric) {
 export function communityReviewSummaryForProduct(productName: string): CommunityProductReviewSummary | null {
   return communityProductReviewSummaries.find((summary) => summary.productMatcher.test(productName)) ?? null;
 }
+
+export const communityReviewPromptMetricAliases = ['price_accuracy'];
