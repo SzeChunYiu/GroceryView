@@ -25,6 +25,7 @@
     "ops:daily-connectors": "npm run build -w @groceryview/ingestion && node scripts/ops/print-daily-connectors.mjs",
     "ops:daily-connector-stores": "npm run build -w @groceryview/ingestion && node scripts/ops/print-daily-connector-stores.mjs",
     "ops:norway-readiness": "npm run build -w @groceryview/ops && node scripts/ops/print-norway-coverage-readiness.mjs",
+    "security:asvs": "node scripts/security/check-asvs-l2.mjs",
     "ops:validate-production-env": "node scripts/ops/validate-production-env.mjs",
     "ingest:export-db-snapshot": "npm run build -w @groceryview/db && node scripts/ingestion/export-db-site-snapshot.mjs",
     "ops:check-supabase-health": "node scripts/ops/check-supabase-project-health.mjs",
