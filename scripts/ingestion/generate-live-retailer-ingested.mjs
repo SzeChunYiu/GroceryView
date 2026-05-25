@@ -22,6 +22,7 @@ import {
   DEFAULT_MATSPAR_SEARCH_QUERIES,
   DEFAULT_MATSPAR_MAX_ROWS,
   DEFAULT_OPENFOODFACTS_SWEDEN_CATALOG_MAX_PAGES,
+  DEFAULT_ICA_STORE_CONFIGS,
   DEFAULT_ICA_REKLAMBLAD_OFFER_PAGE_URLS,
   DEFAULT_ICA_REKLAMBLAD_MAX_ROWS,
   SWEDISH_COUNTY_ISO3166_2_CODES,
@@ -44,6 +45,7 @@ import {
   fetchMatsparProducts,
   fetchOpenFoodFactsSwedenCatalog,
   buildOpenFoodFactsSwedenSearchUrl,
+  fetchIcaDefaultStoreProducts,
   fetchIcaReklambladOffers,
   fetchOkq8FuelPrices,
   fetchOverpassGroceryStores,
@@ -82,6 +84,7 @@ const MATSPAR_PAGES = DEFAULT_MATSPAR_SEARCH_PAGES;
 const APOHEM_SOURCE_PATHS = DEFAULT_APOHEM_SOURCE_PATHS;
 const APOTEK_HJARTAT_SEARCH_URLS = DEFAULT_APOTEK_HJARTAT_SEARCH_URLS;
 const BONUS_IS_MAX_ROWS = 1200;
+const ICA_PRODUCTS_CHUNK_SIZE = 5000;
 
 const retrievedAt = new Date().toISOString();
 
@@ -97,6 +100,7 @@ let willysWeeklyDiscounts = [];
 let hemkopProducts = [];
 let hemkopWeeklyDiscounts = [];
 let lidlStoreOffers = [];
+let icaProducts = [];
 let icaReklambladOffers = [];
 
 if (shouldRun('citygross')) {
@@ -226,6 +230,15 @@ if (shouldRun('bonus-is')) {
   });
   await writeBonusIs(bonusIsProducts);
   summary.bonusIsProducts = bonusIsProducts.length;
+}
+
+if (shouldRun('ica')) {
+  icaProducts = await fetchIcaDefaultStoreProducts({
+    stores: DEFAULT_ICA_STORE_CONFIGS,
+    retrievedAt
+  });
+  await writeIca(icaProducts);
+  summary.icaProducts = icaProducts.length;
 }
 
 if (shouldRun('ica-reklamblad')) {
@@ -1016,6 +1029,77 @@ async function writeBonusIs(rows) {
     })} as const;`,
     '',
     `export const bonusIsProducts: BonusIsIngestedProduct[] = ${literal(rows)};`,
+    ''
+  ]);
+}
+
+async function writeIca(rows) {
+  const productsChunkExport = await writeChunkedGeneratedArray({
+    directoryName: 'ica-products',
+    exportPrefix: 'icaProducts',
+    rows,
+    chunkSize: ICA_PRODUCTS_CHUNK_SIZE
+  });
+  const sourcesByUrl = new Map();
+  for (const row of rows) {
+    const sourceUrl = row.sourceUrl;
+    if (!sourceUrl) continue;
+    const source = sourcesByUrl.get(sourceUrl) ?? {
+      retrievedAt: row.retrievedAt,
+      rowCount: 0,
+      storeAccountId: row.storeAccountId,
+      storeName: row.storeName,
+      regionId: row.regionId,
+      sourceUrl
+    };
+    source.rowCount += 1;
+    if (row.retrievedAt > source.retrievedAt) source.retrievedAt = row.retrievedAt;
+    sourcesByUrl.set(sourceUrl, source);
+  }
+  const sources = [...sourcesByUrl.values()];
+  const latestSources = [...sources]
+    .sort((left, right) => right.retrievedAt.localeCompare(left.retrievedAt))
+    .slice(0, 3);
+
+  await writeGeneratedFile('ica.ts', [
+    '// AUTO-GENERATED from public ICA store-scoped promotions JSON.',
+    '// Source metadata: icaSources below records sourceUrl, retrievedAt, and rowCount for every store endpoint.',
+    '// Latest added sources:',
+    ...latestSources.map((source) => `// - ${source.sourceUrl} (store ${source.storeAccountId} ${source.storeName}, retrieved ${source.retrievedAt}, rows ${source.rowCount})`),
+    `// Row count: ${rows.length} real product rows fetched from handlaprivatkund.ica.se across ${sources.length} store endpoints.`,
+    'export type IcaIngestedProduct = {',
+    '  code: string;',
+    '  productId: string;',
+    '  retailerProductId: string;',
+    '  name: string;',
+    '  brand: string;',
+    '  categories: string[];',
+    '  imageUrl: string;',
+    '  productUrl: string;',
+    '  packageSize: string;',
+    '  countryOfOrigin: string;',
+    '  price: number | null;',
+    '  priceCurrency: string;',
+    '  unitPrice: number | null;',
+    '  unitPriceCurrency: string;',
+    '  unitPriceUnit: string;',
+    '  promoPrice: number | null;',
+    '  promoPriceCurrency: string;',
+    '  promoUnitPrice: number | null;',
+    '  promoUnitPriceCurrency: string;',
+    '  promoUnitPriceUnit: string;',
+    '  promotionDescription: string;',
+    '  memberOnly?: boolean;',
+    '  storeAccountId: string;',
+    '  storeName: string;',
+    '  regionId: string;',
+    '  sourceUrl: string;',
+    '  retrievedAt: string;',
+    '};',
+    '',
+    `export const icaSources = ${literal(sources)} as const;`,
+    '',
+    productsChunkExport('icaProducts', 'IcaIngestedProduct'),
     ''
   ]);
 }
