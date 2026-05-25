@@ -15,6 +15,7 @@ export const ALL_STORE_RUNNER_CHAINWIDE_CATALOG_CONNECTORS = [
   'lloyds-apotek-se-products',
   'seven-eleven-se-convenience-products',
   'direkten-se-small-store-products',
+  'snabbgross-se-wholesale-products',
   'halal-center-se-kosher-halal-products'
 ] as const;
 
