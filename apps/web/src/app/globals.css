@@ -3,9 +3,11 @@
 @tailwind utilities;
 
 :root {
+  --gv-page-bg: #f5f1e8;
+  --gv-page-fg: #0f172a;
   color-scheme: light;
-  background: #f5f1e8;
-  color: #0f172a;
+  background: var(--gv-page-bg);
+  color: var(--gv-page-fg);
 }
 
 * { box-sizing: border-box; }
@@ -16,8 +18,8 @@ body {
   background:
     radial-gradient(circle at 15% 8%, rgba(16, 185, 129, 0.16), transparent 28rem),
     radial-gradient(circle at 86% 14%, rgba(245, 158, 11, 0.18), transparent 24rem),
-    #f5f1e8;
-  color: #0f172a;
+    var(--gv-page-bg);
+  color: var(--gv-page-fg);
   font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
 }
 
@@ -40,17 +42,19 @@ button, input, select, textarea { font: inherit; }
 }
 
 :root.dark {
+  --gv-page-bg: #020617;
+  --gv-page-fg: #e2e8f0;
   color-scheme: dark;
-  background: #020617;
-  color: #e2e8f0;
+  background: var(--gv-page-bg);
+  color: var(--gv-page-fg);
 }
 
 .dark body {
   background:
     radial-gradient(circle at 15% 8%, rgba(16, 185, 129, 0.12), transparent 28rem),
     radial-gradient(circle at 86% 14%, rgba(245, 158, 11, 0.1), transparent 24rem),
-    #020617;
-  color: #e2e8f0;
+    var(--gv-page-bg);
+  color: var(--gv-page-fg);
 }
 
 .dark :where(.bg-white, .bg-white\/70, .bg-white\/80, .bg-white\/85, .bg-white\/88) {
