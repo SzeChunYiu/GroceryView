@@ -98,6 +98,21 @@ model PantryItem {
   @@map("pantry_items")
 }
 
+model WatchlistRestockAlert {
+  id               String    @id @default(uuid()) @db.Uuid
+  userId           String    @map("user_id")
+  productId        String    @map("product_id")
+  lastOutOfStockAt DateTime? @map("last_out_of_stock_at") @db.Timestamptz(6)
+  lastAvailableAt  DateTime? @map("last_available_at") @db.Timestamptz(6)
+  notifiedAt       DateTime? @map("notified_at") @db.Timestamptz(6)
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([userId, productId])
+  @@index([productId, notifiedAt])
+  @@map("watchlist_restock_alerts")
+}
+
 model BenchmarkObservation {
   sourceId    String   @map("source_id")
   country     String

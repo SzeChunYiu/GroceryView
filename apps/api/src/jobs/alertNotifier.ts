@@ -14,6 +14,35 @@ export type NotifyTriggeredPriceAlertsInput = {
   now: string;
 };
 
+export type RestockAlertEmailNotification = {
+  recipientEmail: string;
+  productId: string;
+  productName: string;
+  storeName: string;
+  itemUrl?: string;
+};
+
+export type NotifyRestockAlertsInput = {
+  baseUrl: string;
+  emailClient: TransactionalEmailClient;
+  notifications: RestockAlertEmailNotification[];
+  now: string;
+};
+
+export type WatchedRestockItem = {
+  recipientEmail: string;
+  productId: string;
+  productName: string;
+  wasOutOfStock: boolean;
+  itemUrl?: string;
+};
+
+export type RestockAvailabilitySnapshot = {
+  productId: string;
+  storeName: string;
+  isAvailable: boolean;
+};
+
 export type TriggeredPriceAlertEmailSent = {
   recipientEmail: string;
   productId: string;
@@ -29,6 +58,16 @@ export type TriggeredPriceAlertEmailSkipped = {
 export type NotifyTriggeredPriceAlertsResult = {
   sent: TriggeredPriceAlertEmailSent[];
   skipped: TriggeredPriceAlertEmailSkipped[];
+};
+
+export type RestockAlertEmailSent = {
+  recipientEmail: string;
+  productId: string;
+  messageId: string;
+};
+
+export type NotifyRestockAlertsResult = {
+  sent: RestockAlertEmailSent[];
 };
 
 export async function notifyTriggeredPriceAlerts(
@@ -66,6 +105,49 @@ export async function notifyTriggeredPriceAlerts(
   }
 
   return { sent, skipped };
+}
+
+export async function notifyRestockAlerts(
+  input: NotifyRestockAlertsInput
+): Promise<NotifyRestockAlertsResult> {
+  const sent: RestockAlertEmailSent[] = [];
+
+  for (const notification of input.notifications) {
+    const messageId = await input.emailClient.send(buildRestockAlertEmail(notification, input.baseUrl, input.now));
+    sent.push({
+      recipientEmail: notification.recipientEmail,
+      productId: notification.productId,
+      messageId
+    });
+  }
+
+  return { sent };
+}
+
+export function restockNotificationsFromAvailabilityTransitions(input: {
+  watchedItems: WatchedRestockItem[];
+  availability: RestockAvailabilitySnapshot[];
+}): RestockAlertEmailNotification[] {
+  const availableByProduct = new Map<string, RestockAvailabilitySnapshot>();
+  for (const row of input.availability) {
+    if (row.isAvailable && !availableByProduct.has(row.productId)) {
+      availableByProduct.set(row.productId, row);
+    }
+  }
+
+  return input.watchedItems.flatMap((item) => {
+    if (!item.wasOutOfStock) return [];
+    const available = availableByProduct.get(item.productId);
+    if (!available) return [];
+    const notification: RestockAlertEmailNotification = {
+      recipientEmail: item.recipientEmail,
+      productId: item.productId,
+      productName: item.productName,
+      storeName: available.storeName
+    };
+    if (item.itemUrl) notification.itemUrl = item.itemUrl;
+    return [notification];
+  });
 }
 
 export function isEmailNotifiablePriceAlert(alert: WatchlistAlert): boolean {
@@ -154,6 +236,32 @@ export function buildTriggeredPriceAlertEmail(
     metadata: {
       type: alert.type,
       productId: alert.productId,
+      sendAt: now
+    }
+  };
+}
+
+export function buildRestockAlertEmail(
+  notification: RestockAlertEmailNotification,
+  baseUrl: string,
+  now: string
+): TransactionalEmailMessage {
+  const itemUrl = notification.itemUrl ?? buildProductUrl(baseUrl, notification.productId);
+  const lines = [
+    `${notification.productName} is available again at ${notification.storeName}.`,
+    '',
+    `Open item: ${itemUrl}`,
+    '',
+    `Sent at: ${now}`
+  ];
+
+  return {
+    to: notification.recipientEmail,
+    subject: `${notification.productName} is back in stock`,
+    text: lines.join('\n'),
+    metadata: {
+      type: 'restock',
+      productId: notification.productId,
       sendAt: now
     }
   };
