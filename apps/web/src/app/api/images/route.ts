@@ -71,7 +71,7 @@ function proxiedHeaders(upstream: Response, width: number | null, quality: numbe
 
 export async function GET(request: Request) {
   const parsed = parseSourceUrl(request);
-  if ('error' in parsed) return errorResponse(parsed.error, 400);
+  if ('error' in parsed) return errorResponse(parsed.error ?? 'invalid_image_src', 400);
 
   const upstream = await fetch(parsed.sourceUrl, {
     headers: {
