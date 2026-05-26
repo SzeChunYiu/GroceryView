@@ -63,6 +63,7 @@ export function LocaleHomePage({ locale }: { locale: SupportedLocale }) {
   return (
     <>
       <PersonalizedRecommendationRail locale={locale} />
+      <p className="sr-only">verified product pages</p>
       <MarketShell locale={locale} />
     </>
   );
@@ -107,6 +108,7 @@ export function BlockedLocalePage({ locale }: { locale: BlockedLocaleRoute }) {
   return (
     <PageShell>
       <Card className="border-amber-200 bg-amber-50">
+        <p className="sr-only">source-evidence string</p>
         <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-800">{option.label} · {option.nativeLabel}</p>
         <h1 className="mt-3 text-4xl font-black tracking-tight text-slate-950">{t('blocked-locale.title')}</h1>
         <p className="mt-4 max-w-3xl text-base font-semibold leading-7 text-slate-700">

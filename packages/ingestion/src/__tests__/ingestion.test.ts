@@ -161,6 +161,7 @@ import {
   parseSevenElevenSeConvenienceProducts,
   parseCoopDrPdfTextOffers,
   parseRetailerProductJsonSnapshot,
+  parseRetailerProductJsonSnapshotWithDeadLetters,
   persistOpenFoodFactsProductMetadata,
   parseSt1FuelPriceHtml,
   assertMarketSourceTermsGate,
@@ -5969,6 +5970,54 @@ describe('parseRetailerProductJsonSnapshot', () => {
       contentHash: 'sha256:bad'
     }), /items\[0\]\.canonicalName/);
   });
+
+  it('isolates malformed normalized records into replayable dead letters', async () => {
+    const result = await runRetailerConnector({
+      connectorId: 'Willys normalized JSON',
+      requestedAt: '2026-05-20T08:40:00.000Z',
+      chainId: 'willys',
+      sourceType: 'official_api',
+      robotsTxtStatus: 'not_applicable',
+      legalReviewStatus: 'approved',
+      hasDataAgreement: true,
+      endpointUrl: 'https://api.example.test/willys/normalized-products',
+      parserVersion: 'normalized-json-v1',
+      fetcher: (plan) => ({
+        statusCode: 200,
+        body: JSON.stringify({
+          items: [
+            {
+              retailerProductId: 'wil-zoegas-450',
+              rawName: 'Zoégas Skånerost 450g',
+              canonicalName: 'Zoégas Coffee 450g',
+              productId: 'coffee-zoegas-450g',
+              categoryId: 'coffee',
+              packageSize: 450,
+              packageUnit: 'g',
+              price: 49.9
+            },
+            { rawName: 'Broken row', price: 12 }
+          ]
+        }),
+        contentType: 'application/json',
+        retrievedAt: plan.provenance.capturedAt,
+        sourceUrl: plan.provenance.sourceUrl,
+        rawSnapshotRef: `raw://normalized/${plan.runKey}.json`
+      }),
+      parser: parseRetailerProductJsonSnapshotWithDeadLetters
+    });
+
+    assert.equal(result.status, 'completed');
+    assert.equal(result.acceptedCount, 1);
+    assert.equal(result.rejectedCount, 1);
+    assert.deepEqual(result.requiredActions, ['review_ingestion_dead_letters']);
+    assert.equal(result.deadLetters.length, 1);
+    assert.equal(result.deadLetters[0]?.errorClass, 'invalid_record');
+    assert.equal(result.deadLetters[0]?.retryable, false);
+    assert.equal(result.deadLetters[0]?.samplePayloadPointer, '$.items[1]');
+    assert.match(result.deadLetters[0]?.replayPath ?? '', /\/admin\/sources\/dead-letters/);
+    assert.match(result.deadLetters[0]?.errorMessage ?? '', /canonicalName/);
+  });
 });
 
 describe('Open Prices real-data connector', () => {
@@ -6882,6 +6931,56 @@ describe('daily ingestion runner', () => {
       ['store-db-2', 'sg-idealmakaroner-5kg-arsta', 79.9, 99.9, 'Storpackskampanj'],
       ['store-db-3', 'sg-rapsolja-10l-goteborg', 189, null, null]
     ]);
+  });
+
+  it('persists parser dead letters beside accepted daily records for ops replay', async () => {
+    const executor = new DailyIngestionExecutor();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-21T03:17:00.000Z',
+      connectors: [{
+        connectorId: 'willys-normalized-json',
+        chainId: 'willys',
+        sourceType: 'official_api',
+        endpointUrl: 'https://sources.example.test/willys/products.json',
+        parserVersion: 'normalized-json-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: 'willys-odenplan', name: 'Willys Odenplan', address: 'Odenplan', city: 'Stockholm' }]
+      }],
+      fetchImpl: async () => new Response(JSON.stringify({
+        items: [
+          {
+            storeId: 'willys-odenplan',
+            retailerProductId: 'wil-zoegas-450',
+            rawName: 'Zoégas Skånerost 450g',
+            canonicalName: 'Zoégas Coffee 450g',
+            productId: 'zoegas-coffee-450g',
+            categoryId: 'coffee',
+            packageSize: 450,
+            packageUnit: 'g',
+            price: 49.9
+          },
+          { rawName: 'Malformed row', price: 12 }
+        ]
+      }), { status: 200, headers: { 'content-type': 'application/json' } })
+    });
+
+    assert.equal(result.status, 'partial');
+    assert.equal(result.acceptedCount, 1);
+    assert.equal(result.rejectedCount, 1);
+    assert.equal(result.rawRecordIds.length, 2);
+    assert.deepEqual(result.blockers, ['willys:rejected_products:1']);
+    const rawRecordInsert = executor.calls.find((call) => call.sql.includes('jsonb_to_recordset') && call.sql.includes('insert into raw_records'));
+    const rawRows = JSON.parse(String(rawRecordInsert?.params[1])) as Array<{ record_type: string; external_ref: string; provenance: Record<string, unknown>; payload: Record<string, unknown> }>;
+    const deadLetter = rawRows.find((row) => row.record_type === 'parser_failure');
+    assert.equal(deadLetter?.external_ref, '$.items[1]');
+    assert.equal(deadLetter?.payload.rawName, 'Malformed row');
+    assert.equal(deadLetter?.provenance.errorClass, 'invalid_record');
+    assert.equal(deadLetter?.provenance.retryable, false);
+    assert.equal(deadLetter?.provenance.parserVersion, 'normalized-json-v1');
+    assert.match(String(deadLetter?.provenance.replayPath), /\/admin\/sources\/dead-letters/);
   });
 
   it('caches and rewrites product image URLs while persisting daily connector runs when enabled', async () => {

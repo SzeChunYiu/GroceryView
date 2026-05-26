@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { parseIcelandicPrice } from './icelandic-price.js';
 import type { FuelGradeId, FuelPriceSourceKind } from './okq8-fuel.js';
 
 export type SkeljungurIsFuelPriceObservation = {

@@ -829,11 +829,19 @@ describe('verified-data UI', () => {
 
   it('links admin source health to ingestion runs without public nav clutter', async () => {
     const sources = await read('src/app/admin/sources/page.tsx');
+    const deadLetters = await read('src/app/admin/sources/dead-letters/page.tsx');
     const nav = await read('src/components/app-nav.tsx');
 
     assert.match(sources, /href="\/admin\/ingestion-runs"/);
     assert.match(sources, /View ingestion runs/);
+    assert.match(sources, /href="\/admin\/sources\/dead-letters"/);
+    assert.match(sources, /Review dead letters/);
+    assert.match(deadLetters, /record_type parser_failure/);
+    assert.match(deadLetters, /sourceRunId/);
+    assert.match(deadLetters, /samplePayloadPointer/);
+    assert.match(deadLetters, /rawSnapshotRef/);
     assert.doesNotMatch(nav, /\/admin\/ingestion-runs/);
+    assert.doesNotMatch(nav, /\/admin\/sources\/dead-letters/);
   });
 
 
@@ -4413,5 +4421,61 @@ ${seo}`;
     assert.match(helper, /no synthetic charge amounts/i);
     assert.match(helper, /not legal advice/i);
     assert.match(helper, /complaintTemplate/);
+  });
+
+  it('ships MVP website routes with fail-closed verified data panels', async () => {
+    const home = await read('src/app/page.tsx');
+    const deals = await read('src/app/deals/page.tsx');
+    const market = await read('src/app/market/page.tsx');
+    const marketCategory = await read('src/app/market/[category]/page.tsx');
+    const browse = await read('src/app/browse/page.tsx');
+    const browseCategory = await read('src/app/browse/[category]/page.tsx');
+    const methodology = await read('src/app/methodology/page.tsx');
+    const confidence = await read('src/app/confidence/page.tsx');
+    const nav = await read('src/components/app-nav.tsx');
+    const dataUi = await read('src/components/data-ui.tsx');
+    const forbidden = /\bfake price\b|\bfake store\b|lorem ipsum/i;
+    const mvpSources = [home, deals, market, marketCategory, browse, browseCategory, methodology, confidence].join('\n');
+
+    assert.match(home, /MvpHomePage/);
+    assert.match(deals, /Real Deal/);
+    assert.match(deals, /Fair Discount/);
+    assert.match(deals, /Not Really a Deal/);
+    assert.match(market, /categoryMarketHref/);
+    assert.match(marketCategory, /getCategoryMarketData/);
+    assert.match(browse, /categoryBrowseHref/);
+    assert.match(browseCategory, /MvpProductCard/);
+    assert.match(methodology, /fail closed/i);
+    assert.match(confidence, /sourceCoverage/);
+    assert.match(nav, /href: '\/deals'/);
+    assert.match(nav, /href: '\/market'/);
+    assert.match(nav, /href: '\/browse'/);
+    assert.match(dataUi, /href="\/methodology"/);
+    assert.match(dataUi, /href="\/confidence"/);
+    assert.doesNotMatch(mvpSources, forbidden);
+    assert.match(mvpSources, /NoVerifiedDataPanel|No verified data yet|fail-closed/i);
+  });
+
+  it('ships connected UX helpers, breadcrumbs, and product entity routes', async () => {
+    const routes = await read('src/lib/mvp/routes.ts');
+    const productCard = await read('src/components/mvp/product-card.tsx');
+    const deals = await read('src/app/deals/page.tsx');
+    const marketCategory = await read('src/app/market/[category]/page.tsx');
+    const browseCategory = await read('src/app/browse/[category]/page.tsx');
+    const dataUi = await read('src/components/data-ui.tsx');
+
+    assert.match(routes, /productRoute/);
+    assert.match(routes, /storeRoute/);
+    assert.match(routes, /searchRoute/);
+    assert.match(routes, /mapRoute/);
+    assert.match(routes, /dealsRoute/);
+    assert.match(productCard, /productRoute/);
+    assert.match(deals, /MvpBreadcrumbs/);
+    assert.match(deals, /RelatedLinksPanel/);
+    assert.match(deals, /productRoute\(deal\.product\.id\)/);
+    assert.match(marketCategory, /MvpBreadcrumbs/);
+    assert.match(marketCategory, /CategoryDualLinks/);
+    assert.match(browseCategory, /CategoryDualLinks/);
+    assert.match(dataUi, /href="\/contact"/);
   });
 });
