@@ -5,6 +5,12 @@
 :root {
   --gv-page-bg: #f5f1e8;
   --gv-page-fg: #0f172a;
+  --gv-ink: #10251e;
+  --gv-moss: #064e3b;
+  --gv-lime: #d9f99d;
+  --gv-clay: #f59e0b;
+  --gv-paper: rgba(255, 255, 255, 0.86);
+  --gv-hairline: rgba(15, 23, 42, 0.12);
   color-scheme: light;
   background: var(--gv-page-bg);
   color: var(--gv-page-fg);
@@ -27,6 +33,80 @@ a { color: inherit; text-decoration: none; }
 button, input, select, textarea { font: inherit; }
 ::selection { background: #064e3b; color: white; }
 
+.gv-page-shell {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.gv-page-shell::before,
+.gv-page-shell::after {
+  content: "";
+  pointer-events: none;
+  position: fixed;
+  inset: auto;
+  z-index: -1;
+  border-radius: 999px;
+  filter: blur(12px);
+}
+
+.gv-page-shell::before {
+  right: -10rem;
+  top: 7rem;
+  width: 28rem;
+  height: 28rem;
+  background: radial-gradient(circle, rgba(217, 249, 157, 0.42), transparent 68%);
+}
+
+.gv-page-shell::after {
+  left: -12rem;
+  bottom: 10rem;
+  width: 34rem;
+  height: 34rem;
+  background: radial-gradient(circle, rgba(6, 78, 59, 0.16), transparent 70%);
+}
+
+.gv-page-main {
+  animation: gv-page-rise 420ms ease-out both;
+}
+
+.gv-card {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset, 0 18px 50px rgba(15, 23, 42, 0.06);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.gv-card:hover {
+  border-color: rgba(6, 78, 59, 0.22);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.85) inset, 0 24px 70px rgba(15, 23, 42, 0.09);
+}
+
+.gv-hero-panel {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(236, 253, 245, 0.88)),
+    radial-gradient(circle at 80% 18%, rgba(217, 249, 157, 0.35), transparent 18rem);
+  box-shadow: 0 28px 90px rgba(6, 78, 59, 0.10);
+}
+
+.gv-feature-map {
+  background:
+    radial-gradient(circle at 10% 0%, rgba(217, 249, 157, 0.26), transparent 22rem),
+    radial-gradient(circle at 90% 10%, rgba(20, 184, 166, 0.22), transparent 26rem),
+    linear-gradient(135deg, #081913, #10251e 52%, #17251b);
+}
+
+@keyframes gv-page-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 
@@ -44,6 +124,8 @@ button, input, select, textarea { font: inherit; }
 :root.dark {
   --gv-page-bg: #020617;
   --gv-page-fg: #e2e8f0;
+  --gv-paper: rgba(15, 23, 42, 0.9);
+  --gv-hairline: rgba(148, 163, 184, 0.22);
   color-scheme: dark;
   background: var(--gv-page-bg);
   color: var(--gv-page-fg);

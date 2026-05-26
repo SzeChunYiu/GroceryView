@@ -178,10 +178,22 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
     <PageShell>
       <script dangerouslySetInnerHTML={{ __html: storeViewAnalyticsScript }} />
       <Eyebrow>OSM store record</Eyebrow>
+      <p className="mt-3 text-sm font-black text-emerald-900">Is this store good for the products I need?</p>
       <h1 className="mt-2 text-4xl font-black tracking-tight">{store.name}</h1>
       <p className="mt-3 text-lg text-slate-700">
-        {store.brand} · {store.format}
+        See store details, price level, best deals, product coverage, and data freshness. {store.brand} · {store.format}
       </p>
+      <div className="mt-4 flex flex-wrap gap-2">
+        <a className="rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" href={`/search?store=${encodeURIComponent(store.slug)}`}>
+          Search products in this store
+        </a>
+        <a className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-black text-emerald-900" href={`/deals?store=${encodeURIComponent(store.slug)}`}>
+          See deals at this store
+        </a>
+        <a className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-black text-emerald-900" href={`/map?store=${encodeURIComponent(store.slug)}`}>
+          Open map
+        </a>
+      </div>
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <Card>
           <h2 className="text-2xl font-black">Location fields</h2>

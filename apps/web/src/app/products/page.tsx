@@ -10,6 +10,7 @@ import { NewArrivalsCarousel } from '@/components/TrendingCarousel';
 import { SavedSearchActions } from '@/components/saved-search-actions';
 import { ProductGrid } from '@/components/product-grid';
 import { ChainLogo } from '@/components/chain-logo';
+import { FeaturePlacementMap } from '@/components/feature-placement-map';
 import { apohemSource } from '@/lib/ingested/apohem';
 import { newProductArrivals } from '@/lib/new-arrivals';
 import { buildSavedSearchSubscription } from '@/lib/alert-scheduler';
@@ -206,6 +207,9 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
       <Eyebrow>Products</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Verified product catalogue</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">Products are shown only when present in the Axfood chain snapshot or OpenPrices SEK observations. No filler products are rendered.</p>
+      <div className="mt-6">
+        <FeaturePlacementMap compact focus="products" />
+      </div>
       <NewArrivalsCarousel items={newProductArrivals} />
       <Card className="mt-8 border-indigo-200 bg-indigo-50/70">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">

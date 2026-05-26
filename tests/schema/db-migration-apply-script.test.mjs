@@ -13,7 +13,8 @@ describe('production DB migration apply script', () => {
 
   it('applies the canonical infra migrations through the shared migrator and pg executor', () => {
     for (const expected of [
-      'DATABASE_URL',
+      'resolveDailyWriteDatabaseUrl',
+      'buildPostgresPoolConfig',
       'infra/db/migrations',
       'createMigrationPlan',
       'createPostgresMigrationExecutor',

@@ -1,7 +1,8 @@
 import Link from 'next/link';
+import { FeaturePlacementMap } from '@/components/feature-placement-map';
 import { PageShell } from '@/components/data-ui';
+import { PageQuestionHeader } from '@/components/mvp/handoff-content';
 import { MvpBreadcrumbs } from '@/components/mvp/mvp-breadcrumbs';
-import { MvpPageHeader } from '@/components/mvp/mvp-page-header';
 import { MvpSectionCard } from '@/components/mvp/mvp-section-card';
 import { DealBadge } from '@/components/mvp/deal-badge';
 import { EvidenceStrip } from '@/components/mvp/evidence-strip';
@@ -49,10 +50,11 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
   return (
     <PageShell>
       <MvpBreadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Deals' }]} />
-      <MvpPageHeader
+      <PageQuestionHeader
         eyebrow="Deals"
-        title={replacementFilter ? `Replacement deals for ${replacementFilter.label}` : 'Are supermarket deals actually good?'}
-        subtitle="Each card compares current prices with historic medians and nearby chain evidence. GroceryView labels deals as Real Deal, Fair Discount, or Not Really a Deal instead of trusting campaign copy alone."
+        question="Is this advertised deal actually good?"
+        title={replacementFilter ? `Replacement deals for ${replacementFilter.label}` : 'Real grocery deals'}
+        subtitle="We compare advertised or current prices with price history and nearby stores to show whether a deal is truly worth it."
         evidence={
           <p className="text-sm font-semibold text-slate-600">
             Snapshot {snapshot.retrievedLabel} · {snapshot.axfoodSource}
@@ -61,6 +63,23 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
           </p>
         }
       />
+
+      <div className="mt-6">
+        <FeaturePlacementMap compact focus="deals" />
+      </div>
+
+      <section className="mt-6 grid gap-3 md:grid-cols-3" aria-label="Deal label explanation">
+        {[
+          ['Real Deal', 'Clearly cheaper than usual and competitive against nearby stores.'],
+          ['Fair Discount', 'Lower than normal, but not exceptional.'],
+          ['Not Really a Deal', 'Advertised or highlighted, but price history or nearby comparison does not support a strong discount.']
+        ].map(([label, detail]) => (
+          <article className="rounded-3xl border border-emerald-100 bg-white/90 p-4 shadow-sm" key={label}>
+            <h2 className="text-lg font-black text-slate-950">{label}</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">{detail}</p>
+          </article>
+        ))}
+      </section>
 
       <section className="mt-6 rounded-[2rem] border border-sky-200 bg-sky-50/70 p-5" aria-label="Deal feed filters by chain and category">
         <p className="text-xs font-black uppercase tracking-[0.16em] text-sky-800">Deal tabs</p>

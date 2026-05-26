@@ -142,7 +142,7 @@ describe('infra/db PostgreSQL schema contract', () => {
   it('adds first-class market country scope separate from domain', () => {
     assert.match(allMigrations, /create table if not exists markets/);
     for (const market of ['SE', 'NO', 'IS']) {
-      assert.match(allMigrations, new RegExp(`'${market}'`), `${market} market seed missing`);
+      assert.match(allMigrations, new RegExp(`'${market.toLowerCase()}'`), `${market} market seed missing`);
     }
     for (const table of ['chains', 'stores', 'products', 'observations', 'latest_prices']) {
       assert.match(allMigrations, new RegExp(`alter table ${table} add column if not exists market_code char\\(2\\)`), `${table}.market_code migration missing`);

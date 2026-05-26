@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { compareBasketStrategies, summarizeStoreBasketCoverage } from '@groceryview/core';
 import { createGroceryViewApi } from '@groceryview/api';
 import { ConfidenceBadge } from '@/components/confidence-badge';
+import { FeaturePlacementMap } from '@/components/feature-placement-map';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { ExpiringPromotionRail } from '@/components/expiring-promotion-rail';
 import { StockUpListActions } from '@/components/stock-up-list-actions';
@@ -115,6 +116,9 @@ export default async function WeeklyBasketPage({
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
         This page calls compareBasketStrategies and summarizeStoreBasketCoverage with visible favorite-store price rows, showing split-shop savings and store coverage without estimating missing prices.
       </p>
+      <div className="mt-6">
+        <FeaturePlacementMap compact focus="basket" />
+      </div>
       {recipeBasketItems ? (
         <Card className="mt-6 border-lime-200 bg-lime-50">
           <h2 className="text-2xl font-black text-lime-950">Saved recipe basket</h2>

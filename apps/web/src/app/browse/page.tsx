@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { PageShell } from '@/components/data-ui';
+import { PageQuestionHeader } from '@/components/mvp/handoff-content';
 import { MvpBreadcrumbs } from '@/components/mvp/mvp-breadcrumbs';
-import { MvpPageHeader } from '@/components/mvp/mvp-page-header';
 import { MvpSectionCard } from '@/components/mvp/mvp-section-card';
 import { getBrowsePageData } from '@/lib/mvp/data';
 import { categoryBrowseHref, categoryMarketHref } from '@/lib/mvp/routes';
@@ -16,10 +16,11 @@ export default function BrowsePage() {
   return (
     <PageShell>
       <MvpBreadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Browse' }]} />
-      <MvpPageHeader
+      <PageQuestionHeader
         eyebrow="Browse"
-        title="Choose a category or chain to explore verified products"
-        subtitle="Category cards list names and coverage counts only. Prices appear on product and search results after you drill in."
+        question="What product category do you want to explore?"
+        title="Browse grocery products"
+        subtitle="Start with a category, chain, or search. GroceryView will take you to filtered products with prices, stores, freshness, and confidence."
         actions={
           <Link className="rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" href="/search">
             Search all products
@@ -28,7 +29,7 @@ export default function BrowsePage() {
       />
 
       <form action="/search" className="mt-6 flex gap-2">
-        <input className="min-w-0 flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-3 font-semibold" name="q" placeholder="Search within browse…" type="search" />
+        <input className="min-w-0 flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-3 font-semibold" name="q" placeholder="Search for milk, chicken, coffee, diapers..." type="search" />
         <button className="rounded-2xl bg-emerald-800 px-4 py-3 text-sm font-black text-white" type="submit">
           Search
         </button>
@@ -41,7 +42,10 @@ export default function BrowsePage() {
               <Link className="text-xl font-black text-slate-950 underline" href={categoryBrowseHref(category.slug)}>
                 {category.label}
               </Link>
-              <p className="mt-1 text-sm font-semibold text-slate-600">{category.productCount} verified rows</p>
+              <p className="mt-1 text-sm font-semibold text-slate-600">
+                Compare {category.label.toLowerCase()} prices across chains, product types, and stores.
+              </p>
+              <p className="mt-2 text-sm font-black text-emerald-900">{category.productCount} verified rows</p>
               <Link className="mt-2 inline-block text-xs font-black text-emerald-800 underline" href={categoryMarketHref(category.slug)}>
                 Market view →
               </Link>

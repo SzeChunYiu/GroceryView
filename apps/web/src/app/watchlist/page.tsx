@@ -76,6 +76,7 @@ export default async function WatchlistPage({
     <PageShell>
       <FunnelStepBeacon step="watchlist_alert" />
       <Eyebrow>Watchlist price alerts</Eyebrow>
+      <p className="mt-3 text-sm font-black text-emerald-900">Sign in to track products, stores, categories, and saved market views.</p>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Tracked products with notification-ready alerts</h1>
       {/* Forecast-style alert copy must stay tied to observed historical source rows. */}
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">

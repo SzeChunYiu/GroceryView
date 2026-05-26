@@ -161,7 +161,7 @@ const mutationGuards: MutationGuard[] = [
         { chainId: 'ica', category: 'coffee', unitPrice: 0 },
         { chainId: 'ica', category: 'coffee', unitPrice: Number.NaN }
       ]);
-      assert.deepEqual(summary, { chains: [], categories: [], marketReferenceByCategory: {}, generatedFrom: 0 });
+      assert.deepEqual(summary, { chains: [], categories: [], marketReferenceByCategory: {}, matchedBasketProductIds: [], generatedFrom: 0 });
     }
   },
   {

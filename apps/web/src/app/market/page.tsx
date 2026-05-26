@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { PageShell } from '@/components/data-ui';
+import { PageQuestionHeader, PanelPurpose } from '@/components/mvp/handoff-content';
 import { MvpBreadcrumbs } from '@/components/mvp/mvp-breadcrumbs';
-import { MvpPageHeader } from '@/components/mvp/mvp-page-header';
 import { MvpSectionCard } from '@/components/mvp/mvp-section-card';
 import { NoVerifiedDataPanel } from '@/components/mvp/no-verified-data-panel';
 import { EvidenceStrip } from '@/components/mvp/evidence-strip';
@@ -15,66 +15,149 @@ export function generateMetadata() {
   return routeMetadata('/market');
 }
 
+type MarketIndexSeries = ReturnType<typeof getMarketOverviewData>['chainIndexSeries'][number];
+
+function linePath(points: MarketIndexSeries['points']) {
+  if (points.length === 0) return '';
+  const width = 520;
+  const height = 180;
+  const padding = 18;
+  const values = points.map((point) => point.value);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const span = Math.max(1, max - min);
+  return points
+    .map((point, index) => {
+      const x = padding + (index / Math.max(1, points.length - 1)) * (width - padding * 2);
+      const y = height - padding - ((point.value - min) / span) * (height - padding * 2);
+      return `${index === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`;
+    })
+    .join(' ');
+}
+
+function areaPath(points: MarketIndexSeries['points']) {
+  const path = linePath(points);
+  if (!path) return '';
+  const width = 520;
+  const height = 180;
+  return `${path} L ${width - 18} ${height - 18} L 18 ${height - 18} Z`;
+}
+
+function MarketIndexChart({ series }: Readonly<{ series: MarketIndexSeries }>) {
+  const latest = series.points.at(-1);
+  const previous = series.points.at(-2);
+  const isUp = latest && previous ? latest.value >= previous.value : true;
+  const stroke = isUp ? '#047857' : '#be123c';
+  const gradientId = `market-index-fill-${series.chain.replace(/[^a-z0-9_-]+/gi, '-').toLowerCase()}`;
+
+  return (
+    <article className="overflow-hidden rounded-[1.6rem] border border-slate-200 bg-white shadow-sm">
+      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 p-4">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">{series.indexType} · {series.region}</p>
+          <h3 className="mt-1 text-2xl font-black tracking-tight text-slate-950">{series.chain}</h3>
+        </div>
+        <div className="text-right">
+          <p className="font-mono text-3xl font-black text-slate-950">{latest?.value.toFixed(1) ?? '—'}</p>
+          <p className={`text-sm font-black ${isUp ? 'text-emerald-700' : 'text-rose-700'}`}>
+            {series.weeklyChangePct !== undefined ? `${series.weeklyChangePct >= 0 ? '+' : ''}${series.weeklyChangePct.toFixed(1)}% weekly` : 'weekly —'}
+          </p>
+        </div>
+      </div>
+      <div className="p-4">
+        <svg className="h-48 w-full" role="img" viewBox="0 0 520 180" aria-label={`${series.chain} price index movement`}>
+          <defs>
+            <linearGradient id={gradientId} x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stopColor={stroke} stopOpacity="0.24" />
+              <stop offset="100%" stopColor={stroke} stopOpacity="0.02" />
+            </linearGradient>
+          </defs>
+          {[42, 78, 114, 150].map((y) => (
+            <line key={y} x1="18" x2="502" y1={y} y2={y} stroke="#e2e8f0" strokeDasharray="4 8" />
+          ))}
+          <path d={areaPath(series.points)} fill={`url(#${gradientId})`} />
+          <path d={linePath(series.points)} fill="none" stroke={stroke} strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" />
+          {series.points.map((point, index) => {
+            const values = series.points.map((entry) => entry.value);
+            const min = Math.min(...values);
+            const max = Math.max(...values);
+            const span = Math.max(1, max - min);
+            const x = 18 + (index / Math.max(1, series.points.length - 1)) * (520 - 36);
+            const y = 180 - 18 - ((point.value - min) / span) * (180 - 36);
+            return <circle cx={x} cy={y} fill="#fff" key={`${point.date}-${point.value}`} r="4" stroke={stroke} strokeWidth="3" />;
+          })}
+        </svg>
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs font-bold text-slate-500">
+          <span>{series.points[0]?.date ?? 'Start date unknown'}</span>
+          <span>{series.points.length} dated points · {series.sourceLabel}</span>
+          <span>{latest?.date ?? 'Latest date unknown'}</span>
+        </div>
+      </div>
+    </article>
+  );
+}
+
 export default async function MarketPage({ searchParams }: Readonly<{ searchParams?: Promise<SearchParams> }>) {
   const resolved = await (searchParams ?? Promise.resolve({}));
   const data = getMarketOverviewData(resolved);
   return (
     <PageShell>
       <MvpBreadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Market' }]} />
-      <MvpPageHeader
+      <PageQuestionHeader
         eyebrow="Market overview"
-        title="Chain and category price indexes from verified observations"
-        subtitle="Indexes replay dated observations through the same chain-index engine used on chain-index pages. Missing history stays labelled instead of interpolated."
+        question="Which grocery prices are rising or falling?"
+        title="Grocery market overview"
+        subtitle="Track price changes across chains, categories, and regions. Click any category to drill down into products and deals."
         evidence={<EvidenceStrip evidence={buildMarketEvidence(data)} />}
       />
 
-      <form className="mt-6 flex flex-wrap gap-2">
-        {[
-          { key: 'region', label: 'Region', value: data.selectedRegion, options: ['stockholm', 'goteborg', 'malmo'] },
-          { key: 'index', label: 'Index', value: data.selectedIndexType, options: ['chain-price', 'category-price'] }
-        ].map((field) => (
-          <label className="text-sm font-black text-slate-700" key={field.key}>
-            {field.label}
-            <select className="ml-2 rounded-full border border-slate-200 bg-white px-3 py-2" defaultValue={field.value} name={field.key}>
-              {field.options.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          </label>
-        ))}
-        <button className="rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" type="submit">
-          Apply
-        </button>
-      </form>
-
-      <div className="mt-6 grid gap-6 xl:grid-cols-[1fr_18rem]">
+      <div className="mt-6 grid gap-6 xl:grid-cols-[18rem_1fr_20rem]">
+        <PanelPurpose
+          description="Switch between index type, region, chain, and time-range views. Missing or stale data stays visible instead of guessed."
+          question="Choose what to compare"
+          title="Market controls"
+        >
+          <form className="grid gap-3">
+            {[
+              { key: 'region', label: 'Region', value: data.selectedRegion, options: ['stockholm', 'goteborg', 'malmo'] },
+              { key: 'index', label: 'Index', value: data.selectedIndexType, options: ['chain-price', 'category-price'] }
+            ].map((field) => (
+              <label className="text-sm font-black text-slate-700" key={field.key}>
+                {field.label}
+                <select className="mt-1 w-full rounded-2xl border border-slate-200 bg-white px-3 py-2" defaultValue={field.value} name={field.key}>
+                  {field.options.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ))}
+            <button className="rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" type="submit">
+              Apply
+            </button>
+          </form>
+        </PanelPurpose>
         <div className="space-y-6">
           <MvpSectionCard title="Chain price index">
+            <p className="mb-4 text-sm font-semibold leading-6 text-slate-600">
+              Compare how grocery prices are moving across chains. Use the filters to switch region, category, or time range.
+            </p>
             {data.chainIndexSeries.length > 0 ? (
-              <div className="space-y-4">
+              <div className="grid gap-4 lg:grid-cols-2">
                 {data.chainIndexSeries.map((series) => (
-                  <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4" key={`${series.chain}-${series.indexType}`}>
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="font-black text-slate-950">{series.chain}</p>
-                      <p className="text-sm font-semibold text-slate-600">
-                        Latest {series.points.at(-1)?.value.toFixed(1) ?? '—'} · weekly{' '}
-                        {series.weeklyChangePct !== undefined ? `${series.weeklyChangePct.toFixed(1)}%` : '—'}
-                      </p>
-                    </div>
-                    <p className="mt-2 text-xs font-semibold text-slate-500">
-                      {series.points.length} dated index points · {series.sourceLabel}
-                    </p>
-                  </div>
+                  <MarketIndexChart key={`${series.chain}-${series.indexType}`} series={series} />
                 ))}
               </div>
             ) : (
-              <NoVerifiedDataPanel title="Chain index chart unavailable" message="Not enough dated index points to render a chart for the selected filters." />
+              <NoVerifiedDataPanel title="Not enough verified price history for this chart yet" message="Try another region, category, or time range." />
             )}
           </MvpSectionCard>
 
-          <MvpSectionCard title="Category index table">
+          <MvpSectionCard title="Price movement by category">
+            <p className="mb-4 text-sm font-semibold leading-6 text-slate-600">
+              See which categories are getting more expensive or cheaper. Click a category to inspect the trend, or browse products in that category.
+            </p>
             {data.categoryIndexRows.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="min-w-full text-left text-sm">
@@ -134,8 +217,8 @@ export default async function MarketPage({ searchParams }: Readonly<{ searchPara
         </div>
 
         <aside className="space-y-4">
-          <MvpSectionCard title="Watchlist">
-            <p className="text-sm font-semibold leading-6 text-slate-700">Sign in to save products, stores, and category market views. Until then, watchlist panels stay empty rather than showing sample rows.</p>
+          <MvpSectionCard title="Your market watchlist">
+            <p className="text-sm font-semibold leading-6 text-slate-700">Sign in to track products, stores, categories, and saved market views. Until then, watchlist panels stay empty rather than showing sample rows.</p>
             <Link className="mt-3 inline-block rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" href="/watchlist">
               Open watchlist
             </Link>

@@ -121,6 +121,10 @@ describe('processScanUpload', () => {
       kind: 'receipt',
       totalAmount: 62.4,
       confidence: 0.66,
+      rows: [
+        { rawName: 'ZOEGAS 450G', itemTotal: 49.9, confidence: 0.91 },
+        { rawName: 'SMUDGED ITEM', itemTotal: 12.5, confidence: 0.41 }
+      ],
       needsHumanReview: true,
       lowConfidenceRows: ['SMUDGED ITEM']
     });
@@ -235,6 +239,7 @@ describe('planScanReviewWorkItems', () => {
           kind: 'receipt',
           totalAmount: 62.4,
           confidence: 0.66,
+          rows: [{ rawName: 'SMUDGED ITEM', itemTotal: 12.5, confidence: 0.41 }],
           needsHumanReview: true,
           lowConfidenceRows: ['SMUDGED ITEM']
         }
@@ -290,6 +295,7 @@ describe('planScanReviewWorkItems', () => {
           kind: 'receipt',
           totalAmount: 105,
           confidence: 0.78,
+          rows: [{ rawName: 'ZOEGAS 450G', itemTotal: 105, confidence: 0.78 }],
           needsHumanReview: true,
           lowConfidenceRows: []
         }
