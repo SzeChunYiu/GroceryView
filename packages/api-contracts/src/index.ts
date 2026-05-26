@@ -7,7 +7,7 @@ export const priceTypeSchema = z.enum(['shelf', 'member', 'promotion', 'estimate
 export const confidenceSchema = z.enum(['high', 'medium', 'low', 'unverified']);
 export const sourceTypeSchema = z.enum(['retailer_api', 'retailer_page', 'receipt_scan', 'manual_review', 'seed_stub']);
 export const priceDomainSchema = z.enum(['grocery', 'fuel', 'pharmacy']);
-export const fuelGradeSchema = z.enum(['95', '98', 'diesel', 'hvo100', 'e85']);
+export const fuelGradeSchema = z.enum(['95', '98', 'diesel', 'hvo100', 'e85', 'adblue']);
 export const fuelPriceSourceSchema = z.discriminatedUnion('kind', [
   z.object({
     kind: z.literal('operator_public_price_page'),
@@ -118,6 +118,32 @@ export const watchlistSchema = z.object({
   favoriteStoresOnly: z.boolean().default(false)
 });
 
+export const dealShareRelationshipSchema = z.enum(['household', 'friend']);
+
+export const friendSharedDealSignalSchema = z.object({
+  signalId: idSchema,
+  userId: idSchema,
+  productId: idSchema,
+  sharedByUserId: idSchema,
+  sharedByDisplayName: idSchema,
+  relationship: dealShareRelationshipSchema,
+  sharedAt: isoDateTimeSchema,
+  sourceConfidence: z.number().min(0).max(1),
+  optedIn: z.literal(true),
+  dealScore: z.number().int().min(0).max(100).optional(),
+  createdAt: isoDateTimeSchema
+});
+
+export const friendSharedDealSignalCreateSchema = friendSharedDealSignalSchema
+  .omit({ userId: true, createdAt: true })
+  .extend({ createdAt: isoDateTimeSchema.optional() });
+
+export const friendSharedDealSignalListResponseSchema = z.object({
+  userId: idSchema,
+  signals: z.array(friendSharedDealSignalSchema),
+  guardrails: z.array(idSchema)
+});
+
 export const basketItemSchema = z.object({
   productId: idSchema,
   quantity: z.number().positive()
@@ -145,10 +171,21 @@ export const multiWeekStockUpRowSchema = z.object({
   currentUnitPrice: z.number().nonnegative(),
   historicalLowUnitPrice: z.number().nonnegative(),
   typicalUnitPrice: z.number().nonnegative(),
+  currentVsTypicalPercent: z.number().optional(),
+  currentVsHistoricalLowPercent: z.number().optional(),
+  plannedUnits: z.number().nonnegative().optional(),
+  packagesNeeded: z.number().int().nonnegative().optional(),
+  upfrontCost: z.number().nonnegative().optional(),
+  weeklyEquivalentCost: z.number().nonnegative().optional(),
+  weeklyBudgetSharePercent: z.number().nonnegative().optional(),
+  observationCount: z.number().int().nonnegative().optional(),
+  observedHistoryWindow: idSchema.optional(),
   confidence: multiWeekStockUpConfidenceSchema,
   historyWindowStart: isoDateTimeSchema,
   historyWindowEnd: isoDateTimeSchema,
   storageLimitWeeks: z.number().int().positive().max(26).optional(),
+  contextLabel: idSchema.optional(),
+  seasonalityNote: idSchema.optional(),
   noForecastReason: idSchema,
   reviewTrigger: idSchema,
   updatedAt: isoDateTimeSchema
@@ -165,7 +202,20 @@ export const multiWeekStockUpUpdateRowSchema = multiWeekStockUpCreateRowSchema.p
 export const multiWeekStockUpListResponseSchema = z.object({
   userId: idSchema,
   itemCount: z.number().int().nonnegative(),
+  asOf: isoDateTimeSchema.optional(),
+  planningWeeks: z.number().int().positive().max(26).optional(),
+  weeklyBudget: z.number().positive().optional(),
+  totalUpfrontCost: z.number().nonnegative().optional(),
+  weeklyEquivalentCost: z.number().nonnegative().optional(),
+  weeklyBudgetSharePercent: z.number().nonnegative().optional(),
   rows: z.array(multiWeekStockUpRowSchema),
+  coverage: z.object({
+    confidence: multiWeekStockUpConfidenceSchema,
+    observedItemCount: z.number().int().nonnegative(),
+    totalItemCount: z.number().int().nonnegative(),
+    missingHistoryProductIds: z.array(idSchema).optional(),
+    caveat: idSchema
+  }).optional(),
   guardrails: z.array(idSchema),
   evidence: z.object({
     sourceTables: z.array(idSchema),
@@ -247,6 +297,9 @@ export const apiContractSchemas = {
   basket: basketSchema,
   basketItem: basketItemSchema,
   compareResponse: compareResponseSchema,
+  friendSharedDealSignal: friendSharedDealSignalSchema,
+  friendSharedDealSignalCreate: friendSharedDealSignalCreateSchema,
+  friendSharedDealSignalListResponse: friendSharedDealSignalListResponseSchema,
   latestPrice: latestPriceSchema,
   fuelPriceObservation: fuelPriceObservationSchema,
   fuelPriceSource: fuelPriceSourceSchema,
@@ -292,6 +345,9 @@ export type ProvenanceDto = z.infer<typeof provenanceSchema>;
 export type SourceType = z.infer<typeof sourceTypeSchema>;
 export type StoreDto = z.infer<typeof storeSchema>;
 export type WatchlistDto = z.infer<typeof watchlistSchema>;
+export type FriendSharedDealSignalDto = z.infer<typeof friendSharedDealSignalSchema>;
+export type FriendSharedDealSignalCreateDto = z.infer<typeof friendSharedDealSignalCreateSchema>;
+export type FriendSharedDealSignalListResponseDto = z.infer<typeof friendSharedDealSignalListResponseSchema>;
 
 export const apiContractOpenApiComponents = {
   PriceObservation: {
@@ -392,10 +448,21 @@ export const apiContractOpenApiComponents = {
       currentUnitPrice: { type: 'number', minimum: 0 },
       historicalLowUnitPrice: { type: 'number', minimum: 0 },
       typicalUnitPrice: { type: 'number', minimum: 0 },
+      currentVsTypicalPercent: { type: 'number' },
+      currentVsHistoricalLowPercent: { type: 'number' },
+      plannedUnits: { type: 'number', minimum: 0 },
+      packagesNeeded: { type: 'integer', minimum: 0 },
+      upfrontCost: { type: 'number', minimum: 0 },
+      weeklyEquivalentCost: { type: 'number', minimum: 0 },
+      weeklyBudgetSharePercent: { type: 'number', minimum: 0 },
+      observationCount: { type: 'integer', minimum: 0 },
+      observedHistoryWindow: { type: 'string' },
       confidence: { type: 'string', enum: multiWeekStockUpConfidenceSchema.options },
       historyWindowStart: { type: 'string', format: 'date-time' },
       historyWindowEnd: { type: 'string', format: 'date-time' },
       storageLimitWeeks: { type: 'integer', minimum: 1, maximum: 26 },
+      contextLabel: { type: 'string' },
+      seasonalityNote: { type: 'string' },
       noForecastReason: { type: 'string' },
       reviewTrigger: { type: 'string' },
       updatedAt: { type: 'string', format: 'date-time' }
@@ -407,9 +474,29 @@ export const apiContractOpenApiComponents = {
     properties: {
       userId: { type: 'string' },
       itemCount: { type: 'integer', minimum: 0 },
+      asOf: { type: 'string', format: 'date-time' },
+      planningWeeks: { type: 'integer', minimum: 1, maximum: 26 },
+      weeklyBudget: { type: 'number', minimum: 0 },
+      totalUpfrontCost: { type: 'number', minimum: 0 },
+      weeklyEquivalentCost: { type: 'number', minimum: 0 },
+      weeklyBudgetSharePercent: { type: 'number', minimum: 0 },
       rows: {
         type: 'array',
         items: { $ref: '#/components/schemas/MultiWeekStockUpRow' }
+      },
+      coverage: {
+        type: 'object',
+        required: ['confidence', 'observedItemCount', 'totalItemCount', 'caveat'],
+        properties: {
+          confidence: { type: 'string', enum: multiWeekStockUpConfidenceSchema.options },
+          observedItemCount: { type: 'integer', minimum: 0 },
+          totalItemCount: { type: 'integer', minimum: 0 },
+          missingHistoryProductIds: {
+            type: 'array',
+            items: { type: 'string' }
+          },
+          caveat: { type: 'string' }
+        }
       },
       guardrails: {
         type: 'array',
@@ -486,6 +573,38 @@ export const apiContractOpenApiComponents = {
         items: { $ref: '#/components/schemas/NotificationInboxQueueItem' }
       },
       quietHoursWindow: { type: 'string' },
+      guardrails: {
+        type: 'array',
+        items: { type: 'string' }
+      }
+    }
+  },
+  FriendSharedDealSignal: {
+    type: 'object',
+    required: ['signalId', 'userId', 'productId', 'sharedByUserId', 'sharedByDisplayName', 'relationship', 'sharedAt', 'sourceConfidence', 'optedIn', 'createdAt'],
+    properties: {
+      signalId: { type: 'string' },
+      userId: { type: 'string' },
+      productId: { type: 'string' },
+      sharedByUserId: { type: 'string' },
+      sharedByDisplayName: { type: 'string' },
+      relationship: { type: 'string', enum: dealShareRelationshipSchema.options },
+      sharedAt: { type: 'string', format: 'date-time' },
+      sourceConfidence: { type: 'number', minimum: 0, maximum: 1 },
+      optedIn: { type: 'boolean', enum: [true] },
+      dealScore: { type: 'integer', minimum: 0, maximum: 100 },
+      createdAt: { type: 'string', format: 'date-time' }
+    }
+  },
+  FriendSharedDealSignalListResponse: {
+    type: 'object',
+    required: ['userId', 'signals', 'guardrails'],
+    properties: {
+      userId: { type: 'string' },
+      signals: {
+        type: 'array',
+        items: { $ref: '#/components/schemas/FriendSharedDealSignal' }
+      },
       guardrails: {
         type: 'array',
         items: { type: 'string' }

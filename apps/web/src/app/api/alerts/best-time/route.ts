@@ -57,28 +57,27 @@ function parsePriceHistory(value: unknown): PriceForecastObservation[] {
 
 function parseFlyerWindows(value: unknown): FlyerWindow[] {
   if (!Array.isArray(value)) return [];
-  return value
-    .map((entry) => {
-      if (!entry || typeof entry !== 'object') return null;
-      const candidate = entry as Record<string, unknown>;
-      const storeName = typeof candidate.storeName === 'string' ? candidate.storeName.trim() : '';
-      const categoryLabel = typeof candidate.categoryLabel === 'string' ? candidate.categoryLabel.trim() : '';
-      const startsAt = typeof candidate.startsAt === 'string' ? candidate.startsAt : '';
-      const endsAt = typeof candidate.endsAt === 'string' ? candidate.endsAt : '';
-      const expectedDiscountPct = candidate.expectedDiscountPct === undefined || candidate.expectedDiscountPct === null
-        ? null
-        : Number(candidate.expectedDiscountPct);
-      if (!storeName || !categoryLabel || !startsAt || !endsAt) return null;
-      const expectedDiscount = expectedDiscountPct === null || !Number.isFinite(expectedDiscountPct) ? null : expectedDiscountPct;
-      return {
-        storeName,
-        categoryLabel,
-        startsAt,
-        endsAt,
-        expectedDiscountPct: expectedDiscount
-      };
-    })
-    .filter((entry): entry is FlyerWindow => entry !== null);
+  const windows: FlyerWindow[] = [];
+  for (const entry of value) {
+    if (!entry || typeof entry !== 'object') continue;
+    const candidate = entry as Record<string, unknown>;
+    const storeName = typeof candidate.storeName === 'string' ? candidate.storeName.trim() : '';
+    const categoryLabel = typeof candidate.categoryLabel === 'string' ? candidate.categoryLabel.trim() : '';
+    const startsAt = typeof candidate.startsAt === 'string' ? candidate.startsAt : '';
+    const endsAt = typeof candidate.endsAt === 'string' ? candidate.endsAt : '';
+    const expectedDiscountPct = candidate.expectedDiscountPct === undefined || candidate.expectedDiscountPct === null
+      ? null
+      : Number(candidate.expectedDiscountPct);
+    if (!storeName || !categoryLabel || !startsAt || !endsAt) continue;
+    windows.push({
+      storeName,
+      categoryLabel,
+      startsAt,
+      endsAt,
+      expectedDiscountPct: expectedDiscountPct === null || !Number.isFinite(expectedDiscountPct) ? null : expectedDiscountPct
+    });
+  }
+  return windows;
 }
 
 async function readBestTimeAlertPayload(request: Request): Promise<BestTimeAlertPayload> {

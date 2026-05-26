@@ -3,8 +3,8 @@ import { buildWatchlistAlerts, type WatchlistItem, type WatchlistProductSnapshot
 export type VerifiedFuelPriceObservation = {
   id: string;
   domain: 'fuel';
-  productId: 'fuel-95-e10' | 'fuel-98' | 'fuel-diesel' | 'fuel-hvo100' | 'fuel-e85';
-  grade: '95' | '98' | 'diesel' | 'hvo100' | 'e85';
+  productId: 'fuel-95-e10' | 'fuel-98' | 'fuel-diesel' | 'fuel-hvo100' | 'fuel-e85' | 'fuel-adblue';
+  grade: '95' | '98' | 'diesel' | 'hvo100' | 'e85' | 'adblue';
   label: string;
   operatorId: 'okq8';
   operatorName: 'OKQ8';
@@ -34,7 +34,7 @@ export const fuelPriceSourceSchema = {
   sourceObservationTable: 'fuel_price_source_observations',
   operatorSourceKind: 'operator_public_price_page',
   crowdSourceKind: 'crowd_station_report',
-  requiredGrades: ['fuel-95-e10', 'fuel-98', 'fuel-diesel', 'fuel-hvo100', 'fuel-e85'],
+  requiredGrades: ['fuel-95-e10', 'fuel-98', 'fuel-diesel', 'fuel-hvo100', 'fuel-e85', 'fuel-adblue'],
   observationContract: 'domain=fuel, price per litre, fuel grade id, original source price text'
 } as const;
 

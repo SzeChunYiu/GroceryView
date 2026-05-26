@@ -40,3 +40,23 @@ curl -fsS \
 ```
 
 The route returns HTTP 200 only when the required tables and migration versions are present. It returns HTTP 503 with explicit blockers when migrations are missing or the readiness provider cannot run.
+
+## Backup Restore Drill
+
+Run a restore drill from the latest Postgres backup into a disposable database:
+
+```sh
+GROCERYVIEW_RESTORE_DRILL_ADMIN_URL="$POSTGRES_ADMIN_URL" \
+GROCERYVIEW_BACKUP_DIR=backups/postgres \
+npm run ops:postgres-restore-drill
+```
+
+The drill selects the newest `.sql`, `.sql.gz`, `.dump`, `.dump.gz`, `.backup`, `.backup.gz`, or `.tar` file, creates a `groceryview_restore_drill_*` database, restores the backup with `psql` or `pg_restore`, then reports JSON evidence for migration versions, key table presence, row counts, sample joins, restore duration, and RTO seconds. It drops the disposable database at the end unless `GROCERYVIEW_RESTORE_DRILL_KEEP_DB=1`.
+
+Environment overrides:
+
+- `GROCERYVIEW_BACKUP_FILE`: restore one explicit backup file instead of scanning a directory.
+- `GROCERYVIEW_BACKUP_DIR` or `POSTGRES_BACKUP_DIR`: backup directory to scan, default `backups/postgres`.
+- `GROCERYVIEW_RESTORE_DRILL_ADMIN_URL`: Postgres admin connection string used to create and drop the disposable database.
+- `GROCERYVIEW_RESTORE_DRILL_TARGET_URL`: pre-created disposable target database. It must use the `groceryview_restore_drill` prefix unless `GROCERYVIEW_RESTORE_DRILL_ALLOW_EXISTING_TARGET=1`.
+- `GROCERYVIEW_RESTORE_DRILL_KEY_TABLES`: comma-separated table list for row-count evidence, default `chains,stores,products,observations,latest_prices,source_runs`.

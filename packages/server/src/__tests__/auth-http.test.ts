@@ -15,6 +15,8 @@ describe('authenticated HTTP routes', () => {
 
     const unauthenticatedPrivacyExport = await handle(new Request('http://localhost/api/privacy/export?userId=user-1'));
     assert.equal(unauthenticatedPrivacyExport.status, 401);
+    const unauthenticatedSettings = await handle(new Request('http://localhost/api/settings?userId=user-1'));
+    assert.equal(unauthenticatedSettings.status, 401);
     const unauthenticatedSettingsExport = await handle(new Request('http://localhost/api/settings/data-export?userId=user-1'));
     assert.equal(unauthenticatedSettingsExport.status, 401);
     const unauthenticatedSettingsDelete = await handle(new Request('http://localhost/api/settings/account?userId=user-1', {
@@ -59,6 +61,8 @@ describe('authenticated HTTP routes', () => {
     assert.equal(unauthenticatedPantry.status, 401);
     const unauthenticatedLocalOffers = await handle(new Request('http://localhost/api/basket/local-offers?userId=user-1'));
     assert.equal(unauthenticatedLocalOffers.status, 401);
+    const unauthenticatedStockUp = await handle(new Request('http://localhost/api/basket/stock-up-list?userId=user-1'));
+    assert.equal(unauthenticatedStockUp.status, 401);
     const unauthenticatedMealPlans = await handle(new Request('http://localhost/api/meal-plans/suggestions?userId=user-1'));
     assert.equal(unauthenticatedMealPlans.status, 401);
     const unauthenticatedExpiryRadar = await handle(new Request('http://localhost/api/expiry-deals/radar?userId=user-1'));
@@ -82,6 +86,12 @@ describe('authenticated HTTP routes', () => {
       headers: { authorization: `Bearer ${wrongUserToken}` }
     }));
     assert.equal(forbiddenSettingsExport.status, 403);
+    const forbiddenSettings = await handle(new Request('http://localhost/api/settings?userId=user-1', {
+      method: 'PATCH',
+      headers: { authorization: `Bearer ${wrongUserToken}` },
+      body: JSON.stringify({ preferredStores: ['willys-odenplan'] })
+    }));
+    assert.equal(forbiddenSettings.status, 403);
     const forbiddenSettingsDelete = await handle(new Request('http://localhost/api/settings/account?userId=user-1', {
       method: 'DELETE',
       headers: { authorization: `Bearer ${wrongUserToken}` },
@@ -134,6 +144,10 @@ describe('authenticated HTTP routes', () => {
       headers: { authorization: `Bearer ${wrongUserToken}` }
     }));
     assert.equal(forbiddenLocalOffers.status, 403);
+    const forbiddenStockUp = await handle(new Request('http://localhost/api/basket/stock-up-list?userId=user-1', {
+      headers: { authorization: `Bearer ${wrongUserToken}` }
+    }));
+    assert.equal(forbiddenStockUp.status, 403);
     const forbiddenMealPlans = await handle(new Request('http://localhost/api/meal-plans/suggestions?userId=user-1', {
       headers: { authorization: `Bearer ${wrongUserToken}` }
     }));
@@ -160,6 +174,10 @@ describe('authenticated HTTP routes', () => {
       headers: { authorization: `Bearer ${token}` }
     }));
     assert.equal(authorizedSettingsExport.status, 200);
+    const authorizedSettings = await handle(new Request('http://localhost/api/settings?userId=user-1', {
+      headers: { authorization: `Bearer ${token}` }
+    }));
+    assert.equal(authorizedSettings.status, 200);
     const authorizedSettingsDelete = await handle(new Request('http://localhost/api/settings/account?userId=user-1', {
       method: 'DELETE',
       headers: { authorization: `Bearer ${token}` },
@@ -200,6 +218,10 @@ describe('authenticated HTTP routes', () => {
       headers: { authorization: `Bearer ${token}` }
     }));
     assert.equal(authorizedLocalOffers.status, 200);
+    const authorizedStockUp = await handle(new Request('http://localhost/api/basket/stock-up-list?userId=user-1', {
+      headers: { authorization: `Bearer ${token}` }
+    }));
+    assert.equal(authorizedStockUp.status, 200);
     const authorizedMealPlans = await handle(new Request('http://localhost/api/meal-plans/suggestions?userId=user-1', {
       headers: { authorization: `Bearer ${token}` }
     }));

@@ -6,8 +6,120 @@ on:
     branches: [main]
 
 jobs:
-  verify:
-    name: Test, build, and typecheck
+  prisma-migrations:
+    name: Prisma migration gate
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: groceryview_migration_test
+          POSTGRES_USER: groceryview
+          POSTGRES_PASSWORD: groceryview
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U groceryview -d groceryview_migration_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Verify Prisma migrations on fresh Postgres
+        env:
+          DATABASE_URL: postgresql://groceryview:groceryview@localhost:5432/groceryview_migration_test
+        run: scripts/ci-migrate.sh
+
+  package-verify:
+    name: ${{ matrix.label }} package
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: web
+            workspace: '@groceryview/web'
+          - label: api
+            workspace: '@groceryview/api-app'
+          - label: core
+            workspace: '@groceryview/core'
+          - label: db
+            workspace: '@groceryview/db'
+          - label: ingestion
+            workspace: '@groceryview/ingestion'
+          - label: catalog
+            workspace: '@groceryview/catalog'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Test ${{ matrix.label }}
+        run: npm run test -w ${{ matrix.workspace }}
+      - name: Build ${{ matrix.label }}
+        run: npm run build -w ${{ matrix.workspace }}
+      - name: Summarize package result
+        if: always()
+        run: |
+          {
+            echo "### Package verification"
+            echo "- Package: \`${{ matrix.label }}\`"
+            echo "- Workspace: \`${{ matrix.workspace }}\`"
+            echo "- Result: \`${{ job.status }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  market-fixtures:
+    name: ${{ matrix.market }} ingestion fixtures
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        market: [SE, NO, IS]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Compile ingestion fixture tests
+        run: |
+          npm run build -w @groceryview/db
+          npm run build -w @groceryview/catalog
+          npm run build -w @groceryview/image-cache
+          ./node_modules/.bin/tsc -p packages/ingestion/tsconfig.test.json
+      - name: Run ${{ matrix.market }} fixture tests
+        env:
+          GROCERYVIEW_CI_FIXTURE_COUNTRIES: ${{ matrix.market }}
+        run: node scripts/ci-run-market-fixtures.mjs ${{ matrix.market }}
+      - name: Summarize market result
+        if: always()
+        run: |
+          {
+            echo "### Market fixture verification"
+            echo "- Market: \`${{ matrix.market }}\`"
+            echo "- Fixture env: \`GROCERYVIEW_CI_FIXTURE_COUNTRIES=${{ matrix.market }}\`"
+            echo "- Result: \`${{ job.status }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  root-typecheck:
+    name: Root TypeScript typecheck
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -18,41 +130,60 @@ jobs:
           node-version: '22'
           cache: npm
       - name: Install dependencies
-        id: install
         run: npm ci
-      - name: Run tests with SE/NO/IS fixtures
-        id: tests
-        env:
-          GROCERYVIEW_CI_FIXTURE_COUNTRIES: SE,NO,IS
-        run: npm test
-      - name: Build workspaces
-        id: build
-        run: npm run build
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Summarize typecheck result
+        if: always()
+        run: |
+          {
+            echo "### Root typecheck"
+            echo "- Command: \`npm run typecheck\`"
+            echo "- Result: \`${{ job.status }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  web-performance:
+    name: Web performance budgets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
       - name: Next profile bundle budget
-        id: profile_bundle
         run: npm run perf:bundle:profile -w @groceryview/web
       - name: Lighthouse performance budget
-        id: lighthouse_budget
         run: npm run perf:lighthouse:ci -w @groceryview/web
-      - name: Typecheck
-        id: typecheck
-        run: npm run typecheck
-      - name: Generate dated test report
+      - name: Summarize performance result
         if: always()
-        env:
-          INSTALL_OUTCOME: ${{ steps.install.outcome }}
-          TEST_OUTCOME: ${{ steps.tests.outcome }}
-          BUILD_OUTCOME: ${{ steps.build.outcome }}
-          PROFILE_BUNDLE_OUTCOME: ${{ steps.profile_bundle.outcome }}
-          LIGHTHOUSE_OUTCOME: ${{ steps.lighthouse_budget.outcome }}
-          TYPECHECK_OUTCOME: ${{ steps.typecheck.outcome }}
-          JOB_STATUS: ${{ job.status }}
-        run: node --experimental-strip-types scripts/test-report.ts
-      - name: Upload dated test report
-        if: always()
-        uses: actions/upload-artifact@v4
+        run: |
+          {
+            echo "### Web performance budgets"
+            echo "- Bundle profile: \`npm run perf:bundle:profile -w @groceryview/web\`"
+            echo "- Lighthouse: \`npm run perf:lighthouse:ci -w @groceryview/web\`"
+            echo "- Result: \`${{ job.status }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  keyboard-a11y:
+    name: Keyboard-only navigation regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Setup Node
+        uses: actions/setup-node@v5
         with:
-          name: ci-test-results-${{ github.run_id }}-${{ github.run_attempt }}
-          path: |
-            docs/test-results/*.md
-            docs/testing/INDEX.md
+          node-version: '22'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run keyboard-only navigation regression
+        run: npm run e2e -w @groceryview/web -- --project=chromium e2e/keyboard-navigation.spec.ts

@@ -18,13 +18,18 @@ const retailerSourcePoliciesMigration = readFileSync(join(repoRoot, 'infra/db/mi
 const basketImportReviewsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/010_basket_import_reviews.sql'), 'utf8').toLowerCase();
 const priceAlertsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/011_price_alerts.sql'), 'utf8').toLowerCase();
 const telegramNotificationsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/018_telegram_notifications.sql'), 'utf8').toLowerCase();
+const friendSharedDealSignalsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/025_friend_shared_deal_signals.sql'), 'utf8').toLowerCase();
+const serverPriceObservationOriginCertMigration = readFileSync(
+  join(repoRoot, 'packages/server/migrations/20260525143500_add_origin_cert_to_price_observation.sql'),
+  'utf8'
+).toLowerCase();
 const migrationsDir = join(repoRoot, 'infra/db/migrations');
 const allMigrations = readdirSync(migrationsDir)
   .filter((entry) => entry.endsWith('.sql') && !entry.startsWith('._'))
   .sort()
   .map((entry) => readFileSync(join(migrationsDir, entry), 'utf8').toLowerCase())
   .join('\n');
-const repositoryMigrations = `${repositoryMigration}\n${entitlementMigration}\n${alertRulesMigration}\n${pantryInventoryMigration}\n${receiptUploadsMigration}\n${householdPlansMigration}\n${basketImportReviewsMigration}\n${telegramNotificationsMigration}`;
+const repositoryMigrations = `${repositoryMigration}\n${entitlementMigration}\n${alertRulesMigration}\n${pantryInventoryMigration}\n${receiptUploadsMigration}\n${householdPlansMigration}\n${basketImportReviewsMigration}\n${telegramNotificationsMigration}\n${friendSharedDealSignalsMigration}`;
 const sourcePolicyTables = ['retailer_source_policies'];
 const migrationVerifier = readFileSync(join(repoRoot, 'infra/db/scripts/verify-migrations.sh'), 'utf8').toLowerCase();
 const schemaDoc = readFileSync(join(repoRoot, 'infra/db/SCHEMA.md'), 'utf8').toLowerCase();
@@ -54,6 +59,7 @@ const repositoryTables = [
   'weekly_baskets',
   'basket_items',
   'basket_import_review_items',
+  'friend_shared_deal_signals',
   'human_review_assignments',
   'human_reviewers',
   'community_reporter_trust',
@@ -108,12 +114,41 @@ describe('infra/db PostgreSQL schema contract', () => {
   it('classifies every chain with indexed retailer_type metadata', () => {
     const chains = tableDefinition('chains');
     assert.match(chains, /retailer_type text not null default 'grocery' check/);
-    for (const retailerType of ['grocery', 'pharmacy', 'fuel', 'convenience', 'variety', 'cosmetics', 'household', 'online_marketplace']) {
+    for (const retailerType of [
+      'grocery',
+      'pharmacy',
+      'fuel',
+      'convenience',
+      'variety',
+      'cosmetics',
+      'household',
+      'online_marketplace',
+      'ethnic_asian',
+      'ethnic_polish_eastern_european',
+      'ethnic_middle_eastern',
+      'ethnic_indian_south_asian',
+      'ethnic_latin',
+      'ethnic_african',
+      'health_food',
+      'kosher_halal'
+    ]) {
       assert.match(chains, new RegExp(`'${retailerType}'`), `${retailerType} missing from chains retailer_type check`);
       assert.match(allMigrations, new RegExp(`'${retailerType}'`), `${retailerType} missing from retailer_type migrations`);
     }
     assert.match(allMigrations, /create index if not exists chains_retailer_type_idx/);
     assert.match(schemaDoc, /`retailer_type` is required and indexed/);
+  });
+
+  it('adds first-class market country scope separate from domain', () => {
+    assert.match(allMigrations, /create table if not exists markets/);
+    for (const market of ['SE', 'NO', 'IS']) {
+      assert.match(allMigrations, new RegExp(`'${market}'`), `${market} market seed missing`);
+    }
+    for (const table of ['chains', 'stores', 'products', 'observations', 'latest_prices']) {
+      assert.match(allMigrations, new RegExp(`alter table ${table} add column if not exists market_code char\\(2\\)`), `${table}.market_code migration missing`);
+    }
+    assert.match(allMigrations, /chains_market_domain_idx/);
+    assert.match(allMigrations, /latest_prices_market_chain_idx/);
   });
 
   it('stores immutable price facts with type, time, confidence, and provenance', () => {
@@ -123,6 +158,19 @@ describe('infra/db PostgreSQL schema contract', () => {
     }
     assert.match(observations, /price_type text not null check/);
     assert.match(observations, /confidence numeric\(5, 4\) not null check \(confidence between 0 and 1\)/);
+  });
+
+  it('keeps package-local price observations ready for source-backed origin and certification evidence', () => {
+    assert.match(serverPriceObservationOriginCertMigration, /alter table price_observation/);
+    assert.match(serverPriceObservationOriginCertMigration, /add column if not exists origin_country char\(2\)/);
+    assert.match(serverPriceObservationOriginCertMigration, /add column if not exists cert_level text/);
+    assert.match(serverPriceObservationOriginCertMigration, /price_observation_origin_country_check/);
+    assert.match(serverPriceObservationOriginCertMigration, /origin_country is null or origin_country ~ '\^\[a-z\]\{2\}\$'/i);
+    assert.match(serverPriceObservationOriginCertMigration, /price_observation_cert_level_check/);
+    for (const certLevel of ['krav', 'eu_eco', 'free_range', 'asc', 'msc', 'rainforest_alliance', 'fairtrade', 'conventional']) {
+      assert.match(serverPriceObservationOriginCertMigration, new RegExp(`'${certLevel}'`), `${certLevel} missing from server price observation migration`);
+    }
+    assert.match(serverPriceObservationOriginCertMigration, /price_observation_origin_cert_idx/);
   });
 
   it('tracks observed product availability without deleting price facts', () => {
@@ -226,6 +274,20 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(schemaDoc, /retention.*partition drop/);
   });
 
+  it('adds audited dry-run retention tiering for observations and raw records', () => {
+    assert.match(allMigrations, /create table if not exists retention_runs\b/);
+    assert.match(allMigrations, /create or replace function run_observation_retention\(/);
+    assert.match(allMigrations, /dry_run boolean default true/);
+    assert.match(allMigrations, /latest_prices latest[\s\S]*latest\.observation_id = observation\.id/);
+    assert.match(allMigrations, /price_daily daily[\s\S]*daily\.source_observation_ids @> array\[observation\.id\]/);
+    assert.match(allMigrations, /price_weekly weekly[\s\S]*weekly\.source_observation_ids @> array\[observation\.id\]/);
+    assert.match(allMigrations, /raw_record\.provenance \? 'archiveuri'/);
+    assert.match(migrationVerifier, /\bretention_runs\b/);
+    assert.match(schemaDoc, /### `retention_runs`/);
+    assert.match(schemaDoc, /ops:run-db-retention/);
+    assert.match(schemaDoc, /archiveuri/);
+  });
+
   it('preserves provenance on source-derived tables', () => {
     for (const table of provenanceTables) {
       assert.match(tableDefinition(table), /\bprovenance\b/, `${table}.provenance missing`);
@@ -258,7 +320,7 @@ describe('infra/db PostgreSQL schema contract', () => {
       assert.match(schemaDoc, new RegExp(`### \`${table}\``), `${table} missing from SCHEMA.md`);
       assert.match(migrationVerifier, new RegExp(`\\b${table}\\b`), `${table} missing from migration verifier`);
     }
-    for (const grade of ['fuel-95-e10', 'fuel-98', 'fuel-diesel', 'fuel-hvo100', 'fuel-e85']) {
+    for (const grade of ['fuel-95-e10', 'fuel-98', 'fuel-diesel', 'fuel-hvo100', 'fuel-e85', 'fuel-adblue']) {
       assert.match(allMigrations, new RegExp(grade), `${grade} missing from fuel grade catalog`);
     }
     assert.match(allMigrations, /operator_public_price_page/);
@@ -266,7 +328,10 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(allMigrations, /original_price_text text not null/);
     assert.match(allMigrations, /alter table products add column if not exists fuel_grade_id/);
     assert.match(allMigrations, /products_fuel_grade_domain_check/);
+    assert.match(allMigrations, /supported_fuel_grade_ids text\[\]/);
+    assert.match(allMigrations, /stores_supported_fuel_grade_ids_check/);
     assert.match(schemaDoc, /fuel prices are always price per litre/);
+    assert.match(schemaDoc, /supported_fuel_grade_ids/);
     assert.match(schemaDoc, /community_reporter_trust/);
   });
 
@@ -343,6 +408,10 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(repositoryTableDefinition('basket_import_review_items'), /review_item_id text not null/);
     assert.match(repositoryTableDefinition('basket_import_review_items'), /status text not null check \(status in \('open', 'accepted', 'dismissed'\)\)/);
     assert.match(repositoryTableDefinition('basket_import_review_items'), /primary key \(user_id, review_item_id\)/);
+    assert.match(repositoryTableDefinition('friend_shared_deal_signals'), /signal_id text primary key/);
+    assert.match(repositoryTableDefinition('friend_shared_deal_signals'), /user_id text not null references app_users\(id\) on delete cascade/);
+    assert.match(repositoryTableDefinition('friend_shared_deal_signals'), /relationship text not null check \(relationship in \('household', 'friend'\)\)/);
+    assert.match(repositoryTableDefinition('friend_shared_deal_signals'), /source_confidence numeric\(5, 4\) not null check \(source_confidence between 0 and 1\)/);
     assert.match(repositoryTableDefinition('pantry_items'), /user_id text not null references app_users\(id\) on delete cascade/);
     assert.match(repositoryTableDefinition('pantry_items'), /category text not null check/);
     assert.match(repositoryTableDefinition('pantry_items'), /quantity numeric\(12, 3\) not null check \(quantity >= 0\)/);

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import type { SeoLandingCity, SeoLandingProduct } from '@/lib/seo-landing-pages';
 
-type SeoLandingKind = 'cheapest' | 'compare' | 'city';
+type SeoLandingKind = 'cheapest' | 'compare' | 'city' | 'city-compare';
 
 type SeoLandingPageProps = {
   product: SeoLandingProduct;
@@ -12,12 +12,14 @@ type SeoLandingPageProps = {
 
 function headingFor(product: SeoLandingProduct, kind: SeoLandingKind, city?: SeoLandingCity) {
   if (kind === 'compare') return `${product.name} prisjämförelse`;
+  if (kind === 'city-compare') return `${product.name} prisjämförelse i ${city?.label ?? 'Stockholm'}`;
   if (kind === 'city') return `Billigaste ${product.name} i ${city?.label ?? 'Stockholm'}`;
   return `Billigaste ${product.name}`;
 }
 
 function introFor(product: SeoLandingProduct, kind: SeoLandingKind, city?: SeoLandingCity) {
   if (kind === 'compare') return `Compare ${product.name} across verified Willys and Hemkop chain rows. Cheapest observed chain: ${product.cheapestChainLabel}.`;
+  if (kind === 'city-compare') return `${city?.evidence ?? 'City landing page'} This comparison uses verified chain catalogue rows, not inferred branch availability.`;
   if (kind === 'city') return `${city?.evidence ?? 'City landing page'} Lowest verified chain row: ${product.cheapestChainLabel} at ${product.cheapestPriceLabel}.`;
   return `${product.cheapestChainLabel} is the cheapest verified chain row for ${product.name} at ${product.cheapestPriceLabel}.`;
 }

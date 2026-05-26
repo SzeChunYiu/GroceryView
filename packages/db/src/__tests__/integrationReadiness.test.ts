@@ -318,6 +318,7 @@ describe('buildPostgresIntegrationReadinessReport', () => {
       'missing_table:basket_items',
       'missing_table:chains',
       'missing_table:community_reporter_trust',
+      'missing_table:friend_shared_deal_signals',
       'missing_table:fuel_grades',
       'missing_table:fuel_price_source_observations',
       'missing_table:fuel_price_sources',
@@ -363,6 +364,7 @@ describe('buildPostgresIntegrationReadinessReport', () => {
       'missing_migration:017_observation_availability',
       'missing_migration:018_household_collaboration_rls',
       'missing_migration:019_price_snapshot_unique_index',
+      'missing_migration:025_friend_shared_deal_signals',
       'repository_check_fail:human_review_assignment_round_trip',
       'repository_check_not_run:notification_suppression_round_trip'
     ]);
@@ -400,6 +402,7 @@ describe('buildPostgresIntegrationReadinessReport', () => {
         'table:chains',
         'table:community_reporter_trust',
         'table:favorite_stores',
+        'table:friend_shared_deal_signals',
         'table:fuel_grades',
         'table:fuel_price_source_observations',
         'table:fuel_price_sources',
@@ -447,6 +450,7 @@ describe('buildPostgresIntegrationReadinessReport', () => {
         'migration:017_observation_availability',
         'migration:018_household_collaboration_rls',
         'migration:019_price_snapshot_unique_index',
+        'migration:025_friend_shared_deal_signals',
         'repository_check:favorite_store_round_trip',
         'repository_check:human_review_assignment_round_trip',
         'repository_check:notification_suppression_round_trip',

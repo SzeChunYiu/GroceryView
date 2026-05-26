@@ -30,19 +30,38 @@ model Product {
   nameSv         String?  @map("name_sv")
   nameEn         String?  @map("name_en")
   brand          String?
+  brandId        String?  @map("brand_id") @db.Uuid
+  brandRecord    Brand?   @relation(fields: [brandId], references: [id], onDelete: SetNull)
   categoryPath   String[] @default([]) @map("category_path")
   comparableUnit String   @map("comparable_unit")
   imageUrl       String?  @map("image_url")
   isVegan        Boolean  @default(false) @map("is_vegan")
   isGlutenFree   Boolean  @default(false) @map("is_gluten_free")
   isLactoseFree  Boolean  @default(false) @map("is_lactose_free")
+  deletedAt      DateTime? @map("deleted_at") @db.Timestamptz(6)
+  marketCode     String   @default("SE") @map("market_code") @db.Char(2)
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
 
+  @@index([deletedAt])
+  @@index([brandId])
   @@index([isVegan])
   @@index([isGlutenFree])
   @@index([isLactoseFree])
+  @@index([marketCode])
   @@map("products")
+}
+
+model Brand {
+  id        String    @id @default(uuid()) @db.Uuid
+  name      String
+  slug      String    @unique
+  logoUrl   String?   @map("logo_url")
+  products  Product[]
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@map("brands")
 }
 
 model UserStoreLoyaltyCard {
@@ -56,6 +75,80 @@ model UserStoreLoyaltyCard {
   @@unique([userId, storeId])
   @@index([storeId])
   @@map("user_store_loyalty_cards")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime? @map("email_verified")
+  image         String?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  accounts      Account[]
+  sessions      Session[]
+
+  @@map("users")
+}
+
+model Account {
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refreshToken      String? @map("refresh_token") @db.Text
+  accessToken       String? @map("access_token") @db.Text
+  expiresAt         Int?    @map("expires_at")
+  tokenType         String? @map("token_type")
+  scope             String?
+  idToken           String? @map("id_token") @db.Text
+  sessionState      String? @map("session_state")
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Session {
+  sessionToken String   @id @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@id([identifier, token])
+  @@map("verification_tokens")
+}
+
+model Store {
+  id            String   @id
+  chainId       String   @map("chain_id")
+  name          String
+  address       String
+  city          String
+  district      String?
+  domain        String   @default("grocery")
+  countryCode   String   @default("SE") @map("country_code") @db.Char(2)
+  marketCode    String   @default("SE") @map("market_code") @db.Char(2)
+  latitude      Decimal? @db.Decimal(9, 6)
+  longitude     Decimal? @db.Decimal(9, 6)
+  storeType     String?  @map("store_type")
+  openingHours  Json?    @map("opening_hours")
+  onlineStoreId String?  @map("online_store_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([latitude, longitude])
+  @@index([marketCode, domain])
+  @@map("stores")
 }
 
 model PantryItem {
@@ -75,6 +168,21 @@ model PantryItem {
   @@index([userId, productId])
   @@index([expiresOn])
   @@map("pantry_items")
+}
+
+model WatchlistRestockAlert {
+  id               String    @id @default(uuid()) @db.Uuid
+  userId           String    @map("user_id")
+  productId        String    @map("product_id")
+  lastOutOfStockAt DateTime? @map("last_out_of_stock_at") @db.Timestamptz(6)
+  lastAvailableAt  DateTime? @map("last_available_at") @db.Timestamptz(6)
+  notifiedAt       DateTime? @map("notified_at") @db.Timestamptz(6)
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([userId, productId])
+  @@index([productId, notifiedAt])
+  @@map("watchlist_restock_alerts")
 }
 
 model BenchmarkObservation {

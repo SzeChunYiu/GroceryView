@@ -1,104 +1,150 @@
-# GroceryView
+# GroceryView — a financial terminal for groceries
 
-GroceryView is an npm-workspace monorepo for grocery price discovery: it combines source-backed product/catalog data, ingestion pipelines, comparison/ranking logic, and a Next.js web app so shoppers and operators can inspect grocery prices, source freshness, and confidence boundaries without inventing coverage.
+> **Live status board — auto-generated, do not hand-edit.**
+> Regenerated from real signals (merged PRs, open PRs, GOAL.md, live prod HTML) by
+> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-25 13:52 UTC.
 
-## Screenshots
+GroceryView turns grocery prices into a market: every product is a **ticker** with a
+price chart, chains/categories/brands have **indices**, deals get a **Buy/Wait**
+rating, and shoppers **track, compare, and get alerted** across chains over time.
+Strategy + competitor teardown: [`GOAL.md`](GOAL.md) · [`COMPETITIVE-ANALYSIS.md`](COMPETITIVE-ANALYSIS.md).
 
-Screenshots are intentionally not checked into this README until they are captured from a current deployed or local build. For now, use these live/local routes as screenshot targets:
+## 🟢 Live
 
-- Home and product discovery: [`/`](https://grocery-web-mu.vercel.app/) and `/products`
-- Source/freshness ledger: `/data-sources`
-- Store directory and maps: `/stores` and `/map`
-- Country terms/guardrails: `/sweden/terms`, `/norway/terms`, `/iceland/terms`
+- **Site:** [https://grocery-web-mu.vercel.app](https://grocery-web-mu.vercel.app) — `/` returns HTTP **200**
+- **Visible on homepage:** ~**24** store pages, ~**35** product pages
+- **Shipped `feat:`/`wire:` PRs to date:** **1**
 
-When adding screenshots, include the capture date, route, environment, and any feature flag or data snapshot used.
+## 🛒 What shoppers get (consumer value)
 
-## Supported countries
+The metrics a real shopper cares about — ✅ = core engine wired into the web app,
+🔻 = engine ready, surfacing in progress. Every figure traces to real data + a
+confidence indicator (never fabricated).
 
-GroceryView must make honest country claims only:
+- **💰 Save up to ~47% right now** — biggest cross-chain price gap currently shown on the homepage (the headline "why use this").
+- ✅ **Cheapest chain (Chain Price Index)** — who's cheapest, 100-centred, over time
+- ✅ **Cheapest store for *my* basket** — store basket coverage + cost
+- ✅ **Today's best deals / category deal leaders** — biggest real discounts now
+- ✅ **Your personal grocery inflation (CPI)** — how *your* basket's cost is trending
+- ✅ **Nutrition per krona** — most protein/calories per SEK
+- ✅ **Budget vs premium (brand-tier index)** — how much the store-brand saves
+- ✅ **Expiry / clearance deal radar** — cut waste, grab markdowns
+- ✅ **Watchlist price-drop alerts** — follow a product, get told when it falls
+- ✅ **Price-by-district map** — where shopping is cheaper near you
 
-- **Sweden (`SE`, SEK):** primary supported market in the current repository snapshot, with Swedish grocery/source pages and ingestion connectors represented in code.
-- **Norway (`NO`, NOK), Denmark (`DK`, DKK), Finland (`FI`, EUR), Iceland (`IS`, ISK):** route/terms/readiness scaffolding exists where implemented, but public price/source coverage must stay blocked unless verified country-scoped connector rows exist.
+**Consumer-metric roadmap (highest-value, not yet live):** Deal Score + Buy/Wait
+verdict · 52-week-low badge · price-drop movers board · data-freshness badge ·
+loyalty/member-price-adjusted basket (the feature *no* rival has).
 
-Do not add country coverage, prices, freshness, or chain names to README copy unless the underlying code/data source exists in the repo.
+## 🎯 Current sprint target
 
-## Quick start
+Ship a **visibly populated Stockholm grocery price terminal** at
 
-Requirements:
+## ✅ Recently shipped (last 15 merged `feat:`/`wire:` PRs)
 
-- Node.js and npm compatible with the checked-in `package-lock.json`
-- Docker, when running local Postgres/Redis/object storage services
+- #3256 feat(web): lazy load card images with placeholders
 
-Install and run the web app:
+## 🔄 In progress (open PRs)
 
-```sh
-npm install
-npm run dev -w @groceryview/web
-```
+- #3371 Add cross-category price comparison helper
+- #3370 Add screener service query tests
+- #3366 Document St1 fuel pricing quirks
+- #3363 Add smart shopping list page
+- #3362 Add carbon score badges to product cards
+- #3361 Add BOGO promotion parser
+- #3359 Add observation origin cert migration
+- #3357 Add product best-time-to-buy prediction badge
+- #3355 Add group-buy coordinator e2e
+- #3354 Add ingestion row contract validation
+- #3353 data(web): flag ICA member-only promotions
+- #3351 Show generic OTC medication savings
+- #3350 Add substitution willingness schema
+- #3349 Add Shell SE pricing quirk study
+- #3348 Restore current web contract markers
+- #3347 Add Snabbgross daily materialization coverage
+- #3346 Document Circle K Sweden connector
+- #3345 Add Mlyn Norway coverage connector
+- #3343 Add consumer complaint helper
+- #3342 Add Tanka pricing quirks study
+- #3341 Add source freshness monitoring dashboard
+- #3340 Ticket 1625: badge retailer types in product quotes
+- #3339 [P1 Test] Connector test: rema-1000-no (fixture-based)
+- #3338 Document OKQ8 fuel pricing quirks
+- #3337 Add Middle Eastern NO connector
+- #3335 Seed produce class taxonomy
+- #3334 Add Rusta Norway connector
+- #3333 Study Pressbyrån pricing quirks
+- #3332 Add metadata for grocery index routes
+- #3331 Document 10-11 IS pricing source
+- #3330 Document Lighthouse PR rescue
+- #3326 Add Joker NO flyer connector
+- #3324 Add Biltema NO household connector
+- #3323 Filter store basket coverage by market
+- #3322 Update PR rescue completion log
+- #3321 Docs: document ConfidenceBadge
+- #3319 Add flyer AI vision fallback
+- #3318 Add chain study comparison matrix
+- #3317 Add chain study comparison matrix
+- #3316 feat(ingest): refresh Axfood weekly flyer discounts
+- #3307 Document Swedish grocery data sources
+- #3291 Parameterize Overpass grocery country
+- #3281 Add cursor pagination to catalog endpoints
+- #3277 Add product OpenGraph metadata
+- #3260 Add accessible modal primitives
+- #3241 fix: update stale test assertions and implement missing features
+- #3221 Add Circle K SE fuel and convenience connector
+- #3214 Study DocMorris SE pricing quirks
+- #3205 Add unit audit table filters
+- #3196 Add fixed-off promotion parser
 
-Start and smoke-test local infrastructure when a change needs database, Redis, or object storage dependencies:
+## 📋 To-do (from GOAL.md backlog)
 
-```sh
-infra/scripts/smoke-local-services.sh
-```
+**P1 — highest visible value**
+- Deal score + verdict on `products/[slug]`
+- Cheapest-chain-per-product
+- Category deal leaders
+- Personal grocery inflation
+- Smart swaps
 
-Useful focused checks:
+**P2**
+- Nutrition per krona
+- Expiry deal radar
+- Watchlist price alerts
+- Basket optimizer
+- Deal-based meals
+- Pantry replenishment
+- Brand-tier index
 
-```sh
-npm run test -w @groceryview/web
-npm run build -w @groceryview/web
-npm run test -w @groceryview/ingestion
-npm run typecheck
-```
+**P3 — map + index tie-ins**
+- Students / young singles
+- Families with kids
+- Elderly / pensioners
+- Immigrants / non-native speakers
+- Budget-conscious / low-income
+- Health & fitness
+- Busy professionals
+- Eco-conscious
+- Meal-preppers / large households
+- Deal-hunters / foodies
 
-Repository-wide gates are available with:
+**Steal-list (rival features to adopt)**
+- Browser extension overlay
+- Public price/nutrition API
+- Loyalty-adjusted basket comparison
+- Split-shop / cheapest-route basket optimizer
+- Flyer / digital-catalog ingestion
+- Ingestion: classify + map loose items.
+- Cross-chain commodity comparison
+- Per-chain fresh-food index
+- Unit-price normalisation everywhere
+- Curator/community review of mappings
+- Receipt-fed mapping growth
+- Sweden (home) — win first.
+- Iceland — cheap proof-of-concept.
+- Norway — the real expansion prize.
+- Denmark — only if the terminal decisively beats Prej
+- Finland — last, NOT first.
 
-```sh
-npm run test
-npm run build
-npm run ingest:verify
-```
-
-## Monorepo layout
-
-- [`apps/web`](apps/web): Next.js web application, app routes, route handlers, UI components, and web-only data helpers.
-- [`apps/api`](apps/api): API service workspace.
-- [`apps/jobs`](apps/jobs): job/worker workspace.
-- [`apps/mobile`](apps/mobile): mobile app workspace.
-- [`packages/ingestion`](packages/ingestion): source connectors, parsers, daily ingestion materialization, and provenance handling.
-- [`packages/db`](packages/db): database types, query helpers, repositories, and migrations/seeding helpers.
-- [`packages/core`](packages/core): shared grocery/domain logic.
-- [`packages/catalog`](packages/catalog): catalog and commodity models.
-- [`packages/ops`](packages/ops): operational readiness checks and reports.
-- [`packages/server`](packages/server): server/API composition; see [`packages/server/README.md`](packages/server/README.md).
-- [`scripts`](scripts): repository-level ingestion, ops, and verification commands.
-- [`infra`](infra): Docker Compose services, infrastructure scripts, and DB migration assets.
-- [`tests`](tests): repository-level tests outside a single workspace.
-
-## Per-package docs and policy links
-
-- [License](#license)
-- [Code of conduct](#code-of-conduct)
-- [Security policy](#security-policy)
-
-## Per-package docs and contribution guides
-
-- Contributor workflow: [`CONTRIBUTING.md`](CONTRIBUTING.md)
-- Server package notes: [`packages/server/README.md`](packages/server/README.md)
-- Operational runbooks: [`docs/ops`](docs/ops)
-- Ingestion scripts: [`scripts/ingestion`](scripts/ingestion)
-- Operations scripts: [`scripts/ops`](scripts/ops)
-
-If a package does not yet have a README, document public APIs near the code and link the new package README here when added.
-
-## License
-
-No top-level license file is currently present in this repository snapshot. Until maintainers add a license, do not assume rights beyond the repository host permissions granted to collaborators.
-
-## Code of conduct
-
-A dedicated `CODE_OF_CONDUCT.md` is not currently present. Contributors should keep discussion professional, specific, and evidence-based; use [`CONTRIBUTING.md`](CONTRIBUTING.md) for workflow expectations until a formal policy is added.
-
-## Security policy
-
-A dedicated `SECURITY.md` is not currently present. Do not open public issues with secrets, credentials, private user data, or exploitable details. Report sensitive findings privately to the maintainers through the repository owner's preferred private channel, and include reproduction steps, affected routes/packages, and any relevant logs with secrets redacted.
+---
+_Coverage today: Swedish chains (Willys, Hemköp, ICA, Coop, Mathem). Nordic
+expansion (Norway→Iceland→Denmark) tracked in GOAL.md; Finland deprioritised._

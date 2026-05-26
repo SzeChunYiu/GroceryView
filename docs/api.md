@@ -23,7 +23,9 @@ The endpoint allows 60 requests per minute per client IP. Responses include `X-R
 | `limit` | No | Integer from 1 to 1000. Defaults to 200. |
 | `price_type` | No | One of `shelf`, `online`, `member`, `promotion`, `receipt`, or `community`. |
 | `chain_id` | No | Retail chain UUID filter. |
+| `chain_ids` | No | Comma-separated retail chain UUID filters for selected overlay series. Use instead of `chain_id`. |
 | `store_id` | No | Store UUID filter. |
+| `store_ids` | No | Comma-separated store UUID filters for selected overlay series. Use instead of `store_id`. |
 | `from` | No | Inclusive ISO-8601 `observedAt` lower bound. |
 | `to` | No | Inclusive ISO-8601 `observedAt` upper bound. |
 
@@ -70,9 +72,21 @@ Unsupported or repeated query parameters return `400` so published notebooks fai
     "filters": {
       "priceType": "promotion",
       "chainId": null,
+      "chainIds": ["22222222-2222-2222-2222-222222222222"],
       "storeId": null,
+      "storeIds": [],
       "from": null,
       "to": null
+    },
+    "overlay": {
+      "selectionMode": "selected_overlay",
+      "selectedChainIds": ["22222222-2222-2222-2222-222222222222"],
+      "selectedStoreIds": [],
+      "seriesCount": 1,
+      "normalizedUnitField": "unitPrice",
+      "missingDataPolicy": "preserve_gaps_no_interpolation",
+      "confidence": { "min": 0.88, "max": 0.88, "field": "confidence" },
+      "matchConfidenceDisclosure": "Rows expose persisted observation confidence; clients must keep confidence visible when overlaying selected chains or stores."
     },
     "source": "postgres.observations",
     "generatedAt": "2026-05-25T00:00:00.000Z",

@@ -24,6 +24,7 @@ Price and ingestion records expose provenance directly:
 
 Every price-bearing row carries `price_type`, `confidence`, `observed_at`, and `provenance` either directly or through its referenced observation.
 Fuel-domain rows carry litre unit prices through immutable `domain = fuel` observations and fuel source links.
+Fresh-product rows can also carry observation-level `origin_country` (ISO-3166 alpha-2 grow/raise country) and `cert_level` (`krav`, `eu_eco`, `free_range`, `asc`, `msc`, `rainforest_alliance`, `fairtrade`, or `conventional`) when a chain exposes those values.
 
 ## Partitioning Plan
 
@@ -38,6 +39,14 @@ Migration 013 builds the first time-series partition lane without breaking exist
 
 The same monthly range partition and retention by partition drop pattern can be reused for long-term raw payload retention in `raw_records` if retailer capture volume grows faster than normalized observations.
 
+## Retention Tiering
+
+Migration 027 adds the first operator-run retention policy. The default hot window keeps immutable observations for 400 days and raw payload rows for 90 days. Operators run `npm run ops:run-db-retention` as a dry-run first; destructive execution requires `-- --execute` or `GROCERYVIEW_DB_RETENTION_DRY_RUN=0`.
+
+Observation retention is gated by three checks: the row must be older than the hot window, it must not be referenced by `latest_prices`, and its id must be present in both `price_daily.source_observation_ids` and `price_weekly.source_observation_ids`. This preserves current public charts and latest-price reads before old raw facts are deleted. The partition lane can still use `drop_observations_partitions_before(cutoff_month)` after archive and rollup validation when the canonical writer moves to partition-only retention.
+
+Raw payload retention is shorter but stricter: `raw_records` rows are deleted only when no `observations` or `observations_v2` row references them and `raw_records.provenance` includes an object-storage/archive URI (`archiveUri`, `objectStorageUri`, `payloadArchiveUri`, or `archive_url`). Every dry-run or executed run writes a `retention_runs` audit row with candidate and deleted counts.
+
 ## Deal Score Boundary
 
 The schema stores store location in `stores.position` for map and trip-planning features. Distance or travel time must not be stored as an input to default Deal Score ranking. Deal Score should use price history, discount depth, confidence, and provenance; distance can be applied later as an explicit user-side filter or trip-planning sort.
@@ -46,7 +55,7 @@ The schema stores store location in `stores.position` for map and trip-planning 
 
 Migration 011 adds a `domain` column to `chains`, `stores`, `products`, `observations`, and `latest_prices`. Existing rows default to `grocery`; future verticals are constrained to `fuel` and `pharmacy` until a later migration expands the supported set. This keeps matching domain-scoped: grocery uses EAN + commodity matching, fuel uses fuel grades, and pharmacy uses OTC/health EANs. Public routes must not render non-grocery prices until `observations.domain` has connector or trusted crowd rows for that vertical.
 
-Migration 014 adds the fuel source contract. `fuel_grades` is the only supported grade catalog for the current fuel lane: 95 E10, 98, diesel, HVO100, and E85. `fuel_price_sources` accepts either an operator public price page or a trusted crowd station report, and `fuel_price_source_observations` ties that source evidence to immutable `domain='fuel'` observations with the original price text. Fuel prices are always price per litre; estimated fuel rows are not part of this source model.
+Migration 014 adds the fuel source contract. `fuel_grades` is the only supported grade catalog for the current fuel lane: 95 E10, 98, diesel, HVO100, E85, and AdBlue. `fuel_price_sources` accepts either an operator public price page or a trusted crowd station report, and `fuel_price_source_observations` ties that source evidence to immutable `domain='fuel'` observations with the original price text. Fuel prices are always price per litre; estimated fuel rows are not part of this source model.
 
 ## Tables
 
@@ -56,13 +65,13 @@ Retail banners such as ICA, Willys, Coop, Lidl, Hemkop, Netto, and City Gross.
 
 Key columns: `slug`, `name`, `retailer_type`, `domain`, `country_code`, `website_url`.
 
-`retailer_type` is required and indexed for coverage/readiness filtering. Allowed values are `grocery`, `pharmacy`, `fuel`, `convenience`, `variety`, `cosmetics`, `household`, and `online_marketplace`; all Stockholm launch chains are backfilled as `grocery`.
+`retailer_type` is required and indexed for coverage/readiness filtering. Allowed values are `grocery`, `pharmacy`, `fuel`, `convenience`, `variety`, `cosmetics`, `household`, `online_marketplace`, `ethnic_asian`, `ethnic_polish_eastern_european`, `ethnic_middle_eastern`, `ethnic_indian_south_asian`, `ethnic_latin`, `ethnic_african`, `health_food`, and `kosher_halal`; all Stockholm launch chains are backfilled as `grocery`.
 
 ### `stores`
 
 Physical or online stores belonging to a chain.
 
-Key columns: `chain_id`, `slug`, `domain`, `external_ref`, address fields, `position`, `store_type`, `opening_hours`, `online_order_url`.
+Key columns: `chain_id`, `slug`, `domain`, `external_ref`, address fields, `position`, `store_type`, `opening_hours`, `online_order_url`, `supported_fuel_grade_ids`.
 
 Indexes: `stores_position_gix` for location queries, plus `stores_name_trgm_idx` and `stores_slug_trgm_idx` for fuzzy store search.
 
@@ -85,6 +94,8 @@ Key columns: `slug`, `name_sv`, `name_en`, `category_path`, `comparable_unit` (`
 Canonical fuel products for the fuel vertical. Fuel grades are matched by grade id, not EAN or grocery commodity alias, and every supported grade compares on litres only.
 
 Key columns: `id`, `grade_code`, `label`, `comparable_unit`, `match_key`, `active`.
+
+Supported ids: `fuel-95-e10`, `fuel-98`, `fuel-diesel`, `fuel-hvo100`, `fuel-e85`, `fuel-adblue`.
 
 ### `aliases`
 
@@ -109,6 +120,8 @@ Raw payloads captured during ingestion before normalization.
 Key columns: `source_run_id`, `record_type`, `external_ref`, `observed_at`, `payload`, `payload_hash`, `provenance`.
 
 Indexes: `raw_records_payload_gin_idx`.
+
+Retention: payload rows can be TTL-pruned after archive handoff only when no normalized observation table references them. Archive location must be recorded in `provenance` before `run_observation_retention()` can delete the row.
 
 ### `retailer_source_policies`
 
@@ -140,7 +153,9 @@ Indexes: `fuel_price_source_observations_grade_idx`.
 
 Immutable normalized price facts. This is the canonical table for historical charts and price provenance.
 
-Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `source_run_id`, `raw_record_id`, `retailer_product_ref`, `price_type`, `price`, `regular_price`, `unit_price`, `currency`, `quantity`, `quantity_unit`, promotion fields, `member_required`, `is_available`, `observed_at`, validity window fields, `confidence`, `provenance`.
+Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `source_run_id`, `raw_record_id`, `retailer_product_ref`, `origin_country`, `cert_level`, `price_type`, `price`, `regular_price`, `unit_price`, `currency`, `quantity`, `quantity_unit`, promotion fields, `member_required`, `is_available`, `observed_at`, validity window fields, `confidence`, `provenance`.
+
+Fresh-product origin/certification columns live on the observation because country-of-origin and certification can vary by chain, batch, or date even when the catalog product is the same.
 
 `observations.is_available` defaults true for historical rows and is set false when connector evidence shows a product is out-of-stock, not found, or backed by an empty stock response. The field is part of connector replay idempotency so a stock-state change can append an immutable fact without overwriting price history.
 
@@ -148,17 +163,17 @@ Write policy: daily ingestion uses change-only writes. Before inserting a new im
 
 Allowed `price_type` values: `shelf`, `online`, `member`, `promotion`, `receipt`, `community`, `estimated`.
 
-Indexes: product/time, store/time, price type/time, provenance GIN, and `observations_connector_idempotency_idx` as the compound unique price snapshot guard for scraper upserts and exact connector replay idempotency without updating stored history.
+Indexes: product/time, store/time, price type/time, origin/certification, provenance GIN, and `observations_connector_idempotency_idx` as the compound unique price snapshot guard for scraper upserts and exact connector replay idempotency without updating stored history.
 
 ### `observations_v2`
 
 Range-partitioned monthly mirror of immutable `observations` for high-volume history reads. It is populated by `observations_partition_lane_sync`, which calls `ensure_observations_monthly_partition()` before copying inserts and updates from the canonical table.
 
-Key columns: same price, source, availability, provenance, validity, domain, and observed-time fields as `observations`. The partitioned primary key is `(id, observed_at)` because PostgreSQL range-partitioned unique keys must include the partition key.
+Key columns: same price, source, availability, origin/certification, provenance, validity, domain, and observed-time fields as `observations`. The partitioned primary key is `(id, observed_at)` because PostgreSQL range-partitioned unique keys must include the partition key.
 
 Partitions: monthly range partitions named `observations_YYYY_MM`, plus `observations_default` for rows outside the pre-created window. Operators should drain the default partition by creating the matching monthly partition before long-term retention.
 
-Indexes: parent and per-partition product/time, store/time, price type/time, domain/time, provenance GIN, and `observed_at` BRIN. Retention uses `drop_observations_partitions_before(cutoff_month)` after archive/downsample handoff.
+Indexes: parent and per-partition product/time, store/time, price type/time, domain/time, origin/certification, provenance GIN, and `observed_at` BRIN. Retention uses `drop_observations_partitions_before(cutoff_month)` after archive/downsample handoff.
 
 ### `latest_prices`
 
@@ -187,6 +202,14 @@ Derived weekly rollup over immutable `observations` for long-range market charts
 Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `price_type`, `currency`, `week_start`, `min_price`, `max_price`, `avg_price`, `last_price`, unit-price equivalents, `first_observed_at`, `last_observed_at`, `observation_count`, `source_observation_ids`, `provenance`.
 
 Indexes: `price_weekly_product_chain_week_idx`, `price_weekly_store_week_idx`, and `price_weekly_domain_week_idx`.
+
+### `retention_runs`
+
+Audit log for dry-run and executed storage-retention jobs.
+
+Key columns: `run_kind`, `dry_run`, `observations_cutoff`, `raw_records_cutoff`, candidate/deleted counts for observations and raw records, `policy`, and `provenance`.
+
+Policy: `run_observation_retention(retain_observations_days, retain_raw_records_days, dry_run)` defaults to dry-run behavior through the ops script. It only deletes old observations after latest-price and daily/weekly rollup coverage checks pass, and only deletes raw records with archive/object-storage provenance after normalized references are gone.
 
 ### `users`
 
@@ -307,6 +330,16 @@ Key columns: `user_id`, `review_item_id`, `raw_name`, `quantity`, `reason`, `ret
 Primary key: `(user_id, review_item_id)`.
 
 Indexes: `basket_import_review_items_open_idx` for account-scoped open queue reads and `basket_import_review_items_retailer_idx` for retailer/capture audits.
+
+### `friend_shared_deal_signals`
+
+Account-scoped opt-in household and friend share signals for `suggestFriendSharedDeals`. Rows survive server restarts and stay tied to `app_users` for privacy export and deletion workflows.
+
+Key columns: `signal_id`, `user_id`, `product_id`, `shared_by_user_id`, `shared_by_display_name`, `relationship`, `shared_at`, `source_confidence`, `opted_in`, `deal_score`, `created_at`.
+
+Primary key: `signal_id`.
+
+Indexes: `friend_shared_deal_signals_user_shared_idx` for account-scoped history reads and `friend_shared_deal_signals_product_idx` for opted-in product suggestion inputs.
 
 ### `human_review_assignments`
 

@@ -6,13 +6,25 @@ export type SevenElevenSeProduct = {
   productId: string;
   chainId: 'seven_eleven_se';
   chainName: '7-Eleven Sweden';
+  country: 'SE';
   name: string;
   category: SevenElevenSeProductCategory;
   priceMin: number;
   priceMax: number;
   priceText: string;
   currency: 'SEK';
+  channel: 'b2b';
+  customerSegment: 'business';
+  format: 'seven_eleven';
+  store_id: 'se:national-seven-eleven-b2b';
+  region: 'se-national';
   depositIncluded: boolean;
+  is_member_price: false;
+  is_subscription_price: false;
+  is_coupon_price: false;
+  is_clearance: false;
+  multi_buy: null;
+  out_of_scope_for_consumer_connector: true;
   dietaryTags: SevenElevenSeDietaryTag[];
   sourceUrl: string;
   pdfUrl: string;
@@ -46,6 +58,41 @@ export const SEVEN_ELEVEN_SE_BASE_URL = 'https://7-eleven.se';
 export const SEVEN_ELEVEN_SE_BUSINESS_ORDERS_PATH = '/foretagsbestallningar/';
 export const SEVEN_ELEVEN_SE_ASSORTMENT_PDF_URL = 'https://storage.googleapis.com/seveneleven-media-bucket-prod/1/2025/06/7E-Sortimentlista-B2B-A4-enkelsidor.pdf';
 export const SEVEN_ELEVEN_SE_PRODUCT_PARSER_VERSION = 'seven-eleven-se-b2b-assortment-v1';
+export const SEVEN_ELEVEN_SE_APP_URL = `${SEVEN_ELEVEN_SE_BASE_URL}/ladda-ner-appen/`;
+export const SEVEN_ELEVEN_SE_APP_TERMS_URL = `${SEVEN_ELEVEN_SE_BASE_URL}/kontakt/behandling-av-personuppgifter/appar/`;
+export const SEVEN_ELEVEN_SE_APP_FAQ_URL = `${SEVEN_ELEVEN_SE_BASE_URL}/ladda-ner-appen/faq/`;
+export const SEVEN_ELEVEN_SE_CLICK_AND_COLLECT_TERMS_URL = `${SEVEN_ELEVEN_SE_BASE_URL}/anvandarvillkor/click-and-collect-tos/`;
+export const SEVEN_ELEVEN_SE_PRICING_QUIRKS_PARSER_VERSION = 'seven-eleven-se-pricing-quirks-v1';
+
+export type SevenElevenSePricingQuirkRow = {
+  id: string;
+  chainId: 'seven_eleven_se';
+  chainName: '7-Eleven Sweden';
+  country: 'SE';
+  productScope: 'app_deals' | 'click_and_collect' | 'b2b_assortment';
+  channel: 'app' | 'online' | 'b2b';
+  customerSegment: 'consumer' | 'business';
+  format: 'seven_eleven';
+  store_id: 'se:national-seven-eleven' | 'se:national-seven-eleven-b2b';
+  region: 'se-national';
+  price: number | null;
+  currency: 'SEK';
+  unit: 'metadata';
+  is_member_price: boolean;
+  membershipProgram: 'The Corner Club' | null;
+  is_subscription_price: false;
+  is_coupon_price: boolean;
+  is_clearance: false;
+  multi_buy: null;
+  out_of_scope_for_consumer_connector?: boolean;
+  sourceUrl: string;
+  retrievedAt: string;
+  provenance: {
+    source: 'seven_eleven_se_pricing_quirks';
+    parserVersion: string;
+    evidenceText: string;
+  };
+};
 
 const PRICE_RANGE_PATTERN = /(\d{1,3})\s*[-–]\s*(\d{1,3})\s*:-/;
 
@@ -160,13 +207,25 @@ export function parseSevenElevenSeConvenienceProducts(
       productId,
       chainId: 'seven_eleven_se',
       chainName: '7-Eleven Sweden',
+      country: 'SE',
       name,
       category: categoryForSevenElevenSeProduct(name),
       priceMin: min,
       priceMax: max,
       priceText: `${min}-${max}:-${/\bpant\b/i.test(suffix) ? ' + pant' : ''}`,
       currency: 'SEK',
+      channel: 'b2b',
+      customerSegment: 'business',
+      format: 'seven_eleven',
+      store_id: 'se:national-seven-eleven-b2b',
+      region: 'se-national',
       depositIncluded: /\bpant\b/i.test(suffix),
+      is_member_price: false,
+      is_subscription_price: false,
+      is_coupon_price: false,
+      is_clearance: false,
+      multi_buy: null,
+      out_of_scope_for_consumer_connector: true,
       dietaryTags: dietaryTagsFor(`${name} ${suffix}`),
       sourceUrl,
       pdfUrl,
@@ -178,6 +237,71 @@ export function parseSevenElevenSeConvenienceProducts(
       }
     });
     if (options.maxRows && rows.length >= options.maxRows) break;
+  }
+
+  return rows;
+}
+
+export function parseSevenElevenSePricingQuirks(input: {
+  pages: Array<{ sourceUrl: string; html: string }>;
+  retrievedAt: string;
+}): SevenElevenSePricingQuirkRow[] {
+  const rows: SevenElevenSePricingQuirkRow[] = [];
+  const seen = new Set<string>();
+
+  for (const page of input.pages) {
+    assertSevenElevenSeSource(page.sourceUrl);
+    const text = htmlToFlatText(page.html);
+    if (/captcha|access denied|logga in för att fortsätta/i.test(text)) throw new Error('7-Eleven SE source returned a blocked/login page.');
+
+    const appDeals = text.match(/The Corner Club[\s\S]*?exklusiva app-deals på mat,\s*mellis och fika|Få exklusiva app-deals på mat,\s*mellis och fika/i);
+    if (appDeals && !seen.has('corner-club-app-deals')) {
+      seen.add('corner-club-app-deals');
+      rows.push(pricingQuirkRow({
+        id: 'seven-eleven-se-corner-club-app-deals',
+        productScope: 'app_deals',
+        channel: 'app',
+        customerSegment: 'consumer',
+        is_member_price: true,
+        membershipProgram: 'The Corner Club',
+        is_coupon_price: true,
+        sourceUrl: page.sourceUrl,
+        retrievedAt: input.retrievedAt,
+        evidenceText: appDeals[0]
+      }));
+    }
+
+    const appCoupon = text.match(/skanna den specifika App-kupongens QR-kod i kassan i en 7-Eleven butik|App-kupong kan vara en gratis- eller rabattkupong/i);
+    if (appCoupon && !seen.has('corner-club-coupon-redemption')) {
+      seen.add('corner-club-coupon-redemption');
+      rows.push(pricingQuirkRow({
+        id: 'seven-eleven-se-corner-club-coupon-redemption',
+        productScope: 'app_deals',
+        channel: 'app',
+        customerSegment: 'consumer',
+        is_member_price: true,
+        membershipProgram: 'The Corner Club',
+        is_coupon_price: true,
+        sourceUrl: page.sourceUrl,
+        retrievedAt: input.retrievedAt,
+        evidenceText: appCoupon[0]
+      }));
+    }
+
+    const clickCollect = text.match(/RCS garanterar inte att priserna för Produkterna i Tjänsten följer priserna i butik|Rabattkuponger\/koder kan användas i samband med en beställning i Tjänsten/i);
+    if (clickCollect && !seen.has('click-and-collect-price-split')) {
+      seen.add('click-and-collect-price-split');
+      rows.push(pricingQuirkRow({
+        id: 'seven-eleven-se-click-and-collect-price-split',
+        productScope: 'click_and_collect',
+        channel: 'online',
+        customerSegment: 'consumer',
+        is_coupon_price: /Rabattkuponger\/koder/i.test(text),
+        sourceUrl: page.sourceUrl,
+        retrievedAt: input.retrievedAt,
+        evidenceText: clickCollect[0]
+      }));
+    }
   }
 
   return rows;
@@ -262,6 +386,66 @@ function decodeHtml(value: string): string {
     .replace(/&gt;/g, '>')
     .replace(/&nbsp;/g, ' ')
     .trim();
+}
+
+function assertSevenElevenSeSource(sourceUrl: string): void {
+  const hostname = new URL(sourceUrl).hostname;
+  if (hostname !== '7-eleven.se' && hostname !== 'www.7-eleven.se') {
+    throw new Error('7-Eleven SE connector only accepts 7-eleven.se source URLs.');
+  }
+}
+
+function htmlToFlatText(html: string): string {
+  return decodeHtml(html
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim());
+}
+
+function pricingQuirkRow(input: {
+  id: string;
+  productScope: SevenElevenSePricingQuirkRow['productScope'];
+  channel: SevenElevenSePricingQuirkRow['channel'];
+  customerSegment: SevenElevenSePricingQuirkRow['customerSegment'];
+  is_member_price?: boolean;
+  membershipProgram?: SevenElevenSePricingQuirkRow['membershipProgram'];
+  is_coupon_price?: boolean;
+  sourceUrl: string;
+  retrievedAt: string;
+  evidenceText: string;
+}): SevenElevenSePricingQuirkRow {
+  const row: SevenElevenSePricingQuirkRow = {
+    id: input.id,
+    chainId: 'seven_eleven_se',
+    chainName: '7-Eleven Sweden',
+    country: 'SE',
+    productScope: input.productScope,
+    channel: input.channel,
+    customerSegment: input.customerSegment,
+    format: 'seven_eleven',
+    store_id: input.customerSegment === 'business' ? 'se:national-seven-eleven-b2b' : 'se:national-seven-eleven',
+    region: 'se-national',
+    price: null,
+    currency: 'SEK',
+    unit: 'metadata',
+    is_member_price: input.is_member_price ?? false,
+    membershipProgram: input.membershipProgram ?? null,
+    is_subscription_price: false,
+    is_coupon_price: input.is_coupon_price ?? false,
+    is_clearance: false,
+    multi_buy: null,
+    sourceUrl: input.sourceUrl,
+    retrievedAt: input.retrievedAt,
+    provenance: {
+      source: 'seven_eleven_se_pricing_quirks',
+      parserVersion: SEVEN_ELEVEN_SE_PRICING_QUIRKS_PARSER_VERSION,
+      evidenceText: input.evidenceText
+    }
+  };
+  if (input.customerSegment === 'business') row.out_of_scope_for_consumer_connector = true;
+  return row;
 }
 
 function contentHashFor(body: string): string {

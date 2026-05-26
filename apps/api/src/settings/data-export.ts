@@ -1,4 +1,5 @@
 import { buildPrivacyExport } from '@groceryview/core';
+import { personalDataRegistry } from '@groceryview/db';
 import { groceryApi } from '../demo-data.js';
 
 export const demoDataExportGeneratedAt = '2026-05-20T12:00:00.000Z';
@@ -36,6 +37,7 @@ export function buildDemoUserDataExport() {
       },
       demoDataExportGeneratedAt
     ),
+    privacyRegistry: personalDataRegistry.filter((entry) => entry.exportCoverage),
     demo: true
   };
 }

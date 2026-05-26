@@ -11,10 +11,26 @@ export type MenyNoProduct = {
   priceText: string;
   unitPriceText: string;
   unitPriceUnit: string;
+  validFrom: string;
+  validTo: string;
+  onlineAvailability: 'available' | 'unavailable' | 'unknown';
+  availabilityText: string;
   productUrl: string;
   imageUrl: string;
   sourceUrl: string;
   retrievedAt: string;
+  taxonomy: {
+    countryCode: 'NO';
+    market: 'norway_grocery';
+    chainSlug: 'meny-no';
+    retailer: 'MENY';
+    sourceType: 'product_search';
+  };
+  sourceLineage: {
+    source: 'meny_no_product_search';
+    parserVersion: typeof MENY_NO_PARSER_VERSION;
+    access: typeof MENY_NO_ACCESS_POLICY;
+  };
 };
 
 export type FetchMenyNoProductsOptions = {
@@ -27,6 +43,17 @@ export type FetchMenyNoProductsOptions = {
 
 export const MENY_NO_BASE_URL = 'https://meny.no';
 export const MENY_NO_SEARCH_PATH = '/sok';
+export const MENY_NO_PARSER_VERSION = 'meny-no-product-search-v2';
+export const MENY_NO_ACCESS_POLICY = {
+  status: 'public_page_probe',
+  productSurface: 'https://meny.no/varer renders public catalogue shell content and client-loaded product rows.',
+  offersSurface: 'https://meny.no/varer/tilbud renders weekly offer shell content and client-loaded products.',
+  constraints: [
+    'Do not use logged-in Trumf, cart, checkout, account, or customer-specific APIs.',
+    'Respect MENY session, anti-forgery, and anonymous store-selection cookies; only parse recorded public fixtures or explicitly fetched public HTML/JSON.',
+    'Treat online availability as unknown unless a public product payload explicitly exposes availability or stock status.'
+  ]
+} as const;
 
 export function buildMenyNoSearchUrl(query: string, baseUrl = MENY_NO_BASE_URL): string {
   const url = new URL(MENY_NO_SEARCH_PATH, baseUrl);
@@ -98,6 +125,7 @@ export function normalizeMenyNoProduct(
   const imagePath = firstImage(candidate);
   const brandRecord = recordAt(candidate, ['brand', 'manufacturer', 'supplier']);
   const categoryRecord = recordAt(candidate, ['category', 'mainCategory', 'main_category']);
+  const availabilityText = firstText(candidate, ['availabilityText', 'availability_text', 'availability', 'stockStatus', 'stock_status', 'onlineAvailability']);
 
   return {
     country: 'NO',
@@ -112,10 +140,26 @@ export function normalizeMenyNoProduct(
     priceText: priceText(firstDefined(candidate, ['price', 'currentPrice', 'current_price', 'grossPrice', 'gross_price', 'salesPrice'])) || `${price.toFixed(2)} kr`,
     unitPriceText,
     unitPriceUnit: firstText(candidate, ['unitPriceUnit', 'unit_price_unit', 'comparePriceUnit', 'compare_price_unit']) || unitFromText(unitPriceText),
+    validFrom: firstText(candidate, ['validFrom', 'valid_from', 'offerValidFrom', 'offer_valid_from', 'campaignStartDate']),
+    validTo: firstText(candidate, ['validTo', 'valid_to', 'offerValidTo', 'offer_valid_to', 'campaignEndDate']),
+    onlineAvailability: availabilityFor(candidate, availabilityText),
+    availabilityText,
     productUrl: productPath ? absoluteUrl(productPath, baseUrl) : '',
     imageUrl: imagePath ? absoluteUrl(imagePath, baseUrl) : '',
     sourceUrl,
-    retrievedAt
+    retrievedAt,
+    taxonomy: {
+      countryCode: 'NO',
+      market: 'norway_grocery',
+      chainSlug: 'meny-no',
+      retailer: 'MENY',
+      sourceType: 'product_search'
+    },
+    sourceLineage: {
+      source: 'meny_no_product_search',
+      parserVersion: MENY_NO_PARSER_VERSION,
+      access: MENY_NO_ACCESS_POLICY
+    }
   };
 }
 
@@ -214,6 +258,18 @@ function priceText(value: unknown): string {
   if (typeof value === 'number' && Number.isFinite(value)) return `${value.toFixed(2)} kr`;
   if (isRecord(value)) return firstText(value, ['formatted', 'display', 'text', 'label']) || priceText(firstDefined(value, ['amount', 'value', 'price']));
   return '';
+}
+
+function availabilityFor(record: Record<string, unknown>, availabilityText: string): MenyNoProduct['onlineAvailability'] {
+  const direct = firstDefined(record, ['onlineAvailability', 'isAvailableOnline', 'availableOnline', 'isAvailable', 'available', 'inStock']);
+  if (typeof direct === 'boolean') return direct ? 'available' : 'unavailable';
+  if (typeof direct === 'string') {
+    if (/^(true|available|in stock|på lager|tilgjengelig)$/i.test(direct.trim())) return 'available';
+    if (/^(false|unavailable|out of stock|ikke på lager|ikke tilgjengelig|utsolgt)$/i.test(direct.trim())) return 'unavailable';
+  }
+  if (/ikke tilgjengelig|ikke på lager|utsolgt|unavailable|out of stock/i.test(availabilityText)) return 'unavailable';
+  if (/tilgjengelig|på lager|available|in stock/i.test(availabilityText)) return 'available';
+  return 'unknown';
 }
 
 function unitFromText(value: string): string {

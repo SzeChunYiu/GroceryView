@@ -1,11 +1,14 @@
+import Link from 'next/link';
 import { BasketCalculator, type BasketCalculatorProduct } from '@/components/basket-calculator';
 import { BasketBuyTiming } from '@/components/basket-buy-timing';
-import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
+import { Card, Eyebrow, PageShell, SourceCitation, SourceCoverage } from '@/components/data-ui';
+import { FamilyPackComparisonPanel } from '@/components/family-pack-comparison';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { dbSiteSnapshotGeneratedAt } from '@/lib/generated/db-site-products';
+import { topFamilyPackComparisons } from '@/lib/family-pack';
 import { assessBasketBuyTiming } from '@/lib/price-intelligence';
 import { routeMetadata } from '@/lib/seo';
-import { chainPriceRows, formatPct, formatSek, labelFromSlug, matchedChainProducts, topChainSpreads } from '@/lib/verified-data';
+import { chainPriceRows, formatPct, formatSek, labelFromSlug, matchedChainProducts, topChainSpreads, weeklyBasketEcoGrade, weeklyBasketEcoScore } from '@/lib/verified-data';
 
 export function generateMetadata() {
   return routeMetadata('/basket');
@@ -74,6 +77,7 @@ const sourceLabel = dbSiteSnapshotGeneratedAt
   : 'postgres.latest_prices/observations DB-shaped generated module; local builds fall back to the bundled verified Axfood snapshot';
 
 const weeklyBasketBudgetSek = 600;
+const weeklyBasketFamilyPackComparisons = topFamilyPackComparisons(topChainSpreads.slice(0, 24), labelFromSlug, 4);
 
 export default function BasketPage() {
   const pricedRows = basketProducts.reduce((sum, product) => sum + product.prices.length, 0);
@@ -100,6 +104,16 @@ export default function BasketPage() {
           </p>
         </Card>
       </div>
+      <div className="mt-4">
+        <SourceCitation
+          confidenceLabel={pricedRows > 0 ? `${pricedRows.toLocaleString('sv-SE')} visible basket price rows` : null}
+          connectorRun="chainPriceRows(topChainSpreads) basket projection"
+          href="/data-sources"
+          observedAt={dbSiteSnapshotGeneratedAt}
+          sourceLabel={sourceLabel}
+          unknownReason={dbSiteSnapshotGeneratedAt ? null : 'Generated snapshot time is unavailable, so freshness is not used as a claim.'}
+        />
+      </div>
 
       <div className="mt-6 grid gap-6 md:grid-cols-3">
         <Card>
@@ -120,6 +134,64 @@ export default function BasketPage() {
       </div>
 
       <BasketBuyTiming recommendations={basketBuyTimingRecommendations} />
+
+      <div className="mt-6">
+        <FamilyPackComparisonPanel
+          comparisons={weeklyBasketFamilyPackComparisons}
+          emptyDetail="No larger same-category basket candidate has parseable pack-size evidence in the current weekly basket catalogue."
+          intro="Uses the same verified weekly basket candidates to show when a larger pack lowers normalized unit price and when it only raises the checkout total."
+          title="Weekly basket family-pack checks"
+        />
+      </div>
+
+      <section className="mt-6 rounded-lg border border-emerald-200 bg-emerald-50 p-5" data-basket-eco-score>
+        <div className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
+          <div>
+            <Eyebrow>Basket eco score</Eyebrow>
+            <h2 className="mt-2 text-3xl font-black tracking-tight text-emerald-950">Price and environmental signal, side by side</h2>
+            <p className="mt-3 text-sm font-semibold leading-6 text-emerald-950">
+              This summary averages item-level carbon scores for the same verified weekly basket candidates used by the calculator. Estimated rows are labelled and no kg CO2e value is invented.
+            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <div className="rounded-lg bg-white/80 p-4">
+                <p className="text-xs font-black uppercase text-emerald-700">Eco grade</p>
+                <p className="mt-2 text-4xl font-black text-emerald-950">{weeklyBasketEcoGrade}</p>
+              </div>
+              <div className="rounded-lg bg-white/80 p-4">
+                <p className="text-xs font-black uppercase text-emerald-700">Score</p>
+                <p className="mt-2 text-4xl font-black text-emerald-950">{weeklyBasketEcoScore.averageScore}/100</p>
+              </div>
+              <div className="rounded-lg bg-white/80 p-4">
+                <p className="text-xs font-black uppercase text-emerald-700">Basket</p>
+                <p className="mt-2 text-3xl font-black text-emerald-950">{formatSek(weeklyBasketEcoScore.totalPrice)}</p>
+              </div>
+            </div>
+            <p className="mt-3 text-xs font-bold leading-5 text-emerald-900">
+              {weeklyBasketEcoScore.knownEcoScoreCount} OpenFoodFacts Eco-Score rows · {weeklyBasketEcoScore.estimatedEcoScoreCount} estimated category/origin rows
+            </p>
+          </div>
+          <div className="grid gap-3">
+            {weeklyBasketEcoScore.suggestions.length > 0 ? weeklyBasketEcoScore.suggestions.map((suggestion) => (
+              <Link className="rounded-lg border border-emerald-200 bg-white p-4 transition hover:border-emerald-800" href={`/products/${suggestion.toProductSlug}`} key={`${suggestion.fromProductName}-${suggestion.toProductSlug}`}>
+                <p className="text-xs font-black uppercase text-emerald-700">{suggestion.categoryLabel} · +{suggestion.scoreLift} score</p>
+                <h3 className="mt-2 text-lg font-black text-slate-950">{suggestion.fromProductName} to {suggestion.toProductName}</h3>
+                <p className="mt-2 text-sm font-semibold text-slate-700">{suggestion.currentPriceLabel} to {suggestion.replacementPriceLabel} · eco {suggestion.currentScore} to {suggestion.replacementScore}</p>
+                <p className="mt-2 text-xs font-bold leading-5 text-slate-600">{suggestion.evidenceLabel}</p>
+              </Link>
+            )) : (
+              <div className="rounded-lg border border-emerald-200 bg-white p-4">
+                <p className="text-sm font-black text-slate-950">No cheaper-plus-greener swaps in the current verified basket.</p>
+                <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">Suggestions appear only when same-category rows improve score and do not raise the visible lowest price.</p>
+              </div>
+            )}
+          </div>
+        </div>
+        <ul className="mt-5 grid gap-2 text-sm font-bold leading-6 text-emerald-950 lg:grid-cols-3">
+          {weeklyBasketEcoScore.guardrails.map((guardrail) => (
+            <li className="rounded-lg bg-white/80 p-3" key={guardrail}>{guardrail}</li>
+          ))}
+        </ul>
+      </section>
 
       <BasketCalculator products={basketProducts} sourceLabel={sourceLabel} weeklyBudgetSek={weeklyBasketBudgetSek} />
 

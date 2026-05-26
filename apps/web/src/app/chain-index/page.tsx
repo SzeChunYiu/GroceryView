@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { calculateBrandTierIndices, calculateChainPriceIndex } from '@groceryview/core';
 import { ConfidenceBadge } from '@/components/confidence-badge';
-import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
+import { Card, Eyebrow, PageShell, SourceCitation, SourceCoverage } from '@/components/data-ui';
 import { buildBrandTierPriceObservations, buildChainIndexTrendSeries, buildChainPriceObservations, buildMatchedBasketChainPriceObservations } from '@/lib/chain-index-data';
 import { buildGroceryIndexTickerWidget } from '@/lib/grocery-index-widget';
 import { categorySummaries, formatPct, formatSek, freshFoodChainIndex, marketHeatmapTiles, matchedChainProducts } from '@/lib/verified-data';
@@ -19,6 +19,7 @@ const matchedBasketRefinedIndex = calculateChainPriceIndex([
   ...matchedBasketObservations
 ]);
 const chainIndexTrendSeries = buildChainIndexTrendSeries();
+const matchedBasketConstituents = matchedBasketRefinedIndex.matchedBasketProductIds.slice(0, 12);
 
 const widgetSourceConfidence = matchedBasketRefinedIndex.chains.reduce(
   (summary, chain) => ({
@@ -63,6 +64,18 @@ export default function ChainIndexPage() {
       <Eyebrow>Chain index</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Willys/Hemköp matched-product index</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">The index is computed only from products with the same Axfood code in both chain catalogues. It does not mix unmatched SKUs or branch-location data.</p>
+      <Link className="mt-4 inline-flex rounded-full bg-white px-4 py-2 text-sm font-black text-emerald-900 shadow-sm" href="/methodology-changelog">
+        View data and methodology changelog
+      </Link>
+      <div className="mt-4">
+        <SourceCitation
+          confidenceLabel={`${widgetSourceConfidence.high} high, ${widgetSourceConfidence.medium} medium, ${widgetSourceConfidence.low} low chain confidence rows`}
+          connectorRun="calculateChainPriceIndex(buildChainPriceObservations + matched basket observations)"
+          href="/data-sources"
+          observedAt={chainIndexTrendSeries.series[0]?.latestDate}
+          sourceLabel="Verified chain price observation snapshot"
+        />
+      </div>
       <div className="mt-6 grid gap-4 md:grid-cols-3">
         <Card><p className="text-sm font-black text-slate-600">Matched products</p><p className="mt-2 text-4xl font-black text-emerald-800">{matchedChainProducts.length}</p></Card>
         <Card><p className="text-sm font-black text-slate-600">Average spread</p><p className="mt-2 text-4xl font-black text-emerald-800">{formatPct(averageSpread)}</p></Card>
@@ -167,9 +180,17 @@ export default function ChainIndexPage() {
             <div className="rounded-2xl bg-white/80 p-4" key={chain.chainId}>
               <p className="text-sm font-black uppercase tracking-[0.18em] text-blue-700">{chain.chainId}</p>
               <p className="mt-2 text-3xl font-black text-blue-950">{chain.overallIndex.toFixed(1)}</p>
-              <p className="mt-1 text-sm font-semibold text-blue-900">{chain.confidence} confidence · {chain.categoriesCovered} categories</p>
+              <p className="mt-1 text-sm font-semibold text-blue-900">{chain.confidence} confidence · {chain.categoriesCovered} categories · {chain.matchedBasketCoveragePercent.toFixed(0)}% basket coverage</p>
             </div>
           ))}
+        </div>
+        <div className="mt-5 rounded-2xl bg-white/80 p-4">
+          <p className="text-sm font-black text-blue-950">Matched basket constituents</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {matchedBasketConstituents.map((productId) => (
+              <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-black text-blue-950" key={productId}>{productId}</span>
+            ))}
+          </div>
         </div>
       </Card>
 

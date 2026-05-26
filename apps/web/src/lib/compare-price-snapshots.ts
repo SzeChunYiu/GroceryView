@@ -3,11 +3,14 @@ export const MAX_COMPARE_PRICE_SNAPSHOT_ITEMS = 4;
 export type CompareItemIdsParam = string | string[] | null | undefined;
 
 export type ComparePriceSnapshotStoreRow = {
+  confidence?: string;
   itemId: string;
   itemName: string;
   storeName: string;
+  observedAt?: string;
   price: number | null;
   priceLabel: string;
+  priceType?: string;
   unitLabel: string;
   chainName?: string;
   packSizeLabel?: string;
@@ -41,11 +44,15 @@ type FetchLike = (input: string, init?: { cache?: 'no-store' }) => Promise<{
 }>;
 
 type StorePriceRowPayload = {
+  confidence?: unknown;
   itemId?: unknown;
   itemName?: unknown;
+  observedAt?: unknown;
   storeName?: unknown;
   price?: unknown;
   priceLabel?: unknown;
+  priceType?: unknown;
+  unitPrice?: unknown;
   unitLabel?: unknown;
   chainName?: unknown;
   packSizeLabel?: unknown;
@@ -83,15 +90,39 @@ export function parseCompareItemIdsParam(value: CompareItemIdsParam, maxItems = 
 
 function endpointForItems(endpoint: string, itemIds: string[]) {
   const separator = endpoint.includes('?') ? '&' : '?';
-  return `${endpoint}${separator}items=${encodeURIComponent(itemIds.join(','))}`;
+  return `${endpoint}${separator}itemIds=${encodeURIComponent(itemIds.join(','))}`;
 }
 
 function stringOrFallback(value: unknown, fallback: string) {
   return typeof value === 'string' && value.trim().length > 0 ? value : fallback;
 }
 
+function optionalString(value: unknown) {
+  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : undefined;
+}
+
 function numberOrNull(value: unknown) {
   return typeof value === 'number' && Number.isFinite(value) ? value : null;
+}
+
+function moneyAmount(value: unknown) {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (!value || typeof value !== 'object') return null;
+  const amount = (value as { amount?: unknown }).amount;
+  return typeof amount === 'number' && Number.isFinite(amount) ? amount : null;
+}
+
+function moneyCurrency(value: unknown) {
+  if (!value || typeof value !== 'object') return 'SEK';
+  const currency = (value as { currency?: unknown }).currency;
+  return typeof currency === 'string' && currency.trim() ? currency.trim() : 'SEK';
+}
+
+function formatMoneyLabel(value: unknown) {
+  const amount = moneyAmount(value);
+  if (amount === null) return 'Price unavailable';
+  const currency = moneyCurrency(value);
+  return `${amount.toLocaleString('sv-SE', { maximumFractionDigits: 2 })} ${currency}`;
 }
 
 function overlayBasisFor(row: Pick<ComparePriceSnapshotStoreRow, 'chainName' | 'packSizeLabel' | 'storeName' | 'unitLabel'>): ComparePriceSnapshotOverlayOption['basis'] {
@@ -164,11 +195,14 @@ function directStoreRowsFromPayload(payload: unknown): ComparePriceSnapshotStore
       const storeName = stringOrFallback(row.storeName, 'Unknown store');
       const unitLabel = stringOrFallback(row.unitLabel, 'Unit unavailable');
       return {
+        ...(optionalString(row.confidence) ? { confidence: optionalString(row.confidence) } : {}),
         itemId,
         itemName: stringOrFallback(row.itemName, itemId),
+        ...(optionalString(row.observedAt) ? { observedAt: optionalString(row.observedAt) } : {}),
         storeName,
         price: numberOrNull(row.price),
         priceLabel: stringOrFallback(row.priceLabel, 'Price unavailable'),
+        ...(optionalString(row.priceType) ? { priceType: optionalString(row.priceType) } : {}),
         unitLabel,
         chainName: stringOrFallback(row.chainName, storeName),
         packSizeLabel: stringOrFallback(row.packSizeLabel, unitLabel),
@@ -190,11 +224,14 @@ function nestedStoreRowsFromPayload(payload: unknown): ComparePriceSnapshotStore
         const storeName = stringOrFallback(row.storeName, 'Unknown store');
         const unitLabel = stringOrFallback(row.unitLabel, 'Unit unavailable');
         return {
+          ...(optionalString(row.confidence) ? { confidence: optionalString(row.confidence) } : {}),
           itemId,
           itemName,
+          ...(optionalString(row.observedAt) ? { observedAt: optionalString(row.observedAt) } : {}),
           storeName,
           price: numberOrNull(row.price),
           priceLabel: stringOrFallback(row.priceLabel, 'Price unavailable'),
+          ...(optionalString(row.priceType) ? { priceType: optionalString(row.priceType) } : {}),
           unitLabel,
           chainName: stringOrFallback(row.chainName, storeName),
           packSizeLabel: stringOrFallback(row.packSizeLabel, unitLabel),
@@ -205,8 +242,40 @@ function nestedStoreRowsFromPayload(payload: unknown): ComparePriceSnapshotStore
   });
 }
 
+function contractStoreRowsFromPayload(payload: unknown): ComparePriceSnapshotStoreRow[] {
+  if (!payload || typeof payload !== 'object' || !('stores' in payload)) return [];
+  const stores = (payload as { stores?: unknown }).stores;
+  if (!stores || typeof stores !== 'object' || Array.isArray(stores)) return [];
+
+  return Object.entries(stores).flatMap(([storeId, itemSnapshots]) => {
+    if (!itemSnapshots || typeof itemSnapshots !== 'object' || Array.isArray(itemSnapshots)) return [];
+
+    return Object.entries(itemSnapshots).map(([itemId, snapshot]) => {
+      const row = snapshot && typeof snapshot === 'object' ? snapshot as StorePriceRowPayload : {};
+      const price = moneyAmount(row.price);
+      const unitPrice = moneyAmount(row.unitPrice);
+      const unitCurrency = moneyCurrency(row.unitPrice ?? row.price);
+      return {
+        ...(optionalString(row.confidence) ? { confidence: optionalString(row.confidence) } : {}),
+        itemId,
+        itemName: itemId,
+        ...(optionalString(row.observedAt) ? { observedAt: optionalString(row.observedAt) } : {}),
+        storeName: storeId,
+        price,
+        priceLabel: formatMoneyLabel(row.price),
+        ...(optionalString(row.priceType) ? { priceType: optionalString(row.priceType) } : {}),
+        unitLabel: unitPrice === null ? `${unitCurrency}/unit` : `${unitPrice.toLocaleString('sv-SE', { maximumFractionDigits: 2 })} ${unitCurrency}/unit`,
+        chainName: storeId,
+        packSizeLabel: stringOrFallback(row.priceType, 'snapshot price'),
+        normalizedUnitPrice: unitPrice,
+        normalizedUnitPriceLabel: unitPrice === null ? undefined : `${unitPrice.toLocaleString('sv-SE', { maximumFractionDigits: 2 })} ${unitCurrency}/unit`
+      } satisfies ComparePriceSnapshotStoreRow;
+    });
+  });
+}
+
 function storeRowsFromPayload(payload: unknown): ComparePriceSnapshotStoreRow[] {
-  return [...directStoreRowsFromPayload(payload), ...nestedStoreRowsFromPayload(payload)];
+  return [...contractStoreRowsFromPayload(payload), ...directStoreRowsFromPayload(payload), ...nestedStoreRowsFromPayload(payload)];
 }
 
 function matchedIdsFromPayload(payload: unknown, storeRows: ComparePriceSnapshotStoreRow[]) {
@@ -234,7 +303,7 @@ export async function fetchComparePriceSnapshots(
   if (!fetcher) return fallbackResult(itemIds);
 
   try {
-    const response = await fetcher(endpointForItems(options.endpoint ?? '/api/compare/items', itemIds), { cache: 'no-store' });
+    const response = await fetcher(endpointForItems(options.endpoint ?? '/api/compare', itemIds), { cache: 'no-store' });
     if (!response.ok) return fallbackResult(itemIds);
 
     const payload = await response.json();

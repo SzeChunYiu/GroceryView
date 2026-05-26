@@ -1,0 +1,30 @@
+name: Security ASVS Gate
+
+on:
+  pull_request:
+    paths:
+      - 'apps/api/src/**'
+      - 'apps/mobile/src/**'
+      - 'apps/web/src/app/api/**'
+      - 'apps/web/src/app/account/**'
+      - 'apps/web/src/app/privacy/**'
+      - 'apps/web/src/app/scanner/**'
+      - 'apps/web/src/components/barcode-scanner.tsx'
+      - 'apps/web/src/components/scanner-upload-actions.tsx'
+      - 'apps/web/src/middleware.ts'
+      - 'docs/PRIVACY.md'
+      - 'docs/security/asvs-l2-groceryview.json'
+      - 'packages/auth/**'
+      - 'packages/server/src/**'
+      - 'packages/server/__tests__/**'
+      - 'scripts/security/check-asvs-l2.mjs'
+
+jobs:
+  asvs-l2:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check ASVS L2 mappings
+        run: ASVS_BASE_REF="origin/${{ github.base_ref }}" node scripts/security/check-asvs-l2.mjs

@@ -88,7 +88,7 @@ export function PriceAlertDialog({
         value={targetPrice}
       />
       {error ? (
-        <p className="mt-3 rounded-2xl bg-rose-50 p-3 text-sm font-bold text-rose-800" id="price-alert-target-error" role="alert" aria-live="assertive">
+        <p className="mt-3 rounded-2xl bg-rose-50 p-3 text-sm font-bold text-rose-800" id="price-alert-target-error" role="alert" aria-atomic="true" aria-live="assertive">
           {error}
         </p>
       ) : null}

@@ -37,6 +37,8 @@ import {
   queryRollingAverageDealReport,
   buildUserAccountDeletionQueries,
   type BudgetRecord,
+  type FriendSharedDealSignalRecord,
+  type NotificationSubscriptionRecord,
   type PgLikeClient,
   type PostgresIntegrationReadinessReport,
   type QueryExecutor,
@@ -75,6 +77,7 @@ import {
   type PrivacyRequestStatus,
   type PrivacyRequestType,
   type BasketTripCostTravelMode,
+  type DealShareRelationship,
   type RecurringBasketCadence,
   type WatchlistItem,
   type WatchlistProductSnapshot,
@@ -85,6 +88,7 @@ import {
   createSendgridEmailProvider,
   createTelegramBotProvider,
   formatNotificationOperationsMetrics,
+  planTelegramPriceAlertNotificationDeliveries,
   parseNotificationSuppressionWebhook,
   processNotificationSuppressionEvent,
   runRepositoryNotificationWorkerCycle,
@@ -145,6 +149,10 @@ export type AuthOptions = {
       resolvedProductId?: string;
       quantity?: number;
     }): Promise<BasketImportReviewItem>;
+  };
+  friendSharedDealSignalRepository?: {
+    upsertFriendSharedDealSignal(signal: FriendSharedDealSignalRecord): Promise<void>;
+    listFriendSharedDealSignals(userId: string): Promise<FriendSharedDealSignalRecord[]>;
   };
   notificationWebhookSecret?: string;
   notificationSuppressionSink?: {
@@ -225,6 +233,8 @@ export type RuntimePersistenceRepository = {
   upsertSubscriptionEntitlement(entitlement: BillingSubscriptionEntitlementMutation): Promise<void>;
   upsertBudget(userId: string, budget: BudgetRecord): Promise<void>;
   getBudget(userId: string): Promise<BudgetRecord | null>;
+  getFavoriteStoreIds?(userId: string): Promise<string[]>;
+  getWatchlist?(userId: string): Promise<WatchlistItem[]>;
   deleteUserAccount?(userId: string): Promise<void>;
   getHumanReviewer(reviewerId: string): Promise<HumanReviewOperator | null>;
   listOpenHumanReviewAssignments(): Promise<HumanReviewAssignment[]>;
@@ -237,10 +247,14 @@ export type RuntimePersistenceRepository = {
     resolvedProductId?: string;
     quantity?: number;
   }): Promise<BasketImportReviewItem>;
+  upsertFriendSharedDealSignal?(signal: FriendSharedDealSignalRecord): Promise<void>;
+  listFriendSharedDealSignals?(userId: string): Promise<FriendSharedDealSignalRecord[]>;
   upsertNotificationSuppression(suppression: NotificationSuppressionMutation): Promise<void>;
   listDueNotificationTasks?(now: string): Promise<PersistedNotificationTask[]>;
   listActiveNotificationSuppressions?(): Promise<NotificationSuppression[]>;
   upsertNotificationTask?(task: PersistedNotificationTask): Promise<void>;
+  insertNotificationTaskIfAbsent?(task: PersistedNotificationTask): Promise<boolean>;
+  listActiveTelegramNotificationSubscriptions?(): Promise<NotificationSubscriptionRecord[]>;
   upsertReceiptUpload?(upload: ReceiptUploadRecord): Promise<void>;
 };
 
@@ -618,6 +632,11 @@ function requiredTravelMode(value: unknown): BasketTripCostTravelMode {
   throw new Error('travelMode must be walk, bike, transit, car, or delivery.');
 }
 
+function requiredDealShareRelationship(value: unknown): DealShareRelationship {
+  if (value === 'household' || value === 'friend') return value;
+  throw new Error('relationship must be household or friend.');
+}
+
 function optionalQueryNumber(url: URL, name: string): number | undefined {
   const raw = url.searchParams.get(name);
   if (raw === null || raw === '') return undefined;
@@ -713,6 +732,11 @@ function requiredBoolean(value: unknown, field: string): boolean {
   return value;
 }
 
+function optionalBoolean(value: unknown, field: string): boolean | undefined {
+  if (value === undefined) return undefined;
+  return requiredBoolean(value, field);
+}
+
 function optionalHouseholdJoinRole(value: unknown): HouseholdJoinRequest['role'] {
   if (value === undefined) return undefined;
   if (value === 'editor' || value === 'viewer') return value;
@@ -768,6 +792,32 @@ function basketImportReviewDecisionFromBody(body: JsonRecord): BasketImportRevie
     decision,
     ...(body.productId === undefined ? {} : { productId: requiredString(body.productId, 'productId') }),
     ...(body.quantity === undefined ? {} : { quantity: requiredNumber(body.quantity, 'quantity') })
+  };
+}
+
+function friendSharedDealSignalFromBody(userId: string, body: JsonRecord, now: Date): FriendSharedDealSignalRecord {
+  const sourceConfidence = requiredNumber(body.sourceConfidence, 'sourceConfidence');
+  if (!Number.isFinite(sourceConfidence) || sourceConfidence < 0 || sourceConfidence > 1) {
+    throw new Error('sourceConfidence must be between 0 and 1.');
+  }
+  const dealScore = optionalNumber(body.dealScore, 'dealScore');
+  if (dealScore !== undefined && (!Number.isFinite(dealScore) || dealScore < 0 || dealScore > 100)) {
+    throw new Error('dealScore must be between 0 and 100.');
+  }
+  if (body.optedIn !== true) throw new Error('Only opted-in friend share signals can be persisted.');
+
+  return {
+    signalId: requiredString(body.signalId, 'signalId'),
+    userId,
+    productId: requiredString(body.productId, 'productId'),
+    sharedByUserId: requiredString(body.sharedByUserId, 'sharedByUserId'),
+    sharedByDisplayName: requiredString(body.sharedByDisplayName, 'sharedByDisplayName'),
+    relationship: requiredDealShareRelationship(body.relationship),
+    sharedAt: requiredIsoTimestamp(body.sharedAt, 'sharedAt'),
+    sourceConfidence,
+    optedIn: true,
+    ...(dealScore === undefined ? {} : { dealScore }),
+    createdAt: optionalIsoTimestamp(body.createdAt, 'createdAt') ?? now.toISOString()
   };
 }
 
@@ -863,6 +913,56 @@ function cursorPaginatedEnvelope<T>(items: T[], params: URLSearchParams) {
 }
 
 const watchlistPriceTypes = ['shelf', 'member', 'promotion', 'estimated'] as const satisfies readonly WatchlistPriceType[];
+const settingsCurrencies = ['SEK', 'EUR', 'NOK', 'DKK'] as const;
+const settingsNotificationChannels = ['push', 'email', 'telegram'] as const;
+const settingsAlgorithms = ['balanced', 'best_savings', 'best_unit_price', 'watchlist_first'] as const;
+
+type UserSettingsPreferences = {
+  userId: string;
+  currency: (typeof settingsCurrencies)[number];
+  preferredStores: string[];
+  notificationChannels: Array<(typeof settingsNotificationChannels)[number]>;
+  algorithm_choice: (typeof settingsAlgorithms)[number];
+};
+
+function normalizePreferredStoreSlugs(value: unknown): string[] | undefined {
+  const stores = optionalStringArray(value, 'preferredStores');
+  if (stores === undefined) return undefined;
+  if (stores.length < 1 || stores.length > 5) throw new Error('preferredStores must contain 1 to 5 ordered store slugs.');
+  const normalized = stores.map((store) => store.trim().toLowerCase());
+  if (normalized.some((store) => !/^[a-z0-9][a-z0-9-]*$/.test(store))) {
+    throw new Error('preferredStores must contain store slugs only.');
+  }
+  return [...new Set(normalized)];
+}
+
+function settingsPreferencesPatchFromBody(body: JsonRecord): Partial<Omit<UserSettingsPreferences, 'userId'>> {
+  const patch: Partial<Omit<UserSettingsPreferences, 'userId'>> = {};
+  if (body.currency !== undefined) {
+    if (!settingsCurrencies.includes(body.currency as (typeof settingsCurrencies)[number])) {
+      throw new Error(`currency must be one of: ${settingsCurrencies.join(', ')}.`);
+    }
+    patch.currency = body.currency as UserSettingsPreferences['currency'];
+  }
+  const preferredStores = normalizePreferredStoreSlugs(body.preferredStores);
+  if (preferredStores !== undefined) patch.preferredStores = preferredStores;
+  if (body.notificationChannels !== undefined) {
+    const channels = optionalStringArray(body.notificationChannels, 'notificationChannels') ?? [];
+    for (const channel of channels) {
+      if (!settingsNotificationChannels.includes(channel as (typeof settingsNotificationChannels)[number])) {
+        throw new Error(`notificationChannels must contain only: ${settingsNotificationChannels.join(', ')}.`);
+      }
+    }
+    patch.notificationChannels = channels as UserSettingsPreferences['notificationChannels'];
+  }
+  if (body.algorithm_choice !== undefined) {
+    if (!settingsAlgorithms.includes(body.algorithm_choice as (typeof settingsAlgorithms)[number])) {
+      throw new Error(`algorithm_choice must be one of: ${settingsAlgorithms.join(', ')}.`);
+    }
+    patch.algorithm_choice = body.algorithm_choice as UserSettingsPreferences['algorithm_choice'];
+  }
+  return patch;
+}
 
 function optionalWatchlistPriceTypes(value: unknown): WatchlistPriceType[] | undefined {
   const values = optionalStringArray(value, 'allowedPriceTypes');
@@ -1166,7 +1266,7 @@ async function normalizeWatchlistProductIds(executor: QueryExecutor, watchlist: 
 
 async function queryWatchlistPriceAlertsFromPostgres(
   executor: QueryExecutor,
-  repository: RuntimeWatchlistRepository,
+  repository: Pick<RuntimeWatchlistRepository, 'getFavoriteStoreIds' | 'getWatchlist'>,
   userId: string
 ): Promise<WatchlistPriceAlertReport> {
   const [rawWatchlist, favoriteStoreIds] = await Promise.all([
@@ -1973,6 +2073,16 @@ function parseBillingSubscriptionWebhookBody(body: JsonRecord, authOptions: Auth
 }
 
 export function createHttpHandler(api = createGroceryViewApi(), authOptions: AuthOptions = {}): HttpHandler {
+  const settingsPreferences = new Map<string, UserSettingsPreferences>();
+
+  const settingsForUser = (userId: string): UserSettingsPreferences => settingsPreferences.get(userId) ?? {
+    userId,
+    currency: 'SEK',
+    preferredStores: [],
+    notificationChannels: [],
+    algorithm_choice: 'balanced'
+  };
+
   const requireSession = async (request: Request): Promise<SessionPayload | Response> => {
     if (!authOptions.authSecret) return errorResponse(503, 'Auth secret is not configured.');
     const token = parseBearerToken(request.headers.get('authorization'));
@@ -2011,7 +2121,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
     }, { status: 402 });
   };
 
-  const buildAccountDataExport = (user: string) => {
+  const buildAccountDataExport = async (user: string) => {
     const householdPlan = api.getHouseholdPlan(user);
     const watchlist = api.getWatchlist(user);
     const budgetSummary = api.getBudgetSummary(user);
@@ -2027,7 +2137,13 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
     const preferences = budgetSummary.weeklyBudget > 0 || budgetSummary.monthlyBudget > 0
       ? [{ weeklyBudget: budgetSummary.weeklyBudget, monthlyBudget: budgetSummary.monthlyBudget }]
       : [];
-    const apiWithFriendSignals = api as typeof api & { getFriendSharedDealSignals?: (userId: string) => unknown[] };
+    const apiWithFriendSignals = api as typeof api & { getFriendSharedDealSignals?: (userId: string) => unknown[] | { signals?: unknown[] } };
+    const apiFriendSignals = apiWithFriendSignals.getFriendSharedDealSignals?.(user);
+    const friendSharedDealSignals = authOptions.friendSharedDealSignalRepository
+      ? await authOptions.friendSharedDealSignalRepository.listFriendSharedDealSignals(user)
+      : Array.isArray(apiFriendSignals)
+        ? apiFriendSignals
+        : apiFriendSignals?.signals ?? [];
 
     return buildPrivacyExport(
       {
@@ -2040,7 +2156,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         watchlistProductIds: watchlist.items.map((item) => item.productId),
         receiptIds: [],
         householdIds: householdPlan ? [householdPlan.household.id] : [],
-        friendSharedDealSignals: apiWithFriendSignals.getFriendSharedDealSignals?.(user) ?? []
+        friendSharedDealSignals
       },
       (authOptions.now ?? new Date()).toISOString()
     );
@@ -2269,6 +2385,32 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         };
         if (!authOptions.flyerOffersProvider) return errorResponse(503, 'Discounts provider is not configured.');
         return cachedJsonResponse(authOptions.apiResponseCache, url, apiHotEndpointCacheTtlSeconds[path], () => authOptions.flyerOffersProvider!(query));
+      }
+
+      if (path === '/api/deals/friend-share-signals') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        const repository = authOptions.friendSharedDealSignalRepository;
+        if (!repository) return errorResponse(503, 'Friend share signal repository is not configured.');
+        if (method === 'GET') {
+          return jsonResponse({
+            userId: user,
+            signals: await repository.listFriendSharedDealSignals(user),
+            guardrails: [
+              'Only opted-in household or friend signals are persisted.',
+              'Anonymous shares are rejected before they can feed suggestFriendSharedDeals.',
+              'Signals remain user-scoped for privacy export and deletion workflows.'
+            ]
+          });
+        }
+        if (method === 'POST') {
+          const body = await readJson(request);
+          const signal = friendSharedDealSignalFromBody(user, body, authOptions.now ?? new Date());
+          await repository.upsertFriendSharedDealSignal(signal);
+          return jsonResponse({ accepted: true, persisted: true, signal }, { status: 202 });
+        }
       }
 
       if (method === 'GET' && path === '/api/account/subscription-access') {
@@ -2846,6 +2988,20 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (method === 'GET') return jsonResponse(api.getBasket(user));
       }
 
+      if (path === '/api/basket/stock-up-list') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') {
+          return jsonResponse(api.getMultiWeekStockUpPlan(user, {
+            asOf: url.searchParams.get('asOf') ?? undefined,
+            planningWeeks: optionalQueryNumber(url, 'planningWeeks'),
+            weeklyBudget: optionalQueryNumber(url, 'weeklyBudget')
+          }));
+        }
+      }
+
       if (path === '/api/basket/items') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
@@ -3121,12 +3277,26 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         }
       }
 
+      if (path === '/api/settings') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') return jsonResponse(settingsForUser(user));
+        if (method === 'PATCH') {
+          const body = await readJson(request);
+          const next = { ...settingsForUser(user), ...settingsPreferencesPatchFromBody(body), userId: user };
+          settingsPreferences.set(user, next);
+          return jsonResponse(next);
+        }
+      }
+
       if (path === '/api/privacy/export' || path === '/api/settings/data-export') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
         const authError = await authorizeUser(request, user);
         if (authError) return authError;
-        if (method === 'GET') return jsonResponse(buildAccountDataExport(user));
+        if (method === 'GET') return jsonResponse(await buildAccountDataExport(user));
       }
 
       if (path === '/api/settings/account') {
@@ -3398,6 +3568,13 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/deals': { get: publicOperation('Get current items priced below their 30-day rolling average, sorted by discount percentage.') },
       '/api/deals/discounts': { get: publicOperation('Get active weekly discounts by branch, chain, category, or product with source evidence.') },
       '/api/deals/flyer-offers': { get: publicOperation('Get active weekly flyer offers by branch, chain, category, or product with source evidence.') },
+      '/api/deals/friend-share-signals': {
+        get: operationWithJsonResponse(
+          protectedOperation('List opted-in household and friend deal share signals for the signed-in account.'),
+          'FriendSharedDealSignalListResponse'
+        ),
+        post: protectedOperation('Persist an opted-in household or friend deal share signal for future deal suggestions.')
+      },
       '/api/retailers': { get: publicOperation('List supported retailers with logo and website metadata.') },
       '/api/stores': { get: publicOperation('List stores.') },
       '/api/account/subscription-access': { get: protectedOperation('Get subscription access policy for the signed-in account.') },
@@ -3435,6 +3612,10 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/households/join': { post: protectedOperation('Join an existing household from a signed-in invite token.') },
       '/api/households/current/basket/check': { post: protectedOperation('Check or uncheck a shared household shopping-list item with member attribution.') },
       '/api/privacy/export': { get: protectedOperation('Export signed-in user profile, favorite-store, watchlist, receipt, household, and friend-shared deal signal data.') },
+      '/api/settings': {
+        get: protectedOperation('Read signed-in user preferences including ordered preferred store slugs.'),
+        patch: protectedOperation('Persist signed-in user preferences including 1-5 ordered preferred store slugs.')
+      },
       '/api/settings/account': { delete: protectedOperation('Delete the signed-in account after confirmation, wiping lists, alerts, preferences, and profile rows.') },
       '/api/settings/data-export': { get: protectedOperation('Download my data JSON export with lists, alerts, preferences, and analytics event records.') },
       '/api/privacy/deletion-plan': { post: protectedOperation('Plan account deletion, including friend-shared deal signals, without performing a destructive delete.') },
@@ -3482,6 +3663,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/basket/transfer/{retailerId}': { get: protectedOperation('Preflight secure retailer basket transfer and block unless capability is verified.') },
       '/api/basket/recurring-digest': { get: protectedOperation('Get recurring basket changes, missing-price blockers, and suggested review actions.') },
       '/api/basket/stores/{storeId}/quote': { get: protectedOperation('Quote the current basket at one store with missing-price labels.') },
+      '/api/basket/stock-up-list': { get: protectedOperation('Plan a multi-week stock-up list from signed-in basket items and observed price history without forecasting.') },
       '/api/budget': { patch: protectedOperation('Update budget.') },
       '/api/budget/categories': {
         get: protectedOperation('Get category budget summary.'),
@@ -3779,6 +3961,119 @@ export async function enqueueBestTimeToBuyAlertRulesFromPostgres(input: {
   return dueTasks;
 }
 
+async function normalizeTelegramSubscriptionProductIds(
+  executor: QueryExecutor,
+  subscriptions: readonly NotificationSubscriptionRecord[]
+): Promise<NotificationSubscriptionRecord[]> {
+  const productIds = [...new Set(subscriptions.flatMap((subscription) => subscription.productId ? [subscription.productId] : []))];
+  if (productIds.length === 0) return [...subscriptions];
+
+  const rows = await executor.query<WatchlistProductIdentityRow>(
+    `select id::text as product_id,
+            slug as product_slug
+     from products
+     where id::text = any($1::text[])
+        or slug = any($1::text[])`,
+    [productIds]
+  );
+  const slugsByIdentifier = new Map<string, string>();
+  for (const row of rows) {
+    slugsByIdentifier.set(row.product_id, row.product_slug);
+    slugsByIdentifier.set(row.product_slug, row.product_slug);
+  }
+
+  return subscriptions.map((subscription) => ({
+    ...subscription,
+    ...(subscription.productId ? { productId: slugsByIdentifier.get(subscription.productId) ?? subscription.productId } : {})
+  }));
+}
+
+function telegramWatchlistTaskId(input: {
+  userId: string;
+  productId: string;
+  chatId: string;
+  threshold: number;
+  value: number;
+}): string {
+  return `telegram-watchlist-target:${hashHex([
+    input.userId,
+    input.productId,
+    input.chatId,
+    input.threshold.toFixed(2),
+    input.value.toFixed(2)
+  ].join('|')).slice(0, 32)}`;
+}
+
+export async function enqueueTelegramWatchlistPriceAlertsFromPostgres(input: {
+  executor: QueryExecutor;
+  repository: Pick<
+    RuntimePersistenceRepository,
+    | 'getFavoriteStoreIds'
+    | 'getWatchlist'
+    | 'listActiveTelegramNotificationSubscriptions'
+    | 'insertNotificationTaskIfAbsent'
+    | 'upsertNotificationTask'
+  >;
+  now: string;
+}): Promise<PersistedNotificationTask[]> {
+  if (
+    !input.repository.listActiveTelegramNotificationSubscriptions ||
+    !input.repository.getFavoriteStoreIds ||
+    !input.repository.getWatchlist
+  ) {
+    return [];
+  }
+  const watchlistRepository: Pick<RuntimeWatchlistRepository, 'getFavoriteStoreIds' | 'getWatchlist'> = {
+    getFavoriteStoreIds: (userId) => input.repository.getFavoriteStoreIds!(userId),
+    getWatchlist: (userId) => input.repository.getWatchlist!(userId)
+  };
+  const activeSubscriptions = await input.repository.listActiveTelegramNotificationSubscriptions();
+  const normalizedSubscriptions = await normalizeTelegramSubscriptionProductIds(input.executor, activeSubscriptions);
+  const subscriptionsByUser = new Map<string, NotificationSubscriptionRecord[]>();
+  const createdTasks: PersistedNotificationTask[] = [];
+
+  for (const subscription of normalizedSubscriptions) {
+    subscriptionsByUser.set(subscription.userId, [...(subscriptionsByUser.get(subscription.userId) ?? []), subscription]);
+  }
+
+  for (const [userId, subscriptions] of subscriptionsByUser) {
+    const report = await queryWatchlistPriceAlertsFromPostgres(input.executor, watchlistRepository, userId);
+    const plannedNotifications = planTelegramPriceAlertNotificationDeliveries({
+      now: input.now,
+      alerts: report.alerts,
+      subscriptions: subscriptions.map((subscription) => ({
+        userId: subscription.userId,
+        productId: subscription.productId,
+        chatId: subscription.chatId ?? '',
+        active: subscription.active
+      }))
+    });
+
+    for (const planned of plannedNotifications) {
+      if (typeof planned.alert.trigger.value !== 'number' || planned.alert.trigger.threshold === undefined) continue;
+      const task: PersistedNotificationTask = {
+        id: telegramWatchlistTaskId({
+          userId,
+          productId: planned.alert.productId,
+          chatId: planned.notification.recipient,
+          threshold: planned.alert.trigger.threshold,
+          value: planned.alert.trigger.value
+        }),
+        ...planned.notification,
+        attemptCount: 0,
+        maxAttempts: 3,
+        status: 'queued'
+      };
+      const inserted = input.repository.insertNotificationTaskIfAbsent
+        ? await input.repository.insertNotificationTaskIfAbsent(task)
+        : (await input.repository.upsertNotificationTask?.(task), true);
+      if (inserted) createdTasks.push(task);
+    }
+  }
+
+  return createdTasks;
+}
+
 function buildRuntimeNotificationWorkerRunner(
   config: RuntimeConfig,
   repository: RuntimePersistenceRepository | undefined,
@@ -3790,6 +4085,9 @@ function buildRuntimeNotificationWorkerRunner(
   if (!providers.email && !providers.push && !providers.telegram) return undefined;
   return async () => {
     const now = (options.now ?? new Date()).toISOString();
+    if (executor && providers.telegram) {
+      await enqueueTelegramWatchlistPriceAlertsFromPostgres({ executor, repository, now });
+    }
     if (executor) await enqueueBestTimeToBuyAlertRulesFromPostgres({ executor, repository, now });
     return runRepositoryNotificationWorkerCycle({
       now,
@@ -3994,6 +4292,14 @@ export function buildRepositoryBackedAuthOptions(
             saveBasketImportReviewItems: (userId, items) => repository.saveBasketImportReviewItems!(userId, items),
             listOpenBasketImportReviewItems: (userId) => repository.listOpenBasketImportReviewItems!(userId),
             resolveBasketImportReviewItem: (userId, reviewItemId, resolution) => repository.resolveBasketImportReviewItem!(userId, reviewItemId, resolution)
+          }
+        }
+      : {}),
+    ...(repository.upsertFriendSharedDealSignal && repository.listFriendSharedDealSignals
+      ? {
+          friendSharedDealSignalRepository: {
+            upsertFriendSharedDealSignal: (signal) => repository.upsertFriendSharedDealSignal!(signal),
+            listFriendSharedDealSignals: (userId) => repository.listFriendSharedDealSignals!(userId)
           }
         }
       : {}),

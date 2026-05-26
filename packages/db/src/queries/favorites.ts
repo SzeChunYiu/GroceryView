@@ -1,3 +1,5 @@
+import { ACTIVE_PRODUCTS_PREDICATE } from './items.js';
+
 export type FavoritesSortMode = 'name' | 'price';
 
 export type FavoritesListQueryOptions = {
@@ -96,6 +98,7 @@ export function buildFavoritesListQuery(userId: string, options: FavoritesListQu
             left join ranked_prices on ranked_prices.product_id = products.id and ranked_prices.price_rank = 1
             left join stores on stores.id = ranked_prices.store_id
            where watchlist_items.user_id = $1
+             and ${ACTIVE_PRODUCTS_PREDICATE}
            order by ${orderBy}
            limit $2`,
     values: [userId, clampLimit(options.limit)]

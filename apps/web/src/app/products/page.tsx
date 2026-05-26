@@ -8,19 +8,21 @@ import { ProductSortSelect } from '@/components/product-sort-select';
 import { ProductPriceCards } from '@/components/product-price-cards';
 import { NewArrivalsCarousel } from '@/components/TrendingCarousel';
 import { SavedSearchActions } from '@/components/saved-search-actions';
-import { VirtualizedProductGrid } from '@/components/LazyItemCard';
+import { ProductGrid } from '@/components/product-grid';
+import { ChainLogo } from '@/components/chain-logo';
 import { apohemSource } from '@/lib/ingested/apohem';
 import { newProductArrivals } from '@/lib/new-arrivals';
 import { buildSavedSearchSubscription } from '@/lib/alert-scheduler';
 import { adaptiveProductCards, buildProductSearchView, withProductSearchExplanationBadges, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
-import { publicCatalogueRevalidateSeconds, routeMetadata } from '@/lib/seo';
+import { routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
-import { buildRemovableSearchFilterChips } from '@/lib/search-filters';
+import { allergenRiskBadgesForText, buildRemovableSearchFilterChips, resolveAvoidAllergensSearchDefault, signedInAccountAllergenSearchPreference } from '@/lib/search-filters';
 import { buildSearchFilterPreset } from '@/lib/search-presets';
+import { productImageCdnUrl } from '@/lib/imageCdn';
 
 const PRODUCTS_PER_PAGE = 50;
 
-export const revalidate = publicCatalogueRevalidateSeconds;
+export const revalidate = 300;
 
 export function generateMetadata() {
   return routeMetadata('/products');
@@ -35,8 +37,10 @@ type SearchParams = {
   chain?: string | string[];
   minPrice?: string | string[];
   maxPrice?: string | string[];
+  avoidAllergens?: string | string[];
   inStockOnly?: string | string[];
   minConfidence?: string | string[];
+  minCarbonScore?: string | string[];
   brand?: string | string[];
   sort?: string | string[];
   page?: string | string[];
@@ -77,8 +81,10 @@ function copySearchParams(params: URLSearchParams, source: SearchParams) {
   setFirstParam(params, 'chain', source.chain);
   setFirstParam(params, 'minPrice', source.minPrice);
   setFirstParam(params, 'maxPrice', source.maxPrice);
+  setFirstParam(params, 'avoidAllergens', source.avoidAllergens);
   setFirstParam(params, 'inStockOnly', source.inStockOnly);
   setFirstParam(params, 'minConfidence', source.minConfidence);
+  setFirstParam(params, 'minCarbonScore', source.minCarbonScore);
   setFirstParam(params, 'sort', source.sort);
 }
 
@@ -130,14 +136,33 @@ function zeroResultCategoryShortcuts(query: string, selectedCategory: string | s
 
 export default async function ProductsPage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
-  const search = buildProductSearchView(resolvedSearchParams);
+  const allergenDefault = resolveAvoidAllergensSearchDefault(resolvedSearchParams.avoidAllergens, signedInAccountAllergenSearchPreference);
+  const search = buildProductSearchView(resolvedSearchParams, { accountAvoidAllergensDefault: allergenDefault.checked });
   const { categoryFacets, labelFacets, originFacets, chainFacets, priceRange, inStockOnly, resultCards } = search;
+  const drawerPriceRange = {
+    min: priceRange.min ?? 0,
+    max: priceRange.max ?? 0
+  };
+  const virtualizedResultCards = resultCards.map((card) => ({
+    ...card,
+    isAvailable: card.isAvailable ?? undefined
+  }));
   const requestedPage = toPageNumber(resolvedSearchParams.page);
   const selectedBrand = normalizeSelectedBrand(resolvedSearchParams.brand);
+  const avoidAllergens = search.allergenAvoidance.checked;
   const baseProductCards = selectedBrand
     ? adaptiveProductCards.filter((card) => card.brand === selectedBrand)
     : adaptiveProductCards;
-  const productCards = withProductSearchExplanationBadges(baseProductCards, search.query);
+  const allergenFilteredProductCards = avoidAllergens
+    ? baseProductCards.filter((card) => allergenRiskBadgesForText([
+      card.name,
+      card.brand,
+      card.packageLabel,
+      card.safetyEvidenceLabel,
+      ...card.safetyProfile.allergenTags
+    ]).length === 0)
+    : baseProductCards;
+  const productCards = withProductSearchExplanationBadges(allergenFilteredProductCards, search.query);
   const totalPages = Math.max(1, Math.ceil(resultCards.length / PRODUCTS_PER_PAGE));
   const currentPage = Math.min(requestedPage, totalPages);
   const pageStart = (currentPage - 1) * PRODUCTS_PER_PAGE;
@@ -164,7 +189,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
     return counts;
   }, {});
 
-  function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'origin' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence', string>>) {
+  function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'origin' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'avoidAllergens' | 'inStockOnly' | 'minConfidence', string>>) {
     const params = new URLSearchParams();
     copySearchParams(params, resolvedSearchParams);
     for (const [key, value] of Object.entries(overrides)) {
@@ -212,16 +237,25 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             {inStockOnly.productCount.toLocaleString('sv-SE')} priced products · {inStockOnly.latestPriceCount.toLocaleString('sv-SE')} latest_prices rows
           </div>
         </div>
-        <form action="/products" className="mt-5 grid gap-3 rounded-2xl border border-violet-100 bg-white p-4 shadow-sm lg:grid-cols-[1.2fr_auto]" method="get">
+        <form action="/products" className="mt-5 grid gap-3 rounded-2xl border border-violet-100 bg-white p-4 shadow-sm lg:grid-cols-[1.2fr_180px_auto]" method="get">
           {search.originFilters.map((origin) => <input key={origin} name="origin" type="hidden" value={origin} />)}
           {search.sort !== 'relevance' ? <input name="sort" type="hidden" value={search.sort} /> : null}
+          {search.filters.inStockOnly ? <input name="inStockOnly" type="hidden" value="true" /> : null}
           <label className="text-sm font-black text-slate-950" htmlFor="product-search-q">
             Search
             <input className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-950" defaultValue={search.query} id="product-search-q" name="q" />
           </label>
+          <label className="text-sm font-black text-slate-950" htmlFor="product-min-carbon-score">
+            Min eco score
+            <input className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-950" defaultValue={resolvedSearchParams.minCarbonScore ?? ''} id="product-min-carbon-score" inputMode="numeric" max={100} min={0} name="minCarbonScore" placeholder="0–100" type="number" />
+          </label>
           <div className="flex flex-col justify-end gap-2">
             <button className="rounded-full bg-violet-800 px-4 py-3 text-sm font-black text-white" type="submit">Apply filters</button>
           </div>
+          <label className="flex items-center gap-2 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-black text-rose-950">
+            <input defaultChecked={avoidAllergens} name="avoidAllergens" type="checkbox" value="true" />
+            Exclude allergen-risk items ({allergenDefault.source === 'account_preference' ? 'account default' : 'URL override'})
+          </label>
           <AdvancedFilterDrawer
             activeChips={activeFilterChips}
             brandOptions={productBrandFilterOptions.slice(0, 24)}
@@ -231,10 +265,10 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             dietaryFilters={search.dietaryFilters}
             inStockOnly={search.filters.inStockOnly}
             labelFacets={labelFacets}
-            maxPrice={search.filters.maxPrice}
-            minConfidence={search.filters.minConfidence}
-            minPrice={search.filters.minPrice}
-            priceRange={priceRange}
+            maxPrice={search.filters.maxPrice ?? undefined}
+            minConfidence={search.filters.minConfidence ?? undefined}
+            minPrice={search.filters.minPrice ?? undefined}
+            priceRange={drawerPriceRange}
             selectedBrand={selectedBrand}
             selectedCategories={search.filters.categories}
             selectedChains={search.filters.chains}
@@ -249,6 +283,11 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           ) : null}
         </div>
         <SavedSearchActions resultCount={resultCards.length} subscription={savedSearchSubscription} />
+        {avoidAllergens ? (
+          <p className="mt-3 rounded-2xl border border-rose-200 bg-rose-50 p-3 text-sm font-bold text-rose-950">
+            Allergen-aware search filtering is on; {search.allergenAvoidance.excludedResultCount.toLocaleString('sv-SE')} risky result{search.allergenAvoidance.excludedResultCount === 1 ? '' : 's'} were excluded from results and recommendations.
+          </p>
+        ) : null}
         <OriginFilter
           className="mt-5"
           counts={Object.fromEntries(originFacets.map((facet) => [facet.value, facet.count])) as Partial<Record<OriginFilterCode, number>>}
@@ -307,13 +346,16 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">Chain facets</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {chainFacets.map((facet) => (
-                <Link className="rounded-full bg-sky-50 px-3 py-1 text-xs font-black text-sky-900" href={searchFacetUrl({ chain: facet.value })} key={facet.value}>{facet.label} · {facet.count}</Link>
+                <Link className="inline-flex items-center gap-2 rounded-full bg-sky-50 px-3 py-1 text-xs font-black text-sky-900" href={searchFacetUrl({ chain: facet.value })} key={facet.value}>
+                  <ChainLogo chain={facet.label} />
+                  {facet.label} · {facet.count}
+                </Link>
               ))}
             </div>
           </div>
           <div className="rounded-2xl border border-violet-100 bg-white p-4 shadow-sm">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">Price range + stock</p>
-            <p className="mt-3 text-2xl font-black text-slate-950">{formatSek(priceRange.min)} – {formatSek(priceRange.max)}</p>
+            <p className="mt-3 text-2xl font-black text-slate-950">{formatSek(drawerPriceRange.min)} – {formatSek(drawerPriceRange.max)}</p>
             <p className="mt-2 text-xs font-bold text-slate-600">Comparable unit filters cover kr/kg, kr/l, and per-unit rows. {inStockOnly.label} keeps unpriced catalog rows out of instant results.</p>
             <p className="mt-2 text-xs font-bold text-slate-600">
               Variance badges: {(volatilityBadgeCounts.stable ?? 0).toLocaleString('sv-SE')} stable · {(volatilityBadgeCounts.volatile ?? 0).toLocaleString('sv-SE')} volatile · {(volatilityBadgeCounts['likely-promo'] ?? 0).toLocaleString('sv-SE')} likely promo.
@@ -323,8 +365,8 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
         <p className="mt-5 text-sm font-semibold text-violet-900">
           Rendering {rangeStart.toLocaleString('sv-SE')}–{rangeEnd.toLocaleString('sv-SE')} of {resultCards.length.toLocaleString('sv-SE')} matching products through an accessible virtualized result list.
         </p>
-        {/* product.isAvailable === false is rendered inside VirtualizedProductGrid for measured virtual rows. */}
-        <VirtualizedProductGrid products={resultCards} resultLabel={virtualizedResultLabel} />
+        {/* product.isAvailable === false is rendered inside ProductGrid's VirtualizedProductGrid for measured virtual rows. */}
+        <ProductGrid products={virtualizedResultCards} resultLabel={virtualizedResultLabel} />
         {resultCards.length > PRODUCTS_PER_PAGE ? (
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3 text-sm">
             <p className="font-black text-slate-700">
@@ -385,7 +427,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
               <div className="flex items-start gap-3">
                 {product.imageUrl ? (
                   <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white p-2 ring-1 ring-rose-100">
-                    <Image alt={`${product.productName} watchlist product image`} className="max-h-full max-w-full object-contain transition group-hover:scale-105" height={64} sizes="64px" src={product.imageUrl} width={64} />
+                    <Image alt={`${product.productName} watchlist product image`} className="max-h-full max-w-full object-contain transition group-hover:scale-105" height={64} sizes="64px" src={productImageCdnUrl(product.imageUrl, { width: 64 })} width={64} />
                   </div>
                 ) : null}
                 <div className="min-w-0 flex-1">
@@ -478,16 +520,24 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
         </div>
         <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           {immigrantFamiliarBrandSearch.map((brand) => (
-            <Link className="rounded-2xl border border-sky-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-sky-700" href={`/products/${brand.verifiedProductSlug}`} key={`${brand.reportedBrand}-${brand.verifiedProductSlug}`}>
+            <article className="rounded-2xl border border-sky-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-sky-700" key={`${brand.reportedBrand}-${brand.verifiedProductSlug}`}>
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-sky-700">{brand.reportedBrand}</p>
               <h3 className="mt-2 text-lg font-black text-slate-950">{brand.productName}</h3>
               <p className="mt-1 text-xs font-semibold text-slate-500">{brand.categoryLabel}</p>
               <p className="mt-3 text-xs leading-5 text-slate-600">searchTokens: {brand.searchTokens}</p>
+              <p className="mt-2 text-xs font-semibold leading-5 text-slate-600">
+                Alias review keeps transliterations and non-Swedish familiar names in the admin queue before they change shopper ranking.
+              </p>
               <div className="mt-3 flex items-center justify-between gap-2 text-xs font-black text-slate-700">
                 <span>{formatSek(brand.verifiedPrice)}</span>
                 <span>{brand.evidenceLabel}</span>
               </div>
-            </Link>
+              <div className="mt-3 flex flex-wrap gap-2 text-xs font-black">
+                <Link className="rounded-full bg-sky-700 px-3 py-2 text-white" href={`/products/${brand.verifiedProductSlug}`}>Availability</Link>
+                <Link className="rounded-full bg-white px-3 py-2 text-sky-950 ring-1 ring-sky-200" href={`/compare?q=${encodeURIComponent(brand.productName)}`}>Compare prices</Link>
+                <Link className="rounded-full bg-amber-50 px-3 py-2 text-amber-950 ring-1 ring-amber-200" href={`/admin/search-aliases?candidate=${encodeURIComponent(brand.reportedBrand)}`}>Review alias</Link>
+              </div>
+            </article>
           ))}
         </div>
       </Card>
@@ -507,7 +557,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           {immigrantImageFirstBrowsing.map((item) => (
             <Link className="group overflow-hidden rounded-2xl border border-amber-100 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-amber-700" href={`/products/${item.verifiedProductSlug}`} key={item.verifiedProductSlug}>
               <div className="flex aspect-square items-center justify-center bg-white p-3">
-                <Image alt={item.visualAlt} className="max-h-full max-w-full object-contain transition group-hover:scale-105" height={160} sizes="(min-width: 768px) 20vw, 50vw" src={item.imageUrl} width={160} />
+                <Image alt={item.visualAlt} className="max-h-full max-w-full object-contain transition group-hover:scale-105" height={160} sizes="(min-width: 768px) 20vw, 50vw" src={productImageCdnUrl(item.imageUrl, { width: 160 })} width={160} />
               </div>
               <div className="border-t border-amber-100 p-3">
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-800">{item.reportedBrand}</p>

@@ -39,7 +39,15 @@ describe('major Swedish grocery chain seed metadata', () => {
       'variety',
       'cosmetics',
       'household',
-      'online_marketplace'
+      'online_marketplace',
+      'ethnic_asian',
+      'ethnic_polish_eastern_european',
+      'ethnic_middle_eastern',
+      'ethnic_indian_south_asian',
+      'ethnic_latin',
+      'ethnic_african',
+      'health_food',
+      'kosher_halal'
     ]);
     assert.deepEqual(majorSwedishGroceryRetailerTypeCoverage.find((row) => row.retailerType === 'grocery')?.chainSlugs, [
       'ica',
