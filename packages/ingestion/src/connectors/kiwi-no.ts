@@ -146,8 +146,14 @@ export function parseKiwiNoPriceCheckObservations(
 function priceCheckLines(text: string): string[] {
   const tableStart = text.search(/VARETEKST\s+GAMMEL UTPRIS\s+NY UTPRIS/i);
   const tableText = tableStart >= 0 ? text.slice(tableStart) : text;
+  // textFromHtml already emits one HTML element per line, so rows are newline-separated.
+  // The previous combined regex used a name lookahead with an over-broad character class
+  // (it matched at almost every capital letter and shattered the table into single chars).
+  // Split on newlines, then only re-split a glued line where a completed price run (1-3
+  // amounts) is immediately followed by the start of the next product name.
   return tableText
-    .split(/\n|(?=[A-ZÆØÅ0-9][A-ZÆØÅ0-9!&'.%/\- ]+\s+\d+(?:[,.]\d{1,2})?(?:\s+\d+(?:[,.]\d{1,2})?){0,2}(?:\s|$))/g)
+    .split('\n')
+    .flatMap((line) => line.split(/(?<=\d(?:[,.]\d{1,2})?)\s+(?=[A-ZÆØÅ0-9][A-ZÆØÅ0-9!&'.%/\- ]*?\s+\d+(?:[,.]\d{1,2})?(?:\s+\d+(?:[,.]\d{1,2})?){0,2}(?:\s|$))/g))
     .map((line) => line.replace(/^VARETEKST\s+GAMMEL UTPRIS\s+NY UTPRIS\s+LAVESTE PRIS SISTE 30 DAGENE\s*/i, '').trim())
     .filter(Boolean);
 }

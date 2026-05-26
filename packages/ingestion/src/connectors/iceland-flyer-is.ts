@@ -58,7 +58,10 @@ export function parseIcelandFlyerIsPromotions(html: string, sourceUrl: string, r
   const seen = new Set<string>();
   for (const block of offerBlocks(html)) {
     const name = textFromHtml(firstMatch(block, [/<h[1-4][^>]*>([\s\S]*?)<\/h[1-4]>/i, /itemprop=["']name["'][^>]*>([\s\S]*?)</i, /"name"\s*:\s*"([^"]+)"/i, /data-name=["']([^"']+)["']/i]));
-    const priceText = textFromHtml(firstMatch(block, [/class=["'][^"']*(?:price|verd|verð|tilbod|tilboð|amount)[^"']*["'][^>]*>([\s\S]*?)</i, /"price"\s*:\s*"?([0-9.,\s]+)"?/i, /data-price=["']([^"']+)["']/i]));
+    // NB: do not include 'tilbod'/'tilboð' (= "offer/sale") in the PRICE class pattern — the
+    // offer container itself carries class="vara tilboð", so matching it captured the empty
+    // text after the <article> tag (price -> null) and silently dropped the whole offer row.
+    const priceText = textFromHtml(firstMatch(block, [/class=["'][^"']*(?:price|verd|verð|amount)[^"']*["'][^>]*>([\s\S]*?)</i, /"price"\s*:\s*"?([0-9.,\s]+)"?/i, /data-price=["']([^"']+)["']/i]));
     const price = parseIcelandicPrice(priceText);
     if (!name || price === null) continue;
 

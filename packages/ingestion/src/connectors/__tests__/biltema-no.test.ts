@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
 import { parseBiltemaNoProducts } from '../biltema-no.js';
 
 describe('Biltema NO connector', () => {
@@ -26,20 +27,24 @@ describe('Biltema NO connector', () => {
       </script>
     `, 'https://www.biltema.no/hjem/', '2026-05-25T00:00:00.000Z');
 
-    expect(rows).toHaveLength(2);
-    expect(rows[0]).toMatchObject({
-      country: 'NO',
-      currency: 'NOK',
-      chain: 'biltema-no',
-      code: '36375',
-      name: 'Refillposer Original til fuktsluker, trepakning',
-      category: 'Hjem/Rengjøring/Fuktslukere',
-      price: 47.9,
-      priceText: '47,90 kr',
-      previousPrice: 59.9,
-      previousPriceText: '59,90 kr'
-    });
-    expect(rows[0]?.productUrl).toBe('https://www.biltema.no/hjem/rengjoring-hjem/fuktslukere/refillposer-original-til-fuktsluker-trepakning-2000055266');
-    expect(rows[1]).toMatchObject({ code: '28661', price: 29.9, previousPrice: 0, previousPriceText: '' });
+    assert.equal(rows.length, 2);
+    assert.equal(rows[0]?.country, 'NO');
+    assert.equal(rows[0]?.currency, 'NOK');
+    assert.equal(rows[0]?.chain, 'biltema-no');
+    assert.equal(rows[0]?.code, '36375');
+    assert.equal(rows[0]?.name, 'Refillposer Original til fuktsluker, trepakning');
+    assert.equal(rows[0]?.category, 'Hjem/Rengjøring/Fuktslukere');
+    assert.equal(rows[0]?.price, 47.9);
+    assert.equal(rows[0]?.priceText, '47,90 kr');
+    assert.equal(rows[0]?.previousPrice, 59.9);
+    assert.equal(rows[0]?.previousPriceText, '59,90 kr');
+    assert.equal(
+      rows[0]?.productUrl,
+      'https://www.biltema.no/hjem/rengjoring-hjem/fuktslukere/refillposer-original-til-fuktsluker-trepakning-2000055266'
+    );
+    assert.equal(rows[1]?.code, '28661');
+    assert.equal(rows[1]?.price, 29.9);
+    assert.equal(rows[1]?.previousPrice, 0);
+    assert.equal(rows[1]?.previousPriceText, '');
   });
 });

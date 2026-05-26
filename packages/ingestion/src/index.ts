@@ -2710,7 +2710,11 @@ function optionalString(record: Record<string, unknown>, key: string, path: stri
   const value = record[key];
   if (value === undefined || value === null || value === '') return undefined;
   if (typeof value !== 'string') throw new Error(`${path}.${key} must be a string.`);
-  return value.trim();
+  // Whitespace-only values are absent values, not empty content: trimming to '' and passing
+  // it through would fail the non-empty contract (e.g. a "   " barcode) and wrongly reject the
+  // row. Return undefined so blank optionals are treated as "no value" (null-barcode path).
+  const trimmed = value.trim();
+  return trimmed === '' ? undefined : trimmed;
 }
 
 function requiredNumber(record: Record<string, unknown>, key: string, path: string): number {
@@ -2983,6 +2987,9 @@ export function normalizeUnitPrice(input: UnitInput): UnitPrice {
   if (unit === 'kg') return { unitPrice: round4(input.price / input.packageSize), comparableUnit: 'kg' };
   if (unit === 'ml') return { unitPrice: round4(input.price / (input.packageSize / 1000)), comparableUnit: 'l' };
   if (unit === 'l' || unit === 'liter') return { unitPrice: round4(input.price / input.packageSize), comparableUnit: 'l' };
+  // 'st'/'styck' are the Swedish per-piece units; canonicalise them to the comparable
+  // 'piece' unit so loose/sold-by-the-each rows (e.g. bakery) normalise instead of throwing.
+  if (unit === 'st' || unit === 'styck') return { unitPrice: round4(input.price / input.packageSize), comparableUnit: 'piece' };
   if (unit === 'piece' || unit === 'pcs' || unit === 'roll' || unit === 'diaper') return { unitPrice: round4(input.price / input.packageSize), comparableUnit: unit };
   throw new Error(`Unsupported package unit: ${input.packageUnit}`);
 }
@@ -3210,11 +3217,13 @@ export function normalizeAxfoodCertificationLabels(labels: readonly string[]): A
 }
 
 function commodityTerms(commodity: Commodity): string[] {
+  // Variants are descriptive qualifiers (e.g. potato 'farsk'/fresh, pepper 'rod'/red) used
+  // for variant resolution, NOT commodity identification. Including them caused false matches
+  // such as "Färsk basilika" -> potato (via the 'farsk' variant) -> wrong produce class.
   return [
     commodity.slug.replace(/-/g, ' '),
     commodity.nameSv,
-    commodity.nameEn,
-    ...(commodity.variants ?? [])
+    commodity.nameEn
   ].map(normalizeSearchText).filter(Boolean);
 }
 
