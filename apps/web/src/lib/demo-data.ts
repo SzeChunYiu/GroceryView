@@ -2200,11 +2200,11 @@ export const multiWeekStockUpList = {
     observedHistoryWindow: row.observedHistoryWindow,
     reviewTrigger: row.reviewTrigger
   })),
-  noForecastReason: 'No price forecast: the list combines current OpenPrices observed pack prices with factual observed low/typical context and spreads today’s budget impact across the planning horizon.',
+  noForecastReason: 'No price forecast: the list combines current OpenPrices observed package prices normalized from verified quantity metadata when parseable, with factual observed low/typical context and budget impact spread across the planning horizon.',
   coverageGuardrails: [
     'No price forecast is displayed; every row is a present-tense stock-up plan from generated OpenPrices dated observations.',
     'PlanningWeeks is a household usage horizon, not a price outlook.',
-    'Historical low and typical prices are computed from observed pack-price rows and labelled with coverage.',
+    'Historical low and typical prices are computed from observed quantity-normalized rows; unparseable products stay pack-labelled with low confidence.',
     'Rows stay advisory until account-owned pantry, freezer, and expiry data confirm the storage limits.'
   ]
 };

@@ -226,6 +226,8 @@ export function normalizeComparableUnitPrice(totalPrice: number, packageText: st
   if (!packageAmount || !Number.isFinite(totalPrice) || totalPrice <= 0) return null;
   return {
     packageLabel: packageAmount.packageLabel,
+    packageUnits: packageAmount.amount,
+    comparableUnit: packageAmount.unit,
     unitLabel: `kr/${packageAmount.unit}`,
     unitPrice: totalPrice / packageAmount.amount,
     unitSortPrice: totalPrice / packageAmount.amount

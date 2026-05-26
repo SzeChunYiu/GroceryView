@@ -313,6 +313,49 @@ describe('planMultiWeekStockUpList', () => {
     assert.match(plan.rows[0].contextLabel, /not a forecast/);
   });
 
+  it('preserves kg, liter, and piece stock-up units in package math', () => {
+    const plan = planMultiWeekStockUpList({
+      asOf: '2026-05-21T00:00:00.000Z',
+      planningWeeks: 2,
+      weeklyBudget: 1000,
+      items: [
+        {
+          productId: 'nutella-630g',
+          productName: 'Nutella 630g',
+          storeName: 'OpenPrices',
+          weeklyNeedUnits: 0.63,
+          packageUnits: 0.63,
+          comparableUnit: 'kg',
+          currentUnitPrice: 79.29,
+          history: [{ observedAt: '2026-05-20T09:00:00.000Z', unitPrice: 79.29, sourceType: 'online', confidence: 0.7 }]
+        },
+        {
+          productId: 'barista-1l',
+          productName: 'Barista 1l',
+          storeName: 'OpenPrices',
+          weeklyNeedUnits: 2,
+          packageUnits: 1,
+          comparableUnit: 'l',
+          currentUnitPrice: 21.81,
+          history: [{ observedAt: '2026-05-20T09:00:00.000Z', unitPrice: 21.81, sourceType: 'online', confidence: 0.7 }]
+        },
+        {
+          productId: 'potatisbullar-16st',
+          productName: 'Potatisbullar 16 st',
+          storeName: 'OpenPrices',
+          weeklyNeedUnits: 16,
+          packageUnits: 16,
+          comparableUnit: 'st',
+          currentUnitPrice: 1.77,
+          history: [{ observedAt: '2026-05-20T09:00:00.000Z', unitPrice: 1.77, sourceType: 'online', confidence: 0.7 }]
+        }
+      ]
+    });
+
+    assert.deepEqual(plan.rows.map((row) => row.comparableUnit), ['kg', 'l', 'st']);
+    assert.deepEqual(plan.rows.map((row) => row.packagesNeeded), [2, 4, 2]);
+  });
+
   it('caps a row to storage limits and lowers confidence for sparse history', () => {
     const plan = planMultiWeekStockUpList({
       asOf: '2026-05-20T00:00:00.000Z',
