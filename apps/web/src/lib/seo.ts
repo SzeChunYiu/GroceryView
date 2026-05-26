@@ -289,6 +289,10 @@ export const routeMetadataCatalog = {
     title: 'Personal grocery inflation dashboard | GroceryView',
     description: 'Track grocery inflation, fixed-income budgets, weekly student budgets, and staples price stability from real core summaries.'
   },
+  '/student-staples': {
+    title: 'Student staples budget basket | GroceryView',
+    description: 'Plan affordable student staple baskets with verified grocery prices, per-serving costs, and source confidence guardrails.'
+  },
   '/scanner': {
     title: 'Receipt scanner evidence gate | GroceryView',
     description: 'Receipt scanning stays gated until production uploads, extraction records, and account-bound review are verified.'

@@ -1,4 +1,6 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { hashPassword, verifyPasswordHash } from '@groceryview/auth';
 import { PostgresQueryExecutorService } from '../database/postgres-query-executor.service.js';
 
 export const allowedPreferenceCurrencies = ['SEK', 'EUR', 'NOK', 'DKK'] as const;
@@ -12,11 +14,20 @@ export type UserPreferencePatch = {
   algorithm_choice?: (typeof allowedMyFlyerAlgorithmChoices)[number];
 };
 
+export type PasswordChangePatch = {
+  currentPassword: string;
+  newPassword: string;
+};
+
 type PreferenceRow = {
   preferred_currency: string;
   favorite_stores: string[] | null;
   notification_channels: string[] | null;
   algorithm_choice: string;
+};
+
+type PasswordCredentialRow = {
+  password_hash: string;
 };
 
 function normalizePreferredStores(value: string[]): string[] {
@@ -71,6 +82,42 @@ export class SettingsService {
     }
 
     return this.fetchPreferences(userId);
+  }
+
+  async changePassword(userId: string, patch: PasswordChangePatch) {
+    if (patch.currentPassword === patch.newPassword) {
+      throw new BadRequestException('newPassword must be different from currentPassword.');
+    }
+
+    const credentialRows = await this.executor.query<PasswordCredentialRow>(
+      `select password_hash
+       from password_credentials
+       where user_id = $1`,
+      [userId]
+    );
+    const credential = credentialRows[0];
+    if (!credential) throw new UnauthorizedException('Current password is invalid.');
+
+    const verification = await verifyPasswordHash(patch.currentPassword, credential.password_hash);
+    if (!verification.valid) throw new UnauthorizedException('Current password is invalid.');
+
+    const nextPasswordHash = await hashPassword(patch.newPassword);
+    await this.executor.query(
+      `update password_credentials
+       set password_hash = $2,
+           algorithm = 'scrypt',
+           changed_at = now(),
+           updated_at = now()
+       where user_id = $1`,
+      [userId, nextPasswordHash]
+    );
+    await this.executor.query(
+      `insert into password_changes(id, user_id, changed_at)
+       values ($1, $2, now())`,
+      [randomUUID(), userId]
+    );
+
+    return { userId, passwordChanged: true };
   }
 
   private async fetchPreferences(userId: string) {

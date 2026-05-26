@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, it } from 'node:test';
 import { type INestApplication } from '@nestjs/common';
 import { Test, type TestingModule } from '@nestjs/testing';
 import request from 'supertest';
-import { createSessionToken } from '@groceryview/auth';
+import { createSessionToken, hashPassword, verifyPasswordHash } from '@groceryview/auth';
 import { AppModule } from '../src/app.module.js';
 import { configureApp } from '../src/configure-app.js';
 import { createOpenApiYaml } from '../src/openapi.js';
@@ -24,6 +24,8 @@ class RecordingPriceHistoryExecutor {
     allowed_price_types: string[] | null;
   }> = [];
   preferenceRows = new Map<string, { preferred_currency: string; favorite_stores: string[]; notification_channels: string[]; algorithm_choice: string }>();
+  passwordCredentialRows = new Map<string, { password_hash: string; algorithm: string; changed_at: string }>();
+  passwordChangeRows: Array<{ id: string; user_id: string; changed_at: string }> = [];
   stockUpRows: StockUpListTestRow[] = [];
 
   isConfigured(): boolean {
@@ -52,6 +54,28 @@ class RecordingPriceHistoryExecutor {
         notification_channels: row.notification_channels,
         algorithm_choice: row.algorithm_choice
       }] : []) as T[];
+    }
+    if (sql.includes('from password_credentials') && sql.includes('password_hash')) {
+      const row = this.passwordCredentialRows.get(params[0] as string);
+      return (row ? [{ password_hash: row.password_hash }] : []) as T[];
+    }
+    if (sql.includes('update password_credentials')) {
+      const row = this.passwordCredentialRows.get(params[0] as string);
+      if (!row) return [] as T[];
+      this.passwordCredentialRows.set(params[0] as string, {
+        password_hash: params[1] as string,
+        algorithm: 'scrypt',
+        changed_at: '2026-05-25T08:20:00.000Z'
+      });
+      return [] as T[];
+    }
+    if (sql.includes('insert into password_changes')) {
+      this.passwordChangeRows.push({
+        id: params[0] as string,
+        user_id: params[1] as string,
+        changed_at: '2026-05-25T08:20:00.000Z'
+      });
+      return [] as T[];
     }
     if (sql.includes('insert into multi_week_stock_up_rows')) {
       const row: StockUpListTestRow = {
@@ -768,6 +792,8 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/api/settings']);
     assert.deepEqual(docs.body.paths['/api/settings'].get.security, [{ bearer: [] }]);
     assert.deepEqual(docs.body.paths['/api/settings'].patch.security, [{ bearer: [] }]);
+    assert.ok(docs.body.paths['/api/settings/profile/password']);
+    assert.deepEqual(docs.body.paths['/api/settings/profile/password'].patch.security, [{ bearer: [] }]);
     assert.ok(docs.body.paths['/products']);
     assert.equal(
       docs.body.paths['/products/{id}'].get.responses['200'].content['application/json'].schema.$ref,
@@ -864,6 +890,47 @@ describe('GroceryView API app', () => {
       .expect(400);
   });
 
+  it('verifies and persists authenticated profile password changes', async () => {
+    process.env.AUTH_SECRET = 'test-auth-secret';
+    const token = await createSessionToken({ userId: 'user-password-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'test-auth-secret');
+    priceHistoryExecutor.passwordCredentialRows.set('user-password-1', {
+      password_hash: await hashPassword('current-password-1'),
+      algorithm: 'scrypt',
+      changed_at: '2026-05-25T08:00:00.000Z'
+    });
+
+    await request(app.getHttpServer())
+      .patch('/api/settings/profile/password')
+      .send({ currentPassword: 'current-password-1', newPassword: 'next-password-1' })
+      .expect(401);
+
+    await request(app.getHttpServer())
+      .patch('/api/settings/profile/password')
+      .set('authorization', `Bearer ${token}`)
+      .send({ currentPassword: 'wrong-password', newPassword: 'next-password-1' })
+      .expect(401);
+
+    await request(app.getHttpServer())
+      .patch('/api/settings/profile/password')
+      .set('authorization', `Bearer ${token}`)
+      .send({ currentPassword: 'current-password-1', newPassword: 'current-password-1' })
+      .expect(400);
+
+    const response = await request(app.getHttpServer())
+      .patch('/api/settings/profile/password')
+      .set('authorization', `Bearer ${token}`)
+      .send({ currentPassword: 'current-password-1', newPassword: 'next-password-1' })
+      .expect(200);
+
+    assert.deepEqual(response.body, { userId: 'user-password-1', passwordChanged: true });
+    const credential = priceHistoryExecutor.passwordCredentialRows.get('user-password-1');
+    assert.ok(credential);
+    assert.equal((await verifyPasswordHash('current-password-1', credential.password_hash)).valid, false);
+    assert.equal((await verifyPasswordHash('next-password-1', credential.password_hash)).valid, true);
+    assert.equal(priceHistoryExecutor.passwordChangeRows.length, 1);
+    assert.equal(priceHistoryExecutor.passwordChangeRows[0]?.user_id, 'user-password-1');
+  });
+
   it('reads authenticated user settings preferences through GET /api/settings', async () => {
     process.env.AUTH_SECRET = 'test-auth-secret';
     const token = await createSessionToken({ userId: 'user-settings-read-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'test-auth-secret');
@@ -951,7 +1018,15 @@ describe('GroceryView API app', () => {
     assert.equal(created.body.rows[0].historicalLowUnitPrice, 99.9);
     assert.equal(created.body.rows[0].confidence, 'high');
     assert.equal(created.body.evidence.noForecast, true);
-    assert.deepEqual(created.body.evidence.sourceTables, ['multi_week_stock_up_rows', 'weekly_baskets', 'basket_items', 'products', 'latest_prices', 'observations', 'app_users']);
+    assert.deepEqual(created.body.evidence.sourceTables, [
+      'multi_week_stock_up_rows',
+      'weekly_baskets',
+      'basket_items',
+      'products',
+      'latest_prices',
+      'observations',
+      'app_users'
+    ]);
     assert.ok(created.body.guardrails.some((guardrail: string) => /no future price forecast/i.test(guardrail)));
 
     const updated = await request(app.getHttpServer())

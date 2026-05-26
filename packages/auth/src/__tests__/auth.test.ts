@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { createSessionToken, parseBearerToken, planMobileSessionPolicy, verifySessionToken } from '../index.js';
+import { createSessionToken, hashPassword, parseBearerToken, planMobileSessionPolicy, verifyPasswordHash, verifySessionToken } from '../index.js';
 
 describe('auth sessions', () => {
   it('creates and verifies a signed session token', async () => {
@@ -22,6 +22,15 @@ describe('auth sessions', () => {
     assert.equal(parseBearerToken('Bearer abc.def'), 'abc.def');
     assert.equal(parseBearerToken('Basic nope'), null);
     assert.equal(parseBearerToken(null), null);
+  });
+
+  it('hashes and verifies durable password credentials', async () => {
+    const hash = await hashPassword('correct horse battery staple');
+
+    assert.match(hash, /^scrypt\$/);
+    assert.deepEqual(await verifyPasswordHash('correct horse battery staple', hash), { valid: true, needsRehash: false });
+    assert.deepEqual(await verifyPasswordHash('wrong password', hash), { valid: false, needsRehash: false });
+    await assert.rejects(() => hashPassword('short'), /at least 8 characters/);
   });
 
   it('plans native mobile session storage, device binding, and refresh actions', () => {

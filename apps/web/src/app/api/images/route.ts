@@ -30,7 +30,11 @@ function isBlockedHostname(hostname: string) {
   return false;
 }
 
-function parseSourceUrl(request: Request) {
+type ParsedSourceUrl =
+  | { error: string; sourceUrl?: never; width?: never; quality?: never }
+  | { sourceUrl: URL; width: number | null; quality: number | null; error?: never };
+
+function parseSourceUrl(request: Request): ParsedSourceUrl {
   const requestUrl = new URL(request.url);
   const rawSource = requestUrl.searchParams.get('src') ?? requestUrl.searchParams.get('url');
   if (!rawSource) return { error: 'missing_image_src' } as const;
