@@ -1,0 +1,10 @@
+{
+  "homepage": [{"Plan": {"Node Type": "Index Scan", "Plan Rows": 420}}],
+  "product": [{"Plan": {"Node Type": "Nested Loop", "Plan Rows": 900, "Plans": [{"Node Type": "Index Scan", "Plan Rows": 850}, {"Node Type": "Seq Scan", "Plan Rows": 120}]}}],
+  "compare": [{"Plan": {"Node Type": "Hash Join", "Plan Rows": 2100, "Plans": [{"Node Type": "Index Scan", "Plan Rows": 1600}, {"Node Type": "Seq Scan", "Plan Rows": 500}]}}],
+  "screener": [{"Plan": {"Node Type": "Bitmap Heap Scan", "Plan Rows": 4200, "Plans": [{"Node Type": "Bitmap Index Scan", "Plan Rows": 4200}]}}],
+  "map": [{"Plan": {"Node Type": "Index Scan", "Plan Rows": 5400}}],
+  "chain-index": [{"Plan": {"Node Type": "GroupAggregate", "Plan Rows": 3200, "Plans": [{"Node Type": "Index Scan", "Plan Rows": 3200}]}}],
+  "watchlist": [{"Plan": {"Node Type": "Index Scan", "Plan Rows": 260}}],
+  "public-api": [{"Plan": {"Node Type": "Nested Loop", "Plan Rows": 1400, "Plans": [{"Node Type": "Index Scan", "Plan Rows": 1000}, {"Node Type": "Index Scan", "Plan Rows": 400}]}}]
+}

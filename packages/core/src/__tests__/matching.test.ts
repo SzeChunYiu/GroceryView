@@ -6,6 +6,7 @@ import {
   classifyProductMatch,
   compareCommodityUnitPrices,
   planCommunityReportAbuseControls,
+  planFuelCrowdPriceSubmission,
   planDietarySubstitutionAssistant,
   planStockoutSubstitutionOptions,
   planHumanReviewAssignments,
@@ -901,6 +902,122 @@ describe('planCommunityReportAbuseControls', () => {
     });
 
     assert.deepEqual(controls.map((control) => control.action), ['throttle', 'require_manual_review']);
+  });
+});
+
+describe('planFuelCrowdPriceSubmission', () => {
+  const trustedReporter = {
+    reporterId: 'fuel-reporter-1',
+    reportsLast24Hours: 2,
+    pendingReports: 1,
+    acceptedReportsLast30Days: 12,
+    rejectedReportsLast30Days: 1
+  };
+
+  it('queues fresh trusted fuel reports for verification before display', () => {
+    assert.deepEqual(planFuelCrowdPriceSubmission({
+      submission: {
+        reporter: trustedReporter,
+        stationId: 'station-okq8-odenplan',
+        fuelGradeId: 'fuel-95-e10',
+        pricePerLitre: 19.99,
+        observedAt: '2026-05-25T09:00:00.000Z',
+        submittedAt: '2026-05-25T09:20:00.000Z',
+        evidenceType: 'pump_photo',
+        operatorReferencePricePerLitre: 19.89
+      }
+    }), {
+      status: 'accept_for_review',
+      publicDisplayEligible: false,
+      verificationRequired: true,
+      reasons: ['Fresh trusted crowd fuel report can be queued for verification before public display.'],
+      sourceKind: 'crowd_station_report',
+      trustAction: 'allow',
+      priceSourceDraft: {
+        sourceKind: 'crowd_station_report',
+        stationId: 'station-okq8-odenplan',
+        reporterId: 'fuel-reporter-1',
+        reporterTrustTier: 'trusted',
+        evidenceType: 'pump_photo',
+        submittedAt: '2026-05-25T09:20:00.000Z',
+        provenance: {
+          fuelGradeId: 'fuel-95-e10',
+          observedAt: '2026-05-25T09:00:00.000Z',
+          pricePerLitre: 19.99,
+          operatorReferencePricePerLitre: 19.89,
+          outlierPercent: 0.5
+        }
+      }
+    });
+  });
+
+  it('requires manual review for stale or outlier fuel reports', () => {
+    const decision = planFuelCrowdPriceSubmission({
+      submission: {
+        reporter: trustedReporter,
+        stationId: 'station-okq8-odenplan',
+        fuelGradeId: 'fuel-diesel',
+        pricePerLitre: 25.5,
+        observedAt: '2026-05-24T09:00:00.000Z',
+        submittedAt: '2026-05-25T09:20:00.000Z',
+        evidenceType: 'receipt',
+        operatorReferencePricePerLitre: 19.89
+      }
+    });
+
+    assert.equal(decision.status, 'require_manual_review');
+    assert.equal(decision.publicDisplayEligible, false);
+    assert.equal(decision.verificationRequired, true);
+    assert.equal(decision.priceSourceDraft?.sourceKind, 'crowd_station_report');
+    assert.equal(decision.priceSourceDraft?.provenance.fuelGradeId, 'fuel-diesel');
+    assert.ok((decision.priceSourceDraft?.provenance.outlierPercent ?? 0) > 20);
+    assert.match(decision.reasons.join(' '), /older than 6 hours/);
+    assert.match(decision.reasons.join(' '), /differs from operator reference/);
+  });
+
+  it('rejects fuel reports when reporter trust controls fail', () => {
+    const decision = planFuelCrowdPriceSubmission({
+      submission: {
+        reporter: {
+          reporterId: 'blocked-fuel-reporter',
+          reportsLast24Hours: 4,
+          pendingReports: 1,
+          acceptedReportsLast30Days: 1,
+          rejectedReportsLast30Days: 12
+        },
+        stationId: 'station-okq8-odenplan',
+        fuelGradeId: 'fuel-95-e10',
+        pricePerLitre: 19.99,
+        observedAt: '2026-05-25T09:00:00.000Z',
+        submittedAt: '2026-05-25T09:20:00.000Z',
+        evidenceType: 'station_sign'
+      }
+    });
+
+    assert.equal(decision.status, 'reject');
+    assert.equal(decision.trustAction, 'suspend_reporting');
+    assert.equal(decision.publicDisplayEligible, false);
+    assert.equal(decision.verificationRequired, true);
+    assert.equal(decision.priceSourceDraft, undefined);
+  });
+
+  it('rejects fuel reports without required evidence', () => {
+    const decision = planFuelCrowdPriceSubmission({
+      submission: {
+        reporter: trustedReporter,
+        stationId: 'station-okq8-odenplan',
+        fuelGradeId: 'fuel-95-e10',
+        pricePerLitre: 19.99,
+        observedAt: '2026-05-25T09:00:00.000Z',
+        submittedAt: '2026-05-25T09:20:00.000Z'
+      }
+    });
+
+    assert.equal(decision.status, 'reject');
+    assert.equal(decision.publicDisplayEligible, false);
+    assert.equal(decision.verificationRequired, true);
+    assert.equal(decision.priceSourceDraft, undefined);
+    assert.match(decision.reasons.join(' '), /evidence_type is required/);
   });
 });
 

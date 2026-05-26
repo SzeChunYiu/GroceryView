@@ -14,7 +14,8 @@ import {
 } from '@/lib/verified-data';
 import type { PrivateFeatureRoute } from '@/lib/verified-data';
 import { freshnessCopy, sourceLimitationCopy } from '@/lib/content-style';
-import type { SourceManagementAction } from '@/lib/source-health';
+import { groceryTranslator } from '@/lib/i18n';
+import type { SourceHealthDashboardRow, SourceManagementAction } from '@/lib/source-health';
 
 export function PageShell({ children }: Readonly<{ children: ReactNode }>) {
   return (
@@ -28,6 +29,13 @@ export function PageShell({ children }: Readonly<{ children: ReactNode }>) {
           <Link className="underline decoration-emerald-300 underline-offset-4" href="/en/privacy">Privacy policy</Link>
           <Link className="underline decoration-emerald-300 underline-offset-4" href="/sv/cookies">Cookiepolicy</Link>
           <Link className="underline decoration-emerald-300 underline-offset-4" href="/en/cookies">Cookie policy</Link>
+          <span className="font-black text-slate-950">Data trust</span>
+          <Link className="underline decoration-emerald-300 underline-offset-4" href="/data-sources">Data sources</Link>
+          <Link className="underline decoration-emerald-300 underline-offset-4" href="/methodology">Methodology</Link>
+          <Link className="underline decoration-emerald-300 underline-offset-4" href="/coverage">Coverage</Link>
+          <Link className="underline decoration-emerald-300 underline-offset-4" href="/confidence">Confidence</Link>
+          <span className="font-black text-slate-950">Contact</span>
+          <Link className="underline decoration-emerald-300 underline-offset-4" href="/contact">Contact</Link>
         </div>
       </footer>
       <BottomNav />
@@ -86,6 +94,51 @@ export function StatusBadge({ children, tone = 'neutral' }: Readonly<{ children:
         : 'border-slate-200 bg-slate-50 text-slate-700';
 
   return <span className={`rounded-full border px-3 py-1 text-xs font-black uppercase tracking-[0.14em] ${toneClass}`}>{children}</span>;
+}
+
+export function SourceCitation({
+  confidenceLabel,
+  connectorRun,
+  href,
+  observedAt,
+  sourceLabel,
+  unknownReason
+}: Readonly<{
+  confidenceLabel?: string | null;
+  connectorRun?: string | null;
+  href?: string | null;
+  observedAt?: string | null;
+  sourceLabel?: string | null;
+  unknownReason?: string | null;
+}>) {
+  const source = sourceLabel?.trim() || 'Unknown source';
+  const observed = observedAt?.trim() || 'Freshness unknown';
+  const run = connectorRun?.trim() || 'Connector run unknown';
+  const confidence = confidenceLabel?.trim() || 'Confidence unknown';
+  const isUnknown = Boolean(unknownReason || !sourceLabel || !observedAt || !confidenceLabel);
+  const containerClass = isUnknown
+    ? 'border-amber-200 bg-amber-50 text-amber-950'
+    : 'border-emerald-200 bg-emerald-50 text-emerald-950';
+  const chipClass = isUnknown ? 'bg-white text-amber-950' : 'bg-white text-emerald-950';
+  const sourceNode = href
+    ? href.startsWith('/')
+      ? <Link className="font-black underline decoration-current underline-offset-4" href={href}>{source}</Link>
+      : <a className="font-black underline decoration-current underline-offset-4" href={href}>{source}</a>
+    : <span className="font-black">{source}</span>;
+
+  return (
+    <aside className={`rounded-2xl border p-4 ${containerClass}`} aria-label="Source freshness and confidence">
+      <div className="flex flex-wrap items-center gap-2 text-xs font-black uppercase tracking-[0.14em]">
+        <span className={`rounded-full px-3 py-1 ${chipClass}`}>Source</span>
+        <span className={`rounded-full px-3 py-1 ${chipClass}`}>Freshness</span>
+        <span className={`rounded-full px-3 py-1 ${chipClass}`}>Confidence</span>
+      </div>
+      <p className="mt-3 text-sm font-semibold leading-6">
+        {sourceNode} · observed {observed} · {run} · {confidence}
+        {unknownReason ? ` · ${unknownReason}` : ''}
+      </p>
+    </aside>
+  );
 }
 
 export function SearchRecoveryPanel({
@@ -154,6 +207,77 @@ export function SourceFreshnessStatusBadge({
     <span className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.14em] ${classNames[status]}`}>
       {labels[status]}
     </span>
+  );
+}
+
+function sourceFailureStateClassName(state: SourceHealthDashboardRow['failureState']) {
+  if (state === 'failed') return 'bg-rose-100 text-rose-950';
+  if (state === 'warning') return 'bg-amber-100 text-amber-950';
+  return 'bg-emerald-100 text-emerald-950';
+}
+
+function sourceFailureStateLabel(state: SourceHealthDashboardRow['failureState']) {
+  if (state === 'failed') return 'Failed';
+  if (state === 'warning') return 'Warning';
+  return 'Healthy';
+}
+
+function formatSourceDelta(value: number) {
+  if (value === 0) return '±0';
+  return `${value > 0 ? '+' : ''}${value.toLocaleString('sv-SE')}`;
+}
+
+export function SourceHealthDashboardTable({
+  sources
+}: Readonly<{ sources: SourceHealthDashboardRow[] }>) {
+  return (
+    <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <table className="min-w-full text-left text-sm">
+        <thead className="bg-slate-50 text-xs font-black uppercase tracking-[0.14em] text-slate-500">
+          <tr>
+            <th className="px-4 py-3">Ingestion source</th>
+            <th className="px-4 py-3">Last refresh</th>
+            <th className="px-4 py-3">Rows</th>
+            <th className="px-4 py-3">Failure state</th>
+            <th className="px-4 py-3">Stale threshold</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-slate-200 text-slate-700">
+          {sources.map((source) => (
+            <tr key={source.sourceName}>
+              <td className="px-4 py-4 align-top">
+                <p className="font-black text-slate-950">{source.sourceName}</p>
+                <p className="mt-1 text-xs font-semibold text-slate-500">{source.chain} · {source.dataSource}</p>
+              </td>
+              <td className="px-4 py-4 align-top">
+                <p className="font-semibold text-slate-950">{source.lastRefreshAt}</p>
+                <p className="mt-1 text-xs font-semibold text-slate-500">Lag {source.ingestLagHours}h</p>
+              </td>
+              <td className="px-4 py-4 align-top">
+                <p className="font-black text-slate-950">{source.rowCount.toLocaleString('sv-SE')}</p>
+                <p className={`mt-1 text-xs font-black ${source.rowCountDelta < 0 ? 'text-rose-700' : source.rowCountDelta > 0 ? 'text-emerald-700' : 'text-slate-500'}`}>
+                  {formatSourceDelta(source.rowCountDelta)} since previous ingest
+                </p>
+              </td>
+              <td className="px-4 py-4 align-top">
+                <span className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.14em] ${sourceFailureStateClassName(source.failureState)}`}>
+                  {sourceFailureStateLabel(source.failureState)}
+                </span>
+                <p className="mt-2 max-w-xs text-xs font-semibold leading-5 text-slate-600">
+                  {source.failureCount.toLocaleString('sv-SE')} failure{source.failureCount === 1 ? '' : 's'} · {source.failureStatus}
+                </p>
+              </td>
+              <td className="px-4 py-4 align-top">
+                <SourceFreshnessStatusBadge status={source.status} />
+                <p className="mt-2 text-xs font-semibold text-slate-600">
+                  Stale after {source.staleDataThresholdHours.toLocaleString('sv-SE')}h
+                </p>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
@@ -298,28 +422,29 @@ export function RoutePerformanceBudgetPanel({ reports }: Readonly<{ reports: Rou
 
 export function NoVerifiedData({
   route,
-  title = 'No verified records for this feature yet'
+  title
 }: Readonly<{ route?: PrivateFeatureRoute; title?: string }>) {
+  const t = groceryTranslator();
   const routeCopy = route ? privateFeatureCopy[route] : null;
   return (
     <Card className="border-amber-200 bg-amber-50">
-      <Eyebrow>Fail-closed UI</Eyebrow>
-      <h2 className="mt-2 text-2xl font-black tracking-tight text-amber-950">{title}</h2>
+      <Eyebrow>{t('empty-state.eyebrow')}</Eyebrow>
+      <h2 className="mt-2 text-2xl font-black tracking-tight text-amber-950">{title ?? t('empty-state.title')}</h2>
       <p className="mt-3 max-w-3xl text-sm leading-6 text-amber-950">
-        This page intentionally avoids sample people, fake receipts, estimated coupons, and placeholder workflow rows. It shows only what the current generated data modules can support.
+        {t('empty-state.body')}
       </p>
       {routeCopy ? (
         <div className="mt-4 grid gap-3 lg:grid-cols-3">
           <div className="rounded-2xl bg-white/70 p-4">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">Verified surface</p>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">{t('empty-state.verifiedSurface')}</p>
             <p className="mt-2 text-sm leading-6 text-amber-950">{routeCopy.verifiedSurface}</p>
           </div>
           <div className="rounded-2xl bg-white/70 p-4">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">Gate before launch</p>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">{t('empty-state.gateBeforeLaunch')}</p>
             <p className="mt-2 text-sm leading-6 text-amber-950">{routeCopy.gatedBy}</p>
           </div>
           <div className="rounded-2xl bg-white/70 p-4">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">Next verified step</p>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">{t('empty-state.nextVerifiedStep')}</p>
             <p className="mt-2 text-sm leading-6 text-amber-950">{routeCopy.nextStep}</p>
           </div>
         </div>

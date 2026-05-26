@@ -21,7 +21,7 @@ export function useIntersectionObserver<TElement extends Element>({
     const target = targetNode;
     if (!target || frozen) return undefined;
     if (typeof IntersectionObserver === 'undefined') {
-      setEntry({ isIntersecting: true, target } as IntersectionObserverEntry);
+      setEntry({ isIntersecting: true, target } as unknown as IntersectionObserverEntry);
       return undefined;
     }
 

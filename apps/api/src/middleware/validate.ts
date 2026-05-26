@@ -21,3 +21,20 @@ export function optionalSingleQueryParameter(
   if (typeof value === 'string') return value;
   throw new BadRequestException(`${parameterName} must be a single query parameter`);
 }
+
+export function optionalBoundedIntegerQueryParameter(
+  query: Record<string, unknown>,
+  parameterName: string,
+  options: { defaultValue: number; max: number; min: number }
+): number {
+  const value = optionalSingleQueryParameter(query, parameterName);
+  if (value === undefined) return options.defaultValue;
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isFinite(parsed) || String(parsed) !== value.trim()) {
+    throw new BadRequestException(`${parameterName} must be an integer`);
+  }
+  if (parsed < options.min || parsed > options.max) {
+    throw new BadRequestException(`${parameterName} must be between ${options.min} and ${options.max}`);
+  }
+  return parsed;
+}

@@ -9,8 +9,10 @@ export {
 
 export {
   createTelegramBotProvider,
+  planTelegramPriceAlertNotificationDeliveries,
   planTelegramPriceAlertNotifications,
   type PlanTelegramPriceAlertNotificationsInput,
+  type PlannedTelegramPriceAlertNotification,
   type TelegramBotProviderOptions,
   type TelegramNotificationSubscription,
   type TelegramPriceAlert

@@ -18,6 +18,15 @@ Use this note when triaging GroceryView PRs that fail the Lighthouse Preview job
 - **Total byte weight**: check for large JSON fixtures, unbounded result sets, icons, images, or bundled libraries added to the route. Trim payloads and avoid adding dependencies for a rescue fix.
 - **Performance score only**: inspect the detailed numeric audits first; the score is a symptom, not enough evidence by itself.
 
+## Per-PR rescue note
+
+Leave a short note in the rescued PR before or with the fix:
+
+- Failing route and metric: name the route plus LCP, CLS, TBT, total byte weight, or the detailed audit behind a score-only failure.
+- Most likely cause: cite the specific changed component, asset, data load, effect, or layout shift introduced by the PR.
+- Minimal fix pushed: state the branch-local change and why it targets the measured regression.
+- Budget status: say whether the existing budget now holds. If it still fails for an intentional product requirement, include the budget-change evidence below instead of editing thresholds directly.
+
 ## Budget-change bar
 
 Budget edits require explicit evidence that the product requirement changed and that route-level optimization is exhausted. A valid budget note names the affected route, the exact assertion, the old and proposed threshold, current measured values from CI artifacts, and why the extra cost is intentional.

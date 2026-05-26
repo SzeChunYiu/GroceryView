@@ -86,6 +86,7 @@ export default function SettingsPage() {
           <Link className="rounded-full bg-white px-4 py-2 shadow-sm underline decoration-emerald-300 underline-offset-4" href="/en/privacy">Privacy policy</Link>
           <Link className="rounded-full bg-white px-4 py-2 shadow-sm underline decoration-emerald-300 underline-offset-4" href="/sv/cookies">Cookiepolicy</Link>
           <Link className="rounded-full bg-white px-4 py-2 shadow-sm underline decoration-emerald-300 underline-offset-4" href="/en/cookies">Cookie policy</Link>
+          <Link className="rounded-full bg-white px-4 py-2 shadow-sm underline decoration-emerald-300 underline-offset-4" href="/settings/hidden">Hidden products and stores</Link>
         </div>
       </Card>
 
@@ -228,7 +229,7 @@ export default function SettingsPage() {
         <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Validation errors use live alert regions</h2>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           {settingsValidationErrorAnnouncements.map((message) => (
-            <p className="rounded-2xl bg-white/85 p-4 text-sm font-bold text-slate-700" key={message} role="alert" aria-live="assertive">
+            <p className="rounded-2xl bg-white/85 p-4 text-sm font-bold text-slate-700" key={message} role="alert" aria-atomic="true" aria-live="assertive">
               {message}
             </p>
           ))}

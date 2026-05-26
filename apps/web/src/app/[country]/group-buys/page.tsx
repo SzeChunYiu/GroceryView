@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { routeMetadata } from '@/lib/seo';
+import { GroupBuyCoordinator } from './group-buy-coordinator';
 
 type CountryConfig = {
   slug: string;
@@ -114,6 +115,8 @@ export default async function GroupBuysPage({ params }: Readonly<{ params: Promi
         <Metric label="Currency" value={config.currency} />
         <Metric label="Coordination mode" value="Household opt-in" />
       </div>
+
+      <GroupBuyCoordinator />
 
       <div className="mt-6 grid gap-5">
         {groupBuyPromos.map((promo) => {

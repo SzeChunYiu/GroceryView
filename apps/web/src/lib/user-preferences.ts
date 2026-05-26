@@ -82,7 +82,7 @@ function normalizedValue(value?: string | null) {
   return value?.trim().toLowerCase() ?? '';
 }
 
-function uniquePreferenceValues(values: (string | null | undefined)[]) {
+function uniquePreferenceValues(values: readonly (string | null | undefined)[]) {
   const seen = new Set<string>();
   const nextValues: string[] = [];
 
@@ -107,7 +107,7 @@ function browserStorage() {
 }
 
 function normalizePreferenceList(values: readonly (string | null | undefined)[]) {
-  return uniquePreferenceValues(values);
+  return uniquePreferenceValues([...values]);
 }
 
 function normalizeHouseholdSize(value: unknown) {

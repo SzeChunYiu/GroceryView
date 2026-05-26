@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { parseIcelandicPrice as parseIcelandicPriceValue } from './icelandic-price.js';
 import type { FuelGradeId, FuelPriceSourceKind } from './okq8-fuel.js';
 
 export type N1IsFuelPriceObservation = {
@@ -47,8 +48,7 @@ function textFromHtml(value: string) {
 }
 
 function parseIcelandicPrice(value: string) {
-  const match = value.replace(/\./g, '').match(/(\d+(?:,\d+)?)/);
-  return match ? Number(match[1]!.replace(',', '.')) : undefined;
+  return parseIcelandicPriceValue(value);
 }
 
 function headerProductId(header: string) {

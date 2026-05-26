@@ -22,9 +22,12 @@ type CachedSuggestions = {
   suggestions: Suggestion[];
 };
 
+type SupportedCountry = 'SE' | 'NO' | 'IS';
+
 const SUGGESTION_LIMIT = 10;
 const GROUP_ITEM_LIMIT = 4;
 const CACHE_TTL_MS = 60_000;
+const supportedCountries = new Set<SupportedCountry>(['SE', 'NO', 'IS']);
 const suggestionCache = new Map<string, CachedSuggestions>();
 const groupLabels: Record<HeaderSuggestGroupKind, string> = {
   brands: 'Brands',
@@ -32,6 +35,11 @@ const groupLabels: Record<HeaderSuggestGroupKind, string> = {
   products: 'Products',
   stores: 'Stores'
 };
+
+function parseCountry(value: string | null): SupportedCountry | null {
+  const country = value?.trim().toUpperCase();
+  return country && supportedCountries.has(country as SupportedCountry) ? country as SupportedCountry : null;
+}
 
 function normalizedSearchText(value: string) {
   return value.trim().toLocaleLowerCase('sv-SE');
@@ -66,8 +74,20 @@ function compareSuggestions(left: Suggestion, right: Suggestion) {
   );
 }
 
-function buildSuggestions(query: string) {
-  const products = adaptiveProductCards.flatMap((product): Suggestion[] => {
+function countryProductCards(country: SupportedCountry) {
+  return country === 'SE' ? adaptiveProductCards : [];
+}
+
+function countryCategorySummaries(country: SupportedCountry) {
+  return country === 'SE' ? categorySummaries : [];
+}
+
+function countryStoreUniverse(country: SupportedCountry) {
+  return country === 'SE' ? storeUniverse : [];
+}
+
+function buildSuggestions(query: string, country: SupportedCountry) {
+  const products = countryProductCards(country).flatMap((product): Suggestion[] => {
     const match = matchScore(product.name, query);
     if (!match) return [];
     return [{
@@ -80,7 +100,7 @@ function buildSuggestions(query: string) {
     }];
   });
 
-  const categories = categorySummaries.flatMap((category): Suggestion[] => {
+  const categories = countryCategorySummaries(country).flatMap((category): Suggestion[] => {
     const match = matchScore(category.label, query);
     if (!match) return [];
     return [{
@@ -106,8 +126,8 @@ function uniqueGroupItems(items: HeaderSuggestItem[]) {
   });
 }
 
-function buildSuggestionGroups(query: string): HeaderSuggestGroup[] {
-  const products = adaptiveProductCards.flatMap((product): HeaderSuggestItem[] => {
+function buildSuggestionGroups(query: string, country: SupportedCountry): HeaderSuggestGroup[] {
+  const products = countryProductCards(country).flatMap((product): HeaderSuggestItem[] => {
     const item = groupedItem({
       id: `product:${product.slug}`,
       group: 'products',
@@ -118,7 +138,7 @@ function buildSuggestionGroups(query: string): HeaderSuggestGroup[] {
     return item ? [item] : [];
   });
 
-  const brands = adaptiveProductCards.flatMap((product): HeaderSuggestItem[] => {
+  const brands = countryProductCards(country).flatMap((product): HeaderSuggestItem[] => {
     if (!product.brand) return [];
     const item = groupedItem({
       id: `brand:${product.brand}`,
@@ -130,7 +150,7 @@ function buildSuggestionGroups(query: string): HeaderSuggestGroup[] {
     return item ? [item] : [];
   });
 
-  const categories = categorySummaries.flatMap((category): HeaderSuggestItem[] => {
+  const categories = countryCategorySummaries(country).flatMap((category): HeaderSuggestItem[] => {
     const item = groupedItem({
       id: `category:${category.slug}`,
       group: 'categories',
@@ -141,7 +161,7 @@ function buildSuggestionGroups(query: string): HeaderSuggestGroup[] {
     return item ? [item] : [];
   });
 
-  const stores = storeUniverse.flatMap((store): HeaderSuggestItem[] => {
+  const stores = countryStoreUniverse(country).flatMap((store): HeaderSuggestItem[] => {
     const item = groupedItem({
       id: `store:${store.slug}`,
       group: 'stores',
@@ -165,18 +185,50 @@ function buildSuggestionGroups(query: string): HeaderSuggestGroup[] {
   });
 }
 
-function cachedSuggestions(query: string, now = Date.now()) {
-  const cached = suggestionCache.get(query);
+function cachedSuggestions(query: string, country: SupportedCountry, now = Date.now()) {
+  const cacheKey = `${country}:${query}`;
+  const cached = suggestionCache.get(cacheKey);
   if (cached && cached.expiresAt > now) return cached.suggestions;
 
-  const suggestions = buildSuggestions(query);
-  suggestionCache.set(query, { expiresAt: now + CACHE_TTL_MS, suggestions });
+  const suggestions = buildSuggestions(query, country);
+  suggestionCache.set(cacheKey, { expiresAt: now + CACHE_TTL_MS, suggestions });
   return suggestions;
+}
+
+function countryFacets(query: string, country: SupportedCountry) {
+  if (country !== 'SE') {
+    return headerSearchFacetChips({
+      query,
+      categoryFacets: [],
+      chainFacets: [],
+      dietaryFilters: [],
+      priceRange: { min: null, max: null },
+      formatPrice: formatSek
+    });
+  }
+
+  const searchView = buildProductSearchView({ q: query });
+  return headerSearchFacetChips({
+    query,
+    categoryFacets: searchView.categoryFacets,
+    chainFacets: searchView.chainFacets,
+    dietaryFilters: searchView.dietaryFilters,
+    priceRange: searchView.priceRange,
+    formatPrice: formatSek
+  });
 }
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const query = normalizedSearchText(searchParams.get('q') ?? '');
+  const country = parseCountry(searchParams.get('country'));
+
+  if (!country) {
+    return NextResponse.json(
+      { error: 'country query parameter must be one of SE, NO, or IS.', query, suggestions: [] },
+      { status: 400 }
+    );
+  }
 
   if (query.length < 1) {
     return NextResponse.json(
@@ -185,23 +237,15 @@ export async function GET(request: Request) {
     );
   }
 
-  const searchView = buildProductSearchView({ q: query });
-
   return NextResponse.json(
     {
       query,
-      suggestions: cachedSuggestions(query),
-      groups: buildSuggestionGroups(query),
-      facets: headerSearchFacetChips({
-        query,
-        categoryFacets: searchView.categoryFacets,
-        chainFacets: searchView.chainFacets,
-        dietaryFilters: searchView.dietaryFilters,
-        priceRange: searchView.priceRange,
-        formatPrice: formatSek
-      }),
+      country,
+      suggestions: cachedSuggestions(query, country),
+      groups: buildSuggestionGroups(query, country),
+      facets: countryFacets(query, country),
       limit: SUGGESTION_LIMIT,
-      source: 'verified product and category snapshots'
+      source: 'country-scoped verified product and category snapshots'
     },
     {
       headers: {

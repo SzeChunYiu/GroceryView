@@ -6,6 +6,7 @@ import { ConfidenceBadge } from '@/components/confidence-badge';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
 import { axfoodProducts, type AxfoodProduct } from '@/lib/axfood-products';
 import { buildChainIndexTrendSeries, buildChainPriceObservations, buildMatchedBasketChainPriceObservations } from '@/lib/chain-index-data';
+import { routeMetadata } from '@/lib/seo';
 import { formatPct, formatSek } from '@/lib/verified-data';
 
 type CategorySymbol = 'grocery' | 'dairy' | 'produce' | 'meat' | 'bakery';
@@ -102,20 +103,13 @@ export async function generateMetadata({ params }: Readonly<{ params: Promise<{ 
   if (!category && !chain) notFound();
 
   const label = category?.label ?? `${chain?.chainId ?? symbol} chain index`;
-  const title = `${label} | GroceryView`;
-  const description = 'Observed GroceryView price index page with fixed-basket and chain-price index calculations.';
-  const images = ['/pwa-icon.svg'];
-
-  return {
-    title,
-    description,
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-      images
-    }
-  };
+  return routeMetadata({
+    path: `/index/${symbol}`,
+    title: `${label} | GroceryView`,
+    description: 'Observed GroceryView price index page with fixed-basket and chain-price index calculations.',
+    imagePath: '/pwa-icon.svg',
+    imageAlt: `${label} GroceryView index card`
+  });
 }
 
 function pricedMatchedProducts(definition: CategoryDefinition): AxfoodProduct[] {
@@ -177,6 +171,13 @@ function indexTone(value: number) {
   return 'text-slate-950';
 }
 
+function requireFixedBasketValue(index: FixedBasketIndex): number {
+  if (index.value === null) {
+    throw new Error(`Fixed basket index ${index.id} has no value for a populated basket.`);
+  }
+  return index.value;
+}
+
 function confidenceLabel(level: 'high' | 'medium' | 'low') {
   return `${level} confidence`;
 }
@@ -213,9 +214,10 @@ function emptyWindow(label: PriceChartTerminalWindow['label'], rangeLabel: strin
 }
 
 function fixedBasketChart(index: FixedBasketIndex, rows: CategoryConstituent[]): PriceChartTerminalModel {
+  const value = requireFixedBasketValue(index);
   const points = [
     { time: index.baseDate, value: 100, confidence: 0.82, provenanceLabel: 'Higher matched chain price baseline' },
-    { time: index.currentDate, value: index.value, confidence: 0.82, provenanceLabel: 'Lowest matched chain price basket' }
+    { time: index.currentDate, value, confidence: 0.82, provenanceLabel: 'Lowest matched chain price basket' }
   ];
   const window: PriceChartTerminalWindow = {
     label: 'ALL',
@@ -224,7 +226,7 @@ function fixedBasketChart(index: FixedBasketIndex, rows: CategoryConstituent[]):
     windowEnd: index.currentDate,
     pointCount: points.length,
     markerCount: 1,
-    latestValueLabel: index.value.toFixed(1),
+    latestValueLabel: value.toFixed(1),
     latestObservedAt: index.currentDate,
     lowValueLabel: Math.min(...points.map((point) => point.value)).toFixed(1),
     highValueLabel: Math.max(...points.map((point) => point.value)).toFixed(1),
@@ -353,6 +355,7 @@ function categoryItemListJsonLd(definition: CategoryDefinition, rows: CategoryCo
 }
 
 function CategoryIndexPage({ definition, index, rows }: Readonly<{ definition: CategoryDefinition; index: FixedBasketIndex; rows: CategoryConstituent[] }>) {
+  const value = requireFixedBasketValue(index);
   const averageSaving = rows.reduce((sum, row) => sum + Math.abs(row.movementPercent), 0) / rows.length;
   return (
     <PageShell>
@@ -365,7 +368,7 @@ function CategoryIndexPage({ definition, index, rows }: Readonly<{ definition: C
         </div>
         <div className="rounded-[1.75rem] border border-emerald-200 bg-white p-5 shadow-sm">
           <p className="text-sm font-black uppercase tracking-[0.18em] text-emerald-800">Index value</p>
-          <p className={`mt-2 text-6xl font-black tracking-tight ${indexTone(index.value)}`}>{index.value.toFixed(1)}</p>
+          <p className={`mt-2 text-6xl font-black tracking-tight ${indexTone(value)}`}>{value.toFixed(1)}</p>
           <div className="mt-3"><ConfidenceBadge level={index.confidence} label={confidenceLabel(index.confidence)} sampleSize={rows.length} verificationLabel="matched chain constituents" /></div>
         </div>
       </div>
@@ -438,6 +441,7 @@ function EmptyCategoryIndexPage({ definition }: Readonly<{ definition: CategoryD
 
 function ChainIndexPage({ chain }: Readonly<{ chain: ChainPriceIndex }>) {
   const fixedBasketMirror = fixedBasketForChain(chain);
+  const fixedBasketMirrorValue = requireFixedBasketValue(fixedBasketMirror);
 
   return (
     <PageShell>
@@ -472,7 +476,7 @@ function ChainIndexPage({ chain }: Readonly<{ chain: ChainPriceIndex }>) {
         </Card>
         <Card>
           <p className="text-sm font-black text-slate-600">Fixed-basket mirror</p>
-          <p className={`mt-2 text-4xl font-black ${indexTone(fixedBasketMirror.value)}`}>{fixedBasketMirror.value.toFixed(1)}</p>
+          <p className={`mt-2 text-4xl font-black ${indexTone(fixedBasketMirrorValue)}`}>{fixedBasketMirrorValue.toFixed(1)}</p>
           <p className="mt-2 text-sm font-semibold text-slate-600">calculateFixedBasketIndex over category constituents.</p>
         </Card>
       </div>

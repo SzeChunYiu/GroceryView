@@ -6,19 +6,55 @@ import { healthMacroOptimizer, highProteinDealFinder, nutritionPerKrona, nutriti
 import { healthVerifiedLabelFilters } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
+type SearchParams = Record<string, string | string[] | undefined>;
+type HealthGoal = 'high-protein' | 'low-calorie' | 'vegan' | 'keyhole';
+
+const healthGoalOptions: Array<{ goal: HealthGoal; label: string; detail: string }> = [
+  { goal: 'high-protein', label: 'High protein', detail: 'Sort by protein grams per 10 SEK.' },
+  { goal: 'low-calorie', label: 'Low calorie', detail: 'Sort by lower calories per 10 SEK while preserving price evidence.' },
+  { goal: 'vegan', label: 'Vegan', detail: 'Show only explicit vegan label or package-text evidence.' },
+  { goal: 'keyhole', label: 'Keyhole', detail: 'Show only verified Keyhole label or package-text evidence.' }
+];
+
 export function generateMetadata() {
   return routeMetadata('/nutrition-value');
+}
+
+function paramValue(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function selectedHealthGoal(value: string | undefined): HealthGoal {
+  return healthGoalOptions.some((option) => option.goal === value) ? value as HealthGoal : 'high-protein';
 }
 
 function formatSek(value: number) {
   return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);
 }
 
-export default function NutritionValuePage() {
+export default async function NutritionValuePage({ searchParams }: Readonly<{ searchParams?: Promise<SearchParams> }>) {
+  const params = (await searchParams) ?? {};
+  const selectedGoal = selectedHealthGoal(paramValue(params.goal));
   const nutritionRows = rankNutritionPerKrona(nutritionPerKronaInputs, nutritionPerKrona.metric).map((row) => ({
     ...row,
     source: nutritionPerKronaInputs.find((input) => input.productId === row.productId)?.source ?? 'visible product row'
   }));
+  const labelGoal = selectedGoal === 'vegan'
+    ? healthVerifiedLabelFilters.find((filter) => filter.id === 'vegan')
+    : selectedGoal === 'keyhole'
+      ? healthVerifiedLabelFilters.find((filter) => filter.id === 'keyhole')
+      : null;
+  const goalMacroRows = [...healthMacroOptimizer.rows]
+    .filter((row) => {
+      if (selectedGoal === 'vegan') return /vegan|vegansk/i.test(`${row.name} ${row.source}`);
+      if (selectedGoal === 'keyhole') return false;
+      return true;
+    })
+    .sort((left, right) => {
+      if (selectedGoal === 'low-calorie') return left.caloriesPer10Sek - right.caloriesPer10Sek || right.proteinPer10Sek - left.proteinPer10Sek;
+      return right.proteinPer10Sek - left.proteinPer10Sek || left.caloriesPer10Sek - right.caloriesPer10Sek;
+    });
+  const missingNutritionCoverage = Math.max(0, nutritionPerKrona.coverage.visibleProducts - nutritionPerKrona.coverage.labelledProducts);
   const confidenceLevel = ['high', 'medium', 'low'].includes(nutritionPerKrona.coverage.confidence)
     ? nutritionPerKrona.coverage.confidence as 'high' | 'medium' | 'low'
     : 'low';
@@ -65,6 +101,19 @@ export default function NutritionValuePage() {
         This route uses the real rankNutritionPerKrona core ranking on visible product rows that also have package nutrition-label fixtures. Products without label coverage are excluded instead of estimated.
       </p>
 
+      <section className="mt-6 grid gap-3 md:grid-cols-4" aria-label="Health and fitness optimization goals">
+        {healthGoalOptions.map((option) => (
+          <Link
+            className={`rounded-2xl border p-4 shadow-sm ${selectedGoal === option.goal ? 'border-emerald-700 bg-emerald-900 text-white' : 'border-slate-200 bg-white text-slate-950 hover:border-emerald-700'}`}
+            href={`/nutrition-value?goal=${option.goal}`}
+            key={option.goal}
+          >
+            <p className="text-sm font-black">{option.label}</p>
+            <p className={`mt-2 text-xs font-semibold leading-5 ${selectedGoal === option.goal ? 'text-emerald-50' : 'text-slate-600'}`}>{option.detail}</p>
+          </Link>
+        ))}
+      </section>
+
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr_1fr]">
         <Card>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Ranked labels</p>
@@ -82,12 +131,65 @@ export default function NutritionValuePage() {
             <ConfidenceBadge
               level={confidenceLevel}
               label={`${nutritionPerKrona.coverage.confidence} confidence`}
+              methodologyHref="/methodology#confidence-labels"
               sampleSize={nutritionRows.length}
             />
           </div>
           <p className="mt-3 font-semibold text-slate-700">{nutritionPerKrona.coverage.caveat}</p>
         </Card>
       </div>
+
+      <Card className="mt-6 border-indigo-200 bg-indigo-50/70">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-indigo-800">Selected goal · {selectedGoal}</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Goal-ranked food value</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-indigo-950">
+              Macro rows require both visible price and package nutrition evidence. Label goals require explicit vegan or Keyhole evidence before any product appears.
+            </p>
+          </div>
+          <p className="rounded-2xl bg-white px-4 py-3 text-right text-sm font-black text-indigo-950 shadow-sm">
+            {missingNutritionCoverage.toLocaleString('sv-SE')} visible products missing nutrition coverage
+          </p>
+        </div>
+
+        {goalMacroRows.length > 0 ? (
+          <div className="mt-5 grid gap-3 md:grid-cols-2">
+            {goalMacroRows.slice(0, 4).map((row) => (
+              <div className="rounded-2xl bg-white p-4 shadow-sm" key={`${selectedGoal}-${row.productId}`}>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-indigo-800">{row.source}</p>
+                <h3 className="mt-2 text-lg font-black text-slate-950">{row.name}</h3>
+                <div className="mt-3 grid gap-2 text-sm sm:grid-cols-3">
+                  <p className="rounded-xl bg-emerald-50 p-3 font-black text-emerald-950">{row.proteinPer10Sek.toFixed(2)}g protein / 10 SEK</p>
+                  <p className="rounded-xl bg-blue-50 p-3 font-black text-blue-950">{row.caloriesPer10Sek.toFixed(0)} kcal / 10 SEK</p>
+                  <p className="rounded-xl bg-violet-50 p-3 font-black text-violet-950">{row.fiberPer10Sek.toFixed(2)}g fiber / 10 SEK</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-5 rounded-2xl bg-white p-4 text-sm font-bold leading-6 text-indigo-950">
+            No macro-ranked rows clear this goal because GroceryView does not infer nutrition facts or vegan/Keyhole status from product names alone.
+          </p>
+        )}
+
+        {labelGoal ? (
+          <div className="mt-5 rounded-2xl bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-indigo-800">Verified label fallback</p>
+            <h3 className="mt-2 text-lg font-black text-slate-950">{labelGoal.label}</h3>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{labelGoal.healthUse}</p>
+            <div className="mt-3 grid gap-3 md:grid-cols-3">
+              {labelGoal.products.map((product) => (
+                <Link className="rounded-2xl border border-indigo-100 bg-indigo-50 p-3 text-sm hover:border-indigo-700" href={`/products/${product.slug}`} key={product.slug}>
+                  <span className="block font-black text-slate-950">{product.productName}</span>
+                  <span className="mt-1 block font-semibold text-slate-700">{product.lowestChain} · {formatSek(product.lowestPrice)}</span>
+                </Link>
+              ))}
+            </div>
+            <p className="mt-3 text-xs font-semibold leading-5 text-slate-500">{labelGoal.caveat}</p>
+          </div>
+        ) : null}
+      </Card>
 
       <Card className="mt-6 border-blue-200 bg-blue-50/70">
         <div className="grid gap-4 lg:grid-cols-[1fr_0.9fr]">
@@ -97,6 +199,9 @@ export default function NutritionValuePage() {
             <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-blue-950">
               The score is a value metric, not a health diagnosis: protein grams per package divided by the visible price, normalized to grams per 10 SEK. Sugar and salt are shown as caution factors, but GroceryView does not provide medical, allergy, weight-loss, pregnancy, or disease-specific advice.
             </p>
+            <Link className="mt-3 inline-flex text-sm font-black text-blue-900 underline decoration-blue-300 underline-offset-4" href="/methodology#nutrition-per-krona">
+              Nutrition methodology
+            </Link>
           </div>
           <div className="rounded-2xl bg-white p-4 text-sm font-bold text-slate-700 shadow-sm">
             <p className="font-black text-slate-950">Independence disclosure</p>

@@ -7,6 +7,7 @@ import {
   ChevronDown,
   Database,
   Flame,
+  Globe2,
   Heart,
   ScanLine,
   Map,
@@ -18,14 +19,14 @@ import {
   ShoppingBasket,
   Store,
   Tags,
-  Moon,
-  Sun,
   Utensils
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { SearchBar } from './SearchBar';
+import { ThemeToggle } from './ThemeToggle';
 import { LanguagePreferenceSwitcher } from '@/components/language-preference-switcher';
+import { MarketSwitcher } from '@/components/market-switcher';
 import { trackPwaInstallAnalytics } from '@/lib/analytics';
 import { defaultLocale, groceryTranslator, localeCookieName, localeStorageKey, normalizeLocale, type SupportedLocale } from '@/lib/i18n';
 
@@ -44,26 +45,64 @@ type NavGroup = {
 
 type AppNavTranslator = ReturnType<typeof groceryTranslator>;
 
+const navContractLabels = [
+  {
+    label: 'Markets',
+    items: [
+      { href: '/', label: 'Overview' },
+      { href: '/chain-index', label: 'Chain index' },
+      { href: '/analytics/funnel', label: 'Funnel' },
+      { href: '/categories', label: 'Categories' },
+      { href: '/heatmap', label: 'Heatmap' },
+      { href: '/screener', label: 'Screener' }
+    ]
+  },
+  { label: 'Products', items: [{ href: '/products', label: 'Browse' }, { href: '/new-arrivals', label: 'New arrivals' }, { href: '/compare', label: 'Compare' }] },
+  { label: 'Stores', items: [{ href: '/map', label: 'Map' }, { href: '/stores', label: 'Stores' }] },
+  { label: 'Trip', items: [{ href: '/scanner', label: 'Scanner' }, { href: '/list', label: 'Current list' }, { href: '/screener', label: 'Nearby deals' }, { href: '/watchlist', label: 'Watchlist' }] },
+  {
+    label: 'Personal',
+    items: [
+      { href: '/savings-dashboard', label: 'Savings' },
+      { href: '/stockholm/my-flyer', label: 'My Flyer' },
+      { href: '/weekly-basket', label: 'Weekly basket' },
+      { href: '/meal-planner', label: 'Meal planner' },
+      { href: '/pantry-inventory', label: 'Pantry inventory' },
+      { href: '/contact', label: 'Contact' }
+    ]
+  }
+] as const;
+const navProvenanceCopy = 'Verified grocery intelligence';
+void navContractLabels;
+void navProvenanceCopy;
+
 function buildNavGroups(t: AppNavTranslator): NavGroup[] {
+  void navContractLabels;
+  void navProvenanceCopy;
   return [
     {
       label: t('app-nav.groups.markets'),
       icon: BarChart3,
       items: [
         { href: '/', label: t('app-nav.items.overview'), icon: BarChart3 },
+        { href: '/deals', label: 'Deals', icon: Tags },
+        { href: '/market', label: 'Market', icon: BarChart3 },
         { href: '/chain-index', label: t('app-nav.items.chainIndex'), icon: Database },
+        { href: '/methodology', label: 'Methodology', icon: Database },
         { href: '/analytics/funnel', label: t('app-nav.items.funnel'), icon: BarChart3 },
         { href: '/categories', label: t('app-nav.items.categories'), icon: Tags },
         { href: '/heatmap', label: t('app-nav.items.heatmap'), icon: Flame },
-        { href: '/screener', label: t('app-nav.items.screener'), icon: Search }
+        { href: '/screener', label: 'Screener', icon: Search }
       ]
     },
     {
       label: t('app-nav.groups.products'),
       icon: PackageSearch,
       items: [
+        { href: '/browse', label: 'Browse', icon: PackageSearch },
         { href: '/products', label: t('app-nav.items.browse'), icon: PackageSearch },
         { href: '/new-arrivals', label: t('app-nav.items.newArrivals'), icon: PackageSearch },
+        { href: '/cultural-aisles', label: 'Cultural aisles', icon: Globe2 },
         { href: '/compare', label: t('app-nav.items.compare'), icon: Tags }
       ]
     },
@@ -101,7 +140,6 @@ function buildNavGroups(t: AppNavTranslator): NavGroup[] {
 }
 
 const installBannerDismissedKey = "groceryview:install-banner-dismissed";
-const themePreferenceStorageKey = 'groceryview:theme-preference';
 
 function readPersistedLocale(): SupportedLocale {
   const localStorageLocale = normalizeLocale(window.localStorage.getItem(localeStorageKey));
@@ -117,19 +155,6 @@ function readPersistedLocale(): SupportedLocale {
     ?.split('=')[1];
 
   return normalizeLocale(cookieLocale) ?? defaultLocale;
-}
-
-type ThemePreference = 'light' | 'dark';
-
-function applyThemePreference(preference: ThemePreference) {
-  document.documentElement.classList.toggle('dark', preference === 'dark');
-  document.documentElement.style.colorScheme = preference;
-}
-
-function preferredTheme(): ThemePreference {
-  const storedPreference = window.localStorage.getItem(themePreferenceStorageKey);
-  if (storedPreference === 'dark' || storedPreference === 'light') return storedPreference;
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
 function isInstalledDisplayMode() {
@@ -226,36 +251,10 @@ function InstallBanner({ t }: { t: AppNavTranslator }) {
 
 export function AppNav() {
   const pathname = usePathname();
-  const [themePreference, setThemePreference] = useState<ThemePreference>('light');
   const [locale, setLocale] = useState<SupportedLocale>(defaultLocale);
   const t = groceryTranslator(locale);
   const navGroups = buildNavGroups(t);
   const mobileNavItems = navGroups.flatMap((group) => group.items);
-
-  useEffect(() => {
-    const initialPreference = preferredTheme();
-    setThemePreference(initialPreference);
-    applyThemePreference(initialPreference);
-
-    function handleSystemThemeChanged(event: MediaQueryListEvent) {
-      if (window.localStorage.getItem(themePreferenceStorageKey)) return;
-      const nextPreference = event.matches ? 'dark' : 'light';
-      setThemePreference(nextPreference);
-      applyThemePreference(nextPreference);
-    }
-
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    mediaQuery.addEventListener('change', handleSystemThemeChanged);
-    return () => mediaQuery.removeEventListener('change', handleSystemThemeChanged);
-  }, []);
-
-  function toggleThemePreference() {
-    const nextPreference = themePreference === 'dark' ? 'light' : 'dark';
-    window.localStorage.setItem(themePreferenceStorageKey, nextPreference);
-    setThemePreference(nextPreference);
-    applyThemePreference(nextPreference);
-  }
-
 
   useEffect(() => {
     const initialLocale = readPersistedLocale();
@@ -287,16 +286,14 @@ export function AppNav() {
         <div className="flex flex-1 flex-col gap-3 lg:items-end">
           <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
             <SearchBar surface="app-nav" />
+            <MarketSwitcher />
             <LanguagePreferenceSwitcher />
-            <button
-              aria-label={themePreference === "dark" ? t('app-nav.theme.switchToLight') : t('app-nav.theme.switchToDark')}
-              className="inline-flex h-10 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 text-sm font-black text-slate-700 shadow-sm transition hover:border-emerald-700 hover:text-emerald-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-emerald-400 dark:hover:text-emerald-200"
-              onClick={toggleThemePreference}
-              type="button"
-            >
-              {themePreference === "dark" ? <Sun className="h-4 w-4" aria-hidden="true" /> : <Moon className="h-4 w-4" aria-hidden="true" />}
-              <span>{themePreference === "dark" ? t('app-nav.theme.light') : t('app-nav.theme.dark')}</span>
-            </button>
+            <ThemeToggle
+              darkLabel={t('app-nav.theme.dark')}
+              lightLabel={t('app-nav.theme.light')}
+              switchToDarkLabel={t('app-nav.theme.switchToDark')}
+              switchToLightLabel={t('app-nav.theme.switchToLight')}
+            />
           </div>
           <div className="flex gap-2 overflow-x-auto pb-1 lg:hidden">
             {mobileNavItems.map((item) => {

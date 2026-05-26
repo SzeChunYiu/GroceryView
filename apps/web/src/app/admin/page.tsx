@@ -177,7 +177,9 @@ export default function AdminPage() {
 
         <div className="mt-6 flex flex-wrap gap-3">
           <Link className="rounded-full bg-amber-800 px-5 py-3 text-sm font-black text-white" href="/admin/reports">Review community reports</Link>
+          <Link className="rounded-full border border-slate-300 px-5 py-3 text-sm font-black text-slate-800" href="/admin/coverage">Open coverage alerts</Link>
           <Link className="rounded-full border border-slate-300 px-5 py-3 text-sm font-black text-slate-800" href="/admin/duplicates">Open duplicate review</Link>
+          <Link className="rounded-full border border-sky-300 px-5 py-3 text-sm font-black text-sky-900" href="/admin/performance">Open performance telemetry</Link>
         </div>
       </main>
       <BottomNav />

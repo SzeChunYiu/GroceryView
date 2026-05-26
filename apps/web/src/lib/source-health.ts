@@ -1,5 +1,6 @@
 import { sourceCoverage } from '@/lib/verified-data';
 import { buildIngestionPipelineMonitorRows, type IngestionPipelineRun } from './ingest/transform';
+import { recentRoutePerformanceBudgetReports } from './telemetry';
 
 export type SourceDuplicateSample = {
   source: string;
@@ -79,6 +80,18 @@ export type SourceFreshnessSlaRow = SourceFreshnessSlaConfig & {
   monitoredAt: string;
   ingestLagHours: number;
   status: SourceFreshnessSlaStatus;
+};
+
+export type SourceHealthFailureState = 'healthy' | 'warning' | 'failed';
+
+export type SourceHealthDashboardRow = SourceFreshnessSlaRow & {
+  failureCount: number;
+  failureState: SourceHealthFailureState;
+  lastRefreshAt: string;
+  latestStatus: IngestionPipelineRun['latestStatus'];
+  previousRowCount: number;
+  rowCountDelta: number;
+  staleDataThresholdHours: number;
 };
 
 export const sourceFreshnessSlaMonitoredAt = '2026-05-24T12:00:00.000Z';
@@ -203,6 +216,55 @@ export const ingestionPipelineMonitorSummary = {
   totalRows: ingestionPipelineMonitorRows.reduce((total, source) => total + source.rowCount, 0)
 };
 
+const sourceRowCountDeltasBySource: Record<string, number> = {
+  'Axfood chain price snapshot': 128,
+  'ICA store-scoped promotions': -42,
+  'OpenPrices SEK observations': 64,
+  'OpenFoodFacts metadata catalog': 211,
+  'OKQ8 fuel operator prices': 0,
+  'Sweden store directory': -7
+};
+
+function failureStateForSource(source: SourceFreshnessSlaRow): SourceHealthFailureState {
+  const pipeline = ingestionPipelineMonitorRows.find((row) => row.sourceName === source.sourceName);
+
+  if (pipeline?.latestStatus === 'failed' || source.status === 'breached') {
+    return 'failed';
+  }
+
+  if ((pipeline?.failureCount ?? 0) > 0 || pipeline?.latestStatus === 'warning' || source.status === 'watch') {
+    return 'warning';
+  }
+
+  return 'healthy';
+}
+
+export const sourceHealthDashboardRows: SourceHealthDashboardRow[] = sourceFreshnessSlaDashboard.map((source) => {
+  const pipeline = ingestionPipelineMonitorRows.find((row) => row.sourceName === source.sourceName);
+  const rowCountDelta = sourceRowCountDeltasBySource[source.sourceName] ?? 0;
+
+  return {
+    ...source,
+    failureCount: pipeline?.failureCount ?? 0,
+    failureState: failureStateForSource(source),
+    lastRefreshAt: source.lastSuccessfulIngestAt,
+    latestStatus: pipeline?.latestStatus ?? (source.status === 'breached' ? 'failed' : source.status === 'watch' ? 'warning' : 'succeeded'),
+    previousRowCount: Math.max(0, source.rowCount - rowCountDelta),
+    rowCountDelta,
+    staleDataThresholdHours: source.expectedRefreshHours
+  };
+});
+
+export const sourceHealthDashboardSummary = {
+  failingSourceCount: sourceHealthDashboardRows.filter((source) => source.failureState === 'failed').length,
+  monitoredAt: sourceFreshnessSlaMonitoredAt,
+  rowCountDelta: sourceHealthDashboardRows.reduce((total, source) => total + source.rowCountDelta, 0),
+  sourceCount: sourceHealthDashboardRows.length,
+  staleSourceCount: sourceHealthDashboardRows.filter((source) => source.status !== 'within-sla').length,
+  totalRows: sourceHealthDashboardRows.reduce((total, source) => total + source.rowCount, 0),
+  warningSourceCount: sourceHealthDashboardRows.filter((source) => source.failureState === 'warning').length
+};
+
 export type SourceManagementAction = {
   id: string;
   sourceName: string;
@@ -278,6 +340,264 @@ export const sourceManagementSummary = {
   ownerCount: new Set(sourceManagementActions.map((source) => source.owner)).size
 };
 
+export type SourceTermsDashboardRow = {
+  sourceId: string;
+  market: string;
+  chain: string;
+  accessMethod: string;
+  termsStatus: 'approved' | 'pending' | 'blocked' | 'unknown';
+  productionStatus: 'allowed' | 'blocked';
+  rateLimit: string;
+  credentials: string;
+  coverage: string;
+  owner: string;
+  checkedAt: string;
+};
+
+export const sourceTermsDashboard: SourceTermsDashboardRow[] = [
+  {
+    sourceId: 'se:ica:store-promotions-default-stores',
+    market: 'SE',
+    chain: 'ICA',
+    accessMethod: 'official_api',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Bounded daily store batch',
+    credentials: 'partner_agreement',
+    coverage: 'Default-store promotion endpoints with source-run provenance',
+    owner: 'Data Ops - ICA promotions',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'se:willys:products-all-stores',
+    market: 'SE',
+    chain: 'Willys',
+    accessMethod: 'official_api',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Bounded daily all-store batch',
+    credentials: 'partner_agreement',
+    coverage: 'Branch-scoped product price snapshots',
+    owner: 'Data Ops - Axfood',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'se:willys:weekly-all-stores',
+    market: 'SE',
+    chain: 'Willys weekly offers',
+    accessMethod: 'flyer_campaign',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Daily campaign refresh',
+    credentials: 'partner_agreement',
+    coverage: 'Weekly campaign offers by store',
+    owner: 'Data Ops - Axfood',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'se:coop:products-all-stores',
+    market: 'SE',
+    chain: 'Coop',
+    accessMethod: 'official_api',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Bounded daily all-store batch',
+    credentials: 'partner_agreement',
+    coverage: 'Stores that expose online product prices',
+    owner: 'Data Ops - Coop',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'se:coop:weekly-all-stores',
+    market: 'SE',
+    chain: 'Coop weekly offers',
+    accessMethod: 'flyer_campaign',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Daily campaign refresh',
+    credentials: 'partner_agreement',
+    coverage: 'Weekly campaign offers by store',
+    owner: 'Data Ops - Coop',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'se:hemkop:products-all-stores',
+    market: 'SE',
+    chain: 'Hemkop',
+    accessMethod: 'official_api',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Bounded daily all-store batch',
+    credentials: 'partner_agreement',
+    coverage: 'Branch-scoped product price snapshots',
+    owner: 'Data Ops - Axfood',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'se:hemkop:weekly-all-stores',
+    market: 'SE',
+    chain: 'Hemkop weekly offers',
+    accessMethod: 'flyer_campaign',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Daily campaign refresh',
+    credentials: 'partner_agreement',
+    coverage: 'Weekly campaign offers by store',
+    owner: 'Data Ops - Axfood',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'se:lidl:public-offers-all-stores',
+    market: 'SE',
+    chain: 'Lidl',
+    accessMethod: 'retailer_online_page',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Daily public-offer refresh',
+    credentials: 'none',
+    coverage: 'Public weekly offer pages linked to store evidence',
+    owner: 'Data Ops - Lidl public offers',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'se:city-gross:products-bulk',
+    market: 'SE',
+    chain: 'City Gross',
+    accessMethod: 'official_api',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Bulk minimum-row guard plus worker retry limits',
+    credentials: 'partner_agreement',
+    coverage: 'Bulk product and price snapshots',
+    owner: 'Data Ops - City Gross',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'se:mathem:public-search',
+    market: 'SE',
+    chain: 'Mathem',
+    accessMethod: 'retailer_online_page',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Small query set, daily refresh',
+    credentials: 'none',
+    coverage: 'Public search sample rows',
+    owner: 'Data Ops - public search',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'se:matspar:public-search',
+    market: 'SE',
+    chain: 'Matspar',
+    accessMethod: 'retailer_online_page',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Small query set, daily refresh',
+    credentials: 'none',
+    coverage: 'Public search sample rows',
+    owner: 'Data Ops - public search',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'se:pharmacy:public-products',
+    market: 'SE',
+    chain: 'Sweden pharmacy',
+    accessMethod: 'retailer_online_page',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Bounded public product paths',
+    credentials: 'none',
+    coverage: 'Public OTC pharmacy catalog evidence',
+    owner: 'Data Ops - pharmacy',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'se:apoteket:public-products',
+    market: 'SE',
+    chain: 'Apoteket',
+    accessMethod: 'retailer_online_page',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Bounded public product URLs',
+    credentials: 'none',
+    coverage: 'Public OTC product evidence',
+    owner: 'Data Ops - pharmacy',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'se:okq8:fuel-prices',
+    market: 'SE',
+    chain: 'OKQ8',
+    accessMethod: 'operator_public_page',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Daily operator-price page fetch',
+    credentials: 'none',
+    coverage: 'Public business fuel price page',
+    owner: 'Mobility price ops',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'se:preem:business-list-prices',
+    market: 'SE',
+    chain: 'Preem',
+    accessMethod: 'operator_public_page',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Daily operator-price page fetch',
+    credentials: 'none',
+    coverage: 'Public business fuel list prices',
+    owner: 'Mobility price ops',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'is:ob:fuel-prices',
+    market: 'IS',
+    chain: 'OB Iceland',
+    accessMethod: 'operator_public_page',
+    termsStatus: 'approved',
+    productionStatus: 'allowed',
+    rateLimit: 'Daily operator-price page fetch',
+    credentials: 'none',
+    coverage: 'Public fuel price page',
+    owner: 'Mobility price ops',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'no:rema-1000:search-review',
+    market: 'NO',
+    chain: 'REMA 1000',
+    accessMethod: 'retailer_online_page',
+    termsStatus: 'pending',
+    productionStatus: 'blocked',
+    rateLimit: 'No production rate limit approved',
+    credentials: 'none',
+    coverage: 'Norway source review only',
+    owner: 'Data Ops - Norway readiness',
+    checkedAt: '2026-05-25'
+  },
+  {
+    sourceId: 'is:starter-basket:manual-review',
+    market: 'IS',
+    chain: 'Iceland starter basket',
+    accessMethod: 'public_dataset',
+    termsStatus: 'unknown',
+    productionStatus: 'blocked',
+    rateLimit: 'No production ingestion allowed',
+    credentials: 'none',
+    coverage: 'Manual planning source, not a live price feed',
+    owner: 'Data Ops - Iceland readiness',
+    checkedAt: '2026-05-25'
+  }
+];
+
+export const sourceTermsSummary = {
+  sourceCount: sourceTermsDashboard.length,
+  approvedCount: sourceTermsDashboard.filter((source) => source.termsStatus === 'approved').length,
+  blockedCount: sourceTermsDashboard.filter((source) => source.productionStatus === 'blocked').length,
+  marketCount: new Set(sourceTermsDashboard.map((source) => source.market)).size
+};
+
 export type PartnerOnboardingIntake = {
   intakeEmail: string;
   expectedResponseWindow: string;
@@ -315,4 +635,232 @@ export const partnerOnboardingIntake: PartnerOnboardingIntake = {
     "Data operations checks sample files for required price, unit, and freshness fields.",
     "A partner-specific import plan is created before any shopper-facing claim goes live.",
   ],
+};
+
+export type ReliabilitySloDimension =
+  | 'availability'
+  | 'p95_latency'
+  | 'freshness'
+  | 'ingestion_success'
+  | 'source_coverage'
+  | 'alert_delivery';
+
+export type ReliabilitySloStatus = 'healthy' | 'watch' | 'burning_budget' | 'unmeasured';
+
+export type ReliabilityBurnRateThreshold = {
+  id: string;
+  window: string;
+  burnRate: number;
+  action: string;
+};
+
+export type ReliabilitySlo = {
+  id: string;
+  dimension: ReliabilitySloDimension;
+  name: string;
+  criticalJourney: string;
+  objective: string;
+  targetPercent: number;
+  observedPercent: number | null;
+  observedLabel: string;
+  measurementSource: string;
+  windowDays: number;
+  elapsedWindowPercent: number;
+  errorBudgetPercent: number;
+  consumedBudgetPercent: number | null;
+  remainingBudgetPercent: number | null;
+  burnRate: number | null;
+  status: ReliabilitySloStatus;
+  alertThresholds: ReliabilityBurnRateThreshold[];
+  nextAction: string;
+};
+
+const reliabilitySloWindowDays = 30;
+const reliabilitySloElapsedWindowPercent = 0.5;
+
+const criticalJourneyBurnRateThresholds: ReliabilityBurnRateThreshold[] = [
+  {
+    id: 'fast-burn',
+    window: '1 hour',
+    burnRate: 14.4,
+    action: 'Page immediately and roll back or disable the failing dependency.',
+  },
+  {
+    id: 'high-burn',
+    window: '6 hours',
+    burnRate: 6,
+    action: 'Page data/API owner and start incident review before the next ingest window.',
+  },
+  {
+    id: 'slow-burn',
+    window: '3 days',
+    burnRate: 1,
+    action: 'Create an SRE follow-up and require a mitigation plan before the next release.',
+  },
+];
+
+function percent(numerator: number, denominator: number) {
+  if (denominator <= 0) return 0;
+  return Math.round((numerator / denominator) * 1000) / 10;
+}
+
+function countAvailableSources() {
+  return sourceHealthDashboardRows.filter((source) => source.rowCount > 0).length;
+}
+
+function countFreshSources() {
+  return sourceHealthDashboardRows.filter((source) => source.status === 'within-sla').length;
+}
+
+function countSuccessfulIngestionSources() {
+  return ingestionPipelineMonitorRows.filter((source) => source.latestStatus !== 'failed').length;
+}
+
+function routePerformanceBudgetPassPercent() {
+  const metrics = recentRoutePerformanceBudgetReports.flatMap((report) => report.metrics);
+  return percent(metrics.filter((metric) => !metric.failing).length, metrics.length);
+}
+
+function formatObservedPercent(value: number | null) {
+  if (value === null) return 'No live metric sample attached';
+  return `${value.toLocaleString('sv-SE', { maximumFractionDigits: 1 })}%`;
+}
+
+function buildReliabilitySlo(input: Omit<ReliabilitySlo, 'errorBudgetPercent' | 'consumedBudgetPercent' | 'remainingBudgetPercent' | 'burnRate' | 'status'>): ReliabilitySlo {
+  const errorBudgetPercent = Math.max(0, 100 - input.targetPercent);
+
+  if (input.observedPercent === null) {
+    return {
+      ...input,
+      errorBudgetPercent,
+      consumedBudgetPercent: null,
+      remainingBudgetPercent: null,
+      burnRate: null,
+      status: 'unmeasured',
+    };
+  }
+
+  const consumedBudgetPercent = Math.max(0, input.targetPercent - input.observedPercent);
+  const remainingBudgetPercent = Math.max(0, errorBudgetPercent - consumedBudgetPercent);
+  const consumedBudgetRatio = errorBudgetPercent === 0 ? 0 : consumedBudgetPercent / errorBudgetPercent;
+  const burnRate = Math.round((consumedBudgetRatio / input.elapsedWindowPercent) * 10) / 10;
+  const status: ReliabilitySloStatus =
+    burnRate >= 1 || remainingBudgetPercent === 0
+      ? 'burning_budget'
+      : burnRate >= 0.5 || remainingBudgetPercent <= errorBudgetPercent * 0.25
+        ? 'watch'
+        : 'healthy';
+
+  return {
+    ...input,
+    errorBudgetPercent,
+    consumedBudgetPercent,
+    remainingBudgetPercent,
+    burnRate,
+    status,
+  };
+}
+
+export const reliabilitySloDashboard: ReliabilitySlo[] = [
+  buildReliabilitySlo({
+    id: 'public-web-availability',
+    dimension: 'availability',
+    name: 'Public web availability',
+    criticalJourney: 'Shoppers can load search, product, compare, and watchlist surfaces.',
+    objective: '99.5% successful hosted smoke and health checks per 30 days',
+    targetPercent: 99.5,
+    observedPercent: null,
+    observedLabel: 'Hosted smoke workflow and /api/health exist, but no production check artifact is checked into this snapshot.',
+    measurementSource: '.github hosted smoke workflow plus /api/health readiness endpoint',
+    windowDays: reliabilitySloWindowDays,
+    elapsedWindowPercent: reliabilitySloElapsedWindowPercent,
+    alertThresholds: criticalJourneyBurnRateThresholds,
+    nextAction: 'Publish the hosted smoke result artifact into the SLO report before availability can burn budget automatically.',
+  }),
+  buildReliabilitySlo({
+    id: 'products-api-p95-latency',
+    dimension: 'p95_latency',
+    name: 'Products API p95 latency',
+    criticalJourney: 'Search and product discovery return current grocery rows quickly enough to keep comparison usable.',
+    objective: '95% of product API load samples keep p95 request duration below 800 ms',
+    targetPercent: 95,
+    observedPercent: routePerformanceBudgetPassPercent(),
+    observedLabel: `${formatObservedPercent(routePerformanceBudgetPassPercent())} of current route performance budget metrics pass; the k6 products API p95 gate remains p(95)<800.`,
+    measurementSource: 'scripts/load/products-api-10k.js and recentRoutePerformanceBudgetReports',
+    windowDays: reliabilitySloWindowDays,
+    elapsedWindowPercent: reliabilitySloElapsedWindowPercent,
+    alertThresholds: criticalJourneyBurnRateThresholds,
+    nextAction: 'Attach the latest k6 result JSON so this row reports true products API p95 instead of route-budget proxy evidence.',
+  }),
+  buildReliabilitySlo({
+    id: 'source-freshness',
+    dimension: 'freshness',
+    name: 'Source freshness',
+    criticalJourney: 'Displayed prices and catalogue metadata stay inside each source freshness window.',
+    objective: '99% of monitored ingestion sources are within their stale-data threshold',
+    targetPercent: 99,
+    observedPercent: percent(countFreshSources(), sourceHealthDashboardRows.length),
+    observedLabel: `${countFreshSources().toLocaleString('sv-SE')} of ${sourceHealthDashboardRows.length.toLocaleString('sv-SE')} monitored sources are within SLA.`,
+    measurementSource: 'sourceFreshnessSlaDashboard',
+    windowDays: reliabilitySloWindowDays,
+    elapsedWindowPercent: reliabilitySloElapsedWindowPercent,
+    alertThresholds: criticalJourneyBurnRateThresholds,
+    nextAction: 'Treat any stale source as a shopper-trust incident when it feeds price, offer, or availability copy.',
+  }),
+  buildReliabilitySlo({
+    id: 'ingestion-success',
+    dimension: 'ingestion_success',
+    name: 'Ingestion success',
+    criticalJourney: 'Scheduled connector runs finish without hard failures before rows become shopper-facing.',
+    objective: '99% of monitored ingestion sources avoid hard failed latest status',
+    targetPercent: 99,
+    observedPercent: percent(countSuccessfulIngestionSources(), ingestionPipelineMonitorRows.length),
+    observedLabel: `${countSuccessfulIngestionSources().toLocaleString('sv-SE')} of ${ingestionPipelineMonitorRows.length.toLocaleString('sv-SE')} source monitors avoid hard failure.`,
+    measurementSource: 'ingestionPipelineMonitorRows',
+    windowDays: reliabilitySloWindowDays,
+    elapsedWindowPercent: reliabilitySloElapsedWindowPercent,
+    alertThresholds: criticalJourneyBurnRateThresholds,
+    nextAction: 'Keep warning runs visible, but page only when the latest source status is failed or budget burn crosses threshold.',
+  }),
+  buildReliabilitySlo({
+    id: 'source-coverage',
+    dimension: 'source_coverage',
+    name: 'Source coverage',
+    criticalJourney: 'Comparison pages show enough verified source rows to avoid false empty markets.',
+    objective: '95% of monitored sources have at least one verified row in the current snapshot',
+    targetPercent: 95,
+    observedPercent: percent(countAvailableSources(), sourceHealthDashboardRows.length),
+    observedLabel: `${countAvailableSources().toLocaleString('sv-SE')} of ${sourceHealthDashboardRows.length.toLocaleString('sv-SE')} monitored sources expose verified rows.`,
+    measurementSource: 'sourceCoverage and sourceHealthDashboardRows',
+    windowDays: reliabilitySloWindowDays,
+    elapsedWindowPercent: reliabilitySloElapsedWindowPercent,
+    alertThresholds: criticalJourneyBurnRateThresholds,
+    nextAction: 'Route zero-row sources to data ops before increasing public coverage claims.',
+  }),
+  buildReliabilitySlo({
+    id: 'alert-delivery',
+    dimension: 'alert_delivery',
+    name: 'Alert delivery',
+    criticalJourney: 'Price-drop, watchlist, and digest notifications either deliver or land in retry/dead-letter evidence.',
+    objective: '99% of due notification worker events are delivered or explicitly not due',
+    targetPercent: 99,
+    observedPercent: null,
+    observedLabel: 'Notification Prometheus export is token-protected, but no scrape artifact is checked into this snapshot.',
+    measurementSource: '/api/metrics/notifications and notification-metrics-scrape workflow',
+    windowDays: reliabilitySloWindowDays,
+    elapsedWindowPercent: reliabilitySloElapsedWindowPercent,
+    alertThresholds: criticalJourneyBurnRateThresholds,
+    nextAction: 'Attach the latest notification-metrics.prom artifact so due alert delivery can consume error budget automatically.',
+  }),
+];
+
+export const reliabilitySloDashboardSummary = {
+  monitoredAt: sourceFreshnessSlaMonitoredAt,
+  sloCount: reliabilitySloDashboard.length,
+  measuredSloCount: reliabilitySloDashboard.filter((slo) => slo.status !== 'unmeasured').length,
+  unmeasuredSloCount: reliabilitySloDashboard.filter((slo) => slo.status === 'unmeasured').length,
+  burningBudgetCount: reliabilitySloDashboard.filter((slo) => slo.status === 'burning_budget').length,
+  watchCount: reliabilitySloDashboard.filter((slo) => slo.status === 'watch').length,
+  healthyCount: reliabilitySloDashboard.filter((slo) => slo.status === 'healthy').length,
+  criticalJourneyCount: new Set(reliabilitySloDashboard.map((slo) => slo.criticalJourney)).size,
 };

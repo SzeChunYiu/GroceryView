@@ -8,18 +8,22 @@ async function read(relative) {
 
 describe('shopping list route', () => {
   it('ships the requested route, checkable row component, and localStorage-backed hook', async () => {
-    const [page, listSharePreview, row, hook, shareRoute, bulkImport, searchRoute] = await Promise.all([
+    const [page, listSharePreview, row, hook, shareRoute, bulkImport, searchRoute, reorderSuggestions] = await Promise.all([
       read('src/app/list/page.tsx'),
       read('src/components/list-share-preview.tsx'),
       read('src/components/CheckableListItem.tsx'),
       read('src/hooks/useList.ts'),
       read('src/app/api/list/share/route.ts'),
       read('src/components/BulkImportDialog.tsx'),
-      read('../../apps/api/src/routes/search.ts')
+      read('../../apps/api/src/routes/search.ts'),
+      read('src/lib/reorder-suggestions.ts')
     ]);
 
     assert.match(page, /ListSharePreview/);
     assert.match(page, /metadataForShoppingListShare/);
+    assert.match(page, /reorderWarningsForMatchedProducts/);
+    assert.match(page, /matchedProductSlug: item\.productId/);
+    assert.match(page, /Verified reorder warnings/);
     assert.match(listSharePreview, /useList/);
     assert.match(listSharePreview, /CheckableListItem/);
     assert.match(listSharePreview, /BulkImportDialog/);
@@ -64,5 +68,10 @@ describe('shopping list route', () => {
     assert.match(searchRoute, /products\/search\/list-import/);
     assert.match(searchRoute, /plainTextLines/);
     assert.match(searchRoute, /matchedProductSlug/);
+
+    assert.match(reorderSuggestions, /weeklyBasketChangeDigest/);
+    assert.match(reorderSuggestions, /reorderSignalsFromVerifiedDigest/);
+    assert.match(reorderSuggestions, /matchedProductSlug/);
+    assert.doesNotMatch(reorderSuggestions, /item\.name\.toLocaleLowerCase/);
   });
 });
