@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import type { RoutePerformanceBudgetReport } from '@/lib/telemetry';
-import { AppNav } from './app-nav';
+import { TopBar, SectorTabs, SideNav, Footer as DsFooter } from '@/components/ds/shell';
 import { BottomNav } from './bottom-nav';
 import {
   formatPct,
@@ -19,29 +19,34 @@ import type { SourceHealthDashboardRow, SourceManagementAction } from '@/lib/sou
 
 export function PageShell({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <div className="min-h-screen bg-[#f5f1e8] text-slate-950">
-      <AppNav />
-      <main className="mx-auto w-full max-w-7xl px-4 pb-20 pt-6 sm:px-6 lg:px-8 lg:pb-6">{children}</main>
-      <footer className="mx-auto w-full max-w-7xl px-4 pb-28 pt-2 text-sm font-bold text-slate-600 sm:px-6 lg:px-8 lg:pb-8">
-        <div className="flex flex-wrap gap-3 rounded-2xl border border-slate-200 bg-white/70 p-4">
-          <span className="font-black text-slate-950">Legal</span>
-          <Link className="underline decoration-emerald-300 underline-offset-4" href="/sv/privacy">Integritetspolicy</Link>
-          <Link className="underline decoration-emerald-300 underline-offset-4" href="/en/privacy">Privacy policy</Link>
-          <Link className="underline decoration-emerald-300 underline-offset-4" href="/sv/cookies">Cookiepolicy</Link>
-          <Link className="underline decoration-emerald-300 underline-offset-4" href="/en/cookies">Cookie policy</Link>
+    <div className="ds-root min-h-screen">
+      <TopBar />
+      <SectorTabs />
+      <div className="app-layout container">
+        <SideNav />
+        <main className="app-main" style={{ padding: '24px 0 40px', minWidth: 0 }}>{children}</main>
+      </div>
+      <footer className="mx-auto w-full max-w-7xl px-4 pb-28 pt-2 text-sm sm:px-6 lg:px-8 lg:pb-8">
+        <div className="flex flex-wrap gap-3 card">
+          <span className="font-black">Legal</span>
+          <Link className="underline" href="/sv/privacy">Integritetspolicy</Link>
+          <Link className="underline" href="/en/privacy">Privacy policy</Link>
+          <Link className="underline" href="/sv/cookies">Cookiepolicy</Link>
+          <Link className="underline" href="/en/cookies">Cookie policy</Link>
         </div>
       </footer>
+      <DsFooter />
       <BottomNav />
     </div>
   );
 }
 
 export function Eyebrow({ children }: Readonly<{ children: ReactNode }>) {
-  return <p className="text-xs font-bold uppercase tracking-[0.24em] text-emerald-800">{children}</p>;
+  return <p className="eyebrow">{children}</p>;
 }
 
 export function Card({ children, className = '' }: Readonly<{ children: ReactNode; className?: string }>) {
-  return <section className={`rounded-[1.75rem] border border-slate-200 bg-white/88 p-5 shadow-sm ${className}`}>{children}</section>;
+  return <section className={`card ${className}`}>{children}</section>;
 }
 
 export function DashboardHero({
@@ -51,12 +56,12 @@ export function DashboardHero({
   title
 }: Readonly<{ actions?: ReactNode; children: ReactNode; eyebrow: string; title: string }>) {
   return (
-    <section className="rounded-[2rem] border border-emerald-200 bg-white/90 p-6 shadow-sm">
+    <section className="card brand">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-4xl">
           <Eyebrow>{eyebrow}</Eyebrow>
-          <h1 className="mt-2 text-4xl font-black tracking-tight text-slate-950 md:text-5xl">{title}</h1>
-          <div className="mt-4 text-lg leading-8 text-slate-700">{children}</div>
+          <h1 className="page-title" style={{ marginTop: 8 }}>{title}</h1>
+          <div className="mt-4" style={{ fontSize: 17, lineHeight: 1.6, color: 'var(--ink-2)' }}>{children}</div>
         </div>
         {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
       </div>
