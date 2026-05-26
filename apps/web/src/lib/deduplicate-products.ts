@@ -1,5 +1,5 @@
-import { parsePackageSize } from "./unit-normalizer.ts"
-import { duplicateProductMatchKey, normalizeDuplicateProductText, type DuplicateProductMatchKey } from "./normalization.ts"
+import { parsePackageSize } from './unit-normalizer';
+import { duplicateProductMatchKey, normalizeDuplicateProductText, type DuplicateProductMatchKey } from './normalization';
 
 export type ProductRecord = {
   id: string
