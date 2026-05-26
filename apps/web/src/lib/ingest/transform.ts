@@ -3,7 +3,7 @@ import {
   getCanonicalUnit,
   normalizeQuantity,
   normalizeUnitPrice,
-} from "../unit-normalizer";
+} from "../unit-normalizer.ts";
 
 export type IngestUnitFields = {
   readonly quantity?: number | null;

@@ -134,8 +134,39 @@ describe('City Gross connector fixture parsing', () => {
     });
 
     assert.deepEqual(requestedUrls, [buildCityGrossProductsUrl({ siteId: '3377', query: 'mjölk', take: 10, skip: 0 })]);
-    assert.equal(rows.length, 1);
+    assert.equal(rows.length, 2);
     assert.deepEqual(rows[0]!, {
+      code: 'cg-1001',
+      gtin: '07318690012345',
+      name: 'Arla Ko Mellanmjölk 1,5%',
+      brand: 'Arla Ko',
+      superCategory: 'Mejeri, ost & ägg',
+      category: 'Mjölk',
+      packageText: '1 l',
+      storeId: '3377',
+      price: 17.9,
+      regularPrice: 17.9,
+      unitPrice: null,
+      unitPriceUnit: '',
+      is_member_price: false,
+      hasDiscount: false,
+      hasPromotion: false,
+      isCurrentWeekDiscount: false,
+      isLongTimeDiscount: false,
+      isMembersOnlyPrice: false,
+      promotionFrom: '',
+      promotionTo: '',
+      promotionMinQuantity: null,
+      promotionPrice: null,
+      promotionUnitPrice: null,
+      promotionUnitPriceUnit: '',
+      priceText: '17.90 SEK',
+      productUrl: 'https://www.citygross.se/produkt/arla-ko-mellanmjolk-1-5-1-l',
+      imageUrl: 'https://www.citygross.se/globalassets/product/mjolk.jpg',
+      sourceUrl: requestedUrls[0]!,
+      retrievedAt: RETRIEVED_AT
+    });
+    assert.deepEqual(rows[1]!, {
       code: 'cg-1001',
       gtin: '07318690012345',
       name: 'Arla Ko Mellanmjölk 1,5%',
@@ -148,6 +179,7 @@ describe('City Gross connector fixture parsing', () => {
       regularPrice: 17.9,
       unitPrice: 12.9,
       unitPriceUnit: 'l',
+      is_member_price: true,
       hasDiscount: true,
       hasPromotion: true,
       isCurrentWeekDiscount: true,

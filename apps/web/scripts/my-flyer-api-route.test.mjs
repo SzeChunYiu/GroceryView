@@ -251,12 +251,12 @@ describe('my-flyer API payload', () => {
     assert.match(route, /algorithm: z\.enum\(myFlyerAlgorithms\)\.default\('watchlist_first'\)/);
     assert.match(route, /country: z\.enum\(myFlyerCountries\)\.default\('se'\)/);
     assert.match(route, /limit: z\.coerce\.number\(\)\.int\(\)\.min\(1\)\.max\(50\)\.default\(12\)/);
-    assert.match(route, /'Cache-Control': 'private, max-age=3600'/);
+    assert.match(route, /'Cache-Control': privateAccountCacheControl/);
     assert.match(route, /'X-MyFlyer-Cache'/);
   });
 
   it('wires the MyFlyer page ranker into the API refresh query', () => {
-    const page = readFileSync(new URL('../src/app/[city]/my-flyer/page.tsx', import.meta.url), 'utf8');
+    const page = readFileSync(new URL('../src/app/[country]/my-flyer/page.tsx', import.meta.url), 'utf8');
     const pushActions = readFileSync(new URL('../src/components/my-flyer-push-actions.tsx', import.meta.url), 'utf8');
 
     assert.match(page, /import \{ AlgorithmPicker \} from '@\/components\/algorithm-picker'/);

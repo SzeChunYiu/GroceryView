@@ -17,6 +17,7 @@ const preservedKeys: Array<keyof ProductSortSelectProps['searchParams']> = [
   'maxPrice',
   'inStockOnly',
   'minConfidence',
+  'minCarbonScore',
   'brand'
 ];
 

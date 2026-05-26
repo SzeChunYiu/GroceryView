@@ -52,7 +52,7 @@ function formatDate(value: string) {
 }
 
 export default async function MyFlyerPage({ searchParams }: Readonly<{ searchParams?: Promise<SearchParams> }>) {
-  const params = await (searchParams ?? Promise.resolve({}));
+  const params: SearchParams = searchParams ? await searchParams : {};
   const algorithm = safeAlgorithm(first(params.algorithm));
   const country = safeCountry(first(params.country));
   const limit = safeLimit(first(params.limit));

@@ -4,7 +4,10 @@ export * from './lib/rankers/nearby.js';
 export * from './lib/rankers/premium.js';
 export * from './lib/rankers/myBasket.js';
 export * from './lib/fuelRoute.js';
+export * from './lib/fixtureFactory.js';
 export * from './lib/spendForecast.js';
+export * from './lib/promotionByStore.js';
+export * from './types/chain.js';
 export type DealScoreInput = {
   currentCityPercentile: number;
   knownPromoHistoryPercentile: number;
@@ -351,6 +354,8 @@ export type StorePrice = {
   price: number;
   priceType?: WatchlistPriceType;
   distanceKm?: number;
+  country?: string;
+  currency?: string;
 };
 
 export type BasketInputItem = {
@@ -362,8 +367,16 @@ export type BasketInputItem = {
 export type BasketComparisonInput = {
   favoriteStoreIds: string[];
   enabledMemberStoreIds?: string[];
+  country?: string;
+  currency?: string;
   items: BasketInputItem[];
 };
+
+function priceMatchesBasketMarket(price: StorePrice, input: BasketComparisonInput) {
+  if (input.country && price.country && price.country !== input.country) return false;
+  if (input.currency && price.currency && price.currency !== input.currency) return false;
+  return true;
+}
 
 export type MultiWeekStockUpHistoryPoint = {
   observedAt: string;
@@ -1287,7 +1300,7 @@ export function compareBasketStrategies(input: BasketComparisonInput): BasketCom
   let memberSavingsTotal = 0;
 
   for (const item of input.items) {
-    const favoritePrices = item.prices.filter((price) => favoriteSet.has(price.storeId));
+    const favoritePrices = item.prices.filter((price) => favoriteSet.has(price.storeId) && priceMatchesBasketMarket(price, input));
     const eligiblePrices = favoritePrices.filter((price) => {
       if (price.priceType !== 'member') return true;
       const isEnabled = enabledMemberSet.has(price.storeId);
@@ -1387,7 +1400,7 @@ export function summarizeStoreBasketCoverage(input: BasketComparisonInput): Stor
       const coverage = coverageByStore.get(storeId);
       if (!coverage) continue;
 
-      const price = item.prices.find((candidate) => candidate.storeId === storeId);
+      const price = item.prices.find((candidate) => candidate.storeId === storeId && priceMatchesBasketMarket(candidate, input));
       if (!price) {
         coverage.missingProductIds.push(item.productId);
         continue;
@@ -1857,8 +1870,8 @@ export type FixedBasketIndex = {
   currency: FixedBasketIndexCurrency;
   baseDate: string;
   currentDate: string;
-  value: number;
-  movementPercent: number;
+  value: number | null;
+  movementPercent: number | null;
   confidence: 'low' | 'medium' | 'high';
   components: IndexComponent[];
 };
@@ -1867,7 +1880,18 @@ export function calculateFixedBasketIndex(input: FixedBasketIndexInput): FixedBa
   const expectedCurrency = fixedBasketIndexCurrencyByCountry[input.country];
   const countryComponents = input.components.filter((component) => component.country === input.country);
   if (countryComponents.length === 0) {
-    throw new Error(`At least one ${input.country} component is required to calculate an index.`);
+    return {
+      id: input.id,
+      label: input.label,
+      country: input.country,
+      currency: expectedCurrency,
+      baseDate: input.baseDate,
+      currentDate: input.currentDate,
+      value: null,
+      movementPercent: null,
+      confidence: 'low',
+      components: []
+    };
   }
 
   const currencyMismatch = countryComponents.find((component) => component.currency !== expectedCurrency);
@@ -2387,6 +2411,7 @@ export function calculateBrandTierIndices(observations: BrandTierPriceObservatio
         weight: 1
       }))
     }))
+    .filter((index): index is FixedBasketIndex & { value: number; movementPercent: number } => index.value !== null && index.movementPercent !== null)
     .map((index) => ({
       brandTier: index.id.replace('-index', '') as BrandTier,
       label: index.label,
@@ -3549,6 +3574,46 @@ export type CommunityReportAbuseControl = {
   reason: string;
 };
 
+export type FuelCrowdEvidenceType = 'pump_photo' | 'receipt' | 'station_sign';
+export type FuelCrowdReporterTrustTier = 'new' | 'trusted' | 'operator_verified';
+
+export type FuelCrowdPriceSubmission = {
+  reporter: CommunityReporterActivity;
+  stationId: string;
+  fuelGradeId: string;
+  pricePerLitre: number;
+  observedAt: string;
+  submittedAt: string;
+  evidenceType?: FuelCrowdEvidenceType;
+  operatorReferencePricePerLitre?: number;
+};
+
+export type FuelCrowdPriceSourceDraft = {
+  sourceKind: 'crowd_station_report';
+  stationId: string;
+  reporterId: string;
+  reporterTrustTier: FuelCrowdReporterTrustTier;
+  evidenceType: FuelCrowdEvidenceType;
+  submittedAt: string;
+  provenance: {
+    fuelGradeId: string;
+    observedAt: string;
+    pricePerLitre: number;
+    operatorReferencePricePerLitre?: number;
+    outlierPercent?: number;
+  };
+};
+
+export type FuelCrowdPriceSubmissionDecision = {
+  status: 'accept_for_review' | 'reject' | 'require_manual_review';
+  publicDisplayEligible: boolean;
+  verificationRequired: true;
+  reasons: string[];
+  sourceKind: 'crowd_station_report';
+  trustAction: CommunityReportAbuseControl['action'];
+  priceSourceDraft?: FuelCrowdPriceSourceDraft;
+};
+
 export type HumanReviewQueueItem = {
   id: string;
   subjectType: 'product_match' | 'community_report' | 'commodity_mapping';
@@ -3731,6 +3796,116 @@ export function planCommunityReportAbuseControls(input: {
       reason: 'Reporter history is within trust limits.'
     };
   });
+}
+
+export function planFuelCrowdPriceSubmission(input: {
+  submission: FuelCrowdPriceSubmission;
+  maxFreshnessHours?: number;
+  maxOutlierPercent?: number;
+}): FuelCrowdPriceSubmissionDecision {
+  const maxFreshnessHours = input.maxFreshnessHours ?? 6;
+  const maxOutlierPercent = input.maxOutlierPercent ?? 20;
+  const reasons: string[] = [];
+  const trust = planCommunityReportAbuseControls({ reporters: [input.submission.reporter] })[0]!;
+  const observedAtMs = Date.parse(input.submission.observedAt);
+  const submittedAtMs = Date.parse(input.submission.submittedAt);
+  let outlierPercent: number | undefined;
+
+  if (!input.submission.stationId.trim()) reasons.push('station_id is required.');
+  if (!input.submission.fuelGradeId.trim()) reasons.push('fuel_grade_id is required.');
+  if (!Number.isFinite(input.submission.pricePerLitre) || input.submission.pricePerLitre <= 0) {
+    reasons.push('price_per_litre must be a positive observed value.');
+  }
+  if (!Number.isFinite(observedAtMs) || !Number.isFinite(submittedAtMs) || observedAtMs > submittedAtMs) {
+    reasons.push('observed_at and submitted_at must be valid timestamps with observed_at before submitted_at.');
+  } else {
+    const ageHours = (submittedAtMs - observedAtMs) / (60 * 60 * 1000);
+    if (ageHours > maxFreshnessHours) reasons.push(`Fuel crowd report is older than ${maxFreshnessHours} hours.`);
+  }
+  if (!input.submission.evidenceType) reasons.push('Fuel crowd report evidence_type is required before review.');
+  if (trust.action === 'suspend_reporting' || trust.action === 'throttle') reasons.push(trust.reason);
+
+  if (
+    input.submission.operatorReferencePricePerLitre !== undefined &&
+    input.submission.operatorReferencePricePerLitre > 0 &&
+    Number.isFinite(input.submission.operatorReferencePricePerLitre)
+  ) {
+    outlierPercent = Math.abs((input.submission.pricePerLitre - input.submission.operatorReferencePricePerLitre) / input.submission.operatorReferencePricePerLitre) * 100;
+    if (outlierPercent > maxOutlierPercent) {
+      reasons.push(`Fuel crowd report differs from operator reference by more than ${maxOutlierPercent}%.`);
+    }
+  }
+
+  const priceSourceDraft = input.submission.evidenceType && !reasons.some((reason) => reason.includes('must be') || reason.includes('required'))
+    ? buildFuelCrowdPriceSourceDraft(input.submission, outlierPercent)
+    : undefined;
+
+  const hardReject = reasons.some((reason) =>
+    reason.includes('must be') ||
+    reason.includes('required') ||
+    trust.action === 'suspend_reporting' ||
+    trust.action === 'throttle'
+  );
+
+  if (hardReject) {
+    return {
+      status: 'reject',
+      publicDisplayEligible: false,
+      verificationRequired: true,
+      reasons,
+      sourceKind: 'crowd_station_report',
+      trustAction: trust.action,
+      priceSourceDraft: undefined
+    };
+  }
+
+  if (reasons.length > 0 || trust.action === 'require_manual_review') {
+    return {
+      status: 'require_manual_review',
+      publicDisplayEligible: false,
+      verificationRequired: true,
+      reasons: reasons.length > 0 ? reasons : [trust.reason],
+      sourceKind: 'crowd_station_report',
+      trustAction: trust.action,
+      priceSourceDraft
+    };
+  }
+
+  return {
+    status: 'accept_for_review',
+    publicDisplayEligible: false,
+    verificationRequired: true,
+    reasons: ['Fresh trusted crowd fuel report can be queued for verification before public display.'],
+    sourceKind: 'crowd_station_report',
+    trustAction: trust.action,
+    priceSourceDraft
+  };
+}
+
+function buildFuelCrowdPriceSourceDraft(
+  submission: FuelCrowdPriceSubmission,
+  outlierPercent: number | undefined
+): FuelCrowdPriceSourceDraft {
+  return {
+    sourceKind: 'crowd_station_report',
+    stationId: submission.stationId,
+    reporterId: submission.reporter.reporterId,
+    reporterTrustTier: fuelCrowdReporterTrustTier(submission.reporter),
+    evidenceType: submission.evidenceType!,
+    submittedAt: submission.submittedAt,
+    provenance: {
+      fuelGradeId: submission.fuelGradeId,
+      observedAt: submission.observedAt,
+      pricePerLitre: submission.pricePerLitre,
+      ...(submission.operatorReferencePricePerLitre !== undefined ? { operatorReferencePricePerLitre: submission.operatorReferencePricePerLitre } : {}),
+      ...(outlierPercent !== undefined ? { outlierPercent: roundMoney(outlierPercent) } : {})
+    }
+  };
+}
+
+function fuelCrowdReporterTrustTier(reporter: CommunityReporterActivity): FuelCrowdReporterTrustTier {
+  if (reporter.acceptedReportsLast30Days >= 10 && reporter.rejectedReportsLast30Days <= 2) return 'trusted';
+  return 'new';
 }
 
 export function authorizeHumanReviewAction(input: {
@@ -5075,14 +5250,16 @@ export function calculatePersonalGroceryInflation(input: PersonalInflationInput)
 //      to up/down moves),
 //   5. coverage + confidence are reported per cell and overall, and low-coverage
 //      cells are flagged `estimated` so the UI can mark modelled values honestly.
-// Matched-basket refinement (EAN / fuzzy product matching) can layer on top later
-// for the categories where it's available, raising confidence without changing
-// the scale.
+// Matched-basket refinement (EAN / fuzzy product matching) can add product ids
+// for rows where it is available, raising confidence and exposing basket
+// coverage without changing the scale.
 
 export type ChainPriceObservation = {
   chainId: string;
   category: string;
   unitPrice: number; // SEK per comparable unit (kg / l / pcs)
+  matchedProductId?: string;
+  basketWeight?: number; // optional relative spend/exposure weight for matched-basket rows
 };
 
 export type ChainCategoryIndex = {
@@ -5100,6 +5277,9 @@ export type ChainPriceIndex = {
   observations: number;
   categoriesCovered: number;
   confidence: 'high' | 'medium' | 'low';
+  matchedBasketProductIds: string[];
+  matchedBasketCoveragePercent: number;
+  missingMatchedBasketProductIds: string[];
   byCategory: ChainCategoryIndex[];
 };
 
@@ -5107,6 +5287,7 @@ export type ChainPriceIndexSummary = {
   chains: ChainPriceIndex[]; // sorted cheapest (lowest index) first
   categories: string[]; // every category present in the market
   marketReferenceByCategory: Record<string, number>;
+  matchedBasketProductIds: string[];
   generatedFrom: number; // total observations used
 };
 
@@ -5127,26 +5308,36 @@ function weightedGeometricMean(values: number[], weights: number[]): number {
   return Math.exp(logSum / weightSum);
 }
 
+function observationBasketWeight(observation: ChainPriceObservation): number {
+  return Number.isFinite(observation.basketWeight) && (observation.basketWeight ?? 0) > 0 ? observation.basketWeight! : 1;
+}
+
 export function calculateChainPriceIndex(observations: ChainPriceObservation[]): ChainPriceIndexSummary {
   const usable = observations.filter(
     (o) => Number.isFinite(o.unitPrice) && o.unitPrice > 0 && Boolean(o.chainId) && Boolean(o.category)
   );
   if (usable.length === 0) {
-    return { chains: [], categories: [], marketReferenceByCategory: {}, generatedFrom: 0 };
+    return { chains: [], categories: [], marketReferenceByCategory: {}, matchedBasketProductIds: [], generatedFrom: 0 };
   }
+
+  const matchedBasketProductIds = [...new Set(
+    usable.map((o) => o.matchedProductId?.trim()).filter((id): id is string => Boolean(id))
+  )].sort((a, b) => a.localeCompare(b));
 
   // Market reference (median unit price) + size per category, across all chains.
   const marketByCategory = new Map<string, number[]>();
+  const marketWeightByCategory = new Map<string, number>();
   for (const o of usable) {
     const arr = marketByCategory.get(o.category) ?? [];
     arr.push(o.unitPrice);
     marketByCategory.set(o.category, arr);
+    marketWeightByCategory.set(o.category, (marketWeightByCategory.get(o.category) ?? 0) + observationBasketWeight(o));
   }
   const marketReferenceByCategory: Record<string, number> = {};
   const marketCategorySize: Record<string, number> = {};
   for (const [category, prices] of marketByCategory) {
     marketReferenceByCategory[category] = median(prices);
-    marketCategorySize[category] = prices.length;
+    marketCategorySize[category] = marketWeightByCategory.get(category) ?? prices.length;
   }
   const categories = [...marketByCategory.keys()].sort((a, b) => a.localeCompare(b));
 
@@ -5170,6 +5361,15 @@ export function calculateChainPriceIndex(observations: ChainPriceObservation[]):
     const byCategory: ChainCategoryIndex[] = [];
     const ratios: number[] = [];
     const weights: number[] = [];
+    const matchedBasketProductIdsForChain = [...new Set(
+      rows.map((row) => row.matchedProductId?.trim()).filter((id): id is string => Boolean(id))
+    )].sort((a, b) => a.localeCompare(b));
+    const missingMatchedBasketProductIds = matchedBasketProductIds.filter(
+      (productId) => !matchedBasketProductIdsForChain.includes(productId)
+    );
+    const matchedBasketCoveragePercent = matchedBasketProductIds.length === 0
+      ? 0
+      : roundMoney((matchedBasketProductIdsForChain.length / matchedBasketProductIds.length) * 100);
     for (const [category, prices] of chainByCategory) {
       const reference = marketReferenceByCategory[category];
       if (!reference || reference <= 0) continue;
@@ -5194,10 +5394,12 @@ export function calculateChainPriceIndex(observations: ChainPriceObservation[]):
 
     const overall = roundMoney(weightedGeometricMean(ratios, weights) * 100) || 100;
     const totalObs = rows.length;
+    const matchedBasketConfidenceBoost = matchedBasketProductIdsForChain.length >= 12 && matchedBasketCoveragePercent >= 80;
+    const matchedBasketMediumConfidence = matchedBasketProductIdsForChain.length >= 4 && matchedBasketCoveragePercent >= 50;
     const confidence =
-      totalObs >= 30 && byCategory.length >= 4
+      matchedBasketConfidenceBoost || (totalObs >= 30 && byCategory.length >= 4)
         ? 'high'
-        : totalObs >= 10 && byCategory.length >= 2
+        : matchedBasketMediumConfidence || (totalObs >= 10 && byCategory.length >= 2)
           ? 'medium'
           : 'low';
 
@@ -5207,13 +5409,16 @@ export function calculateChainPriceIndex(observations: ChainPriceObservation[]):
       observations: totalObs,
       categoriesCovered: byCategory.length,
       confidence,
+      matchedBasketProductIds: matchedBasketProductIdsForChain,
+      matchedBasketCoveragePercent,
+      missingMatchedBasketProductIds,
       byCategory
     });
   }
 
   chains.sort((a, b) => a.overallIndex - b.overallIndex);
 
-  return { chains, categories, marketReferenceByCategory, generatedFrom: usable.length };
+  return { chains, categories, marketReferenceByCategory, matchedBasketProductIds, generatedFrom: usable.length };
 }
 export * from './lib/extractors/loosePacked.js';
 

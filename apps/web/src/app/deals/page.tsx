@@ -1,11 +1,14 @@
 import Link from 'next/link';
+import { SourceCitation } from '@/components/data-ui';
 import { DealCard } from '@/components/deal-card';
+import { SavedViewActions } from '@/components/saved-view-actions';
 import { categoryLabels, pricedProducts } from '@/lib/openprices-products';
 import { buildNewProductArrivals } from '@/lib/freshness';
 import { buildPantryReplacementFilter, pantryReplacementMatches } from '@/lib/pantry';
 import { buildCityTrendingItems } from '@/lib/trends';
 import { buildLocalPriceDropFeed } from '@/lib/price-events';
 import { routeMetadata } from '@/lib/seo';
+import { buildSinglePortionDealFinder } from '@/lib/single-portion-deals';
 import { formatPct, labelFromSlug, priceDropMoversBoard, snapshot, topChainSpreads } from '@/lib/verified-data';
 
 type SearchParams = Record<string, string | string[] | undefined>;
@@ -149,6 +152,7 @@ const newProductArrivals = buildNewProductArrivals(pricedProducts.map((product) 
   lastObservedAt: product.lastObservedAt,
   observationCount: product.observationCount
 })), 4);
+const singlePortionDealFinder = buildSinglePortionDealFinder(topChainSpreads, labelFromSlug, { limit: 4 });
 
 export default async function DealsPage({ searchParams }: Readonly<{ searchParams?: Promise<SearchParams> }>) {
   const params = (await searchParams) ?? {};
@@ -177,6 +181,7 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
   const visibleLocalDropFeed = localDropFeed
     .filter((item) => !requestedCategory || slugFromLabel(item.category) === requestedCategory)
     .filter(() => !requestedChain || requestedChain === 'openprices');
+  const currentDealsHref = filterHref({});
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8 text-slate-950 sm:px-6 lg:px-8">
@@ -198,6 +203,24 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
           <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{snapshot.axfoodSource}</p>
         </div>
       </div>
+      <div className="mt-4">
+        <SourceCitation
+          confidenceLabel={`${visibleDeals.length} visible deal cards from observed spread/drop rows`}
+          connectorRun="topChainSpreads + priceDropMoversBoard deal feed"
+          href="/data-sources"
+          observedAt={snapshot.retrievedLabel}
+          sourceLabel={snapshot.axfoodSource}
+        />
+      </div>
+
+      <SavedViewActions
+        allowAlert
+        href={currentDealsHref}
+        label={replacementFilter ? `Replacement deals for ${replacementFilter.label}` : 'Verified deals view'}
+        resultLabel={`${visibleDeals.length} deal cards · ${visibleLocalDropFeed.length} local drop rows · observed rows only`}
+        state={{ category: requestedCategory, chain: requestedChain, replace: replacementParam, sort: 'observed-savings' }}
+        surface="deals"
+      />
 
       <section className="mt-6 rounded-[2rem] border border-sky-200 bg-sky-50/70 p-5 shadow-sm" aria-label="Deal feed filters by chain and category">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -223,6 +246,40 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
             options={categoryFilterOptions}
             toHref={(slug) => filterHref({ category: slug })}
           />
+        </div>
+      </section>
+
+      <section className="mt-6 rounded-[2rem] border border-violet-200 bg-violet-50/80 p-5 shadow-sm" aria-label="Single shopper small portion deals" data-single-portion-deal-finder>
+        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-violet-800">Students / young singles</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Small-portion deals with waste checks</h2>
+          </div>
+          <p className="max-w-xl text-sm font-semibold leading-6 text-violet-950">
+            Ranked from verified Axfood rows by package size, estimated serving count, per-serving cost, and waste risk. Bulk-only deals stay out unless the serving and storage assumptions are visible.
+          </p>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {singlePortionDealFinder.map((deal) => (
+            <Link className="rounded-2xl border border-violet-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-violet-700" href={`/products/${deal.productSlug}`} key={deal.productSlug}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-800">{deal.chainLabel} · {deal.categoryLabel}</p>
+              <h3 className="mt-2 text-lg font-black leading-6 text-slate-950">{deal.productName}</h3>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{deal.brand} · {deal.packageSizeLabel}</p>
+              <div className="mt-3 grid gap-2 rounded-2xl bg-violet-50 p-3 text-xs font-bold text-violet-950">
+                <p>{deal.totalPriceLabel} total · {deal.perServingCostLabel}</p>
+                <p>{deal.servingLabel}</p>
+                <p>{deal.wasteRiskLabel}</p>
+              </div>
+              {deal.cheaperAlternative ? (
+                <p className="mt-3 text-xs font-semibold leading-5 text-slate-600">
+                  Cheaper alternative: {deal.cheaperAlternative.productName} at {deal.cheaperAlternative.perServingCostLabel}.
+                </p>
+              ) : (
+                <p className="mt-3 text-xs font-semibold leading-5 text-slate-600">No lower per-serving match in the current verified small-portion set.</p>
+              )}
+              <p className="mt-3 text-xs font-semibold leading-5 text-slate-500">{deal.confidenceLabel} {deal.sourceLabel}</p>
+            </Link>
+          ))}
         </div>
       </section>
 

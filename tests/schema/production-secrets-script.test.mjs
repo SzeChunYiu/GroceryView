@@ -96,11 +96,9 @@ describe('production secret audit script', () => {
     assert.deepEqual(output.missingGithubActionSecrets, [
       'GROCERYVIEW_SERVER_URL',
       'GROCERYVIEW_API_BASE_URL',
-      'EXPO_TOKEN',
       'VERCEL_TOKEN',
       'VERCEL_ORG_ID',
       'VERCEL_PROJECT_ID',
-      'RESEND_API_KEY',
       'WEEKLY_DIGEST_FROM_EMAIL',
       'GROCERYVIEW_SCANNER_BEARER_TOKEN'
     ]);

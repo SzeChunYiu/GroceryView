@@ -1,6 +1,7 @@
 'use client';
 
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
+import { productImageCdnUrl } from '@/lib/imageCdn';
 import { cn } from '@/lib/utils';
 
 export type FlyerSectionPromo = {
@@ -101,7 +102,7 @@ function LazyPromoImage({
           decoding="async"
           fetchPriority={priority ? 'high' : 'auto'}
           loading={priority ? 'eager' : 'lazy'}
-          src={src}
+          src={productImageCdnUrl(src, { width: 96 })}
         />
       ) : (
         <div className="h-full w-full animate-pulse bg-gradient-to-r from-emerald-50 via-white to-emerald-100" aria-hidden="true" />

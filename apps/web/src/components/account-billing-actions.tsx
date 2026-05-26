@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { resolvePremiumEntitlementGates, type AccountEntitlement } from '@/lib/entitlements';
-import { buildPremiumSavingsForecast } from '@/lib/price-intelligence';
 
 type BillingStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'redirecting' | 'error';
 type BrowserSession = { accessToken: string; userId: string };
@@ -18,8 +17,6 @@ type SubscriptionAccessResponse = {
 };
 type CheckoutSessionResponse = { checkoutUrl?: string; plan?: string };
 type PortalSessionResponse = { portalUrl?: string };
-
-const premiumSavingsForecast = buildPremiumSavingsForecast();
 
 function entitlementFromResponse(entitlement: SubscriptionAccessResponse['entitlement']): AccountEntitlement | null {
   const tier = entitlement?.tier === 'premium' ? 'premium' : entitlement?.tier === 'free' ? 'free' : null;
@@ -136,18 +133,18 @@ export function AccountBillingActions() {
       <p className="text-sm font-black uppercase tracking-[0.2em] text-violet-800">Signed-in billing actions</p>
       <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Checkout and subscription management</h2>
       <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
-        These controls call the protected subscription, Stripe checkout, and Stripe billing portal endpoints with the sessionStorage bearer token. They fail closed without a production session so public visitors cannot create anonymous billing sessions. Review the Premium OCR history plan before checkout to confirm scan-history storage is the upgrade path you need.
+        These controls call the protected subscription, Stripe checkout, and Stripe billing portal endpoints with the sessionStorage bearer token. They fail closed without a production session so public visitors cannot create anonymous billing sessions. Review the Premium plan before checkout to confirm the active and coming-soon gates.
       </p>
 
       <div className="mt-4 flex flex-wrap gap-2">
-        <Link className="rounded-full bg-violet-950 px-4 py-2 text-sm font-black text-white" href="/pricing#premium-ocr-history">Compare Premium OCR history</Link>
+        <Link className="rounded-full bg-violet-950 px-4 py-2 text-sm font-black text-white" href="/pricing#premium">Compare Premium</Link>
         <button className="rounded-full bg-violet-700 px-4 py-2 text-sm font-black text-white" onClick={loadSubscriptionAccess} type="button">Load subscription status</button>
         <button className="rounded-full border border-violet-300 px-4 py-2 text-sm font-black text-violet-900" onClick={() => startCheckout('premium_monthly')} type="button">Upgrade monthly for unlimited alerts</button>
         <button className="rounded-full border border-violet-300 px-4 py-2 text-sm font-black text-violet-900" onClick={() => startCheckout('premium_yearly')} type="button">Upgrade yearly for unlimited alerts</button>
         <button className="rounded-full border border-slate-300 px-4 py-2 text-sm font-black text-slate-800" onClick={manageSubscription} type="button">Manage subscription</button>
       </div>
       <p className="mt-3 rounded-2xl bg-violet-50 p-3 text-sm font-bold text-violet-950">
-        Premium OCR history is highlighted on the pricing page before checkout, alongside exportable product price history for research and budget planning.
+        Premium gates are shown on the pricing page before checkout, including which features are available now and which are coming soon.
       </p>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-3">
@@ -173,7 +170,7 @@ export function AccountBillingActions() {
       <div className="mt-4 rounded-2xl border border-indigo-200 bg-indigo-50 p-4">
         <p className="text-sm font-black text-indigo-950">Server entitlement gates</p>
         <p className="mt-2 text-sm font-semibold leading-6 text-indigo-950">
-          The production subscription response is checked before premium OCR history, advanced forecasts, unlimited alerts, or exports are shown as available.
+          The production subscription response is checked before advanced alerts, saved views, exports/API access, household sharing, pro terminal tools, or premium OCR history are shown as available.
         </p>
         <div className="mt-3 grid gap-3 md:grid-cols-2">
           {entitlementGates.map((gate) => (
@@ -193,19 +190,19 @@ export function AccountBillingActions() {
       <div className="mt-4 rounded-2xl border border-violet-200 bg-violet-50 p-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="text-sm font-black text-violet-950">Premium savings forecast</p>
+            <p className="text-sm font-black text-violet-950">Premium packaging status</p>
             <p className="mt-2 text-sm font-semibold leading-6 text-violet-950">
-              Forecasted monthly savings of {premiumSavingsForecast.monthlySavingsLabel} stay premium-only and combine observed alerts, historical swaps, and basket-planning source rows after subscription access is loaded.
+              Server entitlement gates stay premium-only after subscription access is loaded. The UI does not show fabricated savings claims before a signed-in account has real account-owned history.
             </p>
           </div>
           <p className="rounded-full bg-white px-3 py-1 text-sm font-black text-violet-800">{forecastUnlocked ? 'Unlocked' : 'Locked'}</p>
         </div>
         <div className="mt-3 grid gap-3 md:grid-cols-3">
-          {premiumSavingsForecast.drivers.map((driver) => (
-            <div className="rounded-2xl bg-white p-3" key={driver.label}>
-              <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{driver.label}</p>
-              <p className="mt-1 text-2xl font-black text-violet-800">{driver.amountLabel}</p>
-              <p className="mt-1 text-xs font-semibold leading-5 text-slate-600">{driver.detail}</p>
+          {entitlementGates.slice(0, 3).map((gate) => (
+            <div className="rounded-2xl bg-white p-3" key={gate.feature}>
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{gate.status.replace('_', ' ')}</p>
+              <p className="mt-1 text-lg font-black text-violet-800">{gate.label}</p>
+              <p className="mt-1 text-xs font-semibold leading-5 text-slate-600">{gate.premiumAccess}</p>
             </div>
           ))}
         </div>

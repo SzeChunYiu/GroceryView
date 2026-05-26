@@ -32,8 +32,11 @@ export function normaliseUnitPrice(price: number, quantityStr: string): Normalis
 function parseQuantityString(quantityStr: string): ParsedQuantity {
   const normalized = normalizeDiaperPackageText(quantityStr);
   if (!normalized) throw new Error('quantityStr must not be empty.');
+  if (/(^|[\sx×])-+\s*\d/u.test(normalized)) throw new Error('quantity must be positive.');
 
-  const diaperPackage = parseDiaperPackageClass(normalized);
+  const diaperPackage = /\b(?:blojor|diapers?|strl|storlek|size|comfort)\b/u.test(normalized)
+    ? parseDiaperPackageClass(normalized)
+    : null;
   if (diaperPackage) {
     return quantityFromUnit(diaperPackage.diaperCount, 'piece');
   }

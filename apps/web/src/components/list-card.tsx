@@ -3,6 +3,13 @@
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import type { PublicSharePreview } from "../lib/social";
+import {
+  formatPresenceLastSeen,
+  listPresenceStateLabel,
+  participantsForListItem,
+  summarizeListPresence,
+  type ListPresenceParticipant,
+} from "../lib/list-presence";
 import { getStoreLayoutDepartment, sortItemsByStoreLayout, type StoreLayoutChain, type StoreLayoutGroupOrder } from "../lib/trip-planner";
 import {
   useList,
@@ -28,6 +35,7 @@ type ListCardProps = {
   items: CommentableSharedListItem[];
   mealPlanImport?: MealPlanListImportSummary;
   onConflictPrompt?: (prompt: ListConflictPrompt) => void;
+  presenceParticipants?: ListPresenceParticipant[];
   publicShareHref?: string;
   selectedChain?: StoreLayoutChain;
 };
@@ -103,7 +111,16 @@ export function PublicSharePreviewCard({
   );
 }
 
-export function ListCard({ currentRole, groupOrder = "store-layout", items, mealPlanImport, onConflictPrompt, publicShareHref, selectedChain = "ica" }: ListCardProps) {
+export function ListCard({
+  currentRole,
+  groupOrder = "store-layout",
+  items,
+  mealPlanImport,
+  onConflictPrompt,
+  presenceParticipants = [],
+  publicShareHref,
+  selectedChain = "ica"
+}: ListCardProps) {
   const [commentsByItem, setCommentsByItem] = useState<Record<string, ListItemComment[]>>(() =>
     Object.fromEntries(items.map((item) => [item.id, item.comments ?? []])),
   );
@@ -113,6 +130,7 @@ export function ListCard({ currentRole, groupOrder = "store-layout", items, meal
     onConflictPrompt,
   });
   const storeOrderedItems = sortItemsByStoreLayout(listItems, selectedChain, groupOrder);
+  const presenceSummary = summarizeListPresence(presenceParticipants);
 
   function addComment(itemId: string, event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -186,10 +204,37 @@ export function ListCard({ currentRole, groupOrder = "store-layout", items, meal
           ) : null}
         </div>
       ) : null}
+      {presenceParticipants.length > 0 ? (
+        <div className="mb-3 rounded-xl border border-emerald-100 bg-emerald-50 px-3 py-3" role="status">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-black text-emerald-950">{presenceSummary.statusLabel}</p>
+              <p className="mt-1 text-xs font-semibold text-emerald-900">
+                Household activity before checkout.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {presenceParticipants.map((participant) => (
+                <span
+                  className="inline-flex items-center gap-2 rounded-full border border-white bg-white px-2 py-1 text-xs font-black text-slate-700 shadow-sm"
+                  key={participant.id}
+                  title={formatPresenceLastSeen(participant.lastSeenAt)}
+                >
+                  <span className={`inline-flex size-6 items-center justify-center rounded-full ${participant.colorClassName}`}>
+                    {participant.displayName.slice(0, 1)}
+                  </span>
+                  {participant.displayName} · {listPresenceStateLabel(participant.state)}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       <ul className="space-y-2">
         {storeOrderedItems.map((item) => {
           const comments = commentsByItem[item.id] ?? [];
+          const itemPresence = participantsForListItem(presenceParticipants, item.id);
 
           return (
             <li key={item.id} className="rounded-xl border border-slate-100 p-3">
@@ -224,6 +269,22 @@ export function ListCard({ currentRole, groupOrder = "store-layout", items, meal
                 <p className="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
                   Last edited by {roleLabels[item.updatedByRole]}; confirm ownership before checkout.
                 </p>
+              ) : null}
+              {itemPresence.length > 0 ? (
+                <div className="mt-2 flex flex-wrap gap-2" aria-label={`Presence on ${item.name}`}>
+                  {itemPresence.map((participant) => (
+                    <span
+                      className="inline-flex items-center gap-2 rounded-full bg-sky-50 px-3 py-1 text-xs font-black text-sky-900"
+                      key={`${item.id}:${participant.id}`}
+                      title={formatPresenceLastSeen(participant.lastSeenAt)}
+                    >
+                      <span className={`inline-flex size-5 items-center justify-center rounded-full text-[10px] ${participant.colorClassName}`}>
+                        {participant.displayName.slice(0, 1)}
+                      </span>
+                      {participant.displayName} is {participant.state}
+                    </span>
+                  ))}
+                </div>
               ) : null}
 
               <div className="mt-3 rounded-lg bg-slate-50 p-3">
