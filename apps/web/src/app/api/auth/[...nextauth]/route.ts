@@ -52,7 +52,7 @@ function sessionExpiresAt(): string {
   return expiresAt.toISOString();
 }
 
-export const authOptions: NextAuthOptions = {
+const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   callbacks: {
     async jwt({ token, user }) {
