@@ -255,10 +255,10 @@ export function ProductPriceCards({
       })
         .then((response) => response.ok ? response.json() as Promise<{ compareMode?: string }> : null)
         .then((payload) => {
-          const remoteCompareMode = payload?.compareMode ?? null;
-          if (isCompareMode(remoteCompareMode)) {
-            window.localStorage.setItem(storageKey, remoteCompareMode);
-            setCompareMode(remoteCompareMode);
+          const mode = payload?.compareMode ?? null;
+          if (isCompareMode(mode)) {
+            window.localStorage.setItem(storageKey, mode);
+            setCompareMode(mode);
           }
         })
         .catch(() => undefined);

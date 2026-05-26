@@ -8,7 +8,7 @@ export const productImageCdnRoute = '/api/images';
 const passthroughSchemes = ['data:', 'blob:'];
 
 function boundedInteger(value: number | undefined, min: number, max: number) {
-  if (typeof value !== 'number' || !Number.isFinite(value)) return null;
+  if (value === undefined || !Number.isFinite(value)) return null;
   return String(Math.max(min, Math.min(max, Math.round(value))));
 }
 

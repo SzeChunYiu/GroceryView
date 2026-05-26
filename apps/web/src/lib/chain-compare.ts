@@ -409,7 +409,7 @@ export function buildChainComparisonTable(
     rows.push(compareProductRow(requestedId, product));
   }
 
-  const noChainState = (buildCompareNoChainStateModel as (input: {
+  const noChainState = (buildCompareNoChainStateModel as unknown as (input: {
     activeFilters: CompareChainId[];
     chainOrder: Array<{ id: CompareChainId; label: string }>;
     generatedCapabilities: readonly DbSiteCompareStoreCapability[];

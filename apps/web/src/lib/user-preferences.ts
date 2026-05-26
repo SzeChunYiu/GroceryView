@@ -107,7 +107,7 @@ function browserStorage() {
 }
 
 function normalizePreferenceList(values: readonly (string | null | undefined)[]) {
-  return uniquePreferenceValues(values);
+  return uniquePreferenceValues([...values]);
 }
 
 function normalizeHouseholdSize(value: unknown) {

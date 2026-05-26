@@ -32,7 +32,7 @@ for (const row of facetedSearchRows) {
   const existing = latestChainRowsBySlug.get(row.slug);
   if (existing && existing.observedAt >= observedAt) continue;
   const categoryLabel = row.categoryPath[0] ?? 'Grocery';
-  const chainLabel = row.chainName ?? 'Verified chain';
+  const chainLabel = row.chainName ?? 'Chain not reported';
   latestChainRowsBySlug.set(row.slug, {
     slug: row.slug,
     name: row.canonicalName,
@@ -45,7 +45,6 @@ for (const row of facetedSearchRows) {
     badges: [chainLabel, categoryLabel, freshnessLabel(observedAt)]
   });
 }
-
 const openPricesArrivals: NewProductArrival[] = freshestOpenPrices.slice(0, 12).map((product) => {
   const observedAt = product.lastObservedAt.includes('T') ? product.lastObservedAt : `${product.lastObservedAt}T00:00:00.000Z`;
   const categoryLabel = labelFromSlug(product.category);

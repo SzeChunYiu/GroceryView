@@ -25,10 +25,8 @@ function parseOperatingHoursFilter(value: string | string[] | undefined): Operat
   return raw === 'open-now' || raw === 'open-evening' || raw === 'open-24h' ? raw : null;
 }
 
-type StoresSearchParams = Record<string, string | string[] | undefined>;
-
-export default async function StoresIndexPage({ searchParams }: Readonly<{ searchParams?: Promise<StoresSearchParams> }>) {
-  const params: StoresSearchParams = await (searchParams ?? Promise.resolve({} as StoresSearchParams));
+export default async function StoresIndexPage({ searchParams }: Readonly<{ searchParams?: Promise<Record<string, string | string[] | undefined>> }>) {
+  const params = await (searchParams ?? Promise.resolve<Record<string, string | string[] | undefined>>({}));
   const selectedHoursFilter = parseOperatingHoursFilter(params.hours);
   const filteredStores = storeUniverse.filter((store) => storeMatchesOperatingHoursFilter(store, selectedHoursFilter));
   const brandCounts = [...storeUniverse.reduce((map, store) => map.set(store.brand, (map.get(store.brand) ?? 0) + 1), new Map<string, number>())]
