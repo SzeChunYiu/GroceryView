@@ -375,7 +375,7 @@ export function buildPersonalizedReorderRail<T extends ReorderProductInput>(
   }: { limit?: number; signals?: readonly ReorderProductSignal[] } = {},
 ): PersonalizedReorderItem[] {
   return products
-    .map((product, index) => {
+    .map((product, index): PersonalizedReorderItem | null => {
       const signal = signals.find((entry) => signalMatchesProduct(product.slug, entry.productSlug)) ?? fallbackReorderSignal(index);
       if (!signal) return null;
 

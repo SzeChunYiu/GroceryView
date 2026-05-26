@@ -4,7 +4,11 @@ import { studentBasicsBoard } from '@/lib/demo-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
-  return routeMetadata('/student-staples');
+  return routeMetadata({
+    path: '/student-staples',
+    title: 'Student grocery staples on a weekly budget',
+    description: 'Compare cheapest chains for student staple groceries and track them against a weekly grocery budget.'
+  });
 }
 
 const weeklyBudgetSek = 650;
