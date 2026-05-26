@@ -305,7 +305,7 @@ describe('weekly digest job', () => {
     const bestDealCalls = executor.calls.filter((call) => call.sql.includes('weekly_best_deals'));
     assert.equal(bestDealCalls.length, 2);
     assert.match(bestDealCalls[0]!.sql, /from watchlist_items/);
-    assert.match(bestDealCalls[0]!.sql, /join weekly_baskets/);
+    assert.match(bestDealCalls[0]!.sql, /from weekly_baskets\s+join basket_items on basket_items\.basket_id = weekly_baskets\.id/);
     assert.match(bestDealCalls[0]!.sql, /join latest_prices/);
     assert.match(bestDealCalls[0]!.sql, /latest_prices\.confidence >= 0\.6/);
 
