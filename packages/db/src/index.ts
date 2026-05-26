@@ -13,6 +13,7 @@ export * from './queries/personalized.js';
 export * from './queries/productSearch.js';
 export * from './queries/stores.js';
 export * from './queries/retailers.js';
+export * from './queries/scraperLogs.js';
 export * from './queries/users.js';
 export * from './privacyRegistry.js';
 export * from './seed/retailers.js';
