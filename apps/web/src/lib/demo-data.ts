@@ -1854,18 +1854,57 @@ const budgetStretchKronaExtraStores = Math.max(0, budgetStretchKronaComparison.s
 
 const oneTapBasketComparison = compareBasketStrategies(weeklyBasketOptimizerInput);
 const oneTapBasketCoverage = summarizeStoreBasketCoverage(weeklyBasketOptimizerInput);
+const oneTapManualOverrideProductIds = ['garant-ekologisk-tofu-270g'];
+const oneTapManualOverrides = oneTapManualOverrideProductIds.map((productId) => {
+  const currentAssignment = oneTapBasketComparison.cheapestByProduct.assignments.find((assignment) => assignment.productId === productId);
+  return {
+    productId,
+    preservedStoreName: currentAssignment?.storeName ?? 'Manual store choice',
+    reason: 'Shopper pinned this basket line, so the one-tap action previews savings without moving it.'
+  };
+});
+const oneTapScopeOptions = [
+  {
+    scope: 'cheapest_single_store',
+    label: 'Cheapest single store',
+    total: oneTapBasketComparison.bestSingleStore?.total ?? oneTapBasketComparison.cheapestByProduct.total,
+    storeCount: oneTapBasketComparison.bestSingleStore ? 1 : oneTapBasketComparison.splitStoreCount,
+    savingsVsBestSingleStore: 0,
+    confidenceLabel: oneTapBasketCoverage.bestCoverage ? `${oneTapBasketCoverage.bestCoverage.coveragePercent}% visible basket coverage` : 'No coverage rows available'
+  },
+  {
+    scope: 'split_shop',
+    label: 'Cheapest split shop',
+    total: oneTapBasketComparison.cheapestByProduct.total,
+    storeCount: oneTapBasketComparison.splitStoreCount,
+    savingsVsBestSingleStore: oneTapBasketComparison.savingsVsBestSingleStore,
+    confidenceLabel: `${oneTapBasketComparison.cheapestByProduct.assignments.length} priced lines from favorite-store rows`
+  },
+  {
+    scope: 'preferred_chains',
+    label: 'Preferred chains only',
+    total: oneTapBasketComparison.cheapestByProduct.total,
+    storeCount: weeklyBasketOptimizerInput.favoriteStoreIds.length,
+    savingsVsBestSingleStore: oneTapBasketComparison.savingsVsBestSingleStore,
+    confidenceLabel: `${weeklyBasketOptimizerInput.favoriteStoreIds.length} preferred chains checked; missing rows stay blocked`
+  }
+];
 
 export const oneTapBasketOptimizer = {
   persona: 'Busy professionals',
   title: 'One-tap basket optimizer',
   comparison: oneTapBasketComparison,
   coverage: oneTapBasketCoverage,
+  selectedScope: 'split_shop',
+  scopeOptions: oneTapScopeOptions,
+  manualOverrides: oneTapManualOverrides,
   readyAction: {
     label: oneTapBasketComparison.savingsVsBestSingleStore > 0 ? 'Apply cheapest split plan' : 'Keep best single-store basket',
     storeCount: oneTapBasketComparison.splitStoreCount,
     assignmentCount: oneTapBasketComparison.cheapestByProduct.assignments.length,
     total: oneTapBasketComparison.cheapestByProduct.total,
-    savingsVsBestSingleStore: oneTapBasketComparison.savingsVsBestSingleStore
+    savingsVsBestSingleStore: oneTapBasketComparison.savingsVsBestSingleStore,
+    preservedManualOverrideCount: oneTapManualOverrides.length
   },
   quickestPath: oneTapBasketComparison.cheapestByProduct.assignments.slice(0, 4).map((assignment) => ({
     productId: assignment.productId,
@@ -2161,11 +2200,11 @@ export const multiWeekStockUpList = {
     observedHistoryWindow: row.observedHistoryWindow,
     reviewTrigger: row.reviewTrigger
   })),
-  noForecastReason: 'No price forecast: the list combines current OpenPrices observed pack prices with factual observed low/typical context and spreads today’s budget impact across the planning horizon.',
+  noForecastReason: 'No price forecast: the list combines current OpenPrices observed package prices normalized from verified quantity metadata when parseable, with factual observed low/typical context and budget impact spread across the planning horizon.',
   coverageGuardrails: [
     'No price forecast is displayed; every row is a present-tense stock-up plan from generated OpenPrices dated observations.',
     'PlanningWeeks is a household usage horizon, not a price outlook.',
-    'Historical low and typical prices are computed from observed pack-price rows and labelled with coverage.',
+    'Historical low and typical prices are computed from observed quantity-normalized rows; unparseable products stay pack-labelled with low confidence.',
     'Rows stay advisory until account-owned pantry, freezer, and expiry data confirm the storage limits.'
   ]
 };

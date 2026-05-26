@@ -1,6 +1,6 @@
 import { buildFacetedProductSearch, type RealCatalogSearchPriceRow } from '@groceryview/api';
 import { COMMODITIES, STAPLE_BASKET, SUPPORTED_PRICE_DOMAINS, type Commodity, type ComparableUnit } from '@groceryview/catalog';
-import { buildPriceChartSeries, buildWatchlistAlerts, calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, suggestFriendSharedDeals, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type MultiWeekStockUpHistoryPoint, type PriceChartObservation, type ProductMatchInput, type WatchlistItem, type WatchlistPriceType, type WatchlistProductSnapshot } from '@groceryview/core';
+import { buildPriceChartSeries, buildWatchlistAlerts, calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planFuelCrowdPriceSubmission, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, suggestFriendSharedDeals, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type MultiWeekStockUpHistoryPoint, type PriceChartObservation, type ProductMatchInput, type WatchlistItem, type WatchlistPriceType, type WatchlistProductSnapshot } from '@groceryview/core';
 import { planReceiptAliasGrowth } from '@groceryview/scanning';
 import { calculateCarbonScore, type ProductCarbonScore } from '../../../../packages/core/src/lib/carbonScore';
 import { axfoodProducts } from './axfood-products';
@@ -226,6 +226,8 @@ export function normalizeComparableUnitPrice(totalPrice: number, packageText: st
   if (!packageAmount || !Number.isFinite(totalPrice) || totalPrice <= 0) return null;
   return {
     packageLabel: packageAmount.packageLabel,
+    packageUnits: packageAmount.amount,
+    comparableUnit: packageAmount.unit,
     unitLabel: `kr/${packageAmount.unit}`,
     unitPrice: totalPrice / packageAmount.amount,
     unitSortPrice: totalPrice / packageAmount.amount
@@ -1231,6 +1233,27 @@ export const fuelStationSourceCoverage = {
   ]
 };
 
+export const fuelCrowdSubmissionPolicy = {
+  title: 'Trusted crowd fuel submission gate',
+  driver: planFuelCrowdPriceSubmission.name,
+  sourceKind: 'crowd_station_report',
+  trustTable: 'community_reporter_trust',
+  sourceTable: 'fuel_price_sources',
+  observationLinkTable: 'fuel_price_source_observations',
+  maxFreshnessHours: 6,
+  maxOutlierPercent: 20,
+  requiredFields: ['station_id', 'fuel_grade_id', 'price_per_litre', 'observed_at', 'submitted_at', 'reporter_id', 'evidence_type'],
+  acceptedEvidenceTypes: ['pump_photo', 'receipt', 'station_sign'],
+  abuseControls: planCommunityReportAbuseControls({ reporters: [] }),
+  publicDisplayGates: [
+    'Crowd rows must be fresh within 6 hours of submission.',
+    'Reporter must pass community_reporter_trust burst, pending, and rejection controls.',
+    'Pump photo, receipt, or station-sign evidence is required before review.',
+    'Rows more than 20% away from same-grade operator references require manual review.',
+    'No crowd fuel row is public until verification links it to a domain=fuel observation.'
+  ]
+};
+
 type DeliveryVsInStoreBasketPair = {
   matchedToken: string;
   matchEvidence: string;
@@ -1798,6 +1821,16 @@ export const crowdPriceSubmissionContract = {
     'Require manual review when a reporter has more than 5 unresolved reports.',
     'Suspend reporting when rejected-report volume is high and acceptance ratio is below 20%.'
   ],
+  scoringPipeline: [
+    'Validate account-bound reporterId against the authenticated user header before accepting the report.',
+    'Require image photoEvidence, observedAt, store evidence, and exact SEK reportedPrice before scoring.',
+    'Run planCommunityReportAbuseControls and price outlier checks before enqueuing human_review_assignments.'
+  ],
+  outlierChecks: [
+    'Reports with fewer than two verified comparable prices stay in manual review.',
+    'Reports more than 50% away from comparable median prices are flagged as outliers.',
+    'Accepted reports can improve commodity coverage only after accept_community_report review writeback.'
+  ],
   guardrails: [
     'No anonymous price reports: shopper session and userId are required before any community report is accepted.',
     'Community price reports enter manual review before they can affect verified prices or loose commodity coverage.',
@@ -1805,7 +1838,7 @@ export const crowdPriceSubmissionContract = {
     'community_reporter_trust throttles, suspends, or requires manual review for risky reporters.'
   ],
   reviewWritebacks: ['accept_community_report', 'dismiss_community_report'],
-  nextRuntimeStep: 'Wire the protected runtime endpoint to persist community_report raw_records and enqueue human_review_assignments.'
+  nextRuntimeStep: 'Persist accepted /api/community-price-reports payloads to community_report raw_records and durable human_review_assignments.'
 };
 
 const tomatoCommodity = COMMODITIES.find((commodity) => commodity.slug === 'tomato') ?? COMMODITIES[0]!;

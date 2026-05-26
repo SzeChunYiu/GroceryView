@@ -3574,6 +3574,46 @@ export type CommunityReportAbuseControl = {
   reason: string;
 };
 
+export type FuelCrowdEvidenceType = 'pump_photo' | 'receipt' | 'station_sign';
+export type FuelCrowdReporterTrustTier = 'new' | 'trusted' | 'operator_verified';
+
+export type FuelCrowdPriceSubmission = {
+  reporter: CommunityReporterActivity;
+  stationId: string;
+  fuelGradeId: string;
+  pricePerLitre: number;
+  observedAt: string;
+  submittedAt: string;
+  evidenceType?: FuelCrowdEvidenceType;
+  operatorReferencePricePerLitre?: number;
+};
+
+export type FuelCrowdPriceSourceDraft = {
+  sourceKind: 'crowd_station_report';
+  stationId: string;
+  reporterId: string;
+  reporterTrustTier: FuelCrowdReporterTrustTier;
+  evidenceType: FuelCrowdEvidenceType;
+  submittedAt: string;
+  provenance: {
+    fuelGradeId: string;
+    observedAt: string;
+    pricePerLitre: number;
+    operatorReferencePricePerLitre?: number;
+    outlierPercent?: number;
+  };
+};
+
+export type FuelCrowdPriceSubmissionDecision = {
+  status: 'accept_for_review' | 'reject' | 'require_manual_review';
+  publicDisplayEligible: boolean;
+  verificationRequired: true;
+  reasons: string[];
+  sourceKind: 'crowd_station_report';
+  trustAction: CommunityReportAbuseControl['action'];
+  priceSourceDraft?: FuelCrowdPriceSourceDraft;
+};
+
 export type HumanReviewQueueItem = {
   id: string;
   subjectType: 'product_match' | 'community_report' | 'commodity_mapping';
@@ -3756,6 +3796,116 @@ export function planCommunityReportAbuseControls(input: {
       reason: 'Reporter history is within trust limits.'
     };
   });
+}
+
+export function planFuelCrowdPriceSubmission(input: {
+  submission: FuelCrowdPriceSubmission;
+  maxFreshnessHours?: number;
+  maxOutlierPercent?: number;
+}): FuelCrowdPriceSubmissionDecision {
+  const maxFreshnessHours = input.maxFreshnessHours ?? 6;
+  const maxOutlierPercent = input.maxOutlierPercent ?? 20;
+  const reasons: string[] = [];
+  const trust = planCommunityReportAbuseControls({ reporters: [input.submission.reporter] })[0]!;
+  const observedAtMs = Date.parse(input.submission.observedAt);
+  const submittedAtMs = Date.parse(input.submission.submittedAt);
+  let outlierPercent: number | undefined;
+
+  if (!input.submission.stationId.trim()) reasons.push('station_id is required.');
+  if (!input.submission.fuelGradeId.trim()) reasons.push('fuel_grade_id is required.');
+  if (!Number.isFinite(input.submission.pricePerLitre) || input.submission.pricePerLitre <= 0) {
+    reasons.push('price_per_litre must be a positive observed value.');
+  }
+  if (!Number.isFinite(observedAtMs) || !Number.isFinite(submittedAtMs) || observedAtMs > submittedAtMs) {
+    reasons.push('observed_at and submitted_at must be valid timestamps with observed_at before submitted_at.');
+  } else {
+    const ageHours = (submittedAtMs - observedAtMs) / (60 * 60 * 1000);
+    if (ageHours > maxFreshnessHours) reasons.push(`Fuel crowd report is older than ${maxFreshnessHours} hours.`);
+  }
+  if (!input.submission.evidenceType) reasons.push('Fuel crowd report evidence_type is required before review.');
+  if (trust.action === 'suspend_reporting' || trust.action === 'throttle') reasons.push(trust.reason);
+
+  if (
+    input.submission.operatorReferencePricePerLitre !== undefined &&
+    input.submission.operatorReferencePricePerLitre > 0 &&
+    Number.isFinite(input.submission.operatorReferencePricePerLitre)
+  ) {
+    outlierPercent = Math.abs((input.submission.pricePerLitre - input.submission.operatorReferencePricePerLitre) / input.submission.operatorReferencePricePerLitre) * 100;
+    if (outlierPercent > maxOutlierPercent) {
+      reasons.push(`Fuel crowd report differs from operator reference by more than ${maxOutlierPercent}%.`);
+    }
+  }
+
+  const priceSourceDraft = input.submission.evidenceType && !reasons.some((reason) => reason.includes('must be') || reason.includes('required'))
+    ? buildFuelCrowdPriceSourceDraft(input.submission, outlierPercent)
+    : undefined;
+
+  const hardReject = reasons.some((reason) =>
+    reason.includes('must be') ||
+    reason.includes('required') ||
+    trust.action === 'suspend_reporting' ||
+    trust.action === 'throttle'
+  );
+
+  if (hardReject) {
+    return {
+      status: 'reject',
+      publicDisplayEligible: false,
+      verificationRequired: true,
+      reasons,
+      sourceKind: 'crowd_station_report',
+      trustAction: trust.action,
+      priceSourceDraft: undefined
+    };
+  }
+
+  if (reasons.length > 0 || trust.action === 'require_manual_review') {
+    return {
+      status: 'require_manual_review',
+      publicDisplayEligible: false,
+      verificationRequired: true,
+      reasons: reasons.length > 0 ? reasons : [trust.reason],
+      sourceKind: 'crowd_station_report',
+      trustAction: trust.action,
+      priceSourceDraft
+    };
+  }
+
+  return {
+    status: 'accept_for_review',
+    publicDisplayEligible: false,
+    verificationRequired: true,
+    reasons: ['Fresh trusted crowd fuel report can be queued for verification before public display.'],
+    sourceKind: 'crowd_station_report',
+    trustAction: trust.action,
+    priceSourceDraft
+  };
+}
+
+function buildFuelCrowdPriceSourceDraft(
+  submission: FuelCrowdPriceSubmission,
+  outlierPercent: number | undefined
+): FuelCrowdPriceSourceDraft {
+  return {
+    sourceKind: 'crowd_station_report',
+    stationId: submission.stationId,
+    reporterId: submission.reporter.reporterId,
+    reporterTrustTier: fuelCrowdReporterTrustTier(submission.reporter),
+    evidenceType: submission.evidenceType!,
+    submittedAt: submission.submittedAt,
+    provenance: {
+      fuelGradeId: submission.fuelGradeId,
+      observedAt: submission.observedAt,
+      pricePerLitre: submission.pricePerLitre,
+      ...(submission.operatorReferencePricePerLitre !== undefined ? { operatorReferencePricePerLitre: submission.operatorReferencePricePerLitre } : {}),
+      ...(outlierPercent !== undefined ? { outlierPercent: roundMoney(outlierPercent) } : {})
+    }
+  };
+}
+
+function fuelCrowdReporterTrustTier(reporter: CommunityReporterActivity): FuelCrowdReporterTrustTier {
+  if (reporter.acceptedReportsLast30Days >= 10 && reporter.rejectedReportsLast30Days <= 2) return 'trusted';
+  return 'new';
 }
 
 export function authorizeHumanReviewAction(input: {

@@ -36,7 +36,7 @@ const JSON_STAT_FIXTURE = {
     }
   },
   value: [128.4, 129.1, 131.7, 132.2, 170.1, 171.2]
-} as const;
+};
 
 describe('SSB CPI Norway external-index connector', () => {
   it('builds a JSON-stat2 request for Norwegian food CPI rows', () => {

@@ -170,8 +170,10 @@ function buildRegionalPriceStatisticsGate() {
   };
 }
 
-export default async function MapPage({ searchParams }: Readonly<{ searchParams?: Promise<Record<string, string | string[] | undefined>> }>) {
-  const params = await (searchParams ?? Promise.resolve({}));
+type MapSearchParams = Record<string, string | string[] | undefined>;
+
+export default async function MapPage({ searchParams }: Readonly<{ searchParams?: Promise<MapSearchParams> }>) {
+  const params: MapSearchParams = await (searchParams ?? Promise.resolve({} as MapSearchParams));
   const selectedHoursFilter = parseOperatingHoursFilter(params.hours);
   const filteredStores = storeUniverse.filter((store) => storeMatchesOperatingHoursFilter(store, selectedHoursFilter));
   const visibleStores = filteredStores.slice(0, 80);

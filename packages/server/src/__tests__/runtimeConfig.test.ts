@@ -45,6 +45,42 @@ class RecordingPgPool {
       allowed_price_types: ['promotion']
     }
   ];
+  private notificationSubscriptionRows: Array<{
+    id: string;
+    user_id: string;
+    channel: 'telegram';
+    recipient: string;
+    chat_id: string;
+    product_id: string | null;
+    active: boolean;
+    created_at: string;
+    updated_at: string;
+  }> = [
+    {
+      id: 'telegram-sub-coffee',
+      user_id: 'user-1',
+      channel: 'telegram',
+      recipient: 'telegram:chat-1',
+      chat_id: 'chat-1',
+      product_id: 'product-coffee',
+      active: true,
+      created_at: '2026-05-20T00:00:00.000Z',
+      updated_at: '2026-05-20T00:00:00.000Z'
+    }
+  ];
+  private notificationTaskRows: Array<{
+    id: string;
+    channel: string;
+    type: string;
+    title: string;
+    body: string;
+    priority: string;
+    send_at: string;
+    recipient: string;
+    attempt_count: number;
+    max_attempts: number;
+    status: string;
+  }> = [];
 
   async query(text: string, values: unknown[] = []): Promise<{ rows: unknown[] }> {
     this.calls.push({ text, values });
@@ -74,6 +110,7 @@ class RecordingPgPool {
           'community_reporter_trust',
           'subscription_entitlements',
           'notification_tasks',
+          'notification_subscriptions',
           'notification_suppressions',
           'alert_rules',
           'pantry_items',
@@ -176,6 +213,43 @@ class RecordingPgPool {
     }
     if (text.includes('select store_id from favorite_stores')) {
       return { rows: [{ store_id: 'store-willys' }] };
+    }
+    if (text.includes('from notification_subscriptions')) {
+      return { rows: this.notificationSubscriptionRows };
+    }
+    if (text.includes('insert into notification_tasks')) {
+      const row = {
+        id: values[0] as string,
+        channel: values[1] as string,
+        type: values[2] as string,
+        title: values[3] as string,
+        body: values[4] as string,
+        priority: values[5] as string,
+        send_at: values[6] as string,
+        recipient: values[7] as string,
+        attempt_count: values[8] as number,
+        max_attempts: values[9] as number,
+        status: values[10] as string
+      };
+      const existingIndex = this.notificationTaskRows.findIndex((task) => task.id === row.id);
+      if (text.includes('do nothing')) {
+        if (existingIndex !== -1) return { rows: [] };
+        this.notificationTaskRows.push(row);
+        return { rows: [{ id: row.id }] };
+      }
+      if (existingIndex === -1) this.notificationTaskRows.push(row);
+      else this.notificationTaskRows[existingIndex] = row;
+      return { rows: [] };
+    }
+    if (text.includes('from notification_tasks')) {
+      return {
+        rows: this.notificationTaskRows
+          .filter((task) => task.status === 'queued' && task.send_at <= (values[0] as string))
+          .sort((a, b) => a.send_at.localeCompare(b.send_at) || a.id.localeCompare(b.id))
+      };
+    }
+    if (text.includes('from notification_suppressions')) {
+      return { rows: [] };
     }
     if (text.includes('select slug as store_slug from stores')) {
       return { rows: [{ store_slug: 'willys-odenplan' }] };
@@ -1417,6 +1491,63 @@ describe('runtime config', () => {
       ['https://api.sendgrid.com/v3/mail/send', 'Bearer sendgrid-runtime-key'],
       ['https://exp.host/--/api/v2/push/send', 'Bearer expo-runtime-token']
     ]);
+  });
+
+  it('enqueues Telegram watchlist target-price alerts before the runtime worker drains due tasks', async () => {
+    const pool = new RecordingPgPool();
+    const providerCalls: Array<{ url: string; body: { chat_id?: string; text?: string } }> = [];
+    const service = createRuntimeHttpService(
+      {
+        NODE_ENV: 'development',
+        PORT: '3000',
+        AUTH_SECRET: 'auth-secret',
+        DATABASE_URL: 'postgres://runtime-user:runtime-password@runtime-db.example/groceryview',
+        PUBLIC_WEB_URL: 'https://groceryview.example',
+        NOTIFICATION_WEBHOOK_SECRET: 'notification-secret',
+        TELEGRAM_BOT_TOKEN: 'telegram-runtime-token',
+        BILLING_WEBHOOK_SECRET: 'billing-secret',
+        METRICS_TOKEN: 'metrics-secret'
+      },
+      {
+        pgPoolFactory: () => pool,
+        now: new Date('2026-05-23T00:01:00.000Z'),
+        notificationProviderFetch: async (url: string, init: RequestInit) => {
+          providerCalls.push({
+            url: String(url),
+            body: JSON.parse(String(init.body)) as { chat_id?: string; text?: string }
+          });
+          return Response.json({ ok: true, result: { message_id: 347 } });
+        }
+      }
+    );
+
+    try {
+      const response = await service.handler(new Request('http://localhost/api/workers/notifications/run', {
+        method: 'POST',
+        headers: { 'x-groceryview-metrics-token': 'metrics-secret' }
+      }));
+      const replay = await service.handler(new Request('http://localhost/api/workers/notifications/run', {
+        method: 'POST',
+        headers: { 'x-groceryview-metrics-token': 'metrics-secret' }
+      }));
+
+      assert.equal(response.status, 202);
+      assert.equal(replay.status, 202);
+      const body = await response.json() as { worker: { delivered: number } };
+      const replayBody = await replay.json() as { worker: { delivered: number } };
+      assert.equal(body.worker.delivered, 1);
+      assert.equal(replayBody.worker.delivered, 0);
+    } finally {
+      await service.close();
+    }
+
+    assert.equal(pool.calls.some((call) => call.text.includes('from notification_subscriptions')), true);
+    assert.equal(pool.calls.some((call) => call.text.includes('insert into notification_tasks') && call.text.includes('do nothing')), true);
+    assert.deepEqual(providerCalls.map((call) => [call.url, call.body.chat_id]), [
+      ['https://api.telegram.org/bottelegram-runtime-token/sendMessage', 'chat-1']
+    ]);
+    assert.match(providerCalls[0]?.body.text ?? '', /Zoégas Coffee 450g price alert/);
+    assert.match(providerCalls[0]?.body.text ?? '', /below your 50\.00 SEK target/);
   });
 
   it('exposes PostgreSQL readiness from the runtime DATABASE_URL pool without leaking secrets', async () => {

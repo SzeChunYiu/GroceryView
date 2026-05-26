@@ -16,6 +16,8 @@ const certLevels = ['krav', 'eu_eco', 'free_range', 'asc', 'msc', 'rainforest_al
 
 const fuelSourceKinds = ['operator_public_price_page', 'crowd_station_report'] as const;
 
+const fuelGradeIds = ['fuel-95-e10', 'fuel-98', 'fuel-diesel', 'fuel-hvo100', 'fuel-e85', 'fuel-adblue'] as const;
+
 const nonEmptyString = z.string().trim().min(1);
 const optionalNonEmptyString = nonEmptyString.optional();
 const nonNegativeNumber = z.number().finite().min(0);
@@ -43,10 +45,10 @@ export const ingestRowSchema = z.object({
   barcode: optionalNonEmptyString,
   productKind: z.enum(productKinds).optional(),
   commodityId: optionalNonEmptyString,
-  fuelGradeId: optionalNonEmptyString,
+  fuelGradeId: z.enum(fuelGradeIds).optional(),
   fuelSource: z.object({
     sourceKind: z.enum(fuelSourceKinds),
-    fuelGradeId: nonEmptyString,
+    fuelGradeId: z.enum(fuelGradeIds),
     originalPriceText: nonEmptyString,
     originalEffectiveDate: optionalIsoDateString
   }).strict().optional(),

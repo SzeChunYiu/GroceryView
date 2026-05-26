@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { CoreWebVitalsReporter } from '@/components/core-web-vitals-reporter';
 import { PwaInstall } from '@/components/pwa-install';
 import { ConsentManager } from '@/components/consent-manager';
-import { ListToastViewport } from '@/components/Toast';
+import { ListToastViewport } from '@/components/ListToast';
 import { SkipLink } from '@/components/SkipLink';
 import { EngagementReporter } from '@/lib/engagement';
 import { ServiceWorkerRegistrar } from '@/lib/swRegister';

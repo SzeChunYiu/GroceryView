@@ -38,6 +38,7 @@ import {
   buildUserAccountDeletionQueries,
   type BudgetRecord,
   type FriendSharedDealSignalRecord,
+  type NotificationSubscriptionRecord,
   type PgLikeClient,
   type PostgresIntegrationReadinessReport,
   type QueryExecutor,
@@ -87,6 +88,7 @@ import {
   createSendgridEmailProvider,
   createTelegramBotProvider,
   formatNotificationOperationsMetrics,
+  planTelegramPriceAlertNotificationDeliveries,
   parseNotificationSuppressionWebhook,
   processNotificationSuppressionEvent,
   runRepositoryNotificationWorkerCycle,
@@ -231,6 +233,8 @@ export type RuntimePersistenceRepository = {
   upsertSubscriptionEntitlement(entitlement: BillingSubscriptionEntitlementMutation): Promise<void>;
   upsertBudget(userId: string, budget: BudgetRecord): Promise<void>;
   getBudget(userId: string): Promise<BudgetRecord | null>;
+  getFavoriteStoreIds?(userId: string): Promise<string[]>;
+  getWatchlist?(userId: string): Promise<WatchlistItem[]>;
   deleteUserAccount?(userId: string): Promise<void>;
   getHumanReviewer(reviewerId: string): Promise<HumanReviewOperator | null>;
   listOpenHumanReviewAssignments(): Promise<HumanReviewAssignment[]>;
@@ -249,6 +253,8 @@ export type RuntimePersistenceRepository = {
   listDueNotificationTasks?(now: string): Promise<PersistedNotificationTask[]>;
   listActiveNotificationSuppressions?(): Promise<NotificationSuppression[]>;
   upsertNotificationTask?(task: PersistedNotificationTask): Promise<void>;
+  insertNotificationTaskIfAbsent?(task: PersistedNotificationTask): Promise<boolean>;
+  listActiveTelegramNotificationSubscriptions?(): Promise<NotificationSubscriptionRecord[]>;
   upsertReceiptUpload?(upload: ReceiptUploadRecord): Promise<void>;
 };
 
@@ -1260,7 +1266,7 @@ async function normalizeWatchlistProductIds(executor: QueryExecutor, watchlist: 
 
 async function queryWatchlistPriceAlertsFromPostgres(
   executor: QueryExecutor,
-  repository: RuntimeWatchlistRepository,
+  repository: Pick<RuntimeWatchlistRepository, 'getFavoriteStoreIds' | 'getWatchlist'>,
   userId: string
 ): Promise<WatchlistPriceAlertReport> {
   const [rawWatchlist, favoriteStoreIds] = await Promise.all([
@@ -3955,6 +3961,119 @@ export async function enqueueBestTimeToBuyAlertRulesFromPostgres(input: {
   return dueTasks;
 }
 
+async function normalizeTelegramSubscriptionProductIds(
+  executor: QueryExecutor,
+  subscriptions: readonly NotificationSubscriptionRecord[]
+): Promise<NotificationSubscriptionRecord[]> {
+  const productIds = [...new Set(subscriptions.flatMap((subscription) => subscription.productId ? [subscription.productId] : []))];
+  if (productIds.length === 0) return [...subscriptions];
+
+  const rows = await executor.query<WatchlistProductIdentityRow>(
+    `select id::text as product_id,
+            slug as product_slug
+     from products
+     where id::text = any($1::text[])
+        or slug = any($1::text[])`,
+    [productIds]
+  );
+  const slugsByIdentifier = new Map<string, string>();
+  for (const row of rows) {
+    slugsByIdentifier.set(row.product_id, row.product_slug);
+    slugsByIdentifier.set(row.product_slug, row.product_slug);
+  }
+
+  return subscriptions.map((subscription) => ({
+    ...subscription,
+    ...(subscription.productId ? { productId: slugsByIdentifier.get(subscription.productId) ?? subscription.productId } : {})
+  }));
+}
+
+function telegramWatchlistTaskId(input: {
+  userId: string;
+  productId: string;
+  chatId: string;
+  threshold: number;
+  value: number;
+}): string {
+  return `telegram-watchlist-target:${hashHex([
+    input.userId,
+    input.productId,
+    input.chatId,
+    input.threshold.toFixed(2),
+    input.value.toFixed(2)
+  ].join('|')).slice(0, 32)}`;
+}
+
+export async function enqueueTelegramWatchlistPriceAlertsFromPostgres(input: {
+  executor: QueryExecutor;
+  repository: Pick<
+    RuntimePersistenceRepository,
+    | 'getFavoriteStoreIds'
+    | 'getWatchlist'
+    | 'listActiveTelegramNotificationSubscriptions'
+    | 'insertNotificationTaskIfAbsent'
+    | 'upsertNotificationTask'
+  >;
+  now: string;
+}): Promise<PersistedNotificationTask[]> {
+  if (
+    !input.repository.listActiveTelegramNotificationSubscriptions ||
+    !input.repository.getFavoriteStoreIds ||
+    !input.repository.getWatchlist
+  ) {
+    return [];
+  }
+  const watchlistRepository: Pick<RuntimeWatchlistRepository, 'getFavoriteStoreIds' | 'getWatchlist'> = {
+    getFavoriteStoreIds: (userId) => input.repository.getFavoriteStoreIds!(userId),
+    getWatchlist: (userId) => input.repository.getWatchlist!(userId)
+  };
+  const activeSubscriptions = await input.repository.listActiveTelegramNotificationSubscriptions();
+  const normalizedSubscriptions = await normalizeTelegramSubscriptionProductIds(input.executor, activeSubscriptions);
+  const subscriptionsByUser = new Map<string, NotificationSubscriptionRecord[]>();
+  const createdTasks: PersistedNotificationTask[] = [];
+
+  for (const subscription of normalizedSubscriptions) {
+    subscriptionsByUser.set(subscription.userId, [...(subscriptionsByUser.get(subscription.userId) ?? []), subscription]);
+  }
+
+  for (const [userId, subscriptions] of subscriptionsByUser) {
+    const report = await queryWatchlistPriceAlertsFromPostgres(input.executor, watchlistRepository, userId);
+    const plannedNotifications = planTelegramPriceAlertNotificationDeliveries({
+      now: input.now,
+      alerts: report.alerts,
+      subscriptions: subscriptions.map((subscription) => ({
+        userId: subscription.userId,
+        productId: subscription.productId,
+        chatId: subscription.chatId ?? '',
+        active: subscription.active
+      }))
+    });
+
+    for (const planned of plannedNotifications) {
+      if (typeof planned.alert.trigger.value !== 'number' || planned.alert.trigger.threshold === undefined) continue;
+      const task: PersistedNotificationTask = {
+        id: telegramWatchlistTaskId({
+          userId,
+          productId: planned.alert.productId,
+          chatId: planned.notification.recipient,
+          threshold: planned.alert.trigger.threshold,
+          value: planned.alert.trigger.value
+        }),
+        ...planned.notification,
+        attemptCount: 0,
+        maxAttempts: 3,
+        status: 'queued'
+      };
+      const inserted = input.repository.insertNotificationTaskIfAbsent
+        ? await input.repository.insertNotificationTaskIfAbsent(task)
+        : (await input.repository.upsertNotificationTask?.(task), true);
+      if (inserted) createdTasks.push(task);
+    }
+  }
+
+  return createdTasks;
+}
+
 function buildRuntimeNotificationWorkerRunner(
   config: RuntimeConfig,
   repository: RuntimePersistenceRepository | undefined,
@@ -3966,6 +4085,9 @@ function buildRuntimeNotificationWorkerRunner(
   if (!providers.email && !providers.push && !providers.telegram) return undefined;
   return async () => {
     const now = (options.now ?? new Date()).toISOString();
+    if (executor && providers.telegram) {
+      await enqueueTelegramWatchlistPriceAlertsFromPostgres({ executor, repository, now });
+    }
     if (executor) await enqueueBestTimeToBuyAlertRulesFromPostgres({ executor, repository, now });
     return runRepositoryNotificationWorkerCycle({
       now,

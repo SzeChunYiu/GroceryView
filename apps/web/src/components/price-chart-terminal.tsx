@@ -86,6 +86,17 @@ export type PriceChartTerminalWindow = {
   forecast?: PriceChartTerminalForecast;
 };
 
+
+type PriceMoveNote = {
+  id: string;
+  markerKey: string;
+  markerLabel: string;
+  observedAt: string;
+  sourceLabel: string;
+  provenanceLabel: string | null;
+  explanation: string;
+};
+
 export type PriceChartTerminalModel = {
   available: boolean;
   title: string;
@@ -186,8 +197,8 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
   const visiblePointCount = visibleSeries.reduce((total, series) => total + series.points.length, 0);
   const visibleMarkerCount = visibleSeries.reduce((total, series) => total + series.markers.length, 0);
   const latestReadout = formatPriceChartTerminalReadout(activeWindow);
-  const priceMoveNotes = useMemo(
-    () => activeWindow ? buildPriceChartTerminalMoveNotes({ ...activeWindow, series: visibleSeries }, 5) : [],
+  const priceMoveNotes = useMemo<PriceMoveNote[]>(
+    () => activeWindow ? buildPriceChartTerminalMoveNotes({ ...activeWindow, series: visibleSeries }, 5) as PriceMoveNote[] : [],
     [activeWindow, visibleSeries]
   );
   const csvDownloadHref = useMemo(() => {

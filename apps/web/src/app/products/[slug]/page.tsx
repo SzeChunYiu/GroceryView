@@ -21,6 +21,7 @@ import { Card, Eyebrow, PageShell, SourceCitation } from '@/components/data-ui';
 import { BestTimeBadge } from '@/components/best-time-badge';
 import { ProductBreadcrumb } from '@/components/Breadcrumbs';
 import { ConfidenceBadge } from '@/components/confidence-badge';
+import type { ConfidenceLevel } from '@/lib/content-style';
 import { FamilyPackComparisonPanel } from '@/components/family-pack-comparison';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { FriendPriceSightings } from '@/components/friend-price-sightings';
@@ -240,7 +241,7 @@ function crossChainQuoteRowsFor(product: (typeof axfoodProducts)[number]) {
   }));
 }
 
-function quoteConfidenceLevel(row: ReturnType<typeof crossChainQuoteRowsFor>[number], rowCount: number) {
+function quoteConfidenceLevel(row: ReturnType<typeof crossChainQuoteRowsFor>[number], rowCount: number): ConfidenceLevel {
   if (row.isAvailable === false) return 'low';
   return rowCount >= 2 ? 'high' : 'medium';
 }

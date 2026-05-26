@@ -795,6 +795,14 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/api/settings/profile/password']);
     assert.deepEqual(docs.body.paths['/api/settings/profile/password'].patch.security, [{ bearer: [] }]);
     assert.ok(docs.body.paths['/products']);
+    assert.equal(
+      docs.body.paths['/products/{id}'].get.responses['200'].content['application/json'].schema.$ref,
+      '#/components/schemas/ProductDetailDto'
+    );
+    assert.ok(docs.body.components.schemas.ProductDetailDto.properties.priceComparison);
+    assert.deepEqual(docs.body.components.schemas.ProductDetailDto.required.includes('priceComparison'), true);
+    assert.ok(docs.body.components.schemas.ProductPriceComparisonDto.properties.stores);
+    assert.ok(docs.body.components.schemas.ProductPriceComparisonDto.properties.cheapestStore);
     assert.ok(docs.body.paths['/products/{productId}/cheapest-now']);
     assert.ok(docs.body.paths['/products/{id}/terminal']);
     assert.ok(docs.body.paths['/products/{id}/spread']);
@@ -1154,6 +1162,10 @@ describe('GroceryView API app', () => {
     assert.equal(products.body[0].currentPrices[0].priceType, 'shelf');
     assert.equal(products.body[0].currentPrices[0].sourceType, 'demo_seed');
     assert.ok(products.body[0].currentPrices[0].provenance);
+
+    const product = await request(app.getHttpServer()).get('/products/milk').expect(200);
+    assert.deepEqual(product.body.priceComparison.stores.map((store: { storeId: string }) => store.storeId), ['lidl-sveavagen', 'willys-odenplan']);
+    assert.equal(product.body.priceComparison.cheapestStore.storeId, 'lidl-sveavagen');
 
     const retailers = await request(app.getHttpServer()).get('/retailers').expect(200);
     assert.deepEqual(retailers.body.map((retailer: { id: string; name: string; logo: string; websiteUrl: string }) => [

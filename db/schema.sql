@@ -307,7 +307,7 @@ create table if not exists fuel_price_sources (
   station_id text references stores(id),
   reporter_id text references community_reporter_trust(reporter_id),
   reporter_trust_tier text check (reporter_trust_tier in ('new', 'trusted', 'operator_verified')),
-  evidence_type text check (evidence_type in ('receipt', 'pump_photo', 'manual_entry')),
+  evidence_type text check (evidence_type in ('receipt', 'pump_photo', 'manual_entry', 'station_sign')),
   source_url text,
   parser_version text,
   captured_at timestamptz,
