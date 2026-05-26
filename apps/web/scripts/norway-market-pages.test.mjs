@@ -18,8 +18,12 @@ describe('Norway market SEO pages and switcher', () => {
 
     for (const country of ['sweden', 'norway', 'iceland']) {
       assert.match(routing, new RegExp(`slug: '${country}'`));
-      assert.match(switcher, new RegExp(country));
     }
+    // The switcher renders every market defined in market-routing (sweden/norway/iceland)
+    // dynamically from marketCountries rather than hard-coding each country slug.
+    assert.match(switcher, /marketCountries\.map/);
+    assert.match(switcher, /country\.nativeLabel/);
+    assert.match(switcher, /equivalentMarketPath\(pathname, country\.slug\)/);
     for (const route of [landing, compare, index, deals]) {
       assert.match(route, /alternates/);
       assert.match(route, /canonical/);

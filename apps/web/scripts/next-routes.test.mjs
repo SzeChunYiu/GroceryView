@@ -2336,20 +2336,20 @@ ${seo}`;
     assert.match(bottomNav, /fixed inset-x-3 bottom-3/);
     assert.match(bottomNav, /backdrop-blur-xl/);
     assert.match(bottomNav, /lg:hidden/);
-    assert.match(bottomNav, /Markets/);
-    assert.match(bottomNav, /Search/);
-    assert.match(bottomNav, /Map/);
-    assert.match(bottomNav, /ScanLine/);
-    assert.match(bottomNav, /href: '\/scanner[^']*#scan'/);
-    assert.match(bottomNav, /label: 'Scan'/);
-    assert.match(bottomNav, /grid-cols-8/);
+    // Mobile bottom nav was deliberately realigned to five destinations in
+    // "Align mobile bottom nav destinations" (#3681): Home/Search/Screener/Favourites/Basket.
+    assert.match(bottomNav, /label: 'Home'/);
+    assert.match(bottomNav, /label: 'Search'/);
+    assert.match(bottomNav, /label: 'Screener'/);
+    assert.match(bottomNav, /label: 'Favourites'/);
+    assert.match(bottomNav, /label: 'Basket'/);
+    assert.match(bottomNav, /href: '\/products'/);
+    assert.match(bottomNav, /href: '\/screener'/);
+    assert.match(bottomNav, /href: '\/favourites'/);
+    assert.match(bottomNav, /href: '\/basket'/);
+    assert.match(bottomNav, /grid-cols-5/);
     assert.match(bottomNav, /useHaptic/);
-    assert.match(bottomNav, /impact\(\)/);
-    assert.match(bottomNav, /Deals/);
-    assert.match(bottomNav, /List/);
-    assert.match(bottomNav, /Nearby/);
-    assert.match(bottomNav, /Watchlist/);
-    assert.match(bottomNav, /href: '\/contact'[\s\S]*label: 'Contact'/);
+    assert.match(bottomNav, /selection\(\)/);
     assert.match(dataUi, /import \{ BottomNav \} from '\.\/bottom-nav'/);
     assert.match(dataUi, /pb-20/);
     assert.match(dataUi, /lg:pb-6/);
@@ -3143,7 +3143,9 @@ ${seo}`;
     assert.match(verified, /openFoodFactsCatalogSummary/);
     assert.match(products, /OpenFoodFacts metadata catalog/);
     assert.match(products, /metadata-only/);
-    assert.match(products, /No synthetic prices/);
+    // Metadata-only catalog states no prices are shown until verified observations exist.
+    assert.match(products, /metadata-only · No prices/);
+    assert.match(products, /requires Axfood, OpenPrices, or retailer observations before a price appears/);
   });
 
   it('ships JSON-LD organization, site search, product offer, and breadcrumb metadata', async () => {
@@ -3179,7 +3181,7 @@ ${seo}`;
 
     assert.match(canonicalProductRoute, /<Image/);
     assert.match(canonicalProductRoute, /src=\{product\.image/);
-    assert.match(canonicalProductRoute, /alt=\{product\.name\}/);
+    assert.match(canonicalProductRoute, /alt=\{`\$\{product\.name\}/);
     assert.match(canonicalProductRoute, /Primary price evidence/);
     assert.match(canonicalProductRoute, /Chain price rows/);
     assert.match(canonicalProductRoute, /chainPriceRows\(product\)/);
@@ -3603,7 +3605,10 @@ ${seo}`;
     assert.match(storePage, /StoreMap/);
     assert.match(storePage, /store\.lat/);
     assert.match(storePage, /store\.lng/);
-    assert.match(storeMap, /iframe/);
+    // The Google Maps embed is rendered through a GDPR consent-gated frame wrapper
+    // that emits the actual <iframe> (see consent-safe-third-party-frame.tsx).
+    assert.match(storeMap, /ConsentSafeThirdPartyFrame/);
+    assert.match(await read('src/components/consent-safe-third-party-frame.tsx'), /<iframe/);
     assert.match(storeMap, /Google Maps location/);
     assert.match(storeMap, /Open Google Maps directions/);
     assert.match(mapsConfig, /googleMapsEmbedUrl/);
@@ -4229,7 +4234,8 @@ ${seo}`;
 
     assert.match(fuelRoute, /verifiedFuelPriceObservations/);
     assert.match(fuelRoute, /Fuel prices by grade/);
-    assert.match(fuelRoute, /row\.sourceType/);
+    // Each fuel row renders its source provenance via row.sourceLabel in the Source column.
+    assert.match(fuelRoute, /row\.sourceLabel/);
     assert.match(pharmacyRoute, /domainSlug="pharmacy"/);
     assert.match(pharmacyRoute, /No domain=pharmacy connector observations yet/);
     assert.match(pharmacyRoute, /OTC/);
@@ -4313,8 +4319,13 @@ ${seo}`;
     assert.match(localeHome, /languages/);
     assert.match(localeHome, /\/sv/);
     assert.match(localeHome, /\/en/);
-    assert.match(localeHome, /Native-quality translation review required/);
-    assert.match(localeHome, /No machine-translated prices/);
+    // Blocked-locale guarantee copy is rendered through next-intl keys (blocked-locale.*);
+    // the literal guarantee strings live in the reviewed message catalog (messages/en.json).
+    assert.match(localeHome, /blocked-locale\.guardrailNoMachineTranslation/);
+    assert.match(localeHome, /blocked-locale\.guardrailNativeReview/);
+    const blockedLocaleMessages = await read('messages/en.json');
+    assert.match(blockedLocaleMessages, /Native-quality translation review required/);
+    assert.match(blockedLocaleMessages, /No machine-translated prices/);
     assert.match(svRoute, /locale=\"sv\"/);
     assert.match(enRoute, /locale=\"en\"/);
     assert.match(arRoute, /BlockedLocalePage/);
@@ -4355,7 +4366,10 @@ ${seo}`;
     assert.match(marketShell, /localeFormattingShowcase/);
     assert.match(marketShell, /Multi-currency display follows observation currency/);
     assert.match(marketShell, /SEK · NOK · DKK · EUR · ISK/);
-    assert.match(marketShell, /No currency conversion or fake price/);
+    // Currency guard copy reads "unobserved values", not "fake price": the visible-route-contracts
+    // scaffold guard forbids /fake (price)/i in market-shell.tsx, so both contracts cannot hold the
+    // literal. Both document the same rule — no fabricated or converted money is displayed.
+    assert.match(marketShell, /No currency conversion or unobserved values/);
     assert.match(compareRoute, /formatComparableUnitPrice/);
     assert.match(productDetailRoute, /formatComparableUnitPrice/);
     assert.match(screenerRoute, /formatLocalizedUnitPrice/);
@@ -4445,7 +4459,9 @@ ${seo}`;
     assert.match(marketCategory, /getCategoryMarketData/);
     assert.match(browse, /categoryBrowseHref/);
     assert.match(browseCategory, /MvpProductCard/);
-    assert.match(methodology, /fail closed/i);
+    // Methodology page describes fail-closed behavior in plain language: surfaces hide or
+    // downgrade claims when price, freshness, unit, nutrition, or source coverage is incomplete.
+    assert.match(methodology, /hide or downgrade claims when/i);
     assert.match(confidence, /sourceCoverage/);
     assert.match(nav, /href: '\/deals'/);
     assert.match(nav, /href: '\/market'/);
