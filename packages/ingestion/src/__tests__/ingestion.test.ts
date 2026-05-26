@@ -161,6 +161,7 @@ import {
   parseSevenElevenSeConvenienceProducts,
   parseCoopDrPdfTextOffers,
   parseRetailerProductJsonSnapshot,
+  parseRetailerProductJsonSnapshotWithDeadLetters,
   persistOpenFoodFactsProductMetadata,
   parseSt1FuelPriceHtml,
   assertMarketSourceTermsGate,
@@ -2281,6 +2282,7 @@ describe('fetchBrandedSwedishFuelStations', () => {
       openingHours: '',
       website: 'https://www.circlek.se/station/circle-k-vallentuna',
       phone: '',
+      supportedGradeIds: [],
       sourceUrl: BRANDED_FUEL_STATIONS_OVERPASS_URL,
       retrievedAt: '2026-05-23T12:00:00.000Z'
     }]);
@@ -2845,6 +2847,10 @@ describe('fetchIcaProducts', () => {
 
     assert.equal(requestedUrls[0], buildIcaStorePromotionsUrl('1004599', '6ae1c52a-99a8-4b19-9464-dd01274df39d', 1));
     assert.deepEqual(rows, [{
+      chain: 'ica',
+      ica_format: 'kvantum',
+      format: 'kvantum',
+      channel: 'packaged',
       code: '2077461',
       productId: 'ff3ce59d-323e-42ae-b433-26953b77c7e7',
       retailerProductId: '2077461',
@@ -3478,7 +3484,7 @@ describe('fetchMatpriskollenOffers', () => {
       brand: '',
       store: 'Willys Falkenberg',
       storeKey: 'd20e31b2-2c0e-4e87-8f8e-280d41b1bb16',
-      storeId: '47',
+      storeId: '47:malmo',
       category: 'Frukt & bär',
       priceText: '29,90/frp',
       comparePriceText: '59,80/kg',
@@ -3488,6 +3494,11 @@ describe('fetchMatpriskollenOffers', () => {
       origin: 'Egypten/Italien/Spanien',
       requiresMembershipCard: false,
       requiresCoupon: true,
+      channel: 'store',
+      is_member_price: false,
+      is_coupon_price: true,
+      format: 'willys',
+      multi_buy: '',
       validFrom: '2026-05-17T22:00:00.000Z',
       validTo: '2026-05-24T21:59:59.000Z',
       sourceUrl: buildMatpriskollenStoreOffersUrl('d20e31b2-2c0e-4e87-8f8e-280d41b1bb16'),
@@ -3608,6 +3619,7 @@ describe('fetchCityGrossProducts', () => {
       regularPrice: 39.9,
       unitPrice: 136.96,
       unitPriceUnit: 'KGM',
+      is_member_price: false,
       priceText: '31.50 SEK',
       hasPromotion: false,
       hasDiscount: true,
@@ -3920,6 +3932,12 @@ describe('fetchLidlOffers', () => {
       unitPriceText: '/kg',
       promotionText: 'Superpris',
       memberOnly: false,
+      channel: 'store',
+      is_member_price: false,
+      is_coupon_price: false,
+      is_subscription_price: false,
+      is_clearance: false,
+      multi_buy: '',
       regions: ['1', '2', '3'],
       validFrom: '2026-05-05T11:22:50.499Z',
       validTo: '2026-05-24T21:59:59Z',
@@ -4638,6 +4656,7 @@ describe('fetchWillysProducts', () => {
       longitude: 12.5333,
       onlineStore: true,
       clickAndCollect: true,
+      format: 'willys',
       flyerUrl: 'https://viewer.ipaper.io/willys/2149',
       sourceUrl: buildWillysStoresUrl({ online: true }),
       retrievedAt: '2026-05-22T10:45:00.000Z'
@@ -4682,11 +4701,15 @@ describe('fetchWillysProducts', () => {
       category: 'skafferi|pasta',
       price: 12.2,
       priceText: '12,20 kr',
+      listPrice: 12.2,
+      memberPrice: null,
+      is_member_price: false,
       unitPriceText: '16,27 kr',
       unitPriceUnit: 'kg',
       imageUrl: 'https://assets.axfood.se/image/upload/f_auto,t_200/07310130003547_C1R1_s03',
       labels: ['keyhole'],
       online: true,
+      channel: 'online',
       outOfStock: false,
       sourceUrl: buildWillysSearchUrl('makaroner'),
       retrievedAt: '2026-05-21T00:00:00.000Z'
@@ -4773,6 +4796,12 @@ describe('fetchWillysWeeklyDiscounts', () => {
       storeId: '2110',
       storeName: '',
       city: '',
+      channel: 'store',
+      isMemberPrice: true,
+      isCouponPrice: false,
+      isSubscriptionPrice: false,
+      isClearance: false,
+      multiBuy: null,
       campaignType: 'LOYALTY',
       promotionType: 'MixMatchPricePromotion',
       price: 29.9,
@@ -5242,7 +5271,7 @@ describe('planIngestionBatch', () => {
 
     assert.equal(plan.accepted.length, 1);
     assert.equal(plan.rejected.length, 1);
-    assert.match(plan.rejected[0].reason, /rawName is required/);
+    assert.match(plan.rejected[0].reason, /rawName: String must contain at least 1 character/);
   });
 });
 
@@ -5941,6 +5970,54 @@ describe('parseRetailerProductJsonSnapshot', () => {
       contentHash: 'sha256:bad'
     }), /items\[0\]\.canonicalName/);
   });
+
+  it('isolates malformed normalized records into replayable dead letters', async () => {
+    const result = await runRetailerConnector({
+      connectorId: 'Willys normalized JSON',
+      requestedAt: '2026-05-20T08:40:00.000Z',
+      chainId: 'willys',
+      sourceType: 'official_api',
+      robotsTxtStatus: 'not_applicable',
+      legalReviewStatus: 'approved',
+      hasDataAgreement: true,
+      endpointUrl: 'https://api.example.test/willys/normalized-products',
+      parserVersion: 'normalized-json-v1',
+      fetcher: (plan) => ({
+        statusCode: 200,
+        body: JSON.stringify({
+          items: [
+            {
+              retailerProductId: 'wil-zoegas-450',
+              rawName: 'Zoégas Skånerost 450g',
+              canonicalName: 'Zoégas Coffee 450g',
+              productId: 'coffee-zoegas-450g',
+              categoryId: 'coffee',
+              packageSize: 450,
+              packageUnit: 'g',
+              price: 49.9
+            },
+            { rawName: 'Broken row', price: 12 }
+          ]
+        }),
+        contentType: 'application/json',
+        retrievedAt: plan.provenance.capturedAt,
+        sourceUrl: plan.provenance.sourceUrl,
+        rawSnapshotRef: `raw://normalized/${plan.runKey}.json`
+      }),
+      parser: parseRetailerProductJsonSnapshotWithDeadLetters
+    });
+
+    assert.equal(result.status, 'completed');
+    assert.equal(result.acceptedCount, 1);
+    assert.equal(result.rejectedCount, 1);
+    assert.deepEqual(result.requiredActions, ['review_ingestion_dead_letters']);
+    assert.equal(result.deadLetters.length, 1);
+    assert.equal(result.deadLetters[0]?.errorClass, 'invalid_record');
+    assert.equal(result.deadLetters[0]?.retryable, false);
+    assert.equal(result.deadLetters[0]?.samplePayloadPointer, '$.items[1]');
+    assert.match(result.deadLetters[0]?.replayPath ?? '', /\/admin\/sources\/dead-letters/);
+    assert.match(result.deadLetters[0]?.errorMessage ?? '', /canonicalName/);
+  });
 });
 
 describe('Open Prices real-data connector', () => {
@@ -6362,7 +6439,10 @@ describe('daily ingestion runner', () => {
       connectorStartDelayMs: 0,
       connectorRetryAttempts: 0,
       connectorRetryBaseDelayMs: 250,
-      blockerLogPath: 'codex-tasks/ingestion-blockers.txt'
+      blockerLogPath: 'codex-tasks/ingestion-blockers.txt',
+      zeroRowAlertLogPath: '/tmp/ingest-alerts.jsonl',
+      zeroRowAlertStatePath: '/tmp/ingest-zero-row-state.json',
+      zeroRowAlertWebhookUrl: ''
     });
   });
 
@@ -6418,7 +6498,10 @@ describe('daily ingestion runner', () => {
       connectorStartDelayMs: 125,
       connectorRetryAttempts: 2,
       connectorRetryBaseDelayMs: 500,
-      blockerLogPath: '/tmp/groceryview-ingestion-blockers.txt'
+      blockerLogPath: '/tmp/groceryview-ingestion-blockers.txt',
+      zeroRowAlertLogPath: '/tmp/ingest-alerts.jsonl',
+      zeroRowAlertStatePath: '/tmp/ingest-zero-row-state.json',
+      zeroRowAlertWebhookUrl: ''
     });
     assert.equal(configs.connectors[0]?.storeConcurrency, 6);
     assert.equal(configs.connectors[0]?.storeStartDelayMs, 75);
@@ -6846,8 +6929,58 @@ describe('daily ingestion runner', () => {
       observation.promotion_text
     ]), [
       ['store-db-2', 'sg-idealmakaroner-5kg-arsta', 79.9, 99.9, 'Storpackskampanj'],
-      ['store-db-3', 'sg-rapsolja-10l-goteborg', 189, undefined, undefined]
+      ['store-db-3', 'sg-rapsolja-10l-goteborg', 189, null, null]
     ]);
+  });
+
+  it('persists parser dead letters beside accepted daily records for ops replay', async () => {
+    const executor = new DailyIngestionExecutor();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-21T03:17:00.000Z',
+      connectors: [{
+        connectorId: 'willys-normalized-json',
+        chainId: 'willys',
+        sourceType: 'official_api',
+        endpointUrl: 'https://sources.example.test/willys/products.json',
+        parserVersion: 'normalized-json-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: 'willys-odenplan', name: 'Willys Odenplan', address: 'Odenplan', city: 'Stockholm' }]
+      }],
+      fetchImpl: async () => new Response(JSON.stringify({
+        items: [
+          {
+            storeId: 'willys-odenplan',
+            retailerProductId: 'wil-zoegas-450',
+            rawName: 'Zoégas Skånerost 450g',
+            canonicalName: 'Zoégas Coffee 450g',
+            productId: 'zoegas-coffee-450g',
+            categoryId: 'coffee',
+            packageSize: 450,
+            packageUnit: 'g',
+            price: 49.9
+          },
+          { rawName: 'Malformed row', price: 12 }
+        ]
+      }), { status: 200, headers: { 'content-type': 'application/json' } })
+    });
+
+    assert.equal(result.status, 'partial');
+    assert.equal(result.acceptedCount, 1);
+    assert.equal(result.rejectedCount, 1);
+    assert.equal(result.rawRecordIds.length, 2);
+    assert.deepEqual(result.blockers, ['willys:rejected_products:1']);
+    const rawRecordInsert = executor.calls.find((call) => call.sql.includes('jsonb_to_recordset') && call.sql.includes('insert into raw_records'));
+    const rawRows = JSON.parse(String(rawRecordInsert?.params[1])) as Array<{ record_type: string; external_ref: string; provenance: Record<string, unknown>; payload: Record<string, unknown> }>;
+    const deadLetter = rawRows.find((row) => row.record_type === 'parser_failure');
+    assert.equal(deadLetter?.external_ref, '$.items[1]');
+    assert.equal(deadLetter?.payload.rawName, 'Malformed row');
+    assert.equal(deadLetter?.provenance.errorClass, 'invalid_record');
+    assert.equal(deadLetter?.provenance.retryable, false);
+    assert.equal(deadLetter?.provenance.parserVersion, 'normalized-json-v1');
+    assert.match(String(deadLetter?.provenance.replayPath), /\/admin\/sources\/dead-letters/);
   });
 
   it('caches and rewrites product image URLs while persisting daily connector runs when enabled', async () => {
@@ -7614,7 +7747,7 @@ describe('daily ingestion runner', () => {
     ]);
     const observations = batchObservations(executor);
     assert.deepEqual(observations.map((observation) => [observation.store_id, observation.price, observation.member_required, observation.regular_price]), [
-      ['store-db-2', 19.5, false, undefined],
+      ['store-db-2', 19.5, false, null],
       ['store-db-2', 15, true, 19.5]
     ]);
     assert.equal(observations[0]?.is_available, false);
@@ -8319,6 +8452,7 @@ describe('daily ingestion runner', () => {
       productUrl: 'https://www.apohem.se/vark-feber/varktabletter/alvedon-tabletter-500-mg-paracetamol-20-st',
       imageUrl: 'https://www.apohem.se/globalassets/alvedon.png',
       isOtc: true,
+      channel: 'online',
       sourceUrl: apohemSourceUrl,
       retrievedAt
     });
@@ -8837,13 +8971,25 @@ describe('daily ingestion runner', () => {
       productId: 'seven-eleven-se-croissantfralla-ost-skinka',
       chainId: 'seven_eleven_se',
       chainName: '7-Eleven Sweden',
+      country: 'SE',
       name: 'CROISSANTFRALLA OST & SKINKA',
       category: 'breakfast',
       priceMin: 34,
       priceMax: 39,
       priceText: '34-39:-',
       currency: 'SEK',
+      channel: 'b2b',
+      customerSegment: 'business',
+      format: 'seven_eleven',
+      store_id: 'se:national-seven-eleven-b2b',
+      region: 'se-national',
       depositIncluded: false,
+      is_member_price: false,
+      is_subscription_price: false,
+      is_coupon_price: false,
+      is_clearance: false,
+      multi_buy: null,
+      out_of_scope_for_consumer_connector: true,
       dietaryTags: [],
       sourceUrl,
       pdfUrl: SEVEN_ELEVEN_SE_ASSORTMENT_PDF_URL,

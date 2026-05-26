@@ -409,17 +409,12 @@ export function buildChainComparisonTable(
     rows.push(compareProductRow(requestedId, product));
   }
 
-  const noChainState = (buildCompareNoChainStateModel as unknown as (input: {
-    activeFilters: CompareChainId[];
-    chainOrder: Array<{ id: CompareChainId; label: string }>;
-    generatedCapabilities: readonly DbSiteCompareStoreCapability[];
-    missingProductIds: string[];
-  }) => Omit<ChainCompareNoChainState, 'activeCapabilityFilters' | 'hiddenByCapabilityFilters' | 'resetFiltersHref' | 'visibleChainIds'>)({
+  const noChainState = buildCompareNoChainStateModel({
     activeFilters: [...activeFilters],
-    chainOrder: [...COMPARE_CHAIN_ORDER],
-    generatedCapabilities: [...compareStoreCapabilities],
-    missingProductIds: [...missingProductIds]
-  });
+    chainOrder: COMPARE_CHAIN_ORDER,
+    generatedCapabilities: compareStoreCapabilities,
+    missingProductIds
+  }) as Omit<ChainCompareNoChainState, 'activeCapabilityFilters' | 'hiddenByCapabilityFilters' | 'resetFiltersHref' | 'visibleChainIds'>;
   const visibleChainIds = filterCompareChainsByCapabilities(activeFilters, capabilityFilters, compareStoreCapabilities).map((chain) => chain.id);
   const visibleChainIdSet = new Set(visibleChainIds);
 

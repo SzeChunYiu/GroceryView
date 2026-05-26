@@ -49,7 +49,11 @@ export function parsePressbyranSeMagazineProductHtml(
   const optionBlock = text.match(/Välj prenumeration eller lösnummer:\s*([\s\S]*?)(?:Lägg i varukorgen|Alla priser)/i)?.[1] ?? '';
   const shippingFeeFromSek = money(text.match(/(?:börjar på|Lösnummer från)\s*(\d+(?:[\s,.]\d{1,2})?)\s*kr/i)?.[1]);
   const rows: PressbyranSePriceRow[] = [];
-  const optionPattern = /(Tillsvidareprenumeration|Helår\s*\([^)]*\)|Halvår\s*\([^)]*\)|Kvartal\s*\([^)]*\)|Lösnummer\s*#[^\n\r]*?)(\d[\d\s]*(?:[,.]\d{1,2})?)\s*kr/gi;
+  // The Lösnummer label can carry a year ("Lösnummer #21, 2026"). The price group only
+  // accepts a single amount with Swedish space-grouped thousands (1-3 digits then groups of
+  // exactly 3) so "2026 44" can't be read as one number (-> 202644.9); the year stays in the
+  // non-greedy label and the trailing "44,90" is captured as the price.
+  const optionPattern = /(Tillsvidareprenumeration|Helår\s*\([^)]*\)|Halvår\s*\([^)]*\)|Kvartal\s*\([^)]*\)|Lösnummer\s*#[^\n\r]*?)(\d{1,3}(?:\s\d{3})*(?:[,.]\d{1,2})?|\d+(?:[,.]\d{1,2})?)\s*kr/gi;
   let match: RegExpExecArray | null;
 
   while ((match = optionPattern.exec(optionBlock)) !== null) {

@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
 import { parseEuroprisNoProducts } from '../europris-no.js';
 
 describe('Europris NO connector', () => {
@@ -13,8 +14,13 @@ describe('Europris NO connector', () => {
       </article>
     `, 'https://www.europris.no/kampanje', '2026-05-25T00:00:00.000Z');
 
-    expect(rows).toHaveLength(2);
-    expect(rows[0]).toMatchObject({ country: 'NO', currency: 'NOK', chain: 'europris', code: 'ep-1', price: 29.9, category: 'household' });
-    expect(rows[0]?.productUrl).toBe('https://www.europris.no/p/rengjoring');
+    assert.equal(rows.length, 2);
+    assert.equal(rows[0]?.country, 'NO');
+    assert.equal(rows[0]?.currency, 'NOK');
+    assert.equal(rows[0]?.chain, 'europris');
+    assert.equal(rows[0]?.code, 'ep-1');
+    assert.equal(rows[0]?.price, 29.9);
+    assert.equal(rows[0]?.category, 'household');
+    assert.equal(rows[0]?.productUrl, 'https://www.europris.no/p/rengjoring');
   });
 });

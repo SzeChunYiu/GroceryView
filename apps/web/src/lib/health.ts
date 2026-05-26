@@ -1,3 +1,6 @@
+// @ts-ignore pg may resolve to its ESM entry (pg/esm/index.mjs) with no .d.ts under
+// apps/web depending on build order; @ts-ignore (not @ts-expect-error) so it neither
+// errors when pg is untyped (TS7016) nor when it resolves cleanly (unused-directive).
 import pg from 'pg';
 
 const { Pool } = pg;

@@ -137,6 +137,8 @@ describe('ICA connector fixture parsing', () => {
     assert.deepEqual(rows[0], {
       chain: 'ica',
       ica_format: 'kvantum',
+      format: 'kvantum',
+      channel: 'packaged',
       code: '2033470',
       productId: 'prd-ica-yogurt-1kg',
       retailerProductId: '2033470',
@@ -158,6 +160,7 @@ describe('ICA connector fixture parsing', () => {
       promoUnitPriceCurrency: 'SEK',
       promoUnitPriceUnit: 'kr/kg',
       promotionDescription: 'Med ICA Stammis',
+      is_member_price: true,
       storeAccountId: STORE_ACCOUNT_ID,
       storeName: STORE_NAME,
       regionId: DEFAULT_ICA_REGION_ID,
@@ -188,6 +191,8 @@ describe('ICA connector fixture parsing', () => {
     assert.deepEqual(allRows[1], {
       chain: 'ica',
       ica_format: 'kvantum',
+      format: 'kvantum',
+      channel: 'counter',
       code: '1500812',
       productId: 'prd-ica-loose-salmon',
       retailerProductId: '1500812',

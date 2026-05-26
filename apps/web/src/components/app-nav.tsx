@@ -85,6 +85,8 @@ function buildNavGroups(t: AppNavTranslator): NavGroup[] {
       icon: BarChart3,
       items: [
         { href: '/', label: t('app-nav.items.overview'), icon: BarChart3 },
+        { href: '/deals', label: 'Deals', icon: Tags },
+        { href: '/market', label: 'Market', icon: BarChart3 },
         { href: '/chain-index', label: t('app-nav.items.chainIndex'), icon: Database },
         { href: '/methodology', label: 'Methodology', icon: Database },
         { href: '/analytics/funnel', label: t('app-nav.items.funnel'), icon: BarChart3 },
@@ -97,6 +99,7 @@ function buildNavGroups(t: AppNavTranslator): NavGroup[] {
       label: t('app-nav.groups.products'),
       icon: PackageSearch,
       items: [
+        { href: '/browse', label: 'Browse', icon: PackageSearch },
         { href: '/products', label: t('app-nav.items.browse'), icon: PackageSearch },
         { href: '/new-arrivals', label: t('app-nav.items.newArrivals'), icon: PackageSearch },
         { href: '/cultural-aisles', label: 'Cultural aisles', icon: Globe2 },

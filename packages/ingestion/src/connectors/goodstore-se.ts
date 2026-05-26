@@ -74,7 +74,11 @@ export function parseGoodstoreSeProductHtml(
 ): GoodstoreSePriceRow[] {
   const text = htmlToText(html);
   const name = productName(html, text);
-  const price = money(text.match(PRICE_RE)?.[1]);
+  // The product name (h1) can contain promo copy like "KÖP 2 SPARA 20KR!" whose "20KR"
+  // would otherwise be matched as the price. Strip the name from the price-search text so
+  // the actual shelf price (e.g. "49,95 SEK") is captured instead of the discount amount.
+  const priceText = name ? text.replace(name, ' ') : text;
+  const price = money(priceText.match(PRICE_RE)?.[1]);
   if (!name || price === null) return [];
   const storeOnly = /Endast i butik|Endast i butiken på Åsögatan 116/i.test(text);
   const code = text.match(ARTICLE_RE)?.[1] ?? slugFromUrl(productUrl);
