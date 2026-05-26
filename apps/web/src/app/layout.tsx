@@ -1,9 +1,12 @@
 import type { Metadata, Viewport } from 'next';
+import { CoreWebVitalsReporter } from '@/components/core-web-vitals-reporter';
 import { PwaInstall } from '@/components/pwa-install';
 import { ConsentManager } from '@/components/consent-manager';
+import { ListToastViewport } from '@/components/toast';
 import { SkipLink } from '@/components/SkipLink';
 import { EngagementReporter } from '@/lib/engagement';
 import { ServiceWorkerRegistrar } from '@/lib/swRegister';
+import '@/lib/env';
 import { Providers } from './providers';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './globals.css';
@@ -40,6 +43,14 @@ export const metadata: Metadata = {
     capable: true,
     statusBarStyle: 'default',
     title: 'GroceryView'
+  },
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/pwa-icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/pwa-icon-512.png', sizes: '512x512', type: 'image/png' }
+    ],
+    apple: [{ url: '/pwa-icon-192.png', sizes: '192x192', type: 'image/png' }]
   },
   other: {
     'mobile-web-app-capable': 'yes',
@@ -80,9 +91,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <Providers>{children}</Providers>
         </div>
         <ConsentManager />
+        <CoreWebVitalsReporter />
         <EngagementReporter />
         <ServiceWorkerRegistrar />
         <PwaInstall />
+        <ListToastViewport />
       </body>
     </html>
   );

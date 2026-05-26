@@ -3,10 +3,22 @@ name: Daily ingestion readiness
 on:
   schedule:
     - cron: '17 3 * * *'
+    - cron: '47 3 * * *'
+    - cron: '17 4 * * *'
   workflow_dispatch:
+    inputs:
+      country:
+        description: Country ingestion slot to run.
+        required: true
+        type: choice
+        default: SE
+        options:
+          - SE
+          - NO
+          - IS
 
 concurrency:
-  group: daily-ingestion-readiness
+  group: daily-ingestion-readiness-${{ github.event.schedule || inputs.country || 'manual' }}
   cancel-in-progress: false
 
 jobs:
@@ -21,6 +33,55 @@ jobs:
         with:
           node-version: 22
           cache: npm
+
+      - name: Select country ingestion slot
+        env:
+          SCHEDULE_CRON: ${{ github.event.schedule }}
+          WORKFLOW_DISPATCH_COUNTRY: ${{ inputs.country }}
+        run: |
+          set -euo pipefail
+          country="${WORKFLOW_DISPATCH_COUNTRY:-}"
+          schedule_slot="manual"
+
+          case "${SCHEDULE_CRON:-}" in
+            '17 3 * * *')
+              country="${country:-SE}"
+              schedule_slot="se-0317-utc"
+              ;;
+            '47 3 * * *')
+              country="${country:-NO}"
+              schedule_slot="no-0347-utc"
+              ;;
+            '17 4 * * *')
+              country="${country:-IS}"
+              schedule_slot="is-0417-utc"
+              ;;
+          esac
+
+          if [ -z "${country}" ]; then
+            country="SE"
+          fi
+
+          case "${country}" in
+            SE|NO|IS) ;;
+            *)
+              echo "Unsupported daily ingestion country: ${country}" >&2
+              exit 1
+              ;;
+          esac
+
+          {
+            echo "GROCERYVIEW_DAILY_COUNTRY_CODE=${country}"
+            echo "GROCERYVIEW_DAILY_SCHEDULE_SLOT=${schedule_slot}"
+          } >> "${GITHUB_ENV}"
+
+          {
+            echo "### Daily ingestion slot"
+            echo
+            echo "- country: ${country}"
+            echo "- schedule: ${SCHEDULE_CRON:-manual}"
+            echo "- slot: ${schedule_slot}"
+          } >> "${GITHUB_STEP_SUMMARY}"
 
       - name: Preflight required production configuration
         env:

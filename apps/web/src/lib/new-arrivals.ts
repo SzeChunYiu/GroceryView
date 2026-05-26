@@ -31,16 +31,17 @@ for (const row of facetedSearchRows) {
   const observedAt = row.observedAt;
   if (!observedAt) continue;
   if (existing && existing.observedAt >= observedAt) continue;
+  const chainLabel = row.chainName ?? 'Chain not reported';
   latestChainRowsBySlug.set(row.slug, {
     slug: row.slug,
     name: row.canonicalName,
     brand: row.brand ?? 'Brand not reported',
     categoryLabel: row.categoryPath[0] ?? 'Grocery',
     sourceLabel: `${row.priceType} latest_prices row`,
-    chainLabel: row.chainName ?? 'Unknown chain',
+    chainLabel,
     freshnessLabel: freshnessLabel(observedAt),
     observedAt,
-    badges: [row.chainName ?? 'Unknown chain', row.categoryPath[0] ?? 'Grocery', freshnessLabel(observedAt)]
+    badges: [chainLabel, row.categoryPath[0] ?? 'Grocery', freshnessLabel(observedAt)]
   });
 }
 

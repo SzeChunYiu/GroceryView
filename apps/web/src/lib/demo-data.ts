@@ -3,7 +3,8 @@
 // Real prices replace these as packages/ingestion connectors come online.
 
 import { buildExpiryDealRadar, buildPriceChartSeries, buildWatchlistAlerts, calculateMealCostBreakdown, calculatePersonalGroceryInflation, compareBasketStrategies, forecastGrocerySpend, planGroceryAlertChannelDefault, planMultiWeekStockUpList, planNotifications, planPantryReplenishment, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeBudget, summarizeCategoryDealLeaders, summarizePriceHistory, summarizeStoreBasketCoverage, type BasketComparisonInput, type HouseholdSnapshot, type PantryDeal, type PantryInventoryItem, type PriceChartObservation, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
-import { pricedProducts } from './openprices-products';
+import { parseVerifiedProductQuantity, pricedProducts, type VerifiedQuantityMetadata } from './openprices-products';
+import { suggestCheaperBasketAlternatives } from './meal-budgets';
 
 export const products = [
   {
@@ -1853,18 +1854,57 @@ const budgetStretchKronaExtraStores = Math.max(0, budgetStretchKronaComparison.s
 
 const oneTapBasketComparison = compareBasketStrategies(weeklyBasketOptimizerInput);
 const oneTapBasketCoverage = summarizeStoreBasketCoverage(weeklyBasketOptimizerInput);
+const oneTapManualOverrideProductIds = ['garant-ekologisk-tofu-270g'];
+const oneTapManualOverrides = oneTapManualOverrideProductIds.map((productId) => {
+  const currentAssignment = oneTapBasketComparison.cheapestByProduct.assignments.find((assignment) => assignment.productId === productId);
+  return {
+    productId,
+    preservedStoreName: currentAssignment?.storeName ?? 'Manual store choice',
+    reason: 'Shopper pinned this basket line, so the one-tap action previews savings without moving it.'
+  };
+});
+const oneTapScopeOptions = [
+  {
+    scope: 'cheapest_single_store',
+    label: 'Cheapest single store',
+    total: oneTapBasketComparison.bestSingleStore?.total ?? oneTapBasketComparison.cheapestByProduct.total,
+    storeCount: oneTapBasketComparison.bestSingleStore ? 1 : oneTapBasketComparison.splitStoreCount,
+    savingsVsBestSingleStore: 0,
+    confidenceLabel: oneTapBasketCoverage.bestCoverage ? `${oneTapBasketCoverage.bestCoverage.coveragePercent}% visible basket coverage` : 'No coverage rows available'
+  },
+  {
+    scope: 'split_shop',
+    label: 'Cheapest split shop',
+    total: oneTapBasketComparison.cheapestByProduct.total,
+    storeCount: oneTapBasketComparison.splitStoreCount,
+    savingsVsBestSingleStore: oneTapBasketComparison.savingsVsBestSingleStore,
+    confidenceLabel: `${oneTapBasketComparison.cheapestByProduct.assignments.length} priced lines from favorite-store rows`
+  },
+  {
+    scope: 'preferred_chains',
+    label: 'Preferred chains only',
+    total: oneTapBasketComparison.cheapestByProduct.total,
+    storeCount: weeklyBasketOptimizerInput.favoriteStoreIds.length,
+    savingsVsBestSingleStore: oneTapBasketComparison.savingsVsBestSingleStore,
+    confidenceLabel: `${weeklyBasketOptimizerInput.favoriteStoreIds.length} preferred chains checked; missing rows stay blocked`
+  }
+];
 
 export const oneTapBasketOptimizer = {
   persona: 'Busy professionals',
   title: 'One-tap basket optimizer',
   comparison: oneTapBasketComparison,
   coverage: oneTapBasketCoverage,
+  selectedScope: 'split_shop',
+  scopeOptions: oneTapScopeOptions,
+  manualOverrides: oneTapManualOverrides,
   readyAction: {
     label: oneTapBasketComparison.savingsVsBestSingleStore > 0 ? 'Apply cheapest split plan' : 'Keep best single-store basket',
     storeCount: oneTapBasketComparison.splitStoreCount,
     assignmentCount: oneTapBasketComparison.cheapestByProduct.assignments.length,
     total: oneTapBasketComparison.cheapestByProduct.total,
-    savingsVsBestSingleStore: oneTapBasketComparison.savingsVsBestSingleStore
+    savingsVsBestSingleStore: oneTapBasketComparison.savingsVsBestSingleStore,
+    preservedManualOverrideCount: oneTapManualOverrides.length
   },
   quickestPath: oneTapBasketComparison.cheapestByProduct.assignments.slice(0, 4).map((assignment) => ({
     productId: assignment.productId,
@@ -2093,13 +2133,24 @@ export const mealPrepBulkBuyOptimizer = {
   }
 };
 
+function stockUpUnitPrice(price: number, quantity: VerifiedQuantityMetadata | null) {
+  return quantity ? price / quantity.amount : price;
+}
+
+function stockUpConfidence(productObservationCount: number, quantity: VerifiedQuantityMetadata | null) {
+  if (!quantity) return 0.45;
+  return productObservationCount >= 8 ? 0.78 : 0.66;
+}
+
 const openPricesStockUpProducts = [
-  { slug: 'orientaliskt-r-gbr-d-7340083492464', weeklyNeedUnits: 2, storageLimitWeeks: 3 },
-  { slug: 'havredryck-choklad-7340083494406', weeklyNeedUnits: 3, storageLimitWeeks: 2 },
-  { slug: 'hummus-original-7331217012993', weeklyNeedUnits: 2, storageLimitWeeks: 3 }
+  { slug: 'havregryn-7310130321085', weeklyNeedPackages: 2, storageLimitWeeks: 3 },
+  { slug: 'oddlygood-barista-vanilla-6408430102358', weeklyNeedPackages: 3, storageLimitWeeks: 2 },
+  { slug: 'havredryck-choklad-7340083494406', weeklyNeedPackages: 3, storageLimitWeeks: 2 },
+  { slug: 'hummus-original-7331217012993', weeklyNeedPackages: 2, storageLimitWeeks: 3 }
 ].map((candidate) => {
   const product = pricedProducts.find((row) => row.slug === candidate.slug);
   if (!product) throw new Error(`Missing OpenPrices stock-up product ${candidate.slug}`);
+  const quantity = parseVerifiedProductQuantity(product.quantity);
   const datedObservations = product.observations
     .filter((observation) => observation.date && Number.isFinite(observation.price))
     .sort((left, right) => left.date.localeCompare(right.date));
@@ -2107,14 +2158,15 @@ const openPricesStockUpProducts = [
   if (!latestObservation) throw new Error(`Missing OpenPrices observations for ${candidate.slug}`);
   return {
     product,
+    quantity,
     latestObservation,
-    weeklyNeedUnits: candidate.weeklyNeedUnits,
+    weeklyNeedUnits: quantity ? candidate.weeklyNeedPackages * quantity.amount : candidate.weeklyNeedPackages,
     storageLimitWeeks: candidate.storageLimitWeeks,
     history: datedObservations.map((observation) => ({
       observedAt: `${observation.date}T00:00:00.000Z`,
-      unitPrice: observation.price,
+      unitPrice: stockUpUnitPrice(observation.price, quantity),
       sourceType: 'online' as const,
-      confidence: product.observationCount >= 8 ? 0.78 : 0.66
+      confidence: stockUpConfidence(product.observationCount, quantity)
     }))
   };
 });
@@ -2128,12 +2180,14 @@ const plannedMultiWeekStockUpList = planMultiWeekStockUpList({
     productName: row.product.name,
     storeName: 'OpenPrices SEK observations',
     weeklyNeedUnits: row.weeklyNeedUnits,
-    packageUnits: 1,
-    comparableUnit: 'pack',
-    currentUnitPrice: row.latestObservation.price,
+    packageUnits: row.quantity?.amount ?? 1,
+    comparableUnit: row.quantity?.unit ?? 'pack',
+    currentUnitPrice: stockUpUnitPrice(row.latestObservation.price, row.quantity),
     history: row.history,
     storageLimitWeeks: row.storageLimitWeeks,
-    seasonalityNote: `OpenPrices dated SEK observations for barcode ${row.product.code}; no seasonality or future shelf-price projection.`
+    seasonalityNote: row.quantity
+      ? `OpenPrices dated SEK observations for barcode ${row.product.code}; package quantity ${row.quantity.packageLabel} is used only for factual kr/${row.quantity.unit} normalization.`
+      : `OpenPrices dated SEK observations for barcode ${row.product.code}; quantity metadata is missing or unparsable, so this stays pack-labelled with low confidence.`
   }))
 });
 
@@ -2146,11 +2200,11 @@ export const multiWeekStockUpList = {
     observedHistoryWindow: row.observedHistoryWindow,
     reviewTrigger: row.reviewTrigger
   })),
-  noForecastReason: 'No price forecast: the list combines current OpenPrices observed pack prices with factual observed low/typical context and spreads today’s budget impact across the planning horizon.',
+  noForecastReason: 'No price forecast: the list combines current OpenPrices observed package prices normalized from verified quantity metadata when parseable, with factual observed low/typical context and budget impact spread across the planning horizon.',
   coverageGuardrails: [
     'No price forecast is displayed; every row is a present-tense stock-up plan from generated OpenPrices dated observations.',
     'PlanningWeeks is a household usage horizon, not a price outlook.',
-    'Historical low and typical prices are computed from observed pack-price rows and labelled with coverage.',
+    'Historical low and typical prices are computed from observed quantity-normalized rows; unparseable products stay pack-labelled with low confidence.',
     'Rows stay advisory until account-owned pantry, freezer, and expiry data confirm the storage limits.'
   ]
 };
@@ -2200,6 +2254,40 @@ export const studentBasicsInput: BasketComparisonInput = {
         { storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', price: 25.9 },
         { storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', price: 22.9 }
       ]
+    },
+    {
+      productId: 'arla-mellanmjolk-1l',
+      quantity: 1,
+      prices: [
+        { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 15.9 },
+        { storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', price: 17.5 },
+        { storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', price: 16.9 }
+      ]
+    },
+    {
+      productId: 'friggs-agg-10-pack',
+      quantity: 1,
+      prices: [
+        { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 34.9 },
+        { storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', price: 38.9 }
+      ]
+    },
+    {
+      productId: 'zoegas-kaffe-450g',
+      quantity: 1,
+      prices: [
+        { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 49.9 },
+        { storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', price: 54.9 }
+      ]
+    },
+    {
+      productId: 'svenska-applen-1kg',
+      quantity: 1,
+      prices: [
+        { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 29.9 },
+        { storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', price: 32.9 },
+        { storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', price: 31.9 }
+      ]
     }
   ]
 };
@@ -2209,7 +2297,11 @@ const studentBasicsNames: Record<string, string> = {
   'eldorado-basmati-rice-1kg': 'Eldorado Basmati Rice 1kg',
   'barilla-spaghetti-1kg': 'Barilla Spaghetti 1kg',
   'pagen-lingongrova-500g': 'Pågen Lingongrova 500g',
-  'bravo-apelsinjuice-1l': 'Bravo Apelsinjuice 1L'
+  'bravo-apelsinjuice-1l': 'Bravo Apelsinjuice 1L',
+  'arla-mellanmjolk-1l': 'Arla Mellanmjölk 1L',
+  'friggs-agg-10-pack': 'Friggs Ägg 10-pack',
+  'zoegas-kaffe-450g': 'Zoégas Kaffe 450g',
+  'svenska-applen-1kg': 'Svenska äpplen 1kg'
 };
 
 const studentBasicsComparison = compareBasketStrategies(studentBasicsInput);
@@ -2226,7 +2318,7 @@ export const studentBasicsBoard = {
   })),
   confidence: {
     level: 'medium',
-    caveat: 'Uses visible staple prices across favorite Stockholm stores; missing product-store rows reduce coverage and are not estimated.'
+    caveat: 'Uses visible staple prices for milk, pasta, rice, eggs, coffee, oats, and produce across favorite Stockholm stores; missing product-store rows reduce coverage and are not estimated.'
   }
 };
 
@@ -2561,7 +2653,27 @@ export const budgetEssentialsPriceDropAlerts = {
   }
 };
 
-export const babyDiaperWatchlistInputs: { favoriteStoreIds: string[]; watchlist: WatchlistItem[]; products: (WatchlistProductSnapshot & { source: string; diaperUnitPrice: number })[] } = {
+type BabyDiaperWatchlistProduct = WatchlistProductSnapshot & {
+  source: string;
+  diaperUnitPrice: number;
+};
+
+function diaperBrandFromName(productName: string) {
+  const brand = productName.match(/^(Libero|Pampers)\b/i)?.[1];
+  return brand ? brand[0]!.toUpperCase() + brand.slice(1).toLowerCase() : 'Brand not parsed';
+}
+
+function diaperSizeFromName(productName: string) {
+  return Number(productName.match(/\b(?:size|strl)\s*(\d+)\b/i)?.[1] ?? NaN);
+}
+
+function diaperStrictMatchKey(productName: string) {
+  const brand = diaperBrandFromName(productName).toLowerCase();
+  const size = diaperSizeFromName(productName);
+  return Number.isFinite(size) ? `${brand}:size-${size}` : `${brand}:size-unparsed`;
+}
+
+export const babyDiaperWatchlistInputs: { favoriteStoreIds: string[]; watchlist: WatchlistItem[]; products: BabyDiaperWatchlistProduct[] } = {
   favoriteStoreIds: ['willys-odenplan', 'hemkop-hornstull', 'coop-medborgarplatsen'],
   watchlist: [
     { productId: 'libero-touch-size-4-88p', targetPrice: 179, alertDealScoreAt: 75, favoriteStoresOnly: true, allowedPriceTypes: ['member', 'promotion'] },
@@ -2607,14 +2719,26 @@ export const babyDiaperPriceTracker = {
   persona: 'Families with kids',
   title: 'Baby & diaper price tracking',
   alerts: babyDiaperAlerts,
-  rows: babyDiaperWatchlistInputs.products.map((product) => ({
-    ...product,
-    diaperUnitPrice: product.diaperUnitPrice,
-    alertCount: babyDiaperAlerts.filter((alert) => alert.productId === product.productId).length
-  })),
+  brandFilters: [...new Set(babyDiaperWatchlistInputs.products.map((product) => diaperBrandFromName(product.productName)))],
+  sizeFilters: [...new Set(babyDiaperWatchlistInputs.products.map((product) => diaperSizeFromName(product.productName)).filter(Number.isFinite))].sort((left, right) => left - right),
+  rows: babyDiaperWatchlistInputs.products.map((product) => {
+    const watch = babyDiaperWatchlistInputs.watchlist.find((item) => item.productId === product.productId);
+    const diaperSize = diaperSizeFromName(product.productName);
+    return {
+      ...product,
+      diaperBrand: diaperBrandFromName(product.productName),
+      diaperSize: Number.isFinite(diaperSize) ? diaperSize : null,
+      diaperStageLabel: Number.isFinite(diaperSize) ? `Size ${diaperSize}` : 'Size not parsed',
+      diaperUnitPrice: product.diaperUnitPrice,
+      strictMatchKey: diaperStrictMatchKey(product.productName),
+      targetPriceLabel: watch?.targetPrice === undefined ? 'No target price' : `${watch.targetPrice} SEK target`,
+      historicalLowBadge: product.isNew52WeekLow ? 'New 52-week low' : 'No new historical low',
+      alertCount: babyDiaperAlerts.filter((alert) => alert.productId === product.productId).length
+    };
+  }),
   coverage: {
     confidence: 'medium',
-    caveat: 'Diaper tracking uses visible pack counts and watchlist alert rules; missing private loyalty wallet offers are not estimated.'
+    caveat: 'Diaper tracking uses visible pack counts, strict brand/size match keys, and watchlist target prices; missing private loyalty wallet offers are not estimated.'
   }
 };
 
@@ -3154,6 +3278,35 @@ export const elderlyFixedIncomeBudgetInput = {
   receiptTotalsThisMonth: [612.4, 548.2, 391.8, 228.5]
 };
 
+const elderlyEssentialStapleSlugs = [
+  'arla-milk-1l',
+  'skogaholm-rostbrod-500g',
+  'zoegas-coffee-450g',
+  'garant-havregryn-1kg',
+  'garant-svensk-potatis-2kg',
+  'grumme-handdisk-original-500ml'
+];
+
+const elderlyWeeklyBasketBudgetItems = weeklyBasket.map((row) => {
+  const product = products.find((candidate) => candidate.slug === row.slug);
+  const category = product ? (categoryByTopDeal.get(product.ticker) ?? 'Staples') : 'Staples';
+  return {
+    id: row.slug,
+    name: product?.name ?? row.slug,
+    category,
+    currentPrice: parseSekAmount(row.total),
+    quantity: row.qty,
+    store: product?.store ?? 'Visible basket source',
+    confidence: product?.confidence ?? 'medium',
+    observedAt: product?.observedAt ?? 'latest visible basket row'
+  };
+});
+
+const elderlyEssentialStaplesBasketRows = elderlyWeeklyBasketBudgetItems.filter((row) => elderlyEssentialStapleSlugs.includes(row.id));
+const elderlyCheaperSwapRows = suggestCheaperBasketAlternatives(elderlyEssentialStaplesBasketRows, elderlyWeeklyBasketBudgetItems).slice(0, 3);
+const elderlyEssentialStaplesBasketCost = Math.round(elderlyEssentialStaplesBasketRows.reduce((sum, row) => sum + row.currentPrice, 0) * 100) / 100;
+const elderlyFixedIncomeBudgetSummary = summarizeBudget(elderlyFixedIncomeBudgetInput);
+
 export const elderlyFixedIncomeBudgetTracker = {
   persona: 'Elderly / seniors',
   title: 'Fixed-income monthly budget',
@@ -3162,7 +3315,14 @@ export const elderlyFixedIncomeBudgetTracker = {
     amount: elderlyFixedIncomeBudgetInput.monthlyBudget,
     cadence: 'monthly fixed-income plan'
   },
-  summary: summarizeBudget(elderlyFixedIncomeBudgetInput),
+  summary: elderlyFixedIncomeBudgetSummary,
+  essentialStaplesBasket: {
+    title: 'Essential staples basket',
+    cost: elderlyEssentialStaplesBasketCost,
+    remainingMonthlyBudgetAfterStaples: Math.round((elderlyFixedIncomeBudgetSummary.monthlyRemainingActual - elderlyEssentialStaplesBasketCost) * 100) / 100,
+    rows: elderlyEssentialStaplesBasketRows
+  },
+  cheaperSwaps: elderlyCheaperSwapRows,
   guardrails: [
     { label: 'Staples first', action: 'Reserve milk, oats, coffee, and pharmacy-adjacent household basics before discretionary deals.' },
     { label: 'No estimate padding', action: 'Only scanned receipts and the visible planned basket count toward the monthly envelope.' },
@@ -3170,7 +3330,7 @@ export const elderlyFixedIncomeBudgetTracker = {
   ],
   coverage: {
     confidence: 'medium',
-    caveat: 'Fixed-income budget uses visible receipts and planned basket totals; cash purchases without receipts are not estimated.'
+    caveat: 'Fixed-income budget uses visible receipts, observed weekly basket rows, and product confidence labels; cash purchases without receipts are not estimated.'
   }
 };
 
@@ -3251,14 +3411,33 @@ const elderlyStaplesHistoryInputs = [
   }
 ] as const;
 
+const elderlyStaplesMinimumObservedPoints = 4;
+
+function stapleVolatilityPercent(points: readonly { price: number }[]) {
+  const prices = points.map((point) => point.price);
+  const average = prices.reduce((sum, price) => sum + price, 0) / Math.max(1, prices.length);
+  if (average === 0) return 0;
+  return Math.round(((Math.max(...prices) - Math.min(...prices)) / average) * 1000) / 10;
+}
+
 export const elderlyStaplesStabilityTracker = {
   persona: 'Elderly / seniors',
   title: 'Staples price stability',
-  rows: elderlyStaplesHistoryInputs.map((item) => ({
-    ...item,
-    history: summarizePriceHistory([...item.points]),
-    stabilityBand: item.stabilityBand
-  })),
+  minimumObservedPoints: elderlyStaplesMinimumObservedPoints,
+  rows: elderlyStaplesHistoryInputs.map((item) => {
+    const history = summarizePriceHistory([...item.points]);
+    const insufficientHistoryWarning = history.observedCount < elderlyStaplesMinimumObservedPoints
+      ? `Only ${history.observedCount} observed price points; wait for ${elderlyStaplesMinimumObservedPoints - history.observedCount} more before relying on this staple for fixed-income planning.`
+      : null;
+
+    return {
+      ...item,
+      history,
+      insufficientHistoryWarning,
+      stabilityBand: item.stabilityBand,
+      volatilityPercent: stapleVolatilityPercent(item.points)
+    };
+  }),
   coverage: {
     confidence: 'medium',
     caveat: 'Staples stability uses observed price-history points only; unobserved store weeks stay out of the band instead of being estimated.'

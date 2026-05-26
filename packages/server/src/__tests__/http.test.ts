@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { createHmac } from 'node:crypto';
 import { createGroceryViewApi, type BasketImportReviewItem } from '@groceryview/api';
 import { createSessionToken } from '@groceryview/auth';
+import type { FriendSharedDealSignalRecord } from '@groceryview/db';
 import { createHttpHandler } from '../index.js';
 
 async function json(response: Response) {
@@ -1401,13 +1402,54 @@ describe('createHttpHandler', () => {
     assert.equal(emptyBasket.items.length, 0);
   });
 
+  it('serves protected multi-week stock-up plans from account basket history with budget impact', async () => {
+    const token = await createSessionToken({ userId: 'stock-user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'secret');
+    const handle = createHttpHandler(undefined, { authSecret: 'secret', now: new Date('2026-05-20T12:00:00.000Z') });
+    const headers = { authorization: `Bearer ${token}` };
+
+    assert.equal((await handle(new Request('http://localhost/api/basket/stock-up-list?userId=stock-user-1'))).status, 401);
+    assert.equal((await handle(new Request('http://localhost/api/basket/items?userId=stock-user-1', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ productId: 'coffee', quantity: 2 })
+    }))).status, 201);
+    assert.equal((await handle(new Request('http://localhost/api/budget?userId=stock-user-1', {
+      method: 'PATCH',
+      headers,
+      body: JSON.stringify({ weeklyBudget: 1000, monthlyBudget: 4000 })
+    }))).status, 200);
+
+    const response = await handle(new Request('http://localhost/api/basket/stock-up-list?userId=stock-user-1&planningWeeks=3&asOf=2026-05-20T12%3A00%3A00.000Z', {
+      headers
+    }));
+    assert.equal(response.status, 200);
+    const plan = await json(response) as {
+      coverage: { confidence: string; observedItemCount: number; totalItemCount: number; missingHistoryProductIds: string[]; caveat: string };
+      rows: Array<{ productId: string; observationCount: number; weeklyBudgetSharePercent: number; noForecastReason: string }>;
+      evidence: { noForecast: boolean; sourceTables: string[] };
+    };
+    assert.deepEqual(plan.coverage, {
+      confidence: 'medium',
+      observedItemCount: 1,
+      totalItemCount: 1,
+      missingHistoryProductIds: [],
+      caveat: 'Historical low and typical prices use observed unit-price rows only; missing history lowers confidence and no future price is predicted.'
+    });
+    assert.equal(plan.rows[0]?.productId, 'coffee');
+    assert.equal(plan.rows[0]?.observationCount, 3);
+    assert.equal(plan.rows[0]?.weeklyBudgetSharePercent, 9.98);
+    assert.match(plan.rows[0]?.noForecastReason ?? '', /No price forecast/);
+    assert.equal(plan.evidence.noForecast, true);
+    assert.deepEqual(plan.evidence.sourceTables, ['basket_items', 'products.history', 'latest_prices']);
+  });
+
   it('serves user-scoped privacy export and deletion plans from protected account data', async () => {
     const api = createGroceryViewApi();
     api.addFavoriteStore('user-1', 'willys-odenplan');
     api.addWatchlistItem('user-1', { productId: 'coffee', targetPrice: 50, favoriteStoresOnly: true });
     api.addBasketItem('user-1', { productId: 'milk', quantity: 2 });
     api.updateBudget('user-1', { weeklyBudget: 100, monthlyBudget: 400 });
-    (api as typeof api & { getFriendSharedDealSignals(userId: string): unknown[] }).getFriendSharedDealSignals = (userId) => userId === 'user-1'
+    (api as unknown as { getFriendSharedDealSignals(userId: string): unknown[] }).getFriendSharedDealSignals = (userId) => userId === 'user-1'
       ? [{ signalId: 'friend-share-1', productId: 'coffee', sharedByUserId: 'friend-1', dealScore: 82 }]
       : [];
     const handle = createHttpHandler(api, { now: new Date('2026-05-20T12:00:00.000Z') });
@@ -1494,6 +1536,131 @@ describe('createHttpHandler', () => {
       })
     }));
     assert.equal(crossUser.status, 400);
+  });
+
+  it('persists friend share signals through the repository-backed deals endpoint', async () => {
+    const signals: FriendSharedDealSignalRecord[] = [];
+    const handle = createHttpHandler(undefined, {
+      now: new Date('2026-05-20T12:00:00.000Z'),
+      friendSharedDealSignalRepository: {
+        async upsertFriendSharedDealSignal(signal) {
+          signals.push(signal);
+        },
+        async listFriendSharedDealSignals(userId) {
+          return signals.filter((signal) => signal.userId === userId);
+        }
+      }
+    });
+
+    const saved = await handle(new Request('http://localhost/api/deals/friend-share-signals?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({
+        signalId: 'friend-share-1',
+        productId: 'coffee',
+        sharedByUserId: 'friend-1',
+        sharedByDisplayName: 'Ada',
+        relationship: 'friend',
+        sharedAt: '2026-05-20T10:30:00.000Z',
+        sourceConfidence: 0.87,
+        optedIn: true,
+        dealScore: 82
+      })
+    }));
+    assert.equal(saved.status, 202);
+    const savedBody = await json(saved) as { persisted: boolean; signal: { createdAt: string; userId: string } };
+    assert.equal(savedBody.persisted, true);
+    assert.equal(savedBody.signal.userId, 'user-1');
+    assert.equal(savedBody.signal.createdAt, '2026-05-20T12:00:00.000Z');
+
+    const listed = await json(await handle(new Request('http://localhost/api/deals/friend-share-signals?userId=user-1'))) as {
+      signals: Array<Record<string, unknown>>;
+      guardrails: string[];
+    };
+    assert.match(listed.guardrails.join('\n'), /Only opted-in/);
+    assert.deepEqual(listed.signals, [
+      {
+        signalId: 'friend-share-1',
+        userId: 'user-1',
+        productId: 'coffee',
+        sharedByUserId: 'friend-1',
+        sharedByDisplayName: 'Ada',
+        relationship: 'friend',
+        sharedAt: '2026-05-20T10:30:00.000Z',
+        sourceConfidence: 0.87,
+        optedIn: true,
+        dealScore: 82,
+        createdAt: '2026-05-20T12:00:00.000Z'
+      }
+    ]);
+
+    const exported = await json(await handle(new Request('http://localhost/api/privacy/export?userId=user-1'))) as {
+      sections: Array<{ name: string; records: Array<Record<string, unknown>> }>;
+    };
+    assert.deepEqual(exported.sections.find((section) => section.name === 'friend_shared_deal_signals')?.records, listed.signals);
+
+    const nonConsented = await handle(new Request('http://localhost/api/deals/friend-share-signals?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({
+        signalId: 'friend-share-private',
+        productId: 'coffee',
+        sharedByUserId: 'friend-1',
+        sharedByDisplayName: 'Ada',
+        relationship: 'friend',
+        sharedAt: '2026-05-20T10:30:00.000Z',
+        sourceConfidence: 0.87,
+        optedIn: false
+      })
+    }));
+    assert.equal(nonConsented.status, 400);
+    assert.equal((await handle(new Request('http://localhost/api/deals/friend-share-signals', { method: 'POST', body: '{}' }))).status, 400);
+  });
+
+  it('persists ordered preferred stores for signed-in settings preferences', async () => {
+    const token = await createSessionToken({ userId: 'settings-user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'secret');
+    const otherToken = await createSessionToken({ userId: 'settings-user-2', expiresAt: '2099-01-01T00:00:00.000Z' }, 'secret');
+    const handle = createHttpHandler(undefined, { authSecret: 'secret', now: new Date('2026-05-20T12:00:00.000Z') });
+
+    const unauthenticated = await handle(new Request('http://localhost/api/settings?userId=settings-user-1'));
+    assert.equal(unauthenticated.status, 401);
+
+    const forbidden = await handle(new Request('http://localhost/api/settings?userId=settings-user-1', {
+      method: 'PATCH',
+      headers: { authorization: `Bearer ${otherToken}` },
+      body: JSON.stringify({ preferredStores: ['willys-odenplan'] })
+    }));
+    assert.equal(forbidden.status, 403);
+
+    const saved = await handle(new Request('http://localhost/api/settings?userId=settings-user-1', {
+      method: 'PATCH',
+      headers: { authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        currency: 'EUR',
+        preferredStores: ['willys-odenplan', 'lidl-sveavagen', 'coop-odenplan'],
+        notificationChannels: ['push'],
+        algorithm_choice: 'watchlist_first'
+      })
+    }));
+    assert.equal(saved.status, 200);
+    assert.deepEqual(await json(saved), {
+      userId: 'settings-user-1',
+      currency: 'EUR',
+      preferredStores: ['willys-odenplan', 'lidl-sveavagen', 'coop-odenplan'],
+      notificationChannels: ['push'],
+      algorithm_choice: 'watchlist_first'
+    });
+
+    const readBack = await handle(new Request('http://localhost/api/settings?userId=settings-user-1', {
+      headers: { authorization: `Bearer ${token}` }
+    }));
+    assert.equal(readBack.status, 200);
+    assert.deepEqual((await json(readBack) as { preferredStores: string[] }).preferredStores, ['willys-odenplan', 'lidl-sveavagen', 'coop-odenplan']);
+
+    const tooMany = await handle(new Request('http://localhost/api/settings?userId=settings-user-1', {
+      method: 'PATCH',
+      headers: { authorization: `Bearer ${token}` },
+      body: JSON.stringify({ preferredStores: ['one', 'two', 'three', 'four', 'five', 'six'] })
+    }));
+    assert.equal(tooMany.status, 400);
   });
 
   it('deletes signed-in settings account data after explicit confirmation', async () => {

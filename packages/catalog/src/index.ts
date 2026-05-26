@@ -9,6 +9,20 @@ export type CatalogProductCoverage = {
 
 export { COMMODITIES, STAPLE_BASKET, findCommodity, inferBonusIsGroceryCategory, type Commodity, type ComparableUnit, type GroceryCategoryInference } from './commodities.js';
 export { SUPPORTED_PRICE_DOMAINS, findPriceDomain, type PriceDomain, type PriceDomainItem, type PriceDomainSlug } from './domains.js';
+export {
+  explainProductMatch,
+  marketAliasTermsFor,
+  normalizeProductMatchText,
+  rankExplainableProductMatches,
+  type ExplainableProductMatch,
+  type ProductMatchConfidenceBand,
+  type ProductMatchFactor,
+  type ProductMatchFactorType,
+  type ProductMatchInput,
+  type ProductMatchMarket,
+  type ProductMatchNutrition,
+  type ProductMatchRankingOptions
+} from './product-matching.js';
 
 export type CatalogCoverageInput = {
   targetProducts?: string[];

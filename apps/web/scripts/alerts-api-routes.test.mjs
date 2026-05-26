@@ -73,6 +73,11 @@ describe('open price history JSON API route', () => {
     assert.match(route, /product_id must be a UUID/);
     assert.match(route, /Unsupported query parameter/);
     assert.match(route, /price_type must be one of/);
+    assert.match(route, /chain_ids/);
+    assert.match(route, /store_ids/);
+    assert.match(route, /overlayMeta/);
+    assert.match(route, /preserve_gaps_no_interpolation/);
+    assert.match(route, /matchConfidenceDisclosure/);
     assert.match(route, /open_price_history_database_unconfigured/);
     assert.match(route, /CODE_LICENSE = 'Apache-2.0'/);
     assert.match(route, /DATA_LICENSE = 'CC-BY-4.0'/);
@@ -86,6 +91,11 @@ describe('open price history JSON API route', () => {
     assert.match(docs, /CC-BY-4\.0/);
     assert.match(docs, /60 requests per minute/);
     assert.match(docs, /X-RateLimit-Limit/);
+    assert.match(docs, /chain_ids/);
+    assert.match(docs, /store_ids/);
+    assert.match(docs, /selected_overlay/);
+    assert.match(docs, /normalizedUnitField/);
+    assert.match(docs, /missingDataPolicy/);
     assert.match(docs, /sourceRunId/);
     assert.match(docs, /rawRecordId/);
     assert.match(docs, /provenance/);

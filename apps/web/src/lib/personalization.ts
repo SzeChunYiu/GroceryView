@@ -374,8 +374,8 @@ export function buildPersonalizedReorderRail<T extends ReorderProductInput>(
     signals = demoReorderSignals,
   }: { limit?: number; signals?: readonly ReorderProductSignal[] } = {},
 ): PersonalizedReorderItem[] {
-  const ranked = products
-    .map((product, index) => {
+  return products
+    .map((product, index): PersonalizedReorderItem | null => {
       const signal = signals.find((entry) => signalMatchesProduct(product.slug, entry.productSlug)) ?? fallbackReorderSignal(index);
       if (!signal) return null;
 
@@ -392,11 +392,9 @@ export function buildPersonalizedReorderRail<T extends ReorderProductInput>(
         lastActionLabel: signal.lastActionLabel,
       };
     })
-    .filter((item) => item !== null)
+    .filter((item): item is PersonalizedReorderItem => item !== null)
     .sort((left, right) => right.reorderScore - left.reorderScore || left.name.localeCompare(right.name, 'sv-SE'))
     .slice(0, limit);
-
-  return ranked as PersonalizedReorderItem[];
 }
 
 export function buildPersonalizedRecommendationRail<T extends RecommendationProductInput>(

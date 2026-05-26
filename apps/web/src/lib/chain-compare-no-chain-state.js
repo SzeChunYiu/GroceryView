@@ -9,6 +9,14 @@ function latestEvidenceDate(capabilities) {
   return dates.at(-1) ?? null;
 }
 
+/**
+ * @param {{
+ *   activeFilters?: ReadonlyArray<string>,
+ *   chainOrder: ReadonlyArray<{ id: string, label: string }>,
+ *   generatedCapabilities?: ReadonlyArray<import('./generated/db-site-ingested-overrides.js').DbSiteCompareStoreCapability>,
+ *   missingProductIds?: ReadonlyArray<string>
+ * }} options
+ */
 export function buildCompareNoChainState({ activeFilters = [], chainOrder, generatedCapabilities = [], missingProductIds = [] }) {
   const generatedByChain = new Map(generatedCapabilities.map((capability) => [capability.chainId, capability]));
   const selectedChainIds = activeFilters.length > 0 ? activeFilters : chainOrder.map((chain) => chain.id);

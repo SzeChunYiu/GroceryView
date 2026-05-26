@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
+import { publicCatalogueCacheControl, publicCatalogueRevalidateSeconds } from './cache-policy';
+
+export { publicCatalogueCacheControl, publicCatalogueRevalidateSeconds, publicCatalogueStaleWhileRevalidateSeconds } from './cache-policy';
 
 export const siteUrl = 'https://grocery-web-mu.vercel.app';
 export const siteName = 'GroceryView';
-export const publicCatalogueRevalidateSeconds = 300;
-export const publicCatalogueStaleWhileRevalidateSeconds = publicCatalogueRevalidateSeconds * 3;
-export const publicCatalogueCacheControl = `public, s-maxage=${publicCatalogueRevalidateSeconds}, stale-while-revalidate=${publicCatalogueStaleWhileRevalidateSeconds}`;
 
 const defaultDescription = 'Verified Swedish grocery price intelligence with product tickers, chain comparisons, store coverage, and confidence-labelled savings signals.';
 const localeNegotiatedCurrentRouteCaveat = 'Locale-negotiated current route hreflang alternates share the canonical URL until native route translations exist beyond /sv and /en.';
@@ -152,6 +152,10 @@ export const routeMetadataCatalog = {
     title: 'Compare grocery items side by side | GroceryView',
     description: 'Compare up to four verified grocery items by nutrition labels, store price evidence, and observed trend charts.'
   },
+  '/cultural-aisles': {
+    title: 'Halal kosher and ethnic aisle finder | GroceryView',
+    description: 'Find source-backed halal, kosher, and cultural grocery aisles with verified store coverage, confidence labels, and no inferred religious suitability.'
+  },
   '/coverage': {
     title: 'Freshness lag coverage by class | GroceryView',
     description: 'Inspect per-class freshness lag, stale observation share, latest observed dates, and source boundaries for grocery ingestion cadence tuning.'
@@ -206,15 +210,13 @@ export const routeMetadataCatalog = {
     title: 'Personalized grocery index shortcuts | GroceryView',
     description: 'Browse household-ranked grocery index shortcuts with verified category medians, OpenPrices row counts, and cross-chain spread context.'
   },
-  '/login': {
-    title: 'Sign in to GroceryView',
-    description: 'Authentication is withheld in the static build until a production auth provider can return a verified user session.',
-    noIndex: true
+  '/methodology-changelog': {
+    title: 'Data and methodology changelog | GroceryView',
+    description: 'Track public changes to GroceryView data sources, matching rules, index methodology, deal scoring, market coverage, confidence, and freshness evidence.'
   },
-  '/list': {
-    title: 'Shopping list check-off | GroceryView',
-    description: 'Check off grocery list items while shopping with browser-local checked state that survives refreshes.',
-    noIndex: true
+  '/methodology': {
+    title: 'Score and confidence methodology | GroceryView',
+    description: 'Inspect how GroceryView computes Deal Score, Buy or Wait timing, nutrition per krona, and confidence labels, including missing-data blockers.'
   },
   '/market': {
     title: 'Grocery market overview | GroceryView',
@@ -224,13 +226,19 @@ export const routeMetadataCatalog = {
     title: 'Browse grocery categories | GroceryView',
     description: 'Choose categories and chains to explore verified product search results without fabricated prices.'
   },
-  '/methodology': {
-    title: 'GroceryView methodology',
-    description: 'How price indexes, deal labels, confidence, freshness, and fail-closed empty states work on GroceryView.'
-  },
   '/confidence': {
     title: 'Source confidence | GroceryView',
     description: 'Understand confidence levels and source coverage behind GroceryView price panels.'
+  },
+  '/login': {
+    title: 'Sign in to GroceryView',
+    description: 'Authentication is withheld in the static build until a production auth provider can return a verified user session.',
+    noIndex: true
+  },
+  '/list': {
+    title: 'Shopping list check-off | GroceryView',
+    description: 'Check off grocery list items while shopping with browser-local checked state that survives refreshes.',
+    noIndex: true
   },
   '/map': {
     title: 'Sweden grocery store map and price heat overlay | GroceryView',
@@ -382,7 +390,7 @@ function truncateDescription(description: string) {
   return description.length > 180 ? `${description.slice(0, 177)}...` : description;
 }
 
-function publicCatalogueCacheOther(edgeCache: PublicCatalogueCacheMetadata | undefined, path: string) {
+function publicCatalogueCacheOther(edgeCache: PublicCatalogueCacheMetadata | undefined, path: string): Record<string, string> {
   const surface = edgeCache?.surface ?? publicCatalogueSurfaceForPath(path);
   if (!surface) return {};
   const cacheControl = edgeCache?.cacheControl ?? publicCatalogueCacheControl;
@@ -403,8 +411,7 @@ export function hasAppliedCanonicalFilters(searchParams: CanonicalFilterSearchPa
 }
 
 export function routeMetadata(route: keyof typeof routeMetadataCatalog | RouteMetadataConfig): Metadata {
-  const config: RouteMetadataConfig =
-    typeof route === 'string' ? { path: route, ...routeMetadataCatalog[route] } : route;
+  const config: RouteMetadataConfig = typeof route === 'string' ? { path: route, ...routeMetadataCatalog[route] } : route;
   const alternatePath = config.canonicalPath ?? config.path;
   const canonical = absoluteUrl(alternatePath);
   const title = config.title;
@@ -436,7 +443,7 @@ export function routeMetadata(route: keyof typeof routeMetadataCatalog | RouteMe
     other: {
       'x-groceryview-hreflang-boundary': localeNegotiatedCurrentRouteCaveat,
       ...publicCatalogueCacheOther(config.edgeCache, config.path)
-    } as Metadata['other'],
+    },
     openGraph: {
       title,
       description,

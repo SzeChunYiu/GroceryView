@@ -55,7 +55,7 @@ export function LazyItemCard({ ariaLabel, children, className, compareMode, href
   );
 }
 
-type VirtualizedProduct = {
+export type VirtualizedProduct = {
   allergenRiskBadges: { label: string; matchedTerms: string[] }[];
   brand: string;
   categoryLabel: string;

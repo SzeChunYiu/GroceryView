@@ -16,6 +16,7 @@ import {
   buildDailyConnectorConfigsFromEnv,
   buildDailyIngestionPostgresPoolConfig,
   CITY_GROSS_BULK_MINIMUM_ROWS,
+  createDailyIngestionConnectionUsageMonitor,
   createDailyIngestionQueryExecutor,
   DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_IDS,
   DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_IDS,
@@ -163,6 +164,9 @@ import {
   parseRetailerProductJsonSnapshotWithDeadLetters,
   persistOpenFoodFactsProductMetadata,
   parseSt1FuelPriceHtml,
+  assertMarketSourceTermsGate,
+  marketSourceRegistry,
+  planMarketSourceTermsGate,
   planIngestionBatch,
   planOfferVisibilityBoundary,
   planRetailerConnectorRun,
@@ -2066,7 +2070,7 @@ describe('fetchOverpassGroceryStores', () => {
   it('ships a Sweden-wide query for the nationwide OSM store refresh', () => {
     assert.match(SWEDEN_GROCERY_OVERPASS_QUERY, /ISO3166-1"="SE/);
     assert.match(SWEDEN_GROCERY_OVERPASS_QUERY, /admin_level=2/);
-    assert.match(SWEDEN_GROCERY_OVERPASS_QUERY, /shop"~"\^\(supermarket\|convenience\|grocery\|greengrocer\)\$/);
+    assert.match(SWEDEN_GROCERY_OVERPASS_QUERY, /shop"~"\^\(supermarket\|convenience\|grocery\|deli\|greengrocer\|butcher\|bakery\)\$/);
     assert.doesNotMatch(SWEDEN_GROCERY_OVERPASS_QUERY, /ISO3166-2"="SE-AB/);
     assert.match(STOCKHOLM_GROCERY_OVERPASS_QUERY, /ISO3166-2"="SE-AB/);
     assert.equal(SWEDISH_COUNTY_ISO3166_2_CODES.length, 21);
@@ -2344,6 +2348,7 @@ describe('fetchHemkopProducts', () => {
       imageUrl: 'https://assets.axfood.se/image/upload/f_auto,t_200/07310130003547_C1R1_s03',
       labels: ['keyhole'],
       online: true,
+      channel: 'online',
       outOfStock: false,
       sourceUrl: buildHemkopSearchUrl('makaroner', 100, 0),
       retrievedAt: '2026-05-21T00:45:00.000Z'
@@ -2562,10 +2567,29 @@ describe('fetchHemkopWeeklyDiscounts', () => {
             price: 39.95,
             cartLabel: '39,95 kr/st',
             comparePrice: '79,90/kg',
-            savePrice: 'Spara 22,46 kr',
+            savePrice: 'Tillfälligt klipp',
             weightVolume: '500g',
-            conditionLabel: '',
+            conditionLabel: '2 för',
             redeemLimitLabel: 'Max 3 köp',
+            qualifyingCount: 2,
+            startDate: '18/05-2026',
+            endDate: '24/05-2026',
+            validUntil: 1779659999000
+          }, {
+            code: '2500298173',
+            mainProductCode: '101017250_ST',
+            name: 'Kupongsmör',
+            brands: ['Arla'],
+            campaignType: 'LOYALTY',
+            promotionType: 'MixMatchPricePromotion',
+            price: 29.95,
+            cartLabel: '29,95 kr/st',
+            comparePrice: '59,90/kg',
+            savePrice: 'Spara 32,46 kr',
+            weightVolume: '500g',
+            conditionLabel: 'Kupong 2 för',
+            redeemLimitLabel: 'Personlig rabattkupong',
+            qualifyingCount: 2,
             startDate: '18/05-2026',
             endDate: '24/05-2026',
             validUntil: 1779659999000
@@ -2576,12 +2600,12 @@ describe('fetchHemkopWeeklyDiscounts', () => {
 
     const rows = await fetchHemkopWeeklyDiscounts({
       storeId: '4003',
-      maxRows: 1,
+      maxRows: 2,
       fetchImpl,
       retrievedAt: '2026-05-22T08:25:03.000Z'
     });
 
-    assert.equal(requestedUrls[0], buildHemkopWeeklyDiscountsUrl('4003', 1));
+    assert.equal(requestedUrls[0], buildHemkopWeeklyDiscountsUrl('4003', 2));
     assert.deepEqual(rows, [{
       code: '2500298172',
       productCode: '101017249_ST',
@@ -2590,15 +2614,21 @@ describe('fetchHemkopWeeklyDiscounts', () => {
       storeId: '4003',
       storeName: '',
       city: '',
+      channel: 'store',
+      isMemberPrice: true,
+      isCouponPrice: false,
+      isSubscriptionPrice: false,
+      isClearance: true,
+      multiBuy: { qualifyingCount: 2, label: '2 för' },
       campaignType: 'LOYALTY',
       promotionType: 'MixMatchPricePromotion',
       price: 39.95,
       priceText: '39,95 kr/st',
       comparePriceText: '79,90/kg',
       regularPriceText: '62.41',
-      savePriceText: 'Spara 22,46 kr',
+      savePriceText: 'Tillfälligt klipp',
       packageText: '500g',
-      conditionText: '',
+      conditionText: '2 för',
       redeemLimitText: 'Max 3 köp',
       startDate: '18/05-2026',
       endDate: '24/05-2026',
@@ -2606,7 +2636,39 @@ describe('fetchHemkopWeeklyDiscounts', () => {
       category: 'mejeri-ost-och-agg|smor',
       imageUrl: 'https://assets.axfood.se/image/upload/f_auto,t_200/07310865005168_C1L1_s01',
       labels: ['swedish_flag'],
-      sourceUrl: buildHemkopWeeklyDiscountsUrl('4003', 1),
+      sourceUrl: buildHemkopWeeklyDiscountsUrl('4003', 2),
+      retrievedAt: '2026-05-22T08:25:03.000Z'
+    }, {
+      code: '2500298173',
+      productCode: '101017250_ST',
+      name: 'Kupongsmör',
+      brand: 'Arla',
+      storeId: '4003',
+      storeName: '',
+      city: '',
+      channel: 'store',
+      isMemberPrice: true,
+      isCouponPrice: true,
+      isSubscriptionPrice: false,
+      isClearance: false,
+      multiBuy: { qualifyingCount: 2, label: 'Kupong 2 för' },
+      campaignType: 'LOYALTY',
+      promotionType: 'MixMatchPricePromotion',
+      price: 29.95,
+      priceText: '29,95 kr/st',
+      comparePriceText: '59,90/kg',
+      regularPriceText: '62.41',
+      savePriceText: 'Spara 32,46 kr',
+      packageText: '500g',
+      conditionText: 'Kupong 2 för',
+      redeemLimitText: 'Personlig rabattkupong',
+      startDate: '18/05-2026',
+      endDate: '24/05-2026',
+      validUntil: '2026-05-24T21:59:59.000Z',
+      category: 'mejeri-ost-och-agg|smor',
+      imageUrl: 'https://assets.axfood.se/image/upload/f_auto,t_200/07310865005168_C1L1_s01',
+      labels: ['swedish_flag'],
+      sourceUrl: buildHemkopWeeklyDiscountsUrl('4003', 2),
       retrievedAt: '2026-05-22T08:25:03.000Z'
     }]);
   });
@@ -2905,6 +2967,65 @@ describe('fetchIcaProducts', () => {
       ['5740301203124', undefined],
       ['2385912', undefined]
     ]);
+  });
+
+  it('codifies source-backed ICA format, member, multi-buy, and counter channel quirks', async () => {
+    const fetchImpl: typeof fetch = async () => Response.json({
+      productGroups: [{
+        type: 'ON_OFFER',
+        decoratedProducts: [{
+          productId: 'ica-member-multibuy',
+          retailerProductId: '2142371',
+          name: 'Ätmogen Avokado 3-pack Klass 1 ICA',
+          brand: 'ICA',
+          packSizeDescription: '330g',
+          price: { amount: 40.6, currency: 'SEK' },
+          unitPrice: { price: { amount: 123.03, currency: 'SEK' }, unit: 'fop.price.per.kg' },
+          promotions: [{ description: '2 för 35 kr -- Stammispris' }]
+        }, {
+          productId: 'ica-counter-cheese',
+          retailerProductId: 'counter-cheese',
+          name: 'Herrgård, Präst, Grevé',
+          brand: 'Arla',
+          packSizeDescription: 'ca 700 g',
+          price: { amount: 79, currency: 'SEK' },
+          unitPrice: { price: { amount: 79, currency: 'SEK' }, unit: 'fop.price.per.kg' },
+          promotions: [{ description: '79 kr/kg' }]
+        }]
+      }]
+    });
+
+    const rows = await fetchIcaProducts({
+      fetchImpl,
+      storeName: 'ICA Kvantum Åstorp',
+      retrievedAt: '2026-05-25T12:00:00.000Z',
+      maxRows: 2
+    });
+
+    assert.deepEqual(rows.map((row) => ({
+      code: row.code,
+      format: row.format,
+      channel: row.channel,
+      is_member_price: row.is_member_price,
+      multi_buy: row.multi_buy
+    })), [{
+      code: '2142371',
+      format: 'kvantum',
+      channel: 'packaged',
+      is_member_price: true,
+      multi_buy: {
+        quantity: 2,
+        price: 35,
+        currency: 'SEK',
+        sourceText: '2 för 35 kr -- Stammispris'
+      }
+    }, {
+      code: 'counter-cheese',
+      format: 'kvantum',
+      channel: 'counter',
+      is_member_price: undefined,
+      multi_buy: undefined
+    }]);
   });
 
   it('deduplicates repeated ICA store products', async () => {
@@ -3246,6 +3367,15 @@ describe('fetchMathemProducts', () => {
       imageUrl: 'https://images.mathem.se/product.jpg',
       productUrl: 'https://www.mathem.se/se/products/6448-kungsornen-gammaldags-idealmakaroner/',
       available: true,
+      country: 'SE',
+      currency: 'SEK',
+      chain: 'mathem',
+      mathem_tier: 'spot',
+      channel: 'online',
+      is_coupon_price: false,
+      is_subscription_price: false,
+      is_clearance: false,
+      multi_buy: '',
       sourceUrl: buildMathemSearchUrl('makaroner'),
       retrievedAt: '2026-05-21T01:00:00.000Z'
     }]);
@@ -4999,7 +5129,8 @@ describe('ingestRetailerProduct', () => {
       soldByWeight: true,
       variant: 'vine',
       isOrganic: false,
-      originCountry: 'SE'
+      originCountry: 'SE',
+      certLevel: 'krav'
     });
 
     assert.equal(output.product.productKind, 'commodity');
@@ -5008,9 +5139,44 @@ describe('ingestRetailerProduct', () => {
     assert.equal(output.product.variant, 'vine');
     assert.equal(output.product.isOrganic, false);
     assert.equal(output.product.originCountry, 'SE');
+    assert.equal(output.priceObservation.originCountry, 'SE');
+    assert.equal(output.priceObservation.certLevel, 'krav');
     assert.equal(output.alias.matchConfidence, 0.68);
     assert.equal(output.priceObservation.confidenceScore, 0.68);
     assert.equal(output.priceObservation.unitPrice, 39.9);
+  });
+
+  it('classifies no-barcode loose bakery rows as commodity observations', () => {
+    const output = ingestRetailerProduct({
+      sourceType: 'retailer_online_page',
+      observedAt: '2026-05-22T10:00:00.000Z',
+      parserVersion: 'coop-bakery-v1',
+      rawSnapshotRef: 's3://groceryview-raw/coop/bakery-2026-05-22.json',
+      sourceRunId: 'source-run-2026-05-22',
+      chainId: 'coop',
+      storeId: 'coop-medborgarplatsen',
+      retailerProductId: 'coop-baguette-los',
+      rawName: 'Baguette lösbakat',
+      canonicalName: 'Baguette lösbakat',
+      productId: 'coop-baguette-los',
+      categoryId: 'brod-kakor',
+      packageSize: 1,
+      packageUnit: 'st',
+      price: 12.9,
+      sourceUrl: 'https://example.test/bakery/baguette',
+      soldByWeight: true,
+      variant: 'wheat',
+      isOrganic: false,
+      originCountry: 'SE'
+    });
+
+    assert.equal(output.product.productKind, 'commodity');
+    assert.equal(output.product.commodityId, 'baguette');
+    assert.equal(output.product.variant, 'wheat');
+    assert.equal(output.product.isOrganic, false);
+    assert.equal(output.product.originCountry, 'SE');
+    assert.equal(output.priceObservation.unitPrice, 12.9);
+    assert.equal(output.alias.matchConfidence, 0.68);
   });
 
   it('maps raw sold-by-weight produce labels to produce class ids without raising match confidence', () => {
@@ -5116,6 +5282,56 @@ describe('planRetailerSourceAccess', () => {
       reason: 'Retailer page ingestion requires robots.txt allow and approved legal review.',
       requiredActions: ['robots_txt_allow_required', 'legal_review_approval_required']
     });
+  });
+});
+
+describe('market source terms gate', () => {
+  it('records market, access method, terms, rate limit, credentials, coverage, and owner fields', () => {
+    const willys = marketSourceRegistry.find((source) => source.sourceId === 'se:willys:products-all-stores');
+
+    assert.ok(willys);
+    assert.equal(willys.market, 'SE');
+    assert.equal(willys.accessMethod, 'official_api');
+    assert.equal(willys.termsStatus, 'approved');
+    assert.equal(willys.credentials, 'partner_agreement');
+    assert.match(willys.rateLimit, /daily/i);
+    assert.match(willys.coverage, /Sweden Willys/i);
+    assert.equal(willys.owner, 'Data Ops - Axfood');
+  });
+
+  it('blocks unknown sources unless a development override is explicit', () => {
+    assert.throws(() => assertMarketSourceTermsGate({
+      connectorId: 'unreviewed-source',
+      chainId: 'unreviewed',
+      sourceType: 'retailer_online_page'
+    }), /market source terms gate blocked unreviewed-source/i);
+
+    const override = planMarketSourceTermsGate({
+      connectorId: 'unreviewed-source',
+      chainId: 'unreviewed',
+      sourceType: 'retailer_online_page',
+      allowDevOverride: true
+    });
+
+    assert.equal(override.status, 'dev_override');
+    assert.deepEqual(override.requiredActions, ['market_source_registry_entry_required']);
+  });
+
+  it('blocks pending registry entries from production worker use', () => {
+    assert.throws(() => assertMarketSourceTermsGate({
+      connectorId: 'rema-1000-no-search',
+      chainId: 'rema_1000_no',
+      sourceType: 'retailer_online_page'
+    }), /REMA 1000 Norway public search review is pending/);
+  });
+
+  it('blocks registered connector ids when the endpoint is outside the registered source prefix', () => {
+    assert.throws(() => assertMarketSourceTermsGate({
+      connectorId: 'willys-products-all-stores',
+      chainId: 'willys',
+      sourceType: 'official_api',
+      endpointUrl: 'https://unreviewed.example.test/willys.json'
+    }), /registered_endpoint_url_required/);
   });
 });
 
@@ -5934,7 +6150,18 @@ class DailyIngestionExecutor implements QueryExecutor {
   }
 }
 
-function dailyConnectorFixture(chainId: string) {
+type DailyConnectorFixture = {
+  connectorId: string;
+  chainId: string;
+  sourceType: 'official_api' | 'retailer_online_page' | 'flyer_campaign';
+  endpointUrl: string;
+  parserVersion: string;
+  robotsTxtStatus: 'allow' | 'disallow' | 'not_applicable' | 'unknown';
+  legalReviewStatus: 'approved' | 'pending' | 'rejected';
+  hasDataAgreement: boolean;
+};
+
+function dailyConnectorFixture(chainId: string): DailyConnectorFixture {
   return {
     connectorId: `${chainId}-normalized-json`,
     chainId,
@@ -5945,6 +6172,72 @@ function dailyConnectorFixture(chainId: string) {
     legalReviewStatus: 'approved' as const,
     hasDataAgreement: true
   };
+}
+
+function dailyRegisteredConnectorFixture(chainId: string) {
+  const fixtures: Record<string, DailyConnectorFixture> = {
+    ica: {
+      connectorId: 'ica-store-promotions-default-stores',
+      chainId: 'ica',
+      sourceType: 'official_api',
+      endpointUrl: GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL,
+      parserVersion: 'ica-store-promotions-native-v1',
+      robotsTxtStatus: 'not_applicable',
+      legalReviewStatus: 'approved',
+      hasDataAgreement: true
+    },
+    willys: {
+      connectorId: 'willys-products-all-stores',
+      chainId: 'willys',
+      sourceType: 'official_api',
+      endpointUrl: GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL,
+      parserVersion: 'willys-products-native-v1',
+      robotsTxtStatus: 'not_applicable',
+      legalReviewStatus: 'approved',
+      hasDataAgreement: true
+    },
+    coop: {
+      connectorId: 'coop-products-all-stores',
+      chainId: 'coop',
+      sourceType: 'official_api',
+      endpointUrl: GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL,
+      parserVersion: 'coop-products-native-v1',
+      robotsTxtStatus: 'not_applicable',
+      legalReviewStatus: 'approved',
+      hasDataAgreement: true
+    },
+    hemkop: {
+      connectorId: 'hemkop-products-all-stores',
+      chainId: 'hemkop',
+      sourceType: 'official_api',
+      endpointUrl: GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_PRODUCTS_URL,
+      parserVersion: 'hemkop-products-native-v1',
+      robotsTxtStatus: 'not_applicable',
+      legalReviewStatus: 'approved',
+      hasDataAgreement: true
+    },
+    lidl: {
+      connectorId: 'lidl-public-offers-all-stores',
+      chainId: 'lidl',
+      sourceType: 'retailer_online_page',
+      endpointUrl: GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL,
+      parserVersion: 'lidl-public-offers-native-v1',
+      robotsTxtStatus: 'allow',
+      legalReviewStatus: 'approved',
+      hasDataAgreement: true
+    },
+    city_gross: {
+      connectorId: 'city-gross-products-bulk',
+      chainId: 'city_gross',
+      sourceType: 'official_api',
+      endpointUrl: GROCERYVIEW_DAILY_CITY_GROSS_BULK_PRODUCTS_URL,
+      parserVersion: 'citygross-bulk-native-v1',
+      robotsTxtStatus: 'not_applicable',
+      legalReviewStatus: 'approved',
+      hasDataAgreement: true
+    }
+  };
+  return fixtures[chainId] ?? dailyConnectorFixture(chainId);
 }
 
 function batchObservations(executor: DailyIngestionExecutor) {
@@ -6101,12 +6394,12 @@ describe('daily ingestion runner', () => {
     const configs = buildDailyConnectorConfigsFromEnv({
       DATABASE_URL: 'postgres://user:secret@example/groceryview',
       GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify([
-        dailyConnectorFixture('ica'),
-        dailyConnectorFixture('willys'),
-        dailyConnectorFixture('coop'),
-        dailyConnectorFixture('hemkop'),
-        dailyConnectorFixture('lidl'),
-        dailyConnectorFixture('city_gross')
+        dailyRegisteredConnectorFixture('ica'),
+        dailyRegisteredConnectorFixture('willys'),
+        dailyRegisteredConnectorFixture('coop'),
+        dailyRegisteredConnectorFixture('hemkop'),
+        dailyRegisteredConnectorFixture('lidl'),
+        dailyRegisteredConnectorFixture('city_gross')
       ])
     });
 
@@ -6122,6 +6415,31 @@ describe('daily ingestion runner', () => {
     });
   });
 
+  it('refuses unregistered daily worker source configs unless development override is explicit', () => {
+    const connectors = [
+      { ...dailyRegisteredConnectorFixture('ica'), connectorId: 'unregistered-ica-source' },
+      dailyRegisteredConnectorFixture('willys'),
+      dailyRegisteredConnectorFixture('coop'),
+      dailyRegisteredConnectorFixture('hemkop'),
+      dailyRegisteredConnectorFixture('lidl'),
+      dailyRegisteredConnectorFixture('city_gross')
+    ];
+
+    assert.throws(() => buildDailyConnectorConfigsFromEnv({
+      DATABASE_URL: 'postgres://user:secret@example/groceryview',
+      GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify(connectors)
+    }), /market source terms gate blocked unregistered-ica-source/i);
+
+    const configs = buildDailyConnectorConfigsFromEnv({
+      DATABASE_URL: 'postgres://user:secret@example/groceryview',
+      GROCERYVIEW_DEV_ALLOW_SOURCE_TERMS_OVERRIDE: '1',
+      NODE_ENV: 'development',
+      GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify(connectors)
+    });
+
+    assert.equal(configs.connectors[0].connectorId, 'unregistered-ica-source');
+  });
+
   it('loads bounded runner options and the blocker log override from environment', () => {
     const configs = buildDailyConnectorConfigsFromEnv({
       DATABASE_URL: 'postgres://user:secret@example/groceryview',
@@ -6135,12 +6453,12 @@ describe('daily ingestion runner', () => {
       GROCERYVIEW_DAILY_STORE_RETRY_BASE_DELAY_MS: '250',
       GROCERYVIEW_DAILY_BLOCKER_LOG_PATH: '/tmp/groceryview-ingestion-blockers.txt',
       GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify([
-        dailyConnectorFixture('ica'),
-        dailyConnectorFixture('willys'),
-        dailyConnectorFixture('coop'),
-        dailyConnectorFixture('hemkop'),
-        dailyConnectorFixture('lidl'),
-        dailyConnectorFixture('city_gross')
+        dailyRegisteredConnectorFixture('ica'),
+        dailyRegisteredConnectorFixture('willys'),
+        dailyRegisteredConnectorFixture('coop'),
+        dailyRegisteredConnectorFixture('hemkop'),
+        dailyRegisteredConnectorFixture('lidl'),
+        dailyRegisteredConnectorFixture('city_gross')
       ])
     });
 
@@ -6172,12 +6490,12 @@ describe('daily ingestion runner', () => {
     const configs = buildDailyConnectorConfigsFromEnv({
       DATABASE_URL: 'postgres://user:secret@example/groceryview',
       GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify([
-        dailyConnectorFixture('ica'),
-        dailyConnectorFixture('willys'),
-        dailyConnectorFixture('coop'),
-        dailyConnectorFixture('hemkop'),
-        dailyConnectorFixture('lidl'),
-        dailyConnectorFixture('city_gross'),
+        dailyRegisteredConnectorFixture('ica'),
+        dailyRegisteredConnectorFixture('willys'),
+        dailyRegisteredConnectorFixture('coop'),
+        dailyRegisteredConnectorFixture('hemkop'),
+        dailyRegisteredConnectorFixture('lidl'),
+        dailyRegisteredConnectorFixture('city_gross'),
         {
           connectorId: 'pharmacy-public-products',
           chainId: 'pharmacy',
@@ -6202,12 +6520,12 @@ describe('daily ingestion runner', () => {
   it('loads connector config from a file path to avoid oversized process environments', () => {
     const connectorPath = join(mkdtempSync(join(tmpdir(), 'groceryview-connectors-')), 'connectors.json');
     writeFileSync(connectorPath, JSON.stringify([
-      dailyConnectorFixture('ica'),
-      dailyConnectorFixture('willys'),
-      dailyConnectorFixture('coop'),
-      dailyConnectorFixture('hemkop'),
-      dailyConnectorFixture('lidl'),
-      dailyConnectorFixture('city_gross')
+      dailyRegisteredConnectorFixture('ica'),
+      dailyRegisteredConnectorFixture('willys'),
+      dailyRegisteredConnectorFixture('coop'),
+      dailyRegisteredConnectorFixture('hemkop'),
+      dailyRegisteredConnectorFixture('lidl'),
+      dailyRegisteredConnectorFixture('city_gross')
     ]));
 
     const configs = buildDailyConnectorConfigsFromEnv({
@@ -6224,12 +6542,12 @@ describe('daily ingestion runner', () => {
     const configs = buildDailyConnectorConfigsFromEnv({
       DATABASE_URL: 'postgres://user:secret@example/groceryview',
       GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify([
-        dailyConnectorFixture('ica'),
-        dailyConnectorFixture('willys'),
-        dailyConnectorFixture('coop'),
-        dailyConnectorFixture('hemkop'),
-        dailyConnectorFixture('lidl'),
-        dailyConnectorFixture('city_gross')
+        dailyRegisteredConnectorFixture('ica'),
+        dailyRegisteredConnectorFixture('willys'),
+        dailyRegisteredConnectorFixture('coop'),
+        dailyRegisteredConnectorFixture('hemkop'),
+        dailyRegisteredConnectorFixture('lidl'),
+        dailyRegisteredConnectorFixture('city_gross')
       ]),
       GROCERYVIEW_DAILY_MAX_CONNECTORS: '4',
       GROCERYVIEW_DAILY_MAX_CONCURRENCY: '2',
@@ -6294,6 +6612,34 @@ describe('daily ingestion runner', () => {
 
     assert.deepEqual(rows, [{ id: 'row-1' }]);
     assert.equal(calls.length, 2);
+  });
+
+  it('detects excessive daily ingestion Postgres checkouts without leaking clients', async () => {
+    const monitor = createDailyIngestionConnectionUsageMonitor();
+    const client = {
+      async query() {
+        return { rows: [{ id: 'row-1' }] };
+      }
+    };
+
+    const executor = createDailyIngestionQueryExecutor(client, {
+      retryAttempts: 0,
+      retryBaseDelayMs: 0,
+      connectionUsageMonitor: monitor
+    });
+
+    await executor.query<{ id: string }>('select id from products where id = $1', ['product-1']);
+    await executor.query<{ id: string }>('select id from products where id = $1', ['product-2']);
+
+    assert.deepEqual(monitor.snapshot(), {
+      checkoutCount: 2,
+      activeCheckoutCount: 0,
+      maxActiveCheckoutCount: 1
+    });
+    assert.throws(
+      () => monitor.assertNoLeaks({ maxCheckoutCount: 1 }),
+      /checkout count 2 exceeded expected maximum 1/i
+    );
   });
 
   it('treats pooler handler exits as retryable daily ingestion DB errors', async () => {

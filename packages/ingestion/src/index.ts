@@ -65,8 +65,10 @@ import {
 } from './connectors/apoteket-se.js';
 import {
   fetchLidlOffersForAllStores,
+  type LidlOffer,
   type LidlStoreOffer
 } from './connectors/lidl.js';
+import { fetchLidlBulkProducts } from './connectors/lidl-bulk.js';
 import {
   fetchLocalFoodNodesProductsForAllNodes,
   type LocalFoodNodesProduct
@@ -87,7 +89,7 @@ import {
   fetchObIsFuelPrices,
   OB_IS_FUEL_PRICES_URL,
   type ObIsFuelPriceObservation
-} from './connectors/ob-is-fuel.js';
+} from './connectors/ob-is.js';
 import {
   fetchSevenElevenSeConvenienceProducts,
   type SevenElevenSeProduct
@@ -96,6 +98,10 @@ import {
   fetchMathemProducts,
   type MathemProduct
 } from './connectors/mathem.js';
+import {
+  fetchMathemPrenumerationProducts,
+  type MathemPrenumerationProduct
+} from './connectors/mathem-prenumeration-se.js';
 import {
   fetchMatsparProducts,
   MATSPAR_MINIMUM_ROWS,
@@ -109,42 +115,102 @@ import {
   type WillysWeeklyDiscount
 } from './connectors/willys.js';
 import { fetchWillysBulkProducts } from './connectors/willys-bulk.js';
+import { assertMarketSourceTermsGate } from './market-source-registry.js';
 
 export * from './connectors/openfoodfacts.js';
+export * from './connectors/connector-interface.js';
 export * from './connectors/all-store-runner.js';
 export * from './connectors/overpass.js';
 export * from './connectors/fuel-stations.js';
+export * from './connectors/hagstofa-cpi-is.js';
 export * from './jobs/is-poi-audit.js';
+export * from './jobs/no-poi-audit.js';
 export * from './connectors/citygross.js';
+export {
+  CITY_GROSS_KLUBBEN_OFFERS_URL,
+  cityGrossKlubbenOfferFromProduct,
+  fetchCityGrossKlubbenOffers,
+  promotionRouter as cityGrossKlubbenPromotionRouter,
+  type CityGrossKlubbenOffer,
+  type CityGrossKlubbenStructuredPromotion,
+  type FetchCityGrossKlubbenOffersOptions
+} from './connectors/citygross-klubben-offers-se.js';
 export * from './connectors/citygross-bulk.js';
+export * from './connectors/circle-k-se.js';
 export * from './connectors/coop.js';
+export * from './connectors/direktshop-se.js';
 export * from './connectors/hemkop.js';
+export * from './connectors/hemkop-klubb-offers-se.js';
 export * from './connectors/ica.js';
+export * from './connectors/kiwi-no.js';
 export * from './connectors/ica-bulk.js';
 export * from './connectors/ica-reklamblad.js';
+export * from './connectors/kronans-apotek-se.js';
+export * from './connectors/kassalapp-no.js';
+export {
+  ICA_STAMMIS_OFFERS_URL,
+  fetchIcaStammisOffers,
+  icaStammisOfferFromProduct,
+  promotionRouter as icaStammisPromotionRouter,
+  type FetchIcaStammisOffersOptions,
+  type IcaStammisOffer,
+  type IcaStammisStructuredPromotion
+} from './connectors/ica-stammis-offers-se.js';
 export * from './connectors/lidl.js';
 export * from './connectors/localfoodnodes-se.js';
 export * from './connectors/seven-eleven-no.js';
 export * from './connectors/lyfogheilsa-is.js';
 export * from './connectors/mast-recalls-is.js';
 export * from './connectors/mathem.js';
+export * from './connectors/mathem-prenumeration-se.js';
+export * from './connectors/mattilbud-no.js';
 export * from './connectors/matpriskollen.js';
 export * from './connectors/matspar.js';
+export * from './connectors/meny-flyer-no.js';
 export * from './connectors/meny-no.js';
+export * from './connectors/narvesen-no.js';
+export * from './connectors/normal-se.js';
+export * from './connectors/reklamblad-se.js';
+export {
+  LIDL_PLUS_COUPONS_URL,
+  fetchLidlPlusCoupons,
+  lidlPlusCouponFromOffer,
+  promotionRouter as lidlPlusPromotionRouter,
+  type FetchLidlPlusCouponsOptions,
+  type LidlPlusCoupon,
+  type LidlPlusStructuredPromotion
+} from './connectors/lidl-plus-coupons-se.js';
 export * from './connectors/lidl-bulk.js';
 export * from './connectors/willys-bulk.js';
 export * from './connectors/apohem.js';
 export * from './connectors/bonus-is.js';
+export * from './connectors/iceland-flyer-is.js';
+export * from './connectors/hagkaup-is.js';
 export * from './connectors/atlantsolia-is.js';
+export * from './connectors/apotek-gardabaer-is.js';
 export * from './connectors/apoteket-se.js';
 export * from './connectors/okq8-fuel.js';
-export * from './connectors/ob-is-fuel.js';
+export * from './connectors/ob-is.js';
+export * from './connectors/orkan-is.js';
 export * from './connectors/seven-eleven-se.js';
+export * from './connectors/skeljungur-is.js';
 export * from './connectors/st1-fuel.js';
 export * from './connectors/willys.js';
+export {
+  WILLYS_PLUS_OFFERS_URL,
+  fetchWillysPlusOffers,
+  promotionRouter as willysPlusPromotionRouter,
+  willysPlusOfferFromDiscount,
+  type FetchWillysPlusOffersOptions,
+  type WillysPlusOffer,
+  type WillysPlusStructuredPromotion
+} from './connectors/willys-plus-offers-se.js';
 export * from './store-enumerator.js';
 export * from './store-enumerator.js';
 export * from './unit-price.js';
+export * from './pipeline.js';
+export * from './market-source-registry.js';
+export * from './backfill-replay.js';
 
 export type SourceType =
   | 'official_api'
@@ -1861,7 +1927,7 @@ function hemkopWeeklyDiscountToDailyItem(row: HemkopWeeklyDiscount): RetailerCon
     price: row.price,
     regularPrice: regularPrice !== undefined && regularPrice > row.price ? regularPrice : undefined,
     promoText: row.conditionText || row.priceText || undefined,
-    memberOnly: false,
+    memberOnly: row.isMemberPrice,
     observedAt: row.retrievedAt,
     sourceUrl: row.sourceUrl,
     imageUrl: row.imageUrl || undefined
@@ -1887,7 +1953,7 @@ function icaProductToDailyItem(row: IcaProduct): RetailerConnectorParsedProduct 
     price,
     regularPrice: row.promoPrice !== null && row.price !== null && row.price > row.promoPrice ? row.price : undefined,
     promoText: row.promotionDescription || undefined,
-    memberOnly: false,
+    memberOnly: row.is_member_price === true,
     observedAt: row.retrievedAt,
     originCountry: normalizeRetailerOriginCountry(row.countryOfOrigin),
     sourceUrl: row.sourceUrl,
@@ -1967,6 +2033,27 @@ function lidlStoreOfferToDailyItem(row: LidlStoreOffer): RetailerConnectorParsed
   };
 }
 
+function lidlBulkOfferToDailyItem(row: LidlOffer): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageText);
+  return {
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: `lidl-${stableKeyPart(row.code)}`,
+    categoryId: stableKeyPart(row.category || 'lidl-products'),
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price,
+    regularPrice: row.regularPrice !== null && row.regularPrice > row.price ? row.regularPrice : undefined,
+    promoText: row.promotionText || undefined,
+    memberOnly: row.memberOnly,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.sourceUrl,
+    imageUrl: row.imageUrl || undefined
+  };
+}
+
 function localFoodNodesProductToDailyItem(row: LocalFoodNodesProduct): RetailerConnectorParsedProduct {
   const quantity = parseNativePackageText(row.packageText);
   return {
@@ -2005,8 +2092,10 @@ function cityGrossProductToDailyItem(row: CityGrossProduct): RetailerConnectorPa
     packageUnit: quantity.packageUnit,
     price: row.price,
     regularPrice: row.regularPrice !== null && row.regularPrice > row.price ? row.regularPrice : undefined,
-    promoText: row.regularPrice !== null && row.regularPrice > row.price ? 'City Gross discounted public price' : undefined,
-    memberOnly: false,
+    promoText: row.is_member_price
+      ? 'City Gross member price'
+      : row.regularPrice !== null && row.regularPrice > row.price ? 'City Gross discounted public price' : undefined,
+    memberOnly: row.is_member_price,
     observedAt: row.retrievedAt,
     sourceUrl: row.sourceUrl,
     imageUrl: row.imageUrl || undefined
@@ -2042,7 +2131,7 @@ function matsparProductToDailyItem(row: MatsparProduct): RetailerConnectorParsed
   };
 }
 
-function mathemCategoryId(row: MathemProduct): string {
+function mathemCategoryId(row: Pick<MathemProduct, 'sourceUrl'>): string {
   try {
     const query = new URL(row.sourceUrl).searchParams.get('q');
     if (query?.trim()) return `mathem-${stableKeyPart(query)}`;
@@ -2052,13 +2141,14 @@ function mathemCategoryId(row: MathemProduct): string {
   return 'mathem-public-search';
 }
 
-function mathemProductToDailyItem(row: MathemProduct): RetailerConnectorParsedProduct {
+function mathemProductToDailyItem(row: MathemProduct | MathemPrenumerationProduct): RetailerConnectorParsedProduct {
   const quantity = parseNativePackageText(row.packageText);
   return {
+    chainId: row.chain,
     retailerProductId: row.code,
     rawName: row.name,
     canonicalName: row.name,
-    productId: `mathem-${stableKeyPart(row.code)}`,
+    productId: `${row.chain}-${stableKeyPart(row.code)}`,
     categoryId: mathemCategoryId(row),
     brand: row.brand || undefined,
     packageSize: quantity.packageSize,
@@ -2124,6 +2214,11 @@ function obIsFuelPriceToDailyItem(row: ObIsFuelPriceObservation): RetailerConnec
     validFrom: row.effectiveFrom,
     sourceUrl: row.sourceUrl
   };
+}
+
+function fuelOperatorNameForChain(chainId: string): string {
+  if (chainId === 'ob-is') return 'ÓB';
+  return chainId.toUpperCase();
 }
 
 function sevenElevenSeProductToDailyItem(row: SevenElevenSeProduct): RetailerConnectorParsedProduct {
@@ -2391,6 +2486,19 @@ export async function fetchDailyConnectorSnapshot(
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(lidlStoreOfferToDailyItem) });
   }
 
+  if (sourceUrl === GROCERYVIEW_DAILY_LIDL_BULK_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_LIDL_BULK_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchLidlBulkProducts({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      minRows: dailyNativeNumberParam(url, 'minRows'),
+      offerPaths: dailyNativeStringListParam(url, 'paths'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(lidlBulkOfferToDailyItem) });
+  }
+
   if (sourceUrl === GROCERYVIEW_DAILY_LOCALFOODNODES_SE_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_LOCALFOODNODES_SE_PRODUCTS_URL}?`)) {
     const url = new URL(sourceUrl);
     const retrievedAt = options.retrievedAt ?? new Date().toISOString();
@@ -2441,6 +2549,22 @@ export async function fetchDailyConnectorSnapshot(
     const url = new URL(sourceUrl);
     const retrievedAt = options.retrievedAt ?? new Date().toISOString();
     const rows = await fetchMathemProducts({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      queries: dailyNativeStringListParam(url, 'queries'),
+      pages: dailyNativeNumberListParam(url, 'pages'),
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(mathemProductToDailyItem) });
+  }
+
+  if (
+    sourceUrl === GROCERYVIEW_DAILY_MATHEM_PRENUMERATION_PRODUCTS_URL ||
+    sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_MATHEM_PRENUMERATION_PRODUCTS_URL}?`)
+  ) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchMathemPrenumerationProducts({
       fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
       queries: dailyNativeStringListParam(url, 'queries'),
       pages: dailyNativeNumberListParam(url, 'pages'),
@@ -3019,6 +3143,7 @@ export type RetailerProductInput = {
   variant?: string;
   isOrganic?: boolean;
   originCountry?: string;
+  certLevel?: CertificationLevel;
   soldByWeight?: boolean;
   packageSize: number;
   packageUnit: string;
@@ -3042,6 +3167,8 @@ export type PriceType =
   | 'shelf_photo'
   | 'manual'
   | 'estimated';
+
+export type CertificationLevel = 'krav' | 'eu_eco' | 'free_range' | 'asc' | 'msc' | 'rainforest_alliance' | 'fairtrade' | 'conventional';
 
 export type PriceProvenance = {
   sourceType: SourceType;
@@ -3084,6 +3211,8 @@ export type IngestedPriceObservation = {
   retailerProductId?: string;
   storeId?: string;
   chainId: string;
+  originCountry?: string;
+  certLevel?: CertificationLevel;
   observedAt: string;
   price: number;
   unitPrice: number;
@@ -3143,6 +3272,12 @@ function validateInput(input: RetailerProductInput): void {
   if (input.validFrom !== undefined && Number.isNaN(Date.parse(input.validFrom))) throw new Error('validFrom must be an ISO date.');
   if (input.validUntil !== undefined && Number.isNaN(Date.parse(input.validUntil))) throw new Error('validUntil must be an ISO date.');
   if (input.originCountry !== undefined && !/^[a-z]{2}$/i.test(input.originCountry)) throw new Error('originCountry must be an ISO-3166 alpha-2 code.');
+  if (
+    input.certLevel !== undefined &&
+    !['krav', 'eu_eco', 'free_range', 'asc', 'msc', 'rainforest_alliance', 'fairtrade', 'conventional'].includes(input.certLevel)
+  ) {
+    throw new Error('certLevel must be a supported certification level.');
+  }
 }
 
 function priceTypeForSource(input: RetailerProductInput, hasPromotion: boolean): PriceType {
@@ -3340,6 +3475,8 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
       retailerProductId: input.retailerProductId,
       storeId: input.storeId,
       chainId: input.chainId,
+      originCountry: input.originCountry?.toUpperCase(),
+      certLevel: input.certLevel,
       observedAt: input.observedAt,
       price: input.price,
       unitPrice: normalized.unitPrice,
@@ -3407,7 +3544,7 @@ export function planIngestionBatch(inputs: RetailerProductInput[]): IngestionBat
     }
 
     try {
-      accepted.push(ingestRetailerProduct(input));
+      accepted.push(ingestRetailerProduct(contractResult.data as RetailerProductInput));
     } catch (error) {
       rejected.push({ input, reason: error instanceof Error ? error.message : 'Unknown ingestion error.' });
     }
@@ -3453,13 +3590,15 @@ export type DailyIngestionEnv = Partial<Record<
   | 'GROCERYVIEW_DAILY_ZERO_ROW_ALERT_LOG_PATH'
   | 'GROCERYVIEW_DAILY_ZERO_ROW_ALERT_STATE_PATH'
   | 'GROCERYVIEW_DAILY_ZERO_ROW_ALERT_WEBHOOK_URL'
+  | 'GROCERYVIEW_DEV_ALLOW_SOURCE_TERMS_OVERRIDE'
   | 'GROCERYVIEW_DAILY_STORE_CONCURRENCY'
   | 'GROCERYVIEW_DAILY_STORE_START_DELAY_MS'
   | 'GROCERYVIEW_DAILY_STORE_RETRY_ATTEMPTS'
   | 'GROCERYVIEW_DAILY_STORE_RETRY_BASE_DELAY_MS'
   | 'GROCERYVIEW_IMAGE_CACHE_ENABLED'
   | 'GROCERYVIEW_IMAGE_CACHE_PUBLIC_DIR'
-  | 'GROCERYVIEW_IMAGE_CACHE_MAX_BYTES',
+  | 'GROCERYVIEW_IMAGE_CACHE_MAX_BYTES'
+  | 'NODE_ENV',
   string
 >>;
 
@@ -3575,6 +3714,7 @@ export const GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_PRODUCTS_URL = 'groceryview://da
 export const GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/hemkop/weekly-offers/all-stores';
 export const GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL = 'groceryview://daily/ica/store-promotions/default-stores';
 export const GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL = 'groceryview://daily/lidl/public-offers/all-stores';
+export const GROCERYVIEW_DAILY_LIDL_BULK_PRODUCTS_URL = 'groceryview://daily/lidl/products/bulk';
 export const GROCERYVIEW_DAILY_LOCALFOODNODES_SE_PRODUCTS_URL = 'groceryview://daily/localfoodnodes/se/products/all-nodes';
 export const GROCERYVIEW_DAILY_LYF_OG_HEILSA_IS_PRODUCTS_URL = 'groceryview://daily/is/lyfogheilsa/products/public';
 export const GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/coop/weekly-offers/all-stores';
@@ -3582,6 +3722,7 @@ export const GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL = 'groceryview://dail
 export const GROCERYVIEW_DAILY_CITY_GROSS_BULK_PRODUCTS_URL = 'groceryview://daily/city-gross/products/bulk';
 export const GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL = 'groceryview://daily/city-gross/public-products/all-stores';
 export const GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL = 'groceryview://daily/mathem/products/public-search';
+export const GROCERYVIEW_DAILY_MATHEM_PRENUMERATION_PRODUCTS_URL = 'groceryview://daily/mathem-prenumeration/products/public-search';
 export const GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL = 'groceryview://daily/matspar/products/public-search';
 export const GROCERYVIEW_DAILY_SNABBGROSS_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/snabbgross/products/all-stores';
 export const GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL = OKQ8_FUEL_PRICES_URL;
@@ -3729,6 +3870,17 @@ export function buildDailyConnectorConfigsFromEnv(env: DailyIngestionEnv): Daily
       storeRetryBaseDelayMs: connector.storeRetryBaseDelayMs ?? storeRunnerOptions.storeRetryBaseDelayMs
     })
   }));
+  const allowDevSourceTermsOverride =
+    env.NODE_ENV !== 'production' && dailyEnvFlagEnabled(env.GROCERYVIEW_DEV_ALLOW_SOURCE_TERMS_OVERRIDE);
+  for (const connector of connectors) {
+    assertMarketSourceTermsGate({
+      connectorId: connector.connectorId,
+      chainId: connector.chainId,
+      sourceType: connector.sourceType,
+      endpointUrl: connector.endpointUrl,
+      allowDevOverride: allowDevSourceTermsOverride
+    });
+  }
   const runtimeOptions = {
     maxConcurrency: parseDailyEnvInteger(env.GROCERYVIEW_DAILY_MAX_CONCURRENCY, 1, 'GROCERYVIEW_DAILY_MAX_CONCURRENCY'),
     connectorStartDelayMs: parseDailyEnvInteger(env.GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS, 0, 'GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS'),
@@ -4551,7 +4703,7 @@ async function persistDailyConnectorOutput(input: {
       [
         'operator_public_price_page',
         normalizeDailySlug(config.chainId),
-        config.chainId.toUpperCase(),
+        fuelOperatorNameForChain(config.chainId),
         config.endpointUrl,
         config.parserVersion,
         config.requestedAt ?? result.plan.provenance.capturedAt,
@@ -4679,6 +4831,8 @@ async function persistDailyConnectorOutput(input: {
         storeId,
         sourceRunId: sourceRun.sourceRunId,
         retailerProductRef: accepted.priceObservation.retailerProductId,
+        originCountry: accepted.priceObservation.originCountry,
+        certLevel: accepted.priceObservation.certLevel,
         priceType: dbPriceTypeForIngested(accepted.priceObservation.priceType),
         price: accepted.priceObservation.price,
         regularPrice: accepted.priceObservation.regularPrice,
@@ -4822,6 +4976,49 @@ function normalizeDailyRunnerInteger(value: number | undefined, fallback: number
   return Math.max(0, Math.floor(value));
 }
 
+export type DailyIngestionConnectionUsageSnapshot = {
+  checkoutCount: number;
+  activeCheckoutCount: number;
+  maxActiveCheckoutCount: number;
+};
+
+export type DailyIngestionConnectionUsageMonitor = {
+  beforeCheckout(): void;
+  afterCheckout(): void;
+  snapshot(): DailyIngestionConnectionUsageSnapshot;
+  assertNoLeaks(options?: { maxCheckoutCount?: number }): DailyIngestionConnectionUsageSnapshot;
+};
+
+export function createDailyIngestionConnectionUsageMonitor(): DailyIngestionConnectionUsageMonitor {
+  let checkoutCount = 0;
+  let activeCheckoutCount = 0;
+  let maxActiveCheckoutCount = 0;
+
+  return {
+    beforeCheckout() {
+      checkoutCount += 1;
+      activeCheckoutCount += 1;
+      maxActiveCheckoutCount = Math.max(maxActiveCheckoutCount, activeCheckoutCount);
+    },
+    afterCheckout() {
+      activeCheckoutCount = Math.max(0, activeCheckoutCount - 1);
+    },
+    snapshot() {
+      return { checkoutCount, activeCheckoutCount, maxActiveCheckoutCount };
+    },
+    assertNoLeaks(options = {}) {
+      const current = this.snapshot();
+      if (current.activeCheckoutCount > 0) {
+        throw new Error(`Daily ingestion Postgres client leak detected: ${current.activeCheckoutCount} checkout(s) still active.`);
+      }
+      if (options.maxCheckoutCount !== undefined && current.checkoutCount > options.maxCheckoutCount) {
+        throw new Error(`Daily ingestion Postgres checkout count ${current.checkoutCount} exceeded expected maximum ${options.maxCheckoutCount}.`);
+      }
+      return current;
+    }
+  };
+}
+
 async function waitForDailyRunnerDelay(delayMs: number): Promise<void> {
   if (delayMs <= 0) return;
   await new Promise((resolve) => setTimeout(resolve, delayMs));
@@ -4906,24 +5103,29 @@ function clearZeroRowConnectorState(config: DailyIngestionConnectorConfig, state
 
 export function createDailyIngestionQueryExecutor(
   client: PgLikeClient,
-  options: { retryAttempts?: number; retryBaseDelayMs?: number } = {}
+  options: { retryAttempts?: number; retryBaseDelayMs?: number; connectionUsageMonitor?: DailyIngestionConnectionUsageMonitor } = {}
 ): QueryExecutor {
   const retryAttempts = normalizeDailyRunnerInteger(options.retryAttempts, 8);
   const retryBaseDelayMs = normalizeDailyRunnerInteger(options.retryBaseDelayMs, 2000);
   return {
     async query<T>(sql: string, params: unknown[] = []): Promise<T[]> {
-      for (let attempt = 0; attempt <= retryAttempts; attempt += 1) {
-        try {
-          const result = await client.query(sql, params);
-          return result.rows as T[];
-        } catch (error) {
-          if (attempt >= retryAttempts || !isTransientDailyDatabaseError(error)) throw error;
-          process.stderr.write(`[daily-ingestion] retrying database query attempt=${attempt + 2}/${retryAttempts + 1}: ${error instanceof Error ? error.message : String(error)}
+      options.connectionUsageMonitor?.beforeCheckout();
+      try {
+        for (let attempt = 0; attempt <= retryAttempts; attempt += 1) {
+          try {
+            const result = await client.query(sql, params);
+            return result.rows as T[];
+          } catch (error) {
+            if (attempt >= retryAttempts || !isTransientDailyDatabaseError(error)) throw error;
+            process.stderr.write(`[daily-ingestion] retrying database query attempt=${attempt + 2}/${retryAttempts + 1}: ${error instanceof Error ? error.message : String(error)}
 `);
-          await waitForDailyRunnerDelay(retryBaseDelayMs * (attempt + 1));
+            await waitForDailyRunnerDelay(retryBaseDelayMs * (attempt + 1));
+          }
         }
+        throw new Error('Daily ingestion database query retry loop exhausted.');
+      } finally {
+        options.connectionUsageMonitor?.afterCheckout();
       }
-      throw new Error('Daily ingestion database query retry loop exhausted.');
     }
   };
 }
@@ -5215,4 +5417,6 @@ if (process.argv[1] && import.meta.url === new URL(process.argv[1], 'file:').hre
 }
 
 export * from './connectors/benchmarks/tlv-medicines.js';
+export * from './connectors/benchmarks/ssb-cpi-03013.js';
+export * from './connectors/ssb-cpi-no.js';
 export * from './connectors/benchmarks/registry.js';

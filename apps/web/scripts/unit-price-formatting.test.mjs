@@ -34,4 +34,32 @@ describe('unit price formatting', () => {
     assert.equal(formatSourceUnitPriceText('0,89 kr / 100 g'), '0,89 kr/100 g');
     assert.equal(formatSourceUnitPriceText('', 'kg'), unknownUnitPriceLabel);
   });
+
+  it('property-checks Nordic currency and locale variants without currency flips', () => {
+    const locales = [
+      { locale: 'sv-SE', currency: 'SEK', currencyPattern: /kr\/(?:kg|l|st|100 g)$/ },
+      { locale: 'nb-NO', currency: 'NOK', currencyPattern: /kr\/(?:kg|l|st|100 g)$/ },
+      { locale: 'is-IS', currency: 'ISK', currencyPattern: /kr\.\/(?:kg|l|st|100 g)$/ }
+    ];
+    const sourceLabels = [
+      ['Jämförpris 17,11 SEK', 'kg'],
+      ['Sammenligningspris 42.50 NOK per liter', 'l'],
+      ['Einingarverð 8 ISK / stk', 'st'],
+      ['0,89 kr / 100 g', '100 g']
+    ];
+
+    for (const { locale, currency, currencyPattern } of locales) {
+      for (const [sourceLabel, unit] of sourceLabels) {
+        const formatted = formatSourceUnitPriceText(sourceLabel, unit, { locale, currency });
+
+        assert.match(formatted, currencyPattern, `${sourceLabel} should stay in ${currency}`);
+        assert.notEqual(formatted, unknownUnitPriceLabel, `${sourceLabel} should keep a parseable unit-price label`);
+      }
+    }
+
+    assert.equal(
+      formatSourceUnitPriceText('original shelf label unavailable', 'kg', { unknownLabel: 'original shelf label unavailable' }),
+      'original shelf label unavailable'
+    );
+  });
 });

@@ -163,6 +163,10 @@ describe('Mathem connector fixture parsing', () => {
       imageUrl: 'https://assets.mathem.se/products/mellanmjolk-thumb.jpg',
       productUrl: 'https://www.mathem.se/se/products/1001-arla-ko-mellanmjolk-1l/',
       available: true,
+      country: 'SE',
+      currency: 'SEK',
+      chain: 'mathem',
+      mathem_tier: 'spot',
       channel: 'online',
       is_coupon_price: false,
       is_subscription_price: false,
@@ -223,12 +227,14 @@ describe('Mathem connector fixture parsing', () => {
 
     assert.deepEqual(row && {
       channel: row.channel,
+      tier: row.mathem_tier,
       coupon: row.is_coupon_price,
       subscription: row.is_subscription_price,
       clearance: row.is_clearance,
       multiBuy: row.multi_buy
     }, {
       channel: 'online',
+      tier: 'subscription',
       coupon: true,
       subscription: true,
       clearance: true,

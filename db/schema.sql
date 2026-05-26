@@ -61,6 +61,22 @@ create table if not exists products (
 
 create unique index if not exists products_barcode_unique_idx on products (barcode) where barcode is not null;
 
+create table if not exists analytics_events (
+  id uuid primary key default gen_random_uuid(),
+  event_name text not null,
+  product_id text null references products(id) on delete set null,
+  anonymous_id text null,
+  metadata jsonb not null default '{}'::jsonb,
+  occurred_at timestamptz not null default now()
+);
+
+create index if not exists analytics_events_event_name_occurred_at_idx
+  on analytics_events(event_name, occurred_at desc);
+
+create index if not exists analytics_events_product_id_idx
+  on analytics_events(product_id)
+  where product_id is not null;
+
 create table if not exists product_aliases (
   id bigserial primary key,
   raw_name text not null,
@@ -153,7 +169,8 @@ create table if not exists user_preferences (
   dietary_preferences jsonb not null default '{}'::jsonb,
   notification_preferences jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  constraint user_preferences_favorite_stores_count_check check (cardinality(favorite_stores) <= 5)
 );
 
 create table if not exists favorite_stores (
@@ -290,7 +307,7 @@ create table if not exists fuel_price_sources (
   station_id text references stores(id),
   reporter_id text references community_reporter_trust(reporter_id),
   reporter_trust_tier text check (reporter_trust_tier in ('new', 'trusted', 'operator_verified')),
-  evidence_type text check (evidence_type in ('receipt', 'pump_photo', 'manual_entry')),
+  evidence_type text check (evidence_type in ('receipt', 'pump_photo', 'manual_entry', 'station_sign')),
   source_url text,
   parser_version text,
   captured_at timestamptz,

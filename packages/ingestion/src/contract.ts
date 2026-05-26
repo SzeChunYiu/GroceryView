@@ -12,7 +12,11 @@ const sourceTypes = [
 
 const productKinds = ['branded', 'commodity'] as const;
 
+const certLevels = ['krav', 'eu_eco', 'free_range', 'asc', 'msc', 'rainforest_alliance', 'fairtrade', 'conventional'] as const;
+
 const fuelSourceKinds = ['operator_public_price_page', 'crowd_station_report'] as const;
+
+const fuelGradeIds = ['fuel-95-e10', 'fuel-98', 'fuel-diesel', 'fuel-hvo100', 'fuel-e85', 'fuel-adblue'] as const;
 
 const nonEmptyString = z.string().trim().min(1);
 const optionalNonEmptyString = nonEmptyString.optional();
@@ -41,10 +45,10 @@ export const ingestRowSchema = z.object({
   barcode: optionalNonEmptyString,
   productKind: z.enum(productKinds).optional(),
   commodityId: optionalNonEmptyString,
-  fuelGradeId: optionalNonEmptyString,
+  fuelGradeId: z.enum(fuelGradeIds).optional(),
   fuelSource: z.object({
     sourceKind: z.enum(fuelSourceKinds),
-    fuelGradeId: nonEmptyString,
+    fuelGradeId: z.enum(fuelGradeIds),
     originalPriceText: nonEmptyString,
     originalEffectiveDate: optionalIsoDateString
   }).strict().optional(),
@@ -52,6 +56,7 @@ export const ingestRowSchema = z.object({
   variant: optionalNonEmptyString,
   isOrganic: z.boolean().optional(),
   originCountry: nonEmptyString.regex(/^[A-Za-z]{2}$/, 'must be an ISO-3166 alpha-2 code').transform((value) => value.toUpperCase()).optional(),
+  certLevel: z.enum(certLevels).optional(),
   soldByWeight: z.boolean().optional(),
   packageSize: positiveNumber,
   packageUnit: nonEmptyString,
@@ -74,7 +79,8 @@ export const ingestRowSchema = z.object({
   }
 });
 
-export type IngestRow = z.infer<typeof ingestRowSchema>;
+export const IngestRow = ingestRowSchema;
+export type IngestRow = z.infer<typeof IngestRow>;
 
 export function formatIngestRowZodIssues(issues: readonly z.ZodIssue[]): string {
   return issues

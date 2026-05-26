@@ -1,10 +1,15 @@
 import { createPgQueryExecutor, searchProductsByText, type ProductSearchResult } from '@groceryview/db';
 import { NextResponse } from 'next/server';
+import { publicApiReadCacheControl } from '@/lib/cache-policy';
 import { prefetchFrequentSearches, readSearchCache, searchCacheKey, writeSearchCache } from '@/lib/search-cache';
 import { expandGrocerySearchQuery, type GrocerySearchExpansion } from '@/lib/search-suggest';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+
+const publicApiReadHeaders = {
+  'Cache-Control': publicApiReadCacheControl
+};
 
 type PgPoolLike = {
   query(text: string, values: unknown[]): Promise<{ rows: unknown[] }>;
@@ -90,12 +95,12 @@ export async function GET(request: Request) {
   const cacheKey = searchCacheKey(query, expansion.expandedQueries);
 
   if (query.length < 2) {
-    return NextResponse.json(responsePayload(query, expansion, []));
+    return NextResponse.json(responsePayload(query, expansion, []), { headers: publicApiReadHeaders });
   }
 
   const cachedPayload = readSearchCache<ReturnType<typeof responsePayload>>(cacheKey);
   if (cachedPayload) {
-    return NextResponse.json({ ...cachedPayload, cacheStatus: 'hit' });
+    return NextResponse.json({ ...cachedPayload, cacheStatus: 'hit' }, { headers: publicApiReadHeaders });
   }
 
   const databaseUrl = process.env.DATABASE_URL;
@@ -111,7 +116,7 @@ export async function GET(request: Request) {
     void prefetchFrequentSearches((prefetchQuery) => prefetchSearchQuery(executor, prefetchQuery));
     const payload = responsePayload(query, expansion, await expandedSearchResults(executor, expansion), undefined, 'miss');
     writeSearchCache(cacheKey, { ...payload, cacheStatus: 'stored' });
-    return NextResponse.json(payload);
+    return NextResponse.json(payload, { headers: publicApiReadHeaders });
   } catch (error) {
     console.error('Product search query failed', error instanceof Error ? { name: error.name } : { name: 'unknown' });
     return NextResponse.json(

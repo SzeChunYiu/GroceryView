@@ -1,3 +1,5 @@
+import { ACTIVE_PRODUCTS_PREDICATE } from './items.js';
+
 export type ProductSearchQueryOptions = {
   limit?: number;
 };
@@ -19,6 +21,7 @@ export type ProductSuggestQuery = {
 export type ProductSearchRow = {
   id: string;
   slug: string;
+  barcode: string | null;
   name: string;
   brand: string | null;
   image_url: string | null;
@@ -37,6 +40,7 @@ export type ProductSuggestionRow = {
 export type ProductSearchResult = {
   id: string;
   slug: string;
+  barcode: string | null;
   name: string;
   brand: string | null;
   imageUrl: string | null;
@@ -83,27 +87,32 @@ export function buildProductSearchQuery(query: string, options: ProductSearchQue
   const normalizedSearchDocument = `lower(unaccent(${searchDocument}))`;
   const searchVector = `to_tsvector('simple', unaccent(${searchDocument}))`;
   const fuzzyRank = `similarity(${normalizedSearchDocument}, query.fuzzy_query)`;
+  const barcodeRank = `case when length(query.barcode_query) >= 8 and regexp_replace(coalesce(products.barcode, ''), '\\D', '', 'g') = query.barcode_query then 2 else 0 end`;
 
   return {
     sql: `with query as (
             select websearch_to_tsquery('simple', unaccent($1)) as search_query,
-                   lower(unaccent($1)) as fuzzy_query
+                   lower(unaccent($1)) as fuzzy_query,
+                   regexp_replace($1, '\\D', '', 'g') as barcode_query
           )
           select products.id::text as id,
                  products.slug,
+                 products.barcode,
                  products.canonical_name as name,
                  products.brand,
                  products.image_url,
-                 greatest(ts_rank_cd(${searchVector}, query.search_query), ${fuzzyRank}) as search_rank
+                 greatest(ts_rank_cd(${searchVector}, query.search_query), ${fuzzyRank}, ${barcodeRank}) as search_rank
             from products
             cross join query
            where products.domain = 'grocery'
+             and ${ACTIVE_PRODUCTS_PREDICATE}
              and (
                ${searchVector} @@ query.search_query
                or ${normalizedSearchDocument} like '%' || query.fuzzy_query || '%'
                or ${fuzzyRank} >= 0.2
+               or ${barcodeRank} > 0
              )
-           order by search_rank desc, ${fuzzyRank} desc, products.canonical_name asc
+           order by ${barcodeRank} desc, search_rank desc, ${fuzzyRank} desc, products.canonical_name asc
            limit $2`,
     values: [normalizedQuery, clampLimit(options.limit)]
   };
@@ -138,6 +147,7 @@ export function buildProductSuggestQuery(query: string, options: ProductSuggestQ
             from products
             cross join query
            where products.domain = 'grocery'
+             and ${ACTIVE_PRODUCTS_PREDICATE}
              and (
                products.canonical_name ilike query.raw_prefix || '%'
                or coalesce(products.name_sv, '') ilike query.raw_prefix || '%'
@@ -160,6 +170,7 @@ export function mapProductSearchRow(row: ProductSearchRow): ProductSearchResult 
   return {
     id: row.id,
     slug: row.slug,
+    barcode: row.barcode,
     name: row.name,
     brand: row.brand,
     imageUrl: row.image_url,

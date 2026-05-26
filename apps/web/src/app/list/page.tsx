@@ -5,9 +5,13 @@ import { ListSharePreview } from '@/components/list-share-preview';
 import { createPublicListShareToken, publicListSharePath, type PublicListShareItem } from '@/lib/list-permissions';
 import { parseMealPlanShoppingListExport, type MealPlanShoppingListExport } from '@/lib/meal-budgets';
 import { generateRecurringListInstance, recurringListTemplates } from '@/lib/recurring-lists';
+import { reorderWarningsForMatchedProducts } from '@/lib/reorder-suggestions';
 import { storeLayoutDepartments, storeLayoutDepartmentsForOrder, type StoreLayoutChain, type StoreLayoutGroupOrder } from '@/lib/trip-planner';
 import { metadataForShoppingListShare } from '@/lib/seo';
 import { OFFLINE_LIST_EDIT_RECONCILIATION_STEPS, offlineListSyncStatusCopy } from '@/lib/offline-sync';
+import { listPresenceParticipants, summarizeListPresence } from '@/lib/list-presence';
+import { optimizeBasketByStore, type BasketOptimizerItem, type BasketOptimizerPriceRow } from '@/lib/basketOptimizer';
+import { chainPriceRows, topChainSpreads } from '@/lib/verified-data';
 
 const demoItems = [
   { id: 'bananas', name: 'Bananas', quantity: '1 bunch', ownerRole: 'guardian' as const },
@@ -80,11 +84,29 @@ export default async function ShoppingListPage({ searchParams }: { searchParams?
   const mealPlanExport = mealPlanExportFromParam(resolvedSearchParams.mealPlan);
   const mealPlanItems = mealPlanExport?.items.map((item) => ({
     id: item.id,
+    matchedProductSlug: item.productId,
     name: item.name,
     ownerRole: 'guardian' as const,
     quantity: item.quantity
   })) ?? [];
   const listItems = [...mealPlanItems, ...demoItems.filter((item) => !mealPlanItems.some((mealItem) => mealItem.id === item.id))];
+  const optimizerItems: BasketOptimizerItem[] = listItems.map((item) => ({
+    id: item.id,
+    matchedProductSlug: 'matchedProductSlug' in item ? item.matchedProductSlug : undefined,
+    name: item.name,
+    quantity: item.quantity
+  }));
+  const optimizerPriceRows: BasketOptimizerPriceRow[] = topChainSpreads.flatMap((product) => (
+    chainPriceRows(product).map((row) => ({
+      price: row.price,
+      productSlug: product.slug,
+      storeId: String(row.chain),
+      storeName: String(row.chain).toUpperCase()
+    }))
+  ));
+  const basketOptimization = optimizeBasketByStore(optimizerItems, optimizerPriceRows, { allowTwoStoreSplit: true });
+  const recommendedPlan = basketOptimization.recommendedPlan;
+  const reorderWarnings = reorderWarningsForMatchedProducts(listItems);
   const publicShareToken = shareToken ?? createPublicListShareToken({
     expiresAt: '2026-06-30T23:59:59.000Z',
     items: publicDemoShareItems,
@@ -97,9 +119,33 @@ export default async function ShoppingListPage({ searchParams }: { searchParams?
     template,
     instance: generateRecurringListInstance(template, new Date('2026-05-25T00:00:00.000Z'))
   }));
+  const presenceSummary = summarizeListPresence(listPresenceParticipants);
 
   return (
     <div className="space-y-6">
+      <section className="rounded-2xl border border-emerald-200 bg-white p-4 shadow-sm" aria-labelledby="list-presence-title">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-emerald-800">Live list presence</p>
+            <h2 id="list-presence-title" className="mt-1 text-xl font-bold text-slate-950">{presenceSummary.statusLabel}</h2>
+            <p className="mt-1 text-sm text-slate-600">
+              {presenceSummary.idleCount.toLocaleString('sv-SE')} idle collaborator{presenceSummary.idleCount === 1 ? '' : 's'} remain visible for handoff context.
+            </p>
+          </div>
+          <div className="flex -space-x-2" aria-label="Active household list collaborators">
+            {listPresenceParticipants.map((participant) => (
+              <span
+                aria-label={`${participant.displayName} ${participant.state}`}
+                className={`inline-flex size-10 items-center justify-center rounded-full border-2 border-white text-sm font-black ${participant.colorClassName}`}
+                key={participant.id}
+                title={`${participant.displayName} ${participant.state}`}
+              >
+                {participant.displayName.slice(0, 1)}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
       <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4" aria-labelledby="offline-sync-title">
         <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">Offline edit reconciliation</p>
         <h2 id="offline-sync-title" className="mt-1 text-xl font-bold text-slate-950">Pending edits stay visible until sync finishes</h2>
@@ -146,6 +192,55 @@ export default async function ShoppingListPage({ searchParams }: { searchParams?
         </div>
       </section>
       <ListSharePreview />
+      {recommendedPlan ? (
+        <section className="rounded-2xl border border-cyan-200 bg-cyan-50 p-4" aria-labelledby="basket-optimizer-title">
+          <p className="text-xs font-semibold uppercase tracking-wide text-cyan-800">Optimize basket by store</p>
+          <h2 id="basket-optimizer-title" className="mt-1 text-xl font-bold text-slate-950">
+            {recommendedPlan.mode === 'two_store_split' ? 'Best two-store split' : 'Best single-store basket'}: {recommendedPlan.total === null ? 'No complete price evidence' : formatSek(recommendedPlan.total)}
+          </h2>
+          <p className="mt-2 text-sm text-cyan-950">
+            The optimizer prices matched list items across available chain rows, then compares single-store totals against the cheapest split across two stores. {recommendedPlan.missingCount.toLocaleString('sv-SE')} list item{recommendedPlan.missingCount === 1 ? '' : 's'} still need verified price evidence.
+          </p>
+          <div className="mt-3 grid gap-3 md:grid-cols-2">
+            {recommendedPlan.stores.filter((store) => store.itemCount > 0).map((store) => (
+              <div className="rounded-xl border border-cyan-200 bg-white p-3" key={store.storeId}>
+                <p className="text-sm font-black text-cyan-950">{store.storeName}: {store.total === null ? 'No priced items' : formatSek(store.total)}</p>
+                <p className="mt-1 text-sm font-semibold text-slate-700">{store.itemCount.toLocaleString('sv-SE')} assigned item{store.itemCount === 1 ? '' : 's'}</p>
+              </div>
+            ))}
+          </div>
+          <ul className="mt-3 grid gap-2 text-sm md:grid-cols-2">
+            {recommendedPlan.assignments.map((assignment) => (
+              <li className="rounded-xl bg-white/80 px-3 py-2" key={assignment.itemId}>
+                <span className="font-black text-slate-950">{assignment.itemName}</span>
+                <span className="text-slate-700"> → {assignment.storeName ?? 'missing price'} {assignment.price === null ? '' : `· ${formatSek(assignment.price)}`}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+      {reorderWarnings.length > 0 ? (
+        <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4" aria-labelledby="reorder-warning-title">
+          <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">Verified reorder warnings</p>
+          <h2 id="reorder-warning-title" className="mt-1 text-xl font-bold text-slate-950">Review price changes before preparing a reorder</h2>
+          <ul className="mt-3 grid gap-3 md:grid-cols-2">
+            {reorderWarnings.map((warning) => (
+              <li className="rounded-xl border border-amber-200 bg-white px-3 py-2" key={warning.itemId}>
+                <p className="text-sm font-black text-amber-950">{warning.itemName}: {warning.label}</p>
+                <p className="mt-1 text-sm font-semibold text-slate-700">
+                  {warning.currentUnitPrice === null
+                    ? 'Current verified price missing'
+                    : `${formatSek(warning.currentUnitPrice)} latest verified price`}
+                  {warning.previousUnitPrice === null ? '' : ` · ${formatSek(warning.previousUnitPrice)} previous`}
+                </p>
+                <p className="mt-1 text-xs font-bold text-amber-900">
+                  {warning.recommendedAction} Confidence {(warning.confidence * 100).toFixed(0)}%.
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
       <section className="rounded-2xl border border-sky-200 bg-sky-50 p-4">
         <p className="text-xs font-semibold uppercase tracking-wide text-sky-800">Public share page</p>
         <h2 className="mt-1 text-xl font-bold text-slate-950">Open the read-only public list view</h2>
@@ -184,6 +279,7 @@ export default async function ShoppingListPage({ searchParams }: { searchParams?
         groupOrder={groupOrder}
         items={listItems}
         mealPlanImport={mealPlanExport ? mealPlanImportSummary(mealPlanExport) : undefined}
+        presenceParticipants={listPresenceParticipants}
         publicShareHref={publicShareHref}
         selectedChain={selectedChain}
       />

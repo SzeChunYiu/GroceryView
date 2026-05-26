@@ -16,7 +16,7 @@
  */
 "use client";
 
-import { useMemo, useState } from "react";
+import { type KeyboardEvent, useMemo, useState } from "react";
 
 import {
   buildBasketCouponStackOptimizer,
@@ -50,11 +50,20 @@ export function addBasketBuilderProduct<T extends BasketBuilderProduct>(
   return [...products, product];
 }
 
+export function removeBasketBuilderProduct<T extends BasketBuilderProduct>(
+  products: T[],
+  productId: string,
+): T[] {
+  return products.filter((product) => product.id !== productId);
+}
+
 export type BasketBuilderProps<T extends BasketBuilderProduct> = {
   products: readonly T[];
   pastPurchaseShortcuts?: readonly T[];
   selectedDietaryFilters?: readonly string[];
   onSelectedDietaryFiltersChange?: (filters: string[]) => void;
+  emptyData?: boolean;
+  onAction?: (action: { type: 'add' | 'remove'; product: T }) => void;
 };
 
 export function BasketBuilder<T extends BasketBuilderProduct>({
@@ -62,6 +71,8 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
   pastPurchaseShortcuts = [],
   selectedDietaryFilters,
   onSelectedDietaryFiltersChange,
+  emptyData = false,
+  onAction,
 }: BasketBuilderProps<T>) {
   const [basketProducts, setBasketProducts] = useState<T[]>([]);
   const [localDietaryFilters, setLocalDietaryFilters] = useState<string[]>([]);
@@ -110,7 +121,24 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
   });
 
   function add(product: T) {
+    if (emptyData) return;
+
     setBasketProducts((current) => addBasketBuilderProduct(current, product));
+    onAction?.({ type: 'add', product });
+  }
+
+  function remove(product: T) {
+    setBasketProducts((current) => removeBasketBuilderProduct(current, product.id));
+    onAction?.({ type: 'remove', product });
+  }
+
+  function removeOnBackspace(event: KeyboardEvent<HTMLLIElement>, product: T) {
+    if (event.key !== 'Backspace') return;
+
+    event.preventDefault();
+    if (window.confirm(`Remove ${product.name} from basket?`)) {
+      remove(product);
+    }
   }
 
   function recommendationReasonsFor(product: T) {
@@ -142,7 +170,7 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
 
   return (
     <section aria-label="Basket builder">
-      {pastPurchaseShortcuts.length > 0 ? (
+      {pastPurchaseShortcuts.length > 0 && !emptyData ? (
         <section aria-label="Past purchase shortcuts">
           <h3>Past purchase shortcuts</h3>
           <p>Frequently purchased staples can be added with one tap before you build the rest of the basket.</p>
@@ -158,7 +186,7 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
         </section>
       ) : null}
 
-      {availableDietaryTags.length > 0 ? (
+      {availableDietaryTags.length > 0 && !emptyData ? (
         <fieldset aria-label="Dietary filters">
           <legend>Dietary filters</legend>
           <div>
@@ -178,32 +206,43 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
         </fieldset>
       ) : null}
 
-      <ul>
-        {filteredProducts.map((product) => {
-          const recommendationReasons = recommendationReasonsFor(product);
-          return (
-            <li key={product.id}>
-              <span>{product.name}</span>
-              <button type="button" onClick={() => add(product)}>
-                Add
-              </button>
-              {recommendationReasons.length > 0 ? (
-                <ul aria-label={`${product.name} recommendation reasons`}>
-                  {recommendationReasons.map((reason) => <li key={reason}>{reason}</li>)}
-                </ul>
-              ) : null}
-            </li>
-          );
-        })}
-      </ul>
-      {filteredProducts.length === 0 ? (
+      {!emptyData ? (
+        <ul>
+          {filteredProducts.map((product) => {
+            const recommendationReasons = recommendationReasonsFor(product);
+            return (
+              <li key={product.id}>
+                <span>{product.name}</span>
+                <button type="button" onClick={() => add(product)}>
+                  Add
+                </button>
+                {recommendationReasons.length > 0 ? (
+                  <ul aria-label={`${product.name} recommendation reasons`}>
+                    {recommendationReasons.map((reason) => <li key={reason}>{reason}</li>)}
+                  </ul>
+                ) : null}
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <p>No basket data is available.</p>
+      )}
+      {!emptyData && filteredProducts.length === 0 ? (
         <p>No products match the selected dietary filters.</p>
       ) : null}
 
       <h2>Basket</h2>
       <ul>
         {basketProducts.map((product) => (
-          <li key={product.id}>{product.name}</li>
+          <li
+            aria-label={`${product.name} basket row`}
+            key={product.id}
+            onKeyDown={(event) => removeOnBackspace(event, product)}
+            tabIndex={0}
+          >
+            {product.name}
+          </li>
         ))}
       </ul>
 

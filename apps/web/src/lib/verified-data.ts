@@ -1,6 +1,6 @@
 import { buildFacetedProductSearch, type RealCatalogSearchPriceRow } from '@groceryview/api';
 import { COMMODITIES, STAPLE_BASKET, SUPPORTED_PRICE_DOMAINS, type Commodity, type ComparableUnit } from '@groceryview/catalog';
-import { buildPriceChartSeries, buildWatchlistAlerts, calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, suggestFriendSharedDeals, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type PriceChartObservation, type ProductMatchInput, type WatchlistItem, type WatchlistPriceType, type WatchlistProductSnapshot } from '@groceryview/core';
+import { buildPriceChartSeries, buildWatchlistAlerts, calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planFuelCrowdPriceSubmission, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, suggestFriendSharedDeals, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type MultiWeekStockUpHistoryPoint, type PriceChartObservation, type ProductMatchInput, type WatchlistItem, type WatchlistPriceType, type WatchlistProductSnapshot } from '@groceryview/core';
 import { planReceiptAliasGrowth } from '@groceryview/scanning';
 import { calculateCarbonScore, type ProductCarbonScore } from '../../../../packages/core/src/lib/carbonScore';
 import { axfoodProducts } from './axfood-products';
@@ -22,7 +22,7 @@ import {
   dbSiteMatpriskollenSource
 } from './generated/db-site-ingested-overrides';
 import { dbSiteHomepageTrendingPriceChanges } from './generated/db-site-trending-price-changes';
-import { categoryLabels, pricedProducts } from './openprices-products';
+import { categoryLabels, parseVerifiedProductQuantity, pricedProducts } from './openprices-products';
 import { classifyRecentPriceVariance } from './price-intelligence';
 import { allergenRiskBadgesForText, searchExplanationBadgesForProduct, type SearchExplanationBadge } from './search-filters';
 import { osmStores } from './osm-stores';
@@ -81,7 +81,15 @@ const retailerTypes = [
   'variety',
   'cosmetics',
   'household',
-  'online_marketplace'
+  'online_marketplace',
+  'ethnic_asian',
+  'ethnic_polish_eastern_european',
+  'ethnic_middle_eastern',
+  'ethnic_indian_south_asian',
+  'ethnic_latin',
+  'ethnic_african',
+  'health_food',
+  'kosher_halal'
 ] as const;
 
 const majorSwedishGroceryRetailerTypeCoverage = retailerTypes.map((retailerType) => {
@@ -211,42 +219,15 @@ function median(values: number[]) {
   return sorted.length % 2 === 0 ? (sorted[middle - 1] + sorted[middle]) / 2 : sorted[middle];
 }
 
-function unitAmountFromPackage(packageText: string): { amount: number; unit: 'kg' | 'l' | 'st'; packageLabel: string } | null {
-  const normalized = packageText.replace(',', '.').toLowerCase();
-  const multiplied = normalized.match(/(\d+)\s*x\s*(\d+(?:\.\d+)?)\s*(kg|g|l|ml|cl|st)\b/);
-  if (multiplied) {
-    const count = Number(multiplied[1]);
-    const each = Number(multiplied[2]);
-    const unit = multiplied[3];
-    if (Number.isFinite(count) && Number.isFinite(each) && count > 0 && each > 0) {
-      if (unit === 'kg') return { amount: count * each, unit: 'kg', packageLabel: multiplied[0] };
-      if (unit === 'g') return { amount: (count * each) / 1000, unit: 'kg', packageLabel: multiplied[0] };
-      if (unit === 'l') return { amount: count * each, unit: 'l', packageLabel: multiplied[0] };
-      if (unit === 'cl') return { amount: (count * each) / 100, unit: 'l', packageLabel: multiplied[0] };
-      if (unit === 'ml') return { amount: (count * each) / 1000, unit: 'l', packageLabel: multiplied[0] };
-      return { amount: count * each, unit: 'st', packageLabel: multiplied[0] };
-    }
-  }
-
-  const matches = [...normalized.matchAll(/(\d+(?:\.\d+)?)\s*(kg|g|l|ml|cl|st)\b/g)];
-  const match = matches.at(-1);
-  if (!match) return null;
-  const value = Number(match[1]);
-  const unit = match[2];
-  if (!Number.isFinite(value) || value <= 0) return null;
-  if (unit === 'kg') return { amount: value, unit: 'kg', packageLabel: match[0] };
-  if (unit === 'g') return { amount: value / 1000, unit: 'kg', packageLabel: match[0] };
-  if (unit === 'l') return { amount: value, unit: 'l', packageLabel: match[0] };
-  if (unit === 'cl') return { amount: value / 100, unit: 'l', packageLabel: match[0] };
-  if (unit === 'ml') return { amount: value / 1000, unit: 'l', packageLabel: match[0] };
-  return { amount: value, unit: 'st', packageLabel: match[0] };
-}
+const unitAmountFromPackage = parseVerifiedProductQuantity;
 
 export function normalizeComparableUnitPrice(totalPrice: number, packageText: string) {
   const packageAmount = unitAmountFromPackage(packageText);
   if (!packageAmount || !Number.isFinite(totalPrice) || totalPrice <= 0) return null;
   return {
     packageLabel: packageAmount.packageLabel,
+    packageUnits: packageAmount.amount,
+    comparableUnit: packageAmount.unit,
     unitLabel: `kr/${packageAmount.unit}`,
     unitPrice: totalPrice / packageAmount.amount,
     unitSortPrice: totalPrice / packageAmount.amount
@@ -287,6 +268,38 @@ function dailyObservedPricePoints(product: (typeof pricedProducts)[number]) {
     storeId: 'openprices-community'
   }));
 }
+
+
+function stockUpHistoryFromObservedProduct(product: (typeof pricedProducts)[number] | undefined): MultiWeekStockUpHistoryPoint[] {
+  if (!product || product.observations.length < 2) return [];
+  return product.observations
+    .filter((observation) => Number.isFinite(observation.price) && observation.price > 0 && observation.date)
+    .map((observation) => ({
+      observedAt: `${observation.date}T00:00:00.000Z`,
+      unitPrice: observation.price,
+      sourceType: 'shelf' as const,
+      confidence: product.observationCount >= 6 ? 0.82 : 0.62
+    }));
+}
+
+function bestObservedStockUpProduct(predicate: (product: (typeof pricedProducts)[number]) => boolean) {
+  return [...pricedProducts]
+    .filter((product) => predicate(product) && product.observations.length >= 2)
+    .sort((left, right) => right.observationCount - left.observationCount || right.lastObservedAt.localeCompare(left.lastObservedAt))[0];
+}
+
+export const weeklyBasketLiveStockUpHistoryByProductId: Record<string, MultiWeekStockUpHistoryPoint[]> = {
+  coffee: stockUpHistoryFromObservedProduct(bestObservedStockUpProduct((product) => product.category === 'coffee-tea' || /coffee|kaffe/i.test(product.name))),
+  milk: stockUpHistoryFromObservedProduct(bestObservedStockUpProduct((product) => product.category === 'dairy' && /milk|mjölk|mjolk|havredryck/i.test(product.name))),
+  butter: stockUpHistoryFromObservedProduct(bestObservedStockUpProduct((product) => product.category === 'dairy' || /butter|smör|smor/i.test(product.name)))
+};
+
+export const weeklyBasketLiveStockUpEvidence = {
+  sourceTables: ['postgres.latest_prices', 'postgres.observations', 'generated db-site/openprices snapshot'],
+  noForecast: true,
+  minimumHistoryRows: 2,
+  caveat: 'Uses persisted observed price history when enough rows exist; missing basket items keep partial-coverage confidence visible and no forecast copy is shown.'
+};
 
 function priceDropBadgeLabel(changePercent: number): string {
   return `${Math.round(changePercent)}%`;
@@ -732,6 +745,7 @@ export type ProductSearchUrlParams = {
   chain?: SearchParamValue;
   minPrice?: SearchParamValue;
   maxPrice?: SearchParamValue;
+  avoidAllergens?: SearchParamValue;
   inStockOnly?: SearchParamValue;
   minConfidence?: SearchParamValue;
   minCarbonScore?: SearchParamValue;
@@ -854,7 +868,7 @@ function carbonScoreForFacetedProduct(product: (typeof rawFacetedProductSearch.p
   });
 }
 
-function productSearchResultCards(searchResult: typeof rawFacetedProductSearch, sort: ProductSearchSortOption = 'relevance', minCarbonScore?: number) {
+function productSearchResultCards(searchResult: typeof rawFacetedProductSearch, sort: ProductSearchSortOption = 'relevance', minCarbonScore?: number, avoidAllergens = false) {
   const cards = searchResult.products.map((product, relevanceIndex) => {
     const cheapest = product.currentPrices[0] ?? null;
     const lowestUnitPrice = product.currentPrices.reduce((lowest, price) => Math.min(lowest, price.unitPrice), Number.POSITIVE_INFINITY);
@@ -892,7 +906,10 @@ function productSearchResultCards(searchResult: typeof rawFacetedProductSearch, 
       sortRelevanceIndex: relevanceIndex,
       sortUnitPrice: Number.isFinite(lowestUnitPrice) ? lowestUnitPrice : Number.MAX_SAFE_INTEGER
     };
-  }).filter((card) => minCarbonScore === undefined || card.carbonScore.score >= minCarbonScore);
+  }).filter((card) => (
+    (minCarbonScore === undefined || card.carbonScore.score >= minCarbonScore)
+    && (!avoidAllergens || card.allergenRiskBadges.length === 0)
+  ));
 
   return cards.sort((left, right) => {
     if (sort === 'unit_price_asc' && left.sortUnitPrice !== right.sortUnitPrice) return left.sortUnitPrice - right.sortUnitPrice;
@@ -904,7 +921,7 @@ function productSearchResultCards(searchResult: typeof rawFacetedProductSearch, 
   });
 }
 
-export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}) {
+export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}, options: { accountAvoidAllergensDefault?: boolean } = {}) {
   const query = firstSearchValue(searchParams.q);
   const categories = listSearchValues(searchParams.category);
   const labelFilters = listSearchValues(searchParams.label);
@@ -915,6 +932,9 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
   const minPrice = numericSearchValue(searchParams.minPrice);
   const maxPrice = numericSearchValue(searchParams.maxPrice);
   const inStockOnly = booleanSearchValue(searchParams.inStockOnly);
+  const avoidAllergens = firstSearchValue(searchParams.avoidAllergens)
+    ? booleanSearchValue(searchParams.avoidAllergens)
+    : options.accountAvoidAllergensDefault ?? false;
   const minConfidence = confidenceSearchValue(searchParams.minConfidence);
   const minCarbonScore = numericSearchValue(searchParams.minCarbonScore);
   const sort = productSearchSortValue(searchParams.sort);
@@ -933,6 +953,7 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
     ...chains.map((chain) => `chain=${chainDisplayNames[chain] ?? chain}`),
     minPrice !== undefined ? `min unit ${formatSek(minPrice)}` : null,
     maxPrice !== undefined ? `max unit ${formatSek(maxPrice)}` : null,
+    avoidAllergens ? 'allergen-aware filter on' : null,
     inStockOnly ? 'priced/in-stock only' : null,
     minConfidence !== undefined ? `confidence ≥ ${pct.format(minConfidence * 100)}%` : null,
     minCarbonScore !== undefined ? `eco score ≥ ${minCarbonScore}` : null,
@@ -974,8 +995,12 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
       availableLatestPriceCount: searchResult.evidence.availableLatestPriceCount,
       outOfStockLatestPriceCount: searchResult.evidence.outOfStockLatestPriceCount
     },
+    allergenAvoidance: {
+      checked: avoidAllergens,
+      excludedResultCount: productSearchResultCards(searchResult, sort, minCarbonScore, false).filter((card) => card.allergenRiskBadges.length > 0).length
+    },
     activeFilters,
-    resultCards: productSearchResultCards(searchResult, sort, minCarbonScore)
+    resultCards: productSearchResultCards(searchResult, sort, minCarbonScore, avoidAllergens)
   };
 }
 
@@ -1205,6 +1230,27 @@ export const fuelStationSourceCoverage = {
     'The connector reads OSM station location and grade availability tags only.',
     'Fuel pages must not render pump prices until connector or trusted crowd rows write domain=fuel observations.',
     'Fuel grade matching stays separate from grocery EAN and commodity matching.'
+  ]
+};
+
+export const fuelCrowdSubmissionPolicy = {
+  title: 'Trusted crowd fuel submission gate',
+  driver: planFuelCrowdPriceSubmission.name,
+  sourceKind: 'crowd_station_report',
+  trustTable: 'community_reporter_trust',
+  sourceTable: 'fuel_price_sources',
+  observationLinkTable: 'fuel_price_source_observations',
+  maxFreshnessHours: 6,
+  maxOutlierPercent: 20,
+  requiredFields: ['station_id', 'fuel_grade_id', 'price_per_litre', 'observed_at', 'submitted_at', 'reporter_id', 'evidence_type'],
+  acceptedEvidenceTypes: ['pump_photo', 'receipt', 'station_sign'],
+  abuseControls: planCommunityReportAbuseControls({ reporters: [] }),
+  publicDisplayGates: [
+    'Crowd rows must be fresh within 6 hours of submission.',
+    'Reporter must pass community_reporter_trust burst, pending, and rejection controls.',
+    'Pump photo, receipt, or station-sign evidence is required before review.',
+    'Rows more than 20% away from same-grade operator references require manual review.',
+    'No crowd fuel row is public until verification links it to a domain=fuel observation.'
   ]
 };
 
@@ -1775,6 +1821,16 @@ export const crowdPriceSubmissionContract = {
     'Require manual review when a reporter has more than 5 unresolved reports.',
     'Suspend reporting when rejected-report volume is high and acceptance ratio is below 20%.'
   ],
+  scoringPipeline: [
+    'Validate account-bound reporterId against the authenticated user header before accepting the report.',
+    'Require image photoEvidence, observedAt, store evidence, and exact SEK reportedPrice before scoring.',
+    'Run planCommunityReportAbuseControls and price outlier checks before enqueuing human_review_assignments.'
+  ],
+  outlierChecks: [
+    'Reports with fewer than two verified comparable prices stay in manual review.',
+    'Reports more than 50% away from comparable median prices are flagged as outliers.',
+    'Accepted reports can improve commodity coverage only after accept_community_report review writeback.'
+  ],
   guardrails: [
     'No anonymous price reports: shopper session and userId are required before any community report is accepted.',
     'Community price reports enter manual review before they can affect verified prices or loose commodity coverage.',
@@ -1782,7 +1838,7 @@ export const crowdPriceSubmissionContract = {
     'community_reporter_trust throttles, suspends, or requires manual review for risky reporters.'
   ],
   reviewWritebacks: ['accept_community_report', 'dismiss_community_report'],
-  nextRuntimeStep: 'Wire the protected runtime endpoint to persist community_report raw_records and enqueue human_review_assignments.'
+  nextRuntimeStep: 'Persist accepted /api/community-price-reports payloads to community_report raw_records and durable human_review_assignments.'
 };
 
 const tomatoCommodity = COMMODITIES.find((commodity) => commodity.slug === 'tomato') ?? COMMODITIES[0]!;
@@ -2241,6 +2297,7 @@ export type AdaptiveProductCard = {
   brand: string;
   imageUrl: string | null;
   imageAlt: string | null;
+  lowestChain: string | null;
   productKind: 'branded' | 'commodity';
   totalPriceLabel: string;
   unitPriceLabel: string;
@@ -2372,9 +2429,23 @@ function observationAgeLabel(observedAt: string, asOf = '2026-05-25') {
   return ageDays === 0 ? 'Observed today' : `Observed ${ageDays} day${ageDays === 1 ? '' : 's'} before ${asOf}`;
 }
 
-function confidenceLevelForEvidence(sourceCount: number, hasNormalizedUnit: boolean): AdaptiveProductCard['confidenceLevel'] {
-  if (sourceCount >= 8 && hasNormalizedUnit) return 'high';
-  if (sourceCount >= 2 || hasNormalizedUnit) return 'medium';
+export type CountryCoverageCode = 'SE' | 'NO' | 'IS';
+
+const countryCoverageThresholds: Record<CountryCoverageCode, { high: number; medium: number }> = {
+  SE: { high: 8, medium: 2 },
+  NO: { high: Number.POSITIVE_INFINITY, medium: Number.POSITIVE_INFINITY },
+  IS: { high: Number.POSITIVE_INFINITY, medium: Number.POSITIVE_INFINITY }
+};
+
+export function confidenceLevelForCountryCoverage(
+  countryCode: CountryCoverageCode,
+  sourceCount: number,
+  hasNormalizedUnit: boolean
+): AdaptiveProductCard['confidenceLevel'] {
+  const thresholds = countryCoverageThresholds[countryCode];
+  if (sourceCount >= thresholds.high && hasNormalizedUnit) return 'high';
+  if (countryCode === 'SE' && (sourceCount >= thresholds.medium || hasNormalizedUnit)) return 'medium';
+  if (sourceCount >= thresholds.medium && hasNormalizedUnit) return 'medium';
   return 'low';
 }
 
@@ -2390,6 +2461,74 @@ function carbonScoreForProduct(product: (typeof productUniverse)[number]): Produ
     frozen: categoryEvidence.some((category) => category.toLocaleLowerCase('sv-SE').includes('frozen'))
   });
 }
+
+function carbonGradeForScore(score: number): ProductCarbonScore['grade'] {
+  if (score >= 85) return 'A';
+  if (score >= 70) return 'B';
+  if (score >= 55) return 'C';
+  if (score >= 40) return 'D';
+  return 'E';
+}
+
+const weeklyBasketEcoRows = topChainSpreads.slice(0, 12).map((product) => {
+  const carbonScore = carbonScoreForProduct(product);
+  const cheapest = chainPriceRows(product).sort((left, right) => left.price - right.price || left.chain.localeCompare(right.chain, 'sv'))[0];
+  return {
+    productSlug: product.slug,
+    productName: product.name,
+    categoryLabel: labelFromSlug(product.category),
+    chainId: cheapest?.chain ?? product.lowestChain,
+    chainName: chainDisplayNames[cheapest?.chain ?? product.lowestChain] ?? product.lowestChain,
+    price: cheapest?.price ?? product.lowestPrice,
+    priceLabel: formatSek(cheapest?.price ?? product.lowestPrice),
+    carbonScore,
+    evidenceLabel: carbonScore.source === 'openfoodfacts-ecoscore'
+      ? carbonScore.label
+      : `Estimated from category, labels, origin, and frozen evidence: ${carbonScore.reasons.slice(0, 2).join(', ')}`
+  };
+});
+
+export const weeklyBasketEcoScore = {
+  rows: weeklyBasketEcoRows,
+  averageScore: weeklyBasketEcoRows.length
+    ? Math.round(weeklyBasketEcoRows.reduce((sum, row) => sum + row.carbonScore.score, 0) / weeklyBasketEcoRows.length)
+    : 0,
+  totalPrice: weeklyBasketEcoRows.reduce((sum, row) => sum + row.price, 0),
+  knownEcoScoreCount: weeklyBasketEcoRows.filter((row) => row.carbonScore.source === 'openfoodfacts-ecoscore').length,
+  estimatedEcoScoreCount: weeklyBasketEcoRows.filter((row) => row.carbonScore.source === 'origin-transport-heuristic').length,
+  suggestions: weeklyBasketEcoRows.flatMap((row) => {
+    const replacement = topChainSpreads
+      .filter((candidate) => candidate.slug !== row.productSlug && labelFromSlug(candidate.category) === row.categoryLabel)
+      .map((candidate) => ({
+        candidate,
+        carbonScore: carbonScoreForProduct(candidate)
+      }))
+      .filter(({ candidate, carbonScore }) => candidate.lowestPrice <= row.price && carbonScore.score >= row.carbonScore.score + 8)
+      .sort((left, right) => right.carbonScore.score - left.carbonScore.score || left.candidate.lowestPrice - right.candidate.lowestPrice)[0];
+    if (!replacement) return [];
+    return [{
+      fromProductName: row.productName,
+      toProductName: replacement.candidate.name,
+      toProductSlug: replacement.candidate.slug,
+      categoryLabel: row.categoryLabel,
+      currentPriceLabel: row.priceLabel,
+      replacementPriceLabel: formatSek(replacement.candidate.lowestPrice),
+      currentScore: row.carbonScore.score,
+      replacementScore: replacement.carbonScore.score,
+      scoreLift: replacement.carbonScore.score - row.carbonScore.score,
+      priceDelta: replacement.candidate.lowestPrice - row.price,
+      evidenceLabel: replacement.carbonScore.source === 'openfoodfacts-ecoscore'
+        ? replacement.carbonScore.label
+        : `Estimated: ${replacement.carbonScore.reasons.slice(0, 2).join(', ')}`
+    }];
+  }).slice(0, 4),
+  guardrails: [
+    'Basket eco score is an average of item-level carbon scores for the visible verified basket candidates.',
+    'Rows marked estimated use category, origin, frozen, and label heuristics; no kg CO2e value is fabricated.',
+    'Cheaper-plus-greener suggestions require same-category verified catalogue rows with lower or equal current price.'
+  ]
+};
+export const weeklyBasketEcoGrade = carbonGradeForScore(weeklyBasketEcoScore.averageScore);
 
 export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((product) => {
   const isChainProduct = 'lowestPrice' in product;
@@ -2412,6 +2551,7 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
   const sourceCount = isChainProduct
     ? Object.values(product.chains).filter((row) => typeof row.price === 'number' && Number.isFinite(row.price) && row.price > 0).length
     : product.observationCount;
+  const coverageCountry: CountryCoverageCode = 'SE';
   const latestObservedAt = isChainProduct ? '2026-05-21' : product.lastObservedAt;
   const observationAge = observationAgeLabel(latestObservedAt);
   const normalizationQuality = normalizedUnit
@@ -2422,13 +2562,14 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
     : openFoodFactsSafetyByCode.has(product.code)
       ? 'OpenFoodFacts metadata linked for source review context.'
       : 'OpenPrices observation has no linked OpenFoodFacts review metadata yet.';
-  const confidenceLevel = confidenceLevelForEvidence(sourceCount, Boolean(normalizedUnit));
+  const confidenceLevel = confidenceLevelForCountryCoverage(coverageCountry, sourceCount, Boolean(normalizedUnit));
   const confidenceDrilldown = {
     sourceCount,
     observationAgeLabel: observationAge,
     normalizationQuality,
     reviewStatus,
     rows: [
+      { label: 'Country', value: coverageCountry },
       { label: 'Source count', value: `${sourceCount.toLocaleString('sv-SE')} ${isChainProduct ? 'chain price row(s)' : 'OpenPrices observation(s)'}` },
       { label: 'Observation age', value: observationAge },
       { label: 'Normalization quality', value: normalizationQuality },
@@ -2442,6 +2583,7 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
     brand: isChainProduct ? product.brand : product.brands || 'Brand not reported',
     imageUrl: product.image || null,
     imageAlt: product.image ? `${product.name} product image from ${isChainProduct ? 'Axfood' : 'OpenPrices/OpenFoodFacts'} source data` : null,
+    lowestChain: isChainProduct ? product.lowestChain : null,
     productKind,
     totalPriceLabel: formatSek(totalPrice),
     unitPriceLabel: normalizedUnit ? formatLocalizedUnitPrice(normalizedUnit.unitPrice, {

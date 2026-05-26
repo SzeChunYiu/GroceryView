@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 
-const page = readFileSync(new URL('../../apps/web/src/app/[city]/my-flyer/page.tsx', import.meta.url), 'utf8');
+const page = readFileSync(new URL('../../apps/web/src/app/[country]/my-flyer/page.tsx', import.meta.url), 'utf8');
 const pushActions = readFileSync(new URL('../../apps/web/src/components/my-flyer-push-actions.tsx', import.meta.url), 'utf8');
 const pushLib = readFileSync(new URL('../../apps/web/src/lib/push.ts', import.meta.url), 'utf8');
 
@@ -23,7 +23,7 @@ describe('MyFlyer push actions', () => {
     assert.match(pushLib, /user_id:\s*userId/);
   });
 
-  it('mounts signed-in MyFlyer controls on the printable city page', () => {
+  it('mounts signed-in MyFlyer controls on the printable country page', () => {
     assert.match(page, /import \{ MyFlyerPushActions \}/);
     assert.match(page, /<MyFlyerPushActions/);
     assert.match(page, /defaultAlgorithm="watchlist_first"/);

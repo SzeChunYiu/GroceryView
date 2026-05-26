@@ -13,6 +13,7 @@ export type HemkopProduct = {
   imageUrl: string;
   labels: string[];
   online: boolean;
+  channel: 'online' | 'store';
   outOfStock: boolean;
   sourceUrl: string;
   retrievedAt: string;
@@ -26,6 +27,12 @@ export type HemkopWeeklyDiscount = {
   storeId: string;
   storeName: string;
   city: string;
+  channel: 'store';
+  isMemberPrice: boolean;
+  isCouponPrice: boolean;
+  isSubscriptionPrice: boolean;
+  isClearance: boolean;
+  multiBuy: { qualifyingCount: number; label: string } | null;
   campaignType: string;
   promotionType: string;
   price: number;
@@ -114,6 +121,7 @@ type AxfoodCampaignPromotion = {
   weightVolume?: unknown;
   conditionLabel?: unknown;
   redeemLimitLabel?: unknown;
+  qualifyingCount?: unknown;
   startDate?: unknown;
   endDate?: unknown;
   validUntil?: unknown;
@@ -843,6 +851,7 @@ export function normalizeHemkopProduct(
     imageUrl: text(product.image?.url),
     labels: stringArray(product.labels),
     online: product.online === true,
+    channel: product.online === true ? 'online' : 'store',
     outOfStock: product.outOfStock === true,
     sourceUrl,
     retrievedAt
@@ -864,6 +873,22 @@ export function normalizeHemkopWeeklyDiscount(
     return null;
   }
 
+  const campaignType = text(promotion.campaignType);
+  const promotionType = text(promotion.promotionType);
+  const conditionText = text(promotion.conditionLabel);
+  const redeemLimitText = text(promotion.redeemLimitLabel);
+  const qualifyingCount = numberOrNull(promotion.qualifyingCount);
+  const priceText = text(promotion.cartLabel) || text(promotion.rewardLabel);
+  const promotionHaystack = [
+    campaignType,
+    promotionType,
+    conditionText,
+    redeemLimitText,
+    priceText,
+    text(promotion.savePrice),
+    ...stringArray(product.labels)
+  ].join(' ').toLowerCase();
+
   return {
     code: promotionCode,
     productCode,
@@ -872,16 +897,22 @@ export function normalizeHemkopWeeklyDiscount(
     storeId,
     storeName: '',
     city: '',
-    campaignType: text(promotion.campaignType),
-    promotionType: text(promotion.promotionType),
+    channel: 'store',
+    isMemberPrice: campaignType === 'LOYALTY' || /klubb|medlem|member/.test(promotionHaystack),
+    isCouponPrice: /kupong|coupon|rabattkod|rabattkupong|personlig/.test(promotionHaystack),
+    isSubscriptionPrice: false,
+    isClearance: /klipp/.test(promotionHaystack),
+    multiBuy: qualifyingCount && qualifyingCount > 1 ? { qualifyingCount, label: conditionText || priceText } : null,
+    campaignType,
+    promotionType,
     price,
-    priceText: text(promotion.cartLabel) || text(promotion.rewardLabel),
+    priceText,
     comparePriceText: text(promotion.comparePrice),
     regularPriceText: text(product.priceNoUnit),
     savePriceText: text(promotion.savePrice),
     packageText: text(promotion.weightVolume) || text(product.displayVolume),
-    conditionText: text(promotion.conditionLabel),
-    redeemLimitText: text(promotion.redeemLimitLabel),
+    conditionText,
+    redeemLimitText,
     startDate: text(promotion.startDate),
     endDate: text(promotion.endDate),
     validUntil: epochMillisToIso(promotion.validUntil),

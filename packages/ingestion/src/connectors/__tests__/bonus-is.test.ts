@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import {
   BONUS_IS_STORE_BASE_URL,
+  BONUS_IS_SOURCE_RESEARCH,
   checkBonusIsConnectorHealth,
   fetchBonusIsProducts,
   parseBonusIsProducts
@@ -61,6 +62,9 @@ describe('Bónus IS connector fixture parsing', () => {
       categorySource: 'name',
       price: 1998,
       priceText: '1.998 kr.',
+      currency: 'ISK',
+      unitPrice: null,
+      unitPriceText: null,
       productUrl: 'https://verslun.bonus.is/vara/bonus-brusi/',
       imageUrl: 'https://verslun.bonus.is/wp-content/uploads/2025/04/brusi.jpg',
       inStock: true,
@@ -68,9 +72,16 @@ describe('Bónus IS connector fixture parsing', () => {
       retrievedAt: RETRIEVED_AT
     });
     assert.deepEqual(
-      { code: rows[1]?.code, name: rows[1]?.name, categoryPath: rows[1]?.categoryPath, categoryMatchedKeyword: rows[1]?.categoryMatchedKeyword, price: rows[1]?.price, imageUrl: rows[1]?.imageUrl, productUrl: rows[1]?.productUrl, inStock: rows[1]?.inStock },
-      { code: 'Bon6', name: 'White Cap', categoryPath: ['dryck'], categoryMatchedKeyword: 'white cap', price: 1498, imageUrl: 'https://verslun.bonus.is/wp-content/uploads/2024/12/white-cap.jpg', productUrl: 'https://verslun.bonus.is/vara/white-cap/', inStock: false }
+      { code: rows[1]?.code, name: rows[1]?.name, categoryPath: rows[1]?.categoryPath, categoryMatchedKeyword: rows[1]?.categoryMatchedKeyword, price: rows[1]?.price, currency: rows[1]?.currency, unitPrice: rows[1]?.unitPrice, imageUrl: rows[1]?.imageUrl, productUrl: rows[1]?.productUrl, inStock: rows[1]?.inStock },
+      { code: 'Bon6', name: 'White Cap', categoryPath: ['dryck'], categoryMatchedKeyword: 'white cap', price: 1498, currency: 'ISK', unitPrice: null, imageUrl: 'https://verslun.bonus.is/wp-content/uploads/2024/12/white-cap.jpg', productUrl: 'https://verslun.bonus.is/vara/white-cap/', inStock: false }
     );
+  });
+
+  it('documents Bónus catalog access constraints and unit-price blocker evidence', () => {
+    assert.equal(BONUS_IS_SOURCE_RESEARCH.officialSite, 'https://bonus.is/');
+    assert.equal(BONUS_IS_SOURCE_RESEARCH.accessStatus, 'public_woocommerce_html');
+    assert.match(BONUS_IS_SOURCE_RESEARCH.legalConstraint, /avoid cart\/session endpoints/);
+    assert.match(BONUS_IS_SOURCE_RESEARCH.unitPriceEvidence, /unitPrice remains null/);
   });
 
   it('mocks HTTP with the fixture, skips malformed rows, de-duplicates codes, and preserves request metadata', async () => {

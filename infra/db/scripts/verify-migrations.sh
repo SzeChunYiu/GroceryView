@@ -65,6 +65,7 @@ REQUIRED_TABLES=(
   latest_prices
   price_daily
   price_weekly
+  retention_runs
   users
   watchlists
   baskets
@@ -79,6 +80,7 @@ REQUIRED_TABLES=(
   weekly_baskets
   basket_items
   basket_import_review_items
+  friend_shared_deal_signals
   human_review_assignments
   human_reviewers
   community_reporter_trust

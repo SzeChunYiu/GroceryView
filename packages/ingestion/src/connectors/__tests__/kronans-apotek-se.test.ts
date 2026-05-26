@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
+import { ALL_STORE_RUNNER_CHAINWIDE_CATALOG_CONNECTORS } from '../all-store-runner.js';
 import { fetchKronansApotekSeProducts, parseKronansApotekSeProducts } from '../kronans-apotek-se.js';
 
 const OBSERVED_AT = '2026-05-25T13:45:00.000Z';
@@ -73,6 +74,7 @@ describe('Kronans Apotek SE connector pricing quirks', () => {
     assert.equal(JSON.stringify(headers[0]).includes('kronans-apotek-se-connector'), true);
     assert.equal(rows.length, 3);
     assert.equal(rows.every((row) => row.country === 'SE' && row.currency === 'SEK'), true);
+    assert.ok(ALL_STORE_RUNNER_CHAINWIDE_CATALOG_CONNECTORS.includes('kronans-apotek-se-products'));
   });
 
   it('fails closed on HTTP errors and non-product pages', async () => {

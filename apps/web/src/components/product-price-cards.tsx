@@ -5,12 +5,15 @@ import { useEffect, useMemo, useState } from 'react';
 import { ConfidenceBadge } from './confidence-badge';
 import { EcoBadge } from './eco-badge';
 import { LazyItemCard } from './LazyItemCard';
+import { ChainLogo } from './chain-logo';
 import { FavouriteProductToggle } from './favourite-product-toggle';
 import { readStoredSafetyPreferences, SAFETY_PREFERENCES_CHANGED_EVENT, type ProductSafetyPreferences } from './cert-filter';
 import { buildPriceHistorySparklinePath } from '@/lib/price-events';
 import { volatilityBadgeMethodology } from '@/lib/price-intelligence';
+import { productImageCdnUrl } from '@/lib/imageCdn';
 import type { SearchExplanationBadge } from '@/lib/search-filters';
 import { listFriendPriceSightingsForProduct } from '@/lib/social';
+import { substitutionPlansForUnavailableProducts } from '@/lib/substitutions';
 import type { AdaptiveProductCard } from '@/lib/verified-data';
 
 type CompareMode = 'adaptive' | 'total' | 'unit';
@@ -253,7 +256,7 @@ export function ProductPriceCards({
         .then((response) => response.ok ? response.json() as Promise<{ compareMode?: string }> : null)
         .then((payload) => {
           const mode = payload?.compareMode ?? null;
-          if (mode && isCompareMode(mode)) {
+          if (isCompareMode(mode)) {
             window.localStorage.setItem(storageKey, mode);
             setCompareMode(mode);
           }
@@ -286,6 +289,9 @@ export function ProductPriceCards({
     const delta = sortValue(left, compareMode) - sortValue(right, compareMode);
     return delta === 0 ? left.name.localeCompare(right.name, 'sv') : delta;
   }), [cards, compareMode]);
+  const substitutionPlanBySlug = useMemo(() => new Map(
+    substitutionPlansForUnavailableProducts(cards).map((plan) => [plan.unavailableProduct.slug, plan])
+  ), [cards]);
 
   function chooseMode(value: CompareMode) {
     setCompareMode(value);
@@ -362,7 +368,7 @@ export function ProductPriceCards({
                   loading={productCardImagePolicy.loading}
                   placeholder={productCardImagePolicy.placeholder}
                   sizes={productCardImagePolicy.sizes}
-                  src={card.imageUrl}
+                  src={productImageCdnUrl(card.imageUrl, { width: 144 })}
                   width={144}
                 />
               </div>
@@ -393,6 +399,12 @@ export function ProductPriceCards({
             </div>
             <p className="mt-4 text-3xl font-black text-emerald-800">{primaryLabel(card, compareMode)}</p>
             <p className="mt-1 text-sm font-semibold text-slate-700">{secondaryLabel(card, compareMode)}</p>
+            {card.lowestChain ? (
+              <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-white px-3 py-2 text-xs font-black text-slate-700 shadow-sm">
+                <ChainLogo chain={card.lowestChain} />
+                {card.lowestChain} lowest observed chain
+              </p>
+            ) : null}
             {/* cheapest-per-unit */}
             <div className="mt-3">
               <EcoBadge score={card.carbonScore} />
@@ -402,6 +414,24 @@ export function ProductPriceCards({
             ) : null}
             <SearchExplanationBadges badges={(card as ProductCardWithSearchExplanations).searchExplanationBadges} />
             <p className="mt-3 text-sm leading-6 text-slate-600">{card.sourceLabel}</p>
+            {card.isAvailable === false ? (
+              <div className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 p-3" data-store-substitution-suggestions>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-900">Substitution suggestions</p>
+                {(substitutionPlanBySlug.get(card.slug)?.suggestions.length ?? 0) > 0 ? (
+                  <ul className="mt-2 space-y-2">
+                    {substitutionPlanBySlug.get(card.slug)?.suggestions.map((suggestion) => (
+                      <li className="rounded-xl bg-white p-2 text-xs font-semibold text-slate-700" key={suggestion.slug}>
+                        <p className="font-black text-slate-950">{suggestion.name} · {suggestion.totalPriceLabel}</p>
+                        <p className="mt-1">{suggestion.reason}</p>
+                        <p className="mt-1 text-amber-950">{suggestion.nutritionImpactLabel}</p>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-2 text-xs font-bold text-amber-950">No verified available alternative clears the category, brand, and nutrition-evidence checks.</p>
+                )}
+              </div>
+            ) : null}
             <FriendPriceSightingsPanel card={card} />
             <SafetyWarningBanner card={card} preferences={safetyPreferences} />
             <PriceHistorySparkline card={card} />
