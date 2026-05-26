@@ -378,7 +378,7 @@ function truncateDescription(description: string) {
   return description.length > 180 ? `${description.slice(0, 177)}...` : description;
 }
 
-function publicCatalogueCacheOther(edgeCache: PublicCatalogueCacheMetadata | undefined, path: string) {
+function publicCatalogueCacheOther(edgeCache: PublicCatalogueCacheMetadata | undefined, path: string): Record<string, string> {
   const surface = edgeCache?.surface ?? publicCatalogueSurfaceForPath(path);
   if (!surface) return {};
   const cacheControl = edgeCache?.cacheControl ?? publicCatalogueCacheControl;
@@ -399,7 +399,7 @@ export function hasAppliedCanonicalFilters(searchParams: CanonicalFilterSearchPa
 }
 
 export function routeMetadata(route: keyof typeof routeMetadataCatalog | RouteMetadataConfig): Metadata {
-  const config = typeof route === 'string' ? { path: route, ...routeMetadataCatalog[route] } : route;
+  const config: RouteMetadataConfig = typeof route === 'string' ? { path: route, ...routeMetadataCatalog[route] } : route;
   const alternatePath = config.canonicalPath ?? config.path;
   const canonical = absoluteUrl(alternatePath);
   const title = config.title;

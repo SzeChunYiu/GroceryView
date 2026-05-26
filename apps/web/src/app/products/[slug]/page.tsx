@@ -240,7 +240,7 @@ function crossChainQuoteRowsFor(product: (typeof axfoodProducts)[number]) {
   }));
 }
 
-function quoteConfidenceLevel(row: ReturnType<typeof crossChainQuoteRowsFor>[number], rowCount: number) {
+function quoteConfidenceLevel(row: ReturnType<typeof crossChainQuoteRowsFor>[number], rowCount: number): 'high' | 'medium' | 'low' {
   if (row.isAvailable === false) return 'low';
   return rowCount >= 2 ? 'high' : 'medium';
 }

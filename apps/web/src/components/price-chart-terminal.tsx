@@ -476,7 +476,7 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
                 <p className="text-xs font-bold text-sky-100">{priceMoveNotes.length} marker-linked notes · no inferred retailer cause</p>
               </div>
               <div className="mt-3 grid gap-3 lg:grid-cols-2">
-                {priceMoveNotes.map((note) => (
+                {priceMoveNotes.map((note: { id: string; markerKey: string; markerLabel: string; observedAt: string; explanation: string; sourceLabel: string; provenanceLabel?: string }) => (
                   <article
                     className="rounded-xl border border-white/10 bg-slate-950/70 p-3"
                     data-price-chart-marker-note={note.markerKey}
