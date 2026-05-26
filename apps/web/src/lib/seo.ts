@@ -443,7 +443,7 @@ export function routeMetadata(route: keyof typeof routeMetadataCatalog | RouteMe
     other: {
       'x-groceryview-hreflang-boundary': localeNegotiatedCurrentRouteCaveat,
       ...publicCatalogueCacheOther(config.edgeCache, config.path)
-    },
+    } as Metadata['other'],
     openGraph: {
       title,
       description,
