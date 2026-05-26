@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { CoreWebVitalsReporter } from '@/components/core-web-vitals-reporter';
 import { PwaInstall } from '@/components/pwa-install';
 import { ConsentManager } from '@/components/consent-manager';
-import { ListToastViewport } from '@/components/Toast';
+import { ToastRegion } from '@/components/Toast';
 import { SkipLink } from '@/components/SkipLink';
 import { EngagementReporter } from '@/lib/engagement';
 import { ServiceWorkerRegistrar } from '@/lib/swRegister';
@@ -96,7 +96,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <EngagementReporter />
         <ServiceWorkerRegistrar />
         <PwaInstall />
-        <ListToastViewport />
+        <ToastRegion />
       </body>
     </html>
   );
