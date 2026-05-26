@@ -49,5 +49,10 @@
   },
   "dependencies": {
     "@prisma/client": "^6.19.3"
+  },
+  "apps/web": {
+    "devDependencies": {
+      "@playwright/test": "^1.56.0"
+    }
   }
 }

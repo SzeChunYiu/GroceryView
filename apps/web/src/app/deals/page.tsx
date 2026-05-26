@@ -53,6 +53,8 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
         evidence={
           <p className="text-sm font-semibold text-slate-600">
             Snapshot {snapshot.retrievedLabel} · {snapshot.axfoodSource}
+            <br />
+            Freshly observed products · source refresh · observed rows only · without synthetic discounts
           </p>
         }
       />
