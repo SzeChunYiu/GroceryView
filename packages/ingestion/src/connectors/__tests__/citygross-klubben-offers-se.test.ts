@@ -114,6 +114,7 @@ describe('City Gross Klubben offer connector', () => {
       isCurrentWeekDiscount: true,
       isLongTimeDiscount: false,
       isMembersOnlyPrice: true,
+      is_member_price: true,
       promotionFrom: '2026-05-25',
       promotionTo: '2026-05-31',
       promotionMinQuantity: null,
