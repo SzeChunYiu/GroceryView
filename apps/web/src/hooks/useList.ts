@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { dispatchListToast } from '@/components/Toast';
+import { dispatchListToast } from '@/components/toast';
 import { parseMealPlanShoppingListExport } from '@/lib/meal-budgets';
 
 export type ShoppingListItem = {
