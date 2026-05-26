@@ -37,7 +37,8 @@ const compareModes: Array<{ label: string; value: CompareMode; help: string }> =
 // Legacy compare-mode evidence: cheapest-per-unit.
 const emptySafetyPreferences: ProductSafetyPreferences = {
   requiredDietaryTags: [],
-  avoidedAllergenTags: []
+  avoidedAllergenTags: [],
+  nutritionPriorityTags: []
 };
 
 function isCompareMode(value: string | null): value is CompareMode {
@@ -254,9 +255,10 @@ export function ProductPriceCards({
       })
         .then((response) => response.ok ? response.json() as Promise<{ compareMode?: string }> : null)
         .then((payload) => {
-          if (isCompareMode(payload?.compareMode ?? null)) {
-            window.localStorage.setItem(storageKey, payload.compareMode);
-            setCompareMode(payload.compareMode);
+          const mode = payload?.compareMode ?? null;
+          if (isCompareMode(mode)) {
+            window.localStorage.setItem(storageKey, mode);
+            setCompareMode(mode);
           }
         })
         .catch(() => undefined);
