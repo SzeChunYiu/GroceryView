@@ -6612,23 +6612,17 @@ describe('daily ingestion runner', () => {
   });
 
   it('forces the production daily ingestion database session into write mode', () => {
-    assert.deepEqual(
-      buildDailyIngestionPostgresPoolConfig('postgres://user:secret@example/groceryview'),
-      {
-        connectionString: 'postgres://user:secret@example/groceryview',
-        max: 1
-      }
-    );
+    const config = buildDailyIngestionPostgresPoolConfig('postgres://user:secret@example/groceryview');
+    assert.equal(config.connectionString, 'postgres://user:secret@example/groceryview');
+    assert.equal(config.max, 1);
+    assert.equal(typeof config.lookup, 'function');
   });
 
   it('uses Supabase session pooler mode for long daily ingestion writes', () => {
-    assert.deepEqual(
-      buildDailyIngestionPostgresPoolConfig('postgres://postgres.ref:secret@aws-1-eu-north-1.pooler.supabase.com:6543/postgres'),
-      {
-        connectionString: 'postgres://postgres.ref:secret@aws-1-eu-north-1.pooler.supabase.com:5432/postgres',
-        max: 1
-      }
-    );
+    const config = buildDailyIngestionPostgresPoolConfig('postgres://postgres.ref:secret@aws-1-eu-north-1.pooler.supabase.com:6543/postgres');
+    assert.equal(config.connectionString, 'postgres://postgres.ref:secret@aws-1-eu-north-1.pooler.supabase.com:5432/postgres');
+    assert.equal(config.max, 1);
+    assert.equal(typeof config.lookup, 'function');
   });
 
   it('retries transient production database disconnects while writing daily ingestion batches', async () => {

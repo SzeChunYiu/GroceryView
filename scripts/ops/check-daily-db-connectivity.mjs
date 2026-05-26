@@ -1,6 +1,12 @@
 #!/usr/bin/env node
 import process from 'node:process';
+import { writeFileSync } from 'node:fs';
 import pg from 'pg';
+import {
+  buildPostgresPoolConfig,
+  resolveDailyWriteDatabaseUrl,
+  transformSupabasePoolerForDailyWrites
+} from './db-connection.mjs';
 
 const { Pool: PgPool } = pg;
 
@@ -73,10 +79,7 @@ export function buildSupabaseDirectConnectionString(rawUrl) {
 }
 
 function buildDailyWriteConnectionString(rawUrl) {
-  const classification = classifyDatabaseUrl(rawUrl);
-  const url = new URL(rawUrl);
-  if (classification.transformedForDailyWrites) url.port = String(classification.port);
-  return url.toString();
+  return transformSupabasePoolerForDailyWrites(rawUrl);
 }
 
 function errorText(error) {
@@ -135,17 +138,12 @@ function sanitizeQuerySnippet(value) {
     .trim();
 }
 
-async function probeConnection({ connectionString, retryAttempts, retryBaseDelayMs, retryMaxDelayMs, Pool, wait }) {
+async function probeConnection({ connectionString, retryAttempts, retryBaseDelayMs, retryMaxDelayMs, Pool, wait, transformSupabasePooler = true }) {
   let lastError;
   let attempts = 0;
   for (let attempt = 1; attempt <= retryAttempts; attempt += 1) {
     attempts = attempt;
-    const pool = new Pool({
-      connectionString,
-      max: 1,
-      idleTimeoutMillis: 1_000,
-      connectionTimeoutMillis: 15_000
-    });
+    const pool = new Pool(buildPostgresPoolConfig(connectionString, { transformSupabasePooler }));
     try {
       await pool.query('set default_transaction_read_only=off');
       await pool.query('select 1 as ok');
@@ -172,7 +170,8 @@ async function probeConnection({ connectionString, retryAttempts, retryBaseDelay
 }
 
 export async function checkDailyDatabaseConnectivity(env = process.env, options = {}) {
-  const databaseUrl = env.DATABASE_URL;
+  const resolved = resolveDailyWriteDatabaseUrl(env);
+  const databaseUrl = resolved.configuredUrl;
   if (!databaseUrl?.trim()) throw new Error('DATABASE_URL is required.');
 
   const classification = classifyDatabaseUrl(databaseUrl);
@@ -192,17 +191,24 @@ export async function checkDailyDatabaseConnectivity(env = process.env, options 
   });
 
   if (primary.status === 'ready') {
+    const effectiveDatabaseUrl = buildDailyWriteConnectionString(databaseUrl);
+    if (env.GROCERYVIEW_DB_EFFECTIVE_URL_FILE?.trim()) {
+      writeFileSync(env.GROCERYVIEW_DB_EFFECTIVE_URL_FILE, effectiveDatabaseUrl, { mode: 0o600 });
+    }
     return {
       status: 'ready',
       attempts: primary.attempts,
       retryAttempts,
       retryBaseDelayMs,
       retryMaxDelayMs,
+      connectionStrategy: resolved.source === 'DATABASE_URL' ? 'primary' : resolved.source.replace(/_DATABASE_URL$/, '').toLowerCase(),
+      effectiveDatabaseUrl: redactDatabaseUrl(effectiveDatabaseUrl),
       ...classification
     };
   }
 
   const alternateConnections = [];
+  let fallbackReady = null;
   const transactionPoolerConnectionString = buildSupabaseTransactionPoolerConnectionString(databaseUrl);
   if (transactionPoolerConnectionString) {
     const transactionProbeAttempts = parsePositiveInteger(env.GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS, DEFAULT_ALTERNATE_POOLER_PROBE_ATTEMPTS);
@@ -213,7 +219,8 @@ export async function checkDailyDatabaseConnectivity(env = process.env, options 
       retryBaseDelayMs,
       retryMaxDelayMs,
       Pool,
-      wait
+      wait,
+      transformSupabasePooler: false
     });
     alternateConnections.push({
       name: 'supabase_transaction_pooler',
@@ -232,6 +239,12 @@ export async function checkDailyDatabaseConnectivity(env = process.env, options 
         ? 'Transaction pooler accepts writes; the session-pooler endpoint is the blocker, but run migrations and ingestion only through a validated session/direct/replacement DB path.'
         : 'Transaction pooler also failed; continue provider recovery or replacement DB cutover.'
     });
+    if (transactionProbe.status === 'ready') {
+      fallbackReady = {
+        connectionStrategy: 'supabase_transaction_pooler',
+        effectiveDatabaseUrl: transactionPoolerConnectionString
+      };
+    }
   }
 
   const directConnectionString = buildSupabaseDirectConnectionString(databaseUrl);
@@ -244,7 +257,8 @@ export async function checkDailyDatabaseConnectivity(env = process.env, options 
       retryBaseDelayMs,
       retryMaxDelayMs,
       Pool,
-      wait
+      wait,
+      transformSupabasePooler: false
     });
     alternateConnections.push({
       name: 'supabase_direct_host',
@@ -261,6 +275,31 @@ export async function checkDailyDatabaseConnectivity(env = process.env, options 
         ? 'Direct Supabase host accepts writes; update DATABASE_URL to the direct host or use a replacement DB before rerunning Daily ingestion readiness.'
         : 'Direct Supabase host also failed; continue provider recovery or replacement DB cutover.'
     });
+    if (directProbe.status === 'ready') {
+      fallbackReady = {
+        connectionStrategy: 'supabase_direct_host',
+        effectiveDatabaseUrl: directConnectionString
+      };
+    }
+  }
+
+  if (fallbackReady) {
+    if (env.GROCERYVIEW_DB_EFFECTIVE_URL_FILE?.trim()) {
+      writeFileSync(env.GROCERYVIEW_DB_EFFECTIVE_URL_FILE, fallbackReady.effectiveDatabaseUrl, { mode: 0o600 });
+    }
+    return {
+      status: 'ready',
+      attempts: primary.attempts,
+      retryAttempts,
+      retryBaseDelayMs,
+      retryMaxDelayMs,
+      ...classification,
+      blockers: primary.blockers,
+      error: primary.error,
+      alternateConnections,
+      connectionStrategy: fallbackReady.connectionStrategy,
+      effectiveDatabaseUrl: redactDatabaseUrl(fallbackReady.effectiveDatabaseUrl)
+    };
   }
 
   return {
@@ -277,7 +316,8 @@ export async function checkDailyDatabaseConnectivity(env = process.env, options 
 }
 
 export async function printDailyDatabaseIoHotspots(env = process.env, options = {}) {
-  const databaseUrl = env.DATABASE_URL;
+  const resolved = resolveDailyWriteDatabaseUrl(env);
+  const databaseUrl = resolved.configuredUrl;
   if (!databaseUrl?.trim()) throw new Error('DATABASE_URL is required.');
 
   const limit = parsePositiveInteger(env.GROCERYVIEW_DB_IO_HOTSPOTS_LIMIT, DEFAULT_IO_HOTSPOTS_LIMIT);
@@ -287,12 +327,7 @@ export async function printDailyDatabaseIoHotspots(env = process.env, options = 
   );
   const Pool = options.Pool ?? PgPool;
   const classification = classifyDatabaseUrl(databaseUrl);
-  const pool = new Pool({
-    connectionString: buildDailyWriteConnectionString(databaseUrl),
-    max: 1,
-    idleTimeoutMillis: 1_000,
-    connectionTimeoutMillis: 15_000
-  });
+  const pool = new Pool(buildPostgresPoolConfig(buildDailyWriteConnectionString(databaseUrl)));
 
   try {
     const result = await pool.query(
