@@ -11,6 +11,9 @@ const requiredProductionPublicWebEnv = [
 
 function missingRequiredProductionEnv(env: NodeJS.ProcessEnv, keys: readonly string[]): string[] {
   if (env.NODE_ENV !== 'production') return [];
+  // next build sets NODE_ENV=production but has no runtime secrets; static page
+  // data collection must not require them. Validate at runtime, not build time.
+  if (env.NEXT_PHASE === 'phase-production-build') return [];
   return keys.filter((key) => !env[key]?.trim());
 }
 
