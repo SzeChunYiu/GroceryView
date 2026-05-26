@@ -10,9 +10,9 @@ async function loadProductsRoute() {
     .replace("import { NextResponse } from 'next/server';", 'const NextResponse = { json: (body, init) => Response.json(body, init) };')
     .replace("import { z } from 'zod';", '')
     .replace("import { recordProductSearchPerformanceTelemetry, type ProductSearchPerformanceTelemetry } from '@/lib/analytics';", 'const recordProductSearchPerformanceTelemetry = (telemetry) => ({ ...telemetry, latencyMs: 0, cacheHitRate: telemetry.cacheHit ? 1 : 0, timeoutRate: telemetry.timedOut ? 1 : 0 });')
-    .replace("import { fuzzyProductSearchQueries, rankFuzzyProductResults } from '@/lib/search-fuzzy';", 'const fuzzyProductSearchQueries = (q) => [{ query: q }]; const rankFuzzyProductResults = (_q, _batches, _exp) => [];')
+    .replace("import { fuzzyProductSearchQueries, rankFuzzyProductResults } from '@/lib/search-fuzzy';", 'const fuzzyProductSearchQueries = (query, expansion) => expansion.expandedQueries ?? [query]; const rankFuzzyProductResults = (_query, batches) => batches.flat();')
     .replace("import { searchExplanationBadgesForProduct } from '@/lib/search-filters';", 'const searchExplanationBadgesForProduct = () => [];')
-    .replace("import { buildMisspelledQueryRecovery, expandGrocerySearchQueryWithTelemetry, type GrocerySearchExpansion, type GrocerySearchExpansionTelemetry } from '@/lib/search-suggest';", 'const buildMisspelledQueryRecovery = () => null; const expandGrocerySearchQueryWithTelemetry = (query) => ({ expansion: { query, expandedQueries: query ? [query] : [], matchedAliases: [], matchedFuzzyAliases: [], matchedSynonyms: [] }, telemetry: { cacheHit: false } });')
+    .replace("import { buildMisspelledQueryRecovery, expandGrocerySearchQueryWithTelemetry, type GrocerySearchExpansion, type GrocerySearchExpansionTelemetry } from '@/lib/search-suggest';", 'const buildMisspelledQueryRecovery = (query) => ({ query, didYouMean: [], popularAlternatives: [] }); const expandGrocerySearchQueryWithTelemetry = (query) => ({ expansion: { query, expandedQueries: query ? [query] : [], matchedAliases: [], matchedFuzzyAliases: [], matchedSynonyms: [] }, telemetry: { cacheHit: false } });')
     .replace(/type PgPoolLike = \{[\s\S]*?\};\n\n/, '')
     .replace(/type PgModuleLike = \{[\s\S]*?\};\n\n/, '')
     .replace(/let cachedDatabaseUrl: string \| null = null;/, 'let cachedDatabaseUrl = null;')
@@ -50,7 +50,13 @@ test('products route validation accepts q-only searches and rejects unexpected q
     query: 'a',
     expandedQueries: ['a'],
     matchedAliases: [],
+    matchedFuzzyAliases: [],
     matchedSynonyms: [],
+    queryRecovery: {
+      query: 'a',
+      didYouMean: [],
+      popularAlternatives: []
+    },
     performanceTelemetry: {
       cacheHit: false,
       cacheHitRate: 0,
@@ -60,7 +66,7 @@ test('products route validation accepts q-only searches and rejects unexpected q
       timeoutRate: 0
     },
     results: [],
-    source: 'postgres.products_tsvector_alias_synonym_expansion'
+    source: 'postgres.products_tsvector_alias_synonym_fuzzy_rank'
   });
 
   const rejected = await GET(new Request('https://groceryview.test/api/products?q=a&limit=8'));

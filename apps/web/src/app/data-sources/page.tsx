@@ -32,7 +32,9 @@ import {
   sourceFreshnessSlaDashboard,
   sourceFreshnessSlaSummary,
   sourceManagementActions,
-  sourceManagementSummary
+  sourceManagementSummary,
+  sourceTermsDashboard,
+  sourceTermsSummary
 } from '@/lib/source-health';
 
 const unitNormalizationQaReport = buildUnitNormalizationQaReport([
@@ -237,6 +239,61 @@ export default function DataSourcesPage() {
           </div>
         </div>
         <SourceManagementActionsPanel actions={sourceManagementActions} />
+      </Card>
+
+      <Card className="mt-6 border-violet-200 bg-violet-50/70">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-violet-800">Market source terms gate</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Production source approvals by market</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Daily ingestion sources now expose their terms status, access method, credentials, coverage boundary, and owner before a worker can run a connector in production.
+            </p>
+          </div>
+          <div className="grid gap-2 rounded-2xl bg-white p-3 text-sm font-black text-violet-950 shadow-sm">
+            <p>{sourceTermsSummary.sourceCount.toLocaleString('sv-SE')} registered sources</p>
+            <p>{sourceTermsSummary.marketCount.toLocaleString('sv-SE')} markets</p>
+            <p>{sourceTermsSummary.approvedCount.toLocaleString('sv-SE')} approved</p>
+            <p>{sourceTermsSummary.blockedCount.toLocaleString('sv-SE')} blocked from production</p>
+          </div>
+        </div>
+        <div className="mt-5 overflow-x-auto rounded-2xl border border-violet-100 bg-white">
+          <table className="min-w-full text-left text-sm">
+            <thead className="bg-violet-50 text-xs font-black uppercase tracking-[0.16em] text-violet-900">
+              <tr>
+                <th className="px-4 py-3">Source</th>
+                <th className="px-4 py-3">Terms</th>
+                <th className="px-4 py-3">Access</th>
+                <th className="px-4 py-3">Credentials</th>
+                <th className="px-4 py-3">Coverage</th>
+                <th className="px-4 py-3">Owner</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-violet-100 font-semibold text-slate-700">
+              {sourceTermsDashboard.map((source) => (
+                <tr key={source.sourceId}>
+                  <td className="px-4 py-3">
+                    <p className="font-black text-slate-950">{source.chain}</p>
+                    <p className="text-xs text-slate-500">{source.market} · {source.sourceId}</p>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className={`rounded-full px-3 py-1 text-xs font-black uppercase ${source.productionStatus === 'allowed' ? 'bg-emerald-50 text-emerald-800' : 'bg-red-50 text-red-800'}`}>
+                      {source.termsStatus}
+                    </span>
+                    <p className="mt-2 text-xs text-slate-500">checked {source.checkedAt}</p>
+                  </td>
+                  <td className="px-4 py-3">{source.accessMethod}</td>
+                  <td className="px-4 py-3">{source.credentials}</td>
+                  <td className="px-4 py-3">{source.coverage}</td>
+                  <td className="px-4 py-3">
+                    <p className="font-black text-slate-950">{source.owner}</p>
+                    <p className="mt-1 text-xs text-slate-500">{source.rateLimit}</p>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </Card>
 
       <Card className="mt-6 border-sky-200 bg-sky-50/70">
@@ -484,6 +541,9 @@ export default function DataSourcesPage() {
           </div>
           <Link className="text-sm font-black text-emerald-800 underline decoration-emerald-300 underline-offset-4" href="/products">
             Browse rendered products
+          </Link>
+          <Link className="text-sm font-black text-emerald-800 underline decoration-emerald-300 underline-offset-4" href="/methodology-changelog">
+            Methodology changelog
           </Link>
         </div>
         <div className="mt-5 grid gap-3 lg:grid-cols-3">

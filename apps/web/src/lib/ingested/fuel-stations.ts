@@ -24,6 +24,7 @@ export type IngestedFuelStation = {
   openingHours: string;
   website: string;
   phone: string;
+  supportedGradeIds?: Array<'fuel-95-e10' | 'fuel-98' | 'fuel-diesel' | 'fuel-hvo100' | 'fuel-e85' | 'fuel-adblue'>;
   sourceUrl: string;
   retrievedAt: string;
 };

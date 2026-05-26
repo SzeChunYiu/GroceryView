@@ -23,8 +23,7 @@ class RecordingPriceHistoryExecutor {
     favorite_stores_only: boolean;
     allowed_price_types: string[] | null;
   }> = [];
-  preferenceRows = new Map<string, { preferred_currency: string; notification_channels: string[] }>();
-  favoriteStoreRows = new Map<string, string[]>();
+  preferenceRows = new Map<string, { preferred_currency: string; favorite_stores: string[]; notification_channels: string[]; algorithm_choice: string }>();
   stockUpRows: StockUpListTestRow[] = [];
 
   isConfigured(): boolean {
@@ -36,31 +35,23 @@ class RecordingPriceHistoryExecutor {
     if (sql.includes('insert into app_users')) return [] as T[];
     if (sql.includes('insert into user_preferences')) {
       const userId = params[0] as string;
-      const existing = this.preferenceRows.get(userId) ?? { preferred_currency: 'SEK', notification_channels: [] };
+      const existing = this.preferenceRows.get(userId) ?? { preferred_currency: 'SEK', favorite_stores: [], notification_channels: [], algorithm_choice: 'balanced' };
       this.preferenceRows.set(userId, {
         preferred_currency: (params[1] as string | null) ?? existing.preferred_currency,
-        notification_channels: (params[2] as string[] | null) ?? existing.notification_channels
+        notification_channels: (params[2] as string[] | null) ?? existing.notification_channels,
+        algorithm_choice: (params[3] as string | null) ?? existing.algorithm_choice,
+        favorite_stores: (params[4] as string[] | null) ?? existing.favorite_stores
       });
       return [] as T[];
     }
-    if (sql.includes('select preferred_currency, notification_channels')) {
+    if (sql.includes('select preferred_currency, favorite_stores, notification_channels')) {
       const row = this.preferenceRows.get(params[0] as string);
-      return (row ? [{ preferred_currency: row.preferred_currency, notification_channels: row.notification_channels }] : []) as T[];
-    }
-    if (sql.includes('delete from favorite_stores')) {
-      this.favoriteStoreRows.set(params[0] as string, []);
-      return [] as T[];
-    }
-    if (sql.includes('insert into favorite_stores')) {
-      const userId = params[0] as string;
-      const stores = this.favoriteStoreRows.get(userId) ?? [];
-      const storeId = params[1] as string;
-      if (!stores.includes(storeId)) stores.push(storeId);
-      this.favoriteStoreRows.set(userId, stores);
-      return [] as T[];
-    }
-    if (sql.includes('select store_id from favorite_stores')) {
-      return [...(this.favoriteStoreRows.get(params[0] as string) ?? [])].sort().map((store_id) => ({ store_id })) as T[];
+      return (row ? [{
+        preferred_currency: row.preferred_currency,
+        favorite_stores: row.favorite_stores,
+        notification_channels: row.notification_channels,
+        algorithm_choice: row.algorithm_choice
+      }] : []) as T[];
     }
     if (sql.includes('insert into multi_week_stock_up_rows')) {
       const row: StockUpListTestRow = {
@@ -778,6 +769,14 @@ describe('GroceryView API app', () => {
     assert.deepEqual(docs.body.paths['/api/settings'].get.security, [{ bearer: [] }]);
     assert.deepEqual(docs.body.paths['/api/settings'].patch.security, [{ bearer: [] }]);
     assert.ok(docs.body.paths['/products']);
+    assert.equal(
+      docs.body.paths['/products/{id}'].get.responses['200'].content['application/json'].schema.$ref,
+      '#/components/schemas/ProductDetailDto'
+    );
+    assert.ok(docs.body.components.schemas.ProductDetailDto.properties.priceComparison);
+    assert.deepEqual(docs.body.components.schemas.ProductDetailDto.required.includes('priceComparison'), true);
+    assert.ok(docs.body.components.schemas.ProductPriceComparisonDto.properties.stores);
+    assert.ok(docs.body.components.schemas.ProductPriceComparisonDto.properties.cheapestStore);
     assert.ok(docs.body.paths['/products/{productId}/cheapest-now']);
     assert.ok(docs.body.paths['/products/{id}/terminal']);
     assert.ok(docs.body.paths['/products/{id}/spread']);
@@ -840,21 +839,28 @@ describe('GroceryView API app', () => {
     assert.deepEqual(response.body, {
       userId: 'user-settings-1',
       currency: 'EUR',
-      preferredStores: ['lidl-sveavagen', 'willys-odenplan'],
-      notificationChannels: ['push', 'email']
+      preferredStores: ['willys-odenplan', 'lidl-sveavagen'],
+      notificationChannels: ['push', 'email'],
+      algorithm_choice: 'balanced'
     });
     assert.ok(priceHistoryExecutor.calls.some((call) => call.sql.includes('insert into user_preferences') && call.params[0] === 'user-settings-1'));
     assert.deepEqual(
       priceHistoryExecutor.calls
-        .filter((call) => call.sql.includes('insert into favorite_stores'))
+        .filter((call) => call.sql.includes('insert into user_preferences'))
         .map((call) => call.params),
-      [['user-settings-1', 'willys-odenplan'], ['user-settings-1', 'lidl-sveavagen']]
+      [['user-settings-1', 'EUR', ['push', 'email'], null, ['willys-odenplan', 'lidl-sveavagen']]]
     );
 
     await request(app.getHttpServer())
       .patch('/api/settings')
       .set('authorization', `Bearer ${token}`)
       .send({ notificationChannels: ['sms'] })
+      .expect(400);
+
+    await request(app.getHttpServer())
+      .patch('/api/settings')
+      .set('authorization', `Bearer ${token}`)
+      .send({ preferredStores: ['one', 'two', 'three', 'four', 'five', 'six'] })
       .expect(400);
   });
 
@@ -873,14 +879,16 @@ describe('GroceryView API app', () => {
       userId: 'user-settings-read-1',
       currency: 'SEK',
       preferredStores: [],
-      notificationChannels: []
+      notificationChannels: [],
+      algorithm_choice: 'balanced'
     });
 
     priceHistoryExecutor.preferenceRows.set('user-settings-read-1', {
       preferred_currency: 'NOK',
-      notification_channels: ['email', 'telegram']
+      favorite_stores: ['willys-odenplan', 'lidl-sveavagen'],
+      notification_channels: ['email', 'telegram'],
+      algorithm_choice: 'watchlist_first'
     });
-    priceHistoryExecutor.favoriteStoreRows.set('user-settings-read-1', ['willys-odenplan', 'lidl-sveavagen']);
 
     const response = await request(app.getHttpServer())
       .get('/api/settings')
@@ -890,8 +898,9 @@ describe('GroceryView API app', () => {
     assert.deepEqual(response.body, {
       userId: 'user-settings-read-1',
       currency: 'NOK',
-      preferredStores: ['lidl-sveavagen', 'willys-odenplan'],
-      notificationChannels: ['email', 'telegram']
+      preferredStores: ['willys-odenplan', 'lidl-sveavagen'],
+      notificationChannels: ['email', 'telegram'],
+      algorithm_choice: 'watchlist_first'
     });
     assert.equal(priceHistoryExecutor.calls.some((call) => call.sql.includes('insert into user_preferences')), false);
 
@@ -942,7 +951,7 @@ describe('GroceryView API app', () => {
     assert.equal(created.body.rows[0].historicalLowUnitPrice, 99.9);
     assert.equal(created.body.rows[0].confidence, 'high');
     assert.equal(created.body.evidence.noForecast, true);
-    assert.deepEqual(created.body.evidence.sourceTables, ['multi_week_stock_up_rows', 'app_users']);
+    assert.deepEqual(created.body.evidence.sourceTables, ['multi_week_stock_up_rows', 'weekly_baskets', 'basket_items', 'products', 'latest_prices', 'observations', 'app_users']);
     assert.ok(created.body.guardrails.some((guardrail: string) => /no future price forecast/i.test(guardrail)));
 
     const updated = await request(app.getHttpServer())
@@ -1078,6 +1087,10 @@ describe('GroceryView API app', () => {
     assert.equal(products.body[0].currentPrices[0].priceType, 'shelf');
     assert.equal(products.body[0].currentPrices[0].sourceType, 'demo_seed');
     assert.ok(products.body[0].currentPrices[0].provenance);
+
+    const product = await request(app.getHttpServer()).get('/products/milk').expect(200);
+    assert.deepEqual(product.body.priceComparison.stores.map((store: { storeId: string }) => store.storeId), ['lidl-sveavagen', 'willys-odenplan']);
+    assert.equal(product.body.priceComparison.cheapestStore.storeId, 'lidl-sveavagen');
 
     const retailers = await request(app.getHttpServer()).get('/retailers').expect(200);
     assert.deepEqual(retailers.body.map((retailer: { id: string; name: string; logo: string; websiteUrl: string }) => [

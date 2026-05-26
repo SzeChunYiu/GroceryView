@@ -7,6 +7,7 @@ import {
   calculateDealScore,
   calculateFixedBasketIndex,
   compareBasketStrategies,
+  planMultiWeekStockUpList,
   planBasketFulfillmentSlots,
   planBasketImportExport,
   planBasketTripCost,
@@ -34,6 +35,7 @@ import {
   type BasketFulfillmentSlotInput,
   type BasketTripCostPlan,
   type BasketTripCostTravelMode,
+  type DealShareRelationship,
   type RetailerBasketTransferSession,
   type RetailerHandoffPlan,
   type RetailerHandoffSupport,
@@ -50,6 +52,9 @@ import {
   type LocalOfferBasketSummary,
   type MealDeal,
   type MealSuggestion,
+  type MultiWeekStockUpConfidence,
+  type MultiWeekStockUpHistoryPoint,
+  type MultiWeekStockUpPlan,
   type PriceChartAdapterResult,
   type PriceChartObservation,
   type PriceHistoryConfidenceDisclosure,
@@ -169,6 +174,30 @@ export type BasketImportReviewDecisionRequest = {
   decision: 'accept_as_product' | 'dismiss';
   productId?: string;
   quantity?: number;
+};
+
+export type FriendSharedDealSignal = {
+  signalId: string;
+  userId: string;
+  productId: string;
+  sharedByUserId: string;
+  sharedByDisplayName: string;
+  relationship: DealShareRelationship;
+  sharedAt: string;
+  sourceConfidence: number;
+  optedIn: true;
+  dealScore?: number;
+  createdAt: string;
+};
+
+export type FriendSharedDealSignalInput = Omit<FriendSharedDealSignal, 'userId' | 'createdAt'> & {
+  createdAt?: string;
+};
+
+export type FriendSharedDealSignalList = {
+  userId: string;
+  signals: FriendSharedDealSignal[];
+  guardrails: string[];
 };
 
 export type OcrScanHistoryItem = {
@@ -900,6 +929,23 @@ export const productPriceHistoryEndpoint = {
   queryParams: ['priceType', 'chain', 'store', 'sourceRun', 'minConfidence', 'from', 'to', 'limit']
 } as const;
 
+export const productPriceHistoryCsvEndpoint = {
+  method: 'GET',
+  controllerPath: 'products/:productId',
+  actionPath: 'history.csv',
+  path: '/products/:productId/history.csv',
+  pathParams: ['productId'],
+  queryParams: productPriceHistoryEndpoint.queryParams,
+  response: {
+    contentType: 'text/csv; charset=utf-8',
+    contentDisposition: {
+      type: 'attachment',
+      filenamePattern: '{productSlug}-history.csv'
+    },
+    columns: ['observedAt', 'chainName', 'storeName', 'priceType', 'price', 'unitPrice', 'currency', 'confidence']
+  }
+} as const;
+
 export type ProductPriceHistoryPoint = ProductPriceHistoryObservationInput;
 
 export type ProductPriceHistoryEvidenceTable = 'products' | 'observations' | 'chains' | 'stores';
@@ -1149,6 +1195,37 @@ export type WatchlistPriceAlertReport = {
 export type UserBudgetPatch = {
   weeklyBudget: number;
   monthlyBudget: number;
+};
+
+export type MultiWeekStockUpPlannerOptions = {
+  asOf?: string;
+  planningWeeks?: number;
+  weeklyBudget?: number;
+  historyByProductId?: Record<string, MultiWeekStockUpHistoryPoint[]>;
+};
+
+export type MultiWeekStockUpPlannerRow = MultiWeekStockUpPlan['rows'][number] & {
+  rowId: string;
+  userId: string;
+  storeId?: string;
+  weeklyNeedUnits: number;
+  packageUnits: number;
+  noForecastReason: string;
+  updatedAt: string;
+};
+
+export type MultiWeekStockUpPlannerReport = Omit<MultiWeekStockUpPlan, 'rows' | 'coverage'> & {
+  userId: string;
+  itemCount: number;
+  rows: MultiWeekStockUpPlannerRow[];
+  coverage: MultiWeekStockUpPlan['coverage'] & {
+    missingHistoryProductIds: string[];
+  };
+  evidence: {
+    sourceTables: string[];
+    noForecast: true;
+    historicalPriceFields: string[];
+  };
 };
 
 export type CategoryBudgetPatch = {
@@ -2340,6 +2417,25 @@ function requireScoreThreshold(value: number | undefined) {
   }
 }
 
+function requireDealScore(value: number | undefined) {
+  if (value === undefined) return;
+  if (!Number.isFinite(value) || value < 0 || value > 100) {
+    throw new Error('dealScore must be between 0 and 100');
+  }
+}
+
+function requireSourceConfidence(value: number) {
+  if (!Number.isFinite(value) || value < 0 || value > 1) {
+    throw new Error('sourceConfidence must be between 0 and 1');
+  }
+}
+
+function requireDealShareRelationship(value: DealShareRelationship) {
+  if (value !== 'household' && value !== 'friend') {
+    throw new Error('relationship must be household or friend');
+  }
+}
+
 function requireAllowedPriceTypes(value: WatchlistPriceType[] | undefined) {
   if (value === undefined) return;
   if (!Array.isArray(value)) throw new Error('allowedPriceTypes must be an array');
@@ -2528,6 +2624,38 @@ function storeForId(storeId: string): Store | undefined {
 
 function sortedHistory(product: ProductDetail) {
   return [...product.history].sort((left, right) => Date.parse(left.date) - Date.parse(right.date));
+}
+
+const stockUpPlannerNoForecastReason =
+  'No price forecast: the list combines current basket prices with factual observed low/typical context and spreads today\'s budget impact across the planning horizon.';
+
+const stockUpPlannerHistoricalPriceFields = [
+  'historicalLowUnitPrice',
+  'typicalUnitPrice',
+  'confidence',
+  'historyWindowStart',
+  'historyWindowEnd',
+  'observationCount'
+];
+
+function confidenceForHistoryPoint(product: ProductDetail, point: { verified: boolean }): number {
+  if (!point.verified) return 0.35;
+  return Math.max(0.65, Math.min(0.95, product.dealSignals.sourceConfidence));
+}
+
+function stockUpHistoryForProduct(product: ProductDetail): MultiWeekStockUpHistoryPoint[] {
+  return sortedHistory(product).map((point) => ({
+    observedAt: toIsoObservedAt(point.date),
+    unitPrice: point.price,
+    sourceType: point.verified ? 'shelf' : 'estimated',
+    confidence: confidenceForHistoryPoint(product, point)
+  }));
+}
+
+function stockUpCoverageConfidence(values: MultiWeekStockUpConfidence[], missingHistoryCount: number): MultiWeekStockUpConfidence {
+  if (missingHistoryCount > 0 || values.includes('low')) return 'low';
+  if (values.length === 0 || values.includes('medium')) return 'medium';
+  return 'high';
 }
 
 function latestObservedAt(product: ProductDetail): string | null {
@@ -2844,6 +2972,7 @@ export function buildRealCategoryPriceIndices(rows: RealPriceIndexRow[]): Catego
         weight: 1
       }))
     });
+    if (index.value === null || index.movementPercent === null) return [];
 
     return [{
       id: index.id,
@@ -2941,6 +3070,8 @@ function buildCategoryPriceIndices(): CategoryPriceIndexSummary {
       currentDate: indexCurrentDate(categoryProducts),
       components
     });
+    if (index.value === null || index.movementPercent === null) return [];
+
     return [{
       id: index.id,
       category,
@@ -4511,6 +4642,7 @@ export function createGroceryViewApi() {
   const householdPlans = new Map<string, HouseholdPlan>();
   const householdIdByUserId = new Map<string, string>();
   const basketImportReviews = new Map<string, BasketImportReviewItem[]>();
+  const friendSharedDealSignals = new Map<string, FriendSharedDealSignal[]>();
   const ocrScanHistory = new Map<string, OcrScanHistoryItem[]>();
 
   const productSnapshots = () =>
@@ -5101,6 +5233,7 @@ export function createGroceryViewApi() {
       categoryBudgets.delete(userId);
       subscriptionEntitlements.delete(userId);
       basketImportReviews.delete(userId);
+      friendSharedDealSignals.delete(userId);
       const householdId = householdIdByUserId.get(userId);
       if (householdId) {
         householdPlans.delete(householdId);
@@ -5194,6 +5327,49 @@ export function createGroceryViewApi() {
       };
     },
 
+    createFriendSharedDealSignal(userId: string, input: FriendSharedDealSignalInput): FriendSharedDealSignal {
+      requireNonEmptyId(userId, 'userId');
+      requireNonEmptyId(input.signalId, 'signalId');
+      requireKnownProduct(input.productId);
+      requireNonEmptyId(input.sharedByUserId, 'sharedByUserId');
+      requireNonEmptyId(input.sharedByDisplayName, 'sharedByDisplayName');
+      requireDealShareRelationship(input.relationship);
+      requireSourceConfidence(input.sourceConfidence);
+      requireDealScore(input.dealScore);
+      if (input.optedIn !== true) throw new Error('Only opted-in friend share signals can be persisted.');
+      if (!Number.isFinite(Date.parse(input.sharedAt))) throw new Error('sharedAt must be an ISO timestamp.');
+      if (input.createdAt !== undefined && !Number.isFinite(Date.parse(input.createdAt))) throw new Error('createdAt must be an ISO timestamp.');
+
+      const signal: FriendSharedDealSignal = {
+        ...input,
+        userId,
+        optedIn: true,
+        createdAt: input.createdAt ?? new Date().toISOString()
+      };
+      friendSharedDealSignals.set(userId, [
+        signal,
+        ...(friendSharedDealSignals.get(userId) ?? []).filter((current) => current.signalId !== signal.signalId)
+      ]);
+      return { ...signal };
+    },
+
+    getFriendSharedDealSignals(userId: string): FriendSharedDealSignalList {
+      requireNonEmptyId(userId, 'userId');
+      const signals = (friendSharedDealSignals.get(userId) ?? [])
+        .filter((signal) => signal.optedIn)
+        .sort((a, b) => b.sharedAt.localeCompare(a.sharedAt) || a.signalId.localeCompare(b.signalId))
+        .map((signal) => ({ ...signal }));
+      return {
+        userId,
+        signals,
+        guardrails: [
+          'Only opted-in household or friend signals are persisted.',
+          'Anonymous shares are rejected before they can feed suggestFriendSharedDeals.',
+          'Signals remain user-scoped for privacy export and deletion workflows.'
+        ]
+      };
+    },
+
     addBasketItem(userId: string, item: BasketItemRequest) {
       requireNonEmptyId(userId, 'userId');
       requireKnownProduct(item.productId);
@@ -5245,6 +5421,91 @@ export function createGroceryViewApi() {
     compareBasket(userId: string): BasketComparisonResult {
       const favoriteStoreIds = this.getFavoriteStores(userId).map((store) => store.id);
       return compareBasketStrategies({ favoriteStoreIds, items: basketInputItems(baskets.get(userId) ?? []) });
+    },
+
+    getMultiWeekStockUpPlan(userId: string, options: MultiWeekStockUpPlannerOptions = {}): MultiWeekStockUpPlannerReport {
+      requireNonEmptyId(userId, 'userId');
+      const basketItems = baskets.get(userId) ?? [];
+      const asOf = options.asOf ?? '2026-05-20T12:00:00.000Z';
+      const planningWeeks = options.planningWeeks ?? 3;
+      const savedWeeklyBudget = budgets.get(userId)?.weeklyBudget;
+      const weeklyBudget = options.weeklyBudget ?? (savedWeeklyBudget && savedWeeklyBudget > 0 ? savedWeeklyBudget : 800);
+      const missingHistoryProductIds: string[] = [];
+      const weeklyNeedByProductId = new Map<string, number>();
+      const packageUnitsByProductId = new Map<string, number>();
+      const plannedItems = basketItems.flatMap((item) => {
+        const product = products.find((candidate) => candidate.id === item.productId);
+        if (!product) return [];
+        const bestPrice = bestPriceFor(product);
+        const history = options.historyByProductId?.[product.id] ?? stockUpHistoryForProduct(product);
+        if (!bestPrice || history.length === 0) {
+          missingHistoryProductIds.push(product.id);
+          return [];
+        }
+        weeklyNeedByProductId.set(product.id, item.quantity);
+        packageUnitsByProductId.set(product.id, 1);
+        return [{
+          productId: product.id,
+          productName: product.name,
+          storeName: bestPrice.storeName,
+          weeklyNeedUnits: item.quantity,
+          packageUnits: 1,
+          comparableUnit: 'basket unit',
+          currentUnitPrice: bestPrice.price,
+          history,
+          seasonalityNote: 'Generated from account basket lines and dated product price history; no future shelf-price projection.'
+        }];
+      });
+
+      const plan = planMultiWeekStockUpList({
+        asOf,
+        planningWeeks,
+        weeklyBudget,
+        items: plannedItems
+      });
+      const rowConfidence = plan.rows.map((row) => row.confidence);
+      const coverageConfidence = stockUpCoverageConfidence(rowConfidence, missingHistoryProductIds.length);
+
+      return {
+        userId,
+        itemCount: plan.rows.length,
+        asOf: plan.asOf,
+        planningWeeks: plan.planningWeeks,
+        weeklyBudget: plan.weeklyBudget,
+        totalUpfrontCost: plan.totalUpfrontCost,
+        weeklyEquivalentCost: plan.weeklyEquivalentCost,
+        weeklyBudgetSharePercent: plan.weeklyBudgetSharePercent,
+        rows: plan.rows.map((row) => {
+          const product = products.find((candidate) => candidate.id === row.productId);
+          const bestPrice = product ? bestPriceFor(product) : null;
+          return {
+            ...row,
+            rowId: row.productId,
+            userId,
+            ...(bestPrice ? { storeId: bestPrice.storeId } : {}),
+            weeklyNeedUnits: weeklyNeedByProductId.get(row.productId) ?? 1,
+            packageUnits: packageUnitsByProductId.get(row.productId) ?? 1,
+            noForecastReason: stockUpPlannerNoForecastReason,
+            updatedAt: asOf
+          };
+        }),
+        coverage: {
+          ...plan.coverage,
+          confidence: coverageConfidence,
+          observedItemCount: plan.rows.length,
+          totalItemCount: basketItems.length,
+          missingHistoryProductIds,
+          caveat: missingHistoryProductIds.length > 0
+            ? 'Some basket items have no usable historical price rows; missing history lowers coverage instead of producing a forecast.'
+            : plan.coverage.caveat
+        },
+        guardrails: plan.guardrails,
+        evidence: {
+          sourceTables: ['basket_items', 'products.history', 'latest_prices'],
+          noForecast: true,
+          historicalPriceFields: stockUpPlannerHistoricalPriceFields
+        }
+      };
     },
 
     compareBasketReport(userId: string): BasketComparisonReport {

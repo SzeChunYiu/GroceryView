@@ -2,7 +2,7 @@
 
 alter table chains
   add column if not exists retailer_type text not null default 'grocery'
-  check (retailer_type in ('grocery', 'pharmacy', 'fuel', 'convenience', 'variety', 'cosmetics', 'household', 'online_marketplace'));
+  check (retailer_type in ('grocery', 'pharmacy', 'fuel', 'convenience', 'variety', 'cosmetics', 'household', 'online_marketplace', 'ethnic_asian', 'ethnic_polish_eastern_european', 'ethnic_middle_eastern', 'ethnic_indian_south_asian', 'ethnic_latin', 'ethnic_african', 'health_food', 'kosher_halal'));
 
 update chains
 set retailer_type = 'grocery'

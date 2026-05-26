@@ -19,6 +19,10 @@ export type FetchSsbCpi03013Options = Readonly<{
   ecoicopCodes?: readonly string[];
 }>;
 
+export type BenchmarkObservationQueryExecutor = Readonly<{
+  query: (sql: string, params: readonly unknown[]) => Promise<unknown>;
+}>;
+
 type JsonStatDimension = Readonly<{
   category?: Readonly<{
     index?: Record<string, number>;
@@ -117,4 +121,51 @@ export async function fetchSsbCpi03013BenchmarkObservations(options: FetchSsbCpi
   });
   if (!response.ok) throw new Error(`${SSB_CPI_03013_SOURCE_ID} request failed: ${response.status}`);
   return parseSsbCpi03013JsonStat(await response.json() as JsonStatDataset, observedAt);
+}
+
+export async function upsertSsbCpi03013BenchmarkObservations(
+  executor: BenchmarkObservationQueryExecutor,
+  rows: readonly SsbCpi03013BenchmarkObservation[]
+): Promise<number> {
+  for (const row of rows) {
+    await executor.query(
+      `insert into benchmark_observation (
+        source_id,
+        country,
+        vertical,
+        ecoicop_code,
+        period,
+        value,
+        unit,
+        observed_at
+      ) values ($1, $2, $3, $4, $5, $6, $7, $8)
+      on conflict on constraint benchmark_observation_pkey
+      do update set
+        value = excluded.value,
+        unit = excluded.unit,
+        observed_at = excluded.observed_at`,
+      [
+        row.sourceId,
+        row.country,
+        row.vertical,
+        row.ecoicopCode,
+        row.period,
+        row.value,
+        row.unit,
+        row.observedAt
+      ]
+    );
+  }
+  return rows.length;
+}
+
+export async function fetchAndPersistSsbCpi03013BenchmarkObservations(
+  executor: BenchmarkObservationQueryExecutor,
+  options: FetchSsbCpi03013Options = {}
+): Promise<{ fetched: number; persisted: number }> {
+  const rows = await fetchSsbCpi03013BenchmarkObservations(options);
+  return {
+    fetched: rows.length,
+    persisted: await upsertSsbCpi03013BenchmarkObservations(executor, rows)
+  };
 }

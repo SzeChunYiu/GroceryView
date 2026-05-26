@@ -20,6 +20,7 @@ describe('personalized weekly digest query', () => {
     assert.match(query.sql, /'search'::text as source/i);
     assert.match(query.sql, /from watchlist_items/i);
     assert.match(query.sql, /join basket_items on basket_items\.basket_id = weekly_baskets\.id/i);
+    assert.match(query.sql, /products\.deleted_at is null/i);
     assert.match(query.sql, /latest_prices\.observed_at >= \$1::timestamptz/i);
     assert.match(query.sql, /deal_rank <= \$3/i);
   });

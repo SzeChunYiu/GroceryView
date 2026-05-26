@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
+import { publicCatalogueCacheControl, publicCatalogueRevalidateSeconds } from './cache-policy';
+
+export { publicCatalogueCacheControl, publicCatalogueRevalidateSeconds, publicCatalogueStaleWhileRevalidateSeconds } from './cache-policy';
 
 export const siteUrl = 'https://grocery-web-mu.vercel.app';
 export const siteName = 'GroceryView';
-export const publicCatalogueRevalidateSeconds = 300;
-export const publicCatalogueStaleWhileRevalidateSeconds = publicCatalogueRevalidateSeconds * 3;
-export const publicCatalogueCacheControl = `public, s-maxage=${publicCatalogueRevalidateSeconds}, stale-while-revalidate=${publicCatalogueStaleWhileRevalidateSeconds}`;
 
 const defaultDescription = 'Verified Swedish grocery price intelligence with product tickers, chain comparisons, store coverage, and confidence-labelled savings signals.';
 const localeNegotiatedCurrentRouteCaveat = 'Locale-negotiated current route hreflang alternates share the canonical URL until native route translations exist beyond /sv and /en.';
@@ -152,6 +152,10 @@ export const routeMetadataCatalog = {
     title: 'Compare grocery items side by side | GroceryView',
     description: 'Compare up to four verified grocery items by nutrition labels, store price evidence, and observed trend charts.'
   },
+  '/cultural-aisles': {
+    title: 'Halal kosher and ethnic aisle finder | GroceryView',
+    description: 'Find source-backed halal, kosher, and cultural grocery aisles with verified store coverage, confidence labels, and no inferred religious suitability.'
+  },
   '/coverage': {
     title: 'Freshness lag coverage by class | GroceryView',
     description: 'Inspect per-class freshness lag, stale observation share, latest observed dates, and source boundaries for grocery ingestion cadence tuning.'
@@ -201,6 +205,18 @@ export const routeMetadataCatalog = {
   '/household': {
     title: 'Household grocery planning gate | GroceryView',
     description: 'Household planning stays fail-closed until verified private profile and basket records are connected.'
+  },
+  '/index': {
+    title: 'Personalized grocery index shortcuts | GroceryView',
+    description: 'Browse household-ranked grocery index shortcuts with verified category medians, OpenPrices row counts, and cross-chain spread context.'
+  },
+  '/methodology-changelog': {
+    title: 'Data and methodology changelog | GroceryView',
+    description: 'Track public changes to GroceryView data sources, matching rules, index methodology, deal scoring, market coverage, confidence, and freshness evidence.'
+  },
+  '/methodology': {
+    title: 'Score and confidence methodology | GroceryView',
+    description: 'Inspect how GroceryView computes Deal Score, Buy or Wait timing, nutrition per krona, and confidence labels, including missing-data blockers.'
   },
   '/login': {
     title: 'Sign in to GroceryView',

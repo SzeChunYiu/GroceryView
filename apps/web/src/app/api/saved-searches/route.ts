@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { entitlementFromHeaders, hasActivePremiumEntitlement, premiumRequiredResponse } from '@/lib/entitlements';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,6 +24,7 @@ const savedSearches = globalThis.groceryViewSavedSearches ?? new Map<string, Sav
 globalThis.groceryViewSavedSearches = savedSearches;
 
 const allowedFilterKeys = new Set(['q', 'category', 'chain', 'minPrice', 'maxPrice', 'dietary', 'origin']);
+const FREE_SAVED_SEARCH_LIMIT = 3;
 
 function cleanString(value: unknown) {
   return typeof value === 'string' ? value.trim() : '';
@@ -90,6 +92,15 @@ export async function POST(request: NextRequest) {
   const href = cleanString(body.href) || '/products';
   const label = cleanString(body.label) || 'Saved product filters';
   const existing = savedSearches.get(`${accountId}:${id}`);
+  const accountSearchCount = [...savedSearches.values()].filter((search) => search.accountId === accountId).length;
+  const entitlement = entitlementFromHeaders(request.headers);
+  if (!existing && accountSearchCount >= FREE_SAVED_SEARCH_LIMIT && !hasActivePremiumEntitlement(entitlement)) {
+    return NextResponse.json({
+      ...premiumRequiredResponse('saved_views', entitlement),
+      freeLimit: FREE_SAVED_SEARCH_LIMIT
+    }, { status: 402 });
+  }
+
   const now = new Date().toISOString();
   const resultCount = typeof body.resultCount === 'number' && Number.isFinite(body.resultCount) ? Math.max(0, Math.trunc(body.resultCount)) : null;
   const record: SavedSearchRecord = {

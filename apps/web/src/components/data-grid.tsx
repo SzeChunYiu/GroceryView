@@ -1,4 +1,5 @@
 import type { ComponentPropsWithoutRef } from 'react';
+import { productImageCdnUrl } from '@/lib/imageCdn';
 
 export const dataGridRowStripingClass = '[&_tbody_tr:nth-child(even)]:bg-slate-50 [&_[role=row]:nth-child(even)]:bg-slate-50';
 export const dataGridActionClass = 'rounded-full border border-slate-300 px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-slate-700';
@@ -43,7 +44,7 @@ export function DataGridProductCell({ brand, imageUrl, name, sourceUrl, unitLabe
     <div className="flex min-w-64 gap-3">
       {imageUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img alt="" className="h-14 w-14 rounded-2xl border border-slate-200 bg-white object-contain" loading="lazy" src={imageUrl} />
+        <img alt="" className="h-14 w-14 rounded-2xl border border-slate-200 bg-white object-contain" loading="lazy" src={productImageCdnUrl(imageUrl, { width: 56 })} />
       ) : (
         <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 text-xs font-black text-slate-400">No image</div>
       )}

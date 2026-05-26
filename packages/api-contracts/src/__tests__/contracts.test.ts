@@ -4,6 +4,8 @@ import {
   apiContractOpenApiComponents,
   apiContractSchemas,
   compareResponseSchema,
+  friendSharedDealSignalCreateSchema,
+  friendSharedDealSignalListResponseSchema,
   fuelPriceObservationSchema,
   multiWeekStockUpListResponseSchema,
   multiWeekStockUpUpdateRowSchema,
@@ -74,6 +76,12 @@ const validNotificationInbox: NotificationInboxResponseDto = {
 const validStockUpList: MultiWeekStockUpListResponseDto = {
   userId: 'user-1',
   itemCount: 1,
+  asOf: '2026-05-21T09:00:00.000Z',
+  planningWeeks: 4,
+  weeklyBudget: 800,
+  totalUpfrontCost: 443.56,
+  weeklyEquivalentCost: 110.89,
+  weeklyBudgetSharePercent: 13.86,
   rows: [
     {
       rowId: 'coffee-stock-up',
@@ -88,14 +96,31 @@ const validStockUpList: MultiWeekStockUpListResponseDto = {
       currentUnitPrice: 110.89,
       historicalLowUnitPrice: 99.9,
       typicalUnitPrice: 133.11,
+      currentVsTypicalPercent: -16.69,
+      currentVsHistoricalLowPercent: 11,
+      plannedUnits: 4,
+      packagesNeeded: 9,
+      upfrontCost: 443.56,
+      weeklyEquivalentCost: 110.89,
+      weeklyBudgetSharePercent: 13.86,
+      observationCount: 4,
+      observedHistoryWindow: '2026-04-01T00:00:00.000Z to 2026-05-21T00:00:00.000Z',
       confidence: 'high',
       historyWindowStart: '2026-04-01T00:00:00.000Z',
       historyWindowEnd: '2026-05-21T00:00:00.000Z',
+      contextLabel: '4 observed unit-price points; typical and low are historical facts, not a forecast.',
       noForecastReason: 'Historical low and typical prices are observed facts only; no future shelf price is predicted.',
       reviewTrigger: 'Re-check observed prices before restocking.',
       updatedAt: '2026-05-21T09:00:00.000Z'
     }
   ],
+  coverage: {
+    confidence: 'high',
+    observedItemCount: 1,
+    totalItemCount: 1,
+    missingHistoryProductIds: [],
+    caveat: 'Historical low and typical prices use observed unit-price rows only; missing history lowers confidence and no future price is predicted.'
+  },
   guardrails: ['Rows are account-owned and signed-in.', 'No forecast is stored.'],
   evidence: {
     sourceTables: ['multi_week_stock_up_rows', 'app_users'],
@@ -141,6 +166,9 @@ describe('api contract schemas', () => {
       'basket',
       'basketItem',
       'compareResponse',
+      'friendSharedDealSignal',
+      'friendSharedDealSignalCreate',
+      'friendSharedDealSignalListResponse',
       'fuelPriceObservation',
       'fuelPriceSource',
       'fuelPricesResponse',
@@ -265,6 +293,32 @@ describe('api contract schemas', () => {
     );
   });
 
+  it('requires opted-in friend share deal signals for social suggestions', () => {
+    const signal = {
+      signalId: 'friend-share-1',
+      productId: 'coffee',
+      sharedByUserId: 'friend-1',
+      sharedByDisplayName: 'Ada',
+      relationship: 'friend',
+      sharedAt: '2026-05-20T10:30:00.000Z',
+      sourceConfidence: 0.87,
+      optedIn: true,
+      dealScore: 82
+    } as const;
+
+    assert.equal(friendSharedDealSignalCreateSchema.parse(signal).optedIn, true);
+    assert.equal(friendSharedDealSignalCreateSchema.safeParse({ ...signal, optedIn: false }).success, false);
+    assert.equal(friendSharedDealSignalCreateSchema.safeParse({ ...signal, sharedByUserId: '' }).success, false);
+    assert.equal(friendSharedDealSignalCreateSchema.safeParse({ ...signal, sourceConfidence: 1.2 }).success, false);
+
+    const listed = friendSharedDealSignalListResponseSchema.parse({
+      userId: 'user-1',
+      signals: [{ ...signal, userId: 'user-1', createdAt: '2026-05-20T12:00:00.000Z' }],
+      guardrails: ['Only opted-in household or friend signals are listed.']
+    });
+    assert.equal(listed.signals[0]?.relationship, 'friend');
+  });
+
   it('requires notification inbox timing fields for API and server contracts', () => {
     const parsed = notificationInboxResponseSchema.parse(validNotificationInbox);
 
@@ -286,6 +340,8 @@ describe('api contract schemas', () => {
 
     assert.equal(parsed.rows[0]?.planningWeeks, 4);
     assert.equal(parsed.rows[0]?.confidence, 'high');
+    assert.equal(parsed.rows[0]?.weeklyBudgetSharePercent, 13.86);
+    assert.equal(parsed.coverage?.observedItemCount, 1);
     assert.equal(parsed.evidence.noForecast, true);
     assert.deepEqual(parsed.evidence.sourceTables, ['multi_week_stock_up_rows', 'app_users']);
     assert.equal(
@@ -311,7 +367,7 @@ describe('api contract schemas', () => {
     assert.ok(price.required.includes('sourceType'));
     assert.ok(price.required.includes('provenance'));
     assert.deepEqual(price.properties.priceType.enum, ['shelf', 'member', 'promotion', 'estimated']);
-    assert.deepEqual(apiContractOpenApiComponents.FuelPriceObservation.properties.fuelGrade.enum, ['95', '98', 'diesel', 'hvo100', 'e85']);
+    assert.deepEqual(apiContractOpenApiComponents.FuelPriceObservation.properties.fuelGrade.enum, ['95', '98', 'diesel', 'hvo100', 'e85', 'adblue']);
     assert.deepEqual(apiContractOpenApiComponents.NotificationInboxResponse.properties.queue.items, {
       $ref: '#/components/schemas/NotificationInboxQueueItem'
     });
@@ -333,5 +389,9 @@ describe('api contract schemas', () => {
       $ref: '#/components/schemas/MultiWeekStockUpRow'
     });
     assert.equal(apiContractOpenApiComponents.MultiWeekStockUpListResponse.properties.evidence.properties.noForecast.enum[0], true);
+    assert.deepEqual(apiContractOpenApiComponents.FriendSharedDealSignal.properties.optedIn.enum, [true]);
+    assert.deepEqual(apiContractOpenApiComponents.FriendSharedDealSignalListResponse.properties.signals.items, {
+      $ref: '#/components/schemas/FriendSharedDealSignal'
+    });
   });
 });

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
+import { DatabaseModule } from '../database/database.module.js';
 import { AdminController } from './admin.controller.js';
 
-@Module({ controllers: [AdminController] })
+@Module({ imports: [DatabaseModule], controllers: [AdminController] })
 export class AdminModule {}

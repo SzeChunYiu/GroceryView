@@ -1,4 +1,5 @@
 import { planAccountDeletion } from '@groceryview/core';
+import { personalDataRegistry } from '@groceryview/db';
 import { Controller, Get, HttpCode, Post } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { buildDemoUserDataExport } from '../settings/data-export.js';
@@ -20,6 +21,7 @@ export class PrivacyController {
       ...planAccountDeletion('demo'),
       destructiveAction: false,
       requiresReauthentication: true,
+      privacyRegistry: personalDataRegistry.filter((entry) => entry.deleteCoverage),
       demo: true
     };
   }

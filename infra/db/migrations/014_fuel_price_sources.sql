@@ -6,8 +6,8 @@
 -- reports. They do not permit synthetic or estimated fuel prices.
 
 create table if not exists fuel_grades (
-  id text primary key check (id in ('fuel-95-e10', 'fuel-98', 'fuel-diesel', 'fuel-hvo100', 'fuel-e85')),
-  grade_code text not null unique check (grade_code in ('95', '98', 'diesel', 'hvo100', 'e85')),
+  id text primary key check (id in ('fuel-95-e10', 'fuel-98', 'fuel-diesel', 'fuel-hvo100', 'fuel-e85', 'fuel-adblue')),
+  grade_code text not null unique check (grade_code in ('95', '98', 'diesel', 'hvo100', 'e85', 'adblue')),
   label text not null,
   comparable_unit text not null default 'l' check (comparable_unit = 'l'),
   match_key text not null default 'fuel_grade' check (match_key = 'fuel_grade'),
@@ -22,7 +22,8 @@ values
   ('fuel-98', '98', '98 / Blyfri 98'),
   ('fuel-diesel', 'diesel', 'Diesel'),
   ('fuel-hvo100', 'hvo100', 'HVO100'),
-  ('fuel-e85', 'e85', 'E85')
+  ('fuel-e85', 'e85', 'E85'),
+  ('fuel-adblue', 'adblue', 'AdBlue')
 on conflict (id) do update set
   grade_code = excluded.grade_code,
   label = excluded.label,

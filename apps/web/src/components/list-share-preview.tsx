@@ -128,6 +128,48 @@ export function ListSharePreview() {
     setGeneratedShareUrl(payload.shareUrl ?? '');
     setShareStatus(payload.shareUrl ? 'Read-only share link ready.' : 'Share API returned no link.');
   }, [items]);
+  const safeShareUrl = generatedShareUrl || (shareLink?.isValid ? shareLink.token : '');
+  const qrUrl = safeShareUrl ? `/api/list/qr?url=${encodeURIComponent(safeShareUrl)}` : '';
+
+  const exportCsv = useCallback(() => {
+    const exportedAt = new Date().toISOString();
+    const rows = [
+      ['name', 'quantity', 'matched_product_slug', 'checked', 'freshness_timestamp', 'confidence'],
+      ...items.map((item) => [
+        item.name,
+        item.quantity,
+        item.matchedProductSlug ?? '',
+        item.checked ? 'true' : 'false',
+        exportedAt,
+        item.matchedProductSlug ? 'matched-product' : 'manual-item'
+      ])
+    ];
+    const csv = rows
+      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `groceryview-list-${exportedAt.slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    setShareStatus(`CSV export created with freshness timestamp ${exportedAt}.`);
+  }, [items]);
+
+  const shareGeneratedLink = useCallback(async () => {
+    if (!safeShareUrl) {
+      setShareStatus('Create a read-only share link before sharing outside the app.');
+      return;
+    }
+    if (navigator.share) {
+      await navigator.share({ title: 'GroceryView shopping list', text: 'Read-only GroceryView shopping list', url: safeShareUrl }).catch(() => undefined);
+      setShareStatus('System share sheet opened for the explicit read-only link.');
+      return;
+    }
+    await navigator.clipboard?.writeText(safeShareUrl).catch(() => undefined);
+    setShareStatus('Read-only share link copied. Account-only list data was not shared without this explicit action.');
+  }, [safeShareUrl]);
 
   return (
     <div className="min-h-screen bg-[#f5f1e8] text-slate-950">
@@ -164,6 +206,20 @@ export function ListSharePreview() {
             >
               Create share link
             </button>
+            <button
+              className="inline-flex items-center justify-center rounded-full border border-sky-200 bg-white px-4 py-2 text-sm font-black text-sky-900 transition hover:border-sky-700"
+              onClick={shareGeneratedLink}
+              type="button"
+            >
+              Share explicit link
+            </button>
+            <button
+              className="inline-flex items-center justify-center rounded-full border border-amber-200 bg-white px-4 py-2 text-sm font-black text-amber-900 transition hover:border-amber-700"
+              onClick={exportCsv}
+              type="button"
+            >
+              Export CSV
+            </button>
             <p className="text-sm font-semibold text-slate-600">Print view uses A4 spacing and hides navigation, import controls, and mobile chrome.</p>
           </div>
           <div className="mt-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-black text-emerald-950" data-print-hidden="true" role="status">
@@ -176,6 +232,13 @@ export function ListSharePreview() {
                 <span className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Share via link</span>
                 <input aria-label="Share link" className="mt-1 w-full rounded-xl border border-emerald-200 px-3 py-2 text-sm font-bold text-slate-800" readOnly value={generatedShareUrl} />
               </label>
+            ) : null}
+            {qrUrl ? (
+              <div className="mt-3 rounded-2xl border border-sky-200 bg-sky-50 p-3">
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-sky-800">QR export</p>
+                <img alt="QR code for explicit read-only shopping list share link" className="mt-2 h-32 w-32 rounded-xl bg-white p-2" src={qrUrl} />
+                <p className="mt-2 text-xs font-bold text-sky-950">QR is generated only after explicit share-link creation.</p>
+              </div>
             ) : null}
           </div>
           <ShareMetadataPreview items={items} shareUrl={generatedShareUrl || (shareLink?.isValid ? shareLink.token : '')} />

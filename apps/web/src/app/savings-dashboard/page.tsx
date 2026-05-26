@@ -36,8 +36,8 @@ export function generateMetadata() {
     },
     twitter: {
       card: 'summary_large_image',
-      title,
-      description,
+      title: openGraph?.title ?? title,
+      description: openGraph?.description ?? description,
       images: openGraph?.images
     }
   };
@@ -56,6 +56,75 @@ function formatSignedSek(value: number) {
 
 function formatPercent(value: number) {
   return `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`;
+}
+
+type SavingsBaselineOption = {
+  assumption: string;
+  baselineLabel: string;
+  baselineSpend: number;
+  confidence: 'high' | 'medium' | 'low';
+  coverageLabel: string;
+  observedBasketCount: number;
+  selectedSpend: number;
+};
+
+function parseSekLabel(value: string) {
+  const numeric = value.replace(/[^\d,.-]/g, '');
+  if (numeric.includes(',') && numeric.includes('.')) {
+    return Number(numeric.indexOf(',') < numeric.indexOf('.') ? numeric.replace(/,/g, '') : numeric.replace(/\./g, '').replace(',', '.'));
+  }
+  return Number(numeric.replace(',', '.'));
+}
+
+function buildSavingsCalculatorOptions(): SavingsBaselineOption[] {
+  const plannedMonthToDateSpend = parseSekLabel(savingsDashboard.monthToDate.plannedSpend);
+  const avoidedMonthToDateSpend = parseSekLabel(savingsDashboard.monthToDate.avoidedSpend);
+  const selectedMonthToDateSpend = plannedMonthToDateSpend - avoidedMonthToDateSpend;
+  const districtBaselineSpend = savingsDashboard.districtSavings.reduce((sum, row) => sum + parseSekLabel(row.planned), 0);
+  const districtAvoidedSpend = savingsDashboard.districtSavings.reduce((sum, row) => sum + parseSekLabel(row.avoided), 0);
+  const districtSelectedSpend = districtBaselineSpend - districtAvoidedSpend;
+
+  return [
+    {
+      assumption: 'Uses the signed-in month-to-date planned basket as the usual-store baseline and subtracts only observed avoided spend already shown on this dashboard.',
+      baselineLabel: 'Usual store baseline',
+      baselineSpend: plannedMonthToDateSpend,
+      confidence: 'medium',
+      coverageLabel: `${savingsDashboard.monthToDate.basketCount} observed baskets · best district ${savingsDashboard.monthToDate.bestDistrict}`,
+      observedBasketCount: savingsDashboard.monthToDate.basketCount,
+      selectedSpend: selectedMonthToDateSpend
+    },
+    {
+      assumption: 'Uses district savings rows as the chain-average proxy; no missing district, club-card, or unobserved shelf prices are filled in.',
+      baselineLabel: 'Chain average baseline',
+      baselineSpend: districtBaselineSpend,
+      confidence: 'medium',
+      coverageLabel: `${savingsDashboard.districtSavings.length} district rows with listed planned and avoided spend`,
+      observedBasketCount: Math.max(1, savingsDashboard.districtSavings.length),
+      selectedSpend: districtSelectedSpend
+    },
+    {
+      assumption: 'Uses the personal CPI previous weekly basket as the baseline; if current spend is higher the calculator reports a loss instead of hiding it.',
+      baselineLabel: 'Previous basket baseline',
+      baselineSpend: personalGroceryInflation.baseSpend,
+      confidence: personalGroceryInflation.confidence,
+      coverageLabel: `${personalGroceryInflation.itemContributions.length} priced lines · ${personalGroceryInflation.baseDate} to ${personalGroceryInflation.currentDate}`,
+      observedBasketCount: 1,
+      selectedSpend: personalGroceryInflation.currentSpend
+    }
+  ];
+}
+
+function savingAmount(option: SavingsBaselineOption) {
+  return option.baselineSpend - option.selectedSpend;
+}
+
+function savingForPeriod(option: SavingsBaselineOption, period: 'shop' | 'week' | 'month' | 'year') {
+  const amount = savingAmount(option);
+  if (period === 'shop') return amount / option.observedBasketCount;
+  if (period === 'week') return amount / 4;
+  if (period === 'year') return amount * 12;
+  return amount;
 }
 
 const premiumSavingsForecast = {
@@ -86,6 +155,7 @@ export default function SavingsDashboardPage() {
     .sort((a, b) => Math.abs(b.changeAmount) - Math.abs(a.changeAmount))
     .slice(0, 5);
   const visibleWatchpoints = savingsDashboard.watchpoints.slice(0, 4);
+  const savingsCalculatorOptions = buildSavingsCalculatorOptions();
   const categoryInflationTrends = buildCategoryInflationTrends({ limit: 4 });
   const categoryExposureCards = buildCategoryInflationExposureCards(4);
   const forecastReceiptCount = grocerySpendForecast.confidenceDrivers.receiptCount;
@@ -133,6 +203,44 @@ export default function SavingsDashboardPage() {
       <div className="mt-6">
         <RoutePerformanceBudgetPanel reports={recentRoutePerformanceBudgetReports} />
       </div>
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50/70">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Matpriskollen-style savings calculator</p>
+            <h2 className="mt-2 text-2xl font-black">Selected basket versus shopper baseline</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Pick the baseline that matches how the household shops: usual store, observed chain-average district rows, or the previous basket. Every period below is derived from visible basket totals; missing prices stay out of the calculation.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-emerald-950 shadow-sm">No fabricated savings</p>
+        </div>
+        <div className="mt-4 grid gap-3 lg:grid-cols-3">
+          {savingsCalculatorOptions.map((option) => {
+            const totalSaving = savingAmount(option);
+            return (
+              <div className="rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm" key={option.baselineLabel}>
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div>
+                    <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-700">{option.baselineLabel}</p>
+                    <p className="mt-2 text-3xl font-black text-slate-950">{formatSignedSek(totalSaving)}</p>
+                  </div>
+                  <ConfidenceBadge level={option.confidence} label={`${option.confidence} confidence`} sampleSize={option.observedBasketCount} />
+                </div>
+                <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
+                  <p className="rounded-xl bg-emerald-50 p-3 font-black text-emerald-950">Per shop {formatSignedSek(savingForPeriod(option, 'shop'))}</p>
+                  <p className="rounded-xl bg-slate-50 p-3 font-black text-slate-950">Per week {formatSignedSek(savingForPeriod(option, 'week'))}</p>
+                  <p className="rounded-xl bg-slate-50 p-3 font-black text-slate-950">Per month {formatSignedSek(savingForPeriod(option, 'month'))}</p>
+                  <p className="rounded-xl bg-slate-50 p-3 font-black text-slate-950">Per year {formatSignedSek(savingForPeriod(option, 'year'))}</p>
+                </div>
+                <p className="mt-3 text-sm font-semibold text-slate-700">Selected basket {formatSek(option.selectedSpend)} vs baseline {formatSek(option.baselineSpend)}</p>
+                <p className="mt-2 text-xs font-semibold leading-5 text-slate-600">Coverage: {option.coverageLabel}</p>
+                <p className="mt-2 text-xs font-semibold leading-5 text-slate-500">Assumption: {option.assumption}</p>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
 
       <Card className="mt-6 border-amber-200 bg-amber-50">
         <div className="flex flex-wrap items-start justify-between gap-4">
@@ -436,6 +544,40 @@ export default function SavingsDashboardPage() {
             <p className="mt-1 text-sm font-semibold text-slate-600">after planned basket</p>
           </div>
         </div>
+        <div className="mt-4 grid gap-3 lg:grid-cols-[1fr_1fr]">
+          <div className="rounded-2xl border border-indigo-200 bg-white p-5">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-indigo-800">{elderlyFixedIncomeBudgetTracker.essentialStaplesBasket.title}</p>
+            <p className="mt-2 text-4xl font-black text-indigo-950">{formatSek(elderlyFixedIncomeBudgetTracker.essentialStaplesBasket.cost)}</p>
+            <p className="mt-2 text-lg font-black text-slate-950">
+              {formatSek(elderlyFixedIncomeBudgetTracker.essentialStaplesBasket.remainingMonthlyBudgetAfterStaples)} left after essentials
+            </p>
+            <div className="mt-4 grid gap-2">
+              {elderlyFixedIncomeBudgetTracker.essentialStaplesBasket.rows.map((row) => (
+                <Link className="rounded-2xl bg-indigo-50 p-4 text-left hover:bg-indigo-100" href={`/products/${row.id}`} key={row.id}>
+                  <span className="block text-lg font-black text-slate-950">{row.name}</span>
+                  <span className="mt-1 block text-sm font-semibold text-slate-700">{row.quantity} × basket row · {row.store}</span>
+                  <span className="mt-2 block text-2xl font-black text-indigo-900">{formatSek(row.currentPrice)}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-2xl border border-emerald-200 bg-white p-5">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-emerald-800">Cheaper swaps</p>
+            <p className="mt-2 text-lg font-semibold leading-7 text-slate-700">Large-tap swap cards use only cheaper rows already present in the visible basket catalogue.</p>
+            <div className="mt-4 grid gap-3">
+              {elderlyFixedIncomeBudgetTracker.cheaperSwaps.map((swap) => (
+                <Link className="rounded-2xl bg-emerald-50 p-4 hover:bg-emerald-100" href={`/products/${swap.alternativeProductId}`} key={`${swap.productId}-${swap.alternativeProductId}`}>
+                  <span className="block text-lg font-black text-slate-950">{swap.productName}</span>
+                  <span className="mt-1 block text-sm font-semibold text-slate-700">Swap to {swap.alternativeName}</span>
+                  <span className="mt-2 block text-2xl font-black text-emerald-900">Save {formatSek(swap.estimatedSavings)}</span>
+                </Link>
+              ))}
+              {elderlyFixedIncomeBudgetTracker.cheaperSwaps.length === 0 ? (
+                <p className="rounded-2xl bg-slate-50 p-4 text-lg font-black text-slate-700">No cheaper covered swaps in the current essential basket.</p>
+              ) : null}
+            </div>
+          </div>
+        </div>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           {elderlyFixedIncomeBudgetTracker.guardrails.map((guardrail) => (
             <div className="rounded-2xl border border-indigo-200 bg-white p-4" key={guardrail.label}>
@@ -453,13 +595,22 @@ export default function SavingsDashboardPage() {
         <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
           This senior tracker calls summarizePriceHistory for everyday staples and labels each observed price-history row with a stabilityBand instead of estimating missing weeks.
         </p>
+        <p className="mt-3 rounded-2xl bg-white p-3 text-sm font-black text-slate-800">
+          Minimum history for fixed-income planning: {elderlyStaplesStabilityTracker.minimumObservedPoints} observed shelf points per staple; thinner history renders an amber warning instead of a reliability claim.
+        </p>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           {elderlyStaplesStabilityTracker.rows.map((row) => (
             <Link className="rounded-2xl border border-slate-200 bg-white p-4 hover:border-slate-900" href={`/products/${row.productId}`} key={row.productId}>
               <p className="font-black text-slate-950">{row.productName}</p>
               <p className="mt-2 text-3xl font-black text-slate-950">{formatSek(row.history.latestPrice)}</p>
               <p className="mt-1 text-sm font-semibold text-slate-600">stabilityBand: {row.stabilityBand}</p>
-              <p className="mt-2 text-sm font-semibold text-slate-700">Change {formatSignedSek(row.history.changeFromPrevious)} · {row.history.observedCount} observed points</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">Change {formatSignedSek(row.history.changeFromPrevious)} · volatility {row.volatilityPercent.toFixed(1)}%</p>
+              <p className="mt-1 text-sm font-semibold text-slate-700">{row.history.observedCount} observed points · range {formatSek(row.history.lowestPrice)}–{formatSek(row.history.highestPrice)}</p>
+              {row.insufficientHistoryWarning ? (
+                <p className="mt-3 rounded-2xl bg-amber-50 p-3 text-sm font-black leading-6 text-amber-950">{row.insufficientHistoryWarning}</p>
+              ) : (
+                <p className="mt-3 rounded-2xl bg-emerald-50 p-3 text-sm font-black leading-6 text-emerald-950">History clears the fixed-income planning threshold.</p>
+              )}
             </Link>
           ))}
         </div>

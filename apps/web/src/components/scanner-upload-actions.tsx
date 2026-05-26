@@ -35,6 +35,35 @@ type ScanProcessResponse = {
   purchaseHistory?: ReceiptPurchaseHistoryItem[];
 };
 
+type SearchBarcodeResult = {
+  id: string;
+  slug: string;
+  barcode?: string | null;
+  name: string;
+  brand?: string | null;
+  searchRank?: number;
+};
+
+type SearchBarcodeLookup =
+  | {
+    status: 'matched';
+    barcode: string;
+    product: SearchBarcodeResult;
+    source: string;
+  }
+  | {
+    status: 'missing' | 'unavailable';
+    barcode: string;
+    source: string;
+    reason?: string;
+  };
+
+type SearchBarcodeResponse = {
+  results?: SearchBarcodeResult[];
+  source?: string;
+  error?: string;
+};
+
 type BarcodeDetectorShape = {
   detect(source: HTMLVideoElement): Promise<Array<{ rawValue?: string }>>;
 };
@@ -51,9 +80,14 @@ function newScanId(prefix: 'receipt' | 'barcode') {
   return `${prefix}-${Date.now()}`;
 }
 
+function exactSearchBarcodeMatch(barcode: string, results: SearchBarcodeResult[] = []) {
+  return results.find((result) => result.barcode?.replace(/\D/g, '') === barcode) ?? null;
+}
+
 export function ScannerUploadActions({ fallbackProducts = [], lookupSources = [] }: Readonly<{ fallbackProducts?: BarcodeMissFallbackProduct[]; lookupSources?: readonly string[] }>) {
   const [barcode, setBarcode] = useState('0735000123456');
   const [lookupResult, setLookupResult] = useState<BarcodeLookupResult | null>(() => resolveBarcodeLookup('0735000123456', fallbackProducts));
+  const [searchLookupResult, setSearchLookupResult] = useState<SearchBarcodeLookup | null>(null);
   const [byteLength, setByteLength] = useState('123456');
   const [contentType, setContentType] = useState('image/jpeg');
   const [status, setStatus] = useState<ScannerStatus>('idle');
@@ -70,7 +104,69 @@ export function ScannerUploadActions({ fallbackProducts = [], lookupSources = []
   function updateBarcode(value: string) {
     setBarcode(value);
     setBarcodeFallbackActive(false);
+    setSearchLookupResult(null);
     setLookupResult(resolveBarcodeLookup(value, fallbackProducts));
+  }
+
+  async function lookupBarcodeWithSearch(value = barcode) {
+    const lookupBarcode = value.replace(/\D/g, '');
+    if (lookupBarcode.length < 8) {
+      setSearchLookupResult(null);
+      setStatus('error');
+      setMessage('Enter at least 8 barcode digits before using product search lookup.');
+      return null;
+    }
+
+    setStatus('loading');
+    try {
+      const response = await fetch(`/api/search?q=${encodeURIComponent(lookupBarcode)}`, {
+        headers: { Accept: 'application/json' }
+      });
+      const payload = (await response.json().catch(() => null)) as SearchBarcodeResponse | null;
+      const source = payload?.source ?? '/api/search';
+      if (!response.ok) {
+        const unavailable: SearchBarcodeLookup = {
+          status: 'unavailable',
+          barcode: lookupBarcode,
+          source,
+          reason: payload?.error ?? 'search_lookup_failed'
+        };
+        setSearchLookupResult(unavailable);
+        setBarcodeFallbackActive(true);
+        setStatus('error');
+        setMessage(`/api/search could not check EAN ${lookupBarcode}. Use the local fallback or signed-in scan processing.`);
+        return unavailable;
+      }
+
+      const match = exactSearchBarcodeMatch(lookupBarcode, payload?.results);
+      if (match) {
+        const matched: SearchBarcodeLookup = { status: 'matched', barcode: lookupBarcode, product: match, source };
+        setSearchLookupResult(matched);
+        setBarcodeFallbackActive(false);
+        setStatus('ready');
+        setMessage(`/api/search resolved EAN ${lookupBarcode} to ${match.name}. Open the product detail link below.`);
+        return matched;
+      }
+
+      const missing: SearchBarcodeLookup = { status: 'missing', barcode: lookupBarcode, source };
+      setSearchLookupResult(missing);
+      setBarcodeFallbackActive(true);
+      setStatus('error');
+      setMessage(`/api/search returned no exact barcode match for EAN ${lookupBarcode}. Review fallback options or report the product.`);
+      return missing;
+    } catch {
+      const unavailable: SearchBarcodeLookup = {
+        status: 'unavailable',
+        barcode: lookupBarcode,
+        source: '/api/search',
+        reason: 'network_error'
+      };
+      setSearchLookupResult(unavailable);
+      setBarcodeFallbackActive(true);
+      setStatus('error');
+      setMessage(`/api/search could not be reached for EAN ${lookupBarcode}. Use the local fallback or signed-in scan processing.`);
+      return unavailable;
+    }
   }
 
   function requireSession(): BrowserSession | null {
@@ -254,7 +350,9 @@ export function ScannerUploadActions({ fallbackProducts = [], lookupSources = []
     }
 
     updateBarcode(rawValue);
+    const searchResult = await lookupBarcodeWithSearch(rawValue);
     const result = resolveBarcodeLookup(rawValue, fallbackProducts);
+    if (searchResult?.status === 'matched') return;
     setStatus(result?.status === 'matched' ? 'ready' : 'error');
     setBarcodeFallbackActive(result?.status === 'missing');
     setMessage(result?.status === 'matched'
@@ -386,11 +484,38 @@ export function ScannerUploadActions({ fallbackProducts = [], lookupSources = []
           />
           <div className="mt-3 flex flex-wrap gap-2">
             <button className="rounded-full bg-slate-950 px-4 py-2 text-sm font-black text-white" disabled={!barcode.trim()} type="submit">Process barcode scan</button>
+            <button className="rounded-full bg-sky-800 px-4 py-2 text-sm font-black text-white" disabled={!barcode.trim()} onClick={() => void lookupBarcodeWithSearch()} type="button">Lookup with /api/search</button>
             <button className="rounded-full bg-indigo-800 px-4 py-2 text-sm font-black text-white" onClick={startBarcodeCamera} type="button">Start barcode camera</button>
             <button className="rounded-full bg-emerald-700 px-4 py-2 text-sm font-black text-white" disabled={!cameraReady} onClick={detectBarcodeFromCamera} type="button">Detect EAN from camera</button>
           </div>
         </form>
       </div>
+      {searchLookupResult ? (
+        <section className={`mt-4 rounded-2xl border p-4 ${searchLookupResult.status === 'matched' ? 'border-sky-200 bg-sky-50' : 'border-amber-200 bg-amber-50'}`} aria-label="Product search barcode lookup result">
+          {searchLookupResult.status === 'matched' ? (
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h3 className="text-sm font-black uppercase tracking-[0.18em] text-sky-800">EAN resolved by /api/search</h3>
+                <p className="mt-2 text-sm font-semibold leading-6 text-sky-950">
+                  {searchLookupResult.barcode} matched {searchLookupResult.product.name}{searchLookupResult.product.brand ? ` · ${searchLookupResult.product.brand}` : ''}.
+                </p>
+                <p className="mt-1 text-xs font-bold uppercase tracking-[0.14em] text-sky-700">{searchLookupResult.source}</p>
+              </div>
+              <a className="rounded-full bg-sky-900 px-4 py-2 text-sm font-black text-white" href={`/products/${searchLookupResult.product.slug}`}>Open product detail</a>
+            </div>
+          ) : (
+            <div>
+              <h3 className="text-sm font-black uppercase tracking-[0.18em] text-amber-800">
+                {searchLookupResult.status === 'unavailable' ? 'Product search unavailable' : 'No /api/search barcode match'}
+              </h3>
+              <p className="mt-2 text-sm font-semibold leading-6 text-amber-950">
+                EAN {searchLookupResult.barcode} did not resolve through {searchLookupResult.source}
+                {searchLookupResult.reason ? ` (${searchLookupResult.reason})` : ''}. The scanner keeps local fallback and missing-product reporting available.
+              </p>
+            </div>
+          )}
+        </section>
+      ) : null}
       {lookupResult ? (
         <section className={`mt-4 rounded-2xl border p-4 ${lookupResult.status === 'matched' ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50'}`} aria-label="In-browser barcode lookup result">
           {lookupResult.status === 'matched' ? (

@@ -1,17 +1,44 @@
+import { inferBonusIsGroceryCategory, type GroceryCategoryInference } from '@groceryview/catalog';
+
 export type BonusIsChain = 'bonus-is';
+
+export const BONUS_IS_STORE_BASE_URL = 'https://verslun.bonus.is';
+export const DEFAULT_BONUS_IS_PRODUCT_URLS = [
+  `${BONUS_IS_STORE_BASE_URL}/`,
+  `${BONUS_IS_STORE_BASE_URL}/en/`
+] as const;
 
 export type BonusIsProduct = {
   chain: BonusIsChain;
   code: string;
   name: string;
+  categoryPath: string[];
+  categorySlug: string;
+  categoryConfidence: GroceryCategoryInference['confidence'];
+  categoryMatchedKeyword: string;
+  categorySource: GroceryCategoryInference['source'];
   price: number;
   priceText: string;
+  currency: 'ISK';
+  unitPrice: null;
+  unitPriceText: null;
   productUrl: string;
   imageUrl: string;
   inStock: boolean;
   sourceUrl: string;
   retrievedAt: string;
 };
+
+export const BONUS_IS_SOURCE_RESEARCH = {
+  officialSite: 'https://bonus.is/',
+  catalogUrl: BONUS_IS_STORE_BASE_URL,
+  robotsTxt: 'https://verslun.bonus.is/robots.txt',
+  accessStatus: 'public_woocommerce_html',
+  legalConstraint: 'robots.txt allows the storefront and sitemap while blocking WooCommerce logs, uploads, wp-admin, and add-to-cart URLs; connector must avoid cart/session endpoints and keep request volume bounded.',
+  priceEvidence: 'Storefront product cards expose ISK item prices in WooCommerce price spans.',
+  unitPriceEvidence: 'No stable unit-price field is present in the public product-card HTML fixture, so unitPrice remains null instead of inferred from names or package text.',
+  checkedAt: '2026-05-25T17:59:32.000Z'
+} as const;
 
 export type FetchBonusIsProductsOptions = {
   fetchImpl?: typeof fetch;
@@ -35,12 +62,6 @@ export type BonusIsConnectorHealth = {
   ok: boolean;
   error?: string;
 };
-
-export const BONUS_IS_STORE_BASE_URL = 'https://verslun.bonus.is';
-export const DEFAULT_BONUS_IS_PRODUCT_URLS = [
-  `${BONUS_IS_STORE_BASE_URL}/`,
-  `${BONUS_IS_STORE_BASE_URL}/en/`
-] as const;
 
 export async function checkBonusIsConnectorHealth(options: FetchBonusIsProductsOptions = {}): Promise<BonusIsConnectorHealth> {
   const requestedMaxRows = options.maxRows ?? 5;
@@ -116,13 +137,22 @@ export function normalizeBonusIsProduct(block: string, sourceUrl: string, retrie
     || stableCode(name);
   const imageUrl = absoluteUrl(firstMatch(block, /<img\b[^>]*(?:data-src|src)=["']([^"']+)["']/i), sourceUrl);
   const outOfStock = /outofstock|out of stock|ekki\s+til\s+á\s+lager/i.test(block);
+  const category = inferBonusIsGroceryCategory({ name, productUrl });
 
   return {
     chain: 'bonus-is',
     code,
     name,
+    categoryPath: category.categoryPath,
+    categorySlug: category.categorySlug,
+    categoryConfidence: category.confidence,
+    categoryMatchedKeyword: category.matchedKeyword,
+    categorySource: category.source,
     price,
     priceText,
+    currency: 'ISK',
+    unitPrice: null,
+    unitPriceText: null,
     productUrl,
     imageUrl,
     inStock: !outOfStock,

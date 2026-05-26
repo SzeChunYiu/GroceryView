@@ -25,6 +25,7 @@ export type CityGrossProduct = {
   regularPrice: number | null;
   unitPrice: number | null;
   unitPriceUnit: string;
+  is_member_price: boolean;
   hasDiscount: boolean;
   hasPromotion: boolean;
   isCurrentWeekDiscount: boolean;
@@ -220,10 +221,13 @@ export async function fetchCityGrossProducts(options: FetchCityGrossProductsOpti
     const payload = await response.json() as CityGrossProductResponse;
     const items = payload.items ?? [];
     for (const item of items) {
-      const row = normalizeCityGrossProduct(item, options.siteId, sourceUrl, retrievedAt);
-      if (!row || seen.has(row.code)) continue;
-      seen.add(row.code);
-      rows.push(row);
+      const normalizedRows = normalizeCityGrossProductRows(item, options.siteId, sourceUrl, retrievedAt);
+      for (const row of normalizedRows) {
+        const rowKey = `${row.code}:${row.is_member_price ? 'member' : 'list'}`;
+        if (seen.has(rowKey)) continue;
+        seen.add(rowKey);
+        rows.push(row);
+      }
       if (rows.length >= maxRows) return rows;
     }
     const totalCount = numberOrNull(payload.totalCount);
@@ -271,7 +275,7 @@ export async function fetchCityGrossProductsForAllStores(
   const rows: CityGrossProduct[] = [];
   const seen = new Set<string>();
   for (const product of fetchedRows) {
-    const key = `${product.storeId}:${product.code}`;
+    const key = `${product.storeId}:${product.code}:${product.is_member_price ? 'member' : 'list'}`;
     if (seen.has(key)) continue;
     seen.add(key);
     rows.push(product);
@@ -310,6 +314,15 @@ export function normalizeCityGrossProduct(
   sourceUrl: string,
   retrievedAt: string
 ): CityGrossProduct | null {
+  return normalizeCityGrossProductRows(product, storeId, sourceUrl, retrievedAt)[0] ?? null;
+}
+
+export function normalizeCityGrossProductRows(
+  product: CityGrossProductApiRow,
+  storeId: string,
+  sourceUrl: string,
+  retrievedAt: string
+): CityGrossProduct[] {
   const code = text(product.id);
   const name = text(product.name);
   const superCategory = text(product.superCategory);
@@ -317,9 +330,11 @@ export function normalizeCityGrossProduct(
   const prices = productStoreDetails?.prices;
   const currentPrice = prices?.currentPrice;
   const price = numberOrNull(currentPrice?.price);
-  if (!code || !name || price === null) return null;
-  if (superCategory && !isCityGrossGrocerySuperCategory(superCategory)) return null;
+  if (!code || !name || price === null) return [];
+  if (superCategory && !isCityGrossGrocerySuperCategory(superCategory)) return [];
   const regularPrice = numberOrNull(prices?.ordinaryPrice?.price);
+  const regularUnitPrice = numberOrNull(prices?.ordinaryPrice?.comparativePrice);
+  const isMembersOnlyPrice = booleanValue(productStoreDetails?.p_has_members_only_price);
   const activePromotion = prices?.activePromotion ?? prices?.promotions?.[0] ?? null;
   const promotionPriceDetails = activePromotion?.priceDetails ?? null;
   const promotionPrice = numberOrNull(promotionPriceDetails?.price);
@@ -328,7 +343,7 @@ export function normalizeCityGrossProduct(
   const hasDiscount = booleanValue(prices?.hasDiscount) || hasPromotion || (regularPrice !== null && regularPrice > price);
   const productPath = text(product.url);
   const imageUrl = text(product.images?.[0]?.url);
-  return {
+  const memberRow: CityGrossProduct = {
     code,
     gtin: text(product.gtin),
     name,
@@ -341,11 +356,12 @@ export function normalizeCityGrossProduct(
     regularPrice,
     unitPrice: numberOrNull(currentPrice?.comparativePrice),
     unitPriceUnit: text(currentPrice?.comparativePriceUnit),
+    is_member_price: isMembersOnlyPrice,
     hasDiscount,
     hasPromotion,
     isCurrentWeekDiscount: booleanValue(productStoreDetails?.p_has_current_week_only_discount),
     isLongTimeDiscount: booleanValue(productStoreDetails?.p_has_long_time_discount),
-    isMembersOnlyPrice: booleanValue(productStoreDetails?.p_has_members_only_price),
+    isMembersOnlyPrice,
     promotionFrom: text(activePromotion?.from),
     promotionTo: text(activePromotion?.to),
     promotionMinQuantity: numberOrNull(activePromotion?.minQuantity),
@@ -358,6 +374,31 @@ export function normalizeCityGrossProduct(
     sourceUrl,
     retrievedAt
   };
+  if (!isMembersOnlyPrice || regularPrice === null || regularPrice <= price) return [memberRow];
+
+  return [
+    {
+      ...memberRow,
+      price: regularPrice,
+      regularPrice,
+      unitPrice: regularUnitPrice,
+      unitPriceUnit: text(prices?.ordinaryPrice?.comparativePriceUnit),
+      is_member_price: false,
+      hasDiscount: false,
+      hasPromotion: false,
+      isMembersOnlyPrice: false,
+      isCurrentWeekDiscount: false,
+      isLongTimeDiscount: false,
+      promotionFrom: '',
+      promotionTo: '',
+      promotionMinQuantity: null,
+      promotionPrice: null,
+      promotionUnitPrice: null,
+      promotionUnitPriceUnit: '',
+      priceText: `${regularPrice.toFixed(2)} SEK`
+    },
+    memberRow
+  ];
 }
 
 function isCityGrossGrocerySuperCategory(value: string): boolean {

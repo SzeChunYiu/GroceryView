@@ -60,6 +60,7 @@ export const swedishGroceryCategoryTree = [
       { name: 'Kyckling', slug: 'kyckling' },
       { name: 'Färs', slug: 'fars' },
       { name: 'Korv', slug: 'korv' },
+      { name: 'Chark', slug: 'chark' },
       { name: 'Pålägg', slug: 'palagg' },
       { name: 'Bacon', slug: 'bacon' }
     ]

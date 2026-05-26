@@ -1,14 +1,18 @@
 import Link from 'next/link';
 import { BasketComparisonPrint } from '@/components/basket-comparison-print';
 import { ChainSelector } from '@/components/chain-selector';
-import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { Card, Eyebrow, PageShell, SourceCitation } from '@/components/data-ui';
+import { FamilyPackComparisonPanel } from '@/components/family-pack-comparison';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
+import { SavedViewActions } from '@/components/saved-view-actions';
 import { StoreComparisonTable } from '@/components/StoreComparisonTable';
 import { StorePriceMatrix } from '@/components/store-price-matrix';
-import { COMPARE_CHAIN_ORDER, buildBasketStoreComparison, buildChainComparisonTable, parseCompareChainsParam } from '@/lib/chain-compare';
+import { COMPARE_CHAIN_ORDER, buildBasketStoreComparison, buildChainComparisonTable, parseCompareCapabilityFilters, parseCompareChainsParam, type CompareChainCapabilityFilter } from '@/lib/chain-compare';
+import { fetchComparePriceSnapshots, type ComparePriceSnapshotStoreRow } from '@/lib/compare-price-snapshots';
+import { topFamilyPackComparisons } from '@/lib/family-pack';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
-import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, commodityComparisons, compareOverlayChart, formatPct, formatSek, matchedChainProducts, privateLabelDupeFinder } from '@/lib/verified-data';
+import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, commodityComparisons, compareOverlayChart, formatPct, formatSek, matchedChainProducts, normalizeComparableUnitPrice, privateLabelDupeFinder, snapshot } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 import { buildStoreDistanceCompare } from '@/lib/store-distance';
 
@@ -24,9 +28,34 @@ function formatComparableUnitPrice(value: number | null | undefined, unitLabel: 
   });
 }
 
+function medianPrice(values: number[]) {
+  const sorted = [...values].sort((left, right) => left - right);
+  if (sorted.length === 0) return null;
+  const middle = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 0 ? (sorted[middle - 1]! + sorted[middle]!) / 2 : sorted[middle] ?? null;
+}
+
+function chainDisplayName(chain: string) {
+  if (chain === 'hemkop') return 'Hemköp';
+  if (chain === 'willys') return 'Willys';
+  return chain.toUpperCase();
+}
+
+function chainUnitPriceLabel(price: number, priceUnit: string, packageLabel: string) {
+  if (priceUnit && priceUnit !== 'kr/st') return formatComparableUnitPrice(price, priceUnit);
+  const normalized = normalizeComparableUnitPrice(price, packageLabel);
+  return normalized ? formatComparableUnitPrice(normalized.unitPrice, normalized.unitLabel) : 'Unit price not computable';
+}
+
 type SearchParams = {
   chains?: string | string[];
+  coupon?: string | string[];
+  coupons?: string | string[];
+  delivery?: string | string[];
+  homeDelivery?: string | string[];
+  'home-delivery'?: string | string[];
   overlayMode?: string | string[];
+  pickup?: string | string[];
   products?: string | string[];
   routeMode?: string | string[];
 };
@@ -74,16 +103,20 @@ function overlayWindow(
   const latestValue = values.at(-1) ?? 0;
   const lowValue = values.length ? Math.min(...values) : 0;
   const highValue = values.length ? Math.max(...values) : 0;
+  const windowStart = new Date(windowStartTime).toISOString();
+  const windowEnd = new Date(windowEndTime).toISOString();
+  const rangeStart = compareOverlayChart.windowStart ?? windowStart;
+  const rangeEnd = compareOverlayChart.windowEnd ?? windowEnd;
 
   return {
     label,
-    rangeLabel: days === null ? `${compareOverlayChart.windowStart.slice(0, 10)} → ${compareOverlayChart.windowEnd.slice(0, 10)}` : `Last ${days} days`,
-    windowStart: new Date(windowStartTime).toISOString(),
-    windowEnd: new Date(windowEndTime).toISOString(),
+    rangeLabel: days === null ? `${rangeStart.slice(0, 10)} → ${rangeEnd.slice(0, 10)}` : `Last ${days} days`,
+    windowStart,
+    windowEnd,
     pointCount: series.reduce((sum, item) => sum + item.points.length, 0),
     markerCount: 0,
     latestValueLabel: overlayMode === 'index' ? `${latestValue.toLocaleString('sv-SE')} index` : formatSek(latestValue),
-    latestObservedAt: compareOverlayChart.windowEnd,
+    latestObservedAt: rangeEnd,
     lowValueLabel: overlayMode === 'index' ? `${lowValue.toLocaleString('sv-SE')} index` : formatSek(lowValue),
     highValueLabel: overlayMode === 'index' ? `${highValue.toLocaleString('sv-SE')} index` : formatSek(highValue),
     series
@@ -107,22 +140,90 @@ function overlayTerminalModel(overlayMode: 'price' | 'index'): PriceChartTermina
   };
 }
 
-function compareHref(productsParam: string | string[] | undefined, selectedChainIds: string[]) {
+function compareHref(productsParam: string | string[] | undefined, selectedChainIds: string[], capabilityFilters: readonly CompareChainCapabilityFilter[] = []) {
   const params = new URLSearchParams();
   const products = Array.isArray(productsParam) ? productsParam[0] : productsParam;
   if (products) params.set('products', products);
   if (selectedChainIds.length < COMPARE_CHAIN_ORDER.length) params.set('chains', selectedChainIds.join(','));
+  if (capabilityFilters.includes('coupon')) params.set('coupons', '1');
+  if (capabilityFilters.includes('delivery')) params.set('delivery', '1');
+  if (capabilityFilters.includes('pickup')) params.set('pickup', '1');
   const query = params.toString();
   return `/compare${query ? `?${query}` : ''}`;
+}
+
+function capabilityFilterHref(
+  productsParam: string | string[] | undefined,
+  chainsParam: string | string[] | undefined,
+  activeFilters: readonly CompareChainCapabilityFilter[],
+  filter: CompareChainCapabilityFilter
+) {
+  const params = new URLSearchParams();
+  const products = firstSearchValue(productsParam);
+  const chains = firstSearchValue(chainsParam);
+  const nextFilters = activeFilters.includes(filter)
+    ? activeFilters.filter((item) => item !== filter)
+    : [...activeFilters, filter];
+  if (products) params.set('products', products);
+  if (chains) params.set('chains', chains);
+  if (nextFilters.includes('coupon')) params.set('coupons', '1');
+  if (nextFilters.includes('delivery')) params.set('delivery', '1');
+  if (nextFilters.includes('pickup')) params.set('pickup', '1');
+  const query = params.toString();
+  return `/compare${query ? `?${query}` : ''}`;
+}
+
+function endpointSnapshotMatrix(snapshotRows: ComparePriceSnapshotStoreRow[], requestedItemIds: string[]) {
+  const storeIds = [...new Set(snapshotRows.map((row) => row.storeName))].sort((left, right) => left.localeCompare(right, 'sv-SE'));
+  const rowsByItemStore = new Map(snapshotRows.map((row) => [`${row.itemId}:${row.storeName}`, row]));
+
+  return {
+    chains: storeIds.map((storeId) => ({ id: storeId, label: storeId })),
+    products: requestedItemIds.map((itemId) => {
+      const firstRow = snapshotRows.find((row) => row.itemId === itemId);
+      return {
+        brand: null,
+        packageLabel: 'Endpoint price snapshot',
+        productName: firstRow?.itemName ?? itemId,
+        productSlug: itemId,
+        cells: storeIds.map((storeId) => {
+          const row = rowsByItemStore.get(`${itemId}:${storeId}`);
+          return {
+            chainId: storeId,
+            freshnessObservedAt: row?.observedAt || null,
+            priceText: row?.priceLabel ?? 'Missing from store snapshot',
+            productName: row?.itemName ?? itemId,
+            productSlug: itemId,
+            status: row?.price === null || !row ? 'missing' : 'priced',
+            unitLabel: row?.unitLabel ?? 'No item snapshot row',
+            verificationLabel: row?.confidence ? `Endpoint confidence: ${row.confidence}` : 'Endpoint snapshot row'
+          };
+        })
+      };
+    })
+  };
 }
 
 export default async function ComparePage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
   const productsParam = resolvedSearchParams.products;
+  const compareSnapshots = await fetchComparePriceSnapshots(productsParam, { endpoint: '/api/compare' });
+  const hasEndpointRequestedItems = compareSnapshots.itemIds.length > 0;
+  const endpointMatrix = endpointSnapshotMatrix(compareSnapshots.storeRows, compareSnapshots.itemIds);
   const overlayMode = firstSearchValue(resolvedSearchParams.overlayMode) === 'index' ? 'index' as const : 'price' as const;
   const overlayChartModel = overlayTerminalModel(overlayMode);
-  const comparison = buildChainComparisonTable(productsParam);
   const selectedChainIds = parseCompareChainsParam(resolvedSearchParams.chains);
+  const capabilityFilters = parseCompareCapabilityFilters(resolvedSearchParams);
+  const comparison = buildChainComparisonTable(hasEndpointRequestedItems ? undefined : productsParam, undefined, {
+    activeFilters: selectedChainIds,
+    capabilityFilters
+  });
+  const visibleCompareChains = COMPARE_CHAIN_ORDER.filter((chain) => comparison.noChainState.visibleChainIds.includes(chain.id));
+  const visibleCompareChainIds = new Set(visibleCompareChains.map((chain) => chain.id));
+  const noChainMatches = !hasEndpointRequestedItems
+    && comparison.products.length > 0
+    && comparison.noChainState.activeCapabilityFilters.length > 0
+    && visibleCompareChains.length === 0;
   const basketStoreComparison = buildBasketStoreComparison(productsParam, resolvedSearchParams.chains);
   const cheapestBasketStore = basketStoreComparison.stores.find((store) => store.highlightLabels.includes('Cheapest'));
   const closestBasketStore = basketStoreComparison.stores.find((store) => store.highlightLabels.includes('Closest'));
@@ -130,7 +231,36 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
   const storeDistance = buildStoreDistanceCompare(productsParam, resolvedSearchParams.routeMode);
   const packagedRows = comparison.products.filter((product) => product.matchType === 'packaged_barcode');
   const commodityRows = comparison.products.filter((product) => product.matchType === 'commodity_alias');
+  const requestedMatchedProductSlugs = new Set(comparison.products.map((product) => product.productSlug));
+  const requestedMatchedProducts = requestedMatchedProductSlugs.size > 0
+    ? matchedChainProducts.filter((product) => requestedMatchedProductSlugs.has(product.slug))
+    : [];
+  const cheapestChainSourceProducts = requestedMatchedProducts.length > 0 ? requestedMatchedProducts : matchedChainProducts;
+  const cheapestChainScopeLabel = requestedMatchedProducts.length > 0 ? 'requested matches' : 'high-spread matches';
+  const cheapestChainRows = [...cheapestChainSourceProducts]
+    .sort((left, right) => right.spreadPct - left.spreadPct)
+    .slice(0, 12)
+    .map((product) => {
+      const chainRows = chainPriceRows(product).sort((left, right) => left.price - right.price);
+      const best = chainRows[0];
+      const prices = chainRows.map((row) => row.price);
+      const median = medianPrice(prices);
+
+      return {
+        product,
+        best,
+        chainRows: chainRows.map((row) => ({
+          ...row,
+          chainName: chainDisplayName(row.chain),
+          deltaVsBest: best ? row.price - best.price : null,
+          deltaVsMedian: median === null ? null : row.price - median,
+          unitPriceLabel: chainUnitPriceLabel(row.price, row.priceUnit, product.subline)
+        })),
+        median
+      };
+    });
   const sampleProductsHref = '/compare?products=makaroner-pasta-101302991-st,havregryn-extra-fylliga-101758934-st';
+  const familyPackComparisons = topFamilyPackComparisons(matchedChainProducts, labelFromSlug);
   const chainSelectorOptions = COMPARE_CHAIN_ORDER.map((chain) => ({
     href: compareHref(
       productsParam,
@@ -138,7 +268,8 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
         ? selectedChainIds.length === 1
           ? selectedChainIds
           : selectedChainIds.filter((chainId) => chainId !== chain.id)
-        : [...selectedChainIds, chain.id]
+        : [...selectedChainIds, chain.id],
+      capabilityFilters
     ),
     id: chain.id,
     label: chain.label,
@@ -161,6 +292,12 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
       rows: packagedRows
     }
   ];
+  const currentCompareParams = new URLSearchParams();
+  if (firstSearchValue(productsParam)) currentCompareParams.set('products', firstSearchValue(productsParam));
+  if (firstSearchValue(resolvedSearchParams.chains)) currentCompareParams.set('chains', firstSearchValue(resolvedSearchParams.chains));
+  if (overlayMode === 'index') currentCompareParams.set('overlayMode', 'index');
+  if (firstSearchValue(resolvedSearchParams.routeMode)) currentCompareParams.set('routeMode', firstSearchValue(resolvedSearchParams.routeMode));
+  const currentCompareHref = `/compare${currentCompareParams.toString() ? `?${currentCompareParams.toString()}` : ''}`;
 
   return (
     <PageShell>
@@ -168,6 +305,22 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
       <Eyebrow>Willys vs Hemköp</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Comparable chain prices</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">Rows appear only when the same Axfood product code is present in both chain catalogues. Savings are not shown across unmatched products.</p>
+      <div className="mt-4">
+        <SourceCitation
+          confidenceLabel={`${comparison.products.length || endpointMatrix.products.length} comparison rows; missing chains stay explicit`}
+          connectorRun={hasEndpointRequestedItems ? '/api/compare item snapshot fetch' : 'buildChainComparisonTable snapshot projection'}
+          href="/data-sources"
+          observedAt={comparison.generatedAt}
+          sourceLabel={hasEndpointRequestedItems ? '/api/compare item snapshot rows' : comparison.sourceLabel}
+        />
+      </div>
+      <SavedViewActions
+        href={currentCompareHref}
+        label="Comparable chain price view"
+        resultLabel={`${comparison.products.length || endpointMatrix.products.length} comparison rows · overlay ${overlayMode} · missing rows labelled`}
+        state={{ chains: firstSearchValue(resolvedSearchParams.chains) || 'all', overlayMode, products: firstSearchValue(productsParam), routeMode: firstSearchValue(resolvedSearchParams.routeMode), view: 'chain-compare' }}
+        surface="compare"
+      />
       <Card className="mt-6 overflow-hidden border-emerald-200 bg-gradient-to-br from-white via-emerald-50 to-sky-50">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
           <div>
@@ -185,19 +338,72 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
               label="Compare chains"
               options={chainSelectorOptions}
             />
+            <div className="rounded-3xl border border-emerald-100 bg-white/80 p-4 shadow-sm">
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-800">Store filters</p>
+              <div className="mt-3 flex flex-wrap gap-2" aria-label="Compare store filters">
+                {([
+                  { id: 'coupon' as const, label: 'Coupon' },
+                  { id: 'delivery' as const, label: 'Delivery' },
+                  { id: 'pickup' as const, label: 'Pickup' }
+                ]).map((filter) => (
+                  <Link
+                    aria-pressed={capabilityFilters.includes(filter.id)}
+                    className={capabilityFilters.includes(filter.id) ? 'rounded-full bg-emerald-900 px-3 py-2 text-xs font-black text-white' : 'rounded-full bg-emerald-50 px-3 py-2 text-xs font-black text-emerald-900 hover:bg-emerald-100'}
+                    href={capabilityFilterHref(productsParam, resolvedSearchParams.chains, capabilityFilters, filter.id)}
+                    key={filter.id}
+                  >
+                    {filter.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
             <Link className="justify-self-start rounded-full bg-emerald-900 px-4 py-2 text-sm font-black text-white shadow-sm" href={sampleProductsHref}>
               Try sample products
             </Link>
           </div>
         </div>
         <div className="mt-5 grid gap-4">
-          {comparison.products.length === 0 ? (
+          {hasEndpointRequestedItems ? (
+            <div className="rounded-3xl border border-emerald-100 bg-white p-5 shadow-sm">
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-800">GET /api/compare?itemIds=...</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">Endpoint-backed store snapshots</h3>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+                Requested item ids are fetched from the compare endpoint and rendered as storeId to item snapshot rows. Missing item ids stay visible instead of falling back to name inference.
+              </p>
+              {compareSnapshots.endpointUnavailable ? (
+                <p className="mt-3 rounded-2xl bg-amber-50 p-3 text-sm font-bold text-amber-950">The compare endpoint is unavailable, so requested item ids are held in the missing state.</p>
+              ) : null}
+              {endpointMatrix.products.length > 0 && endpointMatrix.chains.length > 0 ? (
+                <div className="mt-4">
+                  <StorePriceMatrix chains={endpointMatrix.chains} products={endpointMatrix.products} sourceGeneratedAt={comparison.generatedAt} sourceLabel="/api/compare item snapshot rows" />
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+          {!hasEndpointRequestedItems && comparison.products.length === 0 ? (
             <p className="rounded-3xl border border-emerald-100 bg-white p-5 text-sm font-semibold text-slate-600 shadow-sm">
               Add ?products=product-slug-1,product-slug-2 to render DB-backed comparison rows. Missing product ids: {comparison.missingProductIds.join(', ') || 'none yet'}.
             </p>
           ) : null}
-          <StorePriceMatrix chains={COMPARE_CHAIN_ORDER} products={comparison.products} sourceGeneratedAt={comparison.generatedAt} sourceLabel={comparison.sourceLabel} />
-          {rowSections.map((section) => (
+          {noChainMatches ? (
+            <div className="rounded-3xl border border-amber-200 bg-amber-50 p-5 shadow-sm">
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-800">No chains match these filters</p>
+              <h3 className="mt-2 text-lg font-black text-amber-950">The selected coupon, delivery, and pickup filters removed every store column.</h3>
+              <p className="mt-2 text-sm font-semibold leading-6 text-amber-950">
+                Selected products are still loaded. Reset filters to keep the same product comparison and restore all supported chains.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2 text-xs font-bold text-amber-950">
+                {comparison.noChainState.hiddenByCapabilityFilters.map((chain) => (
+                  <span className="rounded-full bg-white px-3 py-1" key={chain.chainId}>{chain.chainName}: {chain.evidenceLabel}</span>
+                ))}
+              </div>
+              <Link className="mt-4 inline-flex rounded-full bg-amber-900 px-4 py-2 text-sm font-black text-white shadow-sm" href={comparison.noChainState.resetFiltersHref}>
+                Reset filters
+              </Link>
+            </div>
+          ) : null}
+          {!hasEndpointRequestedItems && !noChainMatches ? <StorePriceMatrix chains={visibleCompareChains} products={comparison.products} sourceGeneratedAt={comparison.generatedAt} sourceLabel={comparison.sourceLabel} /> : null}
+          {!hasEndpointRequestedItems && !noChainMatches ? rowSections.map((section) => (
             <div className="overflow-hidden rounded-3xl border border-emerald-100 bg-white shadow-sm" key={section.id}>
               <div className="border-b border-emerald-100 bg-emerald-50 px-4 py-3">
                 <h3 className="text-sm font-black text-emerald-950">{section.title}</h3>
@@ -210,7 +416,7 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
                     <thead className="bg-slate-950 text-white">
                       <tr>
                         <th className="px-4 py-3 font-black">Product</th>
-                        {COMPARE_CHAIN_ORDER.map((chain) => (
+                        {visibleCompareChains.map((chain) => (
                           <th className="px-4 py-3 font-black" key={chain.id}>{chain.label}</th>
                         ))}
                         <th className="px-4 py-3 font-black">Best chain</th>
@@ -225,7 +431,7 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
                             <span className="mt-2 inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700">{product.matchLabel}</span>
                             <span className="mt-2 block text-xs font-semibold leading-5 text-slate-500">{product.confidenceLabel}</span>
                           </th>
-                          {product.cells.map((cell) => (
+                          {product.cells.filter((cell) => visibleCompareChainIds.has(cell.chainId)).map((cell) => (
                             <td className="px-4 py-4" key={`${product.productSlug}-${cell.chainId}`}>
                               <p className={cell.status === 'priced' ? 'font-black text-emerald-900' : 'font-black text-slate-400'}>{cell.priceText}</p>
                               <p className="mt-1 text-xs font-semibold text-slate-500">{cell.unitLabel}</p>
@@ -252,16 +458,85 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
                 <p className="px-4 py-5 text-sm font-semibold text-slate-500">No requested rows used this match type.</p>
               )}
             </div>
-          ))}
+          )) : null}
         </div>
-        {comparison.missingProductIds.length > 0 ? (
+        {(hasEndpointRequestedItems ? compareSnapshots.missingItemIds : comparison.missingProductIds).length > 0 ? (
           <p className="mt-3 rounded-2xl bg-amber-50 p-3 text-sm font-bold text-amber-950">
-            Missing product ids: {comparison.missingProductIds.join(', ')}. The compare route does not infer products from names.
+            Missing product ids: {(hasEndpointRequestedItems ? compareSnapshots.missingItemIds : comparison.missingProductIds).join(', ')}. The compare route does not infer products from names.
           </p>
         ) : null}
         <p className="mt-3 text-xs font-semibold text-slate-500">
           Source: {comparison.sourceLabel}{comparison.generatedAt ? ` · generated ${comparison.generatedAt}` : ''}.
         </p>
+      </Card>
+      <Card className="mt-6 overflow-hidden border-teal-200 bg-white">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-teal-800">Cheapest chain answer</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Who is cheapest for this matched product right now?</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Exact matched Willys/Hemköp catalogue rows show each chain price, comparable unit price when package text permits it, and deltas against the current best and row median. Missing or unmatched chains are not inferred.
+            </p>
+          </div>
+          <p className="rounded-full bg-teal-50 px-4 py-2 text-sm font-black text-teal-900">{cheapestChainRows.length} {cheapestChainScopeLabel}</p>
+        </div>
+        <div className="mt-5 overflow-x-auto">
+          <table className="min-w-full border-collapse text-left text-sm">
+            <caption className="sr-only">Cheapest chain comparison for matched products</caption>
+            <thead className="bg-slate-950 text-white">
+              <tr>
+                <th className="px-4 py-3 font-black">Product</th>
+                <th className="px-4 py-3 font-black">Current best</th>
+                <th className="px-4 py-3 font-black">Chain prices</th>
+                <th className="px-4 py-3 font-black">Median</th>
+                <th className="px-4 py-3 font-black">Coverage</th>
+              </tr>
+            </thead>
+            <tbody>
+              {cheapestChainRows.map(({ best, chainRows, median, product }) => (
+                <tr className="border-t border-slate-100 align-top" key={product.slug}>
+                  <th className="px-4 py-4">
+                    <Link className="font-black text-slate-950 underline decoration-teal-300 underline-offset-4" href={`/products/${product.slug}`}>
+                      {product.name}
+                    </Link>
+                    <span className="mt-1 block text-xs font-semibold text-slate-500">{product.brand || 'Brand not reported'} · {product.subline}</span>
+                  </th>
+                  <td className="px-4 py-4">
+                    <p className="rounded-2xl bg-teal-50 px-3 py-2 font-black text-teal-950">{best ? chainDisplayName(best.chain) : 'No priced chain'}</p>
+                    <p className="mt-1 text-sm font-black text-slate-950">{best ? formatSek(best.price) : 'No current best'}</p>
+                    <p className="mt-1 text-xs font-semibold text-slate-500">{best ? chainUnitPriceLabel(best.price, best.priceUnit, product.subline) : 'Coverage pending'}</p>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="grid min-w-[20rem] gap-2 md:grid-cols-2">
+                      {chainRows.map((row) => (
+                        <div className={row.deltaVsBest === 0 ? 'rounded-2xl border border-teal-200 bg-teal-50 p-3' : 'rounded-2xl border border-slate-200 bg-slate-50 p-3'} key={`${product.slug}-${row.chain}`}>
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="font-black text-slate-950">{row.chainName}</p>
+                            {row.deltaVsBest === 0 ? <span className="rounded-full bg-white px-2 py-1 text-xs font-black text-teal-900">Cheapest</span> : null}
+                          </div>
+                          <p className="mt-2 text-lg font-black text-slate-950">{formatSek(row.price)}</p>
+                          <p className="mt-1 text-xs font-semibold text-slate-600">{row.unitPriceLabel}</p>
+                          <p className="mt-2 text-xs font-bold text-slate-500">
+                            {row.deltaVsBest === 0 ? 'Current best' : `${formatSek(row.deltaVsBest)} vs best`}
+                            {row.deltaVsMedian !== null ? ` · ${row.deltaVsMedian >= 0 ? '+' : ''}${formatSek(row.deltaVsMedian)} vs median` : ''}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <p className="font-black text-slate-950">{formatSek(median)}</p>
+                    <p className="mt-1 text-xs font-semibold text-slate-500">Current matched-chain median</p>
+                  </td>
+                  <td className="px-4 py-4">
+                    <p className="font-black text-slate-950">{chainRows.length} chain rows</p>
+                    <p className="mt-1 text-xs font-semibold text-slate-500">Spread {formatPct(product.spreadPct)} · {snapshot.axfoodSource}</p>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </Card>
       <div className="mt-6">
         <StoreComparisonTable
@@ -271,6 +546,9 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
           items={[]}
         />
         <p className="mt-3 text-sm font-semibold leading-6 text-slate-600">Side-by-side chain totals include missing item counts and substitutions. {basketStoreComparison.summary}</p>
+        <p className="mt-2 text-sm font-bold leading-6 text-emerald-900">
+          Store cards are sorted by the total cost of the current shopping list; the lowest priced complete or partial basket is highlighted as Cheapest.
+        </p>
         <div className="mt-3 grid gap-3 md:grid-cols-3">
           <Card className="border-emerald-200 bg-emerald-50">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Cheapest basket</p>
@@ -503,6 +781,14 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
           ))}
         </div>
       </Card>
+      <div className="mt-6">
+        <FamilyPackComparisonPanel
+          comparisons={familyPackComparisons}
+          emptyDetail="No same-category larger-pack comparisons have parseable unit evidence in the current matched-chain catalogue."
+          intro="Ranks family-pack candidates from matched chain rows by normalized unit price, total spend delta, and storage suitability so larger packs do not look cheaper unless the unit data proves it."
+          title="Family-pack unit-price comparison"
+        />
+      </div>
       <Card className="mt-6 border-sky-200 bg-sky-50/70">
         <div className="grid gap-5 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
           <div>

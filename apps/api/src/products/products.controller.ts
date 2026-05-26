@@ -1,5 +1,5 @@
 import { Body, Controller, ForbiddenException, Get, Headers, NotFoundException, Param, Post, Query } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiProperty, ApiTags } from '@nestjs/swagger';
 import { facetedProductSearchEndpoint } from '@groceryview/api';
 import { allProducts, groceryApi } from '../demo-data.js';
 import { resolveProductNameLocale } from '../product-name-locale.js';
@@ -10,6 +10,109 @@ function requireAdminReviewer(value: string | undefined): void {
   if (!['true', '1', 'reviewer'].includes((value ?? '').trim().toLowerCase())) {
     throw new ForbiddenException('Admin reviewer credentials required.');
   }
+}
+
+class ProductPriceComparisonStoreDto {
+  @ApiProperty({ example: 'lidl-sveavagen' })
+  storeId!: string;
+
+  @ApiProperty({ example: 'Lidl Sveavägen' })
+  storeName!: string;
+
+  @ApiProperty({ example: 13.9 })
+  price!: number;
+
+  @ApiProperty({ example: 'shelf', required: false })
+  priceType?: string;
+
+  @ApiProperty({ example: 0.8, required: false })
+  distanceKm?: number;
+
+  @ApiProperty({ example: 'SE', required: false })
+  country?: string;
+
+  @ApiProperty({ example: 'SEK', required: false })
+  currency?: string;
+}
+
+class ProductPriceComparisonDto {
+  @ApiProperty({ type: () => [ProductPriceComparisonStoreDto] })
+  stores!: ProductPriceComparisonStoreDto[];
+
+  @ApiProperty({ type: () => ProductPriceComparisonStoreDto, nullable: true })
+  cheapestStore!: ProductPriceComparisonStoreDto | null;
+}
+
+class ProductDealSignalsDto {
+  @ApiProperty({ example: 18 })
+  currentCityPercentile!: number;
+
+  @ApiProperty({ example: 12 })
+  knownPromoHistoryPercentile!: number;
+
+  @ApiProperty({ example: 35 })
+  equivalentUnitPricePercentile!: number;
+
+  @ApiProperty({ example: 8 })
+  discountDepthPercent!: number;
+
+  @ApiProperty({ example: 0.86 })
+  sourceConfidence!: number;
+}
+
+class ProductHistoryPointDto {
+  @ApiProperty({ example: '2026-05-19' })
+  date!: string;
+
+  @ApiProperty({ example: 14.9 })
+  price!: number;
+
+  @ApiProperty({ example: true })
+  verified!: boolean;
+}
+
+class ProductDetailDto {
+  @ApiProperty({ example: 'milk' })
+  id!: string;
+
+  @ApiProperty({ example: 'ARLA-MILK-1L' })
+  ticker!: string;
+
+  @ApiProperty({ example: 'Arla Milk 1L' })
+  name!: string;
+
+  @ApiProperty({ example: 'dairy' })
+  category!: string;
+
+  @ApiProperty({ example: 'national' })
+  brandTier!: string;
+
+  @ApiProperty({ type: [String], example: ['ica', 'willys', 'lidl'] })
+  availableChains!: string[];
+
+  @ApiProperty({ type: () => [ProductPriceComparisonStoreDto] })
+  currentPrices!: ProductPriceComparisonStoreDto[];
+
+  @ApiProperty({ type: () => ProductPriceComparisonDto })
+  priceComparison!: ProductPriceComparisonDto;
+
+  @ApiProperty({ example: 73 })
+  dealScore!: number;
+
+  @ApiProperty({ example: 'Buy' })
+  verdict!: string;
+
+  @ApiProperty({ example: '14.90 SEK/l' })
+  unitPrice!: string;
+
+  @ApiProperty({ type: () => [ProductHistoryPointDto] })
+  history!: ProductHistoryPointDto[];
+
+  @ApiProperty({ type: () => ProductDealSignalsDto })
+  dealSignals!: ProductDealSignalsDto;
+
+  @ApiProperty({ example: true })
+  demo!: boolean;
 }
 
 @ApiTags('products')
@@ -136,10 +239,14 @@ export class ProductsController {
   }
 
   @Get(':id')
-  @ApiOkResponse({ description: 'Product detail data' })
+  @ApiOkResponse({ description: 'Product detail data', type: ProductDetailDto })
   detail(@Param('id') id: string) {
     const product = groceryApi.getProduct(id);
     if (!product) throw new NotFoundException('Product not found');
-    return { ...product, demo: true };
+    const priceComparison = {
+      stores: product.currentPrices,
+      cheapestStore: product.currentPrices[0] ?? null
+    };
+    return { ...product, priceComparison, demo: true };
   }
 }

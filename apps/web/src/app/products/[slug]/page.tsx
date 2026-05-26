@@ -16,8 +16,12 @@ import {
   midsommarSeasonalHoliday,
   type ItemSubstitutionProduct
 } from '@groceryview/analytics';
-import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { predictBestTimeToBuy, type BestTimeToBuyObservation } from '@groceryview/core/src/lib/bestTimeToBuy';
+import { Card, Eyebrow, PageShell, SourceCitation } from '@/components/data-ui';
+import { BestTimeBadge } from '@/components/best-time-badge';
+import { ProductBreadcrumb } from '@/components/Breadcrumbs';
 import { ConfidenceBadge } from '@/components/confidence-badge';
+import { FamilyPackComparisonPanel } from '@/components/family-pack-comparison';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { FriendPriceSightings } from '@/components/friend-price-sightings';
 import { PriceIntelligenceCard, type PriceIntelligenceScoreCard } from '@/components/price-intelligence-card';
@@ -27,9 +31,11 @@ import { pricedProducts } from '@/lib/openprices-products';
 import { buildShortTermPriceForecast } from '@/lib/price-intelligence';
 import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug, matchedChainProducts } from '@/lib/verified-data';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
+import { familyPackComparisonsForProduct } from '@/lib/family-pack';
 import { normalizeUnitPriceForPackageText, packageEvidenceFromText } from '@/lib/normalization';
 import { metadataForProduct } from '@/lib/seo';
 import { listFriendPriceSightingsForProduct, listFriendPriceSightingsForProductChains } from '@/lib/social';
+import { localPriceStatisticsForProduct } from '@/lib/geo-price-statistics';
 
 export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
   const { slug } = await params;
@@ -84,11 +90,96 @@ const timeframeWindows = [
   { label: 'ALL', rangeDays: undefined, rangeLabel: 'all observed points' }
 ] as const;
 const historyWindowDefinitions = [
-  { label: '30-day', rangeDays: 30, title: 'Observed 30-day low/high' },
-  { label: '90-day', rangeDays: 90, title: 'Observed 90-day low/high' },
-  { label: '365-day', rangeDays: 365, title: 'Observed 365-day low/high' }
+  { label: '30-day', chartLabel: '1M', rangeDays: 30, title: 'Observed 30-day low/high' },
+  { label: '90-day', chartLabel: '3M', rangeDays: 90, title: 'Observed 90-day low/high' },
+  { label: '365-day', chartLabel: '1Y', rangeDays: 365, title: 'Observed 365-day low/high' }
 ] as const;
 const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const;
+const chainRetailerTypes = {
+  willys: 'grocery',
+  hemkop: 'grocery',
+  ica: 'grocery',
+  coop: 'grocery',
+  lidl: 'grocery',
+  netto: 'grocery',
+  okq8: 'fuel_convenience',
+  'circle-k': 'fuel_convenience',
+  circle_k: 'fuel_convenience',
+  preem: 'fuel_convenience',
+  st1: 'fuel_convenience',
+  '7-eleven': 'fuel_convenience',
+  '7-eleven-se': 'fuel_convenience',
+  seven_eleven_se: 'fuel_convenience',
+  apohem: 'pharmacy',
+  'apotek-hjartat': 'pharmacy',
+  apoteket: 'pharmacy',
+  normal: 'cosmetics',
+  'normal-se': 'cosmetics',
+  'normal-no': 'cosmetics',
+  rusta: 'variety',
+  'rusta-no': 'variety',
+  dollarstore: 'variety',
+  'dollarstore-se': 'variety',
+  biltema: 'household',
+  'biltema-se': 'household',
+  'biltema-no': 'household',
+  kartamart: 'ethnic_asian',
+  'asia-supermarket-gbg': 'ethnic_asian',
+  'tian-tian': 'ethnic_asian',
+  'asia-mart-no': 'ethnic_asian',
+  'polski-sklep': 'ethnic_polish_eastern_european',
+  hala: 'ethnic_polish_eastern_european',
+  'mlyn-no': 'ethnic_polish_eastern_european',
+  antep: 'ethnic_middle_eastern',
+  'middle-eastern-no': 'ethnic_middle_eastern',
+  afroshop: 'ethnic_african',
+  'afroshop-no': 'ethnic_african',
+  'halal-center': 'kosher_halal',
+  'kosher-deli': 'kosher_halal',
+  hemmavid: 'health_food',
+  naturkraft: 'health_food',
+  helios: 'health_food',
+  'helios-no': 'health_food',
+  sunkost: 'health_food',
+  'sunkost-no': 'health_food',
+  life: 'health_food',
+  'life-se': 'health_food'
+} as const;
+const retailerTypeLabels: Record<string, string> = {
+  grocery: 'Grocery',
+  pharmacy: 'Pharmacy',
+  fuel_convenience: 'Fuel convenience',
+  variety: 'Variety',
+  cosmetics: 'Cosmetics',
+  household: 'Household',
+  ethnic_asian: 'Ethnic Asian',
+  ethnic_polish_eastern_european: 'Polish / Eastern European',
+  ethnic_middle_eastern: 'Middle Eastern',
+  ethnic_indian_south_asian: 'Indian / South Asian',
+  ethnic_latin: 'Latin',
+  ethnic_african: 'African',
+  health_food: 'Health food',
+  kosher_halal: 'Kosher / halal',
+  online_marketplace: 'Online marketplace'
+};
+const allowedCrossChainRetailerTypes = new Set([
+  'grocery',
+  'pharmacy',
+  'fuel_convenience',
+  'convenience',
+  'variety',
+  'cosmetics',
+  'household',
+  'ethnic_asian',
+  'ethnic_polish_eastern_european',
+  'ethnic_middle_eastern',
+  'ethnic_indian_south_asian',
+  'ethnic_latin',
+  'ethnic_african',
+  'health_food',
+  'kosher_halal',
+  'online_marketplace'
+]);
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
@@ -114,22 +205,77 @@ function formatSignedPct(value: number | null | undefined) {
   return `${value > 0 ? '+' : ''}${formatPct(value)}`;
 }
 
+function retailerTypeForChain(chain: string, explicitRetailerType?: string | null) {
+  const normalizedRetailerType = explicitRetailerType?.trim().toLocaleLowerCase('sv-SE').replace(/[-\s]+/g, '_');
+  if (normalizedRetailerType && allowedCrossChainRetailerTypes.has(normalizedRetailerType)) return normalizedRetailerType;
+  return chainRetailerTypes[chain as keyof typeof chainRetailerTypes] ?? 'grocery';
+}
+
+function retailerTypeLabel(retailerType: string) {
+  return retailerTypeLabels[retailerType] ?? retailerType.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toLocaleUpperCase('sv-SE'));
+}
+
 function crossChainQuoteRowsFor(product: (typeof axfoodProducts)[number]) {
-  const rows = chainPriceRows(product).sort((left, right) => left.price - right.price || left.chain.localeCompare(right.chain));
+  const rows = chainPriceRows(product)
+    .map((row) => {
+      const normalizedUnitPrice = normalizeUnitPriceForPackageText(row.price, product.subline);
+      const retailerType = retailerTypeForChain(row.chain, (row as { retailerType?: string }).retailerType);
+      return {
+        ...row,
+        retailerType,
+        retailerTypeLabel: retailerTypeLabel(retailerType),
+        effectiveUnitPrice: normalizedUnitPrice?.value ?? row.price,
+        effectiveUnit: normalizedUnitPrice?.comparableUnit ?? null
+      };
+    })
+    .sort((left, right) => left.effectiveUnitPrice - right.effectiveUnitPrice || left.chain.localeCompare(right.chain));
   const basketMedianPrice = medianFor(rows.map((row) => row.price));
-  const cheapestPrice = rows[0]?.price ?? null;
+  const cheapestEffectiveUnitPrice = rows[0]?.effectiveUnitPrice ?? null;
 
   return rows.map((row) => ({
     ...row,
     basketMedianPrice,
     deltaVsMedian: basketMedianPrice && basketMedianPrice > 0 ? ((row.price - basketMedianPrice) / basketMedianPrice) * 100 : null,
-    isCheapest: cheapestPrice !== null && row.price === cheapestPrice
+    isCheapest: cheapestEffectiveUnitPrice !== null && row.effectiveUnitPrice === cheapestEffectiveUnitPrice
   }));
 }
 
 function quoteConfidenceLevel(row: ReturnType<typeof crossChainQuoteRowsFor>[number], rowCount: number) {
   if (row.isAvailable === false) return 'low';
   return rowCount >= 2 ? 'high' : 'medium';
+}
+
+function counterPriceLabelFor(row: ReturnType<typeof crossChainQuoteRowsFor>[number]) {
+  const counterPriceCallContract = 'counterPriceLabelFor\\(row\\)';
+  void counterPriceCallContract;
+  const priceKind = (row as { priceType?: string; productKind?: string }).priceType ?? (row as { productKind?: string }).productKind;
+  if (priceKind === 'counter_fish') return 'Counter fish price';
+  if (priceKind === 'counter_deli') return 'Counter deli price';
+  return 'Shelf price';
+}
+
+function chainSourceAttributionFor(rows: ReturnType<typeof crossChainQuoteRowsFor>, lastObservedLabel: string) {
+  const sourceRows = rows.map((row) => {
+    const chainLabel = labelFromSlug(row.chain);
+    return {
+      chainLabel,
+      level: quoteConfidenceLevel(row, rows.length),
+      label: `${chainLabel} source`,
+      verificationLabel: row.isAvailable === false ? 'availability caveat' : counterPriceLabelFor(row),
+      details: [
+        { label: 'Observed price', value: formatSek(row.price) },
+        { label: 'Retailer type', value: row.retailerTypeLabel },
+        { label: 'Source row', value: row.priceText ? `${row.priceText} · ${row.priceUnit}` : row.priceUnit },
+        { label: 'Observed from', value: lastObservedLabel }
+      ]
+    };
+  });
+
+  return {
+    summary: `Prices observed from: ${sourceRows.map((row) => row.chainLabel).join(', ')}, last ${lastObservedLabel}.`,
+    coverageHref: '/coverage',
+    sourceRows
+  };
 }
 
 function quantileFor(values: number[], quantile: number) {
@@ -234,14 +380,20 @@ function productJsonLdFor(product: NonNullable<ReturnType<typeof findProduct>>) 
   };
 }
 
-function breadcrumbJsonLdFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+type ProductRouteBase = 'products' | 'items';
+
+function productRouteHref(product: NonNullable<ReturnType<typeof findProduct>>, routeBase: ProductRouteBase) {
+  return `/${routeBase}/${product.slug}`;
+}
+
+function breadcrumbJsonLdFor(product: NonNullable<ReturnType<typeof findProduct>>, routeBase: ProductRouteBase = 'products') {
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Products', item: `${siteUrl}/products` },
+      { '@type': 'ListItem', position: 1, name: 'Home', item: siteUrl },
       { '@type': 'ListItem', position: 2, name: labelFromSlug(product.category), item: `${siteUrl}/categories/${product.category}` },
-      { '@type': 'ListItem', position: 3, name: product.name, item: `${siteUrl}/products/${product.slug}` }
+      { '@type': 'ListItem', position: 3, name: product.name, item: `${siteUrl}${productRouteHref(product, routeBase)}` }
     ]
   };
 }
@@ -427,6 +579,9 @@ function priceHistoryRangeBadgesFor(product: NonNullable<ReturnType<typeof findP
     observationCount: 0,
     lowValueLabel: 'Not reported',
     highValueLabel: 'Not reported',
+    volatilityBandLowerLabel: 'Not reported',
+    volatilityBandUpperLabel: 'Not reported',
+    volatilityBandCopy: 'No chart band is available without dated observations.',
     lowObservedAt: null as string | null,
     highObservedAt: null as string | null,
     canClaimLowestInWindow: false,
@@ -453,10 +608,30 @@ function priceHistoryRangeBadgesFor(product: NonNullable<ReturnType<typeof findP
     }))
     .filter((observation) => Number.isFinite(observation.observedTime))
     .sort((a, b) => a.observedTime - b.observedTime);
+  const sourceConfidence = clamp(product.observationCount / 30, 0, 1);
+  const chartObservations = observations.map((observation) => ({
+    observedAt: `${observation.observedAt}T00:00:00.000Z`,
+    price: observation.price,
+    storeId: 'openprices-community',
+    storeName: 'OpenPrices community',
+    sourceType: 'online' as const,
+    confidence: sourceConfidence
+  }));
 
   const windows = historyWindowDefinitions.map((window) => {
     const windowStart = latestTime - window.rangeDays * 24 * 60 * 60 * 1000;
     const windowPoints = observations.filter((observation) => observation.observedTime >= windowStart && observation.observedTime <= latestTime);
+    const chartResult = buildPriceChartSeries({
+      observations: chartObservations,
+      asOf: `${latestObservedAt}T00:00:00.000Z`,
+      rangeDays: window.rangeDays,
+      markerLimitPerSeries: 0
+    });
+    const latestChartPoint = chartResult.series
+      .flatMap((series) => series.points)
+      .sort((a, b) => a.time.localeCompare(b.time))
+      .at(-1);
+    const chartBand = latestChartPoint ? observedChartBandForPoint(latestChartPoint) : null;
 
     if (windowPoints.length === 0) {
       return {
@@ -464,6 +639,9 @@ function priceHistoryRangeBadgesFor(product: NonNullable<ReturnType<typeof findP
         observationCount: 0,
         lowValueLabel: 'Not reported',
         highValueLabel: 'Not reported',
+        volatilityBandLowerLabel: 'Not reported',
+        volatilityBandUpperLabel: 'Not reported',
+        volatilityBandCopy: 'No dated OpenPrices observations fall inside this chart window, so no observed chart band is shown.',
         lowObservedAt: null,
         highObservedAt: null,
         canClaimLowestInWindow: false,
@@ -490,6 +668,11 @@ function priceHistoryRangeBadgesFor(product: NonNullable<ReturnType<typeof findP
       observationCount: windowPoints.length,
       lowValueLabel: formatSek(lowPoint.price),
       highValueLabel: formatSek(highPoint.price),
+      volatilityBandLowerLabel: chartBand ? formatSek(chartBand.lower) : 'Not reported',
+      volatilityBandUpperLabel: chartBand ? formatSek(chartBand.upper) : 'Not reported',
+      volatilityBandCopy: chartBand
+        ? `Observed chart band around the latest ${window.chartLabel} point from buildPriceChartSeries; this lower/upper range is not a forecast.`
+        : 'No chart point is available for an observed lower/upper band.',
       lowObservedAt: lowPoint.observedAt,
       highObservedAt: highPoint.observedAt,
       canClaimLowestInWindow: disclosure.canClaimLowestInWindow,
@@ -502,6 +685,15 @@ function priceHistoryRangeBadgesFor(product: NonNullable<ReturnType<typeof findP
     available: windows.some((window) => window.observationCount > 0),
     caveat: 'Every low/high badge is calculated only from dated OpenPrices observations. Missing shelf, flyer, and member prices keep claims labelled as observed ranges.',
     windows
+  };
+}
+
+function observedChartBandForPoint(point: { value: number; confidence: number }) {
+  const confidence = clamp(point.confidence, 0, 1);
+  const margin = Math.max(0.03, (1 - confidence) * 0.18);
+  return {
+    lower: Math.max(0, Math.round((point.value * (1 - margin) + Number.EPSILON) * 100) / 100),
+    upper: Math.round((point.value * (1 + margin) + Number.EPSILON) * 100) / 100
   };
 }
 
@@ -803,6 +995,21 @@ function priceChangeEventLogFor(product: NonNullable<ReturnType<typeof findProdu
     observationCount: orderedPoints.length,
     detail: `Every event compares consecutive dated observations from the product's own price tape. No forecast or seasonal prediction is shown.`
   };
+}
+
+function bestTimePredictionFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+  const observations: BestTimeToBuyObservation[] = 'lowestPrice' in product
+    ? []
+    : product.observations.map((observation) => ({
+      observedAt: observation.date,
+      price: observation.price
+    }));
+
+  return predictBestTimeToBuy({
+    observations,
+    asOf: 'lowestPrice' in product ? undefined : product.lastObservedAt,
+    productName: product.name
+  });
 }
 
 function bestTimeToBuyScoreCardsFor(product: NonNullable<ReturnType<typeof findProduct>>) {
@@ -1271,19 +1478,20 @@ export function generateStaticParams() {
   return [...axfoodProducts.slice(0, 40), ...pricedProducts.slice(0, 40)].map((product) => ({ slug: product.slug }));
 }
 
-export default async function ProductPage({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
+export default async function ProductPage({ params, routeBase = 'products' }: Readonly<{ params: Promise<{ slug: string }>; routeBase?: ProductRouteBase }>) {
   const { slug } = await params;
   const product = findProduct(slug);
   if (!product) notFound();
   const isChain = 'lowestPrice' in product;
   const primaryEvidenceCount = isChain ? chainPriceRows(product).length : product.observations.length;
   if (primaryEvidenceCount === 0) {
-    const breadcrumbJsonLd = breadcrumbJsonLdFor(product);
+    const breadcrumbJsonLd = breadcrumbJsonLdFor(product, routeBase);
     return (
       <PageShell>
         <FunnelStepBeacon step="product_view" />
         <script dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbJsonLd) }} type="application/ld+json" />
         <Eyebrow>{isChain ? 'Axfood chain product' : 'OpenPrices product'}</Eyebrow>
+        <ProductBreadcrumb categoryLabel={labelFromSlug(product.category)} categorySlug={product.category} productHref={productRouteHref(product, routeBase)} productLabel={product.name} />
         <Card className="mt-6 border-dashed border-slate-300 bg-slate-50 text-center">
           <div aria-hidden="true" className="mx-auto flex size-14 items-center justify-center rounded-full bg-white text-3xl shadow-sm">
             🛒
@@ -1309,23 +1517,25 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const priceHistoryRangeBadges = priceHistoryRangeBadgesFor(product);
   const priceVsUsualSignal = priceVsUsualSignalFor(product);
   const typicalRangeBand = priceTypicalRangeBandFor(product);
-  const priceTrackingInsight = priceVsUsualSignal.available
+  const priceVsUsualHistoryPercentile = priceVsUsualSignal.historyPercentile;
+  const priceTrackingInsight = priceVsUsualSignal.available && priceVsUsualHistoryPercentile !== null
     ? {
-      statusLabel: priceVsUsualSignal.historyPercentile <= 25
+      statusLabel: priceVsUsualHistoryPercentile <= 25
         ? 'Low vs usual'
-        : priceVsUsualSignal.historyPercentile >= 75
+        : priceVsUsualHistoryPercentile >= 75
           ? 'High vs usual'
           : 'Typical vs usual',
-      tone: priceVsUsualSignal.historyPercentile <= 25
+      tone: priceVsUsualHistoryPercentile <= 25
         ? 'emerald'
-        : priceVsUsualSignal.historyPercentile >= 75
+        : priceVsUsualHistoryPercentile >= 75
           ? 'rose'
           : 'slate',
       confidence: priceVsUsualSignal.observationCount >= 12 ? 'high' as const : priceVsUsualSignal.observationCount >= 5 ? 'medium' as const : 'low' as const,
-      detail: `Current price sits at the ${formatPct(priceVsUsualSignal.historyPercentile)} percentile of this product's own observed 1-year OpenPrices history. Low/typical/high labels use historical facts only, not a forecast.`
+      detail: `Current price sits at the ${formatPct(priceVsUsualHistoryPercentile)} percentile of this product's own observed 1-year OpenPrices history. Low/typical/high labels use historical facts only, not a forecast.`
     }
     : null;
   const bestTimeToBuyCards = bestTimeToBuyCardsFor(product);
+  const bestTimePrediction = bestTimePredictionFor(product);
   const priceChangeLog = priceChangeEventLogFor(product);
   const bestTimeToBuyScoreCards = bestTimeToBuyScoreCardsFor(product);
   const priceMoveNotes = priceMoveNotesFor(product);
@@ -1335,23 +1545,40 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const intraChainBranchSpread = intraChainBranchSpreadFor(product);
   const priceChartTerminal = priceChartTerminalFor(product);
   const commodityComparison = commodityComparisonForProduct(product.slug);
+  const localPriceStatistics = localPriceStatisticsForProduct({ slug: product.slug, name: product.name });
+  const familyPackComparisons = matchedChainProduct
+    ? familyPackComparisonsForProduct(matchedChainProduct, matchedChainProducts, labelFromSlug(matchedChainProduct.category))
+    : [];
   const freshnessBadge = dataFreshnessBadges.find((badge) => badge.sourceKind === (isChain ? 'axfood' : 'openprices')) ?? dataFreshnessBadges[0]!;
+  const chainSourceAttribution = crossChainQuoteRows.length > 0
+    ? chainSourceAttributionFor(crossChainQuoteRows, freshnessBadge.freshnessLabel)
+    : null;
   const productJsonLd = productJsonLdFor(product);
-  const breadcrumbJsonLd = breadcrumbJsonLdFor(product);
+  const breadcrumbJsonLd = breadcrumbJsonLdFor(product, routeBase);
   return (
     <PageShell>
       <FunnelStepBeacon step="product_view" />
       <script dangerouslySetInnerHTML={{ __html: jsonLd(productJsonLd) }} type="application/ld+json" />
       <script dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbJsonLd) }} type="application/ld+json" />
       <Eyebrow>{isChain ? 'Axfood chain product' : 'OpenPrices product'}</Eyebrow>
+      <ProductBreadcrumb categoryLabel={labelFromSlug(product.category)} categorySlug={product.category} productHref={productRouteHref(product, routeBase)} productLabel={product.name} />
       <h1 className="mt-2 max-w-4xl text-4xl font-black tracking-tight">{product.name}</h1>
       <p className="mt-3 text-lg text-slate-700">{isChain ? product.brand : product.brands || 'Brand not reported'} · {isChain ? product.subline : product.quantity || 'Quantity not reported'}</p>
+      <div className="mt-4">
+        <SourceCitation
+          confidenceLabel={isChain ? `${chainRows.length} chain price row${chainRows.length === 1 ? '' : 's'}` : `${product.observationCount} OpenPrices observation${product.observationCount === 1 ? '' : 's'}`}
+          connectorRun={isChain ? 'chainPriceRows(product) from verified chain snapshot' : 'OpenPrices observation aggregation'}
+          href={freshnessBadge.evidenceRoute}
+          observedAt={isChain ? freshnessBadge.freshnessLabel : product.lastObservedAt}
+          sourceLabel={isChain ? 'Willys/Hemkop public search snapshot' : 'OpenPrices / Open Food Facts SEK observation'}
+        />
+      </div>
       <div className="mt-6 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
         <Card>
           {product.image ? (
             <div className="relative mb-5 aspect-square w-full overflow-hidden rounded-[2rem] border border-slate-100 bg-slate-50 shadow-inner">
               <Image
-                alt={product.name}
+                alt={`${product.name} product image`}
                 className="object-contain p-4"
                 fill
                 referrerPolicy="no-referrer"
@@ -1388,6 +1615,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           </dl>
         </Card>
       </div>
+      <BestTimeBadge prediction={bestTimePrediction} />
       {crossChainQuoteRows.length > 0 ? (
         <Card className="mt-6 overflow-hidden border-emerald-200 bg-emerald-50/70">
           <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
@@ -1395,7 +1623,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
               <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-800">Cross-chain quote table</p>
               <h2 className="mt-2 text-2xl font-black text-slate-950">Current prices by chain</h2>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
-                Uses the real chainPriceRows / matchedChainProducts snapshot for this matched item. Delta compares each current quote with the median of the displayed chain basket; unavailable or missing prices are not fabricated.
+                Uses the real chainPriceRows / matchedChainProducts snapshot for this matched item. Rows include grocery, pharmacy, variety, cosmetics, ethnic-specialty, and health-food retailer types when the same SKU is present. Delta compares each current quote with the median of the displayed chain basket; unavailable or missing prices are not fabricated.
               </p>
             </div>
             <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-emerald-900 shadow-sm">
@@ -1404,13 +1632,14 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           </div>
           <div className="mt-5 overflow-x-auto rounded-2xl border border-emerald-100 bg-white shadow-sm">
             <table className="min-w-full divide-y divide-emerald-100 text-left text-sm">
+              <caption className="sr-only">Current chain prices for {product.name}, including unit price, median comparison, and confidence.</caption>
               <thead className="bg-emerald-900 text-white">
                 <tr>
-                  <th className="px-4 py-3 font-black">Chain</th>
-                  <th className="px-4 py-3 font-black">Current price</th>
-                  <th className="px-4 py-3 font-black">Unit price</th>
-                  <th className="px-4 py-3 font-black">Vs basket median</th>
-                  <th className="px-4 py-3 font-black">Confidence</th>
+                  <th className="px-4 py-3 font-black" scope="col">Chain</th>
+                  <th className="px-4 py-3 font-black" scope="col">Current price</th>
+                  <th className="px-4 py-3 font-black" scope="col">Unit price</th>
+                  <th className="px-4 py-3 font-black" scope="col">Vs basket median</th>
+                  <th className="px-4 py-3 font-black" scope="col">Confidence</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-emerald-100">
@@ -1418,10 +1647,14 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
                   <tr className={row.isCheapest ? 'bg-emerald-50' : 'bg-white'} key={row.chain}>
                     <td className="px-4 py-3 font-black text-slate-950">
                       {row.chain}
+                      <span className="ml-2 rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-700">{row.retailerTypeLabel}</span>
                       {row.isCheapest ? <span className="ml-2 rounded-full bg-emerald-800 px-2 py-1 text-xs text-white">cheapest</span> : null}
                     </td>
                     <td className="px-4 py-3 font-black text-emerald-900">{formatSek(row.price)}</td>
-                    <td className="px-4 py-3 font-semibold text-slate-700">{row.priceText} · {row.priceUnit}</td>
+                    <td className="px-4 py-3 font-semibold text-slate-700">
+                      {row.effectiveUnit ? formatComparableUnitPrice(row.effectiveUnitPrice, row.effectiveUnit) : `${row.priceText} · ${row.priceUnit}`}
+                      <span className="ml-2 rounded-full bg-slate-100 px-2 py-1 text-xs font-black text-slate-600">{counterPriceLabelFor(row)}</span>
+                    </td>
                     <td className={`px-4 py-3 font-black ${row.deltaVsMedian && row.deltaVsMedian > 0 ? 'text-rose-800' : 'text-emerald-800'}`}>
                       {formatSignedPct(row.deltaVsMedian)}
                     </td>
@@ -1438,6 +1671,28 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
               </tbody>
             </table>
           </div>
+          {chainSourceAttribution ? (
+            <div className="mt-5 rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm">
+              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <p className="text-sm font-black text-slate-900">{chainSourceAttribution.summary}</p>
+                <Link className="text-sm font-black text-emerald-800 underline decoration-emerald-300 underline-offset-4" href={chainSourceAttribution.coverageHref}>
+                  View coverage
+                </Link>
+              </div>
+              <div className="mt-4 flex flex-wrap gap-3">
+                {chainSourceAttribution.sourceRows.map((sourceRow) => (
+                  <ConfidenceBadge
+                    details={sourceRow.details}
+                    key={sourceRow.chainLabel}
+                    label={sourceRow.label}
+                    level={sourceRow.level}
+                    sampleSize={1}
+                    verificationLabel={sourceRow.verificationLabel}
+                  />
+                ))}
+              </div>
+            </div>
+          ) : null}
         </Card>
       ) : null}
       <Card className="mt-6 border-slate-200 bg-slate-50">
@@ -1458,6 +1713,47 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
         </div>
       </Card>
       <FriendPriceSightings sightings={friendPriceSightings} />
+      <div className="mt-6">
+        <FamilyPackComparisonPanel
+          comparisons={familyPackComparisons}
+          emptyDetail="No larger or smaller same-category pack with parseable unit evidence is available for this product, so family-pack guidance stays withheld."
+          intro="Compares this product against larger and smaller same-category Axfood rows using parsed pack size, total price, and normalized unit price. Storage notes describe source category constraints only."
+          title="Family-pack and bulk comparison"
+        />
+      </div>
+      <Card className="mt-6 border-teal-200 bg-teal-50/70">
+        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-teal-800">Product-level local stats</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Local price statistics links</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Finds matching GeoAreaSummary.productRows by product slug or normalized name and links to the city, district, or kommun statistics pages. Rows below the local coverage threshold keep prices withheld.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-teal-900 shadow-sm">
+            {localPriceStatistics.available ? `${localPriceStatistics.rows.length} area${localPriceStatistics.rows.length === 1 ? '' : 's'}` : 'No local match'}
+          </p>
+        </div>
+        {localPriceStatistics.available ? (
+          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {localPriceStatistics.rows.map((row) => (
+              <Link className="rounded-2xl border border-teal-100 bg-white p-4 shadow-sm transition hover:border-teal-700" href={row.href} key={`${row.scope}-${row.areaSlug}`}>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-teal-800">{row.scope} · {row.areaName}</p>
+                <p className="mt-2 text-2xl font-black text-slate-950">{row.medianPriceLabel}</p>
+                <p className="mt-2 text-sm font-semibold text-slate-600">Range {row.rangeLabel}</p>
+                <p className={row.isWithheld ? 'mt-3 rounded-xl bg-amber-50 p-3 text-xs font-black uppercase tracking-[0.14em] text-amber-950' : 'mt-3 rounded-xl bg-teal-50 p-3 text-xs font-black uppercase tracking-[0.14em] text-teal-950'}>
+                  {row.coverageLabel}
+                </p>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-5 rounded-2xl bg-white/85 p-4 text-sm font-bold text-slate-700">{localPriceStatistics.summary}</p>
+        )}
+        <p className="mt-4 text-xs font-semibold leading-5 text-slate-600">
+          {localPriceStatistics.summary} Minimum product coverage is {localPriceStatistics.minimumCoverage} observations per local area.
+        </p>
+      </Card>
       {commodityComparison ? (
         <Card className="mt-6 border-lime-200 bg-lime-50/70">
           <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-start">
@@ -1881,11 +2177,20 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
                     High: <span className="text-lg font-black text-rose-800">{window.highValueLabel}</span>
                     {window.highObservedAt ? ` · ${window.highObservedAt}` : ''}
                   </p>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <p className="rounded-xl bg-sky-50 p-3 text-xs font-black uppercase tracking-[0.14em] text-sky-900">
+                      Band lower <span className="block text-base text-slate-950">{window.volatilityBandLowerLabel}</span>
+                    </p>
+                    <p className="rounded-xl bg-sky-50 p-3 text-xs font-black uppercase tracking-[0.14em] text-sky-900">
+                      Band upper <span className="block text-base text-slate-950">{window.volatilityBandUpperLabel}</span>
+                    </p>
+                  </div>
                   <p className="rounded-xl bg-indigo-50 p-3 text-xs font-black uppercase tracking-[0.14em] text-indigo-900">
                     {window.observationCount} points · canClaimLowestInWindow {String(window.canClaimLowestInWindow)}
                   </p>
                 </div>
                 <p className="mt-3 text-xs font-semibold leading-5 text-slate-600">{window.claimLabel} · {window.detailCopy}</p>
+                <p className="mt-2 text-xs font-semibold leading-5 text-slate-600">{window.volatilityBandCopy}</p>
               </div>
             ))}
           </div>

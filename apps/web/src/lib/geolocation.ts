@@ -6,6 +6,7 @@ export type ShopperLocation = {
 };
 
 export type PreferredPickupMode = 'any' | 'full-basket' | 'quick-trip';
+export type OperatingHoursFilter = 'open-now' | 'open-evening' | 'open-24h';
 
 export type NearestStoreCandidate = {
   distanceKm: number;
@@ -78,6 +79,31 @@ function isOpenForTimeWindow(rule: string, date: Date): boolean | null {
     const end = Number(match[3]) * 60 + Number(match[4]);
     return start <= end ? now >= start && now <= end : now >= start || now <= end;
   });
+}
+
+export function isStoreOpen24Hours(store: Pick<OsmStore, 'openingHours' | 'opening_hours'>): boolean {
+  const label = osmStoreOpeningHoursLabel(store);
+  return /24\s*\/\s*7|00:00\s*-\s*(?:24:00|23:59)/i.test(label);
+}
+
+export function isStoreOpenNow(store: OsmStore, now = new Date()): boolean {
+  return isOpenForTimeWindow(osmStoreOpeningHoursLabel(store), now) === true;
+}
+
+export function isStoreOpenThisEvening(store: OsmStore, now = new Date()): boolean {
+  const sixPm = new Date(now);
+  sixPm.setHours(18, 0, 0, 0);
+  const eightPm = new Date(now);
+  eightPm.setHours(20, 0, 0, 0);
+  return isOpenForTimeWindow(osmStoreOpeningHoursLabel(store), sixPm) === true
+    || isOpenForTimeWindow(osmStoreOpeningHoursLabel(store), eightPm) === true;
+}
+
+export function storeMatchesOperatingHoursFilter(store: OsmStore, filter: OperatingHoursFilter | null | undefined, now = new Date()): boolean {
+  if (!filter) return true;
+  if (filter === 'open-now') return isStoreOpenNow(store, now);
+  if (filter === 'open-evening') return isStoreOpenThisEvening(store, now);
+  return isStoreOpen24Hours(store);
 }
 
 export function storePickupModeLabel(store: Pick<OsmStore, 'format' | 'shop'>): string {

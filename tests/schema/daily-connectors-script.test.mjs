@@ -26,12 +26,15 @@ describe('daily connectors export script', () => {
       'hemkop',
       'hemkop',
       'lidl',
+      'lidl',
       'city_gross',
       'mathem',
       'matspar',
       'pharmacy',
       'apoteket',
-      'okq8'
+      'preem',
+      'okq8',
+      'ob-is'
     ]);
     assert.deepEqual(connectors.map((connector) => connector.connectorId), [
       'ica-store-promotions-default-stores',
@@ -42,12 +45,15 @@ describe('daily connectors export script', () => {
       'hemkop-products-all-stores',
       'hemkop-weekly-all-stores',
       'lidl-public-offers-all-stores',
+      'lidl-products-bulk',
       'city-gross-products-bulk',
       'mathem-public-search',
       'matspar-public-search',
       'pharmacy-public-products',
       'apoteket-se-public-products',
-      'okq8-fuel-prices'
+      'preem-se-business-list-prices',
+      'okq8-fuel-prices',
+      'ob-is-fuel-prices'
     ]);
     assert.equal(
       connectors
@@ -79,6 +85,9 @@ describe('daily connectors export script', () => {
     const coopWeeklyConnector = connectors.find((connector) => connector.connectorId === 'coop-weekly-all-stores');
     assert.deepEqual(coopProductConnector.stores.map((store) => store.storeId), ['176110']);
     assert.deepEqual(coopWeeklyConnector.stores.map((store) => store.storeId), ['196183', '176110']);
+    const lidlBulkConnector = connectors.find((connector) => connector.connectorId === 'lidl-products-bulk');
+    assert.equal(lidlBulkConnector.requireStoreScopedPrices, false);
+    assert.deepEqual(lidlBulkConnector.stores, []);
     assert.deepEqual(connectors.map((connector) => connector.endpointUrl), [
       'groceryview://daily/ica/store-promotions/default-stores',
       'groceryview://daily/willys/products/all-stores',
@@ -88,12 +97,15 @@ describe('daily connectors export script', () => {
       'groceryview://daily/hemkop/products/all-stores',
       'groceryview://daily/hemkop/weekly-offers/all-stores',
       'groceryview://daily/lidl/public-offers/all-stores',
+      'groceryview://daily/lidl/products/bulk',
       'groceryview://daily/city-gross/products/bulk',
       'groceryview://daily/mathem/products/public-search',
       'groceryview://daily/matspar/products/public-search',
       'groceryview://daily/pharmacy/products/public',
       'groceryview://daily/apoteket-se/products/public',
-      'https://www.okq8.se/foretag/priser/'
+      'https://www.preem.se/foretag/listpriser/',
+      'https://www.okq8.se/foretag/priser/',
+      'https://olis.ob.is/eldsneytisverd'
     ]);
     assert.deepEqual(connectors.map((connector) => connector.parserVersion), [
       'ica-store-promotions-native-v1',
@@ -104,12 +116,15 @@ describe('daily connectors export script', () => {
       'hemkop-products-native-v1',
       'hemkop-weekly-native-v1',
       'lidl-public-offers-native-v1',
+      'lidl-bulk-native-v1',
       'citygross-bulk-native-v1',
       'mathem-public-search-v1',
       'matspar-public-search-v1',
       'pharmacy-public-products-v1',
       'apoteket-se-public-products-v1',
-      'okq8-fuel-prices-v1'
+      'preem-se-business-list-v1',
+      'okq8-fuel-prices-v1',
+      'ob-is-fuel-prices-v1'
     ]);
   });
 });

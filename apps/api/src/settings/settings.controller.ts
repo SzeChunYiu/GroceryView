@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, HttpCode, Patch, Req, ServiceUnavailableException, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { planAccountDeletion } from '@groceryview/core';
-import { IsArray, IsIn, IsOptional, IsString } from 'class-validator';
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsIn, IsOptional, IsString, Matches } from 'class-validator';
 import { AuthGuard, authenticatedUserId, type AuthenticatedRequest } from '../middleware/auth.js';
 import { settingsRoutes } from '../routes/settings.js';
 import { buildDemoUserDataExport } from './data-export.js';
@@ -14,7 +14,10 @@ class SettingsPatchDto {
 
   @IsOptional()
   @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(5)
   @IsString({ each: true })
+  @Matches(/^[a-z0-9][a-z0-9-]*$/, { each: true })
   preferredStores?: string[];
 
   @IsOptional()

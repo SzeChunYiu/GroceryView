@@ -6,6 +6,7 @@ import { buildBrandLeaderboardTrends, buildCitySearchTrends, buildCityTrendingIt
 import { BrandLeaderboardModule, TrendingSearchModule } from '@/app/page-sections/trending';
 import type { PersonalizedReorderItem } from '@/lib/personalization';
 import type { NewProductArrival } from '@/lib/new-arrivals';
+import { productImageCdnUrl } from '@/lib/imageCdn';
 
 type PersonalizedTrendingProductPriceChange = TrendingProductPriceChange & {
   personalizationReason?: string;
@@ -46,7 +47,7 @@ function CarouselProductImage({ fallbackAlt, item }: Readonly<{ fallbackAlt: str
         loading={carouselImagePolicy.loading}
         placeholder={carouselImagePolicy.placeholder}
         sizes={carouselImagePolicy.sizes}
-        src={item.imageUrl}
+        src={productImageCdnUrl(item.imageUrl, { width: 192 })}
         width={192}
       />
     </div>

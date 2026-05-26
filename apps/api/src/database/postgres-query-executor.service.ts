@@ -1,5 +1,6 @@
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { loadDatabaseConfig, toPgPoolOptions } from '../lib/db.js';
+import { recordDatabaseCheckout } from './connection-usage.js';
 
 export type QueryExecutor = {
   query<T>(sql: string, params?: unknown[]): Promise<T[]>;
@@ -36,7 +37,7 @@ export class PostgresQueryExecutorService implements QueryExecutor, OnModuleDest
   async query<T>(sql: string, params: unknown[] = []): Promise<T[]> {
     const executor = await this.getExecutor();
     if (!executor) throw new Error('DATABASE_URL is not configured.');
-    return executor.query<T>(sql, params);
+    return recordDatabaseCheckout(() => executor.query<T>(sql, params));
   }
 
   async onModuleDestroy(): Promise<void> {

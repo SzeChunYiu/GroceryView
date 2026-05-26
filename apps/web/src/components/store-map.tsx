@@ -50,9 +50,11 @@ function chainIndexColor(score: number | null, fallback: string): string {
   return '#D94F3D';
 }
 
-const syncedMapListStores = osmStores
-  .filter((store) => Number.isFinite(store.lat) && Number.isFinite(store.lng))
-  .slice(0, 8);
+function syncedMapListStoresFor(stores: readonly OsmStore[]) {
+  return stores
+    .filter((store) => Number.isFinite(store.lat) && Number.isFinite(store.lng))
+    .slice(0, 8);
+}
 
 function storeLocationLabel(store: OsmStore): string {
   return [store.district || store.city, store.address].filter(Boolean).join(' · ') || 'Stockholm area';
@@ -102,10 +104,10 @@ function distanceMetersFromUser(userLocation: { lat: number; lng: number }, deal
   return Math.round(distanceKm([userLocation.lng, userLocation.lat], [deal.mapLng, deal.mapLat]) * 1000);
 }
 
-function toFeatureCollection(): GeoJSON.FeatureCollection<GeoJSON.Point> {
+function toFeatureCollection(stores: readonly OsmStore[]): GeoJSON.FeatureCollection<GeoJSON.Point> {
   return {
     type: 'FeatureCollection',
-    features: osmStores
+    features: stores
       .filter((s) => Number.isFinite(s.lat) && Number.isFinite(s.lng))
       .map((s) => ({
         type: 'Feature',
@@ -128,9 +130,9 @@ function toFeatureCollection(): GeoJSON.FeatureCollection<GeoJSON.Point> {
   };
 }
 
-function districtHeatCollection(): GeoJSON.FeatureCollection<GeoJSON.Point> {
+function districtHeatCollection(stores: readonly OsmStore[]): GeoJSON.FeatureCollection<GeoJSON.Point> {
   const byDistrict = new Map<string, { lng: number; lat: number; count: number; scoreSum: number; scored: number }>();
-  for (const store of osmStores) {
+  for (const store of stores) {
     if (!Number.isFinite(store.lat) || !Number.isFinite(store.lng)) continue;
     const district = store.district || store.city || 'Stockholm';
     const score = chainIndexScore(store.brand || '');
@@ -169,16 +171,24 @@ type RouteSavingsMapRow = StoreDistanceRow & { expectedBasketSavingsSek?: number
 
 export function StoreMap({
   nearbyDealRecommendations = [],
-  routeRecommendations = []
-}: Readonly<{ nearbyDealRecommendations?: NearbyDealRecommendation[]; routeRecommendations?: RouteSavingsMapRow[] }>) {
+  routeRecommendations = [],
+  stores = osmStores
+}: Readonly<{ nearbyDealRecommendations?: NearbyDealRecommendation[]; routeRecommendations?: RouteSavingsMapRow[]; stores?: readonly OsmStore[] }>) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
+  const syncedMapListStores = useMemo(() => syncedMapListStoresFor(stores), [stores]);
   const [storeCount, setStoreCount] = useState(0);
   const [selectedStoreSlug, setSelectedStoreSlug] = useState(syncedMapListStores[0]?.slug ?? '');
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [geoStatus, setGeoStatus] = useState('Using map-center distance until location is approved.');
   const [openNowOnly, setOpenNowOnly] = useState(false);
   const [preferredPickupMode, setPreferredPickupMode] = useState<PreferredPickupMode>('any');
+
+  useEffect(() => {
+    if (!syncedMapListStores.some((store) => store.slug === selectedStoreSlug)) {
+      setSelectedStoreSlug(syncedMapListStores[0]?.slug ?? '');
+    }
+  }, [selectedStoreSlug, syncedMapListStores]);
 
   const rankedNearbyDeals = useMemo(() => {
     if (!userLocation) return nearbyDealRecommendations;
@@ -189,11 +199,11 @@ export function StoreMap({
 
   const nearestStores = useMemo(
     () => rankNearestStores(
-      osmStores,
+      [...stores],
       userLocation ?? { lat: STOCKHOLM[1], lng: STOCKHOLM[0] },
       { limit: 5, openNowOnly, preferredPickupMode }
     ),
-    [openNowOnly, preferredPickupMode, userLocation]
+    [openNowOnly, preferredPickupMode, stores, userLocation]
   );
 
   function focusStore(store: OsmStore) {
@@ -224,7 +234,7 @@ export function StoreMap({
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const data = toFeatureCollection();
+    const data = toFeatureCollection(stores);
     setStoreCount(data.features.length);
 
     const handleDirectionsClick = (event: MouseEvent) => {
@@ -267,7 +277,7 @@ export function StoreMap({
     map.on('load', () => {
       map.addSource('district-heat', {
         type: 'geojson',
-        data: districtHeatCollection(),
+        data: districtHeatCollection(stores),
       });
       map.addLayer({
         id: 'district-heat',
@@ -423,7 +433,7 @@ export function StoreMap({
       mapRef.current = null;
       map.remove();
     };
-  }, []);
+  }, [stores]);
 
   return (
     <div className="relative h-full w-full">

@@ -1,6 +1,8 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
 import { ConfidenceBadge } from '@/components/confidence-badge';
+import { SavedViewActions } from '@/components/saved-view-actions';
 import {
   categoryDealLeaders,
   formatPct,
@@ -85,7 +87,7 @@ function screenerOpenGraphImages(fallbackImages: NonNullable<ReturnType<typeof r
   }];
 }
 
-export function generateMetadata() {
+export function generateMetadata(): Metadata {
   const metadata = routeMetadata('/screener');
   const openGraph = metadata.openGraph;
   const ogCopy = screenerOpenGraphCopy(String(metadata.title ?? 'Verified deal screener | GroceryView'), metadata.description ?? '');
@@ -279,6 +281,15 @@ export default async function ScreenerPage({ searchParams }: Readonly<{ searchPa
         </Card>
       </div>
 
+      <SavedViewActions
+        allowAlert
+        href={screenerSortHref(mode, category, minDiscount)}
+        label="Verified deal screener view"
+        resultLabel={`${visibleRows.length} visible rows · sorted by ${sortOptions.find((option) => option.mode === mode)?.label ?? mode} · confidence labels visible`}
+        state={{ category, minDiscount, sort: mode, view: 'deal-screener' }}
+        surface="screener"
+      />
+
       <Card className="mt-6">
         <div className="grid gap-4 lg:grid-cols-[1fr_0.8fr_0.7fr]">
           <div>
@@ -366,13 +377,14 @@ export default async function ScreenerPage({ searchParams }: Readonly<{ searchPa
 
         <div className="overflow-hidden sm:overflow-x-auto">
           <table className="w-full border-separate border-spacing-y-3 text-left text-sm sm:min-w-[920px] sm:border-collapse sm:border-spacing-y-0">
+            <caption className="sr-only">Verified deal screener rows sorted by {sortOptions.find((option) => option.mode === mode)?.label.toLowerCase()}.</caption>
             <thead className="hidden bg-slate-50 text-xs font-black uppercase tracking-[0.16em] text-slate-500 sm:table-header-group">
               <tr>
-                <th className="px-5 py-3">Product</th>
-                <th className="px-5 py-3">Signal</th>
-                <th className="px-5 py-3">Price</th>
-                <th className="px-5 py-3">Comparison</th>
-                <th className="px-5 py-3">Confidence</th>
+                <th className="px-5 py-3" scope="col">Product</th>
+                <th className="px-5 py-3" scope="col">Signal</th>
+                <th className="px-5 py-3" scope="col">Price</th>
+                <th className="px-5 py-3" scope="col">Comparison</th>
+                <th className="px-5 py-3" scope="col">Confidence</th>
               </tr>
             </thead>
             <tbody className="block sm:table-row-group sm:divide-y sm:divide-slate-200">

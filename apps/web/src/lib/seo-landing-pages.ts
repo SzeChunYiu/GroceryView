@@ -97,6 +97,21 @@ export function cityCheapestLandingSeoDecision(product: SeoLandingProduct, city:
   };
 }
 
+export function cityPriceComparisonLandingSeoDecision(product: SeoLandingProduct, city: SeoLandingCity) {
+  const cityPath = `/${city.slug}/prisjamforelse/${product.slug}`;
+  const fallbackCanonicalPath = `/prisjamforelse/${product.slug}`;
+  const hasEnoughCityCoverage = verifiedChainRowCount(product) >= programmaticSeoIndexingGuard.minimumCityVerifiedChainRows;
+  const indexable = hasEnoughCityCoverage && city.hasCitySpecificAvailability;
+
+  return {
+    path: cityPath,
+    canonicalPath: indexable ? cityPath : fallbackCanonicalPath,
+    noIndex: !indexable,
+    noIndexFollow: true,
+    guardrail: indexable ? city.evidence : programmaticSeoIndexingGuard.duplicateCityCanonicalReason
+  };
+}
+
 export function metadataForCheapestLanding(product: SeoLandingProduct): Metadata {
   const noIndex = !hasIndexableProductCoverage(product);
   return routeMetadata({
@@ -128,5 +143,17 @@ export function metadataForCityCheapestLanding(product: SeoLandingProduct, city:
     noIndexFollow: seoDecision.noIndexFollow,
     title: `Billigaste ${product.name} i ${city.label} | GroceryView`,
     description: `Find the cheapest verified chain price for ${product.name} in the ${city.label} GroceryView landing page. Uses chain catalogue evidence and clear local-availability caveats. ${seoDecision.guardrail}`
+  });
+}
+
+export function metadataForCityPriceComparisonLanding(product: SeoLandingProduct, city: SeoLandingCity): Metadata {
+  const seoDecision = cityPriceComparisonLandingSeoDecision(product, city);
+  return routeMetadata({
+    path: seoDecision.path,
+    canonicalPath: seoDecision.canonicalPath,
+    noIndex: seoDecision.noIndex,
+    noIndexFollow: seoDecision.noIndexFollow,
+    title: `${product.name} prisjämförelse i ${city.label} | GroceryView`,
+    description: `Compare verified chain prices for ${product.name} in the ${city.label} GroceryView landing page. Uses chain catalogue evidence and clear local-availability caveats. ${seoDecision.guardrail}`
   });
 }
