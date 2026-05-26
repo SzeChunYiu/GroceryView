@@ -1,3 +1,5 @@
+// @ts-expect-error pg resolves to its ESM entry (pg/esm/index.mjs) under apps/web,
+// which ships no .d.ts — typed via @groceryview/db elsewhere; this health ping uses it directly.
 import pg from 'pg';
 
 const { Pool } = pg;
