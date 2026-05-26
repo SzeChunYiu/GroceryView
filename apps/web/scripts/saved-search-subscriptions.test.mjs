@@ -21,7 +21,10 @@ test('search page saves current URL filters as a saved search subscription', asy
   assert.match(searchPage, /buildSavedSearchSubscription/);
   assert.match(searchPage, /searchParams\?: Promise<SearchPageParams>/);
   assert.match(searchPage, /path: '\/search'/);
-  assert.match(searchPage, /ProductsPage searchParams=\{Promise\.resolve\(resolvedSearchParams\)\}/);
+  // The search page now renders verified results directly via buildProductSearchView with
+  // server-side cursor pagination, rather than delegating to <ProductsPage />.
+  assert.match(searchPage, /buildProductSearchView/);
+  assert.match(searchPage, /pagedResultCards/);
 });
 
 test('saved search subscriptions are stored locally and surfaced on alerts', async () => {

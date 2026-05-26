@@ -41,7 +41,8 @@ describe('shopping list route', () => {
     assert.match(hook, /localStorage\.getItem\(LIST_STORAGE_KEY\)/);
     assert.match(hook, /localStorage\.setItem\(LIST_STORAGE_KEY/);
     assert.match(hook, /toggleItemChecked/);
-    assert.match(hook, /checked: !item\.checked/);
+    assert.match(hook, /const checked = !item\.checked/);
+    assert.match(hook, /return \{ \.\.\.item, checked \}/);
     assert.match(hook, /addImportedItems/);
     assert.match(hook, /importSource: 'bulk-clipboard'/);
     assert.match(hook, /matchedProductSlug/);
