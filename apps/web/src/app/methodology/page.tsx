@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { MvpBreadcrumbs } from '@/components/mvp/mvp-breadcrumbs';
 import { routeMetadata } from '@/lib/seo';
 
 const methodologySections = [
@@ -77,6 +78,7 @@ export function generateMetadata() {
 export default function MethodologyPage() {
   return (
     <PageShell>
+      <MvpBreadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Methodology' }]} />
       <Eyebrow>Trust methodology</Eyebrow>
       <h1 className="mt-2 max-w-4xl text-4xl font-black tracking-tight">How GroceryView scores and hides claims</h1>
       <p className="mt-3 max-w-4xl text-lg leading-8 text-slate-700">
@@ -93,6 +95,9 @@ export default function MethodologyPage() {
         </Link>
         <Link className="rounded-full bg-slate-950 px-4 py-2 text-sm font-black text-white" href="/methodology-changelog">
           Changelog
+        </Link>
+        <Link className="rounded-full bg-emerald-900 px-4 py-2 text-sm font-black text-white" href="/confidence">
+          Source confidence
         </Link>
       </div>
 

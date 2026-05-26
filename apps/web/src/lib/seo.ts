@@ -218,6 +218,18 @@ export const routeMetadataCatalog = {
     title: 'Score and confidence methodology | GroceryView',
     description: 'Inspect how GroceryView computes Deal Score, Buy or Wait timing, nutrition per krona, and confidence labels, including missing-data blockers.'
   },
+  '/market': {
+    title: 'Grocery market overview | GroceryView',
+    description: 'Chain price indexes, category tables, and biggest movers from verified Swedish grocery observations.'
+  },
+  '/browse': {
+    title: 'Browse grocery categories | GroceryView',
+    description: 'Choose categories and chains to explore verified product search results without fabricated prices.'
+  },
+  '/confidence': {
+    title: 'Source confidence | GroceryView',
+    description: 'Understand confidence levels and source coverage behind GroceryView price panels.'
+  },
   '/login': {
     title: 'Sign in to GroceryView',
     description: 'Authentication is withheld in the static build until a production auth provider can return a verified user session.',
@@ -431,7 +443,7 @@ export function routeMetadata(route: keyof typeof routeMetadataCatalog | RouteMe
     other: {
       'x-groceryview-hreflang-boundary': localeNegotiatedCurrentRouteCaveat,
       ...publicCatalogueCacheOther(config.edgeCache, config.path)
-    },
+    } as Metadata['other'],
     openGraph: {
       title,
       description,

@@ -28,6 +28,12 @@ export default function AdminSourcesPage() {
       >
         View ingestion runs
       </Link>
+      <Link
+        className="ml-3 mt-5 inline-flex rounded-full border border-slate-300 px-4 py-2 text-sm font-bold text-slate-800 hover:border-emerald-700 hover:text-emerald-900"
+        href="/admin/sources/dead-letters"
+      >
+        Review dead letters
+      </Link>
 
       <section className="mt-8 grid gap-4" aria-label="Duplicate conflict alerts">
         {alerts.map((alert) => (

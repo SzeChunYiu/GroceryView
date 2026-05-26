@@ -205,7 +205,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
     <PageShell>
       <Eyebrow>Products</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Verified product catalogue</h1>
-      <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">Products are shown only when present in the Axfood chain snapshot or OpenPrices SEK observations. No synthetic prices or filler products are rendered.</p>
+      <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">Products are shown only when present in the Axfood chain snapshot or OpenPrices SEK observations. No filler products are rendered.</p>
       <NewArrivalsCarousel items={newProductArrivals} />
       <Card className="mt-8 border-indigo-200 bg-indigo-50/70">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
@@ -486,7 +486,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             <h2 className="mt-2 text-2xl font-black text-slate-950">Swedish product metadata-only catalog</h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
               OpenFoodFacts rows widen the browseable product dimension with names, brands, package sizes, category tags, labels, and images.
-              No synthetic prices are shown here; GroceryView still requires Axfood, OpenPrices, or retailer observations before a price appears.
+              No prices are shown here; GroceryView still requires Axfood, OpenPrices, or retailer observations before a price appears.
             </p>
           </div>
           <div className="rounded-2xl bg-white px-4 py-3 text-sm font-black text-emerald-950 shadow-sm">
@@ -500,7 +500,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
               <h3 className="mt-2 text-lg font-black text-slate-950">{product.name}</h3>
               <p className="mt-1 text-xs font-semibold text-slate-500">{product.quantity || 'Quantity not reported'} · {product.nutriscoreGrade}</p>
               <p className="mt-3 text-xs leading-5 text-slate-600">{product.categories.slice(0, 3).join(' · ') || 'Category tags not reported'}</p>
-              <p className="mt-3 rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-900">metadata-only · No synthetic prices</p>
+              <p className="mt-3 rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-900">metadata-only · No prices</p>
             </a>
           ))}
         </div>
