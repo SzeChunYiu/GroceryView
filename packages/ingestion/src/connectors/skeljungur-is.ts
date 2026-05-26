@@ -116,6 +116,17 @@ function decodeHtml(value: string) {
     .trim();
 }
 
+// Machine-readable amount fields (fuel `Price` "231.30", shop variant `price.amount`
+// "26712.0") use the dot as the DECIMAL separator. parseIcelandicPrice strips dots as
+// thousands separators (correct only for human display strings like "26.712 kr."), which
+// would turn 231.30 -> 23130 and 26712.0 -> 267120. Parse these directly with Number().
+function parseMachineAmount(value: string | number | undefined) {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : undefined;
+  if (!value) return undefined;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
 function fuelSpecFor(itemName: string) {
   const normalized = itemName.toLocaleLowerCase('is-IS');
   return fuelGradeMap.find((spec) => spec.needles.some((needle) => normalized.includes(needle)));
@@ -142,7 +153,7 @@ export function parseSkeljungurIsFuelPriceList(input: {
   return (parsed.items ?? []).flatMap((item): SkeljungurIsFuelPriceObservation[] => {
     if (typeof item.ItemName !== 'string') return [];
     const spec = fuelSpecFor(item.ItemName);
-    const price = parseIcelandicPrice(typeof item.Price === 'string' || typeof item.Price === 'number' ? item.Price : undefined);
+    const price = parseMachineAmount(typeof item.Price === 'string' || typeof item.Price === 'number' ? item.Price : undefined);
     if (!spec || price === undefined) return [];
     return [
       {
@@ -197,7 +208,7 @@ export function parseSkeljungurIsShopProductPage(input: {
   return variants
     .filter((variant) => variant.option_values?.length)
     .flatMap((variant): SkeljungurIsShopPriceObservation[] => {
-      const price = parseIcelandicPrice(variant.price?.amount);
+      const price = parseMachineAmount(variant.price?.amount);
       if (price === undefined || variant.price?.currency !== 'ISK' || !variant.sku) return [];
       const quantityText = variant.qty_uom || variant.option_values?.[0]?.presentation || '1 STK';
       const quantity = parseQuantity(quantityText);

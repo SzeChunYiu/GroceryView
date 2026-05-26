@@ -101,6 +101,10 @@ function normalizeProductBlock(block: string, sourceUrl: string, retrievedAt: st
   const price = prices[prices.length - 1]!;
   const originalPrice = prices.length > 1 && prices[0]! > price ? prices[0]! : null;
   const categorySlug = categorySlugFromSource(sourceUrl);
+  // Classify using the product's OWN URL path segment (e.g. /verslun/hudvorur/ -> skincare)
+  // in addition to the name; the store-page sourceUrl only yields a generic 'store' slug, so
+  // relying on it alone misclassified skincare like "Vichy ... Cream" as 'care' not 'beauty'.
+  const productCategorySegment = categorySlugFromSource(productUrl);
 
   return {
     country: 'IS',
@@ -109,7 +113,7 @@ function normalizeProductBlock(block: string, sourceUrl: string, retrievedAt: st
     retailerType: 'pharmacy',
     code,
     name,
-    category: lyfjaCategory(`${categorySlug} ${name}`),
+    category: lyfjaCategory(`${productCategorySegment} ${categorySlug} ${name}`),
     categorySlug,
     price,
     priceText: priceTexts[priceTexts.length - 1] ?? `${Math.round(price)} kr.`,
@@ -173,7 +177,7 @@ function lyfjaCategory(value: string): LyfjaIsProductCategory {
   if (matchesAny(normalized, ['gjafabréf', 'gjafapoki'])) return 'gift';
   if (matchesAny(normalized, ['verk', 'hiti', 'kvef', 'ofnæmi', 'melting', 'lyf', 'nefúði', 'mg ', 'mcg'])) return 'otc';
   if (matchesAny(normalized, ['vítamín', 'vitamin', 'bætiefni', 'fæðubót', 'omega', 'steinefni'])) return 'supplement';
-  if (matchesAny(normalized, ['húð', 'snyrti', 'krem', 'serum', 'andlit', 'sól', 'hár', 'spf'])) return 'beauty';
+  if (matchesAny(normalized, ['húð', 'hudvor', 'snyrti', 'krem', 'cream', 'moistur', 'serum', 'andlit', 'sól', 'hár', 'spf', 'vichy', 'mineral 89'])) return 'beauty';
   return 'care';
 }
 
