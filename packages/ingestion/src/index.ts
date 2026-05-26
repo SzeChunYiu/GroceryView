@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import dns from 'node:dns';
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
@@ -3584,6 +3585,10 @@ export type DailyIngestionConnectorConfig = Omit<RetailerConnectorPlanInput, 're
 
 export type DailyIngestionEnv = Partial<Record<
   | 'DATABASE_URL'
+  | 'DIRECT_DATABASE_URL'
+  | 'REPLACEMENT_DATABASE_URL'
+  | 'CANDIDATE_DATABASE_URL'
+  | 'GROCERYVIEW_EFFECTIVE_DATABASE_URL'
   | 'GROCERYVIEW_DAILY_CONNECTORS_JSON'
   | 'GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE'
   | 'GROCERYVIEW_DAILY_BLOCKER_LOG_PATH'
@@ -3857,8 +3862,7 @@ function definedAllStoreRunnerControls(input: AllStoreTaskRunnerControls): AllSt
 }
 
 export function buildDailyConnectorConfigsFromEnv(env: DailyIngestionEnv): DailyIngestionEnvConfig {
-  const databaseUrl = env.DATABASE_URL?.trim();
-  if (!databaseUrl) throw new Error('DATABASE_URL is required for daily ingestion.');
+  const databaseUrl = resolveDailyIngestionDatabaseUrl(env);
   const connectorsJson = env.GROCERYVIEW_DAILY_CONNECTORS_JSON?.trim()
     ?? (env.GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE?.trim() ? readFileSync(env.GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE.trim(), 'utf8') : undefined);
   if (!connectorsJson) throw new Error('GROCERYVIEW_DAILY_CONNECTORS_JSON or GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE is required for daily ingestion.');
@@ -3922,14 +3926,29 @@ function parseDailyEnvInteger(value: string | undefined, fallback: number, name:
   return parsed;
 }
 
-export function buildDailyIngestionPostgresPoolConfig(databaseUrl: string): { connectionString: string; max: number } {
+export function resolveDailyIngestionDatabaseUrl(env: DailyIngestionEnv = process.env): string {
+  for (const key of ['GROCERYVIEW_EFFECTIVE_DATABASE_URL', 'DIRECT_DATABASE_URL', 'REPLACEMENT_DATABASE_URL', 'CANDIDATE_DATABASE_URL', 'DATABASE_URL'] as const) {
+    const value = env[key]?.trim();
+    if (value) return value;
+  }
+  throw new Error('DATABASE_URL is required for daily ingestion.');
+}
+
+export function buildDailyIngestionPostgresPoolConfig(databaseUrl: string): {
+  connectionString: string;
+  max: number;
+  lookup: (hostname: string, options: unknown, callback: (error: NodeJS.ErrnoException | null, address: string, family?: number) => void) => void;
+} {
   const parsed = new URL(databaseUrl);
   if (parsed.hostname.endsWith('.pooler.supabase.com') && parsed.port === '6543') {
     parsed.port = '5432';
   }
   return {
     connectionString: parsed.toString(),
-    max: 1
+    max: 1,
+    lookup: (hostname, _options, callback) => {
+      dns.lookup(hostname, { family: 4 }, callback);
+    }
   };
 }
 
@@ -5388,7 +5407,8 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
 }
 
 export async function runDailyIngestionFromEnv(env: DailyIngestionEnv = process.env): Promise<DailyIngestionRunResult> {
-  const { databaseUrl, connectors, runtimeOptions } = buildDailyConnectorConfigsFromEnv(env);
+  const databaseUrl = resolveDailyIngestionDatabaseUrl(env);
+  const { connectors, runtimeOptions } = buildDailyConnectorConfigsFromEnv(env);
   const pg = requireForDailyIngestion('pg') as { Pool?: new (config: { connectionString: string; max?: number }) => { query(text: string, values?: unknown[]): Promise<{ rows: unknown[] }>; end(): Promise<void>; on?(event: 'error', listener: (error: unknown) => void): void } };
   if (!pg.Pool) throw new Error('pg Pool export is not available.');
   const pool = new pg.Pool(buildDailyIngestionPostgresPoolConfig(databaseUrl));
