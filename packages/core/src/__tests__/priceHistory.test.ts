@@ -385,4 +385,72 @@ describe('planMultiWeekStockUpList', () => {
     assert.match(plan.rows[0].reviewTrigger, /Storage limit caps this at 2 weeks/);
     assert.equal(plan.weeklyEquivalentCost, 21.9);
   });
+
+  it('preserves source-derived kg, l, st, and pack units without converting between unit families', () => {
+    const plan = planMultiWeekStockUpList({
+      asOf: '2026-05-20T00:00:00.000Z',
+      planningWeeks: 2,
+      weeklyBudget: 700,
+      items: [
+        {
+          productId: 'oats-750g',
+          productName: 'Oats 750g',
+          storeName: 'OpenPrices community',
+          weeklyNeedUnits: 1.5,
+          packageUnits: 0.75,
+          comparableUnit: 'kg',
+          currentUnitPrice: 24,
+          history: [
+            { observedAt: '2026-05-01T09:00:00.000Z', unitPrice: 28, sourceType: 'online', confidence: 0.8 },
+            { observedAt: '2026-05-10T09:00:00.000Z', unitPrice: 24, sourceType: 'online', confidence: 0.8 },
+            { observedAt: '2026-05-20T09:00:00.000Z', unitPrice: 24, sourceType: 'online', confidence: 0.8 }
+          ]
+        },
+        {
+          productId: 'juice-1l',
+          productName: 'Juice 1L',
+          storeName: 'OpenPrices community',
+          weeklyNeedUnits: 2,
+          packageUnits: 1,
+          comparableUnit: 'l',
+          currentUnitPrice: 19,
+          history: [
+            { observedAt: '2026-05-01T09:00:00.000Z', unitPrice: 21, sourceType: 'online', confidence: 0.8 },
+            { observedAt: '2026-05-10T09:00:00.000Z', unitPrice: 19, sourceType: 'online', confidence: 0.8 },
+            { observedAt: '2026-05-20T09:00:00.000Z', unitPrice: 19, sourceType: 'online', confidence: 0.8 }
+          ]
+        },
+        {
+          productId: 'eggs-10st',
+          productName: 'Eggs 10-pack',
+          storeName: 'OpenPrices community',
+          weeklyNeedUnits: 10,
+          packageUnits: 10,
+          comparableUnit: 'st',
+          currentUnitPrice: 3,
+          history: [
+            { observedAt: '2026-05-01T09:00:00.000Z', unitPrice: 3.2, sourceType: 'online', confidence: 0.8 },
+            { observedAt: '2026-05-10T09:00:00.000Z', unitPrice: 3, sourceType: 'online', confidence: 0.8 },
+            { observedAt: '2026-05-20T09:00:00.000Z', unitPrice: 3, sourceType: 'online', confidence: 0.8 }
+          ]
+        },
+        {
+          productId: 'unknown-pack',
+          productName: 'Unknown package',
+          storeName: 'OpenPrices community',
+          weeklyNeedUnits: 2,
+          packageUnits: 1,
+          comparableUnit: 'pack',
+          currentUnitPrice: 12,
+          history: [
+            { observedAt: '2026-05-20T09:00:00.000Z', unitPrice: 12, sourceType: 'online', confidence: 0.45 }
+          ]
+        }
+      ]
+    });
+
+    assert.deepEqual(plan.rows.map((row) => row.comparableUnit), ['kg', 'l', 'st', 'pack']);
+    assert.deepEqual(plan.rows.map((row) => row.packagesNeeded), [4, 4, 2, 4]);
+    assert.equal(plan.rows.find((row) => row.productId === 'unknown-pack')?.confidence, 'low');
+  });
 });

@@ -26,6 +26,12 @@ export type LidlOffer = {
   unitPriceText: string;
   promotionText: string;
   memberOnly: boolean;
+  channel: 'store';
+  is_member_price: boolean;
+  is_coupon_price: boolean;
+  is_subscription_price: boolean;
+  is_clearance: boolean;
+  multi_buy: string;
   regions: string[];
   validFrom: string;
   validTo: string;
@@ -337,6 +343,12 @@ export function normalizeLidlOffer(
     unitPriceText: basePriceText,
     promotionText,
     memberOnly: Boolean(regionEntry?.currentLidlPlusPrice || payload.currentLidlPlusPrice),
+    channel: 'store',
+    is_member_price: Boolean(regionEntry?.currentLidlPlusPrice || payload.currentLidlPlusPrice),
+    is_coupon_price: /kupong|coupon/i.test(promotionText),
+    is_subscription_price: false,
+    is_clearance: /superklipp|klipp|svinnsmart|kort datum/i.test(`${promotionText} ${sourceUrl}`),
+    multi_buy: multiBuyPromotion(promotionText),
     regions: Array.isArray(payload.regions) ? payload.regions.map((region) => text(region) || String(region)).filter(Boolean) : Object.keys(payload.regionsPrices ?? {}),
     validFrom: text(currentPrice?.startDate),
     validTo: text(currentPrice?.endDate),
@@ -345,6 +357,10 @@ export function normalizeLidlOffer(
     sourceUrl,
     retrievedAt
   };
+}
+
+function multiBuyPromotion(value: string): string {
+  return /(\d+\s*(st|för)\s*|\d+\s*%\s*vid köp av\s*\d+|3\s*för\s*2|2\s*för)/i.test(value) ? value : '';
 }
 
 function firstRegionPrice(value: Record<string, LidlRegionPrice> | undefined): LidlRegionPrice | undefined {

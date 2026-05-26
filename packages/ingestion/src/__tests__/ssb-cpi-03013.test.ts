@@ -5,7 +5,8 @@ import {
   fetchSsbCpi03013BenchmarkObservations,
   parseSsbCpi03013JsonStat,
   SSB_CPI_03013_CRON,
-  SSB_CPI_03013_REGISTRY_STATUS
+  SSB_CPI_03013_REGISTRY_STATUS,
+  upsertSsbCpi03013BenchmarkObservations
 } from '../connectors/benchmarks/ssb-cpi-03013.js';
 import { benchmarkSourceRegistry } from '../connectors/benchmarks/registry.js';
 
@@ -58,5 +59,31 @@ describe('SSB CPI 03013 benchmark connector', () => {
     assert.equal(requests[0]?.url, 'https://example.test/03013');
     assert.equal(requests[0]?.init?.method, 'POST');
     assert.deepEqual(JSON.parse(String(requests[0]?.init?.body)), buildSsbCpi03013RequestBody(2));
+  });
+
+  it('upserts benchmark observations into benchmark_observation without inventing missing periods', async () => {
+    const rows = parseSsbCpi03013JsonStat(fixture, '2026-05-25T00:00:00.000Z');
+    const queries: Array<{ sql: string; params: readonly unknown[] }> = [];
+    const persisted = await upsertSsbCpi03013BenchmarkObservations({
+      query: async (sql, params) => {
+        queries.push({ sql, params });
+      }
+    }, rows);
+
+    assert.equal(persisted, 5);
+    assert.equal(queries.length, 5);
+    assert.match(queries[0]?.sql ?? '', /insert into benchmark_observation/);
+    assert.match(queries[0]?.sql ?? '', /on conflict on constraint benchmark_observation_pkey/);
+    assert.deepEqual(queries[0]?.params, [
+      'SSB_CPI_03013',
+      'NO',
+      'grocery',
+      '01',
+      '2025-11',
+      141.6,
+      'indeks',
+      '2026-05-25T00:00:00.000Z'
+    ]);
+    assert.equal(queries.some((query) => query.params[3] === '01' && query.params[4] === '2025-12'), false);
   });
 });

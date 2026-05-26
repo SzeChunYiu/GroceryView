@@ -9,6 +9,7 @@ describe('favorite item queries', () => {
     assert.deepEqual(query.values, ['user-1', 25]);
     assert.match(query.sql, /from watchlist_items/i);
     assert.match(query.sql, /join products on products\.id = watchlist_items\.product_id/i);
+    assert.match(query.sql, /products\.deleted_at is null/i);
     assert.match(query.sql, /row_number\(\) over \(partition by latest_prices\.product_id order by latest_prices\.price asc/i);
     assert.match(query.sql, /left join stores on stores\.id = ranked_prices\.store_id/i);
     assert.match(query.sql, /coalesce\(latest_prices\.is_available, true\) = true/i);

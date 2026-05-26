@@ -91,7 +91,7 @@ describe('compare price snapshots helper', () => {
       }
     });
 
-    assert.deepEqual(seenUrls, ['/compare/items?items=milk%2Cbread%2Cmissing']);
+    assert.deepEqual(seenUrls, ['/compare/items?itemIds=milk%2Cbread%2Cmissing']);
     assert.equal(result.endpointUnavailable, false);
     assert.deepEqual(result.itemIds, ['milk', 'bread', 'missing']);
     assert.deepEqual(result.missingItemIds, ['missing']);
@@ -132,6 +132,47 @@ describe('compare price snapshots helper', () => {
         normalizedUnitPrice: null,
         normalizedUnitPriceLabel: undefined
       }
+    ]);
+  });
+
+  it('maps contract compare responses from storeId to item snapshot rows', async () => {
+    const result = await fetchComparePriceSnapshots('coffee,milk,butter', {
+      fetcher: async (url) => {
+        assert.equal(url, '/api/compare?itemIds=coffee%2Cmilk%2Cbutter');
+        return {
+          ok: true,
+          json: async () => ({
+            itemIds: ['coffee', 'milk'],
+            stores: {
+              'willys-odenplan': {
+                coffee: {
+                  price: { amount: 49.9, currency: 'SEK' },
+                  unitPrice: { amount: 110.89, currency: 'SEK' },
+                  priceType: 'promotion',
+                  confidence: 'high',
+                  observedAt: '2026-05-21T09:00:00.000Z'
+                }
+              },
+              'lidl-sveavagen': {
+                milk: {
+                  price: { amount: 13.9, currency: 'SEK' },
+                  priceType: 'shelf',
+                  confidence: 'medium',
+                  observedAt: '2026-05-21T08:00:00.000Z'
+                }
+              }
+            },
+            missingItemIds: ['butter']
+          })
+        };
+      }
+    });
+
+    assert.equal(result.endpointUnavailable, false);
+    assert.deepEqual(result.missingItemIds, ['butter']);
+    assert.deepEqual(result.storeRows.map((row) => [row.storeName, row.itemId, row.price, row.unitLabel, row.confidence]), [
+      ['willys-odenplan', 'coffee', 49.9, '110,89 SEK/unit', 'high'],
+      ['lidl-sveavagen', 'milk', 13.9, 'SEK/unit', 'medium']
     ]);
   });
 

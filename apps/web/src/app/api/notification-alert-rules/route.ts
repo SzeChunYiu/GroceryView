@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import { entitlementFromHeaders, hasActivePremiumEntitlement, premiumRequiredResponse } from '@/lib/entitlements';
 
 type BestTimeToBuyRuleRequest = {
   userId?: unknown;
@@ -13,6 +14,11 @@ export async function POST(request: NextRequest) {
   const authorization = request.headers.get('authorization') ?? '';
   if (!authorization.startsWith('Bearer ')) {
     return NextResponse.json({ error: 'Bearer token is required to create account alert rules.' }, { status: 401 });
+  }
+
+  const entitlement = entitlementFromHeaders(request.headers);
+  if (!hasActivePremiumEntitlement(entitlement)) {
+    return NextResponse.json(premiumRequiredResponse('advanced_alerts', entitlement), { status: 402 });
   }
 
   const body = (await request.json()) as BestTimeToBuyRuleRequest;

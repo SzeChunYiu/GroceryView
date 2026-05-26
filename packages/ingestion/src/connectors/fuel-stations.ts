@@ -1,6 +1,7 @@
 type OsmType = 'node' | 'way' | 'relation';
 
 export type FuelStationChain = 'Circle K' | 'OKQ8' | 'Preem' | 'St1' | 'Ingo' | 'Tanka' | 'Qstar' | 'Shell';
+export type FuelStationSupportedGradeId = 'fuel-95-e10' | 'fuel-98' | 'fuel-diesel' | 'fuel-hvo100' | 'fuel-e85' | 'fuel-adblue';
 
 export type BrandedSwedishFuelStation = {
   osmType: OsmType;
@@ -19,6 +20,7 @@ export type BrandedSwedishFuelStation = {
   openingHours: string;
   website: string;
   phone: string;
+  supportedGradeIds: FuelStationSupportedGradeId[];
   sourceUrl: string;
   retrievedAt: string;
 };
@@ -121,9 +123,25 @@ export function normalizeBrandedSwedishFuelStation(element: OverpassElement, ret
     openingHours: text(tags.opening_hours),
     website: text(tags.website) || text(tags['contact:website']),
     phone: text(tags.phone) || text(tags['contact:phone']),
+    supportedGradeIds: supportedFuelGradeIdsFromTags(tags),
     sourceUrl: BRANDED_FUEL_STATIONS_OVERPASS_URL,
     retrievedAt
   };
+}
+
+export function supportedFuelGradeIdsFromTags(tags: Record<string, unknown>): FuelStationSupportedGradeId[] {
+  const gradeTags: Array<[keyof typeof tags | string, FuelStationSupportedGradeId]> = [
+    ['fuel:octane_95', 'fuel-95-e10'],
+    ['fuel:octane_98', 'fuel-98'],
+    ['fuel:diesel', 'fuel-diesel'],
+    ['fuel:hvo100', 'fuel-hvo100'],
+    ['fuel:e85', 'fuel-e85'],
+    ['fuel:adblue', 'fuel-adblue']
+  ];
+
+  return gradeTags
+    .filter(([tag]) => isTruthyOsmTag(tags[tag]))
+    .map(([, gradeId]) => gradeId);
 }
 
 export function normalizeFuelStationChain(values: unknown[]): FuelStationChain | null {
@@ -145,6 +163,12 @@ function numberOrNull(value: unknown): number | null {
 
 function text(value: unknown): string {
   return typeof value === 'string' ? value.trim() : '';
+}
+
+function isTruthyOsmTag(value: unknown): boolean {
+  if (value === true) return true;
+  const normalized = text(value).toLocaleLowerCase('en-US');
+  return normalized === 'yes' || normalized === '1' || normalized === 'true';
 }
 
 function escapeRegExp(value: string): string {

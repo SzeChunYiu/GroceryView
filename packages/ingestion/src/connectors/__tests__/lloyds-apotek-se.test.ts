@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { fetchLloydsApotekSeProducts, parseLloydsApotekSeProducts } from '../lloyds-apotek-se.js';
+import { fetchLloydsApotekSeProducts, parseLloydsApotekSePricingQuirks, parseLloydsApotekSeProducts } from '../lloyds-apotek-se.js';
 
 const SOURCE_URL = 'https://www.lloydsapotek.se/sok?q=vitamin';
 const OBSERVED_AT = '2026-05-25T12:00:00.000Z';
@@ -26,6 +26,7 @@ describe('lloyds-apotek-se connector', () => {
         country: 'SE',
         currency: 'SEK',
         chain: 'lloyds-apotek',
+        format: 'doz_apotek',
         product_name: 'Lloyds D-vitamin 100 tabletter',
         price_sek: 79,
         unit: '100 st',
@@ -50,5 +51,34 @@ describe('lloyds-apotek-se connector', () => {
     assert.equal(rows[0]?.chain, 'lloyds-apotek');
     assert.equal(requested[0]?.url, SOURCE_URL);
     assert.equal(JSON.stringify(requested[0]?.init?.headers).includes('lloyds-apotek-se-connector'), true);
+  });
+
+  it('emits source-backed DOZ/Lloyds pricing quirks without fabricating store prices', () => {
+    const rows = parseLloydsApotekSePricingQuirks({
+      observedAt: OBSERVED_AT,
+      homeHtml: 'DOZ Apotek | Apotek online och i butik',
+      memberHtml: 'Med DOZ Plus erbjuds rabatterade priser på utvalda produkter och teman som passar in i tiden. Varje månad erbjuder vi även rabatterade medlemspriser. Dessa kan variera mellan apotek och online för att det ska finnas så mycket som möjligt att välja på. DulcoSoft oral lösning 0,5 g/ml, 250 ml Kampanjpris 74,40 kr Ord.pris 93,00 kr',
+      campaignHtml: '25% vid köp av 2 på DOZ Apotek Erbjudandet gäller under perioden 28/1-26/2, både online och i butik. Vi reserverar oss för eventuellt slutförsäljning. Priserna kan skiljas åt mot butik. DOZ Apotek Zinkcitrat 20 mg, 100 st Kampanjpris 66,50 kr Ord.pris 95,00 kr',
+      onlineOnlyProductHtml: 'DOZ Apotek vaniljfudge, 175 g Onlinepris 79,00 kr Butikspris Jämförpris / kg OBS! Kort hållbarhetsdatum! Utgångsdatum: Juni 2026. GÄLLER ENDAST ONLINE, EJ HÄMTNING I BUTIK.'
+    });
+
+    assert.equal(rows.length, 3);
+    assert.equal(rows.find((row) => row.format === 'doz_plus')?.is_member_price, true);
+    assert.equal(rows.find((row) => row.format === 'doz_plus')?.price_sek, 74.4);
+    assert.equal(rows.find((row) => row.multi_buy === '25% vid köp av 2')?.price_sek, 66.5);
+    assert.equal(rows.find((row) => row.format === 'doz_online_only')?.channel, 'online');
+    assert.equal(rows.find((row) => row.format === 'doz_online_only')?.is_clearance, true);
+    assert.equal(rows.some((row) => row.channel === 'store'), false);
+    assert.equal(rows.some((row) => row.is_subscription_price || row.is_coupon_price), false);
+  });
+
+  it('fails closed when required primary-source quirk evidence is absent', () => {
+    assert.throws(() => parseLloydsApotekSePricingQuirks({
+      observedAt: OBSERVED_AT,
+      homeHtml: '',
+      memberHtml: '',
+      campaignHtml: '',
+      onlineOnlyProductHtml: ''
+    }), /missing evidence/);
   });
 });

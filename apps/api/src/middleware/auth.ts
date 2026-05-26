@@ -29,3 +29,8 @@ export function authenticatedUserId(request: AuthenticatedRequest): string {
   if (!request.user?.userId) throw new UnauthorizedException('Authentication required.');
   return request.user.userId;
 }
+
+export function authenticatedUserEmail(request: AuthenticatedRequest): string | undefined {
+  if (!request.user?.userId) throw new UnauthorizedException('Authentication required.');
+  return request.user.email;
+}

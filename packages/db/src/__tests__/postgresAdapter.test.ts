@@ -451,6 +451,21 @@ class RecordingQueryExecutor implements QueryExecutor {
       observed_store_price_types: ['2102:shelf']
     }
   ];
+  friendSharedDealSignalRows: unknown[] = [
+    {
+      signal_id: 'friend-share-1',
+      user_id: 'user-1',
+      product_id: 'coffee',
+      shared_by_user_id: 'friend-1',
+      shared_by_display_name: 'Ada',
+      relationship: 'friend',
+      shared_at: '2026-05-20T10:30:00.000Z',
+      source_confidence: '0.8700',
+      opted_in: true,
+      deal_score: 82,
+      created_at: '2026-05-20T10:31:00.000Z'
+    }
+  ];
 
   async query<T>(sql: string, params: unknown[] = []) {
     this.calls.push({ sql, params });
@@ -476,6 +491,7 @@ class RecordingQueryExecutor implements QueryExecutor {
     if (sql.includes('from subscription_entitlements')) return this.subscriptionEntitlementRows as T[];
     if (sql.includes('from watchlist_items')) return this.watchlistRows as T[];
     if (sql.includes('from basket_import_review_items')) return this.basketImportReviewRows as T[];
+    if (sql.includes('from friend_shared_deal_signals')) return this.friendSharedDealSignalRows as T[];
     if (sql.includes('update basket_import_review_items')) {
       return [{
         ...this.basketImportReviewRows[0] as Record<string, unknown>,
@@ -686,6 +702,56 @@ describe('createPostgresRepository', () => {
     assert.equal(resolved.resolvedAt, '2026-05-22T09:36:00.000Z');
     const updateCall = executor.calls.find((call) => call.sql.includes('update basket_import_review_items'));
     assert.deepEqual(updateCall?.params, ['user-1', 'review-1', 'dismissed', '2026-05-22T09:36:00.000Z', null, null]);
+  });
+
+  it('persists friend-shared deal signals for account-scoped suggestion inputs', async () => {
+    const executor = new RecordingQueryExecutor();
+    const repo = createPostgresRepository(executor);
+
+    await repo.upsertFriendSharedDealSignal({
+      signalId: 'friend-share-1',
+      userId: 'user-1',
+      productId: 'coffee',
+      sharedByUserId: 'friend-1',
+      sharedByDisplayName: 'Ada',
+      relationship: 'friend',
+      sharedAt: '2026-05-20T10:30:00.000Z',
+      sourceConfidence: 0.87,
+      optedIn: true,
+      dealScore: 82,
+      createdAt: '2026-05-20T10:31:00.000Z'
+    });
+
+    const insertCall = executor.calls.find((call) => call.sql.includes('insert into friend_shared_deal_signals'));
+    assert.match(insertCall?.sql ?? '', /on conflict \(signal_id\) do update/);
+    assert.deepEqual(insertCall?.params, [
+      'friend-share-1',
+      'user-1',
+      'coffee',
+      'friend-1',
+      'Ada',
+      'friend',
+      '2026-05-20T10:30:00.000Z',
+      0.87,
+      true,
+      82,
+      '2026-05-20T10:31:00.000Z'
+    ]);
+    assert.deepEqual(await repo.listFriendSharedDealSignals('user-1'), [
+      {
+        signalId: 'friend-share-1',
+        userId: 'user-1',
+        productId: 'coffee',
+        sharedByUserId: 'friend-1',
+        sharedByDisplayName: 'Ada',
+        relationship: 'friend',
+        sharedAt: '2026-05-20T10:30:00.000Z',
+        sourceConfidence: 0.87,
+        optedIn: true,
+        dealScore: 82,
+        createdAt: '2026-05-20T10:31:00.000Z'
+      }
+    ]);
   });
 
   it('persists and reads subscription entitlements with parameterized billing identifiers', async () => {
@@ -1174,6 +1240,7 @@ describe('createPostgresCatalogReader', () => {
 
     assert.match(executor.calls[0]!.sql, /from products/);
     assert.match(executor.calls[0]!.sql, /where slug = \$1/);
+    assert.match(executor.calls[0]!.sql, /products\.deleted_at is null/);
     assert.deepEqual(executor.calls[0]!.params, ['bryggkaffe-450g']);
   });
 
@@ -1212,6 +1279,7 @@ describe('createPostgresCatalogReader', () => {
     assert.match(executor.calls[0]!.sql, /cross join \(select nullif\(trim\(\$1::text\), ''\) as term\) as query/);
     assert.match(executor.calls[0]!.sql, /products\.barcode = query\.term/);
     assert.match(executor.calls[0]!.sql, /products\.canonical_name % query\.term/);
+    assert.match(executor.calls[0]!.sql, /products\.deleted_at is null/);
     assert.match(executor.calls[0]!.sql, /aliases\.normalized_alias % lower\(query\.term\)/);
     assert.match(executor.calls[0]!.sql, /category_path @> \$2::text\[\]/);
     assert.match(executor.calls[0]!.sql, /when products\.barcode = query\.term then 0/);
@@ -1386,6 +1454,7 @@ describe('createPostgresCatalogReader', () => {
     assert.match(executor.calls[0]!.sql, /left join latest_prices on latest_prices\.product_id = products\.id/);
     assert.match(executor.calls[0]!.sql, /left join chains on chains\.id = latest_prices\.chain_id/);
     assert.match(executor.calls[0]!.sql, /left join stores on stores\.id = latest_prices\.store_id/);
+    assert.match(executor.calls[0]!.sql, /products\.deleted_at is null/);
     assert.match(executor.calls[0]!.sql, /array_agg\(distinct replace\(chains\.slug, '-', '_'\)\)/);
     assert.match(executor.calls[0]!.sql, /array_agg\(distinct latest_prices\.price_type\)/);
     assert.match(executor.calls[0]!.sql, /latest_prices\.price_type/);
@@ -2127,6 +2196,7 @@ describe('createPostgresSiteSnapshotReader', () => {
     assert.match(executor.calls[0]!.sql, /latest_prices\.is_available/);
     assert.match(executor.calls[0]!.sql, /observations\.is_available/);
     assert.match(executor.calls[0]!.sql, /join products on products\.id = latest_prices\.product_id/);
+    assert.match(executor.calls[0]!.sql, /products\.deleted_at is null/);
     assert.match(executor.calls[0]!.sql, /join chains on chains\.id = latest_prices\.chain_id/);
     assert.match(executor.calls[0]!.sql, /left join stores on stores\.id = latest_prices\.store_id/);
     assert.match(executor.calls[0]!.sql, /latest_prices\.confidence >= \$1/);
@@ -2174,6 +2244,7 @@ describe('createPostgresWeeklyPriceDropDigestReader', () => {
     assert.match(executor.calls[0]!.sql, /weekly_price_drop_digest/);
     assert.match(executor.calls[0]!.sql, /from latest_prices/);
     assert.match(executor.calls[0]!.sql, /join products on products\.id = latest_prices\.product_id/);
+    assert.match(executor.calls[0]!.sql, /products\.deleted_at is null/);
     assert.match(executor.calls[0]!.sql, /left join stores on stores\.id = latest_prices\.store_id/);
     assert.match(executor.calls[0]!.sql, /latest_prices\.domain = 'grocery'/);
     assert.match(executor.calls[0]!.sql, /latest_prices\.observed_at >= \$1::timestamptz/);
@@ -2329,6 +2400,7 @@ describe('createPostgresTrendingPriceChangeReader', () => {
     assert.match(executor.calls[0]!.sql, /from observations/);
     assert.match(executor.calls[0]!.sql, /lag\(observations\.price\) over/);
     assert.match(executor.calls[0]!.sql, /observations\.domain = 'grocery'/);
+    assert.match(executor.calls[0]!.sql, /products\.deleted_at is null/);
     assert.match(executor.calls[0]!.sql, /observations\.observed_at >= \(\$1::timestamptz - interval '31 days'\)/);
     assert.match(executor.calls[0]!.sql, /observed_at >= \$1::timestamptz/);
     assert.match(executor.calls[0]!.sql, /limit \$3/);
@@ -2385,7 +2457,7 @@ describe('createPostgresPriceReader', () => {
     assert.deepEqual(
       await reader.listPriceObservationHistory({
         productId: 'product-1',
-        chainId: 'chain-1',
+        chainIds: ['chain-1', 'chain-2'],
         storeId: 'store-1',
         priceType: 'promotion',
         observedFrom: '2026-05-01T00:00:00.000Z',
@@ -2442,15 +2514,19 @@ describe('createPostgresPriceReader', () => {
     assert.match(executor.calls[0]!.sql, /\$2::uuid is null or chain_id = \$2::uuid/);
     assert.match(executor.calls[0]!.sql, /\$3::uuid is null or store_id = \$3::uuid/);
     assert.match(executor.calls[0]!.sql, /\$4::text is null or price_type = \$4/);
+    assert.match(executor.calls[0]!.sql, /cardinality\(\$8::uuid\[\]\) = 0 or chain_id = any\(\$8::uuid\[\]\)/);
+    assert.match(executor.calls[0]!.sql, /cardinality\(\$9::uuid\[\]\) = 0 or store_id = any\(\$9::uuid\[\]\)/);
     assert.match(executor.calls[0]!.sql, /order by observed_at desc, chain_id, store_id, price_type, id/);
     assert.deepEqual(executor.calls[0]!.params, [
       'product-1',
-      'chain-1',
+      null,
       'store-1',
       'promotion',
       '2026-05-01T00:00:00.000Z',
       '2026-05-31T23:59:59.000Z',
-      20
+      20,
+      ['chain-1', 'chain-2'],
+      []
     ]);
   });
 
@@ -2461,7 +2537,7 @@ describe('createPostgresPriceReader', () => {
     await reader.listPriceObservationHistory({ productId: 'product-1', limit: 5000 });
     await reader.listPriceObservationHistory({ productId: 'product-1', limit: 0 });
 
-    assert.deepEqual(executor.calls[0]!.params, ['product-1', null, null, null, null, null, 1000]);
-    assert.deepEqual(executor.calls[1]!.params, ['product-1', null, null, null, null, null, 1]);
+    assert.deepEqual(executor.calls[0]!.params, ['product-1', null, null, null, null, null, 1000, [], []]);
+    assert.deepEqual(executor.calls[1]!.params, ['product-1', null, null, null, null, null, 1, [], []]);
   });
 });

@@ -13,7 +13,7 @@ describe('SUPPORTED_PRICE_DOMAINS', () => {
     assert.equal(fuel?.status, 'active');
     assert.equal(pharmacy?.status, 'foundation');
     assert.ok(fuel?.seedItems.some((item) => item.id === 'fuel-95-e10' && item.matchKey === 'fuel_grade'));
-    assert.equal(fuel?.seedItems.some((item) => item.id === 'fuel-adblue'), false);
+    assert.ok(fuel?.seedItems.some((item) => item.id === 'fuel-adblue' && item.comparableUnit === 'l'));
     assert.ok(pharmacy?.seedItems.some((item) => item.id === 'otc-pharmacy' && item.matchKey === 'ean'));
     assert.match(fuel?.priceClaimBoundary ?? '', /operator public price pages/);
     assert.match(pharmacy?.priceClaimBoundary ?? '', /No pharmacy price/);

@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
 const printCssUrl = new URL('../../apps/web/src/app/[country]/my-flyer/print.css', import.meta.url);
-const printImportUrl = new URL('../../apps/web/src/app/[city]/my-flyer/print-import.css', import.meta.url);
-const pageUrl = new URL('../../apps/web/src/app/[city]/my-flyer/page.tsx', import.meta.url);
+const printImportUrl = new URL('../../apps/web/src/app/[country]/my-flyer/print-import.css', import.meta.url);
+const pageUrl = new URL('../../apps/web/src/app/[country]/my-flyer/page.tsx', import.meta.url);
 
 describe('MyFlyer print stylesheet', () => {
   it('imports the country print stylesheet only for print media', async () => {

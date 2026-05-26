@@ -4,7 +4,7 @@ import { useId, useState } from "react";
 
 import { communityReviewSummaryForProduct } from "@/lib/community-reviews";
 import { getStoreProductStockFreshness, type StockFreshnessStatus } from "@/lib/freshness";
-import { sourceDiscrepancyReportOptions, storeProductStockFreshnessExamples } from "@/lib/verified-data";
+import { sourceDiscrepancyReportOptions, storeProductStockFreshnessExamples } from "@/lib/review-contracts";
 
 type FreshnessVote = "fresh" | "outdated";
 type SourceDiscrepancyType = typeof sourceDiscrepancyReportOptions[number]["id"];

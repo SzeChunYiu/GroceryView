@@ -7,6 +7,7 @@ import {
   myFlyerCountries,
   type MyFlyerQuery
 } from '@/lib/my-flyer';
+import { privateAccountCacheControl } from '@/lib/cache-policy';
 
 const userIdSchema = z.string().trim().min(1).max(128).regex(/^[A-Za-z0-9._:-]+$/);
 
@@ -53,7 +54,7 @@ export function GET(request: Request) {
 
   return NextResponse.json(payload, {
     headers: {
-      'Cache-Control': 'private, max-age=3600',
+      'Cache-Control': privateAccountCacheControl,
       'X-MyFlyer-Cache': cacheStatus
     }
   });

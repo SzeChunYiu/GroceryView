@@ -11,6 +11,15 @@ export type MathemProduct = {
   imageUrl: string;
   productUrl: string;
   available: boolean;
+  country: 'SE';
+  currency: 'SEK';
+  chain: 'mathem';
+  mathem_tier: 'spot' | 'subscription';
+  channel: 'online';
+  is_coupon_price: boolean;
+  is_subscription_price: boolean;
+  is_clearance: boolean;
+  multi_buy: string;
   sourceUrl: string;
   retrievedAt: string;
 };
@@ -30,6 +39,15 @@ type MathemSearchProduct = {
     grossUnitPrice?: unknown;
     unitPriceQuantityAbbreviation?: unknown;
     currency?: unknown;
+    campaignLabel?: unknown;
+    promotionLabel?: unknown;
+    badgeText?: unknown;
+    offerText?: unknown;
+    maxQuantityText?: unknown;
+    isCouponPrice?: unknown;
+    requiresCoupon?: unknown;
+    isSubscriptionPrice?: unknown;
+    isClearance?: unknown;
     availability?: { isAvailable?: unknown };
     images?: Array<{ thumbnail?: { url?: unknown }; large?: { url?: unknown } }>;
   };
@@ -342,6 +360,7 @@ export function normalizeMathemProduct(
 
   const unitPrice = numberFromText(attributes.grossUnitPrice);
   const unit = text(attributes.unitPriceQuantityAbbreviation);
+  const mathemTier = attributes.isSubscriptionPrice === true ? 'subscription' : 'spot';
   return {
     code,
     name,
@@ -355,9 +374,42 @@ export function normalizeMathemProduct(
     imageUrl: text(attributes.images?.[0]?.thumbnail?.url) || text(attributes.images?.[0]?.large?.url),
     productUrl: absoluteMathemUrl(attributes.frontUrl ?? attributes.absoluteUrl),
     available: attributes.availability?.isAvailable === true,
+    country: 'SE',
+    currency: 'SEK',
+    chain: 'mathem',
+    mathem_tier: mathemTier,
+    channel: 'online',
+    is_coupon_price: isMathemCouponPrice(attributes),
+    is_subscription_price: mathemTier === 'subscription',
+    is_clearance: attributes.isClearance === true || /klipp|utförsäljning|kort datum/i.test(mathemPromotionText(attributes)),
+    multi_buy: mathemMultiBuy(attributes),
     sourceUrl,
     retrievedAt
   };
+}
+
+function isMathemCouponPrice(attributes: NonNullable<MathemSearchProduct['attributes']>): boolean {
+  return attributes.isCouponPrice === true
+    || attributes.requiresCoupon === true
+    || /rabattkod|kupong/i.test(mathemPromotionText(attributes));
+}
+
+function mathemMultiBuy(attributes: NonNullable<MathemSearchProduct['attributes']>): string {
+  const promotionText = mathemPromotionText(attributes);
+  const match = promotionText.match(/(?:\d+\s*för\s*[\d,.]+\s*kr|\d+\s*%\s*vid köp av\s*\d+|3\s*för\s*2|välj\s*&\s*blanda)/i);
+  return match?.[0] ?? '';
+}
+
+function mathemPromotionText(attributes: NonNullable<MathemSearchProduct['attributes']>): string {
+  return [
+    text(attributes.campaignLabel),
+    text(attributes.promotionLabel),
+    text(attributes.badgeText),
+    text(attributes.offerText),
+    text(attributes.maxQuantityText),
+    text(attributes.fullName),
+    text(attributes.name)
+  ].join(' ');
 }
 
 function visit(value: unknown, products: MathemSearchProduct[]): void {

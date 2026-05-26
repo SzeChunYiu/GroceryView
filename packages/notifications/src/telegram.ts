@@ -31,6 +31,12 @@ export type PlanTelegramPriceAlertNotificationsInput = {
   subscriptions: TelegramNotificationSubscription[];
 };
 
+export type PlannedTelegramPriceAlertNotification = {
+  alert: TelegramPriceAlert;
+  subscription: TelegramNotificationSubscription;
+  notification: DeliveryNotification;
+};
+
 function requireSecret(value: string | undefined, name: string): string {
   if (!value?.trim()) throw new Error(`${name} is required.`);
   return value.trim();
@@ -95,11 +101,13 @@ export function createTelegramBotProvider(options: TelegramBotProviderOptions): 
   };
 }
 
-export function planTelegramPriceAlertNotifications(input: PlanTelegramPriceAlertNotificationsInput): DeliveryNotification[] {
+export function planTelegramPriceAlertNotificationDeliveries(
+  input: PlanTelegramPriceAlertNotificationsInput
+): PlannedTelegramPriceAlertNotification[] {
   if (Number.isNaN(Date.parse(input.now))) throw new Error('now must be an ISO date.');
 
   const activeSubscriptions = input.subscriptions.filter((subscription) => subscription.active && subscription.chatId.trim());
-  const notifications: DeliveryNotification[] = [];
+  const notifications: PlannedTelegramPriceAlertNotification[] = [];
 
   for (const alert of input.alerts) {
     if (alert.type !== 'target_price' || alert.trigger.metric !== 'price') continue;
@@ -109,16 +117,24 @@ export function planTelegramPriceAlertNotifications(input: PlanTelegramPriceAler
     for (const subscription of activeSubscriptions) {
       if (subscription.productId !== undefined && subscription.productId !== alert.productId) continue;
       notifications.push({
-        channel: 'telegram',
-        type: 'target_price',
-        title: `${alert.productName} price alert`,
-        body: alert.message,
-        priority: 'high',
-        sendAt: input.now,
-        recipient: subscription.chatId.trim()
+        alert,
+        subscription,
+        notification: {
+          channel: 'telegram',
+          type: 'target_price',
+          title: `${alert.productName} price alert`,
+          body: alert.message,
+          priority: 'high',
+          sendAt: input.now,
+          recipient: subscription.chatId.trim()
+        }
       });
     }
   }
 
   return notifications;
+}
+
+export function planTelegramPriceAlertNotifications(input: PlanTelegramPriceAlertNotificationsInput): DeliveryNotification[] {
+  return planTelegramPriceAlertNotificationDeliveries(input).map((planned) => planned.notification);
 }

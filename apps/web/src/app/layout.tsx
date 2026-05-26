@@ -1,9 +1,12 @@
 import type { Metadata, Viewport } from 'next';
+import { CoreWebVitalsReporter } from '@/components/core-web-vitals-reporter';
 import { PwaInstall } from '@/components/pwa-install';
 import { ConsentManager } from '@/components/consent-manager';
+import { ListToastViewport } from '@/components/Toast';
 import { SkipLink } from '@/components/SkipLink';
 import { EngagementReporter } from '@/lib/engagement';
 import { ServiceWorkerRegistrar } from '@/lib/swRegister';
+import '@/lib/env';
 import { Providers } from './providers';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './globals.css';
@@ -41,6 +44,14 @@ export const metadata: Metadata = {
     statusBarStyle: 'default',
     title: 'GroceryView'
   },
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/pwa-icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/pwa-icon-512.png', sizes: '512x512', type: 'image/png' }
+    ],
+    apple: [{ url: '/pwa-icon-192.png', sizes: '192x192', type: 'image/png' }]
+  },
   other: {
     'mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-capable': 'yes',
@@ -69,20 +80,22 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="sv" suppressHydrationWarning>
       <body>
         <SkipLink />
-        <script
-          dangerouslySetInnerHTML={{ __html: "try{var p=localStorage.getItem('groceryview:theme-preference');if(p==='dark'||(!p&&matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');document.documentElement.style.colorScheme='dark';}}catch(e){}" }}
-        />
-        <script
-          dangerouslySetInnerHTML={{ __html: jsonLd([organizationJsonLd, websiteJsonLd]) }}
-          type="application/ld+json"
-        />
         <div id="main-content" tabIndex={-1}>
+          <script
+            dangerouslySetInnerHTML={{ __html: "try{var p=localStorage.getItem('groceryview:theme-preference');if(p==='dark'||(!p&&matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');document.documentElement.style.colorScheme='dark';}}catch(e){}" }}
+          />
+          <script
+            dangerouslySetInnerHTML={{ __html: jsonLd([organizationJsonLd, websiteJsonLd]) }}
+            type="application/ld+json"
+          />
           <Providers>{children}</Providers>
         </div>
         <ConsentManager />
+        <CoreWebVitalsReporter />
         <EngagementReporter />
         <ServiceWorkerRegistrar />
         <PwaInstall />
+        <ListToastViewport />
       </body>
     </html>
   );

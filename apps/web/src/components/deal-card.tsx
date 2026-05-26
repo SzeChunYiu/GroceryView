@@ -16,6 +16,7 @@ import {
 import type { ConfidenceLevel } from '@/lib/content-style';
 import { buildDealContext, buildDealExplanationPanel, type DealHistoryPoint } from '@/lib/deal-context';
 import { getPriceFreshness, type FreshnessLevel } from '@/lib/freshness';
+import { productImageCdnUrl } from '@/lib/imageCdn';
 import { dealShareUrl } from '@/lib/seo';
 import { PriceDropReason } from '@/components/price-drop-reason';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
@@ -165,7 +166,7 @@ function LazyDealImage({
           loading={priority ? 'eager' : dealCardImagePolicy.loading}
           placeholder={dealCardImagePolicy.placeholder}
           sizes={dealCardImagePolicy.sizes}
-          src={src}
+          src={productImageCdnUrl(src, { width: 384 })}
         />
       ) : (
         <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-slate-100 via-white to-slate-100" aria-hidden="true" />
@@ -332,6 +333,7 @@ export function DealCard({
               observedAt={priceFreshnessObservedAt}
               sampleSize={priceHistory ? priceHistory.length + 1 : undefined}
               verificationLabel={priceVerificationLabel}
+              methodologyHref="/methodology#confidence-labels"
             />
           </div>
           {originalPrice ? (
@@ -399,6 +401,9 @@ export function DealCard({
             </div>
           ))}
         </dl>
+        <a className="mt-3 inline-flex text-xs font-black text-emerald-900 underline decoration-emerald-300 underline-offset-4" href="/methodology#deal-score">
+          Deal Score methodology
+        </a>
       </details>
 
       {originalPrice ? (

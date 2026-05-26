@@ -15,6 +15,7 @@ describe('deal queries', () => {
     assert.match(query.sql, /from latest_prices/i);
     assert.match(query.sql, /observations\.observed_at > \(\$1::timestamptz - interval '30 days'\)/i);
     assert.match(query.sql, /current_prices\.price < rolling_averages\.rolling_average_price/i);
+    assert.match(query.sql, /products\.deleted_at is null/i);
     assert.match(query.sql, /order by discount_percentage desc/i);
     assert.match(query.sql, /lower\(category\) = lower\(\$2::text\)/i);
   });
