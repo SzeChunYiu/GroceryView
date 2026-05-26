@@ -1,5 +1,5 @@
-import { auditIngestedUnitFields, type IngestUnitFields, type UnitNormalizationAuditConfidence } from './ingest/transform';
-import { unitNormalizationQaSeverity, type UnitNormalizationQaIssueKind, type UnitNormalizationQaSeverity } from './unit-normalizer';
+import { auditIngestedUnitFields, type IngestUnitFields, type UnitNormalizationAuditConfidence } from './ingest/transform.ts';
+import { unitNormalizationQaSeverity, type UnitNormalizationQaIssueKind, type UnitNormalizationQaSeverity } from './unit-normalizer.ts';
 
 export type PackageEvidence = {
   packageSize: number;

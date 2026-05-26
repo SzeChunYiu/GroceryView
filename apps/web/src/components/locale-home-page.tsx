@@ -44,8 +44,9 @@ export function localeHomeMetadata(locale: SupportedLocale): Metadata {
 
 export function blockedLocaleMetadata(locale: BlockedLocaleRoute): Metadata {
   const option = localeOptionFor(locale);
-  const title = `${option.label} translation review required | GroceryView`;
-  const description = 'Native-quality translation review required before this language route can show GroceryView copy. No machine-translated prices or source labels are shipped.';
+  const t = groceryTranslator('en');
+  const title = `${option.label} ${t('blocked-locale.metadataTitleSuffix')} | GroceryView`;
+  const description = t('blocked-locale.metadataDescription');
 
   return {
     metadataBase: new URL(siteUrl),
