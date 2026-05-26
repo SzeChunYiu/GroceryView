@@ -10,6 +10,7 @@ import '@/lib/env';
 import { Providers } from './providers';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './globals.css';
+import '../styles/design-system.css';
 import '@/styles/print.css';
 import '../styles/a11y.css';
 

@@ -3,8 +3,10 @@
 @tailwind utilities;
 
 :root {
-  --gv-page-bg: #f5f1e8;
-  --gv-page-fg: #0f172a;
+  /* Bridged to the v3 editorial-terminal tokens (see design-system.css).
+     Fallbacks keep unconverted pages safe if the design layer fails to load. */
+  --gv-page-bg: var(--bg, #f5f1e8);
+  --gv-page-fg: var(--ink, #0f172a);
   color-scheme: light;
   background: var(--gv-page-bg);
   color: var(--gv-page-fg);
