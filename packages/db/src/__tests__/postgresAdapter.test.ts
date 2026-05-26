@@ -2036,6 +2036,10 @@ describe('createPostgresPriceObservationWriter', () => {
 
       async query<T>(sql: string, params: unknown[] = []) {
         this.calls.push({ sql, params });
+        const trimmed = sql.trim().toLowerCase();
+        if (trimmed === 'begin' || trimmed === 'commit' || trimmed === 'rollback') {
+          return [] as T[];
+        }
         const rows = JSON.parse(String(params[0])) as Array<{ ordinal: number }>;
         return rows.map((row) => ({ ordinal: row.ordinal, id: `observation-${row.ordinal + 1}` })) as T[];
       }
@@ -2089,37 +2093,43 @@ describe('createPostgresPriceObservationWriter', () => {
       { observationIds: ['observation-1', 'observation-2'] }
     );
 
-    assert.equal(executor.calls.length, 1);
-    assert.match(executor.calls[0]!.sql, /from jsonb_to_recordset\(\$1::jsonb\)/);
-    assert.match(executor.calls[0]!.sql, /price numeric\(12, 2\)/);
-    assert.match(executor.calls[0]!.sql, /unit_price numeric\(12, 4\)/);
-    assert.match(executor.calls[0]!.sql, /is_available boolean/);
-    assert.match(executor.calls[0]!.sql, /confidence numeric\(5, 4\)/);
-    assert.match(executor.calls[0]!.sql, /domain text/);
-    assert.match(executor.calls[0]!.sql, /partition by product_id, chain_id, store_id, domain, price_type, observed_at, retailer_product_ref, price, unit_price, currency, is_available, confidence, provenance/);
-    assert.match(executor.calls[0]!.sql, /join observations on observations\.product_id = ranked_input\.product_id/);
-    assert.match(executor.calls[0]!.sql, /and observations\.domain = ranked_input\.domain/);
-    assert.match(executor.calls[0]!.sql, /and observations\.retailer_product_ref is not distinct from ranked_input\.retailer_product_ref/);
-    assert.match(executor.calls[0]!.sql, /and observations\.price = ranked_input\.price/);
-    assert.match(executor.calls[0]!.sql, /and observations\.unit_price = ranked_input\.unit_price/);
-    assert.match(executor.calls[0]!.sql, /and observations\.currency = ranked_input\.currency/);
-    assert.match(executor.calls[0]!.sql, /and observations\.is_available = ranked_input\.is_available/);
-    assert.match(executor.calls[0]!.sql, /and observations\.confidence = ranked_input\.confidence/);
-    assert.match(executor.calls[0]!.sql, /and observations\.provenance = ranked_input\.provenance/);
-    assert.match(executor.calls[0]!.sql, /where input_rank = 1/);
-    assert.match(executor.calls[0]!.sql, /and not exists/);
-    const observationsInsertSql = executor.calls[0]!.sql.slice(
-      executor.calls[0]!.sql.indexOf('insert into observations'),
-      executor.calls[0]!.sql.indexOf('),\n         written as')
+    // Both input rows fit in one default-sized batch (1000), so the writer
+    // issues exactly one data query, wrapped in a single begin/commit so the
+    // connector's observations are persisted atomically.
+    assert.equal(executor.calls.length, 3);
+    assert.equal(executor.calls[0]!.sql.trim().toLowerCase(), 'begin');
+    assert.equal(executor.calls[2]!.sql.trim().toLowerCase(), 'commit');
+    const dataCall = executor.calls[1]!;
+    assert.match(dataCall.sql, /from jsonb_to_recordset\(\$1::jsonb\)/);
+    assert.match(dataCall.sql, /price numeric\(12, 2\)/);
+    assert.match(dataCall.sql, /unit_price numeric\(12, 4\)/);
+    assert.match(dataCall.sql, /is_available boolean/);
+    assert.match(dataCall.sql, /confidence numeric\(5, 4\)/);
+    assert.match(dataCall.sql, /domain text/);
+    assert.match(dataCall.sql, /partition by product_id, chain_id, store_id, domain, price_type, observed_at, retailer_product_ref, price, unit_price, currency, is_available, confidence, provenance/);
+    assert.match(dataCall.sql, /join observations on observations\.product_id = ranked_input\.product_id/);
+    assert.match(dataCall.sql, /and observations\.domain = ranked_input\.domain/);
+    assert.match(dataCall.sql, /and observations\.retailer_product_ref is not distinct from ranked_input\.retailer_product_ref/);
+    assert.match(dataCall.sql, /and observations\.price = ranked_input\.price/);
+    assert.match(dataCall.sql, /and observations\.unit_price = ranked_input\.unit_price/);
+    assert.match(dataCall.sql, /and observations\.currency = ranked_input\.currency/);
+    assert.match(dataCall.sql, /and observations\.is_available = ranked_input\.is_available/);
+    assert.match(dataCall.sql, /and observations\.confidence = ranked_input\.confidence/);
+    assert.match(dataCall.sql, /and observations\.provenance = ranked_input\.provenance/);
+    assert.match(dataCall.sql, /where input_rank = 1/);
+    assert.match(dataCall.sql, /and not exists/);
+    const observationsInsertSql = dataCall.sql.slice(
+      dataCall.sql.indexOf('insert into observations'),
+      dataCall.sql.indexOf('),\n         written as')
     );
     assert.match(
       observationsInsertSql,
       /on conflict \(\s*product_id,\s*chain_id,\s*store_id,\s*domain,\s*retailer_product_ref,\s*price_type,\s*observed_at,\s*price,\s*unit_price,\s*currency,\s*is_available,\s*confidence,\s*provenance\s*\) do nothing/
     );
-    assert.match(executor.calls[0]!.sql, /insert into latest_prices/);
-    assert.match(executor.calls[0]!.sql, /where latest_prices\.observed_at <= excluded\.observed_at/);
+    assert.match(dataCall.sql, /insert into latest_prices/);
+    assert.match(dataCall.sql, /where latest_prices\.observed_at <= excluded\.observed_at/);
 
-    const payload = JSON.parse(String(executor.calls[0]!.params[0])) as Array<Record<string, unknown>>;
+    const payload = JSON.parse(String(dataCall.params[0])) as Array<Record<string, unknown>>;
     assert.deepEqual(payload.map((row) => row.ordinal), [0, 1]);
     assert.deepEqual(payload[0], {
       ordinal: 0,
@@ -2130,6 +2140,8 @@ describe('createPostgresPriceObservationWriter', () => {
       source_run_id: '00000000-0000-0000-0000-000000000004',
       raw_record_id: '00000000-0000-0000-0000-000000000005',
       retailer_product_ref: 'wil-zoegas-450',
+      origin_country: null,
+      cert_level: null,
       price_type: 'online',
       price: 49.9,
       regular_price: 69.9,
@@ -2150,6 +2162,53 @@ describe('createPostgresPriceObservationWriter', () => {
     });
     assert.equal(payload[1]!.observed_at, '2026-05-22T03:17:00.000Z');
     assert.equal(payload[1]!.price, 47.9);
+  });
+
+  it('splits large connector batches into multiple bounded queries while preserving ordinal -> id mapping', async () => {
+    class BatchRecordingExecutor implements QueryExecutor {
+      dataCalls: Array<Array<{ ordinal: number }>> = [];
+
+      async query<T>(sql: string, params: unknown[] = []) {
+        const trimmed = sql.trim().toLowerCase();
+        if (trimmed === 'begin' || trimmed === 'commit' || trimmed === 'rollback') {
+          return [] as T[];
+        }
+        const rows = JSON.parse(String(params[0])) as Array<{ ordinal: number }>;
+        this.dataCalls.push(rows);
+        // ids encode the per-batch-local ordinal to prove the caller offsets correctly.
+        return rows.map((row) => ({ ordinal: row.ordinal, id: `obs-${row.ordinal}` })) as T[];
+      }
+    }
+
+    const previous = process.env.GROCERYVIEW_DAILY_PERSIST_BATCH_SIZE;
+    process.env.GROCERYVIEW_DAILY_PERSIST_BATCH_SIZE = '2';
+    try {
+      const executor = new BatchRecordingExecutor();
+      const writer = createPostgresPriceObservationWriter(executor);
+      const observations = Array.from({ length: 5 }, (_, index) => ({
+        productId: `00000000-0000-0000-0000-00000000000${index + 1}`,
+        chainId: '00000000-0000-0000-0000-0000000000aa',
+        priceType: 'online' as const,
+        price: 10 + index,
+        unitPrice: 10 + index,
+        observedAt: '2026-05-22T03:17:00.000Z',
+        confidence: 0.9,
+        provenance: { connectorId: 'large-connector' }
+      }));
+
+      const result = await writer.upsertConnectorPriceObservations(observations);
+
+      // 5 rows / batch size 2 => 3 bounded queries (2, 2, 1).
+      assert.equal(executor.dataCalls.length, 3);
+      assert.deepEqual(executor.dataCalls.map((call) => call.length), [2, 2, 1]);
+      // Each batch numbers its ordinals from 0; the writer offsets them globally.
+      assert.deepEqual(executor.dataCalls[2]!.map((row) => row.ordinal), [0]);
+      // observationIds remain in the original input order across batch boundaries.
+      assert.deepEqual(result.observationIds, ['obs-0', 'obs-1', 'obs-0', 'obs-1', 'obs-0']);
+    } finally {
+      if (previous === undefined) delete process.env.GROCERYVIEW_DAILY_PERSIST_BATCH_SIZE;
+      else process.env.GROCERYVIEW_DAILY_PERSIST_BATCH_SIZE = previous;
+    }
   });
 });
 

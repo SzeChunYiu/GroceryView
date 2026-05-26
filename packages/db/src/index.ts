@@ -4450,6 +4450,37 @@ export function createPostgresSourceRecordReader(executor: QueryExecutor): Postg
   };
 }
 
+const DEFAULT_DAILY_PERSIST_BATCH_SIZE = 1000;
+
+/**
+ * Resolve the per-query batch size for chunked daily-ingestion persistence.
+ *
+ * The connector-level price-observation upsert feeds its input rows into a
+ * single `jsonb_to_recordset(...)` query. For large connectors (e.g. ICA with
+ * ~97,800 rows) one monolithic query plans/executes for many minutes and
+ * effectively hangs. Splitting the input into bounded batches keeps every
+ * query small and predictable while preserving identical upsert semantics.
+ *
+ * Configurable via `GROCERYVIEW_DAILY_PERSIST_BATCH_SIZE` (default 1000).
+ */
+function resolveDailyPersistBatchSize(): number {
+  const raw = process.env.GROCERYVIEW_DAILY_PERSIST_BATCH_SIZE;
+  if (raw === undefined || raw.trim() === '') return DEFAULT_DAILY_PERSIST_BATCH_SIZE;
+  const parsed = Number.parseInt(raw, 10);
+  if (!Number.isFinite(parsed) || parsed < 1) return DEFAULT_DAILY_PERSIST_BATCH_SIZE;
+  return parsed;
+}
+
+/** Split an array into contiguous batches of at most `size` elements. */
+function batchRows<T>(rows: readonly T[], size: number): T[][] {
+  const safeSize = Number.isFinite(size) && size >= 1 ? Math.floor(size) : DEFAULT_DAILY_PERSIST_BATCH_SIZE;
+  const batches: T[][] = [];
+  for (let index = 0; index < rows.length; index += safeSize) {
+    batches.push(rows.slice(index, index + safeSize));
+  }
+  return batches;
+}
+
 export function createPostgresPriceObservationWriter(executor: QueryExecutor): PostgresPriceObservationWriter {
   return {
     async recordPriceObservation(observation) {
@@ -4587,7 +4618,51 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
 
     async upsertConnectorPriceObservations(observations) {
       if (observations.length === 0) return { observationIds: [] };
-      const rows = await executor.query<BatchObservationIdRow>(
+      const batchSize = resolveDailyPersistBatchSize();
+      const observationIds: string[] = new Array(observations.length);
+      // Persist all batches for this connector inside a single transaction so
+      // the connector's observations remain atomic (all-or-nothing), matching
+      // the prior single-query behaviour.
+      await executor.query('begin');
+      try {
+        let batchOffset = 0;
+        for (const batch of batchRows(observations, batchSize)) {
+          const rows = await runConnectorPriceObservationBatch(executor, batch);
+          if (rows.length !== batch.length) {
+            throw new Error('Connector price observation upsert did not return an id for every input row');
+          }
+          const idsByOrdinal = new Map(rows.map((row) => [Number(row.ordinal), row.id]));
+          for (let ordinal = 0; ordinal < batch.length; ordinal += 1) {
+            const id = idsByOrdinal.get(ordinal);
+            if (!id) {
+              throw new Error(`Connector price observation upsert did not return an id for input row ${batchOffset + ordinal}`);
+            }
+            observationIds[batchOffset + ordinal] = id;
+          }
+          batchOffset += batch.length;
+        }
+        await executor.query('commit');
+      } catch (error) {
+        await executor.query('rollback');
+        throw error;
+      }
+      return { observationIds };
+    }
+  };
+}
+
+/**
+ * Execute the connector price-observation upsert for a single batch of rows.
+ *
+ * The SQL is identical to the historical monolithic statement; only the input
+ * array is bounded. `ordinal` values are local to the batch (0-based per call),
+ * and the CTE chain references only these local ordinals, so batching is safe.
+ */
+async function runConnectorPriceObservationBatch(
+  executor: QueryExecutor,
+  observations: PriceObservationRecord[]
+): Promise<BatchObservationIdRow[]> {
+  return executor.query<BatchObservationIdRow>(
         `with input as (
            select *
            from jsonb_to_recordset($1::jsonb) as x(
@@ -4926,19 +5001,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
           confidence: observation.confidence,
           provenance: observation.provenance
         })))]
-      );
-      if (rows.length !== observations.length) throw new Error('Connector price observation upsert did not return an id for every input row');
-
-      const idsByOrdinal = new Map(rows.map((row) => [Number(row.ordinal), row.id]));
-      return {
-        observationIds: observations.map((_, ordinal) => {
-          const id = idsByOrdinal.get(ordinal);
-          if (!id) throw new Error(`Connector price observation upsert did not return an id for input row ${ordinal}`);
-          return id;
-        })
-      };
-    }
-  };
+  );
 }
 
 export function createPostgresSiteSnapshotReader(executor: QueryExecutor): PostgresSiteSnapshotReader {

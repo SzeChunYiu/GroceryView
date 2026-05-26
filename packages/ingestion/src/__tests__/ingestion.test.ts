@@ -6115,7 +6115,9 @@ class DailyIngestionExecutor implements QueryExecutor {
 
   async query<T>(sql: string, params: unknown[] = []) {
     this.calls.push({ sql, params });
-    if (sql.trim().toLowerCase() === 'set default_transaction_read_only=off') return [] as T[];
+    const control = sql.trim().toLowerCase();
+    if (control === 'begin' || control === 'commit' || control === 'rollback') return [] as T[];
+    if (control === 'set default_transaction_read_only=off') return [] as T[];
     if (sql.includes('insert into source_runs')) return [{ id: 'source-run-db-1' }] as T[];
     if (sql.includes('update source_runs')) return [{ id: params[0] }] as T[];
     if (sql.includes('from products') && sql.includes('barcode ~')) return [
