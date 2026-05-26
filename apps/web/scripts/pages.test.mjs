@@ -8,6 +8,6 @@ describe('legacy static page generator', () => {
     assert.match(packageJson.scripts.build, /next build/);
     assert.match(packageJson.scripts.build, /--webpack/);
     const app = await readFile(new URL('../src/app/page.tsx', import.meta.url), 'utf8');
-    assert.match(app, /MarketShell/);
+    assert.match(app, /MvpHomePage/);
   });
 });

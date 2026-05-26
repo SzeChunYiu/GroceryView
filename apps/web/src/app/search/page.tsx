@@ -13,12 +13,12 @@ import { buildProductSearchView } from '@/lib/verified-data';
 type SearchPageParams = Record<string, string | string[] | undefined>;
 
 export async function generateMetadata({ searchParams }: { searchParams?: Promise<SearchPageParams> }) {
-  const resolvedSearchParams = await (searchParams ?? Promise.resolve({}));
+  const resolvedSearchParams = await (searchParams ?? Promise.resolve({} as SearchPageParams));
   return hasAppliedCanonicalFilters(resolvedSearchParams) ? metadataForSearch(resolvedSearchParams) : routeMetadata('/search');
 }
 
 export default async function SearchPage({ searchParams }: { searchParams?: Promise<SearchPageParams> }) {
-  const resolvedSearchParams = await (searchParams ?? Promise.resolve({}));
+  const resolvedSearchParams = await (searchParams ?? Promise.resolve({} as SearchPageParams));
   const subscription = buildSavedSearchSubscription({ searchParams: resolvedSearchParams, path: '/search' });
   const query = Array.isArray(resolvedSearchParams.q) ? resolvedSearchParams.q[0] ?? '' : resolvedSearchParams.q ?? '';
   const searchView = buildProductSearchView(resolvedSearchParams);

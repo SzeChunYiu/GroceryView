@@ -29,6 +29,7 @@ const latestChainRowsBySlug = new Map<string, NewProductArrival>();
 for (const row of facetedSearchRows) {
   const existing = latestChainRowsBySlug.get(row.slug);
   const observedAt = row.observedAt;
+  if (!observedAt) continue;
   if (existing && existing.observedAt >= observedAt) continue;
   latestChainRowsBySlug.set(row.slug, {
     slug: row.slug,
@@ -36,10 +37,10 @@ for (const row of facetedSearchRows) {
     brand: row.brand ?? 'Brand not reported',
     categoryLabel: row.categoryPath[0] ?? 'Grocery',
     sourceLabel: `${row.priceType} latest_prices row`,
-    chainLabel: row.chainName,
+    chainLabel: row.chainName ?? 'Unknown chain',
     freshnessLabel: freshnessLabel(observedAt),
     observedAt,
-    badges: [row.chainName, row.categoryPath[0] ?? 'Grocery', freshnessLabel(observedAt)]
+    badges: [row.chainName ?? 'Unknown chain', row.categoryPath[0] ?? 'Grocery', freshnessLabel(observedAt)]
   });
 }
 

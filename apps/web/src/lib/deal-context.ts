@@ -525,11 +525,15 @@ export function buildCouponAwareBasketOptimization({
       const subtotal = stackedItems.reduce((sum, item) => sum + item.basePrice, 0);
       const total = stackedItems.reduce((sum, item) => sum + item.finalPrice, 0);
       const savings = subtotal - total;
-      const substitutionLabels = chosen
+      const substitutionLabels: string[] = chosen
         .filter((choice) => choice.isSubstitute)
         .map((choice) => {
           const fallback = `Swap ${choice.originalItem.name ?? choice.originalItem.id} for ${choice.item.name ?? choice.item.id}`;
-          return 'substitutionLabel' in choice.item && choice.item.substitutionLabel ? choice.item.substitutionLabel : fallback;
+          const label =
+            'substitutionLabel' in choice.item && typeof choice.item.substitutionLabel === 'string'
+              ? choice.item.substitutionLabel
+              : fallback;
+          return label;
         });
 
       return [{

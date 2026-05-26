@@ -1554,8 +1554,32 @@ export type RetailerConnectorParsedProduct = Omit<
   'sourceType' | 'observedAt' | 'parserVersion' | 'rawSnapshotRef' | 'sourceRunId' | 'chainId' | 'sourceUrl'
 > & Partial<Pick<RetailerProductInput, 'sourceType' | 'observedAt' | 'parserVersion' | 'rawSnapshotRef' | 'sourceRunId' | 'chainId' | 'sourceUrl'>>;
 
+export type RetailerConnectorDeadLetter = {
+  sourceRunId: string;
+  connectorId: string;
+  chainId: string;
+  sourceUrl: string;
+  parserVersion: string;
+  errorClass: 'invalid_json' | 'invalid_envelope' | 'invalid_record' | 'parser_exception';
+  retryable: boolean;
+  samplePayloadPointer: string;
+  rawSnapshotRef: string;
+  payloadHash: string;
+  payload: unknown;
+  errorMessage: string;
+  replayPath: string;
+};
+
+export type RetailerConnectorParserResult = {
+  parsed: RetailerConnectorParsedProduct[];
+  deadLetters: RetailerConnectorDeadLetter[];
+};
+
 export type RetailerConnectorFetcher = (plan: RetailerConnectorRunPlan) => RetailerConnectorFetchResult | Promise<RetailerConnectorFetchResult>;
-export type RetailerConnectorParser = (snapshot: RetailerConnectorSnapshot, plan: RetailerConnectorRunPlan) => RetailerConnectorParsedProduct[] | Promise<RetailerConnectorParsedProduct[]>;
+export type RetailerConnectorParser = (
+  snapshot: RetailerConnectorSnapshot,
+  plan: RetailerConnectorRunPlan
+) => RetailerConnectorParsedProduct[] | RetailerConnectorParserResult | Promise<RetailerConnectorParsedProduct[] | RetailerConnectorParserResult>;
 
 export type RetailerConnectorRunInput = RetailerConnectorPlanInput & {
   fetcher: RetailerConnectorFetcher;
@@ -1567,6 +1591,7 @@ export type RetailerConnectorRunResult = {
   plan: RetailerConnectorRunPlan;
   snapshot: RetailerConnectorSnapshot | null;
   ingestion: IngestionBatchPlan;
+  deadLetters: RetailerConnectorDeadLetter[];
   fetchAttempted: boolean;
   parserAttempted: boolean;
   acceptedCount: number;
@@ -2517,6 +2542,7 @@ export async function runRetailerConnector(input: RetailerConnectorRunInput): Pr
     plan,
     snapshot: null,
     ingestion: emptyIngestionBatch(),
+    deadLetters: [],
     fetchAttempted: false,
     parserAttempted: false,
     acceptedCount: 0,
@@ -2539,20 +2565,26 @@ export async function runRetailerConnector(input: RetailerConnectorRunInput): Pr
     const currentSnapshot = snapshot;
     parserAttempted = true;
     const parsed = await input.parser(currentSnapshot, plan);
-    const ingestion = planIngestionBatch(parsed.map((row) => normalizeParsedProduct(row, plan, currentSnapshot)));
-    const requiredActions = ingestion.rejected.length > 0 ? ['review_rejected_connector_records'] : [];
+    const parserResult = Array.isArray(parsed) ? { parsed, deadLetters: [] } : parsed;
+    const ingestion = planIngestionBatch(parserResult.parsed.map((row) => normalizeParsedProduct(row, plan, currentSnapshot)));
+    const totalRejectedCount = ingestion.rejected.length + parserResult.deadLetters.length;
+    const requiredActions = [
+      ...(ingestion.rejected.length > 0 ? ['review_rejected_connector_records'] : []),
+      ...(parserResult.deadLetters.length > 0 ? ['review_ingestion_dead_letters'] : [])
+    ];
 
     return {
-      status: ingestion.accepted.length > 0 || ingestion.rejected.length === 0 ? 'completed' : 'failed',
+      status: ingestion.accepted.length > 0 || totalRejectedCount === 0 ? 'completed' : 'failed',
       plan,
       snapshot,
       ingestion,
+      deadLetters: parserResult.deadLetters,
       fetchAttempted,
       parserAttempted,
       acceptedCount: ingestion.accepted.length,
-      rejectedCount: ingestion.rejected.length,
+      rejectedCount: totalRejectedCount,
       requiredActions,
-      error: ingestion.accepted.length === 0 && ingestion.rejected.length > 0 ? 'Every parsed connector record was rejected.' : undefined
+      error: ingestion.accepted.length === 0 && totalRejectedCount > 0 ? 'Every parsed connector record was rejected.' : undefined
     };
   } catch (error) {
     return {
@@ -2560,6 +2592,7 @@ export async function runRetailerConnector(input: RetailerConnectorRunInput): Pr
       plan,
       snapshot,
       ingestion: emptyIngestionBatch(),
+      deadLetters: [],
       fetchAttempted,
       parserAttempted,
       acceptedCount: 0,
@@ -2670,50 +2703,146 @@ function optionalFuelSource(record: Record<string, unknown>, path: string): Reta
   };
 }
 
-export function parseRetailerProductJsonSnapshot(snapshot: RetailerConnectorSnapshot): RetailerConnectorParsedProduct[] {
+function connectorDeadLetter(input: {
+  snapshot: RetailerConnectorSnapshot;
+  plan: RetailerConnectorRunPlan;
+  errorClass: RetailerConnectorDeadLetter['errorClass'];
+  retryable: boolean;
+  samplePayloadPointer: string;
+  payload: unknown;
+  error: unknown;
+}): RetailerConnectorDeadLetter {
+  const errorMessage = input.error instanceof Error ? input.error.message : String(input.error);
+  return {
+    sourceRunId: input.plan.sourceRunId,
+    connectorId: input.plan.connectorId,
+    chainId: input.plan.chainId,
+    sourceUrl: input.snapshot.sourceUrl,
+    parserVersion: input.plan.provenance.parserVersion,
+    errorClass: input.errorClass,
+    retryable: input.retryable,
+    samplePayloadPointer: input.samplePayloadPointer,
+    rawSnapshotRef: input.snapshot.rawSnapshotRef,
+    payloadHash: contentHashFor(JSON.stringify(input.payload)),
+    payload: input.payload,
+    errorMessage,
+    replayPath: `/admin/sources/dead-letters?sourceRunId=${encodeURIComponent(input.plan.sourceRunId)}&pointer=${encodeURIComponent(input.samplePayloadPointer)}`
+  };
+}
+
+export function parseRetailerProductJsonSnapshotWithDeadLetters(
+  snapshot: RetailerConnectorSnapshot,
+  plan: RetailerConnectorRunPlan
+): RetailerConnectorParserResult {
   let payload: unknown;
   try {
     payload = JSON.parse(snapshot.body) as unknown;
   } catch (error) {
-    throw new Error(`connector snapshot body must be valid JSON: ${error instanceof Error ? error.message : 'unknown parse error'}`);
+    return {
+      parsed: [],
+      deadLetters: [connectorDeadLetter({
+        snapshot,
+        plan,
+        errorClass: 'invalid_json',
+        retryable: true,
+        samplePayloadPointer: '$',
+        payload: snapshot.body.slice(0, 4096),
+        error: new Error(`connector snapshot body must be valid JSON: ${error instanceof Error ? error.message : 'unknown parse error'}`)
+      })]
+    };
   }
 
-  const items = Array.isArray(payload) ? payload : recordFrom(payload, 'payload').items;
-  if (!Array.isArray(items)) throw new Error('payload.items must be an array, or the snapshot body must be an array.');
-
-  return items.map((item, index) => {
-    const path = `items[${index}]`;
-    const record = recordFrom(item, path);
+  let items: unknown;
+  try {
+    items = Array.isArray(payload) ? payload : recordFrom(payload, 'payload').items;
+    if (!Array.isArray(items)) throw new Error('payload.items must be an array, or the snapshot body must be an array.');
+  } catch (error) {
     return {
-      sourceType: optionalString(record, 'sourceType', path) as SourceType | undefined,
-      parserVersion: optionalString(record, 'parserVersion', path),
-      rawSnapshotRef: optionalString(record, 'rawSnapshotRef', path),
-      sourceRunId: optionalString(record, 'sourceRunId', path),
-      chainId: optionalString(record, 'chainId', path),
-      storeId: optionalString(record, 'storeId', path),
-      retailerProductId: optionalString(record, 'retailerProductId', path),
-      rawName: requiredString(record, 'rawName', path),
-      canonicalName: requiredString(record, 'canonicalName', path),
-      productId: requiredString(record, 'productId', path),
-      categoryId: requiredString(record, 'categoryId', path),
-      barcode: optionalString(record, 'barcode', path),
-      fuelGradeId: optionalString(record, 'fuelGradeId', path) as FuelGradeId | undefined,
-      fuelSource: optionalFuelSource(record, path),
-      brand: optionalString(record, 'brand', path),
-      packageSize: requiredNumber(record, 'packageSize', path),
-      packageUnit: requiredString(record, 'packageUnit', path),
-      price: requiredNumber(record, 'price', path),
-      regularPrice: optionalNumber(record, 'regularPrice', path),
-      promoText: optionalString(record, 'promoText', path),
-      memberOnly: optionalBoolean(record, 'memberOnly', path),
-      isAvailable: optionalAvailability(record, path),
-      validFrom: optionalString(record, 'validFrom', path),
-      validUntil: optionalString(record, 'validUntil', path),
-      observedAt: optionalString(record, 'observedAt', path),
-      sourceUrl: optionalString(record, 'sourceUrl', path),
-      imageUrl: optionalString(record, 'imageUrl', path)
+      parsed: [],
+      deadLetters: [connectorDeadLetter({
+        snapshot,
+        plan,
+        errorClass: 'invalid_envelope',
+        retryable: false,
+        samplePayloadPointer: '$.items',
+        payload,
+        error
+      })]
     };
-  });
+  }
+
+  const parsed: RetailerConnectorParsedProduct[] = [];
+  const deadLetters: RetailerConnectorDeadLetter[] = [];
+  for (const [index, item] of items.entries()) {
+    const path = `items[${index}]`;
+    try {
+      const record = recordFrom(item, path);
+      parsed.push({
+        sourceType: optionalString(record, 'sourceType', path) as SourceType | undefined,
+        parserVersion: optionalString(record, 'parserVersion', path),
+        rawSnapshotRef: optionalString(record, 'rawSnapshotRef', path),
+        sourceRunId: optionalString(record, 'sourceRunId', path),
+        chainId: optionalString(record, 'chainId', path),
+        storeId: optionalString(record, 'storeId', path),
+        retailerProductId: optionalString(record, 'retailerProductId', path),
+        rawName: requiredString(record, 'rawName', path),
+        canonicalName: requiredString(record, 'canonicalName', path),
+        productId: requiredString(record, 'productId', path),
+        categoryId: requiredString(record, 'categoryId', path),
+        barcode: optionalString(record, 'barcode', path),
+        fuelGradeId: optionalString(record, 'fuelGradeId', path) as FuelGradeId | undefined,
+        fuelSource: optionalFuelSource(record, path),
+        brand: optionalString(record, 'brand', path),
+        packageSize: requiredNumber(record, 'packageSize', path),
+        packageUnit: requiredString(record, 'packageUnit', path),
+        price: requiredNumber(record, 'price', path),
+        regularPrice: optionalNumber(record, 'regularPrice', path),
+        promoText: optionalString(record, 'promoText', path),
+        memberOnly: optionalBoolean(record, 'memberOnly', path),
+        isAvailable: optionalAvailability(record, path),
+        validFrom: optionalString(record, 'validFrom', path),
+        validUntil: optionalString(record, 'validUntil', path),
+        observedAt: optionalString(record, 'observedAt', path),
+        sourceUrl: optionalString(record, 'sourceUrl', path),
+        imageUrl: optionalString(record, 'imageUrl', path)
+      });
+    } catch (error) {
+      deadLetters.push(connectorDeadLetter({
+        snapshot,
+        plan,
+        errorClass: 'invalid_record',
+        retryable: false,
+        samplePayloadPointer: `$.items[${index}]`,
+        payload: item,
+        error
+      }));
+    }
+  }
+  return { parsed, deadLetters };
+}
+
+function parserFallbackPlan(snapshot: RetailerConnectorSnapshot): RetailerConnectorRunPlan {
+  return {
+    status: 'ready',
+    connectorId: 'normalized-json',
+    chainId: 'unknown',
+    sourceType: 'official_api',
+    runKey: 'unknown:official-api:normalized-json:1970-01-01',
+    sourceRunId: 'source-run:unknown:official-api:normalized-json:1970-01-01',
+    provenance: {
+      sourceType: 'official_api',
+      sourceUrl: snapshot.sourceUrl,
+      capturedAt: snapshot.retrievedAt,
+      parserVersion: 'normalized-json-v1'
+    },
+    requiredActions: []
+  };
+}
+
+export function parseRetailerProductJsonSnapshot(snapshot: RetailerConnectorSnapshot, plan?: RetailerConnectorRunPlan): RetailerConnectorParsedProduct[] {
+  const result = parseRetailerProductJsonSnapshotWithDeadLetters(snapshot, plan ?? parserFallbackPlan(snapshot));
+  if (!plan && result.deadLetters[0]) throw new Error(result.deadLetters[0].errorMessage);
+  return result.parsed;
 }
 
 export type OpenPricesConnectorUrlInput = {
@@ -4571,12 +4700,46 @@ async function persistDailyConnectorOutput(input: {
       });
     }
 
+    for (const [deadLetterIndex, deadLetter] of result.deadLetters.entries()) {
+      rawRecordsToUpsert.push({
+        ordinal: result.ingestion.accepted.length + deadLetterIndex,
+        recordType: 'parser_failure',
+        externalRef: deadLetter.samplePayloadPointer,
+        observedAt: result.plan.provenance.capturedAt,
+        payload: deadLetter.payload,
+        payloadHash: deadLetter.payloadHash,
+        provenance: {
+          sourceType: result.plan.sourceType,
+          sourceUrl: deadLetter.sourceUrl,
+          parserVersion: deadLetter.parserVersion,
+          rawSnapshotRef: deadLetter.rawSnapshotRef,
+          chainId: deadLetter.chainId,
+          cadence: 'daily',
+          connectorId: deadLetter.connectorId,
+          runKey: result.plan.runKey,
+          sourceRunId: deadLetter.sourceRunId,
+          errorClass: deadLetter.errorClass,
+          retryable: deadLetter.retryable,
+          samplePayloadPointer: deadLetter.samplePayloadPointer,
+          samplePayloadHash: deadLetter.payloadHash,
+          errorMessage: deadLetter.errorMessage,
+          replayPath: deadLetter.replayPath,
+          domain
+        }
+      });
+    }
+
     const rawRecordIdsByOrdinal = await upsertRawRecordBatch(rawRecordsToUpsert);
     for (let index = 0; index < observationsToInsert.length; index += 1) {
       const rawRecordId = rawRecordIdsByOrdinal.get(index);
       if (!rawRecordId) throw new Error(`Daily ingestion raw record batch did not return an id for accepted record ${index}`);
       rawRecordIds.push(rawRecordId);
       observationsToInsert[index]!.rawRecordId = rawRecordId;
+    }
+    for (let index = 0; index < result.deadLetters.length; index += 1) {
+      const rawRecordId = rawRecordIdsByOrdinal.get(result.ingestion.accepted.length + index);
+      if (!rawRecordId) throw new Error(`Daily ingestion raw record batch did not return an id for dead-letter record ${index}`);
+      rawRecordIds.push(rawRecordId);
     }
     const insertedObservationIds = (await priceWriter.upsertConnectorPriceObservations(observationsToInsert)).observationIds;
     observationIds.push(...insertedObservationIds);
@@ -4798,7 +4961,7 @@ async function runDailyIngestionConnector(input: {
         storeRetryBaseDelayMs: config.storeRetryBaseDelayMs,
         headers: { accept: 'application/json' }
       }),
-      parser: parseRetailerProductJsonSnapshot
+      parser: parseRetailerProductJsonSnapshotWithDeadLetters
     });
 
     process.stderr.write(`[daily-ingestion] fetched ${config.connectorId}: status=${result.status} accepted=${result.acceptedCount} rejected=${result.rejectedCount}\n`);

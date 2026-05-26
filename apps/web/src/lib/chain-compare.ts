@@ -364,7 +364,9 @@ export function buildChainComparisonTable(
       : 'local bundled chain catalogue; production builds prefer packages/db snapshot rows',
     generatedAt: dbSiteSnapshotGeneratedAt,
     noChainState: buildCompareNoChainStateModel({
-      activeFilters: options.activeFilters ?? COMPARE_CHAIN_ORDER.map((chain) => chain.id),
+      activeFilters: (options.activeFilters
+        ? [...options.activeFilters]
+        : COMPARE_CHAIN_ORDER.map((chain) => chain.id)) as CompareChainId[],
       chainOrder: COMPARE_CHAIN_ORDER,
       generatedCapabilities: options.compareStoreCapabilities ?? dbSiteCompareStoreCapabilities,
       missingProductIds

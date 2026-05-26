@@ -321,7 +321,8 @@ export function buildChainCategoryCoverageGaps(limit = 8): ChainCategoryCoverage
       const observedProducts = products.filter((product) => product.inChains.includes(chainId)).length;
       const gapProducts = Math.max(0, targetProducts - observedProducts);
       const coveragePct = targetProducts > 0 ? observedProducts / targetProducts : 0;
-      const trendDirection = observedProducts >= targetProducts ? 'up' : matchedProducts >= targetProducts * 0.7 ? 'flat' : 'down';
+      const trendDirection: ChainCategoryCoverageGap['trendDirection'] =
+        observedProducts >= targetProducts ? 'up' : matchedProducts >= targetProducts * 0.7 ? 'flat' : 'down';
       const actionLabel = gapProducts === 0
         ? 'Meets target depth'
         : `Need ${gapProducts.toLocaleString('sv-SE')} more ${chainId} row${gapProducts === 1 ? '' : 's'}`;

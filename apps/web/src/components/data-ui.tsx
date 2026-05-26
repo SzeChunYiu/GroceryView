@@ -28,6 +28,13 @@ export function PageShell({ children }: Readonly<{ children: ReactNode }>) {
           <Link className="underline decoration-emerald-300 underline-offset-4" href="/en/privacy">Privacy policy</Link>
           <Link className="underline decoration-emerald-300 underline-offset-4" href="/sv/cookies">Cookiepolicy</Link>
           <Link className="underline decoration-emerald-300 underline-offset-4" href="/en/cookies">Cookie policy</Link>
+          <span className="font-black text-slate-950">Data trust</span>
+          <Link className="underline decoration-emerald-300 underline-offset-4" href="/data-sources">Data sources</Link>
+          <Link className="underline decoration-emerald-300 underline-offset-4" href="/methodology">Methodology</Link>
+          <Link className="underline decoration-emerald-300 underline-offset-4" href="/coverage">Coverage</Link>
+          <Link className="underline decoration-emerald-300 underline-offset-4" href="/confidence">Confidence</Link>
+          <span className="font-black text-slate-950">Contact</span>
+          <Link className="underline decoration-emerald-300 underline-offset-4" href="/contact">Contact</Link>
         </div>
       </footer>
       <BottomNav />

@@ -19,7 +19,7 @@ export function BestTimeBadge({ prediction }: Readonly<{ prediction: BestTimeToB
     <aside className={`mt-6 rounded-[1.75rem] border p-5 shadow-sm ${toneByStatus[prediction.status]}`} data-best-time-to-buy-badge>
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.22em] opacity-75">Best-time-to-buy prediction</p>
+          <p className="text-xs font-black uppercase tracking-[0.22em] opacity-75">Best-time-to-buy · historical observations</p>
           <h2 className="mt-2 text-2xl font-black">{prediction.headline}</h2>
           <p className="mt-2 text-sm font-semibold leading-6">{prediction.windowLabel}</p>
         </div>

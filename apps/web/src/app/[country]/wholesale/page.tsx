@@ -18,11 +18,17 @@ function sek(value: number) {
   return new Intl.NumberFormat('sv-SE', { currency: 'SEK', maximumFractionDigits: 2, style: 'currency' }).format(value);
 }
 
-export function generateMetadata({ params }: { params: { country: string } }) {
-  return routeMetadata(`/${params.country}/wholesale`);
+export async function generateMetadata({ params }: { params: Promise<{ country: string }> }) {
+  const { country } = await params;
+  return routeMetadata({
+    path: `/${country}/wholesale`,
+    title: `Wholesale buyer mode (${country.toUpperCase()}) | GroceryView`,
+    description: 'Compare wholesale pack prices with retail unit equivalents using verified Snabbgross-style bulk rows where available.'
+  });
 }
 
-export default function WholesalePage({ params }: Readonly<{ params: { country: string } }>) {
+export default async function WholesalePage({ params }: Readonly<{ params: Promise<{ country: string }> }>) {
+  const { country: countrySlug } = await params;
   const rows = wholesaleRows.map((row) => {
     const units = packUnits(row.pack);
     const wholesaleUnit = row.b2bPrice / units.amount;
@@ -32,7 +38,7 @@ export default function WholesalePage({ params }: Readonly<{ params: { country: 
 
   return (
     <PageShell>
-      <Eyebrow>{params.country.toUpperCase()} wholesale buyer mode</Eyebrow>
+      <Eyebrow>{countrySlug.toUpperCase()} wholesale buyer mode</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">B2B bulk SKU comparison</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
         Filtered to wholesale-style Snabbgross and bulk listings so buyers can compare B2B pack pricing against retail per-kg/per-L references.

@@ -216,6 +216,22 @@ export const routeMetadataCatalog = {
     description: 'Check off grocery list items while shopping with browser-local checked state that survives refreshes.',
     noIndex: true
   },
+  '/market': {
+    title: 'Grocery market overview | GroceryView',
+    description: 'Chain price indexes, category tables, and biggest movers from verified Swedish grocery observations.'
+  },
+  '/browse': {
+    title: 'Browse grocery categories | GroceryView',
+    description: 'Choose categories and chains to explore verified product search results without fabricated prices.'
+  },
+  '/methodology': {
+    title: 'GroceryView methodology',
+    description: 'How price indexes, deal labels, confidence, freshness, and fail-closed empty states work on GroceryView.'
+  },
+  '/confidence': {
+    title: 'Source confidence | GroceryView',
+    description: 'Understand confidence levels and source coverage behind GroceryView price panels.'
+  },
   '/map': {
     title: 'Sweden grocery store map and price heat overlay | GroceryView',
     description: 'Map verified OSM grocery stores with chain-index marker colors, district heat signals, and cheapest-chain context.'
@@ -387,7 +403,8 @@ export function hasAppliedCanonicalFilters(searchParams: CanonicalFilterSearchPa
 }
 
 export function routeMetadata(route: keyof typeof routeMetadataCatalog | RouteMetadataConfig): Metadata {
-  const config = typeof route === 'string' ? { path: route, ...routeMetadataCatalog[route] } : route;
+  const config: RouteMetadataConfig =
+    typeof route === 'string' ? { path: route, ...routeMetadataCatalog[route] } : route;
   const alternatePath = config.canonicalPath ?? config.path;
   const canonical = absoluteUrl(alternatePath);
   const title = config.title;
@@ -419,7 +436,7 @@ export function routeMetadata(route: keyof typeof routeMetadataCatalog | RouteMe
     other: {
       'x-groceryview-hreflang-boundary': localeNegotiatedCurrentRouteCaveat,
       ...publicCatalogueCacheOther(config.edgeCache, config.path)
-    },
+    } as Metadata['other'],
     openGraph: {
       title,
       description,
