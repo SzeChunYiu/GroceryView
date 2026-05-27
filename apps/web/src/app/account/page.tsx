@@ -7,14 +7,34 @@ import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/componen
 import { DietaryProfileOnboarding } from '@/components/diet-filter-picker';
 import { listShareRoles, accountListSharePermissions } from '@/lib/list-permissions';
 import { dietaryPreferenceOnboardingContract, demoPreferredBrandControls, groupPreferredBrandControls, savedSearchesStorageKey } from '@/lib/personalization';
-import { buildPremiumSavingsForecast } from '@/lib/price-intelligence';
 import { routeMetadata } from '@/lib/seo';
 import { accountSavedShoppingContract, formatSek, savedBasketAutoReorderPlanner } from '@/lib/verified-data';
 import { planAccountDeletion } from '@groceryview/core';
 
 const notificationSubscriptionEndpoint = '/api/notifications/subscription';
+const alertPreferencesEndpoint = '/api/alerts/preferences';
+const allergenPreferencesEndpoint = '/api/account/allergen-preferences';
 const notificationVapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? '';
 const notificationChannelPreferences = ['price-drop-alerts', 'basket-reminders'];
+const adaptiveAlertPreferences = {
+  accountId: 'signed-in-user',
+  cadenceOptions: [
+    { value: 'immediate', label: 'Immediate', detail: 'Direct alerts with per-product dedupe.' },
+    { value: 'daily_digest', label: 'Daily digest', detail: 'One planning bundle for noisy price movement.' },
+    { value: 'weekly_digest', label: 'Weekly digest', detail: 'Aligned with flyer and basket planning cadence.' },
+    { value: 'paused', label: 'Paused', detail: 'Keep the profile but suppress delivery.' }
+  ],
+  channels: [
+    { value: 'email', label: 'Email' },
+    { value: 'push', label: 'Push' },
+    { value: 'in_app_digest', label: 'In-app digest' }
+  ],
+  sensitivityOptions: [
+    { value: 'low', label: 'Low', detail: 'Only high-confidence drops and restock signals.' },
+    { value: 'standard', label: 'Standard', detail: 'Balanced thresholds for weekly grocery planning.' },
+    { value: 'high', label: 'High', detail: 'More responsive alerts for active watchlists.' }
+  ]
+};
 const notificationSubscriptionScript = `(() => {
   const root = document.querySelector('[data-push-preferences]');
   if (!root) return;
@@ -139,7 +159,6 @@ const notificationSubscriptionScript = `(() => {
   refreshState();
 })();`;
 
-const premiumSavingsForecast = buildPremiumSavingsForecast();
 const accountDeletionPlan = planAccountDeletion('signed-in-user');
 const accountDeletionConfirmations = [
   'Confirm the active session belongs to the account owner.',
@@ -164,7 +183,7 @@ export default function AccountPage() {
       <Eyebrow>Account shopping state</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Saved baskets & favorite stores</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
-        GroceryView now surfaces the real account API contract for saved shopping state while keeping private rows available to signed-in shoppers only. The public static build describes the production contract and stays closed when authenticated account records are absent.
+        GroceryView uses the account API as the source of truth for saved shopping state while keeping private rows available to signed-in shoppers only. The public static build describes the production contract and stays closed when authenticated account records are absent.
       </p>
 
 
@@ -220,6 +239,24 @@ export default function AccountPage() {
         <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
           The header SearchBar stores recent searches locally and lets signed-in shoppers pin weekly grocery checks into <code className="rounded bg-white/80 px-1 py-0.5 text-violet-900">{savedSearchesStorageKey}</code>. Saved searches are user-triggered shortcuts, not inferred browsing profiles.
         </p>
+      </Card>
+
+      <Card className="mt-6 border-rose-200 bg-rose-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-rose-800">Allergen avoidance defaults</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight">Product search opens with safety filtering enabled</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+          Signed-in accounts persist allergen avoidance through <code className="rounded bg-white/80 px-1 py-0.5 text-rose-900">{allergenPreferencesEndpoint}</code>. Product search uses that account default only when the URL does not include an explicit <code className="rounded bg-white/80 px-1 py-0.5 text-rose-900">avoidAllergens</code> override.
+        </p>
+        <form action={allergenPreferencesEndpoint} className="mt-4 grid gap-3 rounded-2xl bg-white p-4 shadow-sm sm:grid-cols-[1fr_auto]" method="post">
+          <input name="userId" type="hidden" value="signed-in-user" />
+          <input name="avoidedAllergenTags" type="hidden" value="milk,lactose,gluten,wheat" />
+          <label className="flex items-center gap-2 text-sm font-black text-rose-950">
+            <input defaultChecked name="avoidAllergensByDefault" type="checkbox" value="true" />
+            Enable allergen-risk exclusion by default
+          </label>
+          <button className="rounded-full bg-rose-800 px-4 py-2 text-sm font-black text-white" type="submit">Save default</button>
+          <p className="text-sm leading-6 text-slate-600 sm:col-span-2">Default avoided tags: milk, lactose, gluten, wheat. Shoppers can still turn the filter off from any products URL with <code>avoidAllergens=false</code>.</p>
+        </form>
       </Card>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
@@ -498,6 +535,61 @@ export default function AccountPage() {
         </div>
       </Card>
 
+      <Card className="mt-6 border-cyan-200 bg-cyan-50">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <Eyebrow>Adaptive alert preferences</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Cadence, channel, and sensitivity profile</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+              Signed-in shoppers can store a delivery profile at <code className="rounded bg-white/80 px-1 py-0.5 text-cyan-900">{alertPreferencesEndpoint}</code>. The profile lets alert jobs cap daily interruptions, route delivery through selected channels, and raise confidence thresholds when the shopper chooses a quieter sensitivity.
+            </p>
+          </div>
+          <ConfidenceBadge level="high" label="Over-notification guardrails" sampleSize={adaptiveAlertPreferences.cadenceOptions.length + adaptiveAlertPreferences.channels.length + adaptiveAlertPreferences.sensitivityOptions.length} />
+        </div>
+        <form action={alertPreferencesEndpoint} className="mt-5 grid gap-4 lg:grid-cols-[1fr_0.8fr_0.8fr]" method="post">
+          <input name="accountId" type="hidden" value={adaptiveAlertPreferences.accountId} />
+          <fieldset className="rounded-lg border border-cyan-100 bg-white p-4">
+            <legend className="text-sm font-black text-slate-950">Cadence</legend>
+            <div className="mt-3 grid gap-2">
+              {adaptiveAlertPreferences.cadenceOptions.map((option) => (
+                <label className="rounded-lg bg-cyan-50 p-3 text-sm font-semibold text-slate-700" key={option.value}>
+                  <input className="mr-2" defaultChecked={option.value === 'daily_digest'} name="cadence" type="radio" value={option.value} />
+                  <span className="font-black text-slate-950">{option.label}</span>
+                  <span className="mt-1 block">{option.detail}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <fieldset className="rounded-lg border border-cyan-100 bg-white p-4">
+            <legend className="text-sm font-black text-slate-950">Channels</legend>
+            <div className="mt-3 grid gap-2">
+              {adaptiveAlertPreferences.channels.map((channel) => (
+                <label className="rounded-lg bg-cyan-50 p-3 text-sm font-black text-slate-800" key={channel.value}>
+                  <input className="mr-2" defaultChecked={channel.value !== 'push'} name="channels" type="checkbox" value={channel.value} />
+                  {channel.label}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <fieldset className="rounded-lg border border-cyan-100 bg-white p-4">
+            <legend className="text-sm font-black text-slate-950">Sensitivity</legend>
+            <div className="mt-3 grid gap-2">
+              {adaptiveAlertPreferences.sensitivityOptions.map((option) => (
+                <label className="rounded-lg bg-cyan-50 p-3 text-sm font-semibold text-slate-700" key={option.value}>
+                  <input className="mr-2" defaultChecked={option.value === 'standard'} name="sensitivity" type="radio" value={option.value} />
+                  <span className="font-black text-slate-950">{option.label}</span>
+                  <span className="mt-1 block">{option.detail}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <div className="lg:col-span-3">
+            <button className="rounded-full bg-cyan-950 px-5 py-2.5 text-sm font-black text-white shadow-sm" type="submit">Save alert profile</button>
+            <p className="mt-3 text-xs font-bold text-cyan-950">The API returns the persisted profile with derived maxDailyAlerts and minimumConfidence guardrails.</p>
+          </div>
+        </form>
+      </Card>
+
       <Card
         className="mt-6 border-indigo-200 bg-indigo-50"
         data-account-id="signed-in-user"
@@ -546,7 +638,7 @@ export default function AccountPage() {
 
       <AccountMutationActions />
       <p className="mt-6 rounded-2xl bg-violet-50 p-4 text-sm font-bold text-violet-950">
-        Premium forecast preview: {premiumSavingsForecast.monthlySavingsLabel} estimated monthly savings before checkout. Review the <a className="underline decoration-2 underline-offset-4" href="/pricing#premium-ocr-history">Premium OCR history plan</a> before opening checkout.
+        Premium packaging is visible before checkout with active and coming-soon flags. Review the <a className="underline decoration-2 underline-offset-4" href="/pricing#premium">Premium plan</a> before opening checkout.
       </p>
       <AccountBillingActions />
       <AdDisclosureActions />

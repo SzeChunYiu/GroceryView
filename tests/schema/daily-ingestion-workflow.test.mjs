@@ -100,8 +100,11 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_ATTEMPTS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_ATTEMPTS \|\| '30' \}\}/);
     assert.match(workflow, /GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_BASE_DELAY_MS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_BASE_DELAY_MS \|\| '10000' \}\}/);
     assert.match(workflow, /GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_MAX_DELAY_MS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_MAX_DELAY_MS \|\| '30000' \}\}/);
-    assert.match(workflow, /GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS \|\| '1' \}\}/);
-    assert.match(workflow, /GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS \|\| '1' \}\}/);
+    assert.match(workflow, /GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS \|\| '5' \}\}/);
+    assert.match(workflow, /GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS \|\| '3' \}\}/);
+    assert.match(workflow, /GROCERYVIEW_DB_EFFECTIVE_URL_FILE:\s*\/tmp\/daily-db-effective-database-url\.txt/);
+    assert.match(workflow, /GROCERYVIEW_EFFECTIVE_DATABASE_URL<<EOF/);
+    assert.match(workflow, /env\.GROCERYVIEW_EFFECTIVE_DATABASE_URL \|\| secrets\.DIRECT_DATABASE_URL \|\| secrets\.DATABASE_URL/);
     assert.match(workflow, /supabase_direct_host/);
     assert.match(workflow, /supabase_transaction_pooler/);
     assert.match(workflow, /alternateConnections/);

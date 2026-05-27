@@ -128,8 +128,8 @@ describe('daily DB connectivity diagnostic script', () => {
       { Pool: PoolerFailingDirectReadyPool, sleep: async () => {} }
     );
 
-    assert.equal(result.status, 'blocked');
-    assert.deepEqual(result.blockers, ['database_not_accepting_connections']);
+    assert.equal(result.status, 'ready');
+    assert.equal(result.connectionStrategy, 'supabase_direct_host');
     assert.equal(result.alternateConnections.length, 2);
     assert.equal(result.alternateConnections[0].name, 'supabase_transaction_pooler');
     assert.equal(result.alternateConnections[0].status, 'blocked');
@@ -139,6 +139,7 @@ describe('daily DB connectivity diagnostic script', () => {
     assert.equal(result.alternateConnections[1].host, 'db.dgsoqwanrkqgdichtgzl.supabase.co');
     assert.match(result.alternateConnections[1].action, /Direct Supabase host accepts writes/);
     assert.equal(JSON.stringify(result).includes('super-secret'), false);
+    assert.equal(connections.some((connection) => connection.includes('aws-1-eu-north-1.pooler.supabase.com:5432')), true);
     assert.equal(connections.some((connection) => connection.includes('aws-1-eu-north-1.pooler.supabase.com:6543')), true);
     assert.equal(connections.some((connection) => connection.includes('db.dgsoqwanrkqgdichtgzl.supabase.co:5432')), true);
   });
@@ -568,11 +569,18 @@ describe('daily DB connectivity diagnostic script', () => {
   it('classifies Supabase pooler credential circuit-breaker failures as provider recovery blockers', async () => {
     let attempts = 0;
     class SupabaseCircuitBreakerPool {
+      constructor(config) {
+        this.connectionString = config.connectionString;
+      }
+
       async query() {
         attempts += 1;
-        const error = new Error('(ECIRCUITBREAKER) failed to retrieve database credentials after multiple attempts, new connections are temporarily blocked XX000');
-        error.code = 'ECIRCUITBREAKER';
-        throw error;
+        if (this.connectionString.includes('.pooler.supabase.com')) {
+          const error = new Error('(ECIRCUITBREAKER) failed to retrieve database credentials after multiple attempts, new connections are temporarily blocked XX000');
+          error.code = 'ECIRCUITBREAKER';
+          throw error;
+        }
+        return { rows: [{ ok: 1 }] };
       }
 
       async end() {}
@@ -589,13 +597,14 @@ describe('daily DB connectivity diagnostic script', () => {
       { Pool: SupabaseCircuitBreakerPool, sleep: async () => {} }
     );
 
-    assert.equal(result.status, 'blocked');
+    assert.equal(result.status, 'ready');
+    assert.equal(result.connectionStrategy, 'supabase_direct_host');
     assert.equal(result.attempts, 2);
     assert.deepEqual(result.blockers, ['supabase_pooler_circuit_breaker']);
     assert.equal(result.alternateConnections[0].name, 'supabase_transaction_pooler');
     assert.deepEqual(result.alternateConnections[0].blockers, ['supabase_pooler_circuit_breaker']);
     assert.equal(result.alternateConnections[1].name, 'supabase_direct_host');
-    assert.deepEqual(result.alternateConnections[1].blockers, ['supabase_pooler_circuit_breaker']);
-    assert.equal(attempts, 4);
+    assert.equal(result.alternateConnections[1].status, 'ready');
+    assert.equal(attempts, 5);
   });
 });

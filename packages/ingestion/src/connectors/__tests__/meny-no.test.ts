@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import {
   buildMenyNoSearchUrl,
   fetchMenyNoProducts,
+  MENY_NO_ACCESS_POLICY,
+  MENY_NO_PARSER_VERSION,
   parseMenyNoProducts
 } from '../meny-no.js';
 
@@ -64,6 +66,9 @@ describe('Meny Norway connector fixture parsing', () => {
                         price: { amount: 54.9, formatted: '54,90 kr' },
                         unitPrice: { formatted: '219,60 kr/kg' },
                         unitPriceUnit: 'kg',
+                        validFrom: '2026-05-20',
+                        validTo: '2026-05-26',
+                        isAvailableOnline: true,
                         url: '/varer/drikke/kaffe/evergood-filtermalt-7038010012345',
                         images: [{ url: '/globalassets/produktbilder/7038010012345.jpg' }]
                       },
@@ -112,10 +117,26 @@ describe('Meny Norway connector fixture parsing', () => {
       priceText: '54,90 kr',
       unitPriceText: '219,60 kr/kg',
       unitPriceUnit: 'kg',
+      validFrom: '2026-05-20',
+      validTo: '2026-05-26',
+      onlineAvailability: 'available',
+      availabilityText: '',
       productUrl: 'https://meny.no/varer/drikke/kaffe/evergood-filtermalt-7038010012345',
       imageUrl: 'https://meny.no/globalassets/produktbilder/7038010012345.jpg',
       sourceUrl: buildMenyNoSearchUrl('kaffe'),
-      retrievedAt: RETRIEVED_AT
+      retrievedAt: RETRIEVED_AT,
+      taxonomy: {
+        countryCode: 'NO',
+        market: 'norway_grocery',
+        chainSlug: 'meny-no',
+        retailer: 'MENY',
+        sourceType: 'product_search'
+      },
+      sourceLineage: {
+        source: 'meny_no_product_search',
+        parserVersion: MENY_NO_PARSER_VERSION,
+        access: MENY_NO_ACCESS_POLICY
+      }
     });
   });
 
@@ -130,6 +151,7 @@ describe('Meny Norway connector fixture parsing', () => {
           size: 'ca 1 kg',
           currentPrice: '28,90 kr',
           comparePriceText: '28,90 kr/kg',
+          availabilityText: 'Ikke tilgjengelig i nettbutikken',
           href: '/varer/frukt/bananer-12345',
           imageUrl: 'https://images.meny.no/banan.jpg'
         },
@@ -144,6 +166,10 @@ describe('Meny Norway connector fixture parsing', () => {
     assert.equal(rows[0]?.code, '12345');
     assert.equal(rows[0]?.price, 28.9);
     assert.equal(rows[0]?.unitPriceUnit, 'kg');
+    assert.equal(rows[0]?.onlineAvailability, 'unavailable');
+    assert.equal(rows[0]?.taxonomy.market, 'norway_grocery');
+    assert.equal(rows[0]?.sourceLineage.parserVersion, MENY_NO_PARSER_VERSION);
+    assert.equal(rows[0]?.sourceLineage.access.constraints.some((constraint) => constraint.includes('Trumf')), true);
     assert.equal(rows[0]?.productUrl, 'https://meny.no/varer/frukt/bananer-12345');
   });
 

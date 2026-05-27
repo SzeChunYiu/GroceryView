@@ -3,6 +3,7 @@ import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/c
 import { OcrScanHistoryTimeline } from '@/components/ocr-scan-history-timeline';
 import { BarcodeScanner } from '@/components/barcode-scanner';
 import { ScannerUploadActions } from '@/components/scanner-upload-actions';
+import { mobileStrategyDecision } from '@/lib/mobile-strategy';
 import { barcodeLookupSourceOrder, barcodeMissFallbackProducts, lookupOpenFoodFactsBarcode } from '@/lib/openfoodfacts-catalog';
 import { routeMetadata } from '@/lib/seo';
 import { receiptFedAliasGrowthPlan } from '@/lib/verified-data';
@@ -162,6 +163,42 @@ export default async function ScannerPage({ searchParams }: Readonly<{ searchPar
           <Link className="rounded-full border border-indigo-200 px-4 py-2 text-sm font-black text-indigo-900" href="/list">Current list</Link>
           <Link className="rounded-full border border-indigo-200 px-4 py-2 text-sm font-black text-indigo-900" href="/screener">Nearby deals</Link>
           <Link className="rounded-full border border-indigo-200 px-4 py-2 text-sm font-black text-indigo-900" href="/watchlist">Watchlist</Link>
+        </div>
+      </Card>
+      <Card className="mt-6 border-slate-200 bg-white">
+        <div className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr]">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-500">Mobile strategy decision</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">{mobileStrategyDecision.decision} accepted</h2>
+            <p className="mt-3 text-sm font-semibold leading-6 text-slate-700">{mobileStrategyDecision.summary}</p>
+            <p className="mt-3 text-xs font-black uppercase tracking-[0.16em] text-slate-500">
+              {mobileStrategyDecision.status} on {mobileStrategyDecision.decidedOn} · {mobileStrategyDecision.adr}
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {mobileStrategyDecision.evaluations.map((evaluation) => (
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4" key={evaluation.label}>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-sm font-black text-slate-950">{evaluation.label}</p>
+                  <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-[0.12em] text-slate-600">{evaluation.status}</span>
+                </div>
+                <p className="mt-3 text-sm font-semibold leading-6 text-slate-700">{evaluation.pwaFirst}</p>
+                <p className="mt-3 text-xs font-bold leading-5 text-slate-500">{evaluation.evidence}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="mt-5 rounded-2xl bg-slate-50 p-4">
+          <p className="text-sm font-black text-slate-950">PWA follow-up work</p>
+          <div className="mt-3 grid gap-3 md:grid-cols-2">
+            {mobileStrategyDecision.followUps.map((followUp) => (
+              <div className="rounded-2xl bg-white p-3" key={followUp.id}>
+                <p className="text-sm font-black text-slate-950">{followUp.title}</p>
+                <p className="mt-2 text-xs font-bold uppercase tracking-[0.12em] text-slate-500">{followUp.status}</p>
+                <p className="mt-1 text-xs font-semibold text-slate-600">{followUp.routeOrDriver}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </Card>
       <Card className="mt-6 border-amber-200 bg-amber-50/70">

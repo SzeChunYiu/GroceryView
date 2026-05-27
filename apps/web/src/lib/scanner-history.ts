@@ -1,8 +1,12 @@
+export type CorrectionStatusFilter = 'all' | 'pending' | 'corrected' | 'export_ready';
+export type ScannerCorrectionStatus = Exclude<CorrectionStatusFilter, 'all'> | 'none';
+
 export type ScannerHistoryRow = {
   id: string;
   createdAt: string;
   kind: string;
   status: string;
+  correctionStatus: ScannerCorrectionStatus;
   redactedSummary: string;
   itemCount?: number;
   storeName?: string;
@@ -12,6 +16,17 @@ export type ScannerHistoryRow = {
   listHref?: string;
   reportHref?: string;
 };
+
+export const correctionStatusFilters: ReadonlyArray<{
+  id: CorrectionStatusFilter;
+  label: string;
+  ariaLabel: string;
+}> = [
+  { id: 'all', label: 'All scans', ariaLabel: 'Show all OCR scan history rows' },
+  { id: 'pending', label: 'Pending', ariaLabel: 'Show scans with corrections pending' },
+  { id: 'corrected', label: 'Corrected', ariaLabel: 'Show scans with corrected receipt rows' },
+  { id: 'export_ready', label: 'Export ready', ariaLabel: 'Show scans ready for corrected receipt row export' },
+];
 
 type ScannerHistoryPayload = {
   scans?: unknown;
@@ -31,11 +46,26 @@ function numberField(value: unknown) {
   return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
 }
 
+export function normalizeCorrectionStatus(value: unknown): ScannerCorrectionStatus {
+  if (typeof value !== 'string') return 'none';
+  const normalized = value.trim().toLowerCase().replace(/[\s-]+/g, '_');
+  if (['pending', 'needs_correction', 'correction_pending', 'review_pending'].includes(normalized)) return 'pending';
+  if (['corrected', 'correction_complete', 'reviewed', 'accepted'].includes(normalized)) return 'corrected';
+  if (['export_ready', 'ready_for_export', 'ready_to_export'].includes(normalized)) return 'export_ready';
+  return 'none';
+}
+
+export function filterScannerHistoryByCorrectionStatus(rows: readonly ScannerHistoryRow[], filter: CorrectionStatusFilter) {
+  if (filter === 'all') return rows;
+  return rows.filter((row) => row.correctionStatus === filter);
+}
+
 function normalizeRow(row: unknown, index: number): ScannerHistoryRow {
   const value = row && typeof row === 'object' ? row as Record<string, unknown> : {};
   const createdAt = stringField(value.createdAt ?? value.created_at ?? value.scannedAt, 'Timestamp redacted');
   const kind = stringField(value.kind ?? value.scanKind, 'receipt');
   const status = stringField(value.status, 'processed');
+  const correctionStatus = normalizeCorrectionStatus(value.correctionStatus ?? value.correction_status ?? value.correctionState ?? value.correction_state ?? value.status);
   const productSlug = optionalStringField(value.productSlug ?? value.product_slug ?? value.slug);
   const productParam = productSlug ? encodeURIComponent(productSlug) : undefined;
 
@@ -44,6 +74,7 @@ function normalizeRow(row: unknown, index: number): ScannerHistoryRow {
     createdAt,
     kind,
     status,
+    correctionStatus,
     redactedSummary: stringField(value.redactedSummary ?? value.summary, 'Signed-in scan row available; private receipt details stay redacted.'),
     itemCount: numberField(value.itemCount ?? value.item_count),
     storeName: stringField(value.storeName ?? value.store_name, 'Store redacted'),

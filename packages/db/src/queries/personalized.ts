@@ -1,3 +1,5 @@
+import { ACTIVE_PRODUCTS_PREDICATE } from './items.js';
+
 export type PersonalizedWeeklyDigestQueryExecutor = {
   query<T>(sql: string, params?: unknown[]): Promise<T[]>;
 };
@@ -151,6 +153,7 @@ export function buildPersonalizedWeeklyDigestQuery(options: PersonalizedWeeklyDi
              where latest_prices.domain = 'grocery'
                and coalesce(latest_prices.is_available, true) = true
                and latest_prices.price >= 0
+               and ${ACTIVE_PRODUCTS_PREDICATE}
                and latest_prices.observed_at >= $1::timestamptz
                and latest_prices.observed_at < $2::timestamptz
           )

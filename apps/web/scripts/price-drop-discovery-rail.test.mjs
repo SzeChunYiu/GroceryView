@@ -24,6 +24,8 @@ test('home page exposes a week-over-week price-drop discovery rail', async () =>
   assert.match(trending, /5-9 days earlier/);
   assert.match(trending, /data-price-drop-discovery-card/);
 
-  assert.match(home, /PriceDropDiscoveryRail/);
-  assert.match(home, /<PriceDropDiscoveryRail \/>/);
+  const mvpHome = await read('src/components/mvp/mvp-home-page.tsx');
+  assert.match(home, /MvpHomePage/);
+  assert.match(mvpHome, /PriceDropDiscoveryRail/);
+  assert.match(mvpHome, /<PriceDropDiscoveryRail \/>/);
 });

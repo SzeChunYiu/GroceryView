@@ -327,7 +327,7 @@ function stockUpListResponse(userId: string, rows: MultiWeekStockUpSqlRow[]) {
     rows: rows.map(mapStockUpRow),
     guardrails: stockUpListGuardrails,
     evidence: {
-      sourceTables: ['multi_week_stock_up_rows', 'app_users'],
+      sourceTables: ['multi_week_stock_up_rows', 'weekly_baskets', 'basket_items', 'products', 'latest_prices', 'observations', 'app_users'],
       noForecast: true,
       historicalPriceFields: ['historicalLowUnitPrice', 'typicalUnitPrice', 'confidence', 'historyWindowStart', 'historyWindowEnd']
     }
@@ -701,13 +701,86 @@ export class RealBasketsController {
     if (!this.postgres.isConfigured()) throw new ServiceUnavailableException('DATABASE_URL is required for signed-in stock-up lists.');
   }
 
-  private fetchStockUpRows(userId: string) {
-    return this.postgres.query<MultiWeekStockUpSqlRow>(
+  private async fetchStockUpRows(userId: string) {
+    const savedRows = await this.postgres.query<MultiWeekStockUpSqlRow>(
       `select row_id, user_id, product_id, product_name, store_id, store_name, planning_weeks, weekly_need_units,
          package_units, comparable_unit, current_unit_price, historical_low_unit_price, typical_unit_price,
          confidence, history_window_start, history_window_end, storage_limit_weeks, no_forecast_reason, review_trigger, updated_at
        from multi_week_stock_up_rows
        where user_id = $1
+       order by updated_at desc, row_id`,
+      [userId]
+    );
+    if (savedRows.length > 0) return savedRows;
+
+    return this.postgres.query<MultiWeekStockUpSqlRow>(
+      `with latest_basket as (
+         select id
+         from weekly_baskets
+         where user_id = $1
+         order by week_start desc, id desc
+         limit 1
+       ), basket_lines as (
+         select bi.product_id, bi.quantity
+         from latest_basket lb
+         join basket_items bi on bi.basket_id = lb.id
+       ), latest_rows as (
+         select distinct on (latest_prices.product_id)
+                latest_prices.product_id,
+                latest_prices.store_id,
+                stores.name as store_name,
+                latest_prices.unit_price,
+                latest_prices.observed_at,
+                latest_prices.confidence
+         from latest_prices
+         left join stores on stores.id = latest_prices.store_id
+         where latest_prices.price_type in ('shelf', 'online', 'member', 'promotion')
+           and latest_prices.price > 0
+           and latest_prices.unit_price > 0
+         order by latest_prices.product_id, latest_prices.observed_at desc, latest_prices.unit_price asc
+       ), history_rows as (
+         select observations.product_id,
+                min(observations.unit_price) as historical_low_unit_price,
+                percentile_cont(0.5) within group (order by observations.unit_price) as typical_unit_price,
+                count(*) as observation_count,
+                avg(observations.confidence) as average_confidence,
+                min(observations.observed_at) as history_window_start,
+                max(observations.observed_at) as history_window_end
+         from observations
+         join basket_lines on basket_lines.product_id = observations.product_id
+         where observations.unit_price > 0
+           and observations.price > 0
+           and observations.price_type in ('shelf', 'online', 'member', 'promotion')
+         group by observations.product_id
+         having count(*) >= 2
+       )
+       select products.id::text as row_id,
+              $1 as user_id,
+              products.id::text as product_id,
+              products.canonical_name as product_name,
+              latest_rows.store_id::text as store_id,
+              coalesce(latest_rows.store_name, 'Latest observed store') as store_name,
+              3 as planning_weeks,
+              basket_lines.quantity as weekly_need_units,
+              1 as package_units,
+              coalesce(products.comparable_unit, 'basket unit') as comparable_unit,
+              latest_rows.unit_price as current_unit_price,
+              history_rows.historical_low_unit_price,
+              history_rows.typical_unit_price,
+              case when history_rows.observation_count >= 6 and history_rows.average_confidence >= 0.75 then 'high'
+                   when history_rows.observation_count >= 3 and history_rows.average_confidence >= 0.55 then 'medium'
+                   else 'low'
+              end as confidence,
+              history_rows.history_window_start,
+              history_rows.history_window_end,
+              null as storage_limit_weeks,
+              'Historical low and typical prices are observed persisted price_observations/latest_prices facts only; no future shelf price is predicted.' as no_forecast_reason,
+              'Review current latest_prices rows and visible history coverage before stocking up.' as review_trigger,
+              latest_rows.observed_at as updated_at
+       from basket_lines
+       join products on products.id = basket_lines.product_id
+       join latest_rows on latest_rows.product_id = basket_lines.product_id
+       join history_rows on history_rows.product_id = basket_lines.product_id
        order by updated_at desc, row_id`,
       [userId]
     );

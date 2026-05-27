@@ -12,6 +12,38 @@ export type PricedProduct = {
   observations: PriceObservation[];
 };
 
+export type VerifiedQuantityMetadata = {
+  amount: number;
+  unit: 'kg' | 'l' | 'st';
+  packageLabel: string;
+};
+
+function quantityAmount(value: number, unit: string, packageLabel: string): VerifiedQuantityMetadata | null {
+  if (!Number.isFinite(value) || value <= 0) return null;
+  if (unit === 'kg') return { amount: value, unit: 'kg', packageLabel };
+  if (unit === 'g') return { amount: value / 1000, unit: 'kg', packageLabel };
+  if (unit === 'l') return { amount: value, unit: 'l', packageLabel };
+  if (unit === 'dl') return { amount: value / 10, unit: 'l', packageLabel };
+  if (unit === 'cl') return { amount: value / 100, unit: 'l', packageLabel };
+  if (unit === 'ml') return { amount: value / 1000, unit: 'l', packageLabel };
+  if (['st', 'p', 'pc', 'pcs', 'piece', 'pieces', 'each'].includes(unit)) return { amount: value, unit: 'st', packageLabel };
+  return null;
+}
+
+export function parseVerifiedProductQuantity(quantity: string): VerifiedQuantityMetadata | null {
+  const normalized = quantity.replace(/,/g, '.').toLowerCase().trim();
+  if (!normalized) return null;
+
+  const unitPattern = 'kg|g|l|dl|cl|ml|st|p|pc|pcs|piece|pieces|each';
+  const multiplied = normalized.match(new RegExp(`(\\d+)\\s*(?:x|×)\\s*(\\d+(?:\\.\\d+)?)\\s*(${unitPattern})\\b`));
+  const firstSimple = normalized.match(new RegExp(`(\\d+(?:\\.\\d+)?)\\s*(${unitPattern})\\b`));
+  if (multiplied && (!firstSimple || multiplied.index! < firstSimple.index!)) {
+    return quantityAmount(Number(multiplied[1]) * Number(multiplied[2]), multiplied[3]!, multiplied[0]);
+  }
+  if (!firstSimple) return null;
+  return quantityAmount(Number(firstSimple[1]), firstSimple[2]!, firstSimple[0]);
+}
+
 export const categoryLabels: Record<string,string> = {"dairy": "Dairy", "breakfast": "Breakfast", "bread": "Bread & Bakery", "beverages": "Beverages", "coffee-tea": "Coffee & Tea", "snacks": "Snacks", "sweets": "Sweets & Ice cream", "meat": "Meat & Charcuterie", "fish": "Fish & Seafood", "produce": "Fruit & Vegetables", "frozen": "Frozen", "pantry": "Pantry", "plant-based": "Plant-based", "alcohol": "Wine, Beer & Spirits", "baby": "Baby", "pet": "Pet", "household": "Cleaning & Household", "personal-care": "Personal care"};
 
 export const pricedProducts: PricedProduct[] = [

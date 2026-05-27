@@ -1,3 +1,24 @@
+export type IcaReklambladStructuredPromotion =
+  | {
+      kind: 'multi_buy';
+      quantity: number;
+      price: number;
+      memberOnly: boolean;
+      sourceText: string;
+    }
+  | {
+      kind: 'percent_off';
+      percentOff: number;
+      memberOnly: boolean;
+      sourceText: string;
+    }
+  | {
+      kind: 'member_price';
+      price: number | null;
+      memberOnly: true;
+      sourceText: string;
+    };
+
 export type IcaReklambladOffer = {
   code: string;
   name: string;
@@ -18,6 +39,7 @@ export type IcaReklambladOffer = {
   flyerPdfUrl: string;
   imageUrl: string;
   retrievedAt: string;
+  structuredPromotion: IcaReklambladStructuredPromotion | null;
 };
 
 type IcaWeeklyOffer = {
@@ -217,6 +239,7 @@ export function normalizeIcaReklambladOffer(
   }
 
   const store = offer.stores?.[0];
+  const structuredPromotion = parseIcaReklambladStructuredPromotion(priceText);
   return {
     code,
     name,
@@ -236,8 +259,53 @@ export function normalizeIcaReklambladOffer(
     flyerUrl: context.flyerUrl,
     flyerPdfUrl: context.flyerPdfUrl,
     imageUrl: text(offer.eans?.[0]?.image),
-    retrievedAt: context.retrievedAt
+    retrievedAt: context.retrievedAt,
+    structuredPromotion
   };
+}
+
+export function parseIcaReklambladStructuredPromotion(priceText: string): IcaReklambladStructuredPromotion | null {
+  const sourceText = priceText.trim();
+  if (!sourceText) {
+    return null;
+  }
+  const memberOnly = /\b(?:medlemspris|stammispris|ica\s+stammis)\b/i.test(sourceText);
+  const multiBuy = sourceText.match(/(\d+)\s*(?:för|for)\s*(\d+(?:[,.]\d+)?)/i);
+  if (multiBuy) {
+    return {
+      kind: 'multi_buy',
+      quantity: Number.parseInt(multiBuy[1] ?? '', 10),
+      price: parseSwedishNumber(multiBuy[2]),
+      memberOnly,
+      sourceText
+    };
+  }
+
+  const percentOff = sourceText.match(/(\d+(?:[,.]\d+)?)\s*%\s*(?:rabatt|off)?/i);
+  if (percentOff) {
+    return {
+      kind: 'percent_off',
+      percentOff: parseSwedishNumber(percentOff[1]),
+      memberOnly,
+      sourceText
+    };
+  }
+
+  if (memberOnly) {
+    const price = sourceText.match(/(\d+(?:[,.]\d+)?)(?=\s*(?:kr|:-|\/|$))/i);
+    return {
+      kind: 'member_price',
+      price: price ? parseSwedishNumber(price[1]) : null,
+      memberOnly: true,
+      sourceText
+    };
+  }
+
+  return null;
+}
+
+function parseSwedishNumber(value: string | undefined): number {
+  return Number.parseFloat((value ?? '0').replace(',', '.'));
 }
 
 function parseWeeklyOffers(html: string): IcaWeeklyOffer[] {

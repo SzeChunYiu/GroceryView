@@ -1,6 +1,6 @@
 export type CommunityReviewVote = 'upvote' | 'downvote';
-export type CommunityReportModerationStatus = 'active' | 'reported' | 'under_review' | 'dismissed';
-export type ModerationQueueType = 'flagged_review' | 'price_report' | 'duplicate_product_report';
+export type CommunityReportModerationStatus = 'active' | 'reported' | 'under_review' | 'dismissed' | 'resolved' | 'ignored';
+export type ModerationQueueType = 'flagged_review' | 'flagged_list_comment' | 'price_report' | 'duplicate_product_report';
 
 export type CommunityModerationQueueItem = {
   actionLabel: string;
@@ -17,6 +17,7 @@ export type CommunityModerationQueueItem = {
 
 export function moderationQueueTypeLabel(type: ModerationQueueType): string {
   if (type === 'flagged_review') return 'Flagged review';
+  if (type === 'flagged_list_comment') return 'Flagged list comment';
   if (type === 'duplicate_product_report') return 'Duplicate product report';
   return 'Price report';
 }
@@ -126,6 +127,8 @@ export function reportCommunityPriceReview(
 }
 
 export function moderationStatusLabel(status: CommunityReportModerationStatus | undefined): string {
+  if (status === 'resolved') return 'Resolved';
+  if (status === 'ignored') return 'Ignored';
   if (status === 'under_review') return 'Under moderator review';
   if (status === 'reported') return 'Reported by community';
   if (status === 'dismissed') return 'Report dismissed';
@@ -149,6 +152,18 @@ export const communityModerationQueue: CommunityModerationQueueItem[] = [
     title: `${review.productName} · ${review.priceLabel}`,
     type: 'flagged_review'
   })),
+  {
+    actionLabel: 'Review shopping-list comment',
+    detail: 'Shared list comment was reported for spam-like coupon links and should stay hidden from collaborators until a moderator resolves or ignores the flag.',
+    id: 'queue-list-comment-coupon-spam',
+    priority: 'high',
+    reportCount: 4,
+    status: 'under_review',
+    submittedAt: '2026-05-24T16:45:00.000Z',
+    submittedBy: 'Household list collaborator',
+    title: 'Weekly pasta list comment',
+    type: 'flagged_list_comment'
+  },
   {
     actionLabel: 'Validate price evidence',
     detail: 'Receipt photo and shelf tag disagree on Milk 1L at Lidl Sveavägen before it can update shopper-facing prices.',

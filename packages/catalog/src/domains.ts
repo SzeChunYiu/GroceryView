@@ -54,7 +54,8 @@ export const SUPPORTED_PRICE_DOMAINS: PriceDomain[] = [
       { id: 'fuel-98', label: '98 petrol', comparableUnit: 'l', matchKey: 'fuel_grade' },
       { id: 'fuel-diesel', label: 'Diesel', comparableUnit: 'l', matchKey: 'fuel_grade' },
       { id: 'fuel-hvo100', label: 'HVO100', comparableUnit: 'l', matchKey: 'fuel_grade' },
-      { id: 'fuel-e85', label: 'E85', comparableUnit: 'l', matchKey: 'fuel_grade' }
+      { id: 'fuel-e85', label: 'E85', comparableUnit: 'l', matchKey: 'fuel_grade' },
+      { id: 'fuel-adblue', label: 'AdBlue', comparableUnit: 'l', matchKey: 'fuel_grade' }
     ]
   },
   {

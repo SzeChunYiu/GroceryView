@@ -3,6 +3,21 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const schema = readFileSync(new URL('../../db/schema.sql', import.meta.url), 'utf8').toLowerCase();
+const grocerySchemaMigration = readFileSync(new URL('../../infra/db/migrations/001_groceryview_schema.sql', import.meta.url), 'utf8').toLowerCase();
+
+function normalizedSql(sql) {
+  return sql.replace(/\s+/g, ' ').trim();
+}
+
+function barcodeUniquenessSemantics(sql) {
+  const normalized = normalizedSql(sql);
+  return {
+    uniqueIndexName: /create unique index if not exists products_barcode_unique_idx/.test(normalized),
+    productBarcodeColumn: /create table if not exists products\b[\s\S]*?\bbarcode text\b[\s\S]*?\);/.test(sql),
+    uniqueOnBarcode: /on products\s*\(\s*barcode\s*\)/.test(normalized),
+    partialNonNull: /where barcode is not null/.test(normalized)
+  };
+}
 
 const requiredTables = [
   'chains',
@@ -118,6 +133,8 @@ describe('db/schema.sql', () => {
     assert.match(schema, /fuel-diesel/);
     assert.match(schema, /fuel-hvo100/);
     assert.match(schema, /fuel-e85/);
+    assert.match(schema, /fuel-adblue/);
+    assert.match(schema, /supported_fuel_grade_ids/);
     assert.match(schema, /source_kind in \('operator_public_price_page', 'crowd_station_report'\)/);
     assert.match(schema, /reporter_id text references community_reporter_trust/);
     assert.match(schema, /price_observation_id bigint not null references price_observations/);
@@ -129,6 +146,18 @@ describe('db/schema.sql', () => {
       assert.match(schema, new RegExp(`'${retailerType}'`), `${retailerType} retailer type missing`);
     }
     assert.match(schema, /chains_retailer_type_idx/);
+  });
+
+  it('keeps product barcode uniqueness semantics aligned with the first grocery schema migration', () => {
+    const canonicalSemantics = barcodeUniquenessSemantics(schema);
+    const migrationSemantics = barcodeUniquenessSemantics(grocerySchemaMigration);
+    assert.deepEqual(canonicalSemantics, {
+      uniqueIndexName: true,
+      productBarcodeColumn: true,
+      uniqueOnBarcode: true,
+      partialNonNull: true
+    });
+    assert.deepEqual(migrationSemantics, canonicalSemantics);
   });
 
   it('deduplicates scraper price snapshots by product, store, and observed date', () => {

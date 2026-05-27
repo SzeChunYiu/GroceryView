@@ -13,9 +13,11 @@ export type AllStoreTaskFailure = {
 
 export const ALL_STORE_RUNNER_CHAINWIDE_CATALOG_CONNECTORS = [
   'lloyds-apotek-se-products',
+  'kronans-apotek-se-products',
   'seven-eleven-se-convenience-products',
   'direkten-se-small-store-products',
-  'halal-center-se-kosher-halal-products'
+  'halal-center-se-kosher-halal-products',
+  'mathem-prenumeration-se-products'
 ] as const;
 
 export type AllStoreRunnerChainwideCatalogConnector = typeof ALL_STORE_RUNNER_CHAINWIDE_CATALOG_CONNECTORS[number];

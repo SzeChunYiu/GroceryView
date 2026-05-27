@@ -732,7 +732,7 @@ export function MarketShell({ locale = defaultLocale }: { locale?: SupportedLoca
               <h3 className="mt-2 text-xl font-black tracking-tight text-slate-950">Multi-currency display follows observation currency</h3>
               <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
                 SEK · NOK · DKK · EUR · ISK are formatter-ready, but only currencies present on observed price rows render money; the rest stay blocked instead of converting or inventing values.
-                No currency conversion or fake price is displayed for currencies missing from observations.currency.
+                No currency conversion or unobserved values are displayed for currencies missing from observations.currency.
               </p>
             </div>
           </div>

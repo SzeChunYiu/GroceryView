@@ -14,6 +14,11 @@ export type MatpriskollenOffer = {
   origin: string;
   requiresMembershipCard: boolean;
   requiresCoupon: boolean;
+  channel: 'store';
+  is_member_price: boolean;
+  is_coupon_price: boolean;
+  format: string;
+  multi_buy: string;
   validFrom: string;
   validTo: string;
   sourceUrl: string;
@@ -193,7 +198,8 @@ export async function fetchMatpriskollenOffers(
           retrievedAt,
           storeName: text(payload.storeName) || storeName,
           storeKey,
-          storeId: text(store.id)
+          storeId: text(store.id),
+          regionName: region.name
         });
         if (!row) {
           continue;
@@ -222,6 +228,7 @@ export function normalizeMatpriskollenOffer(
     storeName: string;
     storeKey: string;
     storeId: string;
+    regionName?: string;
   }
 ): MatpriskollenOffer | null {
   const code = text(offer.key ?? offer.id);
@@ -239,7 +246,7 @@ export function normalizeMatpriskollenOffer(
     brand: text(offer.product?.brand),
     store: context.storeName,
     storeKey: text(offer.store_key) || context.storeKey,
-    storeId: text(offer.store_id) || context.storeId,
+    storeId: regionStoreId(text(offer.store_id) || context.storeId, context.regionName),
     category,
     priceText,
     comparePriceText: text(offer.comprice),
@@ -249,6 +256,11 @@ export function normalizeMatpriskollenOffer(
     origin: text(offer.product?.origin),
     requiresMembershipCard: Boolean(offer.requiresMembershipCard),
     requiresCoupon: Boolean(offer.requiresCoupon),
+    channel: 'store',
+    is_member_price: Boolean(offer.requiresMembershipCard),
+    is_coupon_price: Boolean(offer.requiresCoupon),
+    format: storeFormat(context.storeName),
+    multi_buy: multiBuyCondition(text(offer.condition)),
     validFrom: unixSecondsToIso(offer.validFrom),
     validTo: unixSecondsToIso(offer.validTo),
     sourceUrl: context.sourceUrl,
@@ -256,6 +268,30 @@ export function normalizeMatpriskollenOffer(
     imageUrl: text(offer.produkt_bild_urls?.bildUrl ?? offer.imageURL ?? offer.imageUrl),
     retrievedAt: context.retrievedAt
   };
+}
+
+function regionStoreId(storeId: string, regionName?: string): string {
+  return storeId && regionName ? `${storeId}:${regionName}` : storeId;
+}
+
+function storeFormat(storeName: string): string {
+  const normalized = storeName.toLowerCase();
+  if (normalized.includes('ica maxi')) return 'ica-maxi';
+  if (normalized.includes('ica kvantum')) return 'ica-kvantum';
+  if (normalized.includes('ica supermarket')) return 'ica-supermarket';
+  if (normalized.includes('ica nära') || normalized.includes('ica nara')) return 'ica-nara';
+  if (normalized.includes('stora coop')) return 'stora-coop';
+  if (normalized.includes('coop x:-tra') || normalized.includes('coop extra')) return 'coop-xtra';
+  if (normalized.includes('city gross')) return 'city-gross';
+  if (normalized.includes('willys')) return 'willys';
+  if (normalized.includes('lidl')) return 'lidl';
+  if (normalized.includes('hemköp') || normalized.includes('hemkop')) return 'hemkop';
+  if (normalized.includes('coop')) return 'coop';
+  return '';
+}
+
+function multiBuyCondition(condition: string): string {
+  return /(\d+\s*(st|för)\s*|\d+\s*%\s*vid köp av\s*\d+|3\s*för\s*2|2\s*för)/i.test(condition) ? condition : '';
 }
 
 function unixSecondsToIso(value: unknown): string {

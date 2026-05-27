@@ -32,6 +32,12 @@ const defaultCorsAllowedOrigins = [
   'http://127.0.0.1:3000'
 ];
 
+const requiredProductionApiEnv = [
+  'AUTH_SECRET',
+  'GROCERYVIEW_PRODUCTION_URL',
+  'PUBLIC_WEB_URL'
+] as const;
+
 function parseStringList(value: string | undefined): string[] {
   return (value ?? '')
     .split(/[\s,]+/)
@@ -83,7 +89,23 @@ function loadScrapeSchedulerConfig(env: NodeJS.ProcessEnv): ScrapeSchedulerConfi
   };
 }
 
+function missingRequiredProductionEnv(env: NodeJS.ProcessEnv, keys: readonly string[]): string[] {
+  if (env.NODE_ENV !== 'production') return [];
+  return keys.filter((key) => !env[key]?.trim());
+}
+
+export function validateApiStartupEnv(env: NodeJS.ProcessEnv = process.env): void {
+  const missing = missingRequiredProductionEnv(env, requiredProductionApiEnv);
+  if (env.NODE_ENV === 'production' && !(env.PGBOUNCER_DATABASE_URL || env.DATABASE_POOL_URL || env.DATABASE_URL)?.trim()) {
+    missing.push('PGBOUNCER_DATABASE_URL or DATABASE_POOL_URL or DATABASE_URL');
+  }
+  if (missing.length > 0) {
+    throw new Error(`Missing required API environment variables: ${missing.join(', ')}`);
+  }
+}
+
 export function loadApiConfig(env: NodeJS.ProcessEnv = process.env): ApiConfig {
+  validateApiStartupEnv(env);
   return {
     cors: loadCorsConfig(env),
     database: loadDatabaseConfig(env),

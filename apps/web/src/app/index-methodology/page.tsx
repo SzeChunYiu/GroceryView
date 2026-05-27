@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { calculateChainPriceIndex } from '@groceryview/core';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { ConfidenceBadge } from '@/components/confidence-badge';
@@ -164,6 +165,9 @@ export default function IndexMethodologyPage() {
       <p className="mt-3 max-w-4xl text-lg leading-8 text-slate-700">
         This S&amp;P-style methodology describes the public GroceryView chain index: eligible constituents, category weights, base date, rebalance rules, and confidence gates. The numbers below are computed from the same real source rows used by the chain-index route.
       </p>
+      <Link className="mt-4 inline-flex rounded-full bg-white px-4 py-2 text-sm font-black text-emerald-900 shadow-sm" href="/methodology-changelog">
+        View data and methodology changelog
+      </Link>
 
       <div className="mt-6 grid gap-4 md:grid-cols-4">
         <Card className="p-4">

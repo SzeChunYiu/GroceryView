@@ -1,12 +1,16 @@
 import { AlertManagementPanel, type AlertProductSummary } from '@/components/AlertListItem';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { DealHunterDiscoveryAlerts, type DealHunterDiscoveryAlert, type DealHunterDiscoveryOption } from '@/components/dealhunter-discovery-alerts';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { PushNotificationPreferenceControls } from '@/components/notification-inbox-actions';
 import { SavedSearchSubscriptionsPanel } from '@/components/saved-search-subscriptions';
 import { buildAlertExplanationTimeline, buildBestTimeAlertExplanationTimeline, type SavedSearchDealCandidate } from '@/lib/alert-scheduler';
 import { FREE_PRICE_ALERT_LIMIT } from '@/app/api/alerts/store';
-import { formatSek, matchedChainProducts } from '@/lib/verified-data';
+import { buildNewArrivalFeed, getPriceFreshness } from '@/lib/freshness';
+import { categoryLabels, pricedProducts, type PricedProduct } from '@/lib/openprices-products';
+import { formatPct, formatSek, matchedChainProducts, priceDropMoversBoard } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
+import { watchlistAlertBoard } from '@/lib/watchlist-data';
 
 export function generateMetadata() {
   return routeMetadata('/alerts');
@@ -66,6 +70,86 @@ const savedSearchDealCandidates: SavedSearchDealCandidate[] = matchedChainProduc
   dealSummary: `${product.lowestChain} currently has the lowest verified chain price for this product.`
 }));
 
+const normalWatchlistAlertProductIds = new Set(watchlistAlertBoard.watchlistAlerts.map((alert) => alert.productId));
+const pricedProductBySlug = new Map(pricedProducts.map((product) => [product.slug, product]));
+const rawNewArrivalFeed = buildNewArrivalFeed(pricedProducts, { categoryLabels, limit: 16, windowDays: 30 });
+const rawMaterialPriceDrops = priceDropMoversBoard.filter((mover) => Math.abs(mover.changePercent) >= 5);
+
+function latestObservedPrice(product: PricedProduct): number | null {
+  const latest = [...product.observations]
+    .filter((observation) => Number.isFinite(observation.price))
+    .sort((left, right) => right.date.localeCompare(left.date))[0];
+  return latest?.price ?? (Number.isFinite(product.priceMedian) ? product.priceMedian : null);
+}
+
+const dealHunterNewProductAlerts: DealHunterDiscoveryAlert[] = rawNewArrivalFeed
+  .filter((item) => !normalWatchlistAlertProductIds.has(item.slug))
+  .flatMap((item) => {
+    const product = pricedProductBySlug.get(item.slug);
+    if (!product) return [];
+    const currentPrice = latestObservedPrice(product);
+    if (currentPrice === null) return [];
+    return [{
+      id: `new-${item.slug}`,
+      type: 'new_product',
+      productSlug: item.slug,
+      productName: item.name,
+      brand: item.brand,
+      categoryKey: product.category,
+      categoryLabel: item.category,
+      chainKey: 'openprices',
+      chainLabel: 'OpenPrices observations',
+      href: item.href,
+      currentPriceLabel: formatSek(currentPrice),
+      sourceLabel: item.sourceLabel,
+      freshnessLabel: item.freshness.label,
+      freshnessDetail: item.freshness.refreshHint,
+      observedAt: item.lastObservedAt,
+      confidenceLabel: `${item.observationCount.toLocaleString('sv-SE')} dated observations`,
+      dedupeLabel: 'Not already covered by a normal watchlist alert'
+    } satisfies DealHunterDiscoveryAlert];
+  });
+
+const dealHunterPriceDropAlerts: DealHunterDiscoveryAlert[] = rawMaterialPriceDrops
+  .filter((mover) => !normalWatchlistAlertProductIds.has(mover.productSlug))
+  .map((mover) => {
+    const product = pricedProductBySlug.get(mover.productSlug);
+    const freshness = getPriceFreshness(mover.latestObservedAt);
+    return {
+      id: `drop-${mover.productSlug}`,
+      type: 'price_drop',
+      productSlug: mover.productSlug,
+      productName: mover.productName,
+      brand: product?.brands || 'Brand not reported',
+      categoryKey: product?.category ?? mover.categoryLabel,
+      categoryLabel: mover.categoryLabel,
+      chainKey: 'openprices',
+      chainLabel: 'OpenPrices observations',
+      href: `/products/${mover.productSlug}`,
+      currentPriceLabel: formatSek(mover.latestPrice),
+      previousPriceLabel: formatSek(mover.previousPrice),
+      dropPercentLabel: `${formatPct(Math.abs(mover.changePercent))} drop`,
+      sourceLabel: `${mover.observedCount.toLocaleString('sv-SE')} dated price points; ${mover.legalCopy}`,
+      freshnessLabel: freshness.label,
+      freshnessDetail: freshness.refreshHint,
+      observedAt: mover.latestObservedAt,
+      confidenceLabel: mover.isNewLow ? 'Observed low in current history' : `${mover.rawObservationCount.toLocaleString('sv-SE')} raw observations`,
+      dedupeLabel: 'Not already covered by a normal watchlist alert'
+    } satisfies DealHunterDiscoveryAlert;
+  });
+
+const dealHunterDiscoveryAlerts = [...dealHunterNewProductAlerts, ...dealHunterPriceDropAlerts].slice(0, 18);
+const dedupedDiscoveryAlertCount = rawNewArrivalFeed.filter((item) => normalWatchlistAlertProductIds.has(item.slug)).length
+  + rawMaterialPriceDrops.filter((mover) => normalWatchlistAlertProductIds.has(mover.productSlug)).length;
+const dealHunterCategoryOptions: DealHunterDiscoveryOption[] = [...new Map(dealHunterDiscoveryAlerts.map((alert) => [alert.categoryKey, {
+  value: alert.categoryKey,
+  label: alert.categoryLabel
+}])).values()].sort((left, right) => left.label.localeCompare(right.label, 'sv'));
+const dealHunterChainOptions: DealHunterDiscoveryOption[] = [...new Map(dealHunterDiscoveryAlerts.map((alert) => [alert.chainKey, {
+  value: alert.chainKey,
+  label: alert.chainLabel
+}])).values()].sort((left, right) => left.label.localeCompare(right.label, 'sv'));
+
 export default function AlertsPage() {
   return (
     <PageShell>
@@ -119,6 +203,13 @@ export default function AlertsPage() {
         </p>
         <PushNotificationPreferenceControls />
       </section>
+
+      <DealHunterDiscoveryAlerts
+        alerts={dealHunterDiscoveryAlerts}
+        categoryOptions={dealHunterCategoryOptions}
+        chainOptions={dealHunterChainOptions}
+        dedupedWatchlistCount={dedupedDiscoveryAlertCount}
+      />
 
       <AlertManagementPanel products={alertProductSummaries} />
       <SavedSearchSubscriptionsPanel candidates={savedSearchDealCandidates} />
