@@ -216,6 +216,17 @@ function retailerTypeLabel(retailerType: string) {
   return retailerTypeLabels[retailerType] ?? retailerType.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toLocaleUpperCase('sv-SE'));
 }
 
+function retailerTypeBadgeTone(retailerType: string) {
+  if (retailerType === 'pharmacy') return 'bg-sky-100 text-sky-900';
+  if (retailerType === 'variety') return 'bg-violet-100 text-violet-900';
+  if (retailerType === 'cosmetics') return 'bg-pink-100 text-pink-900';
+  if (retailerType === 'fuel_convenience') return 'bg-amber-100 text-amber-900';
+  if (retailerType === 'household') return 'bg-orange-100 text-orange-900';
+  if (retailerType === 'health_food') return 'bg-lime-100 text-lime-900';
+  if (retailerType.startsWith('ethnic_')) return 'bg-fuchsia-100 text-fuchsia-900';
+  return 'bg-emerald-100 text-emerald-900';
+}
+
 function crossChainQuoteRowsFor(product: (typeof axfoodProducts)[number]) {
   const rows = chainPriceRows(product)
     .map((row) => {
@@ -1633,10 +1644,11 @@ export default async function ProductPage({ params, routeBase = 'products' }: Re
           </div>
           <div className="mt-5 overflow-x-auto rounded-2xl border border-emerald-100 bg-white shadow-sm">
             <table className="min-w-full divide-y divide-emerald-100 text-left text-sm">
-              <caption className="sr-only">Current chain prices for {product.name}, including unit price, median comparison, and confidence.</caption>
+              <caption className="sr-only">Current chain prices for {product.name}, including retailer type, unit price, median comparison, and confidence.</caption>
               <thead className="bg-emerald-900 text-white">
                 <tr>
                   <th className="px-4 py-3 font-black" scope="col">Chain</th>
+                  <th className="px-4 py-3 font-black" scope="col">Retailer type</th>
                   <th className="px-4 py-3 font-black" scope="col">Current price</th>
                   <th className="px-4 py-3 font-black" scope="col">Unit price</th>
                   <th className="px-4 py-3 font-black" scope="col">Vs basket median</th>
@@ -1648,8 +1660,12 @@ export default async function ProductPage({ params, routeBase = 'products' }: Re
                   <tr className={row.isCheapest ? 'bg-emerald-50' : 'bg-white'} key={row.chain}>
                     <td className="px-4 py-3 font-black text-slate-950">
                       {row.chain}
-                      <span className="ml-2 rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-700">{row.retailerTypeLabel}</span>
                       {row.isCheapest ? <span className="ml-2 rounded-full bg-emerald-800 px-2 py-1 text-xs text-white">cheapest</span> : null}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`rounded-full px-2 py-1 text-xs font-black uppercase tracking-[0.12em] ${retailerTypeBadgeTone(row.retailerType)}`}>
+                        {row.retailerTypeLabel}
+                      </span>
                     </td>
                     <td className="px-4 py-3 font-black text-emerald-900">{formatSek(row.price)}</td>
                     <td className="px-4 py-3 font-semibold text-slate-700">
