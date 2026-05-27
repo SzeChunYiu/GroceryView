@@ -525,7 +525,7 @@ export function buildCouponAwareBasketOptimization({
       const subtotal = stackedItems.reduce((sum, item) => sum + item.basePrice, 0);
       const total = stackedItems.reduce((sum, item) => sum + item.finalPrice, 0);
       const savings = subtotal - total;
-      const substitutionLabels = chosen
+      const substitutionLabels: string[] = chosen
         .filter((choice) => choice.isSubstitute)
         .map((choice): string => {
           const fallback = `Swap ${choice.originalItem.name ?? choice.originalItem.id} for ${choice.item.name ?? choice.item.id}`;

@@ -78,7 +78,11 @@ export function parseCircleKNoRows(input: {
   const fuelText = textFromHtml(input.fuelPricesHtml);
   const foodText = textFromHtml(input.foodHtml);
   const drinkText = textFromHtml(input.drinkHtml);
-  if (/captcha|access denied|cloudflare|logg inn/i.test(`${fuelText} ${foodText} ${drinkText}`)) {
+  // NB: do NOT treat a bare "logg inn" as a blocked page — the legitimate business fuel
+  // portal page invites customers to "Logg inn i/via vår kundeportal" for list prices. Only
+  // flag genuine bot/login WALLS (captcha/cloudflare/access denied, or an explicit
+  // "logg inn for å fortsette/se" gate) so the valid portal copy isn't rejected.
+  if (/captcha|access denied|cloudflare|logg inn for (?:å|a) (?:fortsette|se|få tilgang)/i.test(`${fuelText} ${foodText} ${drinkText}`)) {
     throw new Error('Circle K NO source returned a blocked/login page.');
   }
 

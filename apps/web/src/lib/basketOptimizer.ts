@@ -142,10 +142,10 @@ function planFromAssignments(
       return {
         ...store,
         total: coveredItemIds.length ? roundSek(storeTotal) : null,
+        missingCount: missingItemIds.length,
         itemCount: coveredItemIds.length,
         coveredItemIds,
-        missingItemIds,
-        missingCount: missingItemIds.length
+        missingItemIds
       };
     }),
     assignments

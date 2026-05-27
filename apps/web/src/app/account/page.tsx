@@ -183,7 +183,7 @@ export default function AccountPage() {
       <Eyebrow>Account shopping state</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Saved baskets & favorite stores</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
-        GroceryView now surfaces the real account API contract for saved shopping state while keeping private rows available to signed-in shoppers only. The public static build describes the production contract and stays closed when authenticated account records are absent.
+        GroceryView uses the account API as the source of truth for saved shopping state while keeping private rows available to signed-in shoppers only. The public static build describes the production contract and stays closed when authenticated account records are absent.
       </p>
 
 

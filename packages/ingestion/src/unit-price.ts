@@ -34,9 +34,16 @@ function parseQuantityString(quantityStr: string): ParsedQuantity {
   if (!normalized) throw new Error('quantityStr must not be empty.');
   if (/(^|[\sx×])-+\s*\d/u.test(normalized)) throw new Error('quantity must be positive.');
 
-  const diaperPackage = /\b(?:blojor|diapers?|strl|storlek|size|comfort)\b/u.test(normalized)
-    ? parseDiaperPackageClass(normalized)
-    : null;
+  // Diaper packages are signalled either by an explicit keyword (blöjor/strl/size/comfort/...)
+  // OR by a count pattern the diaper parser understands: a "N x M p" multipack or a
+  // "N per frp" per-package count (e.g. "2x37p", "37 per frp"). Without this the latter two
+  // fell through to the generic matcher and threw "Unsupported quantity unit: per" / ": p".
+  const looksLikeDiaperPackage =
+    /\b(?:blojor|diapers?|strl|storlek|size)\b/u.test(normalized) ||
+    /\bcomfort\s*\d/u.test(normalized) ||
+    /\b\d+\s*[x×]\s*\d+\s*(?:p|st|pcs|pieces?|blojor|diapers?)\b/u.test(normalized) ||
+    /\b\d+\s*(?:per|\/)\s*(?:frp|forp|forpackning|pack|paket)\b/u.test(normalized);
+  const diaperPackage = looksLikeDiaperPackage ? parseDiaperPackageClass(normalized) : null;
   if (diaperPackage) {
     return quantityFromUnit(diaperPackage.diaperCount, 'piece');
   }
