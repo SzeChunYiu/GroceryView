@@ -12,7 +12,7 @@ import { COMPARE_CHAIN_ORDER, buildBasketStoreComparison, buildChainComparisonTa
 import { fetchComparePriceSnapshots, type ComparePriceSnapshotStoreRow } from '@/lib/compare-price-snapshots';
 import { topFamilyPackComparisons } from '@/lib/family-pack';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
-import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, commodityComparisons, compareOverlayChart, formatPct, formatSek, matchedChainProducts, normalizeComparableUnitPrice, privateLabelDupeFinder, snapshot } from '@/lib/verified-data';
+import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, commodityComparisons, compareOverlayChart, formatPct, formatSek, labelFromSlug, matchedChainProducts, normalizeComparableUnitPrice, privateLabelDupeFinder, snapshot } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 import { buildStoreDistanceCompare } from '@/lib/store-distance';
 

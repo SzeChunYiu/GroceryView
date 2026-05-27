@@ -410,7 +410,7 @@ export function buildChainComparisonTable(
   }
 
   const noChainState = buildCompareNoChainStateModel({
-    activeFilters,
+    activeFilters: [...activeFilters],
     chainOrder: COMPARE_CHAIN_ORDER,
     generatedCapabilities: compareStoreCapabilities,
     missingProductIds

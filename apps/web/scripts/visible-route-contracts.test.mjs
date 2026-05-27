@@ -85,13 +85,13 @@ const routeContracts = [
     route: '/ar',
     label: 'Arabic market landing',
     files: ['src/app/ar/page.tsx', 'src/components/locale-home-page.tsx'],
-    required: [/BlockedLocalePage locale="ar"/, /source-evidence string/, /No machine-translated prices/]
+    required: [/BlockedLocalePage locale="ar"/, /source-evidence string/, /blocked-locale\.guardrailNoMachineTranslation/]
   },
   {
     route: '/so',
     label: 'Somali market landing',
     files: ['src/app/so/page.tsx', 'src/components/locale-home-page.tsx'],
-    required: [/BlockedLocalePage locale="so"/, /source-evidence string/, /No machine-translated prices/]
+    required: [/BlockedLocalePage locale="so"/, /source-evidence string/, /blocked-locale\.guardrailNoMachineTranslation/]
   }
 ];
 

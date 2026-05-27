@@ -1,5 +1,6 @@
 import { Buffer } from 'node:buffer';
-import { createHmac, timingSafeEqual } from 'node:crypto';
+import { createHmac, randomBytes, scrypt as scryptCallback, timingSafeEqual } from 'node:crypto';
+import { promisify } from 'node:util';
 
 export type SessionPayload = {
   userId: string;
@@ -26,6 +27,15 @@ export type MobileSessionPolicy = {
   expired: boolean;
   blockers: string[];
   actions: Array<'store_in_secure_storage' | 'refresh_session' | 'reauthenticate' | 'bind_device'>;
+};
+
+const scrypt = promisify(scryptCallback);
+const passwordHashAlgorithm = 'scrypt';
+const scryptKeyLength = 64;
+
+export type PasswordHashVerificationResult = {
+  valid: boolean;
+  needsRehash: boolean;
 };
 
 function base64UrlEncode(value: string): string {
@@ -68,6 +78,23 @@ export function parseBearerToken(authorizationHeader: string | null): string | n
   if (!authorizationHeader) return null;
   const match = authorizationHeader.match(/^Bearer\s+(.+)$/i);
   return match?.[1] ?? null;
+}
+
+export async function hashPassword(password: string): Promise<string> {
+  if (password.length < 8) throw new Error('password must be at least 8 characters.');
+  const salt = randomBytes(16).toString('base64url');
+  const key = (await scrypt(password, salt, scryptKeyLength)) as Buffer;
+  return `${passwordHashAlgorithm}$${salt}$${key.toString('base64url')}`;
+}
+
+export async function verifyPasswordHash(password: string, storedHash: string): Promise<PasswordHashVerificationResult> {
+  const [algorithm, salt, key] = storedHash.split('$');
+  if (algorithm !== passwordHashAlgorithm || !salt || !key) return { valid: false, needsRehash: true };
+
+  const expected = Buffer.from(key, 'base64url');
+  const actual = (await scrypt(password, salt, expected.length)) as Buffer;
+  const valid = actual.length === expected.length && timingSafeEqual(actual, expected);
+  return { valid, needsRehash: false };
 }
 
 export function planMobileSessionPolicy(input: MobileSessionPolicyInput): MobileSessionPolicy {

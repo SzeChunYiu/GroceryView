@@ -1905,8 +1905,11 @@ export function parseIcaStorePromotions(payload: unknown, options: ParseIcaStore
   return rows;
 }
 
-const ICA_COUNTER_CATEGORY_PATTERN = /\b(kött|koett|fisk|skaldjur|chark|delikatess|deli)\b/i;
-const ICA_COUNTER_NAME_PATTERN = /\b(filé|file|lax|torsk|räkor|rakor|skinka|rostbiff|entrec[oô]te|kotlett|färsk fisk|manuell)\b/i;
+const ICA_COUNTER_CATEGORY_PATTERN = /\b(kött|koett|fisk|skaldjur|chark|delikatess|deli|ostdisk|ost)\b/i;
+// Includes deli-counter cheese sold by approximate weight (e.g. "Herrgård, Präst, Grevé"
+// at "ca 700 g" / "kr/kg"), which the original fish/meat-only pattern missed.
+const ICA_COUNTER_NAME_PATTERN =
+  /\b(filé|file|lax|torsk|räkor|rakor|skinka|rostbiff|entrec[oô]te|kotlett|färsk fisk|manuell|ost|herrgård|herrgard|präst|prast|grevé|greve|grevékött)\b/i;
 const ICA_COUNTER_PACKAGE_EVIDENCE_PATTERN = /(?:\blösvikt\b|\bungefärlig\s+vikt\b|\bca\.?\s*\d+(?:[,.]\d+)?\s*(?:g|gram|kg|kilo)\b|^\s*\/?kg\s*$|^\s*\/?kilo\s*$)/i;
 const ICA_MEMBER_PRICE_PATTERN = /\b(?:stammispris|ica\s+stammis|medlemspris)\b/i;
 const ICA_MULTI_BUY_PATTERN = /\b(\d+)\s*(?:för|for)\s*(\d+(?:[,.]\d+)?)\s*kr\b/i;

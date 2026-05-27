@@ -37,6 +37,10 @@
         "properties": {},
         "type": "object"
       },
+      "PasswordChangeDto": {
+        "properties": {},
+        "type": "object"
+      },
       "ProductDealSignalsDto": {
         "properties": {
           "currentCityPercentile": {
@@ -473,6 +477,35 @@
         "responses": {
           "200": {
             "description": "Save authenticated user preferences for currency, preferred stores, notification channels, and MyFlyer algorithm_choice"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/settings/profile/password": {
+      "patch": {
+        "operationId": "AuthenticatedSettingsController_updatePassword",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordChangeDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Verify the current password and persist a rotated password credential for the signed-in account"
           }
         },
         "security": [

@@ -218,6 +218,18 @@ export const routeMetadataCatalog = {
     title: 'Score and confidence methodology | GroceryView',
     description: 'Inspect how GroceryView computes Deal Score, Buy or Wait timing, nutrition per krona, and confidence labels, including missing-data blockers.'
   },
+  '/market': {
+    title: 'Grocery market overview | GroceryView',
+    description: 'Chain price indexes, category tables, and biggest movers from verified Swedish grocery observations.'
+  },
+  '/browse': {
+    title: 'Browse grocery categories | GroceryView',
+    description: 'Choose categories and chains to explore verified product search results without fabricated prices.'
+  },
+  '/confidence': {
+    title: 'Source confidence | GroceryView',
+    description: 'Understand confidence levels and source coverage behind GroceryView price panels.'
+  },
   '/login': {
     title: 'Sign in to GroceryView',
     description: 'Authentication is withheld in the static build until a production auth provider can return a verified user session.',
@@ -276,6 +288,10 @@ export const routeMetadataCatalog = {
   '/savings-dashboard': {
     title: 'Personal grocery inflation dashboard | GroceryView',
     description: 'Track grocery inflation, fixed-income budgets, weekly student budgets, and staples price stability from real core summaries.'
+  },
+  '/student-staples': {
+    title: 'Student staples budget basket | GroceryView',
+    description: 'Plan affordable student staple baskets with verified grocery prices, per-serving costs, and source confidence guardrails.'
   },
   '/scanner': {
     title: 'Receipt scanner evidence gate | GroceryView',
@@ -378,7 +394,7 @@ function truncateDescription(description: string) {
   return description.length > 180 ? `${description.slice(0, 177)}...` : description;
 }
 
-function publicCatalogueCacheOther(edgeCache: PublicCatalogueCacheMetadata | undefined, path: string) {
+function publicCatalogueCacheOther(edgeCache: PublicCatalogueCacheMetadata | undefined, path: string): Record<string, string> {
   const surface = edgeCache?.surface ?? publicCatalogueSurfaceForPath(path);
   if (!surface) return {};
   const cacheControl = edgeCache?.cacheControl ?? publicCatalogueCacheControl;
@@ -399,7 +415,7 @@ export function hasAppliedCanonicalFilters(searchParams: CanonicalFilterSearchPa
 }
 
 export function routeMetadata(route: keyof typeof routeMetadataCatalog | RouteMetadataConfig): Metadata {
-  const config = typeof route === 'string' ? { path: route, ...routeMetadataCatalog[route] } : route;
+  const config: RouteMetadataConfig = typeof route === 'string' ? { path: route, ...routeMetadataCatalog[route] } : route;
   const alternatePath = config.canonicalPath ?? config.path;
   const canonical = absoluteUrl(alternatePath);
   const title = config.title;
@@ -431,7 +447,7 @@ export function routeMetadata(route: keyof typeof routeMetadataCatalog | RouteMe
     other: {
       'x-groceryview-hreflang-boundary': localeNegotiatedCurrentRouteCaveat,
       ...publicCatalogueCacheOther(config.edgeCache, config.path)
-    },
+    } as Metadata['other'],
     openGraph: {
       title,
       description,

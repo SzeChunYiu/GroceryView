@@ -320,11 +320,12 @@ export function buildChainCategoryCoverageGaps(limit = 8): ChainCategoryCoverage
     const matchedProducts = products.filter((product) => product.inChains.length > 1).length;
     const targetProducts = Math.max(12, Math.ceil(products.length * 0.9));
 
-    return chains.map((chainId) => {
+    return chains.map((chainId): ChainCategoryCoverageGap => {
       const observedProducts = products.filter((product) => product.inChains.includes(chainId)).length;
       const gapProducts = Math.max(0, targetProducts - observedProducts);
       const coveragePct = targetProducts > 0 ? observedProducts / targetProducts : 0;
-      const trendDirection = observedProducts >= targetProducts ? 'up' : matchedProducts >= targetProducts * 0.7 ? 'flat' : 'down';
+      const trendDirection: ChainCategoryCoverageGap['trendDirection'] =
+        observedProducts >= targetProducts ? 'up' : matchedProducts >= targetProducts * 0.7 ? 'flat' : 'down';
       const actionLabel = gapProducts === 0
         ? 'Meets target depth'
         : `Need ${gapProducts.toLocaleString('sv-SE')} more ${chainId} row${gapProducts === 1 ? '' : 's'}`;

@@ -31,6 +31,8 @@
   },
   "blocked-locale": {
     "title": "Native-quality translation review required",
+    "metadataTitleSuffix": "translation review required",
+    "metadataDescription": "Native-quality translation review required before this language route can show GroceryView copy. No machine-translated prices or source labels are shipped.",
     "body": "GroceryView only routes Swedish and English public copy today. Arabic and Somali remain visible as expansion routes, but they stay blocked until native reviewers approve every navigation, policy, and source-evidence string.",
     "guardrailNoMachineTranslation": "No machine-translated prices",
     "guardrailEvidenceUnchanged": "SEK amounts and source evidence stay unchanged",

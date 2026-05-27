@@ -134,7 +134,7 @@ function planFromAssignments(
     mode,
     total,
     missingCount: missingItemIds.length,
-    stores: stores.map((store) => {
+    stores: stores.map((store): OptimizedBasketStore => {
       const coveredItemIds = assignments.filter((assignment) => assignment.storeId === store.storeId && assignment.price !== null).map((assignment) => assignment.itemId);
       const storeTotal = assignments
         .filter((assignment) => assignment.storeId === store.storeId && assignment.price !== null)
@@ -142,6 +142,7 @@ function planFromAssignments(
       return {
         ...store,
         total: coveredItemIds.length ? roundSek(storeTotal) : null,
+        missingCount: missingItemIds.length,
         itemCount: coveredItemIds.length,
         coveredItemIds,
         missingItemIds

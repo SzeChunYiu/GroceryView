@@ -2386,7 +2386,11 @@ const brandTierLabels: Record<BrandTier, string> = {
 };
 
 export function calculateBrandTierIndices(observations: BrandTierPriceObservation[]): BrandTierIndexSummary {
-  if (observations.length === 0) throw new Error('At least one brand-tier observation is required.');
+  // Fail closed (matches calculateChainPriceIndex): no observations yields an empty
+  // summary, not a throw — single-chain/sparse data must degrade gracefully, not 500.
+  if (observations.length === 0) {
+    return { indices: [], privateLabelSavingsPercent: 0, highestSavingsCategories: [], premiumGapPercent: 0 };
+  }
 
   const byTier = new Map<BrandTier, BrandTierPriceObservation[]>();
   for (const observation of observations) {

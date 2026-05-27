@@ -142,6 +142,7 @@ jobs:
         if: always()
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_DATABASE_URL: ${{ secrets.DIRECT_DATABASE_URL }}
           REPLACEMENT_DATABASE_URL: ${{ secrets.REPLACEMENT_DATABASE_URL }}
           CANDIDATE_DATABASE_URL: ${{ secrets.CANDIDATE_DATABASE_URL }}
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
@@ -354,14 +355,18 @@ jobs:
       - name: Check production DB write connectivity
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_DATABASE_URL: ${{ secrets.DIRECT_DATABASE_URL }}
+          REPLACEMENT_DATABASE_URL: ${{ secrets.REPLACEMENT_DATABASE_URL }}
+          CANDIDATE_DATABASE_URL: ${{ secrets.CANDIDATE_DATABASE_URL }}
           GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_ATTEMPTS: ${{ vars.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_ATTEMPTS || '30' }}
           GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_BASE_DELAY_MS: ${{ vars.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_BASE_DELAY_MS || '10000' }}
           GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_MAX_DELAY_MS: ${{ vars.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_MAX_DELAY_MS || '30000' }}
-          GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS: ${{ vars.GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS || '1' }}
-          GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS: ${{ vars.GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS || '1' }}
+          GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS: ${{ vars.GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS || '3' }}
+          GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS: ${{ vars.GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS || '5' }}
+          GROCERYVIEW_DB_EFFECTIVE_URL_FILE: /tmp/daily-db-effective-database-url.txt
         run: |
           set -euo pipefail
-          if [ -z "${DATABASE_URL:-}" ]; then
+          if [ -z "${DATABASE_URL:-}" ] && [ -z "${DIRECT_DATABASE_URL:-}" ] && [ -z "${REPLACEMENT_DATABASE_URL:-}" ] && [ -z "${CANDIDATE_DATABASE_URL:-}" ]; then
             cat > /tmp/daily-db-connectivity.json <<EOF
           {
             "status": "blocked",
@@ -384,6 +389,13 @@ jobs:
           fi
           cat /tmp/daily-db-connectivity.json
           node -e "const body=require('/tmp/daily-db-connectivity.json'); for (const candidate of body.alternateConnections ?? []) { if (candidate.name === 'supabase_direct_host' || candidate.name === 'supabase_transaction_pooler') console.error(JSON.stringify({ alternateConnection: candidate.name, status: candidate.status, action: candidate.action })); } if (body.status !== 'ready') { console.error(JSON.stringify(body)); process.exit(1); }"
+          if [ -s /tmp/daily-db-effective-database-url.txt ]; then
+            {
+              echo "GROCERYVIEW_EFFECTIVE_DATABASE_URL<<EOF"
+              cat /tmp/daily-db-effective-database-url.txt
+              echo "EOF"
+            } >> "${GITHUB_ENV}"
+          fi
           exit "${connectivity_status}"
 
       - name: Upload daily DB connectivity diagnostic
@@ -397,7 +409,7 @@ jobs:
 
       - name: Capture daily DB IO hotspots before ingestion
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL: ${{ env.GROCERYVIEW_EFFECTIVE_DATABASE_URL || secrets.DIRECT_DATABASE_URL || secrets.DATABASE_URL }}
           GROCERYVIEW_DB_IO_HOTSPOTS_LIMIT: ${{ vars.GROCERYVIEW_DB_IO_HOTSPOTS_LIMIT || '20' }}
         run: |
           set -euo pipefail
@@ -483,7 +495,7 @@ jobs:
 
       - name: Apply production DB migrations
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL: ${{ env.GROCERYVIEW_EFFECTIVE_DATABASE_URL || secrets.DIRECT_DATABASE_URL || secrets.DATABASE_URL }}
         run: |
           set -euo pipefail
           if [ -z "${DATABASE_URL:-}" ]; then
@@ -536,7 +548,7 @@ jobs:
 
       - name: Run configured daily ingestion
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL: ${{ env.GROCERYVIEW_EFFECTIVE_DATABASE_URL || secrets.DIRECT_DATABASE_URL || secrets.DATABASE_URL }}
           GROCERYVIEW_DAILY_MAX_CONCURRENCY: ${{ vars.GROCERYVIEW_DAILY_MAX_CONCURRENCY || '2' }}
           GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS: ${{ vars.GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS || '250' }}
           GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS: ${{ vars.GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS || '1' }}
@@ -679,7 +691,7 @@ jobs:
       - name: Capture daily DB IO hotspots after ingestion
         if: always()
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL: ${{ env.GROCERYVIEW_EFFECTIVE_DATABASE_URL || secrets.DIRECT_DATABASE_URL || secrets.DATABASE_URL }}
           GROCERYVIEW_DB_IO_HOTSPOTS_LIMIT: ${{ vars.GROCERYVIEW_DB_IO_HOTSPOTS_LIMIT || '20' }}
         run: |
           set -euo pipefail
@@ -745,7 +757,7 @@ jobs:
 
       - name: Export DB-backed site snapshot
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL: ${{ env.GROCERYVIEW_EFFECTIVE_DATABASE_URL || secrets.DIRECT_DATABASE_URL || secrets.DATABASE_URL }}
           GROCERYVIEW_DB_SITE_SNAPSHOT_PATH: /tmp/groceryview-db-site-snapshot.json
           GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE: ${{ vars.GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE || '0.5' }}
           GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT: ${{ vars.GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT || '50000' }}
