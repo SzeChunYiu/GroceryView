@@ -85,6 +85,18 @@ const CONNECTOR_TEMPLATES = [
     hasDataAgreement: true
   },
   {
+    connectorId: 'lidl-products-bulk',
+    chainId: 'lidl',
+    sourceType: 'retailer_online_page',
+    endpointUrl: 'groceryview://daily/lidl/products/bulk',
+    parserVersion: 'lidl-bulk-native-v1',
+    robotsTxtStatus: 'allow',
+    legalReviewStatus: 'approved',
+    hasDataAgreement: true,
+    requireStoreScopedPrices: false,
+    stores: []
+  },
+  {
     connectorId: 'city-gross-products-bulk',
     chainId: 'city_gross',
     sourceType: 'official_api',

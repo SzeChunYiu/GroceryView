@@ -451,6 +451,21 @@ class RecordingQueryExecutor implements QueryExecutor {
       observed_store_price_types: ['2102:shelf']
     }
   ];
+  friendSharedDealSignalRows: unknown[] = [
+    {
+      signal_id: 'friend-share-1',
+      user_id: 'user-1',
+      product_id: 'coffee',
+      shared_by_user_id: 'friend-1',
+      shared_by_display_name: 'Ada',
+      relationship: 'friend',
+      shared_at: '2026-05-20T10:30:00.000Z',
+      source_confidence: '0.8700',
+      opted_in: true,
+      deal_score: 82,
+      created_at: '2026-05-20T10:31:00.000Z'
+    }
+  ];
 
   async query<T>(sql: string, params: unknown[] = []) {
     this.calls.push({ sql, params });
@@ -476,6 +491,7 @@ class RecordingQueryExecutor implements QueryExecutor {
     if (sql.includes('from subscription_entitlements')) return this.subscriptionEntitlementRows as T[];
     if (sql.includes('from watchlist_items')) return this.watchlistRows as T[];
     if (sql.includes('from basket_import_review_items')) return this.basketImportReviewRows as T[];
+    if (sql.includes('from friend_shared_deal_signals')) return this.friendSharedDealSignalRows as T[];
     if (sql.includes('update basket_import_review_items')) {
       return [{
         ...this.basketImportReviewRows[0] as Record<string, unknown>,
@@ -686,6 +702,56 @@ describe('createPostgresRepository', () => {
     assert.equal(resolved.resolvedAt, '2026-05-22T09:36:00.000Z');
     const updateCall = executor.calls.find((call) => call.sql.includes('update basket_import_review_items'));
     assert.deepEqual(updateCall?.params, ['user-1', 'review-1', 'dismissed', '2026-05-22T09:36:00.000Z', null, null]);
+  });
+
+  it('persists friend-shared deal signals for account-scoped suggestion inputs', async () => {
+    const executor = new RecordingQueryExecutor();
+    const repo = createPostgresRepository(executor);
+
+    await repo.upsertFriendSharedDealSignal({
+      signalId: 'friend-share-1',
+      userId: 'user-1',
+      productId: 'coffee',
+      sharedByUserId: 'friend-1',
+      sharedByDisplayName: 'Ada',
+      relationship: 'friend',
+      sharedAt: '2026-05-20T10:30:00.000Z',
+      sourceConfidence: 0.87,
+      optedIn: true,
+      dealScore: 82,
+      createdAt: '2026-05-20T10:31:00.000Z'
+    });
+
+    const insertCall = executor.calls.find((call) => call.sql.includes('insert into friend_shared_deal_signals'));
+    assert.match(insertCall?.sql ?? '', /on conflict \(signal_id\) do update/);
+    assert.deepEqual(insertCall?.params, [
+      'friend-share-1',
+      'user-1',
+      'coffee',
+      'friend-1',
+      'Ada',
+      'friend',
+      '2026-05-20T10:30:00.000Z',
+      0.87,
+      true,
+      82,
+      '2026-05-20T10:31:00.000Z'
+    ]);
+    assert.deepEqual(await repo.listFriendSharedDealSignals('user-1'), [
+      {
+        signalId: 'friend-share-1',
+        userId: 'user-1',
+        productId: 'coffee',
+        sharedByUserId: 'friend-1',
+        sharedByDisplayName: 'Ada',
+        relationship: 'friend',
+        sharedAt: '2026-05-20T10:30:00.000Z',
+        sourceConfidence: 0.87,
+        optedIn: true,
+        dealScore: 82,
+        createdAt: '2026-05-20T10:31:00.000Z'
+      }
+    ]);
   });
 
   it('persists and reads subscription entitlements with parameterized billing identifiers', async () => {
@@ -1174,6 +1240,7 @@ describe('createPostgresCatalogReader', () => {
 
     assert.match(executor.calls[0]!.sql, /from products/);
     assert.match(executor.calls[0]!.sql, /where slug = \$1/);
+    assert.match(executor.calls[0]!.sql, /products\.deleted_at is null/);
     assert.deepEqual(executor.calls[0]!.params, ['bryggkaffe-450g']);
   });
 
@@ -1212,6 +1279,7 @@ describe('createPostgresCatalogReader', () => {
     assert.match(executor.calls[0]!.sql, /cross join \(select nullif\(trim\(\$1::text\), ''\) as term\) as query/);
     assert.match(executor.calls[0]!.sql, /products\.barcode = query\.term/);
     assert.match(executor.calls[0]!.sql, /products\.canonical_name % query\.term/);
+    assert.match(executor.calls[0]!.sql, /products\.deleted_at is null/);
     assert.match(executor.calls[0]!.sql, /aliases\.normalized_alias % lower\(query\.term\)/);
     assert.match(executor.calls[0]!.sql, /category_path @> \$2::text\[\]/);
     assert.match(executor.calls[0]!.sql, /when products\.barcode = query\.term then 0/);
@@ -1386,6 +1454,7 @@ describe('createPostgresCatalogReader', () => {
     assert.match(executor.calls[0]!.sql, /left join latest_prices on latest_prices\.product_id = products\.id/);
     assert.match(executor.calls[0]!.sql, /left join chains on chains\.id = latest_prices\.chain_id/);
     assert.match(executor.calls[0]!.sql, /left join stores on stores\.id = latest_prices\.store_id/);
+    assert.match(executor.calls[0]!.sql, /products\.deleted_at is null/);
     assert.match(executor.calls[0]!.sql, /array_agg\(distinct replace\(chains\.slug, '-', '_'\)\)/);
     assert.match(executor.calls[0]!.sql, /array_agg\(distinct latest_prices\.price_type\)/);
     assert.match(executor.calls[0]!.sql, /latest_prices\.price_type/);
@@ -1967,6 +2036,10 @@ describe('createPostgresPriceObservationWriter', () => {
 
       async query<T>(sql: string, params: unknown[] = []) {
         this.calls.push({ sql, params });
+        const trimmed = sql.trim().toLowerCase();
+        if (trimmed === 'begin' || trimmed === 'commit' || trimmed === 'rollback') {
+          return [] as T[];
+        }
         const rows = JSON.parse(String(params[0])) as Array<{ ordinal: number }>;
         return rows.map((row) => ({ ordinal: row.ordinal, id: `observation-${row.ordinal + 1}` })) as T[];
       }
@@ -2020,37 +2093,43 @@ describe('createPostgresPriceObservationWriter', () => {
       { observationIds: ['observation-1', 'observation-2'] }
     );
 
-    assert.equal(executor.calls.length, 1);
-    assert.match(executor.calls[0]!.sql, /from jsonb_to_recordset\(\$1::jsonb\)/);
-    assert.match(executor.calls[0]!.sql, /price numeric\(12, 2\)/);
-    assert.match(executor.calls[0]!.sql, /unit_price numeric\(12, 4\)/);
-    assert.match(executor.calls[0]!.sql, /is_available boolean/);
-    assert.match(executor.calls[0]!.sql, /confidence numeric\(5, 4\)/);
-    assert.match(executor.calls[0]!.sql, /domain text/);
-    assert.match(executor.calls[0]!.sql, /partition by product_id, chain_id, store_id, domain, price_type, observed_at, retailer_product_ref, price, unit_price, currency, is_available, confidence, provenance/);
-    assert.match(executor.calls[0]!.sql, /join observations on observations\.product_id = ranked_input\.product_id/);
-    assert.match(executor.calls[0]!.sql, /and observations\.domain = ranked_input\.domain/);
-    assert.match(executor.calls[0]!.sql, /and observations\.retailer_product_ref is not distinct from ranked_input\.retailer_product_ref/);
-    assert.match(executor.calls[0]!.sql, /and observations\.price = ranked_input\.price/);
-    assert.match(executor.calls[0]!.sql, /and observations\.unit_price = ranked_input\.unit_price/);
-    assert.match(executor.calls[0]!.sql, /and observations\.currency = ranked_input\.currency/);
-    assert.match(executor.calls[0]!.sql, /and observations\.is_available = ranked_input\.is_available/);
-    assert.match(executor.calls[0]!.sql, /and observations\.confidence = ranked_input\.confidence/);
-    assert.match(executor.calls[0]!.sql, /and observations\.provenance = ranked_input\.provenance/);
-    assert.match(executor.calls[0]!.sql, /where input_rank = 1/);
-    assert.match(executor.calls[0]!.sql, /and not exists/);
-    const observationsInsertSql = executor.calls[0]!.sql.slice(
-      executor.calls[0]!.sql.indexOf('insert into observations'),
-      executor.calls[0]!.sql.indexOf('),\n         written as')
+    // Both input rows fit in one default-sized batch (1000), so the writer
+    // issues exactly one data query, wrapped in a single begin/commit so the
+    // connector's observations are persisted atomically.
+    assert.equal(executor.calls.length, 3);
+    assert.equal(executor.calls[0]!.sql.trim().toLowerCase(), 'begin');
+    assert.equal(executor.calls[2]!.sql.trim().toLowerCase(), 'commit');
+    const dataCall = executor.calls[1]!;
+    assert.match(dataCall.sql, /from jsonb_to_recordset\(\$1::jsonb\)/);
+    assert.match(dataCall.sql, /price numeric\(12, 2\)/);
+    assert.match(dataCall.sql, /unit_price numeric\(12, 4\)/);
+    assert.match(dataCall.sql, /is_available boolean/);
+    assert.match(dataCall.sql, /confidence numeric\(5, 4\)/);
+    assert.match(dataCall.sql, /domain text/);
+    assert.match(dataCall.sql, /partition by product_id, chain_id, store_id, domain, price_type, observed_at, retailer_product_ref, price, unit_price, currency, is_available, confidence, provenance/);
+    assert.match(dataCall.sql, /join observations on observations\.product_id = ranked_input\.product_id/);
+    assert.match(dataCall.sql, /and observations\.domain = ranked_input\.domain/);
+    assert.match(dataCall.sql, /and observations\.retailer_product_ref is not distinct from ranked_input\.retailer_product_ref/);
+    assert.match(dataCall.sql, /and observations\.price = ranked_input\.price/);
+    assert.match(dataCall.sql, /and observations\.unit_price = ranked_input\.unit_price/);
+    assert.match(dataCall.sql, /and observations\.currency = ranked_input\.currency/);
+    assert.match(dataCall.sql, /and observations\.is_available = ranked_input\.is_available/);
+    assert.match(dataCall.sql, /and observations\.confidence = ranked_input\.confidence/);
+    assert.match(dataCall.sql, /and observations\.provenance = ranked_input\.provenance/);
+    assert.match(dataCall.sql, /where input_rank = 1/);
+    assert.match(dataCall.sql, /and not exists/);
+    const observationsInsertSql = dataCall.sql.slice(
+      dataCall.sql.indexOf('insert into observations'),
+      dataCall.sql.indexOf('),\n         written as')
     );
     assert.match(
       observationsInsertSql,
       /on conflict \(\s*product_id,\s*chain_id,\s*store_id,\s*domain,\s*retailer_product_ref,\s*price_type,\s*observed_at,\s*price,\s*unit_price,\s*currency,\s*is_available,\s*confidence,\s*provenance\s*\) do nothing/
     );
-    assert.match(executor.calls[0]!.sql, /insert into latest_prices/);
-    assert.match(executor.calls[0]!.sql, /where latest_prices\.observed_at <= excluded\.observed_at/);
+    assert.match(dataCall.sql, /insert into latest_prices/);
+    assert.match(dataCall.sql, /where latest_prices\.observed_at <= excluded\.observed_at/);
 
-    const payload = JSON.parse(String(executor.calls[0]!.params[0])) as Array<Record<string, unknown>>;
+    const payload = JSON.parse(String(dataCall.params[0])) as Array<Record<string, unknown>>;
     assert.deepEqual(payload.map((row) => row.ordinal), [0, 1]);
     assert.deepEqual(payload[0], {
       ordinal: 0,
@@ -2061,6 +2140,8 @@ describe('createPostgresPriceObservationWriter', () => {
       source_run_id: '00000000-0000-0000-0000-000000000004',
       raw_record_id: '00000000-0000-0000-0000-000000000005',
       retailer_product_ref: 'wil-zoegas-450',
+      origin_country: null,
+      cert_level: null,
       price_type: 'online',
       price: 49.9,
       regular_price: 69.9,
@@ -2081,6 +2162,53 @@ describe('createPostgresPriceObservationWriter', () => {
     });
     assert.equal(payload[1]!.observed_at, '2026-05-22T03:17:00.000Z');
     assert.equal(payload[1]!.price, 47.9);
+  });
+
+  it('splits large connector batches into multiple bounded queries while preserving ordinal -> id mapping', async () => {
+    class BatchRecordingExecutor implements QueryExecutor {
+      dataCalls: Array<Array<{ ordinal: number }>> = [];
+
+      async query<T>(sql: string, params: unknown[] = []) {
+        const trimmed = sql.trim().toLowerCase();
+        if (trimmed === 'begin' || trimmed === 'commit' || trimmed === 'rollback') {
+          return [] as T[];
+        }
+        const rows = JSON.parse(String(params[0])) as Array<{ ordinal: number }>;
+        this.dataCalls.push(rows);
+        // ids encode the per-batch-local ordinal to prove the caller offsets correctly.
+        return rows.map((row) => ({ ordinal: row.ordinal, id: `obs-${row.ordinal}` })) as T[];
+      }
+    }
+
+    const previous = process.env.GROCERYVIEW_DAILY_PERSIST_BATCH_SIZE;
+    process.env.GROCERYVIEW_DAILY_PERSIST_BATCH_SIZE = '2';
+    try {
+      const executor = new BatchRecordingExecutor();
+      const writer = createPostgresPriceObservationWriter(executor);
+      const observations = Array.from({ length: 5 }, (_, index) => ({
+        productId: `00000000-0000-0000-0000-00000000000${index + 1}`,
+        chainId: '00000000-0000-0000-0000-0000000000aa',
+        priceType: 'online' as const,
+        price: 10 + index,
+        unitPrice: 10 + index,
+        observedAt: '2026-05-22T03:17:00.000Z',
+        confidence: 0.9,
+        provenance: { connectorId: 'large-connector' }
+      }));
+
+      const result = await writer.upsertConnectorPriceObservations(observations);
+
+      // 5 rows / batch size 2 => 3 bounded queries (2, 2, 1).
+      assert.equal(executor.dataCalls.length, 3);
+      assert.deepEqual(executor.dataCalls.map((call) => call.length), [2, 2, 1]);
+      // Each batch numbers its ordinals from 0; the writer offsets them globally.
+      assert.deepEqual(executor.dataCalls[2]!.map((row) => row.ordinal), [0]);
+      // observationIds remain in the original input order across batch boundaries.
+      assert.deepEqual(result.observationIds, ['obs-0', 'obs-1', 'obs-0', 'obs-1', 'obs-0']);
+    } finally {
+      if (previous === undefined) delete process.env.GROCERYVIEW_DAILY_PERSIST_BATCH_SIZE;
+      else process.env.GROCERYVIEW_DAILY_PERSIST_BATCH_SIZE = previous;
+    }
   });
 });
 
@@ -2127,6 +2255,7 @@ describe('createPostgresSiteSnapshotReader', () => {
     assert.match(executor.calls[0]!.sql, /latest_prices\.is_available/);
     assert.match(executor.calls[0]!.sql, /observations\.is_available/);
     assert.match(executor.calls[0]!.sql, /join products on products\.id = latest_prices\.product_id/);
+    assert.match(executor.calls[0]!.sql, /products\.deleted_at is null/);
     assert.match(executor.calls[0]!.sql, /join chains on chains\.id = latest_prices\.chain_id/);
     assert.match(executor.calls[0]!.sql, /left join stores on stores\.id = latest_prices\.store_id/);
     assert.match(executor.calls[0]!.sql, /latest_prices\.confidence >= \$1/);
@@ -2174,6 +2303,7 @@ describe('createPostgresWeeklyPriceDropDigestReader', () => {
     assert.match(executor.calls[0]!.sql, /weekly_price_drop_digest/);
     assert.match(executor.calls[0]!.sql, /from latest_prices/);
     assert.match(executor.calls[0]!.sql, /join products on products\.id = latest_prices\.product_id/);
+    assert.match(executor.calls[0]!.sql, /products\.deleted_at is null/);
     assert.match(executor.calls[0]!.sql, /left join stores on stores\.id = latest_prices\.store_id/);
     assert.match(executor.calls[0]!.sql, /latest_prices\.domain = 'grocery'/);
     assert.match(executor.calls[0]!.sql, /latest_prices\.observed_at >= \$1::timestamptz/);
@@ -2329,6 +2459,7 @@ describe('createPostgresTrendingPriceChangeReader', () => {
     assert.match(executor.calls[0]!.sql, /from observations/);
     assert.match(executor.calls[0]!.sql, /lag\(observations\.price\) over/);
     assert.match(executor.calls[0]!.sql, /observations\.domain = 'grocery'/);
+    assert.match(executor.calls[0]!.sql, /products\.deleted_at is null/);
     assert.match(executor.calls[0]!.sql, /observations\.observed_at >= \(\$1::timestamptz - interval '31 days'\)/);
     assert.match(executor.calls[0]!.sql, /observed_at >= \$1::timestamptz/);
     assert.match(executor.calls[0]!.sql, /limit \$3/);
@@ -2385,7 +2516,7 @@ describe('createPostgresPriceReader', () => {
     assert.deepEqual(
       await reader.listPriceObservationHistory({
         productId: 'product-1',
-        chainId: 'chain-1',
+        chainIds: ['chain-1', 'chain-2'],
         storeId: 'store-1',
         priceType: 'promotion',
         observedFrom: '2026-05-01T00:00:00.000Z',
@@ -2442,15 +2573,19 @@ describe('createPostgresPriceReader', () => {
     assert.match(executor.calls[0]!.sql, /\$2::uuid is null or chain_id = \$2::uuid/);
     assert.match(executor.calls[0]!.sql, /\$3::uuid is null or store_id = \$3::uuid/);
     assert.match(executor.calls[0]!.sql, /\$4::text is null or price_type = \$4/);
+    assert.match(executor.calls[0]!.sql, /cardinality\(\$8::uuid\[\]\) = 0 or chain_id = any\(\$8::uuid\[\]\)/);
+    assert.match(executor.calls[0]!.sql, /cardinality\(\$9::uuid\[\]\) = 0 or store_id = any\(\$9::uuid\[\]\)/);
     assert.match(executor.calls[0]!.sql, /order by observed_at desc, chain_id, store_id, price_type, id/);
     assert.deepEqual(executor.calls[0]!.params, [
       'product-1',
-      'chain-1',
+      null,
       'store-1',
       'promotion',
       '2026-05-01T00:00:00.000Z',
       '2026-05-31T23:59:59.000Z',
-      20
+      20,
+      ['chain-1', 'chain-2'],
+      []
     ]);
   });
 
@@ -2461,7 +2596,7 @@ describe('createPostgresPriceReader', () => {
     await reader.listPriceObservationHistory({ productId: 'product-1', limit: 5000 });
     await reader.listPriceObservationHistory({ productId: 'product-1', limit: 0 });
 
-    assert.deepEqual(executor.calls[0]!.params, ['product-1', null, null, null, null, null, 1000]);
-    assert.deepEqual(executor.calls[1]!.params, ['product-1', null, null, null, null, null, 1]);
+    assert.deepEqual(executor.calls[0]!.params, ['product-1', null, null, null, null, null, 1000, [], []]);
+    assert.deepEqual(executor.calls[1]!.params, ['product-1', null, null, null, null, null, 1, [], []]);
   });
 });

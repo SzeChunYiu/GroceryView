@@ -820,7 +820,7 @@ describe('DB-backed site snapshot export script', () => {
     assert.match(moduleText, /AUTO-GENERATED from postgres\.latest_prices\/observations/);
     assert.match(moduleText, /import type \{ ChainPriceObservation \} from '@groceryview\/core';/);
     assert.match(moduleText, /export const dbSiteChainObservationsGeneratedAt = "2026-05-22T21:20:00.000Z";/);
-    assert.match(moduleText, /export const dbSiteSnapshotChainPriceObservations: ChainPriceObservation\[] = \[/);
+    assert.match(moduleText, /export const dbSiteSnapshotChainPriceObservations: DbSiteChainPriceObservation\[] = \[/);
     assert.match(moduleText, /"category": "skafferi · kg"/);
   });
 

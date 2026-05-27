@@ -10,6 +10,7 @@ import {
   createPgQueryExecutor,
   createPostgresMigrationExecutor
 } from '../../packages/db/dist/index.js';
+import { buildPostgresPoolConfig, resolveDailyWriteDatabaseUrl } from './db-connection.mjs';
 
 const { Pool } = pg;
 const repoRoot = new URL('../..', import.meta.url);
@@ -36,8 +37,7 @@ export function loadInfraMigrationFiles() {
 }
 
 function requireDatabaseUrl(env) {
-  if (!env.DATABASE_URL?.trim()) throw new Error('DATABASE_URL is required.');
-  return env.DATABASE_URL.trim();
+  return resolveDailyWriteDatabaseUrl(env).connectionString;
 }
 
 export async function applyProductionMigrations(env = process.env) {
@@ -52,10 +52,7 @@ export async function applyProductionMigrations(env = process.env) {
   }
 
   const pool = new Pool({
-    connectionString: databaseUrl,
-    max: 1,
-    idleTimeoutMillis: 1_000,
-    connectionTimeoutMillis: 15_000,
+    ...buildPostgresPoolConfig(databaseUrl),
     ssl: { rejectUnauthorized: false }
   });
 

@@ -1,6 +1,9 @@
 import { publicApiCatalog, publicApiDisclaimers, publicApiRateLimit, publicApiSmokeExamples, publicApiVersion } from '@/lib/public-api';
 
 const examples = publicApiSmokeExamples();
+const documentedPublicApiResources = ['products', 'current-prices', 'price-history', 'nutrition', 'allergens-labels', 'stores', 'comparisons'] as const;
+
+// Read resources: products, current-prices, price-history, nutrition, allergens-labels, stores, comparisons.
 
 export default function DevelopersApiPage() {
   return (
@@ -21,6 +24,7 @@ export default function DevelopersApiPage() {
       <section className="mt-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
         <h2 className="text-xl font-black text-slate-950">Read endpoints</h2>
         <p className="mt-2 text-sm leading-6 text-slate-600">Base path: <code>/api/public/v1</code>. Add <code>resource</code> and optional <code>limit</code> up to 100.</p>
+        <p className="mt-2 text-xs font-bold text-slate-500">Documented resources: {documentedPublicApiResources.join(', ')}</p>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           {publicApiCatalog().map((resource) => (
             <a className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4 text-sm font-bold text-emerald-950 hover:border-emerald-400" href={resource.href} key={resource.resource}>

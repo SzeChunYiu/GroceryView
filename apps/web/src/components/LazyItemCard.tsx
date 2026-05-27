@@ -6,6 +6,7 @@ import { trackItemCardImpression } from '@/lib/analytics';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { PriceBadge } from './price-badge';
 import { ProductImage } from './product-image';
+import { EcoBadge } from './eco-badge';
 import type { RecentPriceVarianceBadge } from '@/lib/price-intelligence';
 import { dataGridVirtualStatusClass } from '@/components/data-grid';
 
@@ -54,12 +55,19 @@ export function LazyItemCard({ ariaLabel, children, className, compareMode, href
   );
 }
 
-type VirtualizedProduct = {
+export type VirtualizedProduct = {
   allergenRiskBadges: { label: string; matchedTerms: string[] }[];
   brand: string;
   categoryLabel: string;
   chainLabel: string;
   cheapestPriceLabel: string;
+  carbonScore: {
+    score: number;
+    grade: 'A' | 'B' | 'C' | 'D' | 'E';
+    label: string;
+    source: string;
+    reasons: readonly string[];
+  };
   imageUrl?: string | null;
   isAvailable?: boolean;
   name: string;
@@ -192,6 +200,7 @@ export function VirtualizedProductGrid({ products, resultLabel = 'Virtualized pr
               <div className="mt-4 grid gap-2 text-xs font-black text-slate-700">
                 <div className="flex flex-wrap items-center gap-2">
                   <PriceBadge className="px-2 py-0.5 text-xs" price={product.cheapestPriceLabel} varianceBadge={product.volatilityBadge} />
+                  <EcoBadge score={product.carbonScore} />
                   <span>{product.unitPriceLabel}</span>
                 </div>
                 <p>{product.chainLabel}</p>

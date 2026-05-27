@@ -1,9 +1,11 @@
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { StoreMap } from '@/components/StoreMap';
 import { osmStores } from '@/lib/osm-stores';
 import {
+  adaptiveProductCards,
   findStore,
   storeAssortmentOverviewForStore,
   storeOpeningHoursLabel,
@@ -13,6 +15,7 @@ import {
 } from '@/lib/verified-data';
 import { storePageViewScript } from '@/lib/analytics';
 import { metadataForStore } from '@/lib/seo';
+import { substitutionPlansForUnavailableProducts } from '@/lib/substitutions';
 
 type ConfidenceLevel = 'high' | 'medium' | 'low';
 
@@ -126,11 +129,31 @@ function StoreDetailEmptyState() {
   );
 }
 
-export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
+export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>): Promise<Metadata> {
   const { slug } = await params;
   const store = findStore(slug);
   if (!store) notFound();
-  return metadataForStore(store);
+  const metadata = metadataForStore(store);
+  const place = store.city || store.district ? ` in ${[store.district, store.city].filter(Boolean).join(', ')}` : '';
+  const title = `${store.name} store record | GroceryView`;
+  const description = `Verified OpenStreetMap grocery store record for ${store.name}, ${store.brand}${place}. Prices are not inferred from store location.`;
+
+  return {
+    ...metadata,
+    openGraph: {
+      ...metadata.openGraph,
+      title,
+      description,
+      images: [
+        {
+          url: `/stores/${store.slug}/opengraph-image`,
+          width: 1200,
+          height: 630,
+          alt: `${store.name} ${store.brand}`
+        }
+      ]
+    }
+  };
 }
 
 export function generateStaticParams() {
@@ -144,6 +167,7 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
   const pricePercentileRank = storePricePercentileRankFor(store);
   const openingHoursLabel = storeOpeningHoursLabel(store);
   const assortmentOverview = storeAssortmentOverviewForStore(store);
+  const substitutionPlans = substitutionPlansForUnavailableProducts(adaptiveProductCards).slice(0, 3);
   const storeViewAnalyticsScript = storePageViewScript({
     brand: store.brand,
     storeName: store.name,
@@ -253,6 +277,34 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
           <p className="mt-4 text-sm font-black text-amber-900">
             Source: {store.source}; retrieved {store.retrievedDate}.
           </p>
+        </Card>
+        <Card className="border-emerald-200 bg-emerald-50">
+          <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-800">Selected-store substitutions</p>
+          <h2 className="mt-2 text-2xl font-black text-emerald-950">Alternatives when an item is unavailable</h2>
+          <p className="mt-3 text-sm font-semibold leading-6 text-emerald-950">
+            Store pages use the same substitutionSuggestionsForUnavailableProduct scorer as product cards: same category first, then brand preference, price, and nutrition/safety evidence.
+          </p>
+          {substitutionPlans.length > 0 ? (
+            <div className="mt-4 grid gap-3">
+              {substitutionPlans.map((plan) => (
+                <div className="rounded-2xl border border-emerald-200 bg-white p-4" key={plan.unavailableProduct.slug}>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Unavailable: {plan.unavailableProduct.name}</p>
+                  <ul className="mt-2 space-y-2">
+                    {plan.suggestions.map((suggestion) => (
+                      <li className="rounded-xl bg-emerald-50 p-3 text-sm font-semibold text-emerald-950" key={suggestion.slug}>
+                        <span className="block font-black">{suggestion.name} · {suggestion.totalPriceLabel}</span>
+                        {suggestion.reason} · {suggestion.nutritionImpactLabel}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-4 rounded-2xl border border-emerald-200 bg-white p-4 text-sm font-bold text-emerald-950">
+              No verified latest-price row currently marks a product unavailable for this selected store, so alternatives stay hidden instead of being fabricated.
+            </p>
+          )}
         </Card>
         <Card className="border-cyan-200 bg-cyan-50">
           <p className="text-xs font-black uppercase tracking-[0.22em] text-cyan-800">{pricePercentileRank.title}</p>

@@ -15,6 +15,7 @@ export type ListConflictPrompt = {
 
 export type SharedListItem = {
   id: string;
+  matchedProductSlug?: string;
   name: string;
   quantity?: string;
   ownerRole: FamilyRole;

@@ -2,8 +2,8 @@
 
 import { type KeyboardEvent, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { buildPriceHistorySparklinePath } from '@/lib/price-events';
-import { formatPriceChartTerminalReadout } from '../lib/price-chart-terminal-readout.js';
-export { formatPriceChartTerminalReadout, priceChartTerminalLatestPoint } from '../lib/price-chart-terminal-readout.js';
+import { buildPriceChartTerminalMoveNotes, formatPriceChartTerminalReadout } from '../lib/price-chart-terminal-readout.js';
+export { buildPriceChartTerminalMoveNotes, formatPriceChartTerminalReadout, priceChartTerminalLatestPoint } from '../lib/price-chart-terminal-readout.js';
 
 /**
  * Renders the interactive price-history terminal for a product, including
@@ -48,8 +48,10 @@ export type PriceChartTerminalSeries = {
   }>;
   markers: Array<{
     time: string;
+    type?: 'promotion' | 'member' | 'new_low' | 'price_change' | 'receipt_confirmed' | 'source_warning';
     text: string;
     color: string;
+    sourceType?: string;
     provenanceLabel?: string;
   }>;
 };
@@ -82,6 +84,17 @@ export type PriceChartTerminalWindow = {
   highValueLabel: string;
   series: PriceChartTerminalSeries[];
   forecast?: PriceChartTerminalForecast;
+};
+
+
+type PriceMoveNote = {
+  id: string;
+  markerKey: string;
+  markerLabel: string;
+  observedAt: string;
+  sourceLabel: string;
+  provenanceLabel: string | null;
+  explanation: string;
 };
 
 export type PriceChartTerminalModel = {
@@ -184,6 +197,10 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
   const visiblePointCount = visibleSeries.reduce((total, series) => total + series.points.length, 0);
   const visibleMarkerCount = visibleSeries.reduce((total, series) => total + series.markers.length, 0);
   const latestReadout = formatPriceChartTerminalReadout(activeWindow);
+  const priceMoveNotes = useMemo<PriceMoveNote[]>(
+    () => activeWindow ? buildPriceChartTerminalMoveNotes({ ...activeWindow, series: visibleSeries }, 5) as PriceMoveNote[] : [],
+    [activeWindow, visibleSeries]
+  );
   const csvDownloadHref = useMemo(() => {
     const csv = priceHistoryCsv(activeWindow, visibleSeries);
     return csv ? `data:text/csv;charset=utf-8,${encodeURIComponent(csv)}` : '#';
@@ -460,6 +477,37 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
             className="mt-5 h-[280px] overflow-hidden rounded-3xl border border-white/10 bg-white"
             role="img"
           />
+          {priceMoveNotes.length > 0 ? (
+            <div className="mt-4 rounded-2xl border border-sky-300/30 bg-sky-300/10 p-4">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-sky-100">Why markers moved</p>
+                  <h3 className="mt-1 text-lg font-black text-white">Factual notes tied to chart markers</h3>
+                </div>
+                <p className="text-xs font-bold text-sky-100">{priceMoveNotes.length} marker-linked notes · no inferred retailer cause</p>
+              </div>
+              <div className="mt-3 grid gap-3 lg:grid-cols-2">
+                {priceMoveNotes.map((note) => (
+                  <article
+                    className="rounded-xl border border-white/10 bg-slate-950/70 p-3"
+                    data-price-chart-marker-note={note.markerKey}
+                    key={note.id}
+                  >
+                    <p className="text-xs font-black uppercase tracking-[0.14em] text-sky-100">
+                      {note.markerLabel} · {note.observedAt.slice(0, 10)}
+                    </p>
+                    <p className="mt-2 text-sm font-semibold leading-6 text-slate-100">{note.explanation}</p>
+                    <p className="mt-2 text-xs font-bold text-slate-300">
+                      Marker link: {note.markerKey} · {note.sourceLabel}
+                    </p>
+                    {note.provenanceLabel ? (
+                      <p className="mt-1 text-xs font-semibold text-slate-400">Source: {note.provenanceLabel}</p>
+                    ) : null}
+                  </article>
+                ))}
+              </div>
+            </div>
+          ) : null}
           {chartLoadStatus === 'loading' ? (
             <p className="mt-3 rounded-2xl border border-white/10 bg-white/10 p-3 text-xs font-bold text-slate-200">
               Loading interactive lightweight-charts renderer after the product data is visible.

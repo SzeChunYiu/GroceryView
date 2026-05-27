@@ -1,4 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { hashPassword, verifyPasswordHash } from '@groceryview/auth';
 import { PostgresQueryExecutorService } from '../database/postgres-query-executor.service.js';
 
 export const allowedPreferenceCurrencies = ['SEK', 'EUR', 'NOK', 'DKK'] as const;
@@ -12,11 +14,32 @@ export type UserPreferencePatch = {
   algorithm_choice?: (typeof allowedMyFlyerAlgorithmChoices)[number];
 };
 
+export type PasswordChangePatch = {
+  currentPassword: string;
+  newPassword: string;
+};
+
 type PreferenceRow = {
   preferred_currency: string;
+  favorite_stores: string[] | null;
   notification_channels: string[] | null;
   algorithm_choice: string;
 };
+
+type PasswordCredentialRow = {
+  password_hash: string;
+};
+
+function normalizePreferredStores(value: string[]): string[] {
+  const stores = value.map((store) => store.trim().toLowerCase());
+  if (stores.length < 1 || stores.length > 5) {
+    throw new BadRequestException('preferredStores must contain 1 to 5 ordered store slugs.');
+  }
+  if (stores.some((store) => !/^[a-z0-9][a-z0-9-]*$/.test(store))) {
+    throw new BadRequestException('preferredStores must contain store slugs only.');
+  }
+  return [...new Set(stores)];
+}
 
 @Injectable()
 export class SettingsService {
@@ -37,41 +60,71 @@ export class SettingsService {
       [userId]
     );
 
-    if (patch.currency !== undefined || patch.notificationChannels !== undefined || patch.algorithm_choice !== undefined) {
+    const preferredStores = patch.preferredStores === undefined ? undefined : normalizePreferredStores(patch.preferredStores);
+
+    if (
+      patch.currency !== undefined ||
+      patch.notificationChannels !== undefined ||
+      patch.algorithm_choice !== undefined ||
+      preferredStores !== undefined
+    ) {
       await this.executor.query(
-        `insert into user_preferences(user_id, weekly_budget, monthly_budget, preferred_currency, notification_channels, algorithm_choice)
-         values ($1, 0, 0, coalesce($2::text, 'SEK'), coalesce($3::text[], array[]::text[]), coalesce($4::text, 'balanced'))
+        `insert into user_preferences(user_id, weekly_budget, monthly_budget, preferred_currency, notification_channels, algorithm_choice, favorite_stores)
+         values ($1, 0, 0, coalesce($2::text, 'SEK'), coalesce($3::text[], array[]::text[]), coalesce($4::text, 'balanced'), coalesce($5::text[], array[]::text[]))
          on conflict (user_id) do update set
            preferred_currency = coalesce($2::text, user_preferences.preferred_currency),
            notification_channels = coalesce($3::text[], user_preferences.notification_channels),
            algorithm_choice = coalesce($4::text, user_preferences.algorithm_choice),
+           favorite_stores = coalesce($5::text[], user_preferences.favorite_stores),
            updated_at = now()`,
-        [userId, patch.currency ?? null, patch.notificationChannels ?? null, patch.algorithm_choice ?? null]
+        [userId, patch.currency ?? null, patch.notificationChannels ?? null, patch.algorithm_choice ?? null, preferredStores ?? null]
       );
-    }
-
-    if (patch.preferredStores !== undefined) {
-      await this.executor.query('delete from favorite_stores where user_id = $1', [userId]);
-      for (const storeId of patch.preferredStores) {
-        await this.executor.query(
-          'insert into favorite_stores(user_id, store_id) values ($1, $2) on conflict (user_id, store_id) do nothing',
-          [userId, storeId]
-        );
-      }
     }
 
     return this.fetchPreferences(userId);
   }
 
-  private async fetchPreferences(userId: string) {
-    const preferenceRows = await this.executor.query<PreferenceRow>(
-      `select preferred_currency, notification_channels, algorithm_choice
-       from user_preferences
+  async changePassword(userId: string, patch: PasswordChangePatch) {
+    if (patch.currentPassword === patch.newPassword) {
+      throw new BadRequestException('newPassword must be different from currentPassword.');
+    }
+
+    const credentialRows = await this.executor.query<PasswordCredentialRow>(
+      `select password_hash
+       from password_credentials
        where user_id = $1`,
       [userId]
     );
-    const storeRows = await this.executor.query<{ store_id: string }>(
-      'select store_id from favorite_stores where user_id = $1 order by store_id',
+    const credential = credentialRows[0];
+    if (!credential) throw new UnauthorizedException('Current password is invalid.');
+
+    const verification = await verifyPasswordHash(patch.currentPassword, credential.password_hash);
+    if (!verification.valid) throw new UnauthorizedException('Current password is invalid.');
+
+    const nextPasswordHash = await hashPassword(patch.newPassword);
+    await this.executor.query(
+      `update password_credentials
+       set password_hash = $2,
+           algorithm = 'scrypt',
+           changed_at = now(),
+           updated_at = now()
+       where user_id = $1`,
+      [userId, nextPasswordHash]
+    );
+    await this.executor.query(
+      `insert into password_changes(id, user_id, changed_at)
+       values ($1, $2, now())`,
+      [randomUUID(), userId]
+    );
+
+    return { userId, passwordChanged: true };
+  }
+
+  private async fetchPreferences(userId: string) {
+    const preferenceRows = await this.executor.query<PreferenceRow>(
+      `select preferred_currency, favorite_stores, notification_channels, algorithm_choice
+       from user_preferences
+       where user_id = $1`,
       [userId]
     );
     const preference = preferenceRows[0];
@@ -79,7 +132,7 @@ export class SettingsService {
     return {
       userId,
       currency: preference?.preferred_currency ?? 'SEK',
-      preferredStores: storeRows.map((row) => row.store_id),
+      preferredStores: preference?.favorite_stores ?? [],
       notificationChannels: preference?.notification_channels ?? [],
       algorithm_choice: preference?.algorithm_choice ?? 'balanced'
     };

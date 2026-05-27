@@ -49,4 +49,14 @@ describe('calculateFixedBasketIndex', () => {
     assert.deepEqual(summary.highestSavingsCategories, ['Cleaning', 'Coffee', 'Pasta']);
     assert.equal(summary.premiumGapPercent, 58.82);
   });
+
+  it('fails closed with an empty summary when there are no observations', () => {
+    const summary = calculateBrandTierIndices([]);
+    assert.deepEqual(summary, {
+      indices: [],
+      privateLabelSavingsPercent: 0,
+      highestSavingsCategories: [],
+      premiumGapPercent: 0
+    });
+  });
 });

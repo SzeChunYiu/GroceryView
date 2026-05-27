@@ -17,6 +17,10 @@ SSB returns JSON-stat2 with dimensions ordered as `Konsumgrp`, `ContentsCode`, a
 
 Rows with missing, null, non-numeric, or unparsable period values are skipped. The connector never interpolates, carries forward, or estimates missing CPI periods.
 
+## Persistence
+
+`fetchAndPersistSsbCpi03013BenchmarkObservations` writes source rows to `benchmark_observation` with `source_id`, `country`, `vertical`, `ecoicop_code`, `period`, `value`, `unit`, and `observed_at`. The upsert uses the table primary-key constraint and updates only published source values plus the observation timestamp; missing periods produce no write.
+
 ## License and citation
 
 Cite Statistics Norway / Statistisk sentralbyrå and table 03013 when presenting values. Keep the SSB table identifier and retrieval timestamp with downstream benchmark displays.

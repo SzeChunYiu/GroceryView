@@ -2,6 +2,26 @@
   "framework": null,
   "installCommand": "npm ci",
   "buildCommand": "npm run build -w @groceryview/server",
+  "redirects": [
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "groceryview.se" }],
+      "destination": "/se",
+      "permanent": false
+    },
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "groceryview.no" }],
+      "destination": "/no",
+      "permanent": false
+    },
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "groceryview.is" }],
+      "destination": "/is",
+      "permanent": false
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/:path*",

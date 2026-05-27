@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { CategorySuggestionList } from '@/components/category-filter';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { SavedViewActions } from '@/components/saved-view-actions';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { buildDemoHouseholdCategorySignals, defaultHouseholdId, getHouseholdCategoryScore, rankCategoriesByPurchaseHistory } from '@/lib/personalization';
 import { pricedProducts } from '@/lib/openprices-products';
@@ -8,9 +9,9 @@ import { buildCategoryScopedSearchSuggestions } from '@/lib/search-suggest';
 import { CategoryTrendingShelves } from '@/app/page-sections/trending';
 import { buildCategoryTrendingShelves } from '@/lib/grocery-index-widget';
 import { categorySummaries, dietaryScenarioFilters, formatPct, formatSek, immigrantAisleFinder, sustainableBrandFilter } from '@/lib/verified-data';
-import { publicCatalogueRevalidateSeconds, routeMetadata } from '@/lib/seo';
+import { routeMetadata } from '@/lib/seo';
 
-export const revalidate = publicCatalogueRevalidateSeconds;
+export const revalidate = 300;
 
 export function generateMetadata() {
   return routeMetadata('/categories');
@@ -36,6 +37,13 @@ export default function CategoriesIndexPage() {
       <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
         Search categories are ranked for {defaultHouseholdId} using historical conversions and clicks so high-intent aisles appear first.
       </p>
+      <SavedViewActions
+        href="/categories"
+        label="Category coverage ranked by household history"
+        resultLabel={`${personalizedCategories.length} categories · ${categorySuggestionGroups.length} autocomplete groups · verified product rows`}
+        state={{ household: defaultHouseholdId, sort: 'purchase-history', view: 'category-index' }}
+        surface="categories"
+      />
       <Card className="mt-6 border-sky-200 bg-sky-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-800">Category-scoped autocomplete</p>
         <h2 className="mt-2 text-2xl font-black">Suggestions stay inside the active category</h2>

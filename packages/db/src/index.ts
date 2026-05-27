@@ -1,16 +1,23 @@
-import { createHash } from 'node:crypto';
 import { buildUserAccountDeletionQueries } from './queries/users.js';
+import { contentHashForPayload } from './content-hash.js';
+import { ACTIVE_PRODUCTS_PREDICATE } from './queries/items.js';
 
 export * from './client.js';
 export * from './queries/categories.js';
+export * from './queries/analytics.js';
+export * from './queries/availability.js';
 export * from './queries/deals.js';
 export * from './queries/favorites.js';
+export * from './queries/items.js';
 export * from './queries/personalized.js';
 export * from './queries/productSearch.js';
 export * from './queries/stores.js';
 export * from './queries/retailers.js';
+export * from './queries/scraperLogs.js';
 export * from './queries/users.js';
+export * from './privacyRegistry.js';
 export * from './seed/retailers.js';
+export * from './seed/brands.js';
 
 export type Migration = {
   version: string;
@@ -279,6 +286,20 @@ export type BasketImportReviewResolution = {
   quantity?: number;
 };
 
+export type FriendSharedDealSignalRecord = {
+  signalId: string;
+  userId: string;
+  productId: string;
+  sharedByUserId: string;
+  sharedByDisplayName: string;
+  relationship: 'household' | 'friend';
+  sharedAt: string;
+  sourceConfidence: number;
+  optedIn: boolean;
+  dealScore?: number;
+  createdAt: string;
+};
+
 export type PantryItemRecord = {
   id: string;
   userId: string;
@@ -516,6 +537,8 @@ export type PriceObservationRecord = {
   sourceRunId?: string;
   rawRecordId?: string;
   retailerProductRef?: string;
+  originCountry?: string;
+  certLevel?: string;
   priceType: PriceType;
   price: number;
   regularPrice?: number;
@@ -559,7 +582,9 @@ export type PriceObservationHistoryRecord = PriceObservationRecord & {
 export type PriceObservationHistoryFilter = {
   productId: string;
   chainId?: string;
+  chainIds?: string[];
   storeId?: string;
+  storeIds?: string[];
   priceType?: PriceType;
   observedFrom?: string;
   observedTo?: string;
@@ -694,6 +719,8 @@ export type SiteLatestPriceSnapshotRow = LatestPriceRecord & {
   validFrom?: string;
   validUntil?: string;
   retailerProductRef?: string;
+  originCountry?: string;
+  certLevel?: string;
 };
 
 export type SiteLatestPriceSnapshotFilter = {
@@ -862,6 +889,8 @@ export type OpenPricesArtifactPriceObservation = {
   parserVersion?: string;
   rawSnapshotRef: string;
   sourceRunId?: string;
+  originCountry?: string;
+  certLevel?: string;
   confidenceScore: number;
   isOnlinePrice?: boolean;
   isInstorePrice?: boolean;
@@ -924,6 +953,18 @@ export type NotificationTaskRecord = {
   attemptCount: number;
   maxAttempts: number;
   status: 'queued' | 'delivered' | 'dead_lettered' | 'suppressed';
+};
+
+export type NotificationSubscriptionRecord = {
+  id: string;
+  userId: string;
+  channel: 'push' | 'email' | 'telegram';
+  recipient: string;
+  chatId?: string;
+  productId?: string;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type NotificationTaskAcknowledgement =
@@ -1007,6 +1048,8 @@ export type GroceryViewRepository = {
   saveBasketImportReviewItems(userId: string, items: BasketImportReviewRecord[]): Promise<void>;
   listOpenBasketImportReviewItems(userId: string): Promise<BasketImportReviewRecord[]>;
   resolveBasketImportReviewItem(userId: string, reviewItemId: string, resolution: BasketImportReviewResolution): Promise<BasketImportReviewRecord>;
+  upsertFriendSharedDealSignal(signal: FriendSharedDealSignalRecord): Promise<void>;
+  listFriendSharedDealSignals(userId: string): Promise<FriendSharedDealSignalRecord[]>;
   upsertPantryItem(item: PantryItemRecord): Promise<void>;
   listPantryItems(userId: string): Promise<PantryItemRecord[]>;
   upsertReceiptUpload(upload: ReceiptUploadRecord): Promise<void>;
@@ -1018,7 +1061,9 @@ export type GroceryViewRepository = {
   upsertCommunityReporterTrust(trust: CommunityReporterTrustRecord): Promise<void>;
   getCommunityReporterTrust(reporterId: string): Promise<CommunityReporterTrustRecord | null>;
   upsertNotificationTask(task: NotificationTaskRecord): Promise<void>;
+  insertNotificationTaskIfAbsent(task: NotificationTaskRecord): Promise<boolean>;
   listDueNotificationTasks(now: string): Promise<NotificationTaskRecord[]>;
+  listActiveTelegramNotificationSubscriptions(): Promise<NotificationSubscriptionRecord[]>;
   upsertNotificationSuppression(suppression: NotificationSuppressionRecord): Promise<void>;
   listActiveNotificationSuppressions(): Promise<NotificationSuppressionRecord[]>;
   upsertAlertRule(rule: AlertRuleRecord): Promise<void>;
@@ -1263,12 +1308,14 @@ export function createMemoryRepository(): GroceryViewRepository {
   const watchlists = new Map<string, WatchlistRecord[]>();
   const baskets = new Map<string, BasketRecord[]>();
   const basketImportReviewItems = new Map<string, BasketImportReviewRecord[]>();
+  const friendSharedDealSignals = new Map<string, FriendSharedDealSignalRecord>();
   const pantryItems = new Map<string, PantryItemRecord>();
   const receiptUploads = new Map<string, ReceiptUploadRecord>();
   const householdPlans = new Map<string, HouseholdPlanRecord>();
   const humanReviewers = new Map<string, HumanReviewerRecord>();
   const communityReporterTrust = new Map<string, CommunityReporterTrustRecord>();
   const notificationTasks = new Map<string, NotificationTaskRecord>();
+  const notificationSubscriptions = new Map<string, NotificationSubscriptionRecord>();
   const notificationSuppressions = new Map<string, NotificationSuppressionRecord>();
   const alertRules = new Map<string, AlertRuleRecord>();
   const humanReviewAssignments = new Map<string, HumanReviewAssignmentRecord>();
@@ -1286,6 +1333,7 @@ export function createMemoryRepository(): GroceryViewRepository {
       watchlists.delete(userId);
       baskets.delete(userId);
       basketImportReviewItems.delete(userId);
+      for (const [signalId, signal] of friendSharedDealSignals) if (signal.userId === userId) friendSharedDealSignals.delete(signalId);
       for (const [itemId, item] of pantryItems) if (item.userId === userId) pantryItems.delete(itemId);
       for (const [uploadId, upload] of receiptUploads) if (upload.userId === userId) receiptUploads.delete(uploadId);
       for (const [planId, plan] of householdPlans) {
@@ -1380,6 +1428,19 @@ export function createMemoryRepository(): GroceryViewRepository {
       return { ...resolved };
     },
 
+    async upsertFriendSharedDealSignal(signal) {
+      requireUser(users, signal.userId);
+      friendSharedDealSignals.set(signal.signalId, { ...signal });
+    },
+
+    async listFriendSharedDealSignals(userId) {
+      requireUser(users, userId);
+      return [...friendSharedDealSignals.values()]
+        .filter((signal) => signal.userId === userId)
+        .sort((a, b) => b.sharedAt.localeCompare(a.sharedAt) || a.signalId.localeCompare(b.signalId))
+        .map((signal) => ({ ...signal }));
+    },
+
     async upsertPantryItem(item) {
       requireUser(users, item.userId);
       pantryItems.set(item.id, { ...item });
@@ -1467,11 +1528,24 @@ export function createMemoryRepository(): GroceryViewRepository {
       notificationTasks.set(task.id, { ...task });
     },
 
+    async insertNotificationTaskIfAbsent(task) {
+      if (notificationTasks.has(task.id)) return false;
+      notificationTasks.set(task.id, { ...task });
+      return true;
+    },
+
     async listDueNotificationTasks(now) {
       return [...notificationTasks.values()]
         .filter((task) => task.status === 'queued' && task.sendAt <= now)
         .sort((a, b) => a.sendAt.localeCompare(b.sendAt) || a.id.localeCompare(b.id))
         .map((task) => ({ ...task }));
+    },
+
+    async listActiveTelegramNotificationSubscriptions() {
+      return [...notificationSubscriptions.values()]
+        .filter((subscription) => subscription.active && subscription.channel === 'telegram' && subscription.chatId?.trim())
+        .sort((a, b) => a.userId.localeCompare(b.userId) || (a.productId ?? '').localeCompare(b.productId ?? '') || a.id.localeCompare(b.id))
+        .map((subscription) => ({ ...subscription }));
     },
 
     async upsertNotificationSuppression(suppression) {
@@ -1603,6 +1677,17 @@ type NotificationTaskRow = {
   max_attempts: string | number;
   status: NotificationTaskRecord['status'];
 };
+type NotificationSubscriptionRow = {
+  id: string;
+  user_id: string;
+  channel: NotificationSubscriptionRecord['channel'];
+  recipient: string;
+  chat_id: string | null;
+  product_id: string | null;
+  active: boolean;
+  created_at: string | Date;
+  updated_at: string | Date;
+};
 type NotificationSuppressionRow = {
   id: string;
   recipient: string;
@@ -1683,6 +1768,8 @@ type SiteLatestPriceSnapshotRowSql = LatestPriceRow & {
   valid_from: string | Date | null;
   valid_until: string | Date | null;
   retailer_product_ref: string | null;
+  origin_country: string | null;
+  cert_level: string | null;
 };
 type WeeklyPriceDropDigestRow = {
   product_id: string;
@@ -1841,6 +1928,19 @@ type BasketImportReviewRow = {
   resolved_at: string | Date | null;
   resolved_product_id: string | null;
 };
+type FriendSharedDealSignalRow = {
+  signal_id: string;
+  user_id: string;
+  product_id: string;
+  shared_by_user_id: string;
+  shared_by_display_name: string;
+  relationship: FriendSharedDealSignalRecord['relationship'];
+  shared_at: string | Date;
+  source_confidence: string | number;
+  opted_in: boolean;
+  deal_score: string | number | null;
+  created_at: string | Date;
+};
 
 function asIso(value: string | Date): string {
   return value instanceof Date ? value.toISOString() : value;
@@ -1929,7 +2029,9 @@ function mapSiteLatestPriceSnapshotRow(row: SiteLatestPriceSnapshotRowSql): Site
     memberRequired: row.member_required,
     ...(row.valid_from ? { validFrom: asIso(row.valid_from) } : {}),
     ...(row.valid_until ? { validUntil: asIso(row.valid_until) } : {}),
-    ...(row.retailer_product_ref ? { retailerProductRef: row.retailer_product_ref } : {})
+    ...(row.retailer_product_ref ? { retailerProductRef: row.retailer_product_ref } : {}),
+    ...(row.origin_country ? { originCountry: row.origin_country } : {}),
+    ...(row.cert_level ? { certLevel: row.cert_level } : {})
   };
 }
 
@@ -2291,6 +2393,20 @@ function mapNotificationTask(row: NotificationTaskRow): NotificationTaskRecord {
   };
 }
 
+function mapNotificationSubscription(row: NotificationSubscriptionRow): NotificationSubscriptionRecord {
+  return {
+    id: row.id,
+    userId: row.user_id,
+    channel: row.channel,
+    recipient: row.recipient,
+    ...(row.chat_id ? { chatId: row.chat_id } : {}),
+    ...(row.product_id ? { productId: row.product_id } : {}),
+    active: row.active,
+    createdAt: asIso(row.created_at),
+    updatedAt: asIso(row.updated_at)
+  };
+}
+
 function mapNotificationSuppression(row: NotificationSuppressionRow): NotificationSuppressionRecord {
   return {
     id: row.id,
@@ -2344,6 +2460,22 @@ function mapReceiptUpload(row: ReceiptUploadRow, items: ReceiptItemRecord[]): Re
     createdAt: asIso(row.created_at),
     updatedAt: asIso(row.updated_at),
     items
+  };
+}
+
+function mapFriendSharedDealSignal(row: FriendSharedDealSignalRow): FriendSharedDealSignalRecord {
+  return {
+    signalId: row.signal_id,
+    userId: row.user_id,
+    productId: row.product_id,
+    sharedByUserId: row.shared_by_user_id,
+    sharedByDisplayName: row.shared_by_display_name,
+    relationship: row.relationship,
+    sharedAt: asIso(row.shared_at),
+    sourceConfidence: Number(row.source_confidence),
+    optedIn: row.opted_in,
+    ...(row.deal_score === null ? {} : { dealScore: Number(row.deal_score) }),
+    createdAt: asIso(row.created_at)
   };
 }
 
@@ -2590,6 +2722,68 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
       const row = rows[0];
       if (!row) throw new Error(`Basket import review item not found: ${reviewItemId}`);
       return mapBasketImportReview(row);
+    },
+
+    async upsertFriendSharedDealSignal(signal) {
+      await executor.query(
+        `insert into friend_shared_deal_signals(
+           signal_id,
+           user_id,
+           product_id,
+           shared_by_user_id,
+           shared_by_display_name,
+           relationship,
+           shared_at,
+           source_confidence,
+           opted_in,
+           deal_score,
+           created_at
+         ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+         on conflict (signal_id) do update set
+           user_id = excluded.user_id,
+           product_id = excluded.product_id,
+           shared_by_user_id = excluded.shared_by_user_id,
+           shared_by_display_name = excluded.shared_by_display_name,
+           relationship = excluded.relationship,
+           shared_at = excluded.shared_at,
+           source_confidence = excluded.source_confidence,
+           opted_in = excluded.opted_in,
+           deal_score = excluded.deal_score`,
+        [
+          signal.signalId,
+          signal.userId,
+          signal.productId,
+          signal.sharedByUserId,
+          signal.sharedByDisplayName,
+          signal.relationship,
+          signal.sharedAt,
+          signal.sourceConfidence,
+          signal.optedIn,
+          signal.dealScore ?? null,
+          signal.createdAt
+        ]
+      );
+    },
+
+    async listFriendSharedDealSignals(userId) {
+      const rows = await executor.query<FriendSharedDealSignalRow>(
+        `select signal_id,
+                user_id,
+                product_id,
+                shared_by_user_id,
+                shared_by_display_name,
+                relationship,
+                shared_at,
+                source_confidence,
+                opted_in,
+                deal_score,
+                created_at
+         from friend_shared_deal_signals
+         where user_id = $1
+         order by shared_at desc, signal_id`,
+        [userId]
+      );
+      return rows.map(mapFriendSharedDealSignal);
     },
 
     async upsertPantryItem(item) {
@@ -2969,6 +3163,30 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
       );
     },
 
+    async insertNotificationTaskIfAbsent(task) {
+      const rows = await executor.query<IdRow>(
+        `insert into notification_tasks(
+           id, channel, type, title, body, priority, send_at, recipient, attempt_count, max_attempts, status
+         ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+         on conflict (id) do nothing
+         returning id`,
+        [
+          task.id,
+          task.channel,
+          task.type,
+          task.title,
+          task.body,
+          task.priority,
+          task.sendAt,
+          task.recipient,
+          task.attemptCount,
+          task.maxAttempts,
+          task.status
+        ]
+      );
+      return rows.length > 0;
+    },
+
     async listDueNotificationTasks(now) {
       const rows = await executor.query<NotificationTaskRow>(
         `select id, channel, type, title, body, priority, send_at, recipient, attempt_count, max_attempts, status
@@ -2978,6 +3196,18 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
         [now]
       );
       return rows.map(mapNotificationTask);
+    },
+
+    async listActiveTelegramNotificationSubscriptions() {
+      const rows = await executor.query<NotificationSubscriptionRow>(
+        `select id, user_id, channel, recipient, chat_id, product_id, active, created_at, updated_at
+         from notification_subscriptions
+         where active = true
+           and channel = 'telegram'
+           and nullif(btrim(chat_id), '') is not null
+         order by user_id, coalesce(product_id, ''), id`
+      );
+      return rows.map(mapNotificationSubscription);
     },
 
     async upsertNotificationSuppression(suppression) {
@@ -3082,9 +3312,6 @@ function normalizeAlias(value: string): string {
   return normalized;
 }
 
-function contentHashForPayload(payload: unknown): string {
-  return `sha256:${createHash('sha256').update(JSON.stringify(payload)).digest('hex')}`;
-}
 
 function mapOpenPricesPriceType(value: string): PriceType {
   if (value === 'online' || value === 'member' || value === 'receipt' || value === 'estimated') return value;
@@ -3119,6 +3346,15 @@ function validateOpenPricesArtifact(artifact: OpenPricesNormalizedArtifact): voi
     }
     if (row.priceObservation.currency !== 'SEK') throw new Error(`${path}.priceObservation.currency must be SEK.`);
     if (Number.isNaN(Date.parse(row.priceObservation.observedAt))) throw new Error(`${path}.priceObservation.observedAt must be an ISO date.`);
+    if (row.priceObservation.originCountry !== undefined && !/^[A-Z]{2}$/.test(row.priceObservation.originCountry)) {
+      throw new Error(`${path}.priceObservation.originCountry must be an ISO-3166 alpha-2 code.`);
+    }
+    if (
+      row.priceObservation.certLevel !== undefined &&
+      !['krav', 'eu_eco', 'free_range', 'asc', 'msc', 'rainforest_alliance', 'fairtrade', 'conventional'].includes(row.priceObservation.certLevel)
+    ) {
+      throw new Error(`${path}.priceObservation.certLevel must be a supported certification level.`);
+    }
     if (!Number.isFinite(row.priceObservation.confidenceScore) || row.priceObservation.confidenceScore < 0 || row.priceObservation.confidenceScore > 1) {
       throw new Error(`${path}.priceObservation.confidenceScore must be between 0 and 1.`);
     }
@@ -3162,6 +3398,7 @@ async function upsertOpenPricesProduct(executor: QueryExecutor, product: OpenPri
        package_size = excluded.package_size,
        package_unit = excluded.package_unit,
        comparable_unit = excluded.comparable_unit,
+       deleted_at = null,
        updated_at = now()
      returning id`,
     [
@@ -3266,6 +3503,8 @@ export async function persistOpenPricesArtifact(
       sourceRunId: sourceRun.sourceRunId,
       rawRecordId: rawRecord.rawRecordId,
       retailerProductRef: priceObservation.retailerProductId,
+      originCountry: priceObservation.originCountry,
+      certLevel: priceObservation.certLevel,
       priceType: mapOpenPricesPriceType(priceObservation.priceType),
       price: priceObservation.price,
       regularPrice: priceObservation.regularPrice,
@@ -3318,7 +3557,8 @@ export function createPostgresCatalogReader(executor: QueryExecutor): PostgresCa
                 created_at,
                 updated_at
          from products
-         where slug = $1`,
+         where slug = $1
+           and ${ACTIVE_PRODUCTS_PREDICATE}`,
         [slug]
       );
       const row = rows[0];
@@ -3348,7 +3588,8 @@ export function createPostgresCatalogReader(executor: QueryExecutor): PostgresCa
                 updated_at
          from products
          cross join (select nullif(trim($1::text), '') as term) as query
-         where (
+         where ${ACTIVE_PRODUCTS_PREDICATE}
+           and (
              query.term is null
              or products.barcode = query.term
              or products.canonical_name ilike '%' || query.term || '%'
@@ -3500,6 +3741,7 @@ export function createPostgresCatalogReader(executor: QueryExecutor): PostgresCa
          left join latest_prices on latest_prices.product_id = products.id
          left join chains on chains.id = latest_prices.chain_id
          left join stores on stores.id = latest_prices.store_id
+         where ${ACTIVE_PRODUCTS_PREDICATE}
          group by products.id, products.category_path
          order by products.id
          limit $1`,
@@ -3661,6 +3903,7 @@ export const POSTGRES_INTEGRATION_REQUIRED_TABLES = [
   'weekly_baskets',
   'basket_items',
   'basket_import_review_items',
+  'friend_shared_deal_signals',
   'human_review_assignments',
   'human_reviewers',
   'community_reporter_trust',
@@ -3697,7 +3940,8 @@ export const POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS = [
   '016_observation_connector_idempotency',
   '017_observation_availability',
   '018_household_collaboration_rls',
-  '019_price_snapshot_unique_index'
+  '019_price_snapshot_unique_index',
+  '025_friend_shared_deal_signals'
 ] as const;
 
 function assertProbe(condition: boolean, message: string): void {
@@ -4206,6 +4450,37 @@ export function createPostgresSourceRecordReader(executor: QueryExecutor): Postg
   };
 }
 
+const DEFAULT_DAILY_PERSIST_BATCH_SIZE = 1000;
+
+/**
+ * Resolve the per-query batch size for chunked daily-ingestion persistence.
+ *
+ * The connector-level price-observation upsert feeds its input rows into a
+ * single `jsonb_to_recordset(...)` query. For large connectors (e.g. ICA with
+ * ~97,800 rows) one monolithic query plans/executes for many minutes and
+ * effectively hangs. Splitting the input into bounded batches keeps every
+ * query small and predictable while preserving identical upsert semantics.
+ *
+ * Configurable via `GROCERYVIEW_DAILY_PERSIST_BATCH_SIZE` (default 1000).
+ */
+function resolveDailyPersistBatchSize(): number {
+  const raw = process.env.GROCERYVIEW_DAILY_PERSIST_BATCH_SIZE;
+  if (raw === undefined || raw.trim() === '') return DEFAULT_DAILY_PERSIST_BATCH_SIZE;
+  const parsed = Number.parseInt(raw, 10);
+  if (!Number.isFinite(parsed) || parsed < 1) return DEFAULT_DAILY_PERSIST_BATCH_SIZE;
+  return parsed;
+}
+
+/** Split an array into contiguous batches of at most `size` elements. */
+function batchRows<T>(rows: readonly T[], size: number): T[][] {
+  const safeSize = Number.isFinite(size) && size >= 1 ? Math.floor(size) : DEFAULT_DAILY_PERSIST_BATCH_SIZE;
+  const batches: T[][] = [];
+  for (let index = 0; index < rows.length; index += safeSize) {
+    batches.push(rows.slice(index, index + safeSize));
+  }
+  return batches;
+}
+
 export function createPostgresPriceObservationWriter(executor: QueryExecutor): PostgresPriceObservationWriter {
   return {
     async recordPriceObservation(observation) {
@@ -4219,6 +4494,8 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            source_run_id,
            raw_record_id,
            retailer_product_ref,
+           origin_country,
+           cert_level,
            price_type,
            price,
            regular_price,
@@ -4238,7 +4515,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            provenance
          ) values (
            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12,
-           $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24::jsonb
+           $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26::jsonb
          )
          on conflict (
            product_id,
@@ -4264,6 +4541,8 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
           observation.sourceRunId ?? null,
           observation.rawRecordId ?? null,
           observation.retailerProductRef ?? null,
+          observation.originCountry ?? null,
+          observation.certLevel ?? null,
           observation.priceType,
           observation.price,
           observation.regularPrice ?? null,
@@ -4339,7 +4618,51 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
 
     async upsertConnectorPriceObservations(observations) {
       if (observations.length === 0) return { observationIds: [] };
-      const rows = await executor.query<BatchObservationIdRow>(
+      const batchSize = resolveDailyPersistBatchSize();
+      const observationIds: string[] = new Array(observations.length);
+      // Persist all batches for this connector inside a single transaction so
+      // the connector's observations remain atomic (all-or-nothing), matching
+      // the prior single-query behaviour.
+      await executor.query('begin');
+      try {
+        let batchOffset = 0;
+        for (const batch of batchRows(observations, batchSize)) {
+          const rows = await runConnectorPriceObservationBatch(executor, batch);
+          if (rows.length !== batch.length) {
+            throw new Error('Connector price observation upsert did not return an id for every input row');
+          }
+          const idsByOrdinal = new Map(rows.map((row) => [Number(row.ordinal), row.id]));
+          for (let ordinal = 0; ordinal < batch.length; ordinal += 1) {
+            const id = idsByOrdinal.get(ordinal);
+            if (!id) {
+              throw new Error(`Connector price observation upsert did not return an id for input row ${batchOffset + ordinal}`);
+            }
+            observationIds[batchOffset + ordinal] = id;
+          }
+          batchOffset += batch.length;
+        }
+        await executor.query('commit');
+      } catch (error) {
+        await executor.query('rollback');
+        throw error;
+      }
+      return { observationIds };
+    }
+  };
+}
+
+/**
+ * Execute the connector price-observation upsert for a single batch of rows.
+ *
+ * The SQL is identical to the historical monolithic statement; only the input
+ * array is bounded. `ordinal` values are local to the batch (0-based per call),
+ * and the CTE chain references only these local ordinals, so batching is safe.
+ */
+async function runConnectorPriceObservationBatch(
+  executor: QueryExecutor,
+  observations: PriceObservationRecord[]
+): Promise<BatchObservationIdRow[]> {
+  return executor.query<BatchObservationIdRow>(
         `with input as (
            select *
            from jsonb_to_recordset($1::jsonb) as x(
@@ -4351,6 +4674,8 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              source_run_id uuid,
              raw_record_id uuid,
              retailer_product_ref text,
+             origin_country char(2),
+             cert_level text,
              price_type text,
              price numeric(12, 2),
              regular_price numeric(12, 2),
@@ -4377,6 +4702,35 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
                     order by ordinal
                   ) as input_rank
            from input
+         ),
+         latest_prior as (
+           select distinct on (ranked_input.ordinal)
+                  ranked_input.ordinal,
+                  observations.id,
+                  observations.product_id,
+                  observations.chain_id,
+                  observations.store_id,
+                  observations.domain,
+                  observations.price_type,
+                  observations.price,
+                  observations.regular_price,
+                  observations.unit_price,
+                  observations.currency,
+                  observations.is_available,
+                  observations.observed_at,
+                  observations.valid_from,
+                  observations.valid_until,
+                  observations.confidence,
+                  observations.provenance
+           from ranked_input
+           join observations on observations.product_id = ranked_input.product_id
+             and observations.chain_id = ranked_input.chain_id
+             and observations.store_id is not distinct from ranked_input.store_id
+             and observations.domain = ranked_input.domain
+             and observations.price_type = ranked_input.price_type
+             and observations.observed_at <= ranked_input.observed_at
+           where ranked_input.input_rank = 1
+           order by ranked_input.ordinal, observations.observed_at desc, observations.created_at desc, observations.id desc
          ),
          existing as (
            select distinct on (ranked_input.ordinal)
@@ -4411,6 +4765,30 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              and observations.provenance = ranked_input.provenance
            order by ranked_input.ordinal, observations.created_at, observations.id
          ),
+         change_input as (
+           select ranked_input.*
+           from ranked_input
+           left join latest_prior on latest_prior.ordinal = ranked_input.ordinal
+           where ranked_input.input_rank = 1
+             and (
+               latest_prior.id is null
+               or latest_prior.price is distinct from ranked_input.price
+               or latest_prior.unit_price is distinct from ranked_input.unit_price
+               or latest_prior.currency is distinct from ranked_input.currency
+               or latest_prior.is_available is distinct from ranked_input.is_available
+               or latest_prior.regular_price is distinct from ranked_input.regular_price
+             )
+         ),
+         closed_prior as (
+           update observations
+           set valid_until = change_input.observed_at
+           from change_input
+           join latest_prior on latest_prior.ordinal = change_input.ordinal
+           where observations.id = latest_prior.id
+             and observations.observed_at < change_input.observed_at
+             and (observations.valid_until is null or observations.valid_until > change_input.observed_at)
+           returning observations.id
+         ),
          inserted as (
            insert into observations(
              product_id,
@@ -4420,6 +4798,8 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              source_run_id,
              raw_record_id,
              retailer_product_ref,
+             origin_country,
+             cert_level,
              price_type,
              price,
              regular_price,
@@ -4446,6 +4826,8 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              source_run_id,
              raw_record_id,
              retailer_product_ref,
+             origin_country,
+             cert_level,
              price_type,
              price,
              regular_price,
@@ -4459,16 +4841,16 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              member_required,
              is_available,
              observed_at,
-             valid_from,
+             coalesce(valid_from, observed_at),
              valid_until,
              confidence,
              provenance
-           from ranked_input
+           from change_input
            where input_rank = 1
              and not exists (
                select 1
                from existing
-               where existing.ordinal = ranked_input.ordinal
+               where existing.ordinal = change_input.ordinal
              )
            on conflict (
              product_id,
@@ -4489,22 +4871,23 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
          ),
          written as (
            select ranked_input.ordinal,
-                  coalesce(inserted.id, existing.id) as id,
-                  coalesce(inserted.product_id, existing.product_id) as product_id,
-                  coalesce(inserted.chain_id, existing.chain_id) as chain_id,
-                  coalesce(inserted.store_id, existing.store_id) as store_id,
-                  coalesce(inserted.domain, existing.domain) as domain,
-                  coalesce(inserted.price_type, existing.price_type) as price_type,
-                  coalesce(inserted.price, existing.price) as price,
-                  coalesce(inserted.regular_price, existing.regular_price) as regular_price,
-                  coalesce(inserted.unit_price, existing.unit_price) as unit_price,
-                  coalesce(inserted.currency, existing.currency) as currency,
-                  coalesce(inserted.is_available, existing.is_available) as is_available,
-                  coalesce(inserted.observed_at, existing.observed_at) as observed_at,
-                  coalesce(inserted.confidence, existing.confidence) as confidence,
-                  coalesce(inserted.provenance, existing.provenance) as provenance
+                  coalesce(inserted.id, existing.id, latest_prior.id) as id,
+                  coalesce(inserted.product_id, existing.product_id, latest_prior.product_id) as product_id,
+                  coalesce(inserted.chain_id, existing.chain_id, latest_prior.chain_id) as chain_id,
+                  coalesce(inserted.store_id, existing.store_id, latest_prior.store_id) as store_id,
+                  coalesce(inserted.domain, existing.domain, latest_prior.domain) as domain,
+                  coalesce(inserted.price_type, existing.price_type, latest_prior.price_type) as price_type,
+                  coalesce(inserted.price, existing.price, latest_prior.price) as price,
+                  coalesce(inserted.regular_price, existing.regular_price, latest_prior.regular_price) as regular_price,
+                  coalesce(inserted.unit_price, existing.unit_price, latest_prior.unit_price) as unit_price,
+                  coalesce(inserted.currency, existing.currency, latest_prior.currency) as currency,
+                  coalesce(inserted.is_available, existing.is_available, latest_prior.is_available) as is_available,
+                  coalesce(inserted.observed_at, existing.observed_at, latest_prior.observed_at) as observed_at,
+                  coalesce(inserted.confidence, existing.confidence, latest_prior.confidence) as confidence,
+                  coalesce(inserted.provenance, existing.provenance, latest_prior.provenance) as provenance
            from ranked_input
            left join existing on existing.ordinal = ranked_input.ordinal
+           left join latest_prior on latest_prior.ordinal = ranked_input.ordinal
            left join inserted on inserted.product_id = ranked_input.product_id
              and inserted.chain_id = ranked_input.chain_id
              and inserted.store_id is not distinct from ranked_input.store_id
@@ -4518,7 +4901,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              and inserted.is_available = ranked_input.is_available
              and inserted.confidence = ranked_input.confidence
              and inserted.provenance = ranked_input.provenance
-           where inserted.id is not null or existing.id is not null
+           where inserted.id is not null or existing.id is not null or latest_prior.id is not null
          ),
          latest_upsert as (
            insert into latest_prices(
@@ -4598,6 +4981,8 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
           source_run_id: observation.sourceRunId ?? null,
           raw_record_id: observation.rawRecordId ?? null,
           retailer_product_ref: observation.retailerProductRef ?? null,
+          origin_country: observation.originCountry ?? null,
+          cert_level: observation.certLevel ?? null,
           price_type: observation.priceType,
           price: observation.price,
           regular_price: observation.regularPrice ?? null,
@@ -4616,19 +5001,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
           confidence: observation.confidence,
           provenance: observation.provenance
         })))]
-      );
-      if (rows.length !== observations.length) throw new Error('Connector price observation upsert did not return an id for every input row');
-
-      const idsByOrdinal = new Map(rows.map((row) => [Number(row.ordinal), row.id]));
-      return {
-        observationIds: observations.map((_, ordinal) => {
-          const id = idsByOrdinal.get(ordinal);
-          if (!id) throw new Error(`Connector price observation upsert did not return an id for input row ${ordinal}`);
-          return id;
-        })
-      };
-    }
-  };
+  );
 }
 
 export function createPostgresSiteSnapshotReader(executor: QueryExecutor): PostgresSiteSnapshotReader {
@@ -4670,6 +5043,8 @@ export function createPostgresSiteSnapshotReader(executor: QueryExecutor): Postg
                 observations.valid_from,
                 observations.valid_until,
                 observations.retailer_product_ref,
+                observations.origin_country,
+                observations.cert_level,
                 coalesce(observations.provenance, latest_prices.provenance) as provenance
          from latest_prices
          join observations on observations.id = latest_prices.observation_id
@@ -4678,6 +5053,7 @@ export function createPostgresSiteSnapshotReader(executor: QueryExecutor): Postg
          left join stores on stores.id = latest_prices.store_id
          where latest_prices.confidence >= $1
            and latest_prices.domain = 'grocery'
+           and ${ACTIVE_PRODUCTS_PREDICATE}
          order by latest_prices.observed_at desc, products.slug, chains.slug, stores.slug nulls last, latest_prices.price_type
          limit $2`,
         [minConfidence, limit]
@@ -4714,6 +5090,7 @@ export function createPostgresWeeklyPriceDropDigestReader(executor: QueryExecuto
          join chains on chains.id = latest_prices.chain_id
          left join stores on stores.id = latest_prices.store_id
          where latest_prices.domain = 'grocery'
+           and ${ACTIVE_PRODUCTS_PREDICATE}
            and latest_prices.observed_at >= $1::timestamptz
            and latest_prices.observed_at < $2::timestamptz
            and latest_prices.regular_price is not null
@@ -4758,6 +5135,7 @@ export function createPostgresTrendingPriceChangeReader(executor: QueryExecutor)
            join chains on chains.id = observations.chain_id
            left join stores on stores.id = observations.store_id
            where observations.domain = 'grocery'
+             and ${ACTIVE_PRODUCTS_PREDICATE}
              and observations.observed_at >= ($1::timestamptz - interval '31 days')
              and observations.observed_at < $2::timestamptz
              and observations.price >= 0
@@ -4903,6 +5281,8 @@ export function createPostgresPriceReader(executor: QueryExecutor): PostgresPric
            and ($4::text is null or price_type = $4)
            and ($5::timestamptz is null or observed_at >= $5::timestamptz)
            and ($6::timestamptz is null or observed_at <= $6::timestamptz)
+           and (cardinality($8::uuid[]) = 0 or chain_id = any($8::uuid[]))
+           and (cardinality($9::uuid[]) = 0 or store_id = any($9::uuid[]))
          order by observed_at desc, chain_id, store_id, price_type, id
          limit $7`,
         [
@@ -4912,7 +5292,9 @@ export function createPostgresPriceReader(executor: QueryExecutor): PostgresPric
           filter.priceType ?? null,
           filter.observedFrom ?? null,
           filter.observedTo ?? null,
-          limit
+          limit,
+          filter.chainIds ?? [],
+          filter.storeIds ?? []
         ]
       );
       return rows.map(mapPriceObservationHistory);

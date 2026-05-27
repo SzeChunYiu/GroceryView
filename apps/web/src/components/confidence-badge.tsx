@@ -1,3 +1,24 @@
+/**
+ * Displays GroceryView's source-confidence state for a price row or aggregate.
+ *
+ * Accessibility: the visible badge text is backed by an `aria-label` that
+ * expands sample size, freshness, verification, and color-vision indicator
+ * details so confidence is not communicated by color alone. Optional review
+ * actions render as real buttons and are disabled when the badge represents
+ * empty data.
+ *
+ * Dependencies: confidence copy comes from content-style rules, the glyph and
+ * meaning come from the color-vision palette, freshness labels come from the
+ * freshness helper, and supporting copy is localized through the grocery
+ * translator.
+ *
+ * Edge cases: missing labels fall back to confidence copy, missing sample sizes
+ * are omitted from the visible badge, empty detail arrays render only the
+ * badge unless an action is supplied, and provided verification text is trimmed
+ * before display.
+ */
+'use client';
+
 import { confidenceCopy, type ConfidenceLevel } from '@/lib/content-style';
 import { confidenceStateToken } from '@/lib/color-vision-palette';
 import { getPriceFreshness } from '@/lib/freshness';
@@ -13,7 +34,12 @@ type ConfidenceBadgeProps = {
     value: string;
   }>;
   verificationLabel?: string;
+  countryCode?: string;
   locale?: SupportedLocale;
+  emptyData?: boolean;
+  actionLabel?: string;
+  onAction?: () => void;
+  methodologyHref?: string;
 };
 
 const levelClasses: Record<ConfidenceBadgeProps["level"], string> = {
@@ -22,14 +48,20 @@ const levelClasses: Record<ConfidenceBadgeProps["level"], string> = {
   low: "border-amber-200 bg-amber-50 text-amber-900",
 };
 
-export function ConfidenceBadge({ level, label, observedAt, sampleSize, details, verificationLabel, locale }: ConfidenceBadgeProps) {
+function countryCodeFromDetails(details: ConfidenceBadgeProps['details']) {
+  return details?.find((detail) => /country/i.test(detail.label))?.value.trim();
+}
+
+export function ConfidenceBadge({ level, label, observedAt, sampleSize, details, verificationLabel, countryCode, locale, emptyData = false, actionLabel = 'Review confidence data', onAction, methodologyHref }: ConfidenceBadgeProps) {
   const t = groceryTranslator(locale);
   const displayLabel = label ?? confidenceCopy(level, sampleSize);
   const token = confidenceStateToken(level);
   const sampleCopy = sampleSize !== undefined ? t('confidence-badge.sampleSize', { sampleSize }) : '';
   const freshness = observedAt !== undefined ? getPriceFreshness(observedAt) : null;
   const verificationCopy = verificationLabel?.trim();
+  const countryCopy = (countryCode ?? countryCodeFromDetails(details))?.toUpperCase();
   const detailCopy = [
+    countryCopy ? `Country ${countryCopy}.` : '',
     sampleCopy,
     freshness ? t('confidence-badge.freshness', { label: freshness.label, refreshHint: freshness.refreshHint }) : '',
     verificationCopy ? t('confidence-badge.verification', { verificationLabel: verificationCopy }) : '',
@@ -49,20 +81,41 @@ export function ConfidenceBadge({ level, label, observedAt, sampleSize, details,
       {verificationCopy ? <span className="normal-case tracking-normal">{verificationCopy}</span> : null}
     </span>
   );
+  const action = onAction ? (
+    <button
+      type="button"
+      className="ml-2 rounded-lg border border-slate-300 px-3 py-1 text-xs font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+      disabled={emptyData}
+      onClick={onAction}
+    >
+      {actionLabel}
+    </button>
+  ) : null;
+  const methodologyLink = methodologyHref ? (
+    <a className="rounded-lg border border-slate-300 px-3 py-1 text-xs font-semibold text-slate-700" href={methodologyHref}>
+      Methodology
+    </a>
+  ) : null;
 
-  if (!details?.length) return badge;
+  if (!details?.length && !action && !methodologyLink) return badge;
 
   return (
     <div className="inline-block rounded-xl border border-slate-200 bg-white p-2 text-left shadow-sm">
-      {badge}
-      <dl className="mt-2 grid gap-2 text-xs normal-case tracking-normal text-slate-700">
-        {details.map((detail) => (
-          <div key={detail.label}>
-            <dt className="font-black text-slate-950">{detail.label}</dt>
-            <dd>{detail.value}</dd>
-          </div>
-        ))}
-      </dl>
+      <div className="flex flex-wrap items-center gap-2">
+        {badge}
+        {action}
+        {methodologyLink}
+      </div>
+      {details?.length ? (
+        <dl className="mt-2 grid gap-2 text-xs normal-case tracking-normal text-slate-700">
+          {details.map((detail) => (
+            <div key={detail.label}>
+              <dt className="font-black text-slate-950">{detail.label}</dt>
+              <dd>{detail.value}</dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
     </div>
   );
 }

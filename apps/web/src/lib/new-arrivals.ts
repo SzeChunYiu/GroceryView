@@ -27,22 +27,24 @@ function freshnessLabel(observedAt: string) {
 const latestChainRowsBySlug = new Map<string, NewProductArrival>();
 
 for (const row of facetedSearchRows) {
-  const existing = latestChainRowsBySlug.get(row.slug);
   const observedAt = row.observedAt;
+  if (!observedAt) continue;
+  const existing = latestChainRowsBySlug.get(row.slug);
   if (existing && existing.observedAt >= observedAt) continue;
+  const categoryLabel = row.categoryPath[0] ?? 'Grocery';
+  const chainLabel = row.chainName ?? 'Chain not reported';
   latestChainRowsBySlug.set(row.slug, {
     slug: row.slug,
     name: row.canonicalName,
     brand: row.brand ?? 'Brand not reported',
-    categoryLabel: row.categoryPath[0] ?? 'Grocery',
+    categoryLabel,
     sourceLabel: `${row.priceType} latest_prices row`,
-    chainLabel: row.chainName,
+    chainLabel,
     freshnessLabel: freshnessLabel(observedAt),
     observedAt,
-    badges: [row.chainName, row.categoryPath[0] ?? 'Grocery', freshnessLabel(observedAt)]
+    badges: [chainLabel, categoryLabel, freshnessLabel(observedAt)]
   });
 }
-
 const openPricesArrivals: NewProductArrival[] = freshestOpenPrices.slice(0, 12).map((product) => {
   const observedAt = product.lastObservedAt.includes('T') ? product.lastObservedAt : `${product.lastObservedAt}T00:00:00.000Z`;
   const categoryLabel = labelFromSlug(product.category);

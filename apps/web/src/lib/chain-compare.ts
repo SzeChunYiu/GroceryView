@@ -3,6 +3,7 @@ import { buildCompareNoChainState as buildCompareNoChainStateModel } from './cha
 import { dbSiteSnapshotGeneratedAt } from './generated/db-site-products';
 import { dbSiteCompareStoreCapabilities, type DbSiteCompareStoreCapability } from './generated/db-site-ingested-overrides';
 import { commodityComparisonForProduct } from './verified-data';
+import { basketCostWinner, sortStoresByTotalBasketCost } from './basketOptimizer';
 
 export const COMPARE_CHAIN_ORDER = [
   { id: 'ica', label: 'ICA' },
@@ -11,6 +12,8 @@ export const COMPARE_CHAIN_ORDER = [
 ] as const;
 
 export type CompareChainId = (typeof COMPARE_CHAIN_ORDER)[number]['id'];
+export type CompareChainOption = (typeof COMPARE_CHAIN_ORDER)[number];
+export type CompareChainCapabilityFilter = 'coupon' | 'delivery' | 'pickup';
 export type ChainPriceComparisonMode = 'regular' | 'member' | 'coupon' | 'stacked';
 
 export const CHAIN_PRICE_COMPARISON_MODES: Array<{ id: ChainPriceComparisonMode; label: string; guardrail: string }> = [
@@ -84,15 +87,20 @@ export type ChainCompareNoChainCapability = {
 
 export type ChainCompareNoChainState = {
   activeFilters: CompareChainId[];
+  activeCapabilityFilters: CompareChainCapabilityFilter[];
   capabilities: ChainCompareNoChainCapability[];
   capabilitySource: ChainCompareCapabilitySource;
   evidenceUpdatedAt: string | null;
+  hiddenByCapabilityFilters: ChainCompareNoChainCapability[];
   missingProductIds: string[];
   missingIdGuardrail: string;
+  resetFiltersHref: string;
+  visibleChainIds: CompareChainId[];
 };
 
 export type BuildChainComparisonTableOptions = {
   activeFilters?: readonly CompareChainId[];
+  capabilityFilters?: readonly CompareChainCapabilityFilter[];
   compareStoreCapabilities?: readonly DbSiteCompareStoreCapability[];
 };
 
@@ -144,6 +152,15 @@ type CompareResetSearchParams = {
   products?: string | string[] | null | undefined;
 };
 
+type CompareCapabilitySearchParams = {
+  coupon?: string | string[] | null | undefined;
+  coupons?: string | string[] | null | undefined;
+  delivery?: string | string[] | null | undefined;
+  homeDelivery?: string | string[] | null | undefined;
+  'home-delivery'?: string | string[] | null | undefined;
+  pickup?: string | string[] | null | undefined;
+};
+
 const nearbyChainStoreContext: Record<CompareChainId, { distanceKm: number; stockScore: number }> = {
   ica: { distanceKm: 0.8, stockScore: 84 },
   willys: { distanceKm: 1.6, stockScore: 78 },
@@ -184,6 +201,40 @@ export function buildCompareNoChainResetUrl(searchParams: CompareResetSearchPara
   const products = parseCompareProductsParam(searchParams.products);
   const productsQuery = products.map(encodeURIComponent).join(',');
   return productsQuery ? `/compare?products=${productsQuery}` : '/compare';
+}
+
+export function parseCompareCapabilityFilters(searchParams: CompareCapabilitySearchParams = {}): CompareChainCapabilityFilter[] {
+  const filters: CompareChainCapabilityFilter[] = [];
+  if (hasEnabledSearchValue(searchParams.coupon) || hasEnabledSearchValue(searchParams.coupons)) filters.push('coupon');
+  if (hasEnabledSearchValue(searchParams.delivery) || hasEnabledSearchValue(searchParams.homeDelivery) || hasEnabledSearchValue(searchParams['home-delivery'])) filters.push('delivery');
+  if (hasEnabledSearchValue(searchParams.pickup)) filters.push('pickup');
+  return filters;
+}
+
+export function filterCompareChainsByCapabilities(
+  selectedChainIds: readonly CompareChainId[],
+  capabilityFilters: readonly CompareChainCapabilityFilter[],
+  compareStoreCapabilities: readonly DbSiteCompareStoreCapability[] = dbSiteCompareStoreCapabilities
+): CompareChainOption[] {
+  if (capabilityFilters.length === 0) {
+    return COMPARE_CHAIN_ORDER.filter((chain) => selectedChainIds.includes(chain.id));
+  }
+  const capabilitiesByChain = new Map(compareStoreCapabilities.map((capability) => [capability.chainId, capability]));
+  return COMPARE_CHAIN_ORDER
+    .filter((chain) => selectedChainIds.includes(chain.id))
+    .filter((chain) => {
+      const capability = capabilitiesByChain.get(chain.id);
+      return capabilityFilters.every((filter) => Boolean(capability?.[filter]));
+    });
+}
+
+function hasEnabledSearchValue(value: string | string[] | null | undefined): boolean {
+  const values = Array.isArray(value) ? value : [value];
+  return values.some((item) => {
+    if (item === null || item === undefined) return false;
+    const normalized = item.trim().toLowerCase();
+    return normalized === '' || normalized === '1' || normalized === 'true' || normalized === 'on' || normalized === 'yes';
+  });
 }
 
 function productLookup(products: readonly AxfoodProduct[]): Map<string, AxfoodProduct> {
@@ -342,6 +393,9 @@ export function buildChainComparisonTable(
   options: BuildChainComparisonTableOptions = {}
 ): ChainComparisonTable {
   const requestedIds = parseCompareProductsParam(productsParam);
+  const activeFilters = options.activeFilters ?? COMPARE_CHAIN_ORDER.map((chain) => chain.id);
+  const capabilityFilters = options.capabilityFilters ?? [];
+  const compareStoreCapabilities = options.compareStoreCapabilities ?? dbSiteCompareStoreCapabilities;
   const byId = productLookup(products);
   const rows: ChainCompareProductRow[] = [];
   const missingProductIds: string[] = [];
@@ -355,6 +409,15 @@ export function buildChainComparisonTable(
     rows.push(compareProductRow(requestedId, product));
   }
 
+  const noChainState = buildCompareNoChainStateModel({
+    activeFilters: [...activeFilters],
+    chainOrder: COMPARE_CHAIN_ORDER,
+    generatedCapabilities: compareStoreCapabilities,
+    missingProductIds
+  }) as Omit<ChainCompareNoChainState, 'activeCapabilityFilters' | 'hiddenByCapabilityFilters' | 'resetFiltersHref' | 'visibleChainIds'>;
+  const visibleChainIds = filterCompareChainsByCapabilities(activeFilters, capabilityFilters, compareStoreCapabilities).map((chain) => chain.id);
+  const visibleChainIdSet = new Set(visibleChainIds);
+
   return {
     requestedIds,
     missingProductIds,
@@ -363,12 +426,13 @@ export function buildChainComparisonTable(
       ? 'postgres.latest_prices/observations via packages/db site snapshot'
       : 'local bundled chain catalogue; production builds prefer packages/db snapshot rows',
     generatedAt: dbSiteSnapshotGeneratedAt,
-    noChainState: buildCompareNoChainStateModel({
-      activeFilters: options.activeFilters ?? COMPARE_CHAIN_ORDER.map((chain) => chain.id),
-      chainOrder: COMPARE_CHAIN_ORDER,
-      generatedCapabilities: options.compareStoreCapabilities ?? dbSiteCompareStoreCapabilities,
-      missingProductIds
-    }) as ChainCompareNoChainState
+    noChainState: {
+      ...noChainState,
+      activeCapabilityFilters: [...capabilityFilters],
+      hiddenByCapabilityFilters: noChainState.capabilities.filter((capability) => !visibleChainIdSet.has(capability.chainId)),
+      resetFiltersHref: buildCompareNoChainResetUrl({ products: productsParam }),
+      visibleChainIds
+    }
   };
 }
 
@@ -464,17 +528,12 @@ export function buildBasketStoreComparison(
   }
 
   const itemCount = comparison.products.length + comparison.missingProductIds.length;
-  const rankedStores = [...rows.values()]
+  const rankedStores = sortStoresByTotalBasketCost([...rows.values()]
     .map((store) => ({
       ...store,
       total: store.availableCount > 0 ? Number((store.total ?? 0).toFixed(2)) : null
-    }))
-    .sort((left, right) => {
-      if (left.missingCount !== right.missingCount) return left.missingCount - right.missingCount;
-      if ((left.total ?? Number.POSITIVE_INFINITY) !== (right.total ?? Number.POSITIVE_INFINITY)) return (left.total ?? Number.POSITIVE_INFINITY) - (right.total ?? Number.POSITIVE_INFINITY);
-      return left.storeName.localeCompare(right.storeName, 'sv');
-    });
-  const cheapestTotal = Math.min(...rankedStores.map((store) => store.total ?? Number.POSITIVE_INFINITY));
+    })));
+  const cheapestTotal = basketCostWinner(rankedStores)?.total ?? Number.POSITIVE_INFINITY;
   const closestDistance = Math.min(...rankedStores.map((store) => store.distanceKm));
   const bestAvailableCount = Math.max(...rankedStores.map((store) => store.availableCount));
   const bestStockScore = Math.max(...rankedStores.filter((store) => store.availableCount === bestAvailableCount).map((store) => store.stockScore));
@@ -510,7 +569,7 @@ export function buildBasketStoreComparison(
     stores,
     sourceLabel: comparison.sourceLabel,
     summary: bestStore && itemCount > 0
-      ? `${bestStore.storeName} is cheapest at ${bestStore.totalText}; ${closestStore?.storeName ?? 'the nearest matched store'} is closest at ${closestStore?.distanceText ?? 'distance not reported'}; ${bestStockedStore?.storeName ?? 'the best-stocked matched store'} has ${bestStockedStore?.coverageLabel ?? 'stock coverage not reported'}. Missing rows stay visible and substitutions point to the cheapest observed chain row.`
+      ? `${bestStore.storeName} is ranked first by total basket cost at ${bestStore.totalText}; ${closestStore?.storeName ?? 'the nearest matched store'} is closest at ${closestStore?.distanceText ?? 'distance not reported'}; ${bestStockedStore?.storeName ?? 'the best-stocked matched store'} has ${bestStockedStore?.coverageLabel ?? 'stock coverage not reported'}. Missing rows stay visible and substitutions point to the cheapest observed chain row.`
       : 'Add product ids to compare full basket totals across selected chains.'
   };
 }

@@ -11,9 +11,16 @@ import {
   type CommunityPriceReview,
   type CommunityReviewVote
 } from '@/lib/reviews';
-import { COMMUNITY_REVIEW_PROMPT_COPY, COMMUNITY_REVIEW_PROMPTS } from '@/lib/community-reviews';
+import {
+  COMMUNITY_REVIEW_PROMPT_COPY,
+  COMMUNITY_REVIEW_PROMPTS,
+  hasReviewAssignmentScoring,
+  reviewAssignmentScoringLabel
+} from '@/lib/community-reviews';
 import { ReviewPromptForm } from '@/components/review-prompt-form';
-import { sourceDiscrepancyReviewContract } from '@/lib/verified-data';
+import { sourceDiscrepancyReviewContract } from '@/lib/review-contracts';
+
+// ReviewPromptForm renders COMMUNITY_REVIEW_PROMPTS with aria-label={`${prompt.label} rating`}.
 
 type ReviewStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
 type BrowserSession = { accessToken: string; userId: string };
@@ -26,7 +33,7 @@ const humanReviewDecisionContract = {
   reviewPromptAria: 'aria-label={`${prompt.label} rating`}'
 };
 type ReviewModerationAction = ReviewDecision;
-type Assignment = { id: string; reviewId?: string; subjectType?: 'product_match' | 'community_report' | 'commodity_mapping' | 'price_report' | 'duplicate_product_report' | 'source_discrepancy_report'; subjectId?: string; priority?: string; reason?: string; assigneeId?: string; dueAt?: string; status?: string };
+type Assignment = { id: string; reviewId?: string; subjectType?: 'product_match' | 'community_report' | 'commodity_mapping' | 'price_report' | 'duplicate_product_report' | 'source_discrepancy_report'; subjectId?: string; priority?: string; reason?: string; assigneeId?: string; dueAt?: string; status?: string; riskScore?: number | null; confidenceScore?: number | null };
 type AssignmentResponse = { assignments?: Assignment[]; sla?: { status?: string; overdueAssignments?: number; breachedReviewIds?: string[] } };
 
 function readSession(): BrowserSession {
@@ -235,7 +242,7 @@ export function PriceReportReviewActions() {
               <div className="mt-2 flex flex-wrap gap-2 border-t border-emerald-100 pt-3" aria-label={`Moderation actions for ${review.productName}`}>
                 <button className="rounded-full bg-emerald-700 px-3 py-1.5 text-xs font-black text-white" onClick={() => moderateCommunityReview(review.id, 'approve')} type="button">Approve</button>
                 <button className="rounded-full bg-slate-800 px-3 py-1.5 text-xs font-black text-white" onClick={() => moderateCommunityReview(review.id, 'hide')} type="button">Hide</button>
-                <button className="rounded-full bg-rose-700 px-3 py-1.5 text-xs font-black text-white" onClick={() => moderateCommunityReview(review.id, 'escalate')} type="button">Escalate</button>
+                <button className="rounded-full bg-rose-700 px-3 py-1.5 text-xs font-black text-white" onClick={() => moderateCommunityReview(review.id, 'escalate')} type="button">Request more info</button>
               </div>
             </li>
           ))}
@@ -248,7 +255,12 @@ export function PriceReportReviewActions() {
             <li className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm" key={assignment.id}>
               <p className="font-black text-slate-950">{assignment.subjectType ?? 'community_report'} · {assignment.priority ?? 'priority'}</p>
               <p className="mt-1 text-slate-700">{assignment.reason ?? 'Needs human evidence review.'}</p>
-              <p className="mt-1 text-slate-600">{assignment.id} · due {assignment.dueAt ?? 'unassigned due date'}</p>
+              {hasReviewAssignmentScoring(assignment) ? (
+                <p className="mt-2 rounded-xl bg-white px-3 py-2 text-xs font-black uppercase tracking-[0.14em] text-slate-700">
+                  {reviewAssignmentScoringLabel(assignment)}
+                </p>
+              ) : null}
+              <p className="mt-1 text-slate-600">{assignment.id} · status {assignment.status ?? 'in_progress'} · due {assignment.dueAt ?? 'unassigned due date'}</p>
             </li>
           ))}
         </ul>

@@ -1,3 +1,7 @@
+import createNextIntlPlugin from 'next-intl/plugin';
+
+const withNextIntl = createNextIntlPlugin('./src/i18n-request.ts');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
@@ -7,6 +11,9 @@ const nextConfig = {
     deviceSizes: [320, 420, 640, 768, 1024, 1280],
     formats: ['image/avif', 'image/webp'],
     imageSizes: [56, 96, 128, 256, 384],
+    localPatterns: [
+      { pathname: '/api/images' }
+    ],
     remotePatterns: [
       { protocol: 'https', hostname: 'assets.axfood.se' },
       { protocol: 'https', hostname: 'images.openfoodfacts.org' },
@@ -16,4 +23,4 @@ const nextConfig = {
   reactStrictMode: true
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

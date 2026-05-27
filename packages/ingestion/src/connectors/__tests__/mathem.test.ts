@@ -163,6 +163,15 @@ describe('Mathem connector fixture parsing', () => {
       imageUrl: 'https://assets.mathem.se/products/mellanmjolk-thumb.jpg',
       productUrl: 'https://www.mathem.se/se/products/1001-arla-ko-mellanmjolk-1l/',
       available: true,
+      country: 'SE',
+      currency: 'SEK',
+      chain: 'mathem',
+      mathem_tier: 'spot',
+      channel: 'online',
+      is_coupon_price: false,
+      is_subscription_price: false,
+      is_clearance: false,
+      multi_buy: '',
       sourceUrl,
       retrievedAt: RETRIEVED_AT
     });
@@ -187,6 +196,50 @@ describe('Mathem connector fixture parsing', () => {
     assert.equal(rows[2]?.unitPrice, null);
     assert.equal(rows[2]?.unitPriceText, '');
     assert.equal(rows[2]?.available, false);
+  });
+
+  it('normalizes Mathem discount, coupon, subscription, and multi-buy labels', () => {
+    const row = normalizeMathemProduct(
+      {
+        id: 'm-2001',
+        type: 'product',
+        attributes: {
+          id: 'm-2001',
+          fullName: 'Vitamin Well Defence Citrus/Fläder',
+          brand: 'Vitamin Well',
+          nameExtra: '50 cl',
+          frontUrl: '/se/products/2001-vitamin-well-defence/',
+          grossPrice: '21.29',
+          grossUnitPrice: '42.58',
+          unitPriceQuantityAbbreviation: 'l',
+          currency: 'SEK',
+          availability: { isAvailable: true },
+          promotionLabel: '2 för 32 kr',
+          badgeText: 'Välj & blanda',
+          offerText: 'Rabattkod i varukorgen',
+          isSubscriptionPrice: true,
+          isClearance: true
+        }
+      },
+      buildMathemSearchUrl('vitamin well'),
+      RETRIEVED_AT
+    );
+
+    assert.deepEqual(row && {
+      channel: row.channel,
+      tier: row.mathem_tier,
+      coupon: row.is_coupon_price,
+      subscription: row.is_subscription_price,
+      clearance: row.is_clearance,
+      multiBuy: row.multi_buy
+    }, {
+      channel: 'online',
+      tier: 'subscription',
+      coupon: true,
+      subscription: true,
+      clearance: true,
+      multiBuy: '2 för 32 kr'
+    });
   });
 
   it('mocks HTTP with the fixture, skips malformed rows, de-duplicates codes, and preserves row metadata', async () => {

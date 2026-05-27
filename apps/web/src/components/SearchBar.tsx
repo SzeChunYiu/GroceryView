@@ -237,7 +237,7 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
       setStatus('loading');
       try {
         try {
-          const suggestResponse = await fetch(`/api/suggest?q=${encodeURIComponent(trimmedQuery)}`, {
+          const suggestResponse = await fetch(`/api/suggest?q=${encodeURIComponent(trimmedQuery)}&country=SE`, {
             signal: controller.signal,
             headers: { Accept: 'application/json' }
           });
