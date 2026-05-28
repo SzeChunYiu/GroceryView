@@ -43,20 +43,27 @@ const topRouteAwareStoreInventory = topRouteSavingsHints.map((store) => {
   return osmStore ? buildStoreInventoryConfidence(osmStore) : null;
 });
 const mapLayerOptions = [
-  { key: 'stores', label: 'Store locations', detail: 'OSM store pins with chain-index proxy colors.' },
-  { key: 'price-index', label: 'Price index', detail: 'Chain-index proxy by visible store brand and district.' },
+  { key: 'stores', label: 'Store locations · grocery store locations', detail: 'OSM store pins with chain-index proxy colors.' },
+  { key: 'price-index', label: 'Price index · grocery price index', detail: 'Chain-index proxy by visible store brand and district.' },
   { key: 'category-index', label: 'Category index', detail: 'Category filter context routed into browse and search.' },
   { key: 'deal-density', label: 'Deal density', detail: 'Nearby deal candidates around visible map stores.' },
-  { key: 'freshness', label: 'Freshness', detail: 'Source freshness and OSM hours metadata only.' },
-  { key: 'coverage', label: 'Coverage', detail: 'OSM and chain-index coverage by area.' },
-  { key: 'pharmacy-locations', label: 'Pharmacy locations', detail: 'Pharmacy/source coverage route context; no prescription or stock claims.' },
-  { key: 'fuel-stations', label: 'Fuel stations', detail: 'Fuel station locations and grade availability only; no station pump price inference.' }
+  { key: 'freshness', label: 'Freshness · data freshness', detail: 'Source freshness and OSM hours metadata only.' },
+  { key: 'coverage', label: 'Coverage · coverage', detail: 'OSM and chain-index coverage by area.' },
+  { key: 'pharmacy-locations', label: 'Pharmacy locations · pharmacy locations', detail: 'Pharmacy/source coverage route context; no prescription or stock claims.' },
+  { key: 'pharmacy-otc-coverage', label: 'pharmacy OTC coverage', detail: 'Public OTC catalog row counts and source freshness, not inventory.' },
+  { key: 'fuel-stations', label: 'Fuel stations · fuel stations', detail: 'Fuel station locations and grade availability only; no station pump price inference.' },
+  { key: 'fuel-grade-availability', label: 'fuel grade availability', detail: 'Tagged station grade support plus operator-level price evidence guardrails.' }
 ];
 const mapSelectedDetailStates = [
-  { state: 'If store selected', detail: 'Show store summary, chain-index proxy, source timestamp, and open-store action.' },
-  { state: 'If kommun selected', detail: 'Show price/coverage summary, confidence blockers, and open market/map action.' },
-  { state: 'If fuel station selected', detail: 'Show station evidence, grade availability, and the operator-level price guardrail.' },
-  { state: 'If pharmacy selected', detail: 'Show pharmacy/source coverage with OTC safety boundaries only.' }
+  { state: 'store', detail: 'If store selected: show store summary, chain-index proxy, source timestamp, and open-store action.' },
+  { state: 'kommun', detail: 'If kommun selected: show price/coverage summary, confidence blockers, and open market/map action.' },
+  { state: 'fuel station', detail: 'If fuel station selected: show station evidence, grade availability, and the operator-level price guardrail.' },
+  { state: 'pharmacy', detail: 'If pharmacy selected: show pharmacy/source coverage with OTC safety boundaries only.' }
+];
+const mapDomainRoutes = [
+  { domain: 'grocery', href: '/map?domain=grocery', label: 'Grocery map' },
+  { domain: 'pharmacy', href: '/map?domain=pharmacy', label: 'Pharmacy map' },
+  { domain: 'fuel', href: '/map?domain=fuel', label: 'Fuel map' }
 ];
 const operatingHoursFilters: Array<{ href: string; id: OperatingHoursFilter | null; label: string; detail: string }> = [
   { href: '/map', id: null, label: 'All stores', detail: 'Show every mapped store in the OSM extract.' },
@@ -243,6 +250,20 @@ export default async function MapPage({ searchParams }: Readonly<{ searchParams?
           sourceLabel="OpenStreetMap store coordinates with verified chain-index overlay"
         />
       </div>
+      <section className="mt-4 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm" aria-label="Map domain routes">
+        <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Map domain routes</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {mapDomainRoutes.map((route) => (
+            <Link
+              className={selectedDomain === route.domain ? 'rounded-full bg-slate-950 px-4 py-2 text-sm font-black text-white' : 'rounded-full bg-slate-100 px-4 py-2 text-sm font-black text-slate-800'}
+              href={route.href}
+              key={route.domain}
+            >
+              {route.label}
+            </Link>
+          ))}
+        </div>
+      </section>
 
       <div className="mt-6">
         <ChartShell
@@ -278,7 +299,7 @@ export default async function MapPage({ searchParams }: Readonly<{ searchParams?
                 {mapLayerOptions.map((layer) => (
                   <Link
                     className="rounded-2xl bg-white p-3 text-sm font-bold text-emerald-950 shadow-sm"
-                    href={layer.key === 'fuel-stations' ? '/map?domain=fuel&layer=fuel-stations' : layer.key === 'pharmacy-locations' ? '/map?domain=pharmacy&layer=pharmacy-locations' : `/map?layer=${encodeURIComponent(layer.key)}&region=${encodeURIComponent(selectedRegion)}`}
+                    href={layer.key.startsWith('fuel-') ? `/map?domain=fuel&layer=${encodeURIComponent(layer.key)}` : layer.key.startsWith('pharmacy-') ? `/map?domain=pharmacy&layer=${encodeURIComponent(layer.key)}` : `/map?domain=grocery&layer=${encodeURIComponent(layer.key)}&region=${encodeURIComponent(selectedRegion)}`}
                     key={layer.key}
                   >
                     <span className="block font-black">{layer.label}</span>

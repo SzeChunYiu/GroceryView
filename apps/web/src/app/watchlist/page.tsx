@@ -30,6 +30,71 @@ type RecipeBasketSearchParams = {
   ean?: string | string[];
 };
 const emptyRecipeBasketSearchParams: RecipeBasketSearchParams = {};
+const crossDomainWatchlistSections = [
+  {
+    section: 'Grocery products',
+    itemType: 'grocery_product',
+    href: '/watchlist?domain=grocery',
+    source: 'verified chain price rows',
+    freshness: 'latest observed grocery price row',
+    confidence: 'product price-source confidence',
+    limitation: 'No shelf stock guarantee.'
+  },
+  {
+    section: 'Stores',
+    itemType: 'grocery_store',
+    href: '/map?domain=grocery',
+    source: 'OSM store coordinates + chain index proxy',
+    freshness: 'store retrieved date',
+    confidence: 'mapped-store source confidence',
+    limitation: 'No branch-level basket price claim.'
+  },
+  {
+    section: 'Categories',
+    itemType: 'grocery_category',
+    href: '/browse',
+    source: 'category price observations',
+    freshness: 'category observation window',
+    confidence: 'category coverage confidence',
+    limitation: 'Category movements are not product substitutions.'
+  },
+  {
+    section: 'Pharmacy OTC',
+    itemType: 'pharmacy_otc_product',
+    href: '/watchlist?domain=pharmacy',
+    source: 'public OTC exact-EAN catalog rows',
+    freshness: 'OTC source retrieved date',
+    confidence: 'exact-EAN comparison count',
+    limitation: 'No prescription, medical advice, suitability, or stock claim.'
+  },
+  {
+    section: 'Fuel',
+    itemType: 'fuel_grade / fuel_station',
+    href: '/watchlist?domain=fuel',
+    source: 'operator fuel price rows + OSM station rows',
+    freshness: 'fuel observed/retrieved date',
+    confidence: 'operator confidence + station tag coverage',
+    limitation: 'No station-specific pump price without station source evidence.'
+  },
+  {
+    section: 'Saved views',
+    itemType: 'saved_market_view',
+    href: '/saved-views',
+    source: 'saved filters and visible result counts',
+    freshness: 'refreshed when opened',
+    confidence: 'route-backed view state',
+    limitation: 'Saved views do not imply price alerts until alert rules exist.'
+  },
+  {
+    section: 'Alerts',
+    itemType: 'alert_rule',
+    href: '/watchlist',
+    source: 'buildWatchlistAlerts + planNotifications',
+    freshness: 'daily alert evaluation',
+    confidence: 'eligible source rows after quiet-hour rules',
+    limitation: 'Notifications are source-backed signals, not purchase guarantees.'
+  }
+];
 
 function firstSearchValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] ?? '' : value ?? '';
@@ -129,6 +194,28 @@ export default async function WatchlistPage({
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
         This page calls buildWatchlistAlerts with verified chain price rows, then runs planNotifications so set-target push and email rows respect user preferences and quiet-hour rules. Historical wait-window alerts also surface patterns derived from observed source rows before a current threshold is crossed; no forecast is shown without dated observation evidence.
       </p>
+      <section className="mt-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm" aria-label="Cross-domain watchlist sections">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Watchlist sections</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Grocery products, Stores, Categories, Pharmacy OTC, Fuel, Saved views, Alerts</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">Each item type keeps source, freshness, confidence, and limitation visible before creating a notification rule.</p>
+          </div>
+          <Link className="rounded-full bg-slate-950 px-4 py-2 text-sm font-black text-white" href="/search?domain=all">Find an item to watch</Link>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {crossDomainWatchlistSections.map((section) => (
+            <Link className="rounded-2xl border border-slate-100 bg-slate-50 p-4 text-sm font-bold text-slate-800 transition hover:border-slate-900" href={section.href} key={section.section}>
+              <span className="block text-xs font-black uppercase tracking-[0.14em] text-slate-500">{section.itemType}</span>
+              <span className="mt-1 block text-lg font-black text-slate-950">{section.section}</span>
+              <span className="mt-2 block">source: {section.source}</span>
+              <span className="mt-1 block">freshness: {section.freshness}</span>
+              <span className="mt-1 block">confidence: {section.confidence}</span>
+              <span className="mt-2 block rounded-xl bg-amber-50 p-2 text-xs font-black text-amber-950">limitation: {section.limitation}</span>
+            </Link>
+          ))}
+        </div>
+      </section>
       {selectedWatchDomain === 'fuel' ? (
         <Card className="mt-6 border-amber-200 bg-amber-50">
           <div className="flex flex-wrap items-start justify-between gap-4">
