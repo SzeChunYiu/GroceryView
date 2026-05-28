@@ -1,4 +1,5 @@
-import { AdminBackstageScaffold, adminBackstageMetadata } from '@/lib/admin-backstage-scaffold';
+import { AdminBackstageScaffold, AdminReportSourceLabel, adminBackstageMetadata } from '@/lib/admin-backstage-scaffold';
+import { getDataQualityReport } from '@/lib/admin-reports/data-quality';
 
 export function generateMetadata() {
   return adminBackstageMetadata(
@@ -9,6 +10,8 @@ export function generateMetadata() {
 }
 
 export default function AdminDataQualityPage() {
+  const report = getDataQualityReport();
+
   return (
     <AdminBackstageScaffold
       description="Quality gates before gold publish. See docs/data/quality-gates.md for critical vs warning gates."
@@ -17,11 +20,16 @@ export default function AdminDataQualityPage() {
       relatedLinks={[{ href: '/admin/source-runs', label: 'Source runs' }]}
       title="Data quality"
     >
+      <AdminReportSourceLabel label={report.label} />
       <ul className="list-disc space-y-2 pl-5 text-sm font-semibold text-slate-700">
-        <li>Critical: schema validation — pass</li>
-        <li>Critical: non-empty grocery snapshot — pass</li>
-        <li>Warning: ICA coverage below target — open</li>
-        <li>Freshness SLA: 94% observations within 48h</li>
+        {report.gates.map((gate) => (
+          <li key={gate.id}>
+            {gate.severity === 'critical' ? 'Critical' : 'Warning'}: {gate.label} — {gate.status}
+          </li>
+        ))}
+        <li>
+          {report.freshness.label}: {report.freshness.percentWithinSla}% observations within {report.freshness.windowHours}h
+        </li>
       </ul>
     </AdminBackstageScaffold>
   );

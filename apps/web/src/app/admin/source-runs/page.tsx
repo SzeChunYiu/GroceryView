@@ -1,4 +1,5 @@
-import { AdminBackstageScaffold, adminBackstageMetadata } from '@/lib/admin-backstage-scaffold';
+import { AdminBackstageScaffold, AdminReportSourceLabel, adminBackstageMetadata } from '@/lib/admin-backstage-scaffold';
+import { getSourceRunsReport } from '@/lib/admin-reports/source-runs';
 
 export function generateMetadata() {
   return adminBackstageMetadata(
@@ -8,12 +9,9 @@ export function generateMetadata() {
   );
 }
 
-const SAMPLE_RUNS = [
-  { id: 'run-openprices-daily', domain: 'grocery', source: 'openprices', status: 'succeeded', accepted: 12400, rejected: 18, deadLetters: 2 },
-  { id: 'run-axfood-snapshot', domain: 'grocery', source: 'axfood', status: 'partial', accepted: 8200, rejected: 44, deadLetters: 5 }
-];
-
 export default function AdminSourceRunsPage() {
+  const report = getSourceRunsReport();
+
   return (
     <AdminBackstageScaffold
       description="Track bronze-layer source runs before gold publish. Linked from operator source health."
@@ -25,6 +23,7 @@ export default function AdminSourceRunsPage() {
       ]}
       title="Source runs"
     >
+      <AdminReportSourceLabel label={report.label} />
       <table className="w-full text-left text-sm">
         <thead className="text-xs font-black uppercase tracking-[0.14em] text-slate-500">
           <tr>
@@ -37,7 +36,7 @@ export default function AdminSourceRunsPage() {
           </tr>
         </thead>
         <tbody>
-          {SAMPLE_RUNS.map((run) => (
+          {report.rows.map((run) => (
             <tr className="border-t border-slate-100" key={run.id}>
               <td className="py-3 pr-4 font-mono text-xs">
                 <a className="underline" href={`/admin/source-runs/${run.id}`}>{run.id}</a>

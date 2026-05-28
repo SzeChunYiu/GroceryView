@@ -1,4 +1,5 @@
-import { AdminBackstageScaffold, adminBackstageMetadata } from '@/lib/admin-backstage-scaffold';
+import { AdminBackstageScaffold, AdminReportSourceLabel, adminBackstageMetadata } from '@/lib/admin-backstage-scaffold';
+import { getStorageReport } from '@/lib/admin-reports/storage';
 
 export function generateMetadata() {
   return adminBackstageMetadata(
@@ -8,13 +9,9 @@ export function generateMetadata() {
   );
 }
 
-const TABLE_SIZES = [
-  { name: 'observations_v2', sizeGb: 42.1, indexGb: 8.2 },
-  { name: 'latest_prices', sizeGb: 1.8, indexGb: 0.4 },
-  { name: 'search_documents', sizeGb: 3.2, indexGb: 1.1 }
-];
-
 export default function AdminStoragePage() {
+  const report = getStorageReport();
+
   return (
     <AdminBackstageScaffold
       description="Storage growth and partition plan. See docs/data/database-scaling-plan.md."
@@ -22,20 +19,23 @@ export default function AdminStoragePage() {
       path="/admin/storage"
       title="Storage"
     >
+      <AdminReportSourceLabel label={report.label} />
       <table className="w-full text-left text-sm">
         <thead className="text-xs font-black uppercase tracking-[0.14em] text-slate-500">
           <tr>
             <th className="py-2 pr-4">Table</th>
             <th className="py-2 pr-4">Data (GB)</th>
             <th className="py-2 pr-4">Indexes (GB)</th>
+            <th className="py-2 pr-4">Retention</th>
           </tr>
         </thead>
         <tbody>
-          {TABLE_SIZES.map((row) => (
+          {report.rows.map((row) => (
             <tr className="border-t border-slate-100" key={row.name}>
               <td className="py-3 pr-4 font-mono text-xs">{row.name}</td>
               <td className="py-3 pr-4">{row.sizeGb}</td>
               <td className="py-3 pr-4">{row.indexGb}</td>
+              <td className="py-3 pr-4">{row.retentionNote}</td>
             </tr>
           ))}
         </tbody>

@@ -5,6 +5,30 @@ import { BottomNav } from '@/components/bottom-nav';
 import { Card, Eyebrow, StatusBadge } from '@/components/data-ui';
 import { routeMetadata } from '@/lib/seo';
 
+export type AdminReportScaffoldLabel = Readonly<{
+  mode: 'scaffold' | 'live';
+  source: string;
+  nextIntegration: string;
+}>;
+
+export function AdminReportSourceLabel({ label }: Readonly<{ label: AdminReportScaffoldLabel }>) {
+  if (label.mode === 'live') {
+    return (
+      <p className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-950">
+        Live report · Source: {label.source}
+      </p>
+    );
+  }
+
+  return (
+    <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+      <p className="font-black">Backstage scaffold</p>
+      <p className="mt-1 font-semibold">Source: {label.source}</p>
+      <p className="mt-1 font-semibold">Next integration: {label.nextIntegration}</p>
+    </div>
+  );
+}
+
 type AdminBackstageScaffoldProps = Readonly<{
   path: string;
   eyebrow: string;
