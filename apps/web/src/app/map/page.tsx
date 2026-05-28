@@ -2,6 +2,7 @@ import { calculateChainPriceIndex } from '@groceryview/core';
 import Link from 'next/link';
 import { GroceryViewSurfaceAnalytics } from '@/components/analytics/groceryview-surface-analytics';
 import { Card, Eyebrow, PageShell, SourceCitation } from '@/components/data-ui';
+import { ChartShell, ChartTableFallback, GeoHeatmap } from '@/components/mvp/visual-intelligence';
 import { SavedViewActions } from '@/components/saved-view-actions';
 import { StoreDistanceCard } from '@/components/StoreDistanceCard';
 import { MapNearbyStorePreviews } from '@/components/map/map-nearby-store-previews';
@@ -39,6 +40,22 @@ const topRouteAwareStoreInventory = topRouteSavingsHints.map((store) => {
   const osmStore = osmStoreForRouteStore(store);
   return osmStore ? buildStoreInventoryConfidence(osmStore) : null;
 });
+const mapLayerOptions = [
+  { key: 'stores', label: 'Store locations', detail: 'OSM store pins with chain-index proxy colors.' },
+  { key: 'price-index', label: 'Price index', detail: 'Chain-index proxy by visible store brand and district.' },
+  { key: 'category-index', label: 'Category index', detail: 'Category filter context routed into browse and search.' },
+  { key: 'deal-density', label: 'Deal density', detail: 'Nearby deal candidates around visible map stores.' },
+  { key: 'freshness', label: 'Freshness', detail: 'Source freshness and OSM hours metadata only.' },
+  { key: 'coverage', label: 'Coverage', detail: 'OSM and chain-index coverage by area.' },
+  { key: 'pharmacy-locations', label: 'Pharmacy locations', detail: 'Pharmacy/source coverage route context; no prescription or stock claims.' },
+  { key: 'fuel-stations', label: 'Fuel stations', detail: 'Fuel station locations and grade availability only; no station pump price inference.' }
+];
+const mapSelectedDetailStates = [
+  { state: 'If store selected', detail: 'Show store summary, chain-index proxy, source timestamp, and open-store action.' },
+  { state: 'If kommun selected', detail: 'Show price/coverage summary, confidence blockers, and open market/map action.' },
+  { state: 'If fuel station selected', detail: 'Show station evidence, grade availability, and the operator-level price guardrail.' },
+  { state: 'If pharmacy selected', detail: 'Show pharmacy/source coverage with OTC safety boundaries only.' }
+];
 const operatingHoursFilters: Array<{ href: string; id: OperatingHoursFilter | null; label: string; detail: string }> = [
   { href: '/map', id: null, label: 'All stores', detail: 'Show every mapped store in the OSM extract.' },
   { href: '/map?hours=open-now', id: 'open-now', label: 'Open now', detail: 'Map only stores whose OSM hours match the current local time.' },
@@ -187,6 +204,22 @@ export default async function MapPage({ searchParams }: Readonly<{ searchParams?
   const selectedConfidence = Array.isArray(params.confidence) ? params.confidence[0] ?? 'all' : params.confidence ?? 'all';
   const filteredStores = storeUniverse.filter((store) => storeMatchesOperatingHoursFilter(store, selectedHoursFilter));
   const visibleStores = filteredStores.slice(0, 80);
+  const mapFallbackRows = visibleStores.slice(0, 8).map((store) => ({
+    marker: store.name,
+    type: 'Store locations',
+    region: store.district || store.city || selectedRegion,
+    layer: selectedLayer,
+    evidence: store.retrievedDate ? `OSM ${store.retrievedDate}` : 'OSM source'
+  }));
+  const mapGeoCells = districtHeatOverlay.slice(0, 6).map((district) => ({
+    row: district.district,
+    column: selectedLayer,
+    valueLabel: `${district.averageIndex.toFixed(1)} index`,
+    tone: district.averageIndex < 96 ? 'low' as const : district.averageIndex > 104 ? 'high' as const : 'medium' as const,
+    href: `/map?region=${encodeURIComponent(slugifyRouteValue(district.district))}&layer=price-index`,
+    signal: `${district.coveredStores} covered stores`
+  }));
+
   return (
     <PageShell data-gv-surface="map">
       <GroceryViewSurfaceAnalytics surface="map" />
@@ -206,13 +239,73 @@ export default async function MapPage({ searchParams }: Readonly<{ searchParams?
         />
       </div>
 
+      <div className="mt-6">
+        <ChartShell
+          actionHref={`/map?region=${encodeURIComponent(selectedRegion)}&layer=${encodeURIComponent(selectedLayer)}`}
+          actionLabel="Open selected map view"
+          evidenceItems={[
+            `${visibleStores.length} visible markers`,
+            `Layer ${selectedLayer}`,
+            'Always visible legend'
+          ]}
+          fallback={
+            <ChartTableFallback
+              caption="Table/list of visible markers"
+              columns={[
+                { key: 'marker', label: 'Marker', render: (row) => row.marker },
+                { key: 'type', label: 'Layer', render: (row) => row.type },
+                { key: 'region', label: 'Region', render: (row) => row.region },
+                { key: 'evidence', label: 'Evidence', render: (row) => row.evidence }
+              ]}
+              rows={mapFallbackRows}
+            />
+          }
+          hasData={visibleStores.length > 0}
+          insightTitle="Map visual command center"
+          plainSummary="Left layer controls, main map context, right selected detail rules, and bottom Table/list of visible markers stay route-driven and source-backed."
+          userQuestion="Where can I compare mapped grocery, pharmacy, and fuel evidence?"
+        >
+          <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+            <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Always visible legend</p>
+              <div className="mt-3 grid gap-2">
+                {mapLayerOptions.map((layer) => (
+                  <Link
+                    className="rounded-2xl bg-white p-3 text-sm font-bold text-emerald-950 shadow-sm"
+                    href={`/map?layer=${encodeURIComponent(layer.key)}&region=${encodeURIComponent(selectedRegion)}`}
+                    key={layer.key}
+                  >
+                    <span className="block font-black">{layer.label}</span>
+                    <span className="mt-1 block text-xs font-semibold text-slate-600">{layer.detail}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+            <div className="grid gap-4">
+              <GeoHeatmap cells={mapGeoCells} />
+              <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Selected detail panel rules</p>
+                <div className="mt-3 grid gap-2 md:grid-cols-2">
+                  {mapSelectedDetailStates.map((state) => (
+                    <p className="rounded-2xl bg-slate-50 p-3 text-sm font-semibold text-slate-700" key={state.state}>
+                      <span className="block font-black text-slate-950">{state.state}</span>
+                      {state.detail}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </ChartShell>
+      </div>
+
       <div className="mt-6 grid gap-6 xl:grid-cols-[18rem_1fr_20rem]">
         <Card>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Map layers</p>
           <h2 className="mt-2 text-2xl font-black">Choose the signal</h2>
           <form className="mt-4 grid gap-3 text-sm font-semibold leading-6 text-slate-700">
             {[
-              { key: 'layer', label: 'Layer selector', value: selectedLayer, options: ['stores', 'price-index', 'category-index', 'freshness', 'coverage'] },
+              { key: 'layer', label: 'Layer selector', value: selectedLayer, options: mapLayerOptions.map((layer) => layer.key) },
               { key: 'category', label: 'Category selector', value: selectedCategory, options: ['all', 'meat', 'produce', 'baby', 'pantry', 'dairy'] },
               { key: 'chain', label: 'Chain selector', value: selectedChain, options: ['all', 'ica', 'coop', 'willys', 'hemkop', 'lidl'] },
               { key: 'region', label: 'Region / kommun selector', value: selectedRegion, options: ['stockholm', 'goteborg', 'malmo'] },
