@@ -85,6 +85,12 @@ async function focusWithTab(page: Page, target: Locator, maxTabs = 60) {
   const initiallyFocused = await target.evaluate((element) => element === document.activeElement || element.contains(document.activeElement)).catch(() => false);
   if (initiallyFocused) return;
 
+  for (let poll = 0; poll < 10; poll += 1) {
+    await page.waitForTimeout(50);
+    const focused = await target.evaluate((element) => element === document.activeElement || element.contains(document.activeElement)).catch(() => false);
+    if (focused) return;
+  }
+
   for (let index = 0; index < maxTabs; index += 1) {
     await page.keyboard.press('Tab');
     const focused = await target.evaluate((element) => element === document.activeElement || element.contains(document.activeElement)).catch(() => false);

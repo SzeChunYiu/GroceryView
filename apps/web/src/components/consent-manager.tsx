@@ -104,6 +104,7 @@ export function ConsentManager() {
   const [visible, setVisible] = useState(true);
   const [manageOpen, setManageOpen] = useState(false);
   const [draft, setDraft] = useState<ConsentState>(denied);
+  const [storageChecked, setStorageChecked] = useState(false);
   const rejectAllRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -113,9 +114,11 @@ export function ConsentManager() {
       setDraft(stored);
       applyConsentUpdate(stored);
       setVisible(false);
+      setStorageChecked(true);
       return;
     }
     setVisible(true);
+    setStorageChecked(true);
   }, [denied]);
 
   function choose(choice: ConsentState, action: 'accept all' | 'reject all' | 'manage') {
@@ -127,8 +130,8 @@ export function ConsentManager() {
   }
 
   useEffect(() => {
-    if (visible && !manageOpen) rejectAllRef.current?.focus();
-  }, [manageOpen, visible]);
+    if (visible && storageChecked && !manageOpen) rejectAllRef.current?.focus();
+  }, [manageOpen, storageChecked, visible]);
 
   if (!visible) {
     return (
