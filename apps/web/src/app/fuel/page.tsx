@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { FuelDetourCalc } from '@/components/fuel-detour-calc';
+import { ChartShell, ChartTableFallback, DistributionBand, Sparkline } from '@/components/mvp/visual-intelligence';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalSeries } from '@/components/price-chart-terminal';
 import { formatFuelPrice, fuelPriceSourceSchema, fuelPriceTargetAlerts, type VerifiedFuelPriceObservation, verifiedFuelPriceObservations, verifiedFuelPriceSource } from '@/lib/fuel-prices';
 import { fuelStations, fuelStationSource, type FuelStationChain } from '@/lib/ingested/fuel-stations';
@@ -193,6 +194,25 @@ export default async function FuelPage({ searchParams }: Readonly<{ searchParams
     .slice(0, 5);
   const nearestSelectedStation = selectedOperatorStations[0];
   const fuelTerminalChart = fuelTerminalChartFor(selectedGradeRows, selectedGradeLabel);
+  const selectedGradePrices = selectedGradeRows.map((row) => row.pricePerLitre);
+  const selectedGradeMin = Math.min(...selectedGradePrices);
+  const selectedGradeMax = Math.max(...selectedGradePrices);
+  const fuelVisualRows = [...selectedGradeRows]
+    .sort((left, right) => left.pricePerLitre - right.pricePerLitre || right.confidence - left.confidence)
+    .map((row) => {
+      const operatorHistory = selectedGradeRows
+        .filter((candidate) => candidate.operatorId === row.operatorId)
+        .sort((left, right) => left.observedAt.localeCompare(right.observedAt));
+      return {
+        ...row,
+        priceLabel: formatFuelPrice(row.pricePerLitre),
+        confidenceLabel: `${Math.round(row.confidence * 100)}% confidence`,
+        priceHistoryMiniLine: operatorHistory.map((point) => ({
+          label: point.observedAt.slice(0, 10),
+          value: point.pricePerLitre
+        }))
+      };
+    });
   const domain = multiVerticalDomainFoundation.find((candidate) => candidate.slug === 'fuel')!;
   const lowest = [...fuelTerminalRows].sort((a, b) => a.pricePerLitre - b.pricePerLitre)[0]!;
   const freshestDate = fuelTerminalRows
@@ -258,6 +278,89 @@ export default async function FuelPage({ searchParams }: Readonly<{ searchParams
 
       <div className="mt-6">
         <PriceChartTerminal chart={fuelTerminalChart} />
+      </div>
+
+      <div className="mt-6">
+        <ChartShell
+          actionHref="/fuel"
+          actionLabel="Reset fuel view"
+          evidenceItems={[
+            `${selectedGradeRows.length} operator rows`,
+            `Selected grade: ${selectedGradeLabel}`,
+            'Operator-level price, not station-specific pump price'
+          ]}
+          hasData={fuelVisualRows.length > 0}
+          insightTitle="Fuel visual command center"
+          plainSummary={`${selectedGradeLabel} compares public operator rows, source confidence, and nearby station candidates without turning operator prices into station pump claims.`}
+          userQuestion="Which operator-backed fuel rows are cheapest for the selected grade?"
+          fallback={
+            <ChartTableFallback
+              caption="Fuel visual command center fallback"
+              columns={[
+                { key: 'grade', label: 'Grade', render: (row) => row.label },
+                { key: 'operator', label: 'Operator', render: (row) => row.operatorName },
+                { key: 'price', label: 'Price per litre', render: (row) => row.priceLabel },
+                { key: 'effective', label: 'Effective from', render: (row) => row.effectiveFrom },
+                { key: 'source', label: 'Source', render: (row) => row.sourceLabel },
+                { key: 'confidence', label: 'Confidence', render: (row) => row.confidenceLabel }
+              ]}
+              rows={fuelVisualRows}
+            />
+          }
+        >
+          <div className="grid gap-4 lg:grid-cols-[1fr_0.9fr]">
+            <div className="grid gap-3 md:grid-cols-2">
+              {fuelVisualRows.map((row) => (
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4" key={`${row.id}-visual`}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{row.label}</p>
+                      <h3 className="mt-1 text-lg font-black text-slate-950">{row.operatorName}</h3>
+                    </div>
+                    <p className="rounded-full bg-white px-3 py-1 text-xs font-black text-emerald-800">{row.confidenceLabel}</p>
+                  </div>
+                  <p className="mt-3 text-3xl font-black text-emerald-800">{row.priceLabel}</p>
+                  <DistributionBand
+                    current={row.pricePerLitre}
+                    label={`${row.operatorName} ${row.label} price band`}
+                    max={selectedGradeMax}
+                    min={selectedGradeMin}
+                  />
+                  <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl bg-white p-3">
+                    <div>
+                      <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-500">Mini line</p>
+                      <p className="mt-1 text-xs font-semibold text-slate-600">{row.sourceLabel}</p>
+                    </div>
+                    <Sparkline label={`${row.operatorName} ${row.label} fuel price history mini line`} points={row.priceHistoryMiniLine} />
+                  </div>
+                  <p className="mt-3 text-xs font-bold leading-5 text-slate-600">
+                    Effective from {row.effectiveFrom}. Operator-level price, not station-specific pump price.
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <div className="rounded-2xl border border-sky-100 bg-sky-50 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-sky-800">Nearest station candidates</p>
+              <h3 className="mt-2 text-xl font-black text-slate-950">Location context for the cheapest operator</h3>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+                Candidate stations are filtered by the selected cheapest operator and sorted by distance from {currentLocation.label}. They remain location evidence only.
+              </p>
+              <div className="mt-4 space-y-3">
+                {selectedOperatorStations.slice(0, 4).map((station) => (
+                  <div className="rounded-2xl bg-white p-3 text-sm shadow-sm" key={`${station.osmType}-${station.osmId}-visual`}>
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="font-black text-slate-950">{station.name}</p>
+                      <p className="font-black text-sky-900">{formatKm(station.distanceKm)}</p>
+                    </div>
+                    <p className="mt-1 text-xs font-semibold text-slate-600">{stationAddress(station) || 'Address not tagged'}</p>
+                    <p className="mt-2 text-xs font-bold text-slate-500">Operator-level price, not station-specific pump price.</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </ChartShell>
       </div>
 
       <Card className="mt-6 border-sky-200 bg-sky-50">
@@ -349,6 +452,7 @@ export default async function FuelPage({ searchParams }: Readonly<{ searchParams
                 <th className="px-4 py-3">Price per litre</th>
                 <th className="px-4 py-3">Effective from</th>
                 <th className="px-4 py-3">Source</th>
+                <th className="px-4 py-3">Confidence</th>
               </tr>
             </thead>
             <tbody>
@@ -359,6 +463,7 @@ export default async function FuelPage({ searchParams }: Readonly<{ searchParams
                   <td className="px-4 py-3 font-black text-emerald-800">{formatFuelPrice(row.pricePerLitre)}</td>
                   <td className="px-4 py-3 font-semibold text-slate-700">{row.effectiveFrom}</td>
                   <td className="px-4 py-3 font-semibold text-slate-700">{row.sourceLabel}</td>
+                  <td className="px-4 py-3 font-semibold text-slate-700">{Math.round(row.confidence * 100)}%</td>
                 </tr>
               ))}
             </tbody>
