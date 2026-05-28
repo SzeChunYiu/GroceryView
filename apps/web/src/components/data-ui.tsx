@@ -19,9 +19,9 @@ import type { SourceHealthDashboardRow, SourceManagementAction } from '@/lib/sou
 
 export function PageShell({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <div className="min-h-screen bg-[#f5f1e8] text-slate-950">
+    <div className="gv-page-shell min-h-screen bg-[#f5f1e8] text-slate-950">
       <AppNav />
-      <main className="mx-auto w-full max-w-7xl px-4 pb-20 pt-6 sm:px-6 lg:px-8 lg:pb-6">{children}</main>
+      <main className="gv-page-main mx-auto w-full max-w-7xl px-4 pb-20 pt-6 sm:px-6 lg:px-8 lg:pb-6">{children}</main>
       <footer className="mx-auto w-full max-w-7xl px-4 pb-28 pt-2 text-sm font-bold text-slate-600 sm:px-6 lg:px-8 lg:pb-8">
         <div className="flex flex-wrap gap-3 rounded-2xl border border-slate-200 bg-white/70 p-4">
           <span className="font-black text-slate-950">Legal</span>
@@ -48,7 +48,7 @@ export function Eyebrow({ children }: Readonly<{ children: ReactNode }>) {
 }
 
 export function Card({ children, className = '' }: Readonly<{ children: ReactNode; className?: string }>) {
-  return <section className={`rounded-[1.75rem] border border-slate-200 bg-white/88 p-5 shadow-sm ${className}`}>{children}</section>;
+  return <section className={`gv-card rounded-[1.75rem] border border-slate-200 bg-white/88 p-5 shadow-sm ${className}`}>{children}</section>;
 }
 
 export function DashboardHero({
@@ -58,7 +58,7 @@ export function DashboardHero({
   title
 }: Readonly<{ actions?: ReactNode; children: ReactNode; eyebrow: string; title: string }>) {
   return (
-    <section className="rounded-[2rem] border border-emerald-200 bg-white/90 p-6 shadow-sm">
+    <section className="gv-hero-panel rounded-[2rem] border border-emerald-200 bg-white/90 p-6 shadow-sm">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-4xl">
           <Eyebrow>{eyebrow}</Eyebrow>

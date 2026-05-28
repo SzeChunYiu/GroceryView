@@ -4882,6 +4882,127 @@ export type PrivateFeatureRoute =
   | 'shopping-trips'
   | 'privacy';
 
+export type FeaturePlacementCluster = 'products' | 'deals' | 'basket' | 'stores' | 'account';
+
+export const featurePlacementRoadmap: Array<{
+  feature: string;
+  pageCluster: FeaturePlacementCluster;
+  pageLabel: string;
+  targetRoute: string;
+  status: 'ready surface' | 'needs data' | 'account gated' | 'design slot';
+  reason: string;
+  nextFrontendStep: string;
+}> = [
+  {
+    feature: 'Deal Score + Buy/Wait verdict',
+    pageCluster: 'products',
+    pageLabel: 'Product pages',
+    targetRoute: '/products',
+    status: 'ready surface',
+    reason: 'The shopper decides at product detail time whether a current price is actually worth buying.',
+    nextFrontendStep: 'Add verdict chips beside latest-price cards and link to methodology.'
+  },
+  {
+    feature: 'Cheapest-chain-per-product',
+    pageCluster: 'products',
+    pageLabel: 'Products + compare',
+    targetRoute: '/compare',
+    status: 'ready surface',
+    reason: 'Product browse and compare pages already carry chain spread evidence and can show the cheapest verified chain.',
+    nextFrontendStep: 'Promote cheapest-chain badges in result cards and compare rows.'
+  },
+  {
+    feature: 'Nutrition per krona',
+    pageCluster: 'products',
+    pageLabel: 'Nutrition value',
+    targetRoute: '/nutrition-value',
+    status: 'needs data',
+    reason: 'The ranking belongs with product discovery, but only rows with verified nutrition labels should appear.',
+    nextFrontendStep: 'Keep the page fail-closed until nutrition facts are joined to product identifiers.'
+  },
+  {
+    feature: 'Expiry deal radar',
+    pageCluster: 'deals',
+    pageLabel: 'Deals',
+    targetRoute: '/expiry-deals',
+    status: 'ready surface',
+    reason: 'Expiry timing is a deal-quality filter, not a generic catalogue feature.',
+    nextFrontendStep: 'Surface expiring rails from the deals feed and weekly basket.'
+  },
+  {
+    feature: 'Deal-based meals',
+    pageCluster: 'deals',
+    pageLabel: 'Deals + meals',
+    targetRoute: '/meal-planner',
+    status: 'design slot',
+    reason: 'Meal ideas should start from verified discount ingredients, then hand off to planning.',
+    nextFrontendStep: 'Add a deal-to-meal bridge from deals into the meal planner.'
+  },
+  {
+    feature: 'Loyalty-adjusted basket comparison',
+    pageCluster: 'basket',
+    pageLabel: 'Weekly basket',
+    targetRoute: '/weekly-basket',
+    status: 'account gated',
+    reason: 'Member prices and points only make sense once a shopper has saved stores and loyalty preferences.',
+    nextFrontendStep: 'Show a locked loyalty column until account-bound eligibility is available.'
+  },
+  {
+    feature: 'Split-shop route optimizer',
+    pageCluster: 'basket',
+    pageLabel: 'Shopping trips',
+    targetRoute: '/shopping-trips',
+    status: 'ready surface',
+    reason: 'Trip planning is where price savings, store count, and travel friction need to be weighed together.',
+    nextFrontendStep: 'Connect basket strategy totals to route and transport constraints.'
+  },
+  {
+    feature: 'Private-label dupe finder',
+    pageCluster: 'products',
+    pageLabel: 'Products',
+    targetRoute: '/products',
+    status: 'design slot',
+    reason: 'Dupe decisions happen while comparing product alternatives, brands, and package sizes.',
+    nextFrontendStep: 'Add a verified alternatives rail to product detail and search results.'
+  },
+  {
+    feature: 'Store price percentile rank',
+    pageCluster: 'stores',
+    pageLabel: 'Stores + map',
+    targetRoute: '/stores',
+    status: 'needs data',
+    reason: 'Percentile context belongs on store profiles and the map because it compares a branch against cohorts.',
+    nextFrontendStep: 'Add badges once kommun and national cohorts are computed from observations.'
+  },
+  {
+    feature: 'Basket-cost heatmap',
+    pageCluster: 'stores',
+    pageLabel: 'Map',
+    targetRoute: '/map',
+    status: 'design slot',
+    reason: 'A geographic price layer needs map context, not a product list.',
+    nextFrontendStep: 'Reserve the map legend and panel layout for basket-cost overlays.'
+  },
+  {
+    feature: 'Weekly personalized digest',
+    pageCluster: 'account',
+    pageLabel: 'Digest',
+    targetRoute: '/digest',
+    status: 'account gated',
+    reason: 'Digest content depends on watchlist, basket, stores, and notification consent.',
+    nextFrontendStep: 'Place digest controls under account and preview verified public examples only.'
+  },
+  {
+    feature: 'Crowd price submissions',
+    pageCluster: 'account',
+    pageLabel: 'Scanner',
+    targetRoute: '/scanner',
+    status: 'account gated',
+    reason: 'Community reports need trust, review status, and source evidence before changing public prices.',
+    nextFrontendStep: 'Route submissions through scanner and human review states.'
+  }
+];
+
 export const privateFeatureCopy: Record<PrivateFeatureRoute, { verifiedSurface: string; gatedBy: string; nextStep: string }> = {
   'weekly-basket': {
     verifiedSurface: 'The page can compare verified Willys/Hemkop spreads and source coverage, but it cannot assemble a household basket without authenticated pantry and quantity records.',

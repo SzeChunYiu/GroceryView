@@ -1,3 +1,10 @@
 {
-  "waivers": []
+  "waivers": [
+    {
+      "package": "tmp",
+      "via": "tmp has Path Traversal via unsanitized prefix/postfix that enables directory escape",
+      "reason": "CI-only Lighthouse/Inquirer transitive dependency; latest @lhci/cli still pins vulnerable tmp chain, no runtime dependency path.",
+      "expiresAt": "2026-06-30"
+    }
+  ]
 }

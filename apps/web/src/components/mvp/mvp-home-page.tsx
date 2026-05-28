@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import { PriceDropDiscoveryRail } from '@/app/page-sections/trending';
+import { FeaturePlacementMap } from '@/components/feature-placement-map';
 import { PageShell } from '@/components/data-ui';
 import { getHomePageData } from '@/lib/mvp/data';
 import { formatDate, formatSek } from '@/lib/mvp/format';
 import { categoryMarketHref, productRoute } from '@/lib/mvp/routes';
-import { MvpPageHeader } from './mvp-page-header';
+import { PageQuestionHeader, PanelPurpose } from './handoff-content';
 import { MvpSectionCard } from './mvp-section-card';
 import { MvpProductCard } from './product-card';
 import { NoVerifiedDataPanel } from './no-verified-data-panel';
@@ -14,10 +15,11 @@ export function MvpHomePage() {
   const data = getHomePageData();
   return (
     <PageShell>
-      <MvpPageHeader
+      <PageQuestionHeader
         eyebrow="Verified grocery intelligence"
-        title="Compare Swedish grocery prices with evidence, not guesswork"
-        subtitle="GroceryView shows observed prices, deal quality, market indexes, and store coverage from verified ingestion pipelines. Missing data stays hidden instead of being invented."
+        question="Where can I save money on groceries today?"
+        title="Compare grocery prices before you shop."
+        subtitle="GroceryView checks prices, deals, stores, and market trends using verified grocery data. Start with a deal, a product, a store, or the market overview."
         actions={
           <>
             <Link className="rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" href="/search">
@@ -28,6 +30,12 @@ export function MvpHomePage() {
             </Link>
             <Link className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-black text-emerald-900" href="/deals">
               See deals
+            </Link>
+            <Link className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-black text-emerald-900" href="/market">
+              Open market overview
+            </Link>
+            <Link className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-black text-emerald-900" href="/map">
+              View price map
             </Link>
           </>
         }
@@ -55,8 +63,24 @@ export function MvpHomePage() {
         </button>
       </form>
 
+      <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+        {[
+          { label: 'Products tracked', value: data.productCount.toLocaleString('sv-SE'), detail: 'Products tracked show how much of the catalogue has verified evidence.' },
+          { label: 'Stores mapped', value: data.mapPreviewStores.length.toLocaleString('sv-SE'), detail: 'Store coordinates help connect prices to real shopping trips.' },
+          { label: 'Fresh price observations', value: data.marketSnapshot.categoryIndexRows.reduce((sum, row) => sum + row.observationCount, 0).toLocaleString('sv-SE'), detail: 'Fresh price observations help us avoid showing stale deals.' },
+          { label: 'Chains compared', value: data.marketSnapshot.chainIndexSeries.length.toLocaleString('sv-SE'), detail: 'Chain comparisons show where prices differ before you leave home.' },
+          { label: 'Categories covered', value: data.categoryCount.toLocaleString('sv-SE'), detail: 'Category coverage lets you drill from market movement into products.' }
+        ].map((metric) => (
+          <PanelPurpose description={metric.detail} key={metric.label} question={metric.label} title={metric.value} />
+        ))}
+      </div>
+
       <div className="mt-6">
         <PriceDropDiscoveryRail />
+      </div>
+
+      <div className="mt-6">
+        <FeaturePlacementMap compact />
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">

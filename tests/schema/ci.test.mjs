@@ -16,17 +16,20 @@ describe('CI workflow', () => {
     assert.match(workflow, /pull_request:/);
     assert.match(workflow, /push:/);
     assert.match(workflow, /branches:\s*\[main\]/);
-    for (const command of ['npm ci', 'npm test', 'npm run build', 'npm run typecheck']) {
+    for (const command of ['npm ci', 'npm run test -w', 'npm run build -w', 'npm run typecheck']) {
       assert.match(workflow, new RegExp(command.replaceAll(' ', '\\s+')));
     }
-    assert.match(workflow, /name: Run tests with SE\/NO\/IS fixtures/);
-    assert.match(workflow, /GROCERYVIEW_CI_FIXTURE_COUNTRIES:\s*SE,NO,IS/);
+    assert.match(workflow, /package-verify:/);
+    assert.match(workflow, /market-fixtures:/);
+    assert.match(workflow, /market:\s*\[SE, NO, IS\]/);
+    assert.match(workflow, /GROCERYVIEW_CI_FIXTURE_COUNTRIES:\s*\$\{\{ matrix\.market \}\}/);
   });
 
   it('keeps country-scoped fixture tests wired into the CI test command', () => {
     assert.match(rootPackage, /npm run test -w @groceryview\/ingestion/);
     assert.match(rootPackage, /node --test tests\/schema\/\*\.test\.mjs/);
-    assert.match(ingestionPackage, /dist-test\/connectors\/__tests__\/\*\.test\.js/);
+    assert.match(ingestionPackage, /find dist-test -name '\*\.test\.js'/);
+    assert.match(ingestionPackage, /node --test \$\(find dist-test -name '\*\.test\.js' -print \| sort\)/);
 
     assert.match(countryFixtureTests.SE, /countryCode: ['"]SE['"]/);
     assert.match(countryFixtureTests.SE, /describe\('ICA connector fixture parsing'/);

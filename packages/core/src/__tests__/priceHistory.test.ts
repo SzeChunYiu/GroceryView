@@ -358,7 +358,7 @@ describe('planMultiWeekStockUpList', () => {
 
   it('caps a row to storage limits and lowers confidence for sparse history', () => {
     const plan = planMultiWeekStockUpList({
-      asOf: '2026-05-20T00:00:00.000Z',
+      asOf: '2026-05-21T00:00:00.000Z',
       planningWeeks: 4,
       weeklyBudget: 800,
       items: [
@@ -388,7 +388,7 @@ describe('planMultiWeekStockUpList', () => {
 
   it('preserves source-derived kg, l, st, and pack units without converting between unit families', () => {
     const plan = planMultiWeekStockUpList({
-      asOf: '2026-05-20T00:00:00.000Z',
+      asOf: '2026-05-21T00:00:00.000Z',
       planningWeeks: 2,
       weeklyBudget: 700,
       items: [

@@ -25,6 +25,7 @@ create table if not exists stores (
   store_type text,
   opening_hours jsonb,
   online_store_id text,
+  supported_fuel_grade_ids text[] not null default '{}'::text[],
   created_at timestamptz not null default now()
 );
 
@@ -290,14 +291,20 @@ create table if not exists community_reporter_trust (
 );
 
 create table if not exists fuel_grades (
-  id text primary key check (id in ('fuel-95-e10', 'fuel-98', 'fuel-diesel', 'fuel-hvo100', 'fuel-e85')),
-  grade_code text not null unique check (grade_code in ('95', '98', 'diesel', 'hvo100', 'e85')),
+  id text primary key check (id in ('fuel-95-e10', 'fuel-98', 'fuel-diesel', 'fuel-hvo100', 'fuel-e85', 'fuel-adblue')),
+  grade_code text not null unique check (grade_code in ('95', '98', 'diesel', 'hvo100', 'e85', 'adblue')),
   label text not null,
   comparable_unit text not null default 'l' check (comparable_unit = 'l'),
   match_key text not null default 'fuel_grade' check (match_key = 'fuel_grade'),
   active boolean not null default true,
   created_at timestamptz not null default now()
 );
+
+alter table stores add constraint stores_supported_fuel_grade_ids_check
+  check (
+    domain <> 'fuel'
+    or supported_fuel_grade_ids <@ array['fuel-95-e10', 'fuel-98', 'fuel-diesel', 'fuel-hvo100', 'fuel-e85', 'fuel-adblue']::text[]
+  );
 
 create table if not exists fuel_price_sources (
   id bigserial primary key,

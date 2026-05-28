@@ -1574,8 +1574,11 @@ export default async function ProductPage({ params, routeBase = 'products' }: Re
       <script dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbJsonLd) }} type="application/ld+json" />
       <Eyebrow>{isChain ? 'Axfood chain product' : 'OpenPrices product'}</Eyebrow>
       <ProductBreadcrumb categoryLabel={labelFromSlug(product.category)} categorySlug={product.category} productHref={productRouteHref(product, routeBase)} productLabel={product.name} />
+      <p className="mt-3 text-sm font-black text-emerald-900">Is this product a good buy, and where should I buy it?</p>
       <h1 className="mt-2 max-w-4xl text-4xl font-black tracking-tight">{product.name}</h1>
-      <p className="mt-3 text-lg text-slate-700">{isChain ? product.brand : product.brands || 'Brand not reported'} · {isChain ? product.subline : product.quantity || 'Quantity not reported'}</p>
+      <p className="mt-3 text-lg text-slate-700">
+        Compare current price, store availability, price history, and source confidence. {isChain ? product.brand : product.brands || 'Brand not reported'} · {isChain ? product.subline : product.quantity || 'Quantity not reported'}
+      </p>
       <div className="mt-4">
         <SourceCitation
           confidenceLabel={isChain ? `${chainRows.length} chain price row${chainRows.length === 1 ? '' : 's'}` : `${product.observationCount} OpenPrices observation${product.observationCount === 1 ? '' : 's'}`}
@@ -1633,9 +1636,9 @@ export default async function ProductPage({ params, routeBase = 'products' }: Re
           <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-800">Cross-chain quote table</p>
-              <h2 className="mt-2 text-2xl font-black text-slate-950">Current prices by chain</h2>
+              <h2 className="mt-2 text-2xl font-black text-slate-950">Where to buy this product</h2>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
-                Uses the real chainPriceRows / matchedChainProducts snapshot for this matched item. Rows include grocery, pharmacy, variety, cosmetics, ethnic-specialty, and health-food retailer types when the same SKU is present. Delta compares each current quote with the median of the displayed chain basket; unavailable or missing prices are not fabricated.
+                Compare stores selling this product. Sort mentally by cheapest, freshest, or most confident price from the real chainPriceRows / matchedChainProducts snapshot. Rows include grocery, pharmacy, variety, cosmetics, ethnic-specialty, and health-food retailer types when the same SKU is present, plus price per unit, last observed evidence, and confidence; unavailable or missing prices are not fabricated.
               </p>
             </div>
             <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-emerald-900 shadow-sm">

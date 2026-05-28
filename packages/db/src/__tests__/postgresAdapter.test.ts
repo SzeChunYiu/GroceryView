@@ -1813,7 +1813,7 @@ describe('persistOpenPricesArtifact', () => {
     const observationInsert = executor.calls.find((call) => call.sql.includes('insert into observations'));
     assert.ok(observationInsert);
     assert.match(observationInsert.sql, /on conflict/);
-    assert.deepEqual(observationInsert.params.slice(0, 12), [
+    assert.deepEqual(observationInsert.params.slice(0, 14), [
       'product-open-prices',
       'chain-open-prices',
       null,
@@ -1821,15 +1821,17 @@ describe('persistOpenPricesArtifact', () => {
       'source-run-1',
       'raw-record-1',
       'open-prices-price-123',
+      null,
+      null,
       'online',
       49.9,
       null,
       110.8889,
       'SEK'
     ]);
-    assert.equal(observationInsert.params[18], true);
-    assert.equal(observationInsert.params[19], '2026-05-19T00:00:00.000Z');
-    assert.equal(observationInsert.params[22], 0.95);
+    assert.equal(observationInsert.params[20], true);
+    assert.equal(observationInsert.params[21], '2026-05-19T00:00:00.000Z');
+    assert.equal(observationInsert.params[24], 0.95);
     assert.equal(executor.calls.some((call) => /update observations\b/.test(call.sql)), false);
 
     const latestInsert = executor.calls.find((call) => call.sql.includes('insert into latest_prices'));
@@ -1878,8 +1880,8 @@ describe('createPostgresPriceObservationWriter', () => {
     );
 
     assert.match(executor.calls[0]!.sql, /insert into observations/);
-    assert.equal(executor.calls[0]!.params[18], true);
-    assert.equal(executor.calls[0]!.params[19], '2026-05-21T08:00:00.000Z');
+    assert.equal(executor.calls[0]!.params[20], true);
+    assert.equal(executor.calls[0]!.params[21], '2026-05-21T08:00:00.000Z');
     assert.match(executor.calls[1]!.sql, /insert into latest_prices/);
     assert.equal(executor.calls[1]!.params[5], 'observation-1');
   });
@@ -1920,7 +1922,7 @@ describe('createPostgresPriceObservationWriter', () => {
     assert.match(executor.calls[0]!.sql, /insert into observations/);
     assert.match(executor.calls[0]!.sql, /on conflict \(\s*product_id,\s*chain_id,\s*store_id,\s*domain,\s*retailer_product_ref,\s*price_type,\s*observed_at,\s*price,\s*unit_price,\s*currency,\s*is_available,\s*confidence,\s*provenance\s*\) do nothing/);
     assert.match(executor.calls[0]!.sql, /returning id/);
-    assert.deepEqual(executor.calls[0]!.params.slice(0, 12), [
+    assert.deepEqual(executor.calls[0]!.params.slice(0, 14), [
       'product-1',
       'chain-1',
       'store-1',
@@ -1928,14 +1930,16 @@ describe('createPostgresPriceObservationWriter', () => {
       'run-1',
       'raw-1',
       'retailer-1',
+      null,
+      null,
       'promotion',
       49.9,
       69.9,
       110.8889,
       'SEK'
     ]);
-    assert.equal(executor.calls[0]!.params[18], false);
-    assert.equal(executor.calls[0]!.params[23], JSON.stringify({ sourceType: 'retailer_api', sourceName: 'Willys', extractionRule: 'weekly-offers-v1' }));
+    assert.equal(executor.calls[0]!.params[20], false);
+    assert.equal(executor.calls[0]!.params[25], JSON.stringify({ sourceType: 'retailer_api', sourceName: 'Willys', extractionRule: 'weekly-offers-v1' }));
 
     assert.match(executor.calls[1]!.sql, /insert into latest_prices/);
     assert.match(executor.calls[1]!.sql, /on conflict \(product_id, chain_id, store_id, price_type\) do update/);

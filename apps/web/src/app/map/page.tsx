@@ -178,9 +178,10 @@ export default async function MapPage({ searchParams }: Readonly<{ searchParams?
   return (
     <PageShell>
       <Eyebrow>Map data</Eyebrow>
-      <h1 className="mt-2 text-4xl font-black tracking-tight">Store coordinates with chain-index signals</h1>
+      <p className="mt-3 text-sm font-black text-emerald-900">Where are grocery prices cheaper or more expensive?</p>
+      <h1 className="mt-2 text-4xl font-black tracking-tight">Grocery price map</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
-        The website has verified latitude and longitude for OSM stores. Markers are colored by the chain-level price index only; branch-level prices, route times, and store quality scores are not invented.
+        Explore stores, price index heatmaps, category price differences, and data freshness by area. Markers are colored by chain-level price evidence only; branch-level prices, route times, and store quality scores are not invented.
       </p>
       <div className="mt-4">
         <SourceCitation
@@ -190,6 +191,26 @@ export default async function MapPage({ searchParams }: Readonly<{ searchParams?
           observedAt={visibleStores[0]?.retrievedDate}
           sourceLabel="OpenStreetMap store coordinates with verified chain-index overlay"
         />
+      </div>
+
+      <div className="mt-6 grid gap-6 xl:grid-cols-[18rem_1fr_20rem]">
+        <Card>
+          <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Map layers</p>
+          <h2 className="mt-2 text-2xl font-black">Choose the signal</h2>
+          <div className="mt-4 grid gap-3 text-sm font-semibold leading-6 text-slate-700">
+            <p><strong>Store locations:</strong> See mapped grocery stores.</p>
+            <p><strong>Price index:</strong> Compare grocery prices by area.</p>
+            <p><strong>Category index:</strong> See where a category like meat or baby products is more expensive.</p>
+            <p><strong>Freshness:</strong> See where price data is fresh or stale.</p>
+            <p><strong>Coverage:</strong> See where GroceryView has stronger or weaker data.</p>
+          </div>
+        </Card>
+        <Card className="xl:col-span-2">
+          <h2 className="text-2xl font-black">Selected detail panel</h2>
+          <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+            Click store pins to open store previews, kommun summaries to open market context, and nearby deals to open verified product pages.
+          </p>
+        </Card>
       </div>
 
       <SavedViewActions

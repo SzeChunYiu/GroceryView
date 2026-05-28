@@ -7,17 +7,14 @@ import {
   ChevronDown,
   Database,
   Flame,
-  Globe2,
   Heart,
   ScanLine,
   Map,
-  MessageCircle,
   Newspaper,
   PackageSearch,
   PiggyBank,
   Search,
   ShoppingBasket,
-  Store,
   Tags,
   Utensils
 } from 'lucide-react';
@@ -38,12 +35,87 @@ type NavItem = {
 };
 
 type NavGroup = {
-  icon: LucideIcon;
-  items: NavItem[];
   label: string;
+  items: NavItem[];
 };
 
 type AppNavTranslator = ReturnType<typeof groceryTranslator>;
+
+const primaryNavItems: NavItem[] = [
+  { href: '/', label: 'Overview', icon: BarChart3, match: 'exact' },
+  { href: '/deals', label: 'Deals', icon: Tags },
+  { href: '/market', label: 'Market overview', icon: BarChart3 },
+  { href: '/watchlist', label: 'Watchlist', icon: Heart },
+  { href: '/map', label: 'Map', icon: Map },
+  { href: '/browse', label: 'Browse', icon: PackageSearch }
+];
+
+const functionNavItems: NavItem[] = [
+  { href: '/chain-index', label: 'Chain index', icon: Database },
+  { href: '/compare', label: 'Compare', icon: Tags },
+  { href: '/categories', label: 'Categories', icon: Tags },
+  { href: '/products', label: 'Products', icon: PackageSearch },
+  { href: '/weekly-basket', label: 'Weekly basket', icon: ShoppingBasket },
+  { href: '/scanner', label: 'Scanner', icon: ScanLine },
+  { href: '/screener', label: 'Screener', icon: Search },
+  { href: '/heatmap', label: 'Heatmap', icon: Flame },
+  { href: '/feature-roadmap', label: 'Roadmap', icon: Database },
+  { href: '/savings-dashboard', label: 'Savings', icon: PiggyBank },
+  { href: '/stockholm/my-flyer', label: 'My Flyer', icon: Newspaper, match: 'my-flyer' },
+  { href: '/meal-planner', label: 'Meal planner', icon: Utensils }
+];
+
+function buildNavGroups(t: AppNavTranslator): NavGroup[] {
+  return [
+    {
+      label: t('app-nav.groups.markets'),
+      items: [
+        { href: '/', label: t('app-nav.items.overview'), icon: BarChart3, match: 'exact' },
+        { href: '/chain-index', label: t('app-nav.items.chainIndex'), icon: Database },
+        { href: '/analytics/funnel', label: t('app-nav.items.funnel'), icon: BarChart3 },
+        { href: '/categories', label: t('app-nav.items.categories'), icon: Tags },
+        { href: '/heatmap', label: t('app-nav.items.heatmap'), icon: Flame },
+        { href: '/screener', label: 'Screener', icon: Search },
+        { href: '/feature-roadmap', label: 'Roadmap', icon: Database }
+      ]
+    },
+    {
+      label: t('app-nav.groups.products'),
+      items: [
+        { href: '/products', label: t('app-nav.items.browse'), icon: PackageSearch },
+        { href: '/new-arrivals', label: t('app-nav.items.newArrivals'), icon: PackageSearch },
+        { href: '/compare', label: t('app-nav.items.compare'), icon: Tags }
+      ]
+    },
+    {
+      label: t('app-nav.groups.stores'),
+      items: [
+        { href: '/map', label: t('app-nav.items.map'), icon: Map },
+        { href: '/stores', label: t('app-nav.items.stores'), icon: Database }
+      ]
+    },
+    {
+      label: t('app-nav.groups.trip'),
+      items: [
+        { href: '/scanner', label: t('app-nav.items.scanner'), icon: ScanLine },
+        { href: '/list', label: t('app-nav.items.currentList'), icon: ShoppingBasket },
+        { href: '/screener', label: t('app-nav.items.nearbyDeals'), icon: Search },
+        { href: '/watchlist', label: t('app-nav.items.watchlist'), icon: Heart }
+      ]
+    },
+    {
+      label: t('app-nav.groups.personal'),
+      items: [
+        { href: '/savings-dashboard', label: t('app-nav.items.savings'), icon: PiggyBank },
+        { href: '/stockholm/my-flyer', label: t('app-nav.items.myFlyer'), icon: Newspaper, match: 'my-flyer' },
+        { href: '/weekly-basket', label: t('app-nav.items.weeklyBasket'), icon: ShoppingBasket },
+        { href: '/meal-planner', label: t('app-nav.items.mealPlanner'), icon: Utensils },
+        { href: '/pantry-inventory', label: t('app-nav.items.pantryInventory'), icon: Database },
+        { href: '/contact', label: t('app-nav.items.contact'), icon: Database }
+      ]
+    }
+  ];
+}
 
 const navContractLabels = [
   {
@@ -54,7 +126,8 @@ const navContractLabels = [
       { href: '/analytics/funnel', label: 'Funnel' },
       { href: '/categories', label: 'Categories' },
       { href: '/heatmap', label: 'Heatmap' },
-      { href: '/screener', label: 'Screener' }
+      { href: '/screener', label: 'Screener' },
+      { href: '/feature-roadmap', label: 'Roadmap' }
     ]
   },
   { label: 'Products', items: [{ href: '/products', label: 'Browse' }, { href: '/new-arrivals', label: 'New arrivals' }, { href: '/compare', label: 'Compare' }] },
@@ -75,69 +148,6 @@ const navContractLabels = [
 const navProvenanceCopy = 'Verified grocery intelligence';
 void navContractLabels;
 void navProvenanceCopy;
-
-function buildNavGroups(t: AppNavTranslator): NavGroup[] {
-  void navContractLabels;
-  void navProvenanceCopy;
-  return [
-    {
-      label: t('app-nav.groups.markets'),
-      icon: BarChart3,
-      items: [
-        { href: '/', label: t('app-nav.items.overview'), icon: BarChart3 },
-        { href: '/deals', label: 'Deals', icon: Tags },
-        { href: '/market', label: 'Market', icon: BarChart3 },
-        { href: '/chain-index', label: t('app-nav.items.chainIndex'), icon: Database },
-        { href: '/methodology', label: 'Methodology', icon: Database },
-        { href: '/analytics/funnel', label: t('app-nav.items.funnel'), icon: BarChart3 },
-        { href: '/categories', label: t('app-nav.items.categories'), icon: Tags },
-        { href: '/heatmap', label: t('app-nav.items.heatmap'), icon: Flame },
-        { href: '/screener', label: 'Screener', icon: Search }
-      ]
-    },
-    {
-      label: t('app-nav.groups.products'),
-      icon: PackageSearch,
-      items: [
-        { href: '/browse', label: 'Browse', icon: PackageSearch },
-        { href: '/products', label: t('app-nav.items.browse'), icon: PackageSearch },
-        { href: '/new-arrivals', label: t('app-nav.items.newArrivals'), icon: PackageSearch },
-        { href: '/cultural-aisles', label: 'Cultural aisles', icon: Globe2 },
-        { href: '/compare', label: t('app-nav.items.compare'), icon: Tags }
-      ]
-    },
-    {
-      label: t('app-nav.groups.stores'),
-      icon: Store,
-      items: [
-        { href: '/map', label: t('app-nav.items.map'), icon: Map },
-        { href: '/stores', label: t('app-nav.items.stores'), icon: Store }
-      ]
-    },
-    {
-      label: t('app-nav.groups.trip'),
-      icon: ScanLine,
-      items: [
-        { href: '/scanner', label: t('app-nav.items.scanner'), icon: ScanLine },
-        { href: '/list', label: t('app-nav.items.currentList'), icon: ShoppingBasket },
-        { href: '/screener', label: t('app-nav.items.nearbyDeals'), icon: Tags },
-        { href: '/watchlist', label: t('app-nav.items.watchlist'), icon: Heart }
-      ]
-    },
-    {
-      label: t('app-nav.groups.personal'),
-      icon: Heart,
-      items: [
-        { href: '/savings-dashboard', label: t('app-nav.items.savings'), icon: PiggyBank },
-        { href: '/stockholm/my-flyer', label: t('app-nav.items.myFlyer'), icon: Newspaper, match: 'my-flyer' },
-        { href: '/weekly-basket', label: t('app-nav.items.weeklyBasket'), icon: ShoppingBasket },
-        { href: '/meal-planner', label: t('app-nav.items.mealPlanner'), icon: Utensils },
-        { href: '/pantry-inventory', label: t('app-nav.items.pantryInventory'), icon: ShoppingBasket },
-        { href: '/contact', label: t('app-nav.items.contact'), icon: MessageCircle }
-      ]
-    }
-  ];
-}
 
 const installBannerDismissedKey = "groceryview:install-banner-dismissed";
 
@@ -187,6 +197,14 @@ function navItemClassName(isActive: boolean, surface: 'mobile' | 'menu') {
     isActive
       ? 'bg-emerald-800 text-white'
       : 'text-slate-700 dark:text-slate-200 hover:bg-emerald-50 hover:text-emerald-900 focus:bg-emerald-50 focus:text-emerald-900 dark:text-slate-200 dark:hover:bg-emerald-950 dark:hover:text-emerald-200 dark:focus:bg-emerald-950 dark:focus:text-emerald-200'
+  }`;
+}
+
+function primaryNavItemClassName(isActive: boolean) {
+  return `inline-flex h-11 shrink-0 items-center gap-2 rounded-full border px-4 text-sm font-black transition focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800 ${
+    isActive
+      ? 'border-emerald-950 bg-emerald-950 text-white shadow-[0_12px_32px_rgba(6,78,59,0.22)]'
+      : 'border-slate-200 bg-white/82 text-slate-700 shadow-sm backdrop-blur hover:-translate-y-0.5 hover:border-emerald-700 hover:text-emerald-950 dark:border-slate-700 dark:bg-slate-900/86 dark:text-slate-200'
   }`;
 }
 
@@ -255,6 +273,7 @@ export function AppNav() {
   const t = groceryTranslator(locale);
   const navGroups = buildNavGroups(t);
   const mobileNavItems = navGroups.flatMap((group) => group.items);
+  const isFunctionGroupActive = functionNavItems.some((item) => isNavItemActive(item, pathname));
 
   useEffect(() => {
     const initialLocale = readPersistedLocale();
@@ -274,17 +293,18 @@ export function AppNav() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-20 border-b border-slate-200 bg-[#f5f1e8]/95 backdrop-blur transition-colors dark:border-slate-800 dark:bg-slate-950/95">
-      <nav className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
-        <Link className="group flex items-center gap-3" href="/">
-          <span className="grid h-11 w-11 place-items-center rounded-2xl bg-emerald-800 text-lg font-black text-white shadow-sm">GV</span>
+    <header className="sticky top-0 z-20 border-b border-emerald-950/10 bg-[#f5f1e8]/90 backdrop-blur-xl transition-colors dark:border-slate-800 dark:bg-slate-950/95">
+      <nav className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-4 py-3 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+          <Link className="group flex items-center gap-3" href="/">
+          <span className="grid h-11 w-11 place-items-center rounded-2xl bg-emerald-950 text-lg font-black text-lime-200 shadow-sm">GV</span>
           <span>
             <span className="block text-lg font-black tracking-tight text-slate-950 dark:text-slate-50">GroceryView</span>
             <span className="block text-xs font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">{t('app-nav.tagline')}</span>
           </span>
-        </Link>
-        <div className="flex flex-1 flex-col gap-3 lg:items-end">
-          <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+          </Link>
+          <div className="flex min-w-0 flex-1 flex-col gap-3 xl:items-end">
+            <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
             <SearchBar surface="app-nav" />
             <MarketSwitcher />
             <LanguagePreferenceSwitcher />
@@ -294,8 +314,11 @@ export function AppNav() {
               switchToDarkLabel={t('app-nav.theme.switchToDark')}
               switchToLightLabel={t('app-nav.theme.switchToLight')}
             />
+            </div>
           </div>
-          <div className="flex gap-2 overflow-x-auto pb-1 lg:hidden">
+        </div>
+
+        <div className="flex gap-2 overflow-x-auto pb-1 lg:hidden">
             {mobileNavItems.map((item) => {
               const Icon = item.icon;
               const isActive = isNavItemActive(item, pathname);
@@ -306,46 +329,52 @@ export function AppNav() {
                 </Link>
               );
             })}
-          </div>
-          <div className="hidden gap-2 lg:flex lg:justify-end">
-            {navGroups.map((group) => {
-              const GroupIcon = group.icon;
-              const isGroupActive = group.items.some((item) => isNavItemActive(item, pathname));
+        </div>
+
+        <div className="hidden items-center justify-between gap-3 lg:flex">
+          <div className="flex min-w-0 flex-1 gap-2 overflow-x-auto pb-1">
+            {primaryNavItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = isNavItemActive(item, pathname);
               return (
-                <div className="group relative" key={group.label}>
-                  <button
-                    aria-haspopup="true"
-                    className={`inline-flex h-10 shrink-0 items-center gap-2 rounded-full border px-3 text-sm font-black transition focus:border-emerald-700 focus:text-emerald-900 focus:outline-none ${
-                      isGroupActive
-                        ? 'border-emerald-800 bg-emerald-800 text-white shadow-sm'
-                        : 'border-slate-200 bg-white text-slate-700 dark:text-slate-200 hover:border-emerald-700 hover:text-emerald-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-emerald-400 dark:hover:text-emerald-200'
-                    }`}
-                    type="button"
-                  >
-                    <GroupIcon className="h-4 w-4" aria-hidden="true" />
-                    {group.label}
-                    <ChevronDown className="h-4 w-4" aria-hidden="true" />
-                  </button>
-                  <div className="invisible absolute right-0 top-full z-30 mt-2 w-56 rounded-lg border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-900 opacity-0 shadow-xl shadow-slate-900/10 transition group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
-                    {group.items.map((item) => {
-                      const Icon = item.icon;
-                      const isActive = isNavItemActive(item, pathname);
-                      return (
-                        <Link
-                          aria-current={isActive ? 'page' : undefined}
-                          className={navItemClassName(isActive, 'menu')}
-                          href={item.href}
-                          key={`${group.label}-${item.href}-${item.label}`}
-                        >
-                          <Icon className={`h-4 w-4 ${isActive ? 'text-white' : 'text-slate-500 dark:text-slate-400'}`} aria-hidden="true" />
-                          {item.label}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
+                <Link aria-current={isActive ? 'page' : undefined} className={primaryNavItemClassName(isActive)} href={item.href} key={`${item.href}-${item.label}`}>
+                  <Icon className="h-4 w-4" aria-hidden="true" />
+                  {item.label}
+                </Link>
               );
             })}
+          </div>
+          <div className="group relative shrink-0">
+            <button
+              aria-haspopup="true"
+              className={`inline-flex h-11 items-center gap-2 rounded-full border px-4 text-sm font-black transition focus:border-emerald-700 focus:text-emerald-900 focus:outline-none ${
+                isFunctionGroupActive
+                  ? 'border-emerald-950 bg-lime-200 text-emerald-950 shadow-sm'
+                  : 'border-slate-200 bg-white/82 text-slate-700 shadow-sm hover:border-emerald-700 hover:text-emerald-950 dark:border-slate-700 dark:bg-slate-900/86 dark:text-slate-200'
+              }`}
+              type="button"
+            >
+              <Database className="h-4 w-4" aria-hidden="true" />
+              Indices & tools
+              <ChevronDown className="h-4 w-4" aria-hidden="true" />
+            </button>
+            <div className="invisible absolute right-0 top-full z-30 mt-2 grid w-[34rem] grid-cols-2 gap-1 rounded-2xl border border-slate-200 bg-white p-3 opacity-0 shadow-2xl shadow-slate-900/15 transition group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100 dark:border-slate-700 dark:bg-slate-900">
+              {functionNavItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = isNavItemActive(item, pathname);
+                return (
+                  <Link
+                    aria-current={isActive ? 'page' : undefined}
+                    className={navItemClassName(isActive, 'menu')}
+                    href={item.href}
+                    key={`function-${item.href}-${item.label}`}
+                  >
+                    <Icon className={`h-4 w-4 ${isActive ? 'text-white' : 'text-slate-500 dark:text-slate-400'}`} aria-hidden="true" />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         </div>
       </nav>

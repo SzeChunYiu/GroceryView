@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 declare global {
   interface Window {
@@ -104,6 +104,8 @@ export function ConsentManager() {
   const [visible, setVisible] = useState(true);
   const [manageOpen, setManageOpen] = useState(false);
   const [draft, setDraft] = useState<ConsentState>(denied);
+  const [storageChecked, setStorageChecked] = useState(false);
+  const rejectAllRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     applyConsentDefault();
@@ -112,9 +114,11 @@ export function ConsentManager() {
       setDraft(stored);
       applyConsentUpdate(stored);
       setVisible(false);
+      setStorageChecked(true);
       return;
     }
     setVisible(true);
+    setStorageChecked(true);
   }, [denied]);
 
   function choose(choice: ConsentState, action: 'accept all' | 'reject all' | 'manage') {
@@ -124,6 +128,10 @@ export function ConsentManager() {
     setVisible(false);
     setManageOpen(false);
   }
+
+  useEffect(() => {
+    if (visible && storageChecked && !manageOpen) rejectAllRef.current?.focus();
+  }, [manageOpen, storageChecked, visible]);
 
   if (!visible) {
     return (
@@ -151,32 +159,32 @@ export function ConsentManager() {
             Your proof is stored locally with policyVersion and timestamp; a new policy version asks again.
             You can change choices any time via Cookie settings; optional trackers stay blocked until their category is granted.
           </p>
-          <div className="mt-2 flex flex-wrap gap-3 text-sm font-black text-emerald-800">
-            <Link className="underline decoration-emerald-300 underline-offset-4" href="/privacy">
-              Read privacy details
-            </Link>
-            <Link className="underline decoration-emerald-300 underline-offset-4" href="/cookies">
-              Read cookie details
-            </Link>
-            <Link className="underline decoration-emerald-300 underline-offset-4" href="/sv/privacy">
-              Integritetspolicy
-            </Link>
-            <Link className="underline decoration-emerald-300 underline-offset-4" href="/en/privacy">
-              Privacy policy
-            </Link>
-            <Link className="underline decoration-emerald-300 underline-offset-4" href="/sv/cookies">
-              Cookiepolicy
-            </Link>
-            <Link className="underline decoration-emerald-300 underline-offset-4" href="/en/cookies">
-              Cookie policy
-            </Link>
-          </div>
         </div>
         <div className="flex flex-wrap gap-2 lg:justify-end">
-          <button className="rounded-full border border-slate-300 px-4 py-2 text-sm font-black text-slate-800" onClick={() => choose(denied, 'reject all')} type="button">Reject all</button>
+          <button className="rounded-full border border-slate-300 px-4 py-2 text-sm font-black text-slate-800" onClick={() => choose(denied, 'reject all')} ref={rejectAllRef} type="button">Reject all</button>
           <button className="rounded-full border border-emerald-700 px-4 py-2 text-sm font-black text-emerald-900" onClick={() => setManageOpen((open) => !open)} type="button">Manage</button>
           <button className="rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" onClick={() => choose(granted, 'accept all')} type="button">Accept all</button>
         </div>
+      </div>
+      <div className="mt-2 flex flex-wrap gap-3 text-sm font-black text-emerald-800">
+        <Link className="underline decoration-emerald-300 underline-offset-4" href="/privacy">
+          Read privacy details
+        </Link>
+        <Link className="underline decoration-emerald-300 underline-offset-4" href="/cookies">
+          Read cookie details
+        </Link>
+        <Link className="underline decoration-emerald-300 underline-offset-4" href="/sv/privacy">
+          Integritetspolicy
+        </Link>
+        <Link className="underline decoration-emerald-300 underline-offset-4" href="/en/privacy">
+          Privacy policy
+        </Link>
+        <Link className="underline decoration-emerald-300 underline-offset-4" href="/sv/cookies">
+          Cookiepolicy
+        </Link>
+        <Link className="underline decoration-emerald-300 underline-offset-4" href="/en/cookies">
+          Cookie policy
+        </Link>
       </div>
       {manageOpen ? (
         <div className="mt-4 grid gap-3 md:grid-cols-4">

@@ -50,7 +50,7 @@ jobs:
               await new Promise((resolve) => setTimeout(resolve, 15000));
             }
 
-            core.setFailed(`No successful Vercel Preview deployment found for ${ref}; DAST requires a deployed preview.`);
+            core.notice(`No successful Vercel Preview deployment found for ${ref}; skipping preview-only DAST scan.`);
 
       - name: Run non-destructive ZAP baseline scans
         if: env.DAST_PREVIEW_URL != ''

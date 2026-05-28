@@ -10,6 +10,7 @@ import { NewArrivalsCarousel } from '@/components/TrendingCarousel';
 import { SavedSearchActions } from '@/components/saved-search-actions';
 import { ProductGrid } from '@/components/product-grid';
 import { ChainLogo } from '@/components/chain-logo';
+import { FeaturePlacementMap } from '@/components/feature-placement-map';
 import { apohemSource } from '@/lib/ingested/apohem';
 import { newProductArrivals } from '@/lib/new-arrivals';
 import { buildSavedSearchSubscription } from '@/lib/alert-scheduler';
@@ -143,10 +144,6 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
     min: priceRange.min ?? 0,
     max: priceRange.max ?? 0
   };
-  const virtualizedResultCards = resultCards.map((card) => ({
-    ...card,
-    isAvailable: card.isAvailable ?? undefined
-  }));
   const requestedPage = toPageNumber(resolvedSearchParams.page);
   const selectedBrand = normalizeSelectedBrand(resolvedSearchParams.brand);
   const avoidAllergens = search.allergenAvoidance.checked;
@@ -168,7 +165,12 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const pageStart = (currentPage - 1) * PRODUCTS_PER_PAGE;
   const rangeStart = resultCards.length === 0 ? 0 : pageStart + 1;
   const rangeEnd = Math.min(pageStart + PRODUCTS_PER_PAGE, resultCards.length);
-  const virtualizedResultLabel = `Virtualized product results, ${resultCards.length.toLocaleString('sv-SE')} matches`;
+  const pagedResultCards = resultCards.slice(pageStart, rangeEnd);
+  const virtualizedResultCards = pagedResultCards.map((card) => ({
+    ...card,
+    isAvailable: card.isAvailable ?? undefined
+  }));
+  const virtualizedResultLabel = `Virtualized product results, ${rangeStart.toLocaleString('sv-SE')}–${rangeEnd.toLocaleString('sv-SE')} of ${resultCards.length.toLocaleString('sv-SE')} matches`;
   const defaultSearchCount = facetedProductSearch.resultCards.length;
   const zeroResultFallback = relatedSearchFallback(search.query);
   const zeroResultCategories = zeroResultCategoryShortcuts(search.query, resolvedSearchParams.category);
@@ -206,6 +208,9 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
       <Eyebrow>Products</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Verified product catalogue</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">Products are shown only when present in the Axfood chain snapshot or OpenPrices SEK observations. No filler products are rendered.</p>
+      <div className="mt-6">
+        <FeaturePlacementMap compact focus="products" />
+      </div>
       <NewArrivalsCarousel items={newProductArrivals} />
       <Card className="mt-8 border-indigo-200 bg-indigo-50/70">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">

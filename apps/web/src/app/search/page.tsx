@@ -1,4 +1,5 @@
-import { SearchRecoveryPanel } from '@/components/data-ui';
+import { PageShell, SearchRecoveryPanel } from '@/components/data-ui';
+import { PageQuestionHeader, GuidedEmptyState } from '@/components/mvp/handoff-content';
 import { RecentSearchReplayPills } from '@/components/SearchBar';
 import { SaveSearchSubscriptionButton } from '@/components/saved-search-subscriptions';
 import { buildSavedSearchSubscription } from '@/lib/alert-scheduler';
@@ -61,8 +62,38 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
       .slice(0, 3)
     : seoLandingProducts.slice(0, 3);
 
+  const activeFilters = ['category', 'chain', 'type', 'region', 'store', 'dealLevel', 'sort']
+    .map((key) => [key, firstParam(resolvedSearchParams, key)] as const)
+    .filter(([, value]) => value);
+
   return (
-    <>
+    <PageShell>
+      <PageQuestionHeader
+        eyebrow="Search"
+        question="Which products match my filters?"
+        title={query ? `Search results for “${query}”` : activeFilters.length > 0 ? 'Filtered grocery products' : 'Search grocery products'}
+        subtitle="Use filters and sorting to compare price, freshness, confidence, and store availability."
+        actions={
+          <form action="/search" className="flex min-w-[18rem] gap-2">
+            {activeFilters.map(([key, value]) => key !== 'q' ? <input key={key} name={key} type="hidden" value={value} /> : null)}
+            <input className="min-w-0 flex-1 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold" defaultValue={query} name="q" placeholder="Search within list" type="search" />
+            <button className="rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" type="submit">Search</button>
+          </form>
+        }
+      />
+      {activeFilters.length > 0 ? (
+        <section className="mx-auto mt-4 w-full max-w-6xl rounded-3xl border border-slate-200 bg-white p-4 shadow-sm" aria-label="Active filters">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">Active filters</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {activeFilters.map(([key, value]) => (
+              <span className="rounded-full bg-emerald-50 px-3 py-2 text-xs font-black text-emerald-950" key={key}>{key}: {value}</span>
+            ))}
+            {['cheapest', 'best-deal', 'freshest', 'confidence', 'price-drop', 'unit-price'].map((sort) => (
+              <a className="rounded-full bg-slate-100 px-3 py-2 text-xs font-black text-slate-800" href={cursorHref({ ...resolvedSearchParams, sort }, null)} key={sort}>Sort: {sort}</a>
+            ))}
+          </div>
+        </section>
+      ) : null}
       <SaveSearchSubscriptionButton subscription={subscription} />
       <section className="mx-auto mb-4 w-full max-w-5xl rounded-3xl border border-emerald-100 bg-emerald-50/80 p-4 shadow-sm" data-voice-search-help>
         <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">Mobile voice search</p>
@@ -144,21 +175,37 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
             {nextOffset !== null ? <a className="rounded-full bg-slate-950 px-4 py-2 text-sm font-black text-white" href={cursorHref(resolvedSearchParams, nextOffset)}>Next results</a> : null}
           </div>
         </div>
+        {pagedResultCards.length === 0 ? (
+          <GuidedEmptyState
+            title="No verified products match these filters yet"
+            body="Try removing a filter, browsing the category, or checking deals. GroceryView does not fill empty search results with sample products."
+            actions={[
+              { label: 'Browse categories', href: '/browse' },
+              { label: 'See deals', href: '/deals' },
+              { label: 'Open market overview', href: '/market' }
+            ]}
+          />
+        ) : null}
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {pagedResultCards.map((card) => (
             <article className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm" key={card.slug}>
-              <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-700">{card.categoryLabel}</p>
-              <h3 className="mt-2 text-lg font-black text-slate-950">{card.name}</h3>
+              <a className="text-xs font-black uppercase tracking-[0.16em] text-emerald-700 underline" href={`/search?category=${encodeURIComponent(card.categoryLabel)}`}>{card.categoryLabel}</a>
+              <h3 className="mt-2 text-lg font-black text-slate-950"><a href={`/products/${card.slug}`}>{card.name}</a></h3>
               <p className="mt-1 text-sm font-semibold text-slate-600">{card.brand}</p>
               <div className="mt-3 rounded-2xl bg-emerald-50 p-3">
                 <p className="text-xl font-black text-emerald-950">{card.cheapestPriceLabel}</p>
                 <p className="mt-1 text-sm font-bold text-emerald-800">{card.unitPriceLabel}</p>
               </div>
               <p className="mt-3 text-xs font-bold text-slate-500">{card.chainLabel}</p>
+              <div className="mt-3 flex flex-wrap gap-2 text-xs font-black">
+                <a className="rounded-full bg-emerald-50 px-3 py-2 text-emerald-950" href={`/products/${card.slug}`}>Open product</a>
+                <a className="rounded-full bg-slate-100 px-3 py-2 text-slate-800" href={`/market?category=${encodeURIComponent(card.categoryLabel)}`}>Market context</a>
+                <a className="rounded-full bg-slate-100 px-3 py-2 text-slate-800" href={`/search?category=${encodeURIComponent(card.categoryLabel)}&similarTo=${encodeURIComponent(card.slug)}`}>Compare similar</a>
+              </div>
             </article>
           ))}
         </div>
       </section>
-    </>
+    </PageShell>
   );
 }
