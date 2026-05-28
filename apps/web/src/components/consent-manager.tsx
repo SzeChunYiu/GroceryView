@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 declare global {
   interface Window {
@@ -104,6 +104,7 @@ export function ConsentManager() {
   const [visible, setVisible] = useState(true);
   const [manageOpen, setManageOpen] = useState(false);
   const [draft, setDraft] = useState<ConsentState>(denied);
+  const rejectAllRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     applyConsentDefault();
@@ -124,6 +125,10 @@ export function ConsentManager() {
     setVisible(false);
     setManageOpen(false);
   }
+
+  useEffect(() => {
+    if (visible && !manageOpen) rejectAllRef.current?.focus();
+  }, [manageOpen, visible]);
 
   if (!visible) {
     return (
@@ -153,9 +158,9 @@ export function ConsentManager() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2 lg:justify-end">
-          <button className="rounded-full border border-slate-300 px-4 py-2 text-sm font-black text-slate-800" onClick={() => choose(denied, 'reject all')} tabIndex={1} type="button">Reject all</button>
-          <button className="rounded-full border border-emerald-700 px-4 py-2 text-sm font-black text-emerald-900" onClick={() => setManageOpen((open) => !open)} tabIndex={2} type="button">Manage</button>
-          <button className="rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" onClick={() => choose(granted, 'accept all')} tabIndex={3} type="button">Accept all</button>
+          <button className="rounded-full border border-slate-300 px-4 py-2 text-sm font-black text-slate-800" onClick={() => choose(denied, 'reject all')} ref={rejectAllRef} type="button">Reject all</button>
+          <button className="rounded-full border border-emerald-700 px-4 py-2 text-sm font-black text-emerald-900" onClick={() => setManageOpen((open) => !open)} type="button">Manage</button>
+          <button className="rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" onClick={() => choose(granted, 'accept all')} type="button">Accept all</button>
         </div>
       </div>
       <div className="mt-2 flex flex-wrap gap-3 text-sm font-black text-emerald-800">

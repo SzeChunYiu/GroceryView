@@ -82,6 +82,9 @@ async function activeFocusSnapshot(page: Page): Promise<FocusSnapshot | null> {
 }
 
 async function focusWithTab(page: Page, target: Locator, maxTabs = 60) {
+  const initiallyFocused = await target.evaluate((element) => element === document.activeElement || element.contains(document.activeElement)).catch(() => false);
+  if (initiallyFocused) return;
+
   for (let index = 0; index < maxTabs; index += 1) {
     await page.keyboard.press('Tab');
     const focused = await target.evaluate((element) => element === document.activeElement || element.contains(document.activeElement)).catch(() => false);
