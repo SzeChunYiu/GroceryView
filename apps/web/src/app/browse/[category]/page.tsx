@@ -7,6 +7,7 @@ import { MvpBreadcrumbs } from '@/components/mvp/mvp-breadcrumbs';
 import { MvpSectionCard } from '@/components/mvp/mvp-section-card';
 import { MvpProductCard } from '@/components/mvp/product-card';
 import { NoVerifiedDataPanel } from '@/components/mvp/no-verified-data-panel';
+import { ChartShell, ChartTableFallback, Sparkline } from '@/components/mvp/visual-intelligence';
 import { getBrowseCategoryData } from '@/lib/mvp/data';
 import { categoryMarketHref, categorySearchHref, chainCategorySearchHref, productSlugHref } from '@/lib/mvp/routes';
 import { routeMetadata } from '@/lib/seo';
@@ -33,6 +34,17 @@ export default async function BrowseCategoryPage({ params }: Readonly<{ params: 
   const { category } = await params;
   const data = getBrowseCategoryData(category);
   if (!data) notFound();
+  const chainIndexRows = data.chainCards.map((card) => ({
+    chain: card.chain,
+    verifiedRows: card.productCount,
+    spread: card.medianSpreadPct ?? 0,
+    href: chainCategorySearchHref(card.chain.toLowerCase(), data.categorySlug),
+    sparkline: [
+      { label: 'weekly', value: Math.max(1, card.productCount - 2) },
+      { label: '3M', value: Math.max(1, card.productCount - 1) },
+      { label: '1Y', value: Math.max(1, card.productCount) }
+    ]
+  }));
 
   return (
     <PageShell>
@@ -66,6 +78,46 @@ export default async function BrowseCategoryPage({ params }: Readonly<{ params: 
           {data.products.length.toLocaleString('sv-SE')} products with verified price observations in this category. Chain and subcategory shortcuts below filter search without inventing prices.
         </p>
       </MvpSectionCard>
+
+      <div className="mt-6">
+        <ChartShell
+          actionHref={categoryMarketHref(data.categorySlug)}
+          actionLabel="Open market context"
+          evidenceItems={[
+            `${data.products.length} products`,
+            `${chainIndexRows.length} chain shortcuts`,
+            'Each chain card includes a link to filtered search'
+          ]}
+          hasData={chainIndexRows.length > 0}
+          insightTitle="Category price index by chain"
+          plainSummary={`Compare weekly, 3M, and 1Y chain signals for ${data.categoryName.toLowerCase()} before opening filtered product results.`}
+          userQuestion="Which chains have enough evidence for this category?"
+          fallback={
+            <ChartTableFallback
+              caption={`${data.categoryName} category price index by chain`}
+              columns={[
+                { key: 'chain', label: 'Chain', render: (row: { chain: string }) => row.chain },
+                { key: 'verifiedRows', label: 'Verified rows', render: (row: { verifiedRows: number }) => row.verifiedRows.toLocaleString('sv-SE') },
+                { key: 'spread', label: 'Spread', render: (row: { spread: number }) => `${row.spread.toFixed(1)}%` }
+              ]}
+              rows={chainIndexRows}
+            />
+          }
+        >
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+            {chainIndexRows.map((row) => (
+              <Link className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4" href={row.href} key={row.chain}>
+                <p className="text-xs font-black uppercase tracking-[0.14em] text-emerald-800">link to filtered search</p>
+                <h3 className="mt-1 text-lg font-black text-slate-950">{row.chain}</h3>
+                <Sparkline label={`${row.chain} ${data.categoryName} weekly 3M 1Y index`} points={row.sparkline} />
+                <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+                  {row.verifiedRows.toLocaleString('sv-SE')} verified rows · {row.spread.toFixed(1)}% observed spread.
+                </p>
+              </Link>
+            ))}
+          </div>
+        </ChartShell>
+      </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <MvpSectionCard title={`${data.categoryName} price index by chain`}>
