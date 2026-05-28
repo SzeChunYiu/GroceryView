@@ -115,6 +115,7 @@ import {
   type ScanUpload,
   type ScanUploadStorage
 } from '@groceryview/scanning';
+import { analyticsSessionIdFromRequest, emitServerAnalyticsEvent, queryLengthBucket } from './analytics/events.js';
 import { buildReceiptSpendHistory } from './lib/receiptOCR.js';
 
 export type HttpHandler = (request: Request) => Promise<Response>;
@@ -2817,12 +2818,39 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
       }
 
       if (method === 'GET' && (path === '/api/products' || path === '/api/products/search')) {
-        return jsonResponse(cursorPaginatedEnvelope(api.searchProducts(url.searchParams.get('q') ?? ''), url.searchParams));
+        const query = url.searchParams.get('q') ?? '';
+        const searchResults = api.searchProducts(query);
+        emitServerAnalyticsEvent({
+          eventName: 'search_submitted',
+          sessionId: analyticsSessionIdFromRequest(request),
+          pagePath: path,
+          metadata: {
+            query_length_bucket: queryLengthBucket(query.length),
+            result_count: searchResults.length
+          }
+        });
+        if (searchResults.length === 0) {
+          emitServerAnalyticsEvent({
+            eventName: 'search_zero_result',
+            sessionId: analyticsSessionIdFromRequest(request),
+            pagePath: path,
+            metadata: { query_length_bucket: queryLengthBucket(query.length), result_count: 0 }
+          });
+        }
+        return jsonResponse(cursorPaginatedEnvelope(searchResults, url.searchParams));
       }
 
       const productMatch = path.match(/^\/api\/products\/([^/]+)$/);
       if (method === 'GET' && productMatch) {
-        const product = api.getProduct(decodeURIComponent(productMatch[1]));
+        const productId = decodeURIComponent(productMatch[1]);
+        emitServerAnalyticsEvent({
+          eventName: 'product_opened',
+          sessionId: analyticsSessionIdFromRequest(request),
+          pagePath: path,
+          entityType: 'product',
+          entityId: productId
+        });
+        const product = api.getProduct(productId);
         return product ? jsonResponse(product) : errorResponse(404, 'Product not found.');
       }
 
@@ -2921,12 +2949,21 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (method === 'GET') return jsonResponse(api.getWatchlist(user));
         if (method === 'POST') {
           const body = await readJson(request);
+          const productId = requiredString(body.productId, 'productId');
           api.addWatchlistItem(user, {
-            productId: requiredString(body.productId, 'productId'),
+            productId,
             targetPrice: optionalNumber(body.targetPrice, 'targetPrice'),
             alertDealScoreAt: optionalNumber(body.alertDealScoreAt, 'alertDealScoreAt'),
             allowedPriceTypes: optionalWatchlistPriceTypes(body.allowedPriceTypes),
             favoriteStoresOnly: typeof body.favoriteStoresOnly === 'boolean' ? body.favoriteStoresOnly : true
+          });
+          emitServerAnalyticsEvent({
+            eventName: 'watchlist_item_added',
+            sessionId: analyticsSessionIdFromRequest(request),
+            pagePath: path,
+            entityType: 'product',
+            entityId: productId,
+            sourcePanel: 'api_watchlist'
           });
           return jsonResponse(api.getWatchlist(user), { status: 201 });
         }

@@ -644,7 +644,7 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
             <p className="text-xs font-black uppercase tracking-[0.24em] text-indigo-800">TradingView-style compare</p>
             <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Compare-overlay chart</h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
-              Calls buildPriceChartSeries over two real OpenPrices product tapes, then overlays the dated SEK observations so shoppers can compare product tickers without filling missing days.
+              Overlays dated SEK observations from two real OpenPrices product tapes so shoppers can compare product tickers without filling missing days.
               {` ${compareOverlayChart.guardrail}`}
             </p>
           </div>

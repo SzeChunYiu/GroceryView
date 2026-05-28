@@ -26,7 +26,7 @@ test('data-dense interactions keep explicit INP guardrails', async () => {
   assert.equal(INP_GOOD_TARGET_MS, 200);
 
   assert.match(searchPage, /SEARCH_PAGE_SIZE = 24/);
-  assert.match(searchPage, /Showing results/);
+  assert.match(searchPage, /Quick view|SearchResultPreviewCard|Open product/);
   assert.match(searchBar, /new AbortController\(\)/);
   assert.match(searchBar, /window\.setTimeout\(async \(\) =>/);
   assert.match(searchBar, /window\.clearTimeout\(timeout\)/);

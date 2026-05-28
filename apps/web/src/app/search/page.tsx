@@ -227,7 +227,7 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
           </div>
         </section>
       ) : null}
-      <section className="mx-auto w-full max-w-6xl" aria-label="Cursor-paginated search results">
+      <section className="mx-auto w-full max-w-6xl" aria-label="Search results">
         <div className="mb-4 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
           <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">Showing results</p>
           <h2 className="mt-1 text-xl font-black text-slate-950">

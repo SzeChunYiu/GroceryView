@@ -3,112 +3,108 @@
 @tailwind utilities;
 
 :root {
-  --gv-page-bg: #f5f1e8;
-  --gv-page-fg: #0f172a;
-  --gv-ink: #10251e;
-  --gv-moss: #064e3b;
-  --gv-lime: #d9f99d;
-  --gv-clay: #f59e0b;
-  --gv-paper: rgba(255, 255, 255, 0.86);
-  --gv-hairline: rgba(15, 23, 42, 0.12);
+  /* Brand surfaces */
+  --gv-bg: #f7f3ea;
+  --gv-bg-soft: #fbf8ef;
+  --gv-surface: #ffffff;
+  --gv-surface-muted: #f1eee5;
+
+  /* Ink */
+  --gv-ink: #10211a;
+  --gv-ink-soft: #46544c;
+  --gv-muted: #7a857d;
+
+  /* Brand actions */
+  --gv-primary: #064e3b;
+  --gv-primary-strong: #022c22;
+  --gv-primary-soft: #dff7ea;
+  --gv-accent: #bdeb4b;
+  --gv-mint: #a7f3d0;
+
+  /* Semantic */
+  --gv-success: #047857;
+  --gv-warning: #b7791f;
+  --gv-danger: #be123c;
+  --gv-info: #2563eb;
+  --gv-border: #d9dfd6;
+
+  /* Elevation */
+  --gv-shadow: 0 18px 45px rgba(16, 33, 26, 0.08);
+  --gv-shadow-sm: 0 8px 24px rgba(16, 33, 26, 0.06);
+
+  /* Radius */
+  --gv-radius-control: 12px;
+  --gv-radius-card: 16px;
+  --gv-radius-section: 24px;
+  --gv-radius-hero: 32px;
+
+  /* Spacing scale */
+  --gv-space-xs: 4px;
+  --gv-space-sm: 8px;
+  --gv-space-md: 12px;
+  --gv-space-base: 16px;
+  --gv-space-lg: 24px;
+  --gv-space-xl: 32px;
+  --gv-space-2xl: 48px;
+  --gv-space-3xl: 64px;
+  --gv-space-page: 96px;
+
+  /* Typography */
+  --gv-font-stack: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --gv-text-body: 16px;
+  --gv-text-small: 14px;
+  --gv-text-micro: 12px;
+
+  /* Legacy aliases */
+  --gv-page-bg: var(--gv-bg);
+  --gv-page-fg: var(--gv-ink);
+
   color-scheme: light;
-  background: var(--gv-page-bg);
-  color: var(--gv-page-fg);
+  background: var(--gv-bg);
+  color: var(--gv-ink);
 }
 
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   min-width: 320px;
   background:
-    radial-gradient(circle at 15% 8%, rgba(16, 185, 129, 0.16), transparent 28rem),
-    radial-gradient(circle at 86% 14%, rgba(245, 158, 11, 0.18), transparent 24rem),
-    var(--gv-page-bg);
-  color: var(--gv-page-fg);
-  font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+    radial-gradient(circle at 15% 0%, rgba(189, 235, 75, 0.16), transparent 28rem),
+    radial-gradient(circle at 90% 12%, rgba(167, 243, 208, 0.18), transparent 26rem),
+    var(--gv-bg);
+  color: var(--gv-ink);
+  font-family: var(--gv-font-stack);
+  font-size: var(--gv-text-body);
 }
 
-a { color: inherit; text-decoration: none; }
-button, input, select, textarea { font: inherit; }
-::selection { background: #064e3b; color: white; }
-
-.gv-page-shell {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
+a {
+  color: inherit;
+  text-decoration: none;
 }
 
-.gv-page-shell::before,
-.gv-page-shell::after {
-  content: "";
-  pointer-events: none;
-  position: fixed;
-  inset: auto;
-  z-index: -1;
-  border-radius: 999px;
-  filter: blur(12px);
+button,
+input,
+select,
+textarea {
+  font: inherit;
 }
 
-.gv-page-shell::before {
-  right: -10rem;
-  top: 7rem;
-  width: 28rem;
-  height: 28rem;
-  background: radial-gradient(circle, rgba(217, 249, 157, 0.42), transparent 68%);
-}
-
-.gv-page-shell::after {
-  left: -12rem;
-  bottom: 10rem;
-  width: 34rem;
-  height: 34rem;
-  background: radial-gradient(circle, rgba(6, 78, 59, 0.16), transparent 70%);
-}
-
-.gv-page-main {
-  animation: gv-page-rise 420ms ease-out both;
-}
-
-.gv-card {
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset, 0 18px 50px rgba(15, 23, 42, 0.06);
-  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
-}
-
-.gv-card:hover {
-  border-color: rgba(6, 78, 59, 0.22);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.85) inset, 0 24px 70px rgba(15, 23, 42, 0.09);
-}
-
-.gv-hero-panel {
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(236, 253, 245, 0.88)),
-    radial-gradient(circle at 80% 18%, rgba(217, 249, 157, 0.35), transparent 18rem);
-  box-shadow: 0 28px 90px rgba(6, 78, 59, 0.10);
-}
-
-.gv-feature-map {
-  background:
-    radial-gradient(circle at 10% 0%, rgba(217, 249, 157, 0.26), transparent 22rem),
-    radial-gradient(circle at 90% 10%, rgba(20, 184, 166, 0.22), transparent 26rem),
-    linear-gradient(135deg, #081913, #10251e 52%, #17251b);
-}
-
-@keyframes gv-page-rise {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+::selection {
+  background: var(--gv-primary);
+  color: white;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
+  html {
+    scroll-behavior: auto;
+  }
 
   *,
   *::before,
@@ -124,8 +120,6 @@ button, input, select, textarea { font: inherit; }
 :root.dark {
   --gv-page-bg: #020617;
   --gv-page-fg: #e2e8f0;
-  --gv-paper: rgba(15, 23, 42, 0.9);
-  --gv-hairline: rgba(148, 163, 184, 0.22);
   color-scheme: dark;
   background: var(--gv-page-bg);
   color: var(--gv-page-fg);

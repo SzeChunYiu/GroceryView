@@ -1,0 +1,61 @@
+# GroceryView 31-Onward Consolidated Manifest
+
+This ZIP consolidates the latest available files numbered 31 onward from the recent handoff packages.
+
+Included ranges:
+
+- 31–42: Deep UI/UX research and visual redesign system
+- 56–65: Human-centered preview UI, frontstage/backstage separation, overlays, and backstage admin/debug rules
+- 66–80: Living principles/spec governance, data engineering, database scaling, analytics, PR review, and atomic gap governance
+
+Note: files 43–55 were not present in the latest packages; numbering jumped from 42 to 56 when the human-centered preview layer was added.
+
+Start with:
+
+- `42_CLAUDE_CODE_DEEP_UIUX_PROMPT.md` for UI/UX redesign
+- `64_CLAUDE_CODE_HUMAN_CENTERED_PREVIEW_PROMPT.md` for previews/drawers/backstage separation
+- `67_CLAUDE_CODE_GENERATE_LIVING_SPECS_PROMPT.md` or `80_CLAUDE_CODE_SPEC_GENERATION_TASKS.md` for living project specs
+
+Files included:
+
+- 31_DEEP_UIUX_RESEARCH_SUMMARY.md
+- 32_GROCERYVIEW_VISUAL_IDENTITY.md
+- 33_DESIGN_TOKENS_AND_THEME.md
+- 34_PAGE_REDESIGN_BLUEPRINTS.md
+- 35_COMPONENT_POLISH_SPECS.md
+- 36_VISUAL_HIERARCHY_AND_PAGE_RHYTHM.md
+- 37_CONTENT_AND_LANGUAGE_STYLE_GUIDE.md
+- 38_INTERACTION_MOTION_STATE_GUIDE.md
+- 39_MOBILE_FIRST_UIUX.md
+- 40_HEURISTIC_AUDIT_AND_USER_TEST_PLAN.md
+- 41_COMPETITOR_AND_PATTERN_LIBRARY.md
+- 42_CLAUDE_CODE_DEEP_UIUX_PROMPT.md
+- 56_HUMAN_CENTERED_INTERACTION_MODEL.md
+- 57_FRONTSTAGE_BACKSTAGE_SEPARATION.md
+- 58_PREVIEW_CARD_DRAWER_MODAL_RULES.md
+- 59_PAGE_PANEL_CONTENT_REDUCTION_PLAN.md
+- 60_INTERACTION_PATTERN_LIBRARY.md
+- 61_ACCESSIBILITY_RULES_FOR_OVERLAYS.md
+- 62_DESKTOP_MOBILE_PREVIEW_BEHAVIOR.md
+- 63_BACKSTAGE_ADMIN_DEBUG_OBSERVABILITY_UI.md
+- 64_CLAUDE_CODE_HUMAN_CENTERED_PREVIEW_PROMPT.md
+- 65_INTERACTION_ACCEPTANCE_TESTS.md
+- 66_PROJECT_PRINCIPLES_GOVERNANCE_README.md
+- 67_CLAUDE_CODE_GENERATE_LIVING_SPECS_PROMPT.md
+- 68_DATA_ENGINEERING_PRINCIPLES_SPEC.md
+- 69_DATABASE_ARCHITECTURE_AND_SCALING_SPEC.md
+- 70_DATA_ANALYTICS_SEMANTIC_LAYER_SPEC.md
+- 71_METRIC_DICTIONARY_STARTER.md
+- 72_UIUX_LIVING_PRINCIPLES_SPEC.md
+- 73_PAGE_SPEC_TEMPLATE.md
+- 74_FEATURE_SPEC_TEMPLATE.md
+- 75_PR_REVIEW_CHECKLIST.md
+- 76_DATA_QUALITY_AND_OBSERVABILITY_SPEC.md
+- 77_ANALYTICS_EVENT_TRACKING_SPEC.md
+- 78_VERSIONING_AND_ROADMAP_PROCESS.md
+- 79_ATOMIC_GAP_REGISTRY.md
+- 80_CLAUDE_CODE_SPEC_GENERATION_TASKS.md
+- UIUX_RESEARCH_SOURCES.md
+- interaction_matrix.json
+- principles_spec_bundle.json
+- uiux_design_tokens.json

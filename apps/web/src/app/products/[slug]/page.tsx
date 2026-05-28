@@ -2,7 +2,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import {
-  buildPriceChartSeries,
   calculateDealScore,
   recommendSmartSwaps,
   scoreBand,
@@ -30,6 +29,7 @@ import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTermin
 import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
 import { buildShortTermPriceForecast } from '@/lib/price-intelligence';
+import { buildVerifiedPriceChartSeries } from '@/lib/price-chart';
 import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug, matchedChainProducts } from '@/lib/verified-data';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { familyPackComparisonsForProduct } from '@/lib/family-pack';
@@ -633,7 +633,7 @@ function priceHistoryRangeBadgesFor(product: NonNullable<ReturnType<typeof findP
   const windows = historyWindowDefinitions.map((window) => {
     const windowStart = latestTime - window.rangeDays * 24 * 60 * 60 * 1000;
     const windowPoints = observations.filter((observation) => observation.observedTime >= windowStart && observation.observedTime <= latestTime);
-    const chartResult = buildPriceChartSeries({
+    const chartResult = buildVerifiedPriceChartSeries({
       observations: chartObservations,
       asOf: `${latestObservedAt}T00:00:00.000Z`,
       rangeDays: window.rangeDays,
@@ -683,7 +683,7 @@ function priceHistoryRangeBadgesFor(product: NonNullable<ReturnType<typeof findP
       volatilityBandLowerLabel: chartBand ? formatSek(chartBand.lower) : 'Not reported',
       volatilityBandUpperLabel: chartBand ? formatSek(chartBand.upper) : 'Not reported',
       volatilityBandCopy: chartBand
-        ? `Observed chart band around the latest ${window.chartLabel} point from buildPriceChartSeries; this lower/upper range is not a forecast.`
+        ? `Observed chart band around the latest ${window.chartLabel} point from verified price history; this lower/upper range is not a forecast.`
         : 'No chart point is available for an observed lower/upper band.',
       lowObservedAt: lowPoint.observedAt,
       highObservedAt: highPoint.observedAt,
@@ -1264,7 +1264,7 @@ function crossChainHistoryOverlayFor(product: NonNullable<ReturnType<typeof find
   const latest = latestObservationFor(product);
   const asOf = latest ? `${latest.date}T00:00:00.000Z` : undefined;
   const sourceConfidence = clamp(product.observationCount / 30, 0, 1);
-  const overlayResult = buildPriceChartSeries({
+  const overlayResult = buildVerifiedPriceChartSeries({
     observations: product.observations.map((observation) => ({
       observedAt: `${observation.date}T00:00:00.000Z`,
       price: observation.price,
@@ -1316,7 +1316,7 @@ function crossChainHistoryOverlayFor(product: NonNullable<ReturnType<typeof find
     chainHistoryCoverageRows,
     chainCount: crossChainOverlaySeries.length,
     observationCount,
-    detail: `cross-chain history overlay built with buildPriceChartSeries from ${crossChainOverlaySeries.length} per-chain dated price tape series. No forecast or synthetic chain history is shown.`
+    detail: `Cross-chain history overlay from ${crossChainOverlaySeries.length} per-chain dated price tape series. No forecast or synthetic chain history is shown.`
   };
 }
 
@@ -1447,7 +1447,7 @@ function priceChartTerminalFor(product: NonNullable<ReturnType<typeof findProduc
   };
 
   const windows = timeframeWindows.map((window): PriceChartTerminalWindow => {
-    const result = buildPriceChartSeries({
+    const result = buildVerifiedPriceChartSeries({
       observations,
       asOf,
       rangeDays: window.rangeDays,
@@ -1476,7 +1476,7 @@ function priceChartTerminalFor(product: NonNullable<ReturnType<typeof findProduc
   return {
     available: windows.some((window) => window.pointCount > 0),
     title: comparableUnit ? `Multi-timeframe OpenPrices tape · normalized per ${comparableUnit}` : 'Multi-timeframe OpenPrices tape',
-    sourceLabel: comparableUnit ? `buildPriceChartSeries · OpenPrices community observations · normalized unit price per ${comparableUnit}` : 'buildPriceChartSeries · OpenPrices community observations',
+    sourceLabel: comparableUnit ? `OpenPrices community observations · normalized unit price per ${comparableUnit}` : 'OpenPrices community observations',
     confidenceLabel: `${formatPct(sourceConfidence * 100)} chart confidence`,
     caveat: comparableUnit
       ? `Every plotted point comes from dated OpenPrices observations normalized by package size (${packageText}) to a unit price per ${comparableUnit}; missing shelf, flyer, and member prices are disclosed instead of inferred. The forecast band uses only recent observed price-event trends.`
@@ -1901,7 +1901,7 @@ export default async function ProductPage({ params, routeBase = 'products' }: Re
             <p className="text-xs font-black uppercase tracking-[0.22em] text-cyan-800">cross-chain history overlay</p>
             <h2 className="mt-2 text-2xl font-black text-slate-950">Per-chain dated price tape coverage</h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
-              Uses buildPriceChartSeries only when at least two chains have dated observations for the same product. No forecast or synthetic chain history is shown.
+              Uses verified price history only when at least two chains have dated observations for the same product. No forecast or synthetic chain history is shown.
             </p>
           </div>
           <div className="rounded-[2rem] bg-slate-950 p-5 text-right text-white shadow-sm">

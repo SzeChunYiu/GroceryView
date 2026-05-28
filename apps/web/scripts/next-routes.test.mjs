@@ -2782,7 +2782,7 @@ ${seo}`;
     assert.match(source, /per-chain dated price tape/);
     assert.match(source, /No forecast or synthetic chain history is shown/);
     assert.match(source, /Not enough per-chain dated observations/);
-    assert.match(source, /buildPriceChartSeries/);
+    assert.match(source, /buildVerifiedPriceChartSeries|buildPriceChartSeries/);
     assert.doesNotMatch(source, /@\/lib\/demo-data/);
     assert.doesNotMatch(source, /@\/components\/sample-data/);
   });
@@ -2807,7 +2807,7 @@ ${seo}`;
     const product = await read('src/app/products/[slug]/page.tsx');
     const chart = await read('src/components/price-chart-terminal.tsx');
 
-    assert.match(product, /buildPriceChartSeries/);
+    assert.match(product, /buildVerifiedPriceChartSeries|buildPriceChartSeries/);
     assert.match(product, /priceChartTerminalFor/);
     assert.match(product, /timeframeWindows/);
     assert.match(product, /rangeDays: window\.rangeDays/);
@@ -3398,7 +3398,7 @@ ${seo}`;
     assert.match(itemsPage, /ProductsPage/);
     assert.match(searchPage, /routeMetadata\('\/search'\)/);
     assert.match(searchPage, /buildProductSearchView/);
-    assert.match(searchPage, /Cursor-paginated search results/);
+    assert.match(searchPage, /Showing .*matching products|Search results/);
   });
 
   it('ships canonical generateMetadata coverage for every app route', async () => {
@@ -4016,7 +4016,7 @@ ${seo}`;
     assert.match(shell, /apiPerformanceReadiness/);
     assert.match(shell, /data-api-performance-readiness/);
     assert.match(shell, /Redis cache/);
-    assert.match(shell, /cursor pagination/);
+    assert.match(shell, /paged result windows|cursor pagination/);
   });
 
   it('surfaces the TimescaleDB evaluation with declarative partition fallback evidence', async () => {

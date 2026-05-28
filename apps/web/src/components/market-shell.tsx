@@ -331,9 +331,9 @@ export function MarketShell({ locale = defaultLocale }: { locale?: SupportedLoca
         <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-start">
           <div>
             <Eyebrow>API performance readiness</Eyebrow>
-            <h2 className="mt-2 text-3xl font-black tracking-tight">Redis cache, cursor pagination, and pooler guardrails</h2>
+            <h2 className="mt-2 text-3xl font-black tracking-tight">Fast search, reliable snapshots, and safe rollout guardrails</h2>
             <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-cyan-950">
-              The public API now labels the hot-endpoint cache path, returns cursor pagination on product search, and keeps pgbouncer plus Redis cache production readiness fail-closed until runtime configuration is present.
+              Hot product search and market pages stay responsive with cached snapshots, paged result windows, and fail-closed production checks until runtime configuration is present.
             </p>
           </div>
           <Link className="rounded-full bg-cyan-700 px-5 py-3 text-center text-sm font-black text-white" href="/data-sources">
