@@ -371,7 +371,7 @@ export default async function FuelPage({ searchParams }: Readonly<{ searchParams
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
             <p className="font-black text-slate-950">Operator source</p>
-            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{fuelPriceSourceSchema.operatorSourceKind} in {fuelPriceSourceSchema.sourceTable}, parser version {verifiedFuelPriceSource.parserVersion}, captured at {verifiedFuelPriceSource.capturedAt}.</p>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{fuelPriceSourceSchema.operatorSourceKind} in {fuelPriceSourceSchema.sourceTable}, captured at {verifiedFuelPriceSource.capturedAt}.</p>
           </div>
           <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
             <p className="font-black text-slate-950">Crowd source</p>

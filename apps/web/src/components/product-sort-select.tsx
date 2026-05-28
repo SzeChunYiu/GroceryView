@@ -2,6 +2,7 @@ import type { ProductSearchSortOption, ProductSearchUrlParams } from '@/lib/veri
 import { productSearchSortOptions } from '@/lib/verified-data';
 
 type ProductSortSelectProps = {
+  action?: string;
   searchParams: ProductSearchUrlParams & { brand?: string | string[] };
   selectedSort: ProductSearchSortOption;
 };
@@ -31,11 +32,11 @@ function hiddenInputsFor(searchParams: ProductSortSelectProps['searchParams']) {
   });
 }
 
-export function ProductSortSelect({ searchParams, selectedSort }: ProductSortSelectProps) {
+export function ProductSortSelect({ action = '/products', searchParams, selectedSort }: ProductSortSelectProps) {
   const selectedOption = productSearchSortOptions.find((option) => option.value === selectedSort) ?? productSearchSortOptions[0];
 
   return (
-    <form action="/products" className="mt-5 rounded-2xl border border-violet-100 bg-white p-4 shadow-sm" method="get">
+    <form action={action} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm" method="get">
       {hiddenInputsFor(searchParams)}
       <div className="grid gap-3 lg:grid-cols-[1fr_auto] lg:items-end">
         <label className="text-sm font-black text-slate-950" htmlFor="product-search-sort">

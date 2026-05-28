@@ -1,0 +1,9 @@
+# GroceryView factory — 31-onward consolidated (one /goal per pane)
+# Read GOAL.md visible-artifact gate before claiming done.
+
+/goal UIUX-TOKENS. Lane uiux-tokens. Read docs/handoff/groceryview-31-onward-consolidated/33_DESIGN_TOKENS_AND_THEME.md and uiux_design_tokens.json. Wire semantic tokens into apps/web theme; polish KpiCard, ProductCard, DealCard per 35_COMPONENT_POLISH_SPECS.md. Must touch apps/web and pass visible homepage check in GOAL.md.
+/goal UIUX-PAGES. Lane uiux-pages. Read 34_PAGE_REDESIGN_BLUEPRINTS.md and 36_VISUAL_HIERARCHY_AND_PAGE_RHYTHM.md. Redesign market + search pages using FilterRail, ChartShell, EvidenceStrip. Follow 42_CLAUDE_CODE_DEEP_UIUX_PROMPT.md. Ship user-visible HTML on prod driver files.
+/goal UIUX-MOBILE-A11Y. Lane uiux-mobile-a11y. Read 39_MOBILE_FIRST_UIUX.md and 61_ACCESSIBILITY_RULES_FOR_OVERLAYS.md. Fix mobile layouts and overlay a11y in apps/web. Add or extend tests under apps/web.
+/goal PREVIEW-MODEL. Lane preview-model. Read 56-65 docs and interaction_matrix.json. Implement preview card/drawer/modal rules per 58 and 64_CLAUDE_CODE_HUMAN_CENTERED_PREVIEW_PROMPT.md. No backstage copy on public routes (57).
+/goal LIVING-SPECS. Lane living-specs. Read 67 and 80_CLAUDE_CODE_SPEC_GENERATION_TASKS.md. Create living specs under docs/ (data, analytics, uiux templates 73-75). Add docs/roadmap/atomic-gap-registry.md starter per 79.
+/goal DATA-SEMANTICS. Lane data-semantics. Read 68-71 and 76-77. Implement metric dictionary + event tracking hooks where apps/api or packages/server already emit; no fake analytics. Document contracts in docs/data/.

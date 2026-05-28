@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { DesignSystemPreviewSection } from '@/components/design-system/design-system-preview';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceFreshnessStatusBadge, SourceHealthDashboardTable, StatusBadge } from '@/components/data-ui';
 import { PriceChartTerminal } from '@/components/price-chart-terminal';
@@ -62,6 +63,8 @@ export default function ComponentPreviewPage() {
             </div>
           </div>
         </section>
+
+        <DesignSystemPreviewSection />
 
         <section className="grid gap-3 md:grid-cols-3" aria-label="Country coverage fixtures">
           {componentPreviewMarkets.map((market) => (

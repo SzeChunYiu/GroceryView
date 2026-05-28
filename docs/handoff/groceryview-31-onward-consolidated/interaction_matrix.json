@@ -1,0 +1,65 @@
+{
+  "product_card": {
+    "frontstage": [
+      "name",
+      "price",
+      "deal label",
+      "freshness",
+      "confidence",
+      "quick view",
+      "open product"
+    ],
+    "preview": "ProductPreviewCard / drawer / bottom sheet",
+    "full_page": "/products/[slug]",
+    "backstage": [
+      "source_run_id",
+      "raw_record_id",
+      "parser_version"
+    ]
+  },
+  "market_category_row": {
+    "frontstage": [
+      "category",
+      "weekly",
+      "3m",
+      "1y",
+      "trend",
+      "confidence"
+    ],
+    "preview": "CategoryPreviewDrawer",
+    "full_page": "/market/[category]",
+    "backstage": [
+      "index build logs",
+      "raw observations by run"
+    ]
+  },
+  "map_marker": {
+    "frontstage": [
+      "store/station/pharmacy name",
+      "distance",
+      "coverage",
+      "confidence"
+    ],
+    "preview": "SelectedDetailPanel / bottom sheet",
+    "full_page": "/stores/[slug] or /fuel/stations/[id]",
+    "backstage": [
+      "coordinate source logs",
+      "Overpass debug"
+    ]
+  },
+  "evidence_strip": {
+    "frontstage": [
+      "source",
+      "last observed",
+      "confidence",
+      "rows"
+    ],
+    "preview": "EvidenceDrawer",
+    "full_page": "/data-sources or /methodology",
+    "backstage": [
+      "source_run_id",
+      "raw records",
+      "quality checks"
+    ]
+  }
+}

@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "npm run build -w @groceryview/core && npm run build -w @groceryview/catalog && npm run build -w @groceryview/monetization && npm run build -w @groceryview/api && npm run build -w @groceryview/api-contracts && npm run build -w @groceryview/auth && npm run build -w @groceryview/notifications && npm run build -w @groceryview/db && npm run build -w @groceryview/scanning && tsc -p tsconfig.build.json",
-    "test": "npm run build -w @groceryview/core && npm run build -w @groceryview/catalog && npm run build -w @groceryview/monetization && npm run build -w @groceryview/api && npm run build -w @groceryview/api-contracts && npm run build -w @groceryview/auth && npm run build -w @groceryview/notifications && npm run build -w @groceryview/db && npm run build -w @groceryview/scanning && rm -rf dist-test && tsc -p tsconfig.test.json && node --test dist-test/src/__tests__/*.test.js dist-test/__tests__/*.test.js"
+    "test": "npm run build -w @groceryview/core && npm run build -w @groceryview/catalog && npm run build -w @groceryview/monetization && npm run build -w @groceryview/api && npm run build -w @groceryview/api-contracts && npm run build -w @groceryview/auth && npm run build -w @groceryview/notifications && npm run build -w @groceryview/db && npm run build -w @groceryview/scanning && tsc -p tsconfig.test.json && node --test dist-test/src/__tests__/*.test.js dist-test/__tests__/*.test.js && node --test scripts/*.test.mjs"
   },
   "dependencies": {
     "@groceryview/api": "0.1.0",

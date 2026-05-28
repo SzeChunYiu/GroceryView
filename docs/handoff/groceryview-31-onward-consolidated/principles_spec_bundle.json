@@ -1,0 +1,52 @@
+{
+  "data_engineering": {
+    "principles": [
+      "immutable raw",
+      "idempotent writes",
+      "quality gates",
+      "lineage",
+      "observability"
+    ],
+    "required_docs": [
+      "source-run-contract",
+      "database-scaling-plan",
+      "quality-gates"
+    ]
+  },
+  "data_analytics": {
+    "principles": [
+      "one metric definition",
+      "semantic layer",
+      "event tracking",
+      "dashboard roadmap"
+    ],
+    "required_docs": [
+      "metric-dictionary",
+      "event-tracking-plan",
+      "dashboard-roadmap"
+    ]
+  },
+  "uiux": {
+    "principles": [
+      "human-centered",
+      "plain meaning first",
+      "progressive disclosure",
+      "accessibility",
+      "mobile first"
+    ],
+    "required_docs": [
+      "uiux-design",
+      "content-language",
+      "accessibility"
+    ]
+  },
+  "pr_review": {
+    "requires": [
+      "page spec",
+      "data contract",
+      "metric update",
+      "content QA",
+      "tests"
+    ]
+  }
+}
