@@ -252,7 +252,7 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
             `${assortmentOverview.categories.length} category coverage bars`,
             `Price percentile gate: ${pricePercentileRank.confidenceLabel}`
           ]}
-          insightTitle="Store evidence board"
+          insightTitle="Store visual evidence board"
           plainSummary="This store visual groups the verified map pin, opening-hours state, category coverage bars, and price-percentile gate so shoppers can see what is source-backed before browsing products."
           userQuestion="Can I trust this store page for location, hours, coverage, and price rank?"
           fallback={

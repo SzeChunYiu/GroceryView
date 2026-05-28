@@ -70,6 +70,22 @@ export function MvpHomePage() {
         <PublicAdSlot slotId="home_after_hero" />
       </div>
 
+      <section className="mt-6" aria-label="Domain cards">
+        <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">Domain cards</p>
+        <div className="mt-3 grid gap-4 md:grid-cols-3">
+          {[
+            { title: 'Compare groceries', detail: 'Browse verified grocery categories, deal leaders, and chain price evidence.', href: '/browse' },
+            { title: 'Compare OTC pharmacy prices', detail: 'Open public OTC catalog comparisons with exact EAN and safety boundaries.', href: '/pharmacy' },
+            { title: 'Compare fuel prices', detail: 'Review operator-level price per litre by grade without station pump-price overclaims.', href: '/fuel' }
+          ].map((domain) => (
+            <Link className="rounded-3xl border border-emerald-100 bg-emerald-50 p-5 shadow-sm transition hover:-translate-y-0.5 hover:ring-2 hover:ring-emerald-200" href={domain.href} key={domain.title}>
+              <h2 className="text-lg font-black text-emerald-950">{domain.title}</h2>
+              <p className="mt-2 text-sm font-semibold leading-6 text-emerald-900">{domain.detail}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
         {[
           { label: 'Products tracked', value: data.productCount.toLocaleString('sv-SE'), detail: 'Products tracked show how much of the catalogue has verified evidence.', href: '/products' },
