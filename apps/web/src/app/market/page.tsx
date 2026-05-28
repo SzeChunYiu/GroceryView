@@ -5,6 +5,7 @@ import { MvpBreadcrumbs } from '@/components/mvp/mvp-breadcrumbs';
 import { MvpSectionCard } from '@/components/mvp/mvp-section-card';
 import { NoVerifiedDataPanel } from '@/components/mvp/no-verified-data-panel';
 import { EvidenceStrip } from '@/components/mvp/evidence-strip';
+import { ChartEmptyState, ChartShell, ChartTableFallback, HeatmapMatrix, KpiCard, MultiLineChart } from '@/components/mvp/visual-intelligence';
 import { getMarketOverviewData } from '@/lib/mvp/data';
 import { categoryBrowseHref, categoryMarketHref, productSlugHref } from '@/lib/mvp/routes';
 import { routeMetadata } from '@/lib/seo';
@@ -113,15 +114,12 @@ export default async function MarketPage({ searchParams }: Readonly<{ searchPara
 
       <section className="mt-6 grid gap-4 md:grid-cols-4" aria-label="Market KPI cards">
         {[
-          { label: 'Categories tracked', value: data.categoryIndexRows.length.toLocaleString('sv-SE'), href: '/browse' },
-          { label: 'Chain index series', value: data.chainIndexSeries.length.toLocaleString('sv-SE'), href: '/market?index=chain-price' },
-          { label: 'Biggest movers', value: data.biggestMovers.length.toLocaleString('sv-SE'), href: '/market?sort=movers' },
-          { label: 'Confidence', value: data.confidenceLabel, href: '/methodology#confidence-labels' }
+          { label: 'Categories tracked', value: data.categoryIndexRows.length.toLocaleString('sv-SE'), href: '/browse', detail: 'Verified categories with market rows.' },
+          { label: 'Chain index series', value: data.chainIndexSeries.length.toLocaleString('sv-SE'), href: '/market?index=chain-price', detail: 'Dated chain-level index lines.' },
+          { label: 'Biggest movers', value: data.biggestMovers.length.toLocaleString('sv-SE'), href: '/market?sort=movers', detail: 'Products with observed price movement.' },
+          { label: 'Confidence', value: data.confidenceLabel, href: '/methodology#confidence-labels', detail: 'Source and freshness confidence boundary.' }
         ].map((kpi) => (
-          <Link className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:ring-2 hover:ring-emerald-200" href={kpi.href} key={kpi.label}>
-            <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{kpi.label}</p>
-            <p className="mt-2 text-3xl font-black text-slate-950">{kpi.value}</p>
-          </Link>
+          <KpiCard detail={kpi.detail} href={kpi.href} key={kpi.label} label={kpi.label} value={kpi.value} />
         ))}
       </section>
 
@@ -161,15 +159,37 @@ export default async function MarketPage({ searchParams }: Readonly<{ searchPara
             <p className="mb-4 text-sm font-semibold leading-6 text-slate-600">
               Compare how grocery prices are moving across chains. Use the filters to switch region, category, or time range.
             </p>
-            {data.chainIndexSeries.length > 0 ? (
-              <div className="grid gap-4 lg:grid-cols-2">
+            <ChartShell
+              actionHref="/market?index=chain-price"
+              actionLabel="Open chain index"
+              evidenceItems={[`${data.chainIndexSeries.length} chain series`, data.confidenceLabel, data.selectedRegion]}
+              hasData={data.chainIndexSeries.length > 0}
+              insightTitle="Chain index movement"
+              plainSummary="Line movement compares observed chain index values without forecasting missing prices."
+              userQuestion="Which chains are moving up or down?"
+              emptyState={<ChartEmptyState title="Not enough verified price history for this chart yet" message="Try another region, category, or time range." />}
+              fallback={
+                <ChartTableFallback
+                  caption="Chain price index table"
+                  columns={[
+                    { key: 'chain', label: 'Chain', render: (row: MarketIndexSeries) => row.chain },
+                    { key: 'latest', label: 'Latest', render: (row: MarketIndexSeries) => row.points.at(-1)?.value.toFixed(1) ?? '—' },
+                    { key: 'weekly', label: 'Weekly', render: (row: MarketIndexSeries) => row.weeklyChangePct !== undefined ? `${row.weeklyChangePct.toFixed(1)}%` : '—' }
+                  ]}
+                  rows={data.chainIndexSeries}
+                />
+              }
+            >
+              <MultiLineChart
+                ariaLabel="Chain price index movement"
+                series={data.chainIndexSeries.map((series) => ({ label: series.chain, points: series.points, tone: (series.weeklyChangePct ?? 0) >= 0 ? 'up' : 'down' }))}
+              />
+              <div className="mt-4 grid gap-4 lg:grid-cols-2">
                 {data.chainIndexSeries.map((series) => (
                   <MarketIndexChart key={`${series.chain}-${series.indexType}`} series={series} />
                 ))}
               </div>
-            ) : (
-              <NoVerifiedDataPanel title="Not enough verified price history for this chart yet" message="Try another region, category, or time range." />
-            )}
+            </ChartShell>
           </MvpSectionCard>
 
           <MvpSectionCard title="Price movement by category">
@@ -229,15 +249,16 @@ export default async function MarketPage({ searchParams }: Readonly<{ searchPara
           </MvpSectionCard>
 
           <MvpSectionCard title="Chain × category heatmap">
-            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {data.categoryIndexRows.slice(0, 6).flatMap((row) => data.chainIndexSeries.slice(0, 3).map((series) => (
-                <Link className="rounded-2xl border border-slate-100 bg-slate-50 p-3 text-sm font-bold text-slate-800 hover:bg-emerald-50" href={`/search?chain=${encodeURIComponent(series.chain.toLowerCase())}&category=${encodeURIComponent(row.categorySlug)}`} key={`${series.chain}-${row.categorySlug}`}>
-                  <span className="block text-xs font-black uppercase tracking-[0.14em] text-slate-500">{series.chain}</span>
-                  <span className="mt-1 block text-lg font-black text-slate-950">{row.categoryName}</span>
-                  <span className="mt-1 block">{row.weeklyChangePct !== undefined ? `${row.weeklyChangePct.toFixed(1)}% weekly` : 'trend pending'} · {row.confidenceLabel}</span>
-                </Link>
-              )))}
-            </div>
+            <HeatmapMatrix
+              cells={data.categoryIndexRows.slice(0, 6).flatMap((row) => data.chainIndexSeries.slice(0, 3).map((series) => ({
+                row: row.categoryName,
+                column: series.chain,
+                valueLabel: row.weeklyChangePct !== undefined ? `${row.weeklyChangePct.toFixed(1)}% weekly` : 'trend pending',
+                signal: row.confidenceLabel,
+                tone: row.weeklyChangePct === undefined ? 'medium' : row.weeklyChangePct > 1 ? 'high' : 'low',
+                href: `/search?chain=${encodeURIComponent(series.chain.toLowerCase())}&category=${encodeURIComponent(row.categorySlug)}`
+              })))}
+            />
           </MvpSectionCard>
 
           <MvpSectionCard title="Deal opportunity panel">
