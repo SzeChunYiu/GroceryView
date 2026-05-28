@@ -164,7 +164,9 @@ function dealFromPriceDrop(mover: (typeof priceDropMoversBoard)[number]): DealEv
     id: mover.productSlug,
     slug: mover.productSlug,
     name: mover.productName,
-    categorySlug: mover.categoryLabel.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+    categorySlug: 'categorySlug' in mover && typeof mover.categorySlug === 'string'
+      ? mover.categorySlug
+      : mover.categoryLabel.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
     categoryName: mover.categoryLabel,
     imageUrl: mover.imageUrl ?? undefined,
     currentBestPrice: mover.latestPrice,

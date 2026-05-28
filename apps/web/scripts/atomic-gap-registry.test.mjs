@@ -44,7 +44,7 @@ describe('atomic gap registry living spec', () => {
         );
       }
 
-      assert.match(section, /\| status \| open \|/, `${id} should be tracked as open in registry`);
+      assert.match(section, /\| status \| (open|done) \|/, `${id} should be tracked as open or done`);
     }
   });
 

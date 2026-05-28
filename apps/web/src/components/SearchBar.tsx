@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Mic, Search } from 'lucide-react';
 import type { KeyboardEvent, ReactNode } from 'react';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
-import { trackSearchToSavingsFunnelStep, trackVoiceSearchInput } from '@/lib/analytics';
+import { trackSearchToSavingsFunnelStep, trackSpecAnalyticsEvent, trackVoiceSearchInput } from '@/lib/analytics';
 import {
   pinSavedSearch,
   readSavedSearches,
@@ -271,6 +271,10 @@ export function SearchBar({ surface = 'global-nav' }: Readonly<{ surface?: strin
         setStatus(nextResults.length > 0 ? 'ready' : 'empty');
         if (nextResults.length > 0) setRecentSearches(rememberRecentSearchHistory(trimmedQuery, nextResults.length));
         trackSearchToSavingsFunnelStep('landing_search');
+        trackSpecAnalyticsEvent('search_submitted', {
+          result_count: nextResults.length,
+          query_length_bucket: trimmedQuery.length <= 0 ? 'empty' : trimmedQuery.length <= 12 ? 'short' : 'long'
+        });
       } catch (error) {
         if (controller.signal.aborted) return;
         console.error('Product search request failed', error instanceof Error ? { name: error.name } : { name: 'unknown' });

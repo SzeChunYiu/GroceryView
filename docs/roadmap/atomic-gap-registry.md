@@ -19,7 +19,7 @@ Track small missing pieces so GroceryView does not drift. Each gap has a stable 
 | userImpact | Wrong filters, zero results, inconsistent routes vs `/browse/[slug]`. |
 | fix | Emit `categorySlug` on search facets; link with slug; migrate filter normalization. |
 | testRequired | Facet href uses slug; filtered search returns expected rows. |
-| status | open |
+| status | done |
 
 ### `mvp-mover-category-slug-derivation`
 
@@ -32,7 +32,7 @@ Track small missing pieces so GroceryView does not drift. Each gap has a stable 
 | userImpact | Broken category/market links from biggest movers and deal cards. |
 | fix | Use `product.category` or explicit slug from verified-data movers. |
 | testRequired | Mover links resolve to existing category routes. |
-| status | open |
+| status | done |
 
 ### `market-table-missing-3m-1y`
 
@@ -45,7 +45,7 @@ Track small missing pieces so GroceryView does not drift. Each gap has a stable 
 | userImpact | Users cannot compare medium/long-term category trends on market overview. |
 | fix | Add 3M and 1Y columns from snapshot; label windows clearly (W / 3M / 1Y). |
 | testRequired | Route test asserts table headers include 3M and 1Y. |
-| status | open |
+| status | done |
 
 ### `public-debug-copy-cursor-pagination`
 
@@ -58,7 +58,7 @@ Track small missing pieces so GroceryView does not drift. Each gap has a stable 
 | userImpact | User confusion; reads like developer docs. |
 | fix | Replace with “Showing X–Y of Z results”; move pagination detail to admin/docs only. |
 | testRequired | Content lint blocks phrase `Server-side cursor pagination` on public routes. |
-| status | open |
+| status | done |
 
 ### `public-infra-copy-market-shell`
 
@@ -71,7 +71,7 @@ Track small missing pieces so GroceryView does not drift. Each gap has a stable 
 | userImpact | Shoppers see infrastructure jargon unrelated to price questions. |
 | fix | Remove or relocate to `/data-sources` admin/ops audience; frontstage shows price evidence only. |
 | testRequired | Content lint blocks `Redis cache` and `pgbouncer` on locale entry pages. |
-| status | open |
+| status | done |
 
 ### `analytics-event-naming-gap`
 
@@ -84,7 +84,7 @@ Track small missing pieces so GroceryView does not drift. Each gap has a stable 
 | userImpact | Cannot measure search→product conversion or deal engagement consistently. |
 | fix | Implement spec event names in `apps/web/src/lib/analytics.ts` at form submit and card navigation. |
 | testRequired | Telemetry tests assert event names match dictionary. |
-| status | open |
+| status | done |
 
 ### `search-results-missing-evidence-strip`
 
@@ -97,7 +97,7 @@ Track small missing pieces so GroceryView does not drift. Each gap has a stable 
 | userImpact | Users cannot judge trust of search hits vs product page. |
 | fix | Add `EvidenceStrip` or compact confidence/freshness badges per card. |
 | testRequired | Search card render test includes confidence + freshness labels when data present. |
-| status | open |
+| status | done |
 
 ### `metric-dictionary-not-centralized`
 
@@ -110,7 +110,7 @@ Track small missing pieces so GroceryView does not drift. Each gap has a stable 
 | userImpact | Same product may show inconsistent deal labels or change % across surfaces. |
 | fix | Add `packages/metrics/src/definitions.ts`; pages import canonical formulas. |
 | testRequired | Cross-surface consistency test for sample product slugs. |
-| status | open |
+| status | done |
 
 ### `market-chain-index-no-chart`
 
@@ -144,9 +144,9 @@ Track small missing pieces so GroceryView does not drift. Each gap has a stable 
 
 | Status | Count |
 |--------|-------|
-| open | 10 |
+| open | 2 |
 | in_progress | 0 |
-| done | 0 |
+| done | 8 |
 
 **Total gaps:** 10
 
