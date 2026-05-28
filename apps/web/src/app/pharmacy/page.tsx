@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { BadgeCheck, ExternalLink, Pill, Sparkles, Tablets } from 'lucide-react';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { ChartShell, ChartTableFallback, DistributionBand, Sparkline } from '@/components/mvp/visual-intelligence';
 import { PharmacyTargetAlertControls, type PharmacyTargetAlertProduct } from '@/components/pharmacy-target-alerts';
 import { TerminalQuoteTable, TerminalTickerCard, type TerminalQuoteRow } from '@/components/terminal-surface';
 import {
@@ -104,6 +105,13 @@ function cheapestPharmacyComparisons() {
 }
 
 const pharmacyComparisons = cheapestPharmacyComparisons();
+const pharmacySafetyBoundaryItems = [
+  'OTC public catalog only.',
+  'No prescription medicine.',
+  'No medical advice.',
+  'Exact EAN comparison only.',
+  'No stock claim unless source provides stock.'
+];
 
 function comparisonQuoteRows(rows: readonly ApohemIngestedProduct[], cheapestPrice: number): TerminalQuoteRow[] {
   return rows.map((row) => ({
@@ -149,6 +157,37 @@ const pharmacyOtcHistoryRows = pharmacyOtcEvidenceBoard.rows
   })
   .filter((row): row is NonNullable<typeof row> => row !== null)
   .slice(0, 4);
+
+const pharmacyVisualRows = pharmacyComparisons.flatMap((comparison) => {
+  const prices = comparison.rows.map((row) => row.price);
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
+  return comparison.rows.map((row) => {
+    const matchingHistory = pharmacyOtcHistoryRows.find((history) => history.code === row.ean);
+    const priceHistoryMiniLine = matchingHistory
+      ? matchingHistory.observations.map((observation) => ({
+        label: observation.date,
+        value: observation.price
+      }))
+      : [
+        { label: 'Retrieved snapshot', value: row.price },
+        { label: formatDate(row.retrievedAt), value: row.price }
+      ];
+    return {
+      product: comparison.name,
+      ean: comparison.ean,
+      chain: chainLabels[row.chain],
+      price: row.price,
+      priceLabel: row.priceText,
+      retrieved: formatDate(row.retrievedAt),
+      source: sourceLabel(row.sourceUrl),
+      href: row.productUrl,
+      min,
+      max,
+      priceHistoryMiniLine
+    };
+  });
+});
 
 function DomainFoundationSummary({ domainSlug }: Readonly<{ domainSlug: 'pharmacy' }>) {
   const domain = multiVerticalDomainFoundation.find((candidate) => candidate.slug === domainSlug)!;
@@ -210,9 +249,63 @@ export default function PharmacyPage() {
       </header>
 
       <section className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm font-semibold leading-6 text-amber-950">
-        OTC, supplement, and beauty rows are shown as public catalog evidence only. Prescription medicine, medical advice,
-        stock availability claims, and cheapest-pharmacy claims stay excluded from this surface.
+        {pharmacySafetyBoundaryItems.join(' ')} OTC, supplement, and beauty rows are shown as public catalog evidence only.
       </section>
+
+      <ChartShell
+        actionHref="/pharmacy"
+        actionLabel="Open pharmacy surface"
+        evidenceItems={[
+          `${pharmacyComparisons.length} exact OTC comparisons`,
+          `${apohemEanMatches.length.toLocaleString()} cross-chain EAN matches`,
+          `Retrieved ${formatDate(apohemSource.retrievedAt)}`
+        ]}
+        hasData={pharmacyVisualRows.length > 0}
+        insightTitle="Pharmacy visual command center"
+        plainSummary="Safety boundary card, exact EAN comparisons, OTC price cards, source freshness, history sparklines, and target alert controls stay inside public-catalog OTC evidence."
+        userQuestion="Can I compare OTC pharmacy prices safely?"
+        fallback={
+          <ChartTableFallback
+            caption="Exact EAN comparison only pharmacy fallback"
+            columns={[
+              { key: 'product', label: 'Product', render: (row) => row.product },
+              { key: 'ean', label: 'EAN', render: (row) => row.ean },
+              { key: 'chain', label: 'Chain', render: (row) => row.chain },
+              { key: 'price', label: 'Price', render: (row) => row.priceLabel },
+              { key: 'retrieved', label: 'Retrieved', render: (row) => row.retrieved }
+            ]}
+            rows={pharmacyVisualRows}
+          />
+        }
+      >
+        <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="rounded-2xl border border-indigo-100 bg-indigo-50 p-4">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-indigo-800">Safety boundary card</p>
+            <h3 className="mt-2 text-xl font-black text-indigo-950">Exact EAN comparison only.</h3>
+            <div className="mt-4 grid gap-2">
+              {pharmacySafetyBoundaryItems.map((item) => (
+                <p className="rounded-2xl bg-white p-3 text-sm font-black text-indigo-950 shadow-sm" key={item}>{item}</p>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid gap-3 md:grid-cols-2">
+            {pharmacyVisualRows.slice(0, 4).map((row) => (
+              <a className="rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm hover:border-emerald-700" href={row.href} key={`${row.chain}-${row.ean}-visual`}>
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">{row.chain} · Retrieved {row.retrieved}</p>
+                <h3 className="mt-2 text-lg font-black text-slate-950">{row.product}</h3>
+                <p className="mt-1 text-xs font-semibold text-slate-600">EAN {row.ean} · {row.source}</p>
+                <p className="mt-3 text-3xl font-black text-emerald-800">{row.priceLabel}</p>
+                <DistributionBand current={row.price} label={`${row.product} exact EAN pharmacy price range`} max={row.max} min={row.min} />
+                <div className="mt-3 flex items-center justify-between rounded-2xl bg-slate-50 p-3">
+                  <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-500">OTC history sparkline</p>
+                  <Sparkline label={`${row.product} OTC public catalog only price history`} points={row.priceHistoryMiniLine} />
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </ChartShell>
 
       <Card className="border-indigo-200 bg-indigo-50">
         <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
