@@ -27,6 +27,7 @@ import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
 import { FriendPriceSightings } from '@/components/friend-price-sightings';
 import { PriceIntelligenceCard, type PriceIntelligenceScoreCard } from '@/components/price-intelligence-card';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
+import { ChartShell, ChartTableFallback, DistributionBand, PriceHistoryChart } from '@/components/mvp/visual-intelligence';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
 import { buildShortTermPriceForecast } from '@/lib/price-intelligence';
@@ -1558,6 +1559,37 @@ export default async function ProductPage({ params, routeBase = 'products' }: Re
   const priceChartTerminal = priceChartTerminalFor(product);
   const commodityComparison = commodityComparisonForProduct(product.slug);
   const localPriceStatistics = localPriceStatisticsForProduct({ slug: product.slug, name: product.name });
+  const productEvidenceBounds = productOfferBounds(product);
+  const productEvidenceCurrentPrice = productCurrentPrice(product);
+  const productEvidenceHistoryPoints = 'lowestPrice' in product
+    ? []
+    : product.observations.slice(-12).map((observation) => ({
+      date: observation.date,
+      label: observation.date,
+      value: observation.price
+    }));
+  const productEvidenceFallbackRows = [
+    {
+      metric: 'Current price',
+      value: formatSek(productEvidenceCurrentPrice),
+      evidence: isChain ? 'Lowest current chain quote' : 'Latest OpenPrices observation or median fallback'
+    },
+    {
+      metric: 'National price range band',
+      value: `${formatSek(productEvidenceBounds.lowPrice)}–${formatSek(productEvidenceBounds.highPrice)}`,
+      evidence: `${productEvidenceBounds.offerCount} verified offer/observation row${productEvidenceBounds.offerCount === 1 ? '' : 's'}`
+    },
+    {
+      metric: 'Local/kommun comparison band',
+      value: localPriceStatistics.available ? `${localPriceStatistics.rows.length} matched local area${localPriceStatistics.rows.length === 1 ? '' : 's'}` : 'Coverage blocker',
+      evidence: localPriceStatistics.summary
+    },
+    {
+      metric: 'Retailer quote table',
+      value: crossChainQuoteRows.length > 0 ? `${crossChainQuoteRows.length} retailer quote${crossChainQuoteRows.length === 1 ? '' : 's'}` : 'No cross-chain quote rows',
+      evidence: crossChainQuoteRows.length > 0 ? 'Rows below list chain, price, unit price, confidence, and source limits' : 'OpenPrices-only items keep retailer rows withheld instead of fabricated'
+    }
+  ];
   const familyPackComparisons = matchedChainProduct
     ? familyPackComparisonsForProduct(matchedChainProduct, matchedChainProducts, labelFromSlug(matchedChainProduct.category))
     : [];
@@ -1631,7 +1663,64 @@ export default async function ProductPage({ params, routeBase = 'products' }: Re
         </Card>
       </div>
       <BestTimeBadge prediction={bestTimePrediction} />
+      <div className="mt-6">
+        <ChartShell
+          actionHref="#retailer-quote-table"
+          actionLabel="Jump to retailer quotes"
+          evidenceItems={[
+            `${productEvidenceBounds.offerCount} verified offer/observation row${productEvidenceBounds.offerCount === 1 ? '' : 's'}`,
+            freshnessBadge.freshnessLabel,
+            localPriceStatistics.available ? `${localPriceStatistics.rows.length} local comparison band${localPriceStatistics.rows.length === 1 ? '' : 's'}` : 'Local/kommun comparison band withheld',
+            'Retailer quote table stays source-backed'
+          ]}
+          hasData={productEvidenceBounds.offerCount > 0}
+          insightTitle="Product price evidence panel"
+          plainSummary="A compact product visual combines the current price, national range, local coverage gate, price history line, and retailer quote table fallback without inventing branch-specific prices."
+          userQuestion="Is this current price high or low against verified ranges?"
+          fallback={
+            <ChartTableFallback
+              caption="Product price evidence panel fallback"
+              columns={[
+                { key: 'metric', label: 'Metric', render: (row: (typeof productEvidenceFallbackRows)[number]) => row.metric },
+                { key: 'value', label: 'Value', render: (row: (typeof productEvidenceFallbackRows)[number]) => row.value },
+                { key: 'evidence', label: 'Evidence', render: (row: (typeof productEvidenceFallbackRows)[number]) => row.evidence }
+              ]}
+              rows={productEvidenceFallbackRows}
+            />
+          }
+        >
+          <div className="grid gap-4 lg:grid-cols-[1fr_1fr]">
+            <div className="rounded-3xl border border-emerald-100 bg-emerald-50/70 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">National price range band</p>
+              <p className="mt-2 text-3xl font-black text-slate-950">{formatSek(productEvidenceCurrentPrice)}</p>
+              <DistributionBand current={productEvidenceCurrentPrice} label={`${product.name} current price against national verified range`} max={productEvidenceBounds.highPrice} min={productEvidenceBounds.lowPrice} />
+              <p className="mt-3 text-sm font-bold leading-6 text-slate-700">
+                Current price is placed against {formatSek(productEvidenceBounds.lowPrice)}–{formatSek(productEvidenceBounds.highPrice)} from verified product rows.
+              </p>
+            </div>
+            <div className="rounded-3xl border border-teal-100 bg-teal-50/70 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-teal-800">Local/kommun comparison band</p>
+              <p className="mt-2 text-3xl font-black text-slate-950">{localPriceStatistics.available ? `${localPriceStatistics.rows.length} area${localPriceStatistics.rows.length === 1 ? '' : 's'}` : 'Withheld'}</p>
+              <p className="mt-3 rounded-2xl bg-white/85 p-3 text-sm font-bold leading-6 text-slate-700">
+                {localPriceStatistics.summary} Branch-specific prices are never inferred from regional statistics.
+              </p>
+            </div>
+            <div className="rounded-3xl border border-slate-100 bg-slate-50 p-4 lg:col-span-2">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">Price history line</p>
+              {productEvidenceHistoryPoints.length >= 2 ? (
+                <PriceHistoryChart label={`${product.name} observed price history`} points={productEvidenceHistoryPoints} />
+              ) : (
+                <p className="mt-3 rounded-2xl bg-amber-50 p-4 text-sm font-black text-amber-950">
+                  Not-enough-data state: this source does not expose enough dated observations for a compact line chart, so the product keeps the range and quote evidence visible instead.
+                </p>
+              )}
+              <p className="mt-3 text-xs font-bold uppercase tracking-[0.14em] text-slate-500">Retailer quote table is the detailed source of store/chain, price, unit price, freshness, confidence, and open-store context below.</p>
+            </div>
+          </div>
+        </ChartShell>
+      </div>
       {crossChainQuoteRows.length > 0 ? (
+        <section id="retailer-quote-table">
         <Card className="mt-6 overflow-hidden border-emerald-200 bg-emerald-50/70">
           <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
@@ -1714,6 +1803,7 @@ export default async function ProductPage({ params, routeBase = 'products' }: Re
             </div>
           ) : null}
         </Card>
+        </section>
       ) : null}
       <Card className="mt-6 border-slate-200 bg-slate-50">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
