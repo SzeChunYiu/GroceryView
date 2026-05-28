@@ -1,0 +1,92 @@
+{
+  "domains": {
+    "grocery": {
+      "status": "yes + tested",
+      "requirements": {
+        "landingPage": "yes + tested",
+        "searchDomain": "yes + tested",
+        "detailPage": "yes + tested",
+        "mapLayer": "yes + tested",
+        "mapSelectedDetail": "yes + tested",
+        "watchlistAlerts": "yes + tested",
+        "evidenceConfidence": "yes + tested",
+        "claimBoundaryTests": "yes + tested",
+        "adminBackstageReports": "yes + tested",
+        "analyticsEvents": "yes + tested",
+        "releaseReady": "yes + tested"
+      },
+      "blockingItems": [],
+      "evidence": [
+        "apps/web/scripts/atomic-gap-registry.test.mjs",
+        "apps/web/scripts/cross-domain-closure.test.mjs",
+        "apps/web/scripts/data-ops-production-closure.test.mjs",
+        "apps/web/scripts/analytics-observability-closure.test.mjs",
+        "apps/web/scripts/release-readiness-report.test.mjs"
+      ]
+    },
+    "fuel": {
+      "status": "yes + tested",
+      "requirements": {
+        "landingPage": "yes + tested",
+        "searchDomain": "yes + tested",
+        "detailPage": "yes + tested",
+        "mapLayer": "yes + tested",
+        "mapSelectedDetail": "yes + tested",
+        "watchlistAlerts": "yes + tested",
+        "evidenceConfidence": "yes + tested",
+        "claimBoundaryTests": "yes + tested",
+        "adminBackstageReports": "yes + tested",
+        "analyticsEvents": "yes + tested",
+        "releaseReady": "yes + tested"
+      },
+      "blockingItems": [],
+      "evidence": [
+        "apps/web/scripts/fuel-domain-closure.test.mjs",
+        "apps/web/scripts/cross-domain-closure.test.mjs",
+        "apps/web/scripts/analytics-observability-closure.test.mjs",
+        "apps/web/scripts/release-readiness-report.test.mjs"
+      ]
+    },
+    "pharmacyOtc": {
+      "status": "yes + tested",
+      "requirements": {
+        "landingPage": "yes + tested",
+        "searchDomain": "yes + tested",
+        "detailPage": "yes + tested",
+        "mapLayer": "yes + tested",
+        "mapSelectedDetail": "yes + tested",
+        "watchlistAlerts": "yes + tested",
+        "evidenceConfidence": "yes + tested",
+        "claimBoundaryTests": "yes + tested",
+        "adminBackstageReports": "yes + tested",
+        "analyticsEvents": "yes + tested",
+        "releaseReady": "yes + tested"
+      },
+      "blockingItems": [],
+      "evidence": [
+        "apps/web/scripts/pharmacy-domain-closure.test.mjs",
+        "apps/web/scripts/cross-domain-closure.test.mjs",
+        "apps/web/scripts/analytics-observability-closure.test.mjs",
+        "apps/web/scripts/release-readiness-report.test.mjs"
+      ]
+    }
+  },
+  "platform": {
+    "status": "yes + tested",
+    "requirements": {
+      "adminBackstageReports": "yes + tested",
+      "dataOperationsReports": "yes + tested",
+      "analyticsEvents": "yes + tested",
+      "adsAccessibility": "yes + tested",
+      "manualQa": "yes + tested",
+      "releaseGate": "yes + tested"
+    },
+    "blockingItems": [],
+    "evidence": [
+      "apps/web/scripts/data-ops-production-closure.test.mjs",
+      "apps/web/scripts/analytics-observability-closure.test.mjs",
+      "apps/web/scripts/release-readiness-report.test.mjs",
+      "scripts/ops/release-readiness-report.mjs"
+    ]
+  }
+}
