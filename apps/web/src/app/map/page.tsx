@@ -1,4 +1,5 @@
 import { calculateChainPriceIndex } from '@groceryview/core';
+import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCitation } from '@/components/data-ui';
 import { SavedViewActions } from '@/components/saved-view-actions';
 import { StoreDistanceCard } from '@/components/StoreDistanceCard';
@@ -42,6 +43,10 @@ const operatingHoursFilters: Array<{ href: string; id: OperatingHoursFilter | nu
   { href: '/map?hours=open-evening', id: 'open-evening', label: 'Open this evening', detail: 'Map stores open around 18:00 or 20:00 today.' },
   { href: '/map?hours=open-24h', id: 'open-24h', label: '24h', detail: 'Map stores labelled 24/7 or 00:00-24:00.' }
 ];
+
+function slugifyRouteValue(value: string) {
+  return value.toLowerCase().replace(/å/g, 'a').replace(/ä/g, 'a').replace(/ö/g, 'o').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
 
 function parseOperatingHoursFilter(value: string | string[] | undefined): OperatingHoursFilter | null {
   const raw = Array.isArray(value) ? value[0] : value;
@@ -173,6 +178,11 @@ function buildRegionalPriceStatisticsGate() {
 export default async function MapPage({ searchParams }: Readonly<{ searchParams?: Promise<Record<string, string | string[] | undefined>> }>) {
   const params = await (searchParams ?? Promise.resolve<Record<string, string | string[] | undefined>>({}));
   const selectedHoursFilter = parseOperatingHoursFilter(params.hours);
+  const selectedLayer = Array.isArray(params.layer) ? params.layer[0] ?? 'stores' : params.layer ?? 'stores';
+  const selectedCategory = Array.isArray(params.category) ? params.category[0] ?? 'all' : params.category ?? 'all';
+  const selectedChain = Array.isArray(params.chain) ? params.chain[0] ?? 'all' : params.chain ?? 'all';
+  const selectedRegion = Array.isArray(params.region) ? params.region[0] ?? 'stockholm' : params.region ?? 'stockholm';
+  const selectedConfidence = Array.isArray(params.confidence) ? params.confidence[0] ?? 'all' : params.confidence ?? 'all';
   const filteredStores = storeUniverse.filter((store) => storeMatchesOperatingHoursFilter(store, selectedHoursFilter));
   const visibleStores = filteredStores.slice(0, 80);
   return (
@@ -197,19 +207,40 @@ export default async function MapPage({ searchParams }: Readonly<{ searchParams?
         <Card>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Map layers</p>
           <h2 className="mt-2 text-2xl font-black">Choose the signal</h2>
-          <div className="mt-4 grid gap-3 text-sm font-semibold leading-6 text-slate-700">
-            <p><strong>Store locations:</strong> See mapped grocery stores.</p>
-            <p><strong>Price index:</strong> Compare grocery prices by area.</p>
-            <p><strong>Category index:</strong> See where a category like meat or baby products is more expensive.</p>
-            <p><strong>Freshness:</strong> See where price data is fresh or stale.</p>
-            <p><strong>Coverage:</strong> See where GroceryView has stronger or weaker data.</p>
-          </div>
+          <form className="mt-4 grid gap-3 text-sm font-semibold leading-6 text-slate-700">
+            {[
+              { key: 'layer', label: 'Layer selector', value: selectedLayer, options: ['stores', 'price-index', 'category-index', 'freshness', 'coverage'] },
+              { key: 'category', label: 'Category selector', value: selectedCategory, options: ['all', 'meat', 'produce', 'baby', 'pantry', 'dairy'] },
+              { key: 'chain', label: 'Chain selector', value: selectedChain, options: ['all', 'ica', 'coop', 'willys', 'hemkop', 'lidl'] },
+              { key: 'region', label: 'Region / kommun selector', value: selectedRegion, options: ['stockholm', 'goteborg', 'malmo'] },
+              { key: 'confidence', label: 'Confidence / freshness selector', value: selectedConfidence, options: ['all', 'fresh', 'aging', 'stale', 'high-confidence'] }
+            ].map((field) => (
+              <label className="font-black" key={field.key}>
+                {field.label}
+                <select className="mt-1 w-full rounded-2xl border border-slate-200 bg-white px-3 py-2" defaultValue={field.value} name={field.key}>
+                  {field.options.map((option) => <option key={option} value={option}>{option}</option>)}
+                </select>
+              </label>
+            ))}
+            <button className="rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" type="submit">Apply layer controls</button>
+          </form>
         </Card>
         <Card className="xl:col-span-2">
           <h2 className="text-2xl font-black">Selected detail panel</h2>
           <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
             Click store pins to open store previews, kommun summaries to open market context, and nearby deals to open verified product pages.
           </p>
+          <div className="mt-4 grid gap-3 md:grid-cols-3">
+            <Link className="rounded-2xl bg-emerald-50 p-3 text-sm font-black text-emerald-950" href={`/map?layer=${encodeURIComponent(selectedLayer)}&region=${encodeURIComponent(selectedRegion)}`}>
+              Active layer: {selectedLayer}
+            </Link>
+            <Link className="rounded-2xl bg-slate-50 p-3 text-sm font-black text-slate-800" href={selectedCategory === 'all' ? '/browse' : `/browse/${encodeURIComponent(selectedCategory)}`}>
+              Category: {selectedCategory}
+            </Link>
+            <Link className="rounded-2xl bg-slate-50 p-3 text-sm font-black text-slate-800" href={selectedChain === 'all' ? '/stores' : `/search?chain=${encodeURIComponent(selectedChain)}`}>
+              Chain: {selectedChain}
+            </Link>
+          </div>
         </Card>
       </div>
 
@@ -283,7 +314,7 @@ export default async function MapPage({ searchParams }: Readonly<{ searchParams?
         </div>
         <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           {nearbyDealRecommendations.map((deal) => (
-            <div className="rounded-2xl border border-fuchsia-100 bg-white p-4 shadow-sm" data-nearby-deal-recommendation={deal.storeSlug} key={deal.id}>
+            <Link className="rounded-2xl border border-fuchsia-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:ring-2 hover:ring-fuchsia-200" data-nearby-deal-recommendation={deal.storeSlug} href={`/products/${encodeURIComponent(slugifyRouteValue(deal.dealName))}`} key={deal.id}>
               <p className="text-xs font-black uppercase tracking-[0.18em] text-fuchsia-800">{deal.chainName} · {deal.areaLabel}</p>
               <h3 className="mt-2 text-lg font-black text-slate-950">{deal.dealName}</h3>
               <p className="mt-1 text-sm font-semibold text-slate-600">{deal.packageText || deal.sourceStoreName}</p>
@@ -300,7 +331,7 @@ export default async function MapPage({ searchParams }: Readonly<{ searchParams?
               <p className="mt-3 rounded-xl bg-slate-50 p-3 text-xs font-bold leading-5 text-slate-700">
                 {deal.offerMechanicText || `${deal.offerPrice.toFixed(2)} SEK`} · {deal.medMeraRequired ? 'MedMera required' : 'No member flag'}
               </p>
-            </div>
+            </Link>
           ))}
         </div>
       </Card>
@@ -325,7 +356,7 @@ export default async function MapPage({ searchParams }: Readonly<{ searchParams?
           {topRouteSavingsHints.map((store, index) => {
             const inventory = topRouteAwareStoreInventory[index];
             return (
-            <div className="rounded-2xl border border-cyan-100 bg-white p-4 shadow-sm" data-route-aware-nearest-store={store.id} key={store.id}>
+            <Link className="rounded-2xl border border-cyan-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:ring-2 hover:ring-cyan-200" data-route-aware-nearest-store={store.id} href={`/stores/${encodeURIComponent(store.id)}`} key={store.id}>
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">#{index + 1} · {store.chainName}</p>
@@ -356,7 +387,7 @@ export default async function MapPage({ searchParams }: Readonly<{ searchParams?
                 </div>
               ) : null}
               <p className="mt-3 text-xs font-semibold leading-5 text-slate-500">{store.recommendationLabel}</p>
-            </div>
+            </Link>
             );
           })}
         </div>

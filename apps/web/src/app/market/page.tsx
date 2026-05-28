@@ -111,16 +111,34 @@ export default async function MarketPage({ searchParams }: Readonly<{ searchPara
         evidence={<EvidenceStrip evidence={buildMarketEvidence(data)} />}
       />
 
+      <section className="mt-6 grid gap-4 md:grid-cols-4" aria-label="Market KPI cards">
+        {[
+          { label: 'Categories tracked', value: data.categoryIndexRows.length.toLocaleString('sv-SE'), href: '/browse' },
+          { label: 'Chain index series', value: data.chainIndexSeries.length.toLocaleString('sv-SE'), href: '/market?index=chain-price' },
+          { label: 'Biggest movers', value: data.biggestMovers.length.toLocaleString('sv-SE'), href: '/market?sort=movers' },
+          { label: 'Confidence', value: data.confidenceLabel, href: '/methodology#confidence-labels' }
+        ].map((kpi) => (
+          <Link className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:ring-2 hover:ring-emerald-200" href={kpi.href} key={kpi.label}>
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{kpi.label}</p>
+            <p className="mt-2 text-3xl font-black text-slate-950">{kpi.value}</p>
+          </Link>
+        ))}
+      </section>
+
       <div className="mt-6 grid gap-6 xl:grid-cols-[18rem_1fr_20rem]">
         <PanelPurpose
-          description="Switch between index type, region, chain, and time-range views. Missing or stale data stays visible instead of guessed."
+          description="Switch between index type, region, category, chain, time-range, and confidence views. Missing or stale data stays visible instead of guessed."
           question="Choose what to compare"
           title="Market controls"
         >
           <form className="grid gap-3">
             {[
               { key: 'region', label: 'Region', value: data.selectedRegion, options: ['stockholm', 'goteborg', 'malmo'] },
-              { key: 'index', label: 'Index', value: data.selectedIndexType, options: ['chain-price', 'category-price'] }
+              { key: 'index', label: 'Index', value: data.selectedIndexType, options: ['chain-price', 'category-price'] },
+              { key: 'category', label: 'Category', value: 'all', options: ['all', ...data.categoryIndexRows.slice(0, 8).map((row) => row.categorySlug)] },
+              { key: 'chain', label: 'Chain', value: 'all', options: ['all', ...data.chainIndexSeries.map((series) => series.chain.toLowerCase())] },
+              { key: 'range', label: 'Time range', value: 'weekly', options: ['weekly', '3m', '1y'] },
+              { key: 'confidence', label: 'Confidence', value: 'all', options: ['all', 'high', 'medium', 'low'] }
             ].map((field) => (
               <label className="text-sm font-black text-slate-700" key={field.key}>
                 {field.label}
@@ -165,8 +183,11 @@ export default async function MarketPage({ searchParams }: Readonly<{ searchPara
                     <tr className="border-b border-slate-200 text-xs font-black uppercase tracking-[0.14em] text-slate-500">
                       <th className="py-2 pr-4">Category</th>
                       <th className="py-2 pr-4">Weekly</th>
-                      <th className="py-2 pr-4">Observations</th>
-                      <th className="py-2 pr-4">Freshness</th>
+                      <th className="py-2 pr-4">3M</th>
+                      <th className="py-2 pr-4">1Y</th>
+                      <th className="py-2 pr-4">Trend</th>
+                      <th className="py-2 pr-4">Cheapest chain</th>
+                      <th className="py-2 pr-4">Confidence</th>
                       <th className="py-2">Browse</th>
                     </tr>
                   </thead>
@@ -179,8 +200,19 @@ export default async function MarketPage({ searchParams }: Readonly<{ searchPara
                           </Link>
                         </td>
                         <td className="py-3 pr-4 font-semibold">{row.weeklyChangePct !== undefined ? `${row.weeklyChangePct.toFixed(1)}%` : '—'}</td>
-                        <td className="py-3 pr-4 font-semibold">{row.observationCount}</td>
-                        <td className="py-3 pr-4 font-semibold">{row.freshnessLabel}</td>
+                        <td className="py-3 pr-4 font-semibold">{row.threeMonthChangePct !== undefined ? `${row.threeMonthChangePct.toFixed(1)}%` : '—'}</td>
+                        <td className="py-3 pr-4 font-semibold">{row.oneYearChangePct !== undefined ? `${row.oneYearChangePct.toFixed(1)}%` : '—'}</td>
+                        <td className="py-3 pr-4">
+                          <Link className="font-mono text-xs font-black text-slate-700 underline" href={categoryMarketHref(row.categorySlug)}>
+                            {row.sparkline.map((point) => point.value.toFixed(0)).join(' → ') || 'No trend'}
+                          </Link>
+                        </td>
+                        <td className="py-3 pr-4 font-semibold">
+                          <Link className="underline" href={`/search?chain=${encodeURIComponent(row.cheapestChain ?? '')}&category=${encodeURIComponent(row.categorySlug)}`}>
+                            {row.cheapestChain ?? '—'}
+                          </Link>
+                        </td>
+                        <td className="py-3 pr-4 font-semibold">{row.confidenceLabel} · {row.observationCount}</td>
                         <td className="py-3">
                           <Link className="text-sm font-black text-emerald-800 underline" href={categoryBrowseHref(row.categorySlug)}>
                             Browse
@@ -194,6 +226,42 @@ export default async function MarketPage({ searchParams }: Readonly<{ searchPara
             ) : (
               <NoVerifiedDataPanel />
             )}
+          </MvpSectionCard>
+
+          <MvpSectionCard title="Chain × category heatmap">
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {data.categoryIndexRows.slice(0, 6).flatMap((row) => data.chainIndexSeries.slice(0, 3).map((series) => (
+                <Link className="rounded-2xl border border-slate-100 bg-slate-50 p-3 text-sm font-bold text-slate-800 hover:bg-emerald-50" href={`/search?chain=${encodeURIComponent(series.chain.toLowerCase())}&category=${encodeURIComponent(row.categorySlug)}`} key={`${series.chain}-${row.categorySlug}`}>
+                  <span className="block text-xs font-black uppercase tracking-[0.14em] text-slate-500">{series.chain}</span>
+                  <span className="mt-1 block text-lg font-black text-slate-950">{row.categoryName}</span>
+                  <span className="mt-1 block">{row.weeklyChangePct !== undefined ? `${row.weeklyChangePct.toFixed(1)}% weekly` : 'trend pending'} · {row.confidenceLabel}</span>
+                </Link>
+              )))}
+            </div>
+          </MvpSectionCard>
+
+          <MvpSectionCard title="Deal opportunity panel">
+            <div className="grid gap-3 md:grid-cols-2">
+              {data.biggestMovers.slice(0, 4).map((mover) => (
+                <Link className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4" href={productSlugHref(mover.productSlug)} key={`opportunity-${mover.productSlug}`}>
+                  <p className="text-xs font-black uppercase tracking-[0.14em] text-emerald-800">{mover.categoryLabel} · {mover.confidenceLabel}</p>
+                  <h3 className="mt-2 font-black text-emerald-950">{mover.productName}</h3>
+                  <p className="mt-1 text-sm font-bold text-emerald-900">{mover.changePercent.toFixed(1)}% move · {mover.latestPrice.toFixed(2)} SEK</p>
+                </Link>
+              ))}
+            </div>
+          </MvpSectionCard>
+
+          <MvpSectionCard title="Data quality panel">
+            <div className="grid gap-3 md:grid-cols-3">
+              {data.categoryIndexRows.slice(0, 6).map((row) => (
+                <Link className="rounded-2xl bg-slate-50 p-3 text-sm font-bold text-slate-700" href={categoryBrowseHref(row.categorySlug)} key={`quality-${row.categorySlug}`}>
+                  <span className="block font-black text-slate-950">{row.categoryName}</span>
+                  <span className="block">{row.observationCount.toLocaleString('sv-SE')} observations</span>
+                  <span className="block">{row.freshnessLabel} · {row.confidenceLabel}</span>
+                </Link>
+              ))}
+            </div>
           </MvpSectionCard>
 
           <MvpSectionCard title="Biggest movers">

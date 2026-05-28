@@ -42,12 +42,17 @@ type NavGroup = {
 type AppNavTranslator = ReturnType<typeof groceryTranslator>;
 
 const primaryNavItems: NavItem[] = [
-  { href: '/', label: 'Overview', icon: BarChart3, match: 'exact' },
+  { href: '/', label: 'Home', icon: BarChart3, match: 'exact' },
+  { href: '/market', label: 'Market', icon: BarChart3 },
   { href: '/deals', label: 'Deals', icon: Tags },
-  { href: '/market', label: 'Market overview', icon: BarChart3 },
-  { href: '/watchlist', label: 'Watchlist', icon: Heart },
+  { href: '/browse', label: 'Browse', icon: PackageSearch },
   { href: '/map', label: 'Map', icon: Map },
-  { href: '/browse', label: 'Browse', icon: PackageSearch }
+  { href: '/watchlist', label: 'Watchlist', icon: Heart }
+];
+
+const primaryMobileNavItems: NavItem[] = [
+  ...primaryNavItems,
+  { href: '/products', label: 'More', icon: ChevronDown }
 ];
 
 const functionNavItems: NavItem[] = [
@@ -272,7 +277,7 @@ export function AppNav() {
   const [locale, setLocale] = useState<SupportedLocale>(defaultLocale);
   const t = groceryTranslator(locale);
   const navGroups = buildNavGroups(t);
-  const mobileNavItems = navGroups.flatMap((group) => group.items);
+  const mobileNavItems = primaryMobileNavItems;
   const isFunctionGroupActive = functionNavItems.some((item) => isNavItemActive(item, pathname));
 
   useEffect(() => {
