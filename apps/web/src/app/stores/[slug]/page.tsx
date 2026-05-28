@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, PageShell, SourceCitation } from '@/components/data-ui';
 import { PageQuestionHeader } from '@/components/mvp/handoff-content';
+import { ChartShell, ChartTableFallback, DistributionBand } from '@/components/mvp/visual-intelligence';
 import { StoreMap } from '@/components/StoreMap';
 import { osmStores } from '@/lib/osm-stores';
 import {
@@ -175,6 +176,29 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
     storeName: store.name,
     storeSlug: store.slug
   });
+  const maxCategoryCoverage = Math.max(1, ...assortmentOverview.categories.map((category) => category.itemCount));
+  const storeEvidenceFallbackRows = [
+    {
+      signal: 'Map pin',
+      value: `${store.lat}, ${store.lng}`,
+      evidence: `Verified OSM coordinates from ${store.source}`
+    },
+    {
+      signal: 'Opening hours',
+      value: openingHoursLabel,
+      evidence: 'Shown only when source reports hours; missing hours stay explicit'
+    },
+    {
+      signal: 'Category coverage bars',
+      value: assortmentOverview.statusLabel,
+      evidence: assortmentOverview.sourceLabel
+    },
+    {
+      signal: 'Price percentile gate',
+      value: pricePercentileRank.statusLabel,
+      evidence: pricePercentileRank.coverageLabel
+    }
+  ];
 
   return (
     <PageShell>
@@ -217,6 +241,74 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
         <Link className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-black text-emerald-900" href={`/map?store=${encodeURIComponent(store.slug)}`}>
           Open map
         </Link>
+      </div>
+      <div className="mt-6">
+        <ChartShell
+          actionHref={`/map?store=${encodeURIComponent(store.slug)}`}
+          actionLabel="Open map"
+          evidenceItems={[
+            `Map pin ${store.lat}, ${store.lng}`,
+            `Opening hours: ${openingHoursLabel}`,
+            `${assortmentOverview.categories.length} category coverage bars`,
+            `Price percentile gate: ${pricePercentileRank.confidenceLabel}`
+          ]}
+          insightTitle="Store evidence board"
+          plainSummary="This store visual groups the verified map pin, opening-hours state, category coverage bars, and price-percentile gate so shoppers can see what is source-backed before browsing products."
+          userQuestion="Can I trust this store page for location, hours, coverage, and price rank?"
+          fallback={
+            <ChartTableFallback
+              caption="Store evidence board fallback"
+              columns={[
+                { key: 'signal', label: 'Signal', render: (row: (typeof storeEvidenceFallbackRows)[number]) => row.signal },
+                { key: 'value', label: 'Value', render: (row: (typeof storeEvidenceFallbackRows)[number]) => row.value },
+                { key: 'evidence', label: 'Evidence', render: (row: (typeof storeEvidenceFallbackRows)[number]) => row.evidence }
+              ]}
+              rows={storeEvidenceFallbackRows}
+            />
+          }
+        >
+          <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+            <div className="rounded-3xl border border-emerald-100 bg-emerald-50/70 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">Map pin</p>
+              <p className="mt-2 text-2xl font-black text-slate-950">{store.name}</p>
+              <p className="mt-2 text-sm font-bold leading-6 text-slate-700">
+                {store.address || 'Address not reported by OSM'} · {store.lat}, {store.lng}
+              </p>
+              <p className="mt-3 rounded-2xl bg-white/85 p-3 text-sm font-black text-emerald-950">Opening hours: {openingHoursLabel}</p>
+            </div>
+            <div className="rounded-3xl border border-sky-100 bg-sky-50/70 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-sky-800">Category coverage bars</p>
+              {assortmentOverview.categories.length > 0 ? (
+                <div className="mt-3 grid gap-3">
+                  {assortmentOverview.categories.slice(0, 4).map((category) => (
+                    <div key={category.category}>
+                      <div className="mb-1 flex items-center justify-between gap-3 text-xs font-black uppercase tracking-[0.12em] text-slate-600">
+                        <span>{category.category}</span>
+                        <span>{category.itemCount.toLocaleString('sv-SE')} items</span>
+                      </div>
+                      <DistributionBand current={category.itemCount} label={`${category.category} store category coverage`} max={maxCategoryCoverage} min={0} />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-3 rounded-2xl bg-amber-50 p-4 text-sm font-black text-amber-950">
+                  No branch-specific category coverage bars are rendered until verified assortment rows match this store.
+                </p>
+              )}
+            </div>
+            <div className="rounded-3xl border border-cyan-100 bg-cyan-50/70 p-4 lg:col-span-2">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-cyan-800">Price percentile gate</p>
+              <p className="mt-2 text-2xl font-black text-cyan-950">{pricePercentileRank.statusLabel}</p>
+              {pricePercentileRank.isRanked && pricePercentileRank.nationalPricePercentile !== null ? (
+                <DistributionBand current={pricePercentileRank.nationalPricePercentile} label={`${store.name} national price percentile`} max={100} min={0} />
+              ) : (
+                <p className="mt-3 rounded-2xl bg-white/85 p-3 text-sm font-bold leading-6 text-cyan-950">
+                  {pricePercentileRank.detail}
+                </p>
+              )}
+            </div>
+          </div>
+        </ChartShell>
       </div>
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <Card>
