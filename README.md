@@ -2,7 +2,7 @@
 
 > **Live status board — auto-generated, do not hand-edit.**
 > Regenerated from real signals (merged PRs, open PRs, GOAL.md, live prod HTML) by
-> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-25 13:52 UTC.
+> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-28 20:29 UTC.
 
 GroceryView turns grocery prices into a market: every product is a **ticker** with a
 price chart, chains/categories/brands have **indices**, deals get a **Buy/Wait**
@@ -13,7 +13,7 @@ Strategy + competitor teardown: [`GOAL.md`](GOAL.md) · [`COMPETITIVE-ANALYSIS.m
 
 - **Site:** [https://grocery-web-mu.vercel.app](https://grocery-web-mu.vercel.app) — `/` returns HTTP **200**
 - **Visible on homepage:** ~**24** store pages, ~**35** product pages
-- **Shipped `feat:`/`wire:` PRs to date:** **1**
+- **Shipped `feat:`/`wire:` PRs to date:** **4**
 
 ## 🛒 What shoppers get (consumer value)
 
@@ -42,60 +42,13 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 
 ## ✅ Recently shipped (last 15 merged `feat:`/`wire:` PRs)
 
-- #3256 feat(web): lazy load card images with placeholders
+- #3768 feat(web): composer-25 multitask pack
+- #3753 feat(ingestion): chunk citygross + lidl into bounded files
+- #3732 feat(web): MVP site with v3 connected UX and fail-closed data
 
 ## 🔄 In progress (open PRs)
 
-- #3371 Add cross-category price comparison helper
-- #3370 Add screener service query tests
-- #3366 Document St1 fuel pricing quirks
-- #3363 Add smart shopping list page
-- #3362 Add carbon score badges to product cards
-- #3361 Add BOGO promotion parser
-- #3359 Add observation origin cert migration
-- #3357 Add product best-time-to-buy prediction badge
-- #3355 Add group-buy coordinator e2e
-- #3354 Add ingestion row contract validation
-- #3353 data(web): flag ICA member-only promotions
-- #3351 Show generic OTC medication savings
-- #3350 Add substitution willingness schema
-- #3349 Add Shell SE pricing quirk study
-- #3348 Restore current web contract markers
-- #3347 Add Snabbgross daily materialization coverage
-- #3346 Document Circle K Sweden connector
-- #3345 Add Mlyn Norway coverage connector
-- #3343 Add consumer complaint helper
-- #3342 Add Tanka pricing quirks study
-- #3341 Add source freshness monitoring dashboard
-- #3340 Ticket 1625: badge retailer types in product quotes
-- #3339 [P1 Test] Connector test: rema-1000-no (fixture-based)
-- #3338 Document OKQ8 fuel pricing quirks
-- #3337 Add Middle Eastern NO connector
-- #3335 Seed produce class taxonomy
-- #3334 Add Rusta Norway connector
-- #3333 Study Pressbyrån pricing quirks
-- #3332 Add metadata for grocery index routes
-- #3331 Document 10-11 IS pricing source
-- #3330 Document Lighthouse PR rescue
-- #3326 Add Joker NO flyer connector
-- #3324 Add Biltema NO household connector
-- #3323 Filter store basket coverage by market
-- #3322 Update PR rescue completion log
-- #3321 Docs: document ConfidenceBadge
-- #3319 Add flyer AI vision fallback
-- #3318 Add chain study comparison matrix
-- #3317 Add chain study comparison matrix
-- #3316 feat(ingest): refresh Axfood weekly flyer discounts
-- #3307 Document Swedish grocery data sources
-- #3291 Parameterize Overpass grocery country
-- #3281 Add cursor pagination to catalog endpoints
-- #3277 Add product OpenGraph metadata
-- #3260 Add accessible modal primitives
-- #3241 fix: update stale test assertions and implement missing features
-- #3221 Add Circle K SE fuel and convenience connector
-- #3214 Study DocMorris SE pricing quirks
-- #3205 Add unit audit table filters
-- #3196 Add fixed-off promotion parser
+- #3769 Add map visual command center
 
 ## 📋 To-do (from GOAL.md backlog)
 
