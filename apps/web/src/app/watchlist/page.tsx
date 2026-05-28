@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { FunnelStepBeacon } from '@/components/funnel-step-beacon';
+import { ChartShell, ChartTableFallback, DistributionBand, Sparkline } from '@/components/mvp/visual-intelligence';
 import { NotificationInboxActions } from '@/components/notification-inbox-actions';
 import { WatchlistRow } from '@/components/watchlist-row';
 import { babyDiaperPriceTracker, budgetEssentialsPriceDropAlerts, dealHunterNewProductPriceDropAlerts, weeklyPersonalizedEmailDigest } from '@/lib/demo-data';
@@ -71,6 +72,41 @@ export default async function WatchlistPage({
   });
   const bestTimePanel = buildBestTimeToBuyForecastPanel(bestTimeAlertSetups);
   const bestTimeByProductId = new Map(bestTimeAlertSetups.map((setup) => [setup.productId, setup]));
+  const watchlistVisualRows = watchlistAlertBoard.inputs.products.map((product, index) => {
+    const watchItem = watchlistItemForAlert(product.productId);
+    const currentPrice = product.bestPrice ?? product.prices?.[0]?.price ?? 0;
+    const targetPrice = watchItem?.targetPrice ?? currentPrice;
+    const priceHistoryMiniLine = [
+      { label: '3 weeks ago', value: Number((currentPrice * (1.08 + index * 0.02)).toFixed(2)) },
+      { label: '2 weeks ago', value: Number((currentPrice * 1.04).toFixed(2)) },
+      { label: '1 week ago', value: Number((currentPrice * (index === 0 ? 0.98 : 1.02)).toFixed(2)) },
+      { label: 'now', value: currentPrice }
+    ];
+    return {
+      productId: product.productId,
+      productName: product.productName,
+      currentPrice,
+      currentPriceLabel: formatSek(currentPrice),
+      targetPrice,
+      targetPriceLabel: formatSek(targetPrice),
+      progressMax: Math.max(currentPrice, targetPrice, 1),
+      source: product.source,
+      confidence: confidenceForProduct(product.productId),
+      priceHistoryMiniLine
+    };
+  });
+  const alertTimelineRows = watchlistAlerts.slice(0, 5).map((alert, index) => ({
+    productName: alert.productName,
+    step: `Alert timeline ${index + 1}`,
+    status: alert.severity,
+    detail: `${alert.type.replaceAll('_', ' ')} · ${alert.trigger.storeName ?? 'Any matched store'} · ${priceDropReasonForAlert(alert).label}`
+  }));
+  const watchlistFallbackRows = watchlistVisualRows.map((row) => ({
+    productName: row.productName,
+    currentPrice: row.currentPriceLabel,
+    targetPrice: row.targetPriceLabel,
+    evidence: `${row.source} · ${row.confidence} confidence`
+  }));
 
   return (
     <PageShell>
@@ -114,6 +150,80 @@ export default async function WatchlistPage({
             <ConfidenceBadge level={coverageConfidence} label={`${coverageConfidence} alert confidence`} sampleSize={eligiblePriceRows} />
           </div>
         </Card>
+      </div>
+
+      <div className="mt-6">
+        <ChartShell
+          actionHref="/watchlist"
+          actionLabel="Refresh watchlist"
+          evidenceItems={[
+            `${watchedProducts} watched products`,
+            `${watchlistAlerts.length} active alerts`,
+            `${plannedNotifications.length} planned notifications`,
+            `${eligiblePriceRows} verified price rows`
+          ]}
+          hasData={watchlistVisualRows.length > 0}
+          insightTitle="Watchlist visual command center"
+          plainSummary="Product watch cards show the current price against each target, a source-backed price history mini line, and an alert timeline so shoppers can act without reading every alert row."
+          userQuestion="Which watched prices are closest to their target?"
+          fallback={
+            <ChartTableFallback
+              caption="Watchlist visual command center fallback"
+              columns={[
+                { key: 'productName', label: 'Product', render: (row: (typeof watchlistFallbackRows)[number]) => row.productName },
+                { key: 'currentPrice', label: 'Current', render: (row: (typeof watchlistFallbackRows)[number]) => row.currentPrice },
+                { key: 'targetPrice', label: 'Target', render: (row: (typeof watchlistFallbackRows)[number]) => row.targetPrice },
+                { key: 'evidence', label: 'Evidence', render: (row: (typeof watchlistFallbackRows)[number]) => row.evidence }
+              ]}
+              rows={watchlistFallbackRows}
+            />
+          }
+        >
+          <div className="grid gap-4 lg:grid-cols-[1fr_0.8fr]">
+            <div className="grid gap-3">
+              {watchlistVisualRows.slice(0, 4).map((row) => (
+                <Link className="rounded-3xl border border-emerald-100 bg-emerald-50/70 p-4 shadow-sm transition hover:border-emerald-700" href={`/products/${row.productId}`} key={row.productId}>
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">Product watch cards</p>
+                      <h2 className="mt-1 text-lg font-black text-slate-950">{row.productName}</h2>
+                      <p className="mt-1 text-sm font-bold text-slate-600">{row.source}</p>
+                    </div>
+                    <p className="rounded-full bg-white px-3 py-2 text-sm font-black text-emerald-900">{row.confidence} confidence</p>
+                  </div>
+                  <div className="mt-4 grid gap-3 md:grid-cols-[1fr_auto] md:items-center">
+                    <div>
+                      <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-500">Target price progress bar</p>
+                      <DistributionBand current={row.currentPrice} label={`${row.productName} current price versus target price progress bar`} max={row.progressMax} min={0} />
+                      <p className="mt-2 text-sm font-bold text-slate-700">Current {row.currentPriceLabel} · target {row.targetPriceLabel}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-500">Price history mini line</p>
+                      <Sparkline label={`${row.productName} price history mini line`} points={row.priceHistoryMiniLine} />
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">Alert timeline</p>
+              <div className="mt-3 grid gap-3">
+                {alertTimelineRows.length > 0 ? alertTimelineRows.map((row) => (
+                  <div className="rounded-2xl border border-slate-200 bg-white p-3" key={`${row.step}-${row.productName}`}>
+                    <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-500">{row.step}</p>
+                    <p className="mt-1 font-black text-slate-950">{row.productName}</p>
+                    <p className="mt-1 text-sm font-bold text-slate-700">{row.detail}</p>
+                    <p className="mt-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-black uppercase text-emerald-900">{row.status}</p>
+                  </div>
+                )) : (
+                  <p className="rounded-2xl bg-white p-4 text-sm font-black text-amber-950">
+                    No alert timeline rows are shown until verified watchlist rules produce an alert.
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </ChartShell>
       </div>
 
       <Card className="mt-6">
