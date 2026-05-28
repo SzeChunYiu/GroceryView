@@ -78,7 +78,7 @@ async function activeFocusSnapshot(page: Page): Promise<FocusSnapshot | null> {
         || (style.outlineStyle !== 'none' && outlineWidth > 0)
         || style.boxShadow !== 'none'
     };
-  });
+  }).catch(() => null);
 }
 
 async function focusWithTab(page: Page, target: Locator, maxTabs = 60) {
