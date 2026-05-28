@@ -10,6 +10,7 @@ import { StoreMap } from '@/components/store-map';
 import { buildChainPriceObservations } from '@/lib/chain-index-data';
 import { storeMatchesOperatingHoursFilter, type OperatingHoursFilter } from '@/lib/geolocation';
 import { buildFuelSelectedStationDetail } from '@/lib/fuel-domain';
+import { buildPharmacySelectedDetail } from '@/lib/pharmacy-domain';
 import { basketCostHeatmap } from '@/lib/map-basket-cost-heatmap';
 import { buildStoreInventoryConfidence } from '@/lib/osm-stores';
 import { formatPct, storePricePercentileRanks, storeUniverse } from '@/lib/verified-data';
@@ -200,7 +201,8 @@ export default async function MapPage({ searchParams }: Readonly<{ searchParams?
   const selectedHoursFilter = parseOperatingHoursFilter(params.hours);
   const selectedDomain = Array.isArray(params.domain) ? params.domain[0] ?? 'grocery' : params.domain ?? 'grocery';
   const selectedFuelStation = buildFuelSelectedStationDetail(params.station);
-  const selectedLayer = selectedDomain === 'fuel' ? 'fuel-stations' : Array.isArray(params.layer) ? params.layer[0] ?? 'stores' : params.layer ?? 'stores';
+  const selectedPharmacy = buildPharmacySelectedDetail(params.pharmacy);
+  const selectedLayer = selectedDomain === 'fuel' ? 'fuel-stations' : selectedDomain === 'pharmacy' ? 'pharmacy-locations' : Array.isArray(params.layer) ? params.layer[0] ?? 'stores' : params.layer ?? 'stores';
   const selectedCategory = Array.isArray(params.category) ? params.category[0] ?? 'all' : params.category ?? 'all';
   const selectedChain = Array.isArray(params.chain) ? params.chain[0] ?? 'all' : params.chain ?? 'all';
   const selectedRegion = Array.isArray(params.region) ? params.region[0] ?? 'stockholm' : params.region ?? 'stockholm';
@@ -276,7 +278,7 @@ export default async function MapPage({ searchParams }: Readonly<{ searchParams?
                 {mapLayerOptions.map((layer) => (
                   <Link
                     className="rounded-2xl bg-white p-3 text-sm font-bold text-emerald-950 shadow-sm"
-                    href={layer.key === 'fuel-stations' ? '/map?domain=fuel&layer=fuel-stations' : `/map?layer=${encodeURIComponent(layer.key)}&region=${encodeURIComponent(selectedRegion)}`}
+                    href={layer.key === 'fuel-stations' ? '/map?domain=fuel&layer=fuel-stations' : layer.key === 'pharmacy-locations' ? '/map?domain=pharmacy&layer=pharmacy-locations' : `/map?layer=${encodeURIComponent(layer.key)}&region=${encodeURIComponent(selectedRegion)}`}
                     key={layer.key}
                   >
                     <span className="block font-black">{layer.label}</span>
@@ -356,6 +358,21 @@ export default async function MapPage({ searchParams }: Readonly<{ searchParams?
           ) : selectedDomain === 'fuel' ? (
             <div className="mt-4 rounded-3xl border border-amber-200 bg-amber-50 p-4">
               <p className="text-sm font-black text-amber-950">Fuel map layer is active. Choose a station from /search?domain=fuel or /fuel/stations to open /map?domain=fuel&station=[id]. Operator-level price guardrail stays visible until station-specific evidence exists.</p>
+            </div>
+          ) : null}
+          {selectedDomain === 'pharmacy' ? (
+            <div className="mt-4 rounded-3xl border border-sky-200 bg-sky-50 p-4" data-gv-event="map_marker_selected" data-gv-entity-type="pharmacy">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-sky-800">Pharmacy selected source detail</p>
+              <h3 className="mt-1 text-xl font-black text-sky-950">{selectedPharmacy.title}</h3>
+              <p className="mt-2 text-sm font-bold leading-6 text-sky-950">OTC coverage/source freshness: {selectedPharmacy.rowCount} public catalog rows · refreshed {selectedPharmacy.retrievedAt}</p>
+              <p className="mt-2 rounded-2xl bg-white/80 p-3 text-sm font-black leading-6 text-sky-950">No stock or prescription claim. {selectedPharmacy.guardrail}</p>
+              <div className="mt-3 grid gap-2 md:grid-cols-2">
+                {selectedPharmacy.sampleRows.slice(0, 4).map((row) => (
+                  <Link className="rounded-2xl bg-white p-3 text-xs font-black text-sky-950" href={row.href} key={`${selectedPharmacy.chain}-${row.ean}`}>
+                    {row.name} · {row.priceLabel}
+                  </Link>
+                ))}
+              </div>
             </div>
           ) : null}
         </Card>

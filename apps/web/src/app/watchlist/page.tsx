@@ -9,6 +9,7 @@ import { babyDiaperPriceTracker, budgetEssentialsPriceDropAlerts, dealHunterNewP
 import { samplePredictiveDropAlerts } from '@/lib/alert-scheduler';
 import { fuelPriceTargetAlerts } from '@/lib/fuel-prices';
 import { fuelStations } from '@/lib/ingested/fuel-stations';
+import { buildPharmacyDomainSearchView } from '@/lib/pharmacy-domain';
 import { buildBestTimeToBuyAlert, buildBestTimeToBuyForecastPanel } from '@/lib/price-intelligence';
 import { priceAlertThresholdPreferenceContract } from '@/lib/verified-data';
 import { confidenceForProduct, priceRowCount, priceDropReasonForAlert, priceDropReasonForProduct, priceSource, volatilityForProduct, watchlistAlertBoard, watchlistItemForAlert } from '@/lib/watchlist-data';
@@ -26,6 +27,7 @@ type RecipeBasketSearchParams = {
   recipeBasket?: string | string[];
   domain?: string | string[];
   station?: string | string[];
+  ean?: string | string[];
 };
 const emptyRecipeBasketSearchParams: RecipeBasketSearchParams = {};
 
@@ -51,6 +53,8 @@ export default async function WatchlistPage({
   const selectedWatchDomain = firstSearchValue(resolvedSearchParams.domain) || 'grocery';
   const selectedFuelStationId = firstSearchValue(resolvedSearchParams.station);
   const selectedFuelStation = fuelStations.find((station) => String(station.osmId) === selectedFuelStationId) ?? fuelStations[0];
+  const pharmacyWatchView = buildPharmacyDomainSearchView(resolvedSearchParams);
+  const selectedPharmacyWatchCard = pharmacyWatchView.cards.find((card) => card.ean === firstSearchValue(resolvedSearchParams.ean)) ?? pharmacyWatchView.cards[0];
   const { watchlistAlerts, plannedNotifications, watchedProducts, eligiblePriceRows, coverageConfidence } = watchlistAlertBoard;
   const bestTimeAlertSetups = watchlistAlertBoard.inputs.products.slice(0, 3).map((product, index) => {
     const currentPrice = product.bestPrice ?? product.prices?.[0]?.price ?? 0;
@@ -159,6 +163,30 @@ export default async function WatchlistPage({
             </div>
           </div>
           <p className="mt-4 rounded-2xl bg-white/80 p-3 text-xs font-black text-amber-950">{fuelPriceTargetAlerts.guardrails.join(' ')}</p>
+        </Card>
+      ) : null}
+      {selectedWatchDomain === 'pharmacy' ? (
+        <Card className="mt-6 border-sky-200 bg-sky-50">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-800">pharmacy_otc_product watchlist</p>
+              <h2 className="mt-2 text-2xl font-black text-sky-950">Pharmacy OTC target alerts</h2>
+              <p className="mt-2 text-sm font-semibold leading-6 text-sky-950">
+                Notify me when exact EAN {selectedPharmacyWatchCard?.ean ?? 'selected OTC product'} drops below my target. Alerts stay tied to OTC public catalog rows, exact EAN evidence, and no medical advice.
+              </p>
+            </div>
+            <Link className="rounded-full bg-sky-900 px-4 py-2 text-sm font-black text-white" href="/search?domain=pharmacy&q=alvedon">Search OTC</Link>
+          </div>
+          <div className="mt-4 grid gap-3 md:grid-cols-3">
+            {pharmacyWatchView.cards.slice(0, 3).map((card) => (
+              <Link className="rounded-2xl bg-white p-4 text-sm font-bold text-sky-950" href={`/pharmacy/${card.ean}`} key={card.ean}>
+                <span className="block text-xs font-black uppercase tracking-[0.14em] text-sky-700">Exact EAN alert target</span>
+                <span className="mt-1 block text-base font-black">{card.name}</span>
+                <span className="mt-1 block">EAN {card.ean} · {card.priceLabel}</span>
+              </Link>
+            ))}
+          </div>
+          <p className="mt-4 rounded-2xl bg-white/80 p-3 text-xs font-black text-sky-950">No prescription medicine. No medical advice. No suitability recommendation. No stock claim unless source exists.</p>
         </Card>
       ) : null}
       {recipeWatchlistItems ? (
