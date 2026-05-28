@@ -291,8 +291,8 @@ export default async function FuelPage({ searchParams }: Readonly<{ searchParams
           ]}
           hasData={fuelVisualRows.length > 0}
           insightTitle="Fuel visual command center"
-          plainSummary={`${selectedGradeLabel} compares public operator rows, source confidence, and nearby station candidates without turning operator prices into station pump claims.`}
-          userQuestion="Which operator-backed fuel rows are cheapest for the selected grade?"
+          plainSummary={`Which operator-backed fuel rows are cheapest for the selected grade? ${selectedGradeLabel} compares public operator rows, source confidence, and nearby station candidates without turning operator prices into station pump claims.`}
+          userQuestion="Where can I compare fuel prices by grade?"
           fallback={
             <ChartTableFallback
               caption="Fuel visual command center fallback"

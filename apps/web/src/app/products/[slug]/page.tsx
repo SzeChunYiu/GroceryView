@@ -1931,7 +1931,7 @@ export default async function ProductPage({ params, routeBase = 'products' }: Re
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-500">Substitute engine</p>
-            <h2 className="mt-2 text-2xl font-black text-slate-950">Smart swaps</h2>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Similar products and smart swaps</h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
               Calls recommendSmartSwaps with visible package sizes and prices. The private-label preference accepts retailer/private-label tiers but blocks high-risk baby formula substitutions.
             </p>
