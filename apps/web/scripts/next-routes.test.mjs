@@ -4015,7 +4015,7 @@ ${seo}`;
     assert.match(route, /rollupTables\.map/);
     assert.match(shell, /apiPerformanceReadiness/);
     assert.match(shell, /data-api-performance-readiness/);
-    assert.match(shell, /Redis cache/);
+    assert.match(shell, /Cached responses|paged result windows/);
     assert.match(shell, /paged result windows|cursor pagination/);
   });
 

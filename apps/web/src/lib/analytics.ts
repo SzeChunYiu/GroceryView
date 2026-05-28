@@ -735,6 +735,28 @@ export function trackAffiliateOutboundClick(metadata: AffiliateLinkMetadata) {
   });
 }
 
+/** Spec event names from docs/specs/analytics-event-tracking.md */
+export const SPEC_ANALYTICS_EVENT_NAMES = [
+  'search_submitted',
+  'search_result_clicked',
+  'product_opened',
+  'deal_opened',
+  'deal_card_clicked',
+  'market_filter_changed',
+  'preview_opened',
+  'evidence_drawer_opened',
+  'watchlist_item_added'
+] as const;
+
+export type SpecAnalyticsEventName = (typeof SPEC_ANALYTICS_EVENT_NAMES)[number];
+
+export function trackSpecAnalyticsEvent(eventName: SpecAnalyticsEventName, payload: Record<string, unknown> = {}) {
+  publishConsentAwareAnalyticsEvent(eventName, {
+    ...payload,
+    observedAt: new Date().toISOString()
+  });
+}
+
 export function affiliateOutboundClickScript(metadata: AffiliateLinkMetadata) {
   const payload = JSON.stringify({
     ...metadata,

@@ -1,0 +1,275 @@
+[
+  {
+    "feature_id": "global_search",
+    "surface": "public",
+    "target_status": "IMPLEMENT_NOW_PUBLIC",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "domain_switcher",
+    "surface": "public",
+    "target_status": "IMPLEMENT_NOW_PUBLIC",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "home_domain_cards",
+    "surface": "public",
+    "target_status": "IMPLEMENT_NOW_PUBLIC",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "search_domain_filters",
+    "surface": "public",
+    "target_status": "IMPLEMENT_NOW_PUBLIC",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "market_kpi_row",
+    "surface": "public",
+    "target_status": "IMPLEMENT_NOW_PUBLIC",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "market_heatmap",
+    "surface": "public",
+    "target_status": "IMPLEMENT_NOW_PUBLIC",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "category_browse_real_deal_cards",
+    "surface": "public",
+    "target_status": "IMPLEMENT_NOW_PUBLIC",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "map_layer_controls",
+    "surface": "public",
+    "target_status": "IMPLEMENT_NOW_PUBLIC",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "watchlist_multi_domain",
+    "surface": "public",
+    "target_status": "IMPLEMENT_NOW_PUBLIC",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "product_preview",
+    "surface": "preview",
+    "target_status": "IMPLEMENT_NOW_PREVIEW",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "store_preview",
+    "surface": "preview",
+    "target_status": "IMPLEMENT_NOW_PREVIEW",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "category_preview",
+    "surface": "preview",
+    "target_status": "IMPLEMENT_NOW_PREVIEW",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "deal_preview",
+    "surface": "preview",
+    "target_status": "IMPLEMENT_NOW_PREVIEW",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "fuel_station_preview",
+    "surface": "preview",
+    "target_status": "IMPLEMENT_NOW_PREVIEW",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "pharmacy_otc_preview",
+    "surface": "preview",
+    "target_status": "IMPLEMENT_NOW_PREVIEW",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "evidence_drawer",
+    "surface": "preview",
+    "target_status": "IMPLEMENT_NOW_PREVIEW",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "side_drawer",
+    "surface": "preview",
+    "target_status": "IMPLEMENT_NOW_PREVIEW",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "bottom_sheet",
+    "surface": "preview",
+    "target_status": "IMPLEMENT_NOW_PREVIEW",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "admin_source_runs",
+    "surface": "backstage",
+    "target_status": "IMPLEMENT_NOW_BACKSTAGE",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "admin_dead_letters",
+    "surface": "backstage",
+    "target_status": "IMPLEMENT_NOW_BACKSTAGE",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "admin_data_quality",
+    "surface": "backstage",
+    "target_status": "IMPLEMENT_NOW_BACKSTAGE",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "admin_lineage",
+    "surface": "backstage",
+    "target_status": "IMPLEMENT_NOW_BACKSTAGE",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "admin_search_analytics",
+    "surface": "backstage",
+    "target_status": "IMPLEMENT_NOW_BACKSTAGE",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "admin_query_performance",
+    "surface": "backstage",
+    "target_status": "IMPLEMENT_NOW_BACKSTAGE",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "admin_ad_policy",
+    "surface": "backstage",
+    "target_status": "IMPLEMENT_NOW_BACKSTAGE",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "admin_content_lint",
+    "surface": "backstage",
+    "target_status": "IMPLEMENT_NOW_BACKSTAGE",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "admin_storage",
+    "surface": "backstage",
+    "target_status": "IMPLEMENT_NOW_BACKSTAGE",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "source_runs",
+    "surface": "data",
+    "target_status": "IMPLEMENT_NOW_DATA",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "raw_records",
+    "surface": "data",
+    "target_status": "IMPLEMENT_NOW_DATA",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "dead_letters",
+    "surface": "data",
+    "target_status": "IMPLEMENT_NOW_DATA",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "quality_gates",
+    "surface": "data",
+    "target_status": "IMPLEMENT_NOW_DATA",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "idempotency_helper",
+    "surface": "data",
+    "target_status": "IMPLEMENT_NOW_DATA",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "gold_publish_gate",
+    "surface": "data",
+    "target_status": "IMPLEMENT_NOW_DATA",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "db_health_scripts",
+    "surface": "data",
+    "target_status": "IMPLEMENT_NOW_DATA",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "metric_dictionary",
+    "surface": "data",
+    "target_status": "IMPLEMENT_NOW_DATA",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "event_tracking_plan",
+    "surface": "data",
+    "target_status": "IMPLEMENT_NOW_DATA",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "adslot",
+    "surface": "ads",
+    "target_status": "IMPLEMENT_NOW_PUBLIC",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "ad_policy",
+    "surface": "ads",
+    "target_status": "IMPLEMENT_NOW_PUBLIC",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  },
+  {
+    "feature_id": "ad_tests",
+    "surface": "ads",
+    "target_status": "IMPLEMENT_NOW_PUBLIC",
+    "status": "TODO_REGISTER_AND_VERIFY",
+    "tests_required": true
+  }
+]

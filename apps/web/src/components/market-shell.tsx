@@ -344,7 +344,7 @@ export function MarketShell({ locale = defaultLocale }: { locale?: SupportedLoca
           {homepageApiPerformanceReadiness.hotEndpoints.map((endpoint) => (
             <Link className="rounded-2xl border border-cyan-100 bg-white p-4 shadow-sm hover:border-cyan-700" data-api-performance-readiness={endpoint.path} href="/data-sources" key={endpoint.path}>
               <p className="font-mono text-sm font-black text-slate-950">{endpoint.path}</p>
-              <p className="mt-2 text-sm font-semibold text-slate-700">Redis cache TTL {endpoint.ttlSeconds}s · {endpoint.coverage}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">Cached responses · {endpoint.coverage}</p>
             </Link>
           ))}
         </div>

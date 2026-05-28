@@ -1,4 +1,6 @@
 import { PageShell, SearchRecoveryPanel } from '@/components/data-ui';
+import { EvidenceStrip } from '@/components/mvp/evidence-strip';
+import { confidenceLabelFromScore } from '@/lib/mvp/evidence';
 import { PageQuestionHeader, GuidedEmptyState } from '@/components/mvp/handoff-content';
 import { ChartShell, ChartTableFallback, Sparkline } from '@/components/mvp/visual-intelligence';
 import { RecentSearchReplayPills } from '@/components/SearchBar';
@@ -271,9 +273,18 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
                 <a className="rounded-full bg-slate-100 px-3 py-2 text-slate-800" href={`/market/${encodeURIComponent(card.categorySlug)}`}>Market context</a>
                 <a className="rounded-full bg-slate-100 px-3 py-2 text-slate-800" href={`/search?category=${encodeURIComponent(card.categorySlug)}&similarTo=${encodeURIComponent(card.slug)}`}>Compare similar</a>
               </div>
-              <p className="mt-3 rounded-2xl bg-slate-50 p-3 text-xs font-bold leading-5 text-slate-600">
-                {card.sourceTables.join(' + ') || 'Verified product index'} · {card.isAvailable ? 'priced row available' : 'availability not confirmed'}
-              </p>
+              <div className="mt-3 rounded-2xl bg-slate-50 p-3">
+                <EvidenceStrip
+                  evidence={{
+                    sourceLabel: card.sourceTables.join(' + ') || 'Verified product index',
+                    freshnessLabel: card.sortNewestObservedAt ? 'fresh' : 'unknown',
+                    confidence: card.sortConfidence,
+                    confidenceLabel: confidenceLabelFromScore(card.sortConfidence, 1),
+                    observationCount: card.isAvailable ? 1 : 0,
+                    lastObservedAt: card.sortNewestObservedAt || new Date(0).toISOString()
+                  }}
+                />
+              </div>
             </article>
           ))}
         </div>
