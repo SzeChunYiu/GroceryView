@@ -395,7 +395,7 @@ export default async function WatchlistPage({
               ))}
             </select>
             <input className="w-32 rounded-full border border-emerald-200 px-4 py-2 text-sm font-bold text-slate-950" min="0" name="target" placeholder="Target SEK" step="0.01" type="number" />
-            <button className="rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" type="submit">Save target</button>
+            <button className="rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" data-gv-event="watchlist_item_added" type="submit">Save target</button>
           </form>
           <p className="mt-2 text-xs font-semibold text-emerald-900">Daily watchlist alert jobs compare current effective unit prices with saved alert_target values before email or push delivery.</p>
         </div>

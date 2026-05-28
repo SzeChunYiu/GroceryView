@@ -750,6 +750,10 @@ export const GROCERYVIEW_ANALYTICS_EVENT_NAMES = [
   'preview_opened',
   'evidence_drawer_opened',
   'fuel_grade_selected',
+  'fuel_station_candidate_clicked',
+  'fuel_alert_set',
+  'pharmacy_product_clicked',
+  'pharmacy_ean_comparison_opened',
   'pharmacy_otc_alert_set',
   'watchlist_item_added'
 ] as const;
