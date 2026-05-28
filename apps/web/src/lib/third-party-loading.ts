@@ -54,7 +54,7 @@ export const thirdPartyInventory: ThirdPartyInventoryEntry[] = [
     notes: 'Current analytics events are first-party CustomEvents/dataLayer pushes gated by stored analytics consent.'
   },
   {
-    id: 'ads',
+    id: 'live_adsense_fill',
     category: 'ads',
     owner: 'web',
     consentCategory: 'ads',
