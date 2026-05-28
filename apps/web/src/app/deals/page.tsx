@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { GroceryViewSurfaceAnalytics } from '@/components/analytics/groceryview-surface-analytics';
 import { FeaturePlacementMap } from '@/components/feature-placement-map';
 import { PageShell } from '@/components/data-ui';
 import { PageQuestionHeader } from '@/components/mvp/handoff-content';
@@ -67,7 +68,8 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
   const totalDealRows = Math.max(1, data.deals.length);
 
   return (
-    <PageShell>
+    <PageShell data-gv-surface="deals">
+      <GroceryViewSurfaceAnalytics surface="deals" />
       <MvpBreadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Deals' }]} />
       <PageQuestionHeader
         eyebrow="Deals"
@@ -161,12 +163,27 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
               <article className="rounded-2xl border border-slate-200 bg-white p-4" key={deal.id}>
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <DealBadge label={deal.dealLabel} />
-                  <Link className="text-lg font-black text-emerald-800" href={productRoute(deal.product.id)}>
+                  <Link
+                    className="text-lg font-black text-emerald-800"
+                    data-gv-entity-id={deal.product.slug}
+                    data-gv-entity-type="product"
+                    data-gv-event="deal_card_clicked"
+                    data-gv-source-panel="deals_feed"
+                    href={productRoute(deal.product.id)}
+                  >
                     {formatSek(deal.currentPrice)}
                   </Link>
                 </div>
                 <h3 className="mt-2 text-xl font-black text-slate-950">
-                  <Link href={productRoute(deal.product.id)}>{deal.product.name}</Link>
+                  <Link
+                    data-gv-entity-id={deal.product.slug}
+                    data-gv-entity-type="product"
+                    data-gv-event="deal_card_clicked"
+                    data-gv-source-panel="deals_feed"
+                    href={productRoute(deal.product.id)}
+                  >
+                    {deal.product.name}
+                  </Link>
                 </h3>
                 <ul className="mt-2 list-disc space-y-1 pl-5 text-sm font-semibold text-slate-600">
                   {deal.reasons.map((reason) => (
@@ -217,7 +234,15 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
         {singlePortionDealFinder.length > 0 ? (
           <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
             {singlePortionDealFinder.map((deal) => (
-              <Link className="rounded-2xl border border-violet-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-violet-700" href={`/products/${deal.productSlug}`} key={deal.productSlug}>
+              <Link
+                className="rounded-2xl border border-violet-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-violet-700"
+                data-gv-entity-id={deal.productSlug}
+                data-gv-entity-type="product"
+                data-gv-event="deal_card_clicked"
+                data-gv-source-panel="single_portion_deals"
+                href={`/products/${deal.productSlug}`}
+                key={deal.productSlug}
+              >
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-800">{deal.chainLabel} · {deal.categoryLabel}</p>
                 <h3 className="mt-2 text-lg font-black leading-6 text-slate-950">{deal.productName}</h3>
                 <p className="mt-1 text-sm font-semibold text-slate-600">{deal.brand} · {deal.packageSizeLabel}</p>

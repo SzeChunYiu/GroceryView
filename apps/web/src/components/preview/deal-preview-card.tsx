@@ -6,6 +6,7 @@ import { DealBadge } from '@/components/mvp/deal-badge';
 import { EvidenceStrip } from '@/components/mvp/evidence-strip';
 import { formatDealLabel, formatSek } from '@/lib/mvp/format';
 import type { DealEvaluation } from '@/lib/mvp/types';
+import { trackGroceryViewEvent } from '@/lib/analytics';
 import { EvidenceDrawer } from './evidence-drawer';
 import { PreviewDrawer } from './preview-drawer';
 
@@ -37,12 +38,31 @@ export function DealPreviewCard({ deal }: DealPreviewCardProps) {
             aria-expanded={open}
             className="rounded-full bg-slate-950 px-3 py-1.5 text-xs font-black text-white"
             data-quick-view="deal"
-            onClick={() => setOpen(true)}
+            onClick={() => {
+              setOpen(true);
+              trackGroceryViewEvent({
+                eventName: 'preview_opened',
+                sourcePanel: 'deal_why_ranked',
+                entityType: 'product',
+                entityId: product.slug
+              });
+            }}
             type="button"
           >
-            Why ranked
+            Why this deal?
           </button>
-          <Link className="rounded-full border border-emerald-200 px-3 py-1.5 text-xs font-black text-emerald-900" href={fullPageHref}>
+          <Link
+            className="rounded-full border border-emerald-200 px-3 py-1.5 text-xs font-black text-emerald-900"
+            href={fullPageHref}
+            onClick={() => {
+              trackGroceryViewEvent({
+                eventName: 'deal_card_clicked',
+                sourcePanel: 'deals_feed',
+                entityType: 'product',
+                entityId: product.slug
+              });
+            }}
+          >
             Open product
           </Link>
         </div>

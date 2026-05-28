@@ -735,25 +735,117 @@ export function trackAffiliateOutboundClick(metadata: AffiliateLinkMetadata) {
   });
 }
 
-/** Spec event names from docs/specs/analytics-event-tracking.md */
-export const SPEC_ANALYTICS_EVENT_NAMES = [
+/** Canonical GroceryView events — docs/specs/analytics-event-tracking.md */
+export const GROCERYVIEW_ANALYTICS_EVENT_NAMES = [
   'search_submitted',
+  'search_filter_applied',
+  'search_sort_changed',
   'search_result_clicked',
   'product_opened',
-  'deal_opened',
   'deal_card_clicked',
   'market_filter_changed',
+  'market_heatmap_cell_clicked',
+  'map_marker_selected',
   'preview_opened',
   'evidence_drawer_opened',
+  'fuel_grade_selected',
+  'pharmacy_otc_alert_set',
   'watchlist_item_added'
 ] as const;
 
-export type SpecAnalyticsEventName = (typeof SPEC_ANALYTICS_EVENT_NAMES)[number];
+export type GroceryViewAnalyticsEventName = (typeof GROCERYVIEW_ANALYTICS_EVENT_NAMES)[number];
 
-export function trackSpecAnalyticsEvent(eventName: SpecAnalyticsEventName, payload: Record<string, unknown> = {}) {
-  publishConsentAwareAnalyticsEvent(eventName, {
-    ...payload,
-    observedAt: new Date().toISOString()
+/** @deprecated Use GroceryViewAnalyticsEventName */
+export type GroceryViewEventName = GroceryViewAnalyticsEventName;
+
+/** @deprecated Use GROCERYVIEW_ANALYTICS_EVENT_NAMES */
+export const SPEC_ANALYTICS_EVENT_NAMES = GROCERYVIEW_ANALYTICS_EVENT_NAMES;
+
+/** @deprecated Use GroceryViewAnalyticsEventName */
+export type SpecAnalyticsEventName = GroceryViewAnalyticsEventName;
+
+export type GroceryViewAnalyticsDomain = 'grocery' | 'pharmacy' | 'fuel';
+
+export type AnalyticsEvent = {
+  eventName: GroceryViewAnalyticsEventName;
+  occurredAt: string;
+  sessionId: string;
+  pagePath: string;
+  domain?: GroceryViewAnalyticsDomain;
+  entityType?: string;
+  entityId?: string;
+  sourcePanel?: string;
+  rank?: number;
+  filters?: Record<string, string>;
+  metadata?: Record<string, string | number | boolean>;
+};
+
+const analyticsSessionStorageKey = 'groceryview:analytics-session-id';
+const blockedAnalyticsMetadataKey = /email|name|query|search|term|phone|address|user|password|token|receipt/i;
+
+function currentAnalyticsSessionId() {
+  if (typeof window === 'undefined') return 'server-runtime';
+
+  try {
+    let sessionId = window.sessionStorage.getItem(analyticsSessionStorageKey);
+    if (!sessionId) {
+      sessionId = typeof crypto !== 'undefined' && 'randomUUID' in crypto
+        ? `gv_${crypto.randomUUID()}`
+        : `gv_${Date.now().toString(36)}`;
+      window.sessionStorage.setItem(analyticsSessionStorageKey, sessionId);
+    }
+    return sessionId;
+  } catch {
+    return 'anonymous';
+  }
+}
+
+function sanitizeAnalyticsMetadata(metadata?: Record<string, string | number | boolean>) {
+  if (!metadata) return undefined;
+
+  const next: Record<string, string | number | boolean> = {};
+  for (const [key, value] of Object.entries(metadata)) {
+    if (blockedAnalyticsMetadataKey.test(key)) continue;
+    if (typeof value === 'string' && value.length > 128) continue;
+    next[key] = value;
+  }
+
+  return Object.keys(next).length > 0 ? next : undefined;
+}
+
+function sanitizeAnalyticsFilters(filters?: Record<string, string>) {
+  if (!filters) return undefined;
+
+  const next: Record<string, string> = {};
+  for (const [key, value] of Object.entries(filters)) {
+    if (blockedAnalyticsMetadataKey.test(key)) continue;
+    const trimmed = value.trim();
+    if (!trimmed || trimmed.length > 64) continue;
+    next[key] = trimmed;
+  }
+
+  return Object.keys(next).length > 0 ? next : undefined;
+}
+
+export function trackGroceryViewEvent(
+  event: Omit<AnalyticsEvent, 'occurredAt' | 'sessionId' | 'pagePath'> & Partial<Pick<AnalyticsEvent, 'occurredAt' | 'sessionId' | 'pagePath'>>
+) {
+  const payload: AnalyticsEvent = {
+    ...event,
+    occurredAt: event.occurredAt ?? new Date().toISOString(),
+    sessionId: event.sessionId ?? currentAnalyticsSessionId(),
+    pagePath: event.pagePath ?? currentAnalyticsRoute(),
+    filters: sanitizeAnalyticsFilters(event.filters),
+    metadata: sanitizeAnalyticsMetadata(event.metadata)
+  };
+
+  publishConsentAwareAnalyticsEvent(payload.eventName, payload as unknown as Record<string, unknown>);
+}
+
+export function trackSpecAnalyticsEvent(eventName: GroceryViewAnalyticsEventName, payload: Record<string, unknown> = {}) {
+  trackGroceryViewEvent({
+    eventName,
+    metadata: payload as Record<string, string | number | boolean>
   });
 }
 

@@ -1,5 +1,6 @@
 import { calculateChainPriceIndex } from '@groceryview/core';
 import Link from 'next/link';
+import { GroceryViewSurfaceAnalytics } from '@/components/analytics/groceryview-surface-analytics';
 import { Card, Eyebrow, PageShell, SourceCitation } from '@/components/data-ui';
 import { SavedViewActions } from '@/components/saved-view-actions';
 import { StoreDistanceCard } from '@/components/StoreDistanceCard';
@@ -186,7 +187,8 @@ export default async function MapPage({ searchParams }: Readonly<{ searchParams?
   const filteredStores = storeUniverse.filter((store) => storeMatchesOperatingHoursFilter(store, selectedHoursFilter));
   const visibleStores = filteredStores.slice(0, 80);
   return (
-    <PageShell>
+    <PageShell data-gv-surface="map">
+      <GroceryViewSurfaceAnalytics surface="map" />
       <Eyebrow>Map data</Eyebrow>
       <p className="mt-3 text-sm font-black text-emerald-900">Where are grocery prices cheaper or more expensive?</p>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Grocery price map</h1>

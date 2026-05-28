@@ -6,6 +6,9 @@ import { useRef, useState } from 'react';
 import type { ConfidenceLabel, FreshnessLabel, ProductSummary } from '@/lib/mvp/types';
 import { formatSek } from '@/lib/mvp/format';
 import { productSlugHref } from '@/lib/mvp/routes';
+import { trackGroceryViewEvent } from '@/lib/analytics';
+import { EvidenceStrip } from '@/components/mvp/evidence-strip';
+import { confidenceLabelFromScore } from '@/lib/mvp/evidence';
 import { EvidenceDrawer } from './evidence-drawer';
 import { PreviewDrawer } from './preview-drawer';
 
@@ -16,6 +19,7 @@ export type SearchResultPreviewCardProps = Readonly<{
     brand: string;
     imageUrl?: string | null;
     categoryLabel: string;
+    categorySlug?: string;
     cheapestPrice: number | null;
     cheapestPriceLabel: string;
     unitPriceLabel: string;
@@ -39,7 +43,7 @@ function searchCardToProductSummary(card: SearchResultPreviewCardProps['card'], 
     slug: card.slug,
     name: card.name,
     brand: card.brand,
-    categorySlug: card.categoryLabel,
+    categorySlug: card.categorySlug ?? card.categoryLabel,
     categoryName: card.categoryLabel,
     imageUrl: card.imageUrl ?? undefined,
     currentBestPrice: card.cheapestPrice ?? undefined,
@@ -71,18 +75,52 @@ export function SearchResultPreviewCard({ card, sourceLabel = 'OpenPrices + chai
           <p className="mt-1 text-sm font-bold text-emerald-800">{card.unitPriceLabel}</p>
         </div>
         <p className="mt-3 text-xs font-bold text-slate-500">{card.chainLabel}</p>
+        <div className="mt-3 rounded-2xl bg-slate-50 p-3">
+          <EvidenceStrip
+            evidence={{
+              sourceLabel: sourceLabel,
+              freshnessLabel: card.sortNewestObservedAt ? 'fresh' : 'unknown',
+              confidence: card.sortConfidence,
+              confidenceLabel: confidenceLabelFromScore(card.sortConfidence),
+              observationCount: 1,
+              lastObservedAt: card.sortNewestObservedAt || new Date(0).toISOString()
+            }}
+          />
+        </div>
         <div className="mt-3 flex flex-wrap gap-2">
           <button
             ref={triggerRef}
             aria-expanded={open}
             className="rounded-full bg-slate-950 px-3 py-1.5 text-xs font-black text-white"
             data-quick-view="search-result"
-            onClick={() => setOpen(true)}
+            onClick={() => {
+              setOpen(true);
+              trackGroceryViewEvent({
+                eventName: 'preview_opened',
+                sourcePanel: 'search_result_quick_view',
+                entityType: 'product',
+                entityId: card.slug
+              });
+            }}
             type="button"
           >
             Quick view
           </button>
-          <Link className="rounded-full border border-emerald-200 bg-white px-3 py-1.5 text-xs font-black text-emerald-900" href={fullPageHref}>
+          <Link
+            className="rounded-full border border-emerald-200 bg-white px-3 py-1.5 text-xs font-black text-emerald-900"
+            data-gv-entity-id={card.slug}
+            data-gv-entity-type="product"
+            data-gv-event="product_opened"
+            href={fullPageHref}
+            onClick={() => {
+              trackGroceryViewEvent({
+                eventName: 'search_result_clicked',
+                sourcePanel: 'search_result_card',
+                entityType: 'product',
+                entityId: card.slug
+              });
+            }}
+          >
             Open product
           </Link>
         </div>

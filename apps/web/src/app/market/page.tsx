@@ -1,4 +1,7 @@
 import Link from 'next/link';
+import { GroceryViewSurfaceAnalytics } from '@/components/analytics/groceryview-surface-analytics';
+import { CategoryPreviewDrawer } from '@/components/preview/category-preview-drawer';
+import { PublicAdSlot } from '@/components/public-ad-slot';
 import { PageShell } from '@/components/data-ui';
 import { PageQuestionHeader, PanelPurpose } from '@/components/mvp/handoff-content';
 import { MvpBreadcrumbs } from '@/components/mvp/mvp-breadcrumbs';
@@ -102,7 +105,8 @@ export default async function MarketPage({ searchParams }: Readonly<{ searchPara
   const resolved = await (searchParams ?? Promise.resolve({}));
   const data = getMarketOverviewData(resolved);
   return (
-    <PageShell>
+    <PageShell data-gv-surface="market">
+      <GroceryViewSurfaceAnalytics surface="market" />
       <MvpBreadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Market' }]} />
       <PageQuestionHeader
         eyebrow="Market overview"
@@ -223,9 +227,12 @@ export default async function MarketPage({ searchParams }: Readonly<{ searchPara
                         <td className="py-3 pr-4 font-semibold">{row.threeMonthChangePct !== undefined ? `${row.threeMonthChangePct.toFixed(1)}%` : '—'}</td>
                         <td className="py-3 pr-4 font-semibold">{row.oneYearChangePct !== undefined ? `${row.oneYearChangePct.toFixed(1)}%` : '—'}</td>
                         <td className="py-3 pr-4">
-                          <Link className="font-mono text-xs font-black text-slate-700 underline" href={categoryMarketHref(row.categorySlug)}>
-                            {row.sparkline.map((point) => point.value.toFixed(0)).join(' → ') || 'No trend'}
-                          </Link>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <CategoryPreviewDrawer row={row} triggerLabel="Preview trend" />
+                            <Link className="font-mono text-xs font-black text-slate-700 underline" href={categoryMarketHref(row.categorySlug)}>
+                              {row.sparkline.map((point) => point.value.toFixed(0)).join(' → ') || 'Open chart'}
+                            </Link>
+                          </div>
                         </td>
                         <td className="py-3 pr-4 font-semibold">
                           <Link className="underline" href={`/search?chain=${encodeURIComponent(row.cheapestChain ?? '')}&category=${encodeURIComponent(row.categorySlug)}`}>
@@ -256,7 +263,10 @@ export default async function MarketPage({ searchParams }: Readonly<{ searchPara
                 valueLabel: row.weeklyChangePct !== undefined ? `${row.weeklyChangePct.toFixed(1)}% weekly` : 'trend pending',
                 signal: row.confidenceLabel,
                 tone: row.weeklyChangePct === undefined ? 'medium' : row.weeklyChangePct > 1 ? 'high' : 'low',
-                href: `/search?chain=${encodeURIComponent(series.chain.toLowerCase())}&category=${encodeURIComponent(row.categorySlug)}`
+                href: `/search?chain=${encodeURIComponent(series.chain.toLowerCase())}&category=${encodeURIComponent(row.categorySlug)}`,
+                entityType: 'category',
+                entityId: row.categorySlug,
+                analyticsEvent: 'market_heatmap_cell_clicked'
               })))}
             />
           </MvpSectionCard>
@@ -318,6 +328,10 @@ export default async function MarketPage({ searchParams }: Readonly<{ searchPara
             </Link>
           </MvpSectionCard>
         </aside>
+      </div>
+
+      <div className="mx-auto mt-8 w-full max-w-6xl">
+        <PublicAdSlot slotId="market_bottom" />
       </div>
     </PageShell>
   );
