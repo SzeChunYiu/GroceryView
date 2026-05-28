@@ -74,13 +74,19 @@ export function MvpHomePage() {
         <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">Domain cards</p>
         <div className="mt-3 grid gap-4 md:grid-cols-3">
           {[
-            { title: 'Compare groceries', detail: 'Browse verified grocery categories, deal leaders, and chain price evidence.', href: '/browse' },
-            { title: 'Compare OTC pharmacy prices', detail: 'Open public OTC catalog comparisons with exact EAN and safety boundaries.', href: '/pharmacy' },
-            { title: 'Compare fuel prices', detail: 'Review operator-level price per litre by grade without station pump-price overclaims.', href: '/fuel' }
+            { title: 'Compare groceries', detail: 'Browse verified grocery categories, deal leaders, and chain price evidence.', href: '/browse', source: 'verified grocery price rows', freshness: formatDate(data.snapshotGeneratedAt), confidence: `${data.productCount.toLocaleString('sv-SE')} products tracked`, limitation: 'No shelf stock guarantee.' },
+            { title: 'Compare OTC pharmacy prices', detail: 'Open public OTC catalog comparisons with exact EAN and safety boundaries.', href: '/pharmacy', source: 'public OTC catalog rows', freshness: 'source retrieved date', confidence: 'exact-EAN comparisons only', limitation: 'No prescription, medical advice, or stock claim.' },
+            { title: 'Compare fuel prices', detail: 'Review operator-level price per litre by grade without station pump-price overclaims.', href: '/fuel', source: 'operator price evidence + OSM stations', freshness: 'observed/retrieved source date', confidence: 'operator-level confidence', limitation: 'No station pump-price inference.' }
           ].map((domain) => (
             <Link className="rounded-3xl border border-emerald-100 bg-emerald-50 p-5 shadow-sm transition hover:-translate-y-0.5 hover:ring-2 hover:ring-emerald-200" href={domain.href} key={domain.title}>
               <h2 className="text-lg font-black text-emerald-950">{domain.title}</h2>
               <p className="mt-2 text-sm font-semibold leading-6 text-emerald-900">{domain.detail}</p>
+              <dl className="mt-3 grid gap-1 text-xs font-bold leading-5 text-emerald-950">
+                <div>source: {domain.source}</div>
+                <div>freshness: {domain.freshness}</div>
+                <div>confidence: {domain.confidence}</div>
+                <div className="rounded-xl bg-white/80 p-2 text-amber-950">limitation: {domain.limitation}</div>
+              </dl>
             </Link>
           ))}
         </div>

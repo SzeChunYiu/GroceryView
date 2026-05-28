@@ -95,6 +95,60 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
       { label: 'open detail', value: Math.max(1, pagedResultCards.length - index + 2) }
     ]
   }));
+  const allDomainResultCards = [
+    ...searchView.resultCards.slice(0, 3).map((card) => ({
+      id: `grocery-${card.slug}`,
+      type: 'Grocery product card',
+      title: card.name,
+      subtitle: `${card.brand ?? card.categoryLabel} · ${card.cheapestPriceLabel}`,
+      href: `/products/${card.slug}`,
+      mapHref: card.chainSlug ? `/map?domain=grocery&chain=${encodeURIComponent(card.chainSlug)}` : '/map?domain=grocery',
+      watchHref: `/watchlist?domain=grocery&product=${encodeURIComponent(card.slug)}`,
+      source: card.sourceTables.join(' + ') || 'Verified grocery product index',
+      freshness: card.sortNewestObservedAt ? String(card.sortNewestObservedAt).slice(0, 10) : 'freshness unavailable',
+      confidence: `${Math.round(Math.min(Math.max(card.sortConfidence ?? 0, 0), 1) * 100)}% confidence`,
+      limitation: card.isAvailable ? 'Grocery price evidence only; final shelf availability can differ by store.' : 'Availability not confirmed; no stock claim.'
+    })),
+    ...pharmacySearchView.cards.slice(0, 3).map((card) => ({
+      id: `pharmacy-${card.ean}`,
+      type: 'Pharmacy OTC card',
+      title: card.name,
+      subtitle: `${card.brand} · EAN ${card.ean} · ${card.priceLabel}`,
+      href: card.href,
+      mapHref: card.mapHref,
+      watchHref: card.alertHref,
+      source: card.sourceLabel,
+      freshness: card.retrievedAt,
+      confidence: `${card.comparisonCount} exact-EAN row${card.comparisonCount === 1 ? '' : 's'} · ${card.chainCount} chain${card.chainCount === 1 ? '' : 's'}`,
+      limitation: card.limitation
+    })),
+    ...fuelSearchView.gradeCards.slice(0, 2).map((card) => ({
+      id: `fuel-grade-${card.id}`,
+      type: 'Fuel grade/operator/station card',
+      title: card.label,
+      subtitle: `${card.operatorName} · ${card.priceLabel}`,
+      href: card.href,
+      mapHref: '/map?domain=fuel&layer=fuel-grade-availability',
+      watchHref: '/watchlist?domain=fuel',
+      source: card.sourceLabel,
+      freshness: card.freshnessLabel,
+      confidence: card.confidenceLabel,
+      limitation: card.limitation
+    })),
+    ...fuelSearchView.stationCards.slice(0, 2).map((station) => ({
+      id: `fuel-station-${station.osmId}`,
+      type: 'Fuel grade/operator/station card',
+      title: station.name,
+      subtitle: `${station.chain} · ${station.gradeAvailability}`,
+      href: station.href,
+      mapHref: station.mapHref,
+      watchHref: `/watchlist?domain=fuel&station=${station.osmId}`,
+      source: station.sourceLabel,
+      freshness: station.freshnessLabel,
+      confidence: 'OSM location evidence + tagged grade availability',
+      limitation: station.limitation
+    }))
+  ];
 
   const activeFilters = ['category', 'chain', 'type', 'region', 'store', 'dealLevel', 'sort']
     .map((key) => [key, firstParam(resolvedSearchParams, key)] as const)
@@ -116,6 +170,89 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
       </div>
     </section>
   );
+
+  if (selectedSearchDomain === 'all') {
+    return (
+      <PageShell data-gv-surface="search">
+        <GroceryViewSurfaceAnalytics surface="search" />
+        <PageQuestionHeader
+          eyebrow="Search"
+          question="Which grocery, pharmacy OTC, or fuel result should I open?"
+          title={query ? `All-domain results for “${query}”` : 'All-domain search'}
+          subtitle="Search across grocery products, Pharmacy OTC exact-EAN cards, and fuel grade/operator/station cards without mixing evidence types."
+          actions={
+            <form action="/search" className="flex min-w-[18rem] gap-2">
+              <input name="domain" type="hidden" value="all" />
+              <input className="min-w-0 flex-1 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold" defaultValue={query} name="q" placeholder="Search groceries, OTC, fuel…" type="search" />
+              <button className="rounded-full bg-slate-950 px-4 py-2 text-sm font-black text-white" type="submit">Search all</button>
+            </form>
+          }
+        />
+        {domainTabsNav}
+        <section className="mx-auto mt-6 w-full max-w-6xl" aria-label="All-domain search results">
+          <ChartShell
+            actionHref="/search?domain=all"
+            actionLabel="Reset all-domain search"
+            evidenceItems={[
+              `${searchView.resultCards.length} grocery product candidates`,
+              pharmacySearchView.evidenceSummary,
+              fuelSearchView.evidenceSummary,
+              'Every card shows source, freshness, confidence, and limitation before handoff.'
+            ]}
+            fallback={
+              <ChartTableFallback
+                caption="All-domain result cards"
+                columns={[
+                  { key: 'type', label: 'Result card type', render: (row: (typeof allDomainResultCards)[number]) => row.type },
+                  { key: 'title', label: 'Result', render: (row: (typeof allDomainResultCards)[number]) => row.title },
+                  { key: 'source', label: 'Source', render: (row: (typeof allDomainResultCards)[number]) => row.source },
+                  { key: 'limitation', label: 'Limitation', render: (row: (typeof allDomainResultCards)[number]) => row.limitation }
+                ]}
+                rows={allDomainResultCards}
+              />
+            }
+            hasData={allDomainResultCards.length > 0}
+            insightTitle="Cross-domain search command center"
+            plainSummary="All-domain search keeps Grocery product card, Pharmacy OTC card, and Fuel grade/operator/station card result types distinct while sharing route handoffs to detail, map, and watchlist."
+            userQuestion="Which domain result has enough evidence to open?"
+          >
+            <div className="grid gap-4 lg:grid-cols-3">
+              {allDomainResultCards.map((card) => (
+                <article className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm" key={card.id}>
+                  <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{card.type}</p>
+                  <h2 className="mt-1 text-xl font-black text-slate-950">{card.title}</h2>
+                  <p className="mt-1 text-sm font-bold text-slate-700">{card.subtitle}</p>
+                  <dl className="mt-4 grid gap-2 text-xs font-bold leading-5 text-slate-700">
+                    <div className="rounded-2xl bg-slate-50 p-3">
+                      <dt className="font-black text-slate-950">source</dt>
+                      <dd>{card.source}</dd>
+                    </div>
+                    <div className="rounded-2xl bg-slate-50 p-3">
+                      <dt className="font-black text-slate-950">freshness</dt>
+                      <dd>{card.freshness}</dd>
+                    </div>
+                    <div className="rounded-2xl bg-slate-50 p-3">
+                      <dt className="font-black text-slate-950">confidence</dt>
+                      <dd>{card.confidence}</dd>
+                    </div>
+                    <div className="rounded-2xl bg-amber-50 p-3 text-amber-950">
+                      <dt className="font-black">limitation</dt>
+                      <dd>{card.limitation}</dd>
+                    </div>
+                  </dl>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <Link className="rounded-full bg-slate-950 px-3 py-2 text-xs font-black text-white" data-gv-event="cross_domain_result_clicked" href={card.href}>Open detail</Link>
+                    <Link className="rounded-full bg-slate-100 px-3 py-2 text-xs font-black text-slate-900" href={card.mapHref}>Open map</Link>
+                    <Link className="rounded-full bg-slate-100 px-3 py-2 text-xs font-black text-slate-900" href={card.watchHref}>Save alert</Link>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </ChartShell>
+        </section>
+      </PageShell>
+    );
+  }
 
   if (selectedSearchDomain === 'pharmacy') {
     return (
