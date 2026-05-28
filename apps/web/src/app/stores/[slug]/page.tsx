@@ -1,7 +1,9 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { ConfidenceBadge } from '@/components/confidence-badge';
-import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { Card, PageShell, SourceCitation } from '@/components/data-ui';
+import { PageQuestionHeader } from '@/components/mvp/handoff-content';
 import { StoreMap } from '@/components/StoreMap';
 import { osmStores } from '@/lib/osm-stores';
 import {
@@ -177,22 +179,44 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
   return (
     <PageShell>
       <script dangerouslySetInnerHTML={{ __html: storeViewAnalyticsScript }} />
-      <Eyebrow>OSM store record</Eyebrow>
-      <p className="mt-3 text-sm font-black text-emerald-900">Is this store good for the products I need?</p>
-      <h1 className="mt-2 text-4xl font-black tracking-tight">{store.name}</h1>
-      <p className="mt-3 text-lg text-slate-700">
-        See store details, price level, best deals, product coverage, and data freshness. {store.brand} · {store.format}
-      </p>
+      <PageQuestionHeader
+        eyebrow="OSM store record"
+        question="Is this store good for the products I need?"
+        title={store.name}
+        subtitle={`See store details, price level, best deals, product coverage, and data freshness. ${store.brand} · ${store.format}`}
+        actions={
+          <>
+            <Link className="rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" href={`/search?store=${encodeURIComponent(store.slug)}`}>
+              Search products in this store
+            </Link>
+            <Link className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-black text-emerald-900" href={`/deals?store=${encodeURIComponent(store.slug)}`}>
+              Deals at this store
+            </Link>
+            <Link className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-black text-emerald-900" href={`/map?store=${encodeURIComponent(store.slug)}`}>
+              Open map
+            </Link>
+          </>
+        }
+      />
+      <div className="mt-4">
+        <SourceCitation
+          confidenceLabel={`${pricePercentileRank.confidenceLabel} · ${pricePercentileRank.coverageLabel}`}
+          connectorRun={`storeUniverse OSM snapshot · ${assortmentOverview.statusLabel}`}
+          href="/data-sources"
+          observedAt={store.retrievedDate}
+          sourceLabel={`${store.source} · ${openingHoursLabel}`}
+        />
+      </div>
       <div className="mt-4 flex flex-wrap gap-2">
-        <a className="rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" href={`/search?store=${encodeURIComponent(store.slug)}`}>
+        <Link className="rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" href={`/search?store=${encodeURIComponent(store.slug)}`}>
           Search products in this store
-        </a>
-        <a className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-black text-emerald-900" href={`/deals?store=${encodeURIComponent(store.slug)}`}>
-          See deals at this store
-        </a>
-        <a className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-black text-emerald-900" href={`/map?store=${encodeURIComponent(store.slug)}`}>
+        </Link>
+        <Link className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-black text-emerald-900" href={`/deals?store=${encodeURIComponent(store.slug)}`}>
+          Deals at this store
+        </Link>
+        <Link className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-black text-emerald-900" href={`/map?store=${encodeURIComponent(store.slug)}`}>
           Open map
-        </a>
+        </Link>
       </div>
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <Card>
@@ -241,6 +265,14 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
             {assortmentOverview.statusLabel}
           </p>
           <p className="mt-4 text-sm leading-6 text-slate-700">{assortmentOverview.sourceLabel}</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Link className="rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" href={`/search?store=${encodeURIComponent(store.slug)}`}>
+              Search products at this store
+            </Link>
+            <Link className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-black text-emerald-900" href={`/deals?store=${encodeURIComponent(store.slug)}`}>
+              Deals at this store
+            </Link>
+          </div>
           {assortmentOverview.categories.length > 0 ? (
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               {assortmentOverview.categories.map((category) => (
@@ -258,14 +290,14 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
           {assortmentOverview.items.length > 0 ? (
             <div className="mt-4 grid gap-3">
               {assortmentOverview.items.slice(0, 24).map((item) => (
-                <div className="rounded-2xl border border-slate-200 p-4" key={item.id}>
+                <Link className="rounded-2xl border border-slate-200 p-4 transition hover:-translate-y-0.5 hover:ring-2 hover:ring-emerald-200" href={`/products/${encodeURIComponent(item.id)}`} key={item.id}>
                   <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">{item.category}</p>
                   <p className="mt-1 font-black">{item.name}</p>
                   <p className="mt-1 text-sm font-bold text-slate-700">
                     {item.priceLabel} · {item.unitPriceLabel} · {item.packageLabel}
                   </p>
                   <p className="mt-1 text-xs font-bold text-slate-500">{item.validWindow}</p>
-                </div>
+                </Link>
               ))}
             </div>
           ) : (
@@ -304,8 +336,10 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
                   <ul className="mt-2 space-y-2">
                     {plan.suggestions.map((suggestion) => (
                       <li className="rounded-xl bg-emerald-50 p-3 text-sm font-semibold text-emerald-950" key={suggestion.slug}>
+                        <Link className="block underline decoration-emerald-300 underline-offset-4" href={`/products/${encodeURIComponent(suggestion.slug)}`}>
                         <span className="block font-black">{suggestion.name} · {suggestion.totalPriceLabel}</span>
                         {suggestion.reason} · {suggestion.nutritionImpactLabel}
+                        </Link>
                       </li>
                     ))}
                   </ul>
