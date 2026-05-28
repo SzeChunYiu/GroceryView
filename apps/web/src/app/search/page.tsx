@@ -161,6 +161,8 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
         {domainTabs.map((tab) => (
           <Link
             className={selectedSearchDomain === tab.value ? 'rounded-full bg-slate-950 px-4 py-2 text-sm font-black text-white' : 'rounded-full bg-slate-100 px-4 py-2 text-sm font-black text-slate-800'}
+            data-gv-event="search_filter_applied"
+            data-gv-filter-domain={tab.value}
             href={tab.href}
             key={tab.value}
           >
@@ -184,7 +186,7 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
             <form action="/search" className="flex min-w-[18rem] gap-2">
               <input name="domain" type="hidden" value="all" />
               <input className="min-w-0 flex-1 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold" defaultValue={query} name="q" placeholder="Search groceries, OTC, fuel…" type="search" />
-              <button className="rounded-full bg-slate-950 px-4 py-2 text-sm font-black text-white" type="submit">Search all</button>
+              <button className="rounded-full bg-slate-950 px-4 py-2 text-sm font-black text-white" data-gv-event="search_submitted" type="submit">Search all</button>
             </form>
           }
         />
@@ -243,7 +245,7 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
                   <div className="mt-4 flex flex-wrap gap-2">
                     <Link className="rounded-full bg-slate-950 px-3 py-2 text-xs font-black text-white" data-gv-event="cross_domain_result_clicked" href={card.href}>Open detail</Link>
                     <Link className="rounded-full bg-slate-100 px-3 py-2 text-xs font-black text-slate-900" href={card.mapHref}>Open map</Link>
-                    <Link className="rounded-full bg-slate-100 px-3 py-2 text-xs font-black text-slate-900" href={card.watchHref}>Save alert</Link>
+                    <Link className="rounded-full bg-slate-100 px-3 py-2 text-xs font-black text-slate-900" data-gv-event="watchlist_item_added" href={card.watchHref}>Save alert</Link>
                   </div>
                 </article>
               ))}
@@ -267,7 +269,7 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
             <form action="/search" className="flex min-w-[18rem] gap-2">
               <input name="domain" type="hidden" value="pharmacy" />
               <input className="min-w-0 flex-1 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold" defaultValue={query} name="q" placeholder="Search alvedon, ipren, EAN" type="search" />
-              <button className="rounded-full bg-sky-800 px-4 py-2 text-sm font-black text-white" type="submit">Search OTC</button>
+              <button className="rounded-full bg-sky-800 px-4 py-2 text-sm font-black text-white" data-gv-event="search_submitted" type="submit">Search OTC</button>
             </form>
           }
         />
@@ -310,7 +312,7 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
                     <Link className="rounded-full bg-sky-900 px-3 py-2 text-xs font-black text-white" data-gv-event="pharmacy_product_clicked" href={`/pharmacy/${card.ean}`}>Open product</Link>
                     <Link className="rounded-full bg-emerald-50 px-3 py-2 text-xs font-black text-emerald-950" data-gv-event="pharmacy_ean_comparison_opened" href={`/pharmacy/${card.ean}`}>Exact EAN comparison</Link>
                     <Link className="rounded-full bg-slate-100 px-3 py-2 text-xs font-black text-slate-900" href={`/map?domain=pharmacy&pharmacy=${card.chain}`}>Open map source</Link>
-                    <Link className="rounded-full bg-slate-100 px-3 py-2 text-xs font-black text-slate-900" href={card.alertHref}>Set alert</Link>
+                    <Link className="rounded-full bg-slate-100 px-3 py-2 text-xs font-black text-slate-900" data-gv-event="pharmacy_otc_alert_set" href={card.alertHref}>Set alert</Link>
                   </div>
                 </article>
               ))}
@@ -337,7 +339,7 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
             <form action="/search" className="flex min-w-[18rem] gap-2">
               <input name="domain" type="hidden" value="fuel" />
               <input className="min-w-0 flex-1 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold" defaultValue={query} name="q" placeholder="Search diesel, 95, OKQ8" type="search" />
-              <button className="rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" type="submit">Search fuel</button>
+              <button className="rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" data-gv-event="search_submitted" type="submit">Search fuel</button>
             </form>
           }
         />
@@ -411,7 +413,7 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
         </section>
         <section className="mx-auto mt-6 w-full max-w-6xl rounded-3xl border border-emerald-200 bg-emerald-50 p-4 shadow-sm">
           <p className="text-sm font-black text-emerald-950">Fuel watchlist handoff</p>
-          <Link className="mt-2 inline-flex rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" href="/watchlist?domain=fuel">Set a fuel target alert</Link>
+          <Link className="mt-2 inline-flex rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" data-gv-event="fuel_alert_set" href="/watchlist?domain=fuel">Set a fuel target alert</Link>
         </section>
       </PageShell>
     );
@@ -429,7 +431,7 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
           <form action="/search" className="flex min-w-[18rem] gap-2">
             {activeFilters.map(([key, value]) => key !== 'q' ? <input key={key} name={key} type="hidden" value={value} /> : null)}
             <input className="min-w-0 flex-1 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold" defaultValue={query} name="q" placeholder="Search within list" type="search" />
-            <button className="rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" type="submit">Search</button>
+            <button className="rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" data-gv-event="search_submitted" type="submit">Search</button>
           </form>
         }
       />

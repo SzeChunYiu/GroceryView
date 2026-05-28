@@ -13,6 +13,32 @@ Aligned with [77 — Analytics Event Tracking Spec](../handoff/groceryview-31-on
 
 ## Event contract
 
+## Canonical public analytics events
+
+These names must match `GROCERYVIEW_ANALYTICS_EVENT_NAMES` in `apps/web/src/lib/analytics.ts`.
+
+```text
+search_submitted
+search_filter_applied
+search_sort_changed
+search_result_clicked
+product_opened
+deal_card_clicked
+deal_opened
+market_filter_changed
+market_heatmap_cell_clicked
+map_marker_selected
+preview_opened
+evidence_drawer_opened
+fuel_grade_selected
+fuel_station_candidate_clicked
+fuel_alert_set
+pharmacy_product_clicked
+pharmacy_ean_comparison_opened
+pharmacy_otc_alert_set
+watchlist_item_added
+```
+
 ```ts
 type AnalyticsEvent = {
   eventName: string;
@@ -59,6 +85,7 @@ type AnalyticsEvent = {
 |------------|-------|---------|
 | Deals tabs | `deal_tab_selected` | Tab change |
 | Deal card | `deal_card_clicked` | Card navigation |
+| Deal detail open | `deal_opened` | Deal explanation/preview opened |
 | Deal explainer | `deal_explanation_opened` | Score methodology panel |
 
 ### Market
@@ -78,6 +105,28 @@ type AnalyticsEvent = {
 | Marker | `map_marker_selected` | Marker tap |
 | Store sheet | `map_store_opened` | Store detail |
 | List fallback | `map_list_fallback_used` | No geo permission |
+
+### Fuel
+
+| UI surface | Event | Trigger | Payload notes |
+|------------|-------|---------|---------------|
+| Grade result card | `fuel_grade_selected` | User chooses petrol/diesel grade | `domain=fuel`, `entityType=fuel_grade` |
+| Station candidate | `fuel_station_candidate_clicked` | User opens a station candidate from fuel search | `entityType=fuel_station`, `entityId=osmId` |
+| Fuel alert CTA | `fuel_alert_set` | User starts fuel grade/station alert flow | Aggregate only; no raw location stored |
+
+### Pharmacy
+
+| UI surface | Event | Trigger | Payload notes |
+|------------|-------|---------|---------------|
+| OTC result card | `pharmacy_product_clicked` | User opens exact OTC/EAN product | `domain=pharmacy`, `entityType=otc_product` |
+| EAN comparison | `pharmacy_ean_comparison_opened` | User opens exact-EAN comparison | `entityId=ean` |
+| OTC alert CTA | `pharmacy_otc_alert_set` | User starts pharmacy alert flow | Aggregate only |
+
+### Watchlist
+
+| UI surface | Event | Trigger | Payload notes |
+|------------|-------|---------|---------------|
+| Add/save alert | `watchlist_item_added` | User saves grocery/pharmacy/fuel watch target | `entityType` identifies domain object |
 
 ### Funnel (aggregate, web)
 

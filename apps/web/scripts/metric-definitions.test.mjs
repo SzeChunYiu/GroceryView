@@ -12,12 +12,17 @@ const canonicalEvents = [
   'search_result_clicked',
   'product_opened',
   'deal_card_clicked',
+  'deal_opened',
   'market_filter_changed',
   'market_heatmap_cell_clicked',
   'map_marker_selected',
   'preview_opened',
   'evidence_drawer_opened',
   'fuel_grade_selected',
+  'fuel_station_candidate_clicked',
+  'fuel_alert_set',
+  'pharmacy_product_clicked',
+  'pharmacy_ean_comparison_opened',
   'pharmacy_otc_alert_set',
   'watchlist_item_added'
 ];

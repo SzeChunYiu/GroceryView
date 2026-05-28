@@ -162,6 +162,84 @@ Each metric uses the semantic shape from handoff 70. Public claim boundaries pre
 
 ---
 
+## deal_card_click_rate
+
+| Field | Value |
+|-------|-------|
+| **Definition** | Share of deal impressions that produce a deal-card click or open action. |
+| **Formula** | `count(deal_card_clicked) / count(deal impressions)` using aggregate deal surface counters. |
+| **Source tables** | `analytics_events`, deal impression aggregates |
+| **Owner** | analytics |
+| **Grain** | domain × deal surface × day |
+| **Claim boundary** | Engagement metric only; does not prove redemption or checkout savings. |
+
+---
+
+## preview_open_rate
+
+| Field | Value |
+|-------|-------|
+| **Definition** | Share of preview-capable result cards that open a quick-view drawer. |
+| **Formula** | `count(preview_opened) / count(preview-capable card impressions)`. |
+| **Source tables** | `analytics_events`, runtime card-impression aggregates |
+| **Owner** | analytics |
+| **Grain** | route × domain × day |
+| **Claim boundary** | Aggregate only; preview opens cannot include raw search terms or user identifiers. |
+
+---
+
+## evidence_drawer_open_rate
+
+| Field | Value |
+|-------|-------|
+| **Definition** | Share of product, deal, or market cards where shoppers open source/freshness/confidence evidence. |
+| **Formula** | `count(evidence_drawer_opened) / count(cards with evidence drawer)`. |
+| **Source tables** | `analytics_events`, evidence surface aggregates |
+| **Owner** | analytics |
+| **Grain** | route × domain × day |
+| **Claim boundary** | Measures evidence engagement, not evidence correctness; data-quality reports own correctness. |
+
+---
+
+## fuel_grade_selection_rate
+
+| Field | Value |
+|-------|-------|
+| **Definition** | Share of fuel search sessions where a shopper selects a fuel grade card. |
+| **Formula** | `count(fuel_grade_selected) / count(search_submitted where domain = 'fuel')`. |
+| **Source tables** | `analytics_events`, fuel search aggregates |
+| **Owner** | analytics |
+| **Grain** | fuel grade × region × day |
+| **Claim boundary** | Does not store raw location or route; region is bucketed. |
+
+---
+
+## pharmacy_alert_set_rate
+
+| Field | Value |
+|-------|-------|
+| **Definition** | Share of pharmacy OTC product sessions that start an OTC alert flow. |
+| **Formula** | `count(pharmacy_otc_alert_set) / count(pharmacy_product_clicked or pharmacy_ean_comparison_opened)`. |
+| **Source tables** | `analytics_events`, watchlist alert aggregates |
+| **Owner** | product |
+| **Grain** | OTC product/EAN × day |
+| **Claim boundary** | Alert starts are not notification delivery guarantees. |
+
+---
+
+## watchlist_add_rate
+
+| Field | Value |
+|-------|-------|
+| **Definition** | Share of detail/search/map sessions that add a grocery, pharmacy, fuel, or saved market-view watchlist target. |
+| **Formula** | `count(watchlist_item_added) / count(eligible watchlist CTA impressions)`. |
+| **Source tables** | `analytics_events`, `watchlist_items`, runtime CTA-impression aggregates |
+| **Owner** | product |
+| **Grain** | domain × entity_type × day |
+| **Claim boundary** | Add rate is aggregate; account-bound watchlist state remains governed by auth and privacy rules. |
+
+---
+
 ## watchlist_alert_trigger_rate
 
 | Field | Value |
@@ -192,4 +270,5 @@ Each metric uses the semantic shape from handoff 70. Public claim boundaries pre
 
 | Date | Change |
 |------|--------|
+| 2026-05-28 | Added cross-domain product analytics rates for deals, previews, evidence, fuel, pharmacy, and watchlist closure. |
 | 2026-05-28 | Initial dictionary (Agent 5): 14 metrics with formulas and owners. |

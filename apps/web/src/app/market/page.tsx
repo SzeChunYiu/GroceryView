@@ -153,7 +153,7 @@ export default async function MarketPage({ searchParams }: Readonly<{ searchPara
                 </select>
               </label>
             ))}
-            <button className="rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" type="submit">
+            <button className="rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" data-gv-event="market_filter_changed" type="submit">
               Apply
             </button>
           </form>

@@ -373,7 +373,7 @@ export default async function MapPage({ searchParams }: Readonly<{ searchParams?
               <p className="mt-2 text-xs font-bold text-amber-900">{selectedFuelStation.sourceLabel} · refreshed {selectedFuelStation.freshnessLabel}</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 <Link className="rounded-full bg-amber-900 px-3 py-2 text-xs font-black text-white" href={`/fuel/stations/${selectedFuelStation.station.osmId}`}>Open fuel station detail</Link>
-                <Link className="rounded-full bg-white px-3 py-2 text-xs font-black text-amber-950" href={selectedFuelStation.watchlistHref}>Save fuel station</Link>
+                <Link className="rounded-full bg-white px-3 py-2 text-xs font-black text-amber-950" data-gv-event="fuel_alert_set" href={selectedFuelStation.watchlistHref}>Save fuel station</Link>
               </div>
             </div>
           ) : selectedDomain === 'fuel' ? (
