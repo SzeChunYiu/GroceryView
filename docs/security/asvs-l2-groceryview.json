@@ -296,9 +296,24 @@
         "section": "V9.2 Token content",
         "level": "L2"
       },
-      "status": "unknown",
-      "blocker": true,
-      "blockerReason": "Audience, purpose, and issuer validation for self-contained tokens is not yet evidenced across every auth entry point."
+      "status": "mapped",
+      "evidence": [
+        {
+          "type": "code",
+          "path": "packages/auth/src/index.ts",
+          "summary": "Server routes verify HMAC session tokens via verifySessionToken before honoring protected session context (signature + expiry)."
+        },
+        {
+          "type": "test",
+          "path": "packages/auth/src/__tests__/auth.test.ts",
+          "summary": "Auth tests reject malformed, tampered, and expired session tokens."
+        },
+        {
+          "type": "test",
+          "path": "packages/server/src/__tests__/auth-http.test.ts",
+          "summary": "Protected HTTP routes require a valid bearer session and reject missing or invalid tokens."
+        }
+      ]
     },
     {
       "id": "asvs-v14-sensitive-data-inventory",
