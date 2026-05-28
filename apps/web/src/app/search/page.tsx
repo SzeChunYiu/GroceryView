@@ -14,6 +14,7 @@ import { buildMisspelledQueryRecovery } from '@/lib/search-suggest';
 import { phoneticSearchBadgesForQuery } from '@/lib/search-filters';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
 import { buildFuelDomainSearchView } from '@/lib/fuel-domain';
+import { buildPharmacyDomainSearchView } from '@/lib/pharmacy-domain';
 import { buildProductSearchView } from '@/lib/verified-data';
 
 type SearchPageParams = Record<string, string | string[] | undefined>;
@@ -68,6 +69,7 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
   const query = Array.isArray(resolvedSearchParams.q) ? resolvedSearchParams.q[0] ?? '' : resolvedSearchParams.q ?? '';
   const selectedSearchDomain = firstParam(resolvedSearchParams, 'domain') || 'grocery';
   const fuelSearchView = buildFuelDomainSearchView(resolvedSearchParams);
+  const pharmacySearchView = buildPharmacyDomainSearchView(resolvedSearchParams);
   const searchView = buildProductSearchView(resolvedSearchParams);
   const offset = cursorOffset(resolvedSearchParams);
   const pagedResultCards = searchView.resultCards.slice(offset, offset + SEARCH_PAGE_SIZE);
@@ -114,6 +116,76 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
       </div>
     </section>
   );
+
+  if (selectedSearchDomain === 'pharmacy') {
+    return (
+      <PageShell data-gv-surface="search">
+        <GroceryViewSurfaceAnalytics surface="search" />
+        <PageQuestionHeader
+          eyebrow="Search"
+          question="Which OTC exact-EAN pharmacy rows match my query?"
+          title={query ? `Pharmacy OTC results for “${query}”` : 'Pharmacy OTC search'}
+          subtitle="Search public OTC catalog rows by name, brand, chain, or exact EAN. Every card keeps no prescription or medical advice boundaries visible."
+          actions={
+            <form action="/search" className="flex min-w-[18rem] gap-2">
+              <input name="domain" type="hidden" value="pharmacy" />
+              <input className="min-w-0 flex-1 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold" defaultValue={query} name="q" placeholder="Search alvedon, ipren, EAN" type="search" />
+              <button className="rounded-full bg-sky-800 px-4 py-2 text-sm font-black text-white" type="submit">Search OTC</button>
+            </form>
+          }
+        />
+        {domainTabsNav}
+        <section className="mx-auto mt-6 w-full max-w-6xl" aria-label="Pharmacy OTC search results">
+          <ChartShell
+            actionHref="/search?domain=pharmacy"
+            actionLabel="Reset pharmacy search"
+            evidenceItems={[
+              pharmacySearchView.evidenceSummary,
+              'Pharmacy cards route to /pharmacy/[ean]',
+              'Map actions route to /map?domain=pharmacy&pharmacy=[chain]'
+            ]}
+            fallback={
+              <ChartTableFallback
+                caption="Pharmacy OTC search fallback"
+                columns={[
+                  { key: 'name', label: 'OTC product', render: (row: { name: string }) => row.name },
+                  { key: 'ean', label: 'EAN', render: (row: { ean: string }) => row.ean },
+                  { key: 'limitation', label: 'Limitation', render: (row: { limitation: string }) => row.limitation }
+                ]}
+                rows={pharmacySearchView.cards}
+              />
+            }
+            hasData={pharmacySearchView.resultCount > 0}
+            insightTitle="Pharmacy OTC domain search"
+            plainSummary="Pharmacy search returns OTC cards keyed by exact EAN and separates public catalog price evidence from stock, prescription, or medical-advice claims."
+            userQuestion="Which OTC exact-EAN card should I compare?"
+          >
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {pharmacySearchView.cards.map((card) => (
+                <article className="rounded-3xl border border-sky-100 bg-white p-5 shadow-sm" key={card.ean}>
+                  <p className="text-xs font-black uppercase tracking-[0.16em] text-sky-800">pharmacy_otc_product</p>
+                  <h2 className="mt-1 text-xl font-black text-slate-950">{card.name}</h2>
+                  <p className="mt-1 text-sm font-bold text-slate-600">{card.brand} · EAN {card.ean}</p>
+                  <p className="mt-3 text-2xl font-black text-emerald-800">{card.priceLabel}</p>
+                  <p className="mt-2 text-xs font-bold leading-5 text-slate-600">{card.chainLabel} · {card.sourceLabel} · refreshed {card.retrievedAt}</p>
+                  <p className="mt-3 rounded-2xl bg-amber-50 p-3 text-xs font-black leading-5 text-amber-950">{card.limitation}</p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <Link className="rounded-full bg-sky-900 px-3 py-2 text-xs font-black text-white" data-gv-event="pharmacy_product_clicked" href={`/pharmacy/${card.ean}`}>Open product</Link>
+                    <Link className="rounded-full bg-emerald-50 px-3 py-2 text-xs font-black text-emerald-950" data-gv-event="pharmacy_ean_comparison_opened" href={`/pharmacy/${card.ean}`}>Exact EAN comparison</Link>
+                    <Link className="rounded-full bg-slate-100 px-3 py-2 text-xs font-black text-slate-900" href={`/map?domain=pharmacy&pharmacy=${card.chain}`}>Open map source</Link>
+                    <Link className="rounded-full bg-slate-100 px-3 py-2 text-xs font-black text-slate-900" href={card.alertHref}>Set alert</Link>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {pharmacySearchView.resultCount === 0 ? (
+              <p className="mt-4 rounded-2xl bg-white p-4 text-sm font-black text-amber-950">{pharmacySearchView.emptyState}</p>
+            ) : null}
+          </ChartShell>
+        </section>
+      </PageShell>
+    );
+  }
 
   if (selectedSearchDomain === 'fuel') {
     return (
