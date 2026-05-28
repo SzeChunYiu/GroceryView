@@ -1,6 +1,6 @@
 const terminalUrls = [
   'http://127.0.0.1:3000/',
-  'http://127.0.0.1:3000/products',
+  'http://127.0.0.1:3000/search',
   'http://127.0.0.1:3000/compare',
   'http://127.0.0.1:3000/data-sources'
 ];
