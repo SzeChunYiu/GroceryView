@@ -77,3 +77,18 @@ test('search, deals, market, and map pages wire groceryview surface analytics', 
   assert.match(searchBar, /trackGroceryViewEvent\(/);
   assert.match(searchBar, /search_submitted/);
 });
+
+test('metric dictionary gap summary counts stay consistent', async () => {
+  const gapRegistry = await readFile(
+    new URL('../../../docs/roadmap/atomic-gap-registry.md', import.meta.url),
+    'utf8'
+  );
+
+  assert.match(gapRegistry, /### `metric-dictionary-not-centralized`[\s\S]*\| status \| done \|/);
+
+  const doneMatch = gapRegistry.match(/\| done \| (\d+) \|/);
+  const openMatch = gapRegistry.match(/\| open \| (\d+) \|/);
+  assert.ok(doneMatch, 'gap registry should declare done count');
+  assert.ok(openMatch, 'gap registry should declare open count');
+  assert.equal(Number.parseInt(doneMatch[1], 10) + Number.parseInt(openMatch[1], 10), 10, 'open + done should equal total gaps');
+});

@@ -41,8 +41,8 @@ Living registry for the implement-everything lock pack. Every feature is **IMPLE
 | idempotency_helper | data | IMPLEMENT_NOW_DATA | IMPLEMENTED | `packages/ingestion/src/pipeline.ts` |
 | gold_publish_gate | data | IMPLEMENT_NOW_DATA | IMPLEMENTED | `docs/data/quality-gates.md` |
 | db_health_scripts | data | IMPLEMENT_NOW_DATA | IMPLEMENTED | `npm run ops:check-supabase-health`, DB ops scripts |
-| metric_dictionary | data | IMPLEMENT_NOW_DATA | IMPLEMENTED | `docs/data/metric-dictionary.md`, `packages/metrics` |
-| event_tracking_plan | data | IMPLEMENT_NOW_DATA | IMPLEMENTED | `docs/data/event-tracking-plan.md`, `docs/specs/analytics-event-tracking.md` |
+| metric_dictionary | data | IMPLEMENT_NOW_DATA | IMPLEMENTED | `docs/data/metric-dictionary.md`, `packages/metrics/src/definitions.ts`, `metric-definitions.test.mjs` |
+| event_tracking_plan | data | IMPLEMENT_NOW_DATA | TEST_ONLY | `docs/data/event-tracking-plan.md`, `trackGroceryViewEvent` (`search_submitted` only); gap `analytics-event-naming-gap` |
 | adslot | ads | IMPLEMENT_NOW_PUBLIC | IMPLEMENTED | `components/design-system/ad-slot.tsx`, `lib/ad-slots.ts` |
 | ad_policy | ads | IMPLEMENT_NOW_PUBLIC | IMPLEMENTED | `lib/ad-policy.ts` |
 | ad_tests | ads | IMPLEMENT_NOW_PUBLIC | IMPLEMENTED | `scripts/ad-slot-contracts.test.mjs` |
@@ -56,6 +56,6 @@ Living registry for the implement-everything lock pack. Every feature is **IMPLE
 
 ## Registry meta
 
-- **Total registered:** 40 (+ 2 deferred)
+- **Total registered:** 39 (+ 2 deferred)
 - **Orphans allowed:** 0
 - **Enforced by:** `apps/web/scripts/feature-implementation-registry.test.mjs`

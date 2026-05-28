@@ -33,3 +33,9 @@ test('public routes avoid backstage debug phrases', async () => {
     }
   }
 });
+
+test('search page uses shopper-facing result counts instead of cursor jargon', async () => {
+  const searchPage = await readFile(new URL('../src/app/search/page.tsx', import.meta.url), 'utf8');
+  assert.match(searchPage, /Showing .*matching products/);
+  assert.doesNotMatch(searchPage, /Server-side cursor pagination/i);
+});
