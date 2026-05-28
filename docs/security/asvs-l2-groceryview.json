@@ -332,9 +332,29 @@
         "section": "V14.2 General Data Protection",
         "level": "L2"
       },
-      "status": "unknown",
-      "blocker": true,
-      "blockerReason": "Sensitive-data cache prevention is partially represented in route code, but no single L2 evidence contract covers web, API, and mobile caches."
+      "status": "mapped",
+      "evidence": [
+        {
+          "type": "documentation",
+          "path": "docs/security/sensitive-data-cache-and-logging.md",
+          "summary": "Shared ASVS L2 contract states private account data is no-store in web caches and redacted before mobile persistence."
+        },
+        {
+          "type": "code",
+          "path": "apps/web/src/lib/cache-policy.ts",
+          "summary": "Account, watchlist, settings, scanner, alert, and user-specific API paths map to privateAccountCacheControl = private, no-store."
+        },
+        {
+          "type": "test",
+          "path": "apps/web/scripts/cache-policy-headers.test.mjs",
+          "summary": "Cache policy tests assert account and user-specific routes stay out of edge caches."
+        },
+        {
+          "type": "code",
+          "path": "apps/mobile/src/queryCache.ts",
+          "summary": "Mobile cache plan partitions by user, purges on sign-out, bounds persisted age, and redacts receipt images, auth tokens, and precise location before persistence."
+        }
+      ]
     },
     {
       "id": "asvs-v16-security-logging",
@@ -368,9 +388,24 @@
         "section": "V16.2 General Logging",
         "level": "L2"
       },
-      "status": "unknown",
-      "blocker": true,
-      "blockerReason": "Sensitive-field redaction before application logging is not yet mapped to one shared logger contract."
+      "status": "mapped",
+      "evidence": [
+        {
+          "type": "documentation",
+          "path": "docs/security/sensitive-data-cache-and-logging.md",
+          "summary": "Shared logging contract forbids request bodies, headers, query strings, account identifiers, receipt contents, watchlist targets, and tokens in application logs."
+        },
+        {
+          "type": "code",
+          "path": "apps/api/src/middleware/logger.ts",
+          "summary": "Structured API logger allowlists method, path without query string, status, duration, request id, and timestamp only."
+        },
+        {
+          "type": "test",
+          "path": "apps/api/test/request-logging.e2e-spec.ts",
+          "summary": "Request logging test verifies the emitted structured log shape and request id propagation."
+        }
+      ]
     }
   ]
 }
