@@ -14,10 +14,11 @@ export const GOLD_PUBLISH_CRITICAL_GATES = [
 function evaluateGoldPublishGate({ qualityReport, sourceRunReport, domain, region }) {
   const blockers = [];
   const warnings = [];
+  const qualityStatus = qualityReport.qualityStatus ?? qualityReport.status;
 
-  if (qualityReport.status === 'failed') {
+  if (qualityStatus === 'failed') {
     blockers.push('quality_critical_checks_failed');
-  } else if (qualityReport.status === 'warning') {
+  } else if (qualityStatus === 'warning') {
     warnings.push('quality_warning_checks_failed');
   }
 
@@ -39,16 +40,16 @@ function evaluateGoldPublishGate({ qualityReport, sourceRunReport, domain, regio
     blockers.push('forbidden_domain_claim');
   }
 
-  const status = blockers.length > 0 ? 'blocked' : warnings.length > 0 ? 'ready_with_warnings' : 'ready';
+  const gateStatus = blockers.length > 0 ? 'blocked' : warnings.length > 0 ? 'ready_with_warnings' : 'ready';
   return {
-    status,
+    gateStatus,
     domain,
     region,
     publishAllowed: blockers.length === 0,
     blockers,
     warnings,
     criticalGates: GOLD_PUBLISH_CRITICAL_GATES,
-    qualityReportStatus: qualityReport.status,
+    qualityReportStatus: qualityStatus,
     sourceRunSummary: sourceRunReport.summary
   };
 }
@@ -62,7 +63,7 @@ export function buildGoldPublishFixtureReport(env = process.env) {
     scenario === 'blocked'
       ? {
           ...buildQualityFixtureReport(env),
-          status: 'failed',
+          qualityStatus: 'failed',
           criticalFailureCount: 1,
           checks: buildQualityFixtureReport(env).checks.map((check) =>
             check.id === 'gold_snapshot_empty'
@@ -91,8 +92,10 @@ export function buildGoldPublishFixtureReport(env = process.env) {
     productionClaim: false,
     fixtureScenario: scenario,
     ...gate,
+    rows: [gate],
     qualityReport: {
       status: qualityReport.status,
+      qualityStatus: qualityReport.qualityStatus ?? qualityReport.status,
       criticalFailureCount: qualityReport.criticalFailureCount,
       warningFailureCount: qualityReport.warningFailureCount
     },
@@ -121,8 +124,10 @@ export async function buildGoldPublishDatabaseReport(env = process.env, options 
     }),
     productionClaim: true,
     ...gate,
+    rows: [gate],
     qualityReport: {
       status: qualityReport.status,
+      qualityStatus: qualityReport.qualityStatus ?? qualityReport.status,
       criticalFailureCount: qualityReport.criticalFailureCount,
       warningFailureCount: qualityReport.warningFailureCount
     },

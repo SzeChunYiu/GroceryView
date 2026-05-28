@@ -1,8 +1,8 @@
-import { scaffoldLabel } from './types';
+import { generatedReportLabel } from './types';
 
 export function getSearchAnalyticsReport() {
   return {
-    label: scaffoldLabel('product search telemetry rollup + /api/analytics/search-to-savings-funnel'),
+    label: generatedReportLabel('scripts/ops/search-analytics-report.mjs + analytics_events', 'Set DATABASE_URL for live analytics_events and search_documents rollups.'),
     summary: {
       zeroResultRate7d: 6.2,
       searchToProductCtr: 38,

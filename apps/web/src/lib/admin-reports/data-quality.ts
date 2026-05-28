@@ -1,8 +1,8 @@
-import { scaffoldLabel } from './types';
+import { generatedReportLabel } from './types';
 
 export function getDataQualityReport() {
   return {
-    label: scaffoldLabel('docs/data/quality-gates.md + scripts/ops/check-gold-publish-gate.mjs'),
+    label: generatedReportLabel('scripts/ops/quality-report.mjs + scripts/ops/check-gold-publish-gate.mjs', 'Set DATABASE_URL for live quality_checks and gold publish evidence.'),
     gates: [
       { id: 'freshness_sla', severity: 'critical' as const, label: 'Freshness SLA', status: 'pass' },
       { id: 'duplicate_gtin', severity: 'warning' as const, label: 'Duplicate GTIN rate', status: 'warn' },

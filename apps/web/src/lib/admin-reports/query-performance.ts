@@ -1,8 +1,8 @@
-import { scaffoldLabel } from './types';
+import { generatedReportLabel } from './types';
 
 export function getQueryPerformanceReport() {
   return {
-    label: scaffoldLabel('pg_stat_statements + scripts/ops/check-hot-query-plans.mjs'),
+    label: generatedReportLabel('scripts/ops/slow-query-report.mjs + scripts/ops/check-hot-query-plans.mjs', 'Set DATABASE_URL for live pg_stat_statements slow query evidence.'),
     rows: [
       { route: '/api/products/search', p95Ms: 180, sampleCount: 1200 },
       { route: '/api/market/overview', p95Ms: 95, sampleCount: 800 },

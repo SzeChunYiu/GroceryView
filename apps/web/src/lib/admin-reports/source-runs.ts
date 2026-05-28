@@ -1,4 +1,4 @@
-import { scaffoldLabel } from './types';
+import { generatedReportLabel } from './types';
 
 export type SourceRunRow = {
   id: string;
@@ -42,7 +42,7 @@ const DETAILS: Record<string, SourceRunDetail> = {
 
 export function getSourceRunsReport() {
   return {
-    label: scaffoldLabel('ingestion.source_runs table + scripts/ops/source-run-report.mjs'),
+    label: generatedReportLabel('scripts/ops/source-run-report.mjs', 'Set DATABASE_URL for live source_runs, raw_records, and lineage_events evidence.'),
     rows: RUNS
   };
 }

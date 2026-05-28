@@ -1,8 +1,8 @@
-import { scaffoldLabel } from './types';
+import { generatedReportLabel } from './types';
 
 export function getDeadLettersReport() {
   return {
-    label: scaffoldLabel('ingestion.dead_letter_queue + scripts/ops/quality-report.mjs'),
+    label: generatedReportLabel('scripts/ops/dead-letter-report.mjs', 'Set DATABASE_URL for live dead_letters replay and severity evidence.'),
     queueHref: '/admin/sources/dead-letters',
     rows: [
       {

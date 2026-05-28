@@ -6,7 +6,8 @@ import { Card, Eyebrow, StatusBadge } from '@/components/data-ui';
 import { routeMetadata } from '@/lib/seo';
 
 export type AdminReportScaffoldLabel = Readonly<{
-  mode: 'scaffold' | 'live';
+  mode: 'scaffold' | 'generated' | 'live';
+  status: 'scaffold' | 'generated' | 'live' | 'stale' | 'unavailable';
   source: string;
   nextIntegration: string;
 }>;
@@ -20,9 +21,19 @@ export function AdminReportSourceLabel({ label }: Readonly<{ label: AdminReportS
     );
   }
 
+  if (label.mode === 'generated') {
+    return (
+      <div className="mb-4 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-950">
+        <p className="font-black">Report status: {label.status}</p>
+        <p className="mt-1 font-semibold">Source: {label.source}</p>
+        <p className="mt-1 font-semibold">Next integration: {label.nextIntegration}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
-      <p className="font-black">Backstage scaffold</p>
+      <p className="font-black">Report status: {label.status}</p>
       <p className="mt-1 font-semibold">Source: {label.source}</p>
       <p className="mt-1 font-semibold">Next integration: {label.nextIntegration}</p>
     </div>

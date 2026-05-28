@@ -67,7 +67,11 @@ export function buildQualityFixtureReport(env = process.env) {
     productionClaim: false,
     criticalChecks: QUALITY_CRITICAL_CHECKS,
     warningChecks: QUALITY_WARNING_CHECKS,
-    ...evaluation
+    qualityStatus: evaluation.status,
+    criticalFailureCount: evaluation.criticalFailureCount,
+    warningFailureCount: evaluation.warningFailureCount,
+    rows: checks,
+    checks
   };
 }
 
@@ -220,7 +224,11 @@ export async function buildQualityDatabaseReport(env = process.env, options = {}
       productionClaim: true,
       criticalChecks: QUALITY_CRITICAL_CHECKS,
       warningChecks: QUALITY_WARNING_CHECKS,
-      ...evaluation
+      qualityStatus: evaluation.status,
+      criticalFailureCount: evaluation.criticalFailureCount,
+      warningFailureCount: evaluation.warningFailureCount,
+      rows: checks,
+      checks
     };
   } finally {
     await pool.end();
@@ -237,7 +245,7 @@ if (import.meta.url === new URL(process.argv[1], 'file:').href) {
   try {
     const report = await buildQualityReport(process.env);
     process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
-    if (report.status === 'failed') process.exitCode = 1;
+    if (report.qualityStatus === 'failed') process.exitCode = 1;
   } catch (error) {
     process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
     process.exitCode = 1;
