@@ -9,6 +9,7 @@ import { MapNearbyStorePreviews } from '@/components/map/map-nearby-store-previe
 import { StoreMap } from '@/components/store-map';
 import { buildChainPriceObservations } from '@/lib/chain-index-data';
 import { storeMatchesOperatingHoursFilter, type OperatingHoursFilter } from '@/lib/geolocation';
+import { buildFuelSelectedStationDetail } from '@/lib/fuel-domain';
 import { basketCostHeatmap } from '@/lib/map-basket-cost-heatmap';
 import { buildStoreInventoryConfidence } from '@/lib/osm-stores';
 import { formatPct, storePricePercentileRanks, storeUniverse } from '@/lib/verified-data';
@@ -197,7 +198,9 @@ function buildRegionalPriceStatisticsGate() {
 export default async function MapPage({ searchParams }: Readonly<{ searchParams?: Promise<Record<string, string | string[] | undefined>> }>) {
   const params = await (searchParams ?? Promise.resolve<Record<string, string | string[] | undefined>>({}));
   const selectedHoursFilter = parseOperatingHoursFilter(params.hours);
-  const selectedLayer = Array.isArray(params.layer) ? params.layer[0] ?? 'stores' : params.layer ?? 'stores';
+  const selectedDomain = Array.isArray(params.domain) ? params.domain[0] ?? 'grocery' : params.domain ?? 'grocery';
+  const selectedFuelStation = buildFuelSelectedStationDetail(params.station);
+  const selectedLayer = selectedDomain === 'fuel' ? 'fuel-stations' : Array.isArray(params.layer) ? params.layer[0] ?? 'stores' : params.layer ?? 'stores';
   const selectedCategory = Array.isArray(params.category) ? params.category[0] ?? 'all' : params.category ?? 'all';
   const selectedChain = Array.isArray(params.chain) ? params.chain[0] ?? 'all' : params.chain ?? 'all';
   const selectedRegion = Array.isArray(params.region) ? params.region[0] ?? 'stockholm' : params.region ?? 'stockholm';
@@ -245,6 +248,7 @@ export default async function MapPage({ searchParams }: Readonly<{ searchParams?
           actionLabel="Open selected map view"
           evidenceItems={[
             `${visibleStores.length} visible markers`,
+            `Domain ${selectedDomain}`,
             `Layer ${selectedLayer}`,
             'Always visible legend'
           ]}
@@ -272,7 +276,7 @@ export default async function MapPage({ searchParams }: Readonly<{ searchParams?
                 {mapLayerOptions.map((layer) => (
                   <Link
                     className="rounded-2xl bg-white p-3 text-sm font-bold text-emerald-950 shadow-sm"
-                    href={`/map?layer=${encodeURIComponent(layer.key)}&region=${encodeURIComponent(selectedRegion)}`}
+                    href={layer.key === 'fuel-stations' ? '/map?domain=fuel&layer=fuel-stations' : `/map?layer=${encodeURIComponent(layer.key)}&region=${encodeURIComponent(selectedRegion)}`}
                     key={layer.key}
                   >
                     <span className="block font-black">{layer.label}</span>
@@ -337,6 +341,23 @@ export default async function MapPage({ searchParams }: Readonly<{ searchParams?
               Chain: {selectedChain}
             </Link>
           </div>
+          {selectedFuelStation ? (
+            <div className="mt-4 rounded-3xl border border-amber-200 bg-amber-50 p-4" data-gv-event="map_marker_selected" data-gv-entity-type="fuel_station">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-800">Fuel selected station detail</p>
+              <h3 className="mt-1 text-xl font-black text-amber-950">{selectedFuelStation.title}</h3>
+              <p className="mt-2 text-sm font-bold leading-6 text-amber-950">{selectedFuelStation.address} · {selectedFuelStation.gradeAvailability}</p>
+              <p className="mt-2 rounded-2xl bg-white/80 p-3 text-sm font-black leading-6 text-amber-950">{selectedFuelStation.guardrail}</p>
+              <p className="mt-2 text-xs font-bold text-amber-900">{selectedFuelStation.sourceLabel} · refreshed {selectedFuelStation.freshnessLabel}</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Link className="rounded-full bg-amber-900 px-3 py-2 text-xs font-black text-white" href={`/fuel/stations/${selectedFuelStation.station.osmId}`}>Open fuel station detail</Link>
+                <Link className="rounded-full bg-white px-3 py-2 text-xs font-black text-amber-950" href={selectedFuelStation.watchlistHref}>Save fuel station</Link>
+              </div>
+            </div>
+          ) : selectedDomain === 'fuel' ? (
+            <div className="mt-4 rounded-3xl border border-amber-200 bg-amber-50 p-4">
+              <p className="text-sm font-black text-amber-950">Fuel map layer is active. Choose a station from /search?domain=fuel or /fuel/stations to open /map?domain=fuel&station=[id]. Operator-level price guardrail stays visible until station-specific evidence exists.</p>
+            </div>
+          ) : null}
         </Card>
       </div>
 

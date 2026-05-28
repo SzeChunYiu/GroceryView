@@ -1,5 +1,6 @@
+import Link from 'next/link';
 import { SearchResultsGrid } from '@/components/search/search-results-grid';
-import { PageShell, SearchRecoveryPanel } from '@/components/data-ui';
+import { Card, PageShell, SearchRecoveryPanel } from '@/components/data-ui';
 import { GroceryViewSurfaceAnalytics } from '@/components/analytics/groceryview-surface-analytics';
 import { PageQuestionHeader, GuidedEmptyState } from '@/components/mvp/handoff-content';
 import { ChartShell, ChartTableFallback, Sparkline } from '@/components/mvp/visual-intelligence';
@@ -12,11 +13,18 @@ import { authenticatedSavedSearchShortcuts } from '@/lib/saved-searches';
 import { buildMisspelledQueryRecovery } from '@/lib/search-suggest';
 import { phoneticSearchBadgesForQuery } from '@/lib/search-filters';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
+import { buildFuelDomainSearchView } from '@/lib/fuel-domain';
 import { buildProductSearchView } from '@/lib/verified-data';
 
 type SearchPageParams = Record<string, string | string[] | undefined>;
 const emptySearchPageParams: SearchPageParams = {};
 const SEARCH_PAGE_SIZE = 24;
+const domainTabs = [
+  { value: 'all', label: 'All', href: '/search?domain=all' },
+  { value: 'grocery', label: 'Grocery', href: '/search?domain=grocery' },
+  { value: 'pharmacy', label: 'Pharmacy OTC', href: '/search?domain=pharmacy' },
+  { value: 'fuel', label: 'Fuel', href: '/search?domain=fuel' }
+] as const;
 const searchSortControls = [
   { value: 'unit_price_asc', label: 'Cheapest' },
   { value: 'relevance', label: 'Best deal' },
@@ -58,6 +66,8 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
   const resolvedSearchParams = await (searchParams ?? Promise.resolve(emptySearchPageParams));
   const subscription = buildSavedSearchSubscription({ searchParams: resolvedSearchParams, path: '/search' });
   const query = Array.isArray(resolvedSearchParams.q) ? resolvedSearchParams.q[0] ?? '' : resolvedSearchParams.q ?? '';
+  const selectedSearchDomain = firstParam(resolvedSearchParams, 'domain') || 'grocery';
+  const fuelSearchView = buildFuelDomainSearchView(resolvedSearchParams);
   const searchView = buildProductSearchView(resolvedSearchParams);
   const offset = cursorOffset(resolvedSearchParams);
   const pagedResultCards = searchView.resultCards.slice(offset, offset + SEARCH_PAGE_SIZE);
@@ -88,6 +98,116 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
     .map((key) => [key, firstParam(resolvedSearchParams, key)] as const)
     .filter(([, value]) => value);
 
+  const domainTabsNav = (
+    <section className="mx-auto mt-4 w-full max-w-6xl rounded-3xl border border-slate-200 bg-white p-4 shadow-sm" aria-label="Domain tabs">
+      <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">Domain tabs</p>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {domainTabs.map((tab) => (
+          <Link
+            className={selectedSearchDomain === tab.value ? 'rounded-full bg-slate-950 px-4 py-2 text-sm font-black text-white' : 'rounded-full bg-slate-100 px-4 py-2 text-sm font-black text-slate-800'}
+            href={tab.href}
+            key={tab.value}
+          >
+            {tab.label}
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+
+  if (selectedSearchDomain === 'fuel') {
+    return (
+      <PageShell data-gv-surface="search">
+        <GroceryViewSurfaceAnalytics surface="search" />
+        <PageQuestionHeader
+          eyebrow="Search"
+          question="Which fuel prices or stations match my query?"
+          title={query ? `Fuel search results for “${query}”` : 'Fuel search'}
+          subtitle="Search operator price cards and OSM fuel station cards with source, freshness, confidence, and limitation on every result."
+          actions={
+            <form action="/search" className="flex min-w-[18rem] gap-2">
+              <input name="domain" type="hidden" value="fuel" />
+              <input className="min-w-0 flex-1 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold" defaultValue={query} name="q" placeholder="Search diesel, 95, OKQ8" type="search" />
+              <button className="rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" type="submit">Search fuel</button>
+            </form>
+          }
+        />
+        {domainTabsNav}
+        <section className="mx-auto mt-6 w-full max-w-6xl" aria-label="Fuel search results">
+          <ChartShell
+            actionHref="/search?domain=fuel"
+            actionLabel="Reset fuel search"
+            evidenceItems={[
+              fuelSearchView.evidenceSummary,
+              'Fuel grade cards route to /fuel?grade=[grade]',
+              'Fuel station cards route to detail and map selected station views'
+            ]}
+            fallback={
+              <ChartTableFallback
+                caption="Fuel search result fallback"
+                columns={[
+                  { key: 'label', label: 'Fuel result', render: (row: { label: string }) => row.label },
+                  { key: 'evidence', label: 'Evidence', render: (row: { evidence: string }) => row.evidence },
+                  { key: 'limitation', label: 'Limitation', render: (row: { limitation: string }) => row.limitation }
+                ]}
+                rows={[
+                  ...fuelSearchView.gradeCards.map((card) => ({ label: card.label, evidence: `${card.priceLabel} · ${card.sourceLabel} · ${card.freshnessLabel}`, limitation: card.limitation })),
+                  ...fuelSearchView.stationCards.map((station) => ({ label: station.name, evidence: `${station.chain} · ${station.sourceLabel} · ${station.freshnessLabel}`, limitation: station.limitation }))
+                ]}
+              />
+            }
+            hasData={fuelSearchView.resultCount > 0}
+            insightTitle="Fuel domain search"
+            plainSummary="Fuel search separates operator price cards from station location cards so shoppers can compare grades without inferring station-specific pump prices."
+            userQuestion="Which fuel grade or station evidence should I open?"
+          >
+            <div className="grid gap-4 lg:grid-cols-2">
+              <Card className="border-emerald-200 bg-emerald-50">
+                <h2 className="text-2xl font-black text-emerald-950">Fuel grade cards</h2>
+                <div className="mt-4 grid gap-3">
+                  {fuelSearchView.gradeCards.map((card) => (
+                    <Link className="rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm" data-gv-event="fuel_grade_selected" href={card.href} key={card.id}>
+                      <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">Operator price card</p>
+                      <h3 className="mt-1 text-lg font-black text-slate-950">{card.label}</h3>
+                      <p className="mt-1 text-sm font-black text-emerald-900">{card.priceLabel} · {card.operatorName}</p>
+                      <p className="mt-2 text-xs font-bold leading-5 text-slate-600">{card.sourceLabel} · {card.freshnessLabel} · {card.confidenceLabel}</p>
+                      <p className="mt-2 rounded-xl bg-amber-50 p-3 text-xs font-black text-amber-950">{card.limitation}</p>
+                    </Link>
+                  ))}
+                </div>
+              </Card>
+              <Card className="border-sky-200 bg-sky-50">
+                <h2 className="text-2xl font-black text-sky-950">Fuel station cards</h2>
+                <div className="mt-4 grid gap-3">
+                  {fuelSearchView.stationCards.map((station) => (
+                    <article className="rounded-2xl border border-sky-100 bg-white p-4 shadow-sm" key={station.osmId}>
+                      <p className="text-xs font-black uppercase tracking-[0.16em] text-sky-800">Fuel station card</p>
+                      <h3 className="mt-1 text-lg font-black text-slate-950">{station.name}</h3>
+                      <p className="mt-1 text-sm font-bold text-slate-700">{station.chain} · {station.address}</p>
+                      <p className="mt-2 text-xs font-bold leading-5 text-slate-600">{station.gradeAvailability} · {station.sourceLabel} · {station.freshnessLabel}</p>
+                      <p className="mt-2 rounded-xl bg-amber-50 p-3 text-xs font-black text-amber-950">Operator-level price guardrail: {station.limitation}</p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <Link className="rounded-full bg-sky-900 px-3 py-2 text-xs font-black text-white" data-gv-event="fuel_station_candidate_clicked" href={station.href}>Open station</Link>
+                        <Link className="rounded-full bg-slate-100 px-3 py-2 text-xs font-black text-slate-900" href={`/map?domain=fuel&station=${station.osmId}`}>Open map selection</Link>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </Card>
+            </div>
+            {fuelSearchView.resultCount === 0 ? (
+              <p className="mt-4 rounded-2xl bg-white p-4 text-sm font-black text-amber-950">{fuelSearchView.emptyState}</p>
+            ) : null}
+          </ChartShell>
+        </section>
+        <section className="mx-auto mt-6 w-full max-w-6xl rounded-3xl border border-emerald-200 bg-emerald-50 p-4 shadow-sm">
+          <p className="text-sm font-black text-emerald-950">Fuel watchlist handoff</p>
+          <Link className="mt-2 inline-flex rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" href="/watchlist?domain=fuel">Set a fuel target alert</Link>
+        </section>
+      </PageShell>
+    );
+  }
+
   return (
     <PageShell data-gv-surface="search">
       <GroceryViewSurfaceAnalytics surface="search" />
@@ -104,6 +224,7 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
           </form>
         }
       />
+      {domainTabsNav}
       {activeFilters.length > 0 ? (
         <section className="mx-auto mt-4 w-full max-w-6xl rounded-3xl border border-slate-200 bg-white p-4 shadow-sm" aria-label="Active filters">
           <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">Active filters</p>

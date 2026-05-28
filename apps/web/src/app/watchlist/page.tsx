@@ -7,6 +7,8 @@ import { NotificationInboxActions } from '@/components/notification-inbox-action
 import { WatchlistRow } from '@/components/watchlist-row';
 import { babyDiaperPriceTracker, budgetEssentialsPriceDropAlerts, dealHunterNewProductPriceDropAlerts, weeklyPersonalizedEmailDigest } from '@/lib/demo-data';
 import { samplePredictiveDropAlerts } from '@/lib/alert-scheduler';
+import { fuelPriceTargetAlerts } from '@/lib/fuel-prices';
+import { fuelStations } from '@/lib/ingested/fuel-stations';
 import { buildBestTimeToBuyAlert, buildBestTimeToBuyForecastPanel } from '@/lib/price-intelligence';
 import { priceAlertThresholdPreferenceContract } from '@/lib/verified-data';
 import { confidenceForProduct, priceRowCount, priceDropReasonForAlert, priceDropReasonForProduct, priceSource, volatilityForProduct, watchlistAlertBoard, watchlistItemForAlert } from '@/lib/watchlist-data';
@@ -22,6 +24,8 @@ function formatSek(value: number) {
 
 type RecipeBasketSearchParams = {
   recipeBasket?: string | string[];
+  domain?: string | string[];
+  station?: string | string[];
 };
 const emptyRecipeBasketSearchParams: RecipeBasketSearchParams = {};
 
@@ -44,6 +48,9 @@ export default async function WatchlistPage({
 }: Readonly<{ searchParams?: Promise<RecipeBasketSearchParams> }>) {
   const resolvedSearchParams = await (searchParams ?? Promise.resolve(emptyRecipeBasketSearchParams));
   const recipeWatchlistItems = parseRecipeWatchlist(firstSearchValue(resolvedSearchParams.recipeBasket));
+  const selectedWatchDomain = firstSearchValue(resolvedSearchParams.domain) || 'grocery';
+  const selectedFuelStationId = firstSearchValue(resolvedSearchParams.station);
+  const selectedFuelStation = fuelStations.find((station) => String(station.osmId) === selectedFuelStationId) ?? fuelStations[0];
   const { watchlistAlerts, plannedNotifications, watchedProducts, eligiblePriceRows, coverageConfidence } = watchlistAlertBoard;
   const bestTimeAlertSetups = watchlistAlertBoard.inputs.products.slice(0, 3).map((product, index) => {
     const currentPrice = product.bestPrice ?? product.prices?.[0]?.price ?? 0;
@@ -118,6 +125,42 @@ export default async function WatchlistPage({
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
         This page calls buildWatchlistAlerts with verified chain price rows, then runs planNotifications so set-target push and email rows respect user preferences and quiet-hour rules. Historical wait-window alerts also surface patterns derived from observed source rows before a current threshold is crossed; no forecast is shown without dated observation evidence.
       </p>
+      {selectedWatchDomain === 'fuel' ? (
+        <Card className="mt-6 border-amber-200 bg-amber-50">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-800">fuel_station watchlist</p>
+              <h2 className="mt-2 text-2xl font-black text-amber-950">Fuel watchlist and alerts</h2>
+              <p className="mt-2 text-sm font-semibold leading-6 text-amber-950">
+                {'Notify me when diesel < 17.50 kr/l.'} Fuel alerts use operator domain=fuel observations and station saved items use OSM location evidence only.
+              </p>
+            </div>
+            <Link className="rounded-full bg-amber-900 px-4 py-2 text-sm font-black text-white" href="/search?domain=fuel&q=diesel">Search fuel</Link>
+          </div>
+          <div className="mt-4 grid gap-4 lg:grid-cols-2">
+            <div className="rounded-2xl bg-white/80 p-4">
+              <h3 className="text-lg font-black text-amber-950">Fuel grade targets</h3>
+              <div className="mt-3 grid gap-2">
+                {fuelPriceTargetAlerts.targets.map((target) => (
+                  <Link className="rounded-xl bg-amber-50 p-3 text-sm font-bold text-amber-950" href={`/fuel?grade=${target.productId.replace('fuel-', '').replace('-e10', '')}`} key={target.id}>
+                    {target.name} · {target.targetPriceLabel} · observed {target.observedPriceLabel}
+                  </Link>
+                ))}
+              </div>
+            </div>
+            <div className="rounded-2xl bg-white/80 p-4">
+              <h3 className="text-lg font-black text-amber-950">Fuel station saved item</h3>
+              <p className="mt-2 text-sm font-bold text-amber-950">{selectedFuelStation.name} · {selectedFuelStation.chain}</p>
+              <p className="mt-2 text-xs font-bold leading-5 text-amber-900">Saved fuel stations are location reminders, not station-specific pump price alerts, until trusted station evidence exists.</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Link className="rounded-full bg-white px-3 py-2 text-xs font-black text-amber-950" href={`/fuel/stations/${selectedFuelStation.osmId}`}>Open station</Link>
+                <Link className="rounded-full bg-white px-3 py-2 text-xs font-black text-amber-950" href={`/map?domain=fuel&station=${selectedFuelStation.osmId}`}>Open fuel map</Link>
+              </div>
+            </div>
+          </div>
+          <p className="mt-4 rounded-2xl bg-white/80 p-3 text-xs font-black text-amber-950">{fuelPriceTargetAlerts.guardrails.join(' ')}</p>
+        </Card>
+      ) : null}
       {recipeWatchlistItems ? (
         <Card className="mt-6 border-lime-200 bg-lime-50">
           <h2 className="text-2xl font-black text-lime-950">Recipe basket watchlist draft</h2>
