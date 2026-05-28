@@ -69,7 +69,7 @@ export function GroceryViewSurfaceAnalytics({ surface, domain = 'grocery' }: Gro
       });
     };
 
-    const handleClick = (event: MouseEvent) => {
+    const handleClick = (event: Event) => {
       const target = (event.target as HTMLElement | null)?.closest<HTMLElement>('[data-gv-event]');
       if (!target || !root.contains(target)) return;
       trackFromElement(target, domain);

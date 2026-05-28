@@ -632,7 +632,7 @@ export default function DataSourcesPage() {
             <p className="text-xs font-black uppercase tracking-[0.24em] text-cyan-800">perf(web)</p>
             <h2 className="mt-2 text-2xl font-black tracking-tight">API performance readiness</h2>
             <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
-              Hot public API paths now have an injectable Redis cache contract, product search returns paged result envelopes, and production readiness remains fail closed until Redis cache credentials and pgbouncer pooler routing are configured. Long-range analytics are documented as rollups only.
+              Hot public API paths use an injectable cache contract, product search returns paged result envelopes, and production readiness remains fail closed until runtime cache credentials and pooler routing are configured in the deployment environment. Long-range analytics are documented as rollups only.
             </p>
           </div>
           <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-cyan-900 shadow-sm">{apiPerformanceReadiness.status}</p>

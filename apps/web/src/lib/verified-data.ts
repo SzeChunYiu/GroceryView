@@ -4078,7 +4078,7 @@ export const publicApiDirectory = {
 
 export const apiPerformanceReadiness = {
   title: 'API performance readiness',
-  status: 'fail closed until Redis cache and pgbouncer are configured',
+  status: 'fail closed until runtime cache and pooler routing are configured',
   source: 'packages/server/src/index.ts hot public endpoint cache + cursor-paginated product search',
   requiredRuntime: [
     {

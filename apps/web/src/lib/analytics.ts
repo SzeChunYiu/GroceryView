@@ -743,6 +743,7 @@ export const GROCERYVIEW_ANALYTICS_EVENT_NAMES = [
   'search_result_clicked',
   'product_opened',
   'deal_card_clicked',
+  'deal_opened',
   'market_filter_changed',
   'market_heatmap_cell_clicked',
   'map_marker_selected',

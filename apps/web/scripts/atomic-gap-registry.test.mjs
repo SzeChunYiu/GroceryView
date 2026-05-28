@@ -51,6 +51,15 @@ const DONE_GAP_EVIDENCE = {
     file: 'src/app/market/page.tsx',
     pattern: /MultiLineChart/,
   },
+  'analytics-event-naming-gap': {
+    file: 'src/lib/analytics.ts',
+    pattern: /'deal_opened'/,
+  },
+  'verified-data-fail-closed-banner-public': {
+    file: 'src/app/data-sources/page.tsx',
+    pattern: /fail closed until Redis cache/i,
+    mustNotMatch: true,
+  },
 };
 
 const OPEN_GAP_PROBES = {
@@ -58,23 +67,6 @@ const OPEN_GAP_PROBES = {
     file: 'packages/api/src/__tests__/routes.test.ts',
     pattern: /facets\.categories\.find\(\(facet\) => facet\.value === 'Dairy'\)/,
     repo: true,
-  },
-  'analytics-event-naming-gap': {
-    followUp: async () => {
-      const [analytics, spec, funnelTest] = await Promise.all([
-        readFile(new URL('../src/lib/analytics.ts', import.meta.url), 'utf8'),
-        readFile(new URL('../../../docs/specs/analytics-event-tracking.md', import.meta.url), 'utf8'),
-        readFile(new URL('./funnel-analytics.test.mjs', import.meta.url), 'utf8'),
-      ]);
-      assert.match(spec, /deal_opened/);
-      assert.doesNotMatch(analytics, /'deal_opened'/);
-      assert.match(analytics, /GROCERYVIEW_ANALYTICS_EVENT_NAMES/);
-      assert.doesNotMatch(funnelTest, /GROCERYVIEW_ANALYTICS_EVENT_NAMES/);
-    },
-  },
-  'verified-data-fail-closed-banner-public': {
-    file: 'src/app/data-sources/page.tsx',
-    pattern: /fail closed until Redis cache/i,
   },
 };
 

@@ -1,23 +1,17 @@
-import type { AdminReport } from './types';
+import { scaffoldLabel } from './types';
 
-export type DataQualityRow = {
-  gate: string;
-  status: string;
-  blocking: boolean;
-  detail: string;
-};
-
-export function getDataQualityReport(generatedAt = new Date().toISOString()): AdminReport<DataQualityRow> {
+export function getDataQualityReport() {
   return {
-    title: 'Data quality gates',
-    scaffold: true,
-    sourceLabel: 'local report helper',
-    nextIntegration: 'docs/data/quality-gates.md checks + scripts/ops/check-gold-publish-gate.mjs',
-    generatedAt,
-    rows: [
-      { gate: 'freshness_sla', status: 'pass', blocking: false, detail: 'Snapshot within 24h for SE grocery connectors' },
-      { gate: 'duplicate_gtin', status: 'warn', blocking: false, detail: '12 duplicate GTIN candidates queued for dedup review' },
-      { gate: 'gold_publish', status: 'hold', blocking: true, detail: 'Publish blocked until quality-report passes with --strict' }
-    ]
+    label: scaffoldLabel('docs/data/quality-gates.md + scripts/ops/check-gold-publish-gate.mjs'),
+    gates: [
+      { id: 'freshness_sla', severity: 'critical' as const, label: 'Freshness SLA', status: 'pass' },
+      { id: 'duplicate_gtin', severity: 'warning' as const, label: 'Duplicate GTIN rate', status: 'warn' },
+      { id: 'gold_publish', severity: 'critical' as const, label: 'Gold publish gate', status: 'hold' }
+    ],
+    freshness: {
+      label: 'Observation freshness',
+      percentWithinSla: 94,
+      windowHours: 24
+    }
   };
 }

@@ -4,6 +4,7 @@ import { GroceryViewSurfaceAnalytics } from '@/components/analytics/groceryview-
 import { Card, Eyebrow, PageShell, SourceCitation } from '@/components/data-ui';
 import { SavedViewActions } from '@/components/saved-view-actions';
 import { StoreDistanceCard } from '@/components/StoreDistanceCard';
+import { MapNearbyStorePreviews } from '@/components/map/map-nearby-store-previews';
 import { StoreMap } from '@/components/store-map';
 import { buildChainPriceObservations } from '@/lib/chain-index-data';
 import { storeMatchesOperatingHoursFilter, type OperatingHoursFilter } from '@/lib/geolocation';
@@ -354,45 +355,15 @@ export default async function MapPage({ searchParams }: Readonly<{ searchParams?
             <p className="mt-2 text-sm font-semibold text-cyan-900">{routeAwareNearestStorePlan.mode} route · no private GPS by default</p>
           </div>
         </div>
-        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          {topRouteSavingsHints.map((store, index) => {
-            const inventory = topRouteAwareStoreInventory[index];
-            return (
-            <Link className="rounded-2xl border border-cyan-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:ring-2 hover:ring-cyan-200" data-route-aware-nearest-store={store.id} href={`/stores/${encodeURIComponent(store.id)}`} key={store.id}>
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">#{index + 1} · {store.chainName}</p>
-                  <h3 className="mt-2 text-lg font-black text-slate-950">{store.storeName}</h3>
-                  <p className="mt-1 text-sm font-semibold text-slate-600">{store.areaLabel} · {(store.distanceMeters / 1000).toFixed(1)} km</p>
-                </div>
-                <span className="rounded-full bg-cyan-100 px-3 py-2 text-sm font-black text-cyan-950">{store.routeScore.toFixed(0)}</span>
-              </div>
-              <dl className="mt-4 grid grid-cols-2 gap-2 text-sm">
-                <div className="rounded-xl bg-cyan-50 p-3">
-                  <dt className="text-xs font-black uppercase tracking-[0.12em] text-cyan-700">Basket</dt>
-                  <dd className="mt-1 font-black text-cyan-950">{store.basketTotalSek.toFixed(2)} SEK</dd>
-                  <dd className="mt-1 text-xs font-bold text-cyan-800">Saves {store.expectedBasketSavingsSek.toFixed(2)} SEK vs highest visible basket</dd>
-                </div>
-                <div className="rounded-xl bg-slate-50 p-3">
-                  <dt className="text-xs font-black uppercase tracking-[0.12em] text-slate-500">Trip</dt>
-                  <dd className="mt-1 font-black text-slate-950">{store.totalMinutes} min · {store.travelCostSek.toFixed(1)} SEK</dd>
-                </div>
-              </dl>
-              <p className="mt-3 rounded-xl bg-slate-50 p-3 text-xs font-bold leading-5 text-slate-700">{store.openingStatusLabel}</p>
-              {inventory ? (
-                <div className={`mt-3 rounded-xl p-3 text-xs font-bold leading-5 ${inventoryTone(inventory.level)}`}>
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p>{inventory.label}</p>
-                    <time dateTime={inventory.lastSeenAt}>{inventory.lastSeenLabel}</time>
-                  </div>
-                  <p className="mt-1">{inventory.detail}</p>
-                </div>
-              ) : null}
-              <p className="mt-3 text-xs font-semibold leading-5 text-slate-500">{store.recommendationLabel}</p>
-            </Link>
-            );
-          })}
-        </div>
+        <MapNearbyStorePreviews
+          stores={topRouteSavingsHints.map((store) => ({
+            id: store.id,
+            storeName: store.storeName,
+            chainName: store.chainName,
+            basketTotalSek: store.basketTotalSek,
+            areaLabel: store.areaLabel
+          }))}
+        />
         {topRouteSavingsHints[0] ? (
           <StoreDistanceCard
             fallbackLabel="Use the route-aware list above while location is unavailable, then verify stock before leaving."

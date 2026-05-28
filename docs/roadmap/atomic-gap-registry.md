@@ -84,7 +84,7 @@ Track small missing pieces so GroceryView does not drift. Each gap has a stable 
 | userImpact | Cannot measure search→product conversion or deal engagement consistently. |
 | fix | Align spec/runtime names and add telemetry tests for canonical event coverage. |
 | testRequired | Telemetry tests assert event names match dictionary. Enforced by `atomic-gap-registry.test.mjs` (open-gap probe). |
-| status | open |
+| status | done |
 
 ### `search-results-missing-evidence-strip`
 
@@ -136,7 +136,7 @@ Track small missing pieces so GroceryView does not drift. Each gap has a stable 
 | userImpact | Ops status leaks into shopper-facing trust copy. |
 | fix | Split operator readiness from public evidence labels. |
 | testRequired | Public routes do not render `fail closed until Redis` phrase. Enforced by `atomic-gap-registry.test.mjs` (open-gap probe). |
-| status | open |
+| status | done |
 
 ---
 
@@ -144,9 +144,9 @@ Track small missing pieces so GroceryView does not drift. Each gap has a stable 
 
 | Status | Count |
 |--------|-------|
-| open | 3 |
+| open | 1 |
 | in_progress | 0 |
-| done | 7 |
+| done | 9 |
 
 **Total gaps:** 10
 

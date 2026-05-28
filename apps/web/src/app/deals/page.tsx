@@ -5,24 +5,13 @@ import { PageShell } from '@/components/data-ui';
 import { PageQuestionHeader } from '@/components/mvp/handoff-content';
 import { MvpBreadcrumbs } from '@/components/mvp/mvp-breadcrumbs';
 import { MvpSectionCard } from '@/components/mvp/mvp-section-card';
-import { DealBadge } from '@/components/mvp/deal-badge';
-import { EvidenceStrip } from '@/components/mvp/evidence-strip';
+import { DealFeedWithPreviews } from '@/components/deals/deal-feed-with-previews';
 import { NoVerifiedDataPanel } from '@/components/mvp/no-verified-data-panel';
-import { RelatedLinksPanel } from '@/components/mvp/related-links-panel';
 import { ChartShell, ChartTableFallback, DistributionBand } from '@/components/mvp/visual-intelligence';
 import { buildPantryReplacementFilter } from '@/lib/pantry';
 import { getDealsPageData } from '@/lib/mvp/data';
-import { formatSek } from '@/lib/mvp/format';
 import type { DealLabel } from '@/lib/mvp/types';
-import {
-  categoryBrowseHref,
-  categoryMarketHref,
-  dealsRoute,
-  methodologyDealScoreHref,
-  productRoute,
-  searchRoute,
-  storeSlugHref
-} from '@/lib/mvp/routes';
+import { categoryMarketHref, dealsRoute } from '@/lib/mvp/routes';
 import { routeMetadata } from '@/lib/seo';
 import { buildSinglePortionDealFinder } from '@/lib/single-portion-deals';
 import { labelFromSlug, snapshot, topChainSpreads } from '@/lib/verified-data';
@@ -157,68 +146,7 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
       </section>
 
       <MvpSectionCard className="mt-6" title="Verified deal feed">
-        {data.deals.length > 0 ? (
-          <div className="grid gap-4 lg:grid-cols-2">
-            {data.deals.map((deal) => (
-              <article className="rounded-2xl border border-slate-200 bg-white p-4" key={deal.id}>
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <DealBadge label={deal.dealLabel} />
-                  <Link
-                    className="text-lg font-black text-emerald-800"
-                    data-gv-entity-id={deal.product.slug}
-                    data-gv-entity-type="product"
-                    data-gv-event="deal_card_clicked"
-                    data-gv-source-panel="deals_feed"
-                    href={productRoute(deal.product.id)}
-                  >
-                    {formatSek(deal.currentPrice)}
-                  </Link>
-                </div>
-                <h3 className="mt-2 text-xl font-black text-slate-950">
-                  <Link
-                    data-gv-entity-id={deal.product.slug}
-                    data-gv-entity-type="product"
-                    data-gv-event="deal_card_clicked"
-                    data-gv-source-panel="deals_feed"
-                    href={productRoute(deal.product.id)}
-                  >
-                    {deal.product.name}
-                  </Link>
-                </h3>
-                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm font-semibold text-slate-600">
-                  {deal.reasons.map((reason) => (
-                    <li key={reason}>{reason}</li>
-                  ))}
-                  {deal.historicDiscountPct === undefined ? (
-                    <li className="text-amber-800">Historic comparison unavailable — treat discount depth cautiously.</li>
-                  ) : null}
-                </ul>
-                <div className="mt-3">
-                  <EvidenceStrip evidence={deal} />
-                </div>
-                <div className="mt-4">
-                  <RelatedLinksPanel
-                    links={[
-                      { label: 'Product detail', href: productRoute(deal.product.id), detail: deal.product.name },
-                      {
-                        label: `Search ${deal.product.name}`,
-                        href: searchRoute({ q: deal.product.name, category: deal.product.categorySlug, chain: deal.chain?.toLowerCase() })
-                      },
-                      { label: `${deal.product.categoryName} market`, href: categoryMarketHref(deal.product.categorySlug) },
-                      { label: `Browse ${deal.product.categoryName}`, href: categoryBrowseHref(deal.product.categorySlug) },
-                      ...(deal.chain
-                        ? [{ label: `${deal.chain} store`, href: storeSlugHref(deal.chain.toLowerCase()), detail: 'Chain landing when store ID unavailable' }]
-                        : []),
-                      { label: 'How deal score works', href: methodologyDealScoreHref() }
-                    ]}
-                  />
-                </div>
-              </article>
-            ))}
-          </div>
-        ) : (
-          <NoVerifiedDataPanel title="No verified deals match these filters" />
-        )}
+        {data.deals.length > 0 ? <DealFeedWithPreviews deals={data.deals} /> : <NoVerifiedDataPanel title="No verified deals match these filters" />}
       </MvpSectionCard>
 
       <section className="mt-6 rounded-[2rem] border border-violet-200 bg-violet-50/80 p-5 shadow-sm" aria-label="Single shopper small portion deals" data-single-portion-deal-finder>

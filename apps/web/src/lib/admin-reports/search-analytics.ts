@@ -1,23 +1,16 @@
-import type { AdminReport } from './types';
+import { scaffoldLabel } from './types';
 
-export type SearchAnalyticsRow = {
-  queryCluster: string;
-  searches: number;
-  zeroResultRate: number;
-  topCategory: string;
-};
-
-export function getSearchAnalyticsReport(generatedAt = new Date().toISOString()): AdminReport<SearchAnalyticsRow> {
+export function getSearchAnalyticsReport() {
   return {
-    title: 'Search analytics',
-    scaffold: true,
-    sourceLabel: 'local report helper',
-    nextIntegration: 'product search telemetry rollup + /api/analytics/search-to-savings-funnel',
-    generatedAt,
-    rows: [
-      { queryCluster: 'mjölk', searches: 420, zeroResultRate: 0.04, topCategory: 'mejeri-ost-agg' },
-      { queryCluster: 'kaffe', searches: 310, zeroResultRate: 0.07, topCategory: 'kaffe' },
-      { queryCluster: 'bröd', searches: 280, zeroResultRate: 0.05, topCategory: 'brod-bageri' }
-    ]
+    label: scaffoldLabel('product search telemetry rollup + /api/analytics/search-to-savings-funnel'),
+    summary: {
+      zeroResultRate7d: 6.2,
+      searchToProductCtr: 38,
+      topQueries: [
+        { query: 'mjölk', searches: 420, zeroResultRate: 4, clickThroughRate: 41 },
+        { query: 'kaffe', searches: 310, zeroResultRate: 7, clickThroughRate: 35 },
+        { query: 'bröd', searches: 280, zeroResultRate: 5, clickThroughRate: 39 }
+      ]
+    }
   };
 }

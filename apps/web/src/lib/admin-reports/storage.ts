@@ -1,23 +1,12 @@
-import type { AdminReport } from './types';
+import { scaffoldLabel } from './types';
 
-export type StorageRow = {
-  object: string;
-  sizeGb: number;
-  growth7dPct: number;
-  retentionDays: number;
-};
-
-export function getStorageReport(generatedAt = new Date().toISOString()): AdminReport<StorageRow> {
+export function getStorageReport() {
   return {
-    title: 'Storage footprint',
-    scaffold: true,
-    sourceLabel: 'local report helper',
-    nextIntegration: 'scripts/ops/db-size-report.mjs + object storage inventory',
-    generatedAt,
+    label: scaffoldLabel('scripts/ops/db-size-report.mjs + object storage inventory'),
     rows: [
-      { object: 'price_observations', sizeGb: 42.5, growth7dPct: 2.1, retentionDays: 400 },
-      { object: 'ingestion_raw', sizeGb: 18.2, growth7dPct: 4.8, retentionDays: 90 },
-      { object: 'product_images', sizeGb: 6.4, growth7dPct: 0.9, retentionDays: 365 }
+      { name: 'price_observations', sizeGb: 42.5, indexGb: 8.1, retentionNote: '400d rolling partitions' },
+      { name: 'ingestion_raw', sizeGb: 18.2, indexGb: 2.4, retentionNote: '90d bronze retention' },
+      { name: 'product_images', sizeGb: 6.4, indexGb: 0.8, retentionNote: 'CDN cache + metadata only' }
     ]
   };
 }

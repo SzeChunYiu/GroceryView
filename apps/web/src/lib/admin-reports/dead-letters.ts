@@ -1,23 +1,24 @@
-import type { AdminReport } from './types';
+import { scaffoldLabel } from './types';
 
-export type DeadLetterRow = {
-  id: string;
-  source: string;
-  reason: string;
-  observedAt: string;
-  retryable: boolean;
-};
-
-export function getDeadLettersReport(generatedAt = new Date().toISOString()): AdminReport<DeadLetterRow> {
+export function getDeadLettersReport() {
   return {
-    title: 'Dead letters',
-    scaffold: true,
-    sourceLabel: 'local report helper',
-    nextIntegration: 'ingestion.dead_letter_queue + scripts/ops/quality-report.mjs',
-    generatedAt,
+    label: scaffoldLabel('ingestion.dead_letter_queue + scripts/ops/quality-report.mjs'),
+    queueHref: '/admin/sources/dead-letters',
     rows: [
-      { id: 'dl-axfood-001', source: 'axfood', reason: 'schema_version_mismatch', observedAt: generatedAt, retryable: true },
-      { id: 'dl-op-014', source: 'openprices', reason: 'missing_gtin', observedAt: generatedAt, retryable: false }
+      {
+        id: 'dl-axfood-001',
+        sourceRunId: 'run-axfood-snapshot',
+        errorClass: 'schema_version_mismatch',
+        severity: 'high',
+        suggestedFix: 'Bump connector schema mapping and replay batch'
+      },
+      {
+        id: 'dl-op-014',
+        sourceRunId: 'run-openprices-daily',
+        errorClass: 'missing_gtin',
+        severity: 'medium',
+        suggestedFix: 'Route to commodity alias review queue'
+      }
     ]
   };
 }

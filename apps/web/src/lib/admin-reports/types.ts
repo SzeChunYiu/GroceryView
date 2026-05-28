@@ -1,15 +1,9 @@
-export type AdminReportRow = Record<string, string | number | boolean | null | undefined>;
+import type { AdminReportScaffoldLabel } from '@/lib/admin-backstage-scaffold';
 
-export type AdminReport<T extends AdminReportRow = AdminReportRow> = Readonly<{
-  title: string;
-  scaffold: true;
-  sourceLabel: string;
-  nextIntegration: string;
-  generatedAt: string;
-  rows: readonly T[];
-}>;
-
-export const ADMIN_SCAFFOLD_BANNER = {
-  eyebrow: 'Backstage scaffold',
-  source: 'Source: local report helper',
-} as const;
+export function scaffoldLabel(nextIntegration: string): AdminReportScaffoldLabel {
+  return {
+    mode: 'scaffold',
+    source: 'local report helper',
+    nextIntegration
+  };
+}

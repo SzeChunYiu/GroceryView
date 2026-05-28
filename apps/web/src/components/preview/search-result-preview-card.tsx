@@ -30,13 +30,6 @@ export type SearchResultPreviewCardProps = Readonly<{
   sourceLabel?: string;
 }>;
 
-function confidenceLabelFromScore(score: number): ConfidenceLabel {
-  if (score >= 0.75) return 'high';
-  if (score >= 0.45) return 'medium';
-  if (score > 0) return 'low';
-  return 'unknown';
-}
-
 function searchCardToProductSummary(card: SearchResultPreviewCardProps['card'], sourceLabel: string): ProductSummary {
   return {
     id: card.slug,
@@ -52,7 +45,7 @@ function searchCardToProductSummary(card: SearchResultPreviewCardProps['card'], 
     lastObservedAt: card.sortNewestObservedAt,
     freshnessLabel: 'unknown' satisfies FreshnessLabel,
     confidence: card.sortConfidence,
-    confidenceLabel: confidenceLabelFromScore(card.sortConfidence),
+    confidenceLabel: confidenceLabelFromScore(card.sortConfidence, 1),
     observationCount: 1
   };
 }
@@ -81,7 +74,7 @@ export function SearchResultPreviewCard({ card, sourceLabel = 'OpenPrices + chai
               sourceLabel: sourceLabel,
               freshnessLabel: card.sortNewestObservedAt ? 'fresh' : 'unknown',
               confidence: card.sortConfidence,
-              confidenceLabel: confidenceLabelFromScore(card.sortConfidence),
+              confidenceLabel: confidenceLabelFromScore(card.sortConfidence, 1),
               observationCount: 1,
               lastObservedAt: card.sortNewestObservedAt || new Date(0).toISOString()
             }}

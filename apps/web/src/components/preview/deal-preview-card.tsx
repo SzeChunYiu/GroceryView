@@ -4,8 +4,17 @@ import Link from 'next/link';
 import { useRef, useState } from 'react';
 import { DealBadge } from '@/components/mvp/deal-badge';
 import { EvidenceStrip } from '@/components/mvp/evidence-strip';
+import { RelatedLinksPanel } from '@/components/mvp/related-links-panel';
 import { formatDealLabel, formatSek } from '@/lib/mvp/format';
 import type { DealEvaluation } from '@/lib/mvp/types';
+import {
+  categoryBrowseHref,
+  categoryMarketHref,
+  methodologyDealScoreHref,
+  productRoute,
+  searchRoute,
+  storeSlugHref
+} from '@/lib/mvp/routes';
 import { trackGroceryViewEvent } from '@/lib/analytics';
 import { EvidenceDrawer } from './evidence-drawer';
 import { PreviewDrawer } from './preview-drawer';
@@ -40,6 +49,12 @@ export function DealPreviewCard({ deal }: DealPreviewCardProps) {
             data-quick-view="deal"
             onClick={() => {
               setOpen(true);
+              trackGroceryViewEvent({
+                eventName: 'deal_opened',
+                sourcePanel: 'deals_feed',
+                entityType: 'product',
+                entityId: product.slug
+              });
               trackGroceryViewEvent({
                 eventName: 'preview_opened',
                 sourcePanel: 'deal_why_ranked',
@@ -76,6 +91,23 @@ export function DealPreviewCard({ deal }: DealPreviewCardProps) {
         </ul>
         <div className="mt-3">
           <EvidenceDrawer evidence={product} />
+        </div>
+        <div className="mt-4">
+          <RelatedLinksPanel
+            links={[
+              { label: 'Product detail', href: productRoute(product.id), detail: product.name },
+              {
+                label: `Search ${product.name}`,
+                href: searchRoute({ q: product.name, category: product.categorySlug, chain: deal.chain?.toLowerCase() })
+              },
+              { label: `${product.categoryName} market`, href: categoryMarketHref(product.categorySlug) },
+              { label: `Browse ${product.categoryName}`, href: categoryBrowseHref(product.categorySlug) },
+              ...(deal.chain
+                ? [{ label: `${deal.chain} store`, href: storeSlugHref(deal.chain.toLowerCase()), detail: 'Chain landing when store ID unavailable' }]
+                : []),
+              { label: 'How deal score works', href: methodologyDealScoreHref() }
+            ]}
+          />
         </div>
         <Link className="mt-4 inline-flex rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" href={fullPageHref}>
           Open full product page
