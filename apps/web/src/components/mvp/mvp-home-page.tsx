@@ -5,12 +5,13 @@ import { PageShell } from '@/components/data-ui';
 import { getHomePageData } from '@/lib/mvp/data';
 import { formatDate, formatSek } from '@/lib/mvp/format';
 import { categoryMarketHref, productRoute } from '@/lib/mvp/routes';
-import { PageQuestionHeader, PanelPurpose } from './handoff-content';
+import { PageQuestionHeader } from './handoff-content';
 import { MvpSectionCard } from './mvp-section-card';
 import { MvpProductCard } from './product-card';
 import { NoVerifiedDataPanel } from './no-verified-data-panel';
 import { DealBadge } from './deal-badge';
 import { EvidenceStrip } from './evidence-strip';
+import { KpiCard } from './visual-intelligence';
 export function MvpHomePage() {
   const data = getHomePageData();
   return (
@@ -65,13 +66,13 @@ export function MvpHomePage() {
 
       <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
         {[
-          { label: 'Products tracked', value: data.productCount.toLocaleString('sv-SE'), detail: 'Products tracked show how much of the catalogue has verified evidence.' },
-          { label: 'Stores mapped', value: data.mapPreviewStores.length.toLocaleString('sv-SE'), detail: 'Store coordinates help connect prices to real shopping trips.' },
-          { label: 'Fresh price observations', value: data.marketSnapshot.categoryIndexRows.reduce((sum, row) => sum + row.observationCount, 0).toLocaleString('sv-SE'), detail: 'Fresh price observations help us avoid showing stale deals.' },
-          { label: 'Chains compared', value: data.marketSnapshot.chainIndexSeries.length.toLocaleString('sv-SE'), detail: 'Chain comparisons show where prices differ before you leave home.' },
-          { label: 'Categories covered', value: data.categoryCount.toLocaleString('sv-SE'), detail: 'Category coverage lets you drill from market movement into products.' }
+          { label: 'Products tracked', value: data.productCount.toLocaleString('sv-SE'), detail: 'Products tracked show how much of the catalogue has verified evidence.', href: '/products' },
+          { label: 'Stores mapped', value: data.mapPreviewStores.length.toLocaleString('sv-SE'), detail: 'Store coordinates help connect prices to real shopping trips.', href: '/map' },
+          { label: 'Fresh price observations', value: data.marketSnapshot.categoryIndexRows.reduce((sum, row) => sum + row.observationCount, 0).toLocaleString('sv-SE'), detail: 'Fresh price observations help us avoid showing stale deals.', href: '/coverage' },
+          { label: 'Chains compared', value: data.marketSnapshot.chainIndexSeries.length.toLocaleString('sv-SE'), detail: 'Chain comparisons show where prices differ before you leave home.', href: '/chain-index' },
+          { label: 'Categories covered', value: data.categoryCount.toLocaleString('sv-SE'), detail: 'Category coverage lets you drill from market movement into products.', href: '/browse' }
         ].map((metric) => (
-          <PanelPurpose description={metric.detail} key={metric.label} question={metric.label} title={metric.value} />
+          <KpiCard detail={metric.detail} href={metric.href} key={metric.label} label={metric.label} value={metric.value} />
         ))}
       </div>
 
