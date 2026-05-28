@@ -11,7 +11,9 @@ import { MvpProductCard } from './product-card';
 import { NoVerifiedDataPanel } from './no-verified-data-panel';
 import { DealBadge } from './deal-badge';
 import { EvidenceStrip } from './evidence-strip';
+import { PublicAdSlot } from '@/components/public-ad-slot';
 import { KpiCard } from './visual-intelligence';
+
 export function MvpHomePage() {
   const data = getHomePageData();
   return (
@@ -63,6 +65,10 @@ export function MvpHomePage() {
           Search
         </button>
       </form>
+
+      <div className="mt-6">
+        <PublicAdSlot slotId="home_after_hero" />
+      </div>
 
       <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
         {[

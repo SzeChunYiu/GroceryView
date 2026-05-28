@@ -23,3 +23,12 @@ test('search placement requires index >= 12', () => {
   assert.match(adPolicy, /searchAdAllowedAfterIndex/);
   assert.match(adPolicy, /resultIndex >= 12/);
 });
+
+test('public pages integrate policy-gated ad slots', async () => {
+  const home = await readFile(new URL('../src/components/mvp/mvp-home-page.tsx', import.meta.url), 'utf8');
+  const searchGrid = await readFile(new URL('../src/components/search/search-results-grid.tsx', import.meta.url), 'utf8');
+  const dealsFeed = await readFile(new URL('../src/components/deals/deal-feed-with-previews.tsx', import.meta.url), 'utf8');
+  assert.match(home, /PublicAdSlot/);
+  assert.match(searchGrid, /search_after_results_12/);
+  assert.match(dealsFeed, /deals_bottom/);
+});

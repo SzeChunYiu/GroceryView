@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import type { ReactNode } from 'react';
+import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 import type { RoutePerformanceBudgetReport } from '@/lib/telemetry';
 import { AppNav } from './app-nav';
 import { BottomNav } from './bottom-nav';
@@ -17,9 +17,9 @@ import { freshnessCopy, sourceLimitationCopy } from '@/lib/content-style';
 import { groceryTranslator } from '@/lib/i18n';
 import type { SourceHealthDashboardRow, SourceManagementAction } from '@/lib/source-health';
 
-export function PageShell({ children }: Readonly<{ children: ReactNode }>) {
+export function PageShell({ children, ...props }: Readonly<{ children: ReactNode } & ComponentPropsWithoutRef<'div'>>) {
   return (
-    <div className="gv-page-shell min-h-screen bg-[#f5f1e8] text-slate-950">
+    <div className="gv-page-shell min-h-screen bg-[#f5f1e8] text-slate-950" {...props}>
       <AppNav />
       <main className="gv-page-main mx-auto w-full max-w-7xl px-4 pb-20 pt-6 sm:px-6 lg:px-8 lg:pb-6">{children}</main>
       <footer className="mx-auto w-full max-w-7xl px-4 pb-28 pt-2 text-sm font-bold text-slate-600 sm:px-6 lg:px-8 lg:pb-8">

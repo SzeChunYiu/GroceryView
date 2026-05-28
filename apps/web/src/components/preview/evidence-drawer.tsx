@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import type { VerifiedEvidence } from '@/lib/mvp/types';
+import { trackGroceryViewEvent } from '@/lib/analytics';
 import { formatConfidenceLabel, formatDate, formatFreshness } from '@/lib/mvp/format';
 import { PreviewDrawer } from './preview-drawer';
 
@@ -21,7 +22,15 @@ export function EvidenceDrawer({ evidence, triggerLabel = 'View evidence' }: Rea
         ref={triggerRef}
         aria-expanded={open}
         className="text-xs font-black uppercase tracking-[0.14em] text-emerald-800 underline-offset-2 hover:underline"
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setOpen(true);
+          trackGroceryViewEvent({
+            eventName: 'evidence_drawer_opened',
+            sourcePanel: 'evidence_drawer',
+            entityType: 'product',
+            entityId: evidence.sourceLabel
+          });
+        }}
         type="button"
       >
         {triggerLabel}

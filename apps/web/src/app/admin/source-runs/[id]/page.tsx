@@ -1,4 +1,5 @@
-import { AdminBackstageScaffold, adminBackstageMetadata } from '@/lib/admin-backstage-scaffold';
+import { AdminBackstageScaffold, AdminReportSourceLabel, adminBackstageMetadata } from '@/lib/admin-backstage-scaffold';
+import { getSourceRunDetail, getSourceRunsReport } from '@/lib/admin-reports/source-runs';
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -11,6 +12,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 export default async function AdminSourceRunDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const { label } = getSourceRunsReport();
+  const detail = getSourceRunDetail(id);
+
   return (
     <AdminBackstageScaffold
       description="Raw counts, quality checks, dead letters, and publish gate outcome for a single ingestion run."
@@ -19,24 +23,29 @@ export default async function AdminSourceRunDetailPage({ params }: { params: Pro
       relatedLinks={[{ href: '/admin/source-runs', label: 'All runs' }]}
       title={`Run ${id}`}
     >
-      <dl className="grid gap-3 text-sm font-semibold text-slate-700 sm:grid-cols-2">
-        <div>
-          <dt className="text-xs font-black uppercase tracking-[0.14em] text-slate-500">Quality status</dt>
-          <dd className="mt-1 text-slate-950">Passed critical gates · 2 warnings</dd>
-        </div>
-        <div>
-          <dt className="text-xs font-black uppercase tracking-[0.14em] text-slate-500">Publish decision</dt>
-          <dd className="mt-1 text-slate-950">Gold snapshot eligible</dd>
-        </div>
-        <div>
-          <dt className="text-xs font-black uppercase tracking-[0.14em] text-slate-500">Raw records</dt>
-          <dd className="mt-1 text-slate-950">12,462</dd>
-        </div>
-        <div>
-          <dt className="text-xs font-black uppercase tracking-[0.14em] text-slate-500">Dead letters</dt>
-          <dd className="mt-1 text-slate-950">2 · review queue</dd>
-        </div>
-      </dl>
+      <AdminReportSourceLabel label={label} />
+      {detail ? (
+        <dl className="grid gap-3 text-sm font-semibold text-slate-700 sm:grid-cols-2">
+          <div>
+            <dt className="text-xs font-black uppercase tracking-[0.14em] text-slate-500">Quality status</dt>
+            <dd className="mt-1 text-slate-950">{detail.qualityStatus}</dd>
+          </div>
+          <div>
+            <dt className="text-xs font-black uppercase tracking-[0.14em] text-slate-500">Publish decision</dt>
+            <dd className="mt-1 text-slate-950">{detail.publishDecision}</dd>
+          </div>
+          <div>
+            <dt className="text-xs font-black uppercase tracking-[0.14em] text-slate-500">Raw records</dt>
+            <dd className="mt-1 text-slate-950">{detail.rawRecords.toLocaleString('sv-SE')}</dd>
+          </div>
+          <div>
+            <dt className="text-xs font-black uppercase tracking-[0.14em] text-slate-500">Dead letters</dt>
+            <dd className="mt-1 text-slate-950">{detail.deadLetters} · {detail.deadLetterNote}</dd>
+          </div>
+        </dl>
+      ) : (
+        <p className="text-sm font-semibold text-slate-700">No scaffold detail for run {id}. Connect source_runs lookup next.</p>
+      )}
     </AdminBackstageScaffold>
   );
 }

@@ -32,3 +32,13 @@ test('interactive preview components export and use PreviewDrawer pattern', asyn
   assert.match(drawer, /Escape/);
   assert.match(drawer, /aria-modal/);
 });
+
+test('public flows wire preview components', async () => {
+  const searchPage = await readFile(new URL('../src/app/search/page.tsx', import.meta.url), 'utf8');
+  const dealsPage = await readFile(new URL('../src/app/deals/page.tsx', import.meta.url), 'utf8');
+  const marketPage = await readFile(new URL('../src/app/market/page.tsx', import.meta.url), 'utf8');
+
+  assert.match(searchPage, /SearchResultsGrid/);
+  assert.match(dealsPage, /DealFeedWithPreviews/);
+  assert.match(marketPage, /CategoryPreviewDrawer/);
+});

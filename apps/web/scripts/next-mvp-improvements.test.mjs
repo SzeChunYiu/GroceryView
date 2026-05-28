@@ -13,14 +13,15 @@ test("MVP product cards use slug routes, not backend ids", async () => {
 });
 
 test("search cards link product, browse, market, and category-filter routes by slug", async () => {
-  const source = await read("src/app/search/page.tsx");
-  assert.match(source, /href=\{`\/products\/\$\{card\.slug\}`\}/);
-  assert.match(source, /href=\{`\/browse\/\$\{encodeURIComponent\(card\.categorySlug\)\}`\}/);
-  assert.match(source, /href=\{`\/market\/\$\{encodeURIComponent\(card\.categorySlug\)\}`\}/);
-  assert.match(source, /search\?category=\$\{encodeURIComponent\(card\.categorySlug\)\}/);
-  assert.match(source, /Sort results/);
-  assert.match(source, /Showing results/);
-  assert.doesNotMatch(source, /Server-side cursor pagination/);
+  const searchPage = await read("src/app/search/page.tsx");
+  const searchGrid = await read("src/components/search/search-results-grid.tsx");
+  const previewCard = await read("src/components/preview/search-result-preview-card.tsx");
+  assert.match(searchPage, /SearchResultsGrid/);
+  assert.match(searchGrid, /categorySlug: card\.categorySlug/);
+  assert.match(previewCard, /productSlugHref\(card\.slug\)/);
+  assert.match(searchPage, /Sort results/);
+  assert.match(searchPage, /Showing results/);
+  assert.doesNotMatch(searchPage, /Server-side cursor pagination/);
 });
 
 test("market table and panels include requested analytical columns and surfaces", async () => {
@@ -49,7 +50,9 @@ test("map layer controls, selected detail panel, and linked deal-store cards are
   }
   assert.match(source, /Active layer: \{selectedLayer\}/);
   assert.match(source, /href=\{`\/products\/\$\{encodeURIComponent\(slugifyRouteValue\(deal\.dealName\)\)\}`\}/);
-  assert.match(source, /href=\{`\/stores\/\$\{encodeURIComponent\(store\.id\)\}`\}/);
+  assert.match(source, /MapNearbyStorePreviews/);
+  const previews = await read("src/components/map/map-nearby-store-previews.tsx");
+  assert.match(previews, /storeSlug=\{store\.id\}/);
 });
 
 test("mobile nav is constrained to primary MVP items", async () => {

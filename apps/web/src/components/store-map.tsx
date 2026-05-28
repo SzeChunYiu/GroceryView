@@ -5,7 +5,7 @@ import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { osmStoreHolidayWarningLabel, osmStoreOpeningHoursLabel, osmStores, type OsmStore } from '@/lib/osm-stores';
 import { cheapestMapChain, mapChainIndexScores } from '@/lib/map-chain-index';
-import { trackStoreDirectionsClick } from '@/lib/analytics';
+import { trackGroceryViewEvent, trackStoreDirectionsClick } from '@/lib/analytics';
 import { rankNearestStores, type PreferredPickupMode } from '@/lib/geolocation';
 import type { NearbyDealRecommendation, StoreDistanceRow } from '@/lib/store-distance';
 
@@ -393,6 +393,12 @@ export function StoreMap({
         if (!f) return;
         const p = f.properties as Record<string, string | number | undefined>;
         setSelectedStoreSlug(String(p.slug ?? ''));
+        trackGroceryViewEvent({
+          eventName: 'map_marker_selected',
+          sourcePanel: 'store_map',
+          entityType: 'store',
+          entityId: String(p.slug ?? '')
+        });
         const [lng, lat] = (f.geometry as GeoJSON.Point).coordinates;
         const directions = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
         const mapCenter = map.getCenter();

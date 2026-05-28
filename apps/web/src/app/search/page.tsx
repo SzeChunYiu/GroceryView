@@ -1,6 +1,6 @@
+import { SearchResultsGrid } from '@/components/search/search-results-grid';
 import { PageShell, SearchRecoveryPanel } from '@/components/data-ui';
-import { EvidenceStrip } from '@/components/mvp/evidence-strip';
-import { confidenceLabelFromScore } from '@/lib/mvp/evidence';
+import { GroceryViewSurfaceAnalytics } from '@/components/analytics/groceryview-surface-analytics';
 import { PageQuestionHeader, GuidedEmptyState } from '@/components/mvp/handoff-content';
 import { ChartShell, ChartTableFallback, Sparkline } from '@/components/mvp/visual-intelligence';
 import { RecentSearchReplayPills } from '@/components/SearchBar';
@@ -89,7 +89,8 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
     .filter(([, value]) => value);
 
   return (
-    <PageShell>
+    <PageShell data-gv-surface="search">
+      <GroceryViewSurfaceAnalytics surface="search" />
       <PageQuestionHeader
         eyebrow="Search"
         question="Which products match my filters?"
@@ -118,7 +119,15 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
           <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">Sort results</p>
           <div className="mt-2 flex flex-wrap gap-2">
             {searchSortControls.map((sort) => (
-              <a className="rounded-full bg-slate-100 px-3 py-2 text-xs font-black text-slate-800" href={cursorHref({ ...resolvedSearchParams, sort: sort.value }, null)} key={`${sort.value}-${sort.label}`}>{sort.label}</a>
+              <a
+                className="rounded-full bg-slate-100 px-3 py-2 text-xs font-black text-slate-800"
+                data-gv-event="search_sort_changed"
+                data-gv-sort={sort.value}
+                href={cursorHref({ ...resolvedSearchParams, sort: sort.value }, null)}
+                key={`${sort.value}-${sort.label}`}
+              >
+                {sort.label}
+              </a>
             ))}
           </div>
         </section>
@@ -150,7 +159,14 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
           >
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
               {resultEvidenceRows.map((row) => (
-                <a className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4" href={row.href} key={row.href}>
+                <a
+                  className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4"
+                  data-gv-entity-id={row.href.replace('/products/', '')}
+                  data-gv-entity-type="product"
+                  data-gv-event="search_result_clicked"
+                  href={row.href}
+                  key={row.href}
+                >
                   <p className="text-xs font-black uppercase tracking-[0.14em] text-emerald-800">Result card evidence</p>
                   <h3 className="mt-1 text-base font-black text-slate-950">{row.name}</h3>
                   <p className="mt-1 text-sm font-black text-emerald-900">{row.price}</p>
@@ -254,40 +270,25 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
             ]}
           />
         ) : null}
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {pagedResultCards.map((card) => (
-            <article className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm" key={card.slug}>
-              <a className="text-xs font-black uppercase tracking-[0.16em] text-emerald-700 underline" href={`/browse/${encodeURIComponent(card.categorySlug)}`}>{card.categoryLabel}</a>
-              <h3 className="mt-2 text-lg font-black text-slate-950"><a href={`/products/${card.slug}`}>{card.name}</a></h3>
-              <p className="mt-1 text-sm font-semibold text-slate-600">{card.brand}</p>
-              <div className="mt-3 rounded-2xl bg-emerald-50 p-3">
-                <p className="text-xl font-black text-emerald-950">{card.cheapestPriceLabel}</p>
-                <p className="mt-1 text-sm font-bold text-emerald-800">{card.unitPriceLabel}</p>
-              </div>
-              <p className="mt-3 text-xs font-bold text-slate-500">
-                {card.chainSlug ? <a className="underline" href={`/search?chain=${encodeURIComponent(card.chainSlug)}`}>{card.chainLabel}</a> : card.chainLabel}
-              </p>
-              <div className="mt-3 flex flex-wrap gap-2 text-xs font-black">
-                <a className="rounded-full bg-emerald-50 px-3 py-2 text-emerald-950" href={`/products/${card.slug}`}>Open product</a>
-                <a className="rounded-full bg-slate-100 px-3 py-2 text-slate-800" href={`/browse/${encodeURIComponent(card.categorySlug)}`}>Browse category</a>
-                <a className="rounded-full bg-slate-100 px-3 py-2 text-slate-800" href={`/market/${encodeURIComponent(card.categorySlug)}`}>Market context</a>
-                <a className="rounded-full bg-slate-100 px-3 py-2 text-slate-800" href={`/search?category=${encodeURIComponent(card.categorySlug)}&similarTo=${encodeURIComponent(card.slug)}`}>Compare similar</a>
-              </div>
-              <div className="mt-3 rounded-2xl bg-slate-50 p-3">
-                <EvidenceStrip
-                  evidence={{
-                    sourceLabel: card.sourceTables.join(' + ') || 'Verified product index',
-                    freshnessLabel: card.sortNewestObservedAt ? 'fresh' : 'unknown',
-                    confidence: card.sortConfidence,
-                    confidenceLabel: confidenceLabelFromScore(card.sortConfidence, 1),
-                    observationCount: card.isAvailable ? 1 : 0,
-                    lastObservedAt: card.sortNewestObservedAt || new Date(0).toISOString()
-                  }}
-                />
-              </div>
-            </article>
-          ))}
-        </div>
+        <SearchResultsGrid
+          cards={pagedResultCards.map((card) => ({
+            slug: card.slug,
+            name: card.name,
+            brand: card.brand,
+            imageUrl: card.imageUrl,
+            categoryLabel: card.categoryLabel,
+            categorySlug: card.categorySlug,
+            cheapestPrice: card.cheapestPrice,
+            cheapestPriceLabel: card.cheapestPriceLabel,
+            unitPriceLabel: card.unitPriceLabel,
+            chainLabel: card.chainLabel,
+            chainSlug: card.chainSlug,
+            sortConfidence: card.sortConfidence,
+            sortNewestObservedAt: card.sortNewestObservedAt,
+            sourceTables: card.sourceTables,
+            isAvailable: card.isAvailable ?? false
+          }))}
+        />
       </section>
     </PageShell>
   );

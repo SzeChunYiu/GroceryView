@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { PublicAdSlot } from '@/components/public-ad-slot';
 import { PageShell } from '@/components/data-ui';
 import { PageQuestionHeader } from '@/components/mvp/handoff-content';
 import { MvpBreadcrumbs } from '@/components/mvp/mvp-breadcrumbs';
@@ -99,6 +100,10 @@ export default function BrowsePage() {
           ))}
         </div>
       </MvpSectionCard>
+
+      <div className="mt-6">
+        <PublicAdSlot slotId="browse_after_categories" />
+      </div>
 
       <MvpSectionCard className="mt-6" title="All categories">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

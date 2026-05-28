@@ -5,7 +5,17 @@ type ChartPoint = { date?: string; label?: string; value: number };
 type ChartTone = 'up' | 'down' | 'neutral';
 type ChartSeries = { label: string; points: ChartPoint[]; tone?: ChartTone };
 type TableColumn<T> = { key: string; label: string; render: (row: T) => ReactNode };
-type HeatmapCell = { row: string; column: string; valueLabel: string; tone?: 'low' | 'medium' | 'high'; href?: string; signal?: string };
+type HeatmapCell = {
+  row: string;
+  column: string;
+  valueLabel: string;
+  tone?: 'low' | 'medium' | 'high';
+  href?: string;
+  signal?: string;
+  analyticsEvent?: string;
+  entityType?: string;
+  entityId?: string;
+};
 
 function extent(series: ChartSeries[]) {
   const values = series.flatMap((entry) => entry.points.map((point) => point.value));
@@ -130,7 +140,20 @@ export function HeatmapMatrix({ cells }: Readonly<{ cells: HeatmapCell[] }>) {
       {cells.map((cell) => {
         const tone = cell.tone === 'high' ? 'border-rose-100 bg-rose-50 text-rose-950' : cell.tone === 'medium' ? 'border-amber-100 bg-amber-50 text-amber-950' : 'border-emerald-100 bg-emerald-50 text-emerald-950';
         const body = <><span className="block text-xs font-black uppercase tracking-[0.14em]">{cell.column}</span><span className="mt-1 block text-lg font-black">{cell.row}</span><span className="mt-1 block text-sm font-bold">{cell.valueLabel} · {cell.signal}</span></>;
-        return cell.href ? <Link className={`rounded-2xl border p-3 ${tone}`} href={cell.href} key={`${cell.row}-${cell.column}`}>{body}</Link> : <div className={`rounded-2xl border p-3 ${tone}`} key={`${cell.row}-${cell.column}`}>{body}</div>;
+        return cell.href ? (
+          <Link
+            className={`rounded-2xl border p-3 ${tone}`}
+            data-gv-entity-id={cell.entityId}
+            data-gv-entity-type={cell.entityType}
+            data-gv-event={cell.analyticsEvent}
+            href={cell.href}
+            key={`${cell.row}-${cell.column}`}
+          >
+            {body}
+          </Link>
+        ) : (
+          <div className={`rounded-2xl border p-3 ${tone}`} key={`${cell.row}-${cell.column}`}>{body}</div>
+        );
       })}
     </div>
   );

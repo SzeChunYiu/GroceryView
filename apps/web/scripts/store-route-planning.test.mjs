@@ -28,7 +28,7 @@ describe('map nearest store route planning', () => {
     assert.match(mapPage, /routeAwareNearestStorePlan/);
     assert.match(mapPage, /Route-aware nearest stores/);
     assert.match(mapPage, /basketTotalSek/);
-    assert.match(mapPage, /openingStatusLabel/);
+    assert.match(mapPage, /MapNearbyStorePreviews/);
     assert.match(mapPage, /no private GPS by default/i);
 
     assert.match(storeMap, /routeRecommendations/);

@@ -1,0 +1,63 @@
+{
+  "recommended_mode": "one Composer task per branch",
+  "batches": [
+    {
+      "name": "Batch 1 - mostly independent infrastructure",
+      "tasks": [
+        "A_CLOSE_REGISTRIES_AND_TESTS",
+        "C_BACKSTAGE_REAL_REPORTS",
+        "E_DATA_ENGINEERING_REPORTS",
+        "F_ANALYTICS_EVENTS"
+      ]
+    },
+    {
+      "name": "Batch 2 - public UI, run after Batch 1",
+      "tasks": [
+        "B_WIRE_PREVIEW_COMPONENTS",
+        "D_AD_SYSTEM_INTEGRATION",
+        "G_FINAL_PUBLIC_COPY_UX_QA"
+      ]
+    }
+  ],
+  "tasks": {
+    "A_CLOSE_REGISTRIES_AND_TESTS": {
+      "file": "02_TASK_A_CLOSE_REGISTRIES_AND_TESTS.md",
+      "avoid_parallel_with": [
+        "any task editing docs/roadmap/atomic-gap-registry.md"
+      ]
+    },
+    "B_WIRE_PREVIEW_COMPONENTS": {
+      "file": "03_TASK_B_WIRE_PREVIEW_COMPONENTS.md",
+      "avoid_parallel_with": [
+        "G_FINAL_PUBLIC_COPY_UX_QA",
+        "D_AD_SYSTEM_INTEGRATION"
+      ]
+    },
+    "C_BACKSTAGE_REAL_REPORTS": {
+      "file": "04_TASK_C_BACKSTAGE_REAL_REPORTS.md",
+      "avoid_parallel_with": []
+    },
+    "D_AD_SYSTEM_INTEGRATION": {
+      "file": "05_TASK_D_AD_SYSTEM_INTEGRATION.md",
+      "avoid_parallel_with": [
+        "G_FINAL_PUBLIC_COPY_UX_QA",
+        "B_WIRE_PREVIEW_COMPONENTS"
+      ]
+    },
+    "E_DATA_ENGINEERING_REPORTS": {
+      "file": "06_TASK_E_DATA_ENGINEERING_REPORTS.md",
+      "avoid_parallel_with": []
+    },
+    "F_ANALYTICS_EVENTS": {
+      "file": "07_TASK_F_ANALYTICS_EVENTS.md",
+      "avoid_parallel_with": []
+    },
+    "G_FINAL_PUBLIC_COPY_UX_QA": {
+      "file": "08_TASK_G_FINAL_PUBLIC_COPY_UX_QA.md",
+      "avoid_parallel_with": [
+        "B_WIRE_PREVIEW_COMPONENTS",
+        "D_AD_SYSTEM_INTEGRATION"
+      ]
+    }
+  }
+}

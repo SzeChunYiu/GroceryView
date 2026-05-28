@@ -32,7 +32,7 @@ describe('31-onward handoff: public search and market routes', () => {
     assert.match(searchPage, /Which products match my filters\?/);
     assert.match(searchPage, /Showing .*matching products/);
     assert.match(searchPage, /ChartShell/);
-    assert.match(searchPage, /href=\{`\/products\/\$\{card\.slug\}`\}/);
+    assert.match(searchPage, /SearchResultsGrid/);
   });
 
   it('market uses visual intelligence primitives and 3M/1Y table columns', async () => {
