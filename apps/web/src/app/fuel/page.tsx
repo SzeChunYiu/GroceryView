@@ -630,10 +630,10 @@ export default async function FuelPage({ searchParams }: Readonly<{ searchParams
               className="grid gap-2 border-b border-slate-100 px-4 py-3 text-sm last:border-b-0 md:grid-cols-[1fr_0.5fr_1fr_0.9fr_0.6fr_0.6fr]"
               key={`${station.osmType}-${station.osmId}-row`}
             >
-              <span className="min-w-0">
+              <Link className="min-w-0 underline-offset-4 hover:underline" href={`/fuel/stations/${station.osmId}`}>
                 <span className="block truncate font-black text-slate-950">{station.name}</span>
                 <span className="mt-1 block text-xs font-semibold text-slate-500">OSM {station.osmType}/{station.osmId}</span>
-              </span>
+              </Link>
               <span className="font-semibold text-slate-700">{station.chain}</span>
               <span className="truncate text-slate-600">{stationAddress(station) || 'Address not tagged'}</span>
               <span className="text-xs font-semibold leading-5 text-slate-600">{stationSupportedGrades(station)}</span>
