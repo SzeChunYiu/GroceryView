@@ -2,12 +2,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { ProductSummary } from '@/lib/mvp/types';
 import { formatSek } from '@/lib/mvp/format';
-import { productRoute } from '@/lib/mvp/routes';
+import { productSlugHref } from '@/lib/mvp/routes';
 import { DealBadge } from './deal-badge';
 import { EvidenceStrip } from './evidence-strip';
 
 export function MvpProductCard({ product }: Readonly<{ product: ProductSummary }>) {
-  const href = productRoute(product.id);
+  const href = productSlugHref(product.slug);
   return (
     <Link className="block rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:ring-2 hover:ring-emerald-200" href={href}>
       <div className="flex gap-3">

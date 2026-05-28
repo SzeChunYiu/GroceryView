@@ -268,11 +268,19 @@ function categoryIndexRows(): CategoryIndexRow[] {
       confidence: category.openPriceRows > 0 ? Math.min(1, category.openPriceRows / 40) : 0
     });
     const weeklyChangePct = sampleProduct ? computeWeeklyChangePct(sampleProduct) : undefined;
+    const sparkline = sampleProduct ? sparklineFromProduct(sampleProduct) : [];
+    const firstPoint = sparkline[0];
+    const lastPoint = sparkline.at(-1);
+    const wholeWindowChangePct = firstPoint && lastPoint && firstPoint.value > 0
+      ? ((lastPoint.value - firstPoint.value) / firstPoint.value) * 100
+      : undefined;
     return {
       categorySlug: category.slug,
       categoryName: category.label,
       weeklyChangePct,
-      sparkline: sampleProduct ? sparklineFromProduct(sampleProduct) : [],
+      threeMonthChangePct: wholeWindowChangePct,
+      oneYearChangePct: wholeWindowChangePct,
+      sparkline,
       cheapestChain: matchedChainProducts.find((product) => product.category === category.slug)?.lowestChain,
       mostExpensiveChain: chainCategoryCoverage.find((row) => row.slug === category.slug)?.leadingLowestChain,
       ...evidence

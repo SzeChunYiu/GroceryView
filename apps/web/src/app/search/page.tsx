@@ -14,6 +14,14 @@ import { buildProductSearchView } from '@/lib/verified-data';
 type SearchPageParams = Record<string, string | string[] | undefined>;
 const emptySearchPageParams: SearchPageParams = {};
 const SEARCH_PAGE_SIZE = 24;
+const searchSortControls = [
+  { value: 'unit_price_asc', label: 'Cheapest' },
+  { value: 'relevance', label: 'Best deal' },
+  { value: 'newest_observation', label: 'Freshest' },
+  { value: 'confidence_desc', label: 'Highest confidence' },
+  { value: 'newest_observation', label: 'Price drop' },
+  { value: 'unit_price_asc', label: 'Unit price' }
+];
 
 function firstParam(params: SearchPageParams, key: string) {
   const value = params[key];
@@ -88,8 +96,15 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
             {activeFilters.map(([key, value]) => (
               <span className="rounded-full bg-emerald-50 px-3 py-2 text-xs font-black text-emerald-950" key={key}>{key}: {value}</span>
             ))}
-            {['cheapest', 'best-deal', 'freshest', 'confidence', 'price-drop', 'unit-price'].map((sort) => (
-              <a className="rounded-full bg-slate-100 px-3 py-2 text-xs font-black text-slate-800" href={cursorHref({ ...resolvedSearchParams, sort }, null)} key={sort}>Sort: {sort}</a>
+          </div>
+        </section>
+      ) : null}
+      {searchView.resultCards.length > 0 ? (
+        <section className="mx-auto mt-4 w-full max-w-6xl rounded-3xl border border-slate-200 bg-white p-4 shadow-sm" aria-label="Sort search results">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">Sort results</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {searchSortControls.map((sort) => (
+              <a className="rounded-full bg-slate-100 px-3 py-2 text-xs font-black text-slate-800" href={cursorHref({ ...resolvedSearchParams, sort: sort.value }, null)} key={`${sort.value}-${sort.label}`}>{sort.label}</a>
             ))}
           </div>
         </section>
@@ -163,12 +178,12 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
       ) : null}
       <section className="mx-auto w-full max-w-6xl" aria-label="Cursor-paginated search results">
         <div className="mb-4 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
-          <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">Server-side cursor pagination</p>
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">Showing results</p>
           <h2 className="mt-1 text-xl font-black text-slate-950">
-            Showing {searchView.resultCards.length === 0 ? 0 : offset + 1}-{Math.min(offset + SEARCH_PAGE_SIZE, searchView.resultCards.length)} of {searchView.resultCards.length.toLocaleString('sv-SE')} verified matches
+            Showing {searchView.resultCards.length === 0 ? 0 : offset + 1}-{Math.min(offset + SEARCH_PAGE_SIZE, searchView.resultCards.length)} of {searchView.resultCards.length.toLocaleString('sv-SE')} matching products.
           </h2>
           <p className="mt-1 text-sm font-semibold text-slate-600">
-            The search page renders only this cursor window on the server instead of sending the full result set at once.
+            Use the controls above to compare cheapest, freshest, highest-confidence, and unit-price views.
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
             {previousOffset !== null ? <a className="rounded-full border border-slate-300 px-4 py-2 text-sm font-black text-slate-900" href={cursorHref(resolvedSearchParams, previousOffset)}>Previous results</a> : null}
@@ -189,19 +204,25 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {pagedResultCards.map((card) => (
             <article className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm" key={card.slug}>
-              <a className="text-xs font-black uppercase tracking-[0.16em] text-emerald-700 underline" href={`/search?category=${encodeURIComponent(card.categoryLabel)}`}>{card.categoryLabel}</a>
+              <a className="text-xs font-black uppercase tracking-[0.16em] text-emerald-700 underline" href={`/browse/${encodeURIComponent(card.categorySlug)}`}>{card.categoryLabel}</a>
               <h3 className="mt-2 text-lg font-black text-slate-950"><a href={`/products/${card.slug}`}>{card.name}</a></h3>
               <p className="mt-1 text-sm font-semibold text-slate-600">{card.brand}</p>
               <div className="mt-3 rounded-2xl bg-emerald-50 p-3">
                 <p className="text-xl font-black text-emerald-950">{card.cheapestPriceLabel}</p>
                 <p className="mt-1 text-sm font-bold text-emerald-800">{card.unitPriceLabel}</p>
               </div>
-              <p className="mt-3 text-xs font-bold text-slate-500">{card.chainLabel}</p>
+              <p className="mt-3 text-xs font-bold text-slate-500">
+                {card.chainSlug ? <a className="underline" href={`/search?chain=${encodeURIComponent(card.chainSlug)}`}>{card.chainLabel}</a> : card.chainLabel}
+              </p>
               <div className="mt-3 flex flex-wrap gap-2 text-xs font-black">
                 <a className="rounded-full bg-emerald-50 px-3 py-2 text-emerald-950" href={`/products/${card.slug}`}>Open product</a>
-                <a className="rounded-full bg-slate-100 px-3 py-2 text-slate-800" href={`/market?category=${encodeURIComponent(card.categoryLabel)}`}>Market context</a>
-                <a className="rounded-full bg-slate-100 px-3 py-2 text-slate-800" href={`/search?category=${encodeURIComponent(card.categoryLabel)}&similarTo=${encodeURIComponent(card.slug)}`}>Compare similar</a>
+                <a className="rounded-full bg-slate-100 px-3 py-2 text-slate-800" href={`/browse/${encodeURIComponent(card.categorySlug)}`}>Browse category</a>
+                <a className="rounded-full bg-slate-100 px-3 py-2 text-slate-800" href={`/market/${encodeURIComponent(card.categorySlug)}`}>Market context</a>
+                <a className="rounded-full bg-slate-100 px-3 py-2 text-slate-800" href={`/search?category=${encodeURIComponent(card.categorySlug)}&similarTo=${encodeURIComponent(card.slug)}`}>Compare similar</a>
               </div>
+              <p className="mt-3 rounded-2xl bg-slate-50 p-3 text-xs font-bold leading-5 text-slate-600">
+                {card.sourceTables.join(' + ') || 'Verified product index'} · {card.isAvailable ? 'priced row available' : 'availability not confirmed'}
+              </p>
             </article>
           ))}
         </div>

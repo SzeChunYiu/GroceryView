@@ -8,7 +8,7 @@ import { MvpSectionCard } from '@/components/mvp/mvp-section-card';
 import { MvpProductCard } from '@/components/mvp/product-card';
 import { NoVerifiedDataPanel } from '@/components/mvp/no-verified-data-panel';
 import { getBrowseCategoryData } from '@/lib/mvp/data';
-import { categoryMarketHref, categorySearchHref, chainCategorySearchHref } from '@/lib/mvp/routes';
+import { categoryMarketHref, categorySearchHref, chainCategorySearchHref, productSlugHref } from '@/lib/mvp/routes';
 import { routeMetadata } from '@/lib/seo';
 import { categoryLabels } from '@/lib/openprices-products';
 import { categorySummaries } from '@/lib/verified-data';
@@ -72,7 +72,27 @@ export default async function BrowseCategoryPage({ params }: Readonly<{ params: 
           <p className="text-sm font-semibold leading-6 text-slate-700">
             See which chains are becoming cheaper or more expensive for {data.categoryName.toLowerCase()}. Each chain shortcut opens filtered products for this category.
           </p>
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-4 grid gap-3">
+            {data.overview.categoryIndexRows.map((row) => (
+              <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-3" key={`index-${row.categorySlug}`}>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="font-black text-emerald-950">{row.weeklyChangePct !== undefined ? `${row.weeklyChangePct.toFixed(1)}% weekly` : 'Weekly trend pending'}</p>
+                  <p className="text-xs font-black uppercase tracking-[0.14em] text-emerald-800">{row.confidenceLabel} confidence</p>
+                </div>
+                <div className="mt-3 flex h-12 items-end gap-1" aria-label={`${data.categoryName} mini price index`}>
+                  {row.sparkline.map((point) => (
+                    <Link
+                      className="w-full rounded-t bg-emerald-700"
+                      href={`${categorySearchHref(data.categorySlug)}&date=${encodeURIComponent(point.date)}`}
+                      key={`${point.date}-${point.value}`}
+                      style={{ height: `${Math.max(18, Math.min(48, point.value / 2))}px` }}
+                      title={`${point.date}: ${point.value.toFixed(1)}`}
+                    />
+                  ))}
+                </div>
+                <p className="mt-2 text-xs font-bold text-emerald-900">Cheapest chain: {row.cheapestChain ?? 'not enough chain rows'} · {row.observationCount} observations</p>
+              </div>
+            ))}
             {data.chainCards.map((card) => (
               <Link className="rounded-full bg-emerald-50 px-3 py-2 text-sm font-black text-emerald-950" href={chainCategorySearchHref(card.chain.toLowerCase(), data.categorySlug)} key={`index-${card.chain}`}>
                 {card.chain} chart / products
@@ -84,17 +104,35 @@ export default async function BrowseCategoryPage({ params }: Readonly<{ params: 
           </div>
         </MvpSectionCard>
         <MvpSectionCard title={`Best ${data.categoryName.toLowerCase()} deals right now`}>
-          <div className="grid gap-2 text-sm font-semibold text-slate-700">
-            <p>Best deals near you: filtered by verified chain and store evidence.</p>
-            <p>Best discounts: compared with historic observations when available.</p>
-            <p>Biggest price drops: linked through the central search/product route.</p>
-            <p>Watchlist matches: sign in to save products and categories.</p>
-          </div>
+          {data.bestDeals.length > 0 ? (
+            <div className="grid gap-3">
+              {data.bestDeals.map((deal) => (
+                <Link className="rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm" href={productSlugHref(deal.product.slug)} key={deal.id}>
+                  <p className="text-xs font-black uppercase tracking-[0.14em] text-emerald-800">{deal.chain ?? deal.product.currentBestChain ?? 'Verified chain'} · {deal.confidenceLabel}</p>
+                  <h3 className="mt-2 font-black text-slate-950">{deal.product.name}</h3>
+                  <p className="mt-1 text-sm font-bold text-slate-700">{deal.currentPrice.toFixed(2)} SEK · deal score {deal.dealScore.toFixed(0)}</p>
+                  <p className="mt-2 text-xs font-bold text-slate-500">{deal.reasons.join(' · ')}</p>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <NoVerifiedDataPanel title="No actual deal cards in this category yet" />
+          )}
           <Link className="mt-4 inline-block rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" href={`${categorySearchHref(data.categorySlug)}&sort=best-deal`}>
             Search best deals
           </Link>
         </MvpSectionCard>
       </div>
+
+      <MvpSectionCard className="mt-6" title="Combined quick actions">
+        <div className="flex flex-wrap gap-2">
+          {data.chainCards.slice(0, 4).flatMap((card) => data.subcategories.slice(0, 3).map((sub) => (
+            <Link className="rounded-full bg-slate-100 px-3 py-2 text-sm font-black text-slate-800" href={`${chainCategorySearchHref(card.chain.toLowerCase(), data.categorySlug)}&type=${encodeURIComponent(sub.slug)}`} key={`${card.chain}-${sub.slug}`}>
+              {card.chain} + {sub.label}
+            </Link>
+          )))}
+        </div>
+      </MvpSectionCard>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <MvpSectionCard title="Chains">

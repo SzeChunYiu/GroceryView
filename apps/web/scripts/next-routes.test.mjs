@@ -4485,7 +4485,7 @@ ${seo}`;
     assert.match(routes, /searchRoute/);
     assert.match(routes, /mapRoute/);
     assert.match(routes, /dealsRoute/);
-    assert.match(productCard, /productRoute/);
+    assert.match(productCard, /productSlugHref\(product\.slug\)/);
     assert.match(deals, /MvpBreadcrumbs/);
     assert.match(deals, /RelatedLinksPanel/);
     assert.match(deals, /productRoute\(deal\.product\.id\)/);

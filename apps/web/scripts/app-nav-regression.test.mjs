@@ -44,7 +44,9 @@ function buildNavGroupSegment(groupKey) {
 test('AppNav keeps required navigation groups and child links stable', () => {
   assert.match(source, /const navContractLabels = \[/);
   assert.match(source, /const navGroups = buildNavGroups\(t\)/);
-  assert.match(source, /const mobileNavItems = navGroups\.flatMap\(\(group\) => group\.items\)/);
+  assert.match(source, /const primaryMobileNavItems: NavItem\[\] = \[/);
+  assert.match(source, /const mobileNavItems = primaryMobileNavItems/);
+  assert.doesNotMatch(source, /const mobileNavItems = navGroups\.flatMap\(\(group\) => group\.items\)/);
 
   for (const group of expectedGroups) {
     const segment = buildNavGroupSegment(group.key);
