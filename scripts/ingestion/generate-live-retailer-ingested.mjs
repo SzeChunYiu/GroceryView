@@ -342,6 +342,11 @@ console.log(JSON.stringify(summary, null, 2));
 async function writeCityGross(rows) {
   const sourceUrls = unique(rows.map((row) => row.sourceUrl));
   const storeIds = unique(rows.map((row) => row.storeId));
+  const productChunkExport = await writeChunkedGeneratedArray({
+    directoryName: 'citygross-products',
+    exportPrefix: 'cityGrossProducts',
+    rows
+  });
   await writeGeneratedFile('citygross.ts', [
     '// AUTO-GENERATED from City Gross public store catalog and Loop54 product API.',
     `// sourceUrl: ${sourceUrls[0] ?? 'https://www.citygross.se/api/v1/Loop54/products?Q={query}&skip={skip}&take={take}&siteId={siteId}'}`,
@@ -382,7 +387,7 @@ async function writeCityGross(rows) {
       sourceUrls
     })} as const;`,
     '',
-    `export const cityGrossProducts: CityGrossIngestedProduct[] = ${literal(rows)};`,
+    productChunkExport('cityGrossProducts', 'CityGrossIngestedProduct'),
     ''
   ]);
 }
@@ -686,6 +691,11 @@ async function writeHemkop(products, weeklyDiscounts) {
 async function writeLidl(rows) {
   const sourceUrls = unique(rows.map((row) => row.sourceUrl));
   const storeIds = unique(rows.map((row) => row.storeId));
+  const offerChunkExport = await writeChunkedGeneratedArray({
+    directoryName: 'lidl-store-offers',
+    exportPrefix: 'lidlStoreOffers',
+    rows
+  });
   await writeGeneratedFile('lidl.ts', [
     '// AUTO-GENERATED from Lidl public store pages and public offer pages.',
     `// sourceUrl: ${sourceUrls[0] ?? 'https://www.lidl.se/s/sv-SE/butiker/'}`,
@@ -729,7 +739,7 @@ async function writeLidl(rows) {
       storeIds
     })} as const;`,
     '',
-    `export const lidlStoreOffers: LidlIngestedStoreOffer[] = ${literal(rows)};`,
+    offerChunkExport('lidlStoreOffers', 'LidlIngestedStoreOffer'),
     ''
   ]);
 }
