@@ -1,5 +1,6 @@
 import { PageShell, SearchRecoveryPanel } from '@/components/data-ui';
 import { PageQuestionHeader, GuidedEmptyState } from '@/components/mvp/handoff-content';
+import { ChartShell, ChartTableFallback, Sparkline } from '@/components/mvp/visual-intelligence';
 import { RecentSearchReplayPills } from '@/components/SearchBar';
 import { SaveSearchSubscriptionButton } from '@/components/saved-search-subscriptions';
 import { buildSavedSearchSubscription } from '@/lib/alert-scheduler';
@@ -69,6 +70,17 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
       .filter((product) => `${product.name} ${product.brand} ${product.categoryLabel}`.toLocaleLowerCase('sv-SE').includes(normalizedQuery))
       .slice(0, 3)
     : seoLandingProducts.slice(0, 3);
+  const resultEvidenceRows = pagedResultCards.slice(0, 4).map((card, index) => ({
+    name: card.name,
+    price: card.cheapestPriceLabel,
+    evidence: `${card.sourceTables.join(' + ') || 'Verified product index'} · ${card.isAvailable ? 'priced row available' : 'availability not confirmed'}`,
+    href: `/products/${card.slug}`,
+    sparkline: [
+      { label: 'result rank', value: Math.max(1, pagedResultCards.length - index) },
+      { label: 'filtered rank', value: Math.max(1, pagedResultCards.length - index + 1) },
+      { label: 'open detail', value: Math.max(1, pagedResultCards.length - index + 2) }
+    ]
+  }));
 
   const activeFilters = ['category', 'chain', 'type', 'region', 'store', 'dealLevel', 'sort']
     .map((key) => [key, firstParam(resolvedSearchParams, key)] as const)
@@ -107,6 +119,45 @@ export default async function SearchPage({ searchParams }: { searchParams?: Prom
               <a className="rounded-full bg-slate-100 px-3 py-2 text-xs font-black text-slate-800" href={cursorHref({ ...resolvedSearchParams, sort: sort.value }, null)} key={`${sort.value}-${sort.label}`}>{sort.label}</a>
             ))}
           </div>
+        </section>
+      ) : null}
+      {resultEvidenceRows.length > 0 ? (
+        <section className="mx-auto mt-4 w-full max-w-6xl" aria-label="Search visual intelligence">
+          <ChartShell
+            actionHref={cursorHref(resolvedSearchParams, null)}
+            actionLabel="Refresh filtered results"
+            evidenceItems={[
+              `${searchView.resultCards.length.toLocaleString('sv-SE')} matching products`,
+              `${activeFilters.length} active filters`,
+              'optional sparkline shown only from ranked result evidence'
+            ]}
+            insightTitle="Search result evidence"
+            plainSummary="The first ranked product cards show price, availability, source tables, and an optional sparkline-style rank cue before you open a detail page."
+            userQuestion="Which filtered products are strongest?"
+            fallback={
+              <ChartTableFallback
+                caption="Search result evidence"
+                columns={[
+                  { key: 'name', label: 'Product', render: (row: { name: string }) => row.name },
+                  { key: 'price', label: 'Price', render: (row: { price: string }) => row.price },
+                  { key: 'evidence', label: 'Evidence', render: (row: { evidence: string }) => row.evidence }
+                ]}
+                rows={resultEvidenceRows}
+              />
+            }
+          >
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+              {resultEvidenceRows.map((row) => (
+                <a className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4" href={row.href} key={row.href}>
+                  <p className="text-xs font-black uppercase tracking-[0.14em] text-emerald-800">Result card evidence</p>
+                  <h3 className="mt-1 text-base font-black text-slate-950">{row.name}</h3>
+                  <p className="mt-1 text-sm font-black text-emerald-900">{row.price}</p>
+                  <Sparkline label={`${row.name} optional sparkline`} points={row.sparkline} />
+                  <p className="mt-2 text-xs font-bold leading-5 text-slate-600">{row.evidence}</p>
+                </a>
+              ))}
+            </div>
+          </ChartShell>
         </section>
       ) : null}
       <SaveSearchSubscriptionButton subscription={subscription} />
