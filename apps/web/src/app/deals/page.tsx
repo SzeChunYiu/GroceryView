@@ -8,6 +8,7 @@ import { DealBadge } from '@/components/mvp/deal-badge';
 import { EvidenceStrip } from '@/components/mvp/evidence-strip';
 import { NoVerifiedDataPanel } from '@/components/mvp/no-verified-data-panel';
 import { RelatedLinksPanel } from '@/components/mvp/related-links-panel';
+import { ChartShell, ChartTableFallback, DistributionBand } from '@/components/mvp/visual-intelligence';
 import { buildPantryReplacementFilter } from '@/lib/pantry';
 import { getDealsPageData } from '@/lib/mvp/data';
 import { formatSek } from '@/lib/mvp/format';
@@ -46,6 +47,24 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
   const params = (await searchParams) ?? {};
   const replacementFilter = buildPantryReplacementFilter(paramValue(params.replace));
   const data = getDealsPageData(params);
+  const dealQualityRows = [
+    {
+      label: 'Real Deal',
+      count: data.deals.filter((deal) => deal.dealLabel === 'real_deal').length,
+      detail: 'Strong price-history or nearby comparison support.'
+    },
+    {
+      label: 'Fair Discount',
+      count: data.deals.filter((deal) => deal.dealLabel === 'fair_discount').length,
+      detail: 'Useful reduction, but not the strongest observed opportunity.'
+    },
+    {
+      label: 'Not Really a Deal',
+      count: data.deals.filter((deal) => deal.dealLabel === 'not_really_a_deal').length,
+      detail: 'Highlighted price lacks enough evidence for a strong discount claim.'
+    }
+  ];
+  const totalDealRows = Math.max(1, data.deals.length);
 
   return (
     <PageShell>
@@ -80,6 +99,45 @@ export default async function DealsPage({ searchParams }: Readonly<{ searchParam
           </article>
         ))}
       </section>
+
+      <div className="mt-6">
+        <ChartShell
+          actionHref="/methodology#deal-score"
+          actionLabel="Read deal-score method"
+          evidenceItems={[`${data.deals.length} visible deals`, snapshot.retrievedLabel, 'Observed rows only']}
+          hasData={data.deals.length > 0}
+          insightTitle="Deal quality distribution"
+          plainSummary="This visual shows how many visible deals are strong, fair, or weak so the page does not over-emphasize a single advertised discount."
+          userQuestion="How strong are the current deal labels?"
+          fallback={
+            <ChartTableFallback
+              caption="Deal quality distribution table"
+              columns={[
+                { key: 'label', label: 'Label', render: (row: (typeof dealQualityRows)[number]) => row.label },
+                { key: 'count', label: 'Count', render: (row: (typeof dealQualityRows)[number]) => row.count.toLocaleString('sv-SE') },
+                { key: 'detail', label: 'Why it ranks there', render: (row: (typeof dealQualityRows)[number]) => row.detail }
+              ]}
+              rows={dealQualityRows}
+            />
+          }
+        >
+          <div className="grid gap-3 md:grid-cols-3">
+            {dealQualityRows.map((row) => (
+              <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4" key={row.label}>
+                <div className="flex items-center justify-between gap-3">
+                  <p className="font-black text-slate-950">{row.label}</p>
+                  <p className="font-mono text-2xl font-black text-emerald-800">{row.count}</p>
+                </div>
+                <DistributionBand current={row.count} label={`${row.label} share of visible deals`} max={totalDealRows} min={0} />
+                <p className="mt-2 text-xs font-bold leading-5 text-slate-600">{row.detail}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-4 rounded-2xl bg-emerald-50 p-3 text-sm font-bold leading-6 text-emerald-950">
+            Why-ranked explanation: deal labels are ranked from observed discount strength, historic context when available, current price, source confidence, and nearby comparison evidence. Missing history keeps the claim cautious.
+          </p>
+        </ChartShell>
+      </div>
 
       <section className="mt-6 rounded-[2rem] border border-sky-200 bg-sky-50/70 p-5" aria-label="Deal feed filters by chain and category">
         <p className="text-xs font-black uppercase tracking-[0.16em] text-sky-800">Deal tabs</p>
