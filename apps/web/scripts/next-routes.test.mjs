@@ -3743,6 +3743,8 @@ ${seo}`;
     assert.match(products, /minConfidence\?: string \| string\[\]/);
     assert.match(products, /buildProductSearchView\(resolvedSearchParams, \{ accountAvoidAllergensDefault: allergenDefault\.checked \}\)/);
     assert.match(products, /search\.activeFilters/);
+    assert.match(products, /href=\{searchFacetUrl\(\{ category: facet\.value \}\)\}/);
+    assert.match(products, /href=\{searchFacetUrl\(\{ category: facet\.value \}\)\} key=\{facet\.value\}>\{facet\.label\} · \{facet\.count\}<\/Link>/);
     assert.match(products, /href=\{searchFacetUrl\(\{ label: facet\.value \}\)\}/);
     assert.match(products, /href=\{searchFacetUrl\(\{ chain: facet\.value \}\)\}/);
     assert.match(products, /name="q"/);

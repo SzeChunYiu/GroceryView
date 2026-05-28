@@ -60,15 +60,14 @@ const DONE_GAP_EVIDENCE = {
     pattern: /fail closed until Redis cache/i,
     mustNotMatch: true,
   },
-};
-
-const OPEN_GAP_PROBES = {
   'search-category-label-url': {
     file: 'packages/api/src/__tests__/routes.test.ts',
-    pattern: /facets\.categories\.find\(\(facet\) => facet\.value === 'Dairy'\)/,
+    pattern: /facets\.categories\.find\(\(facet\) => facet\.value === 'dairy'\)/,
     repo: true,
   },
 };
+
+const OPEN_GAP_PROBES = {};
 
 function evidenceRoot(entry) {
   return entry.repo ? repoRoot : webRoot;

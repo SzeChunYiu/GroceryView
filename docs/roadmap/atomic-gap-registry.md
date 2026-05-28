@@ -18,8 +18,8 @@ Track small missing pieces so GroceryView does not drift. Each gap has a stable 
 | description | Category facet links pass display labels (e.g. `Dairy`) in `?category=` instead of canonical slugs (`mejeri-ost-och-agg`). API tests still assert `facets.categories` values as labels even though search cards pass `categorySlug`. |
 | userImpact | Wrong filters, zero results, inconsistent routes vs `/browse/[slug]`. |
 | fix | Emit `categorySlug` on search facets; link with slug; migrate filter normalization. |
-| testRequired | Facet href uses slug; filtered search returns expected rows. Enforced by `atomic-gap-registry.test.mjs` (open-gap probe). |
-| status | open |
+| testRequired | Facet href uses slug; filtered search returns expected rows. Evidence: `packages/api/src/__tests__/routes.test.ts`, `apps/web/scripts/next-routes.test.mjs`. |
+| status | done |
 
 ### `mvp-mover-category-slug-derivation`
 
@@ -144,9 +144,9 @@ Track small missing pieces so GroceryView does not drift. Each gap has a stable 
 
 | Status | Count |
 |--------|-------|
-| open | 1 |
+| open | 0 |
 | in_progress | 0 |
-| done | 9 |
+| done | 10 |
 
 **Total gaps:** 10
 

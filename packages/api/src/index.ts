@@ -1520,7 +1520,7 @@ export type FacetedProductSearchResult = {
     }>;
   }>;
   facets: {
-    categories: Array<{ value: string; count: number }>;
+    categories: Array<{ value: string; label: string; count: number }>;
     labels: Array<{ value: string; count: number }>;
     origins: Array<{ value: string; count: number }>;
     brands: Array<{ value: string; count: number }>;
@@ -1623,6 +1623,20 @@ function sortedFacet(map: Map<string, number>): Array<{ value: string; count: nu
     .sort((a, b) => b.count - a.count || a.value.localeCompare(b.value));
 }
 
+function sortedCategoryFacet(map: Map<string, { label: string; count: number }>): Array<{ value: string; label: string; count: number }> {
+  return [...map.entries()]
+    .map(([value, facet]) => ({ value, label: facet.label, count: facet.count }))
+    .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+}
+
+function incrementCategoryFacet(map: Map<string, { label: string; count: number }>, category: string): void {
+  const slug = categorySlug(category);
+  if (!slug) return;
+  const current = map.get(slug) ?? { label: categoryName(category), count: 0 };
+  current.count += 1;
+  map.set(slug, current);
+}
+
 function money(value: number): number {
   return Math.round(value * 100) / 100;
 }
@@ -1658,7 +1672,7 @@ export function buildFacetedProductSearch(input: {
   const inStockOnly = filters.inStockOnly ?? false;
   const minConfidence = filters.minConfidence;
   const productMap = new Map<string, FacetedProductSearchResult['products'][number]>();
-  const categoryFacet = new Map<string, number>();
+  const categoryFacet = new Map<string, { label: string; count: number }>();
   const labelFacet = new Map<string, number>();
   const originFacet = new Map<string, number>();
   const brandFacet = new Map<string, number>();
@@ -1672,7 +1686,7 @@ export function buildFacetedProductSearch(input: {
   let outOfStockLatestPriceCount = 0;
 
   for (const row of input.rows) {
-    const rowCategories = row.categoryPath.map((category) => category.toLocaleLowerCase('sv-SE'));
+    const rowCategories = row.categoryPath.flatMap((category) => [categorySlug(category), category.toLocaleLowerCase('sv-SE')]).filter(Boolean);
     const rowLabels = (row.labels ?? []).map((label) => label.toLocaleLowerCase('sv-SE'));
     if (query && !rowSearchHaystack(row).includes(query)) continue;
     if (categoryFilters.size > 0 && !rowCategories.some((category) => categoryFilters.has(category))) continue;
@@ -1708,7 +1722,7 @@ export function buildFacetedProductSearch(input: {
         currentPrices: []
       };
       productMap.set(row.productId, product);
-      for (const category of row.categoryPath) increment(categoryFacet, category);
+      for (const category of row.categoryPath) incrementCategoryFacet(categoryFacet, category);
       for (const label of row.labels ?? []) increment(labelFacet, label);
       if (row.originCountry) increment(originFacet, row.originCountry);
       if (row.brand) increment(brandFacet, row.brand);
@@ -1793,7 +1807,7 @@ export function buildFacetedProductSearch(input: {
     count: products.length,
     products,
     facets: {
-      categories: sortedFacet(categoryFacet),
+      categories: sortedCategoryFacet(categoryFacet),
       labels: sortedFacet(labelFacet),
       origins: sortedFacet(originFacet),
       brands: sortedFacet(brandFacet),

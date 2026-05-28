@@ -178,6 +178,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const activeFilterChips = buildRemovableSearchFilterChips(resolvedSearchParams, {
     basePath: '/products',
     labels: {
+      category: Object.fromEntries(search.categoryFacets.map((facet) => [facet.value, facet.label])),
       chain: Object.fromEntries(search.chainFacets.map((facet) => [facet.value, facet.label])),
       dietary: Object.fromEntries(search.dietaryFilters.map((filter) => [filter.value, filter.label])),
       label: Object.fromEntries(search.labelFacets.map((facet) => [facet.value, facet.label])),
@@ -322,7 +323,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
                 <div className="mt-2 flex flex-wrap gap-2">
                   {zeroResultCategories.map((category) => (
                     <Link className="rounded-full bg-white px-3 py-2 text-xs font-black text-amber-950 shadow-sm" href={`/products?category=${encodeURIComponent(category.value)}`} key={category.value}>
-                      {category.value} · {category.count}
+                      {category.label} · {category.count}
                     </Link>
                   ))}
                 </div>
@@ -335,7 +336,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">Category facets</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {categoryFacets.map((facet) => (
-                <Link className="rounded-full bg-violet-50 px-3 py-1 text-xs font-black text-violet-900" href={searchFacetUrl({ category: facet.value })} key={facet.value}>{facet.value} · {facet.count}</Link>
+                <Link className="rounded-full bg-violet-50 px-3 py-1 text-xs font-black text-violet-900" href={searchFacetUrl({ category: facet.value })} key={facet.value}>{facet.label} · {facet.count}</Link>
               ))}
             </div>
           </div>

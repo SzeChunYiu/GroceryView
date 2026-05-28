@@ -266,7 +266,7 @@ describe('createGroceryViewApi', () => {
 
     const result = buildFacetedProductSearch({
       rows: realRows,
-      filters: { query: 'mjolk', categories: ['Dairy'], originCountries: ['SE'], chains: ['willys'], limit: 10 }
+      filters: { query: 'mjolk', categories: ['dairy'], originCountries: ['SE'], chains: ['willys'], limit: 10 }
     });
 
     assert.equal(result.count, 1);
@@ -278,11 +278,25 @@ describe('createGroceryViewApi', () => {
     assert.deepEqual(result.filters.originCountries, ['SE']);
     assert.equal(result.products[0]?.originCountry, 'SE');
     assert.equal(result.products[0]?.currentPrices.some((price) => price.chainSlug === 'coop'), false);
-    assert.deepEqual(result.facets.categories.find((facet) => facet.value === 'Dairy'), { value: 'Dairy', count: 1 });
+    assert.deepEqual(result.facets.categories.find((facet) => facet.value === 'dairy'), { value: 'dairy', label: 'Dairy', count: 1 });
     assert.deepEqual(result.facets.origins.find((facet) => facet.value === 'SE'), { value: 'SE', count: 1 });
     assert.deepEqual(result.facets.chains.find((facet) => facet.value === 'willys'), { value: 'willys', label: 'Willys', count: 1 });
     assert.deepEqual(result.facets.priceRange, { min: 14.9, max: 14.9 });
     assert.deepEqual(result.evidence.sourceTables, ['products', 'latest_prices', 'chains', 'stores']);
+
+    const localizedCategory = buildFacetedProductSearch({
+      rows: [{
+        ...realRows[0],
+        productId: 'product-egg',
+        slug: 'agg-6-pack',
+        canonicalName: 'Ägg 6-pack',
+        categoryPath: ['Mejeri ost och ägg'],
+        observationId: 'obs-egg-willys'
+      }],
+      filters: { categories: ['mejeri-ost-och-agg'], limit: 10 }
+    });
+    assert.equal(localizedCategory.count, 1);
+    assert.deepEqual(localizedCategory.facets.categories, [{ value: 'mejeri-ost-och-agg', label: 'Mejeri Ost Och Ägg', count: 1 }]);
   });
 
   it('applies label, unit-price, in-stock, and confidence filters for faceted search', () => {
