@@ -77,20 +77,32 @@ export async function GET(request: Request) {
   const parsed = parseSourceUrl(request);
   if ('error' in parsed) return errorResponse(parsed.error ?? 'invalid_image_src', 400);
 
-  const upstream = await fetch(parsed.sourceUrl, {
-    headers: {
-      accept: 'image/avif,image/webp,image/*,*/*;q=0.8',
-      'user-agent': 'GroceryView image CDN proxy'
-    },
-    redirect: 'follow'
-  });
+  let upstream: Response;
+  try {
+    upstream = await fetch(parsed.sourceUrl, {
+      headers: {
+        accept: 'image/avif,image/webp,image/*,*/*;q=0.8',
+        'user-agent': 'GroceryView image CDN proxy'
+      },
+      redirect: 'follow'
+    });
+  } catch {
+    return errorResponse('image_upstream_fetch_failed', 502);
+  }
 
   if (!upstream.ok) return errorResponse('image_upstream_unavailable', upstream.status >= 400 && upstream.status < 500 ? 404 : 502);
 
   const contentType = upstream.headers.get('content-type') ?? '';
   if (!contentType.toLowerCase().startsWith('image/')) return errorResponse('image_upstream_not_image', 502);
 
-  return new Response(upstream.body, {
+  let body: ArrayBuffer;
+  try {
+    body = await upstream.arrayBuffer();
+  } catch {
+    return errorResponse('image_upstream_read_failed', 502);
+  }
+
+  return new Response(body, {
     headers: proxiedHeaders(upstream, parsed.width, parsed.quality),
     status: 200
   });
