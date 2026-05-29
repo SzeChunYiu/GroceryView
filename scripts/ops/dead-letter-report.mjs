@@ -4,6 +4,8 @@ import pg from 'pg';
 import { buildPostgresPoolConfig } from './db-connection.mjs';
 import {
   buildReportShell,
+  buildUnavailableReport,
+  isUndefinedTableError,
   parsePositiveInteger,
   resolveDatabaseUrl,
   resolveReportMode
@@ -79,6 +81,16 @@ export async function buildDeadLetterDatabaseReport(env = process.env, options =
   const pool = new Pool(buildPostgresPoolConfig(resolved.connectionString));
 
   try {
+    const relationCheck = await pool.query("select to_regclass('public.dead_letters') as relation");
+    if (!relationCheck.rows[0]?.relation) {
+      return buildUnavailableReport({
+        reportType: 'dead_letter_report',
+        databaseSource: resolved.source,
+        missingRelation: 'dead_letters',
+        extra: { lookbackHours, summary: summarizeDeadLetters([]) }
+      });
+    }
+
     const result = await pool.query(
       `
         select

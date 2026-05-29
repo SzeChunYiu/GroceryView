@@ -129,11 +129,16 @@ export async function buildQualityDatabaseReport(env = process.env, options = {}
       })),
       pool.query(
         `
+          -- Defense-in-depth public-leak guard. Prescription products are excluded at
+          -- ingestion (see packages/ingestion/src/connectors/apoteket-se.ts isPrescriptionOnly,
+          -- which drops rows whose availability text contains 'receptbel'/'prescription'),
+          -- so the schema has no prescription column by design. This re-checks that no
+          -- pharmacy product carrying a prescription marker in its name reached public prices.
           select count(*)::int as count
           from latest_prices lp
           join products p on p.id = lp.product_id
           where lp.domain = 'pharmacy'
-            and coalesce(p.metadata->>'requiresPrescription', 'false') = 'true'
+            and (lower(p.canonical_name) like '%receptbel%' or lower(p.canonical_name) like '%prescription%')
         `
       ),
       pool.query(
