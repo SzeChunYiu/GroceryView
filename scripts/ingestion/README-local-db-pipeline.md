@@ -34,6 +34,19 @@ it; production regenerates it from the production DB at deploy time.
 `generate-multichain-catalog.mjs` is a file-only alternative (skips the DB) for quick local
 previews; the DB-first path above is canonical.
 
+The processor groups by `ean-<barcode>` when a product has a barcode (else by slug), so the
+same product across chains collapses into one entry with per-chain prices.
+
+## (Optional) ICA cross-chain matching
+ICA's source carries no EAN, so ICA products don't match the EAN-keyed Axfood chains by
+identity. `scripts/sql/match-ica-products-by-name.sql` backfills an EAN onto ICA products by
+matching within the same brand on normalized package size + name similarity, with a 1:1 guard.
+It is **heuristic** (a minority of close-variant matches may be imperfect); run it before the
+processing step if you want ICA included in cross-chain comparison.
+```bash
+DATABASE_URL=postgresql://… psql "$DATABASE_URL" -f scripts/sql/match-ica-products-by-name.sql
+```
+
 ## Product-organization views
 `scripts/sql/product-organization-views.sql` creates reporting views over the schema:
 - `vw_bi_brand_dimension` — normalized brand dimension from the denormalized `products.brand`.
