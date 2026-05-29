@@ -1179,7 +1179,7 @@ export const pharmacyOtcEvidenceBoard = {
   guardrails: [
     'OpenPrices + OpenBeautyFacts rows are public OTC, supplement, suncare, or health/beauty product observations only.',
     'This is not a pharmacy-chain comparison: no cheapest pharmacy, stock, online-vs-in-store, prescription, or medical advice claim is shown.',
-    'domain=pharmacy connector observations are still required before pharmacy alerts or cross-pharmacy history render.'
+    'Trusted pharmacy-source evidence is still required before pharmacy alerts or cross-pharmacy history render.'
   ]
 };
 
@@ -1208,13 +1208,13 @@ export const multiVerticalDomainFoundation = SUPPORTED_PRICE_DOMAINS.map((domain
     ? 'Grocery can render verified price observations with source confidence.'
     : domain.slug === 'fuel'
       ? 'Fuel renders only source-backed operator observations; no crowd rows are shown yet.'
-      : 'No domain=pharmacy connector observations yet; public OTC evidence is separated from pharmacy-chain claims.',
+      : 'Public OTC evidence is separated from pharmacy-chain claims until trusted pharmacy-source evidence exists.',
   migrationFields: ['chains.domain', 'stores.domain', 'products.domain', 'observations.domain', 'latest_prices.domain'],
   schemaDefault: "domain default 'grocery'",
   guardrails: [
     "Existing GroceryView rows default to domain='grocery'.",
-    'Fuel and pharmacy routes may show supported item and location models, but must not show chain prices before domain-scoped observations exist.',
-    'Fuel price rows must carry domain=fuel, price per litre, grade id, and operator or trusted crowd provenance.',
+    'Fuel and pharmacy routes may show supported items and locations, but must not show chain prices before source-backed price evidence exists.',
+    'Fuel price rows must carry price per litre, grade labels, and operator or trusted crowd evidence.',
     'Non-grocery matching remains domain-scoped: fuel grades are not compared to grocery EANs, and pharmacy OTC rows exclude prescription claims.'
   ]
 }));
@@ -1232,7 +1232,7 @@ export const fuelStationSourceCoverage = {
   fuelGradeTags: ['fuel:octane_95', 'fuel:octane_98', 'fuel:diesel', 'fuel:hvo100', 'fuel:e85', 'fuel:adblue'],
   guardrails: [
     'The connector reads OSM station location and grade availability tags only.',
-    'Fuel pages must not render pump prices until connector or trusted crowd rows write domain=fuel observations.',
+    'Fuel pages must not render pump prices until station-specific or trusted crowd evidence exists.',
     'Fuel grade matching stays separate from grocery EAN and commodity matching.'
   ]
 };

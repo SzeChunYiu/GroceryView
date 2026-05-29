@@ -193,20 +193,19 @@ function DomainFoundationSummary({ domainSlug }: Readonly<{ domainSlug: 'pharmac
   const domain = multiVerticalDomainFoundation.find((candidate) => candidate.slug === domainSlug)!;
   return (
     <Card className="border-amber-200 bg-amber-50">
-      <Eyebrow>{domain.label} foundation</Eyebrow>
+      <Eyebrow>{domain.label} evidence</Eyebrow>
       <h2 className="mt-2 text-2xl font-black text-amber-950">Pharmacy OTC price comparison</h2>
       <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-amber-950">
-        No domain=pharmacy connector observations yet; this route keeps the domain model and claim boundaries visible while
-        the Apohem catalog rows remain public source evidence, not normalized pharmacy observation rows.
+        Pharmacy prices are currently shown from public OTC catalog rows. The page keeps safety boundaries visible and does not claim prescription coverage, stock, or a cheapest pharmacy result.
       </p>
       <div className="mt-4 grid gap-3 md:grid-cols-3">
         <div className="rounded-2xl bg-white/75 p-4">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-700">Status</p>
-          <p className="mt-2 text-lg font-black text-amber-950">No domain=pharmacy connector observations yet</p>
+          <p className="mt-2 text-lg font-black text-amber-950">Public OTC catalog comparison active</p>
         </div>
         <div className="rounded-2xl bg-white/75 p-4">
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-700">OTC item models</p>
-          <p className="mt-2 text-lg font-black text-amber-950">{domain.seedItemCount} supported EAN models</p>
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-700">Exact EAN coverage</p>
+          <p className="mt-2 text-lg font-black text-amber-950">{domain.seedItemCount} exact EAN products ready</p>
         </div>
         <div className="rounded-2xl bg-white/75 p-4">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-700">Claim boundary</p>

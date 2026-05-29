@@ -34,6 +34,7 @@ const crossDomainWatchlistSections = [
   {
     section: 'Grocery products',
     itemType: 'grocery_product',
+    itemTypeLabel: 'Grocery product alerts',
     href: '/watchlist?domain=grocery',
     source: 'verified chain price rows',
     freshness: 'latest observed grocery price row',
@@ -43,6 +44,7 @@ const crossDomainWatchlistSections = [
   {
     section: 'Stores',
     itemType: 'grocery_store',
+    itemTypeLabel: 'Store reminders',
     href: '/map?domain=grocery',
     source: 'OSM store coordinates + chain index proxy',
     freshness: 'store retrieved date',
@@ -52,6 +54,7 @@ const crossDomainWatchlistSections = [
   {
     section: 'Categories',
     itemType: 'grocery_category',
+    itemTypeLabel: 'Category alerts',
     href: '/browse',
     source: 'category price observations',
     freshness: 'category observation window',
@@ -61,6 +64,7 @@ const crossDomainWatchlistSections = [
   {
     section: 'Pharmacy OTC',
     itemType: 'pharmacy_otc_product',
+    itemTypeLabel: 'OTC exact-EAN alerts',
     href: '/watchlist?domain=pharmacy',
     source: 'public OTC exact-EAN catalog rows',
     freshness: 'OTC source retrieved date',
@@ -70,6 +74,7 @@ const crossDomainWatchlistSections = [
   {
     section: 'Fuel',
     itemType: 'fuel_grade / fuel_station',
+    itemTypeLabel: 'Fuel grade and station alerts',
     href: '/watchlist?domain=fuel',
     source: 'operator fuel price rows + OSM station rows',
     freshness: 'fuel observed/retrieved date',
@@ -79,6 +84,7 @@ const crossDomainWatchlistSections = [
   {
     section: 'Saved views',
     itemType: 'saved_market_view',
+    itemTypeLabel: 'Saved market views',
     href: '/saved-views',
     source: 'saved filters and visible result counts',
     freshness: 'refreshed when opened',
@@ -88,8 +94,9 @@ const crossDomainWatchlistSections = [
   {
     section: 'Alerts',
     itemType: 'alert_rule',
+    itemTypeLabel: 'Notification rules',
     href: '/watchlist',
-    source: 'buildWatchlistAlerts + planNotifications',
+    source: 'saved targets and notification preferences',
     freshness: 'daily alert evaluation',
     confidence: 'eligible source rows after quiet-hour rules',
     limitation: 'Notifications are source-backed signals, not purchase guarantees.'
@@ -192,21 +199,21 @@ export default async function WatchlistPage({
       <h1 className="mt-2 text-4xl font-black tracking-tight">Tracked products with notification-ready alerts</h1>
       {/* Forecast-style alert copy must stay tied to observed historical source rows. */}
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
-        This page calls buildWatchlistAlerts with verified chain price rows, then runs planNotifications so set-target push and email rows respect user preferences and quiet-hour rules. Historical wait-window alerts also surface patterns derived from observed source rows before a current threshold is crossed; no forecast is shown without dated observation evidence.
+        Use this page to track grocery products, stores, categories, OTC products, fuel grades, stations, and saved market views. Alerts respect your preferences and quiet hours; historical wait-window guidance is only shown when dated source evidence exists.
       </p>
       <section className="mt-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm" aria-label="Cross-domain watchlist sections">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Watchlist sections</p>
             <h2 className="mt-2 text-2xl font-black text-slate-950">Grocery products, Stores, Categories, Pharmacy OTC, Fuel, Saved views, Alerts</h2>
-            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">Each item type keeps source, freshness, confidence, and limitation visible before creating a notification rule.</p>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">Each saved section keeps source, freshness, confidence, and limitation visible before creating a notification rule.</p>
           </div>
           <Link className="rounded-full bg-slate-950 px-4 py-2 text-sm font-black text-white" href="/search?domain=all">Find an item to watch</Link>
         </div>
         <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           {crossDomainWatchlistSections.map((section) => (
             <Link className="rounded-2xl border border-slate-100 bg-slate-50 p-4 text-sm font-bold text-slate-800 transition hover:border-slate-900" href={section.href} key={section.section}>
-              <span className="block text-xs font-black uppercase tracking-[0.14em] text-slate-500">{section.itemType}</span>
+              <span className="block text-xs font-black uppercase tracking-[0.14em] text-slate-500">{section.itemTypeLabel}</span>
               <span className="mt-1 block text-lg font-black text-slate-950">{section.section}</span>
               <span className="mt-2 block">source: {section.source}</span>
               <span className="mt-1 block">freshness: {section.freshness}</span>
@@ -220,10 +227,10 @@ export default async function WatchlistPage({
         <Card className="mt-6 border-amber-200 bg-amber-50">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-800">fuel_station watchlist</p>
+              <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-800">Fuel station reminders</p>
               <h2 className="mt-2 text-2xl font-black text-amber-950">Fuel watchlist and alerts</h2>
               <p className="mt-2 text-sm font-semibold leading-6 text-amber-950">
-                {'Notify me when diesel < 17.50 kr/l.'} Fuel alerts use operator domain=fuel observations and station saved items use OSM location evidence only.
+                {'Notify me when diesel < 17.50 kr/l.'} Fuel alerts use verified operator fuel price rows, while station saved items use OpenStreetMap location evidence only.
               </p>
             </div>
             <Link className="rounded-full bg-amber-900 px-4 py-2 text-sm font-black text-white" href="/search?domain=fuel&q=diesel">Search fuel</Link>
@@ -256,7 +263,7 @@ export default async function WatchlistPage({
         <Card className="mt-6 border-sky-200 bg-sky-50">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-800">pharmacy_otc_product watchlist</p>
+              <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-800">OTC exact-EAN alerts</p>
               <h2 className="mt-2 text-2xl font-black text-sky-950">Pharmacy OTC target alerts</h2>
               <p className="mt-2 text-sm font-semibold leading-6 text-sky-950">
                 Notify me when exact EAN {selectedPharmacyWatchCard?.ean ?? 'selected OTC product'} drops below my target. Alerts stay tied to OTC public catalog rows, exact EAN evidence, and no medical advice.
@@ -513,16 +520,16 @@ export default async function WatchlistPage({
         <p className="text-sm font-black uppercase tracking-[0.2em] text-indigo-800">email digest</p>
         <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Weekly personalised email digest</h2>
         <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
-          {weeklyPersonalizedEmailDigest.subject} is assembled from watchlistAlerts produced by buildWatchlistAlerts and bestDeals produced by rankDealOpportunities, then passed through planNotifications with email-only preferences.
+          {weeklyPersonalizedEmailDigest.subject} is assembled from saved watchlist targets and best current deals, then filtered through email-only preferences and quiet-hour rules.
         </p>
         <div className="mt-4 grid gap-3 lg:grid-cols-3">
           <div className="rounded-2xl bg-white p-4 shadow-sm">
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">watchlistAlerts</p>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Watchlist alerts</p>
             <p className="mt-1 text-4xl font-black text-indigo-900">{weeklyPersonalizedEmailDigest.watchlistAlerts.length}</p>
             <p className="mt-2 text-sm font-semibold text-slate-600">Private watched products, target-price hits, and stock-up opportunities.</p>
           </div>
           <div className="rounded-2xl bg-white p-4 shadow-sm">
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">bestDeals</p>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Best deals</p>
             <p className="mt-1 text-4xl font-black text-indigo-900">{weeklyPersonalizedEmailDigest.bestDeals.length}</p>
             <p className="mt-2 text-sm font-semibold text-slate-600">Public ranked deal opportunities filtered by source confidence.</p>
           </div>
@@ -571,7 +578,7 @@ export default async function WatchlistPage({
         <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-800">{dealHunterNewProductPriceDropAlerts.persona}</p>
         <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">New-product & price-drop alerts</h2>
         <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
-          Deal hunters get priceDropAlerts from buildWatchlistAlerts and newProductSignals from rankDealOpportunities output. A newProductSignals row is not a retailer launch claim; it only means the product newly surfaced in visible ranked deal rows.
+          Deal hunters get price-drop alerts and newly visible deal signals from source-backed price rows. A new deal signal is not a retailer launch claim; it only means the product newly surfaced in visible ranked deal rows.
         </p>
         <div className="mt-4 grid gap-4 lg:grid-cols-2">
           <div className="rounded-2xl border border-amber-100 bg-white p-4">
@@ -613,7 +620,7 @@ export default async function WatchlistPage({
         <p className="text-sm font-black uppercase tracking-[0.2em] text-purple-800">Account watchlist preferences</p>
         <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Custom price alert thresholds</h2>
         <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
-          No anonymous thresholds are stored or applied. Signed-in shoppers can save targetPrice and dealScoreMinimum preferences, then GroceryView passes those values into buildWatchlistAlerts before planNotifications applies channel and quiet-hour rules.
+          No anonymous thresholds are stored or applied. Signed-in shoppers can save target prices and deal-score preferences, then GroceryView applies channel and quiet-hour rules before sending any notification.
         </p>
         <div className="mt-4 grid gap-3 lg:grid-cols-4">
           {priceAlertThresholdPreferenceContract.thresholdTypes.map((threshold) => (
@@ -650,7 +657,7 @@ export default async function WatchlistPage({
         <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">{budgetEssentialsPriceDropAlerts.persona}</p>
         <h2 className="mt-2 text-2xl font-black">Essentials price-drop alerts</h2>
         <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
-          This low-income tracker calls buildWatchlistAlerts for weekly essentials and keeps essentialCategory plus weeklyNeed visible so shoppers can prioritize staples before treats.
+          This essentials tracker watches weekly staple products and keeps the category plus weekly need visible so shoppers can prioritize staples before treats.
         </p>
         <div className="mt-4 grid gap-3 lg:grid-cols-3">
           {budgetEssentialsPriceDropAlerts.rows.map((row) => (
@@ -678,7 +685,7 @@ export default async function WatchlistPage({
         <p className="text-sm font-black uppercase tracking-[0.2em] text-blue-800">{babyDiaperPriceTracker.persona}</p>
         <h2 className="mt-2 text-2xl font-black">Baby & diaper price tracking</h2>
         <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
-          This family tracker calls buildWatchlistAlerts for diaper packs and exposes diaperUnitPrice so parents can compare price per diaper without estimating missing loyalty-wallet offers.
+          This family tracker watches diaper packs and shows price per diaper so parents can compare pack value without estimating missing loyalty-wallet offers.
         </p>
         <div className="mt-4 flex flex-wrap gap-2 text-xs font-black uppercase tracking-[0.14em] text-blue-900">
           {babyDiaperPriceTracker.brandFilters.map((brand) => (

@@ -113,7 +113,7 @@ export function SourceCitation({
 }>) {
   const source = sourceLabel?.trim() || 'Unknown source';
   const observed = observedAt?.trim() || 'Freshness unknown';
-  const run = connectorRun?.trim() || 'Connector run unknown';
+  const run = connectorRun?.trim() || 'Data source detail unknown';
   const confidence = confidenceLabel?.trim() || 'Confidence unknown';
   const isUnknown = Boolean(unknownReason || !sourceLabel || !observedAt || !confidenceLabel);
   const containerClass = isUnknown
