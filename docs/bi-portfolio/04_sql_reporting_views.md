@@ -44,11 +44,11 @@ FROM latest_prices lp
 JOIN products p ON p.id = lp.product_id
 JOIN chains c ON c.id = lp.chain_id
 LEFT JOIN stores s ON s.id = lp.store_id
-WHERE lp.domain = grocery
+WHERE lp.domain = 'grocery'
   AND COALESCE(lp.is_available, TRUE) = TRUE
   AND lp.price > 0
   AND lp.unit_price > 0
-  AND COALESCE(p.deleted_at, infinity::timestamptz) > now();
+  AND COALESCE(p.deleted_at, 'infinity'::timestamptz) > now();
 ```
 
 ## Business use
@@ -247,4 +247,44 @@ WITH price_stats AS (
         o.product_id,
         o.chain_id,
         MAX(o.observed_at) AS latest_observed_at,
-        AVG(o.price) FILTER (WHERE o.observed_at >= now() - INTERVAL 30
+        AVG(o.price) FILTER (WHERE o.observed_at >= now() - INTERVAL '30 days') AS avg_price_30d,
+        AVG(o.price) FILTER (WHERE o.observed_at >= now() - INTERVAL '90 days') AS avg_price_90d,
+        MIN(o.price) AS min_price_all_time,
+        MAX(o.price) AS max_price_all_time,
+        COUNT(*) AS observation_count
+    FROM observations o
+    WHERE o.domain = 'grocery'
+      AND o.price > 0
+    GROUP BY o.product_id, o.chain_id
+)
+SELECT
+    ps.product_id,
+    p.slug AS product_slug,
+    p.canonical_name AS product_name,
+    ps.chain_id,
+    c.slug AS chain_slug,
+    c.name AS chain_name,
+    ps.latest_observed_at,
+    ps.avg_price_30d,
+    ps.avg_price_90d,
+    ps.min_price_all_time,
+    ps.max_price_all_time,
+    ps.observation_count,
+    CASE
+        WHEN ps.min_price_all_time > 0
+        THEN ROUND(
+            (((ps.max_price_all_time - ps.min_price_all_time) / ps.min_price_all_time) * 100)::numeric,
+            2
+        )
+        ELSE NULL
+    END AS price_range_pct
+FROM price_stats ps
+JOIN products p ON p.id = ps.product_id
+JOIN chains c ON c.id = ps.chain_id;
+```
+
+## Business use
+
+- Product-level price trend analysis
+- Feature engineering for deal scoring and forecasting
+- Volatility and price-range reporting per product and chain
