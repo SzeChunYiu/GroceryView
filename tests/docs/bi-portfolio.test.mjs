@@ -72,6 +72,34 @@ test("SQL reporting views are aligned with GroceryView schema names", () => {
   assert.match(sqlDoc, /CREATE OR REPLACE VIEW vw_bi_basket_cost_by_chain/);
 });
 
+test("SQL reporting views are syntactically well-formed", () => {
+  const sqlDoc = read("docs/bi-portfolio/04_sql_reporting_views.md");
+
+  // Code fences must be balanced (a dropped closing fence means a truncated doc).
+  const fenceCount = (sqlDoc.match(/```/g) || []).length;
+  assert.equal(fenceCount % 2, 0, "unbalanced ``` code fences in SQL views doc");
+
+  const blocks = [...sqlDoc.matchAll(/```sql\n([\s\S]*?)```/g)].map((match) => match[1]);
+  assert.ok(blocks.length > 0, "no fenced SQL blocks found");
+  const sql = blocks.join("\n");
+
+  // Balanced parentheses — catches statements truncated mid-expression.
+  const open = (sql.match(/\(/g) || []).length;
+  const close = (sql.match(/\)/g) || []).length;
+  assert.equal(open, close, `unbalanced parentheses (${open} '(' vs ${close} ')') — likely a truncated statement`);
+
+  // Every CREATE VIEW must be terminated; the SQL must end on a finished statement.
+  const views = (sql.match(/CREATE OR REPLACE VIEW/g) || []).length;
+  const terminators = (sql.match(/;/g) || []).length;
+  assert.ok(terminators >= views, `found ${views} views but only ${terminators} terminators — a view may be truncated`);
+  assert.match(sql.trimEnd(), /;\s*$/, "SQL does not end with a terminated statement (truncated view)");
+
+  // Common literal mistakes that only surface against a real database.
+  assert.doesNotMatch(sql, /\bINTERVAL\s+\d/i, "INTERVAL must use a quoted literal, e.g. INTERVAL '30 days'");
+  assert.doesNotMatch(sql, /=\s*(grocery|pharmacy|fuel)\b/i, "domain comparisons must quote the literal, e.g. = 'grocery'");
+  assert.doesNotMatch(sql.replace(/'infinity'/gi, ""), /\binfinity\b/i, "infinity must be quoted, e.g. 'infinity'::timestamptz");
+});
+
 test("BI portfolio markdown links resolve inside the repo", () => {
   const markdownLink = /\[[^\]]+\]\(([^)]+)\)/g;
   const filesToCheck = ["README.md", ...expectedFiles.map((file) => path.join("docs", "bi-portfolio", file))];
