@@ -18,7 +18,7 @@ const pool = new pg.Pool({ connectionString: databaseUrl, max: 1 });
 // surface real cross-chain comparison (products are EAN-keyed, shared across chains).
 const { rows } = await pool.query(`
   SELECT
-    p.slug              AS "productSlug",
+    COALESCE('ean-' || NULLIF(p.barcode, ''), p.slug) AS "productSlug",
     p.canonical_name    AS "canonicalName",
     c.slug              AS "chainSlug",
     c.name              AS "chainName",
