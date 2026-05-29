@@ -9,6 +9,15 @@ price chart, chains/categories/brands have **indices**, deals get a **Buy/Wait**
 rating, and shoppers **track, compare, and get alerted** across chains over time.
 Strategy + competitor teardown: [`GOAL.md`](GOAL.md) · [`COMPETITIVE-ANALYSIS.md`](COMPETITIVE-ANALYSIS.md).
 
+## BI / Data Analyst Portfolio Case Study
+
+GroceryView also includes a BI-focused case study showing how the same grocery
+price data becomes reporting-ready KPIs, SQL views, dashboard pages, data quality
+checks, and an automated weekly reporting workflow.
+
+Start here: [`docs/bi-portfolio/00_overview.md`](docs/bi-portfolio/00_overview.md)
+or browse the full [`docs/bi-portfolio/`](docs/bi-portfolio/) documentation set.
+
 ## 🟢 Live
 
 - **Site:** [https://grocery-web-mu.vercel.app](https://grocery-web-mu.vercel.app) — `/` returns HTTP **200**
