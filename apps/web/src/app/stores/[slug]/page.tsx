@@ -18,6 +18,7 @@ import {
 } from '@/lib/verified-data';
 import { storePageViewScript } from '@/lib/analytics';
 import { metadataForStore } from '@/lib/seo';
+import { JsonLd, buildBreadcrumbJsonLd, buildStoreLocalBusinessJsonLd } from '@/lib/structured-data';
 import { substitutionPlansForUnavailableProducts } from '@/lib/substitutions';
 
 type ConfidenceLevel = 'high' | 'medium' | 'low';
@@ -177,6 +178,24 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
     storeSlug: store.slug
   });
   const maxCategoryCoverage = Math.max(1, ...assortmentOverview.categories.map((category) => category.itemCount));
+  const storeJsonLd = [
+    buildStoreLocalBusinessJsonLd({
+      name: store.name,
+      url: `/stores/${store.slug}`,
+      brand: store.brand,
+      streetAddress: store.address,
+      addressLocality: store.city || store.district,
+      latitude: store.lat,
+      longitude: store.lng,
+      openingHours: store.openingHours || store.opening_hours
+    }),
+    buildBreadcrumbJsonLd([
+      { name: 'Home', item: '/' },
+      { name: 'Stores', item: '/stores' },
+      { name: store.name, item: `/stores/${store.slug}` }
+    ])
+  ];
+
   const storeEvidenceFallbackRows = [
     {
       signal: 'Map pin',
@@ -202,6 +221,7 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
 
   return (
     <PageShell>
+      <JsonLd data={storeJsonLd} />
       <script dangerouslySetInnerHTML={{ __html: storeViewAnalyticsScript }} />
       <PageQuestionHeader
         eyebrow="OSM store record"

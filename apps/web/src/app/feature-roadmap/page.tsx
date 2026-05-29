@@ -50,7 +50,7 @@ export default function FeatureRoadmapPage() {
             <p className="text-xs font-black uppercase tracking-[0.22em] text-lime-200">Implementation rule</p>
             <h2 className="mt-3 text-3xl font-black tracking-tight text-white">Do not sell or render claims before evidence exists</h2>
             <p className="mt-3 text-sm font-semibold leading-6 text-slate-300">
-              The roadmap can show intent, IA, and locked states. Product, price, loyalty, nutrition, and account surfaces must still fail closed until the matching source rows, entitlements, and consent records are live.
+              The roadmap can show intent, IA, and locked states. Product, price, loyalty, nutrition, and account surfaces remain unavailable until the matching source rows, entitlements, and consent records are live.
             </p>
           </div>
           <div className="grid gap-3 md:grid-cols-2">

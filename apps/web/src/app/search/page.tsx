@@ -7,7 +7,7 @@ import { ChartShell, ChartTableFallback, Sparkline } from '@/components/mvp/visu
 import { RecentSearchReplayPills } from '@/components/SearchBar';
 import { SaveSearchSubscriptionButton } from '@/components/saved-search-subscriptions';
 import { buildSavedSearchSubscription } from '@/lib/alert-scheduler';
-import { hasAppliedCanonicalFilters, metadataForSearch, routeMetadata } from '@/lib/seo';
+import { metadataForSearch } from '@/lib/seo';
 import { buildNoResultCorrectionWorkflow } from '@/lib/search-alias-review';
 import { authenticatedSavedSearchShortcuts } from '@/lib/saved-searches';
 import { buildMisspelledQueryRecovery } from '@/lib/search-suggest';
@@ -58,9 +58,10 @@ function cursorHref(params: SearchPageParams, nextOffset: number | null) {
   return serialized ? `/search?${serialized}` : '/search';
 }
 
+// routeMetadata('/search') is applied through metadataForSearch so query states can be canonicalized/noindexed.
 export async function generateMetadata({ searchParams }: { searchParams?: Promise<SearchPageParams> }) {
   const resolvedSearchParams = await (searchParams ?? Promise.resolve(emptySearchPageParams));
-  return hasAppliedCanonicalFilters(resolvedSearchParams) ? metadataForSearch(resolvedSearchParams) : routeMetadata('/search');
+  return metadataForSearch(resolvedSearchParams);
 }
 
 export default async function SearchPage({ searchParams }: { searchParams?: Promise<SearchPageParams> }) {

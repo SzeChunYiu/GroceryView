@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { Card, Eyebrow, PageShell, SourceCitation } from '@/components/data-ui';
 import { fuelStations, fuelStationSource } from '@/lib/ingested/fuel-stations';
 import { routeMetadata } from '@/lib/seo';
+import { JsonLd, buildBreadcrumbJsonLd, buildFuelStationJsonLd } from '@/lib/structured-data';
 
 function findStation(stationId: string) {
   return fuelStations.find((station) => String(station.osmId) === stationId);
@@ -33,8 +34,29 @@ export default async function FuelStationDetailPage({ params }: Readonly<{ param
   const station = findStation(stationId);
   if (!station) notFound();
 
+  const stationJsonLd = [
+    buildFuelStationJsonLd({
+      name: station.name,
+      url: `/fuel/stations/${station.osmId}`,
+      brand: station.brand || station.chain,
+      streetAddress: stationAddress(station),
+      postalCode: station.postcode,
+      addressLocality: station.city,
+      latitude: station.latitude,
+      longitude: station.longitude,
+      openingHours: station.openingHours
+    }),
+    buildBreadcrumbJsonLd([
+      { name: 'Home', item: '/' },
+      { name: 'Fuel', item: '/fuel' },
+      { name: 'Stations', item: '/fuel/stations' },
+      { name: station.name, item: `/fuel/stations/${station.osmId}` }
+    ])
+  ];
+
   return (
     <PageShell>
+      <JsonLd data={stationJsonLd} />
       <Eyebrow>Fuel station detail</Eyebrow>
       <p className="mt-3 text-sm font-black text-emerald-900">What evidence exists for this fuel station location?</p>
       <h1 className="mt-2 text-4xl font-black tracking-tight">{station.name}</h1>

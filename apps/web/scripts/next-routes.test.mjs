@@ -2324,7 +2324,7 @@ ${seo}`;
     assert.match(homeMetadataSource, /source route mapping/);
     assert.match(homeMetadataSource, /catalogue savings/);
     assert.match(homeMetadataSource, /map chain index signals/);
-    assert.match(homeMetadataSource, /gated feature readiness/);
+    assert.match(homeMetadataSource, /clear confidence labels/);
   });
 
   it('mounts a glassmorphic mobile bottom navigation in the shared page shell', async () => {

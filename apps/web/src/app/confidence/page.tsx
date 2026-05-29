@@ -32,7 +32,7 @@ export default function ConfidencePage() {
             <strong className="text-slate-950">Low</strong> — Thin evidence; treat comparisons cautiously.
           </li>
           <li>
-            <strong className="text-slate-950">Unknown</strong> — Not enough verified rows to score; panel should fail closed.
+            <strong className="text-slate-950">Unknown</strong> — Not enough verified rows to score; panel should stay unavailable.
           </li>
         </ul>
       </MvpSectionCard>

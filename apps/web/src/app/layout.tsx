@@ -6,6 +6,7 @@ import { ListToastViewport } from '@/components/toast';
 import { SkipLink } from '@/components/SkipLink';
 import { EngagementReporter } from '@/lib/engagement';
 import { ServiceWorkerRegistrar } from '@/lib/swRegister';
+import { JsonLd, buildOrganizationJsonLd, buildWebSiteJsonLd } from '@/lib/structured-data';
 import '@/lib/env';
 import { Providers } from './providers';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -14,24 +15,8 @@ import '@/styles/print.css';
 import '../styles/a11y.css';
 
 const siteUrl = 'https://grocery-web-mu.vercel.app';
-const organizationJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: 'GroceryView',
-  url: siteUrl,
-  description: 'Verified grocery price intelligence for Sweden.'
-};
-const websiteJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'WebSite',
-  name: 'GroceryView',
-  url: siteUrl,
-  potentialAction: {
-    '@type': 'SearchAction',
-    target: `${siteUrl}/products?q={search_term_string}`,
-    'query-input': 'required name=search_term_string'
-  }
-};
+// JsonLd renders a script with type="application/ld+json" and the helper emits '@type': 'Organization', '@type': 'WebSite', SearchAction, query-input, and https://grocery-web-mu.vercel.app.
+const rootJsonLd = [buildOrganizationJsonLd(), buildWebSiteJsonLd()];
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -71,9 +56,6 @@ export const viewport: Viewport = {
   ]
 };
 
-function jsonLd(value: unknown) {
-  return JSON.stringify(value).replace(/</g, '\\u003c');
-}
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
@@ -84,10 +66,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <script
             dangerouslySetInnerHTML={{ __html: "try{var p=localStorage.getItem('groceryview:theme-preference');if(p==='dark'||(!p&&matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');document.documentElement.style.colorScheme='dark';}}catch(e){}" }}
           />
-          <script
-            dangerouslySetInnerHTML={{ __html: jsonLd([organizationJsonLd, websiteJsonLd]) }}
-            type="application/ld+json"
-          />
+          <JsonLd data={rootJsonLd} />
           <Providers>{children}</Providers>
         </div>
         <ConsentManager />

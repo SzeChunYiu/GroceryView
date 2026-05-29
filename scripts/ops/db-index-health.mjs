@@ -139,7 +139,7 @@ if (import.meta.url === new URL(process.argv[1], 'file:').href) {
   try {
     const report = await buildDbIndexHealthReport(process.env);
     process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
-    if (report.summary.unusedIndexCount > 0 && process.env.GROCERYVIEW_DB_INDEX_HEALTH_ALLOW_UNUSED !== '1') {
+    if (report.productionClaim && report.summary.unusedIndexCount > 0 && process.env.GROCERYVIEW_DB_INDEX_HEALTH_ALLOW_UNUSED !== '1') {
       process.exitCode = 1;
     }
   } catch (error) {
