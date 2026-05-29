@@ -4,6 +4,7 @@ import pg from 'pg';
 import { buildPostgresPoolConfig } from './db-connection.mjs';
 import {
   buildReportShell,
+  buildUnavailableReport,
   parsePositiveInteger,
   resolveDatabaseUrl,
   resolveReportMode
@@ -92,6 +93,16 @@ export async function buildSearchAnalyticsDatabaseReport(env = process.env, opti
   const pool = new Pool(buildPostgresPoolConfig(resolved.connectionString));
 
   try {
+    const relationCheck = await pool.query("select to_regclass('public.analytics_events') as relation");
+    if (!relationCheck.rows[0]?.relation) {
+      return buildUnavailableReport({
+        reportType: 'search_analytics_report',
+        databaseSource: resolved.source,
+        missingRelation: 'analytics_events',
+        extra: { lookbackHours, summary: summarizeSearchAnalytics([]) }
+      });
+    }
+
     const result = await pool.query(
       `
         select

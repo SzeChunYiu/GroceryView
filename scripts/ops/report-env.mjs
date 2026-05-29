@@ -39,6 +39,38 @@ export function parsePositiveInteger(value, fallback) {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
+// Postgres "undefined_table" SQLSTATE. A report whose backing table is not provisioned
+// in the connected database should return status "unavailable" (per the source-run
+// contract) rather than crash, so admin pages can show a clear provenance state.
+export const UNDEFINED_TABLE_SQLSTATE = '42P01';
+
+export function isUndefinedTableError(error) {
+  if (!error || typeof error !== 'object') return false;
+  if (error.code === UNDEFINED_TABLE_SQLSTATE) return true;
+  const message = typeof error.message === 'string' ? error.message.toLowerCase() : '';
+  return /relation ".*" does not exist/.test(message);
+}
+
+export function buildUnavailableReport({ reportType, databaseSource = null, missingRelation, nextIntegration = undefined, extra = {} }) {
+  return {
+    reportType,
+    mode: 'database',
+    status: 'unavailable',
+    generatedAt: new Date().toISOString(),
+    envVars: REPORT_ENV_VARS,
+    sourceLabel: 'database',
+    databaseConfigured: true,
+    databaseUrlSource: databaseSource,
+    productionClaim: false,
+    unavailableReason: `Relation "${missingRelation}" is not provisioned in the connected database.`,
+    nextIntegration:
+      nextIntegration ??
+      `Apply the data-platform migration that creates "${missingRelation}" to enable this report.`,
+    rows: [],
+    ...extra
+  };
+}
+
 export function buildReportShell({ reportType, mode, databaseSource = null, nextIntegration = undefined }) {
   const status = mode === 'database' ? 'live' : 'generated';
   return {
