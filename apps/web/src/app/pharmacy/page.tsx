@@ -194,7 +194,7 @@ function DomainFoundationSummary({ domainSlug }: Readonly<{ domainSlug: 'pharmac
   return (
     <Card className="border-amber-200 bg-amber-50">
       <Eyebrow>{domain.label} foundation</Eyebrow>
-      <h2 className="mt-2 text-2xl font-black text-amber-950">Pharmacy OTC price foundation</h2>
+      <h2 className="mt-2 text-2xl font-black text-amber-950">Pharmacy OTC price comparison</h2>
       <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-amber-950">
         No domain=pharmacy connector observations yet; this route keeps the domain model and claim boundaries visible while
         the Apohem catalog rows remain public source evidence, not normalized pharmacy observation rows.

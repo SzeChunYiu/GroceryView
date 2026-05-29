@@ -25,6 +25,7 @@ import {
   timescaleDbEvaluation
 } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
+import { JsonLd, buildDatasetJsonLd } from '@/lib/structured-data';
 import {
   ingestionPipelineMonitorRows,
   ingestionPipelineMonitorSummary,
@@ -104,6 +105,7 @@ export const dynamic = 'force-static';
 export default function DataSourcesPage() {
   return (
     <PageShell>
+      <JsonLd data={buildDatasetJsonLd({ name: 'GroceryView public source coverage', description: 'Source coverage, freshness, allowed claims, and blocked claims for GroceryView public price intelligence.', url: '/data-sources', keywords: ['grocery prices', 'Sweden', 'source coverage'] })} />
       <Eyebrow>Data sources</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Verified snapshot provenance</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
@@ -632,7 +634,7 @@ export default function DataSourcesPage() {
             <p className="text-xs font-black uppercase tracking-[0.24em] text-cyan-800">perf(web)</p>
             <h2 className="mt-2 text-2xl font-black tracking-tight">API performance readiness</h2>
             <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
-              Hot public API paths use an injectable cache contract, product search returns paged result envelopes, and production readiness remains fail closed until runtime cache credentials and pooler routing are configured in the deployment environment. Long-range analytics are documented as rollups only.
+              Hot public API paths use an injectable cache contract, product search returns paged result envelopes, and production readiness remains fail closed until runtime cache credentials and database routing are configured in the deployment environment. Long-range analytics are documented as rollups only.
             </p>
           </div>
           <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-cyan-900 shadow-sm">{apiPerformanceReadiness.status}</p>
@@ -653,7 +655,7 @@ export default function DataSourcesPage() {
               {apiPerformanceReadiness.hotEndpoints.map((endpoint) => (
                 <div className="rounded-xl bg-slate-50 p-3" key={endpoint.path}>
                   <p className="font-mono text-sm font-black text-slate-950">{endpoint.path}</p>
-                  <p className="mt-1 text-sm font-semibold text-slate-700">{endpoint.coverage} · Redis cache TTL {endpoint.ttlSeconds}s</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-700">{endpoint.coverage} · public cache TTL {endpoint.ttlSeconds}s</p>
                 </div>
               ))}
             </div>

@@ -14,11 +14,14 @@ import { buildPharmacySelectedDetail } from '@/lib/pharmacy-domain';
 import { basketCostHeatmap } from '@/lib/map-basket-cost-heatmap';
 import { buildStoreInventoryConfidence } from '@/lib/osm-stores';
 import { formatPct, storePricePercentileRanks, storeUniverse } from '@/lib/verified-data';
-import { routeMetadata } from '@/lib/seo';
+import { metadataForPolicyRoute } from '@/lib/seo';
 import { buildNearbyDealRecommendations, buildStoreDistanceCompare } from '@/lib/store-distance';
 
-export function generateMetadata() {
-  return routeMetadata('/map');
+type MapSearchParams = Record<string, string | string[] | undefined>;
+
+// routeMetadata('/map') is applied through metadataForPolicyRoute so selected map URLs canonicalize to stable routes.
+export async function generateMetadata({ searchParams }: { searchParams?: Promise<MapSearchParams> }) {
+  return metadataForPolicyRoute('/map', await (searchParams ?? Promise.resolve({})));
 }
 
 const chainIndexSummary = calculateChainPriceIndex(buildChainPriceObservations());

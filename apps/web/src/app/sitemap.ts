@@ -9,6 +9,8 @@ import { axfoodProducts } from '@/lib/axfood-products';
 import { osmStores } from '@/lib/osm-stores';
 import { pricedProducts } from '@/lib/openprices-products';
 import { seoLandingCities, seoLandingProducts } from '@/lib/seo-landing-pages';
+import { fuelStations } from '@/lib/ingested/fuel-stations';
+import { buildPharmacyDomainSearchView } from '@/lib/pharmacy-domain';
 
 const siteUrl = 'https://grocery-web-mu.vercel.app';
 const fallbackLastModified = new Date('2026-05-22T00:00:00.000Z');
@@ -42,6 +44,16 @@ const nordicHreflangByCountry: Record<typeof nordicCountryRoutes[number], string
   no: 'nb-NO',
   is: 'is-IS'
 };
+const guideRoutes = [
+  '/guides',
+  '/guides/compare-grocery-prices',
+  '/guides/real-grocery-deals',
+  '/guides/fuel-prices-sweden',
+  '/guides/otc-pharmacy-price-comparison',
+  '/guides/how-groceryview-uses-confidence',
+  '/guides/how-we-handle-missing-data'
+] as const;
+
 const nordicLogicalRoutes = [
   '/terms',
   '/rescue',
@@ -107,6 +119,8 @@ export function buildCatalogSitemapEntries(): MetadataRoute.Sitemap {
   return [
     ...products.map((product) => entry(`/products/${product.slug}`, 0.82, 'daily', lastModifiedFrom(product.updatedAt))),
     ...categories.map((category) => entry(`/categories/${category.slug}`, 0.74, 'daily')),
+    ...categories.map((category) => entry(`/market/${category.slug}`, 0.7, 'daily')),
+    ...categories.map((category) => entry(`/browse/${category.slug}`, 0.7, 'daily')),
     ...stores.map((store) => entry(`/stores/${store.slug}`, 0.58, 'weekly', lastModifiedFrom(store.updatedAt)))
   ];
 }
@@ -126,7 +140,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     entry('/screener', 0.9, 'daily'),
     entry('/alerts', 0.72, 'daily'),
     entry('/fuel', 0.7, 'weekly'),
+    entry('/fuel/stations', 0.68, 'weekly'),
     entry('/pharmacy', 0.7, 'weekly'),
+    entry('/pharmacy/otc', 0.68, 'weekly'),
+    entry('/market', 0.86, 'daily'),
+    entry('/browse', 0.86, 'daily'),
     entry('/pricing', 0.72, 'weekly'),
     entry('/seasonal-calendar', 0.89, 'weekly'),
     entry('/meal-cost', 0.88, 'daily'),
@@ -145,6 +163,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...countryTermsRoutes.map((country) => entry(`/${country}/terms`, 0.52, 'monthly'))
   ];
 
+  const guideSitemapRoutes = guideRoutes.map((path) => entry(path, path === '/guides' ? 0.76 : 0.68, 'weekly'));
+
+  const fuelStationRoutes = fuelStations.slice(0, 250).map((station) => entry(`/fuel/stations/${station.osmId}`, 0.5, 'weekly', lastModifiedFrom(station.retrievedAt)));
+
+  const pharmacyProductRoutes = buildPharmacyDomainSearchView().cards.slice(0, 80).map((card) => entry(`/pharmacy/${card.ean}`, 0.54, 'weekly', fallbackLastModified));
+
   const seoLandingRoutes = seoLandingProducts.flatMap((product) => [
     entry(`/billigaste/${product.slug}`, 0.78, 'daily'),
     entry(`/prisjamforelse/${product.slug}`, 0.78, 'daily'),
@@ -157,6 +181,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...staticRoutes,
     ...buildNordicCountrySitemapEntries(),
     ...buildCatalogSitemapEntries(),
+    ...guideSitemapRoutes,
+    ...fuelStationRoutes,
+    ...pharmacyProductRoutes,
     ...seoLandingRoutes
   ];
 }

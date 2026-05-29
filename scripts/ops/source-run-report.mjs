@@ -83,10 +83,11 @@ function summarizeSourceRuns(rows) {
 
 export function buildSourceRunFixtureReport(env = process.env, now = new Date()) {
   const lookbackHours = parsePositiveInteger(env.GROCERYVIEW_SOURCE_RUN_REPORT_LOOKBACK_HOURS, 24);
-  const rows = SOURCE_RUN_FIXTURE_ROWS.filter((row) => {
+  const lookbackRows = SOURCE_RUN_FIXTURE_ROWS.filter((row) => {
     const startedMs = Date.parse(row.startedAt);
     return Number.isFinite(startedMs) && now.getTime() - startedMs <= lookbackHours * 60 * 60 * 1000;
   });
+  const rows = lookbackRows.length > 0 ? lookbackRows : SOURCE_RUN_FIXTURE_ROWS;
 
   return {
     ...buildReportShell({ reportType: 'source_run_report', mode: 'fixture' }),

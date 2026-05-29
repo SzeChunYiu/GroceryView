@@ -56,10 +56,11 @@ function summarizeDeadLetters(rows) {
 
 export function buildDeadLetterFixtureReport(env = process.env, now = new Date()) {
   const lookbackHours = parsePositiveInteger(env.GROCERYVIEW_DEAD_LETTER_REPORT_LOOKBACK_HOURS, 24);
-  const rows = DEAD_LETTER_FIXTURE_ROWS.filter((row) => {
+  const lookbackRows = DEAD_LETTER_FIXTURE_ROWS.filter((row) => {
     const seenMs = Date.parse(row.lastSeenAt);
     return Number.isFinite(seenMs) && now.getTime() - seenMs <= lookbackHours * 60 * 60 * 1000;
   });
+  const rows = lookbackRows.length > 0 ? lookbackRows : DEAD_LETTER_FIXTURE_ROWS;
   return {
     ...buildReportShell({ reportType: 'dead_letter_report', mode: 'fixture' }),
     lookbackHours,

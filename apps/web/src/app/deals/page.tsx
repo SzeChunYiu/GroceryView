@@ -12,7 +12,7 @@ import { buildPantryReplacementFilter } from '@/lib/pantry';
 import { getDealsPageData } from '@/lib/mvp/data';
 import type { DealLabel } from '@/lib/mvp/types';
 import { categoryMarketHref, dealsRoute } from '@/lib/mvp/routes';
-import { routeMetadata } from '@/lib/seo';
+import { metadataForPolicyRoute } from '@/lib/seo';
 import { buildSinglePortionDealFinder } from '@/lib/single-portion-deals';
 import { labelFromSlug, snapshot, topChainSpreads } from '@/lib/verified-data';
 
@@ -29,8 +29,9 @@ function dealsHref(tab: DealLabel | 'all', chain?: string, category?: string) {
   return dealsRoute({ tab, chain, category });
 }
 
-export function generateMetadata() {
-  return routeMetadata('/deals');
+// routeMetadata('/deals') is applied through metadataForPolicyRoute so filtered deal URLs are noindexed.
+export async function generateMetadata({ searchParams }: Readonly<{ searchParams?: Promise<SearchParams> }>) {
+  return metadataForPolicyRoute('/deals', await (searchParams ?? Promise.resolve({})));
 }
 
 export default async function DealsPage({ searchParams }: Readonly<{ searchParams?: Promise<SearchParams> }>) {

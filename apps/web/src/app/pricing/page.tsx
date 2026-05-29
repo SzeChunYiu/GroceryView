@@ -27,7 +27,7 @@ const plans = [
 ];
 
 const premiumGuardrails = [
-  'Premium gates fail closed unless the server sees an active or trialing entitlement.',
+  'Premium tools stay unavailable unless the server sees an active or trialing entitlement.',
   'Legal, privacy, source confidence, freshness, and core price comparison information are never paywalled.',
   'Coming-soon features are labelled before checkout and are not sold as active capabilities.'
 ];

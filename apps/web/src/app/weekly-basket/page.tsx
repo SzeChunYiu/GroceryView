@@ -329,7 +329,7 @@ export default async function WeeklyBasketPage({
           <div className="rounded-[1.5rem] border border-cyan-100 bg-white p-4 shadow-sm">
             <h3 className="text-lg font-black text-slate-950">{savedBasketAutoReorderPlan.readyAction.label}</h3>
             <p className="mt-1 text-sm leading-6 text-slate-600">
-              Account-bound reorder readiness is fail-closed: signed-in saved basket state is required before a shopper can approve any draft.
+              Account-bound reorder readiness stays unavailable: signed-in saved basket state is required before a shopper can approve any draft.
             </p>
             <ul className="mt-3 space-y-2 text-sm font-semibold text-slate-700">
               {savedBasketAutoReorderPlan.guardrails.map((guardrail) => (

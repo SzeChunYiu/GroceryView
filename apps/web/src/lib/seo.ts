@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { publicCatalogueCacheControl, publicCatalogueRevalidateSeconds } from './cache-policy';
+import { canonicalForRoute, robotsForRoute, type RouteSearchParams } from './route-seo-policy';
 
 export { publicCatalogueCacheControl, publicCatalogueRevalidateSeconds, publicCatalogueStaleWhileRevalidateSeconds } from './cache-policy';
 
@@ -90,7 +91,7 @@ type ShoppingListSharePayload = {
 export const routeMetadataCatalog = {
   '/': {
     title: 'GroceryView verified grocery snapshot',
-    description: 'Verified Sweden grocery price, product browsing, fresh OpenPrices observations, source route mapping, catalogue savings, map chain index signals, and gated feature readiness.'
+    description: 'Verified Sweden grocery price, product browsing, fresh OpenPrices observations, source route mapping, catalogue savings, map chain index signals, and clear confidence labels.'
   },
   '/account': {
     title: 'Account and alert controls | GroceryView',
@@ -200,11 +201,11 @@ export const routeMetadataCatalog = {
   },
   '/fuel': {
     title: 'Fuel prices by grade | GroceryView',
-    description: 'View source-backed fuel observations by grade with price per litre, domain=fuel modeling, and operator provenance.'
+    description: 'View source-backed fuel observations by grade with price per litre, operator provenance, and clear station-level claim boundaries.'
   },
   '/household': {
     title: 'Household grocery planning gate | GroceryView',
-    description: 'Household planning stays fail-closed until verified private profile and basket records are connected.'
+    description: 'Household planning stays unavailable until verified private profile and basket records are connected.'
   },
   '/index': {
     title: 'Personalized grocery index shortcuts | GroceryView',
@@ -265,8 +266,8 @@ export const routeMetadataCatalog = {
     description: 'Plan pantry replenishment from verified basket needs, expiry signals, missing-price blockers, and source coverage.'
   },
   '/pharmacy': {
-    title: 'Pharmacy OTC price foundation | GroceryView',
-    description: 'Preview the domain-scoped OTC pharmacy price model while prescription and non-observed pharmacy prices remain withheld.'
+    title: 'Pharmacy OTC price comparison | GroceryView',
+    description: 'Compare source-backed public OTC pharmacy catalog rows while prescription and non-observed pharmacy prices remain withheld.'
   },
   '/price-reports': {
     title: 'Price report evidence gate | GroceryView',
@@ -578,10 +579,24 @@ export function metadataForCategory(category: { slug: string; label: string }, s
 }
 
 export function metadataForSearch(searchParams?: CanonicalFilterSearchParams): Metadata {
+  const policy = robotsForRoute('/search', searchParams);
   return routeMetadata({
     path: '/search',
-    canonicalPath: hasAppliedCanonicalFilters(searchParams) ? '/search' : undefined,
-    ...routeMetadataCatalog['/search']
+    canonicalPath: canonicalForRoute('/search', searchParams),
+    ...routeMetadataCatalog['/search'],
+    noIndex: !policy.index,
+    noIndexFollow: policy.follow
+  });
+}
+
+export function metadataForPolicyRoute(pathname: keyof typeof routeMetadataCatalog, searchParams?: RouteSearchParams): Metadata {
+  const policy = robotsForRoute(pathname, searchParams);
+  return routeMetadata({
+    path: pathname,
+    canonicalPath: canonicalForRoute(pathname, searchParams),
+    ...routeMetadataCatalog[pathname],
+    noIndex: !policy.index,
+    noIndexFollow: policy.follow
   });
 }
 

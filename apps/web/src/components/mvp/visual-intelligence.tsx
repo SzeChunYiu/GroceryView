@@ -86,7 +86,7 @@ export function ChartShell({ userQuestion, insightTitle, plainSummary, evidenceI
         </div>
         <Link className="rounded-full bg-emerald-800 px-3 py-2 text-xs font-black text-white" href={actionHref}>{actionLabel}</Link>
       </div>
-      <div className="mt-4">{hasData ? children : (emptyState ?? <ChartEmptyState />)}</div>
+      <div className="mt-4 min-h-[12rem]">{hasData ? children : (emptyState ?? <ChartEmptyState />)}</div>
       <div className="mt-4 flex flex-wrap gap-2" aria-label="Evidence strip">
         {evidenceItems.map((item) => <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700" key={item}>{item}</span>)}
         <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700">Color is not the only signal</span>

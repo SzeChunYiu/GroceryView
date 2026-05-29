@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { MvpBreadcrumbs } from '@/components/mvp/mvp-breadcrumbs';
 import { routeMetadata } from '@/lib/seo';
+import { JsonLd, buildDatasetJsonLd } from '@/lib/structured-data';
 
 const methodologySections = [
   {
@@ -78,6 +79,7 @@ export function generateMetadata() {
 export default function MethodologyPage() {
   return (
     <PageShell>
+      <JsonLd data={buildDatasetJsonLd({ name: 'GroceryView scoring and confidence methodology', description: 'Public methodology for GroceryView deal scores, Buy or Wait labels, nutrition value, and confidence boundaries.', url: '/methodology', keywords: ['methodology', 'confidence', 'grocery prices'] })} />
       <MvpBreadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Methodology' }]} />
       <Eyebrow>Trust methodology</Eyebrow>
       <h1 className="mt-2 max-w-4xl text-4xl font-black tracking-tight">How GroceryView scores and hides claims</h1>

@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { Card, Eyebrow, PageShell, SourceCitation } from '@/components/data-ui';
 import { buildPharmacyDomainSearchView, buildPharmacyProductDetail } from '@/lib/pharmacy-domain';
 import { routeMetadata } from '@/lib/seo';
+import { JsonLd, buildBreadcrumbJsonLd, buildPharmacyProductJsonLd } from '@/lib/structured-data';
 
 export function generateStaticParams() {
   return buildPharmacyDomainSearchView().cards.slice(0, 20).map((card) => ({ product: card.ean }));
@@ -17,7 +18,7 @@ export async function generateMetadata({ params }: Readonly<{ params: Promise<{ 
     path: `/pharmacy/${detail.ean}`,
     title: `${detail.name} exact EAN OTC comparison | GroceryView`,
     description: `Compare public OTC catalog rows for exact EAN ${detail.ean} with safety boundaries, freshness, and no medical advice.`,
-    noIndex: true
+    noIndex: false
   });
 }
 
@@ -26,8 +27,25 @@ export default async function PharmacyProductDetailPage({ params }: Readonly<{ p
   const detail = buildPharmacyProductDetail(product);
   if (!detail) notFound();
 
+  const pharmacyJsonLd = [
+    buildPharmacyProductJsonLd({
+      name: detail.name,
+      url: `/pharmacy/${detail.ean}`,
+      description: `Public OTC exact-EAN price comparison for ${detail.name}.`,
+      lowPrice: detail.rows[0]?.price,
+      highPrice: detail.rows.at(-1)?.price,
+      offerCount: detail.rows.length
+    }),
+    buildBreadcrumbJsonLd([
+      { name: 'Home', item: '/' },
+      { name: 'Pharmacy OTC', item: '/pharmacy/otc' },
+      { name: detail.name, item: `/pharmacy/${detail.ean}` }
+    ])
+  ];
+
   return (
     <PageShell>
+      <JsonLd data={pharmacyJsonLd} />
       <Eyebrow>Pharmacy OTC detail</Eyebrow>
       <p className="mt-3 text-sm font-black text-sky-900">Exact EAN comparison only</p>
       <h1 className="mt-2 text-4xl font-black tracking-tight">{detail.name}</h1>
