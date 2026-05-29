@@ -7,12 +7,26 @@ const BLOCKED_ON_PUBLIC = [
   'source_run_id',
   'raw_record_id',
   'COPY staging',
-  'fail closed until Redis cache and pgbouncer'
+  'fail closed until Redis cache and pgbouncer',
+  'domain=fuel observations',
+  'terminal view',
+  'domain=pharmacy connector',
+  'buildWatchlistAlerts',
+  'planNotifications',
+  'pharmacy_otc_product watchlist',
+  'fuel_station watchlist',
+  'Supported fuel item model',
+  'OTC item models',
+  'Connector run unknown'
 ];
 
 const PUBLIC_FILES = [
   'src/app/search/page.tsx',
+  'src/app/fuel/page.tsx',
+  'src/app/pharmacy/page.tsx',
+  'src/app/watchlist/page.tsx',
   'src/components/market-shell.tsx',
+  'src/components/data-ui.tsx',
   'src/app/[locale]/page.tsx'
 ].map((relative) => new URL(`../${relative}`, import.meta.url));
 

@@ -160,8 +160,8 @@ function fuelTerminalChartFor(rows: FuelTerminalRow[], gradeLabel: string): Pric
 
   return {
     available: series.length > 0,
-    title: `${gradeLabel} fuel price terminal`,
-    sourceLabel: 'domain=fuel operator price history',
+    title: `${gradeLabel} fuel price view`,
+    sourceLabel: 'Operator fuel price history',
     confidenceLabel: 'Operator page confidence; no station pump inference',
     caveat: 'History points are sourced from public operator price pages. Station dots are locations only unless station-level prices are explicitly observed.',
     defaultWindow: 'ALL',
@@ -225,17 +225,17 @@ export default async function FuelPage({ searchParams }: Readonly<{ searchParams
 
   return (
     <PageShell>
-      <Eyebrow>{domain.label} observations</Eyebrow>
+      <Eyebrow>Verified fuel price rows</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Fuel prices by grade</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
-        GroceryView now renders fuel only from domain=fuel observations with price per litre and source provenance. The first operator source is OKQ8&apos;s public fuel price page; crowd reports remain schema-ready but empty.
+        GroceryView shows fuel as verified price per litre rows with source dates, freshness, and confidence. OKQ8&apos;s public fuel price page is the first operator source; crowd-submitted prices stay hidden until trusted station evidence exists.
       </p>
 
       <Card className="mt-6 border-slate-200 bg-slate-50">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Grade selector</p>
-            <h2 className="mt-2 text-2xl font-black text-slate-950">{selectedGradeLabel} terminal view</h2>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">{selectedGradeLabel} price view</h2>
             <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
               Selected grade uses {selectedGradeRows.length} verified operator rows and highlights the cheapest operator-backed station candidates near {currentLocation.label}.
             </p>
@@ -258,7 +258,7 @@ export default async function FuelPage({ searchParams }: Readonly<{ searchParams
         <Card>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Observed rows</p>
           <p className="mt-2 text-5xl font-black text-slate-950">{fuelTerminalRows.length}</p>
-          <p className="mt-3 text-sm font-semibold text-slate-700">All rows are domain=fuel and unit=litre.</p>
+          <p className="mt-3 text-sm font-semibold text-slate-700">All rows are verified fuel price rows measured per litre.</p>
         </Card>
         <Card>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Lowest shown</p>
@@ -436,7 +436,7 @@ export default async function FuelPage({ searchParams }: Readonly<{ searchParams
       <Card className="mt-6">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
-            <h2 className="text-2xl font-black">Per-grade observations</h2>
+            <h2 className="text-2xl font-black">Per-grade price rows</h2>
             <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{verifiedFuelPriceSource.caveat}</p>
           </div>
           <Link className="text-sm font-black text-emerald-800 underline decoration-emerald-300 underline-offset-4" href={verifiedFuelPriceSource.sourceUrl}>
@@ -519,12 +519,12 @@ export default async function FuelPage({ searchParams }: Readonly<{ searchParams
       </Card>
 
       <Card className="mt-6">
-        <h2 className="text-2xl font-black">Supported fuel item model</h2>
+        <h2 className="text-2xl font-black">Fuel grades ready for comparison</h2>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           {domain.seedItems.map((item) => (
             <div className="rounded-lg border border-slate-200 bg-slate-50 p-4" key={item.id}>
               <p className="font-black text-slate-950">{item.label}</p>
-              <p className="mt-2 text-sm font-semibold text-slate-700">{item.id} · comparable unit: {item.comparableUnit} · {item.matchKey}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">Compared per litre with exact grade labels, source dates, and confidence.</p>
             </div>
           ))}
         </div>
@@ -536,12 +536,12 @@ export default async function FuelPage({ searchParams }: Readonly<{ searchParams
             <p className="text-sm font-black uppercase tracking-[0.2em] text-indigo-800">{fuelStationSourceCoverage.source}</p>
             <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">OSM fuel station source</h2>
             <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
-              The fuel station lane has a public Overpass connector contract: {fuelStationSourceCoverage.connector} posts an amenity=fuel query ({fuelStationSourceCoverage.overpassFilter}) for {fuelStationSourceCoverage.stationScope}. It is location and grade-availability evidence only; the price table above comes from operator domain=fuel observations.
+              Fuel station locations come from OpenStreetMap fuel-station data for {fuelStationSourceCoverage.stationScope}. They show location and grade-availability evidence only; the price table above comes from verified operator fuel price rows.
             </p>
           </div>
           <div className="rounded-lg bg-white p-4 text-right shadow-sm">
             <p className="text-4xl font-black text-indigo-900">{fuelStationSourceCoverage.priceObservationCount}</p>
-            <p className="text-sm font-bold uppercase tracking-[0.16em] text-slate-500">OSM price observations</p>
+            <p className="text-sm font-bold uppercase tracking-[0.16em] text-slate-500">Station price rows</p>
             <p className="mt-2 text-xs font-semibold text-slate-600">{fuelStationSourceCoverage.status}</p>
           </div>
         </div>

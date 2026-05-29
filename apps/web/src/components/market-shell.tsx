@@ -288,10 +288,10 @@ export function MarketShell({ locale = defaultLocale }: { locale?: SupportedLoca
       <Card className="mt-6 border-slate-900 bg-slate-950 text-white">
         <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>
-            <Eyebrow>Homepage market terminal</Eyebrow>
+            <Eyebrow>Homepage market view</Eyebrow>
             <h2 className="mt-2 text-3xl font-black tracking-tight">{homepageMarketTerminal.title}</h2>
             <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-200">
-              The homepage now opens with a Grocery Index terminal view: cheapest-chain index, sharpest verified price-drop mover, OpenPrices observation depth, and route-level source coverage stay connected to the same generated evidence used across product, map, and data-source pages.
+              The homepage now opens with a Grocery Index price view: cheapest-chain index, sharpest verified price-drop mover, OpenPrices observation depth, and route-level source coverage stay connected to the same evidence used across product, map, and data-source pages.
             </p>
           </div>
           <Link className="rounded-full bg-emerald-400 px-5 py-3 text-center text-sm font-black text-emerald-950" href="/chain-index">
@@ -611,7 +611,7 @@ export function MarketShell({ locale = defaultLocale }: { locale?: SupportedLoca
             <Eyebrow>Pharmacy OTC evidence</Eyebrow>
             <h2 className="mt-2 text-3xl font-black tracking-tight">Public OTC item prices before pharmacy-chain claims</h2>
             <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-indigo-950">
-              The homepage now previews the pharmacy vertical with OpenPrices + OpenBeautyFacts OTC rows. These are EAN-coded public observations only: no prescription medicine, medical advice, stock, or cheapest-pharmacy claim is displayed before domain=pharmacy connector rows exist.
+              The homepage now previews the pharmacy vertical with OpenPrices + OpenBeautyFacts OTC rows. These are EAN-coded public observations only: no prescription medicine, medical advice, stock, or cheapest-pharmacy claim is displayed until trusted pharmacy-source evidence exists.
             </p>
           </div>
           <Link className="rounded-full bg-indigo-700 px-5 py-3 text-center text-sm font-black text-white" href="/pharmacy">

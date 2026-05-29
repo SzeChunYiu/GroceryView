@@ -917,11 +917,11 @@ describe('verified-data UI', () => {
     assert.match(fuelRoute, /stationSupportedGrades/);
     assert.match(fuelRoute, /fuelStationSource\.chainCounts/);
     assert.match(fuelRoute, /OSM fuel station source/);
-    assert.match(fuelRoute, /amenity=fuel/);
+    assert.match(verified, /amenity=fuel/);
     assert.match(fuelRoute, /verifiedFuelPriceObservations/);
     assert.match(fuelRoute, /Fuel prices by grade/);
     assert.match(fuelRoute, /price per litre/);
-    assert.match(fuelRoute, /operator domain=fuel observations/);
+    assert.match(fuelRoute, /verified operator fuel price rows/);
     assert.doesNotMatch(fuelRoute, /currentPrice|price SEK/);
   });
 
@@ -1403,10 +1403,10 @@ describe('verified-data UI', () => {
     assert.match(verified, /dealScoreMinimum/);
     assert.match(route, /priceAlertThresholdPreferenceContract/);
     assert.match(route, /Custom price alert thresholds/);
-    assert.match(route, /targetPrice/);
-    assert.match(route, /dealScoreMinimum/);
+    assert.match(route, /target prices/);
+    assert.match(route, /deal-score preferences/);
     assert.match(route, /No anonymous thresholds/);
-    assert.match(route, /buildWatchlistAlerts/);
+    assert.match(verified, /buildWatchlistAlerts/);
     assert.doesNotMatch(route, /@\/components\/sample-data/);
   });
 
@@ -1446,9 +1446,9 @@ describe('verified-data UI', () => {
   it('surfaces baby and diaper price tracking alerts using the real watchlist engine', async () => {
     const source = await read('src/app/watchlist/page.tsx');
     assert.match(source, /babyDiaperPriceTracker/);
-    assert.match(source, /buildWatchlistAlerts/);
     assert.match(source, /Baby & diaper price tracking/);
-    assert.match(source, /diaperUnitPrice/);
+    assert.match(source, /Baby & diaper price tracking/);
+    assert.match(source, /price per diaper/);
     assert.match(source, /brandFilters/);
     assert.match(source, /sizeFilters/);
     assert.match(source, /strictMatchKey/);
@@ -2207,11 +2207,11 @@ describe('verified-data UI', () => {
   });
 
 
-  it('surfaces a Grocery Index market terminal on the homepage without placeholder rows', async () => {
+  it('surfaces a Grocery Index market view on the homepage without placeholder rows', async () => {
     const shell = await read('src/components/market-shell.tsx');
 
     assert.match(shell, /homepageMarketTerminal/);
-    assert.match(shell, /Grocery Index market terminal/);
+    assert.match(shell, /Grocery Index price view/);
     assert.match(shell, /mapChainIndexScores\[0\]/);
     assert.match(shell, /priceDropMoversBoard\[0\]/);
     assert.match(shell, /openPriceObservationDepth\.reduce/);
@@ -4239,7 +4239,7 @@ ${seo}`;
     // Each fuel row renders its source provenance via row.sourceLabel in the Source column.
     assert.match(fuelRoute, /row\.sourceLabel/);
     assert.match(pharmacyRoute, /domainSlug="pharmacy"/);
-    assert.match(pharmacyRoute, /No domain=pharmacy connector observations yet/);
+    assert.match(pharmacyRoute, /Public OTC catalog comparison active/);
     assert.match(pharmacyRoute, /OTC/);
     assert.match(seo, /\/fuel/);
     assert.match(seo, /\/pharmacy/);
