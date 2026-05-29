@@ -43,3 +43,25 @@ ranked AS (  -- 1:1 guard: keep only the best ICA per EAN
 UPDATE products SET barcode = r.ean, updated_at = now()
 FROM ranked r
 WHERE products.id = r.ica_id AND r.rn = 1 AND (products.barcode IS NULL OR products.barcode = '');
+
+-- Second pass: weight-variable products (cheese / fish / flatbread sold by approximate weight,
+-- e.g. "ca 730g"), where exact size never matches a fixed-weight twin even though it's the same
+-- product. These are distinctive enough to match on brand + name similarity alone (no size gate).
+WITH ica AS (
+  SELECT DISTINCT ON (p.id) p.id, p.canonical_name nm, lower(p.brand) br
+  FROM products p
+  JOIN latest_prices lp ON lp.product_id=p.id JOIN chains c ON c.id=lp.chain_id
+  WHERE c.slug='ica' AND p.brand IS NOT NULL AND (p.barcode IS NULL OR p.barcode='')
+    AND p.canonical_name ~* '(ost |matjes|sill|tunnbröd|herrgård|grevé|präst)'
+),
+m AS (
+  SELECT DISTINCT ON (ica.id) ica.id AS ica_id, op.barcode AS ean, similarity(op.canonical_name, ica.nm) AS sim
+  FROM ica JOIN products op ON lower(op.brand)=ica.br AND op.barcode IS NOT NULL AND op.barcode <> ''
+  WHERE op.id IN (SELECT lp.product_id FROM latest_prices lp JOIN chains c ON c.id=lp.chain_id WHERE c.slug<>'ica')
+    AND similarity(op.canonical_name, ica.nm) > 0.4
+  ORDER BY ica.id, similarity(op.canonical_name, ica.nm) DESC
+),
+ranked AS (SELECT ica_id, ean, row_number() OVER (PARTITION BY ean ORDER BY sim DESC, ica_id) AS rn FROM m)
+UPDATE products SET barcode = r.ean, updated_at = now()
+FROM ranked r
+WHERE products.id = r.ica_id AND r.rn = 1 AND (products.barcode IS NULL OR products.barcode = '');
