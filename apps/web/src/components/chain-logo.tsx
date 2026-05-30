@@ -1,11 +1,11 @@
 const chainLogoBySlug: Record<string, { alt: string; src: string }> = {
-  citygross: { alt: 'City Gross logo', src: '/logos/city-gross.png' },
-  coop: { alt: 'Coop logo', src: '/logos/coop.png' },
-  hemkop: { alt: 'Hemköp logo', src: '/logos/hemkop.png' },
-  ica: { alt: 'ICA logo', src: '/logos/ica.png' },
+  citygross: { alt: 'City Gross logo', src: '/logos/city-gross.svg' },
+  coop: { alt: 'Coop logo', src: '/logos/coop.svg' },
+  hemkop: { alt: 'Hemköp logo', src: '/logos/hemkop.svg' },
+  ica: { alt: 'ICA logo', src: '/logos/ica.svg' },
   lidl: { alt: 'Lidl logo', src: '/logos/lidl.svg' },
   netto: { alt: 'Netto logo', src: '/logos/netto.svg' },
-  willys: { alt: 'Willys logo', src: '/logos/willys.png' }
+  willys: { alt: 'Willys logo', src: '/logos/willys.svg' }
 };
 
 export function chainLogoSlug(value: string) {
