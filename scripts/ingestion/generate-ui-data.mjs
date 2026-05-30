@@ -77,12 +77,13 @@ async function products(domain, limit) {
 }
 
 async function fuelProducts() {
-  // national reference price per grade if present; else the only fuel rows we have
-  const rows = await q(`SELECT p.canonical_name name, round(lp.price,2) price
-    FROM latest_prices lp JOIN products p ON p.id=lp.product_id WHERE lp.domain='fuel' AND lp.price>0 LIMIT 12`);
+  // per fuel grade: cheapest + avg + dearest across all stations (real per-station, crowd-sourced)
+  const rows = await q(`SELECT p.canonical_name name, round(min(lp.price),2) lo, round(avg(lp.price)::numeric,2) avg, round(max(lp.price),2) hi, count(*) stations
+    FROM latest_prices lp JOIN products p ON p.id=lp.product_id WHERE lp.domain='fuel' AND lp.price>0 GROUP BY p.canonical_name ORDER BY count(*) DESC`);
   return rows.map((r) => ({ slug: 'fuel-' + r.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'), name: r.name,
-    emoji: '⛽', unit: 'kr/L', price: { SE: Number(r.price) }, low52: { SE: Number(r.price) }, high52: { SE: Number(r.price) },
-    sparkline: Array(13).fill(Number(r.price)), sector: 'fuel' }));
+    emoji: '⛽', unit: 'kr/L', price: { SE: Number(r.lo) }, regular: { SE: Number(r.avg) },
+    low52: { SE: Number(r.lo) }, high52: { SE: Number(r.hi) }, stations: Number(r.stations),
+    sparkline: Array(13).fill(Number(r.avg)), sector: 'fuel', confidence: 'medium', verdict: 'buy' }));
 }
 
 async function stores() {
