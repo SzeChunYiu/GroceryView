@@ -23,3 +23,8 @@ __pycache__/
 **/.lighthouseci/
 supabase/.temp/
 apps/web/public/product-images/
+
+# local price-crawl artifacts (regenerable, large)
+data/ica-crawl/
+data/snapshots/
+.claude/
