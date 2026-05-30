@@ -2,6 +2,7 @@ import { buildPrivacyExport } from '@groceryview/core';
 import Link from 'next/link';
 import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { ChainSelector } from '@/components/chain-selector';
+import { MunicipalitySelector } from '@/components/municipality-selector';
 import { PushNotificationPreferenceControls } from '@/components/notification-inbox-actions';
 import { SettingsDataExportActions } from '@/components/settings-data-export-actions';
 import { DietaryProfileOnboarding } from '@/components/diet-filter-picker';
@@ -74,6 +75,17 @@ export default function SettingsPage() {
       </p>
 
       <SettingsDataExportActions />
+
+      <Card className="mt-6 border-sky-200 bg-sky-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-800">Location</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Choose your municipality</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+          Pick which municipality&apos;s store prices you want to see. Your choice is saved on this device.
+        </p>
+        <div className="mt-4 max-w-xl">
+          <MunicipalitySelector />
+        </div>
+      </Card>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Legal policies</p>
