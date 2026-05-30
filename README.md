@@ -2,27 +2,18 @@
 
 > **Live status board — auto-generated, do not hand-edit.**
 > Regenerated from real signals (merged PRs, open PRs, GOAL.md, live prod HTML) by
-> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-28 20:29 UTC.
+> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-30 05:56 UTC.
 
 GroceryView turns grocery prices into a market: every product is a **ticker** with a
 price chart, chains/categories/brands have **indices**, deals get a **Buy/Wait**
 rating, and shoppers **track, compare, and get alerted** across chains over time.
 Strategy + competitor teardown: [`GOAL.md`](GOAL.md) · [`COMPETITIVE-ANALYSIS.md`](COMPETITIVE-ANALYSIS.md).
 
-## BI / Data Analyst Portfolio Case Study
-
-GroceryView also includes a BI-focused case study showing how the same grocery
-price data becomes reporting-ready KPIs, SQL views, dashboard pages, data quality
-checks, and an automated weekly reporting workflow.
-
-Start here: [`docs/bi-portfolio/00_overview.md`](docs/bi-portfolio/00_overview.md)
-or browse the full [`docs/bi-portfolio/`](docs/bi-portfolio/) documentation set.
-
 ## 🟢 Live
 
 - **Site:** [https://grocery-web-mu.vercel.app](https://grocery-web-mu.vercel.app) — `/` returns HTTP **200**
 - **Visible on homepage:** ~**24** store pages, ~**35** product pages
-- **Shipped `feat:`/`wire:` PRs to date:** **4**
+- **Shipped `feat:`/`wire:` PRs to date:** **12**
 
 ## 🛒 What shoppers get (consumer value)
 
@@ -51,13 +42,22 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 
 ## ✅ Recently shipped (last 15 merged `feat:`/`wire:` PRs)
 
+- #3796 feat(web): municipality selector + fix date-fragile search-analytics fixture
+- #3795 feat(ingestion): load fuel grade prices into DB
+- #3794 feat(ingestion): load Apohem pharmacy products into the DB
+- #3793 feat(web): real vector (SVG) chain logos from Wikimedia Commons
+- #3792 feat(web): real chain logos (incl. City Gross) + local product-image saving
+- #3791 feat(ingestion): backfill product images from ingested files
+- #3790 feat(ingestion): weight-variable second pass for ICA matching
+- #3789 feat(ingestion): heuristic ICA cross-chain matching + EAN-keyed catalog grouping
+- #3788 feat(ingestion): local DB-first pipeline + product-organization views
 - #3768 feat(web): composer-25 multitask pack
 - #3753 feat(ingestion): chunk citygross + lidl into bounded files
 - #3732 feat(web): MVP site with v3 connected UX and fail-closed data
 
 ## 🔄 In progress (open PRs)
 
-- #3769 Add map visual command center
+_(no open PRs)_
 
 ## 📋 To-do (from GOAL.md backlog)
 
