@@ -15,7 +15,7 @@ import pg from 'pg';
 const DIR = path.resolve(fileURLToPath(new URL('../../data/ica-crawl/', import.meta.url)));
 const NOW = new Date().toISOString();
 const SRC = 'ica-store-crawl';
-const STORES_PER_BATCH = 25;
+const STORES_PER_BATCH = 12;
 const unitFor = (u) => { const s = String(u || '').toLowerCase(); if (s.includes('kg')) return 'kg'; if (s.includes('l')) return 'l'; return 'st'; };
 
 function* parse(f) {
@@ -46,6 +46,13 @@ async function batchInsert(table, cols, rows, perRow) {
   }
 }
 
+// resume: skip stores already loaded (per-batch commits persist across runs)
+const loaded = new Set((await client.query(
+  `SELECT DISTINCT s.external_ref FROM latest_prices lp JOIN stores s ON s.id=lp.store_id WHERE lp.provenance->>'source'=$1`, [SRC]
+)).rows.map((r) => r.external_ref));
+const todo = files.filter((f) => !loaded.has(f.replace('.ndjson', '')));
+console.error(`already loaded: ${loaded.size} stores; remaining to load: ${todo.length}`);
+
 try {
   await client.query(`ALTER TABLE observations DISABLE TRIGGER observations_partition_lane_sync`);
   // products (once)
@@ -60,8 +67,8 @@ try {
   await client.query(`CREATE TEMP TABLE ostg (slug text, ext text, price numeric, unit_price numeric)`);
 
   let done = 0;
-  for (let i = 0; i < files.length; i += STORES_PER_BATCH) {
-    const group = files.slice(i, i + STORES_PER_BATCH);
+  for (let i = 0; i < todo.length; i += STORES_PER_BATCH) {
+    const group = todo.slice(i, i + STORES_PER_BATCH);
     const rows = [];
     for (const f of group) for (const r of parse(f)) rows.push(r);
     if (!rows.length) { done += group.length; continue; }
@@ -86,7 +93,7 @@ try {
       DO UPDATE SET price=EXCLUDED.price, unit_price=EXCLUDED.unit_price, observation_id=EXCLUDED.observation_id, observed_at=EXCLUDED.observed_at`, [NOW, SRC]);
     await client.query('COMMIT');
     done += group.length;
-    console.error(`  committed ${done}/${files.length} stores (+${rows.length} rows)`);
+    console.error(`  committed ${done}/${todo.length} remaining stores (+${rows.length} rows)`);
   }
   await client.query(`ALTER TABLE observations ENABLE TRIGGER observations_partition_lane_sync`);
   const g = (await client.query(`

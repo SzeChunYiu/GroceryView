@@ -86,36 +86,32 @@ async function fuelProducts() {
 }
 
 async function stores() {
-  // geocoded grocery stores; basketCost = sum of this store's price for a fixed common basket (real per-store for ICA)
+  // fast read from the materialized per-store basket (built by db-optimize.sql)
   const rows = await q(`
-    WITH geo AS (
-      SELECT s.id, s.name, c.slug chain, NULLIF(s.city,'—') city,
-             ST_Y(s.position::geometry) lat, ST_X(s.position::geometry) lng
-      FROM stores s JOIN chains c ON c.id=s.chain_id
-      WHERE s.domain='grocery' AND s.position IS NOT NULL),
-    bc AS (
-      SELECT esp.store_id, round(avg(esp.price)*40,0) basket
-      FROM vw_effective_store_price esp GROUP BY esp.store_id)
-    SELECT geo.id, geo.name, geo.chain, geo.city, round(geo.lat::numeric,4) lat, round(geo.lng::numeric,4) lng, bc.basket
-    FROM geo JOIN bc ON bc.store_id=geo.id
-    WHERE bc.basket IS NOT NULL
-    ORDER BY bc.basket LIMIT 120`);
+    SELECT b.store_id, s.name, b.chain, NULLIF(b.city,'—') city,
+           round(b.lat::numeric,4) lat, round(b.lng::numeric,4) lng, b.basket_est basket, b.price_basis
+    FROM mv_store_basket b JOIN stores s ON s.id=b.store_id
+    WHERE b.basket_est IS NOT NULL AND b.city NOT IN ('Sweden')
+    ORDER BY b.basket_est LIMIT 400`);
   if (!rows.length) return [];
-  const median = rows[Math.floor(rows.length / 2)].basket;
-  return rows.map((r) => ({ slug: 's' + r.id.slice(0, 8), name: r.name, chain: r.chain.replace(/-/g, '_'),
+  const sorted = rows.map((r) => Number(r.basket)).sort((a, b) => a - b);
+  const median = sorted[Math.floor(sorted.length / 2)];
+  return rows.map((r) => ({ slug: 's' + r.store_id.slice(0, 8), name: r.name, chain: r.chain.replace(/-/g, '_'),
     city: r.city || 'Sverige', country: 'SE', district: r.city || '', distance: 0,
-    basketCost: Number(r.basket), basketDiff: Number(r.basket) - Number(median),
-    percentile: Math.round((rows.filter((x) => x.basket <= r.basket).length / rows.length) * 100),
-    openTill: '', coords: [r.lng, r.lat], lat: Number(r.lat), lng: Number(r.lng) }));
+    basketCost: Number(r.basket), basketDiff: Number(r.basket) - median,
+    percentile: Math.round((sorted.filter((x) => x <= Number(r.basket)).length / sorted.length) * 100),
+    openTill: '', coords: [Number(r.lng), Number(r.lat)], lat: Number(r.lat), lng: Number(r.lng), priceBasis: r.price_basis }));
 }
 
 async function municipalities() {
-  const rows = await q(`SELECT municipality name, stores, products, avg_price
-    FROM vw_municipality_price_index WHERE municipality <> 'Okänd' AND stores>0 ORDER BY products DESC LIMIT 60`);
+  // fast read from the materialized municipality heatmap (243 kommuner)
+  const rows = await q(`SELECT municipality name, stores, price_points, avg_price, median_price, cheapest_basket, dearest_basket
+    FROM mv_municipality_index WHERE municipality NOT IN ('Okänd','Sweden') AND stores>0 ORDER BY stores DESC, price_points DESC`);
   if (!rows.length) return [];
   const avgAll = rows.reduce((s, r) => s + Number(r.avg_price), 0) / rows.length;
   return rows.map((r) => ({ name: r.name, region: '', index: +(Number(r.avg_price) / avgAll).toFixed(3),
-    stores: Number(r.stores), avgPrice: Number(r.avg_price), products: Number(r.products) }));
+    stores: Number(r.stores), avgPrice: Number(r.avg_price), medianPrice: Number(r.median_price),
+    cheapestBasket: Number(r.cheapest_basket), dearestBasket: Number(r.dearest_basket) }));
 }
 
 const HELPERS = `

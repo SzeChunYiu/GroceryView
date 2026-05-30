@@ -20,7 +20,7 @@ if (!existsSync(FILE)) { console.error('no file', FILE); process.exit(1); }
 const rows = readFileSync(FILE, 'utf8').split('\n').map((l) => l.trim()).filter((l) => l && !l.startsWith('#'))
   .map((l) => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean)
   .map((r) => {
-    const ean = String(r.ean || '').trim();
+    const ean = String(r.ean || '').replace(/[^0-9]/g, '');
     const alt = String(r.varunr || r.sku || r.code || '').trim();
     const price = num(r.price);
     return { chain: r.chain, ean, alt, name: r.name, brand: r.brand || null,
