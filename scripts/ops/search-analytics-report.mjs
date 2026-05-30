@@ -65,10 +65,13 @@ function summarizeSearchAnalytics(rows) {
 
 export function buildSearchAnalyticsFixtureReport(env = process.env, now = new Date()) {
   const lookbackHours = parsePositiveInteger(env.GROCERYVIEW_SEARCH_ANALYTICS_REPORT_LOOKBACK_HOURS, 24);
-  const rows = SEARCH_ANALYTICS_FIXTURE_ROWS.filter((row) => {
+  const withinLookback = SEARCH_ANALYTICS_FIXTURE_ROWS.filter((row) => {
     const seenMs = Date.parse(row.lastSeenAt);
     return Number.isFinite(seenMs) && now.getTime() - seenMs <= lookbackHours * 60 * 60 * 1000;
-  }).map((row) => ({
+  });
+  // Fall back to the full fixture set when fixtures age past the lookback window, so the
+  // demo report stays non-empty regardless of the current date (matches dead-letter-report).
+  const rows = (withinLookback.length > 0 ? withinLookback : SEARCH_ANALYTICS_FIXTURE_ROWS).map((row) => ({
     ...row,
     zeroResultRate: pct(row.zeroResultCount, row.searchCount),
     clickThroughRate: pct(row.resultClickCount, row.searchCount),
