@@ -146,7 +146,13 @@ async function main() {
   ]);
   const CATS = [...new Set(groceries.map((p) => p.category).filter(Boolean))]
     .map((slug) => ({ slug, name: slug, nameSv: slug, emoji: EMOJI[slug] || '🛒', count: groceries.filter((p) => p.category === slug).length }));
-  const COUNTRIES = { SE: { code: 'SE', name: 'Sverige', city: 'Stockholm', flag: '🇸🇪', currency: 'kr', currencyCode: 'SEK', locale: 'sv-SE', dec: ',' } };
+  // SE carries the real data; NO/IS metadata is included only so the template's multi-country
+  // scaffolding (pickers, hero strip) never hits an undefined country. They have no product data.
+  const COUNTRIES = {
+    SE: { code: 'SE', name: 'Sverige', city: 'Stockholm', flag: '🇸🇪', currency: 'kr', currencyCode: 'SEK', locale: 'sv-SE', dec: ',' },
+    NO: { code: 'NO', name: 'Norge', city: 'Oslo', flag: '🇳🇴', currency: 'kr', currencyCode: 'NOK', locale: 'nb-NO', dec: ',' },
+    IS: { code: 'IS', name: 'Ísland', city: 'Reykjavík', flag: '🇮🇸', currency: 'kr.', currencyCode: 'ISK', locale: 'is-IS', dec: ',' },
+  };
   const SECTORS = {
     groceries: { id: 'groceries', name: 'Groceries', nameLocal: { SE: 'Mat' }, emoji: '🛒', items: groceries.length },
     fuel: { id: 'fuel', name: 'Fuel', nameLocal: { SE: 'Drivmedel' }, emoji: '⛽', items: fuel.length },
@@ -158,7 +164,7 @@ async function main() {
   const j = (o) => JSON.stringify(o, null, 1);
   const out = `/* AUTO-GENERATED from the live GroceryView DB — real Swedish prices. Schema matches the prototype. */
 const COUNTRIES = ${j(COUNTRIES)};
-const MUNICIPALITIES = { SE: ${j(MUN)} };
+const MUNICIPALITIES = { SE: ${j(MUN)}, NO: [], IS: [] };
 const SECTORS = ${j(SECTORS)};
 const CHAINS = ${j(CH)};
 const CATEGORIES = ${j(CATS)};
@@ -177,6 +183,7 @@ Object.assign(window, { COUNTRIES, MUNICIPALITIES, SECTORS, CHAINS, CATEGORIES, 
   FUEL_STATIONS, PRICE_HISTORY_LONG, MY_BASKET_DEFAULT,
   fmtPrice, fmtPct, findProduct, findStore, findCategory, priceOf, chainsOf, cheapestChainOf,
   municipalitiesFor, municipalityInfo, jamforpris });
+try { var _gc = window.localStorage && localStorage.getItem('gv-country'); if (_gc && !COUNTRIES[_gc]) { localStorage.setItem('gv-country','SE'); localStorage.removeItem('gv-municipality'); } } catch (e) {}
 `;
   writeFileSync(OUT, out);
   console.log(`wrote ${OUT}: grocery=${groceries.length} pharmacy=${pharmacy.length} beauty=${beauty.length} fuel=${fuel.length} stores=${STO.length} municipalities=${MUN.length} chains=${Object.keys(CH).length}`);
