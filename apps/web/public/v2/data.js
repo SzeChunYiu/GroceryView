@@ -2460,7 +2460,7 @@ const SECTORS = {
    "SE": "Drivmedel"
   },
   "emoji": "⛽",
-  "items": 6
+  "items": 7
  },
  "pharmacy": {
   "id": "pharmacy",
@@ -2536,14 +2536,68 @@ const CHAINS = {
   "color": "oklch(52% 0.16 145)",
   "tier": "national"
  },
+ "circle_k": {
+  "id": "circle_k",
+  "name": "Circle K",
+  "short": "CK",
+  "country": "SE",
+  "sector": "fuel",
+  "color": "oklch(58% 0.20 60)",
+  "tier": "per_store"
+ },
+ "din_x": {
+  "id": "din_x",
+  "name": "Din X",
+  "short": "DX",
+  "country": "SE",
+  "sector": "fuel",
+  "color": "oklch(50% 0.14 60)",
+  "tier": "per_store"
+ },
+ "ingo": {
+  "id": "ingo",
+  "name": "Ingo",
+  "short": "I",
+  "country": "SE",
+  "sector": "fuel",
+  "color": "oklch(54% 0.20 140)",
+  "tier": "per_store"
+ },
  "okq8": {
   "id": "okq8",
   "name": "OKQ8",
   "short": "O",
   "country": "SE",
   "sector": "fuel",
-  "color": "oklch(58% 0.20 60)",
+  "color": "oklch(56% 0.20 25)",
   "tier": "national"
+ },
+ "other_fuel": {
+  "id": "other_fuel",
+  "name": "Other Fuel",
+  "short": "OF",
+  "country": "SE",
+  "sector": "fuel",
+  "color": "oklch(50% 0.20 25)",
+  "tier": "per_store"
+ },
+ "preem": {
+  "id": "preem",
+  "name": "Preem",
+  "short": "P",
+  "country": "SE",
+  "sector": "fuel",
+  "color": "oklch(48% 0.18 250)",
+  "tier": "per_store"
+ },
+ "qstar": {
+  "id": "qstar",
+  "name": "Qstar",
+  "short": "Q",
+  "country": "SE",
+  "sector": "fuel",
+  "color": "oklch(50% 0.16 250)",
+  "tier": "per_store"
  },
  "st1": {
   "id": "st1",
@@ -2551,8 +2605,17 @@ const CHAINS = {
   "short": "S",
   "country": "SE",
   "sector": "fuel",
-  "color": "oklch(50% 0.14 60)",
+  "color": "oklch(54% 0.18 35)",
   "tier": "national"
+ },
+ "tanka": {
+  "id": "tanka",
+  "name": "Tanka",
+  "short": "T",
+  "country": "SE",
+  "sector": "fuel",
+  "color": "oklch(52% 0.16 145)",
+  "tier": "per_store"
  },
  "city_gross": {
   "id": "city_gross",
@@ -2560,7 +2623,7 @@ const CHAINS = {
   "short": "CG",
   "country": "SE",
   "sector": "groceries",
-  "color": "oklch(54% 0.20 140)",
+  "color": "oklch(58% 0.20 60)",
   "tier": "national"
  },
  "coop": {
@@ -2569,7 +2632,7 @@ const CHAINS = {
   "short": "C",
   "country": "SE",
   "sector": "groceries",
-  "color": "oklch(56% 0.20 25)",
+  "color": "oklch(50% 0.14 60)",
   "tier": "regional"
  },
  "hemkop": {
@@ -2578,7 +2641,7 @@ const CHAINS = {
   "short": "H",
   "country": "SE",
   "sector": "groceries",
-  "color": "oklch(50% 0.20 25)",
+  "color": "oklch(54% 0.20 140)",
   "tier": "national"
  },
  "ica": {
@@ -2587,7 +2650,7 @@ const CHAINS = {
   "short": "I",
   "country": "SE",
   "sector": "groceries",
-  "color": "oklch(48% 0.18 250)",
+  "color": "oklch(56% 0.20 25)",
   "tier": "per_store"
  },
  "lidl": {
@@ -2596,7 +2659,7 @@ const CHAINS = {
   "short": "L",
   "country": "SE",
   "sector": "groceries",
-  "color": "oklch(50% 0.16 250)",
+  "color": "oklch(50% 0.20 25)",
   "tier": "national"
  },
  "netto": {
@@ -2605,7 +2668,7 @@ const CHAINS = {
   "short": "N",
   "country": "SE",
   "sector": "groceries",
-  "color": "oklch(54% 0.18 35)",
+  "color": "oklch(48% 0.18 250)",
   "tier": "national"
  },
  "willys": {
@@ -2614,7 +2677,7 @@ const CHAINS = {
   "short": "W",
   "country": "SE",
   "sector": "groceries",
-  "color": "oklch(52% 0.16 145)",
+  "color": "oklch(50% 0.16 250)",
   "tier": "national"
  },
  "apohem": {
@@ -2623,7 +2686,7 @@ const CHAINS = {
   "short": "A",
   "country": "SE",
   "sector": "pharmacy",
-  "color": "oklch(58% 0.20 60)",
+  "color": "oklch(54% 0.18 35)",
   "tier": "national"
  },
  "apotea": {
@@ -2632,7 +2695,7 @@ const CHAINS = {
   "short": "A",
   "country": "SE",
   "sector": "pharmacy",
-  "color": "oklch(50% 0.14 60)",
+  "color": "oklch(52% 0.16 145)",
   "tier": "national"
  },
  "apoteket": {
@@ -2641,7 +2704,7 @@ const CHAINS = {
   "short": "A",
   "country": "SE",
   "sector": "pharmacy",
-  "color": "oklch(54% 0.20 140)",
+  "color": "oklch(58% 0.20 60)",
   "tier": "national"
  },
  "apotekhjartat": {
@@ -2650,7 +2713,7 @@ const CHAINS = {
   "short": "A",
   "country": "SE",
   "sector": "pharmacy",
-  "color": "oklch(56% 0.20 25)",
+  "color": "oklch(50% 0.14 60)",
   "tier": "national"
  },
  "kronansapotek": {
@@ -2659,7 +2722,7 @@ const CHAINS = {
   "short": "K",
   "country": "SE",
   "sector": "pharmacy",
-  "color": "oklch(50% 0.20 25)",
+  "color": "oklch(54% 0.20 140)",
   "tier": "national"
  },
  "meds": {
@@ -2668,7 +2731,7 @@ const CHAINS = {
   "short": "M",
   "country": "SE",
   "sector": "pharmacy",
-  "color": "oklch(48% 0.18 250)",
+  "color": "oklch(56% 0.20 25)",
   "tier": "national"
  }
 };
@@ -5692,97 +5755,78 @@ const GROCERY_PRODUCTS = [
 ];
 const FUEL_PRODUCTS = [
  {
-  "slug": "fuel-e85",
-  "name": "E85",
+  "slug": "fuel-bensin-95",
+  "name": "Bensin 95",
   "emoji": "⛽",
   "unit": "kr/L",
   "price": {
-   "SE": 15.84
+   "SE": 16.34
+  },
+  "regular": {
+   "SE": 17.37
   },
   "low52": {
-   "SE": 15.84
+   "SE": 16.34
   },
   "high52": {
-   "SE": 15.84
+   "SE": 21
   },
+  "stations": 102,
   "sparkline": [
-   15.84,
-   15.84,
-   15.84,
-   15.84,
-   15.84,
-   15.84,
-   15.84,
-   15.84,
-   15.84,
-   15.84,
-   15.84,
-   15.84,
-   15.84
+   17.37,
+   17.37,
+   17.37,
+   17.37,
+   17.37,
+   17.37,
+   17.37,
+   17.37,
+   17.37,
+   17.37,
+   17.37,
+   17.37,
+   17.37
   ],
-  "sector": "fuel"
+  "sector": "fuel",
+  "confidence": "medium",
+  "verdict": "buy"
  },
  {
-  "slug": "fuel-95-e10-blyfri-95",
-  "name": "95 E10 / Blyfri 95",
+  "slug": "fuel-diesel",
+  "name": "Diesel",
   "emoji": "⛽",
   "unit": "kr/L",
   "price": {
-   "SE": 18.89
+   "SE": 18.69
+  },
+  "regular": {
+   "SE": 19.67
   },
   "low52": {
-   "SE": 18.89
+   "SE": 18.69
   },
   "high52": {
-   "SE": 18.89
+   "SE": 21.34
   },
+  "stations": 98,
   "sparkline": [
-   18.89,
-   18.89,
-   18.89,
-   18.89,
-   18.89,
-   18.89,
-   18.89,
-   18.89,
-   18.89,
-   18.89,
-   18.89,
-   18.89,
-   18.89
+   19.67,
+   19.67,
+   19.67,
+   19.67,
+   19.67,
+   19.67,
+   19.67,
+   19.67,
+   19.67,
+   19.67,
+   19.67,
+   19.67,
+   19.67
   ],
-  "sector": "fuel"
- },
- {
-  "slug": "fuel-fuel-undefined",
-  "name": "Fuel undefined",
-  "emoji": "⛽",
-  "unit": "kr/L",
-  "price": {
-   "SE": 20.19
-  },
-  "low52": {
-   "SE": 20.19
-  },
-  "high52": {
-   "SE": 20.19
-  },
-  "sparkline": [
-   20.19,
-   20.19,
-   20.19,
-   20.19,
-   20.19,
-   20.19,
-   20.19,
-   20.19,
-   20.19,
-   20.19,
-   20.19,
-   20.19,
-   20.19
-  ],
-  "sector": "fuel"
+  "sector": "fuel",
+  "confidence": "medium",
+  "verdict": "buy"
  },
  {
   "slug": "fuel-98-blyfri-98",
@@ -5792,12 +5836,16 @@ const FUEL_PRODUCTS = [
   "price": {
    "SE": 20.49
   },
+  "regular": {
+   "SE": 20.49
+  },
   "low52": {
    "SE": 20.49
   },
   "high52": {
    "SE": 20.49
   },
+  "stations": 1,
   "sparkline": [
    20.49,
    20.49,
@@ -5813,38 +5861,120 @@ const FUEL_PRODUCTS = [
    20.49,
    20.49
   ],
-  "sector": "fuel"
+  "sector": "fuel",
+  "confidence": "medium",
+  "verdict": "buy"
  },
  {
-  "slug": "fuel-diesel",
-  "name": "Diesel",
+  "slug": "fuel-95-e10-blyfri-95",
+  "name": "95 E10 / Blyfri 95",
   "emoji": "⛽",
   "unit": "kr/L",
   "price": {
-   "SE": 21.34
+   "SE": 18.89
+  },
+  "regular": {
+   "SE": 18.89
   },
   "low52": {
-   "SE": 21.34
+   "SE": 18.89
   },
   "high52": {
-   "SE": 21.34
+   "SE": 18.89
   },
+  "stations": 1,
   "sparkline": [
-   21.34,
-   21.34,
-   21.34,
-   21.34,
-   21.34,
-   21.34,
-   21.34,
-   21.34,
-   21.34,
-   21.34,
-   21.34,
-   21.34,
-   21.34
+   18.89,
+   18.89,
+   18.89,
+   18.89,
+   18.89,
+   18.89,
+   18.89,
+   18.89,
+   18.89,
+   18.89,
+   18.89,
+   18.89,
+   18.89
   ],
-  "sector": "fuel"
+  "sector": "fuel",
+  "confidence": "medium",
+  "verdict": "buy"
+ },
+ {
+  "slug": "fuel-e85",
+  "name": "E85",
+  "emoji": "⛽",
+  "unit": "kr/L",
+  "price": {
+   "SE": 15.84
+  },
+  "regular": {
+   "SE": 15.84
+  },
+  "low52": {
+   "SE": 15.84
+  },
+  "high52": {
+   "SE": 15.84
+  },
+  "stations": 1,
+  "sparkline": [
+   15.84,
+   15.84,
+   15.84,
+   15.84,
+   15.84,
+   15.84,
+   15.84,
+   15.84,
+   15.84,
+   15.84,
+   15.84,
+   15.84,
+   15.84
+  ],
+  "sector": "fuel",
+  "confidence": "medium",
+  "verdict": "buy"
+ },
+ {
+  "slug": "fuel-fuel-undefined",
+  "name": "Fuel undefined",
+  "emoji": "⛽",
+  "unit": "kr/L",
+  "price": {
+   "SE": 20.19
+  },
+  "regular": {
+   "SE": 20.19
+  },
+  "low52": {
+   "SE": 20.19
+  },
+  "high52": {
+   "SE": 20.19
+  },
+  "stations": 1,
+  "sparkline": [
+   20.19,
+   20.19,
+   20.19,
+   20.19,
+   20.19,
+   20.19,
+   20.19,
+   20.19,
+   20.19,
+   20.19,
+   20.19,
+   20.19,
+   20.19
+  ],
+  "sector": "fuel",
+  "confidence": "medium",
+  "verdict": "buy"
  },
  {
   "slug": "fuel-hvo100",
@@ -5854,12 +5984,16 @@ const FUEL_PRODUCTS = [
   "price": {
    "SE": 29.89
   },
+  "regular": {
+   "SE": 29.89
+  },
   "low52": {
    "SE": 29.89
   },
   "high52": {
    "SE": 29.89
   },
+  "stations": 1,
   "sparkline": [
    29.89,
    29.89,
@@ -5875,7 +6009,9 @@ const FUEL_PRODUCTS = [
    29.89,
    29.89
   ],
-  "sector": "fuel"
+  "sector": "fuel",
+  "confidence": "medium",
+  "verdict": "buy"
  }
 ];
 const PHARMACY_PRODUCTS = [
