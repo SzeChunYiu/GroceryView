@@ -2,7 +2,7 @@
 
 > **Live status board — auto-generated, do not hand-edit.**
 > Regenerated from real signals (merged PRs, open PRs, GOAL.md, live prod HTML) by
-> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-30 05:56 UTC.
+> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-30 10:13 UTC.
 
 GroceryView turns grocery prices into a market: every product is a **ticker** with a
 price chart, chains/categories/brands have **indices**, deals get a **Buy/Wait**
@@ -13,7 +13,7 @@ Strategy + competitor teardown: [`GOAL.md`](GOAL.md) · [`COMPETITIVE-ANALYSIS.m
 
 - **Site:** [https://grocery-web-mu.vercel.app](https://grocery-web-mu.vercel.app) — `/` returns HTTP **200**
 - **Visible on homepage:** ~**24** store pages, ~**35** product pages
-- **Shipped `feat:`/`wire:` PRs to date:** **12**
+- **Shipped `feat:`/`wire:` PRs to date:** **13**
 
 ## 🛒 What shoppers get (consumer value)
 
@@ -42,6 +42,7 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 
 ## ✅ Recently shipped (last 15 merged `feat:`/`wire:` PRs)
 
+- #3798 feat(ingestion): complete store directory — OSM locations for every chain
 - #3796 feat(web): municipality selector + fix date-fragile search-analytics fixture
 - #3795 feat(ingestion): load fuel grade prices into DB
 - #3794 feat(ingestion): load Apohem pharmacy products into the DB
@@ -57,7 +58,7 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 
 ## 🔄 In progress (open PRs)
 
-_(no open PRs)_
+- #3799 feat(data): per-store shelf prices (Matpriskollen) + price-matrix data structure
 
 ## 📋 To-do (from GOAL.md backlog)
 
