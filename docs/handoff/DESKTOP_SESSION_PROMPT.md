@@ -1,41 +1,61 @@
-# Desktop Claude Code — kickoff for the Figma homepage art
+# Desktop Claude Code — finish the GroceryView homepage art (fully automated, no AI credits)
 
-**Folder to open:** `/Users/billy/GroceryView` (NOT `grocery-map-build` — that's a stale secondary checkout on an unrelated branch with no node_modules).
-**Branch:** `feat/figma-homepage` (already checked out; PR #3808 open against main).
-**Current state:** search-first homepage scaffold is live and pushed (real search hero + slim ticker with real data + reused calm sections). The hero art is a CSS-gradient PLACEHOLDER inside `apps/web/src/components/home/geometric-hero-art.tsx` (`.gv-art` wrapper). Everything is ready to receive real Figma art.
+**Paste the prompt in the box below into Desktop Claude Code, opened in folder `/Users/billy/GroceryView`. That's it — it does everything itself: sources free art, recolors it, wires it in, screenshots variants, lets you pick, finalizes, and pushes.**
 
----
-
-## Step A — get an art frame (you have none yet)
-
-Easiest path = **Figma Make** (AI generates the art; no manual design needed). In figma.com → Make → New, paste:
-
-> A geometric data-collage hero illustration for a Nordic grocery price-comparison website. Editorial, Scandinavian, Bloomberg-terminal feel on warm-cream paper (oklch 96.5% 0.012 78). Asymmetric, right-weighted composition: offset rectangles, thin rule lines, a sparkline/price-chart motif, concentric arcs, small data ticks. Accent colors used sparingly: burgundy, deep forest green, neon-lime (ONE small pop only), purple, mustard-yellow. Calm and sophisticated, not busy. Leave the left side open for a large search bar. Decorative only — no text.
-
-Then right-click the frame → **Copy link to selection**. That URL is your frame.
-
-(Alternatives: design it yourself in Figma; or grab a free editorial/geometric SVG from unDraw / Figma Community and skip Figma entirely.)
+(Open `/Users/billy/GroceryView` — NOT `grocery-map-build`, that's a stale checkout.)
 
 ---
 
-## Step B — paste this prompt into Desktop Claude Code
+## PROMPT — copy everything below this line
 
-> **Context:** Working in `/Users/billy/GroceryView` (npm workspaces monorepo — use `npm`, NOT pnpm; `node` is the Codex.app bundled binary). I'm on branch `feat/figma-homepage` (has all features; PR #3808 open against main). Push with `GH_TOKEN=$(gh auth token -u SzeChunYiu) git push origin feat/figma-homepage` — always SzeChunYiu, NEVER Babbloo. Commit trailer: `Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>`.
->
-> **Read first:** `docs/handoff/DESIGN_SPEC_three-style-blend.md` (the brief). The search-first homepage scaffold already exists at `apps/web/src/components/home/search-first-home.tsx` + `geometric-hero-art.tsx` (currently a gradient placeholder). Build on it — don't redo it. See `git log --oneline origin/main..HEAD`.
->
-> **Figma is the art source.** Verify the Figma MCP is live with `/mcp` (tools are `mcp__...Figma__*`). My homepage hero art frame: **[PASTE FIGMA FRAME URL HERE]**.
->
-> **Do this:**
-> 1. Pull that frame via the Figma MCP (`get_design_context` / `get_code` / `get_image` / `get_variable_defs`). Export raster/vector art as optimized assets into `apps/web/public/`.
-> 2. Replace the placeholder in `geometric-hero-art.tsx` with the REAL Figma art, integrated faithfully (not machine-invented shapes). Keep it decorative (`aria-hidden`, `pointer-events:none`), behind/right of the search field, low enough not to compete.
-> 3. Map any Figma color variables → the `--gv-*` / `--art-*` tokens already in `globals.css` (extend, don't rename). Art colors stay decorative-only; cards/tables/forms/CTAs stay calm + WCAG AA.
-> 4. **Verify before claiming done:** `cd apps/web && npm run dev`; `curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/` must be 200; headless-Chrome screenshot and visually confirm it matches the Figma frame. Fix all compile/TS errors (`npx tsc --noEmit`). Update any homepage literal-string contract tests in `apps/web/scripts/*.test.mjs` (update assertions, don't delete tests).
-> 5. Commit in logical chunks, push to `feat/figma-homepage`, report honestly what matches the frame and what doesn't.
->
-> Hold a high design bar — only report success for what you verified with a 200 + a screenshot you actually looked at.
+You are finishing the homepage redesign for the GroceryView Next.js app. Automate the WHOLE thing end to end — source the art yourself, integrate it, verify it, and only stop to let me pick between rendered options. Do NOT ask me to find art or design anything; I have no AI credits, so use FREE pre-made open-license assets, not AI generation.
+
+### Environment (hard facts)
+- Repo: `/Users/billy/GroceryView`. npm workspaces monorepo — use `npm`, NOT pnpm (pnpm/corepack are not installed). `node` is the Codex.app bundled binary, already on PATH. Deps already installed.
+- You are on branch `feat/figma-homepage` (cut from current origin/main, has all features). PR #3808 is open against main. DO NOT switch/rebase/merge branches. Additive work only — never break the working homepage.
+- Push: `cd /Users/billy/GroceryView && GH_TOKEN=$(gh auth token -u SzeChunYiu) git push origin feat/figma-homepage`. ALWAYS the SzeChunYiu account (run `gh auth switch -u SzeChunYiu` first). NEVER Babbloo.
+- Commit trailer: `Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>`. Never skip hooks.
+- Dev server: `cd apps/web && npm run dev` → http://localhost:3000 (Next 16, Turbopack; compiles route on first request).
+
+### Read first
+- `docs/handoff/DESIGN_SPEC_three-style-blend.md` — the design brief.
+- Existing scaffold (build on it, don't redo): `apps/web/src/components/home/search-first-home.tsx` and `apps/web/src/components/home/geometric-hero-art.tsx` (currently a CSS-gradient PLACEHOLDER). The homepage is already search-first with a real ticker + reused sections, HTTP 200. Your job is to replace the placeholder with real, designed art and polish the hero.
+- Design tokens already exist in `apps/web/src/app/globals.css`: core `--gv-*` palette + a `.gv-art`-scoped art palette `--art-burgundy/forest/lime/purple/yellow`. Recolor all art to these tokens.
+
+### The style target
+Geometric / editorial "data-collage" on warm-cream paper. Scandinavian calm + a Bloomberg-terminal hint: offset rectangles, thin rule lines, a sparkline/price-chart motif, concentric arcs, small data ticks. Accents from the `--art-*` tokens used SPARINGLY (neon-lime = one tiny pop only). Decorative only, must not compete with the search field, must sit behind/right of it.
+
+### Source the art yourself — FREE, open-license only (no AI, no credits)
+Fetch real assets via direct URLs with WebFetch/curl into `apps/web/public/art/`. Prefer these, in order:
+1. **Hero Patterns** (heropatterns.com) — free CC0 geometric SVG patterns (e.g. "Graph Paper", "Diagonal Lines", "Hexagons", "Circuit Board"). Inline the SVG, recolor to `--art-*`. Great for a subtle textured backdrop.
+2. **SVGBackgrounds.com / Haikei-style** generated geometric SVGs (low-poly, blob, stacked-waves) if downloadable as static SVG.
+3. **unDraw** (undraw.co) — open-license editorial SVG illustrations; pick a data/finance/shopping/chart-themed one, recolor via its single-color theme to terracotta.
+4. **Tabler Icons / Lucide** (CC/ISC) — for sparkline, candlestick, trending-up, grid-dot motifs to compose the collage.
+Verify each asset's license is CC0/MIT/open and attribution-free (or add attribution to a `apps/web/public/art/CREDITS.md` if required). If a URL fails, fall back to the next source or hand-compose a tasteful collage from the icon primitives above — but prefer real downloaded assets.
+
+### Build it — produce 2-3 distinct hero variants
+Compose 2 or 3 genuinely different hero-art treatments (e.g. A = subtle Hero-Patterns texture backdrop; B = an unDraw editorial illustration offset right; C = a layered geometric collage from icon primitives + sparkline). Each:
+- Lives in/!under `geometric-hero-art.tsx` (a `variant` prop is fine), inside the `.gv-art` wrapper, `aria-hidden`, `pointer-events:none`, respects `prefers-reduced-motion`.
+- Recolored ONLY with `--art-*` tokens. Cards/tables/forms/CTAs stay calm + WCAG AA — art tokens must not leak onto them.
+
+### Verify EACH variant (mandatory — no claims without proof)
+For each variant: start dev server, `curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/` must be 200, then headless-Chrome screenshot to `/tmp/gv-variant-{A,B,C}.png`:
+`"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --disable-gpu --hide-scrollbars --virtual-time-budget=12000 --screenshot=/tmp/gv-variant-A.png --window-size=1440,2200 http://localhost:3000/`
+Read each PNG and confirm it actually looks polished. Fix all compile/TS errors (`npx tsc --noEmit`).
+
+### STOP and let me choose
+Show me the 2-3 screenshots and a one-line description of each. Ask which variant I want (this is the ONLY thing you ask me). Then:
+
+### Finalize
+- Set the chosen variant as the hero, delete the others' dead code/assets.
+- Update any homepage literal-string contract tests in `apps/web/scripts/*.test.mjs` + `design-tokens.test.mjs` (update assertions to match new content; don't delete or weaken tests).
+- Final verify: 200 + screenshot + `npx tsc --noEmit` clean.
+- Commit in logical chunks, push to `feat/figma-homepage`, stop the dev server (`lsof -ti:3000 | xargs kill`).
+- Report honestly: what shipped, the screenshot paths, test pass/fail, asset sources + licenses, anything imperfect.
+
+Hold a high design bar. Only report success for what you verified with a 200 + a screenshot you actually looked at. If something can't be done cleanly, say so plainly rather than faking it.
 
 ---
 
-## Phase 2b (later, separate PR) — Bloomberg-dense Market page
-Move the "Nordic price index" chart hero to the Market page; add price-index board, heatmaps, sector breakdown, watchlist, multi-series charts; empty-state/404 art. Not part of this homepage PR.
+## After this lands
+Phase 2b (separate PR, later): Bloomberg-dense Market page — move the "Nordic price index" chart hero there; add price-index board, heatmaps, sector breakdown, watchlist, multi-series charts; empty-state/404 art.
