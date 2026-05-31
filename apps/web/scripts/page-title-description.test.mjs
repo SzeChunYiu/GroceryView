@@ -18,6 +18,6 @@ test('important pages expose route metadata and readable headings', () => {
   for (const page of pages) {
     const source = readFileSync(new URL(`../${page}`, import.meta.url), 'utf8');
     assert.match(source, /routeMetadata|metadataForSearch|metadataForPolicyRoute/, `${page} should define metadata`);
-    assert.match(source, /<h1|PageQuestionHeader|MvpHomePage|PharmacyPage/, `${page} should include a human heading`);
+    assert.match(source, /<h1|PageQuestionHeader|MvpHomePage|SearchFirstHome|PharmacyPage/, `${page} should include a human heading`);
   }
 });

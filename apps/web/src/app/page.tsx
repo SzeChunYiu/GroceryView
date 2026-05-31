@@ -1,4 +1,4 @@
-import { MvpHomePage } from '@/components/mvp/mvp-home-page';
+import { SearchFirstHome } from '@/components/home/search-first-home';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -6,5 +6,5 @@ export function generateMetadata() {
 }
 
 export default function HomePage() {
-  return <MvpHomePage />;
+  return <SearchFirstHome />;
 }
