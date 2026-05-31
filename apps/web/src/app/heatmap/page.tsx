@@ -173,7 +173,7 @@ export default function HeatmapPage() {
                         <Link
                           aria-label={`${row.label} ${chain.chainId} index ${cell ? cell.index.toFixed(1) : 'not available'}: ${stateToken.label}. ${stateToken.meaning}.`}
                           className={`block min-h-24 rounded-lg border p-3 transition ${indexTone(cell?.index ?? null)}`}
-                          href={`/index/${symbol}`}
+                          href={`/grocery-index/${symbol}`}
                         >
                           <span className="mb-2 inline-flex items-center gap-1 rounded-full bg-white/75 px-2 py-1 text-[0.65rem] font-black uppercase tracking-[0.12em]">
                             <span aria-hidden="true">{stateToken.indicator}</span>

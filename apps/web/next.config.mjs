@@ -20,7 +20,17 @@ const nextConfig = {
       { protocol: 'https', hostname: 'images.openbeautyfacts.org' }
     ]
   },
-  reactStrictMode: true
+  reactStrictMode: true,
+  async redirects() {
+    // The "/index" route was renamed to "/grocery-index": a route literally named
+    // `index` collides with Next's root-`/` build output (`app/index.*`), so its
+    // server bundle (`app/index/page.js`) is never emitted and Vercel's Linux file
+    // collector fails with ENOENT. Preserve the old URLs for links/SEO.
+    return [
+      { source: '/index', destination: '/grocery-index', permanent: true },
+      { source: '/index/:symbol', destination: '/grocery-index/:symbol', permanent: true }
+    ];
+  }
 };
 
 export default withNextIntl(nextConfig);

@@ -7,7 +7,7 @@ import { categorySummaries, formatPct, formatSek } from '@/lib/verified-data';
 export const dynamic = 'force-dynamic';
 
 export function generateMetadata() {
-  return routeMetadata('/index');
+  return routeMetadata('/grocery-index');
 }
 
 type LandingShortcut = {
