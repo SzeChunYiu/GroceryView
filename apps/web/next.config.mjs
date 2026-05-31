@@ -5,7 +5,11 @@ const withNextIntl = createNextIntlPlugin('./src/i18n-request.ts');
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    webpackBuildWorker: false
+    webpackBuildWorker: false,
+    // Vercel Hobby build containers are ~8GB; this build peaks near 6GB and was
+    // flakily OOM-killed (SIGKILL) on deploy. Trade a little build speed for a
+    // markedly lower webpack memory ceiling so deploys are reliable.
+    webpackMemoryOptimizations: true
   },
   images: {
     deviceSizes: [320, 420, 640, 768, 1024, 1280],

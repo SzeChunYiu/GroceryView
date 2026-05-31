@@ -46,9 +46,9 @@ const routeContracts = [
     required: [/verified OSM coordinates/, /Source confidence|confidence\/coverage/, /without inventing branch-level basket prices/]
   },
   {
-    route: '/index',
-    label: 'index',
-    files: ['src/app/index/page.tsx'],
+    route: '/grocery-index',
+    label: 'grocery index',
+    files: ['src/app/grocery-index/page.tsx'],
     required: [/OpenPrices rows/, /historical conversions/, /max spread/]
   },
   {

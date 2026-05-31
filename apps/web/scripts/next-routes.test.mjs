@@ -4109,7 +4109,7 @@ ${seo}`;
   });
 
   it('emits source-backed ItemList JSON-LD on category index pages', async () => {
-    const source = await read('src/app/index/[symbol]/page.tsx');
+    const source = await read('src/app/grocery-index/[symbol]/page.tsx');
 
     assert.match(source, /type="application\/ld\+json"/);
     assert.match(source, /'@type': 'ItemList'/);
