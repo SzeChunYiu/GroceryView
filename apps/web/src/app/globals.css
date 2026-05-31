@@ -55,6 +55,22 @@
   --gv-text-small: 14px;
   --gv-text-micro: 12px;
 
+  /* v3 oklch core palette (warm-cream paper system) */
+  --gv-bg-warm: oklch(96.5% 0.012 78);
+  --gv-surface-warm: oklch(98% 0.008 78);
+  --gv-ink-v3: oklch(18% 0.020 250);
+  --gv-rule: oklch(86% 0.014 78);
+  --gv-terracotta: oklch(48% 0.16 38);
+  --gv-up: oklch(46% 0.14 152);
+  --gv-down: oklch(48% 0.18 25);
+  --gv-warn-v3: oklch(58% 0.14 80);
+  --gv-info-v3: oklch(42% 0.14 240);
+
+  /* Font tokens (set via next/font in layout) */
+  --font-display: 'Newsreader', Georgia, serif;
+  --font-body: 'Inter Tight', 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+
   /* Legacy aliases */
   --gv-page-bg: var(--gv-bg);
   --gv-page-fg: var(--gv-ink);
@@ -99,6 +115,15 @@ textarea {
 ::selection {
   background: var(--gv-primary);
   color: white;
+}
+
+/* Art palette — scoped to .gv-art zones ONLY. Never on cards/tables/forms/buttons. */
+.gv-art {
+  --art-burgundy: oklch(38% 0.13 12);
+  --art-forest: oklch(45% 0.12 152);
+  --art-lime: oklch(88% 0.22 128);
+  --art-purple: oklch(48% 0.18 300);
+  --art-yellow: oklch(86% 0.16 95);
 }
 
 @media (prefers-reduced-motion: reduce) {

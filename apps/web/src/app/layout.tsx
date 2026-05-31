@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { Newsreader, Inter_Tight, JetBrains_Mono } from 'next/font/google';
 import { CoreWebVitalsReporter } from '@/components/core-web-vitals-reporter';
 import { PwaInstall } from '@/components/pwa-install';
 import { ConsentManager } from '@/components/consent-manager';
@@ -13,6 +14,31 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import './globals.css';
 import '@/styles/print.css';
 import '../styles/a11y.css';
+
+const fontDisplay = Newsreader({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  style: ['normal', 'italic'],
+  variable: '--font-display',
+  display: 'swap',
+  fallback: ['Georgia', 'Times New Roman', 'serif']
+});
+
+const fontBody = Inter_Tight({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800', '900'],
+  variable: '--font-body',
+  display: 'swap',
+  fallback: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'sans-serif']
+});
+
+const fontMono = JetBrains_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  variable: '--font-mono',
+  display: 'swap',
+  fallback: ['Fira Code', 'ui-monospace', 'monospace']
+});
 
 const siteUrl = 'https://grocery-web-mu.vercel.app';
 // JsonLd renders a script with type="application/ld+json" and the helper emits '@type': 'Organization', '@type': 'WebSite', SearchAction, query-input, and https://grocery-web-mu.vercel.app.
@@ -59,7 +85,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="sv" suppressHydrationWarning>
+    <html lang="sv" suppressHydrationWarning className={`${fontDisplay.variable} ${fontBody.variable} ${fontMono.variable}`}>
       <body>
         <SkipLink />
         <div id="main-content" tabIndex={-1}>
