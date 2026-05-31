@@ -15,5 +15,5 @@ test('heatmap route locks row, column, tone, and cell-link semantics', async () 
   assert.match(heatmap, /if \(value <= 103\).*amber/s);
   assert.match(heatmap, /return 'border-red-300 bg-red-100 text-red-950 hover:bg-red-200'/);
   assert.match(heatmap, /row\.cells\.map\(\(\{ chain, cell \}\) => \{/);
-  assert.match(heatmap, /href=\{`\/index\/\$\{symbol\}`\}/);
+  assert.match(heatmap, /href=\{`\/grocery-index\/\$\{symbol\}`\}/);
 });

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+import { BrandArtEmptyBackdrop } from '@/components/brand-art/brand-art-empty-backdrop';
 
 export function NoVerifiedDataPanel({
   title = 'No verified data yet',
@@ -11,7 +12,9 @@ export function NoVerifiedDataPanel({
   action?: ReactNode;
 }>) {
   return (
-    <section className="rounded-[1.75rem] border border-amber-200 bg-amber-50 p-5">
+    <div className="relative" data-brand-art-empty-state>
+      <BrandArtEmptyBackdrop />
+      <section className="relative z-10 rounded-[1.75rem] border border-amber-200 bg-amber-50/95 p-5">
       <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-800">Fail-closed panel</p>
       <h2 className="mt-2 text-2xl font-black tracking-tight text-amber-950">{title}</h2>
       <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-amber-950">{message}</p>
@@ -28,5 +31,6 @@ export function NoVerifiedDataPanel({
         )}
       </div>
     </section>
+    </div>
   );
 }

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { BrandArtMarketAccent } from '@/components/brand-art';
 import { GroceryViewSurfaceAnalytics } from '@/components/analytics/groceryview-surface-analytics';
 import { CategoryPreviewDrawer } from '@/components/preview/category-preview-drawer';
 import { PublicAdSlot } from '@/components/public-ad-slot';
@@ -108,6 +109,7 @@ export default async function MarketPage({ searchParams }: Readonly<{ searchPara
     <PageShell data-gv-surface="market">
       <GroceryViewSurfaceAnalytics surface="market" />
       <MvpBreadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Market' }]} />
+      <BrandArtMarketAccent />
       <PageQuestionHeader
         eyebrow="Market overview"
         question="Which grocery prices are rising or falling?"

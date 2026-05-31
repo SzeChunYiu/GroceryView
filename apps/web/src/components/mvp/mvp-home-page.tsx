@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { PriceDropDiscoveryRail } from '@/app/page-sections/trending';
+import { BrandArtHeroShell } from '@/components/brand-art';
 import { FeaturePlacementMap } from '@/components/feature-placement-map';
 import { PageShell } from '@/components/data-ui';
 import { getHomePageData } from '@/lib/mvp/data';
@@ -14,57 +15,69 @@ import { EvidenceStrip } from './evidence-strip';
 import { PublicAdSlot } from '@/components/public-ad-slot';
 import { KpiCard } from './visual-intelligence';
 
+const DOMAIN_CHIPS = [
+  { label: 'Grocery', href: '/browse' },
+  { label: 'Pharmacy OTC', href: '/pharmacy' },
+  { label: 'Fuel', href: '/fuel' }
+] as const;
+
 export function MvpHomePage() {
   const data = getHomePageData();
   return (
     <PageShell>
-      <PageQuestionHeader
-        eyebrow="Verified grocery intelligence"
-        question="Where can I save money on groceries today?"
-        title="Compare grocery prices before you shop."
-        subtitle="GroceryView checks prices, deals, stores, and market trends using verified grocery data. Start with a deal, a product, a store, or the market overview."
-        actions={
-          <>
-            <Link className="rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white" href="/search">
-              Search products
-            </Link>
-            <Link className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-black text-emerald-900" href="/browse">
-              Browse categories
-            </Link>
-            <Link className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-black text-emerald-900" href="/deals">
-              See deals
-            </Link>
-            <Link className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-black text-emerald-900" href="/market">
-              Open market overview
-            </Link>
-            <Link className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-black text-emerald-900" href="/map">
-              View price map
-            </Link>
-          </>
-        }
-        evidence={
-          <p className="text-sm font-semibold text-slate-600">
-            Snapshot {formatDate(data.snapshotGeneratedAt)} · {data.productCount.toLocaleString('sv-SE')} verified products ·{' '}
-            {data.categoryCount.toLocaleString('sv-SE')} categories with observations
-          </p>
-        }
-      />
+      <BrandArtHeroShell className="mt-0">
+        <div className="rounded-[1.85rem] border border-white/20 bg-white/95 p-6 shadow-sm backdrop-blur-sm">
+          <PageQuestionHeader
+            eyebrow="Verified grocery intelligence"
+            question="Where can I save money on groceries today?"
+            title="Compare grocery prices before you shop."
+            subtitle="Start with search, then jump into grocery, pharmacy OTC, or fuel comparisons backed by verified observations."
+            actions={
+              <Link
+                className="rounded-full bg-emerald-800 px-5 py-2.5 text-sm font-black text-white shadow-sm ring-2 ring-emerald-600/30"
+                data-home-primary-cta="search"
+                href="/search"
+              >
+                Search groceries
+              </Link>
+            }
+            evidence={
+              <p className="text-sm font-semibold text-slate-600">
+                Snapshot {formatDate(data.snapshotGeneratedAt)} · {data.productCount.toLocaleString('sv-SE')} verified products ·{' '}
+                {data.categoryCount.toLocaleString('sv-SE')} categories with observations
+              </p>
+            }
+          />
 
-      <form action="/search" className="mt-6 flex flex-col gap-2 sm:flex-row">
-        <label className="sr-only" htmlFor="mvp-home-search">
-          Search groceries
-        </label>
-        <input
-          className="min-w-0 flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-base font-semibold text-slate-950 shadow-sm"
-          id="mvp-home-search"
-          name="q"
-          placeholder="Search milk, bread, coffee…"
-          type="search"
-        />
-        <button className="rounded-2xl bg-emerald-800 px-5 py-3 text-sm font-black text-white" type="submit">
-          Search
-        </button>
-      </form>
+          <div aria-label="Domain shortcuts" className="mt-4 flex flex-wrap gap-2" data-domain-chips>
+            {DOMAIN_CHIPS.map((chip) => (
+              <Link
+                className="rounded-full border-2 border-violet-400/80 bg-white px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-violet-950 shadow-sm hover:bg-violet-50"
+                href={chip.href}
+                key={chip.href}
+              >
+                {chip.label}
+              </Link>
+            ))}
+          </div>
+
+          <form action="/search" className="mt-5 flex flex-col gap-2 sm:flex-row">
+            <label className="sr-only" htmlFor="mvp-home-search">
+              Search groceries
+            </label>
+            <input
+              className="min-w-0 flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-base font-semibold text-slate-950 shadow-sm"
+              id="mvp-home-search"
+              name="q"
+              placeholder="Search milk, bread, coffee…"
+              type="search"
+            />
+            <button className="rounded-2xl bg-emerald-800 px-5 py-3 text-sm font-black text-white" type="submit">
+              Search
+            </button>
+          </form>
+        </div>
+      </BrandArtHeroShell>
 
       <div className="mt-6">
         <PublicAdSlot slotId="home_after_hero" />
@@ -89,6 +102,21 @@ export function MvpHomePage() {
               </dl>
             </Link>
           ))}
+        </div>
+      </section>
+
+      <section className="mt-6" aria-label="Quick routes">
+        <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">Quick routes</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Link className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-black text-emerald-900" href="/deals">
+            See deals
+          </Link>
+          <Link className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-black text-emerald-900" href="/market">
+            Open market overview
+          </Link>
+          <Link className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-black text-emerald-900" href="/map">
+            View price map
+          </Link>
         </div>
       </section>
 
