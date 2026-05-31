@@ -104,7 +104,7 @@ export async function generateMetadata({ params }: Readonly<{ params: Promise<{ 
 
   const label = category?.label ?? `${chain?.chainId ?? symbol} chain index`;
   return routeMetadata({
-    path: `/index/${symbol}`,
+    path: `/grocery-index/${symbol}`,
     title: `${label} | GroceryView`,
     description: 'Observed GroceryView price index page with fixed-basket and chain-price index calculations.',
     imagePath: '/pwa-icon.svg',

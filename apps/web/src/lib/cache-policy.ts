@@ -42,7 +42,7 @@ const publicMarketPagePaths = new Set([
   '/expiry-deals',
   '/fuel',
   '/heatmap',
-  '/index',
+  '/grocery-index',
   '/map',
   '/meal-cost',
   '/new-arrivals',

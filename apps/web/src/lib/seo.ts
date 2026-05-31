@@ -207,7 +207,7 @@ export const routeMetadataCatalog = {
     title: 'Household grocery planning gate | GroceryView',
     description: 'Household planning stays unavailable until verified private profile and basket records are connected.'
   },
-  '/index': {
+  '/grocery-index': {
     title: 'Personalized grocery index shortcuts | GroceryView',
     description: 'Browse household-ranked grocery index shortcuts with verified category medians, OpenPrices row counts, and cross-chain spread context.'
   },
