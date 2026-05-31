@@ -2,8 +2,11 @@
 
 **Goal:** move from "clean and functional" to "distinctive, polished, top ~10% data-product site" — flirting with Awwwards/CSSDA tier — using Claude Code, free assets, and motion. No AI credits required.
 
+## Scope: 2D ONLY
+No WebGL, no 3D, no shaders, no canvas 3D. Everything is 2D: SVG, CSS, HTML, 2D motion. This is deliberate and it HELPS — 2D flat/editorial design is exactly where code craft competes head-on with award winners, and it removes the one area (3D/WebGL) where Claude Code is hit-or-miss. Any earlier mention of WebGL/shader heroes is void.
+
 ## Honest ceiling (read this first)
-Claude Code CAN deliver: world-class **layout, typography, color craft, motion/micro-interactions, polish**, and competent **WebGL/canvas** hero effects. Claude Code CANNOT originate **bespoke illustration / hand-drawn / 3D art** — that needs a human illustrator, a commission, or Figma Make. The realistic target here is award-*adjacent* through craft + motion, with art filled by free open-license assets. The biggest, most underused lever is **motion** (100% code, zero credits).
+In the 2D space, Claude Code CAN deliver world-class **layout, typography, color craft, 2D motion/micro-interactions, SVG art composition, and polish** — genuinely award-adjacent. Claude Code CANNOT originate **bespoke hand-drawn illustration** — that needs a human illustrator, a commission, or Figma Make; but it CAN compose strong 2D art from geometric SVG, free open-license illustration (recolored), and animated SVG. The biggest, most underused lever is **2D motion** (100% code, zero credits).
 
 To calibrate the bar, the user should drop 3-5 competition-winner URLs/screenshots into `docs/handoff/REFERENCES/` — the motion/type/grid techniques get extracted from those and applied here.
 
@@ -37,20 +40,21 @@ Add ONLY interaction primitives (not cards/charts — those stay bespoke):
 - `Select`, `Popover`, `Tooltip` → themed to `--gv-*`.
 - Build `<MarketTicker>` (extract from homepage inline), and the Market **price-index board** for phase 2b.
 
-## Phase 4 — Motion layer (the award-tier lever, code-only)
-This is where "wow" comes from. Add tastefully, respect `prefers-reduced-motion`:
-- Library: Framer Motion (or CSS scroll-driven animations + a little GSAP for sequenced hero).
-- Hero: staggered entrance, search field focus choreography, subtle parallax on the geometric art.
+## Phase 4 — 2D motion layer (the award-tier lever, code-only)
+This is where "wow" comes from — all 2D. Add tastefully, respect `prefers-reduced-motion`:
+- Library: Framer Motion (or CSS scroll-driven animations + a little GSAP for sequenced hero). 2D transforms/opacity only.
+- Hero: staggered entrance, search field focus choreography, subtle 2D parallax (translate/scale) on the geometric SVG art.
 - Market ticker: real continuous marquee with eased pauses on hover.
-- Charts: draw-on animation (PriceChartTerminal line reveal), number count-ups on KPIs.
+- Charts: SVG line draw-on (stroke-dashoffset), number count-ups on KPIs.
 - Lists/cards: stagger-in on scroll (IntersectionObserver), hover lift with spring easing.
 - Page transitions: view-transition API / Framer layout transitions.
+- Animated SVG art: morphing/looping geometric SVG in the hero (2D), not a 3D canvas.
 - Loading: skeleton choreography, not spinners.
 
-## Phase 5 — Art assets (free, no credits)
-- Hero / accent / empty-state art: Hero Patterns (CC0 geometric), unDraw (recolor to terracotta), Tabler/Lucide motifs — per `DESKTOP_SESSION_PROMPT.md`. Build 2-3 variants, user picks.
-- Optional WebGL hero: a tasteful generative shader/canvas backdrop (Claude-authored) as one variant — judge by screenshot, keep only if it looks intentional.
-- TRUE bespoke illustration (if user wants it): commission a human or use Figma Make — out of code scope; flagged honestly.
+## Phase 5 — 2D art assets (free, no credits)
+- Hero / accent / empty-state art: Hero Patterns (CC0 geometric SVG), unDraw (flat 2D SVG illustration, recolor to terracotta), Tabler/Lucide motifs, SVGBackgrounds/Haikei (flat low-poly/blob/wave SVG) — per `DESKTOP_SESSION_PROMPT.md`. Build 2-3 variants, user picks.
+- All art is flat 2D SVG/vector — no 3D, no WebGL, no shader/canvas.
+- TRUE bespoke 2D illustration (if user wants it): commission a human illustrator or use Figma Make — out of code scope; flagged honestly.
 
 ## Phase 6 — Measure (real optimization, not vibes)
 - Lighthouse / Core Web Vitals (repo has `perf:lighthouse:ci`), INP, bundle budget (`perf:bundle:budget`).
